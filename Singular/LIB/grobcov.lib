@@ -28,7 +28,7 @@ IMPORTANT: Recently published book:
            the  routines included in this library.
            It defines and proves all the theoretic results used
            in the library,  and shows examples of all the routines.
-           There are many previous papers realted to the subject,
+           There are many previous papers related to the subject,
            and the book actualices all the contents.
 
 AUTHORS:  Antonio Montes (Universitat Politecnica de Catalunya),
@@ -202,7 +202,7 @@ envelop(F,C); Special routine for determining the envelop
           of a family of hyper-surfaces F  in
           Q[x1,..,xn][t1,..,tm] depending on an ideal of
           constraints C in Q[t1,..,tm]. It computes the
-          locus of the envelop, and detemines the
+          locus of the envelop, and determines the
           different components as well as its taxonomy:
           \"Normal\", \"Special\", \"Accumulation\",
           \"Degenerate\". (See help for locus).
@@ -246,7 +246,7 @@ WLemma(F,A); Given an ideal F in Q[a][x] and an ideal A
 WLCGS(F);  Given a parametric ideal F in Q[a][x]
           determines a CGS in full-representation using WLemma
 
-intersectpar(L); Auxiliary routine. Given a list of ideals definend on K[a][x]
+intersectpar(L); Auxiliary routine. Given a list of ideals defined on K[a][x]
          it determines the intersection of all of them in K[x,a]
 
 ADGT(H,T,H1,T1); Given 4 ideals H,T,H1,T1 in Q[a][x], corresponding to
@@ -256,7 +256,7 @@ ADGT(H,T,H1,T1); Given 4 ideals H,T,H1,T1 in Q[a][x], corresponding to
         Theorem.
         If H1=1 then H1 is not considered, and analogously for T1.
 
-ConsLevels(A); Given a list of locally colsed sets, constructs the
+ConsLevels(A); Given a list of locally closed sets, constructs the
         canonical representation of the levels of A an its complement.
 
 Levels(L); Transforms the output of ConsLevels
@@ -889,8 +889,8 @@ static proc cld(ideal J)
 };
 
 // simpqcoeffs : simplifies a quotient of two polynomials
-// input: two coeficients (or terms), that are considered as a quotient
-// output: the two coeficients reduced without common factors
+// input: two coefficients (or terms), that are considered as a quotient
+// output: the two coefficients reduced without common factors
 static proc simpqcoeffs(poly n,poly m)
 {
   def nc=content(n);
@@ -3394,7 +3394,7 @@ static proc searchinlist(intvec c,list L)
 // Output: S=(w_1,..,w_j)
 //    where the w_l=(n_l1,..,n_ls) are intvec of length size(L), where
 //    n_lt fixes which element of (v_t1,..,v_tk_t) is to be
-//    choosen to form the tth (Q,P) for the lth element of the sheaf
+//    chosen to form the tth (Q,P) for the lth element of the sheaf
 //    representing the I-regular function.
 // The selection is done to obtian the minimal number of elements
 //    of the sheaf that specializes to non-null everywhere.
@@ -4507,7 +4507,7 @@ LLL;
 
 // Converts the output of ConsLevels, given by the set of closures of the Levels of the constructible S
 //     to an expression where the Levels are apparent.
-// Input: The ouput of ConsLevels of the form
+// Input: The output of ConsLevels of the form
 //    [A1,A2,..,Ak], where the Ai's are the closures of the levels.
 // Output: An expression of the form
 //      L1=[[1,[A1,A2]],[3,[A3,A4]],..,[2l-1,[A_{2l-1},A_{2l}]]] the list of Levels of S
@@ -4736,7 +4736,7 @@ static proc indepparameterspoly(B)
 
 // dimP0: Auxiliary routine
 // if the dimension in @P of an ideal in the parameters has dimension 0 then it returns 0
-// else it retuns 1
+// else it returns 1
 static proc dimP0(ideal N)
 {
   def RR=basering;
@@ -4757,7 +4757,7 @@ static proc dimP0(ideal N)
 }
 
 //  DimPar
-//  Auxilliary routine to NorSing determining the dimension of a parametric ideal
+//  Auxiliary routine to NorSing determining the dimension of a parametric ideal
 //  Does not use @P and define it directly because is assumes that
 //                              variables and parameters have been inverted
  static proc DimPar(ideal E)
@@ -4774,8 +4774,8 @@ static proc dimP0(ideal N)
  }
 
 //  DimPar
-//  Auxilliary routine to locus2 determining the dimension of a parametric ideal
-//  it is identical to DimPar but adds infromation about the character of the component
+//  Auxiliary routine to locus2 determining the dimension of a parametric ideal
+//  it is identical to DimPar but adds information about the character of the component
 static proc dimComp(ideal PA)
 {
   def RR=basering;
@@ -4965,7 +4965,7 @@ static proc determineF(ideal A,poly F,ideal E)
 
 
 // locus0(G): Private routine used by locus (the public routine), that
-//               builds the diferent components.
+//               builds the different components.
 // input:     The output G of the grobcov (in generic representation, which is the default option)
 //       Options: The algorithm allows the following options as pair of arguments:
 //               "moverdim", d  : by default moverdim is m=number of variables,
@@ -5180,12 +5180,12 @@ static proc locus0(list GG, list #)
 }
 
 // locus2(G): Private routine used by locus (the public routine), that
-//                builds the diferent components.
+//                builds the different components.
 // input:      The output G of the grobcov (in generic representation, which is the default option)
 //                The ideal F defining the locus problem (G is the grobcov of F and has been
 //                already determined by locus.
 //       Options: The algorithm allows the following options as pair of arguments:
-//                "moverdim", d  : by default moverdim is the number of variabes but it can
+//                "moverdim", d  : by default moverdim is the number of variables but it can
 //                 be set to minor values.
 //                "version", v   :  There are two versions of the algorithm. ('version',1) is
 //                 a full algorithm that always distinguishes correctly between 'Normal'
@@ -5345,7 +5345,7 @@ static proc locus2(list G, ideal F, list #)
  return(L);
 }
 
-// Auxilliary algorithm of locus2.
+// Auxiliary algorithm of locus2.
 //           The algorithm searches the basis corresponding to C, in the grobcov.
 //           It reduces the basis modulo the component.
 //           The result is the reduced basis BR.
@@ -5413,7 +5413,7 @@ static proc NS(ideal F,list G, ideal C, list N, list #)
   list LK;
   ideal bu;                               // ideal of all variables   (u)
   for(i=1;i<=nv;i++){bu[i]=var(i);}
-  ideal mv;                            // ideal of mover varibles
+  ideal mv;                            // ideal of mover variables
   for(i=1;i<=nv;i++){mv[size(mv)+1]=var(i);}
 
    // Searching the basis associated to C
@@ -5433,7 +5433,7 @@ static proc NS(ideal F,list G, ideal C, list N, list #)
    //"T_B=G[j0][2]="; B;
    //string("T_k0=",k0," G[",j0,"]="); G[j0];
 
-   // Searching the elements in Q[v_m]  on basis differents from B that are nul there
+   // Searching the elements in Q[v_m]  on basis different from B that are nul there
    // and cannot become 0 on the antiimage of B. They are placed on NoNul
    list NoNul;
    ideal BNoNul;
@@ -5520,7 +5520,7 @@ static proc NS(ideal F,list G, ideal C, list N, list #)
     BR[i]=reduce(BB[i],CC);
   }
 
-  // Computing the GB(B) inthe ring PR     lex(x,u)
+  // Computing the GB(B) in the ring PR     lex(x,u)
   BR=std(BR);
   ideal BRP;
 
@@ -5583,7 +5583,7 @@ static proc NS(ideal F,list G, ideal C, list N, list #)
   return(LKK);
 }
 
-// Auxilliary algorithm of locus2.
+// Auxiliary algorithm of locus2.
 //           The algorithm searches the basis corresponding to C, in the grobcov.
 //           It reduces the basis modulo the component.
 //           The result is the reduced basis BR.
@@ -5634,7 +5634,7 @@ static proc AISnonor(ideal C,list G, list #)
   list LK;
   ideal bu;                               // ideal of all variables   (u)
   for(i=1;i<=nv;i++){bu[i]=var(i);}
-  ideal mv;                            // ideal of mover varibles
+  ideal mv;                            // ideal of mover variables
   for(i=1;i<=nv;i++){mv[size(mv)+1]=var(i);}
 
    // Searching the basis associated to Nonor
@@ -5657,7 +5657,7 @@ static proc AISnonor(ideal C,list G, list #)
 }
 
 // NOT USED
-// Auxilliary algorithm of locus2.
+// Auxiliary algorithm of locus2.
 //           The algorithm searches the basis corresponding to C, in the grobcov.
 //           It reduces the basis modulo the component.
 //           The result is the reduced basis BR.
@@ -5719,9 +5719,9 @@ static proc NS5(ideal F,list G, ideal C, list N)
    def B=G[j0][2];     // basis associated to C
    //"T_B="; B;
 
-  // Searching the elements in Q[vmov]  on bases differents from B that are nul there
+  // Searching the elements in Q[vmov]  on bases different from B that are nul there
   // and cannot become 0 on the antiimage of C. They are placed on NoNul
-  list NoNul;          // elements in Q[vmov]  on bases differents from B
+  list NoNul;          // elements in Q[vmov]  on bases different from B
   ideal BNoNul;
   ideal covertop;   // basis of the segment whose top is a hole of our segment
   int te1;
@@ -5975,7 +5975,7 @@ stdlocus(S96);
 //               Elements 1 and 2 represent the P-canonical form of the component.
 //               The third element tax is:
 //                 for normal point components, tax=(d,taxonomy,anti-image)
-//                    being d=dimension of the anti-image on the mover varaibles,
+//                    being d=dimension of the anti-image on the mover variables,
 //                           taxonomy='Normal'  or  'Special', and
 //                           anti-image=ideal of the anti-image over the mover variables
 //                                which are taken to be the last n variables.
@@ -6024,7 +6024,7 @@ OPTIONS: An option is a pair of arguments: string, integer.
 
         \"moverdim\", k  to restrict the mover-variables of the
         anti-image to the last k variables.
-        By defaulat k is equal to the number of u-variables,
+        By default k is equal to the number of u-variables,
         The restriction to a smaller value
         can produce an error in the character
          \"Normal\" or \"Special\" of a locus component.
@@ -6045,7 +6045,7 @@ RETURN: The output is a list of the components:
         The third element tax is:
           for normal point components,
             tax=(d,taxonomy,anti-image) being
-             d=dimension of the anti-image on the mover varaibles,
+             d=dimension of the anti-image on the mover variables,
              taxonomy=\"Normal\"  or  \"Special\" and
              anti-image=ideal of the anti-image over the mover
              variables.
@@ -6739,7 +6739,7 @@ RETURN: list [lpp,basis,segment]. The basis determines
        The lpp determines the dimension of the set.
        The segment is the component and is given in Prep.
        Fixing the values of (x_1,..,x_n) inside E, the basis
-       allows to detemine the values of the parameters
+       allows to determine the values of the parameters
        (u_1,..u_m), of the hyper-surfaces passing at a point
        of E. See the book
        A. Montes. \"The Groebner Cover\" (Discussing
@@ -6914,7 +6914,7 @@ poly f=a*x^2*y+b*x*y+c*y;
 discrim(f,x);
 }
 
-// AddLocus: auxilliary routine for locus0 that computes the components of the constructible:
+// AddLocus: auxiliary routine for locus0 that computes the components of the constructible:
 // Input:  the list of locally closed sets to be added, each with its type as third argument
 //     L=[ [LC[11],..,LC[1k_1],.., [LC[r1],..,LC[rk_r] ] where
 //            LC[1]=[p1,[p11,..,p1k],typ]
@@ -7789,9 +7789,9 @@ ADGT(H,T,H1,T1,"neg",1);
 
 // Vertices of the triangle: A(-2,0), B(2,0), C(2a,2b)
 
-// Heigth foot: A1(x1,y1),
-// Heigth foot: B1(x2,y2),
-// Heigth foot: C1(2a,0)
+// Height foot: A1(x1,y1),
+// Height foot: B1(x2,y2),
+// Height foot: C1(2a,0)
 
 // Middle point BC:  A2(a+1,b)
 // Middle point CA:  B2 (a-1,b)

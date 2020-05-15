@@ -331,7 +331,7 @@ EXAMPLE: example grview; shows an example
 
     for( c = nc; c > 0; c-- )
     {
-      D[1, c+d] = c; // top row indeces
+      D[1, c+d] = c; // top row indices
       D[nr+2*d, c+d] = G[c]; // deg(v) + gr[ leadexp(v)[m] ]; // bottom row with computed column induced degrees
     }
 
@@ -342,7 +342,7 @@ EXAMPLE: example grview; shows an example
       {
         D[r+d, c+d] = deg(M[r, c]); // central block with degrees (-1 means zero entry)
       }
-      D[r+d, nc+2*d] = r; // right-most block with indeces
+      D[r+d, nc+2*d] = r; // right-most block with indices
     }
 
     if( nr == nc) // square matrix // detect diagonal?
@@ -457,7 +457,7 @@ proc grdeg(M)
 RETURN:  intvec of degrees
 PURPOSE: graded degrees of columns (generators) of M, describing the source of M
 ASSUME:  M must be a graded object (matrix/module/ideal/mapping)
-NOTE:    if M has zero cols it shoud have attrib(M,'degHomog') set.
+NOTE:    if M has zero cols it should have attrib(M,'degHomog') set.
 EXAMPLE: example grdeg; shows an example
 "
 {
@@ -1141,7 +1141,7 @@ example
 }
 
 proc grtest(def N, list #)
-"USAGE:  grtest(M[,b]), anyting M, optionally int b
+"USAGE:  grtest(M[,b]), anything M, optionally int b
 RETURN:  1 if M is a valid graded object, 0 otherwise
 PURPOSE: validate a graded object. Print an invalid object message if b is not given
 NOTE: M should be an ideal or module or matrix, with weighting attribute
@@ -1226,7 +1226,7 @@ EXAMPLE: example grtest; shows an example
 
   if( !homog(N) )
   {
-    if(b) { "   ? grtest: Input should be graded homogenous!"; };
+    if(b) { "   ? grtest: Input should be graded homogeneous!"; };
     return (0);
   };
 

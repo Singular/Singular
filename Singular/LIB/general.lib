@@ -24,9 +24,9 @@ PROCEDURES:
  watchdog(i,cmd);       only wait for result of command cmd for i seconds
  primecoeffs(J[,q]);    primefactors <= min(p,32003) of coeffs of J
  timeStd(i,d)           std(i) if the standard basis computation finished
-                        after d-1 seconds and i otherwhise
+                        after d-1 seconds and i otherwise
  timeFactorize(p,d)     factorize(p) if the factorization finished after d-1
-                        seconds otherwhise f is considered to be irreducible
+                        seconds otherwise f is considered to be irreducible
  factorH(p)             changes variables to become the last variable the
                         principal one in the multivariate factorization and
                         factorizes then the polynomial
@@ -1174,7 +1174,7 @@ example
 proc timeFactorize(poly i,list #)
 "USAGE:  timeFactorize(p,d); poly p , integer d
 RETURN:  factorize(p) if the factorization finished after d-1
-         seconds otherwhise f is considered to be irreducible
+         seconds otherwise f is considered to be irreducible
 EXAMPLE: example timeFactorize; shows an example
 "
 {
@@ -1191,7 +1191,7 @@ EXAMPLE: example timeFactorize; shows an example
       open(l_fork);
       write(l_fork, quote(timeFactorize(eval(i))));
 
-      // sleep in small intervalls for appr. one second
+      // sleep in small intervals for appr. one second
       if (wait > 0)
       {
         while(j < 1000000)
@@ -1201,7 +1201,7 @@ EXAMPLE: example timeFactorize; shows an example
         }
       }
 
-      // sleep in intervalls of one second from now on
+      // sleep in intervals of one second from now on
       j = 1;
       while (j < wait)
       {
@@ -1246,7 +1246,7 @@ example
 proc timeStd(ideal i,list #)
 "USAGE:  timeStd(i,d), i ideal, d integer
 RETURN:  std(i) if the standard basis computation finished after
-         d-1 seconds and i otherwhise
+         d-1 seconds and i otherwise
 EXAMPLE: example timeStd; shows an example
 "
 {

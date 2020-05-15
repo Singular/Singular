@@ -21,7 +21,7 @@ Mora, Teo: La queste del Saint Gr_a(A_L): A computational approach to local alge
 Marais, Magdaleen and Ren, Yue: Mora's holy graal: Algorithms for computing in localizations at prime ideals
 
 PROCEDURES:
-graalMixed(ideal L[,int t]);              contruct graalBearer
+graalMixed(ideal L[,int t]);              construct graalBearer
 dimensionOfLocalization(def L);           dimension of the localization A_L of A at L
 systemOfParametersOfLocalization(def L);  system of parameter of the localization A_L of A at L
 isLocalizationRegular(def L);             test if localization A_L of A at L is regular
@@ -170,7 +170,7 @@ static proc containsVariablesApartFromLast(poly g)
 
 /***
  * assuming that the ordering is lexicographical,
- * checks whether m is in general position with repect to it.
+ * checks whether m is in general position with respect to it.
  **/
 static proc isInGeneralPosition(ideal m)
 {
@@ -386,7 +386,7 @@ EXAMPLE:  example graalMixed; shows an example
     }
     else
     {
-      ERROR("graal: unexpected optional paramemters");
+      ERROR("graal: unexpected optional parameters");
       return(Gr);
     }
   }

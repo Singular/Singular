@@ -73,7 +73,7 @@ example
   staircase("",std(I));
 
   // Paste the output into a Mathematica notebook
-  // active evalutation of the cell with SHIFT RETURN
+  // active evaluation of the cell with SHIFT RETURN
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +91,7 @@ example
   mathinit();
 
   // Paste the output into a Mathematica notebook
-  // active evalutation of the cell with SHIFT RETURN
+  // active evaluation of the cell with SHIFT RETURN
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -337,7 +337,7 @@ example
    mplot("",I,J,"-2,2");
 
  // Paste the output into a Mathematica notebook
- // active evalutation of the cell with SHIFT RETURN
+ // active evaluation of the cell with SHIFT RETURN
 
  pause("Hit RETURN to continue");
    // --------- space curves --------------
@@ -345,7 +345,7 @@ example
    mplot("",I);
 
  // Paste the output into a Mathematica notebook
- // active evalutation of the cell with SHIFT RETURN
+ // active evaluation of the cell with SHIFT RETURN
 
  pause("Hit RETURN to continue");
    // ----------- surfaces -------------------
@@ -354,7 +354,7 @@ example
    mplot("",J,"-2,1","1,2");
 
  // Paste the output into a Mathematica notebook
- // active evalutation of the cell with SHIFT RETURN
+ // active evaluation of the cell with SHIFT RETURN
  kill rr0,rr1;
 }
 ///////////////////////////////////////////////////////////////////////////////

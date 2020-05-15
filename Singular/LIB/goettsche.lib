@@ -16,7 +16,7 @@ REFERENCES:
   [1] Drezet, Jean-Marc     Cohomologie des varie'te's de modules de hauter nulle.
                             Mathematische Annalen: 281, 43-85, (1988).
 
-  [2] Goettsche, Lothar,    The Betti numbers of the Hilbert scheme of ponts
+  [2] Goettsche, Lothar,    The Betti numbers of the Hilbert scheme of points
                             on a smooth projective surface.
                             Mathematische Annalen: 286, 193-208, (1990).
 
@@ -762,7 +762,7 @@ static proc PPolyW(int q, int m, int n, poly t, int d, list #)
   int j;
   list plg;// will be the matrix-list with all the data
   list newPlg;// will be used for computation of new entries of plg
-  // initial intitialization of plg, M entries
+  // initial initialization of plg, M entries
   for(i=1;i<=M;i++)
   {
     plg = plg + list( list()   );

@@ -63,8 +63,8 @@ PROCEDURES:
   evaluateProduct(list,list); Evaluate a list of products of group elements in terms of a given representation of the elements as permutations.
   GITfanSymmetric(list,intmat,cone,list); Compute GIT-fan from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
   GITfanParallelSymmetric(list, intmat, cone, list); Compute GIT-fan in parallel from orbit cones by determining a minimal representing set for the orbits of maximal dimensional GIT-cones.
-  bigintToBinary(bigint,int); Convert bigint into a sparse binary represenation specifying the indices of the one-entries
-  binaryToBigint(intvec); Convert sparse binary represenation specifying the indices of the one-entries to bigint
+  bigintToBinary(bigint,int); Convert bigint into a sparse binary representation specifying the indices of the one-entries
+  binaryToBigint(intvec); Convert sparse binary representation specifying the indices of the one-entries to bigint
   applyPermutationToIntvec(intvec,permutation); Apply permutation to a set of integers represented as an intvec
   hashToCone(bigint,list); Convert a bigint hash to a GIT-cone
   hashesToFan(list hashes,list OC)
@@ -1128,7 +1128,7 @@ static proc matrixToIntmat(matrix A){
 
 proc groupActionOnHashes(list Asigma, list OCmov)
 "USAGE: groupActionOnHashes(Asigma,OCmov); Asigma: list, OCmov: list of list of cones
-PURPOSE: From the list of orbits of orbitcones, and the symmetry group represenation given by the matrices in Asigma, compute the corresponding permutation representation of the symmetry group on the orbit cones. The permutations are specified in a map representation of length the sum of the size of the orbits of OCmov.
+PURPOSE: From the list of orbits of orbitcones, and the symmetry group representation given by the matrices in Asigma, compute the corresponding permutation representation of the symmetry group on the orbit cones. The permutations are specified in a map representation of length the sum of the size of the orbits of OCmov.
 RETURN: list of permutations
 EXAMPLE: example groupActionOnHashes; shows an example
 "
