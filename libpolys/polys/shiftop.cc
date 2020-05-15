@@ -927,6 +927,7 @@ ring freeAlgebra(ring r, int d, int ncGenCount)
     ring save = r;
     r = rPlusVar(r, varname, 0);
     omFreeSize(varname, 256);
+    if (r==NULL) return NULL; /* error in rPlusVar*/
     rDelete(save);
   }
   ring R=rCopy0(r);
