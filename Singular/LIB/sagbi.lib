@@ -174,7 +174,7 @@ static proc spolynomialsGB(ideal algebra,def r,int method)
   attrib(kernOld,"isSB",1);
   ideal kern=stdKernPhi(kernNew,kernOld,leadTermsAlgebra,method);
   dbprint(ppl-2,"//Spoly-2-1- ideal kern",kern);
-  //-------------------------- calulate algebraic relations -----------------------
+  //-------------------------- calculate algebraic relations -----------------------
   dbprint(ppl,"//Spoly-3- computing new algebraic relations");
   ideal algebraicRelations=nselect(kern,1..nvars(br));
   attrib(algebraicRelationsOld,"isSB",1);
@@ -449,14 +449,14 @@ static proc sagbiConstruction(ideal algebra, int iterations, int tailreduction, 
   algebra = canonicalform(algebra);
   ideal P=1;
   //note: P is initialized this way, so that the while loop is entered.
-  //P gets overriden there, anyhow.
+  //P gets overridden there, anyhow.
   ideal varsBasering=maxideal(1);
   map phi;
   ideal spolynomialsNew;
   def r=br;
   while (size(P)>0)
   {
-    dbprint(ppl,"// -"+string(i)+"- interation of SAGBI construction algorithm");
+    dbprint(ppl,"// -"+string(i)+"- interaction of SAGBI construction algorithm");
     dbprint(ppl-1,"// -"+string(i)+"-1- Computing algebraic relations");
     def rNew=spolynomialsGB(algebra,r,method); /* canonicalizing inside! */
     kill r;
@@ -547,7 +547,7 @@ PURPOSE: Returns SAGBI S-polynomials of the leading terms of a given ideal A if 
 @*          used for computing the algebraic relations.
 @*          - If meth=0 (default), the procedure std is used.
 @*          - If meth=1, the procedure slimgb is used.
-@*          - If meth=2, the prodecure uses toric_ideal.
+@*          - If meth=2, the procedure uses toric_ideal.
 EXAMPLE:  example sagbiSPoly; shows an example"
 {
   assumeQring();
@@ -888,7 +888,7 @@ EXAMPLE: example algebraicDependence; shows an example"
   I=simplify(I,2); //avoid that I contains zeros
 
         //Create two polynomial rings, which both are extensions of the current basering.
-  //The first ring will contain the additional paramteres @c(1),...,@c(m), the second one
+  //The first ring will contain the additional parameters @c(1),...,@c(m), the second one
   //will contain the additional variables @c(1),...,@c(m), where m=ncols(I).
   string parameterName=uniqueVariableName("@c");
   list l = ringlist(basering);
@@ -967,7 +967,7 @@ EXAMPLE: example algebraicDependence; shows an example"
   int j=1;
   //If K[x_1,...,x_n] was the basering, then algebra is in K(@c(1),...,@c(m))[x_1,...x_n]. We intersect
   //elements in algebra with K(@c(1),..,@c(n)) to get algDep. Note that @c(i) can only appear in the numerator,
-  //as the SAGBI construction algorithms just multiplies and substracts polynomials. So actually we have
+  //as the SAGBI construction algorithms just multiplies and subtracts polynomials. So actually we have
   //algDep=algebra intersect K[@c(1),...,@c(m)]
   ideal algDep;
   for (i=1; i<= ncols(algebra); i++)
@@ -1042,7 +1042,7 @@ RETURN: polynomial, after one step of subalgebra reduction
 PURPOSE:
 @format
     Three algorithm variants are used to perform subalgebra reduction.
-    The positive interger n determines which variant should be used.
+    The positive integer n determines which variant should be used.
     n may take the values 0 (default), 1 or 2.
 @end format
 NOTE: works over both polynomial rings and their quotients
@@ -1135,7 +1135,7 @@ EXAMPLE: example sagbiReduction; shows an example"
                                          // "simplify"
     }
 
-    //---------  test wether @(0)-h(@(1),...,@(z)) is in ker ---------------
+    //---------  test whether @(0)-h(@(1),...,@(z)) is in ker ---------------
     // for some poly h and divide by maximal power of q=#[1]
     poly h;
     z=size(kern);
@@ -1179,7 +1179,7 @@ example
 }
 
 proc sagbiNF(id,ideal dom,int k,list#)
-"USAGE: sagbiNF(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
+"USAGE: sagbiNF(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive integers.
 RETURN: same as type of id; ideal or polynomial.
 PURPOSE:
 @format

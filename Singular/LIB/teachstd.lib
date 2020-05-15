@@ -23,7 +23,7 @@ PROCEDURES:
  NFMora(i);             normal form of i w.r.t Mora algorithm
  prodcrit(f,g[,o]);     test for product criterion
  chaincrit(f,g,h);      test for chain criterion
- pairset(G);            pairs form G neither satifying prodcrit nor chaincrit
+ pairset(G);            pairs form G neither satisfying prodcrit nor chaincrit
  updatePairs(P,S,h);    pairset P enlarded by not useless pairs (h,f), f in S
  standard(id);          standard basis of ideal/module
  localstd(id);          local standard basis of id using Lazard's method

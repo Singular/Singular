@@ -16,7 +16,7 @@ PROCEDURES:
  fetchall(R[,str]);       fetch all objects of ring R to basering
  imapall(R[,str]);        imap all objects of ring R to basering
  mapall(R,i[,str]);       map all objects of ring R via ideal i to basering
- ord_test(R);             test wether ordering of R is global, local or mixed
+ ord_test(R);             test whether ordering of R is global, local or mixed
  ringtensor(s,t,..);      create ring, tensor product of rings s,t,...
  ringweights(r);          intvec of weights of ring variables of ring r
  preimageLoc(R,phi,Q)     computes preimage for non-global orderings
@@ -29,7 +29,7 @@ PROCEDURES:
  hasZp_aCoefficient       check if the coefficient ring is an elag. ext. of ZZ/p
  hasQQCoefficient         check if the coefficient ring is QQ
  hasNumericCoeffs(rng)    check for use of floating point numbers
- hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
+ hasCommutativeVars(rng)  non-commutative or commutative polynomial ring
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
  hasMixedOrdering()       mixed versus global/local ordering
  hasAlgExtensionCoefficient(r) coefficients are an algebraic extension
@@ -1027,7 +1027,7 @@ example
 
 proc hasAlgExtensionCoefficient(def rng )
 "USAGE: hasAlgExtensionCoefficient ( rng );
-RETURN:  1 if the coeffcients are an algebraic extension, 0 otherwise.
+RETURN:  1 if the coefficients are an algebraic extension, 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasAlgExtensionCoefficient; shows an example
 "
@@ -1047,7 +1047,7 @@ example
 
 proc hasTransExtensionCoefficient(def rng )
 "USAGE: hasTransExtensionCoefficient ( rng );
-RETURN:  1 if the coeffcients are rational functions, 0 otherwise.
+RETURN:  1 if the coefficients are rational functions, 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasTransExtensionCoefficient; shows an example
 "
@@ -1067,7 +1067,7 @@ example
 
 proc hasGFCoefficient(def rng )
 "USAGE: hasGFCoefficient ( rng );
-RETURN:  1 if the coeffcients are of the form GF(p,k), 0 otherwise.
+RETURN:  1 if the coefficients are of the form GF(p,k), 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasGFCoefficient; shows an example
 "
@@ -1088,7 +1088,7 @@ example
 
 proc hasZp_aCoefficient(def rng )
 "USAGE: hasZp_aCoefficient ( rng );
-RETURN:  1 if the coeffcients are of the form Zp_a(p,k), 0 otherwise.
+RETURN:  1 if the coefficients are of the form Zp_a(p,k), 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasZp_aCoefficient; shows an example
 "
@@ -1109,7 +1109,7 @@ example
 
 proc hasZpCoefficient(def rng )
 "USAGE: hasZpCoefficient ( rng );
-RETURN:  1 if the coeffcients are of the form ZZ/p, 0 otherwise.
+RETURN:  1 if the coefficcients are of the form ZZ/p, 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasZpCoefficient; shows an example
 "
@@ -1127,7 +1127,7 @@ example
 
 proc hasQQCoefficient(def rng )
 "USAGE: hasQQCoefficient ( rng );
-RETURN:  1 if the coeffcients are QQ, 0 otherwise.
+RETURN:  1 if the coefficcients are QQ, 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasQQCoefficient; shows an example
 "
@@ -1178,7 +1178,7 @@ example
 
 proc hasNumericCoeffs(def rng)
 "USAGE: hasNumericCoeffs ( rng );
-RETURN:  1 if rng has inexact coeffcients, 0 otherwise.
+RETURN:  1 if rng has inexact coefficcients, 0 otherwise.
 KEYWORDS: floating point
 EXAMPLE: example hasNumericCoeffs; shows an example
 "
@@ -1272,7 +1272,7 @@ proc addvarsTo(def r,list vars,int blockorder)
          int may be: 0:ordering: dp
                      1:ordering dp,dp
                      2:oring.ordering,dp
-RETURN:  a ring with the addtional variables
+RETURN:  a ring with the additional variables
 EXAMPLE: example addvarsTo(); shows an example
 "
 {
@@ -1313,7 +1313,7 @@ proc addNvarsTo(def r,int N,string n,int blockorder)
          b may be: 0:ordering: dp
                    1:ordering dp,dp
                    2:oring.ordering,dp
-RETURN:  a ring with N addtional variables
+RETURN:  a ring with N additional variables
 EXAMPLE: example addNvarsTo(); shows an example
 "
 {

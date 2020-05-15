@@ -22,7 +22,7 @@
   - \subpage kernel_page "Mathematical Algorithms",
   - \subpage singular_page "Singular Interpreter and related".
 
-\Note Singlar relies on some third-party \subpage external_packages_page "Packages".
+\Note Singular relies on some third-party \subpage external_packages_page "Packages".
 
 \Note In case of any uncovered topics or unanswered questions please report
 them to us.
@@ -55,7 +55,7 @@ them to us.
   - \ref dynmodules_page
 
 
-Dependencies between Singular packages (and sub-grouppings) are shown as arrows on the following diagramm:
+Dependencies between Singular packages (and sub-grouppings) are shown as arrows on the following diagram:
 \dotfile Includes.dot Package dependency diagram
 */
 

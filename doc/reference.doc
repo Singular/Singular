@@ -724,7 +724,7 @@ See
 @*@code{chinrem (} intvec, intvec @code{)}
 @item @strong{Type:}
 the same type as the elements of the first argument
-@*If the elements of the first argument are lists again, chinrem is applied recusively.
+@*If the elements of the first argument are lists again, chinrem is applied recursively.
 @item @strong{Purpose:}
 applies chinese remainder theorem to the first argument w.r.t. the moduli given in the second.
 The elements in the first list must be of same type which can be @code{bigint}/@code{int},
@@ -895,7 +895,7 @@ develops each polynomial of the first argument J
 as a univariate polynomial in the given ring_variable
 z, and returns the coefficients as a matrix M.
 
-With e denoting the maximal z-degree occuring in the polynomials of J, and d:=e+1, M =
+With e denoting the maximal z-degree occurring in the polynomials of J, and d:=e+1, M =
 @tex
   $(m_{ij})$
 @end tex
@@ -1468,7 +1468,7 @@ int, resp.@: poly
 @item @strong{Purpose:}
 returns the determinant of a square matrix.
 The applied algorithms depend on type of input or the optional second argument.@*
-The optional second argument  specifies the algorith to use.
+The optional second argument  specifies the algorithm to use.
 Possible values are @code{"Bareiss"}, @code{"SBareiss"}, @code{"Mu"} and
 @code{"Factory"}.
 
@@ -2062,7 +2062,7 @@ See
 type of the first argument (unless it is @code{list})
 @item @strong{Purpose:}
 lift the first argument modulo the second to the rationals.@*
-The (coeffients of the) result a/b is the best approximation under the condition
+The (coefficients of the) result a/b is the best approximation under the condition
 @ifinfo
 |a|,|b|<=sqrt((N-1)/2)
 @end ifinfo
@@ -3309,7 +3309,7 @@ ideal, resp.@: module
 computes the intersection of ideals, resp.@: modules.
 @item @strong{Note:}
 If the option @code{prot} is enabled then the result the used method (elimination/syzygies) is displayed.
-@*An optional last argument specifies the Groebner base algorith to use.
+@*An optional last argument specifies the Groebner base algorithm to use.
 Possible values are @code{"std"} and @code{"slimgb"}.
 @item @strong{Example:}
 @smallexample
@@ -3913,7 +3913,7 @@ where @code{U} is a diagonal matrix of units.
 (not power series ring). @code{U} is stored in the optional third argument.
 @item @strong{Note:}
 Gives a warning if @code{sm} is not a submodule.
-@*An optional 4th argument specifies the Groebner base algorith to use.
+@*An optional 4th argument specifies the Groebner base algorithm to use.
 Possible values are @code{"std"} and @code{"slimgb"}.
 @item @strong{Example:}
 @smallexample
@@ -3959,7 +3959,7 @@ then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)},
 resp.@: @code{sm=module(matrix(m)*T)}.
 @*In an optional third argument the syzygy module will be returned.
 if working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and @code{sm=reduce(ideal(matrix(m)*T),0)}.
-@*An optional 4th argument specifies the Groebner base algorith to use.
+@*An optional 4th argument specifies the Groebner base algorithm to use.
 Possible values are @code{"std"} and @code{"slimgb"}.
 @item @strong{Example:}
 @smallexample
@@ -4347,7 +4347,7 @@ See
 @node  memory, min, maxideal, Functions
 @subsection memory
 @cindex memory
-@cindex memory managment
+@cindex memory management
 @table @code
 @item @strong{Syntax:}
 @code{memory (} int_expression @code{)}
@@ -5388,7 +5388,7 @@ and memory consumption - it does not ensure tail reduction on the result - use r
 @c ---------
 @item @code{redThrough}
 @cindex redThrough, option
-for inhomogenous input, polynomial reductions during standard basis
+for inhomogeneous input, polynomial reductions during standard basis
 computations are never postponed, but always finished through. This option
 is ring dependent. By default, it is set for rings with global degree
 orderings and not set for all other rings.
@@ -6611,7 +6611,7 @@ From a list of such structure, a new ring may be defined by the command @code{ri
 If the attribute "maxExp" of the ring is different from the default 32767,
 it is also set for the list.
 @item @strong{Note:} All data which depends on a ring belong to the current ring,
-not to a ring which can be contructed fron a modified list.
+not to a ring which can be constructed from a modified list.
 These data will be mapped via fetch to the ring to be constructed.
 @item @strong{Example:}
 @smallexample
@@ -6680,7 +6680,7 @@ the quotient ideal.
 From a list of such structure, a new ring may be defined by the command @code{ring}
 ( see the following example ).
 @item @strong{Note:} All data which depends on a ring belong to the current ring,
-not to a ring which can be contructed fron a modified list.
+not to a ring which can be constructed from a modified list.
 These data will be mapped via fetch to the ring to be constructed.
 @item @strong{Example:}
 @smallexample
@@ -6908,7 +6908,7 @@ The output is a list L with
 @item * L[1] = matrix
 @item * L[2] = int:
     0 = finite solution found;  1 = unbounded;  -1 = no solution;
-   -2 = error occured;
+   -2 = error occurred;
 @item * L[3] = intvec :
    L[3][k] = number of variable which corresponds to row k+1 of L[1];
 @item * L[4] = intvec :
@@ -6981,7 +6981,7 @@ erase zero generators/columns.
 @item 4
 erase copies of earlier listed generators/columns.
 @item 8
-erase generators/columns which a skalar multiples (w.r.t. ground field/ring) of earlier listed generators/columns.
+erase generators/columns which a scalar multiples (w.r.t. ground field/ring) of earlier listed generators/columns.
 @item 16
 erase generators/columns whose leading monomials are copies of leading monomials of earlier listed generators/columns such that the coefficients of both leading terms are units in the ground field/ring.
 @item 32
@@ -7610,7 +7610,7 @@ returns the number of cpus as int (for creating multiple threads/processes).
 @item @code{system("denom_list")}
 @cindex denom_list
 @cindex system, denom_list
-returns the list of denominators (number) which occured in the latest std
+returns the list of denominators (number) which occurred in the latest std
 computationi(s).
 Is reset to the empty list at ring changes or by this system call.
 @c ..........................
@@ -7797,7 +7797,7 @@ returns the absolute (path) name of the running @sc{Singular} as string.
 @item @code{system("SingularLib")}
 @cindex SingularLib
 @cindex system, SingularLib
-returns the colon seperated library search path name as string.
+returns the colon separated library search path name as string.
 @c ..........................
 @item @code{system("spadd",} list, list @code{)}
 or @code{system("spadd",} list, list, int @code{)}
@@ -7816,7 +7816,7 @@ computes from list of spectrum numbers the multiple of it.
 @c ..........................
 @item @code{system("std_syz",} module, int @code{)}
 @cindex system, std_syz
-compute a partial groebner base of a module, stopp after the given column
+compute a partial groebner base of a module, stop after the given column
 @c ..........................
 @item @code{system("tensorModuleMult",} int, module @code{)}
 @cindex system, tensorModuleMult
@@ -7923,7 +7923,7 @@ module
 @item @strong{Purpose:}
 computes the first syzygy (i.e., the module of relations of the given
 generators) of the ideal, resp.@: module.
-@*An optional second argument specifies the Groebner base algorith to use.
+@*An optional second argument specifies the Groebner base algorithm to use.
 Possible values are @code{"std"}(default) and @code{"slimgb"}.
 @*Only for use of "std": If @code{option(returnSB)} is set,
 a standard basis is returned, otherwise a generating set.
@@ -8912,7 +8912,7 @@ Objects defined in a ring are not automatically exported
 when exporting the ring.
 
 @item @strong{Warning:}
-The identifier is transfered to the other package. It does no longer
+The identifier is transferred to the other package. It does no longer
 exist in the current package. If the identifier should only be copied,
 @ref{importfrom} should be used instead.
 
@@ -9138,7 +9138,7 @@ The second string selections options for loading.
 @item @strong{Note:} @code{load(<string_expr>,"with")} is equivalent to
 @code{LIB <string_expr>}.
 @item @strong{Note:} @code{load(<string_expr>,"try")} is equivalent to
-@code{LIB <string_expr>} which never fails - test the package name to distiguish.
+@code{LIB <string_expr>} which never fails - test the package name to distinguish.
 @end table
 
 All loaded libraries are displayed by the @code{listvar(package);}

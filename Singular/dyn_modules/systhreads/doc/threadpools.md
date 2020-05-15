@@ -87,7 +87,7 @@ In this example, three different jobs are created. The first one,
 second one, `increment`, requires one additional argument. And the
 `add2and2` job does not require any more arguments.
 
-Jobs can also be created from other jobs by pasing in a job argument
+Jobs can also be created from other jobs by passing in a job argument
 instead of a function name as the first argument:
 
     job j2 = createJob(job j[, def arg1, ..., def argn]);

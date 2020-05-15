@@ -411,7 +411,7 @@ used. If there is at least one space surrounding the @code{/} operator
 the @code{div} operator instead of @code{/} for integer division and an
 explicit type cast to @code{number} for ring division. Note, that this
 problem does only occur for divisions of numerical constants.
-It also apllies for large numerical constants which are of type @code{bigint}.
+It also applies for large numerical constants which are of type @code{bigint}.
 @smallexample
 @c example error
   ring r=32002,x,dp;

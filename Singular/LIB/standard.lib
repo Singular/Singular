@@ -9,10 +9,10 @@ PROCEDURES:
  stdhilb(ideal[,h])     Hilbert driven Groebner basis of ideal
  groebner(ideal,...)    standard basis using a heuristically chosen method
  res(ideal/module,[i])  free resolution of ideal or module
- sprintf(fmt,...)       returns fomatted string
+ sprintf(fmt,...)       returns formatted string
  fprintf(link,fmt,..)   writes formatted string to link
  printf(fmt,...)        displays formatted string
- weightKB(stc,dd,vl)    degree dd part of a kbase w.r.t. some weigths
+ weightKB(stc,dd,vl)    degree dd part of a kbase w.r.t. some weights
  qslimgb(i)             computes a standard basis with slimgb in a qring
  par2varRing([i])       create a ring making pars to vars, together with i
  datetime()             return date and time as a string
@@ -358,7 +358,7 @@ EXAMPLE: example stdhilb;  shows an example"
   }
 
 //-------------------- go back to original ring ---------------------------
-//The main computation is done. Do not forget to simplfy before maping.
+//The main computation is done. Do not forget to simplfy before mapping.
 
   // subst 1 for homogenizing var
   if ( p_opt ) { "dehomogenization"; }
@@ -412,7 +412,7 @@ PURPOSE: define a ringlist, say QL, of the first argument, say RL, which is
          RL[4] is not a standard basis with respect to the given monomial
          order in RL[3]. Then QL will be obtained from RL just by replacing
          RL[4] by a standard of it with respect to this order. RL itself
-         will be returnd if size(RL[4]) <= 1 (in which case it is known to be
+         will be returned if size(RL[4]) <= 1 (in which case it is known to be
          a standard basis w.r.t. any ordering) or if a second argument
          \"isSB\" of type string is given.
 NOTE:    the command ring(quotientList(RL)) defines a quotient ring correctly
@@ -565,7 +565,7 @@ example
 proc hilbRing ( list # )
 "USAGE:   hilbRing([w,l]); w = intvec, l = list of ideals/modules
 RETURN:  list, say L: L[1] is a ring and L[2] an intvec
-         L[1] is a ring whith an extra homogenizing variable with name @,
+         L[1] is a ring with an extra homogenizing variable with name @,
          resp. @(i) if @ and @(1), ..., @(i-1) are defined.
          The monomial ordering of L[1] is consists of 1 block: dp if the
          weights of the variables of the basering, say R, are all 1, resp.
@@ -855,7 +855,7 @@ EXAMPLE: example groebner;  shows an example"
 //   - 1-Block-Ordnungen/non-commutative: direkt Aufruf von std oder slimgb
 //   - Komplizierte Ordnungen (lp oder > 1 Block): hilb
 //V1 - Parameter werden grundsaetzlich nicht in Variable umgewandelt
-//V2 - Mehr als ein Parmeter wird zu Variable konvertiert
+//V2 - Mehr als ein Parameter wird zu Variable konvertiert
 //   - fglm is keine Heuristik, da sonst vorher dim==0 peprueft werden muss
 
 //2. Vorgabe aus {std,slimgb}: es wird wo immer moeglich das Angegebene
@@ -1042,7 +1042,7 @@ EXAMPLE: example groebner;  shows an example"
   //block which is not a matrix ordering and not a lexicographical ordering.
   //(Note:Singular counts always least 2 blocks, one is for module component):
   //Call a method "direct" if conversion=="no" && partovar="no" which means
-  //that we apply std or slimgb dircet in the basering (exception
+  //that we apply std or slimgb direct in the basering (exception
   //as long as slimgb does not know qrings: in a qring of a ring P
   //the ideal Qideal is added to the ideal and slimgb is applied in P).
   //We apply a direct method if we have a simple monomial ordering, if no
@@ -1075,7 +1075,7 @@ EXAMPLE: example groebner;  shows an example"
 //We are in the following situation:
 //direct=="no" (i.e. "hilb" or "fglm" or "par2var" is given)
 //or no method is given and we have a complicated monomial ordering
-//V1: "par2var" is not a default strategy, it must be explicitely
+//V1: "par2var" is not a default strategy, it must be explicitly
 //given in order to be performed.
 //V2: "par2var" is a default strategy if there are more than 1 parameters
 
@@ -1912,7 +1912,7 @@ example
 proc datetime()
 "SYNTAX: @code{datetime ()}
 RETURN:  string
-PURPOSE: return the curent date and time as a string
+PURPOSE: return the current date and time as a string
 EXAMPLE: example datetime; shows an example
 "
 {

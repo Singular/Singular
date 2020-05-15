@@ -241,7 +241,7 @@ static proc listDot(list VV, intvec expv)
       }
       else
       {
-        ERROR("listDot: unkown or invalid relevant entry");
+        ERROR("listDot: unknown or invalid relevant entry");
       }
     }
   }

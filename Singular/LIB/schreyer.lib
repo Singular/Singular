@@ -7,7 +7,7 @@ AUTHOR:  Oleksandr Motsak <U@D>, where U={motsak}, D={mathematik.uni-kl.de}
 KEYWORDS: Schreyer ordering; Schreyer resolution; syzygy
 OVERVIEW:
 The library contains several procedures for computing a/part of Schreyer
-resoltion (cf. [SFO]), and some helpers for derham.lib (which requires
+resolution (cf. [SFO]), and some helpers for derham.lib (which requires
 resolutions over the homogenized Weyl algebra) for that purpose.
 The input for any resolution computation is a set of vectors M in form of a
 module over some basering R. The helpers works both in the commutative and

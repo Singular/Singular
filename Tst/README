@@ -17,17 +17,17 @@ recommended set of tests:
 
 Run
   perl ./regress.cmd -h
-for a summary of the comand-line options of regress.cmd.
+for a summary of the command-line options of regress.cmd.
 
 To test(s) correctness of Singular:
 -----------------------------------
 1.) Put the Singular binary in this directory
-    (prefered solution: ln -s <path_to_Singular_binary> Singular)
+    (preferred solution: ln -s <path_to_Singular_binary> Singular)
 2.) Run
      perl ./regress.cmd [*.tst] [*.lst]
     with the desired tst (i.e., Singular test scripts) or lst (list
     of tst files -- see Old/universal.lst for an example) file(s).
-    (prefered test scenario:
+    (preferred test scenario:
     perl ./regress.cmd Old/universal.lst Short/ok_s.lst Long/ok_l.lst
     )
 3.) If no differences between the new results and the
@@ -36,7 +36,7 @@ To test(s) correctness of Singular:
 4.) If differences between the new results and the
     previously obtained results are found, regress.cmd exits with
     status != 0, and, for each file xx.tst which lead to a
-    difference, the coresponding files xx.new.res, xx.res, and xx.diff
+    difference, the corresponding files xx.new.res, xx.res, and xx.diff
     are kept, and differences are written to stdout.
 5.) The Singular executable which is used for testing can
     alternatively be specified using the -s <Singular> option.
@@ -60,7 +60,7 @@ To test memory/timing performance of Singular:
     memory/timings differences, i.e., it does not cause an exit with
     status != 0 if timing/memory performance is above specified
     per-cent.
-6.) The timing/memory performance differenes which trigger an error
+6.) The timing/memory performance differences which trigger an error
     (or, report) can be also be set: Either use
       ./regress.cmd -[e,r] all%<val>
     which sets tolerance of all criteria to <val> per-cent, or, use
@@ -74,7 +74,7 @@ Run
 with the desired tst (i.e., Singular test scripts) or lst (list
 of tst files).
 NOTE: Running regress.cmd with the -g option re-generates the result
-and stat files, i.e., all previous results and statisitics are
+and stat files, i.e., all previous results and statistics are
 overwritten and lost!
 
 To include timing/memory statistics for a machine:

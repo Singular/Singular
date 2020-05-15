@@ -2035,7 +2035,7 @@ when called with two arguments: computes the part of a vector space basis of the
 to the second argument. Here, the quotient does not need to be finite dimensional.
 
 @item @strong{Note:}
-in the non-commutative case, a ring modulo an ideal has a ring stucture
+in the non-commutative case, a ring modulo an ideal has a ring structure
 if and only if the ideal is two-sided.
 
 Also, @code{kbase} respects module grading given by the @code{isHomog} attribute of input modules.
@@ -2969,7 +2969,7 @@ matrix C from the definition of @ref{G-algebras})
 (this corresponds to the matrix D from the definition of @ref{G-algebras})
 @end enumerate
 @item @strong{Note:}
-After modifying a list aquired with @code{ringlist}, one can construct a corresponding ring with @code{ring(list)}.
+After modifying a list acquired with @code{ringlist}, one can construct a corresponding ring with @code{ring(list)}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3285,7 +3285,7 @@ this is the same as the vector space dimension of the
 left factor module.
 
 @item @strong{Note:}
-In the non-commutative case, a ring modulo an ideal has a ring stucture if and only if the ideal is two-sided.
+In the non-commutative case, a ring modulo an ideal has a ring structure if and only if the ideal is two-sided.
 @item @strong{Example:}
 @smallexample
 @c example

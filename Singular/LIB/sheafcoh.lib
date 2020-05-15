@@ -196,7 +196,7 @@ ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
 RETURN:  module
 NOTE:    Output is a presentation matrix for the truncation of coker(M)
          at d.
-         Fast + experimental version. M shoud be a SB!
+         Fast + experimental version. M should be a SB!
 DISPLAY: If @code{printlevel}>=1, step-by step timings will be printed.
          If @code{printlevel}>=2 we add progress debug messages
          if @code{printlevel}>=3, even all intermediate results...

@@ -836,7 +836,7 @@ static proc getcoefmat(ideal IM, int m)
             {
                C[k,1]=Co[2,j];
                break;//we dont need to check any other elements of M
-               //since theyre all different
+               //since they are all different
             }
          }
       }
@@ -858,7 +858,7 @@ static proc getconcatcoefmats(list L)
 {//L the first size(L) entries of K
    //returns the concatenated coef matrices
    //more precisely: let m be the degree of the elements of L[size(L)], then we want
-   //to know, which homogenous polynomials of degree m can be written as a combination
+   //to know, which homogeneous polynomials of degree m can be written as a combination
    //of polynomials in the ideals contained in L. In particular, we want to know which
    //of the elements of L[size(L)] can be written as a combination of other polys
    //in L and are thereby superfluous (cf superfluousL)
@@ -1551,7 +1551,7 @@ static proc convert_p(list p)
    //interesting: apparently, since p is a list of strings to begin with, it is not
    //bound to the basering, so it will exist in the ring r, as well. But, as we change
    //the entries of p from type string to type number/poly, it gets bound to the ring r,
-   //so it doesnt exist in br anymore. Hence, we have do define list p=fetch.
+   //so it doesn't exist in br anymore. Hence, we have do define list p=fetch.
 
 
    //we change the ring, so that we know, what the imaginary unit is called, define the
@@ -2437,7 +2437,7 @@ EXAMPLE: example num_elim1; shows an example
    //We now have to change the ring we work over: we delete the variables which are
    //to be eliminated. -> The number of variables and the number of components in
    //the projected point are the same. Then we can apply our procedure and imap the
-   //results to our original ring, since we didnt change the names of the variables.
+   //results to our original ring, since we didn't change the names of the variables.
    def br=basering;
    list l=ringlist(br);
 
@@ -2566,7 +2566,7 @@ EXAMPLE: example realLLL; shows an example
    while(i<n)
    {
       //check whether there is an i sth eucl(Bs[i,i]) <= 4/3*euclid(Bs[i+1,i])
-      //if so, thats fine
+      //if so, that's fine
       //if not, b_i and b_i+1 are swapped + we do the necessary changes in Bs and U
       if(inner_product(B[i],B[i]) <= (301/300)*inner_product(B[i+1],B[i+1]))
       {

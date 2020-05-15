@@ -204,7 +204,7 @@ system("--browser");
 @end smallexample
 returns the currently used browser.
 
-If no browser is explicitely set by the user, then the first available browser
+If no browser is explicitly set by the user, then the first available browser
 (w.r.t. the order of the browsers in the file @code{LIB/help.cnf}) is chosen.
 
 The @code{.singularrc} (@pxref{Startup sequence}) file is a good place
@@ -240,7 +240,7 @@ browsers to work.
 @cindex help browsers, setting command to use
 The help browsers are only available if the respective programs are installed
 on your system (for @code{xinfo}, the programs @code{xterm} and
-@code{info} are necessary). You can explicitely specify which program to
+@code{info} are necessary). You can explicitly specify which program to
 use, by changing the entry in @code{LIB/help.cnf}
 
 @item
@@ -248,7 +248,7 @@ If the help browser cannot find the local html
 pages of the @sc{Singular} manual (which it will look for at
 @code{$RootDir/html} -- see @ref{Loading a library} for more info on
 @code{$RootDir}) @emph{and} the (command-line) option @code{--allow-net}
-has @emph{explicitely} been set (see @ref{Command line options} and
+has @emph{explicitly} been set (see @ref{Command line options} and
 @ref{system} for more info on
 setting values of command-line options), then it dispatches the html
 pages from
@@ -579,7 +579,7 @@ reported by the @code{timer} and @code{rtimer} variable divided by
 set the maximal number of CPUs to use.
 
 @item @code{--cntrlc=C}
-set the default answer for interupt signals to C which should be
+set the default answer for interrupt signals to C which should be
 a for abort, c for continue or q for quit.
 @end table
 
@@ -682,7 +682,7 @@ executes the files @code{file1}, @code{file2} @dots{}  (given on the command
 line) in that order.
 @end enumerate
 
-@strong{Note:} @code{.singularrc} file(s) are an approriate place for
+@strong{Note:} @code{.singularrc} file(s) are an appropriate place for
 setting some default values of (command-line) options.
 
 For example, a system administrator might remove the locally installed
@@ -1451,7 +1451,7 @@ are guaranteed to work:
 
 @itemize
 @item
-- basic polynomial arithmetic, i.e. addition, multiplication, division, exponentation
+- basic polynomial arithmetic, i.e. addition, multiplication, division, exponentiation
 @item
 - std, i.e. computing standard bases (and related: syz, etc.)
 @item
@@ -1771,7 +1771,7 @@ an expression_list of the name @code{real} and two optional int_expressions
 determining the precision in decimal digits and
 the size for the stabilizing rest. The default for the rest is the same size
 as for the representation.
-An exeption is the name @code{real} without any integers.
+An exception is the name @code{real} without any integers.
 These numbers are implemented as machine floating point numbers
 of single precision.
 Note that computations over all these fields are not exact.
@@ -1862,7 +1862,7 @@ Operations based on standard bases (e.g. @code{std},@code{groebner}, etc., @code
 @strong{Example:}
 @smallexample
 @c example
-  // defintion and usage:
+  // definition and usage:
   ring r=(ZZ/32003)[x,y];
   poly f=x3+yx2+3y+4;
   qring q=std(maxideal(2));
@@ -3660,7 +3660,7 @@ on run-time, errors may be reported using the @ref{ERROR} function.
 @item
 Names of procedures should not be shorter than 4 characters and should not
 contain any special characters. In particular, the use of @code{_} in names of
-procedures is discourraged. If the name of the procedure is composed of
+procedures is discouraged. If the name of the procedure is composed of
 more than one word, each new word should start with a capital letter, all
 other letters should be lower case (e.g. linearMapKernel).
 @item
@@ -3855,7 +3855,7 @@ Enforces a line-break.
 @item @code{@@ref@{...@}}
 For references to other parts of the @sc{Singular} manual, use one of
 the following @code{@@ref@{node@}} constructs. Here, @code{node}
-must be the name of a section of the @sc{Signular} manual. In
+must be the name of a section of the @sc{Singular} manual. In
 particular,  it may be the name of a function, library or procedure
 in a library.
 
@@ -4310,7 +4310,7 @@ the @code{LIB} command in @sc{Singular}, but generates more output during
 parsing.  @code{libparse} is useful if an error
 occurs while loading the library, but the whole block around the line
 specified seems to be correct. In these situations the real error might
-have occured hundreds of lines earlier in the library.
+have occurred hundreds of lines earlier in the library.
 
 @strong{Usage:}
 @*@code{libparse [options] singular-library}
@@ -4392,7 +4392,7 @@ are @strong{not errors} is is worth thinking about it.
 @item
 change of options during a procedure call: is this side effect intended?
 @item
-use of @code{def}: avoids type checking, but usefull if a procedure handles
+use of @code{def}: avoids type checking, but useful if a procedure handles
 several types at once
 @item
 @code{ASSUME} outside of procedures: while a failed @code{ASSUME} aborts

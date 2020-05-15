@@ -10,7 +10,7 @@
 The black box data types @code{reference} and @code{shared} in @sc{Singular}
 allow for concurrently accessing  @sc{Singular} object data.
 Copying such object will only add an additional handle which allows you
-to define multiple identifers for the same object instance.
+to define multiple identifiers for the same object instance.
 
 Both experimental features are hidden by default, please activate them by
 typing @code{system("reference");} or @code{system("shared");}, respectively,
@@ -296,7 +296,7 @@ subst(ref, x,1, y,2, zvar,3);
 @end smallexample
 
 
-In some cases @code{reference}s have to be dereferenced explicitely. For
+In some cases @code{reference}s have to be dereferenced explicitly. For
 instance, this is the case for n-ary function calls not starting with
 a @code{reference} or @code{shared} object. You can use the @code{link}
 operator or a type cast to work around this.

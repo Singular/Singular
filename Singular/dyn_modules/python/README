@@ -103,7 +103,7 @@ If you want to help, which would make me happy, follow some simple rules:
 - divide the work in layers, so what is a problem of a better C++-Interface should be done in the Singular kernel (compare Number.h, Poly.h PowerSeries.h), the Pythonwrapper itself should be ultrathin
 -raw operations (+,-,* creation of res...) should map directly to the Singular kernel (prefereable nice C++ wrapper classes in the kernel)
 - Wrapper classes in C++ should behave like canonical C++-Classes, no additional res.-management (with the exception of new, delete) should be required
-- never use currRing implicitely, always write out the currRing argument, if this isn't done consequently in my code, it would be nice of you to fix it
+- never use currRing implicitly, always write out the currRing argument, if this isn't done consequently in my code, it would be nice of you to fix it
 - regularly check in, check out from CVS
 
 

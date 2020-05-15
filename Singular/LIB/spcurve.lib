@@ -527,7 +527,7 @@ EXAMPLE: example relweight; shows an example
   int i,j,temp;
   def r=basering;
 //---------------------------------------------------------------------------
-// Comparision entry by entry
+// Comparison entry by entry
 //---------------------------------------------------------------------------
   for(i=1; i<=nrows(N); i++)
   {

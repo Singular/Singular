@@ -13,7 +13,7 @@ OVERVIEW: Computing Janet bases and border bases for any ordering
 REFERENCES:
    [1] A. Kehrein, M. Kreuzer, L. Robbiano: An algebrists view on border bases, in:
        A. Dickenstein and I. Emiris (eds.), Solving Polynomial Equations:
-       Foundations, Algorithms and Aplications, Springer, Heidelberg 2005, 169-202.
+       Foundations, Algorithms and Applications, Springer, Heidelberg 2005, 169-202.
 
    [2] V.P. Gerdt: Involute Algorithms for Computing Groebner Bases, In
        Computational Commutative and Non-Computational Algebra Geometry,

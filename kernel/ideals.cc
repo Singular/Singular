@@ -2768,7 +2768,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
   return result;
 }
 #endif
-/* currently unsed:
+/* currently unused:
 ideal idChineseRemainder(ideal *xx, intvec *iv)
 {
   int rl=iv->length();

@@ -22,7 +22,7 @@ PROCEDURES:
  EOrdlist(Coef,Exp,k,n,flag);       computes the E-order of an ideal (giving in the language of lists)
  maxEord(Coef,Exp,k,n,flag);        computes de maximum E-order of an ideal given by Coef and Exp
  ECoef(Coef,expP,sP,V,auxc,n,flag); Computes a simplified version of the E-Coeff ideal. The E-orders are correct,
-                                    but tranformations of coefficients of the generators and powers of binomials
+                                    but transformations of coefficients of the generators and powers of binomials
                                     cannot be computed easily in terms of lists.
  elimrep(L);                        removes repeated terms from a list
  Emaxcont(Coef,Exp,k,n,flag);       computes a list of hypersurfaces of E-maximal contact
@@ -131,7 +131,7 @@ example
 
 proc identifyvar()
 "USAGE: identifyvar();
-COMPUTE: Asign 0 to variables x and 1 to variables y, only necessary at the beginning
+COMPUTE: Assign 0 to variables x and 1 to variables y, only necessary at the beginning
 RETURN: list, say l, of size the dimension of the basering
         l[i] is: 0 if the i-th variable is x(i),
                  1 if the i-th variable is y(i)
@@ -157,7 +157,7 @@ example
 
 proc data(ideal K,int k,int n)
 "USAGE: data(K,k,n); K any ideal, k integer (!=0), n integer (!=0)
-COMPUTE: Construcs a list with the coefficients and exponents of one ideal
+COMPUTE: Constructs a list with the coefficients and exponents of one ideal
 RETURN: lists of coefficients and exponents of K
 EXAMPLE: example data; shows an example
 "
@@ -718,7 +718,7 @@ if (Y!=0){transH=iniD(n);
                 expI[i]=aux1;}}                                     // monomial
         }
 
-// NOTE: coeficients of I = coeficients of J, because I and J differ in a monomial
+// NOTE: coefficients of I = coefficients of J, because I and J differ in a monomial
 
 // Detecting errors, negative exponents in expI
 
@@ -1001,7 +1001,7 @@ example
   LL[5];  // components of the resolution function t
   LL[6];  // list of D_4,D_3,D_2,D_1
   LL[7];  // list of H_4,H_3,H_2,H_1 (exceptional divisors)
-  LL[8];  // list of all exceptional divisors acumulated
+  LL[8];  // list of all exceptional divisors accumulated
   LL[9];  // auxiliary invariant
   LL[10]; // intvec pointing out the last step where the function t has dropped
 
@@ -1652,7 +1652,7 @@ if (cont3==n){    // ALL THE VARIABLES ARE INVERTIBLE
                 mobile[idchart+1]=auxmb;
 
               idchart=idchart+1;}
-else{     // OTHERWISE, CONTINUE CHEKING IF newI=0 or not
+else{     // OTHERWISE, CONTINUE CHECKING IF newI=0 or not
 
 Coef=extraL[1];
 expI=extraL[2];
@@ -1841,7 +1841,7 @@ if (Mout[2]==1){
                }
 // else{def r=basering;}   // CHECK THAT IS NECESSARY !!!
 
-// IF WE ARE IN POSTIVE CHAR
+// IF WE ARE IN POSITIVE CHAR
 
 if (p>0){list Lring=ringlist(basering);
          Lring[1]=0;
@@ -2624,7 +2624,7 @@ example
 proc tradtoideal(intvec a,ideal J2,list flag)
 "USAGE: tradtoideal(a,J2,flag);
         a intvec, J2 ideal, flag list
-COMPUTE: traslate to an ideal the intvec defining the center
+COMPUTE: translate to an ideal the intvec defining the center
 RETURN: the ideal of the center, given by the intvec a, or J2 if a=0
 EXAMPLE: example tradtoideal; shows an example
 "

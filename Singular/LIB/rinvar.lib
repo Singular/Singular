@@ -146,7 +146,7 @@ EXAMPLE: example ImageGroup; shows an example
 
   // create a new basering which might contain more variables
   // s(1..newVars) as the original basering and map the ideal
-  // Gn (contians only z(1..newVars)) to this ring
+  // Gn (contains only z(1..newVars)) to this ring
 
   list l1;  
   for (int zz = 1; zz <= newVars; zz++)
@@ -857,7 +857,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a) and minpoly != 0,
          G is an ideal of a reductive algebraic group in K[s(1..r)],
          'action' is a linear group action of G on K^n (n = ncols(action))
 RETURN:  ideal of the nullcone of G.
-NOTE:    the generators of the nullcone are homogenous, but in general not invariant
+NOTE:    the generators of the nullcone are homogeneous, but in general not invariant
 EXAMPLE: example NullCone; shows an example
 "
 {
@@ -1052,7 +1052,8 @@ RETURN:  matrix M, f = M[1,1]*M[2,1] + ... + M[1,n]*M[2,n]
     }
     if(defined(auxM)) { kill auxM;}
     matrix auxM[2][size(columnList)];      // built new matrix and omit
-    for(j = 1; j <= size(columnList); j++) {    // the linear dependent colums
+    for(j = 1; j <= size(columnList); j++)    // the linear dependent columns
+    {
       auxM[1, j] = decompMx[1, columnList[j]];    // found above
       auxM[2, j] = decompMx[2, columnList[j]];
     }

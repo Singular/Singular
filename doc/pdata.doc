@@ -373,7 +373,7 @@ $\hbox{Loc}_{(x)}K[x_1,\ldots,x_n]$.
 Loc_(x)K[x1,...,xn].
 @end ifinfo
 
-For inhomogenous input ideals,  standard (resp.@: groebner) bases
+For inhomogeneous input ideals,  standard (resp.@: groebner) bases
 computations are generally faster
 with the orderings
 @tex

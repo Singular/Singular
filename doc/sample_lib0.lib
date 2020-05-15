@@ -10,7 +10,7 @@
   proc dummy2(proc sum, int j, int k)
         { return(sum(j,k)); }
   /* { and } does not need to be the
-     first charater in line */
+     first character in line */
 
   //////////////////////////
   /*

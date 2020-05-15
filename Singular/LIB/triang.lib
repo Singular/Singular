@@ -53,7 +53,7 @@ EXAMPLE: example triangL; shows an example
     }
 
     // Noetige Optionen setzen.
-    // obachman: save options so that tey can be reset on exit
+    // obachman: save options so that they can be reset on exit
     intvec ovec = option(get);
     option(redSB);
     option(returnSB);
@@ -221,7 +221,7 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
     }
 
     // Noetige Optionen setzen.
-    // obachman: save options so that tey can be reset on exit
+    // obachman: save options so that they can be reset on exit
     intvec ovec = option(get);
     option(redSB);
     option(returnSB);
@@ -831,7 +831,7 @@ EXAMPLE: example triangMH; shows an example
     }
 
     // Noetige Optionen setzen.
-    // obachman: save options so that tey can be reset on exit
+    // obachman: save options so that they can be reset on exit
     intvec ovec = option(get);
     option(redSB);
     option(redTail);

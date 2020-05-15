@@ -7,13 +7,13 @@ AUTHOR :  Silke Spang
 
 OVERVIEW:
    Algorithms about the computation of the real
-   radical of an arbitary ideal over the rational numbers
+   radical of an arbitrary ideal over the rational numbers
    and transcendetal extensions thereof
 
 PROCEDURES:
  realpoly(f);     Computes the real part of the univariate polynomial f
  realzero(j);     Computes the real radical of the zerodimensional ideal j
- realrad(j);      Computes the real radical of an arbitary ideal over
+ realrad(j);      Computes the real radical of an arbitrary ideal over
                   transcendental extension of the rational numbers
 ";
 
@@ -34,7 +34,7 @@ LIB "elim.lib";
 //// the main procedure //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 proc realrad(ideal id)
-"USAGE: realrad(id), id an ideal of arbitary dimension
+"USAGE: realrad(id), id an ideal of arbitrary dimension
 RETURN: the real radical of id
 EXAMPE: example realrad; shows an example"
 {
@@ -125,7 +125,7 @@ example
 
 
 /*static*/ proc zeroreduct(ideal i)
-"USAGE:zeroreduct(i), i an arbitary ideal
+"USAGE:zeroreduct(i), i an arbitrary ideal
 RETURN: an ideal j of dimension <=0 s.th. i is contained in
         j and j is contained in i_{Iso} which is the zariski closure
         of all real isolated points of i
@@ -311,7 +311,7 @@ EXAMPLE:   example radzero; shows no example"
    //get real zeros
 
    //this will act via a coordinate chance into general position
-   //denote that this random chance doesn't work allways
+   //denote that this random chance doesn't work always
    //the ideas for the transformation into general position are
    //used from the primdec.lib
    transprep=buffer[l];
@@ -489,7 +489,7 @@ example
 //// for semi-definiteness/////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 proc decision(poly f)
-" USAGE: decission(f); a multivariate polynomial f in Q[x_1,..,x_n] and lc f=0
+"USAGE: decision(f); a multivariate polynomial f in Q[x_1,..,x_n] and lc f=0
  RETURN: assume that the basering has a lexicographical ordering,
          1 if f is positive semidefinite  0 if f is indefinite
 EXAMPLE: decision shows an example
@@ -872,7 +872,7 @@ EXAMPLE:   example is_real; shows an example"
    if
    (a*b!=1)
    //polynomials are contineous so the image is an interval
-   //referres to analysis
+   //referes to analysis
    {
       return(1);
    }
@@ -897,7 +897,7 @@ static proc prepare_max(ideal m)
 "USAGE: prepare_max(m); m a maximal ideal in Q(y_1,...,y_m)[x_1,...,x_n]
 RETURN: a list erg=(id,j); where id is the real radical of m if j=1 (i.e. m
         satisfies the shape lemma in one variable x_i) else id=m and j=0;
-EXAMPLE: is_in_shape shows an exmaple;
+EXAMPLE: is_in_shape shows an example;
 "
 
 {
@@ -973,8 +973,8 @@ EXAMPLE: is_in_shape shows an exmaple;
 
 static proc length(poly f)
 "USAGE:    length(f); poly f;
-RETURN:    sum of the absolute Value of all coeffients of an irreducible
-           poly nomial f
+RETURN:    sum of the absolute Value of all coefficients of an irreducible
+           polynomial f
 EXAMPLE:   example length; shows an example"
 
 {
@@ -1178,7 +1178,7 @@ EXAMPLE: contnonloc shows an example
     }
     setring r;
 
-    //id only consits of non units in F(pari)
+    //id only consists of non units in F(pari)
     if (tester==1)
     {
      contractpr=insert(contractpr,primcomp);

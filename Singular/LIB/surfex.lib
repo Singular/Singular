@@ -1195,7 +1195,7 @@ l[4]: mult() of this prime ideal
 
 If an additional argument # is given then l[1] changes:
 l[1]: a standard basis of the primary ideal
-Morever, there are some more entries:
+Moreover, there are some more entries:
 l[5]: dim() of this primary ideal
 l[6]: mult() of this primary ideal
 l[7]: l[6] / l[5]

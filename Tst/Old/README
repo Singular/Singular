@@ -14,7 +14,7 @@ Results:
 - if a test fails
   (i.e. there are differences between the output and
   the corresponding .res file),
-  the name of unsuccessfull test file go to stderr
+  the name of unsuccessful test file go to stderr
 
 To compare two versions of Singular do:
 

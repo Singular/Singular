@@ -1417,8 +1417,8 @@ static void enterOnePairRing (int i,poly p,int /*ecart*/, int isFromQ,kStrategy 
   /*
   *the set B collects the pairs of type (S[j],p)
   *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
-  *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-  *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+  *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+  *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
   */
 
   for(j = strat->Bl;j>=0;j--)
@@ -2035,8 +2035,8 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     /*
     *the set B collects the pairs of type (S[j],p)
     *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+    *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+    *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
     */
     {
       j = strat->Bl;
@@ -2079,9 +2079,9 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
       *the product criterion has applied for (s,p),
       *i.e. lcm(s,p)=product of the leading terms of s and p.
       *Suppose (s,r) is in L and the leading term
-      *of p devides lcm(s,r)
-      *(==> the leading term of p devides the leading term of r)
-      *but the leading term of s does not devide the leading term of r
+      *of p divides lcm(s,r)
+      *(==> the leading term of p divides the leading term of r)
+      *but the leading term of s does not divide the leading term of r
       *(notice that tis condition is automatically satisfied if r is still
       *in S), then (s,r) can be canceled.
       *This should be done here because the
@@ -2100,8 +2100,8 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
       /*
       *the set B collects the pairs of type (S[j],p)
       *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-      *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-      *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+      *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+      *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
       */
       for(j = strat->Bl;j>=0;j--)
       {
@@ -2191,8 +2191,8 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     /*
     *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
     *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
-    *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
-    *term of p devides the lcm(s,r)
+    *divide lcm(r,p)). In the last case (s,r) can be canceled if the leading
+    *term of p divides the lcm(s,r)
     *(this canceling should be done here because
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
@@ -2311,8 +2311,8 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     /*
     *the set B collects the pairs of type (S[j],p)
     *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+    *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+    *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
     */
     {
       j = strat->Bl;
@@ -2351,9 +2351,9 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     *the product criterion has applied for (s,p),
     *i.e. lcm(s,p)=product of the leading terms of s and p.
     *Suppose (s,r) is in L and the leading term
-    *of p devides lcm(s,r)
-    *(==> the leading term of p devides the leading term of r)
-    *but the leading term of s does not devide the leading term of r
+    *of p divides lcm(s,r)
+    *(==> the leading term of p divides the leading term of r)
+    *but the leading term of s does not divide the leading term of r
     *(notice that tis condition is automatically satisfied if r is still
     *in S), then (s,r) can be canceled.
     *This should be done here because the
@@ -2372,8 +2372,8 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     /*
     *the set B collects the pairs of type (S[j],p)
     *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+    *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+    *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
     */
     for(j = strat->Bl;j>=0;j--)
     {
@@ -2420,8 +2420,8 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     /*
     *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
     *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
-    *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
-    *term of p devides the lcm(s,r)
+    *divide lcm(r,p)). In the last case (s,r) can be canceled if the leading
+    *term of p divides the lcm(s,r)
     *(this canceling should be done here because
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
@@ -4233,8 +4233,8 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
   /*
   *the set B collects the pairs of type (S[j],p)
   *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
-  *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-  *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+  *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+  *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
   */
   for(j = strat->Bl;j>=0;j--)
   {
@@ -4291,8 +4291,8 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
     /*
     *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
     *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
-    *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
-    *term of p devides the lcm(s,r)
+    *divide lcm(r,p)). In the last case (s,r) can be canceled if the leading
+    *term of p divides the lcm(s,r)
     *(this canceling should be done here because
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
@@ -12568,8 +12568,8 @@ static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, k
   /*
   *the set B collects the pairs of type (S[j],p)
   *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
-  *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-  *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+  *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+  *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
   */
 
   for(j = strat->Bl;j>=0;j--)
@@ -12951,8 +12951,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     /*
     *the set B collects the pairs of type (S[j],p)
     *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+    *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+    *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
     */
     {
       j = strat->Bl;
@@ -13007,9 +13007,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       *the product criterion has applied for (s,p),
       *i.e. lcm(s,p)=product of the leading terms of s and p.
       *Suppose (s,r) is in L and the leading term
-      *of p devides lcm(s,r)
-      *(==> the leading term of p devides the leading term of r)
-      *but the leading term of s does not devide the leading term of r
+      *of p divides lcm(s,r)
+      *(==> the leading term of p divides the leading term of r)
+      *but the leading term of s does not divide the leading term of r
       *(notice that tis condition is automatically satisfied if r is still
       *in S), then (s,r) can be canceled.
       *This should be done here because the
@@ -13034,8 +13034,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       /*
       *the set B collects the pairs of type (S[j],p)
       *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-      *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-      *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+      *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
+      *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
       */
       for(j = strat->Bl;j>=0;j--)
       {
@@ -13140,8 +13140,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     /*
     *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
     *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
-    *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
-    *term of p devides the lcm(s,r)
+    *divide lcm(r,p)). In the last case (s,r) can be canceled if the leading
+    *term of p divides the lcm(s,r)
     *(this canceling should be done here because
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit

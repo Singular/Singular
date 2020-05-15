@@ -2,7 +2,7 @@ o singular-restart funktioniert nicht bei singular-other
 o Wenn beim Starten von Singular ein Fehler passiert, sollte der Buffer
   trotzdem sichtbar bleiben (->Fehlermeldungen)
 o singular-cursor-key-model aus customize speichern hat nicht funktioniert
-o loading file default coice/dir does not end with an "/"
+o loading file default choice/dir does not end with an "/"
 o no key binding for 'comint-interrupt-subjob
   (i.e., for interrupting Singular), should be extra menu item
 o no font-locking for .lib .sing files when loaded from ESingular

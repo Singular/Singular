@@ -1,7 +1,7 @@
 Access specifiers:
 ------------------
 private:	symbol is accessed only in same folding
-public:		symbol is accessed througout whole singular.el
+public:		symbol is accessed throughout whole singular.el
 semipub:	symbol is accessed only in a feq functions
 		outside same folding.  Functions have to be
 		specified, then.

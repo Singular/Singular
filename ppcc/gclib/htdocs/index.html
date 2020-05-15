@@ -177,7 +177,7 @@ machine/<ACRONYM>OS</ACRONYM>-specific code portions) and tunable;
 <LI>simple collection World-stopped Mark-and-Sweep algorithm implementation;
 <LI>malloc-based allocation (i.e. every object is allocated using
 <CODE>malloc()</CODE>);
-<LI>objects finalization and memory recycling (reclaiming to the underlaying
+<LI>objects finalization and memory recycling (reclaiming to the underlying
 malloc implementation) is done lazily (between collections).
 </UL></DIV>
 
@@ -190,7 +190,7 @@ malloc implementation) is done lazily (between collections).
 <LI>16-bit architectures are supported;
 <LI>small initial internal data size;
 <LI>less source code (to verify);
-<LI>minimal set of the underlaying
+<LI>minimal set of the underlying
 <ACRONYM>clib</ACRONYM>/<ACRONYM>pthread</ACRONYM>/<ACRONYM>Win32</ACRONYM>
 functions used.
 </UL>
@@ -208,7 +208,7 @@ functions used.
 <LI>no "advanced" allocation and collection technologies (no blacklisting,
 memory unmapping, thread-local allocation, parallel marking, generation and
 incremental collections);
-<LI>relies on the underlaying malloc/free() implementation (which may be
+<LI>relies on the underlying malloc/free() implementation (which may be
 broken for large heaps, like, e.g., in some versions of msvcrt);
 <LI>"all-interior-pointers" mode is limited by the offset of 256
 <CODE>(1 &lt;&lt; GC_LOG2_OFFIGNORE)</CODE> bytes (this also means that
@@ -236,7 +236,7 @@ same as in <ACRONYM>BoehmGC</ACRONYM>;
 (all the internal symbols are not visible outside);
 <LI>both <ACRONYM>pthreads</ACRONYM> and <ACRONYM>Win32</ACRONYM> threads are
 supported;
-<LI>no thread-safety of the underlaying malloc/free is required;
+<LI>no thread-safety of the underlying malloc/free is required;
 <LI>the stack direction is detected at <ACRONYM>TinyGC</ACRONYM>
 initialization;
 <LI>no warnings are printed;
@@ -245,7 +245,7 @@ synchronization primitives (yielding and sleeping are used instead for better
 portability);
 <LI><ACRONYM>CPU</ACRONYM> state is saved by <CODE>setjmp()</CODE>;
 <LI>there is no object "header" (i.e. the original object size is passed to
-the underlaying <CODE>malloc()</CODE>).
+the underlying <CODE>malloc()</CODE>).
 </UL>
 <P>Usage notes:
 <UL>

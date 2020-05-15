@@ -210,7 +210,7 @@ libraries are stored on your disk.
 when writing a procedure, for instance, to have a look at intermediate
 results (see @ref{Debugging tools}).
 
-If such a libarary should be contributed to @sc{Singular} some formal
+If such a library should be contributed to @sc{Singular} some formal
 requirements are needed:
 @itemize
 @item
@@ -438,7 +438,7 @@ leadmonom(1+x(1));       // unit
 @c example
 @end smallexample
 
-Note, that even if we implictly compute over the localization of
+Note, that even if we implicitly compute over the localization of
 the polynomial ring, most computations are explicitly performed with
 polynomial data only.
 In particular,  @code{1/(1-x);} does not return a power series
@@ -737,7 +737,7 @@ else                                                    // 4.
 }
 @c example
 @end smallexample
-Some explainatory remarks are in order:
+Some explanatory remarks are in order:
 @enumerate
 @item
 Instead of using links of the type @code{ssi:fork}, we alternatively
@@ -965,7 +965,7 @@ Groebner bases which is designed for keeping the polynomials slim (short
 with small coefficients) during a Groebner basis computation. It provides,
 in particular, a fast algorithm for computing Groebner bases over function
 fields or over the rational numbers, but also in several other
-cases. The algorithm which is still under developement was developed in
+cases. The algorithm which is still under development was developed in
 the diploma thesis of Michael Brickenstein. It has been published as
 @code{https://www.singular.uni-kl.de/reports/35/paper_35_full.ps.gz}.
 
@@ -1492,7 +1492,7 @@ the @code{lres} command.
   ideal i =z2-1y3+x3y,xz,-1xy2+x4,x3z;
   resolution rs=mres(i,0);   // computes a minimal resolution
   rs;                        // the standard representation of complexes
-    list resi=rs;            // convertion to a list
+    list resi=rs;            // conversion to a list
   print(resi[1]);            // the 1st module is i minimized
   print(resi[2]);            // the 1st syzygy module of i
   resi[3];                   // the 2nd syzygy module of i
@@ -3310,7 +3310,7 @@ The GIT-Fan can be computed using symmetries as follows:
 
 Although we provide a procedure to compute the orbit decomposition of the group action on the simplex of variables
 this is not fast in Singular. In the following we describe how to use GAP to obtain the orbit decomposition and then continue
-with this data in Singular. This is particularily useful for more complicated examples.
+with this data in Singular. This is particularly useful for more complicated examples.
 
 The file orbits.gp in the directory doc of the Singular source tree contains GAP code to do this computation.
 This result is provided in the file doc/simplexOrbitRepresentativesG25.sing.

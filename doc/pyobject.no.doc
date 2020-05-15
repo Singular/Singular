@@ -10,7 +10,7 @@ The pyobject is a black box data type in @sc{Singular}
 for handling objects from the programming language @code{python}. It
 needs the @code{python} support of @sc{Singular} to be installed.
 
-Together with some basic operations and funtions, pyobject instances
+Together with some basic operations and functions, pyobject instances
 access @code{python} functionality from within @sc{Singular} and store
 the results for re-use:
 

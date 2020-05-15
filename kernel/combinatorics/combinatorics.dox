@@ -1,6 +1,6 @@
-/*! \page kernel_combinatorics_page Combinatorical algorithms
+/*! \page kernel_combinatorics_page Combinatorial algorithms
 
- \brief This sub-package of \ref kernel_page contains some combinatorical algorithms.
+ \brief This sub-package of \ref kernel_page contains some combinatorial algorithms.
 
  Main header in `/kernel/combinatorics/`:
  - \ref kernel/combinatorics/hutil.h

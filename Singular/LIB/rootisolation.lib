@@ -597,7 +597,7 @@ static proc ivmatMultiplyGeneral(ivmat A, B)
 
 proc evalPolyAtBox()
 "USAGE: @code{evalPolyAtBox(f, B)}; @code{f poly, B box}
-RETURN: interval, evalutaion of @code{f} at @code{B} using interval arithmetic
+RETURN: interval, evaluation of @code{f} at @code{B} using interval arithmetic
 PURPOSE: computes an interval extension of the polynomial
 EXAMPLE: example evalPolyAtBox; shows an example"
 {
@@ -974,8 +974,8 @@ EXAMPLE: example rootIsolationNoPreprocessing; exclusion test for intersection
           // numbers, we substitute the corresponding ring variables with these
           // numbers and pass to the subring where these variables have been
           // removed.
-          // As rootIsolation now accpets ideals with arbitrary generators we
-          // compute the zeros of the substituion ideal and reassemble the
+          // As rootIsolation now accepts ideals with arbitrary generators we
+          // compute the zeros of the substitution ideal and reassemble the
           // boxes afterwards.
           //
           // This is probably overkill.
@@ -1445,7 +1445,7 @@ EXAMPLE: example rootIsolation; for intersection of two ellipses"
       // boxes
       for (k = 0; k < sizes[i]; k++)
       {
-        // repetions
+        // repetitions
         for (l = 1; l <= repCount[i]; l++)
         {
           // last index since we need interval in one-dimensional box

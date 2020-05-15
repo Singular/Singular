@@ -184,7 +184,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//------- sigma(z^N + f) in terms of the imbedded resolution graph of f -------
+//------- sigma(z^N + f) in terms of the embedded resolution graph of f -------
 
 static proc dedekindSum(number b, number c, int a)
 {
@@ -274,7 +274,7 @@ static proc sumEdges(intmat N, list M, int K, int n)
 
 static proc etaRes(list L, int K)
 //=== L total multiplicities
-//=== eta-invariant in terms of the imbedded resolution graph of f
+//=== eta-invariant in terms of the embedded resolution graph of f
 {
    int i,j,d;
    intvec v;
@@ -319,7 +319,7 @@ static proc etaRes(list L, int K)
 
 static proc signatureRes(int N, poly f)
 //=== computes signature of surface singularity defined by z^N + f(x,y) = 0
-//=== in terms of the imbedded resolution graph of f
+//=== in terms of the embedded resolution graph of f
 {
    list L = totalmultiplicities(f);
    return(etaRes(L,N) - N*etaRes(L,1));

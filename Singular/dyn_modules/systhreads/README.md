@@ -73,7 +73,7 @@ Also, `statChannel(ch)` returns the number of elements in the channel.
 Note that this is an estimate, as new elements can concurrently be
 written to or existing elements retrieved from the channel.
 
-# Syncronization Variables
+# Synchronization Variables
 
 Synchronization Variables are created via `makeSyncVar(uri)`. You can
 use `writeSyncVar(sv, val)` to write a value to a synchronization

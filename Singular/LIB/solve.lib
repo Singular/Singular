@@ -107,14 +107,14 @@ EXAMPLE: example laguerre_solve; shows an example
     return(roots);
   }
 
-  if(prot!=0)// more informations
+  if(prot!=0)// more information
   {
     pout="//control: complex ring with precision "+string(numberprec);
     if(size(ss)==0){pout=pout+nl+
         "//         basering not complex, hence solutiontype string";
     if(solutionprec<numberprec){pout=pout+nl+
         "//         with precision "+string(solutionprec);}}
-    if(splitcontrol<0){pout=pout+nl+ "//       no spliting";}
+    if(splitcontrol<0){pout=pout+nl+ "//       no splitting";}
     if(splitcontrol==0){pout=pout+nl+"//       output without multiple roots";}
     if(rootcheck){pout=pout+nl+
         "//         check roots with precision "+string(solutionprec);}
@@ -447,7 +447,7 @@ static proc checkroots(poly p,poly v,list r,int ima,number pr)
     attrib(li,"isSB",1);
     n=leadcoef(reduce(p,li));n=n/m;
     if(n!=0)
-    {if(nerr(n,pr)!=0){ERROR("Unsufficient accuracy!");}}
+    {if(nerr(n,pr)!=0){ERROR("Insufficient accuracy!");}}
   }
 }
 /*
@@ -603,7 +603,7 @@ EXAMPLE: example solve; shows an example
     }
   }
   if (outprec>prec){prec = outprec;}
-  // if interaktive version is chosen -- choice of basering (Top::`outR`)
+  // if interactive version is chosen -- choice of basering (Top::`outR`)
   // and name for list of solutions (outL):
   if (oldr==1)
   {
@@ -1626,7 +1626,7 @@ static proc psubst( int d, int dd, int n, list resl,
         }
         else
         {
-            dbprint( printlevel-voice+1,"// 30 ps == 0, thats not cool...");
+            dbprint( printlevel-voice+1,"// 30 ps == 0, that's not cool...");
             lsr=list(number(0));
         }
 

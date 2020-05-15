@@ -259,7 +259,7 @@ RETURN:   a copy of t.
 NOTE:     'task t1 = copyTask(t2);' is not the same as 'task t1 = t2;'. After
           the latter command, t1 points to the same object as t2; any changes
           to t2 will also effect t1. In contrast to this, copyTask() creates a
-          new independend task.
+          new independent task.
        @* A task whose state is 'started' cannot be copied.
 SEE ALSO: getCommand, getArguments, getResult, getState, createTask, killTask,
           compareTasks, printTask
@@ -983,7 +983,7 @@ EXAMPLE:  example waitTasks; shows an example"
         }
     }
 
-    /* send the reqests */
+    /* send the requests */
     for (j = size(requests); j > 0; j--) {
         write(requests[j][3], 1);
         write(requests[j][3], requests[j][2]);

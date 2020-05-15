@@ -541,7 +541,7 @@ EXAMPLE:  irrRealizationDim; shows an example"
     //check if also realizable by an irreducible curve
     list lweight;
     int i_rdim = -1;
-    //substitute the vectors by a primitve one and store the multiplicities
+    //substitute the vectors by a primitive one and store the multiplicities
     for(i=1;i<=size(lInput);i++)
     {
       lweight[i] = gcdvector(lInput[i]);

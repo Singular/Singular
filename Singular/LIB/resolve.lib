@@ -535,7 +535,7 @@ proc blowUpBO(list BO, ideal C,int e)
 ASSUME:  R  = basering, a polynomial ring, W an ideal of R,
 @*       J  = ideal containing W,
 @*       C  = ideal containing J
-COMPUTE: the blowing up of BO[1] in C, the exeptional locus, the strict
+COMPUTE: the blowing up of BO[1] in C, the exceptional locus, the strict
          transform of BO[2]
 NOTE:    blowUpBO may be applied to basic objects in the sense of
 @*       [Bravo, Encinas, Villamayor] in the following referred to as BO and
@@ -586,7 +586,7 @@ EXAMPLE: example blowUpBO;  shows an example
 //---keeps all charts
    if(e==2){noDel=1;}
 //---this is only for curves and surfaces
-//---keeps all charts with relevant informations on the exceptional divisors
+//---keeps all charts with relevant information on the exceptional divisors
    if(e==3){keepDiv=1;}
    if( typeof(attrib(BO[2],"isEqui"))=="int" )
    {
@@ -862,7 +862,7 @@ EXAMPLE: example blowUpBO;  shows an example
      if(deg(JJ[1])==0)
      {
         delCharts[i+1]=1;
-//--- the i-th chart will be marked for deleting because all informations
+//--- the i-th chart will be marked for deleting because all information
 //--- are already contained in the union of the remaining charts
      }
      else
@@ -908,7 +908,7 @@ EXAMPLE: example blowUpBO;  shows an example
            }
            if(m)
            {
-//--- the i-th chart will be marked for deleting because all informations
+//--- the i-th chart will be marked for deleting because all information
 //--- are already contained in the union of the remaining charts
               delCharts[i+1]=1;
            }
@@ -959,7 +959,7 @@ EXAMPLE: example blowUpBO;  shows an example
            {
               if(m==1)
               {
-//--- the i-th chart will be marked for deleting because all informations
+//--- the i-th chart will be marked for deleting because all information
 //--- are already contained in the union of the remaining charts
                  delCharts[i+1]=1;
               }
@@ -970,7 +970,7 @@ EXAMPLE: example blowUpBO;  shows an example
                  if(normalCrossB(B[2],B[4],MAtmp))
                  {
 //--- in case of the option extra
-//--- the i-th chart will be marked for deleting because all informations
+//--- the i-th chart will be marked for deleting because all information
 //--- are already contained in the union of the remaining charts
 
                    delCharts[i+1]=1;
@@ -2178,7 +2178,7 @@ example
 /////////////////////////////////////////////////////////////////////////////
 static proc invGreater(intmat M1, intmat M2, intvec iv1, intvec iv2)
 {
-// Auxilliary procedure, BM-algorithm
+// Auxiliary procedure, BM-algorithm
    int i;
    for(i=1;i<=min(ncols(M1),ncols(M2));i++)
    {
@@ -2207,7 +2207,7 @@ static proc invGreater(intmat M1, intmat M2, intvec iv1, intvec iv2)
 /////////////////////////////////////////////////////////////////////////////
 proc CenterTail(list BM, ideal C)
 {
-//!!! Auxilliary procedure, BM-algorithm
+//!!! Auxiliary procedure, BM-algorithm
 //!!!!!!!!Rueckgabe im Zentrumsformat
   int i,j,bmin;
   int alpha=lcm(BM[3]);
@@ -3049,7 +3049,7 @@ static proc CoverCenter(list BO,int b, ideal Jb)
            if(BO[3]!=0)
            {
 //--- intersections with E do not meet conditions ==> reset
-              ERROR("reset in Coeff, please send the example to the autors");
+              ERROR("reset in Coeff, please send the example to the authors");
            }
          }
        }
@@ -3922,7 +3922,7 @@ COMPUTE: a resolution of J,
 @*       j3: value 0 or 4; turn off or on debugBlowUp
 @*       j4: value 0 or 8; turn off or on debugCoeff
 @*       j5: value 0 or 16:turn off or on debugging of Intersection with E^-
-@*       j6: value 0 or 32:turn off or on stop after pass throught the loop
+@*       j6: value 0 or 32:turn off or on stop after pass through the loop
 @*       i=j1+j2+j3+j4+j5+j6
 RETURN:  a list l of 2 lists of rings
          l[1][i] is a ring containing a basic object BO, the result of the

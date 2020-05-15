@@ -19,7 +19,7 @@ There is a comparison operator, we access the operator via the function isEqual.
 This function isEqual can be used to compare two elements of the same type
 (Set, list, int, bigint, string, intmat, bigintmat, intvec, ring, map, poly, matrix,
 ideal, module, vector, resolution) and also works for comparing of int, bigint and
-number with each other, similarily for matrix, bigintmat and intmat.
+number with each other, similarly for matrix, bigintmat and intmat.
 
 The function size can be used to determine the number of elements.
 
@@ -164,12 +164,15 @@ proc isEqualList(def a, def b)
 
 proc isEqualSet(def a, def b)
 {
-  if(size(a)!=size(b)){                //check if the two sets have the same size
+  if(size(a)!=size(b))             //check if the two sets have the same size
+  {
    return(0);
   }
   list L = a.elements;
-  for(int i=1;i<=size(a);i++){                //chek if every element of the first set occurs in
-    if(!(isElement(L[i],b))){        //the second set
+  for(int i=1;i<=size(a);i++)      //check if every element of the first set occurs in
+  {
+    if(!(isElement(L[i],b)))       //the second set
+    {
       return(0);
     }
   }

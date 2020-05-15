@@ -58,7 +58,7 @@ Example: bla
   ALLOW_ZERODIVISOR: coefficients/cring elements may be zero divisors
   NO_ZERODIVISOR: coefficients/cring elements must be a domain
 
-  if a requirement from a group is ommited,
+  if a requirement from a group is omited,
   the defaults are:  NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
 - add one (or more) lines for the procedures to call:

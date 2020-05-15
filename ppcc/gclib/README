@@ -54,7 +54,7 @@ implementation;
 - malloc-based allocation (i.e. every object is allocated using
 malloc());
 - objects finalization and memory recycling (reclaiming to the
-underlaying malloc implementation) is done lazily (between
+underlying malloc implementation) is done lazily (between
 collections).
 
 Advantages and drawbacks
@@ -65,7 +65,7 @@ The major TinyGC advantages over BoehmGC are:
 - 16-bit architectures are supported;
 - small initial internal data size;
 - less source code (to verify);
-- minimal set of the underlaying clib/pthread/Win32 functions used.
+- minimal set of the underlying clib/pthread/Win32 functions used.
 
 The drawbacks of TinyGC are:
 - lower allocation speed and larger world-stopped collection delays
@@ -80,7 +80,7 @@ threads;
 - no "advanced" allocation and collection technologies (no
 blacklisting, memory unmapping, thread-local allocation, parallel
 marking, generation and incremental collections);
-- relies on the underlaying malloc/free() implementation (which may be
+- relies on the underlying malloc/free() implementation (which may be
 broken for large heaps, like, e.g., in some versions of msvcrt);
 - "all-interior-pointers" mode is limited by the offset of 256
 (1 << GC_LOG2_OFFIGNORE) bytes (this also means that disappearing links
@@ -103,7 +103,7 @@ the same as in BoehmGC;
 - full TinyGC implementation resides in a single file (all the internal
 symbols are not visible outside);
 - both pthreads and Win32 threads are supported;
-- no thread-safety of the underlaying malloc/free is required;
+- no thread-safety of the underlying malloc/free is required;
 - the stack direction is detected at TinyGC initialization;
 - no warnings are printed;
 - the thread "suspend" handler does not use pthread synchronization
@@ -111,7 +111,7 @@ primitives (yielding and sleeping are used instead for better
 portability);
 - CPU state is saved by setjmp();
 - there is no object "header" (i.e. the original object size is passed
-to the underlaying malloc()).
+to the underlying malloc()).
 
 Usage notes:
 - all pointers must be word-aligned;

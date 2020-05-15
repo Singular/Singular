@@ -1,5 +1,5 @@
 The structure pointed to by "coeffs" describes a commutative ring with 1
-which could be used as coeffcients for polynomials.
+which could be used as coefficients for polynomials.
 
 To create a new representant of coeffs, implement all of the following
 properties/functions and register it via nRegister(n_unknown,<InitCharFunc>)
@@ -17,8 +17,8 @@ mandatory:
   cfDiv is supposed to be a Euclidean division in rings that are meant
   to be Euclidean and an exact division otherwise.
 -cfInit
--cfInt (returns 0, if the arguemnt is not in int)
--cfMPZ (returns mpz_init_si(0), if the arguemnt is not an integer)
+-cfInt (returns 0, if the argument is not in int)
+-cfMPZ (returns mpz_init_si(0), if the argument is not an integer)
 -cfInpNeg
   negates (mult. by -1) in-place.
 -cfInvers
@@ -119,6 +119,6 @@ Howto define a new coeff type:
 // register the new class of coeffs:
  n_coeffType type=nRegister(n_unknown,<your InitChar procedure>);
 // create the new coeff type:
- coeffs cf=nInitChar(type,<your paramater for the InitChar procedure>);
+ coeffs cf=nInitChar(type,<your parameter for the InitChar procedure>);
 // cf may now be used for (polynomial) ring definitions etc.
 

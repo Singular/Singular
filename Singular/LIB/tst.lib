@@ -577,14 +577,14 @@ proc tst_test_res(ideal i, list #)
 "USAGE:    tst_test_res(ideal i, only_lres_and_hres)
 RETURN:    1, if ok; 0 on error
 PURPOSE:   Tests sres, lres, hres, mres with betti commands and conversions
-           If optinal third argument is given, test only lres and hres
+           If optional third argument is given, test only lres and hres
 EXAMPLE:  example tst_test_res shows an example"
 {
   int ret = 1;
 
   if (! homog(i))
   {
-    ERROR("ERROR: input ideal needs to be homogenous ");
+    ERROR("ERROR: input ideal needs to be homogeneous ");
   }
 
   if (size(#) == 0)

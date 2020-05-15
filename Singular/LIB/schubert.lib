@@ -680,7 +680,7 @@ RETURN:     number
 INPUT:      M is a moduli space of stable maps, G is a graph
 OUTPUT:     a number corresponding to the normal bundle on a moduli space of
             stable maps at a graph
-KEYWORDS:   normal bundle, graph, rational curves, mutiple covers, lines on
+KEYWORDS:   normal bundle, graph, rational curves, multiple covers, lines on
             hypersurfaces
 SEE ALSO:   contributionBundle
 EXAMPLE:    example normalBundle; shows an example

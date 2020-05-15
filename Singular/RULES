@@ -13,7 +13,7 @@ Compiler conventions
 --------------------
 - should compile with gcc/g++ version 2.9.3 to 4.x
 - should create correct code with gcc/g++ version 2.9.3 to 4.x : with
-  well known exeptions
+  well known exceptions
   ( IA64: gcc 4.0.x, 4.1.x produce wrong code,
     OsX: ..., etc.)
 
@@ -37,7 +37,7 @@ Naming conventions(filenames, libraries):
 
 Error messages:
 --------------
-- allways test for wrong input from the user,
+- always test for wrong input from the user,
   report errors via Werror/WerrorS, warnings via Warn/WarnS
 - trust other parts of Singular:
   - only very fast tests

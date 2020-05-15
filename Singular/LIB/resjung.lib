@@ -128,7 +128,7 @@ EXAMPLE: example jungfib; shows an example.
 //build the fibreproduct
   setring A;
   list fibreP = buildFP(embresolvee,NoetherN,phi);
-  //a list of lists, where fibreP[i] contains the information conserning
+  //a list of lists, where fibreP[i] contains the information concerning
   //the i-th chart of the fibrepoduct
   //fibreP[i] is the ring; QIdeal the quotientideal; BMap is the map from A
   return(fibreP);
@@ -329,7 +329,7 @@ static proc branchlocus(ideal id)
   ideal I = radical(l[size(l)]);
   poly product=1;
   kill l;
-  for(int i=1; i < n-1; i++){ //elimination of all variables exept var(i),var(n-1),var(n)
+  for(int i=1; i < n-1; i++){ //elimination of all variables except var(i),var(n-1),var(n)
     intvec v;
     for(int j=1; j < n-1; j++){
       if(j<>i){
@@ -360,7 +360,7 @@ static proc branchlocus(ideal id)
     int index = 1;
     if(attrib(J,"isPrincipal")==0){
       setring R;
-      for(int j = 1;j<=size(J);j++){//determines the monic polynomial in var(i) with coefficents in C2
+      for(int j = 1;j<=size(J);j++){//determines the monic polynomial in var(i) with coefficients in C2
         intvec w = leadexp(J[j]);
         attrib(w,"isMonic",1);
         for(int k = 1;k<=size(w);k++){
@@ -388,7 +388,7 @@ static proc branchlocus(ideal id)
   ideal clocus= imap(A,product);      //the critical locus is contained in this
   ideal I = preimage(A,LastTwo,lowdim);
   clocus= radical(intersect(clocus,I));
-  //radical is necessary since the resultant is in gerneral not reduced
+  //radical is necessary since the resultant is in general not reduced
   export(clocus);
   return(C2);
 }
@@ -542,9 +542,9 @@ static proc resolve2(list BO){
               if(defined(blowup)){kill blowup;}
               list blowup = blowUpBO(BO,primdecSL[index][2],3);
               //if it has a rational singularity blow it up else choose
-              //some arbitary singular point
+              //some arbitrary singular point
               if(attrib(primdecSL[1],"isRational")==0){
-              //if we blow up a non rational singularity the exeptional divisors
+              //if we blow up a non rational singularity the exceptional divisors
               //are reduzible so we need to separate them
                 for(int k=1;k<=size(blowup);k++){
                   def R2=blowup[k];

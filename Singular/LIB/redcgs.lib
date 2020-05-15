@@ -223,7 +223,7 @@ example
   @RP;
 }
 
-//*************Auxilliary routines**************
+//*************Auxiliary routines**************
 
 // cld : clears denominators of an ideal and normalizes to content 1
 //       can be used in @R or @P or @RP
@@ -398,7 +398,7 @@ example
   subset(J,K);
 }
 
-//*************Auxilliary routines**************
+//*************Auxiliary routines**************
 
 
 // elimintfromideal: elimine the constant numbers from the ideal
@@ -417,8 +417,8 @@ proc elimintfromideal(ideal J)
 
 // simpqcoeffs : simplifies a quotient of two polynomials of @R
 //               for ring @R
-// input: two coeficients (or terms) of @R (that are considered as quotients)
-// output: the two coeficients reduced without common factors
+// input: two coefficients (or terms) of @R (that are considered as quotients)
+// output: the two coefficients reduced without common factors
 proc simpqcoeffs(poly n,poly m)
 {
   def nc=content(n);
@@ -1297,7 +1297,7 @@ RETURN:   Returns a list T describing a dichotomic discussion tree, whose
             [7] the set of lpp of ideal F
             [8] condition that was taken to reach the vertex
                 (poly 1, for the root).
-          The remaning elements of the list represent vertices of the tree:
+          The remaining elements of the list represent vertices of the tree:
           with the same structure:
             [1] label: intvec (1,0,0,1,...) gives its position in the tree:
                 first branch condition is taken non-null, second null,...
@@ -1322,7 +1322,7 @@ NOTE:     The basering R, must be of the form K[a][x], a=parameters,
           selects the terminal vertices.
           The content of buildtree can be written in a file that is readable
           by Maple in order to plot its content using buildtreetoMaple;
-          The file written by buildtreetoMaple when readed in a Maple
+          The file written by buildtreetoMaple when read in a Maple
           worksheet can be plotted using the dbgb routine tplot;
 
 KEYWORDS: CGS, disjoint, reduced, comprehensive Groebner system
@@ -1394,7 +1394,7 @@ example
   buildtreetoMaple(T,"Tb","Tb.txt");
 }
 
-// recbuildtree: auxilliary recursive routine called by buildtree
+// recbuildtree: auxiiary recursive routine called by buildtree
 proc recbuildtree(list v, list P)
 {
   def vertex=v;
@@ -1533,14 +1533,14 @@ proc recbuildtree(list v, list P)
 //    containing the table representing it in Maple
 
 // writes the list L=buildtree(F) to a file "writefile" that
-// is readable by Maple whith name T
+// is readable by Maple with name T
 // input:
 //   L: the list output by buildtree
 //   T: the name (string) of the output table in Maple
 //   writefile: the name of the datafile where the output is to be stored
 // output:
-//   the result is written on the datafile "writefile" containig
-//   the assignement to the table with name "T"
+//   the result is written on the datafile "writefile" containing
+//   the assignment to the table with name "T"
 proc buildtreetoMaple(list L, string T, string writefile)
 "USAGE:   buildtreetoMaple(T, TM, writefile);
           T: is the list provided by buildtree,
@@ -1842,7 +1842,7 @@ proc comp(int n,int p)
 // given the matrices of coefficients and monomials m amd m1 of
 // two polynomials (the first one contains all the terms of f
 // and the second only those of f
-// it returns the list with the comon monomials and the list of coefficients
+// it returns the list with the common monomials and the list of coefficients
 // of the polynomial f with zeroes if necessary.
 proc adaptcoef(matrix m, matrix m1)
 {
@@ -1863,7 +1863,7 @@ proc adaptcoef(matrix m, matrix m1)
   return(list(T,C));
 }
 
-// given teh ideal of non-null conditions and an intvec lambda
+// given the ideal of non-null conditions and an intvec lambda
 // with the exponents of each w in W
 // it returns the polynomial prod (w_i)^(lambda_i).
 proc WW(ideal W, intvec lambda)
@@ -2465,7 +2465,7 @@ proc selectcases(list bT)
   TT0[1]=list(T0[7],T0[3],list(list(T0[4],T0[5],T0[6])));
              // first element of the output of selectcases
   list T1=T; // the initial list; it is only actualized (split)
-             // when a segment is completly revised (all split are
+             // when a segment is completely revised (all split are
              // already be considered);
              // ( (lpp, ((lab,B,N,W,L),.. ()) ), .. (..) )
   list TT;   // the output list ( (lpp,B,((N,W,L),..()) ),.. (..) )
@@ -2918,7 +2918,7 @@ proc cantree(list S)
 }
 
 // addcase
-// recursive routine that adds to the list @L, (an alredy GCS)
+// recursive routine that adds to the list @L, (an already GCS)
 // a new redspec rs=(N,W,L);
 // and returns the test t whose value is
 // 0 if the new canspec is not to be hung to the fathers vertex,
@@ -3074,7 +3074,7 @@ proc simplifynewadded(intvec labu)
 
 // given the label labfu of the vertex fu it returns the last
 // int of the label of the last existing children.
-// if no child exists, then it ouputs 0.
+// if no child exists, then it outputs 0.
 proc lastchildrenindex(intvec labfu)
 {
   int i;
@@ -3100,7 +3100,7 @@ proc lastchildrenindex(intvec labfu)
 }
 
 // given the vertex u it provides the next brother of u.
-// if it does not exist, then it ouputs v=list(list(intvec(0)),0)
+// if it does not exist, then it outputs v=list(list(intvec(0)),0)
 proc nextbrother(intvec labu)
 {
   list L; int i; int j; list next;
@@ -3286,7 +3286,7 @@ RETURN:   The list representing the Minimal Reduced CGS.
           How is to be read the mrcgs tree? The vertices with an even number of
           integers in the label are to be considered as additive and those
           with an odd number of integers in the label are to be considered as
-          substraction. As an example consider the following vertices:
+          subtraction. As an example consider the following vertices:
           v1=((i),2,lpp,B),
           v2=((i,1),2,P_{(i,1)}),
           v3=((i,1,1),2,P_{(i,1,1)},
@@ -3629,7 +3629,7 @@ RETURN:   The list representing the Reduced CGS.
           How is to be read the rcgs tree? The vertices with an even number of
           integers in the label are to be considered as additive and those
           with an odd number of integers in the label are to be considered as
-          substraction. As an example consider the following vertices:
+          subtraction. As an example consider the following vertices:
           v1=((i),2,lpp,B),
           v2=((i,1),2,P_{(i,1)}),
           v3=((i,1,1),0,P_{(i,1,1)}, v4=((i,1,2),0,P_{(i,1,1)}),
@@ -3811,7 +3811,7 @@ RETURN:   The list representing the Canonical Reduced CGS.
           How is to be read the mrcgs tree? The vertices with an even number of
           integers in the label are to be considered as additive and those
           with an odd number of integers in the label are to be considered as
-          substraction. As an example consider the following vertices:
+          subtraction. As an example consider the following vertices:
           v1=((i),2,lpp,B),
           v2=((i,1),2,P_{(i,1)}),
           v3=((i,1,1),0,P_{(i,1,1)}, v4=((i,1,2),0,P_{(i,1,1)}),

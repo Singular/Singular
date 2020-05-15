@@ -1488,7 +1488,7 @@ RETURN: The canonical C-representation [P,Q] of the
         locally closed set, formed by a pair of radical
         ideals with P included in Q, representing the set
         V(P) \ V(Q) = V(N) \ V(M)
-KEYWORDS: locally closed set; canoncial form
+KEYWORDS: locally closed set; canonical form
 EXAMPLE:  Crep; shows an example"
 {
   int te;
@@ -1588,7 +1588,7 @@ RETURN: The canonical P-representation of the locally closed
        set V(N) \ V(M)
        Output: [Comp_1, .. , Comp_s ] where
        Comp_i=[p_i,[p_i1,..,p_is_i]]
-KEYWORDS: locally closed set; canoncial form
+KEYWORDS: locally closed set; canonical form
 EXAMPLE:  Prep; shows an example"
 {
   int te;
@@ -1685,7 +1685,7 @@ RETURN:The canonical C-representation [P,Q] of the
        locally closed set. A pair of radical ideals with
        P included in Q, representing the
        set V(P) \ V(Q)
-KEYWORDS: locally closed set; canoncial form
+KEYWORDS: locally closed set; canonical form
 EXAMPLE:  PtoCrep; shows an example"
 {
   int te;

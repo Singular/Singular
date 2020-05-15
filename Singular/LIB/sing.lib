@@ -471,7 +471,7 @@ EXAMPLE: example qhspectrum; shows an example
    ideal k = std(jacob(f));
    if( vdim(k) == -1 )
    {
-       "// f is no isolated singuarity!";
+       "// f is no isolated singularity!";
        return();
     }
    k = kbase(k);

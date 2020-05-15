@@ -31,7 +31,7 @@ static proc num_of_vars(ideal I)
 
 RETURN: an intvec containing one entry for each ring variable.
 each contains the sums of all degrees in this variable of all monomials
-occuring in the ideal.
+occurring in the ideal.
 An entry is zero if and only if the corresponding variable does not occur in the ideal.
 "
 {

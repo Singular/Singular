@@ -80,7 +80,7 @@ and the [Singular build system description](@ref bs_page).
   - Consider the choice between macros and inline function very careful,
     prefer inline functions:
     - macros are not type safe
-    + macros are allways inlined
+    + macros are always inlined
     - arguments to macros can be multiply computed
 
     - "inline" is only a hint for the optimizer (especially in the C parts):
@@ -120,7 +120,7 @@ and the [Singular build system description](@ref bs_page).
   - interpreter routines have to check their input
   - use const wherever possible/suitable (especially in declarations of input
     parameters to functions/methods provided as pointers or references or for
-    methods that do not change the state of an object, consider delaring
+    methods that do not change the state of an object, consider declaring
     variables "mutable" whenever suitable)
 
   - kernel routines have to document their requirements,

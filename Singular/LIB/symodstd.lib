@@ -19,7 +19,7 @@ OVERVIEW:
    To compute a standard basis of I we apply a modification of the modular
    version of the standard basis algorithm (improving the calculations in
    positive characteristic). Therefore we only allow primes p such that p-1 is
-   divisible by k. This guarantees the existance of a k-th primitive root of
+   divisible by k. This guarantees the existence of a k-th primitive root of
    unity in Z/pZ.
 
 PROCEDURES:
@@ -649,7 +649,7 @@ proc divPrimeList(int k, ideal I, int n, list #)
 {
 // the intvec of n greatest primes p <= 2147483647 (resp. n greatest primes
 // < L[size(L)] union with L) such that each (p-1) is divisible by k, and none
-// of these primes divides any coefficient occuring in I
+// of these primes divides any coefficient occurring in I
 // --> similar to procedure primeList in modstd.lib
 
    intvec L;

@@ -45,7 +45,7 @@ LIB "primdec.lib";
 
 // note : return a ring : ring need not be exported !!!
 
-// Artihmetic in Q(a)[x] without built-in procedures
+// Arithmetic in Q(a)[x] without built-in procedures
 // assume basering = Q[x,a] and minpoly is represented by mpoly(a).
 // the algorithms are taken from "Polynomial Algorithms in Computer Algebra",
 // F. Winkler, Springer Verlag Wien, 1996.
@@ -66,9 +66,9 @@ LIB "primdec.lib";
 // extension field is represented as Q[x...,a] together with the ideal
 // 'mpoly' (attribute "isSB"). The arithmetic in the extension field is
 // implemented in the procedures in the procedures 'MultPolys' (multiplication)
-// and 'InvertNumber' (inversion). After addition and substraction one should
+// and 'InvertNumber' (inversion). After addition and subtraction one should
 // apply 'SimplifyPoly' to the result to reduce the result w.r.t. 'mpoly'.
-// This is done by reducing each coefficient seperately, which is more
+// This is done by reducing each coefficient separately, which is more
 // efficient for polynomials with many terms.
 
 
@@ -816,9 +816,9 @@ EXAMPLE: example zeroSetMain; shows an example
 "
 {
   // main work is done in zeroSetMainWork, here the zero-set of each ideal from the
-  // primary decompostion is coputed by menas of zeroSetMainWork, and then the
+  // primary decomposition is coputed by means of zeroSetMainWork, and then the
   // minpoly and the parameter representing the algebraic extension are
-  // transformed according to 'newA', i.e., only bookeeping is done.
+  // transformed according to 'newA', i.e., only bookkeeping is done.
 
   def altring=basering;
   int i, j, n, noMP, dbPrt;

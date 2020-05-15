@@ -94,7 +94,7 @@
 /* This is called if nothing goes any more, i.e., if
    memory request can not be serviced. If set, this function should never return.*/
 #ifndef OM_DEFAULT_OUT_OF_MEMORY_FUNC
-/* This initalizes om_Opts.OutOfMemoryFunc which is declared as
+/* This initializes om_Opts.OutOfMemoryFunc which is declared as
    void (*OutOfMemoryFunc)(); */
 #define OM_DEFAULT_OUT_OF_MEMORY_FUNC NULL
 #endif
@@ -113,7 +113,7 @@ while (0)
 /* This is called whenever no more memory could be obtained from the system.
    It should trigger the release of as much memory by the application as possible */
 #ifndef OM_DEFAULT_MEMORY_LOW_FUNC
-/* This initalizes om_Opts.MemoryLowFunc which is declared as
+/* This initializes om_Opts.MemoryLowFunc which is declared as
    void (*MemoryLowFunc)(); */
 #define OM_DEFAULT_MEMORY_LOW_FUNC NULL
 #endif
@@ -230,7 +230,7 @@ while (0)
 #define OM_MAX_KEPT_FRAMES 10
 #endif
 
-/* pattern with which memory is initalized, for front and back padding,
+/* pattern with which memory is initialized, for front and back padding,
    and for free memory: only relevant if track >= 3*/
 #ifndef OM_INIT_PATTERN
 #define OM_INIT_PATTERN    0xfe

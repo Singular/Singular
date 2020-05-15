@@ -26,7 +26,7 @@ as @code{a-b-c-d} where a,b,c and d are numbers:
       extended options, new algorithms, etc.)
 @item d is changed with each release (i.e. with bug fixes, etc.)
 @end itemize
-@sc{Singular} does also have "unofficial" build orginating from
+@sc{Singular} does also have "unofficial" build originating from
 a code version between "official" version: such builds display
 "Development version a.b.c" in the header while "official" versions
 show "version a.b.c". Also the manual describes version a-b-c.
@@ -49,7 +49,7 @@ In general, the user syntax has not changed, however there are some changes in t
 @c table @asis
 @itemize @bullet
 @item setting @code{minpoly} results in changing the current coefficient domain
-and clears all previously defined varaiables of that ring
+and clears all previously defined variables of that ring
 
 @item Minor changes in the output of coefficient ring description. Moreover the output of elements of certain rings has been improved (for example, reals).
 
@@ -58,7 +58,7 @@ and clears all previously defined varaiables of that ring
       have been changed. In some cases this leads to a different, mathematically equivalent results of Groebner
       bases and related computations. For example a Groebner basis element may differ by a unit.
 
-@item Most noteably, due to the redesign of the coefficient rings, if the user sets the minimal polynomial
+@item Most notably, due to the redesign of the coefficient rings, if the user sets the minimal polynomial
       all variables dependent on the current ring are deleted.
 
 @end itemize

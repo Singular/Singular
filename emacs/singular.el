@@ -107,7 +107,7 @@ Currently, the following modes are supported:
 (defmacro singular-debug (mode form &optional else-form)
   "Major debugging hook for singular.el.
 Evaluates FORM if `singular-debug' equals t or if MODE is an element
-of `singular-debug', othwerwise ELSE-FORM."
+of `singular-debug', otherwise ELSE-FORM."
   `(if (or (eq singular-debug t)
 	   (memq ,mode singular-debug))
        ,form
@@ -321,7 +321,7 @@ the customizing stuff to change buffer-local properties."
 ;; interactive mode with its input and output sections.  So we begun to
 ;; rewrite large portions of Comint to adapt it to our needs.  At some
 ;; point it came clear that it would be best to throw out Comint
-;; alltogether, would not have been there some auxilliary functions which
+;; all together, would not have been there some auxiliary functions which
 ;; are really useful but annoying to rewrite.  These are, for example, the
 ;; command line history functions or the completion stuff offered by
 ;; Comint.
@@ -619,7 +619,7 @@ This function is called  at mode initialization time."
 
 (defconst singular-menu-initial-library-menu
   '(["other..." (singular-load-library t) t])
-  "Menu definition for the inital library sub menu.
+  "Menu definition for the initial library sub menu.
 This should be a list of vectors.")
 
 (defun singular-menu-build-libraries-menu (definition)
@@ -675,7 +675,7 @@ up a menu with submenues for each category in the submenu (\"Commands\"
   "Initialize menu stuff for Singular interactive mode.
 
 This function is called by `singular-exec'."
-  (singular-debug 'interactive (message "Initializing menue stuff"))
+  (singular-debug 'interactive (message "Initializing menu stuff"))
   (make-local-variable 'singular-standard-libraries-alist)
   (make-local-variable 'singular-standard-libraries-with-categories))
 
@@ -688,7 +688,7 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
   (easy-menu-change '("Commands") "Libraries" singular-menu-initial-library-menu))
 
 ;; For some reasons emacs inserts new menus in the oppsite order.
-;; Defining menu-2 prior to menu-1 will result in the follwoing menu:
+;; Defining menu-2 prior to menu-1 will result in the following menu:
 ;;   Singular   Commands
 ;; That's what we want. So DO NOT exchange both (or ..) statements!
 (or singular-interactive-mode-menu-2
@@ -788,7 +788,7 @@ This function is called  at mode initialization time."
   "Skip backward over prompts."
   ;; is that really the simplest and fastest method?  The problem is that
   ;; `re-search-backward' is not greedy so on an regexp as "\\([>.] \\)+"
-  ;; it stops right after the first occurence of the sub-expression.
+  ;; it stops right after the first occurrence of the sub-expression.
   ;; Anyway, the `(- (point) 2)' expression is OK, even at bob.
   (while (re-search-backward "[>.] " (- (point) 2) t)))
 
@@ -1199,7 +1199,7 @@ This function is called at mode initialization time."
 ;; - There is one nasty little corner case: what if a non-clear simple
 ;;   section spans up to end of buffer?  By definition, eob is not included
 ;;   in that section since they are right-opened intervals.  Most of the
-;;   functions react as if there is an imagenary empty clear simple section
+;;   functions react as if there is an imaginary empty clear simple section
 ;;   at eob.
 ;; - Even though by now there are only two types of different simple
 ;;   sections there may be an arbitrary number of them.  Furthermore,
@@ -1378,11 +1378,11 @@ Assumes that no narrowing is in effect."
 
 (defun singular-emacs-simple-sec-start-at (pos)
   "Return start of clear simple section at position POS.
-Assumes the existence of an imagenary empty clear simple section if POS is
+Assumes the existence of an imaginary empty clear simple section if POS is
 at end of buffer and there is non-clear simple section immediately ending
 at POS.
 Assumes that no narrowing is in effect (since `previous-overlay-change'
-imlicitly does so)."
+implicitly does so)."
   ;; yes, this `(1+ pos)' is OK at eob for
   ;; `singular-emacs-simple-sec-before' as well as
   ;; `previous-overlay-change'
@@ -1399,11 +1399,11 @@ imlicitly does so)."
 
 (defun singular-emacs-simple-sec-end-at (pos)
   "Return end of clear simple section at position POS.
-Assumes the existence of an imagenary empty clear simple section if POS is
+Assumes the existence of an imaginary empty clear simple section if POS is
 at end of buffer and there is non-clear simple section immediately ending
 at POS.
 Assumes that no narrowing is in effect (since `next-overlay-change'
-imlicitly does so)."
+implicitly does so)."
   (let ((next-overlay-change-pos (next-overlay-change pos)))
     ;; this `while' loop at last will run into the beginning of the next
     ;; non-clear simple section or stop at eob.  Since POS may not be at
@@ -1417,7 +1417,7 @@ imlicitly does so)."
 
 (defun singular-emacs-simple-sec-at (pos)
   "Return simple section at buffer position POS.
-Assumes the existence of an imagenary empty clear simple section if POS is
+Assumes the existence of an imaginary empty clear simple section if POS is
 at end of buffer and there is non-clear simple section immediately ending
 at POS.
 Narrowing has no effect on this function."
@@ -1437,7 +1437,7 @@ A simple section intersects the region if the section and the region have
 at least one character in common.  The sections are returned with
 startpoints in increasing order and clear simple sections (that is, nil's)
 inserted as necessary.  BEG is assumed to be less than or equal to END.
-The imagenary empty clear simple section at end of buffer is never included
+The imaginary empty clear simple section at end of buffer is never included
 in the result.
 Narrowing has no effect on this function."
   (let (overlays overlay-cursor)
@@ -1576,16 +1576,16 @@ Assumes that no narrowing is in effect."
 
 (defun singular-xemacs-simple-sec-start-at (pos)
   "Return start of clear simple section at position POS.
-Assumes the existence of an imagenary empty clear simple section if POS is
+Assumes the existence of an imaginary empty clear simple section if POS is
 at end of buffer and there is non-clear simple section immediately ending
 at POS.
 Assumes that no narrowing is in effect (since `previous-extent-change'
-imlicitly does so)."
+implicitly does so)."
   ;; get into some hairy details at end of buffer.  Look if there is a
   ;; non-clear simple section immediately ending at end of buffer and
-  ;; return the start of the imagenary empty clear simple section in that
+  ;; return the start of the imaginary empty clear simple section in that
   ;; case.  If buffer is empty this test fails since
-  ;; `singular-xemacs-simple-sec-before' (corretly) returns nil.  But in
+  ;; `singular-xemacs-simple-sec-before' (correctly) returns nil.  But in
   ;; that case the following loop returns the correct result.
   (if (and (eq pos (point-max))
 	   (singular-xemacs-simple-sec-before pos))
@@ -1603,11 +1603,11 @@ imlicitly does so)."
 
 (defun singular-xemacs-simple-sec-end-at (pos)
   "Return end of clear simple section at position POS.
-Assumes the existence of an imagenary empty clear simple section if POS is
+Assumes the existence of an imaginary empty clear simple section if POS is
 at end of buffer and there is non-clear simple section immediately ending
 at POS.
 Assumes that no narrowing is in effect (since `next-extent-change'
-imlicitly does so)."
+implicitly does so)."
   (let ((next-extent-change-pos (next-extent-change pos)))
     ;; this `while' loop at last will run into the beginning of the next
     ;; non-clear simple section or stop at eob.  Since POS may not be at
@@ -1621,7 +1621,7 @@ imlicitly does so)."
 
 (defun singular-xemacs-simple-sec-at (pos)
   "Return simple section at buffer position POS.
-Assumes the existence of an imagenary empty clear simple section if POS is
+Assumes the existence of an imaginary empty clear simple section if POS is
 at end of buffer and there is non-clear simple section immediately ending
 at POS.
 Narrowing has no effect on this function."
@@ -1637,7 +1637,7 @@ A simple section intersects the region if the section and the region have
 at least one character in common.  The sections are returned with
 startpoints in increasing order and clear simple sections (that is, nil's)
 inserted as necessary.  BEG is assumed to be less than or equal to END.
-The imagenary empty clear simple section at end of buffer is never included
+The imaginary empty clear simple section at end of buffer is never included
 in the result.
 Narrowing has no effect on this function."
   (let (extents extent-cursor)
@@ -1743,7 +1743,7 @@ display the sections.
 	       (cons :tag "Output sections"
 		     (const :format "" output)
 		     (choice :format
-"Choose either clear or non-clear ouput sections.  For non-clear sections,
+"Choose either clear or non-clear output sections.  For non-clear sections,
 select or modify a face (preferably `singular-section-output-face') used to
 display the sections.
 %[Choice%]
@@ -1825,7 +1825,7 @@ non-nil."
      ((and restricted
 	   (> start (point-max)))
       (singular-section-create simple-sec type (point-max) (point-max)))
-     ;; restricted but not degenrated
+     ;; restricted but not degenerated
      (t
       (singular-section-create simple-sec type
 			       (max start (point-min))

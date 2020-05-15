@@ -69,7 +69,7 @@ At least a handler for @code{SIGCHLD} must be installed
 for the commands @ref{waitfirst}, @ref{waitall} and the routines from @ref{parallel_lib}, @ref{modstd_lib}, @ref{modnormal_lib}, @ref{tasks_lib}.@*
 If the child was started by @code{libSingular} the handler
 has to call @code{sig_chld_hdl} from @code{Singular/links/ssiLink.cc}
-or implement something similiar (call @code{slClose(l)} for ssi links).
+or implement something similar (call @code{slClose(l)} for ssi links).
 @item
 error handlers for factory, NTL
 (see @code{init_signals} in @code{Singular/cntrlc.cc}).@*
@@ -124,7 +124,7 @@ $SINGULAR_EXECUTABLE
 @item SINGULAR_DATA_DIR
 @*the root of the singular data files, default: $SINGULAR_BIN_DIR/../share
 @item SINGULARPATH
-@*the directories for libraries and optional dynamic modules (seperated by @code{;}), default:
+@*the directories for libraries and optional dynamic modules (separated by @code{;}), default:
   @itemize
   @item $SINGULAR_DATA_DIR/singular/LIB
   @item $SINGULAR_ROOT_DIR/share/singular/LIB
@@ -141,7 +141,7 @@ $SINGULAR_EXECUTABLE
   @item $SINGULAR_BIN_DIR
   @end itemize
 @item SINGULAR_PROCS_DIR
-@*the directories for dynamic modules (seperated by @code{;}), default:
+@*the directories for dynamic modules (separated by @code{;}), default:
   @itemize
   @item $SINGULAR_BIN_DIR/MOD
   @item $SINGULAR_ROOT_DIR/lib/singular/MOD

@@ -115,7 +115,7 @@ SEE ALSO:  nrroots, nrRootsProbab, sturmquery, solve
 EXAMPLE:   example nrRootsDeterm; shows an example"
 {
   //Note on complexity: Let n = no of complex roots of I (= vdim(std(I)).
-  //Then the algotithm needs:
+  //Then the algorithm needs:
   //1 std(I) and (1/2)n*(n+1)^2 ~ 1/2n^3 NF computations (of monomials w.r.t. I)
 
   if (isparam(I)) {
@@ -398,7 +398,7 @@ EXAMPLE:   example coords; shows an example"
 
   // We first compute the normal form of f w.r.t. I
   g = reduce(f,I);
-  int n = size(g);    //allways n <= N
+  int n = size(g);    //always n <= N
 
   while (k <= N) {
     if (leadmonom(g[l]) == B[k]) {

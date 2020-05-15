@@ -1367,7 +1367,7 @@ static proc chi_ast(list re,list iden,list #)
 {
 //--- compute the Euler characteristic of the Ei,Eij,Eijk and the
 //--- corresponding Ei^*,Eij^*,Eijk^* by preparing the input to the
-//--- specialized auxilliary procedures and then recombining the results
+//--- specialized auxiliary procedures and then recombining the results
 
 //----------------------------------------------------------------------------
 // Initialization
@@ -1533,7 +1533,7 @@ static proc chi_ast_local(list re,list iden,list #)
 {
 //--- compute the Euler characteristic of the Ei,Eij,Eijk and the
 //--- corresponding Ei^*,Eij^*,Eijk^* by preparing the input to the
-//--- specialized auxilliary procedures and then recombining the results
+//--- specialized auxiliary procedures and then recombining the results
 
 //----------------------------------------------------------------------------
 // Initialization
@@ -1715,7 +1715,7 @@ proc discrepancy(list re)
 "USAGE:   discrepancy(L);
 @*        L    = list of rings
 ASSUME:   L is the output of resolution of singularities
-RETRUN:   discrepancies of the given resolution"
+RETURN:   discrepancies of the given resolution"
 {
 //----------------------------------------------------------------------------
 // Initialization
@@ -1779,9 +1779,9 @@ RETURN:   list l
                      ast[1]=chi(Ei^*)
                      ast[2]=chi(Eij^*)
                      ast[3]=chi(Eijk^*)
-          l[3]: intvec nu of multiplicites as needed in computation of zeta
+          l[3]: intvec nu of multiplicities as needed in computation of zeta
                 function
-          l[4]: intvec N of multiplicities as needed in compuation of zeta
+          l[4]: intvec N of multiplicities as needed in computation of zeta
                 function
           l[5]: string specifying characteristic polynomial of monodromy,
                 if "A" was specified
@@ -4029,7 +4029,7 @@ static proc addToRE(intvec v,int x,list RE)
 "Internal procedure - no help and no example available
 "
 {
-//--- auxilliary procedure for collectDiv,
+//--- auxiliary procedure for collectDiv,
 //--- inserting an entry at the correct place
    int i=1;
    while(i<=size(RE))
@@ -4801,7 +4801,7 @@ proc fetchInTree(list L,
    {
       algext=attrib(idname,"algext");
    }
-//--- check wheter comPa is in the history of m1
+//--- check whether comPa is in the history of m1
 //--- same test for o1 can be done later on (on the fly)
    if(m1==comPa)
    {
@@ -5422,7 +5422,7 @@ static proc Vielfachheit(ideal J,ideal I)
 "Internal procedure - no help and no example available
 "
 {
-//--- auxilliary procedure for addSelfInter
+//--- auxiliary procedure for addSelfInter
 //--- compute multiplicity, suitable for the special situation there
   int d=1;
   int vd;

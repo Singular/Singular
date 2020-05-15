@@ -1083,7 +1083,7 @@ Comments should be send to the author of the library directly.
 * hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * methods_lib:: construction procedures
 * modules_lib:: Representations of Modules
-* modwalk_lib:: Groebner basis convertion
+* modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
 * nets_lib:: Pretty printing
 * nfmodstd_lib:: Groebner bases of ideals in rings over algebraic number fields

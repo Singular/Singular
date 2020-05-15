@@ -101,7 +101,7 @@ For a standard basis $G$ of $I$ the following holds:
 $f \in I$ if and only if $\hbox{NF}(f,G) = 0$.
 @end tex
 @ifinfo
-For a standart basis G of I the following holds:
+For a standard basis G of I the following holds:
 f in I if and only if NF(f,G) = 0.
 @end ifinfo
 @item Hilbert function:
@@ -546,7 +546,7 @@ $O/J_f\cong H''/H'$
 @ifinfo
 O/J_f~=H''/H'
 @end ifinfo
-in @code{l[4]} (seperated by degree).
+in @code{l[4]} (separated by degree).
 
 @tex
 If the principal part of $f$ is $C$-nondegenerate, one can compute the spectrum using the library {\tt spectrum.lib}.

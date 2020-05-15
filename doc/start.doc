@@ -699,7 +699,7 @@ command @code{return}.
 We may e.g. define the following procedure called @code{Milnor}:
 (Here the parameter list is @code{(poly h)} meaning that @code{Milnor}
 must be called with one argument which can be assigned to the type @code{poly}
-and is refered to by the name @code{h}.)
+and is referred to by the name @code{h}.)
 
 @smallexample
 proc Milnor (poly h)
