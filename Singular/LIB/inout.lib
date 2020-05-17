@@ -317,7 +317,7 @@ example
    execute(sid);
    id; "";
    // Now treat a matrix in Macaulay format. Using the execute
-   // command, this could be assiged to a Singular matrix as above.
+   // command, this could be assigned to a Singular matrix as above.
    string s2 = "
    0  0  0  0  0
    a3 0  0  0  0

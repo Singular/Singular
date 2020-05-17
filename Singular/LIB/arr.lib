@@ -1601,7 +1601,7 @@ EXAMPLE:    example arrIsEssential; shows an example"
 
 example
 {
-"EXAMPLE: We check whether theseare essential and a non-essential arrangement ";
+"EXAMPLE: We check whether these are essential and a non-essential arrangement ";
 echo = 2;
 ring S = 0,(x,y,z),lp;
 arr A = ideal(x,y,z);
