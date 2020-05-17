@@ -22,7 +22,7 @@
 @heading News for version @value{VERSION}
 Changes in the kernel/build system:
 @itemize
-@item: Letterplace: modulo,syz,lift,liftstd (@nref{LETTERPLACE})
+@item Letterplace: modulo,syz,lift,liftstd (@nref{LETTERPLACE})
 @end itemize
 
 @heading News for version 4-1-3
