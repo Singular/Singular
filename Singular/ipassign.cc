@@ -170,11 +170,11 @@ static void jjMINPOLY_red(idhdl h)
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
 }
-BOOLEAN jjSetMinpoly(ring r, number a, BOOLEAN modify)
+ring jjSetMinpoly(ring r, number a, BOOLEAN modify)
 {
   if( !nCoeff_is_transExt(r->cf) && (r->idroot == NULL) && n_IsZero(a, r->cf) )
   {
-    return FALSE;
+    return r;
   }
 
 
@@ -183,14 +183,14 @@ BOOLEAN jjSetMinpoly(ring r, number a, BOOLEAN modify)
     if(!nCoeff_is_algExt(r->cf) )
     {
       WerrorS("cannot set minpoly for these coeffients");
-      return TRUE;
+      return NULL;
     }
   }
   if ((rVar(r->cf->extRing)!=1)
   && !n_IsZero(a, r->cf) )
   {
     WerrorS("only univarite minpoly allowed");
-    return TRUE;
+    return NULL;
   }
 
   BOOLEAN redefine_from_algext=FALSE;
@@ -209,10 +209,10 @@ BOOLEAN jjSetMinpoly(ring r, number a, BOOLEAN modify)
     n_Delete(&p, r->cf);
     if( nCoeff_is_transExt(r->cf) )
     {
-      return FALSE;
+      return r;
     }
     WarnS("cannot set minpoly to 0 / alg. extension?");
-    return TRUE;
+    return NULL;
   }
   if (!modify) r=rCopy(r);
   // remove all object currently in the ring
@@ -236,7 +236,7 @@ BOOLEAN jjSetMinpoly(ring r, number a, BOOLEAN modify)
     // cleanup A: TODO
     rDelete( A.r );
     if (!modify) rDelete(r);
-    return TRUE;
+    return NULL;
   }
   if (!redefine_from_algext && (DEN((fraction)(p)) != NULL)) // minpoly must be a fraction with poly numerator...!!
   {
@@ -267,17 +267,17 @@ BOOLEAN jjSetMinpoly(ring r, number a, BOOLEAN modify)
     // cleanup A: TODO
     rDelete( A.r );
     if (!modify) rDelete(r);
-    return TRUE;
+    return NULL;
   }
   else
   {
     nKillChar(r->cf); r->cf=new_cf;
   }
-  return FALSE;
+  return r;
 }
 static BOOLEAN jjMINPOLY(leftv, leftv a)
 {
-  return jjSetMinpoly(currRing,(number)a->Data(),TRUE);
+  return (jjSetMinpoly(currRing,(number)a->Data(),TRUE)==NULL);
 }
 
 static BOOLEAN jjNOETHER(leftv, leftv a)
