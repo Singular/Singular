@@ -170,101 +170,82 @@ static void jjMINPOLY_red(idhdl h)
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
 }
-static BOOLEAN jjMINPOLY(leftv, leftv a)
+BOOLEAN jjSetMinpoly(ring r, number a, BOOLEAN modify)
 {
-  if( !nCoeff_is_transExt(currRing->cf) && (currRing->idroot == NULL) && n_IsZero((number)a->Data(), currRing->cf) )
+  if( !nCoeff_is_transExt(r->cf) && (r->idroot == NULL) && n_IsZero(a, r->cf) )
   {
-#ifndef SING_NDEBUG
-    WarnS("Set minpoly over non-transcendental ground field to 0?!");
-    Warn("in >>%s<<",my_yylinebuf);
-#endif
     return FALSE;
   }
 
 
-  if ( !nCoeff_is_transExt(currRing->cf) )
+  if ( !nCoeff_is_transExt(r->cf) )
   {
-    WarnS("Trying to set minpoly over non-transcendental ground field...");
-    if(!nCoeff_is_algExt(currRing->cf) )
+    if(!nCoeff_is_algExt(r->cf) )
     {
       WerrorS("cannot set minpoly for these coeffients");
       return TRUE;
     }
   }
-  if ((rVar(currRing->cf->extRing)!=1)
-  && !n_IsZero((number)a->Data(), currRing->cf) )
+  if ((rVar(r->cf->extRing)!=1)
+  && !n_IsZero(a, r->cf) )
   {
     WerrorS("only univarite minpoly allowed");
     return TRUE;
   }
 
   BOOLEAN redefine_from_algext=FALSE;
-  if ( currRing->idroot != NULL )
+  if ( r->idroot != NULL )
   {
-    redefine_from_algext=(currRing->cf->extRing->qideal!=NULL);
-//    return TRUE;
-#ifndef SING_NDEBUG
-    idhdl p = currRing->idroot;
-
-    WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
-
-    while(p != NULL)
-    {
-      PrintS(p->String(TRUE)); Print("(%s)\n",IDID(p));
-      p = p->next;
-    }
-#endif
+    redefine_from_algext=(r->cf->extRing->qideal!=NULL);
   }
 
-//  assume (currRing->idroot==NULL);
+//  assume (r->idroot==NULL);
 
-  number p = (number)a->CopyD(NUMBER_CMD);
-  n_Normalize(p, currRing->cf);
+  number p = n_Copy(a,r->cf);
+  n_Normalize(p, r->cf);
 
-  if (n_IsZero(p, currRing->cf))
+  if (n_IsZero(p, r->cf))
   {
-    n_Delete(&p, currRing->cf);
-    if( nCoeff_is_transExt(currRing->cf) )
+    n_Delete(&p, r->cf);
+    if( nCoeff_is_transExt(r->cf) )
     {
-#ifndef SING_NDEBUG
-      WarnS("minpoly is already 0...");
-#endif
       return FALSE;
     }
     WarnS("cannot set minpoly to 0 / alg. extension?");
     return TRUE;
   }
-
+  if (!modify) r=rCopy(r);
   // remove all object currently in the ring
-  while(currRing->idroot!=NULL)
+  while(r->idroot!=NULL)
   {
 #ifndef SING_NDEBUG
-    Warn("killing a local object due to minpoly change: %s", IDID(currRing->idroot));
+    Warn("killing a local object due to minpoly change: %s", IDID(r->idroot));
 #endif
-    killhdl2(currRing->idroot,&(currRing->idroot),currRing);
+    killhdl2(r->idroot,&(r->idroot),r);
   }
 
   AlgExtInfo A;
 
-  A.r = rCopy(currRing->cf->extRing); // Copy  ground field!
+  A.r = rCopy(r->cf->extRing); // Copy  ground field!
   // if minpoly was already set:
-  if( currRing->cf->extRing->qideal != NULL ) id_Delete(&(A.r->qideal),A.r);
+  if( r->cf->extRing->qideal != NULL ) id_Delete(&(A.r->qideal),A.r);
   ideal q = idInit(1,1);
   if ((p==NULL) ||(NUM((fraction)p)==NULL))
   {
     WerrorS("Could not construct the alg. extension: minpoly==0");
     // cleanup A: TODO
     rDelete( A.r );
+    if (!modify) rDelete(r);
     return TRUE;
   }
   if (!redefine_from_algext && (DEN((fraction)(p)) != NULL)) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
-    if(!p_IsConstantPoly(n,currRing->cf->extRing))
+    if(!p_IsConstantPoly(n,r->cf->extRing))
     {
       WarnS("denominator must be constant - ignoring it");
     }
-    p_Delete(&n,currRing->cf->extRing);
+    p_Delete(&n,r->cf->extRing);
     DEN((fraction)(p))=NULL;
   }
 
@@ -272,17 +253,6 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   else          q->m[0] = NUM((fraction)p);
   A.r->qideal = q;
 
-#if 0
-  PrintS("\nTrying to conver the currRing into an algebraic field: ");
-  PrintS("Ground poly. ring: \n");
-  rWrite( A.r );
-  PrintS("\nGiven MinPOLY: ");
-  p_Write( A.i->m[0], A.r );
-#endif
-
-  // :(
-//  NUM((fractionObject *)p) = NULL; // makes 0/ NULL fraction - which should not happen!
-//  n_Delete(&p, currRing->cf); // doesn't expect 0/ NULL :(
   if (!redefine_from_algext)
   {
     EXTERN_VAR omBin fractionObjectBin;
@@ -296,13 +266,18 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
     WerrorS("Could not construct the alg. extension: llegal minpoly?");
     // cleanup A: TODO
     rDelete( A.r );
+    if (!modify) rDelete(r);
     return TRUE;
   }
   else
   {
-    nKillChar(currRing->cf); currRing->cf=new_cf;
+    nKillChar(r->cf); r->cf=new_cf;
   }
   return FALSE;
+}
+static BOOLEAN jjMINPOLY(leftv, leftv a)
+{
+  return jjSetMinpoly(currRing,(number)a->Data(),TRUE);
 }
 
 static BOOLEAN jjNOETHER(leftv, leftv a)
