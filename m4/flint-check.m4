@@ -44,7 +44,7 @@ if test "$FLINT_HOME_PATH" = "$DEFAULT_CHECKING_PATH" ; then
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
 	CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
-	LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUPLIBS}"
+	LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
 	AC_CHECK_HEADER([flint/fmpz.h],
 		[AC_CHECK_LIB(flint,fmpz_init,
@@ -66,7 +66,7 @@ if test "x$flint_found" = "xno" ; then
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
 		CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
-		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUPLIBS}"
+		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
 		AC_CHECK_LIB(flint,fmpz_init,
 		[flint_found="yes"],
