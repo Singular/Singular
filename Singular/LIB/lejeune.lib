@@ -421,8 +421,7 @@ static proc atoz (int n)
    {
      ERROR("n must range between 1 and 26!");
    }
-  string s="ring r=0,("+A_Z("a",n)+"),ds;";
-  execute(s);
+  ring r = create_ring(0, A_Z_L("a",n), "ds");
   return (string(var(n)));
 }
 

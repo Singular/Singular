@@ -715,7 +715,7 @@ static proc ncRingDefine()
   int i;
   string s;
 
-  s = "ring NCRING = (0, I), (";
+  s = "(";
   for (i = 1; i <= size(NCVARIABLES); i++)
   {
     if (i == 1)
@@ -727,8 +727,9 @@ static proc ncRingDefine()
       s = s + ", " + NCVARIABLES[i];
     }
   }
-  s = s + "), dp; minpoly = I^2+1;";
-  execute(s);
+  s = s + ")"; 
+  ring NCRING = create_ring("(0, I)", s, "dp");
+  minpoly = I^2+1;
   short = 0;
   exportto(Top, NCRING);
 }

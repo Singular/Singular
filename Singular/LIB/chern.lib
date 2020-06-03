@@ -200,9 +200,8 @@ NOTE:     constants are not considered symmetric
    l2[size(l2)+1] = "A@("+string(ii)+")";
   }
   ring r@ = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly"); 
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-  ideal V=F(V);
-  poly f=F(f);
+  ideal V = fetch(br@,V);// define the corresponding inclusion of rings
+  poly f = fetch(br@,f);
   int i;
   for(i=1; i<=nV; i++)
   {
@@ -704,8 +703,9 @@ NOTE:     uses the elimination and is extremely inefficient,
      l3[size(l3)+1] = "a@("+string(ii)+")";
     }
     ring r@ = create_ring(ringlist(basering)[1], l3, "lp", "no_minpoly");
-    execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-    list c=F(c); // embed c in the bigger ring
+   // execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+   // list c=F(c); // embed c in the bigger ring
+    list c= fetch(br@,c);
     poly rez;
     list A=a@(1..n);
     list sym=symm(A);
@@ -720,8 +720,8 @@ NOTE:     uses the elimination and is extremely inefficient,
     I=simplify(elim(I, E),1);
     rez = -subst(I[1], c@, 0);
     setring br@; // come back to the initial base ring
-    execute( "map FF= r@,0,"+varstr(br@)+";" ); // define the specialization homomorphism
-    poly rez=FF(rez); // bring the result to the base ring
+    //execute( "map FF= r@,0,"+varstr(br@)+";" ); // define the specialization homomorphism
+    poly rez=fetch(r@,rez); // bring the result to the base ring
     return( (1/factorial(n))*rez);
   }
 }

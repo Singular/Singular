@@ -616,20 +616,13 @@ EXAMPLE: example cycleLength;   shows an example"
   int j;
   // create a ring whose variables are indexed by the points in
   // boundary resp. by interior
- string rst="ring cyclering=0,(u"+string(interior[1])+string(interior[2]);
+ string rst="(u"+string(interior[1])+string(interior[2]);
  for (j=1;j<=size(boundary);j++)
  {
    rst=rst+",u"+string(boundary[j][1])+string(boundary[j][2]);
  }
- rst=rst+"),lp;";
- execute(rst);
-/*string rst="(u"+string(interior[1])+string(interior[2]);
-  for (j=1;j<=size(boundary);j++)
-  {
-   rst=rst+",u"+string(boundary[j][1])+string(boundary[j][2]);
-  }
-  rst=rst+")";
-  ring cyclering = create_ring(0, rst, "lp"); */
+ rst=rst+")";
+ ring cyclering = create_ring(0, rst, "lp");
   // add the first and second point at the end of boundary
   boundary[size(boundary)+1]=boundary[1];
   boundary[size(boundary)+1]=boundary[2];
