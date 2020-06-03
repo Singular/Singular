@@ -261,7 +261,8 @@ BOOLEAN atATTRIB1(leftv res,leftv v)
       PrintS("attr:ring_cf, type int\n");
       #ifdef HAVE_SHIFTBBA
       PrintS("attr:isLetterplaceRing, type int\n");
-      PrintS("attr:ncgenCount, type int\n");
+      if (rIsLPRing((ring)v->Data()))
+        PrintS("attr:ncgenCount, type int\n");
       #endif
 
       haveNoAttribute=FALSE;
