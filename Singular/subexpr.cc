@@ -118,7 +118,7 @@ void sleftv::Print(leftv store, int spaces)
             &&(currRing->qideal!=NULL))
             {
               poly p=pCopy(sBucketPeek(b));
-              jjNormalizeQRingP(p);
+              p=jjNormalizeQRingP(p);
               PrintNSpaces(spaces);
               pWrite0(p);
               pDelete(&p);
@@ -182,7 +182,7 @@ void sleftv::Print(leftv store, int spaces)
           {
             setFlag(this,FLAG_QRING);
             poly p=(poly)d;
-            jjNormalizeQRingP(p);
+            p=jjNormalizeQRingP(p);
             if (p!=(poly)d)
             {
               d=(void*)p;

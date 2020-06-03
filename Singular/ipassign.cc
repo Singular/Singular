@@ -617,7 +617,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     if ((p!=NULL) && TEST_V_QRING && (currRing->qideal!=NULL)
     && (!hasFlag(a,FLAG_QRING)))
     {
-      jjNormalizeQRingP(p);
+      p=jjNormalizeQRingP(p);
       setFlag(res,FLAG_QRING);
     }
     if (res->data!=NULL) pDelete((poly*)&res->data);
@@ -655,7 +655,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     }
     if ((p!=NULL) && TEST_V_QRING && (currRing->qideal!=NULL))
     {
-      jjNormalizeQRingP(p);
+      p=jjNormalizeQRingP(p);
     }
     if (res->rtyp==SMATRIX_CMD)
     {
@@ -1405,7 +1405,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   idDelete(&I);
   l1->CleanUp();
   r->CleanUp();
-  //if (TEST_V_QRING && (currRing->qideal!=NULL)) jjNormalizeQRingP(l);
+  //if (TEST_V_QRING && (currRing->qideal!=NULL)) l=jjNormalizeQRingP(l);
   return FALSE;
 }
 static BOOLEAN jjA_L_LIST(leftv l, leftv r)
@@ -2199,17 +2199,21 @@ void jjNormalizeQRingId(leftv I)
     }
   }
 }
-void jjNormalizeQRingP(poly &p)
+poly jj_NormalizeQRingP(poly p, const ring r)
 {
-  if((p!=NULL) && (currRing->qideal!=NULL))
+  if((p!=NULL) && (r->qideal!=NULL))
   {
+    ring save=currRing;
+    if (r!=currRing) rChangeCurrRing(r);
     ideal F=idInit(1,1);
-    poly p2=kNF(F,currRing->qideal,p);
-    pNormalize(p2);
-    idDelete(&F);
-    pDelete(&p);
+    poly p2=kNF(F,r->qideal,p);
+    p_Normalize(p2,r);
+    id_Delete(&F,r);
+    p_Delete(&p,r);
     p=p2;
+    if (r!=save) rChangeCurrRing(save);
   }
+  return p;
 }
 BOOLEAN jjIMPORTFROM(leftv, leftv u, leftv v)
 {
