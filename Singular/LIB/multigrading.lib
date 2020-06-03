@@ -3115,7 +3115,7 @@ CREATE:  temporary files sing4ti2.mat, sing4ti2.lat, sing4ti2.mar
 NOTE:    input rules for 4ti2 also apply to input to this procedure
 @*       hence ker(A)={x|Ax=0} and Im(A)={xA}
 RETURN:  toric ideal specified by Hilbert basis thereof
-EXAMPLE: example graver4ti2; shows an example
+EXAMPLE: example hilbert4ti2intmat; shows an example
 "
 {
    // find the name of hilbert/4ti2-hilbert
