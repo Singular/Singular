@@ -718,9 +718,6 @@ EXAMPLE: example molien; shows an example
       { chst=chst[i..size(chst)];
         execute
         ("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
-        string  strr2 = "First else";     // comment by sachin
-        strr2;    // comment by sachin
-        ringlist(newring);
         
       }
     }

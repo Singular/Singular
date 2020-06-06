@@ -582,8 +582,7 @@ EXAMPLE: example setinitials; shows an example
   string strvar=cosine+","+sine+")";
   svars=svars+","+strvar;            ////variables
   string sord="(c,lp)";         ////ordering
-  string sring="ring Q="+scf+","+svars+","+sord+";";
-  execute(sring);
+  ring Q = create_ring(scf, svars, sord);
   ideal Id=i**2+1;
   int j;
   for(j=1;j<=size(LV)-1;j++)

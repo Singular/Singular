@@ -458,21 +458,13 @@ EXAMPLE: example Sannfslog; shows examples
   L[2] = NName;
   tmp = 0;
   // block ord (dp(N),dp);
-  s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv = 1:(Nnew-1);
   tmp[1] = "dp";  // string
   tmp[2] = iv;   // intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  // string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
+  iv = 1:Nnew;
   kill s;
   kill NName;
   tmp[2]      = iv;
@@ -600,13 +592,7 @@ EXAMPLE: example ALTannfsBM; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -669,13 +655,7 @@ EXAMPLE: example ALTannfsBM; shows examples
   list NName = Name + DName + tmp;
   L[2] = NName;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp     = 0;
   tmp[1]  = "dp";  //string
@@ -710,6 +690,8 @@ EXAMPLE: example ALTannfsBM; shows examples
   ideal LD = K;
   export LD;
   return(@R2);
+  string  strr1 = "Printing from ALTannfsBM";     // comment by sachin
+  strr1;    // comment by sachin  
 }
 example
 {
@@ -790,13 +772,7 @@ EXAMPLE: example bernsteinBM; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:(Nnew-1);
   kill s;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -858,22 +834,13 @@ EXAMPLE: example bernsteinBM; shows examples
   L[2] = NName;
   tmp = 0;
   // block ord (dp(N),dp);
-  string s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1] = "dp";  //string
   tmp[2] = iv;    //intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  //string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   kill NName;
   tmp[2]  = iv;
   Lord[2] = tmp;
@@ -1020,13 +987,7 @@ EXAMPLE: example annfsBM; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -1088,22 +1049,13 @@ EXAMPLE: example annfsBM; shows examples
   L[2] = NName;
   tmp = 0;
   // block ord (dp(N),dp);
-  string s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1] = "dp";  //string
   tmp[2] = iv;    //intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  //string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   kill NName;
   tmp[2]  = iv;
   Lord[2] = tmp;
@@ -1184,14 +1136,7 @@ EXAMPLE: example annfsBM; shows examples
   list NName = Name + DName;
   L[2] = NName;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   tmp     = 0;
   tmp[1]  = "dp";  //string
   tmp[2]  = iv;    //intvec
@@ -1343,18 +1288,11 @@ EXAMPLE: example annfs2; shows examples
   }
   L[2] = NName;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
+  iv=1:Nnew;
   tmp     = 0;
   tmp[1]  = "dp";  // string
   tmp[2]  = iv;  // intvec
   Lord[1] = tmp;
-  kill s;
   tmp[1]  = "C";
   iv = 0;
   tmp[2]  = iv;
@@ -1538,18 +1476,11 @@ EXAMPLE: example annfsRB; shows examples
   }
   L[2] = NName;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
+  iv=1:Nnew;
   tmp     = 0;
   tmp[1]  = "dp";  // string
   tmp[2]  = iv;  // intvec
   Lord[1] = tmp;
-  kill s;
   tmp[1]  = "C";
   iv = 0;
   tmp[2]  = iv;
@@ -1674,13 +1605,7 @@ EXAMPLE: example operatorBM; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -1742,22 +1667,13 @@ EXAMPLE: example operatorBM; shows examples
   L[2] = NName;
   tmp = 0;
   // block ord (dp(N),dp);
-  string s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1] = "dp";  //string
   tmp[2] = iv;    //intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  //string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   kill NName;
   tmp[2]  = iv;
   Lord[2] = tmp;
@@ -1839,14 +1755,7 @@ EXAMPLE: example operatorBM; shows examples
   list NName = Name + DName + tmp;
   L[2] = NName;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   tmp     = 0;
   tmp[1]  = "dp";  //string
   tmp[2]  = iv;    //intvec
@@ -2128,13 +2037,7 @@ EXAMPLE: example annfsParamBM; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -2222,14 +2125,7 @@ EXAMPLE: example annfsParamBM; shows examples
   list NName = Name + DName + tmp;
   L[2] = NName;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   tmp     = 0;
   tmp[1]  = "dp";  //string
   tmp[2]  = iv;    //intvec
@@ -2399,24 +2295,12 @@ EXAMPLE: example annfsBMI; shows examples
   kill NName;
   // block ord (lp(P),dp);
   tmp[1] = "lp";  //string
-  s      = "iv=";
-  for (i=1; i<=2*P; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:(2*P);
   tmp[2] = iv;  //intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  //string
-  s      = "iv=";
-  for (i=1; i<=Nnew; i++)  //actually i<=2*N
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]  = iv;
   Lord[2] = tmp;
@@ -2528,26 +2412,13 @@ EXAMPLE: example annfsBMI; shows examples
   L[2] = NName;
   tmp = 0;
   // block ord (dp(N),dp);
-  string s = "iv=";
-  for (i=1; i<=Nnew-P; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-P);
   tmp[1] = "dp";  //string
   tmp[2] = iv;    //intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  //string
-  s[size(s)] = ",";
-  for (j=1; j<=P; j++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
-  kill s;
+  iv=1:P;
   kill NName;
   tmp[2]  = iv;
   Lord[2] = tmp;
@@ -2659,14 +2530,7 @@ EXAMPLE: example annfsBMI; shows examples
   L[2] = NName;
   tmp = 0;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   kill NName;
   tmp[1] = "dp";  //string
   tmp[2] = iv;    //intvec
@@ -2814,13 +2678,7 @@ EXAMPLE: example annfsOT; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for(i=1;i<=Nnew;i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   tmp[2]    = iv;
   Lord[2]   = tmp;
   tmp[1]    = "C";
@@ -2891,11 +2749,7 @@ EXAMPLE: example annfsOT; shows examples
   Lord[1] = tmp;
   // continue with a(1,1,1,1)...
   tmp[1]  = "dp"; s  = "iv=";
-  for(i=1; i<= Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";  execute(s);
+  iv=1:Nnew;
   kill NName;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -2954,21 +2808,12 @@ EXAMPLE: example annfsOT; shows examples
   L[2]   = NName;
   tmp    = 0;
   // block ord (a(1,1...),dp);
-  string  s = "iv=";
-  for(i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1]  = "a"; // string
   tmp[2]  = iv; //intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s[size(s)]=","; s= s+"1;";
-  execute(s);
-  kill s;
   kill NName;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -3050,18 +2895,10 @@ EXAMPLE: example annfsOT; shows examples
   list NName = Name + DName;
   L[2]   = NName;
   // dp ordering;
-  string   s       = "iv=";
-  for(i=1;i<=Nnew;i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
   tmp     = 0;
   tmp[1]  = "dp"; // string
   tmp[2]  = iv; //intvec
   Lord[1] = tmp;
-  kill s;
   tmp[1]    = "C";
   iv        = 0;
   tmp[2]    = iv;
@@ -3192,13 +3029,7 @@ EXAMPLE: example SannfsOT; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for(i=1;i<=Nnew;i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   tmp[2]    = iv;
   Lord[2]   = tmp;
   tmp[1]    = "C";
@@ -3269,11 +3100,7 @@ EXAMPLE: example SannfsOT; shows examples
   Lord[1] = tmp;
   // continue with a(1,1,1,1)...
   tmp[1]  = "dp"; s  = "iv=";
-  for(i=1; i<= Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";  execute(s);
+  iv=1:Nnew;
   kill NName;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -3328,22 +3155,13 @@ EXAMPLE: example SannfsOT; shows examples
   L[2] = NName;
   tmp = 0;
   // block ord (dp(N),dp);
-  string s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1] = "dp";  // string
   tmp[2] = iv;   // intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  // string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   kill NName;
   tmp[2]      = iv;
   Lord[2]     = tmp;
@@ -3464,13 +3282,7 @@ EXAMPLE: example SannfsBM; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for(i=1;i<=Nnew;i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -3536,22 +3348,13 @@ EXAMPLE: example SannfsBM; shows examples
   L[2] = NName;
   tmp = 0;
   // block ord (dp(N),dp);
-  string s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1] = "dp";  // string
   tmp[2] = iv;   // intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  // string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
-  kill s;
+  iv=1:Nnew;
   kill NName;
   tmp[2]      = iv;
   Lord[2]     = tmp;
@@ -3980,13 +3783,7 @@ EXAMPLE: example SannfsBFCTstd; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for(i=1;i<=Nnew;i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]    = iv;
   Lord[2]   = tmp;
@@ -4053,13 +3850,7 @@ EXAMPLE: example SannfsBFCTstd; shows examples
   tmp = 0;
   // just dp
   // block ord (dp(N),dp);
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:Nnew;
   tmp[1] = "dp";  // string
   tmp[2] = iv;   // intvec
   Lord[1] = tmp;
@@ -4217,13 +4008,7 @@ EXAMPLE: example SannfsLOT; shows examples
   Lord[2] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for(i=1;i<=Nnew;i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   tmp[2]    = iv;
   Lord[3]   = tmp;
   tmp[1]    = "C";
@@ -4296,21 +4081,13 @@ EXAMPLE: example SannfsLOT; shows examples
   tmp = 0;
   // block ord (dp(N),dp);
   // string s is already defined
-  s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1] = "dp";  // string
   tmp[2] = iv;   // intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  // string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   kill NName;
   tmp[2]      = iv;
@@ -4442,13 +4219,7 @@ EXAMPLE: example SannfsLOT; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv=";
-  for(i=1;i<=Nnew;i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]= ";";
-  execute(s);
+  iv=1:Nnew;
   tmp[2]    = iv;
   Lord[2]   = tmp;
   tmp[1]    = "C";
@@ -4521,22 +4292,14 @@ EXAMPLE: example SannfsLOT; shows examples
   tmp = 0;
   // block ord (dp(N),dp);
   // string s is already defined
-  s = "iv=";
-  for (i=1; i<=Nnew-1; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:(Nnew-1);
   tmp[1] = "dp";  // string
   tmp[2] = iv;   // intvec
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  // string
-  s[size(s)] = ",";
-  s = s+"1;";
-  execute(s);
-  kill s;
+  iv=1:Nnew; 
+  kill s; 
   kill NName;
   tmp[2]      = iv;
   Lord[2]     = tmp;
@@ -4726,18 +4489,11 @@ EXAMPLE: example annfs0; shows examples
   }
   L[2] = NName;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
+  iv=1:Nnew;
   tmp     = 0;
   tmp[1]  = "dp";  // string
   tmp[2]  = iv;  // intvec
   Lord[1] = tmp;
-  kill s;
   tmp[1]  = "C";
   iv = 0;
   tmp[2]  = iv;
@@ -5366,13 +5122,7 @@ EXAMPLE: example checkRoot1; shows examples
   kill Name,NName;
   // block ord (dp);
   tmp[1] = "dp"; // string
-  s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:Nnew;
   kill s;
   tmp[2]  = iv;
   Lord[1] = tmp;
@@ -5501,13 +5251,7 @@ EXAMPLE: example checkRoot2; shows examples
   kill Name;
   // block ord (dp);
   tmp[1] = "dp"; // string
-  s = "iv=";
-  for (i=1; i<=N; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)]=";";
-  execute(s);
+  iv=1:N;
   kill s;
   tmp[2]  = iv;
   Lord[1] = tmp;
@@ -5798,18 +5542,11 @@ EXAMPLE: example bernsteinLift; shows examples
   Lord[1] = tmp;
   tmp=0;
   // dp ordering;
-  string s = "iv=";
-  for (i=1; i<=Nnew; i++)
-  {
-    s = s+"1,";
-  }
-  s[size(s)] = ";";
-  execute(s);
+  iv=1:Nnew;
   tmp     = 0;
   tmp[1]  = "dp";  // string
   tmp[2]  = iv;  // intvec
   Lord[2] = tmp;
-  kill s;
   tmp     = 0;
   L[3]    = Lord;
   // we are done with the list
