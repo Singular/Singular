@@ -566,9 +566,9 @@ EXAMPLE:example HilbertClassPoly; shows an example
           s2=string(b);
           s3=string(t);
 
-          a1=int(a);
-          b1=int(b);
-          t1=int(t);
+          execute("a1="+s1+";");
+          execute("b1="+s2+";");
+          execute("t1="+s3+";");
           g1=gcd(gcd(a1,b1),t1 div a1);
           setring C;
           g=g1;

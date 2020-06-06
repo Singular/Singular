@@ -3182,9 +3182,6 @@ EXAMPLE: example SannfsOT; shows examples
   dbprint(ppl,"// -3-1- the ring @R3(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R3);
   ideal MM = maxideal(1);
-  string  strr1 = "printing s";     // comment by sachin
-strr1;    // comment by sachin
-  s;
   MM = 0,s,MM;
   map R01 = @R2, MM;
   ideal K2 = R01(K2);
