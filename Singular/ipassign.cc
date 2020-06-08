@@ -170,14 +170,8 @@ static void jjMINPOLY_red(idhdl h)
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
 }
-ring jjSetMinpoly(ring r, number a, BOOLEAN modify)
+ring jjSetMinpoly(ring r, number a)
 {
-  if( !nCoeff_is_transExt(r->cf) && (r->idroot == NULL) && n_IsZero(a, r->cf) )
-  {
-    return r;
-  }
-
-
   if ( !nCoeff_is_transExt(r->cf) )
   {
     if(!nCoeff_is_algExt(r->cf) )
@@ -186,20 +180,13 @@ ring jjSetMinpoly(ring r, number a, BOOLEAN modify)
       return NULL;
     }
   }
-  if ((rVar(r->cf->extRing)!=1)
-  && !n_IsZero(a, r->cf) )
+  if (rVar(r->cf->extRing)!=1)
   {
     WerrorS("only univarite minpoly allowed");
     return NULL;
   }
 
-  BOOLEAN redefine_from_algext=FALSE;
-  if ( r->idroot != NULL )
-  {
-    redefine_from_algext=(r->cf->extRing->qideal!=NULL);
-  }
-
-//  assume (r->idroot==NULL);
+  assume (r->idroot==NULL);
 
   number p = n_Copy(a,r->cf);
   n_Normalize(p, r->cf);
@@ -214,15 +201,8 @@ ring jjSetMinpoly(ring r, number a, BOOLEAN modify)
     WarnS("cannot set minpoly to 0 / alg. extension?");
     return NULL;
   }
-  if (!modify) r=rCopy(r);
+  r=rCopy(r);
   // remove all object currently in the ring
-  while(r->idroot!=NULL)
-  {
-#ifndef SING_NDEBUG
-    Warn("killing a local object due to minpoly change: %s", IDID(r->idroot));
-#endif
-    killhdl2(r->idroot,&(r->idroot),r);
-  }
 
   AlgExtInfo A;
 
@@ -235,10 +215,10 @@ ring jjSetMinpoly(ring r, number a, BOOLEAN modify)
     WerrorS("Could not construct the alg. extension: minpoly==0");
     // cleanup A: TODO
     rDelete( A.r );
-    if (!modify) rDelete(r);
+    rDelete(r);
     return NULL;
   }
-  if (!redefine_from_algext && (DEN((fraction)(p)) != NULL)) // minpoly must be a fraction with poly numerator...!!
+  if (DEN((fraction)(p)) != NULL) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
     if(!p_IsConstantPoly(n,r->cf->extRing))
@@ -249,16 +229,12 @@ ring jjSetMinpoly(ring r, number a, BOOLEAN modify)
     DEN((fraction)(p))=NULL;
   }
 
-  if (redefine_from_algext) q->m[0]=(poly)p;
-  else          q->m[0] = NUM((fraction)p);
+  q->m[0] = NUM((fraction)p);
   A.r->qideal = q;
 
-  if (!redefine_from_algext)
-  {
-    EXTERN_VAR omBin fractionObjectBin;
-    NUM((fractionObject *)p) = NULL; // not necessary, but still...
-    omFreeBin((ADDRESS)p, fractionObjectBin);
-  }
+  EXTERN_VAR omBin fractionObjectBin;
+  NUM((fractionObject *)p) = NULL; // not necessary, but still...
+  omFreeBin((ADDRESS)p, fractionObjectBin);
 
   coeffs new_cf = nInitChar(n_algExt, &A);
   if (new_cf==NULL)
@@ -266,7 +242,7 @@ ring jjSetMinpoly(ring r, number a, BOOLEAN modify)
     WerrorS("Could not construct the alg. extension: llegal minpoly?");
     // cleanup A: TODO
     rDelete( A.r );
-    if (!modify) rDelete(r);
+    rDelete(r);
     return NULL;
   }
   else
