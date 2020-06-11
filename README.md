@@ -21,7 +21,7 @@ GNU General Public Licence (See [COPYING](@ref copying_page)).
     <https://www.singular.uni-kl.de/Manual/latest>
 
 * Bug/Issue-Tracker:
-    <http://www.singular.uni-kl.de:8002/trac>
+    <https://www.singular.uni-kl.de:8002/trac>
 
 * Singular Wiki:
     <https://github.com/Singular/Sources/wiki/>
