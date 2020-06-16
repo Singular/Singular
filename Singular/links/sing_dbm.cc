@@ -384,7 +384,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
 {
   DBM_info *db = (DBM_info *)l->data;
   BOOLEAN b=TRUE;
-  register int ret;
+  int ret;
 
   // database is opened
   if((key!=NULL) && (key->Typ()==STRING_CMD) )
