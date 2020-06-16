@@ -183,5 +183,6 @@ AC_CONFIG_FILES([reporter/Makefile])
 AC_CONFIG_FILES([coeffs/Makefile])
 AC_CONFIG_FILES([polys/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_FILES([libpolys-config libpolys.pc])
+AC_CONFIG_FILES([libpolys-config], [chmod +x libpolys-config])
+AC_CONFIG_FILES([libpolys.pc])
 AC_OUTPUT
