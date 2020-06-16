@@ -14,6 +14,8 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 dnl Check if build env is sane
 AM_SANITY_CHECK
 
+AX_PROG_CC_FOR_BUILD
+
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([libpolysconfig.h],[],[_config.h])
 

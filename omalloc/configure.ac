@@ -26,6 +26,8 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AM_SANITY_CHECK
 
+AX_PROG_CC_FOR_BUILD
+
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([omConfig.h],[],[_config.h])
 
@@ -147,14 +149,6 @@ AC_CHECK_PROG(ADDR2LINE, addr2line, addr2line, no)
 if test "$ac_cv_prog_ADDR2LINE" = addr2line; then
   AC_DEFINE_UNQUOTED(OM_PROG_ADDR2LINE, "$ac_cv_prog_ADDR2LINE", "Name of addr2line")
 fi
-
-AC_MSG_NOTICE(HOSTCC set)
-HOSTCC=${HOSTCC:=$CC}
-HOSTLD=${HOSTLD:=$LD}
-HOSTCFLAGS=${HOSTCFLAGS:=$CFLAGS}
-  AC_SUBST(HOSTCC)
-  AC_SUBST(HOSTLD)
-  AC_SUBST(HOSTCFLAGS)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl header file checks
