@@ -3,3 +3,6 @@
 /test
 /test-suite.log
 /test.log
+/include/factory/cplusplus.h
+/include/factory/factory.h
+/include/factory/factoryconf.h
