@@ -26,6 +26,8 @@
 #include "canonicalform.h"
 #include "facMul.h"
 #include "cf_util.h"
+#include "cf_iter.h"
+#include "cf_algorithm.h"
 #include "templates/ftmpl_functions.h"
 
 #ifdef HAVE_NTL

@@ -508,7 +508,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else
     {
-      #if defined(HAVE_NTL) || defined(HAVE_FLINT)
+      #if defined(HAVE_NTL)
       if (issqrfree)
       {
         CFList factors;
@@ -529,8 +529,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F= FpFactorize (f);
       }
       #else
-      ASSERT( f.isUnivariate(), "multivariate factorization depends on FLINT/NTL(missing)" );
-      factoryError ("multivariate factorization depends on FLINT/NTL(missing)");
+      ASSERT( f.isUnivariate(), "multivariate factorization depends on NTL(missing)" );
+      factoryError ("multivariate factorization depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -618,7 +618,14 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         #endif
       }
       else
+      {
+        #ifdef HAVE_NTL
         F = ratFactorize (fz);
+        #else
+        factoryError ("multivariate factorization over Z depends on NTL(missing)");
+        return CFFList (CFFactor (f, 1));
+        #endif
+      }
       Off (SW_RATIONAL);
     }
 
@@ -762,7 +769,12 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     }
     else
     {
+      #ifdef HAVE_NTL
       F= FqFactorize (f, alpha);
+      #else
+      factoryError ("univariate factorization  depends on NTL(missing)");
+      return CFFList (CFFactor (f, 1));
+      #endif
     }
   }
   else // Q(a)[x]
@@ -773,7 +785,12 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     }
     else //Q(a)[x1,...,xn]
     {
+      #ifdef HAVE_NTL
       F= ratFactorize (f, alpha);
+      #else
+      factoryError ("multivariate factorization  depends on NTL(missing)");
+      return CFFList (CFFactor (f, 1));
+      #endif
     }
   }
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
