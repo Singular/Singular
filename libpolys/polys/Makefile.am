@@ -111,7 +111,7 @@ p_Procs_Generate_CPPFLAGS = ${AM_CPPFLAGS} ${USE_P_PROCS_STATIC}
 BUILT_SOURCES = prCopy.inc gftables MOD templates/p_Procs.inc
 
 templates/p_Procs.inc: p_Procs_Generate.cc
-	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXX_FOR_BUILD)" p_Procs_Generate
+	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXX_FOR_BUILD)" CXXFLAGS="$(CXXFLAGS_FOR_BUILD)" LDFLAGS="" LIBS="" p_Procs_Generate
 	./p_Procs_Generate$(BUILD_EXEEXT) > ./templates/p_Procs.inc
 
 prCopy.inc: prCopy.pl
