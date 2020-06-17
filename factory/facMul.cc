@@ -31,6 +31,7 @@
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
 #include "NTLconvert.h"
+#endif
 
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
@@ -451,7 +452,8 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         fq_poly_clear (FLINTG, fq_con);
         fq_ctx_clear (fq_con);
         return b (result);
-#else
+#endif
+#ifdef HAVE_NTL
         ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
         ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (mipo));
         ZZ_pE::init (NTLmipo);
@@ -488,7 +490,8 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         return result;
       }
       return mulFLINTQ (F, G);
-#else
+#endif
+#ifdef HAVE_NTL
       if (b.getp() != 0)
       {
         ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
@@ -568,7 +571,8 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
           fq_ctx_clear (fq_con);
 
           return b (result);
-#else
+#endif
+#ifdef HAVE_NTL
           ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
           ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
           ZZ_pE::init (NTLmipo);
@@ -606,12 +610,14 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     return F*G;
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
+#ifdef HAVE_NTL
 #if (!defined(HAVE_FLINT) ||  __FLINT_RELEASE < 20400)
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
+#endif
 #endif
   Variable alpha;
   CanonicalForm result;
@@ -645,13 +651,15 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     fq_nmod_poly_clear (FLINTG, fq_con);
     nmod_poly_clear (FLINTmipo);
     fq_nmod_ctx_clear (fq_con);
-#else
+    return result;
+#elif defined(AHVE_NTL)
     zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
     zz_pE::init (NTLMipo);
     zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
     zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
     mul (NTLF, NTLF, NTLG);
     result= convertNTLzz_pEX2CF(NTLF, F.mvar(), alpha);
+    return result;
 #endif
   }
   else
@@ -664,14 +672,16 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     result= convertnmod_poly_t2FacCF (FLINTF, F.mvar());
     nmod_poly_clear (FLINTF);
     nmod_poly_clear (FLINTG);
-#else
+    return result;
+#endif
+#ifdef HAVE_NTL
     zz_pX NTLF= convertFacCF2NTLzzpX (F);
     zz_pX NTLG= convertFacCF2NTLzzpX (G);
     mul (NTLF, NTLF, NTLG);
-    result= convertNTLzzpX2CF(NTLF, F.mvar());
+    return convertNTLzzpX2CF(NTLF, F.mvar());
 #endif
   }
-  return result;
+  return F*G;
 }
 
 CanonicalForm
@@ -3734,4 +3744,3 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
 
 // end division
 
-#endif
