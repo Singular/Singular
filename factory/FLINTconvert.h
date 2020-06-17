@@ -119,6 +119,14 @@ convertFLINTnmod_poly_factor2FacCFFList (
                                            ///< have
                                         );
 
+/// conversion of a FLINT factorization over Z to a CFFList
+CFFList
+convertFLINTfmpz_poly_factor2FacCFFList (
+                   const fmpz_poly_factor_t fac, ///< [in] a fmpz_poly_factor_t
+                   const Variable& x       ///< [in] variable the result should
+                                           ///< have
+                                        );
+
 /// conversion of a factory univariate poly over Z to a FLINT poly over
 /// Z/p (for non word size p)
 void

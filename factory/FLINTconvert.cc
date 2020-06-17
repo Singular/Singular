@@ -291,6 +291,26 @@ convertFLINTnmod_poly_factor2FacCFFList (const nmod_poly_factor_t fac,
   return result;
 }
 
+#if __FLINT_RELEASE >= 20503
+CFFList
+convertFLINTfmpz_poly_factor2FacCFFList (
+                   const fmpz_poly_factor_t fac, ///< [in] a nmod_poly_factor_t
+                   const Variable& x       ///< [in] variable the result should
+                                           ///< have
+                                        )
+
+{
+  CFFList result;
+  long i;
+
+  for (i = 0; i < fac->num; i++)
+    result.append (CFFactor (convertFmpz_poly_t2FacCF (
+                             (fmpz_poly_t &)fac->p[i],x),
+                             fac->exp[i]));
+  return result;
+}
+#endif
+
 #if __FLINT_RELEASE >= 20400
 CFFList
 convertFLINTFq_nmod_poly_factor2FacCFFList (const fq_nmod_poly_factor_t fac,

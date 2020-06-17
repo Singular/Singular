@@ -535,7 +535,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       #endif
     }
   }
-  else
+  else // char 0
   {
     bool on_rational = isOn(SW_RATIONAL);
     On(SW_RATIONAL);
@@ -574,20 +574,41 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F.insert( new_first );
         }
       }
-      #else
-      factoryError ("univariate factorization over Z depends on NTL(missing)");
+      if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
+      return F;
+      #endif
+      #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20504)
+      // use FLINT
+      fmpz_poly_t f1;
+      convertFacCF2Fmpz_poly_t (f1, f);
+      fmpz_poly_factor_t result;
+      fmpz_poly_factor_init (result);
+      fmpz_poly_factor_zassenhaus(result, f1);
+      F= convertFLINTfmpz_poly_factor2FacCFFList (result, f.mvar());
+      fmpz_poly_factor_clear (result);
+      fmpz_poly_clear (f1);
+      if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
+      return F;
+      #endif
+      #if !defined(AHE_NTL) && !defined(HAVE_FLINT)
+      factoryError ("univariate factorization over Z depends on NTL/FLINT(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
-    else
+    else // not univariate,  char 0
     {
       On (SW_RATIONAL);
       if (issqrfree)
       {
         CFList factors;
+        #ifdef HAVE_NTL
         factors= ratSqrfFactorize (fz);
         for (CFListIterator i= factors; i.hasItem(); i++)
           F.append (CFFactor (i.getItem(), 1));
+        #else
+        factoryError ("multivariate factorization over Z depends on NTL(missing)");
+        return CFFList (CFFactor (f, 1));
+        #endif
       }
       else
         F = ratFactorize (fz);
