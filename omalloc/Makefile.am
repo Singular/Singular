@@ -40,12 +40,12 @@ libomalloc_la_CPPFLAGS  = ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL
 BUILT_SOURCES = omTables.inc omTables.h
 
 omTables.inc:
-	$(MAKE) $(AM_MAKEFLAGS) CC="${CC_FOR_BUILD}" LD="${CC_FOR_BUILD}" omTables
-	./omTables$(EXEEXT) > omTables.xx && mv omTables.xx  omTables.inc
+	$(MAKE) $(AM_MAKEFLAGS) CC="${CC_FOR_BUILD}" omTables
+	./omTables$(BUILD_EXEEXT) > omTables.xx && mv omTables.xx  omTables.inc
 
 omTables.h:
-	$(MAKE) $(AM_MAKEFLAGS) CC="${CC_FOR_BUILD}" LD="${CC_FOR_BUILD}" omTables1
-	./omTables1$(EXEEXT) >omTables.yy && mv omTables.yy omTables.h
+	$(MAKE) $(AM_MAKEFLAGS) CC="${CC_FOR_BUILD}" omTables1
+	./omTables1$(BUILD_EXEEXT) >omTables.yy && mv omTables.yy omTables.h
 
 noinst_PROGRAMS = omTables omTables1
 omTables_SOURCES = omAllocPrivate.h omTables.c
