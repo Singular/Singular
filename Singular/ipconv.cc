@@ -434,13 +434,13 @@ static void iiL2R(leftv out, leftv in)
 */
 BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv output,const struct sConvertTypes *dConvertTypes)
 {
-  memset(output,0,sizeof(sleftv));
+  output->Init();
   if ((inputType==outputType)
   || (outputType==DEF_CMD)
   || ((outputType==IDHDL)&&(input->rtyp==IDHDL)))
   {
     memcpy(output,input,sizeof(*output));
-    memset(input,0,sizeof(*input));
+    input->Init();
     return FALSE;
   }
   else if (outputType==ANY_TYPE)

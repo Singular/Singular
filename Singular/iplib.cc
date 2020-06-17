@@ -397,7 +397,7 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   {
     iiCurrArgs=(leftv)omAllocBin(sleftv_bin);
     memcpy(iiCurrArgs,v,sizeof(sleftv)); // keeps track of v->next etc.
-    memset(v,0,sizeof(sleftv));
+    v->Init();
   }
   else
   {
@@ -739,7 +739,7 @@ leftv ii_CallLibProcM(const char*n, void **args, int* arg_types, const ring R, B
   {
     leftv h=(leftv)omAllocBin(sleftv_bin);
     memcpy(h,&iiRETURNEXPR,sizeof(sleftv));
-    memset(&iiRETURNEXPR,0,sizeof(sleftv));
+    iiRETURNEXPR.Init();
     return h;
   }
   return NULL;
@@ -1189,7 +1189,7 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
   int token;
   char FullName[256];
 
-  memset(FullName,0,256);
+  memset(FullName,0,sizeof(FullName));
 
   if( *fullname != '/' &&  *fullname != '.' )
     sprintf(FullName, "./%s", newlib);

@@ -742,7 +742,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         v->req_packhdl=pa;
         syMake(v, v->name, pa);
         memcpy(res, v, sizeof(sleftv));
-        memset(v, 0, sizeof(sleftv));
+        v->Init();
       }
       break;
     case DEF_CMD:
@@ -1409,7 +1409,7 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
   leftv p=NULL;
   int i;
   sleftv t;
-  memset(&t,0,sizeof(t));
+  t.Init();
   t.rtyp=INT_CMD;
   for (i=0;i<iv->length(); i++)
   {
@@ -1587,8 +1587,7 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjKLAMMER_rest(leftv res, leftv u, leftv v)
 {
-  leftv tmp=(leftv)omAllocBin(sleftv_bin);
-  memset(tmp,0,sizeof(sleftv));
+  leftv tmp=(leftv)omAlloc0Bin(sleftv_bin);
   BOOLEAN b;
   if (v->Typ()==INTVEC_CMD)
     b=jjKLAMMER_IV(tmp,u,v);
@@ -1664,7 +1663,7 @@ static BOOLEAN jjRING_1(leftv res, leftv u, leftv v)
 {
   u->next=(leftv)omAlloc(sizeof(sleftv));
   memcpy(u->next,v,sizeof(sleftv));
-  memset(v,0,sizeof(sleftv));
+  v->Init();
   BOOLEAN bo=iiExprArithM(res,u,'[');
   u->next=NULL;
   return bo;
@@ -2215,7 +2214,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     }
     if (IDTYP(w)==ALIAS_CMD) w=(idhdl)IDDATA(w);
     sleftv tmpW;
-    memset(&tmpW,0,sizeof(sleftv));
+    tmpW.Init();
     tmpW.rtyp=IDTYP(w);
     tmpW.data=IDDATA(w);
     if ((bo=maApplyFetch(op,NULL,res,&tmpW, r,
@@ -2512,7 +2511,7 @@ static BOOLEAN jjKoszul(leftv res, leftv u, leftv v)
 static BOOLEAN jjKoszul_Id(leftv res, leftv u, leftv v)
 {
   sleftv h;
-  memset(&h,0,sizeof(sleftv));
+  h.Init();
   h.rtyp=INT_CMD;
   h.data=(void *)(long)IDELEMS((ideal)v->Data());
   return mpKoszul(res, u, &h, v);
@@ -4487,7 +4486,7 @@ static BOOLEAN jjPFAC1(leftv res, leftv v)
   /* call method jjPFAC2 with second argument = 0 (meaning that no
      valid bound for the prime factors has been given) */
   sleftv tmp;
-  memset(&tmp, 0, sizeof(tmp));
+  tmp.Init();
   tmp.rtyp = INT_CMD;
   return jjPFAC2(res, v, &tmp);
 }
@@ -4525,7 +4524,6 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   // clean out "_":
   sLastPrinted.CleanUp();
-  memset(&sLastPrinted,0,sizeof(sleftv));
   // collect all info:
   omUpdateInfo();
   switch(((int)(long)v->Data()))
@@ -5709,20 +5707,20 @@ static BOOLEAN jjBRACK_SM(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjBRACK_Ma_I_IV(leftv res, leftv u, leftv v,leftv w)
 {
-  sleftv t;
-  sleftv ut;
-  leftv p=NULL;
-  intvec *iv=(intvec *)w->Data();
-  int l;
-  BOOLEAN nok;
-
   if ((u->rtyp!=IDHDL)||(u->e!=NULL))
   {
     WerrorS("cannot build expression lists from unnamed objects");
     return TRUE;
   }
+
+  leftv p=NULL;
+  intvec *iv=(intvec *)w->Data();
+  int l;
+  BOOLEAN nok;
+  sleftv ut;
   memcpy(&ut,u,sizeof(ut));
-  memset(&t,0,sizeof(t));
+  sleftv t;
+  t.Init();
   t.rtyp=INT_CMD;
   for (l=0;l< iv->length(); l++)
   {
@@ -5759,20 +5757,19 @@ static BOOLEAN jjBRACK_Ma_I_IV(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjBRACK_Ma_IV_I(leftv res, leftv u, leftv v,leftv w)
 {
-  sleftv t;
-  sleftv ut;
-  leftv p=NULL;
-  intvec *iv=(intvec *)v->Data();
-  int l;
-  BOOLEAN nok;
-
   if ((u->rtyp!=IDHDL)||(u->e!=NULL))
   {
     WerrorS("cannot build expression lists from unnamed objects");
     return TRUE;
   }
+  leftv p=NULL;
+  intvec *iv=(intvec *)v->Data();
+  int l;
+  BOOLEAN nok;
+  sleftv ut;
   memcpy(&ut,u,sizeof(ut));
-  memset(&t,0,sizeof(t));
+  sleftv t;
+  t.Init();
   t.rtyp=INT_CMD;
   for (l=0;l< iv->length(); l++)
   {
@@ -5809,7 +5806,11 @@ static BOOLEAN jjBRACK_Ma_IV_I(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjBRACK_Ma_IV_IV(leftv res, leftv u, leftv v,leftv w)
 {
-  sleftv t1,t2,ut;
+  if ((u->rtyp!=IDHDL)||(u->e!=NULL))
+  {
+    WerrorS("cannot build expression lists from unnamed objects");
+    return TRUE;
+  }
   leftv p=NULL;
   intvec *vv=(intvec *)v->Data();
   intvec *wv=(intvec *)w->Data();
@@ -5817,15 +5818,11 @@ static BOOLEAN jjBRACK_Ma_IV_IV(leftv res, leftv u, leftv v,leftv w)
   int wl;
   BOOLEAN nok;
 
-  if ((u->rtyp!=IDHDL)||(u->e!=NULL))
-  {
-    WerrorS("cannot build expression lists from unnamed objects");
-    return TRUE;
-  }
+  sleftv t1,t2,ut;
   memcpy(&ut,u,sizeof(ut));
-  memset(&t1,0,sizeof(sleftv));
-  memset(&t2,0,sizeof(sleftv));
+  t1.Init();
   t1.rtyp=INT_CMD;
+  t2.Init();
   t2.rtyp=INT_CMD;
   for (vl=0;vl< vv->length(); vl++)
   {
@@ -5862,17 +5859,17 @@ static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
 {
   v->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(v->next,w,sizeof(sleftv));
-  memset(w,0,sizeof(sleftv));
+  w->Init();
   return jjPROC(res,u,v);
 }
 static BOOLEAN jjRING_2(leftv res, leftv u, leftv v, leftv w)
 {
   u->next=(leftv)omAlloc(sizeof(sleftv));
   memcpy(u->next,v,sizeof(sleftv));
-  memset(v,0,sizeof(sleftv));
+  v->Init();
   u->next->next=(leftv)omAlloc(sizeof(sleftv));
   memcpy(u->next->next,w,sizeof(sleftv));
-  memset(w,0,sizeof(sleftv));
+  w->Init();
   BOOLEAN bo=iiExprArithM(res,u,'[');
   u->next=NULL;
   return bo;
@@ -5934,7 +5931,7 @@ static BOOLEAN jjCOEFFS3_P(leftv res, leftv u, leftv v, leftv w)
   ideal i=idInit(1,1);
   i->m[0]=p;
   sleftv t;
-  memset(&t,0,sizeof(t));
+  t.Init();
   t.data=(char *)i;
   t.rtyp=IDEAL_CMD;
   int rank=1;
@@ -6609,7 +6606,7 @@ static BOOLEAN jjSUBST_Id_N(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w, int input_type)
 {
   sleftv tmp;
-  memset(&tmp,0,sizeof(tmp));
+  tmp.Init();
   // do not check the result, conversion from int/number to poly works always
   iiConvert(input_type,POLY_CMD,iiTestConvert(input_type,POLY_CMD),w,&tmp);
   BOOLEAN b=jjSUBST_Id(res,u,v,&tmp);
@@ -7179,7 +7176,7 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
     }
     if (IDTYP(w)==ALIAS_CMD) w=(idhdl)IDDATA(w);
     sleftv tmpW;
-    memset(&tmpW,0,sizeof(sleftv));
+    tmpW.Init();
     tmpW.rtyp=IDTYP(w);
     tmpW.data=IDDATA(w);
     if ((bo=maApplyFetch(IMAP_CMD,NULL,res,&tmpW, r,
@@ -7551,7 +7548,7 @@ static BOOLEAN jjBRACKET_PL(leftv res, leftv u)
     u=u->next;
   }
   #else
-  memset(res,0,sizeof(sleftv));
+  res->Init();
   res->rtyp=NONE;
   return TRUE;
   #endif
@@ -7563,7 +7560,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
   && ((strcmp(u->Name(),"real")==0) || (strcmp(u->Name(),"complex")==0)))
   {
     memcpy(res,u,sizeof(sleftv));
-    memset(u,0,sizeof(sleftv));
+    u->Init();
     return FALSE;
   }
   leftv v=u->next;
@@ -8179,10 +8176,10 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
   BOOLEAN b = iiExprArith3(res, iiOp, u, v, w);
   if ((rest!=NULL) && (!b))
   {
-    sleftv tmp_res;
     leftv tmp_next=res->next;
     res->next=rest;
-    memset(&tmp_res,0,sizeof(tmp_res));
+    sleftv tmp_res;
+    tmp_res.Init();
     b = iiExprArithM(&tmp_res,res,iiOp);
     memcpy(res,&tmp_res,sizeof(tmp_res));
     res->next=tmp_next;
@@ -8353,7 +8350,6 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
                                     int at, int bt,
                                     const struct sConvertTypes *dConvertTypes)
 {
-  memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
@@ -8512,6 +8508,7 @@ BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
                                     int at,
                                     const struct sConvertTypes *dConvertTypes)
 {
+  res->Init();
   leftv b=a->next;
   a->next=NULL;
   int bt=b->Typ();
@@ -8522,7 +8519,7 @@ BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
 }
 BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 {
-  memset(res,0,sizeof(sleftv));
+  res->Init();
 
   if (!errorreported)
   {
@@ -8581,7 +8578,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 
 BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, int at, const struct sConvertTypes *dConvertTypes)
 {
-  memset(res,0,sizeof(sleftv));
+  res->Init();
   BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
@@ -8711,7 +8708,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
 }
 BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 {
-  memset(res,0,sizeof(sleftv));
+  res->Init();
 
   if (!errorreported)
   {
@@ -8772,7 +8769,6 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
   const struct sValCmd3* dA3, int at, int bt, int ct,
   const struct sConvertTypes *dConvertTypes)
 {
-  memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
 
   assume(dA3[0].cmd==op);
@@ -8924,7 +8920,7 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
 }
 BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
 {
-  memset(res,0,sizeof(sleftv));
+  res->Init();
 
   if (!errorreported)
   {
@@ -8979,6 +8975,7 @@ BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
                                     int at,
                                     const struct sConvertTypes *dConvertTypes)
 {
+  res->Init();
   leftv b=a->next;
   a->next=NULL;
   int bt=b->Typ();
@@ -9014,7 +9011,7 @@ static BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
 
 BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 {
-  memset(res,0,sizeof(sleftv));
+  res->Init();
 
   if (!errorreported)
   {
@@ -9781,7 +9778,7 @@ static int jjCOMPARE_ALL(const void * aa, const void * bb)
   if (at > bt) return 1;
   int tab_pos=iiTabIndex(dArithTab2,JJTAB2LEN,'<');
   sleftv tmp;
-  memset(&tmp,0,sizeof(sleftv));
+  tmp.Init();
   iiOp='<';
   BOOLEAN bo=iiExprArith2TabIntern(&tmp,a,'<',b,FALSE,dArith2+tab_pos,at,bt,dConvertTypes);
   if (bo)

@@ -147,7 +147,7 @@ void sleftv::Print(leftv store, int spaces)
         case RING_CMD:
         {
           PrintNSpaces(spaces);
-          const ring r = (const ring)d;
+          const ring r = (ring)d;
           rWrite(r, currRing == r);
           break;
         }
@@ -1829,7 +1829,6 @@ void syMakeMonom(leftv v,const char * id)
   idhdl save_ring=currRingHdl;
   v->Init();
   v->req_packhdl = currPack;
-  idhdl h=NULL;
 #ifdef SIQ
   if (siq<=0)
 #endif
@@ -1927,7 +1926,7 @@ int sleftv::Eval()
           if (!nok)
           {
             memcpy(this,&iiRETURNEXPR,sizeof(sleftv));
-            memset(&iiRETURNEXPR,0,sizeof(sleftv));
+            iiRETURNEXPR.Init();
           }
         }
       }
@@ -1972,7 +1971,7 @@ int sleftv::Eval()
                     omCheckAddr((ADDRESS)d->arg1.name));
           if (!nok)
           {
-            memset(&d->arg1,0,sizeof(sleftv));
+            d->arg1.Init();
             this->CleanUp();
             rtyp=NONE;
           }

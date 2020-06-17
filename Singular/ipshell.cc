@@ -203,7 +203,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                    {
                      char *s;
                      l=strlen(IDSTRING(h));
-                     memset(buffer,0,22);
+                     memset(buffer,0,sizeof(buffer));
                      strncpy(buffer,IDSTRING(h),si_min(l,20));
                      if ((s=strchr(buffer,'\n'))!=NULL)
                      {
@@ -651,7 +651,7 @@ leftv iiMap(map theMap, const char * what)
       char *save_r=NULL;
       v=(leftv)omAlloc0Bin(sleftv_bin);
       sleftv tmpW;
-      memset(&tmpW,0,sizeof(sleftv));
+      tmpW.Init();
       tmpW.rtyp=IDTYP(w);
       if (tmpW.rtyp==MAP_CMD)
       {
@@ -890,7 +890,7 @@ BOOLEAN jjMINRES(leftv res, leftv v)
 BOOLEAN jjBETTI(leftv res, leftv u)
 {
   sleftv tmp;
-  memset(&tmp,0,sizeof(tmp));
+  tmp.Init();
   tmp.rtyp=INT_CMD;
   tmp.data=(void *)1;
   if ((u->Typ()==IDEAL_CMD)
@@ -910,7 +910,7 @@ BOOLEAN jjBETTI2_ID(leftv res, leftv u, leftv v)
   if (a!=NULL)
   l->m[0].attribute=*a;
   sleftv tmp2;
-  memset(&tmp2,0,sizeof(tmp2));
+  tmp2.Init();
   tmp2.rtyp=LIST_CMD;
   tmp2.data=(void *)l;
   BOOLEAN r=jjBETTI2(res,&tmp2,v);
@@ -997,7 +997,7 @@ void iiDebug()
   s = (char *)omAlloc(BREAK_LINE_LENGTH+4);
   loop
   {
-    memset(s,0,80);
+    memset(s,0,BREAK_LINE_LENGTH+4);
     fe_fgets_stdin("",s,BREAK_LINE_LENGTH);
     if (s[BREAK_LINE_LENGTH-1]!='\0')
     {
@@ -1048,7 +1048,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   hMu = 0;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((rVar(currRing) + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (rVar(currRing) * rVar(currRing))) * sizeof(long));
+  hpure = (scmon)omAlloc0((1 + (rVar(currRing) * rVar(currRing))) * sizeof(long));
   hrad = hexist;
   hNrad = hNexist;
   radmem = hCreate(rVar(currRing) - 1);
@@ -1059,7 +1059,6 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   if (hNvar)
   {
     hCo = hNvar;
-    memset(hpure, 0, (rVar(currRing) + 1) * sizeof(long));
     hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
     hLexR(hrad, hNrad, hvar, hNvar);
     hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
@@ -1129,7 +1128,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
   BOOLEAN is_qring=FALSE;
   const char *id = name->name;
 
-  memset(sy,0,sizeof(sleftv));
+  sy->Init();
   if ((name->name==NULL)||(isdigit(name->name[0])))
   {
     WerrorS("object to declare is not a name");
@@ -1193,7 +1192,7 @@ BOOLEAN iiDefaultParameter(leftv p)
   if (at==NULL)
     return FALSE;
   sleftv tmp;
-  memset(&tmp,0,sizeof(sleftv));
+  tmp.Init();
   tmp.rtyp=at->atyp;
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
@@ -1582,7 +1581,6 @@ idhdl rDefault(const char *s)
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
   ring r = IDRING(tmp) = (ring) omAlloc0Bin(sip_sring_bin);
@@ -3181,7 +3179,7 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
 BOOLEAN syBetti1(leftv res, leftv u)
 {
   sleftv tmp;
-  memset(&tmp,0,sizeof(tmp));
+  tmp.Init();
   tmp.rtyp=INT_CMD;
   tmp.data=(void *)1;
   return syBetti2(res,u,&tmp);
@@ -4560,9 +4558,9 @@ BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
 BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
 {
   sleftv tmp;
-  memset(&tmp,0,sizeof(tmp));
+  tmp.Init();
   tmp.rtyp=INT_CMD;
-  /* tmp.data = (void *)0;  -- done by memset */
+  /* tmp.data = (void *)0;  -- done by Init */
 
   return  semicProc3(res,u,v,&tmp);
 }
@@ -5139,7 +5137,6 @@ void rSetHdl(idhdl h)
     if(sLastPrinted.RingDependend())
     {
       sLastPrinted.CleanUp();
-      //memset(&sLastPrinted,0,sizeof(sleftv)); // done by Cleanup,Init
     }
 
     if (rg!=currRing)/*&&(currRing!=NULL)*/
@@ -6282,12 +6279,12 @@ ideal kGroebner(ideal F, ideal Q)
     new_ring=currRingHdl;
     IDRING(currRingHdl)=currRing;
   }
-  sleftv v; memset(&v,0,sizeof(v)); v.rtyp=IDEAL_CMD; v.data=(char *) F;
+  sleftv v; v.Init(); v.rtyp=IDEAL_CMD; v.data=(char *) F;
   idhdl h=ggetid("groebner");
-  sleftv u; memset(&u,0,sizeof(u)); u.rtyp=IDHDL; u.data=(char *) h;
+  sleftv u; u.Init(); u.rtyp=IDHDL; u.data=(char *) h;
             u.name=IDID(h);
 
-  sleftv res; memset(&res,0,sizeof(res));
+  sleftv res; res.Init();
   if(jjPROC(&res,&u,&v))
   {
     resid=kStd(F,Q,testHomog,NULL);
@@ -6386,7 +6383,7 @@ BOOLEAN iiApplyINTVEC(leftv res, leftv a, int op, leftv proc)
   BOOLEAN bo=FALSE;
   for(int i=0;i<aa->length(); i++)
   {
-    memset(&tmp_in,0,sizeof(tmp_in));
+    tmp_in.Init();
     tmp_in.rtyp=INT_CMD;
     tmp_in.data=(void*)(long)(*aa)[i];
     if (proc==NULL)
@@ -6428,7 +6425,7 @@ BOOLEAN iiApplyLIST(leftv res, leftv a, int op, leftv proc)
   BOOLEAN bo=FALSE;
   for(int i=0;i<=aa->nr; i++)
   {
-    memset(&tmp_in,0,sizeof(tmp_in));
+    tmp_in.Init();
     tmp_in.Copy(&(aa->m[i]));
     if (proc==NULL)
       bo=iiExprArith1(&tmp_out,&tmp_in,op);
@@ -6453,7 +6450,7 @@ BOOLEAN iiApplyLIST(leftv res, leftv a, int op, leftv proc)
 }
 BOOLEAN iiApply(leftv res, leftv a, int op, leftv proc)
 {
-  memset(res,0,sizeof(sleftv));
+  res->Init();
   res->rtyp=a->Typ();
   switch (res->rtyp /*a->Typ()*/)
   {
@@ -6521,7 +6518,7 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
     s[start_s]='\0';
     sprintf(ss,"parameter def %s;%s;return(%s);\n",a,s,s+start_s+1);
   }
-  memset(r,0,sizeof(*r));
+  r->Init();
   // now produce procinfo for PROC_CMD:
   r->data = (void *)omAlloc0Bin(procinfo_bin);
   ((procinfo *)(r->data))->language=LANG_NONE;
@@ -6541,7 +6538,7 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
   if (t==RING_CMD)
   {
     sleftv tmp;
-    memset(&tmp,0,sizeof(tmp));
+    tmp.Init();
     tmp.rtyp=IDHDL;
     idhdl h=rDefault(ring_name);
     tmp.data=(char*)h;
@@ -6561,7 +6558,7 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
   {
     sleftv tmp;
     sleftv n;
-    memset(&n,0,sizeof(n));
+    n.Init();
     n.name=ring_name;
     if (iiDeclCommand(&tmp,&n,myynest,CRING_CMD,&IDROOT)) return TRUE;
     if (iiAssign(&tmp,arg)) return TRUE;
@@ -6636,7 +6633,7 @@ void iiSetReturn(const leftv source)
       if ((IDLEV((idhdl)source->data)==myynest)
       &&(IDTYP((idhdl)source->data)!=RING_CMD))
       {
-        memset(&iiRETURNEXPR,0,sizeof(sleftv));
+        iiRETURNEXPR.Init();
         iiRETURNEXPR.rtyp=IDTYP((idhdl)source->data);
         iiRETURNEXPR.data=IDDATA((idhdl)source->data);
         iiRETURNEXPR.flag=IDFLAG((idhdl)source->data);

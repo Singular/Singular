@@ -58,12 +58,12 @@ char * newstruct_String(blackbox *b, void *d)
     if (p!=NULL)
     {
       sleftv tmp;
-      memset(&tmp,0,sizeof(tmp));
+      tmp.Init();
       tmp.rtyp=ad->id;
       void * newstruct_Copy(blackbox*, void *); //forward declaration
       tmp.data=(void*)newstruct_Copy(b,d);
       idrec hh;
-      memset(&hh,0,sizeof(hh));
+      hh.Init();
       hh.id=Tok2Cmdname(p->t);
       hh.typ=PROC_CMD;
       hh.data.pinf=p->p;
@@ -181,12 +181,11 @@ BOOLEAN newstruct_Assign_user(int op, leftv l, leftv r)
   {
     BOOLEAN sl;
     idrec hh;
-    memset(&hh,0,sizeof(hh));
+    hh.Init();
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
     sleftv tmp;
-    memset(&tmp,0,sizeof(sleftv));
     tmp.Copy(r);
     sl = iiMake_proc(&hh, NULL, &tmp);
     if (!sl)
@@ -258,7 +257,7 @@ BOOLEAN newstruct_Op1(int op, leftv res, leftv arg)
   if (p!=NULL)
   {
     idrec hh;
-    memset(&hh,0,sizeof(hh));
+    hh.Init();
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
@@ -437,7 +436,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
           Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
           r->start = nm->pos+1;
           memcpy(res,a1,sizeof(sleftv));
-          memset(a1,0,sizeof(sleftv));
+          a1->Init();
           if (res->e==NULL) res->e=r;
           else
           {
@@ -445,7 +444,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             while (sh->next != NULL) sh=sh->next;
             sh->next=r;
           }
-          //a1->CleanUp();// see memset above
+          //a1->CleanUp();// see Init() above
           a2->CleanUp();
           return FALSE;
         }
@@ -468,12 +467,11 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
   if (p!=NULL)
   {
     sleftv tmp;
-    memset(&tmp,0,sizeof(sleftv));
     tmp.Copy(a1);
     tmp.next=(leftv)omAlloc0(sizeof(sleftv));
     tmp.next->Copy(a2);
     idrec hh;
-    memset(&hh,0,sizeof(hh));
+    hh.Init();
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
@@ -516,7 +514,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
   if (p!=NULL)
   {
     idrec hh;
-    memset(&hh,0,sizeof(hh));
+    hh.Init();
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
@@ -612,7 +610,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
 {
   newstruct_desc dd=(newstruct_desc)b->data;
   sleftv l;
-  memset(&l,0,sizeof(l));
+  l.Init();
   l.rtyp=STRING_CMD;
   l.data=(void*)getBlackboxName(dd->id);
   f->m->Write(f, &l);
@@ -683,11 +681,11 @@ void newstruct_Print(blackbox *b,void *d)
   {
     BOOLEAN sl;
     sleftv tmp;
-    memset(&tmp,0,sizeof(tmp));
+    tmp.Init();
     tmp.rtyp=dd->id;
     tmp.data=(void*)newstruct_Copy(b,d);
     idrec hh;
-    memset(&hh,0,sizeof(hh));
+    hh.Init();
     hh.id=Tok2Cmdname(p->t);
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;

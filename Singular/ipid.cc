@@ -268,7 +268,7 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
 char * idrec::String(BOOLEAN typed)
 {
   sleftv tmp;
-  memset(&tmp,0,sizeof(sleftv));
+  tmp.Init();
   tmp.rtyp=IDTYP(this);
   tmp.data=IDDATA(this);
   tmp.name=IDID(this);
