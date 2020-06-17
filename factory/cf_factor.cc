@@ -544,10 +544,32 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     Off(SW_RATIONAL);
     if ( f.isUnivariate() )
     {
-      #ifdef HAVE_NTL
-      //USE NTL
       CanonicalForm ic=icontent(fz);
       fz/=ic;
+      #if 0 // #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20504)
+      // use FLINT
+      fmpz_poly_t f1;
+      convertFacCF2Fmpz_poly_t (f1, fz);
+      fmpz_poly_factor_t result;
+      fmpz_poly_factor_init (result);
+      fmpz_poly_factor_zassenhaus(result, f1);
+      F= convertFLINTfmpz_poly_factor2FacCFFList (result, fz.mvar());
+      fmpz_poly_factor_clear (result);
+      fmpz_poly_clear (f1);
+      if ( ! ic.isOne() )
+      {
+        if ( F.getFirst().factor().inCoeffDomain() )
+        {
+          CFFactor new_first( F.getFirst().factor() * ic );
+          F.removeFirst();
+          F.insert( new_first );
+        }
+        else
+          F.insert( CFFactor( ic ) );
+      }
+      goto end_char0;
+      #elif defined HAVE_NTL
+      //USE NTL
       ZZ c;
       vec_pair_ZZX_long factors;
       //factorize the converted polynomial
@@ -574,23 +596,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F.insert( new_first );
         }
       }
-      if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
-      return F;
-      #endif
-      #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20504)
-      // use FLINT
-      fmpz_poly_t f1;
-      convertFacCF2Fmpz_poly_t (f1, f);
-      fmpz_poly_factor_t result;
-      fmpz_poly_factor_init (result);
-      fmpz_poly_factor_zassenhaus(result, f1);
-      F= convertFLINTfmpz_poly_factor2FacCFFList (result, f.mvar());
-      fmpz_poly_factor_clear (result);
-      fmpz_poly_clear (f1);
-      if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
-      return F;
-      #endif
-      #if !defined(AHE_NTL) && !defined(HAVE_FLINT)
+      goto end_char0;
+      #else
       factoryError ("univariate factorization over Z depends on NTL/FLINT(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
@@ -615,6 +622,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       Off (SW_RATIONAL);
     }
 
+end_char0:
     if ( on_rational )
       On(SW_RATIONAL);
     if ( ! cd.isOne() )
