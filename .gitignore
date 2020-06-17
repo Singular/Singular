@@ -43,7 +43,7 @@ _config.h.in
 /libpolys/libpolysconfig.h
 /libpolys/libpolysconfig.h.in
 /libpolys/polys/m4/
-/libpolys/polys/templates/p_Procs_Generate
+/libpolys/polys/p_Procs_Generate
 /libpolys/polys/templates/p_Procs.inc
 /libpolys/tests/gftables
 /libpolys/tests/p_Procs_*.so
@@ -62,6 +62,7 @@ _config.h.in
 /omalloc/omConfig.h.in
 /omalloc/omExternalConfig.h
 /omalloc/omTables
+/omalloc/omTables1
 /omalloc/omTables.dSYM/*
 /omalloc/omTables.h
 /omalloc/omTables.inc
