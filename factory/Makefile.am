@@ -255,6 +255,8 @@ DISTCLEANFILES =  config.h readcf.cc
 #distclean-local:
 #	-rm -f readcf.cc
 
+factory.h factoryconf.h: config.status
+
 .template.h: $(factory_headers)
 	${srcdir}/bin/makeheader $< $@
 	cp $@ include/factory/
