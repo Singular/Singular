@@ -303,6 +303,8 @@ convertFLINTfmpz_poly_factor2FacCFFList (
   CFFList result;
   long i;
 
+  result.append (CFFactor(convertFmpz2CF(&fac->c),1));
+
   for (i = 0; i < fac->num; i++)
     result.append (CFFactor (convertFmpz_poly_t2FacCF (
                              (fmpz_poly_t &)fac->p[i],x),

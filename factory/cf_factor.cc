@@ -546,16 +546,23 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     {
       CanonicalForm ic=icontent(fz);
       fz/=ic;
-      #if 0 // #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20504)
-      // use FLINT
-      fmpz_poly_t f1;
-      convertFacCF2Fmpz_poly_t (f1, fz);
-      fmpz_poly_factor_t result;
-      fmpz_poly_factor_init (result);
-      fmpz_poly_factor_zassenhaus(result, f1);
-      F= convertFLINTfmpz_poly_factor2FacCFFList (result, fz.mvar());
-      fmpz_poly_factor_clear (result);
-      fmpz_poly_clear (f1);
+      if (fz.degree()==1)
+      {
+        F=CFFList(CFFactor(fz,1));
+      }
+      else
+      #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20504)
+      {
+        // use FLINT
+        fmpz_poly_t f1;
+        convertFacCF2Fmpz_poly_t (f1, fz);
+        fmpz_poly_factor_t result;
+        fmpz_poly_factor_init (result);
+        fmpz_poly_factor(result, f1);
+        F= convertFLINTfmpz_poly_factor2FacCFFList (result, fz.mvar());
+        fmpz_poly_factor_clear (result);
+        fmpz_poly_clear (f1);
+      }
       if ( ! ic.isOne() )
       {
         if ( F.getFirst().factor().inCoeffDomain() )
@@ -568,15 +575,17 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F.insert( CFFactor( ic ) );
       }
       goto end_char0;
-      #elif defined HAVE_NTL
-      //USE NTL
-      ZZ c;
-      vec_pair_ZZX_long factors;
-      //factorize the converted polynomial
-      factor(c,factors,convertFacCF2NTLZZX(fz));
+      #elif defined(HAVE_NTL)
+      {
+        //USE NTL
+        ZZ c;
+        vec_pair_ZZX_long factors;
+        //factorize the converted polynomial
+        factor(c,factors,convertFacCF2NTLZZX(fz));
 
-      //convert the result back to Factory
-      F=convertNTLvec_pair_ZZX_long2FacCFFList(factors,c,fz.mvar());
+        //convert the result back to Factory
+        F=convertNTLvec_pair_ZZX_long2FacCFFList(factors,c,fz.mvar());
+      }
       if ( ! ic.isOne() )
       {
         if ( F.getFirst().factor().inCoeffDomain() )
