@@ -762,7 +762,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
         return F;
       }
 #endif
-#if !defined(HAVE_NTL) && !defined(HAVEFLINT)
+#if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
       factoryError ("univariate factorization  depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
 #endif //HAVE_NTL
