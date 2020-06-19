@@ -114,6 +114,8 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     {
       fc= EZGCD_P (fc, gc);
     }
+    #endif
+    #ifdef HAVE_NTL
     else if (isOn(SW_USE_FF_MOD_GCD) && !fc_and_gc_Univariate)
     {
       Variable a;
