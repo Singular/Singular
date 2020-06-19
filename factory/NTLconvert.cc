@@ -768,8 +768,7 @@ convertNTLvec_pair_ZZX_long2FacCFFList (const vec_pair_ZZX_long & e,const ZZ & m
     result.append(CFFactor(bigone,exponent));
   }
   // the multiplicity at pos 1
-  //if (!IsOne(multi))
-    result.insert(CFFactor(convertZZ2CF(multi),1));
+  result.insert(CFFactor(convertZZ2CF(multi),1));
 
   //return the converted list
   return result;

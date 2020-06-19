@@ -477,7 +477,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 #endif
 #ifdef HAVE_NTL
       {
-        // USE NTL
+        // use NTL
         if (fac_NTL_char != getCharacteristic())
         {
           fac_NTL_char = getCharacteristic();
@@ -506,7 +506,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       return CFFList (CFFactor (f, 1));
 #endif
     }
-    else
+    else // char p, multivariate
     {
       #if defined(HAVE_NTL)
       if (issqrfree)
@@ -562,22 +562,19 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         F= convertFLINTfmpz_poly_factor2FacCFFList (result, fz.mvar());
         fmpz_poly_factor_clear (result);
         fmpz_poly_clear (f1);
-      }
-      if ( ! ic.isOne() )
-      {
-        if ( F.getFirst().factor().inCoeffDomain() )
+        if ( ! ic.isOne() )
         {
+	   // according to convertFLINTfmpz_polyfactor2FcaCFFlist,
+	   //  first entry is in CoeffDomain
           CFFactor new_first( F.getFirst().factor() * ic );
           F.removeFirst();
           F.insert( new_first );
         }
-        else
-          F.insert( CFFactor( ic ) );
       }
       goto end_char0;
       #elif defined(HAVE_NTL)
       {
-        //USE NTL
+        //use NTL
         ZZ c;
         vec_pair_ZZX_long factors;
         //factorize the converted polynomial
@@ -585,23 +582,12 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 
         //convert the result back to Factory
         F=convertNTLvec_pair_ZZX_long2FacCFFList(factors,c,fz.mvar());
-      }
-      if ( ! ic.isOne() )
-      {
-        if ( F.getFirst().factor().inCoeffDomain() )
+        if ( ! ic.isOne() )
         {
+	   // according to convertNTLvec_pair_ZZX_long2FacCFFList
+	   //  first entry is in CoeffDomain
           CFFactor new_first( F.getFirst().factor() * ic );
           F.removeFirst();
-          F.insert( new_first );
-        }
-        else
-          F.insert( CFFactor( ic ) );
-      }
-      else
-      {
-        if ( !F.getFirst().factor().inCoeffDomain() )
-        {
-          CFFactor new_first( 1 );
           F.insert( new_first );
         }
       }
@@ -611,7 +597,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       return CFFList (CFFactor (f, 1));
       #endif
     }
-    else // not univariate,  char 0
+    else // multivariate,  char 0
     {
       On (SW_RATIONAL);
       if (issqrfree)
@@ -643,16 +629,9 @@ end_char0:
       On(SW_RATIONAL);
     if ( ! cd.isOne() )
     {
-      if ( F.getFirst().factor().inCoeffDomain() )
-      {
-        CFFactor new_first( F.getFirst().factor() / cd );
-        F.removeFirst();
-        F.insert( new_first );
-      }
-      else
-      {
-        F.insert( CFFactor( 1/cd ) );
-      }
+      CFFactor new_first( F.getFirst().factor() / cd );
+      F.removeFirst();
+      F.insert( new_first );
     }
   }
 
@@ -772,11 +751,11 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       }
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
-      factoryError ("univariate factorization  depends on NTL(missing)");
+      factoryError ("univariate factorization  depends on FLINT/NTL(missing)");
       return CFFList (CFFactor (f, 1));
-#endif //HAVE_NTL
+#endif
     }
-    else
+    else // char p, multivariate
     {
       #ifdef HAVE_NTL
       F= FqFactorize (f, alpha);
