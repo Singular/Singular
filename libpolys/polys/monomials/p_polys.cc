@@ -1568,9 +1568,9 @@ poly p_DivideM(poly a, poly b, const ring r)
 
   if(!p_IsConstant(b,r))
   {
-    if (rIsLPRing(r))
+    if (rIsNCRing(r))
     {
-      WerrorS("not implemented for letterplace rings");
+      WerrorS("p_DivideM not implemented for non-commuative rings");
       return NULL;
     }
     poly prev=NULL;
