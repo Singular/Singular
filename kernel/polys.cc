@@ -334,16 +334,12 @@ poly p_DivRem(poly p, poly q, poly &rest, const ring r)
     p_Delete(&q,r);
     return NULL;
   }
-  if (rIsLPRing(r))
-  {
-    WerrorS("not implemented for letterplace rings");
-    return NULL;
-  }
   if(p_GetComp(p,r)==0)
   {
     if((rFieldType(r)==n_transExt)
     &&(convSingTrP(p,r))
-    &&(convSingTrP(q,r)))
+    &&(convSingTrP(q,r))
+    &&(!rIsNCRing(r)))
     {
       poly res=singclap_pdivide(p, q, r);
       rest=singclap_pmod(p,q,r);
@@ -352,7 +348,8 @@ poly p_DivRem(poly p, poly q, poly &rest, const ring r)
       return res;
     }
     else if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
-    &&(!rField_is_Ring(r)))
+    &&(!rField_is_Ring(r))
+    &&(!rIsNCRing(r)))
     {
       poly res=singclap_pdivide(p, q, r);
       rest=singclap_pmod(p,q,r);
