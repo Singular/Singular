@@ -101,7 +101,7 @@ result of various computations (in particular Groebner bases).
 @c table @asis
 @itemize @bullet
 @item The tree structure of the binary Singular distribution has been changed.
-The typical tree now looks as show at @uref{https://github.com/Singular/Sources/wiki/Sw-tree}
+The typical tree now looks as show at @uref{https://github.com/Singular/Singular/wiki/Sw-tree}
 
 @item Accordingly Singular search paths (where Singular searches for libraries, dynamic modules, etc.) have been changed. You can display them by calling Singular by @code{Singular -v}.
 

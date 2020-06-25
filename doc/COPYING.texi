@@ -136,7 +136,7 @@ Some external programs are optional:
 @uref{https://imaginary.org/program/surfer}
 @item surfex (used by surfex.lib, @pxref{surfex_lib})
 @copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
-@* @uref{https://github.com/Singular/Sources/tree/spielwiese/Singular/LIB/surfex}
+@* @uref{https://github.com/Singular/Singular/tree/spielwiese/Singular/LIB/surfex}
 @item TOPCOM (used by polymake.lib, @pxref{polymake_lib})
 @copyright{} J@"org Rambau
 @* @uref{http://www.rambau.wm.uni-bayreuth.de/TOPCOM/}

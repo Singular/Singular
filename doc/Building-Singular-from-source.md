@@ -10,7 +10,7 @@ for step by step instructions.
 # Build the development branch of Singular as follows:
 
 1. as prerequisite autotools (>=2.62), [gmp](http://ftp.gnu.org/gnu/gmp/) (>= 4.2), are needed, furthermore we recommend to use [NTL](http://www.shoup.net/ntl/) (>= 5.0) configured with NTL_GMP_LIP=on (for further details see [NTL Documentation](http://www.shoup.net/ntl/doc/tour-gmp.html)), [FLINT](http://www.flintlib.org/) (>=2.4) which depends on [MPFR](http://www.mpfr.org/mpfr-current/) (>=3.0.0)  , and readline
-2. get the sources with `git clone -b spielwiese git://github.com/Singular/Sources.git <directory_name>`
+2. get the sources with `git clone -b spielwiese git://github.com/Singular/Singular.git <directory_name>`
 3. run `<abs_directory_name_from_above>/autogen.sh` (formerly known as `for_Hans_with_love.sh`) from the root directory
 4. create and switch to your temporary build directory. Do not build Singular in the source folder itself!
 5. run `<abs_directory_name_from_above>/configure --prefix=<destination path>` (builds release version)
@@ -51,7 +51,7 @@ Note: modules are not required to be static...
 
 # Build the old ```master``` Singular as follows:
 
-1. get the sources with `git clone -b trunk git://github.com/Singular2/Sources.git <directory_name>`
+1. get the sources with `git clone -b trunk git://github.com/Singular/Singular.git <directory_name>`
 2. `cd <directory_name_from_above>`
 3. run `./configure` from the root directory
 4. `make install` (or `make -jN install`, where N as above), and _yes_ it should really be `install`!

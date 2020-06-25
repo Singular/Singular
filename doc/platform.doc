@@ -212,7 +212,7 @@ install normaliz 2.8 (or newer)
 @end itemize
 
 See also
-@url{https://github.com/Singular/Sources/wiki/Step-by-Step-Installation-Instructions-for-Singular}
+@url{https://github.com/Singular/Singular/wiki/Step-by-Step-Installation-Instructions-for-Singular}
 which includes instructions adapted for debian and fedora based systems.
 
 @c ----------------------------------------------------------
