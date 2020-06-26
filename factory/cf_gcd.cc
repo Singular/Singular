@@ -140,13 +140,15 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     }
     else
     #endif
+    #ifdef HAVE_NTL
     if ( isOn( SW_USE_EZGCD ) )
       fc= ezgcd (fc, gc);
+    #endif  
     #ifdef HAVE_NTL
     else if (isOn(SW_USE_CHINREM_GCD))
       fc = modGCDZ( fc, gc);
-    #endif
     else
+    #endif
     {
        fc = subResGCD_0( fc, gc );
     }

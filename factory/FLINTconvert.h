@@ -41,6 +41,9 @@ extern "C"
 #include <flint/fq_nmod_poly.h>
 #include <flint/fq_nmod_mat.h>
 #endif
+
+EXTERN_VAR flint_rand_t FLINTrandom;
+
 #ifdef __cplusplus
 }
 #endif

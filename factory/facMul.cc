@@ -40,6 +40,7 @@
 #endif
 
 // univariate polys
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 
 #ifdef HAVE_FLINT
 void kronSubQa (fmpz_poly_t result, const CanonicalForm& A, int d)
@@ -3746,3 +3747,8 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
 
 // end division
 
+#else
+CanonicalForm
+mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
+{ return F*G; }
+#endif

@@ -305,7 +305,7 @@ CanonicalForm mapUp (const CanonicalForm& F, const CanonicalForm& G,
   }
 }
 
-#ifdef HAVE_NTL
+#ifdef HAVE_NTL // FindRoot
 CanonicalForm
 primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
 {
@@ -322,20 +322,30 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   CanonicalForm mipo= getMipo (alpha);
   int d= degree (mipo);
   int p= getCharacteristic ();
+  //#if !defined(HAVE_FLINT) && defined(AHVE_NTL)
   if (fac_NTL_char != p)
   {
     fac_NTL_char= p;
     zz_p::init (p);
   }
   zz_pX NTL_mipo;
+  //#endif
   CanonicalForm mipo2;
   primitive= false;
   fail= false;
   bool initialized= false;
   do
   {
+    //#ifdef HAVE_FLINT
+    //nmod_poly_t Irredpoly;
+    //nmod_poly_init(Irredpoly,p);
+    //nmod_poly_randtest_monic_irreducible(Irredpoly, FLINTrandom, d+1);
+    //mipo2=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
+    //nmod_poly_clear(Irredpoly);
+    //#elif defined(HAVE_NTL)
     BuildIrred (NTL_mipo, d);
     mipo2= convertNTLzzpX2CF (NTL_mipo, Variable (1));
+    //#endif
     if (!initialized)
       beta= rootOf (mipo2);
     else

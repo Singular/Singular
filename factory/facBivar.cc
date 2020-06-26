@@ -25,7 +25,6 @@
 #include "facMul.h"
 #include "cf_primes.h"
 
-#ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
 TIMING_DEFINE_PRINT(fac_bi_hensel_lift)
 TIMING_DEFINE_PRINT(fac_bi_factor_recombination)
@@ -184,6 +183,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, int& i)
   } while (1);
 }
 
+#ifdef HAVE_NTL // resultatnt(ZZ), discrimeninat
 CFList biFactorize (const CanonicalForm& F, const Variable& v)
 {
   if (F.inCoeffDomain())
@@ -606,5 +606,4 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
 
   return factors;
 }
-
 #endif

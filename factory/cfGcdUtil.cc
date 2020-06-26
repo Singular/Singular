@@ -13,10 +13,15 @@
 #include "NTLconvert.h"
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 /// Coprimality Check. f and g are assumed to have the same level. If swap is
 /// true, the main variables of f and g are swapped with Variable(1). If the
 /// result is false, d is set to the degree of the gcd of f and g evaluated at a
 /// random point in K^n-1. This gcd is a gcd of univariate polynomials.
+#ifdef HAVE_NTL // primitiveElement, FindRoot
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d )
 {
@@ -82,34 +87,55 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
     }
     else if (p > 0 && p < TEST_ONE_MAX && algExtension)
     {
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
       int d= degree (getMipo (v));
       CFList source, dest;
       Variable v2;
       CanonicalForm primElem, imPrimElem;
       if (p == 2 && d < 6)
       {
-        if (fac_NTL_char != 2)
-        {
-          fac_NTL_char= 2;
-          zz_p::init (p);
-        }
         bool primFail= false;
         Variable vBuf;
         primElem= primitiveElement (v, vBuf, primFail);
         ASSERT (!primFail, "failure in integer factorizer");
         if (d < 3)
         {
+          #ifdef HAVE_FLINT
+          nmod_poly_t Irredpoly;
+          nmod_poly_init(Irredpoly,p);
+          nmod_poly_randtest_monic_irreducible(Irredpoly, FLINTrandom, 3*d+1);
+          CanonicalForm newMipo=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
+          nmod_poly_clear(Irredpoly);
+          #elif defined(HAVE_NTL)
+          if (fac_NTL_char != 2)
+          {
+            fac_NTL_char= 2;
+            zz_p::init (p);
+          }
           zz_pX NTLIrredpoly;
           BuildIrred (NTLIrredpoly, d*3);
           CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+          #endif
           v2= rootOf (newMipo);
         }
         else
         {
+          #ifdef HAVE_FLINT
+          nmod_poly_t Irredpoly;
+          nmod_poly_init(Irredpoly,p);
+          nmod_poly_randtest_monic_irreducible(Irredpoly, FLINTrandom, 3*d+1);
+          CanonicalForm newMipo=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
+          nmod_poly_clear(Irredpoly);
+          #elif defined(HAVE_NTL)
+          if (fac_NTL_char != 2)
+          {
+            fac_NTL_char= 2;
+            zz_p::init (p);
+          }
           zz_pX NTLIrredpoly;
           BuildIrred (NTLIrredpoly, d*2);
           CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+          #endif
           v2= rootOf (newMipo);
         }
         imPrimElem= mapPrimElem (primElem, v, v2);
@@ -117,18 +143,26 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       }
       else if ((p == 3 && d < 4) || ((p == 5 || p == 7) && d < 3))
       {
+        bool primFail= false;
+        Variable vBuf;
+        primElem= primitiveElement (v, vBuf, primFail);
+        ASSERT (!primFail, "failure in integer factorizer");
+        #ifdef HAVE_FLINT
+        nmod_poly_t Irredpoly;
+        nmod_poly_init(Irredpoly,p);
+        nmod_poly_randtest_monic_irreducible(Irredpoly, FLINTrandom, 2*d+1);
+        CanonicalForm newMipo=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
+        nmod_poly_clear(Irredpoly);
+        #elif defined(HAVE_NTL)
         if (fac_NTL_char != p)
         {
           fac_NTL_char= p;
           zz_p::init (p);
         }
-        bool primFail= false;
-        Variable vBuf;
-        primElem= primitiveElement (v, vBuf, primFail);
-        ASSERT (!primFail, "failure in integer factorizer");
         zz_pX NTLIrredpoly;
         BuildIrred (NTLIrredpoly, d*2);
         CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+        #endif
         v2= rootOf (newMipo);
         imPrimElem= mapPrimElem (primElem, v, v2);
         extOfExt= true;
@@ -218,6 +252,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       prune1 (v3);
     return result;
 }
+#endif
 
 /**
  * same as balance_p ( const CanonicalForm & f, const CanonicalForm & q )

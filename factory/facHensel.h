@@ -26,7 +26,6 @@
 #include "canonicalform.h"
 #include "fac_util.h"
 
-#ifdef HAVE_NTL
 /// sort a list of polynomials by their degree in @a x.
 ///
 void sortList (CFList& list,     ///< [in, out] list of polys, sorted list
@@ -239,7 +238,6 @@ nonMonicHenselLift (const CFList& eval,    ///< [in] a list of polys the last
                     bool& noOneToOne       ///< [in, out] check for one to one
                                            ///< correspondence
                    );
-#endif /* HAVE_NTL */
 #endif
 /* FAC_HENSEL_H */
 

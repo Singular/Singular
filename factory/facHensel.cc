@@ -35,6 +35,7 @@
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
 #include "NTLconvert.h"
+#endif
 
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
@@ -45,6 +46,8 @@ TIMING_DEFINE_PRINT (product1)
 TIMING_DEFINE_PRINT (product2)
 TIMING_DEFINE_PRINT (hensel23)
 TIMING_DEFINE_PRINT (hensel)
+
+#if defined (HAVE_NTL) || defined(HAVE_FLINT)
 
 #if (!(HAVE_FLINT && __FLINT_RELEASE >= 20400))
 static
@@ -465,9 +468,12 @@ void sortList (CFList& list, const Variable& x)
   }
 }
 
+#ifdef HAVE_NTL
 CFList
 diophantine (const CanonicalForm& F, const CFList& factors);
+#endif
 
+#ifdef HAVE_NTL // diophantine
 CFList
 diophantineHensel (const CanonicalForm & F, const CFList& factors,
                    const modpk& b)
@@ -557,6 +563,7 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
 
   return result;
 }
+#endif
 
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
 /// over \f$ Q(\alpha) \f$ by p-adic lifting
@@ -772,6 +779,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
 /// over \f$ Q(\alpha) \f$ by first computing mod \f$p\f$ and if no zero divisor
 /// occurred compute it mod \f$p^k\f$
+#ifdef HAVE_NTL // XGCD, zzp_eX
 CFList
 diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
                const CFList& factors, modpk& b, const Variable& alpha)
@@ -882,7 +890,9 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
   }
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // diophantineQa
 CFList
 diophantine (const CanonicalForm& F, const CanonicalForm& G,
              const CFList& factors, modpk& b)
@@ -933,13 +943,16 @@ diophantine (const CanonicalForm& F, const CanonicalForm& G,
   }
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // diophantineQa
 CFList
 diophantine (const CanonicalForm& F, const CFList& factors)
 {
   modpk b= modpk();
   return diophantine (F, 1, factors, b);
 }
+#endif
 
 void
 henselStep12 (const CanonicalForm& F, const CFList& factors,
@@ -1144,6 +1157,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
   }
 }
 
+#ifdef HAVE_NTL // diopantineQa
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
               CFList& diophant, CFMatrix& M, modpk& b, bool sort)
@@ -1201,7 +1215,9 @@ henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
     k.getItem()= bufFactors[i];
   factors.removeFirst();
 }
+#endif
 
+#ifdef HAVE_NTL //henselLift12
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
               CFList& diophant, CFMatrix& M, bool sort)
@@ -1209,6 +1225,7 @@ henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   modpk dummy= modpk();
   henselLift12 (F, factors, l, Pi, diophant, M, dummy, sort);
 }
+#endif
 
 void
 henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
@@ -1235,6 +1252,7 @@ henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
   return;
 }
 
+#ifdef HAVE_NTL // diophantine
 CFList
 biDiophantine (const CanonicalForm& F, const CFList& factors, int d)
 {
@@ -1334,6 +1352,7 @@ biDiophantine (const CanonicalForm& F, const CFList& factors, int d)
     return result;
   }
 }
+#endif
 
 CFList
 multiRecDiophantine (const CanonicalForm& F, const CFList& factors,
@@ -1649,6 +1668,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
   return;
 }
 
+#ifdef HAVE_NTL // biDiophantine
 CFList
 henselLift23 (const CFList& eval, const CFList& factors, int* l, CFList&
               diophant, CFArray& Pi, CFMatrix& M)
@@ -1689,6 +1709,7 @@ henselLift23 (const CFList& eval, const CFList& factors, int* l, CFList&
     result.append (bufFactors[k]);
   return result;
 }
+#endif
 
 void
 henselLiftResume (const CanonicalForm& F, CFList& factors, int start, int end,
@@ -1756,6 +1777,7 @@ henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
   return result;
 }
 
+#ifdef HAVE_NTL // henselLift23
 CFList
 henselLift (const CFList& eval, const CFList& factors, int* l, int lLength,
             bool sort)
@@ -1790,6 +1812,7 @@ henselLift (const CFList& eval, const CFList& factors, int* l, int lLength,
   }
   return result;
 }
+#endif
 
 // nonmonic
 
@@ -2014,6 +2037,7 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
   return;
 }
 
+#ifdef HAVE_NTL // diophantine
 void
 nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
                       CFArray& Pi, CFList& diophant, CFMatrix& M,
@@ -2090,8 +2114,9 @@ nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
     factors.append (bufFactors[i]);
   return;
 }
+#endif
 
-
+#ifdef HAVE_NTL
 /// solve \f$ E=\sum_{i= 1}^r{\sigma_{i}\prod_{j=1, j\neq i}^{r}{f_{j}}} \f$
 /// mod M, @a products contains \f$ \prod_{j=1, j\neq i}^{r}{f_{j}} \f$
 CFList
@@ -2171,7 +2196,9 @@ diophantine (const CFList& recResult, const CFList& factors,
   }
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // diophantine
 void
 nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
                     CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
@@ -2410,6 +2437,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
   TIMING_END_AND_PRINT (product2, "time for product in hensel step: ");
   return;
 }
+#endif
 
 // wrt. Variable (1)
 CanonicalForm replaceLC (const CanonicalForm& F, const CanonicalForm& c)
@@ -2425,6 +2453,7 @@ CanonicalForm replaceLC (const CanonicalForm& F, const CanonicalForm& c)
   }
 }
 
+#ifdef HAVE_NTL // nonMonicHenselStep
 CFList
 nonMonicHenselLift232(const CFList& eval, const CFList& factors, int* l, CFList&
                       diophant, CFArray& Pi, CFMatrix& M, const CFList& LCs1,
@@ -2486,8 +2515,9 @@ nonMonicHenselLift232(const CFList& eval, const CFList& factors, int* l, CFList&
     result.append (bufFactors[k]);
   return result;
 }
+#endif
 
-
+#ifdef HAVE_NTL // nonMonicHenselStep
 CFList
 nonMonicHenselLift2 (const CFList& F, const CFList& factors, const CFList& MOD,
                     CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
@@ -2550,7 +2580,9 @@ nonMonicHenselLift2 (const CFList& F, const CFList& factors, const CFList& MOD,
     result.append (bufFactors[k]);
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // nonMonicHenselStep
 CFList
 nonMonicHenselLift2 (const CFList& eval, const CFList& factors, int* l, int
                     lLength, bool sort, const CFList& LCs1, const CFList& LCs2,
@@ -2602,7 +2634,9 @@ nonMonicHenselLift2 (const CFList& eval, const CFList& factors, int* l, int
   }
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // diophantine
 CFList
 nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
                       CFList& LCs, CFList& diophant, CFArray& Pi, int liftBound,
@@ -2704,7 +2738,9 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
     result.append (bufFactors[i]);
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // nonMonicHenselStep
 CFList
 nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
                     CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
@@ -2787,7 +2823,9 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
     result.append (bufFactors[k]);
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // nonMonicHenselLift23
 CFList
 nonMonicHenselLift (const CFList& eval, const CFList& factors,
                     CFList* const& LCs, CFList& diophant, CFArray& Pi,
@@ -2838,7 +2876,5 @@ nonMonicHenselLift (const CFList& eval, const CFList& factors,
 
   return result;
 }
-
 #endif
-/* HAVE_NTL */
-
+#endif

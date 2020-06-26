@@ -27,13 +27,14 @@
 #include "cf_map.h"
 #include "cfNewtonPolygon.h"
 #include "fac_util.h"
+#include "cf_algorithm.h"
 
 TIMING_DEFINE_PRINT(fac_fq_bi_sqrf)
 TIMING_DEFINE_PRINT(fac_fq_bi_factor_sqrf)
 
 static const double log2exp= 1.442695041;
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 /// Factorization of a squarefree bivariate polynomials over an arbitrary finite
 /// field, information on the current field we work over is in @a info. @a info
 /// may also contain information about the initial field if initial and current

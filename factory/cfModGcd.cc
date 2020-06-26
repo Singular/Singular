@@ -84,7 +84,7 @@ terminationTest (const CanonicalForm& F, const CanonicalForm& G,
   return false;
 }
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL)|| defined(HAVE_FLINT)
 
 static const double log2exp= 1.442695041;
 
@@ -421,12 +421,6 @@ randomElement (const CanonicalForm & F, const Variable & alpha, CFList & list,
 static inline
 Variable chooseExtension (const Variable & alpha)
 {
-  if (fac_NTL_char != getCharacteristic())
-  {
-    fac_NTL_char= getCharacteristic();
-    zz_p::init (getCharacteristic());
-  }
-  zz_pX NTLIrredpoly;
   int i, m;
   // extension of F_p needed
   if (alpha.level() == 1)
@@ -439,16 +433,33 @@ Variable chooseExtension (const Variable & alpha)
     i= 4;
     m= degree (getMipo (alpha));
   }
+  #ifdef HAVE_FLINT
+  nmod_poly_t Irredpoly;
+  nmod_poly_init(Irredpoly,getCharacteristic());
+  nmod_poly_randtest_monic_irreducible(Irredpoly, FLINTrandom, i*m+1);
+  CanonicalForm newMipo=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
+  nmod_poly_clear(Irredpoly);
+  #else
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
+  zz_pX NTLIrredpoly;
   BuildIrred (NTLIrredpoly, i*m);
   CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+  #endif
   return rootOf (newMipo);
 }
 
+#ifdef HAVE_NTL
 CanonicalForm
 modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   CanonicalForm& coF, CanonicalForm& coG,
                   Variable & alpha, CFList& l, bool& topLevel);
+#endif
 
+#ifdef HAVE_NTL // modGCDFq
 CanonicalForm
 modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   Variable & alpha, CFList& l, bool& topLevel)
@@ -458,11 +469,13 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                                           topLevel);
   return result;
 }
+#endif
 
 /// GCD of F and G over \f$ F_{p}(\alpha ) \f$ ,
 /// l and topLevel are only used internally, output is monic
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
+#ifdef HAVE_NTL // primitiveElement, FindRoot
 CanonicalForm
 modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   CanonicalForm& coF, CanonicalForm& coG,
@@ -798,6 +811,7 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       l.append (random_element);
   } while (1);
 }
+#endif
 
 /// compute a random element a of GF, s.t. F(a) \f$ \neq 0 \f$ , F is a
 /// univariate polynomial, returns fail if there are no field elements left
@@ -1188,11 +1202,14 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   return random;
 }
 
+#ifdef HAVE_NTL // primitiveElement, FindRoot
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
              bool& topLevel, CFList& l);
+#endif
 
+#ifdef HAVE_NTL // primitiveElement, FindRoot
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
              bool& topLevel, CFList& l)
@@ -1201,7 +1218,9 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   CanonicalForm result= modGCDFp (F, G, dummy1, dummy2, topLevel, l);
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // primitiveElement, FindRoot
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
@@ -1556,6 +1575,7 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
       l.append (random_element);
   } while (1);
 }
+#endif
 
 CFArray
 solveVandermonde (const CFArray& M, const CFArray& A)
@@ -1762,6 +1782,7 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
   return rk;
 }
 
+#ifdef HAVE_NTL //gauss, zz_pE
 long
 gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
 {
@@ -1800,6 +1821,7 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   delete N;
   return rk;
 }
+#endif
 
 CFArray
 solveSystemFp (const CFMatrix& M, const CFArray& L)
@@ -1853,6 +1875,7 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   return A;
 }
 
+#ifdef HAVE_NTL //gauss, zz_pE
 CFArray
 solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
 {
@@ -1892,6 +1915,7 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   delete N;
   return A;
 }
+#endif
 #endif
 
 CFArray
@@ -2136,6 +2160,7 @@ void eval (const CanonicalForm& A, const CanonicalForm& B, CanonicalForm& Aeval,
   }
 }
 
+#ifdef HAVE_NTL // primitiveElement,FindRoot
 CanonicalForm
 monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
                      const CanonicalForm& skeleton, const Variable& alpha,
@@ -2419,7 +2444,9 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     return 0;
   }
 }
+#endif
 
+#ifdef HAVE_NTL // primitiveElement, FindRoot
 CanonicalForm
 nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
                         const CanonicalForm& skeleton, const Variable& alpha,
@@ -3067,7 +3094,9 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     return 0;
   }
 }
+#endif
 
+#ifdef HAVE_NTL // primitiveElement,FindRoot
 CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                            const Variable & alpha, CFList& l, bool& topLevel)
 {
@@ -3499,7 +3528,9 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
     }
   } while (1);
 }
+#endif
 
+#ifdef HAVE_NTL // primitiveElement,FindRoot
 CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
                            bool& topLevel, CFList& l)
 {
@@ -4007,6 +4038,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     }
   } while (1); //end of first do
 }
+#endif
 
 TIMING_DEFINE_PRINT(modZ_termination)
 TIMING_DEFINE_PRINT(modZ_recursion)
