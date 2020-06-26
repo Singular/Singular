@@ -129,6 +129,8 @@ zz_pX convertFacCF2NTLzzpX(const CanonicalForm & f)
     if (!c.isImm())
     {  //This case will never happen if the characteristic is in fact a prime
        // number, since all coefficients are represented as immediates
+       out_cf("f:->",f,"\n");
+       out_cf("c:->",c,"\n");
        #ifndef NOSTREAMIO
        cout<<"convertFacCF2NTLzz_pX: coefficient not immediate! : "<<f<<"\n";
        #else

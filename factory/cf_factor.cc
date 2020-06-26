@@ -564,8 +564,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         fmpz_poly_clear (f1);
         if ( ! ic.isOne() )
         {
-	   // according to convertFLINTfmpz_polyfactor2FcaCFFlist,
-	   //  first entry is in CoeffDomain
+           // according to convertFLINTfmpz_polyfactor2FcaCFFlist,
+           //  first entry is in CoeffDomain
           CFFactor new_first( F.getFirst().factor() * ic );
           F.removeFirst();
           F.insert( new_first );
@@ -584,8 +584,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         F=convertNTLvec_pair_ZZX_long2FacCFFList(factors,c,fz.mvar());
         if ( ! ic.isOne() )
         {
-	   // according to convertNTLvec_pair_ZZX_long2FacCFFList
-	   //  first entry is in CoeffDomain
+           // according to convertNTLvec_pair_ZZX_long2FacCFFList
+           //  first entry is in CoeffDomain
           CFFactor new_first( F.getFirst().factor() * ic );
           F.removeFirst();
           F.insert( new_first );
@@ -734,17 +734,23 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
           zz_p::init(getCharacteristic());
         }
 
+        // set minimal polynomial in NTL
+        zz_pX minPo=convertFacCF2NTLzzpX(getMipo(alpha));
+        zz_pE::init (minPo);
+
         // convert to NTL
-        zz_pX f1=convertFacCF2NTLzzpX(f);
-        zz_p leadcoeff = LeadCoeff(f1);
+        zz_pEX f1=convertFacCF2NTLzz_pEX(f,minPo);
+        zz_pE leadcoeff= LeadCoeff(f1);
 
         //make monic
         f1=f1 / LeadCoeff(f1);
+
         // factorize
-        vec_pair_zz_pX_long factors;
+        vec_pair_zz_pEX_long factors;
         CanZass(factors,f1);
 
-        F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+        // return converted result
+        F=convertNTLvec_pair_zzpEX_long2FacCFFList(factors,leadcoeff,f.mvar(),alpha);
         //test_cff(F,f);
         if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
         return F;
