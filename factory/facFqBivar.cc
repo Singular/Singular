@@ -799,16 +799,16 @@ factorRecombination (CFList& factors, CanonicalForm& F,
 
 Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 {
-  #if 0//#ifdef HAVE_NTL
+  #if defined(HAVE_FLINT)
+  nmod_poly_t Irredpoly;
+  nmod_poly_init(Irredpoly,getCharacteristic());
+  #elif defined(HAVE_NTL)
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
   zz_pX NTLIrredpoly;
-  #elif defined(HAVE_FLINT)
-  nmod_poly_t Irredpoly;
-  nmod_poly_init(Irredpoly,getCharacteristic());
   #endif
   int i=1, m= 2;
   // extension of F_p needed
@@ -832,12 +832,12 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
     m= degree (getMipo (beta));
     i= degree (getMipo (alpha))/m + 1;
   }
-  #if 0 //#ifdef HAVE_NTL
-  BuildIrred (NTLIrredpoly, i*m);
-  CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
-  #elif defined(HAVE_FLINT)
+  #if defined(HAVE_FLINT)
   nmod_poly_randtest_monic_irreducible(Irredpoly,FLINTrandom,i*m+1);
   CanonicalForm newMipo= convertnmod_poly_t2FacCF(Irredpoly,Variable (1));
+  #elif defined(HAVE_NTL)
+  BuildIrred (NTLIrredpoly, i*m);
+  CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
   #endif
   return rootOf (newMipo);
 }
