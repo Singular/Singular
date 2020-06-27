@@ -92,7 +92,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       CFList source, dest;
       Variable v2;
       CanonicalForm primElem, imPrimElem;
-      #if defned(HAVE_NTL) && !defined(HAVE_FLINT)
+      #if defined(HAVE_NTL) && !defined(HAVE_FLINT)
       if (fac_NTL_char != p)
       {
         fac_NTL_char= p;
