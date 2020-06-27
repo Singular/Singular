@@ -465,7 +465,7 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     fq_nmod_init(r0, ctx);
     fq_nmod_poly_get_coeff(r0,fac->poly,0,ctx);
     // convert
-    CanonicalForm r1=convertFq_nmod_t2FacCF(r0,alpha);
+    CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta);
     // cleanup
     fq_nmod_poly_factor_clear(fac,ctx);
     fq_nmod_clear(r0, ctx);
