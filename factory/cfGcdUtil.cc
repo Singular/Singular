@@ -92,6 +92,13 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       CFList source, dest;
       Variable v2;
       CanonicalForm primElem, imPrimElem;
+      #if defned(HAVE_NTL) && !defined(HAVE_FLINT)
+      if (fac_NTL_char != p)
+      {
+        fac_NTL_char= p;
+        zz_p::init (p);
+      }
+      #endif
       if (p == 2 && d < 6)
       {
         bool primFail= false;
@@ -107,11 +114,6 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
           CanonicalForm newMipo=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
           nmod_poly_clear(Irredpoly);
           #elif defined(HAVE_NTL)
-          if (fac_NTL_char != 2)
-          {
-            fac_NTL_char= 2;
-            zz_p::init (p);
-          }
           zz_pX NTLIrredpoly;
           BuildIrred (NTLIrredpoly, d*3);
           CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
@@ -127,11 +129,6 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
           CanonicalForm newMipo=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
           nmod_poly_clear(Irredpoly);
           #elif defined(HAVE_NTL)
-          if (fac_NTL_char != 2)
-          {
-            fac_NTL_char= 2;
-            zz_p::init (p);
-          }
           zz_pX NTLIrredpoly;
           BuildIrred (NTLIrredpoly, d*2);
           CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
@@ -154,11 +151,6 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
         CanonicalForm newMipo=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
         nmod_poly_clear(Irredpoly);
         #elif defined(HAVE_NTL)
-        if (fac_NTL_char != p)
-        {
-          fac_NTL_char= p;
-          zz_p::init (p);
-        }
         zz_pX NTLIrredpoly;
         BuildIrred (NTLIrredpoly, d*2);
         CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
