@@ -344,7 +344,7 @@ newtonInterp (const CanonicalForm & alpha, const CanonicalForm & u,
   return interPoly;
 }
 
-#ifdef HAVE_NTL // primitiveElement
+#ifdef HAVE_NTL // mapPrimElem
 CanonicalForm
 resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
              bool prob)
@@ -556,8 +556,7 @@ symmetricRemainder (const CanonicalForm& f, const CanonicalForm& q)
   }
   return result;
 }
-
-#ifdef HAVE_NTL // resultantFp
+#ifdef HAVE_NTL // mapPrimitiveElem
 CanonicalForm
 resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
             bool prob)

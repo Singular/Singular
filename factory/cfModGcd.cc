@@ -475,7 +475,7 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
 /// l and topLevel are only used internally, output is monic
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
-#ifdef HAVE_NTL // primitiveElement, FindRoot
+#ifdef HAVE_NTL // mapPrimElem
 CanonicalForm
 modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   CanonicalForm& coF, CanonicalForm& coG,
@@ -1202,14 +1202,14 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   return random;
 }
 
-#ifdef HAVE_NTL // primitiveElement, FindRoot
+#ifdef HAVE_NTL
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
              bool& topLevel, CFList& l);
 #endif
 
-#ifdef HAVE_NTL // primitiveElement, FindRoot
+#ifdef HAVE_NTL
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
              bool& topLevel, CFList& l)
@@ -1220,7 +1220,7 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 }
 #endif
 
-#ifdef HAVE_NTL // primitiveElement, FindRoot
+#ifdef HAVE_NTL // mapPrimElem
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
@@ -2160,7 +2160,6 @@ void eval (const CanonicalForm& A, const CanonicalForm& B, CanonicalForm& Aeval,
   }
 }
 
-#ifdef HAVE_NTL // primitiveElement,FindRoot
 CanonicalForm
 monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
                      const CanonicalForm& skeleton, const Variable& alpha,
@@ -2444,9 +2443,7 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     return 0;
   }
 }
-#endif
 
-#ifdef HAVE_NTL // primitiveElement, FindRoot
 CanonicalForm
 nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
                         const CanonicalForm& skeleton, const Variable& alpha,
@@ -3094,9 +3091,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     return 0;
   }
 }
-#endif
 
-#ifdef HAVE_NTL // primitiveElement,FindRoot
 CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                            const Variable & alpha, CFList& l, bool& topLevel)
 {
@@ -3528,9 +3523,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
     }
   } while (1);
 }
-#endif
 
-#ifdef HAVE_NTL // primitiveElement,FindRoot
 CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
                            bool& topLevel, CFList& l)
 {
@@ -4038,7 +4031,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     }
   } while (1); //end of first do
 }
-#endif
 
 TIMING_DEFINE_PRINT(modZ_termination)
 TIMING_DEFINE_PRINT(modZ_recursion)

@@ -126,8 +126,8 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       else
         fc=modGCDFp (fc, gc);
     }
-    else
     #endif
+    else
     fc = subResGCD_p( fc, gc );
   }
   else if (!fc_and_gc_Univariate) /* && char==0*/

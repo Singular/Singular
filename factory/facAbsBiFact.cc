@@ -31,7 +31,6 @@
 #endif
 
 #ifdef HAVE_NTL
-
 TIMING_DEFINE_PRINT(fac_Qa_factorize)
 TIMING_DEFINE_PRINT(fac_evalpoint)
 
@@ -779,7 +778,4 @@ differentevalpoint:
 
   return result;
 }
-
 #endif
-
-

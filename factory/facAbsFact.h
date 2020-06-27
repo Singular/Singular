@@ -15,7 +15,7 @@
 
 #include "facAbsBiFact.h"
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL)
 /// main absolute factorization routine, expects poly which is
 /// irreducible over Q
 ///
@@ -31,7 +31,7 @@ CFAFList absFactorizeMain (const CanonicalForm& F ///<[in] irred poly over Q
 #endif
 
 /*BEGINPUBLIC*/
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL)
 /// absolute factorization of a multivariate poly over Q
 ///
 /// @return absFactorize returns a list whose entries contain three

@@ -21,7 +21,7 @@
 /// true, the main variables of f and g are swapped with Variable(1). If the
 /// result is false, d is set to the degree of the gcd of f and g evaluated at a
 /// random point in K^n-1. This gcd is a gcd of univariate polynomials.
-#ifdef HAVE_NTL // primitiveElement, FindRoot
+#ifdef HAVE_NTL // mapPrimElem
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d )
 {

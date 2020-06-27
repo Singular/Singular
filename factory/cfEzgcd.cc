@@ -864,7 +864,7 @@ STATIC_VAR int sizePerVars1= 500; //try dense gcd if size/#variables is bigger
 
 /// Extended Zassenhaus GCD for finite fields.
 /// In case things become too dense we switch to a modular algorithm.
-#ifdef HAVE_NTL // primitiveElement, FindRoot
+#ifdef HAVE_NTL // Hensel
 CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   if (FF.isZero() && degree(GG) > 0) return GG/Lc(GG);
@@ -1501,5 +1501,5 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   }
   return N (d*cand);
 }
-#endif /*HAVE_NTL*/
+#endif
 #endif

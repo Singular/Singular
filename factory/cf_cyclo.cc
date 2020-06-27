@@ -132,7 +132,6 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
   return leftShift (result, n/prod);
 }
 
-#ifdef HAVE_NTL
 bool isPrimitive (const Variable& alpha, bool& fail)
 {
   int p= getCharacteristic();
@@ -146,5 +145,3 @@ bool isPrimitive (const Variable& alpha, bool& fail)
   else
     return false;
 }
-
-#endif

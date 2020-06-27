@@ -35,7 +35,7 @@
 #include <NTL/LLL.h>
 #endif
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL)
 TIMING_DEFINE_PRINT(abs_fac_bi_factorizer)
 TIMING_DEFINE_PRINT(abs_fac_hensel_lift)
 TIMING_DEFINE_PRINT(abs_fac_factor_recombination)
