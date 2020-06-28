@@ -504,6 +504,54 @@ map (const CanonicalForm& primElem, const Variable& alpha,
     order++;
   }
   int p= getCharacteristic ();
+  #ifdef HAVE_FLINT
+  // convert mipo
+  nmod_poly_t mipo1;
+  convertFacCF2nmod_poly_t(mipo1,getMipo(beta));
+  fq_nmod_ctx_t ctx;
+  fq_nmod_ctx_init_modulus(ctx,mipo1,"t");
+  nmod_poly_clear(mipo1);
+  // convert mipo2 (alpha)
+  fq_nmod_poly_t mipo2;
+  convertFacCF2Fq_nmod_poly_t(mipo2,getMipo(alpha),ctx);
+  fq_nmod_poly_factor_t fac;
+  fq_nmod_poly_factor_init(fac,ctx);
+  fq_nmod_poly_roots(fac, mipo2, 0, ctx);
+  // roots in fac, #=fac->num
+  int ind=-1;
+  fq_nmod_t r0,FLINTbeta;
+  fq_nmod_init(r0, ctx);
+  fq_nmod_init(FLINTbeta, ctx);
+  convertFacCF2Fq_nmod_t(FLINTbeta,beta,ctx);
+  fmpz_t FLINTorder;
+  fmpz_set_si(FLINTorder,order);
+  for(int i=0;i< fac->num;i++)
+  {
+    // get the root (-abs.term of linear factor)
+    fq_nmod_poly_get_coeff(r0,fac->poly+i,0,ctx);
+    fq_nmod_neg(r0,r0,ctx);
+    // r^order
+    fq_nmod_pow(r0,r0,FLINTorder,ctx);
+    // ==beta?
+    if (fq_nmod_equal(r0,FLINTbeta,ctx))
+    {
+       ind=i;
+       break;
+    }
+  }
+  fmpz_clear(FLINTorder);
+  // convert
+  fq_nmod_poly_get_coeff(r0,fac->poly+ind,0,ctx);
+  fq_nmod_neg(r0,r0,ctx);
+  CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta);
+  // cleanup
+  fq_nmod_poly_factor_clear(fac,ctx);
+  fq_nmod_clear(r0, ctx);
+  fq_nmod_clear(FLINTbeta,ctx);
+  fq_nmod_poly_clear(mipo2,ctx);
+  fq_nmod_ctx_clear(ctx);
+  return r1;
+  #elif defined(HAVE_NTL)
   if (fac_NTL_char != p)
   {
     fac_NTL_char= p;
@@ -524,6 +572,7 @@ map (const CanonicalForm& primElem, const Variable& alpha,
     }
   }
   return (convertNTLzzpE2CF (roots[ind], beta));
+  #endif
 }
 
 CanonicalForm
