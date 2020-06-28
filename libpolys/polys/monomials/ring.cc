@@ -5236,7 +5236,7 @@ static int rReallocM1(ring r, int size, int pos)
 static void rOppWeight(int *w, int l)
 {
   /* works for commutative/Plural; need to be changed for Letterplace */
-  /* Letterpace: each block of vars needs to be reverted on it own */ 
+  /* Letterpace: each block of vars needs to be reverted on it own */
   int i2=(l+1)/2;
   for(int j=0; j<=i2; j++)
   {
@@ -5263,7 +5263,11 @@ ring rOpposite(ring src)
 //  rDebugPrint(src);
 #endif
 
-  ring r = rCopy0(src,FALSE); /* qideal will be deleted later on!!! */
+  ring r = rCopy0(src,FALSE);
+  if (src->qideal != NULL)
+  {
+    id_Delete(&(r->qideal), src);
+  }
 
   // change vars v1..vN -> vN..v1
   int i;
@@ -5340,11 +5344,11 @@ ring rOpposite(ring src)
 //    }
 //  }
   // Change order/block structures (needed for rPrint, rAdd etc.)
-  
+
   int j=0;
   int l=rBlocks(src);
   if ( ! rIsLPRing(src) )
-  { 
+  {
     // ie Plural or commutative
     for(i=0; src->order[i]!=0; i++)
     {
@@ -5359,12 +5363,12 @@ ring rOpposite(ring src)
           r->order[j]=ringorder_rp;
           r->block0[j]=rOppVar(r, src->block1[i]);
           r->block1[j]=rOppVar(r, src->block0[i]);
-          break;
+          j++;break;
         case ringorder_rp: /* rp -> lp */
           r->order[j]=ringorder_lp;
           r->block0[j]=rOppVar(r, src->block1[i]);
           r->block1[j]=rOppVar(r, src->block0[i]);
-          break;
+          j++;break;
         case ringorder_dp: /* dp -> a(1..1),ls */
         {
           l=rRealloc1(r,l,j);
@@ -5481,7 +5485,7 @@ ring rOpposite(ring src)
     }
   } /* end if (!rIsLPRing(src)) */
   if (rIsLPRing(src))
-  { 
+  {
     // applies to Letterplace only
     // Letterplace conventions: dp<->Dp, lp<->rp
     // Wp(v) cannot be converted since wp(v) does not encode a monomial ordering
@@ -5499,23 +5503,25 @@ ring rOpposite(ring src)
           r->order[j]=ringorder_rp;
           r->block0[j]=rOppVar(r, src->block1[i]);
           r->block1[j]=rOppVar(r, src->block0[i]);
-          break;
+          j++;break;
         case ringorder_rp: /* rp -> lp */
           r->order[j]=ringorder_lp;
           r->block0[j]=rOppVar(r, src->block1[i]);
           r->block1[j]=rOppVar(r, src->block0[i]);
-          break;
+          j++;break;
         case ringorder_dp: /* dp -> Dp */
         {
           r->order[j]=ringorder_Dp;
           r->block0[j]=rOppVar(r, src->block1[i]);
           r->block1[j]=rOppVar(r, src->block0[i]);
+          j++;break;
         }
         case ringorder_Dp: /* Dp -> dp*/
         {
           r->order[j]=ringorder_dp;
           r->block0[j]=rOppVar(r, src->block1[i]);
           r->block1[j]=rOppVar(r, src->block0[i]);
+          j++;break;
         }
         // not clear how to do:
         case ringorder_wp:
@@ -5606,8 +5612,6 @@ ring rOpposite(ring src)
   /* now oppose the qideal for qrings */
   if (src->qideal != NULL)
   {
-    id_Delete(&(r->qideal), r);
-
 #ifdef HAVE_PLURAL
     r->qideal = idOppose(src, src->qideal, r); // into the currRing: r
 #else
