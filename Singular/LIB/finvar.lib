@@ -716,8 +716,17 @@ EXAMPLE: example molien; shows an example
       }
       else
       { chst=chst[i..size(chst)];
-        execute
-        ("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+        list rl=ringlist(br);
+        if (typeof(rl[1]=="int"))
+        {
+          rl[1]=0;
+        }
+        else
+        {
+          rl[1][1]=0;
+        }  
+        def newring=ring(rl);
+        setring newring;
         
       }
     }
@@ -725,7 +734,17 @@ EXAMPLE: example molien; shows an example
     { string minp=string(minpoly);
       minp=minp[2..size(minp)-1];
       chst=chst[i..size(chst)];
-      execute("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+      list rl=ringlist(br);
+      if (typeof(rl[1]=="int"))
+      {
+        rl[1]=0;
+      }
+      else
+      {
+        rl[1][1]=0;
+      }  
+      def newring=ring(rl);
+      setring newring;
       execute("minpoly="+minp);
     }
     matrix I=diag(1,n);
@@ -1111,19 +1130,39 @@ EXAMPLE: example reynolds_molien; shows an example
     }
     if (minpoly==0)
     { if (i>size(chst))
-      { execute("ring newring=0,("+varstr(br)+"),("+ordstr(br)+")");
+      { 
+         ring newring = create_ring(0, "("+varstr(br)+")", "("+ordstr(br)+")");
       }
       else
       { chst=chst[i..size(chst)];
-        execute
-        ("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+        list rl=ringlist(br);
+        if (typeof(rl[1]=="int"))
+        {
+          rl[1]=0;
+        }
+        else
+        {
+          rl[1][1]=0;
+        }  
+        def newring=ring(rl);
+        setring newring; 
       }
     }
     else
     { string minp=string(minpoly);
       minp=minp[2..size(minp)-1];
       chst=chst[i..size(chst)];
-      execute("ring newring=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+      list rl=ringlist(br);
+      if (typeof(rl[1]=="int"))
+      {
+        rl[1]=0;
+      }
+      else
+      {
+        rl[1][1]=0;
+      }  
+      def newring=ring(rl);
+      setring newring;  
       execute("minpoly="+minp);
     }
     poly v1=var(1);                    // the Molien series will be in terms of
@@ -7171,7 +7210,12 @@ EXAMPLE: example orbit_variety; shows an example
     for (int i=1;i<=m;i++)
     { I[i]=I[i]-y(i); }
     I=elim(I,1..n);
-    execute("ring newring=("+charstr(br)+"),(y(1..m)),dp(m);");
+    list l3;
+    for (int zz = 1; zz <= m; zz++)
+    {
+      l3[zz] = "y("+string(zz)+")";
+    }
+    ring newring = create_ring(ringlist(br)[1], l3, "dp("+string(m)+")", "no_minpoly");
     if (mp!="0")
     { execute("minpoly=number("+mp+");"); }
     ideal vars;
@@ -7416,7 +7460,12 @@ EXAMPLE: example relative_orbit_variety; shows an example
       }
     }
     G=compress(G);
-    execute("ring newring=("+charstr(br)+"),(y(1..m)),lp;");
+    list l4;
+    for (int zz = 1; zz <= m; zz++)
+    {
+      l4[zz] = "y("+string(zz)+")";
+    }
+    ring newring = create_ring(ringlist(br)[1], l4, "lp", "no_minpoly");
     if (mp!="0")
     { execute("minpoly=number("+mp+");"); }
     ideal vars;
