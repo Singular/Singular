@@ -7650,7 +7650,6 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 }
 #endif
 
-#ifdef HAVE_NTL //primitiveElement
 ExtensionInfo
 init4ext (const ExtensionInfo& info, const CanonicalForm& evaluation,
           int& degMipo
@@ -7703,9 +7702,8 @@ init4ext (const ExtensionInfo& info, const CanonicalForm& evaluation,
 
   return info2;
 }
-#endif
 
-#ifdef HAVE_NTL // init4ext
+#ifdef HAVE_NTL // extSieveSmallFactors,...
 CFList
 extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
                                const ExtensionInfo& extInfo, const

@@ -491,7 +491,6 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
 }
 #endif
 
-#ifdef HAVE_NTL
 CanonicalForm
 map (const CanonicalForm& primElem, const Variable& alpha,
      const CanonicalForm& F, const Variable& beta)
@@ -575,6 +574,7 @@ map (const CanonicalForm& primElem, const Variable& alpha,
   #endif
 }
 
+#ifdef HAVE_NTL
 CanonicalForm
 findMinPoly (const CanonicalForm& F, const Variable& alpha)
 {
