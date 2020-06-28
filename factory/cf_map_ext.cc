@@ -83,10 +83,11 @@ CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
     fq_nmod_poly_factor_t fac;
     fq_nmod_poly_factor_init(fac,ctx);
     fq_nmod_poly_roots(fac, mipo2, 0, ctx);
-     // root of first factor:
+    // root of first (linear) factor: -absolute Term
     fq_nmod_t r0;
     fq_nmod_init(r0, ctx);
     fq_nmod_poly_get_coeff(r0,fac->poly,0,ctx);
+    fq_nmod_neg(r0, r0, ctx);
     // convert
     CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta);
     // cleanup
@@ -397,10 +398,11 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   fq_nmod_poly_factor_t fac;
   fq_nmod_poly_factor_init(fac,ctx);
   fq_nmod_poly_roots(fac, FLINT_beta_mipo, 0, ctx);
-  // root of first factor:
+  // root of first (linear) factor: -absolute Term
   fq_nmod_t r0;
   fq_nmod_init(r0, ctx);
   fq_nmod_poly_get_coeff(r0,fac->poly,0,ctx);
+  fq_nmod_neg(r0, r0, ctx);
   // convert
   CanonicalForm r1=convertFq_nmod_t2FacCF(r0,alpha);
   // cleanup
@@ -460,10 +462,11 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     fq_nmod_poly_factor_t fac;
     fq_nmod_poly_factor_init(fac,ctx);
     fq_nmod_poly_roots(fac, mipo2, 0, ctx);
-     // root of first factor:
+    // root of first (linear) factor: -absolute Term
     fq_nmod_t r0;
     fq_nmod_init(r0, ctx);
     fq_nmod_poly_get_coeff(r0,fac->poly,0,ctx);
+    fq_nmod_neg(r0, r0, ctx);
     // convert
     CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta);
     // cleanup
