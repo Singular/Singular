@@ -351,7 +351,10 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   CanonicalForm mipo= getMipo (alpha);
   int d= degree (mipo);
   int p= getCharacteristic ();
-  #if !defined(HAVE_FLINT) && defined(HAVE_NTL)
+  #ifdef HAVE_FLINT
+  nmod_poly_t FLINT_mipo;
+  nmod_poly_init(FLINT_mipo,p);
+  #elif defined(HAVE_NTL)
   if (fac_NTL_char != p)
   {
     fac_NTL_char= p;
@@ -366,11 +369,8 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   do
   {
     #ifdef HAVE_FLINT
-    nmod_poly_t Irredpoly;
-    nmod_poly_init(Irredpoly,p);
-    nmod_poly_randtest_monic_irreducible(Irredpoly, FLINTrandom, d+1);
-    mipo2=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
-    nmod_poly_clear(Irredpoly);
+    nmod_poly_randtest_monic_irreducible(FLINT_mipo, FLINTrandom, d+1);
+    mipo2=convertnmod_poly_t2FacCF(FLINT_mipo,Variable(1));
     #elif defined(HAVE_NTL)
     BuildIrred (NTL_mipo, d);
     mipo2= convertNTLzzpX2CF (NTL_mipo, Variable (1));
@@ -386,6 +386,7 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
       return 0;
   } while (1);
   #ifdef HAVE_FLINT
+  nmod_poly_clear(FLINT_mipo);
   // convert alpha_mipo
   nmod_poly_t alpha_mipo;
   convertFacCF2nmod_poly_t(alpha_mipo,mipo);
