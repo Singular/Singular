@@ -2842,7 +2842,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       {
         if (!pN_set) n_Delete(&pN,curr->cf); // free initial nInit(0)
         pN = p_GetCoeff(MATELEM(CC,1,2), curr);
-	pN_set=TRUE;
+        pN_set=TRUE;
       }
 
     tmpIsSkewConstant = true;
@@ -2882,6 +2882,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       bCnew = true;
     }
     else
+
       C = CC;
 
     IsSkewConstant = tmpIsSkewConstant;
