@@ -30,7 +30,7 @@
 #include <NTL/LLL.h>
 #endif
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 TIMING_DEFINE_PRINT(fac_Qa_factorize)
 TIMING_DEFINE_PRINT(fac_evalpoint)
 
@@ -112,12 +112,35 @@ choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec,
           f2Factors.removeFirst();
         if (f2Factors.length() == 1 && f2Factors.getFirst().exp() == 1)
         {
+          #ifdef HAVE_FLINT
+          // init
+          fmpz_t FLINTD1,FLINTD2;
+          fmpz_init(FLINTD1);
+          fmpz_init(FLINTD2);
+          fmpz_poly_t FLINTf1;
+          fmpz_poly_t FLINTf2;
+          // conversion
+          convertFacCF2Fmpz_poly_t(FLINTf1,f1);
+          convertFacCF2Fmpz_poly_t(FLINTf2,f2);
+          // discriminant
+          fmpz_poly_discriminant(FLINTD1,FLINTf1);
+          fmpz_poly_discriminant(FLINTD2,FLINTf2);
+          // conversion
+          CanonicalForm D1= convertFmpz2CF(FLINTD1);
+          CanonicalForm D2= convertFmpz2CF(FLINTD2);
+          // clean up
+          fmpz_poly_clear(FLINTf1);
+          fmpz_poly_clear(FLINTf2);
+          fmpz_clear(FLINTD1);
+          fmpz_clear(FLINTD2);
+          #elif defined(HAVE_NTL)
           ZZX NTLf1= convertFacCF2NTLZZX (f1);
           ZZX NTLf2= convertFacCF2NTLZZX (f2);
           ZZ NTLD1= discriminant (NTLf1);
           ZZ NTLD2= discriminant (NTLf2);
           CanonicalForm D1= convertZZ2CF (NTLD1);
           CanonicalForm D2= convertZZ2CF (NTLD2);
+          #endif
           if ((!f.isZero()) &&
               (abs(f)>cf_getSmallPrime (cf_getNumSmallPrimes()-1)))
           {
@@ -182,6 +205,7 @@ choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec,
   return 0;
 }
 
+#ifdef HAVE_NTL
 //G is assumed to be bivariate, irreducible over Q, primitive wrt x and y, compressed
 CFAFList absBiFactorizeMain (const CanonicalForm& G, bool full)
 {
@@ -669,11 +693,33 @@ differentevalpoint:
     uniFactors.append (iter.getItem().factor());
 
   F /= Lc (F1);
+  #ifdef HAVE_FLINT
+  // init
+  fmpz_t FLINTf,FLINTD;
+  fmpz_init(FLINTf);
+  fmpz_init(FLINTD);
+  fmpz_poly_t FLINTmipo;
+  fmpz_poly_t FLINTLcf;
+  //conversion
+  convertFacCF2Fmpz_poly_t(FLINTmipo,mipo);
+  convertFacCF2Fmpz_poly_t(FLINTLcf,Lc (F*bCommonDen (F)));
+  // resultant, discriminant
+  fmpz_poly_resultant(FLINTf,FLINTmipo,FLINTLcf);
+  fmpz_poly_discriminant(FLINTD,FLINTmipo);
+  fmpz_mul(FLINTf,FLINTD,FLINTf);
+  den= abs (convertFmpz2CF(FLINTf));
+  // clean up
+  fmpz_clear(FLINTf);
+   // FLINTD is used below
+  fmpz_poly_clear(FLINTLcf);
+  fmpz_poly_clear(FLINTmipo);
+  #elif defined(HAVE_NTL)
   ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
   ZZX NTLLcf= convertFacCF2NTLZZX (Lc (F*bCommonDen (F)));
   ZZ NTLf= resultant (NTLmipo, NTLLcf);
   ZZ NTLD= discriminant (NTLmipo);
   den= abs (convertZZ2CF (NTLD*NTLf));
+  #endif
 
   // make factors elements of Z(a)[x] disable for modularDiophant
   CanonicalForm multiplier= 1;
@@ -687,7 +733,12 @@ differentevalpoint:
 
   Off (SW_RATIONAL);
   int ii= 0;
+  #ifdef HAVE_FLINT
+  CanonicalForm discMipo= convertFmpz2CF(FLINTD);
+  fmpz_clear(FLINTD);
+  #elif defined(HAVE_NTL)
   CanonicalForm discMipo= convertZZ2CF (NTLD);
+  #endif
   findGoodPrime (bufF*discMipo,ii);
   findGoodPrime (F1*discMipo,ii);
   findGoodPrime (F*discMipo,ii);
@@ -778,4 +829,5 @@ differentevalpoint:
 
   return result;
 }
+#endif
 #endif
