@@ -1782,7 +1782,6 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
   return rk;
 }
 
-#ifdef HAVE_NTL //gauss, zz_pE
 long
 gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
 {
@@ -1798,6 +1797,22 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
   int p= getCharacteristic ();
+  #ifdef HAVE_FLINT
+  // convert mipo
+  nmod_poly_t mipo1;
+  convertFacCF2nmod_poly_t(mipo1,getMipo(alpha));
+  fq_nmod_ctx_t ctx;
+  fq_nmod_ctx_init_modulus(ctx,mipo1,"t");
+  nmod_poly_clear(mipo1);
+  // convert matrix
+  fq_nmod_mat_t FLINTN;
+  convertFacCFMatrix2Fq_nmod_mat_t (FLINTN, ctx, *N);
+  // rank
+  long rk= fq_nmod_mat_rref (FLINTN,ctx);
+  // clean up
+  fq_nmod_mat_clear (FLINTN,ctx);
+  fq_nmod_ctx_clear(ctx);
+  #elif defined(HAVE_NTL)
   if (fac_NTL_char != p)
   {
     fac_NTL_char= p;
@@ -1807,11 +1822,10 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   zz_pE::init (NTLMipo);
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
   long rk= gauss (*NTLN);
-
-  delete N;
   N= convertNTLmat_zz_pE2FacCFMatrix (*NTLN, alpha);
-
   delete NTLN;
+  #endif
+  delete N;
 
   M= (*N) (1, M.rows(), 1, M.columns());
   L= CFArray (M.rows());
@@ -1821,7 +1835,6 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   delete N;
   return rk;
 }
-#endif
 
 CFArray
 solveSystemFp (const CFMatrix& M, const CFArray& L)
@@ -1875,7 +1888,6 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   return A;
 }
 
-#ifdef HAVE_NTL //gauss, zz_pE
 CFArray
 solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
 {
@@ -1890,6 +1902,19 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
   int p= getCharacteristic ();
+  #ifdef HAVE_FLINT
+  // convert mipo
+  nmod_poly_t mipo1;
+  convertFacCF2nmod_poly_t(mipo1,getMipo(alpha));
+  fq_nmod_ctx_t ctx;
+  fq_nmod_ctx_init_modulus(ctx,mipo1,"t");
+  nmod_poly_clear(mipo1);
+  // convert matrix
+  fq_nmod_mat_t FLINTN;
+  convertFacCFMatrix2Fq_nmod_mat_t (FLINTN, ctx, *N);
+  // rank
+  long rk= fq_nmod_mat_rref (FLINTN,ctx);
+  #elif defined(HAVE_NTL)
   if (fac_NTL_char != p)
   {
     fac_NTL_char= p;
@@ -1899,23 +1924,31 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   zz_pE::init (NTLMipo);
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
   long rk= gauss (*NTLN);
+  #endif
 
   delete N;
   if (rk != M.columns())
   {
+    #if defined(HAVE_NTL) && !defined(HAVE_FLINT)
     delete NTLN;
+    #endif
     return CFArray();
   }
+  #ifdef HAVE_FLINT
+  // convert and clean up
+  N=convertFq_nmod_mat_t2FacCFMatrix(FLINTN,ctx,alpha);
+  fq_nmod_mat_clear (FLINTN,ctx);
+  fq_nmod_ctx_clear(ctx);
+  #elif defined(HAVE_NTL)
   N= convertNTLmat_zz_pE2FacCFMatrix (*NTLN, alpha);
-
   delete NTLN;
+  #endif
 
   CFArray A= readOffSolution (*N, rk);
 
   delete N;
   return A;
 }
-#endif
 #endif
 
 CFArray
@@ -4221,6 +4254,4 @@ CanonicalForm modGCDZ ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
   }
 }
-
-
 #endif
