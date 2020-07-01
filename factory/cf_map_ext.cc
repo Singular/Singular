@@ -70,7 +70,7 @@ static inline
 CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
 {
   int p= getCharacteristic ();
-  #ifdef HAVE_FLINT
+  #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
     // convert mipo1
     nmod_poly_t mipo1;
     convertFacCF2nmod_poly_t(mipo1,getMipo(beta));
