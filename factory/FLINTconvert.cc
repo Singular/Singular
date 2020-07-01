@@ -407,14 +407,9 @@ convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
 }
 
 CanonicalForm
-convertFq_nmod_t2FacCF (const fq_nmod_t poly, const fq_nmod_ctx_t ctx, const Variable& alpha)
+convertFq_nmod_t2FacCF (const fq_nmod_t poly, const Variable& alpha, const fq_nmod_ctx_t ctx)
 {
-  nmod_poly_t p;
-  nmod_poly_init(p,getCharacteristic());
-  fq_nmod_get_nmod_poly(p,poly,ctx);
-  CanonicalForm res= convertnmod_poly_t2FacCF (p, alpha);
-  nmod_poly_clear(p);
-  return res;
+  return convertnmod_poly_t2FacCF (poly, alpha);
 }
 
 void
