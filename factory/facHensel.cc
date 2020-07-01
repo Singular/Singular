@@ -41,6 +41,8 @@
 #include "FLINTconvert.h"
 #endif
 
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
+
 TIMING_DEFINE_PRINT (diotime)
 TIMING_DEFINE_PRINT (product1)
 TIMING_DEFINE_PRINT (product2)
@@ -468,12 +470,9 @@ void sortList (CFList& list, const Variable& x)
   }
 }
 
-#ifdef HAVE_NTL
 CFList
 diophantine (const CanonicalForm& F, const CFList& factors);
-#endif
 
-#ifdef HAVE_NTL // diophantine
 CFList
 diophantineHensel (const CanonicalForm & F, const CFList& factors,
                    const modpk& b)
@@ -563,7 +562,6 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
 
   return result;
 }
-#endif
 
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
 /// over \f$ Q(\alpha) \f$ by p-adic lifting
@@ -879,8 +877,8 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
     else
       buf1= divNTL (F, i.getItem(), b);
     XGCD (NTLbuf3, NTLS, NTLT, NTLbuf3, convertFacCF2NTLZZ_pEX (buf1, NTLmipo));
-    CFListIterator k= bufFactors;
     S= convertNTLZZ_pEX2CF (NTLS, x, gamma);
+    CFListIterator k= bufFactors;
     for (CFListIterator j= result; j.hasItem(); j++, k++)
     {
       j.getItem()= mulNTL (j.getItem(), S, b);
@@ -2116,7 +2114,6 @@ nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
 }
 #endif
 
-#ifdef HAVE_NTL
 /// solve \f$ E=\sum_{i= 1}^r{\sigma_{i}\prod_{j=1, j\neq i}^{r}{f_{j}}} \f$
 /// mod M, @a products contains \f$ \prod_{j=1, j\neq i}^{r}{f_{j}} \f$
 CFList
@@ -2196,7 +2193,6 @@ diophantine (const CFList& recResult, const CFList& factors,
   }
   return result;
 }
-#endif
 
 #ifdef HAVE_NTL // diophantine
 void
