@@ -89,7 +89,7 @@ CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
     fq_nmod_poly_get_coeff(r0,fac->poly,0,ctx);
     fq_nmod_neg(r0, r0, ctx);
     // convert
-    CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta);
+    CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta,ctx);
     // cleanup
     fq_nmod_poly_factor_clear(fac,ctx);
     fq_nmod_clear(r0, ctx);
@@ -405,7 +405,7 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   fq_nmod_poly_get_coeff(r0,fac->poly,0,ctx);
   fq_nmod_neg(r0, r0, ctx);
   // convert
-  CanonicalForm r1=convertFq_nmod_t2FacCF(r0,alpha);
+  CanonicalForm r1=convertFq_nmod_t2FacCF(r0,alpha,ctx);
   // cleanup
   fq_nmod_poly_factor_clear(fac,ctx);
   fq_nmod_clear(r0, ctx);
@@ -468,7 +468,7 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     fq_nmod_poly_get_coeff(r0,fac->poly,0,ctx);
     fq_nmod_neg(r0, r0, ctx);
     // convert
-    CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta);
+    CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta,ctx);
     // cleanup
     fq_nmod_poly_factor_clear(fac,ctx);
     fq_nmod_clear(r0, ctx);
@@ -541,7 +541,7 @@ map (const CanonicalForm& primElem, const Variable& alpha,
   // convert
   fq_nmod_poly_get_coeff(r0,fac->poly+ind,0,ctx);
   fq_nmod_neg(r0,r0,ctx);
-  CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta);
+  CanonicalForm r1=convertFq_nmod_t2FacCF(r0,beta,ctx);
   // cleanup
   fq_nmod_poly_factor_clear(fac,ctx);
   fq_nmod_clear(r0, ctx);

@@ -156,7 +156,8 @@ convertFmpz_mod_poly_t2FacCF (
 /// alpha
 CanonicalForm
 convertFq_nmod_t2FacCF (const fq_nmod_t poly, ///< [in] fq_nmod_t
-                        const Variable& alpha ///< [in] algebraic variable
+                        const Variable& alpha, ///< [in] algebraic variable
+			const fq_nmod_ctx_t ctx ///<[in] context
                        );
 
 /// conversion of a FLINT element of F_q with non-word size p to a CanonicalForm

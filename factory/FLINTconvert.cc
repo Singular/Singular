@@ -62,6 +62,27 @@ extern "C"
 #endif
 #if ( __FLINT_RELEASE >= 20503)
 #include <flint/fmpq_mpoly.h>
+
+#if (__FLINT_RELEASE < 20601)
+// helper for fq_nmod_t -> nmod_poly_t
+static void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
+{
+    FLINT_ASSERT(b->mod.n == ctx->modulus->mod.n);
+    a->mod = ctx->modulus->mod;
+    nmod_poly_set(a, b);
+}
+
+// helper for nmod_poly_t -> fq_nmod_t
+static void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx)
+{
+    FLINT_ASSERT(a->mod.n == b->mod.n);
+    FLINT_ASSERT(a->mod.n == ctx->modulus->mod.n);
+    nmod_poly_set(a, b);
+    fq_nmod_reduce(a, ctx);
+}
+#endif
+
+
 #endif
 #ifdef __cplusplus
 }
@@ -362,6 +383,8 @@ convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
 {
   bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
   if (save_sym_ff) Off (SW_SYMMETRIC_FF);
+  nmod_poly_t res;
+  nmod_poly_init(res,getCharacteristic());
   for (CFIterator i= f; i.hasTerms(); i++)
   {
     CanonicalForm c= i.coeff();
@@ -375,16 +398,23 @@ convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
     else
     {
       STICKYASSERT (i.exp() <= fq_nmod_ctx_degree(ctx), "convertFacCF2Fq_nmod_t: element is not reduced");
-      nmod_poly_set_coeff_ui (result, i.exp(), c.intval());
+      nmod_poly_set_coeff_ui (res, i.exp(), c.intval());
     }
   }
+  fq_nmod_init(result,ctx);
+  fq_nmod_set_nmod_poly(result,res,ctx);
   if (save_sym_ff) On (SW_SYMMETRIC_FF);
 }
 
 CanonicalForm
-convertFq_nmod_t2FacCF (const fq_nmod_t poly, const Variable& alpha)
+convertFq_nmod_t2FacCF (const fq_nmod_t poly, const fq_nmod_ctx_t ctx, const Variable& alpha)
 {
-  return convertnmod_poly_t2FacCF (poly, alpha);
+  nmod_poly_t p;
+  nmod_poly_init(p,getCharacteristic());
+  fq_nmod_get_nmod_poly(p,poly,ctx);
+  CanonicalForm res= convertnmod_poly_t2FacCF (p, alpha);
+  nmod_poly_clear(p);
+  return res;
 }
 
 void
@@ -475,7 +505,7 @@ convertFq_nmod_poly_t2FacCF (const fq_nmod_poly_t p, const Variable& x,
     fq_nmod_poly_get_coeff (coeff, p, i, ctx);
     if (fq_nmod_is_zero (coeff, ctx))
       continue;
-    result += convertFq_nmod_t2FacCF (coeff, alpha)*power (x, i);
+    result += convertFq_nmod_t2FacCF (coeff, alpha, ctx)*power (x, i);
     fq_nmod_zero (coeff, ctx);
   }
   fq_nmod_clear (coeff, ctx);
@@ -572,7 +602,7 @@ convertFq_nmod_mat_t2FacCFMatrix(const fq_nmod_mat_t m,
     for(j=res->columns();j>0;j--)
     {
       (*res)(i,j)=convertFq_nmod_t2FacCF (fq_nmod_mat_entry (m, i-1, j-1),
-                                          alpha);
+                                          alpha, fq_con);
     }
   }
   return res;
