@@ -439,7 +439,6 @@ mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& /*beta*/,
   return mapUp (F, prim_elem, alpha, im_prim_elem, source, dest);
 }
 
-#ifdef HAVE_NTL // findMinPoly
 CanonicalForm
 mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
              const Variable& beta)
@@ -490,7 +489,6 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     #endif
   }
 }
-#endif
 
 CanonicalForm
 map (const CanonicalForm& primElem, const Variable& alpha,
@@ -575,12 +573,62 @@ map (const CanonicalForm& primElem, const Variable& alpha,
   #endif
 }
 
-#ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+/*
+    g is in Fp[x]
+    F is in Fp[t]
+    h is in Fp[t]
+    In the finite field Fp[t]/h(t), find g(x) in Fp[x] such that
+        g(F(t)) = 0 mod h(t)
+    i.e. g is the minpoly of the element F(t) of the finite field.
+*/
+static void minpoly(nmod_poly_t g, const nmod_poly_t F, const nmod_poly_t h)
+{
+    slong i;
+    slong d = nmod_poly_degree(h);
+    mp_limb_t p = h->mod.n;
+    nmod_poly_t Fpow;
+    nmod_berlekamp_massey_t bma;
+
+    nmod_poly_init(Fpow, p);
+    nmod_berlekamp_massey_init(bma, p);
+
+    nmod_poly_one(Fpow);
+    for (i = 0; i < 2*d; i++)
+    {
+        nmod_berlekamp_massey_add_point(bma, nmod_poly_get_coeff_ui(Fpow, 0));
+        nmod_poly_mulmod(Fpow, Fpow, F, h);
+    }
+
+    nmod_berlekamp_massey_reduce(bma);
+
+    /* something went horribly wrong if V does not kill the whole sequence */
+    FLINT_ASSERT(nmod_poly_degree(nmod_berlekamp_massey_R_poly(bma)) <
+                 nmod_poly_degree(nmod_berlekamp_massey_V_poly(bma)));
+
+    nmod_poly_make_monic(g, nmod_berlekamp_massey_V_poly(bma));
+#if WANT_ASSERT
+    {
+        nmod_poly_t z;
+        nmod_poly_init(z, p);
+        nmod_poly_compose_mod(z, g, F, h);
+        FLINT_ASSERT(nmod_poly_is_zero(z));
+        nmod_poly_clear(z);
+    }
+#endif
+    nmod_poly_clear(Fpow);
+    nmod_berlekamp_massey_clear(bma);
+}
+#endif
+
+
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 findMinPoly (const CanonicalForm& F, const Variable& alpha)
 {
   ASSERT (F.isUnivariate() && F.mvar()==alpha,"expected element of F_p(alpha)");
 
+  #if defined(HAVE_NTL) && !defined(HAVE_FLINT)
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
@@ -610,6 +658,17 @@ findMinPoly (const CanonicalForm& F, const Variable& alpha)
   MinPolySeq (NTLMinPoly, pows, d);
 
   return convertNTLzzpX2CF (NTLMinPoly, Variable (1));
+  #elif defined(HAVE_FLINT)
+  nmod_poly_t FLINT_F,FLINT_alpha,g;
+  nmod_poly_init(g,getCharacteristic());
+  convertFacCF2nmod_poly_t(FLINT_F,F);
+  convertFacCF2nmod_poly_t(FLINT_alpha,getMipo(alpha));
+  minpoly(g,FLINT_F,FLINT_alpha);
+  nmod_poly_clear(FLINT_alpha);
+  nmod_poly_clear(FLINT_F);
+  CanonicalForm res=convertnmod_poly_t2FacCF(g,Variable(1));
+  nmod_poly_clear(g);
+  return res;
+  #endif
 }
-
 #endif

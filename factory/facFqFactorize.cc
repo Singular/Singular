@@ -33,9 +33,6 @@
 #include "facMul.h"
 #include "cfUnivarGcd.h"
 
-#ifdef HAVE_NTL
-#include "NTLconvert.h"
-
 TIMING_DEFINE_PRINT(fac_fq_bi_factorizer)
 TIMING_DEFINE_PRINT(fac_fq_hensel_lift)
 TIMING_DEFINE_PRINT(fac_fq_factor_recombination)
@@ -735,6 +732,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   return result;
 }
 
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 #define CHAR_THRESHOLD 8
 CFList
 evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
@@ -908,6 +906,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
 
   return result;
 }
+#endif
 
 static inline
 int newMainVariableSearch (CanonicalForm& A, CFList& Aeval, CFList&
@@ -1992,8 +1991,6 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
   }
 }
 
-#endif
-
 static inline
 CanonicalForm prodEval (const CFList& l, const CanonicalForm& evalPoint,
                         const Variable& v)
@@ -2164,7 +2161,7 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
   return result;
 }
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 void
 factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
                                      const ExtensionInfo& info,
@@ -2203,6 +2200,7 @@ factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
     }
   }
 }
+#endif
 
 CFList conv (const CFArray & A)
 {
@@ -2903,6 +2901,7 @@ LCHeuristic4 (const CFList& oldBiFactors, const CFList* oldAeval,
   }
 }
 
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CFList
 extFactorize (const CanonicalForm& F, const ExtensionInfo& info);
 
@@ -3827,6 +3826,4 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 }
-
 #endif
-/* HAVE_NTL */

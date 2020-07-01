@@ -344,7 +344,6 @@ newtonInterp (const CanonicalForm & alpha, const CanonicalForm & u,
   return interPoly;
 }
 
-#ifdef HAVE_NTL // mapPrimElem
 CanonicalForm
 resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
              bool prob)
@@ -521,7 +520,6 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
 
   return N (H);
 }
-#endif
 
 static inline
 CanonicalForm

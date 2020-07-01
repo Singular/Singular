@@ -8921,7 +8921,6 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 }
 #endif
 
-#ifdef HAVE_NTL // primitiveElement
 CFList
 extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 {
@@ -9095,5 +9094,4 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 }
-#endif
 #endif
