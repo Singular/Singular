@@ -412,7 +412,7 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   fq_nmod_poly_clear(FLINT_beta_mipo,ctx);
   fq_nmod_ctx_clear(ctx);
   return r1;
-  #elif defined(NTL)
+  #elif defined(HAVE_NTL)
   zz_pX alpha_mipo= convertFacCF2NTLzzpX (mipo);
   zz_pE::init (alpha_mipo);
   zz_pEX NTL_beta_mipo= to_zz_pEX (NTL_mipo);
