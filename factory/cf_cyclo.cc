@@ -21,10 +21,6 @@
 #include "cf_util.h"
 #include "cf_assert.h"
 
-#ifdef HAVE_NTL
-#include <NTL/ZZ.h>
-#endif
-
 int* integerFactorizer (const long integer, int& length, bool& fail)
 {
   ASSERT (integer != 0 && integer != 1 && integer != -1,
