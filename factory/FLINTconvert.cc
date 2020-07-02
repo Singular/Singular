@@ -265,7 +265,7 @@ convertFmpq_poly_t2FacCF (const fmpq_poly_t p, const Variable& x)
       fmpq_clear (coeff);
       continue;
     }
-    result += convertFmpq_t2CF (coeff)*power (x, i);
+    result += convertFmpq2CF (coeff)*power (x, i);
     fmpq_clear (coeff);
   }
   return result;
@@ -700,7 +700,7 @@ CanonicalForm convFlintMPFactoryP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, int N)
   {
     fmpq_mpoly_get_term_coeff_fmpq(c,f,i,ctx);
     fmpq_mpoly_get_term_exp_ui(exp,f,i,ctx);
-    CanonicalForm term=convertFmpq_t2CF(c);
+    CanonicalForm term=convertFmpq2CF(c);
     for ( int i = 0; i <N; i++ )
     {
       if (exp[i]!=0) term*=CanonicalForm( Variable( N-i ), exp[i] );
