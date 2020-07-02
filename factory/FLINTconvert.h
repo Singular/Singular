@@ -98,6 +98,9 @@ convertCF2Fmpq (fmpq_t result,         ///< [in,out] an fmpq_t
                                        ///< rational
                );
 
+/// conversion of a FLINT rational to CanonicalForm
+CanonicalForm convertFmpq2CF (const fmpq_t q);
+
 /// conversion of a factory univariate polynomials over Q to fmpq_poly_t
 void
 convertFacCF2Fmpq_poly_t (fmpq_poly_t result,    ///< [in,out] an fmpq_poly_t

@@ -209,7 +209,7 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
   }
 }
 
-CanonicalForm convertFmpq_t2CF (const fmpq_t q)
+CanonicalForm convertFmpq2CF (const fmpq_t q)
 {
   bool isRat= isOn (SW_RATIONAL);
   if (!isRat)
