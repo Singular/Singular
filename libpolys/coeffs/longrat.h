@@ -10,6 +10,7 @@
 
 #include "coeffs/si_gmp.h"
 #include "coeffs/coeffs.h"
+#include "factory/si_log2.h"
 
 number   nlGetDenom(number &n, const coeffs r); /*for SAGE,, better: n_GetDenom */
 number   nlGetNumerator(number &n, const coeffs r); /*for SAGE, better: n_GetNumerator*/
@@ -82,7 +83,7 @@ static  FORCE_INLINE int nlQlogSize (number n, const coeffs r)
     long i = SR_TO_INT (n);
     unsigned long v;
     v = ABS(i);
-    return SI_LOG2(v) + 1;
+    return SI_LOG2_LONG(v) + 1;
   }
   //assume denominator is 0
   number nn=(number) n;

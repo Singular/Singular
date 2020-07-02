@@ -32,6 +32,7 @@
 #include "factory/templates/ftmpl_afactor.h"
 #include "factory/templates/ftmpl_factor.h"
 #include "factory/templates/ftmpl_matrix.h"
+#include "si_log2.h"
 #ifdef HAVE_OMALLOC
 #ifndef XMEMORY_H
 #include "omalloc/omallocClass.h"

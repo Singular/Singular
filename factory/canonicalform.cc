@@ -426,7 +426,7 @@ CanonicalForm::degree( const Variable & v ) const
       case GFMARK:  return imm_iszero_gf( value ) ? -1 : 0;
       case 0: if ( value->inBaseDomain() )
               return value->degree();
-	      break;
+              break;
     }
 #endif
 
@@ -720,7 +720,7 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
           *this=mulFlintMP_Zp(*this,l_this,cf,l_cf,m);
         }
         else
-	/*-----------------------------------------------------*/
+        /*-----------------------------------------------------*/
         if ((getCharacteristic()==0)
         &&(!hasAlgVar(*this))
         &&(!hasAlgVar(cf))
@@ -1383,13 +1383,7 @@ CanonicalForm::ilog2 () const
         ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
         long a = imm2int( value );
         ASSERT( a > 0, "arg to ilog2() less or equal zero" );
-        int n = -1;
-        while ( a > 0 )
-        {
-          n++;
-          a /=2;
-        }
-        return n;
+        return SI_LOG2_LONG(a);
     }
     else
         return value->ilog2();

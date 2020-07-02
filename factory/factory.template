@@ -24,6 +24,7 @@
 
 #include "factory/factoryconf.h"
 #include <stdint.h>
+#include "factory/si_log2.h"
 #ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
 #ifndef XMEMORY_H

@@ -38,15 +38,18 @@ int ipower ( int b, int m )
     return prod;
 }
 
-int ilog2 (int a)
+int ilog2 (int v)
 {
-  int n = -1;
-  while ( a > 0 )
-  {
-    n++;
-    a /=2;
-  }
-  return n;
+  const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
+  const unsigned int S[] = {1, 2, 4, 8, 16};
+
+  unsigned int r = 0; // result of log2(v) will go here
+  if (v & b[4]) { v >>= S[4]; r |= S[4]; }
+  if (v & b[3]) { v >>= S[3]; r |= S[3]; }
+  if (v & b[2]) { v >>= S[2]; r |= S[2]; }
+  if (v & b[1]) { v >>= S[1]; r |= S[1]; }
+  if (v & b[0]) { v >>= S[0]; r |= S[0]; }
+  return (int)r;
 }
 
 int igcd( int a, int b )
