@@ -30,10 +30,6 @@
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
 #endif
-#ifdef HAVE_NTL
-#include "NTLconvert.h"
-#include <NTL/LLL.h>
-#endif
 
 #if defined(HAVE_NTL)
 TIMING_DEFINE_PRINT(abs_fac_bi_factorizer)
