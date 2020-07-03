@@ -473,6 +473,7 @@ void sortList (CFList& list, const Variable& x)
 CFList
 diophantine (const CanonicalForm& F, const CFList& factors);
 
+#ifdef HAVE_NTL // diophantine
 CFList
 diophantineHensel (const CanonicalForm & F, const CFList& factors,
                    const modpk& b)
@@ -562,6 +563,7 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
 
   return result;
 }
+#endif
 
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
 /// over \f$ Q(\alpha) \f$ by p-adic lifting

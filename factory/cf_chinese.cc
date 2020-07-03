@@ -162,7 +162,7 @@ chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, C
     DEBDECLEVEL( cerr, "chineseRemainder( ... CFArray ... )" );
 }
 
-#if 0
+#if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
 CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 //"USAGE:  Farey_n (N,P); P, N number;
 //RETURN:  a rational number a/b such that a/b=N mod P
@@ -250,6 +250,9 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
               Off (SW_RATIONAL);
             }
           }
+#else
+          if (c.inZ())
+	    result += power (x, i.exp()) * Farey_n(c,q);
 #endif
           else
             result += power( x, i.exp() ) * Farey(c,q);

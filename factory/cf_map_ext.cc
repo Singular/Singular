@@ -439,6 +439,7 @@ mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& /*beta*/,
   return mapUp (F, prim_elem, alpha, im_prim_elem, source, dest);
 }
 
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
              const Variable& beta)
@@ -489,6 +490,7 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     #endif
   }
 }
+#endif
 
 CanonicalForm
 map (const CanonicalForm& primElem, const Variable& alpha,

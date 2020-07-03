@@ -360,6 +360,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   return uniFactors;
 }
 
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 /// naive factor recombination as decribed in "Factoring
 /// multivariate polynomials over a finite field" by L Bernardin.
 CFList
@@ -574,6 +575,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   delete [] v;
   return result;
 }
+#endif
 
 /// naive factor recombination as decribed in "Factoring
 /// multivariate polynomials over a finite field" by L Bernardin.
@@ -8921,6 +8923,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 }
 #endif
 
+#ifdef HAVE_NTL // biFactorize
 CFList
 extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 {
@@ -9094,4 +9097,5 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 }
+#endif
 #endif
