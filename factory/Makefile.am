@@ -174,7 +174,7 @@ noinst_HEADERS = $(factory_headers)
 libfactory_includedir = ${includedir}/factory
 
 nodist_libfactory_include_HEADERS = factory.h factoryconf.h
-libfactory_include_HEADERS = globaldefs.h
+libfactory_include_HEADERS = globaldefs.h si_log2.h
 
 
 ####################################################
