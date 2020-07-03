@@ -19,6 +19,10 @@
 #include "NTLconvert.h"
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 #include "cf_assert.h"
 #include "debug.h"
 
@@ -158,7 +162,7 @@ chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, C
     DEBDECLEVEL( cerr, "chineseRemainder( ... CFArray ... )" );
 }
 
-#ifndef HAVE_NTL
+#if 0
 CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 //"USAGE:  Farey_n (N,P); P, N number;
 //RETURN:  a rational number a/b such that a/b=N mod P
@@ -202,7 +206,15 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
     CanonicalForm result = 0;
     CanonicalForm c;
     CFIterator i;
-#ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+   fmpz_t FLINTq;
+   fmpz_init(FLINTq);
+   convertCF2Fmpz(FLINTq,q);
+   fmpz_t FLINTc;
+   fmpz_init(FLINTc);
+   fmpq_t FLINTres;
+   fmpq_init(FLINTres);
+#elif defined(HAVE_NTL)
     ZZ NTLq= convertFacCF2NTLZZ (q);
     ZZ bound;
     SqrRoot (bound, NTLq/2);
@@ -212,7 +224,14 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
         c = i.coeff();
         if ( c.inCoeffDomain())
         {
-#ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+          if (c.inZ())
+          {
+             convertCF2Fmpz(FLINTc,c);
+             fmpq_reconstruct_fmpz(FLINTres,FLINTc,FLINTq);
+             result += power (x, i.exp())*(convertFmpq2CF(FLINTres));
+          }
+#elif defined(HAVE_NTL)
           if (c.inZ())
           {
             ZZ NTLc= convertFacCF2NTLZZ (c);
@@ -231,19 +250,19 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
               Off (SW_RATIONAL);
             }
           }
-          else
-            result += power( x, i.exp() ) * Farey(c,q);
-#else
-          if (c.inZ())
-            result += power( x, i.exp() ) * Farey_n(c,q);
-          else
-            result += power( x, i.exp() ) * Farey(c,q);
 #endif
+          else
+            result += power( x, i.exp() ) * Farey(c,q);
         }
         else
           result += power( x, i.exp() ) * Farey(c,q);
     }
     if (is_rat) On(SW_RATIONAL);
+#ifdef HAVE_FLINT
+    fmpq_clear(FLINTres);
+    fmpz_clear(FLINTc);
+    fmpz_clear(FLINTq);
+#endif
     return result;
 }
 
