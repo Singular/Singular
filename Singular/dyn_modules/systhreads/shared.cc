@@ -1479,6 +1479,7 @@ void *joinThread(ThreadState *ts) {
   ts->running = false;
   ts->active = false;
   thread_lock.unlock();
+  return result;
 }
 
 static InterpreterThread *createInterpreterThread(const char **error) {
@@ -2491,23 +2492,24 @@ Job *startJob(ThreadPool *pool, Job *job) {
   return startJob(pool, job, NULL);
 }
 
-Job *scheduleJob(ThreadPool *pool, Job *job, long ndeps, Job **deps) {
-  if (job->pool) return NULL;
-  pool->scheduler->lock.lock();
-  bool cancelled = false;
-  job->addDep(ndeps, deps);
-  for (long i = 0; i < ndeps; i++) {
-    deps[i]->addNotify(job);
-    cancelled |= deps[i]->cancelled;
-  }
-  if (cancelled) {
-    job->pool = pool;
-    pool->cancelJob(job);
-  }
-  else
-    pool->attachJob(job);
-  pool->scheduler->lock.unlock();
-}
+// Job *scheduleJob(ThreadPool *pool, Job *job, long ndeps, Job **deps) {
+//   if (job->pool) return NULL;
+//   pool->scheduler->lock.lock();
+//   bool cancelled = false;
+//   job->addDep(ndeps, deps);
+//   for (long i = 0; i < ndeps; i++) {
+//     deps[i]->addNotify(job);
+//     cancelled |= deps[i]->cancelled;
+//   }
+//   if (cancelled) {
+//     job->pool = pool;
+//     pool->cancelJob(job);
+//   }
+//   else
+//     pool->attachJob(job);
+//   pool->scheduler->lock.unlock();
+//   return FIXME: missing/unclear what this is supposed to be
+// }
 
 void cancelJob(Job *job) {
   ThreadPool *pool = job->pool;
