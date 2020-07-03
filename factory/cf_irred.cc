@@ -26,19 +26,6 @@ is_irreducible ( const CanonicalForm & f )
     return F.length() == 1 && F.getFirst().exp() == 1;
 }
 
-CanonicalForm
-find_irreducible ( int deg, CFRandom & gen, const Variable & x )
-{
-    CanonicalForm result;
-    int i;
-    do {
-        result = power( x, deg );
-        for ( i = deg-1; i >= 0; i-- )
-            result += gen.generate() * power( x, i );
-    } while ( ! is_irreducible( result ) );
-    return result;
-}
-
 #if defined(HAVE_NTL) || defined(HAVE_FLINT)
 /// computes a random monic irreducible univariate polynomial in x over Fp of
 /// degree i via NTL/FLINT
@@ -63,5 +50,18 @@ randomIrredpoly (int i, const Variable & x)
   CanonicalForm CFirredpoly= convertNTLzzpX2CF (NTLirredpoly, x);
   #endif
   return CFirredpoly;
+}
+#else
+CanonicalForm
+find_irreducible ( int deg, CFRandom & gen, const Variable & x )
+{
+    CanonicalForm result;
+    int i;
+    do {
+        result = power( x, deg );
+        for ( i = deg-1; i >= 0; i-- )
+            result += gen.generate() * power( x, i );
+    } while ( ! is_irreducible( result ) );
+    return result;
 }
 #endif
