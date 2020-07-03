@@ -205,7 +205,7 @@ choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec,
   return 0;
 }
 
-#ifdef HAVE_NTL
+#ifdef HAVE_NTL // henselLiftAndEarly
 //G is assumed to be bivariate, irreducible over Q, primitive wrt x and y, compressed
 CFAFList absBiFactorizeMain (const CanonicalForm& G, bool full)
 {
@@ -518,6 +518,19 @@ differentevalpoint:
       (*M) (j+1,j)= -liftedSmallestFactor;
     }
 
+    #ifdef HAVE_FLINT
+    fmpz_mat_t FLINTM;
+    convertFacCFMatrix2Fmpz_mat_t(FLINTM,*M);
+    fmpq_t delta,eta;
+    fmpq_init(delta); fmpq_set_si(delta,1,1);
+    fmpq_init(eta); fmpq_set_si(eta,3,4);
+    fmpz_mat_transpose(FLINTM,FLINTM);
+    fmpz_mat_lll_storjohann(FLINTM,delta,eta);
+    fmpz_mat_transpose(FLINTM,FLINTM);
+    delete M;
+    M=convertFmpz_mat_t2FacCFMatrix(FLINTM);
+    fmpz_mat_clear(FLINTM);
+    #elif defined(HAVE_NTL)
     mat_ZZ * NTLM= convertFacCFMatrix2NTLmat_ZZ (*M);
 
     ZZ det;
@@ -528,6 +541,7 @@ differentevalpoint:
     delete M;
     M= convertNTLmat_ZZ2FacCFMatrix (*NTLM);
     delete NTLM;
+    #endif
 
     mipo= 0;
     for (int j= 1; j <= s; j++)

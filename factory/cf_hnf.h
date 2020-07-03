@@ -4,8 +4,6 @@
 
 /*BEGINPUBLIC*/
 
-#ifdef HAVE_NTL
-
 /**
  *
  * The input matrix A is square matrix of integers
@@ -40,12 +38,10 @@ CFMatrix* cf_HNF(CFMatrix& A);
  * is no more than 2^{r-1} times that of the shortest vector in
  * the lattice.
  *
- * @note: uses NTL
+ * @note: uses NTL or FLINT
 **/
 
 CFMatrix* cf_LLL(CFMatrix& A);
-
-#endif
 
 /*ENDPUBLIC*/
 

@@ -1762,7 +1762,7 @@ number singclap_det_bi( bigintmat * m, const coeffs cf)
   return res;
 }
 
-#ifdef HAVE_NTL   /*define derived from factory*/
+#if defined(HAVE_NTL) || defined(AHVE_FLINT)
 matrix singntl_HNF(matrix  m, const ring s )
 {
   int r=m->rows();
@@ -1916,7 +1916,33 @@ intvec* singntl_LLL(intvec*  m)
   delete MM;
   return mm;
 }
+#else
+matrix singntl_HNF(matrix  m, const ring s )
+{
+  WerrorS("NTL/FLINT missing");
+  return NULL;
+}
 
+intvec* singntl_HNF(intvec*  m)
+{
+  WerrorS("NTL/FLINT missing");
+  return NULL;
+}
+
+matrix singntl_LLL(matrix  m, const ring s )
+{
+  WerrorS("NTL/FLINT missing");
+  return NULL;
+}
+
+intvec* singntl_LLL(intvec*  m)
+{
+  WerrorS("NTL/FLINT missing");
+  return NULL;
+}
+#endif
+
+#ifdef HAVE_NTL
 ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
 {
   p_Test(f, r);
@@ -1994,30 +2020,6 @@ ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFa
 }
 
 #else
-matrix singntl_HNF(matrix  m, const ring s )
-{
-  WerrorS("NTL missing");
-  return NULL;
-}
-
-intvec* singntl_HNF(intvec*  m)
-{
-  WerrorS("NTL missing");
-  return NULL;
-}
-
-matrix singntl_LLL(matrix  m, const ring s )
-{
-  WerrorS("NTL missing");
-  return NULL;
-}
-
-intvec* singntl_LLL(intvec*  m)
-{
-  WerrorS("NTL missing");
-  return NULL;
-}
-
 ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
 {
   WerrorS("NTL missing");
