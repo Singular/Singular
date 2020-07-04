@@ -154,6 +154,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
   return random;
 }
 
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CFList
 uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 {
@@ -359,6 +360,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     uniFactors.append (i.getItem().factor());
   return uniFactors;
 }
+#endif
 
 #if defined(HAVE_NTL) || defined(HAVE_FLINT)
 /// naive factor recombination as decribed in "Factoring
@@ -799,6 +801,7 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   return result;
 }
 
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 {
   #if defined(HAVE_FLINT)
@@ -843,6 +846,7 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
   #endif
   return rootOf (newMipo);
 }
+#endif
 
 void
 earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
@@ -1460,7 +1464,7 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
 }
 #endif
 
-#ifndef HAVE_FLINT
+#ifdef HAVE_NTL
 long isReduced (const mat_zz_p& M)
 {
   long i, j, nonZero;
@@ -1498,7 +1502,7 @@ long isReduced (const nmod_mat_t M)
 }
 #endif
   
-#ifdef HAVE_NTL // mat_zz_pE
+#ifdef HAVE_NTL
 long isReduced (const mat_zz_pE& M)
 {
   long i, j, nonZero;
@@ -1517,7 +1521,7 @@ long isReduced (const mat_zz_pE& M)
 }
 #endif
 
-#ifndef HAVE_FLINT
+#ifdef HAVE_NTL
 int * extractZeroOneVecs (const mat_zz_p& M)
 {
   long i, j;
@@ -1569,7 +1573,7 @@ int * extractZeroOneVecs (const nmod_mat_t M)
 }
 #endif
 
-#ifdef HAVE_NTL // mat_zz_pE
+#ifdef HAVE_NTL
 int * extractZeroOneVecs (const mat_zz_pE& M)
 {
   long i, j;
@@ -1595,7 +1599,7 @@ int * extractZeroOneVecs (const mat_zz_pE& M)
 }
 #endif
 
-#ifdef HAVE_NTL // mat_zz_pE
+#ifdef HAVE_NTL
 void
 reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
                    factors, const int liftBound, int& factorsFound, int*&
@@ -1679,7 +1683,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
 }
 #endif
 
-#ifndef HAVE_FLINT
+#ifdef HAVE_NTL
 void
 reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
                    factors, const int liftBound, int& factorsFound, int*&
@@ -1847,7 +1851,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
 }
 #endif
 
-#ifdef HAVE_NTL //mat_zz_pE
+#ifdef HAVE_NTL
 CFList
 reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
                 precision, const mat_zz_pE& N, const CanonicalForm& eval
@@ -1898,7 +1902,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
 }
 #endif
 
-#ifdef HAVE_NTL // mat_zz_pE
+#ifdef HAVE_NTL
 CFList
 monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
                      int precision, const mat_zz_pE& N
@@ -1951,7 +1955,7 @@ monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
 }
 #endif
 
-#ifndef HAVE_FLINT
+#ifdef HAVE_NTL
 CFList
 extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
                    precision, const mat_zz_p& N, const ExtensionInfo& info,
@@ -2113,7 +2117,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
 }
 #endif
 
-#ifndef HAVE_FLINT
+#ifdef HAVE_NTL
 CFList
 reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
                 int precision, const mat_zz_p& N, const CanonicalForm& eval)
@@ -2215,7 +2219,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
 }
 #endif
 
-#ifndef HAVE_FLINT
+#ifdef HAVE_NTL
 void
 extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
                       CFList& factors, const int liftBound, int& factorsFound,
@@ -2475,8 +2479,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
 }
 #endif
 
-#ifndef HAVE_FLINT
-#ifdef HAVE_NTL // logarithmicDerivative
+#ifdef HAVE_NTL
 //over Fp
 int
 liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
@@ -2599,7 +2602,6 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   }
   return l;
 }
-#endif
 #endif
 
 #ifdef HAVE_FLINT
@@ -2741,8 +2743,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
 #endif
 #endif
 
-#ifndef HAVE_FLINT
-#ifdef HAVE_NTL //logarithmicDerivative
+#ifdef HAVE_NTL
 //over field extension
 int
 extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
@@ -2938,7 +2939,6 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   }
   return l;
 }
-#endif
 #endif
 
 #ifdef HAVE_FLINT
