@@ -2015,15 +2015,26 @@ EXAMPLE: example displayHNE; shows an example
 /*
  if (parstr(basering)!="") {
    if (charstr(basering)!=string(char(basering))+","+parstr(basering)) {
-     execute
-      ("ring dazu=("+charstr(basering)+"),z(0.."+string(size(v)-1)+"),ls;");
+     list l2;
+     for (int zz = 0; zz <= size(v)-1; zz++)
+     {
+       l2[size(l2)+1] = "z("+string(zz)+")";
+     }
+     ring dazu = create_ring(ringlist(basering)[1], l2, "ls", "no_minpoly");
    }
    else { ring dazu=char(altring),z(0..size(v)-1),ls; }
  }
  else   { ring dazu=char(altring),z(0..size(v)-1),ls; }
  def displayring=dazu+altring;
 */
- execute("ring displayring=("+charstr(basering)+"),(z(0.."+string(size(v)-1)+"),"+varstr(basering)+"),(ls("+string(size(v))+"),"+ordstr(basering)+");");
+ list l1;
+ for (int zz = 0; zz <= size(v)-1; zz++)
+ {
+   l1[size(l1)+1] = "z("+string(zz)+")";
+ }
+ list l2=ringlist(basering)[2];
+ l1 = l1 + l2;
+ ring displayring = create_ring(ringlist(basering)[1], l1, "(ls("+string(size(v))+"),"+ordstr(basering)+")", "no_minpoly");
  // End change by T. Keilen
  //////////////////////////////////////////////////////////////
  setring displayring;
