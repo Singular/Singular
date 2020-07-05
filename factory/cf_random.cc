@@ -14,6 +14,18 @@
 #include "gfops.h"
 #include "imm.h"
 
+#ifdef HAVE_FLINT
+extern "C"
+{
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
+#include <flint/flint.h>
+
+GLOBAL_VAR flint_rand_t FLINTrandom;
+}
+#endif
+
 class RandomGenerator {
 private:
     const int ia, im, iq, ir, deflt;
@@ -173,7 +185,12 @@ int factoryrandom( int n )
         return ranGen.generate() % n;
 }
 
+
 void factoryseed ( int s )
 {
     ranGen.seed( s );
+
+#ifdef HAVE_FLINT
+    flint_randinit(FLINTrandom);
+#endif
 }

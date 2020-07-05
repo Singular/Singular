@@ -1327,13 +1327,6 @@ static BOOLEAN iiCrossProd(leftv res, leftv args)
 /*2
 * initialize components of Singular
 */
-#ifdef HAVE_FLINT
-extern "C" 
-{
-GLOBAL_VAR flint_rand_t FLINTrandom;
-}
-#endif
-
 void siInit(char *name)
 {
 // memory initialization: -----------------------------------------------
@@ -1396,9 +1389,6 @@ void siInit(char *name)
   factoryseed(t);
   siRandomStart=t;
   feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
-  #ifdef HAVE_FLINT
-  flint_randinit(FLINTrandom);
-  #endif
 
 // ressource table: ----------------------------------------------------
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
