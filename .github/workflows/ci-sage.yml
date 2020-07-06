@@ -45,19 +45,19 @@ on:
 
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
-  DIST_PREREQ: python3-setuptools
+  DIST_PREREQ: tar
   # Name of this project in the Sage distribution
-  SPKG:        normaliz
+  SPKG:        singular
   # Sage distribution packages to build
   TARGETS_PRE: build/make/Makefile
-  TARGETS:     SAGE_CHECK=yes pynormaliz
-  TARGETS_OPTIONAL: build/make/Makefile
+  TARGETS:     SAGE_CHECK=yes singular
+  TARGETS_OPTIONAL: SAGE_CHECK=warn pynac pysingular
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:   sagemath/sage
   SAGE_REF:    develop
-  # Temporarily test on the branch from sage ticket 27952
+  # Temporarily test on the branch from sage ticket for singular 4.1.3 upgrade
   SAGE_TRAC_GIT: git://trac.sagemath.org/sage.git
-  SAGE_TICKET: 27952
+  SAGE_TICKET: 25993
   REMOVE_PATCHES: "*"
 
 jobs:
@@ -75,12 +75,9 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get install $DIST_PREREQ
       - name: Run make dist, prepare upstream artifact
         run: |
-          (cd build/pkgs/${{ env.SPKG }}/src && ./bootstrap.sh && ./configure && make dist) \
+          (cd build/pkgs/${{ env.SPKG }}/src && ./autogen.sh && ./configure && make dist) \
           && mkdir -p upstream && cp build/pkgs/${{ env.SPKG }}/src/*.tar.gz upstream/${{ env.SPKG }}-git.tar.gz \
           && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=optional" > upstream/update-pkgs.sh \
-          && (mkdir -p build/pkgs/pynormaliz && cd build/pkgs/pynormaliz && rm -rf src PyNormaliz && tar -xzf - --wildcards normaliz-\*/PyNormaliz && mv normaliz-*/PyNormaliz src && cd src && python3 setup.py sdist) <upstream/normaliz-git.tar.gz \
-          && cp build/pkgs/pynormaliz/src/dist/*.tar.gz upstream/pynormaliz-git.tar.gz \
-          && echo "sage-package create pynormaliz --version git --tarball pynormaliz-git.tar.gz --type=optional" >> upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
           && ls -l upstream/
       - uses: actions/upload-artifact@v2
