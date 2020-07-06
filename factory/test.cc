@@ -97,9 +97,7 @@ int main( int, char *argv[] )
 #endif
 
 //  On (SW_USE_EZGCD); On (SW_USE_EZGCD_P); // TODO&NOTE: these switches lead to failed tests (with nonzero p)!
-
-  Off (SW_USE_EZGCD);
-  Off (SW_USE_CHINREM_GCD);
+//  use the default switches (depend also on NTL/FLINT):
 
   int t= test2 (0);
   if (t < 0)
