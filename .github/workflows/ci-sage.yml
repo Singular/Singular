@@ -45,7 +45,7 @@ on:
 
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
-  DIST_PREREQ: libcdd-dev
+  DIST_PREREQ: tar
   # Name of this project in the Sage distribution
   SPKG:        singular
   # Sage distribution packages to build
@@ -75,7 +75,7 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get install $DIST_PREREQ
       - name: Run make dist, prepare upstream artifact
         run: |
-          (cd build/pkgs/${{ env.SPKG }}/src && ./autogen.sh && ./configure && make dist) \
+          (cd build/pkgs/${{ env.SPKG }}/src && ./make_tar.sh) \
           && mkdir -p upstream && cp build/pkgs/${{ env.SPKG }}/src/*.tar.gz upstream/${{ env.SPKG }}-git.tar.gz \
           && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=optional" > upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
