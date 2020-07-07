@@ -100,7 +100,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   gc = g;
   if ( getCharacteristic() != 0 )
   {
-    if (0) ; // dummy, to be able to build without NTL and FLINT
+    if (0) {} // dummy, to be able to build without NTL and FLINT
     #if defined(HAVE_FLINT) && ( __FLINT_RELEASE >= 20503)
     if ( isOn( SW_USE_FL_GCD_P)
     && (CFFactory::gettype() != GaloisFieldDomain)

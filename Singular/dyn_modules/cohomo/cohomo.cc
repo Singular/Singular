@@ -1312,9 +1312,10 @@ std::vector<int> fvarsvalue(int vnum, std::vector<int> fvars)
     if(fset[i]==vnum)
     {
       fset.erase(fset.begin()+i);
-      return fset;
+      break;
     }
   }
+  return fset;
 }
 
 
@@ -4134,7 +4135,7 @@ std::vector<std::vector<int> > bsubsets_1(poly b)
   std::vector<std::vector<int> > bset;
   for(int i=0;i<bvs.size();i++)
   {
-    for(int j=0;j<bvs.size(), j!=i; j++)
+    for(int j=0;j!=i; j++)
     {
       vs.push_back(bvs[j]);
     }

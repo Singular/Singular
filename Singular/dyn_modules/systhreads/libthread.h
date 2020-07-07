@@ -24,7 +24,7 @@ namespace LibThread {
   // Job scheduling
   Job *startJob(ThreadPool *pool, Job *job, leftv arg);
   Job *startJob(ThreadPool *pool, Job *job);
-  Job *scheduleJob(ThreadPool *pool, Job *job, long ndeps, Job **deps);
+//   Job *scheduleJob(ThreadPool *pool, Job *job, long ndeps, Job **deps);
   void cancelJob(Job *job);
   void waitJob(Job *job);
   // reference counting

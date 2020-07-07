@@ -215,13 +215,13 @@ lists evEigenvals(matrix M)
       }
       else
       {
-        if(e->m[i0]==NULL&&!nGreaterZero(pGetCoeff(e->m[i1]))||
-           e->m[i1]==NULL&&
-          (nGreaterZero(pGetCoeff(e->m[i0]))||pNext(e->m[i0])!=NULL)||
+        if((e->m[i0]==NULL&&!nGreaterZero(pGetCoeff(e->m[i1])))||
+           (e->m[i1]==NULL&&
+            (nGreaterZero(pGetCoeff(e->m[i0]))||pNext(e->m[i0])!=NULL))||
            e->m[i0]!=NULL&&e->m[i1]!=NULL&&
-          (pNext(e->m[i0])!=NULL&&pNext(e->m[i1])==NULL||
-           pNext(e->m[i0])==NULL&&pNext(e->m[i1])==NULL&&
-           nGreater(pGetCoeff(e->m[i0]),pGetCoeff(e->m[i1]))))
+            ((pNext(e->m[i0])!=NULL&&pNext(e->m[i1])==NULL)||
+             (pNext(e->m[i0])==NULL&&pNext(e->m[i1])==NULL&&
+             nGreater(pGetCoeff(e->m[i0]),pGetCoeff(e->m[i1])))))
         {
           poly e1=e->m[i0];
           e->m[i0]=e->m[i1];
