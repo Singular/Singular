@@ -310,6 +310,7 @@ nforder_ideal* nf_idPower(nforder_ideal* A, int i)
     return new nforder_ideal(A, 1);
   } else if (i<0) {
     Werror("not done yet");
+    return NULL;
   } else {
     nforder_ideal *B = nf_idPower(A, i/2);
     nforder_ideal *res = nf_idMult(B, B);
