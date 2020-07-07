@@ -1,7 +1,12 @@
 #!/bin/sh
+# Hannes helper to build tar files for the ftp server:
+# to be called: bash make_tar.sh
+
 TARVERSION=4.1.3p2
 VERSION=4.1.3
-export VERSION TARVERSION
+INSTALL_DIT=/tmp2/wawa-i
+BUILD_DIR=/tmp2/wawa
+export VERSION TARVERSION INSTALL_DIR BUILD_DIR
 
 git archive --prefix=singular-$VERSION/ HEAD |tar xf -
 mkdir singular-$VERSION/doc
@@ -29,8 +34,8 @@ command rm -rf singular-$VERSION/kernel/old singular-$VERSION/kernel/sample
 command rm -rf singular-$VERSION/dox/Doxyfile.html.all singular-$VERSION/dox/Doxyfile.in1 singular-$VERSION/dox/Doxyfile.latex.short singular-$VERSION/dox/readme
 command rm singular-$VERSION/factory/ConwayList.txt
 command rm -rf singular-$VERSION/logo  singular-$VERSION/standalone.test  singular-$VERSION/templates  singular-$VERSION/tests
-cp redhat/singular.spec singular-$VERSION/redhat/singular.spec
-cp /tmp2/wawa-i/share/singular/LIB/all.lib  singular-$VERSION/Singular/LIB/.
+cp $BUILD_DIR/redhat/singular.spec singular-$VERSION/redhat/singular.spec
+cp $INSTALL_DIR/share/singular/LIB/all.lib  singular-$VERSION/Singular/LIB/.
 tar cf singular-$TARVERSION.tar singular-$VERSION
 gzip -9 -f singular-$TARVERSION.tar
 command rm -rf singular-$VERSION
