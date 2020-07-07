@@ -7,6 +7,13 @@
 
 #include "kernel/mod2.h"
 
+#if !defined(__CYGWIN__) || defined(STATIC_VERSION)
+// acces from a module to routines from the main program
+// does not work on windows (restrict of the dynamic linker),
+// a static version is required:
+// ./configure --with-builtinmodules=cohomo,...
+
+
 #include "omalloc/omalloc.h"
 #include "misc/mylimits.h"
 #include "libpolys/misc/intvec.h"
@@ -37,12 +44,6 @@
 #include <Singular/libsingular.h>
 #include <time.h>
 
-
-
-
-
-
-
 /***************************print(only for debugging)***********************************************/
 //print vector of integers.
 void listprint(std::vector<int> vec)
@@ -59,7 +60,6 @@ void listprint(std::vector<int> vec)
     PrintLn();
   }
 }
-
 
 //print vector of vectors of integers.
 void listsprint(std::vector<std::vector<int> > posMat)
@@ -91,9 +91,6 @@ void id_print(ideal h)
     PrintLn();
   }
 }
-
-
-
 
 //only for T^2,
 //print vector of polynomials.
@@ -5333,8 +5330,7 @@ extern "C" int SI_MOD_INIT0(cohomo)(SModulFunctions* p)
   firstorderdef_setup(p);
   return MAX_TOK;
 }
-
-
+#endif
 #endif
 
 
