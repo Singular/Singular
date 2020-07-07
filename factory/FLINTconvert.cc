@@ -383,8 +383,10 @@ convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
 {
   bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
   if (save_sym_ff) Off (SW_SYMMETRIC_FF);
+  #if __FLINT_RELEASE >= 20503
   nmod_poly_t res;
   nmod_poly_init(res,getCharacteristic());
+  #endif
   for (CFIterator i= f; i.hasTerms(); i++)
   {
     CanonicalForm c= i.coeff();
@@ -398,11 +400,17 @@ convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
     else
     {
       STICKYASSERT (i.exp() <= fq_nmod_ctx_degree(ctx), "convertFacCF2Fq_nmod_t: element is not reduced");
+      #if __FLINT_RELEASE >= 20503
       nmod_poly_set_coeff_ui (res, i.exp(), c.intval());
+      #else
+      nmod_poly_set_coeff_ui (result, i.exp(), c.intval());
+      #endif
     }
   }
+  #if __FLINT_RELEASE >= 20503
   fq_nmod_init(result,ctx);
   fq_nmod_set_nmod_poly(result,res,ctx);
+  #endif
   if (save_sym_ff) On (SW_SYMMETRIC_FF);
 }
 
