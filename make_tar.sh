@@ -1,6 +1,7 @@
-#!/bin/sh
-# Hannes helper to build tar files for the ftp server:
-# to be called: bash make_tar.sh
+#!/usr/bin/env bash
+# Hannes helper to build tar files for the ftp server
+
+set -e
 
 TARVERSION=4.1.3p2
 VERSION=4.1.3
