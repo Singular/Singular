@@ -30,6 +30,8 @@
 #include "facFactorize.h"
 #include "singext.h"
 #include "cf_util.h"
+#include "fac_berlekamp.h"
+#include "fac_cantzass.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -438,7 +440,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       if (degree (f) < 300)
 #endif
       {
-        // use FLINT
+        // use FLINT: char p, univariate
         nmod_poly_t f1;
         convertFacCF2nmod_poly_t (f1, f);
         nmod_poly_factor_t result;
@@ -452,7 +454,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
 #endif
 #ifdef HAVE_NTL
-      {
+      { // NTL char 2, univariate
         if (getCharacteristic()==2)
         {
           // Specialcase characteristic==2
@@ -477,7 +479,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 #endif
 #ifdef HAVE_NTL
       {
-        // use NTL
+        // use NTL char p, univariate
         if (fac_NTL_char != getCharacteristic())
         {
           fac_NTL_char = getCharacteristic();
@@ -502,8 +504,13 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
       // Use Factory without NTL
-      factoryError ("univariate factorization depends on FLINT/NTL(missing)");
-      return CFFList (CFFactor (f, 1));
+      {  // Use Factory without NTL
+        if ( isOn( SW_BERLEKAMP ) )
+          F=FpFactorizeUnivariateB( f, issqrfree );
+        else
+          F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
+        return F;
+      }
 #endif
     }
     else // char p, multivariate

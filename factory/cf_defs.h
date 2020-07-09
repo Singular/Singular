@@ -45,6 +45,8 @@ static const int SW_USE_FF_MOD_GCD=7;
 static const int SW_USE_FL_GCD_P=8;
 /// set to 1 to use Flints gcd over Q/Z
 static const int SW_USE_FL_GCD_0=9;
+/// set to 1 to use Factorys Berlekamp alg.
+static const int SW_BERLEKAMP=10;
 
 /*ENDPUBLIC*/
 

@@ -64,6 +64,8 @@ SOURCES = \
 		facFactorize.cc \
 		fac_sqrfree.cc \
 		fac_util.cc \
+		fac_berlekamp.cc \
+		fac_cantzass.cc \
 		facFqBivar.cc \
 		facFqBivarUtil.cc \
 		facFqFactorize.cc \
@@ -144,6 +146,8 @@ factory_headers = \
 		facFactorize.h \
 		fac_sqrfree.h \
 		fac_util.h \
+		fac_berlekamp.h \
+		fac_cantzass.h \
 		facFqBivar.h \
 		facFqBivarUtil.h \
 		facFqFactorize.h \

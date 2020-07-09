@@ -21,4 +21,5 @@ CFFList sqrFreeZ ( const CanonicalForm & f );
 CanonicalForm sqrfPart (const CanonicalForm& F ///<[in] some poly
                        );
 
+CFFList sqrFreeFp ( const CanonicalForm & f );
 #endif /* ! INCL_FAC_SQRFREE_H */
