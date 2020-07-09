@@ -1208,6 +1208,10 @@ if( length($teamcity) > 0 )
 
 
 # Und Tschuess
+if ($exit_code != 0 && ($exit_code % 256) == 0)
+{
+  $exit_code = 1;
+}
 exit $exit_code;
 
 
