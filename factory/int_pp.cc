@@ -12,6 +12,7 @@
 #include "cf_factory.h"
 #include "imm.h"
 
+#if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
 mpz_t InternalPrimePower::primepow;
 mpz_t InternalPrimePower::primepowhalf;
 int InternalPrimePower::prime;
@@ -407,3 +408,4 @@ InternalPrimePower::sign () const
     return mpz_sgn( thempi );
 }
 //}}}
+#endif

@@ -17,7 +17,9 @@
 #include "cf_iter.h"
 #include "cf_primes.h"
 #include "fac_sqrfree.h"
+#include "cfUnivarGcd.h"
 
+#if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
 TIMING_DEFINE_PRINT(fac_choosePrimes)
 TIMING_DEFINE_PRINT(fac_facModPrimes)
 TIMING_DEFINE_PRINT(fac_liftFactors)
@@ -214,6 +216,26 @@ liftDegreeFactRec( CFArray & theFactors, CanonicalForm & F, const CanonicalForm 
     }
 }
 
+bool isSqrFreeZ ( const CanonicalForm & f )
+{
+    return gcd( f, f.deriv() ).degree() == 0;
+}
+
+bool isSqrFreeFp( const CanonicalForm & f )
+{
+  CFFList F = sqrFreeFp( f );
+  return ( F.length() == 1 && F.getFirst().exp() == 1 );
+}
+
+bool isSqrFree ( const CanonicalForm & f )
+{
+//    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+    if ( getCharacteristic() == 0 )
+        return isSqrFreeZ( f );
+    else
+        return isSqrFreeFp( f );
+}
+
 
 static int choosePrimes ( int * p, const CanonicalForm & f )
 {
@@ -248,7 +270,7 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
     CanonicalForm a, b, aa, bb, c, g, h, g1, h1, e, modulus, tmp, q, r;
     int i, j, save;
     int p = pk.getp(), k = pk.getk();
-    int no_iter = (int)(log( (double)k )/log(2.0)+2);
+    int no_iter = SI_LOG2(k)+2;
     int * kvals = new int[no_iter];
 
     DEBOUTLN( cerr, "quadratic lift called with p = " << p << "  and k = " << k );
@@ -277,7 +299,7 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
         c = e / modulus;
         {
             j--;
-            setCharacteristic( p, kvals[j+1] );
+            setCharacteristic( p, kvals[j+1]);
             DEBOUTLN( cerr, "lifting from p^" << kvals[j+1] << " to p^" << kvals[j] );
             c = mapinto( c );
             DEBOUTLN( cerr, " !!! g = " << mapinto( g ) );
@@ -541,3 +563,4 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
     DEBDECLEVEL( cerr, "ZFactorizeUnivariate" );
     return ZF;
 }
+#endif

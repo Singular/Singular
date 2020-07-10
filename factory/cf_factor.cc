@@ -32,6 +32,7 @@
 #include "cf_util.h"
 #include "fac_berlekamp.h"
 #include "fac_cantzass.h"
+#include "fac_univar.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -503,8 +504,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
-      // Use Factory without NTL
-      {  // Use Factory without NTL
+      // Use Factory without NTL: char p, univariate
+      {
         if ( isOn( SW_BERLEKAMP ) )
           F=FpFactorizeUnivariateB( f, issqrfree );
         else
@@ -600,8 +601,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
       goto end_char0;
       #else
-      factoryError ("univariate factorization over Z depends on NTL/FLINT(missing)");
-      return CFFList (CFFactor (f, 1));
+      {
+        //Use Factory without NTL: char 0, univariate
+        F = ZFactorizeUnivariate( fz, issqrfree );
+        goto end_char0;
+      }
       #endif
     }
     else // multivariate,  char 0
