@@ -768,8 +768,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       }
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
-      factoryError ("univariate factorization  depends on FLINT/NTL(missing)");
-      return CFFList (CFFactor (f, 1));
+      // char p, extension, univariate
+      F=FpFactorizeUnivariateCZ( f, false, 1, alpha, Variable() );
 #endif
     }
     else // char p, multivariate
