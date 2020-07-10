@@ -559,9 +559,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         F=CFFList(CFFactor(fz,1));
       }
       else
-      #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20504)
+      #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20503)  && (__FLINT_RELEASE!= 20600)
       {
-        // use FLINT
+        // FLINT 2.6.0 has a bug:
+	// factorize x^12-13*x^10-13*x^8+13*x^4+13*x^2-1 runs forever
+        // use FLINT: char 0, univariate
         fmpz_poly_t f1;
         convertFacCF2Fmpz_poly_t (f1, fz);
         fmpz_poly_factor_t result;
