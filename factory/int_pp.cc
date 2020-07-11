@@ -2,7 +2,7 @@
 
 
 #include "config.h"
-
+#include "globaldefs.h"
 
 #include "cf_assert.h"
 
@@ -13,11 +13,11 @@
 #include "imm.h"
 
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
-mpz_t InternalPrimePower::primepow;
-mpz_t InternalPrimePower::primepowhalf;
-int InternalPrimePower::prime;
-int InternalPrimePower::exp;
-bool InternalPrimePower::initialized = false;
+GLOBAL_VAR mpz_t InternalPrimePower::primepow;
+GLOBAL_VAR mpz_t InternalPrimePower::primepowhalf;
+GLOBAL_VAR int InternalPrimePower::prime;
+GLOBAL_VAR int InternalPrimePower::exp;
+GLOBAL_VAR bool InternalPrimePower::initialized = false;
 
 
 InternalPrimePower::InternalPrimePower()
