@@ -16,6 +16,7 @@
 #include "canonicalform.h"
 #include "cf_defs.h"
 #include "cf_hnf.h"
+#include "cf_util.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
