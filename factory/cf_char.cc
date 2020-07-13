@@ -18,6 +18,10 @@
 #include "cf_util.h"
 #include "int_pp.h"
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h" // for __FLINT_RELEASE
+#endif
+
 STATIC_VAR int theCharacteristic = 0;
 STATIC_VAR int theDegree = 1;
 
@@ -43,7 +47,8 @@ void setCharacteristic( int c )
     }
 }
 
-#if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
+#if !defined(HAVE_NTL)
+#if !defined(HAVE_FLINT) || (__FLINT_RELEASE==20600)
 void setCharacteristic( int c, int n )
 {
     ASSERT( c > 1 && n > 0, "illegal characteristic" );
@@ -51,6 +56,7 @@ void setCharacteristic( int c, int n )
     InternalPrimePower::setPrimePower( c, n );
     CFFactory::settype( PrimePowerDomain );
 }
+#endif
 #endif
 
 

@@ -19,7 +19,12 @@
 #include "fac_sqrfree.h"
 #include "cfUnivarGcd.h"
 
-#if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h" // for __FLINT_RELEASE
+#endif
+
+#if !defined(HAVE_NTL)
+#if !defined(HAVE_FLINT) || (__FLINT_RELEASE==20600)
 TIMING_DEFINE_PRINT(fac_choosePrimes)
 TIMING_DEFINE_PRINT(fac_facModPrimes)
 TIMING_DEFINE_PRINT(fac_liftFactors)
@@ -563,4 +568,5 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
     DEBDECLEVEL( cerr, "ZFactorizeUnivariate" );
     return ZF;
 }
+#endif
 #endif

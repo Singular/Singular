@@ -15,6 +15,7 @@
 
 
 #include "cf_assert.h"
+#include "cf_util.h"
 #include "debug.h"
 #include "timing.h"
 
@@ -552,6 +553,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     ZZ NTLf= resultant (NTLmipo, NTLLcf);
     ZZ NTLD= discriminant (NTLmipo);
     den= abs (convertZZ2CF (NTLD*NTLf));
+    #else
+    factoryError("NTL/FLINT missing: biFactorize");
     #endif
 
     // make factors elements of Z(a)[x] disable for modularDiophant
@@ -571,6 +574,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     fmpz_clear(FLINTD);
     #elif defined(HAVE_NTL)
     CanonicalForm discMipo= convertZZ2CF (NTLD);
+    #else
+    factoryError("NTL/FLINT missing: biFactorize");
     #endif
     findGoodPrime (F*discMipo,i);
     findGoodPrime (Aeval*discMipo,i);

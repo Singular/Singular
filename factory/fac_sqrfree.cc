@@ -11,6 +11,10 @@
 #include "cf_map.h"
 #include "cf_algorithm.h"
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h" // for __FLINT_RELEASE
+#endif
+
 static int
 compareFactors( const CFFactor & f, const CFFactor & g )
 {
@@ -149,7 +153,8 @@ sqrfPart (const CanonicalForm& F)
   return result;
 }
 
-#if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
+#if !defined(HAVE_NTL)
+#if !defined(HAVE_FLINT)||(__FLINT_RELEASE==20600)
 static int divexp = 1;
 
 static void divexpfunc ( CanonicalForm &, int & e )
@@ -204,4 +209,5 @@ CFFList sqrFreeFp ( const CanonicalForm & f )
     }
     return F;
 }
+#endif
 #endif
