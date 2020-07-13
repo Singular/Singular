@@ -107,6 +107,8 @@ CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
   zz_pEX NTL_alpha_mipo= convertFacCF2NTLzz_pEX (getMipo(alpha), NTL_mipo);
   zz_pE root= FindRoot (NTL_alpha_mipo);
   return convertNTLzzpE2CF (root, beta);
+  #else
+  factoryError("NTL/FLINT missing: mapUp");
   #endif
 }
 
@@ -361,6 +363,9 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
     zz_p::init (p);
   }
   zz_pX NTL_mipo;
+  #else
+  factoryError("NTL/FLINT missing: primitiveElement");
+  return CanonicalForm(0);
   #endif
   CanonicalForm mipo2;
   primitive= false;
@@ -487,6 +492,8 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     zz_pEX NTLPrimElemMipo= convertFacCF2NTLzz_pEX (primElemMipo, NTLMipo);
     zz_pE root= FindRoot (NTLPrimElemMipo);
     return convertNTLzzpE2CF (root, beta);
+    #else
+    factoryError("NTL/FLINT missing: mapPrimElem");
     #endif
   }
 }
@@ -572,6 +579,9 @@ map (const CanonicalForm& primElem, const Variable& alpha,
     }
   }
   return (convertNTLzzpE2CF (roots[ind], beta));
+  #else
+  factoryError("NTL/FLINT missing: map");
+  return CanonicalForm(0);
   #endif
 }
 
@@ -671,6 +681,8 @@ findMinPoly (const CanonicalForm& F, const Variable& alpha)
   MinPolySeq (NTLMinPoly, pows, d);
 
   return convertNTLzzpX2CF (NTLMinPoly, Variable (1));
+  #else
+  factoryError("NTL/FLINT missing: findMinPoly");
   #endif
 }
 #endif

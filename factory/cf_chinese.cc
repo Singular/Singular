@@ -218,6 +218,8 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
     ZZ NTLq= convertFacCF2NTLZZ (q);
     ZZ bound;
     SqrRoot (bound, NTLq/2);
+#else
+   factoryError("NTL/FLINT missing:Farey");
 #endif
     for ( i = f; i.hasTerms(); i++ )
     {

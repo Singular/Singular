@@ -116,6 +116,8 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
           zz_pX NTLIrredpoly;
           BuildIrred (NTLIrredpoly, d*3);
           CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+          #else
+          factoryError("NTL/FLINT missing:gcd_test_one");
           #endif
           v2= rootOf (newMipo);
         }
@@ -131,6 +133,8 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
           zz_pX NTLIrredpoly;
           BuildIrred (NTLIrredpoly, d*2);
           CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+          #else
+          factoryError("NTL/FLINT missing:gcd_test_one");
           #endif
           v2= rootOf (newMipo);
         }
@@ -153,6 +157,8 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
         zz_pX NTLIrredpoly;
         BuildIrred (NTLIrredpoly, d*2);
         CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+        #else
+        factoryError("NTL/FLINT missing:gcd_test_one");
         #endif
         v2= rootOf (newMipo);
         imPrimElem= mapPrimElem (primElem, v, v2);
