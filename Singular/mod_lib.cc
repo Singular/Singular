@@ -13,7 +13,12 @@
 
 #define SI_BUILTIN_LIBSTR(name) (char*) #name ".so",
 
-const char * const si_builtin_libs[] = { SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR) NULL };
+const char * const si_builtin_libs[] = { SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR)
+#ifdef HAVE_FLINT
+                                        "flint.so",
+#endif
+                                        NULL };
+
 
 #undef SI_BUILTIN_LIBSTR
 
