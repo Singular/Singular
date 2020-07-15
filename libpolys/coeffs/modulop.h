@@ -252,10 +252,6 @@ static inline number npInversM (number c, const coeffs r)
 // The folloing is reused inside gnumpc.cc, gnumpfl.cc and longrat.cc
 long    npInt         (number &n, const coeffs r);
 
-// The folloing is reused inside tgb*.cc
-number  npMult        (number a, number b, const coeffs r);
-
 #define npEqualM(A,B,r)  ((A)==(B))
-
 
 #endif
