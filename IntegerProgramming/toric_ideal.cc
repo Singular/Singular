@@ -237,19 +237,7 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-
-/////////////////////// provide help text ///////////////////////////////////
-
   // handle the case of "missing" arguments
-
-  if((argc==2) && !strcmp(argv[1],"--help"))
-    // help required
-  {
-    system("less toric_ideal.hlp");
-    return 0;
-  }
-
-  else
     // invalid arguments
     cerr<<"USAGE: toric_ideal [options] matrix_file"<<endl
         <<"Type `toric_ideal --help' for help on options."<<endl;
