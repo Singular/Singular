@@ -24,7 +24,7 @@
 #endif
 
 #if !defined(HAVE_NTL)
-#if !defined(HAVE_FLINT) || (__FLINT_RELEASE==20600)
+#if (!defined(HAVE_FLINT)) || (__FLINT_RELEASE<=20600)
 TIMING_DEFINE_PRINT(fac_choosePrimes)
 TIMING_DEFINE_PRINT(fac_facModPrimes)
 TIMING_DEFINE_PRINT(fac_liftFactors)

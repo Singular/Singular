@@ -154,7 +154,7 @@ sqrfPart (const CanonicalForm& F)
 }
 
 #if !defined(HAVE_NTL)
-#if !defined(HAVE_FLINT)||(__FLINT_RELEASE==20600)
+#if !defined(HAVE_FLINT)||(__FLINT_RELEASE<=20600)
 static int divexp = 1;
 
 static void divexpfunc ( CanonicalForm &, int & e )

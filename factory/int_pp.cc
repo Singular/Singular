@@ -17,7 +17,7 @@
 #endif
 
 #if !defined(HAVE_NTL)
-#if !defined(HAVE_FLINT)||(__FLINT_RELEASE==20600)
+#if !defined(HAVE_FLINT)||(__FLINT_RELEASE<=20600)
 GLOBAL_VAR mpz_t InternalPrimePower::primepow;
 GLOBAL_VAR mpz_t InternalPrimePower::primepowhalf;
 GLOBAL_VAR int InternalPrimePower::prime;
