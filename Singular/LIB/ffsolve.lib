@@ -313,6 +313,7 @@ ASSUME:         basering is a finite field of type (p^n,a)
   list partial_solutions;
   ideal partial_system, curr_sol, curr_sys, factors;
   poly univar_poly;
+  intvec ones = 1:nvars(basering);
   E = E+defaultIdeal();
   // check assumptions
   if(npars(basering)>1)
@@ -344,7 +345,7 @@ ASSUME:         basering is a finite field of type (p^n,a)
       factors = factorize(univar_poly,1);
       for(j=1; j<=ncols(factors); j++)
       {
-        if(deg(factors[j])==1)
+        if(deg(factors[j], ones)==1)
         {
           curr_sol = std(solutions[i]+ideal(factors[j]));
           curr_sys = reduce(E, curr_sol);
@@ -850,10 +851,9 @@ static proc linearReduce(ideal I, list mons)
     string minpolystr = "minpoly="
     +get_minpoly_str(size(original_ring),parstr(original_ring,1))+";" ;
   }
-  string old_vars = varstr(original_ring);
-  string new_vars = "@y(1.."+string( number_of_monomials )+")";
 
-  def ring_for_var_change = changevar( old_vars+","+new_vars, original_ring);
+  def ring_for_var_change = addNvarsTo(original_ring, number_of_monomials, "@y", 2);
+ 
   setring ring_for_var_change;
   if( prime_field == 0)
   {
@@ -876,6 +876,7 @@ static proc linearReduce(ideal I, list mons)
     linear_eqs = reduce(linear_eqs, C[i]);
   }
 
+  string new_vars = "@y(1.."+string( number_of_monomials )+")";
   def ring_for_elimination = changevar( new_vars, ring_for_var_change);
   setring ring_for_elimination;
   if( prime_field == 0)
