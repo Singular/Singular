@@ -1,0 +1,42 @@
+name: Run tests
+
+# Trigger the workflow on push or pull request
+on: [push, pull_request]
+
+env:
+  prefix: "/tmp/prefix"
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        configflags: ["", "--without-ntl --with-flint"]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install dependencies"
+        run: |
+               if [ "$RUNNER_OS" == "Linux" ]; then
+                    # sharutils is for uudecode
+                    sudo apt install sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev 4ti2 normaliz
+                    # install new enough FLINT (>= 2.6.0)
+                    wget -O FLINT.tar.gz "https://github.com/JuliaBinaryWrappers/FLINT_jll.jl/releases/download/FLINT-v2.6.0%2B0/FLINT.v2.6.0.x86_64-linux-gnu.tar.gz"
+                    sudo tar -C /usr -xvf FLINT.tar.gz
+                    rm -f FLINT.tar.gz
+               elif [ "$RUNNER_OS" == "macOS" ]; then
+                    brew install autoconf automake libtool gmp readline mpfr ntl flint cddlib
+                    # TODO: 4ti2?
+                    # TODO: normaliz?
+               else
+                    echo "$RUNNER_OS not supported"
+                    exit 1
+               fi
+      - run: ./autogen.sh
+      - run: ./configure --prefix=$prefix --enable-gfanlib ${{ matrix.configflags }}
+      - run: make -j3
+      - run: make check
+      - run: make install
+
+# TODO: code coverage?
