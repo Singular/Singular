@@ -2286,60 +2286,142 @@ void
 {
   int i;
   int s = place_holders.size ();
-  for(i = 0; i < s; i++)
-  {
-    DataNoroCacheNode *ref = place_holders[i].ref;
-    number coef = place_holders[i].coef;
-    if(ref->value_len == backLinkCode)
-    {
-      row[ref->term_index] = npAddM (row[ref->term_index], coef);
-    }
-    else
-    {
-#ifndef NORO_SPARSE_ROWS_PRE
-      DenseRow *ref_row = ref->row;
-      if(ref_row == NULL)
-        continue;
-      number *ref_begin = ref_row->array;
-      number *ref_end = ref_row->array + (ref_row->end - ref_row->begin);
-      number *my_pos = row + ref_row->begin;
-      //TODO npisOne distinction
-      if(!(npIsOne (coef)))
-      {
-        while(ref_begin != ref_end)
-        {
 
-          *my_pos = npAddM (*my_pos, npMult (coef, *ref_begin));
-          ++ref_begin;
-          ++my_pos;
-        }
+  if (currRing->cf-ch<=NV_MAX_PRIME)
+  {
+    for(i = 0; i < s; i++)
+    {
+      DataNoroCacheNode *ref = place_holders[i].ref;
+      number coef = place_holders[i].coef;
+      if(ref->value_len == backLinkCode)
+      {
+        row[ref->term_index] = npAddM (row[ref->term_index], coef);
       }
       else
       {
-        while(ref_begin != ref_end)
+  #ifndef NORO_SPARSE_ROWS_PRE
+        DenseRow *ref_row = ref->row;
+        if(ref_row == NULL)
+          continue;
+        number *ref_begin = ref_row->array;
+        number *ref_end = ref_row->array + (ref_row->end - ref_row->begin);
+        number *my_pos = row + ref_row->begin;
+        //TODO npisOne distinction
+        if(!(npIsOne (coef)))
         {
-
-          *my_pos = npAddM (*my_pos, *ref_begin);
-          ++ref_begin;
-          ++my_pos;
+          while(ref_begin != ref_end)
+          {
+            *my_pos = npAddM (*my_pos, npMult (coef, *ref_begin));
+            ++ref_begin;
+            ++my_pos;
+          }
         }
-      }
+        else
+        {
+          while(ref_begin != ref_end)
+          {
 
-#else
-      SparseRow *ref_row = ref->row;
-      if(ref_row == NULL)
-        continue;
-      int n = ref_row->len;
-      int j;
-      int *idx_array = ref_row->idx_array;
-      number *coef_array = ref_row->coef_array;
-      for(j = 0; j < n; j++)
-      {
-        int idx = idx_array[j];
-        number ref_coef = coef_array[j];
-        row[idx] = npAddM (row[idx], npMult (coef, ref_coef));
+            *my_pos = npAddM (*my_pos, *ref_begin);
+            ++ref_begin;
+            ++my_pos;
+          }
+        }
+  #else
+        SparseRow *ref_row = ref->row;
+        if(ref_row == NULL)
+          continue;
+        int n = ref_row->len;
+        int j;
+        int *idx_array = ref_row->idx_array;
+        number *coef_array = ref_row->coef_array;
+        if(!(npIsOne (coef)))
+        {
+          for(j = 0; j < n; j++)
+          {
+            int idx = idx_array[j];
+            number ref_coef = coef_array[j];
+            row[idx] = npAddM (row[idx], npMult (coef, ref_coef));
+          }
+        }
+        else
+        {
+          for(j = 0; j < n; j++)
+          {
+            int idx = idx_array[j];
+            number ref_coef = coef_array[j];
+            row[idx] = npAddM (row[idx], ref_coef);
+          }
+        }
+  #endif
       }
-#endif
+    }
+  }
+  else /*ch >NV_MAX_PRIME */
+  {
+    for(i = 0; i < s; i++)
+    {
+      DataNoroCacheNode *ref = place_holders[i].ref;
+      number coef = place_holders[i].coef;
+      if(ref->value_len == backLinkCode)
+      {
+        row[ref->term_index] = npAddM (row[ref->term_index], coef);
+      }
+      else
+      {
+  #ifndef NORO_SPARSE_ROWS_PRE
+        DenseRow *ref_row = ref->row;
+        if(ref_row == NULL)
+          continue;
+        number *ref_begin = ref_row->array;
+        number *ref_end = ref_row->array + (ref_row->end - ref_row->begin);
+        number *my_pos = row + ref_row->begin;
+        //TODO npisOne distinction
+        if(!(npIsOne (coef)))
+        {
+          while(ref_begin != ref_end)
+          {
+            *my_pos = npAddM (*my_pos, nvMult (coef, *ref_begin));
+            ++ref_begin;
+            ++my_pos;
+          }
+        }
+        else
+        {
+          while(ref_begin != ref_end)
+          {
+            *my_pos = npAddM (*my_pos, *ref_begin);
+            ++ref_begin;
+            ++my_pos;
+          }
+        }
+  #else
+        SparseRow *ref_row = ref->row;
+        if(ref_row == NULL)
+          continue;
+        int n = ref_row->len;
+        int j;
+        int *idx_array = ref_row->idx_array;
+        number *coef_array = ref_row->coef_array;
+        if(!(npIsOne (coef)))
+        {
+          for(j = 0; j < n; j++)
+          {
+            int idx = idx_array[j];
+            number ref_coef = coef_array[j];
+            row[idx] = npAddM (row[idx], nvMult (coef, ref_coef));
+          }
+        }
+        else
+        {
+          for(j = 0; j < n; j++)
+          {
+            int idx = idx_array[j];
+            number ref_coef = coef_array[j];
+            row[idx] = npAddM (row[idx], ref_coef);
+          }
+        }
+  #endif
+      }
     }
   }
 }
@@ -3308,12 +3390,12 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   add_later = idInit (ADD_LATER_SIZE, S->rank);
 #ifdef USE_NORO
   use_noro = ((!(nc)) && (S->rank <= 1) && (rField_is_Zp (r))
-              && (!(eliminationProblem)) && (n_GetChar(currRing->cf) <= 32003));
+              && (!(eliminationProblem)) && (n_GetChar(currRing->cf) <= NV_MAX_PRIME));
   use_noro_last_block = false;
   if((!(use_noro)) && (lastDpBlockStart <= (currRing->N)))
   {
     use_noro_last_block = ((!(nc)) && (S->rank <= 1) && (rField_is_Zp (r))
-                           && (n_GetChar(currRing->cf) <= 32003));
+                           && (n_GetChar(currRing->cf) <= NV_MAX_PRIME));
   }
 #else
   use_noro = false;
