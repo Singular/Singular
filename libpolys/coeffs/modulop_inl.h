@@ -34,6 +34,13 @@ static inline number npInit (long i, const coeffs r)
   return c;
 }
 
+static inline BOOLEAN npIsZero (number  a, const coeffs r)
+{
+  n_Test(a, r);
+
+  return 0 == (long)a;
+}
+
 #ifdef NV_OPS
 // -----------------------------------------------------------
 //  operation for very large primes (32749< p < 2^31-1)

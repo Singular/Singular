@@ -26,7 +26,6 @@
 BOOLEAN npGreaterZero (number k, const coeffs r);
 long    npInt         (number &n, const coeffs r);
 void    npPower       (number a, int i, number * result,const coeffs r);
-BOOLEAN npIsZero      (number a,const coeffs r);
 BOOLEAN npIsMOne       (number a,const coeffs r);
 number  npDiv         (number a, number b,const coeffs r);
 number  npNeg         (number c,const coeffs r);
@@ -89,13 +88,6 @@ long npInt(number &n, const coeffs r)
 
   if ((long)n > (((long)r->ch) >>1)) return ((long)n -((long)r->ch));
   else                               return ((long)n);
-}
-
-BOOLEAN npIsZero (number  a, const coeffs r)
-{
-  n_Test(a, r);
-
-  return 0 == (long)a;
 }
 
 BOOLEAN npIsMOne (number a, const coeffs r)
