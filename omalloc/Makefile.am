@@ -44,7 +44,11 @@ omTables.inc:
 	./omTables$(BUILD_EXEEXT) > omTables.xx && mv omTables.xx  omTables.inc
 
 omTables.h:
-	$(MAKE) $(AM_MAKEFLAGS) CC="${CC_FOR_BUILD}" CFLAGS="${CFLAGS_FOR_BUILD}" LDFLAGS="$(LDFLAGS_FOR_BUILD)" omTables1
+	$(MAKE) $(AM_MAKEFLAGS) \
+	CPPFLGAS="$(AM_CPPFLAGS) $(CPPFLAGS_FOR_BUILD) -DOM_GENERATE_INC" \
+	CC="${CC_FOR_BUILD}" \
+	CFLAGS="${CFLAGS_FOR_BUILD}" \
+	LDFLAGS="$(LDFLAGS_FOR_BUILD)" omTables1
 	./omTables1$(BUILD_EXEEXT) >omTables.yy && mv omTables.yy omTables.h
 
 noinst_PROGRAMS = omTables omTables1
