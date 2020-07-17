@@ -66,10 +66,6 @@ using std::vector;
 #include "kernel/GBEngine/kInline.h"
 #include "kernel/GBEngine/kstd1.h"
 
-
-#define npNeg npNegM
-#define npInvers npInversM
-
 #include "coeffs/modulop_inl.h" // npInit, npMult
 
 class PolySimple
@@ -773,7 +769,7 @@ template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(po
 
     poly exp_diff=cache->temp_term;
     p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
-    p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat,c->r->cf),c->r->cf),c->r);
+    p_SetCoeff(exp_diff,npNegM(npInversM(coefstrat,c->r->cf),c->r->cf),c->r);
     p_Setm(exp_diff,c->r);
     assume(c->strat->S[i]!=NULL);
 
@@ -1571,7 +1567,7 @@ public:
     int other_row;
     assume(!(npIsZero((number)(long) row_array[start],currRing->cf)));
     if (!(npIsOne((number)(long) coef,currRing->cf)))
-      multiplyRow(r,F4mat_to_number_type(npInvers((number)(long) coef,currRing->cf)));
+      multiplyRow(r,F4mat_to_number_type(npInversM((number)(long) coef,currRing->cf)));
     assume(npIsOne((number)(long) row_array[start],currRing->cf));
     int lastIndex=modP_lastIndexRow(row_array, ncols);
     number minus_one=npInit(-1, currRing->cf);
@@ -1584,7 +1580,7 @@ public:
         {
           int i;
           number_type* other_row_array=rows[other_row];
-          number coef2=npNeg((number)(long) other_row_array[start],currRing->cf);
+          number coef2=npNegM((number)(long) other_row_array[start],currRing->cf);
           if (coef2==minus_one)
           {
             for(i=start;i<=lastIndex;i++)
@@ -1619,7 +1615,7 @@ public:
         {
           int i;
           number_type* other_row_array=rows[other_row];
-          number coef2=npNeg((number)(long) other_row_array[start],currRing->cf);
+          number coef2=npNegM((number)(long) other_row_array[start],currRing->cf);
           if (coef2==minus_one)
           {
             for(i=start;i<=lastIndex;i++)
@@ -1778,7 +1774,7 @@ public:
     if (!(npIsOne((number)(long) row_array[r],currRing->cf)))
     {
       //it should be one, but this safety is not expensive
-      multiplyRow(r, F4mat_to_number_type(npInvers((number)(long) row_array[start],currRing->cf)));
+      multiplyRow(r, F4mat_to_number_type(npInversM((number)(long) row_array[start],currRing->cf)));
     }
     int lastIndex=modP_lastIndexRow(row_array, ncols);
     assume(lastIndex<ncols);
@@ -1791,7 +1787,7 @@ public:
         if (lastReducibleIndices[other_row]==start)
         {
           number_type* other_row_array=rows[other_row];
-          number coef=npNeg((number)(long) other_row_array[start],currRing->cf);
+          number coef=npNegM((number)(long) other_row_array[start],currRing->cf);
           assume(!(npIsZero(coef,currRing->cf)));
           int i;
           assume(start>startIndices[other_row]);
@@ -1814,7 +1810,7 @@ public:
         if (lastReducibleIndices[other_row]==start)
         {
           number_type* other_row_array=rows[other_row];
-          number coef=npNeg((number)(long) other_row_array[start],currRing->cf);
+          number coef=npNegM((number)(long) other_row_array[start],currRing->cf);
           assume(!(npIsZero(coef,currRing->cf)));
           int i;
           assume(start>startIndices[other_row]);
