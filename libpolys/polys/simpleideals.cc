@@ -937,6 +937,11 @@ int binom (int n,int r)
     }
     result /= i;
   }
+  if (result>MAX_INT)
+  {
+    Werror("int overflow in binom");
+    result=MAX_INT;
+  }
   return (int)result;
 }
 
@@ -947,7 +952,7 @@ ideal id_FreeModule (int i, const ring r)
   assume(i >= 0);
   if (r->isLPring)
   {
-	PrintS("In order to address bimodules, the command freeAlgebra should be used.");  
+    PrintS("In order to address bimodules, the command freeAlgebra should be used.");
   }
   ideal h = idInit(i, i);
 
