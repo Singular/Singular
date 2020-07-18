@@ -921,7 +921,8 @@ int idGetNumberOfChoise(int t, int d, int begin, int end, int * choise)
 */
 int binom (int n,int r)
 {
-  int i,result;
+  int i;
+  int64 result;
 
   if (r==0) return 1;
   if (n-r<r) return binom(n,n-r);
@@ -936,7 +937,7 @@ int binom (int n,int r)
     }
     result /= i;
   }
-  return result;
+  return (int)result;
 }
 
 
