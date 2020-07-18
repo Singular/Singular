@@ -27,6 +27,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_SANITY_CHECK
 
 AX_PROG_CC_FOR_BUILD
+AC_SUBST(BUILD_EXEEXT)
 
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([omConfig.h],[],[_config.h])

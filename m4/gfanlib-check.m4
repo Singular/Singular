@@ -22,9 +22,33 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  AC_MSG_CHECKING([whether libcddgmp is usable])
 
- BACKUP_LIBS=$LIBS
+# Check whether --with-gmp was given.
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+if test "$with_gmp" = yes ; then
+	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+elif test "$with_gmp" != no ; then
+	GMP_HOME_PATH="$with_gmp ${DEFAULT_CHECKING_PATH}"
+fi
 
- LIBS="-lcddgmp -lgmp $GMP_LIBS $LIBS"
+BACKUP_CFLAGS=${CFLAGS}
+BACKUP_LIBS=${LIBS}
+
+for GMP_HOME in ${GMP_HOME_PATH}
+do
+  if test "x$GMP_HOME" != "x/usr"; then
+    if test -e ${GMP_HOME}/include/gmp.h; then
+      GMP_CPPFLAGS="-I${GMP_HOME}/include"
+      GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+    fi
+  fi
+done
+if test -z "${GMP_LIBS}"
+then
+  GMP_LIBS="-lgmp"
+fi
+
+LIBS="-lcddgmp $GMP_LIBS $LIBS"
 
  AC_LANG_PUSH(C++)
  AC_LINK_IFELSE(
@@ -75,8 +99,6 @@ else
  AC_MSG_RESULT(no)
  PASSED_ALL_TESTS_FOR_GFANLIB="0"
 fi
-
-
 
 AM_CONDITIONAL(HAVE_GFANLIB, test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1)
 AC_DEFINE_UNQUOTED(HAVE_GFANLIB, ${PASSED_ALL_TESTS_FOR_GFANLIB}, [whether gfanlib support is enabled])

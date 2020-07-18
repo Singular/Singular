@@ -13,7 +13,7 @@ dnl FLINT_CFLAGS and FLINT_LIBS
 
 AC_DEFUN([LB_CHECK_FLINT],
 [
-DEFAULT_CHECKING_PATH="/sw /opt/local"
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 
 AC_ARG_WITH(flint,
 [  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have

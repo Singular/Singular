@@ -207,6 +207,7 @@ DX_INIT_DOXYGEN($PACKAGE_NAME, doxygen.cfg, $srcdir/docu)
 AC_CHECK_LIB(m, atof, , [ AC_MSG_ERROR(libm.a not found) ])
 
 # Check whether --with-gmp was given.
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 if test "${with_gmp+set}" = set; then :
   if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
