@@ -930,17 +930,12 @@ int binom (int n,int r)
   for (i=2;i<=r;i++)
   {
     result *= n-r+i;
-    if (result<0)
-    {
-      WarnS("overflow in binomials");
-      return 0;
-    }
     result /= i;
   }
-  if (result>MAX_INT)
+  if (result>MAX_INT_VAL)
   {
-    Werror("int overflow in binom");
-    result=MAX_INT;
+    WarnS("overflow in binomials");
+    result=0;
   }
   return (int)result;
 }
