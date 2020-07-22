@@ -181,6 +181,7 @@ non-commutative rings: @sc{Plural}, @sc{Sca} and @sc{Letterplace}.
 * Functions  (letterplace)::
 * Mathematical background (letterplace)::
 * LETTERPLACE libraries::
+* Release Notes (letterplace)::
 @end menu
 @include s-plural.tex
 @include s-plulibs.tex
