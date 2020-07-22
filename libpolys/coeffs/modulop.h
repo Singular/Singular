@@ -168,10 +168,6 @@ static inline number npNegM(number a, const coeffs r)
   return (number)((long)(r->ch)-(long)(a));
 }
 
-static inline BOOLEAN npIsZeroM (number  a, const coeffs)
-{
-  return 0 == (long)a;
-}
 static inline BOOLEAN npIsOne (number a, const coeffs)
 {
   return 1 == (long)a;

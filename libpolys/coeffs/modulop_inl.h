@@ -34,11 +34,12 @@ static inline number npInit (long i, const coeffs r)
   return c;
 }
 
+#define npIsZeroM(A,B) (0==(long)A)
 static inline BOOLEAN npIsZero (number  a, const coeffs r)
 {
   n_Test(a, r);
 
-  return 0 == (long)a;
+  return npIsZeroM(a,r);
 }
 
 #ifdef NV_OPS
