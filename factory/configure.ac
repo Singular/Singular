@@ -30,6 +30,7 @@ AX_PREFIX_CONFIG_H([config.h],[],[_config.h])
 #
 # - check for CC and CXX but be careful about CFLAGS.
 #
+AC_CHECK_SIZEOF(long,4)
 SING_RESET_FLAGS()
 SING_CHECK_SET_ARGS()
 
