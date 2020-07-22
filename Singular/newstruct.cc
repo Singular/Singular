@@ -89,8 +89,8 @@ char * newstruct_String(blackbox *b, void *d)
     {
       StringAppendS(a->name);
       StringAppendS("=");
-      if ((!RingDependend(a->typ))
-      || ((l->m[a->pos-1].data==(void *)currRing)
+      if (((!RingDependend(a->typ)&&!RingDependend(l->m[a->pos].rtyp)))
+      || ((rEqual((ring)l->m[a->pos-1].data,currRing))
          && (currRing!=NULL)))
       {
         if (l->m[a->pos].rtyp==LIST_CMD)
@@ -646,7 +646,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
     f->m->Write(f,&(ll->m[i]));
   }
   omFreeSize(rings,Ll+1);
-  if (ring_changed)
+  if (ring_changed && (save_ring!=NULL))
     f->m->SetRing(f,save_ring,FALSE);
   return FALSE;
 }
