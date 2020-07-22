@@ -808,9 +808,12 @@ void ssiReadBlackbox(leftv res, si_link l)
   blackboxIsCmd(name,tok);
   if (tok>MAX_TOK)
   {
+    ring save_ring=currRing;
     blackbox *b=getBlackboxStuff(tok);
     res->rtyp=tok;
     b->blackbox_deserialize(&b,&(res->data),l);
+    if (save_ring!=currRing)
+      rChangeCurrRing(save_ring);
   }
   else
   {
