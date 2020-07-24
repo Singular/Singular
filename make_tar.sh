@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Hannes helper to build tar files for the ftp server
+# for the patch-versions (version between official releases x.x.x)
+# for official versions: use "make dist"/"make distcheck"
 
 set -e
 
@@ -8,6 +10,10 @@ VERSION=4.1.3
 INSTALL_DIR=/tmp2/wawa-i
 BUILD_DIR=/tmp2/wawa
 export VERSION TARVERSION INSTALL_DIR BUILD_DIR
+
+# sanity check
+if test -e $BUILD_DIR/singularconfig.h
+then
 
 git archive --prefix=singular-$VERSION/ HEAD |tar xf -
 mkdir singular-$VERSION/doc
@@ -40,3 +46,10 @@ cp $INSTALL_DIR/share/singular/LIB/all.lib  singular-$VERSION/Singular/LIB/.
 tar cf singular-$TARVERSION.tar singular-$VERSION
 gzip -9 -f singular-$TARVERSION.tar
 command rm -rf singular-$VERSION
+
+else
+  echo BUILD_DIR is not set correctly, use
+  echo make dist
+  echo in a configured directory
+  exit 1
+fi
