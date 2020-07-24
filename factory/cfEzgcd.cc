@@ -1034,6 +1034,8 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         zz_pX NTLIrredpoly;
         BuildIrred (NTLIrredpoly, d*3);
         CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+        #else
+        factoryError("NTL/FLINT missing: EZGCD_P");
         #endif
         v2= rootOf (newMipo);
       }
@@ -1054,6 +1056,8 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         zz_pX NTLIrredpoly;
         BuildIrred (NTLIrredpoly, d*2);
         CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+        #else
+        factoryError("NTL/FLINT missing: EZGCD_P");
         #endif
         v2= rootOf (newMipo);
       }
@@ -1081,6 +1085,8 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       zz_pX NTLIrredpoly;
       BuildIrred (NTLIrredpoly, d*2);
       CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+      #else
+      factoryError("NTL/FLINT missing: EZGCD_P");
       #endif
       v2= rootOf (newMipo);
       imPrimElem= mapPrimElem (primElem, a, v2);

@@ -921,7 +921,8 @@ int idGetNumberOfChoise(int t, int d, int begin, int end, int * choise)
 */
 int binom (int n,int r)
 {
-  int i,result;
+  int i;
+  int64 result;
 
   if (r==0) return 1;
   if (n-r<r) return binom(n,n-r);
@@ -929,14 +930,14 @@ int binom (int n,int r)
   for (i=2;i<=r;i++)
   {
     result *= n-r+i;
-    if (result<0)
-    {
-      WarnS("overflow in binomials");
-      return 0;
-    }
     result /= i;
   }
-  return result;
+  if (result>MAX_INT_VAL)
+  {
+    WarnS("overflow in binomials");
+    result=0;
+  }
+  return (int)result;
 }
 
 
@@ -946,7 +947,7 @@ ideal id_FreeModule (int i, const ring r)
   assume(i >= 0);
   if (r->isLPring)
   {
-	PrintS("In order to address bimodules, the command freeAlgebra should be used.");  
+    PrintS("In order to address bimodules, the command freeAlgebra should be used.");
   }
   ideal h = idInit(i, i);
 

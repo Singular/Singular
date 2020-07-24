@@ -64,6 +64,9 @@ SOURCES = \
 		facFactorize.cc \
 		fac_sqrfree.cc \
 		fac_util.cc \
+		fac_berlekamp.cc \
+		fac_cantzass.cc \
+		fac_univar.cc \
 		facFqBivar.cc \
 		facFqBivarUtil.cc \
 		facFqFactorize.cc \
@@ -83,6 +86,7 @@ SOURCES = \
 		int_intdiv.cc \
 		int_poly.cc \
 		int_rat.cc \
+		int_pp.cc \
 		variable.cc \
 		NTLconvert.cc \
 		singext.cc \
@@ -144,6 +148,9 @@ factory_headers = \
 		facFactorize.h \
 		fac_sqrfree.h \
 		fac_util.h \
+		fac_berlekamp.h \
+		fac_cantzass.h \
+		fac_univar.h \
 		facFqBivar.h \
 		facFqBivarUtil.h \
 		facFqFactorize.h \
@@ -163,6 +170,7 @@ factory_headers = \
 		int_int.h \
 		int_poly.h \
 		int_rat.h \
+		int_pp.h \
 		timing.h \
 		variable.h \
 		NTLconvert.h \

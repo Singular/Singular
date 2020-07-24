@@ -21,6 +21,7 @@
 
 
 #include "cf_assert.h"
+#include "cf_util.h"
 #include "debug.h"
 #include "timing.h"
 
@@ -840,6 +841,8 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
   zz_pX NTLIrredpoly;
   BuildIrred (NTLIrredpoly, i*m);
   CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+  #else
+  factoryError("NTL/FLINT missing: chooseExtension");
   #endif
   return rootOf (newMipo);
 }

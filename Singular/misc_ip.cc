@@ -806,7 +806,8 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_FLINT
               StringAppend("FLINT(%s),",FLINT_VERSION);
 #endif
-              StringAppendS("factory(" FACTORYVERSION "),\n\t");
+//              StringAppendS("factory(" FACTORYVERSION "),\n\t");
+              StringAppendS("\n\t");
 #ifndef HAVE_OMALLOC
               StringAppendS("xalloc,");
 #else
@@ -924,8 +925,8 @@ char * versionString(/*const bool bShowDetails = false*/ )
               "(ver: " __VERSION__ ")"
 #endif
               "\n",AC_CONFIGURE_ARGS, CC,CFLAGS " " PTHREAD_CFLAGS,
-	      CXX,CXXFLAGS " " PTHREAD_CFLAGS,  DEFS,CPPFLAGS,  LDFLAGS,
-	      LIBS " " PTHREAD_LIBS);
+              CXX,CXXFLAGS " " PTHREAD_CFLAGS,  DEFS,CPPFLAGS,  LDFLAGS,
+              LIBS " " PTHREAD_LIBS);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppendS("\n");
@@ -1262,6 +1263,29 @@ static BOOLEAN ii_FlintQrat_init(leftv res,leftv a)
   return FALSE;
 }
 #endif
+extern "C" int flint_mod_init(SModulFunctions* psModulFunctions)
+{
+    package save=currPack;
+    currPack=basePack;
+    n_FlintQ=nRegister(n_unknown,flintQ_InitChar);
+    if (n_FlintQ!=n_unknown)
+    {
+      iiAddCproc("kernel","flintQp",FALSE,ii_FlintQ_init);
+      nRegisterCfByName(flintQInitCfByName,n_FlintQ);
+    }
+#if __FLINT_RELEASE >= 20503
+    iiAddCproc("kernel","flintQ",FALSE,ii_FlintQrat_init);
+    nRegisterCfByName(flintQInitCfByName,n_FlintQ);
+#endif
+    n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
+    if (n_FlintZn!=n_unknown)
+    {
+      iiAddCproc("kernel","flintZn",FALSE,ii_FlintZn_init);
+      nRegisterCfByName(flintZnInitCfByName,n_FlintZn);
+    }
+    currPack=save;
+    return MAX_TOK;
+}
 #endif
 
 static BOOLEAN iiFloat(leftv res, leftv pnn)
@@ -1424,24 +1448,6 @@ void siInit(char *name)
     //IDDATA(h)=(char*)nInitChar(n_R,NULL);
     //h=enterid("CC",0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
     //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
-    #ifdef HAVE_FLINT
-    n_FlintQ=nRegister(n_unknown,flintQ_InitChar);
-    if (n_FlintQ!=n_unknown)
-    {
-      iiAddCproc("kernel","flintQp",FALSE,ii_FlintQ_init);
-      nRegisterCfByName(flintQInitCfByName,n_FlintQ);
-    }
-#if __FLINT_RELEASE >= 20503
-    iiAddCproc("kernel","flintQ",FALSE,ii_FlintQrat_init);
-    nRegisterCfByName(flintQInitCfByName,n_FlintQ);
-#endif
-    n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
-    if (n_FlintZn!=n_unknown)
-    {
-      iiAddCproc("kernel","flintZn",FALSE,ii_FlintZn_init);
-      nRegisterCfByName(flintZnInitCfByName,n_FlintZn);
-    }
-    #endif
   }
 // setting routines for PLURAL QRINGS:
 // allowing to use libpolys without libSingular(kStd)

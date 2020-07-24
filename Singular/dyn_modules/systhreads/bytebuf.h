@@ -32,6 +32,7 @@ public:
     pos = 0;
     buf = allocate_space(cap);
     memcpy(buf, other.buf, count);
+    return *this;
   }
   ~ByteBuf() {
     free_space(cap, buf);

@@ -43,7 +43,10 @@ int newstruct_desc_size()
 {
   return sizeof(newstruct_desc_s);
 }
-
+static inline int NeedShadowRing(int t)
+{
+  return (RingDependend(t)|| (t==DEF_CMD) ||(t==LIST_CMD));
+}
 char * newstruct_String(blackbox *b, void *d)
 {
   if (d==NULL) return omStrDup("oo");
@@ -86,8 +89,8 @@ char * newstruct_String(blackbox *b, void *d)
     {
       StringAppendS(a->name);
       StringAppendS("=");
-      if ((!RingDependend(a->typ))
-      || ((l->m[a->pos-1].data==(void *)currRing)
+      if (((!RingDependend(a->typ)&&!RingDependend(l->m[a->pos].rtyp)))
+      || ((rEqual((ring)l->m[a->pos-1].data,currRing))
          && (currRing!=NULL)))
       {
         if (l->m[a->pos].rtyp==LIST_CMD)
@@ -95,10 +98,10 @@ char * newstruct_String(blackbox *b, void *d)
           StringAppendS("<list>");
         }
         else if (l->m[a->pos].rtyp==STRING_CMD)
-	{
+        {
           StringAppendS((char*)l->m[a->pos].Data());
-	}
-	else
+        }
+        else
         {
           char *tmp2=omStrDup(l->m[a->pos].String());
           if ((strlen(tmp2)>80)||(strchr(tmp2,'\n')!=NULL))
@@ -352,7 +355,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
           {
             nm=nt->member;
             while ((nm!=NULL)&&(strcmp(nm->name,a2->name+2)!=0)) nm=nm->next;
-            if ((nm!=NULL)&&(RingDependend(nm->typ)))
+            if ((nm!=NULL)&&(NeedShadowRing(nm->typ)))
               search_ring=TRUE;
             else
               nm=NULL;
@@ -549,7 +552,7 @@ void *newstruct_Init(blackbox *b)
   while (nm!=NULL)
   {
     l->m[nm->pos].rtyp=nm->typ;
-    if (RingDependend(nm->typ) ||(nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
+    if (NeedShadowRing(nm->typ))
     {
       l->m[nm->pos-1].rtyp=RING_CMD;
       l->m[nm->pos-1].data=currRing; //idrecDataInit may create ringdep obj.
@@ -643,7 +646,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
     f->m->Write(f,&(ll->m[i]));
   }
   omFreeSize(rings,Ll+1);
-  if (ring_changed)
+  if (ring_changed && (save_ring!=NULL))
     f->m->SetRing(f,save_ring,FALSE);
   return FALSE;
 }
@@ -754,7 +757,7 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
       return NULL;
     }
     if (t==QRING_CMD) t=RING_CMD;
-    else if (RingDependend(t) || (t==DEF_CMD)||(t==LIST_CMD))
+    else if (NeedShadowRing(t))
       res->size++;    // one additional field for the ring (before the data)
     //Print("found type %s at real-pos %d",start,res->size);
     elem=(newstruct_member)omAlloc0(sizeof(*elem));
@@ -846,7 +849,7 @@ void newstructShow(newstruct_desc d)
   while (elem!=NULL)
   {
     Print(">>%s<< at pos %d, type %d (%s)\n",elem->name,elem->pos,elem->typ,Tok2Cmdname(elem->typ));
-    if (RingDependend(elem->typ)|| (elem->typ==DEF_CMD) ||(elem->typ==LIST_CMD))
+    if (NeedShadowRing(elem->typ))
       Print(">>r_%s<< at pos %d, shadow ring\n",elem->name,elem->pos-1);
     elem=elem->next;
   }

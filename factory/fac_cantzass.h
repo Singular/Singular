@@ -3,7 +3,7 @@
 #ifndef INCL_FAC_CANTZASS_H
 #define INCL_FAC_CANTZASS_H
 
-// #include "config.h"
+#include <config.h>
 
 #include "variable.h"
 #include "canonicalform.h"

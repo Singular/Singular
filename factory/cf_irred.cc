@@ -48,6 +48,8 @@ randomIrredpoly (int i, const Variable & x)
   zz_pX NTLirredpoly;
   BuildIrred (NTLirredpoly, i);
   CanonicalForm CFirredpoly= convertNTLzzpX2CF (NTLirredpoly, x);
+  #else
+  factoryError("NTL/FLINT missing: randomIrredpoly");
   #endif
   return CFirredpoly;
 }

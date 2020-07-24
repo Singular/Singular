@@ -1,5 +1,6 @@
 LIB "tst.lib";
 tst_init();
+LIB"flint.so";
 
 link l1="ssi:w ss1.ssi";
 ring r1=ZZ,x,dp;

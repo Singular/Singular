@@ -798,10 +798,14 @@ extern "C"
 #  undef  SI_GET_BUILTIN_MOD_INIT0
 };
 
+extern "C" int flint_mod_init(SModulFunctions* psModulFunctions);
 
 SModulFunc_t
 iiGetBuiltinModInit(const char* libname)
 {
+#ifdef HAVE_FLINT
+  if (strcmp(libname,"flint.so")==0) return SI_MOD_INIT0(flint);
+#endif
 #  define SI_GET_BUILTIN_MOD_INIT(name) if (strcmp(libname, #name ".so") == 0){ return SI_MOD_INIT0(name); }
           SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT)
 #  undef  SI_GET_BUILTIN_MOD_INIT

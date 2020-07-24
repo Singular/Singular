@@ -20,6 +20,7 @@
 #define LEVELEXPR 1000001
 
 #define UndefinedDomain 32000
+#define PrimePowerDomain 5
 #define GaloisFieldDomain 4
 #define FiniteFieldDomain 3
 #define RationalDomain 2
@@ -45,7 +46,10 @@ static const int SW_USE_FF_MOD_GCD=7;
 static const int SW_USE_FL_GCD_P=8;
 /// set to 1 to use Flints gcd over Q/Z
 static const int SW_USE_FL_GCD_0=9;
+/// set to 1 to use Factorys Berlekamp alg.
+static const int SW_BERLEKAMP=10;
 
+static const int SW_FAC_QUADRATICLIFT=11;
 /*ENDPUBLIC*/
 
 #ifdef HAVE_OMALLOC

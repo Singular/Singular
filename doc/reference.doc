@@ -2343,6 +2343,7 @@ Require flint >=2.5.3.
 @item @strong{Example:}
 @smallexample
 @c example
+  LIB "flint.so";
   ring R1=flintQ(a,b),(x,y),dp;
   R1;
 @c example

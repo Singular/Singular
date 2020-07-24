@@ -276,19 +276,7 @@ int main(int argc, char *argv[])
     }
   }
 
-
-/////////////////////// provide help text ///////////////////////////////////
-
   // handle the case of "missing" arguments
-
-  if((argc==2) && !strcmp(argv[1],"--help"))
-    // help required
-  {
-    system("less solve_IP.hlp");
-    return 0;
-  }
-
-  else
     // invalid arguments
     cerr<<"USAGE: solve_IP [options] toric_file problem_file\n"
         <<"Type `solve_IP --help' for help on options.\n";

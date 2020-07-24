@@ -1,5 +1,11 @@
 #include "Singular/libsingular.h"
 
+#if !defined(__CYGWIN__) || defined(STATIC_VERSION)
+// acces from a module to routines from the main program
+// does not work on windows (restrict of the dynamic linker),
+// a static version is required:
+// ./configure --with-builtinmodules=subsets,...
+
 #include <vector>
 
 static void s_subset(std::vector<int> &arr, int size, int left, int index, std::vector<int> &l, std::vector<std::vector<int> > &L)
@@ -72,3 +78,4 @@ extern "C" int SI_MOD_INIT(subsets)(SModulFunctions* p)
   p->iiAddCproc("subsets.so","subsets",FALSE,subsets);
   return (MAX_TOK);
 }
+#endif

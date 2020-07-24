@@ -23,7 +23,7 @@ singmathic_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} ${MATHIC_LIBS} $(SINGULAR_LDF
 
 if SING_WIN
 if !SI_BUILTIN_SINGMATHIC
- singmathic_la_LIBADD = ${top_srcdir}/Singular/libSingular.la
+ singmathic_la_LIBADD = ${top_builddir}/Singular/libSingular.la
 endif
 endif
 

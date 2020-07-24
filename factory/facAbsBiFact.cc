@@ -140,6 +140,8 @@ choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec,
           ZZ NTLD2= discriminant (NTLf2);
           CanonicalForm D1= convertZZ2CF (NTLD1);
           CanonicalForm D2= convertZZ2CF (NTLD2);
+          #else
+          factoryError("NTL/FLINT missing: choosePoint");
           #endif
           if ((!f.isZero()) &&
               (abs(f)>cf_getSmallPrime (cf_getNumSmallPrimes()-1)))
@@ -541,6 +543,8 @@ differentevalpoint:
     delete M;
     M= convertNTLmat_ZZ2FacCFMatrix (*NTLM);
     delete NTLM;
+    #else
+    factoryError("NTL/FLINT missing: absBiFactorizeMain");
     #endif
 
     mipo= 0;
@@ -733,6 +737,8 @@ differentevalpoint:
   ZZ NTLf= resultant (NTLmipo, NTLLcf);
   ZZ NTLD= discriminant (NTLmipo);
   den= abs (convertZZ2CF (NTLD*NTLf));
+  #else
+  factoryError("NTL/FLINT missing: absBiFactorizeMain");
   #endif
 
   // make factors elements of Z(a)[x] disable for modularDiophant

@@ -107,6 +107,8 @@ CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
   zz_pEX NTL_alpha_mipo= convertFacCF2NTLzz_pEX (getMipo(alpha), NTL_mipo);
   zz_pE root= FindRoot (NTL_alpha_mipo);
   return convertNTLzzpE2CF (root, beta);
+  #else
+  factoryError("NTL/FLINT missing: mapUp");
   #endif
 }
 
@@ -351,7 +353,7 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   CanonicalForm mipo= getMipo (alpha);
   int d= degree (mipo);
   int p= getCharacteristic ();
-  #ifdef HAVE_FLINT
+  #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
   nmod_poly_t FLINT_mipo;
   nmod_poly_init(FLINT_mipo,p);
   #elif defined(HAVE_NTL)
@@ -361,6 +363,9 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
     zz_p::init (p);
   }
   zz_pX NTL_mipo;
+  #else
+  factoryError("NTL/FLINT missing: primitiveElement");
+  return CanonicalForm(0);
   #endif
   CanonicalForm mipo2;
   primitive= false;
@@ -368,7 +373,7 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
   bool initialized= false;
   do
   {
-    #ifdef HAVE_FLINT
+    #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
     nmod_poly_randtest_monic_irreducible(FLINT_mipo, FLINTrandom, d+1);
     mipo2=convertnmod_poly_t2FacCF(FLINT_mipo,Variable(1));
     #elif defined(HAVE_NTL)
@@ -385,7 +390,7 @@ primitiveElement (const Variable& alpha, Variable& beta, bool& fail)
     if (fail)
       return 0;
   } while (1);
-  #ifdef HAVE_FLINT
+  #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
   nmod_poly_clear(FLINT_mipo);
   // convert alpha_mipo
   nmod_poly_t alpha_mipo;
@@ -450,7 +455,7 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
   {
     CanonicalForm primElemMipo= findMinPoly (primElem, alpha);
     int p= getCharacteristic ();
-    #ifdef HAVE_FLINT
+    #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
     // convert mipo1
     nmod_poly_t mipo1;
     convertFacCF2nmod_poly_t(mipo1,getMipo(beta));
@@ -487,6 +492,8 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     zz_pEX NTLPrimElemMipo= convertFacCF2NTLzz_pEX (primElemMipo, NTLMipo);
     zz_pE root= FindRoot (NTLPrimElemMipo);
     return convertNTLzzpE2CF (root, beta);
+    #else
+    factoryError("NTL/FLINT missing: mapPrimElem");
     #endif
   }
 }
@@ -504,7 +511,7 @@ map (const CanonicalForm& primElem, const Variable& alpha,
     order++;
   }
   int p= getCharacteristic ();
-  #ifdef HAVE_FLINT
+  #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
   // convert mipo
   nmod_poly_t mipo1;
   convertFacCF2nmod_poly_t(mipo1,getMipo(beta));
@@ -572,10 +579,13 @@ map (const CanonicalForm& primElem, const Variable& alpha,
     }
   }
   return (convertNTLzzpE2CF (roots[ind], beta));
+  #else
+  factoryError("NTL/FLINT missing: map");
+  return CanonicalForm(0);
   #endif
 }
 
-#ifdef HAVE_FLINT
+#if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
 /*
     g is in Fp[x]
     F is in Fp[t]
@@ -630,7 +640,18 @@ findMinPoly (const CanonicalForm& F, const Variable& alpha)
 {
   ASSERT (F.isUnivariate() && F.mvar()==alpha,"expected element of F_p(alpha)");
 
-  #if defined(HAVE_NTL) && !defined(HAVE_FLINT)
+  #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
+  nmod_poly_t FLINT_F,FLINT_alpha,g;
+  nmod_poly_init(g,getCharacteristic());
+  convertFacCF2nmod_poly_t(FLINT_F,F);
+  convertFacCF2nmod_poly_t(FLINT_alpha,getMipo(alpha));
+  minpoly(g,FLINT_F,FLINT_alpha);
+  nmod_poly_clear(FLINT_alpha);
+  nmod_poly_clear(FLINT_F);
+  CanonicalForm res=convertnmod_poly_t2FacCF(g,Variable(1));
+  nmod_poly_clear(g);
+  return res;
+  #elif defined(HAVE_NTL)
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
@@ -660,17 +681,8 @@ findMinPoly (const CanonicalForm& F, const Variable& alpha)
   MinPolySeq (NTLMinPoly, pows, d);
 
   return convertNTLzzpX2CF (NTLMinPoly, Variable (1));
-  #elif defined(HAVE_FLINT)
-  nmod_poly_t FLINT_F,FLINT_alpha,g;
-  nmod_poly_init(g,getCharacteristic());
-  convertFacCF2nmod_poly_t(FLINT_F,F);
-  convertFacCF2nmod_poly_t(FLINT_alpha,getMipo(alpha));
-  minpoly(g,FLINT_F,FLINT_alpha);
-  nmod_poly_clear(FLINT_alpha);
-  nmod_poly_clear(FLINT_F);
-  CanonicalForm res=convertnmod_poly_t2FacCF(g,Variable(1));
-  nmod_poly_clear(g);
-  return res;
+  #else
+  factoryError("NTL/FLINT missing: findMinPoly");
   #endif
 }
 #endif

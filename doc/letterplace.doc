@@ -756,8 +756,8 @@ See
 * Free associative algebras::
 * Monomial orderings on free algebras::
 * Groebner bases for two-sided ideals in free associative algebras::
-* Letterplace correspondence::
 * Bimodules and syzygies and lifts::
+* Letterplace correspondence::
 @end menu
 
 @c ---------------------------------------------------------------------------

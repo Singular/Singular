@@ -89,6 +89,7 @@ AC_SUBST(CC)
 AC_CHECK_LIB(rt,clock_gettime)
 
 # Check whether --with-gmp was given.
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
@@ -108,8 +109,14 @@ do
     fi
   fi
 done
+if test -z "${GMP_LIBS}"
+then
+  GMP_LIBS="-lgmp"
+fi
+
 CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
-LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
+LIBS=" ${GMP_LIBS} ${BACKUP_LIBS}"
+
 AC_SUBST(GMP_CPPFLAGS)
 AC_SUBST(GMP_LIBS)
 

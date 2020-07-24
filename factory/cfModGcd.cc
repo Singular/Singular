@@ -1824,6 +1824,8 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   long rk= gauss (*NTLN);
   N= convertNTLmat_zz_pE2FacCFMatrix (*NTLN, alpha);
   delete NTLN;
+  #else
+  factoryError("NTL/FLINT missing: gaussianElimFq");
   #endif
   delete N;
 
@@ -1924,6 +1926,8 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   zz_pE::init (NTLMipo);
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
   long rk= gauss (*NTLN);
+  #else
+  factoryError("NTL/FLINT missing: solveSystemFq");
   #endif
 
   delete N;

@@ -2,7 +2,7 @@
 
 
 #include "config.h"
-
+#include "globaldefs.h"
 
 #include "cf_assert.h"
 
@@ -12,11 +12,17 @@
 #include "cf_factory.h"
 #include "imm.h"
 
-mpz_t InternalPrimePower::primepow;
-mpz_t InternalPrimePower::primepowhalf;
-int InternalPrimePower::prime;
-int InternalPrimePower::exp;
-bool InternalPrimePower::initialized = false;
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
+#if !defined(HAVE_NTL)
+#if !defined(HAVE_FLINT)||(__FLINT_RELEASE<=20600)
+GLOBAL_VAR mpz_t InternalPrimePower::primepow;
+GLOBAL_VAR mpz_t InternalPrimePower::primepowhalf;
+GLOBAL_VAR int InternalPrimePower::prime;
+GLOBAL_VAR int InternalPrimePower::exp;
+GLOBAL_VAR bool InternalPrimePower::initialized = false;
 
 
 InternalPrimePower::InternalPrimePower()
@@ -407,3 +413,5 @@ InternalPrimePower::sign () const
     return mpz_sgn( thempi );
 }
 //}}}
+#endif
+#endif

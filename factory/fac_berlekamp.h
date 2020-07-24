@@ -3,7 +3,7 @@
 #ifndef INCL_FAC_BERLEKAMP_H
 #define INCL_FAC_BERLEKAMP_H
 
-// #include "config.h"
+#include <config.h>
 
 #include "canonicalform.h"
 

@@ -257,6 +257,8 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
     power (q, p, k);
     buffer= pthRoot (A, q, alpha);
   }
+#else
+  factoryError("NTL/FLINT missing: squarefreeFactorization");
 #endif
 
   tmp1= squarefreeFactorization (buffer, alpha);

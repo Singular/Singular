@@ -1,10 +1,8 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+#include <config.h>
 
-#include "config.h"
-
-
-#include "cf_assert.h"
+#include "assert.h"
 #include "debug.h"
 
 #include "cf_defs.h"
@@ -16,6 +14,8 @@
 #include "cf_iter.h"
 #include "cf_generator.h"
 #include "fac_sqrfree.h"
+
+#if !defined(HAVE_FLINT) && !defined(HAVE_NTL)
 
 #ifdef DEBUGOUTPUT
 void QprintFF( int ** Q, int n )
@@ -398,3 +398,4 @@ CFFList FpFactorizeUnivariateB( const CanonicalForm& f, bool issqrfree )
     }
     return H;
 }
+#endif

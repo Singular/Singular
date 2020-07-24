@@ -28,6 +28,7 @@
 
 #include "canonicalform.h"
 #include "cf_iter.h"
+#include "cf_util.h"
 
 
 /** void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
@@ -218,6 +219,8 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
     ZZ NTLq= convertFacCF2NTLZZ (q);
     ZZ bound;
     SqrRoot (bound, NTLq/2);
+#else
+   factoryError("NTL/FLINT missing:Farey");
 #endif
     for ( i = f; i.hasTerms(); i++ )
     {

@@ -3,7 +3,7 @@
 #ifndef INCL_CF_UTIL_H
 #define INCL_CF_UTIL_H
 
-// #include "config.h"
+#include "globaldefs.h"
 
 int ilog2 (int a);
 

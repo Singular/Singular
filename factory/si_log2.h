@@ -16,7 +16,7 @@ static inline int SI_LOG2(int v)
   if (v & b[0]) { v >>= S[0]; r |= S[0]; }
   return (int)r;
 }
-#if SIZE_OF_LONG==4
+#if SIZEOF_LONG==4
 #define SI_LOG2_LONG(A) SI_LOG2(A)
 #else
 static inline int SI_LOG2_LONG(long v)

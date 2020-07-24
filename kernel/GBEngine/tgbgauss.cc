@@ -250,7 +250,7 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* /*c*/)
     //reduction
     //must extract content and normalize here
     mat->row_content(row);
-    mat->row_normalize(row);
+    //mat->row_normalize(row); // row_content does normalize
 
     //for(i=row+1;i<pn;i++){
     for(i=max_in_area;i>row;i--)
@@ -861,7 +861,6 @@ void tgb_sparse_matrix::row_content(int row)
     nNormalize(ph->coef);
     if(!nGreaterZero(ph->coef))
     {
-      //ph = pNeg(ph);
       p=ph;
       while(p!=NULL)
       {
@@ -869,6 +868,7 @@ void tgb_sparse_matrix::row_content(int row)
         p=p->next;
       }
     }
+    if (currRing->cf->cfGcd==ndGcd) return;
 
     h=nCopy(ph->coef);
     p = ph->next;

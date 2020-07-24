@@ -30,6 +30,9 @@
 #include "facFactorize.h"
 #include "singext.h"
 #include "cf_util.h"
+#include "fac_berlekamp.h"
+#include "fac_cantzass.h"
+#include "fac_univar.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -438,7 +441,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       if (degree (f) < 300)
 #endif
       {
-        // use FLINT
+        // use FLINT: char p, univariate
         nmod_poly_t f1;
         convertFacCF2nmod_poly_t (f1, f);
         nmod_poly_factor_t result;
@@ -452,7 +455,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
 #endif
 #ifdef HAVE_NTL
-      {
+      { // NTL char 2, univariate
         if (getCharacteristic()==2)
         {
           // Specialcase characteristic==2
@@ -477,7 +480,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 #endif
 #ifdef HAVE_NTL
       {
-        // use NTL
+        // use NTL char p, univariate
         if (fac_NTL_char != getCharacteristic())
         {
           fac_NTL_char = getCharacteristic();
@@ -501,9 +504,14 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
-      // Use Factory without NTL
-      factoryError ("univariate factorization depends on FLINT/NTL(missing)");
-      return CFFList (CFFactor (f, 1));
+      // Use Factory without NTL: char p, univariate
+      {
+        if ( isOn( SW_BERLEKAMP ) )
+          F=FpFactorizeUnivariateB( f, issqrfree );
+        else
+          F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
+        return F;
+      }
 #endif
     }
     else // char p, multivariate
@@ -551,9 +559,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         F=CFFList(CFFactor(fz,1));
       }
       else
-      #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20504)
+      #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20503)  && (__FLINT_RELEASE!= 20600)
       {
-        // use FLINT
+        // FLINT 2.6.0 has a bug:
+        // factorize x^12-13*x^10-13*x^8+13*x^4+13*x^2-1 runs forever
+        // use FLINT: char 0, univariate
         fmpz_poly_t f1;
         convertFacCF2Fmpz_poly_t (f1, fz);
         fmpz_poly_factor_t result;
@@ -593,8 +603,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
       goto end_char0;
       #else
-      factoryError ("univariate factorization over Z depends on NTL/FLINT(missing)");
-      return CFFList (CFFactor (f, 1));
+      {
+        //Use Factory without NTL: char 0, univariate
+        F = ZFactorizeUnivariate( fz, issqrfree );
+        goto end_char0;
+      }
       #endif
     }
     else // multivariate,  char 0
@@ -757,8 +770,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       }
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
-      factoryError ("univariate factorization  depends on FLINT/NTL(missing)");
-      return CFFList (CFFactor (f, 1));
+      // char p, extension, univariate
+      F=FpFactorizeUnivariateCZ( f, false, 1, alpha, Variable() );
 #endif
     }
     else // char p, multivariate

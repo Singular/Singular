@@ -1,6 +1,12 @@
 #include "Singular/libsingular.h"
 #include <vector>
 
+#if !defined(__CYGWIN__) || defined(STATIC_VERSION)
+// acces from a module to routines from the main program
+// does not work on windows (restrict of the dynamic linker),
+// a static version is required:
+// ./configure --with-builtinmodules=freealgebra,...
+
 #ifdef HAVE_SHIFTBBA
 static BOOLEAN freeAlgebra(leftv res, leftv args)
 {
@@ -456,3 +462,4 @@ extern "C" int SI_MOD_INIT(freealgebra)(SModulFunctions* p)
 #endif
   return (MAX_TOK);
 }
+#endif

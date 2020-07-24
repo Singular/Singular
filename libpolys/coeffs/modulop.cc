@@ -24,12 +24,8 @@
 #include <string.h>
 
 BOOLEAN npGreaterZero (number k, const coeffs r);
-number  npMult        (number a, number b, const coeffs r);
-number  npInit        (long i, const coeffs r);
 long    npInt         (number &n, const coeffs r);
 void    npPower       (number a, int i, number * result,const coeffs r);
-BOOLEAN npIsZero      (number a,const coeffs r);
-BOOLEAN npIsOne       (number a,const coeffs r);
 BOOLEAN npIsMOne       (number a,const coeffs r);
 number  npDiv         (number a, number b,const coeffs r);
 number  npNeg         (number c,const coeffs r);
@@ -46,21 +42,9 @@ BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
 
 nMapFunc npSetMap(const coeffs src, const coeffs dst);
 
-#ifdef NV_OPS
-#pragma GCC diagnostic ignored "-Wlong-long"
-static inline number nvMultM(number a, number b, const coeffs r)
-{
-  assume( getCoeffType(r) == n_Zp );
+#include "coeffs/modulop_inl.h" // npMult, npInit
 
-#if SIZEOF_LONG == 4
-#define ULONG64 (unsigned long long)(unsigned long)
-#else
-#define ULONG64 (unsigned long)
-#endif
-  return (number)
-      (unsigned long)((ULONG64 a)*(ULONG64 b) % (ULONG64 r->ch));
-}
-number  nvMult        (number a, number b, const coeffs r);
+#ifdef NV_OPS
 number  nvDiv         (number a, number b, const coeffs r);
 number  nvInvers      (number c, const coeffs r);
 //void    nvPower       (number a, int i, number * result, const coeffs r);
@@ -82,17 +66,6 @@ BOOLEAN npGreaterZero (number k, const coeffs r)
 //  return c;
 //}
 
-number npMult (number a,number b, const coeffs r)
-{
-  n_Test(a, r);
-  n_Test(b, r);
-
-  if (((long)a == 0) || ((long)b == 0))
-    return (number)0;
-  number c = npMultM(a,b, r);
-  n_Test(c, r);
-  return c;
-}
 
 void npInpMult (number &a,number b, const coeffs r)
 {
@@ -107,20 +80,6 @@ void npInpMult (number &a,number b, const coeffs r)
 }
 
 /*2
-* create a number from int
-*/
-number npInit (long i, const coeffs r)
-{
-  long ii=i % (long)r->ch;
-  if (ii <  0L)                         ii += (long)r->ch;
-
-  number c = (number)ii;
-  n_Test(c, r);
-  return c;
-}
-
-
-/*2
  * convert a number to an int in (-p/2 .. p/2]
  */
 long npInt(number &n, const coeffs r)
@@ -129,13 +88,6 @@ long npInt(number &n, const coeffs r)
 
   if ((long)n > (((long)r->ch) >>1)) return ((long)n -((long)r->ch));
   else                               return ((long)n);
-}
-
-BOOLEAN npIsZero (number  a, const coeffs r)
-{
-  n_Test(a, r);
-
-  return 0 == (long)a;
 }
 
 BOOLEAN npIsMOne (number a, const coeffs r)
@@ -691,18 +643,9 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
 //  operation for very large primes (32749< p < 2^31-1)
 // ----------------------------------------------------------
 #ifdef NV_OPS
-
-number nvMult (number a,number b, const coeffs r)
-{
-  //if (((long)a == 0) || ((long)b == 0))
-  //  return (number)0;
-  //else
-    return nvMultM(a,b,r);
-}
-
 void nvInpMult(number &a, number b, const coeffs r)
 {
-  number n=nvMultM(a,b,r);
+  number n=nvMult(a,b,r);
   a=n;
 }
 
@@ -724,7 +667,7 @@ number nvDiv (number a,number b, const coeffs r)
   else
   {
     number inv=nvInversM(b,r);
-    return nvMultM(a,inv,r);
+    return nvMult(a,inv,r);
   }
 }
 number  nvInvers (number c, const coeffs r)
@@ -751,7 +694,7 @@ void nvPower (number a, int i, number * result, const coeffs r)
   else
   {
     nvPower(a,i-1,result,r);
-    *result = nvMultM(a,*result,r);
+    *result = nvMult(a,*result,r);
   }
 }
 #endif

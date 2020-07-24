@@ -3224,7 +3224,7 @@ namespace bidiagonal
         {
             return;
         }
-        ap::ap_error::make_assertion(fromtheright && zcolumns==m || !fromtheright && zrows==m);
+        ap::ap_error::make_assertion(fromtheright ? zcolumns==m : zrows==m);
 
         //
         // init
@@ -3451,7 +3451,7 @@ namespace bidiagonal
         {
             return;
         }
-        ap::ap_error::make_assertion(fromtheright && zcolumns==n || !fromtheright && zrows==n);
+        ap::ap_error::make_assertion(fromtheright ? zcolumns==n : zrows==n);
 
         //
         // init
@@ -3859,7 +3859,7 @@ namespace bidiagonal
         {
             return;
         }
-        ap::ap_error::make_assertion(fromtheright && zcolumns==m || !fromtheright && zrows==m);
+        ap::ap_error::make_assertion(fromtheright ? zcolumns==m : zrows==m);
 
         //
         // init
@@ -4074,7 +4074,7 @@ namespace bidiagonal
         {
             return;
         }
-        ap::ap_error::make_assertion(fromtheright && zcolumns==n || !fromtheright && zrows==n);
+        ap::ap_error::make_assertion(fromtheright ? zcolumns==n : zrows==n);
 
         //
         // init
@@ -6896,7 +6896,7 @@ namespace bdsvd
                 // Run convergence test in forward direction
                 // First apply standard test to bottom of matrix
                 //
-                if( amp::abs<Precision>(e(m-1))<=amp::abs<Precision>(tol)*amp::abs<Precision>(d(m)) || tol<0 && amp::abs<Precision>(e(m-1))<=thresh )
+                if( amp::abs<Precision>(e(m-1))<=amp::abs<Precision>(tol)*amp::abs<Precision>(d(m)) || (tol<0 && amp::abs<Precision>(e(m-1))<=thresh) )
                 {
                     e(m-1) = 0;
                     continue;
@@ -6936,7 +6936,7 @@ namespace bdsvd
                 // Run convergence test in backward direction
                 // First apply standard test to top of matrix
                 //
-                if( amp::abs<Precision>(e(ll))<=amp::abs<Precision>(tol)*amp::abs<Precision>(d(ll)) || tol<0 && amp::abs<Precision>(e(ll))<=thresh )
+                if( amp::abs<Precision>(e(ll))<=amp::abs<Precision>(tol)*amp::abs<Precision>(d(ll)) || (tol<0 && amp::abs<Precision>(e(ll))<=thresh) )
                 {
                     e(ll) = 0;
                     continue;

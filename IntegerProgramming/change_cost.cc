@@ -189,19 +189,8 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-
-/////////////////////// provide help text ///////////////////////////////////
-
   // handle the case of "missing" arguments
 
-  if((argc==2) && !strcmp(argv[1],"--help"))
-    // help required
-  {
-    system("less change_cost.hlp");
-    return 0;
-  }
-
-  else
     // invalid arguments
     cerr<<"USAGE: change_cost [options] groebner_file new_cost_file"<<endl
         <<"Type `change_cost --help' for help on options."<<endl;

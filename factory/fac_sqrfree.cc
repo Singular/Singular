@@ -11,6 +11,10 @@
 #include "cf_map.h"
 #include "cf_algorithm.h"
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h" // for __FLINT_RELEASE
+#endif
+
 static int
 compareFactors( const CFFactor & f, const CFFactor & g )
 {
@@ -149,3 +153,61 @@ sqrfPart (const CanonicalForm& F)
   return result;
 }
 
+#if !defined(HAVE_NTL)
+#if !defined(HAVE_FLINT)||(__FLINT_RELEASE<=20600)
+static int divexp = 1;
+
+static void divexpfunc ( CanonicalForm &, int & e )
+{
+    e /= divexp;
+}
+
+CFFList sqrFreeFp ( const CanonicalForm & f )
+{
+    CanonicalForm t0 = f, t, v, w, h;
+    CanonicalForm leadcf = t0.lc();
+    Variable x = f.mvar();
+    CFFList F;
+    int p = getCharacteristic();
+    int k, e = 1;
+
+    if ( ! leadcf.isOne() )
+        t0 /= leadcf;
+
+    divexp = p;
+    while ( t0.degree(x) > 0 )
+    {
+        t = gcd( t0, t0.deriv() );
+        v = t0 / t;
+        k = 0;
+        while ( v.degree(x) > 0 )
+        {
+            k = k+1;
+            if ( k % p == 0 )
+            {
+                t /= v;
+                k = k+1;
+            }
+            w = gcd( t, v );
+            h = v / w;
+            v = w;
+            t /= v;
+            if ( h.degree(x) > 0 )
+                F.append( CFFactor( h/h.lc(), e*k ) );
+        }
+        t0 = apply( t, divexpfunc );
+        e = p * e;
+    }
+    if ( ! leadcf.isOne() )
+    {
+        if ( !F.isEmpty() && (F.getFirst().exp() == 1) )
+        {
+            leadcf = F.getFirst().factor() * leadcf;
+            F.removeFirst();
+        }
+        F.insert( CFFactor( leadcf, 1 ) );
+    }
+    return F;
+}
+#endif
+#endif
