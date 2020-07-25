@@ -290,6 +290,8 @@ jobs:
     env:
       TOX_ENV: local-${{ matrix.tox_system_factor }}-${{ matrix.tox_packages_factor }}
       LOGS_ARTIFACT_NAME: logs-commit-${{ github.sha }}-tox-local-${{ matrix.tox_system_factor }}-${{ matrix.tox_packages_factor }}
+      DOCKER_TARGETS: configured with-targets with-targets-optional
+
     steps:
 
       - name: Check out SageMath
