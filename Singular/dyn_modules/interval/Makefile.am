@@ -21,6 +21,7 @@ SOURCES = interval.cc interval.h
 interval_la_SOURCES   = $(SOURCES)
 interval_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 interval_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOOL_LDFLAGS} $(SINGULAR_LDFLAGS)
+
 if SING_WIN
 if !SI_BUILTIN_INTERVAL
 interval_la_LIBADD    = ${top_builddir}/Singular/libSingular.la

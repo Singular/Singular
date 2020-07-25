@@ -42,17 +42,3 @@ endif
 if HAVE_GFANLIB
  gfanlib_la_LIBADD   += ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 endif
-
-#AM_COLOR_TESTS=always
-#
-#TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables:${abs_builddir}/.libs:${abs_srcdir}'
-#TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
-#TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular' $(SHELL) -x
-#
-#if WANT_DEBUG
-# TESTS=test_release.sh test_debug.sh
-#else
-# TESTS=test_release.sh
-#endif
-#
-# EXTRA_DIST = gfanlib.tst test.sh $(TESTS)

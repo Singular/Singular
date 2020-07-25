@@ -27,13 +27,3 @@ if !SI_BUILTIN_SINGMATHIC
 endif
 endif
 
-# AM_COLOR_TESTS=always
-#
-# TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables:${abs_builddir}/.libs:${abs_srcdir}'
-# TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
-# TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
-#
-# TESTS=test_release.sh
-#
-# EXTRA_DIST = test.sh $(TESTS)
-

@@ -21,6 +21,7 @@ SOURCES = shared.cc lintree.cc bytebuf.cc thread.cc bytebuf.h lintree.h channel.
 systhreads_la_SOURCES   = $(SOURCES)
 systhreads_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 systhreads_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOOL_LDFLAGS} $(SINGULAR_LDFLAGS)
+
 if SING_WIN
 if !SI_BUILTIN_SYSTHREADS
 systhreads_la_LIBADD    = ${top_builddir}/Singular/libSingular.la

@@ -22,3 +22,9 @@ freealgebra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LD
 SOURCES = freealgebra.cc
 freealgebra_la_SOURCES   = $(SOURCES)
 
+if SING_WIN
+if !SI_BUILTIN_FREEALGEBRA
+freealgebra_la_LIBADD   = ${top_builddir}/Singular/libSingular.la
+endif
+endif
+
