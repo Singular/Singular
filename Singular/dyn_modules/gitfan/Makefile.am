@@ -24,16 +24,9 @@ gitfan_la_SOURCES  = $(SOURCES)
 gitfan_la_CPPFLAGS = ${MY_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${CDDGMPCPPFLAGS}
 gitfan_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
 
-#AM_COLOR_TESTS=always
-#
-#TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables:${abs_builddir}/.libs:${abs_srcdir}'
-#TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
-#TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular' $(SHELL) -x
-#
-#if WANT_DEBUG
-# TESTS=test_release.sh test_debug.sh
-#else
-# TESTS=test_release.sh
-#endif
-#
-# EXTRA_DIST = gitfan.tst test.sh $(TESTS)
+if SING_WIN
+if !SI_BUILTIN_GITFAN
+gitfan_la_LIBADD   = ${top_builddir}/Singular/libSingular.la
+endif
+endif
+

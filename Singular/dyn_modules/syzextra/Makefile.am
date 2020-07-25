@@ -21,6 +21,7 @@ SOURCES = mod_main.cc singularxx_defs.h syzextra.cc syzextra.h
 syzextra_la_SOURCES   = $(SOURCES)
 syzextra_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 syzextra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOOL_LDFLAGS} $(SINGULAR_LDFLAGS)
+
 if SING_WIN
 if !SI_BUILTIN_SYZEXTRA
 syzextra_la_LIBADD    = ${top_builddir}/Singular/libSingular.la

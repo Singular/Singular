@@ -23,6 +23,7 @@ customstd_la_SOURCES  = $(SOURCES)
 
 customstd_la_CPPFLAGS = ${MY_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${CDDGMPCPPFLAGS}
 customstd_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
+
 if SING_WIN
 if !SI_BUILTIN_CUSTOMSTD
 customstd_la_LIBADD   = ${top_builddir}/Singular/libSingular.la

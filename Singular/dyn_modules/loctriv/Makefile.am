@@ -22,3 +22,9 @@ loctriv_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAG
 SOURCES = loctriv.cc
 loctriv_la_SOURCES   = $(SOURCES)
 
+if SING_WIN
+if !SI_BUILTIN_LOCTRIV
+loctriv_la_LIBADD   = ${top_builddir}/Singular/libSingular.la
+endif
+endif
+
