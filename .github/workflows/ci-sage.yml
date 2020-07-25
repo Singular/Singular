@@ -75,7 +75,6 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install $DIST_PREREQ
       - name: Run make dist, prepare upstream artifact
-        # make dist broken, make_tar.sh broken - https://github.com/Singular/Singular/issues/1016
         run: |
           (cd build/pkgs/${{ env.SPKG }}/src && (./autogen.sh && ./configure && make dist) ) \
           && mkdir -p upstream && cp build/pkgs/${{ env.SPKG }}/src/*.tar.gz upstream/${{ env.SPKG }}-git.tar.gz \
