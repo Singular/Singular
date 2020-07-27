@@ -7,9 +7,8 @@ set -e
 
 TARVERSION=4.1.3p2
 VERSION=4.1.3
-INSTALL_DIR=/tmp2/wawa-i
 BUILD_DIR=/tmp2/wawa
-export VERSION TARVERSION INSTALL_DIR BUILD_DIR
+export VERSION TARVERSION BUILD_DIR
 
 # sanity check
 if test -e $BUILD_DIR/singularconfig.h
@@ -42,7 +41,7 @@ command rm -rf singular-$VERSION/dox/Doxyfile.html.all singular-$VERSION/dox/Dox
 command rm singular-$VERSION/factory/ConwayList.txt
 command rm -rf singular-$VERSION/logo  singular-$VERSION/standalone.test  singular-$VERSION/templates  singular-$VERSION/tests
 cp $BUILD_DIR/redhat/singular.spec singular-$VERSION/redhat/singular.spec
-cp $INSTALL_DIR/share/singular/LIB/all.lib  singular-$VERSION/Singular/LIB/.
+cp $BUILD_DIR/Singular/all.lib  singular-$VERSION/Singular/LIB/.
 tar cf singular-$TARVERSION.tar singular-$VERSION
 gzip -9 -f singular-$TARVERSION.tar
 command rm -rf singular-$VERSION
