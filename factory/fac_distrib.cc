@@ -12,7 +12,9 @@
 #include "cf_algorithm.h"
 #include "cf_iter.h"
 #include "fac_util.h"
+#include "fac_multihensel.h"
 
+#ifndef HAVE_NTL
 bool
 nonDivisors ( CanonicalForm omega, CanonicalForm delta, const CFArray & F, CFArray & d )
 {
@@ -211,3 +213,4 @@ Hensel2 ( const CanonicalForm & U, CFArray & G, const Evaluation & A, const modp
         G[i] *= A(TrueLcs[i])/lc(G[i]);
     return Hensel(U, G, TrueLcs, A, bound, x);
 }
+#endif

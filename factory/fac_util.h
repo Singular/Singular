@@ -48,4 +48,10 @@ bool gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap,
 
 void extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, CanonicalForm & T, const modpk & pk );
 
+CanonicalForm remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk );
+
+CanonicalForm prod ( const CFArray & a, int f, int l );
+
+CanonicalForm prod ( const CFArray & a );
+
 #endif /* ! INCL_FAC_UTIL_H */

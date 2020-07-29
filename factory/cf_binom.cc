@@ -10,6 +10,8 @@
 #include "canonicalform.h"
 #include "cf_binom.h"
 
+#ifndef HAVE_NTL
+
 #define MAXPT 40
 
 #define INITPT 10
@@ -131,3 +133,4 @@ binomialpower ( const Variable & x, const CanonicalForm & a, int n )
         }
     }
 }
+#endif

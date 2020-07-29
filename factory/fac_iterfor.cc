@@ -9,6 +9,8 @@
 #include "cf_defs.h"
 #include "fac_iterfor.h"
 
+#ifndef HAVE_NTL
+
 void
 IteratedFor::fill ( int from, int max )
 {
@@ -107,3 +109,4 @@ OSTREAM& operator<< ( OSTREAM& os, const IteratedFor & I )
     return os;
 }
 #endif /* NOSTREAMIO */
+#endif

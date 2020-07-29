@@ -19,7 +19,9 @@
 #include "cf_iter.h"
 #include "cf_primes.h"
 #include "fac_distrib.h"
+#include "fac_multihensel.h"
 
+#ifndef HAVE_NTL
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 void out_cff(CFFList &L);
 
@@ -398,3 +400,4 @@ CFFList ZFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
     }
     return R;
 }
+#endif

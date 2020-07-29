@@ -48,7 +48,6 @@ void setCharacteristic( int c )
 }
 
 #if !defined(HAVE_NTL)
-#if !defined(HAVE_FLINT) || (__FLINT_RELEASE<=20600)
 void setCharacteristic( int c, int n )
 {
     ASSERT( c > 1 && n > 0, "illegal characteristic" );
@@ -56,7 +55,6 @@ void setCharacteristic( int c, int n )
     InternalPrimePower::setPrimePower( c, n );
     CFFactory::settype( PrimePowerDomain );
 }
-#endif
 #endif
 
 

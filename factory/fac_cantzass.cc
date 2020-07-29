@@ -18,7 +18,6 @@
 #endif
 
 #if !defined(HAVE_NTL)
-#if !defined(HAVE_FLINT)||(__FLINT_RELEASE<=20600)
 static CanonicalForm randomPoly( int n, const Variable & x, const CFRandom & gen );
 
 static CFFList CantorZassenhausFactorFFGF( const CanonicalForm & f, int d, int q, const CFRandom & );
@@ -295,5 +294,4 @@ CanonicalForm powerMod2( const CanonicalForm & f, mpz_t q, int s, const Canonica
     mpz_clear( m );
     return prod;
 }
-#endif
 #endif

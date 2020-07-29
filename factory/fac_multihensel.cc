@@ -13,8 +13,10 @@
 #include "cf_binom.h"
 #include "fac_util.h"
 #include "fac_iterfor.h"
+#include "fac_multihensel.h"
 #include "cf_iter.h"
 
+#ifndef HAVE_NTL
 
 TIMING_DEFINE_PRINT(fac_solve)
 TIMING_DEFINE_PRINT(fac_modpk)
@@ -349,3 +351,4 @@ Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evalua
     delete[] n;
     return goodeval;
 }
+#endif

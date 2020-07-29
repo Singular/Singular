@@ -33,6 +33,7 @@
 #include "fac_berlekamp.h"
 #include "fac_cantzass.h"
 #include "fac_univar.h"
+#include "fac_multivar.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -615,14 +616,12 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       On (SW_RATIONAL);
       if (issqrfree)
       {
-        CFList factors;
         #ifdef HAVE_NTL
-        factors= ratSqrfFactorize (fz);
+        CFList factors= ratSqrfFactorize (fz);
         for (CFListIterator i= factors; i.hasItem(); i++)
           F.append (CFFactor (i.getItem(), 1));
         #else
-        factoryError ("multivariate factorization over Z depends on NTL(missing)");
-        return CFFList (CFFactor (f, 1));
+	F=ZFactorizeMultivariate(fz, issqrfree);
         #endif
       }
       else
@@ -630,8 +629,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         #ifdef HAVE_NTL
         F = ratFactorize (fz);
         #else
-        factoryError ("multivariate factorization over Z depends on NTL(missing)");
-        return CFFList (CFFactor (f, 1));
+	F=ZFactorizeMultivariate(fz, issqrfree);
         #endif
       }
       Off (SW_RATIONAL);

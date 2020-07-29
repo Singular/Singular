@@ -8,6 +8,7 @@
 #include "canonicalform.h"
 #include "fac_util.h"
 
+bool isSqrFree ( const CanonicalForm & f );
 CFFList ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree = false );
 
 modpk getZFacModulus();

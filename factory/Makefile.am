@@ -51,6 +51,7 @@ SOURCES = \
 		cfSubResGcd.cc \
 		cf_switches.cc \
 		cf_util.cc \
+		cf_binom.cc \
 		cfUnivarGcd.cc \
 		debug.cc \
 		DegreePattern.cc \
@@ -67,6 +68,10 @@ SOURCES = \
 		fac_berlekamp.cc \
 		fac_cantzass.cc \
 		fac_univar.cc \
+		fac_multivar.cc \
+		fac_multihensel.cc \
+		fac_iterfor.cc \
+		fac_distrib.cc \
 		facFqBivar.cc \
 		facFqBivarUtil.cc \
 		facFqFactorize.cc \
@@ -135,6 +140,7 @@ factory_headers = \
 		cfSubResGcd.h \
 		cf_switches.h \
 		cf_util.h \
+		cf_binom.h \
 		cfUnivarGcd.h \
 		debug.h \
 		DegreePattern.h \
@@ -151,6 +157,10 @@ factory_headers = \
 		fac_berlekamp.h \
 		fac_cantzass.h \
 		fac_univar.h \
+		fac_multivar.h \
+		fac_multihensel.h \
+		fac_iterfor.h \
+		fac_distrib.h \
 		facFqBivar.h \
 		facFqBivarUtil.h \
 		facFqFactorize.h \
