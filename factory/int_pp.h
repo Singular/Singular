@@ -5,6 +5,7 @@
 
 // #include "config.h"
 
+#include "cf_defs.h"
 #include "factory/cf_gmp.h"
 
 #ifndef NOSTREAMIO
@@ -30,8 +31,8 @@ private:
     STATIC_VAR int prime;
     STATIC_VAR int exp;
     static void initialize();
+    static mpz_ptr MPI( const InternalCF * const c );
 public:
-    mpz_ptr MPI( const InternalCF * const c );
     STATIC_VAR mpz_t primepow;
     STATIC_VAR mpz_t primepowhalf;
     InternalPrimePower();

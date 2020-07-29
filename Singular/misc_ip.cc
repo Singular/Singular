@@ -1365,7 +1365,11 @@ void siInit(char *name)
     om_Opts.Keep = 0; /* OM_NDEBUG */
 #endif
     omInitInfo();
-
+// factory
+#ifndef HAVE_NTL
+  extern void initPT();
+  initPT();
+#endif
 // options ---------------------------------------------------------------
   si_opt_1=0;
 // interpreter tables etc.: -----------------------------------------------

@@ -1966,16 +1966,3 @@ isOn( int sw )
     return cf_glob_switches.isOn( sw );
 }
 
-#ifndef HAVE_NTL
-static int initialized=0;
-int
-initCanonicalForm( void )
-{
-  if ( ! initialized )
-  {
-    initPT();
-    initialized = true;
-  }
-}
-#endif
-
