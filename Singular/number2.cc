@@ -126,6 +126,7 @@ BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b)
   coeffs a2=(coeffs)a->Data();
   coeffs b2=(coeffs)b->Data();
   res->data=(void*)(long)(a2==b2);
+  if (iiOp==NOTEQUAL) res->data=(char *)(!(long)res->data);
   return FALSE;
 }
 

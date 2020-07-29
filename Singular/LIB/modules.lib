@@ -875,8 +875,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 static proc compareRing(def r, def t){
-list a=ringlist(r);
-list b=ringlist(t);
+list a=ring_list(r);
+list b=ring_list(t);
 if(a[1]!=b[1]){return(0);}
 for(int i=1;i<=size(a[2]);i++){
   if(a[2][i]!=b[2][i]){return(0);}
