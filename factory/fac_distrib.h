@@ -1,9 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_distrib.h 12231 2009-11-02 10:12:22Z hannes $ */
 
 #ifndef INCL_FAC_DISTRIB_H
 #define INCL_FAC_DISTRIB_H
 
-// #include "config.h"
+#include <config.h>
 
 #include "canonicalform.h"
 

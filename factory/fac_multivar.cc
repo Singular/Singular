@@ -1,10 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_multivar.cc 14377 2011-09-01 13:40:30Z mlee $ */
 
+#include <config.h>
 
-#include "config.h"
-
-
-#include "cf_assert.h"
+#include "assert.h"
 #include "debug.h"
 #include "timing.h"
 
@@ -20,15 +19,17 @@
 #include "cf_primes.h"
 #include "fac_distrib.h"
 #include "fac_multihensel.h"
+#include "facBivar.h"
 
 #ifndef HAVE_NTL
+
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 void out_cff(CFFList &L);
 
-TIMING_DEFINE_PRINT(fac_content)
-TIMING_DEFINE_PRINT(fac_findeval)
-TIMING_DEFINE_PRINT(fac_distrib)
-TIMING_DEFINE_PRINT(fac_hensel)
+TIMING_DEFINE_PRINT(fac_content);
+TIMING_DEFINE_PRINT(fac_findeval);
+TIMING_DEFINE_PRINT(fac_distrib);
+TIMING_DEFINE_PRINT(fac_hensel);
 
 static CFArray
 conv_to_factor_array( const CFFList & L )
@@ -68,7 +69,7 @@ conv_to_factor_array( const CFFList & L )
 }
 
 static modpk
-coeffBound ( const CanonicalForm & f, int p )
+coeffBound_old ( const CanonicalForm & f, int p )
 {
     int * degs = degrees( f );
     int M = 0, i, k = f.level();
@@ -147,8 +148,8 @@ findEvaluation ( const CanonicalForm & U, const CanonicalForm & V, const Canonic
     DEBDECLEVEL( cerr, "findEvaluation" );
 }
 
-#ifdef HAVE_NTL
-VAR int prime_number=0;
+
+static int prime_number=0;
 void find_good_prime(const CanonicalForm &f, int &start)
 {
   if (! f.inBaseDomain() )
@@ -198,10 +199,11 @@ void find_good_prime(const CanonicalForm &f, int &start)
 */
   }
 }
-#endif
-
 static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
 {
+    prime_number=0;
+    bool is_rat=isOn(SW_RATIONAL);
+    Off(SW_RATIONAL);
     DEBINCLEVEL( cerr, "ZFactorizeMulti" );
     CFMap M;
     CanonicalForm UU, U = compress( arg, M );
@@ -263,7 +265,6 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
         DEBOUTLN( cerr, "now factorize the univariate polynomial " << U0 );
         G = conv_to_factor_array( factorize( U0, false ) );
         DEBOUTLN( cerr, "which factorizes into " << G );
-        #ifdef HAVE_NTL
         {
           int i=prime_number;
           find_good_prime(arg,i);
@@ -278,20 +279,17 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
           }
           else if (((i==0)||(i!=prime_number)))
           {
-            b = coeffBound( U, p );
+            b = coeffBound_old( U, p );
             prime_number=i;
           }
           // p!=0:
-          modpk bb=coeffBound(U0,p);
+          modpk bb=coeffBound_old(U0,p);
           if (bb.getk() > b.getk() ) b=bb;
-          bb=coeffBound(arg,p);
+          bb=coeffBound_old(arg,p);
           if (bb.getk() > b.getk() ) b=bb;
         }
-        #else
-        b = coeffBound( U, getZFacModulus().getp() );
         if ( getZFacModulus().getpk() > b.getpk() )
             b = getZFacModulus();
-        #endif
         //printf("p=%d, k=%d\n",b.getp(),b.getk());
         DEBOUTLN( cerr, "the coefficient bound of the factors of U is " << b.getpk() );
 
@@ -341,6 +339,7 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
     if ( negate )
         G[1] = -G[1];
     DEBDECLEVEL( cerr, "ZFactorMulti" );
+    if(is_rat) On(SW_RATIONAL);
     return G;
 }
 
@@ -363,7 +362,10 @@ CFFList ZFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
     for ( i = F; i.hasItem(); i++ )
     {
         if ( i.getItem().factor().inCoeffDomain() )
-            R.append( CFFactor( i.getItem().factor(), i.getItem().exp() ) );
+        {
+            if ( ! i.getItem().factor().isOne() )
+                R.append( CFFactor( i.getItem().factor(), i.getItem().exp() ) );
+        }
         else
         {
             TIMING_START(fac_content);

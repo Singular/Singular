@@ -403,4 +403,6 @@ typedef Array<int> Intarray;
 
 /*ENDPUBLIC*/
 
+int initCanonicalForm( void );
+static int cf_is_initialized_now = initCanonicalForm();
 #endif /* ! INCL_CANONICALFORM_H */

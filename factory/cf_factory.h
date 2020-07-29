@@ -28,7 +28,7 @@ public:
     static int gettype () { return currenttype; }
     static void settype ( int type )
     {
-      ASSERT( type==FiniteFieldDomain || type==GaloisFieldDomain || type==IntegerDomain || type==RationalDomain, "illegal basic domain!" );
+      ASSERT( type==FiniteFieldDomain || type==GaloisFieldDomain || type==IntegerDomain || type==RationalDomain || type==PrimePowerDomain, "illegal basic domain!" );
       currenttype = type;
     };
     static InternalCF * basic ( long value );
@@ -45,5 +45,4 @@ public:
 };
 
 void getmpi ( InternalCF * value, mpz_t mpi);
-
 #endif /* ! INCL_CF_FACTORY_H */

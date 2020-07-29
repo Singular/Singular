@@ -14,10 +14,12 @@
 #include "int_cf.h"
 #include "cf_algorithm.h"
 #include "imm.h"
+#include "int_pp.h"
 #include "gfops.h"
 #include "facMul.h"
 #include "facAlgFuncUtil.h"
 #include "FLINTconvert.h"
+#include "cf_binom.h"
 
 #ifndef NOSTREAMIO
 CanonicalForm readCF( ISTREAM& );
@@ -203,6 +205,7 @@ CanonicalForm::intval() const
         return value->intval();
 }
 
+
 CanonicalForm
 CanonicalForm::mapinto () const
 {
@@ -215,13 +218,38 @@ CanonicalForm::mapinto () const
                 return CanonicalForm( int2imm( ff_symmetric( gf_gf2ff( imm2int( value ) ) ) ) );
             else
                 return *this;
+        else  if ( CFFactory::gettype() == PrimePowerDomain )
+            return CanonicalForm( CFFactory::basic( imm2int( value ) ) );
         else  if ( getGFDegree() == 1 )
             return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
         else
             return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
     else  if ( value->inBaseDomain() )
         if ( getCharacteristic() == 0 )
-             return *this;
+            if ( value->levelcoeff() == PrimePowerDomain )
+            {
+              mpz_t d;
+              getmpi( value,d);
+              if ( mpz_cmp( InternalPrimePower::primepowhalf, d ) < 0 )
+                mpz_sub( d, d, InternalPrimePower::primepow );
+              return CFFactory::basic( d );
+            }
+            else
+                return *this;
+        else  if ( CFFactory::gettype() == PrimePowerDomain )
+        {
+            ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
+            if ( value->levelcoeff() == PrimePowerDomain )
+                return *this;
+            else
+            {
+              mpz_t d;
+              getmpi(value,d);
+              if ( mpz_cmp( InternalPrimePower::primepowhalf, d ) < 0 )
+                mpz_sub( d, d, InternalPrimePower::primepow );
+              return CFFactory::basic( d );
+            }
+        }
         else
         {
             int val;
@@ -247,7 +275,6 @@ CanonicalForm::mapinto () const
         return result;
     }
 }
-
 /** CanonicalForm CanonicalForm::lc (), Lc (), LC (), LC ( v ) const
  *
  * lc(), Lc(), LC() - leading coefficient functions.
@@ -1934,3 +1961,17 @@ isOn( int sw )
 {
     return cf_glob_switches.isOn( sw );
 }
+
+#ifndef HAVE_NTL
+static int initialized=0;
+int
+initCanonicalForm( void )
+{
+  if ( ! initialized )
+  {
+    initPT();
+    initialized = true;
+  }
+}
+#endif
+

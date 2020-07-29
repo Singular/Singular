@@ -1,10 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_distrib.cc 14344 2011-07-25 14:08:17Z mlee $ */
 
+#include <config.h>
 
-#include "config.h"
-
-
-#include "cf_assert.h"
+#include "assert.h"
 #include "debug.h"
 
 #include "cf_defs.h"
@@ -15,6 +14,7 @@
 #include "fac_multihensel.h"
 
 #ifndef HAVE_NTL
+
 bool
 nonDivisors ( CanonicalForm omega, CanonicalForm delta, const CFArray & F, CFArray & d )
 {

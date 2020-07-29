@@ -29,11 +29,11 @@ private:
     STATIC_VAR bool initialized;
     STATIC_VAR int prime;
     STATIC_VAR int exp;
+    static void initialize();
+public:
+    mpz_ptr MPI( const InternalCF * const c );
     STATIC_VAR mpz_t primepow;
     STATIC_VAR mpz_t primepowhalf;
-    static void initialize();
-    static mpz_ptr MPI( const InternalCF * const c );
-public:
     InternalPrimePower();
     InternalPrimePower( const InternalCF& )
     {
@@ -90,7 +90,7 @@ public:
     int intmod( int p ) const;
 
     int sign() const;
-    friend mpz_ptr getmpi ( InternalCF * value, bool symmetric );
+    friend void getmpi ( InternalCF * value, mpz_t );
 };
 
 inline mpz_ptr InternalPrimePower::MPI( const InternalCF * const c )

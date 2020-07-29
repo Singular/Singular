@@ -1,10 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
+/* $Id: fac_multihensel.cc 12231 2009-11-02 10:12:22Z hannes $ */
 
+#include <config.h>
 
-#include "config.h"
-
-
-#include "cf_assert.h"
+#include "assert.h"
 #include "debug.h"
 #include "timing.h"
 
@@ -13,18 +12,17 @@
 #include "cf_binom.h"
 #include "fac_util.h"
 #include "fac_iterfor.h"
-#include "fac_multihensel.h"
 #include "cf_iter.h"
 
 #ifndef HAVE_NTL
 
-TIMING_DEFINE_PRINT(fac_solve)
-TIMING_DEFINE_PRINT(fac_modpk)
-TIMING_DEFINE_PRINT(fac_corrcoeff)
-TIMING_DEFINE_PRINT(fac_extgcd)
+TIMING_DEFINE_PRINT(fac_solve);
+TIMING_DEFINE_PRINT(fac_modpk);
+TIMING_DEFINE_PRINT(fac_corrcoeff);
+TIMING_DEFINE_PRINT(fac_extgcd);
 
 static void
-extgcdrest ( const CanonicalForm & a, const CanonicalForm & b, const CanonicalForm & s, const CanonicalForm & t, const CanonicalForm & c, CanonicalForm & S, CanonicalForm & T, const modpk & /*pk*/ )
+extgcdrest ( const CanonicalForm & a, const CanonicalForm & b, const CanonicalForm & s, const CanonicalForm & t, const CanonicalForm & c, CanonicalForm & S, CanonicalForm & T, const modpk & pk )
 {
     CanonicalForm sigma = s * c, tau = t * c;
 //    divremainder( sigma, b, T, S, pk );
@@ -168,7 +166,7 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
     for ( i = 1; i <= r; i++ )
         A[i] = remainder( pk( a[i] * C0 ), P0[i], pk );
     DEBOUTLN( cerr, "the first approximation of the correction coefficients is " << A );
-/*#ifdef DEBUGOUTPUT
+#ifdef DEBUGOUTPUT
     if ( check_dummy( A, P, Q ) - C != 0 )
     {
         DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not" );
@@ -176,7 +174,7 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
         DEBOUTLN( cerr, "corresponding P " << P );
         DEBOUTLN( cerr, "              Q " << Q );
     }
-#endif*/
+#endif
     for ( m = 0; m <= h && ( m == 0 || Dm != 0 ); m++ )
     {
         Dm = pk( evalF( P, Q, A, r ) - C );
@@ -218,14 +216,14 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
         }
         DEBOUTLN( cerr, "the correction coefficients at step " << m );
         DEBOUTLN( cerr, "are now " << A );
-/*#ifdef DEBUGOUTPUT
+#ifdef DEBUGOUTPUT
     if ( check_dummy( A, P, Q ) - C != 0 ) {
         DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not" );
         DEBOUTLN( cerr, "fulfill equation F(A)" );
         DEBOUTLN( cerr, "corresponding P " << P );
         DEBOUTLN( cerr, "              Q " << Q );
     }
-#endif*/
+#endif
     }
     DEBDECLEVEL( cerr, "findCorrCoeffs" );
     return A;
@@ -325,7 +323,7 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
 }
 
 bool
-Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & /*x*/ )
+Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & x )
 {
     DEBINCLEVEL( cerr, "Hensel" );
     int k, i, h, t = A.max();
