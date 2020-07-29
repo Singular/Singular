@@ -226,6 +226,7 @@ CanonicalForm::mapinto () const
             return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
     else  if ( value->inBaseDomain() )
         if ( getCharacteristic() == 0 )
+            #ifndef HAVE_NTL
             if ( value->levelcoeff() == PrimePowerDomain )
             {
               mpz_t d;
@@ -235,7 +236,9 @@ CanonicalForm::mapinto () const
               return CFFactory::basic( d );
             }
             else
+            #endif
                 return *this;
+        #ifndef HAVE_NTL
         else  if ( CFFactory::gettype() == PrimePowerDomain )
         {
             ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
@@ -250,6 +253,7 @@ CanonicalForm::mapinto () const
               return CFFactory::basic( d );
             }
         }
+        #endif
         else
         {
             int val;

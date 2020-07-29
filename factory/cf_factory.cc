@@ -46,8 +46,10 @@ CFFactory::basic ( long value )
         return int2imm_p( ff_norm( value ) );
     case GaloisFieldDomain:
         return int2imm_gf( gf_int2gf( value ) );
+    #ifndef HAVE_NTL
     case PrimePowerDomain:
         return new InternalPrimePower( value );
+    #endif
     default: {
         ASSERT( 0, "illegal basic domain!" );
         return 0;
