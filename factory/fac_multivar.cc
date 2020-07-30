@@ -282,6 +282,7 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
             b = coeffBound_old( U, p );
             prime_number=i;
           }
+	  else prime_number++;
           // p!=0:
           modpk bb=coeffBound_old(U0,p);
           if (bb.getk() > b.getk() ) b=bb;
