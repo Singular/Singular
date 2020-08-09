@@ -39,6 +39,10 @@ static proc assumeQring()
   {
     ERROR("This function has not yet been implemented over qrings.");
   }
+  if(!hasGlobalOrdering(basering))
+  {
+    ERROR("global ordering required");
+  }
 }
 
 
@@ -880,8 +884,8 @@ PURPOSE: Returns a ring containing the ideal @code{algDep}, which contains possi
 @*                 to access these objects.
 EXAMPLE: example algebraicDependence; shows an example"
 {
-        assumeQring();
-        int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
+  assumeQring();
+  int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
   dbprint(ppl,"//AlgDep-1- initialisation and precomputation");
   def br=basering;
   int i;
