@@ -27,10 +27,10 @@
 // operation: attrib (def)  ->  nothing
 // operation: bareiss (bigintmat)  ->  bigintmat
 // operation: bareiss (module)  ->  list, only commutative rings, domain coeffs
-// operation: betti (list)  ->  intmat
-// operation: betti (resolution)  ->  intmat
-// operation: betti (ideal)  ->  intmat
-// operation: betti (module)  ->  intmat
+// operation: betti (list)  ->  intmat, field coeffs
+// operation: betti (resolution)  ->  intmat, field coeffs
+// operation: betti (ideal)  ->  intmat, field coeffs
+// operation: betti (module)  ->  intmat, field coeffs
 // operation: bigint (bigint)  ->  bigint
 // operation: bigint (number)  ->  bigint
 // operation: bigint (poly)  ->  bigint
