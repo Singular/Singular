@@ -64,6 +64,7 @@ extern "C"
 #include <flint/fmpq_mpoly.h>
 
 // planed, but not yet in FLINT: #if (__FLINT_RELEASE < 20602)
+#if (__FLINT_RELEASE < 20603)
 // helper for fq_nmod_t -> nmod_poly_t
 static void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
 {
@@ -80,7 +81,7 @@ static void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmo
     nmod_poly_set(a, b);
     fq_nmod_reduce(a, ctx);
 }
-//#endif
+#endif
 
 
 #endif
