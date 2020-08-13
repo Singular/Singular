@@ -20,8 +20,6 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 	AC_MSG_WARN([Error, setoper.h is missing!])
  fi
 
- AC_MSG_CHECKING([whether libcddgmp is usable])
-
 # Check whether --with-gmp was given.
 DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
@@ -82,6 +80,7 @@ LIBS="-lcddgmp $GMP_LIBS $LIBS"
 
  LIBS=$BACKUP_LIBS
 
+ AC_MSG_CHECKING([whether libcddgmp is usable])
  if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then
   AC_MSG_RESULT([yes])
   AC_SUBST(CDDGMPLDFLAGS)
@@ -92,7 +91,6 @@ LIBS="-lcddgmp $GMP_LIBS $LIBS"
    AC_MSG_ERROR([Error, could not use libcddgmp])
   fi
  fi
- AC_MSG_RESULT(no)
 
  AC_SUBST(CDDGMPLDFLAGS)
 else
