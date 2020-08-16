@@ -1351,6 +1351,7 @@ static BOOLEAN iiCrossProd(leftv res, leftv args)
 /*2
 * initialize components of Singular
 */
+static void callWerrorS(const char *s) { WerrorS(s); }
 void siInit(char *name)
 {
 // memory initialization: -----------------------------------------------
@@ -1472,5 +1473,7 @@ void siInit(char *name)
     iiLibCmd("standard.lib", TRUE,TRUE,TRUE);
     SI_RESTORE_OPT(save1,save2);
   }
+  // interpreter error handling
+  factoryError=callWerrorS; // to honour later changes of variable WerrorS
   errorreported = 0;
 }
