@@ -401,7 +401,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           ( const CanonicalForm & f, const Variable & alpha ) instead");
 #endif
   //out_cf("factorize:",f,"==================================\n");
-  if (! f.isUnivariate() )
+  if (! f.isUnivariate() ) // preprocess homog. polys
   {
     if ( singular_homog_flag && f.isHomogeneous())
     {
