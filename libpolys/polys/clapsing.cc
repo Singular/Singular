@@ -995,7 +995,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   Variable a;
   if (r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
   {
-    if (rField_is_Q(r) || rField_is_Q_a(r)) /* Q, Q(a) */
+    if (rField_is_Q(r) || rField_is_Q_a(r) || rField_is_Z(r)) /* Q, Q(a), Z */
     {
       //if (f!=NULL) // already tested at start of routine
       {
@@ -1003,6 +1003,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         if (with_exps==0)
           N=n_Copy(n0,r->cf);
         p_Cleardenom(f, r);
+        if (rField_is_Z(r)) p_Content(f, r);
         //after here f should not have a denominator!!
         //PrintS("S:");p_Write(f,r);PrintLn();
         NN=n_Div(n0,pGetCoeff(f),r->cf);
