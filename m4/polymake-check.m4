@@ -26,8 +26,8 @@ if test "x$ENABLE_POLYMAKE" != xno; then
   else
 
 ##  AC_MSG_CHECKING(whether polymake is properly installed)
-   AC_CHECK_PROG([PMCONFIG],[polymake-config],[1],[0])
-   if test $PMCONFIG = "1"; then
+   AC_CHECK_PROG([PMCONFIG],[polymake-config],[yes],[no])
+   if test $PMCONFIG = yes; then
 ##    AC_MSG_CHECKING([whether polymake is up-to-date])
     SUPPORTEDPOLYMAKEVERSION="21"
     CURRENTPOLYMAKEVERSION=`polymake-config --version | cut -c -3 -| sed s'/\.//'`
