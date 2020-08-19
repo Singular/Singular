@@ -1002,9 +1002,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         number n0=n_Copy(pGetCoeff(f),r->cf);
         if (with_exps==0)
           N=n_Copy(n0,r->cf);
-        p_Cleardenom(f, r);
         if (rField_is_Z(r)) p_Content(f, r);
-        //after here f should not have a denominator!!
+        else                p_Cleardenom(f, r);
+        //after here f should not have a denominator!! and no content
         //PrintS("S:");p_Write(f,r);PrintLn();
         NN=n_Div(n0,pGetCoeff(f),r->cf);
         n_Delete(&n0,r->cf);
