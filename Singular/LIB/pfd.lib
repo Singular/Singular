@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="version pfd.lib 4.1.?.? Aug_2020 ";
+version="version pfd.lib 4.1.3.2 Aug_2020 ";
 category="??";
 info="
 LIBRARY: pfd.lib Multivariate Partial Fraction Decomposition
