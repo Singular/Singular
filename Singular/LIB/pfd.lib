@@ -89,6 +89,7 @@ NOTE:     The result depends on the monomial ordering. For \"small\" results
 EXAMPLE:  example pfd; shows an example
 SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat"
 {
+  short = 0;
   int i;
   if(typeof(#[1])=="list")
   {
@@ -175,7 +176,7 @@ SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat"
     }
 
     // (1) factorization of the denominator:
-    if(debug) {int t1 = rtimer; write(l,"factorizing ...");}
+    if(debug) {int t1 = rtimer; write(l,"factorizing ");}
     list factor = factorize(g);
     number lcoeff;
     for(i=2; i<=size(factor[1]); i++) // making polynomials unique
@@ -223,7 +224,7 @@ SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat"
 
   // (2) Nullstellensatz decomposition
   if(debug)
-    {int t2 = rtimer; write(l,"Nullstellensatz decomposition ...");}
+    {int t2 = rtimer; write(l,"Nullstellensatz decomposition ");}
   list terms = list(list(poly(f),1..m,e));
   list dec,newterms,result;
   int imax;
@@ -248,7 +249,7 @@ SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat"
 
   // (3) short numerator decomposition
   if(debug)
-    {int t3 = rtimer; write(l,"short numerator decompositions ..."); counter=0;}
+    {int t3 = rtimer; write(l,"short numerator decompositions "); counter=0;}
   terms = dec;
   dec = list();
   while(size(terms)>0)
@@ -277,7 +278,7 @@ SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat"
 
   // (4) algebraic dependence decomposition
   if(debug)
-    {int t4 = rtimer; write(l,"algebraic dependence decomposition ..."); counter=0;}
+    {int t4 = rtimer; write(l,"algebraic dependence decomposition "); counter=0;}
   terms = dec;
   dec = list();
   while(size(terms)>0)
@@ -305,7 +306,7 @@ SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat"
 
   // (5) numerator decomposition
   if(debug)
-    {int t5 = rtimer; write(l,"numerator decompositions ..."); counter=0;}
+    {int t5 = rtimer; write(l,"numerator decompositions "); counter=0;}
   terms = dec;
   dec = list();
   while(size(terms)>0)
@@ -1085,7 +1086,7 @@ EXAMPLE:  example getStringpfd; shows an example"
   string s = getStringFraction(dec[1],q);
   for(int i=2; i<=size(dec); i++)
   {
-    s = s+"+"+getStringFraction(dec[i],q);
+    s = s+" + "+getStringFraction(dec[i],q);
   }
   return(s);
 }
@@ -1115,7 +1116,7 @@ EXAMPLE:  example getStringpfd_indexed; shows an example"
   string s = getStringFraction_indexed(dec[1]);
   for(int i=2; i<=size(dec); i++)
   {
-    s = s+"+"+getStringFraction_indexed(dec[i]);
+    s = s+" + "+getStringFraction_indexed(dec[i]);
   }
   return(s);
 }
@@ -1178,9 +1179,9 @@ PURPOSE:  read matrix of rational functions from a txt-file and turn it into a
           matrix (i.e. a list of lists) of pairs of polynomials (numerators and
           denominators). The string file is the [directory +] name of the file,
           r is the ring chosen for the numerator/denominator polynomials.
-       @* The input file should be a list of lists using the brackets \"\{\",
-          \"\}\" and \",\" as seperation, e.g.
-       @* \"\{\{(x+y)/(x^2-x*y), -(x^2*y+1)/(y), x^2\}, \{(x+1)/y, y/x, 0\}\}\".
+       @* The input file should be a list of lists using the brackets \"{\",
+          \"}\" and \",\" as seperation, e.g.
+       @* \"{{(x+y)/(x^2-x*y), -(x^2*y+1)/(y), x^2}, {(x+1)/y, y/x, 0}}\".
        @* The file should contain less than 2^31 characters (filesize < 2 GB).
           For bigger files the matrix should be split row-wise in multiple
           matrices and saved in different files. A list of the filenames
@@ -1193,6 +1194,9 @@ PURPOSE:  read matrix of rational functions from a txt-file and turn it into a
 SEE ALSO: pfdMat"
 {
   system("--ticks-per-sec",1000);
+  short = 0;
+  if(!defined(basering))
+    {ERROR("no basering defined!");}
   int left__,right__,pos1__,pos2__,tmp__,i__,j__,t__,tt__;
   int mode__=1;
   if(size(#)>0) {mode__=#[1];}
@@ -1202,7 +1206,7 @@ SEE ALSO: pfdMat"
     list mat__ = list();
     for(i__=1;i__<=n;i__++)
     {
-      printf("%n  file %s of %s:",i__,n);
+      printf("  file %s of %s:",i__,n);
       if(find(file__[i__],".txt")==0) {ERROR("wrong file type, expected txt");}
       mat__ = mat__ + readInputTXT(file__[i__],2);
     }
@@ -1210,7 +1214,7 @@ SEE ALSO: pfdMat"
     if(mode__==2) {return(mat__);}
 
     string filename__ = file__[1][1,find(file__[1],".txt")-1];
-    print("  saving to file "+filename__+".ssi ..."); t__ = rtimer;
+    print("  saving to file "+filename__+".ssi "); t__ = rtimer;
     write("ssi:w "+filename__+".ssi", mat__);
     printf("  done! (%s ms)", rtimer-t__);
 
@@ -1220,12 +1224,12 @@ SEE ALSO: pfdMat"
     {ERROR("wrong type for first argument (expected string or list)");}
   if(find(file__,".txt")==0) {ERROR("wrong file type, expected txt");}
 
-  print("  reading file ..."); t__=rtimer;
+  print("  reading file "); t__=rtimer;
   string data__ = read(":r "+file__);
   printf("  done! (%s ms)", rtimer-t__);
 
 
-  print("  processing input ..."); t__ = rtimer;
+  print("  processing input "); t__ = rtimer;
   left__ = find(data__,"{");
   right__ = find(data__,"}");
   tmp__ = find(data__,"{",left__+1);
@@ -1292,12 +1296,138 @@ SEE ALSO: pfdMat"
   if(mode__==2) {return(mat__);}
 
   string filename__ = file__[1,find(file__,".txt")-1];
-  print("  saving to file "+filename__+".ssi ..."); t__ = rtimer;
+  print("  saving to file "+filename__+".ssi "); t__ = rtimer;
   write("ssi:w "+filename__+".ssi", mat__);
   printf("  done! (%s ms)", rtimer-t__);
 
   if(mode__==3) {return(mat__);}
 }
+/* new version:
+{
+  system("--ticks-per-sec",1000);
+  if(!defined(basering))
+    {ERROR("no basering defined!");}
+  int left__,right__,pos1__,pos2__,tmp__,i__,j__,k__,d__,t__,tt__;
+  int mode__=1;
+  if(size(#)>0) {mode__=#[1];}
+  if(typeof(file__)=="list") // list of filenames given --> apply function to each
+  {                          // file and concatenate the resulting matrices
+    int n = size(file__);
+    list mat__ = list();
+    for(i__=1;i__<=n;i__++)
+    {
+      printf("  file %s of %s:",i__,n);
+      if(find(file__[i__],".txt")==0) {ERROR("wrong file type, expected txt");}
+      mat__ = mat__ + readInputTXT(file__[i__],2);
+    }
+
+    if(mode__==2) {return(mat__);}
+
+    string filename__ = file__[1][1,find(file__[1],".txt")-1];
+    print("  saving to "+filename__+".ssi "); t__ = rtimer;
+    write("ssi:w "+filename__+".ssi", mat__);
+    printf("  done! (%s ms)", rtimer-t__);
+
+    if(mode__==3) {return(mat__);}
+  }
+  if(typeof(file__)!="string")
+    {ERROR("wrong type for first argument (expected string or list)");}
+  if(find(file__,".txt")==0) {ERROR("wrong file type, expected txt");}
+
+  print("  reading input matrix as string from "+file__); t__=rtimer;
+  string data__ = read(":r "+file__);
+  printf("  done! (%s ms)", rtimer-t__);
+
+
+  print("  processing input "); t__ = rtimer;
+  left__ = find(data__,"{");
+  right__ = find(data__,"}");
+  tmp__ = find(data__,"{",left__+1);
+  if(left__<tmp__ && tmp__<right__) {left__ = tmp__;}
+
+  int finished__;
+  poly p__,q__;
+  int depth__;
+  list mat__;
+  string s__,s1__,s2__;
+  for(i__=1;1;i__++)
+  {
+    tt__ = rtimer;
+    mat__[i__] = list();
+    pos2__ = left__;
+    finished__ = 0;
+    for(j__=1; not finished__; j__++)
+    {
+      pos1__ = pos2__+1;
+      pos2__ = find(data__,",",pos1__);
+      if(pos2__==0 || pos2__>right__) {finished__=1; pos2__=right__;}
+      s__ = data__[pos1__,pos2__-pos1__];
+      for(k__=1; s__[k__]==" "; k__++) {}
+      s__ = s__[k__,size(s__)-k__+1]; // remove spaces
+
+      tmp__=find(s__,"/");
+      //printf("s: %s",s__);
+      if(tmp__>0)
+      {
+        depth__=0;
+        d__=0;
+        for(k__=tmp__+1;k__<=size(s__);k__++)
+        {
+          if(s__[k__]=="(") {depth__++; k__++; continue;}
+          if(s__[k__]==")") {depth__--; k__++; continue;}
+          if(s__[k__]=="/" && depth__<=d__) {tmp__=k__; d__=depth__;}
+        }
+        s1__ = s__[1,tmp__-1];
+        s2__ = s__[tmp__+1,size(s__)-tmp__];
+        depth__=0;
+        for(k__=size(s1__); k__>1; k__--)
+        {
+          if(s1__[k__]==")") {depth__++; k__--; continue;}
+          if(s1__[k__]=="(") {depth__--; k__--; continue;}
+          if(depth__==0 && (s1__[k__]=="+" || s1__[k__]=="-")) {tmp__=0; break}
+        }
+        depth__=0;
+        for(k__=1; k__<=size(s2__); k__++)
+        {
+          if(s2__[k__]=="(") {depth__++; k__++; continue;}
+          if(s2__[k__]==")") {depth__--; k__++; continue;}
+          if(depth__==0 && (s2__[k__]=="+" || s2__[k__]=="-" || s2__[k__]=="*")) {tmp__=0; break}
+        }
+        //printf("s1: %s,%ns2: %s",s1__,s2__);
+      }
+      if(tmp__==0) // no denominator
+      {
+        execute("p__=" + s__);
+        q__=1;
+      }
+      else // s1__ = numerator, s2__ = denominator
+      {
+        execute("p__=" + fixBrackets(s1__));
+        execute("q__=" + fixBrackets(s2__));
+        if(deg(q__)==0) {p__=p__/q__; q__=1;}
+      }
+      ;
+
+      mat__[i__][j__] = list(p__,q__);
+    }
+    printf("    row %s done! (%s ms)",i__,rtimer-tt__);
+
+    left__ = find(data__,"{",right__);
+    if(left__==0) {break;}
+    right__ = find(data__,"}",left__);
+  }
+  printf("  done! (%s ms)", rtimer-t__);
+
+  if(mode__==2) {return(mat__);}
+
+  string filename__ = file__[1,find(file__,".txt")-1];
+  print("  saving to "+filename__+".ssi "); t__ = rtimer;
+  write("ssi:w "+filename__+".ssi", mat__);
+  printf("  done! (%s ms)", rtimer-t__);
+
+  if(mode__==3) {return(mat__);}
+} */
+
 
 static proc fixBrackets(string data)
 {
@@ -1330,16 +1460,16 @@ static proc fixBrackets(string data)
   return(data);
 }
 
-static proc pfdWrap(poly f, def g, int i, int j, link logfile, int create_ssi_files)
+static proc pfdWrap(poly f, def g, int i, int j, link logfile, int output_mode)
 {
   system("--ticks-per-sec",1000);
-  if(create_ssi_files==2)
+  if(output_mode>3)
     {write("ssi:w pfd_results_"+string(i)+"_"+string(j)
            +".ssi","task started, but not finished yet");}
   int t0 = rtimer;
   list result = pfd(f,g);
   fprintf(logfile,"_[%s,%s]: %s ms",i,j,rtimer-t0);
-  if(create_ssi_files==2)
+  if(output_mode>3)
     {write("ssi:w pfd_results_"+string(i)+"_"+string(j)+".ssi",result);}
   return(result);
 }
@@ -1355,8 +1485,8 @@ static proc testEntry(int i, int j, list fraction, list dec, link logfile, int N
 }
 
 proc pfdMat(def infile, list #)
-"USAGE:   pfdMat(file[, dotest, ignore_nonlin, create_ssi_files, parallelize]);
-          file string, dotest,ignore_nonlin,create_ssi_files,parallelize int
+"USAGE:   pfdMat(file[, dotest, ignore_nonlin, output_mode, parallelize]);
+          file string, dotest,ignore_nonlin,output_mode,parallelize int
 PURPOSE:  apply @code{pfd} to all entries of a matrix of rational functions
           saved in a file. The string file is the [directory +] name of the
           file.
@@ -1386,7 +1516,7 @@ PURPOSE:  apply @code{pfd} to all entries of a matrix of rational functions
           output matrix divided element-wise by the matrix containing the
           nonlinear factors.)
           (default: @code{ignore_nonlin=1})
-       @* If @code{create_ssi_files} is nonzero, the input and result are also
+       @* If @code{output_mode} is nonzero, the input and result are also
           saved to ssi-files containing matrices (as list of lists) of the input
           rational functions (as lists of numerator and denominator poly) and
           decompositions respectively. For the ssi-file containing the result,
@@ -1400,26 +1530,27 @@ PURPOSE:  apply @code{pfd} to all entries of a matrix of rational functions
        @*   3) an intvec containing the exponents of those irreducible factors.
        @* Also, the results of @code{pfd} will be saved directly in ssi-files
           named pfd_results_i_j where i,j are the matrix indices in the current
-          directory. (default: @code{create_ssi_files=0})
+          directory. (default: @code{output_mode=0})
        @* If @code{parallelize} is nonzero, the decompositions are calculated in
           parallel using @ref{parallel_lib}. (default: @code{parallelize=1})
 SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
 {
   system("--ticks-per-sec",1000);
-  int dotest,ignore_nonlin,create_ssi_files,parallelize = -1,1,0,1;
+  short = 0;
+  int dotest,ignore_nonlin,output_mode,parallelize = -1,1,0,1;
   if(size(#)>0) {dotest = #[1];}
   if(size(#)>1) {ignore_nonlin = #[2];}
-  if(size(#)>2) {create_ssi_files = #[3];}
+  if(size(#)>2) {output_mode = #[3];}
   if(size(#)>3) {parallelize = #[4];}
 
   int i,j,k,l,ind;
   list arguments,results;
 
-  print("reading data ..."); int t0=rtimer;
+  print(newline+"reading data "); int t0=rtimer;
 
   if(typeof(infile)=="list")
   {
-    if(create_ssi_files) {list mat = readInputTXT(infile,3);}
+    if(output_mode>2) {list mat = readInputTXT(infile,3);}
     else {list mat = readInputTXT(infile,2);}
     int pos=find(infile[1],".txt");
     string filename = infile[1][1,pos-1];
@@ -1429,7 +1560,7 @@ SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
     int pos=find(infile,".txt");
     if(pos!=0)
     {
-      if(create_ssi_files) {list mat = readInputTXT(infile,3);}
+      if(output_mode>2) {list mat = readInputTXT(infile,3);}
       else {list mat = readInputTXT(infile,2);}
     }
     else
@@ -1444,49 +1575,57 @@ SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
     string filename = infile[1,pos-1];
   }
 
-  link qpfile = ":w "+filename+"_denominator_factors.txt";
+  link qfile = ":w "+filename+"_denominator_factors.txt";
   int n = size(mat);
   int m = size(mat[1]);
   printf("done! (%s ms)",rtimer-t0);
 
-  if(typeof(mat[1][1][2])=="poly") // denominators are not yet factorized
+  if(typeof(mat[1][1][2])!="list") // denominators are not yet factorized
   {
-    print("factorizing the denominators ..."); t0=rtimer;
+    print("factorizing the denominators "); t0=rtimer;
     mat = FactDenom(mat);
-    if(create_ssi_files)
+    if(output_mode>2)
       {write("ssi:w "+filename+"_factorized_denominators.ssi",mat);}
     printf("done! (%s ms)",rtimer-t0);
   }
 
   if(ignore_nonlin)
   {
-    printf("moving nonlinear denominator factors into separate txt-file"
-           +" (%s_non_linear_factors[_indexed].txt):", filename);
+    print("removing nonlinear denominator factors before pfd is applied");
+    //       +" (%s_non_linear_factors[_indexed].txt):", filename);
     list denom_factors;
-    print(" reading in the factors");
-    mat, denom_factors = removeNonlinearFactors(mat, filename, create_ssi_files);
-    print(" saving to txt-file");
-    ideal p = saveNonlinearFactorsTXT(denom_factors, filename);
-    filename = filename + "_linear_part";
+    ideal p;
+    mat, denom_factors, p = removeNonlinearFactors(mat, filename);
+    if(output_mode>2)
+    {
+      print("saving nonlinear factors to "+filename+"_non_linear_factors.ssi "); t0 = rtimer;
+      write("ssi:w "+filename+"_non_linear_factors.ssi", denom_factors);
+      printf("done! (%s ms)",rtimer-t0);
+      print("saving input matrix without the nonlinear factors to "+filename+"_linear_part.ssi "); t0 = rtimer;
+      write("ssi:w "+filename+"_linear_part.ssi", mat);
+      printf("done! (%s ms)",rtimer-t0);
+    }
+    //ideal p = saveNonlinearFactorsTXT(denom_factors, filename);
+    //filename = filename + "_linear_part";
   }
 
   if(parallelize)
   {
-    print("creating tasks ..."); t0=rtimer;
-    write(":w "+filename+"_logfile.txt","finished matrix entries with runtimes "
+    print("creating tasks "); t0=rtimer;
+    write(":w "+filename+"_pfdMat_logfile.txt","finished matrix entries with runtimes "
           +"(calculated in parallel on "+string(getcores())+" cores):");
-    link logfile = ":a "+filename+"_logfile.txt";
+    link logfile = ":a "+filename+"_pfdMat_logfile.txt";
     for(i=1; i<=n; i++)
     {
       for(j=1; j<=m; j++)
       {
         ind = m*(i-1)+j;
-        arguments[ind] = list(mat[i][j][1],mat[i][j][2],i,j,logfile,create_ssi_files);
+        arguments[ind] = list(mat[i][j][1],mat[i][j][2],i,j,logfile,output_mode);
       }
     }
     printf("done! (%s ms)",rtimer-t0);
 
-    print("decomposing ..."); t0 = rtimer;
+    print("applying pfd to each matrix entry "); t0 = rtimer;
     results = parallelWaitAll("pfdWrap",arguments);
     arguments = list();
     printf("done! (%s ms)",rtimer-t0);
@@ -1494,7 +1633,7 @@ SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
     write(logfile,"decomposition: "+string(rtimer-t0)+" ms and "+string(memory(2))
                    +" Byte Memory max. (after calling pfd on each matrix entry)");
 
-    print("writing results in matrix shape ..."); t0 = rtimer;
+    print("writing results in matrix shape "); t0 = rtimer;
     list dec_mat;
     for(i=1; i<=n; i++)
     {
@@ -1510,17 +1649,17 @@ SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
   }
   else
   {
-    print("decomposing ..."); t0=rtimer;
-    write(":w "+filename+"_logfile.txt",
+    print("applying pfd to each matrix entry "); t0=rtimer;
+    write(":w "+filename+"_pfdMat_logfile.txt",
           "finished matrix entries with runtimes (no parallelization):");
-    link logfile = ":a "+filename+"_logfile.txt";
+    link logfile = ":a "+filename+"_pfdMat_logfile.txt";
     list dec_mat;
     for(i=1; i<=n; i++)
     {
       dec_mat[i] = list();
       for(j=1; j<=m; j++)
       {
-        dec_mat[i][j] = pfdWrap(mat[i][j][1],mat[i][j][2],i,j,logfile,create_ssi_files);
+        dec_mat[i][j] = pfdWrap(mat[i][j][1],mat[i][j][2],i,j,logfile,output_mode);
       }
     }
     printf("done! (%s ms)",rtimer-t0);
@@ -1528,7 +1667,7 @@ SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
           +" Byte Memory max. (after calling pfd on each matrix entry)");
  }
 
-  print("making one single list of denominator factors ..."); t0 = rtimer;
+  print("making one single list of denominator factors "); t0 = rtimer;
   ideal q,new_q;
   intvec dict;
   for(i=1; i<=n; i++)
@@ -1560,28 +1699,52 @@ SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
   }
   printf("done! (%s ms)",rtimer-t0);
 
-  if(create_ssi_files)
+  if(output_mode>2)
   {
-    print("saving result to file "+filename+"_results.ssi ..."); t0 = rtimer;
-    write("ssi:w "+filename+"_results.ssi", list(q,dec_mat));
+    print("saving result to "+filename+"_pfd_only_linear_factors.ssi "); t0 = rtimer;
+    write("ssi:w "+filename+"_pfd_only_linear_factors.ssi", list(q,dec_mat));
     printf("done! (%s ms)",rtimer-t0);
   }
 
-  printf("creating readable .txt-files ..."); t0 = rtimer;
-  print(" indexed ("+filename+"_results_indexed.txt):");
-  saveResultTXT_indexed(dec_mat, filename+"_results_indexed");
-  for(i=1; i<=size(q); i++) {fprintf(qpfile, "q%s = %s;", i, q[i]);}
-  print(" denominators written out ("+filename+"_results.txt):");
-  saveResultTXT(dec_mat, q, filename+"_results");
   if(ignore_nonlin)
   {
-    for(i=1; i<=size(p); i++) {fprintf(qpfile, "p%s = %s;", i, p[i]);}
+    ind = size(q);
+    for(i=1; i<=size(p); i++) {q[ind+i]=p[i];} // add nonlin. polynomials to q
+    for(i=1; i<=n; i++)
+    {
+      for(j=1; j<=m; j++)
+        {
+          denom_factors[i][j][1] = denom_factors[i][j][1]+ind; // adjust indices
+        }
+    }
+  }
+
+  if(ignore_nonlin)
+    {printf("creating readable .txt-files (including the nonlinear factors again)");}
+  else
+    {printf("creating readable .txt-files ");}
+  t0 = rtimer;
+  print(" indexed ("+filename+"_pfd_indexed.txt):");
+  if(ignore_nonlin)
+    {saveResultTXT_indexed(dec_mat, filename+"_pfd_indexed", denom_factors);}
+  else {saveResultTXT_indexed(dec_mat, filename+"_pfd_indexed");}
+  for(i=1; i<=size(q); i++) {fprintf(qfile, "q%s = %s;", i, q[i]);}
+  if(output_mode>1)
+  {
+    print(" denominators written out ("+filename+"_pfd.txt):");
+    if(ignore_nonlin)
+      {saveResultTXT(dec_mat, q, filename+"_pfd", denom_factors);}
+    else {saveResultTXT(dec_mat, q, filename+"_pfd");}
   }
   printf("done! (%s ms)",rtimer-t0);
 
   if(dotest)
   {
-    print("checking for correctness ..."); t0 = rtimer;
+    if(dotest<0)
+      {print("checking for correctness (exact test) ");}
+    else
+      {printf("checking for correctness (%s random evaluations per entry) ",dotest);}
+    t0 = rtimer;
     if(parallelize)
     {
       for(i=1; i<=n; i++)
@@ -1726,13 +1889,13 @@ static proc FactDenom(list mat)
   return(mat);
 }
 
-static proc saveResultTXT_indexed(list dec, list #)
+static proc saveResultTXT_indexed(list dec, string filename, list #)
 {
   // expect dec = list(list(dec11, dec12, ...), list(dec21, dec22, ...), ...),
   // where dec11, dec12, ... are decompositions of form list(list(poly, intvec, intvec), ...)
   system("--ticks-per-sec",1000);
-  string filename = "result";
-  if(size(#)>0) {filename = #[1];}
+  list nonlinFactors = list();
+  if(size(#)>0) {nonlinFactors = #;}
   link file = ":w "+filename+".txt";
 
   int i,j;
@@ -1747,6 +1910,15 @@ static proc saveResultTXT_indexed(list dec, list #)
     s = s+"{";
     for(j=1; j<=m; j++)
     {
+      if(size(nonlinFactors)>0)
+      {
+        if(size(nonlinFactors[i][j][1])>0)
+        {
+          s = s + getStringFraction_indexed(list(poly(1))+nonlinFactors[i][j])
+                + " * (" + getStringpfd_indexed(dec[i][j]) + "), ";
+          j++; continue;
+        }
+      }
       s = s + getStringpfd_indexed(dec[i][j]) + ", ";
     }
     k = size(s);
@@ -1756,16 +1928,15 @@ static proc saveResultTXT_indexed(list dec, list #)
   k = size(s);
   s[k-1] = "}"; s[k] = " ";
   write(file,s);
-  close(file);
 }
 
-static proc saveResultTXT(list dec, ideal q, list #)
+static proc saveResultTXT(list dec, ideal q, string filename, list #)
 {
   // expect dec = list(list(dec11, dec12, ...), list(dec21, dec22, ...), ...),
   // where dec11, dec12, ... are decompositions of form list(list(poly, intvec, intvec), ...)
   system("--ticks-per-sec",1000);
-  string filename = "result";
-  if(size(#)>0) {filename = #[1];}
+  list nonlinFactors = list();
+  if(size(#)>0) {nonlinFactors = #;}
   link file = ":w "+filename+".txt";
 
   int i,j;
@@ -1780,6 +1951,15 @@ static proc saveResultTXT(list dec, ideal q, list #)
     s = s+"{";
     for(j=1; j<=m; j++)
     {
+      if(size(nonlinFactors)>0)
+      {
+        if(size(nonlinFactors[i][j][1])>0)
+        {
+          s = s + getStringFraction(list(poly(1))+nonlinFactors[i][j],q)
+                + " * (" + getStringpfd(list(q,dec[i][j])) + "), ";
+          j++; continue;
+        }
+      }
       s = s + getStringpfd(list(q,dec[i][j])) + ", ";
     }
     k = size(s);
@@ -1789,16 +1969,16 @@ static proc saveResultTXT(list dec, ideal q, list #)
   k = size(s);
   s[k-1] = "}"; s[k] = " ";
   write(file,s);
-  close(file);
 }
 
-static proc removeNonlinearFactors(list fractions, string filename, int create_ssi_files)
+static proc removeNonlinearFactors(list fractions, string filename)
 {
   int n=size(fractions);
   int m=size(fractions[1]);
-  int i,j,k,t0;
+  int i,j,k,t0,ind;
+  ideal p;
   list denom_factors;
-  list factors,exponents;
+  intvec factors,exponents;
   list fac;
   for(i=1; i<=n; i++)
   {
@@ -1807,13 +1987,29 @@ static proc removeNonlinearFactors(list fractions, string filename, int create_s
     for(j=1; j<=m; j++)
     {
       fac = fractions[i][j][2];
-      factors = list();
-      exponents = list();
+      factors = 0:0;
+      exponents = 0:0;
       for(k=1; k<=size(fac[1]); k++)
       {
         if(deg(poly(fac[1][k]))>1)
         {
-          factors[size(factors)+1] = fac[1][k];
+          // add the nonlin. factor fac[1][k] to p if necessary:
+          if(size(p)==0) {ind = 1; p[ind]=fac[1][k];}
+          else
+          {
+            for(ind=1;1;ind++)
+            {
+              //print("   "+string(ind));
+              if(p[ind]==fac[1][k]) {break;}
+              if(ind==size(p))
+              {
+                ind++;
+                p[ind]=fac[1][k];
+                break;
+              }
+            }
+          }
+          factors[size(factors)+1] = ind;
           exponents[size(exponents)+1] = fac[2][k];
           fac[1] = delete(fac[1],k);
           fac[2] = delete(fac[2],k);
@@ -1826,83 +2022,7 @@ static proc removeNonlinearFactors(list fractions, string filename, int create_s
     }
     printf("  row %s done! (%s ms)",i,rtimer-t0);
   }
-  if(create_ssi_files)
-  {
-    write("ssi:w "+filename+"_linear_part.ssi",fractions);
-    write("ssi:w "+filename+"_non_linear_factors.ssi",denom_factors);
-  }
-  return(fractions, denom_factors);
-}
-
-static proc saveNonlinearFactorsTXT(list mat, string filename)
-{
-  string data="{";
-  string data_indexed="{";
-  ideal p;
-  int n=size(mat);
-  int m=size(mat[1]);
-  int i,j,k,ind,t0;
-  for(i=1;i<=n;i++)
-  {
-    //print(i);
-    t0 = rtimer;
-    data = data+"{";
-    data_indexed = data_indexed+"{";
-    for(j=1;j<=m;j++)
-    {
-      //print(" "+string(j));
-      if(size(mat[i][j][1])==0)
-      {
-        data = data+"1,";
-        data_indexed = data_indexed+"1,";
-        j++; continue;
-      }
-      for(k=1;k<=size(mat[i][j][1]);k++)
-      {
-        //print("  "+string(k)+"/"+string(size(mat[i][j][1])));
-        data = data+"("+string(mat[i][j][1][k])+")";
-
-        if(size(p)==0) {ind = 1; p[ind]=mat[i][j][1][k];}
-        else
-        {
-          for(ind=1;1;ind++)
-          {
-            //print("   "+string(ind));
-            if(p[ind]==mat[i][j][1][k]) {break;}
-            if(ind==size(p))
-            {
-              ind++;
-              p[ind]=mat[i][j][1][k];
-              break;
-            }
-          }
-        }
-        data_indexed = data_indexed+"p"+string(ind);
-
-        if(mat[i][j][2][k]>1)
-        {
-          data = data+"^"+string(mat[i][j][2][k]);
-          data_indexed = data_indexed+"^"+string(mat[i][j][2][k]);
-        }
-
-        data = data+"*";
-        data_indexed = data_indexed+"*";
-      }
-      data[size(data)] = ",";
-      data_indexed[size(data_indexed)] = ",";
-    }
-    data[size(data)] = "}";
-    data_indexed[size(data_indexed)] = "}";
-    data = data+",";
-    data_indexed = data_indexed+",";
-    printf("  row %s done! (%s ms)",i,rtimer-t0);
-  }
-  data[size(data)] = "}";
-  data_indexed[size(data_indexed)] = "}";
-
-  write(":w "+filename+"_non_linear_factors.txt",data);
-  write(":w "+filename+"_non_linear_factors_indexed.txt",data_indexed);
-  return(p);
+  return(fractions, denom_factors, p);
 }
 
 proc checkpfdMat(def input, string output, string qfile, list #)
@@ -1933,31 +2053,22 @@ PURPOSE:  test the output files of @code{pfdMat} for correctness. Input and
 SEE ALSO: readInputTXT, pfd, checkpfd, pfdMat"
 {
   system("--ticks-per-sec",1000);
+  short = 0;
   int t0;
-  string nonlinFactors = "";
   int N=0;
   int parallelize=1;
   if(size(#)==1)
   {
     if(typeof(#[1])=="int") {N=#[1];}
-    else {if(typeof(#[1])=="string") {nonlinFactors=#[1];}
-    else {ERROR("invalid argument type: "+typeof(#[1]));}}
+    else {ERROR("invalid argument type: "+typeof(#[1]));}
   }
   if(size(#)==2)
   {
-    if(typeof(#[1])=="string" && typeof(#[2])=="int")
-      {nonlinFactors=#[1]; N=#[2];}
-    else{if(typeof(#[1])=="int" && typeof(#[2])=="int")
+    if(typeof(#[1])=="int" && typeof(#[2])=="int")
       {N=#[1]; parallelize=#[2];}
-    else {ERROR("invalid argument types: "+typeof(#[1])+", "+typeof(#[2]));}}
+    else {ERROR("invalid argument types: "+typeof(#[1])+", "+typeof(#[2]));}
   }
-  if(size(#)==3)
-  {
-    if(typeof(#[1])=="string" && typeof(#[2])=="int" && typeof(#[3])=="int")
-      {nonlinFactors=#[1]; N=#[2]; parallelize=#[3];}
-    else {ERROR("invalid argument types: "+typeof(#[1])+", "+typeof(#[2])+", "+typeof(#[3]));}
-  }
-  if(size(#)>3) {ERROR("too many arguments");}
+  if(size(#)>2) {ERROR("too many arguments");}
 
   print(newline+"reading input file:");
   list frac = readInputTXT(input,2);
@@ -1965,89 +2076,70 @@ SEE ALSO: readInputTXT, pfd, checkpfd, pfdMat"
   if(typeof(input)=="list")   {string filename=input[1];}
   filename = filename[1,find(filename,".txt")-1];
 
-  print("factorizing the denominators ..."); t0=rtimer;
+  print("factorizing the denominators "); t0=rtimer;
   frac = FactDenom(frac);
   printf("done! (%s ms)",rtimer-t0);
 
-  print(newline+"reading output files:"); t0=rtimer;
-  print(newline+"List of denominator factors");
-  ideal q,p;
-  q,p = readQfileTXT(qfile);
-  printf("linear: %s",q);
-  printf("nonlinear: %s",p);
-  print("done!");
+  print("reading output files:"); t0=rtimer;
+  print(" reading list of denominator factors from "+qfile);
+  ideal q;
+  q = readQfileTXT(qfile);
+  //printf("denominator factors: %s",q);
+  print(" done!");
 
-  print(newline+"output decompositions (indexed):");
-  list dec = readOutputTXT(output);
+  print(" reading (indexed) output decompositions ");
+  list dec,nonlin;
+  dec,nonlin = readOutputTXT(output);
+
+  if(parallelize)
+    {printf("done! (%s ms)%n%ncreating tasks",rtimer-t0,0); t0=rtimer;}
+  else
+  {
+    printf("done! (%s ms)%n%n",rtimer-t0,0);
+    if(N<=0)
+      {print("checking for correctness (exact test) ");}
+    else
+      {printf("checking for correctness (%s random evaluations per entry) ",N);}
+    t0=rtimer;
+  }
+
+  fprintf(":w "+filename+"_checkpfd_logfile.txt","Input file (matrix of rational functions): %s"
+          +"%nOutput file (decompositions): %s%nlist of all denominator factors: %s"
+          +"%n%nResults of checkpfdMat:",input,output,qfile,0);
+  link logfile = ":a "+filename+"_checkpfd_logfile.txt";
 
   int n=size(frac);
   int m=size(frac[1]);
   int i,j,k,ind;
-
   list arguments;
-  if(nonlinFactors=="")
+  for(i=1;i<=n;i++)
   {
-    if(parallelize)
-      {printf("%ndone! (%s ms)%ncreating tasks",rtimer-t0,0); t0=rtimer;}
-    else
-      {printf("%ndone! (%s ms)%nchecking correctness",rtimer-t0,0); t0=rtimer;}
-
-    fprintf(":w "+filename+"_checkpfd.txt","Input file (matrix of rational functions): %s
-            Output file (decompositions): %s%nlist of all denominator factors: %s
-            Results of checkpfdMat:%n",input,output,qfile,0);
-    link logfile = ":a "+filename+"_checkpfd.txt";
-    for(i=1;i<=n;i++)
+    for(j=1;j<=m;j++)
     {
-      for(j=1;j<=m;j++)
+      for(k=1;k<=size(nonlin[i][j][1]);k++)
       {
-        if(parallelize)
-          {arguments[(i-1)*m+j] = list(i,j,frac[i][j],list(q,dec[i][j]),logfile,N);}
-        else
-          {results[(i-1)*m+j] = testEntry(i,j,frac[i][j],list(q,dec[i][j]),logfile,N);}
+        ind = find_entry(frac[i][j][2][1],q[nonlin[i][j][1][k]]);
+        if(ind==0) {ERROR("nonlinear factors are wrong");}
+        if(frac[i][j][2][2][ind]!=nonlin[i][j][2][k])
+          {ERROR("nonlinear factors are wrong");}
+        frac[i][j][2][1] = delete(frac[i][j][2][1],ind);
+        frac[i][j][2][2] = delete(frac[i][j][2][2],ind);
       }
+      if(parallelize)
+        {arguments[(i-1)*m+j] = list(i,j,frac[i][j],list(q,dec[i][j]),logfile,N);}
+      else
+        {results[(i-1)*m+j] = testEntry(i,j,frac[i][j],list(q,dec[i][j]),logfile,N);}
     }
   }
-  else
-  {
-    print(newline+"nonlinear factors (indexed)");
-    list nonlin = readNonlinFactorsTXT(nonlinFactors,p);
-    print("done!");
 
-    if(parallelize)
-      {printf("%ndone! (%s ms)%ncreating tasks",rtimer-t0,0); t0=rtimer;}
-    else
-      {printf("%ndone! (%s ms)%nchecking correctness",rtimer-t0,0); t0=rtimer;}
-
-    fprintf(":w "+filename+"_checkpfd.txt","Input file (matrix of rational functions): %s"
-            +"%nOutput file (decompositions without nonlinear factors): %s"
-            +"%nnonlinear denominator factors: %s%nlist of all denominator factors: %s"
-            +"%nResults of checkpfdMat:%n",input,output,nonlinFactors,qfile,0);
-
-    link logfile = ":a "+filename+"_checkpfd.txt";
-
-    for(i=1;i<=n;i++)
-    {
-      for(j=1;j<=m;j++)
-      {
-        for(k=1;k<=size(nonlin[i][j][1]);k++)
-        {
-          ind = find_entry(frac[i][j][2][1],nonlin[i][j][1][k]);
-          if(ind==0) {print(1);print(frac[i][j][2][1]);print(nonlin[i][j][1]);print(nonlin[i][j][1][k]);ERROR("nonlinear factors are wrong");}
-          if(frac[i][j][2][2][ind]!=nonlin[i][j][2][k])
-            {print(2);print(frac[i][j][2][1]);print(nonlin[i][j][1]);print(nonlin[i][j][1][k]);ERROR("nonlinear factors are wrong");}
-          frac[i][j][2][1] = delete(frac[i][j][2][1],ind);
-          frac[i][j][2][2] = delete(frac[i][j][2][2],ind);
-        }
-        if(parallelize)
-          {arguments[(i-1)*m+j] = list(i,j,frac[i][j],list(q,dec[i][j]),logfile,N);}
-        else
-          {results[(i-1)*m+j] = testEntry(i,j,frac[i][j],list(q,dec[i][j]),logfile,N);}
-      }
-    }
-  }
   if(parallelize)
   {
-    printf("done! (%s ms)%nchecking correctness",rtimer-t0,0); t0=rtimer;
+    printf("done! (%s ms)%n%n",rtimer-t0,0);
+    if(N<=0)
+      {print("checking for correctness (exact test) ");}
+    else
+      {printf("checking for correctness (%s random evaluations per entry) ",N);}
+    t0=rtimer;
     list results = parallelWaitAll("testEntry",arguments);
   }
   else {printf("done! (%s ms)",rtimer-t0);}
@@ -2060,12 +2152,17 @@ SEE ALSO: readInputTXT, pfd, checkpfd, pfdMat"
 static proc readOutputTXT(string filename__)
 {
   system("--ticks-per-sec",1000);
-  print("  reading file ..."); int t__=rtimer; int tt__;
+  print("  reading matrix of decompositions from file "+filename__);
+  int t__=rtimer;
+  int tt__;
   string data__ = read(":r "+filename__);
   printf("  done! (%s ms)", rtimer-t__);
 
-  print("  processing input ..."); t__ = rtimer;
+  print("  processing input "); t__ = rtimer;
   list mat__;
+  list nonlin__=list();
+  int nonlin_factors_seperated__=0;
+  if(find(data__," * ")>0) {nonlin_factors_seperated__=1;}
   int left__,right__=0,0;
   left__ = find(data__,"{");
   int pos1__,pos2__=0,0;
@@ -2082,6 +2179,7 @@ static proc readOutputTXT(string filename__)
     if(left__==0) {break;}
     right__ = find(data__,"}",left__);
     mat__[i__]=list();
+    nonlin__[i__]=list();
     pos2__=left__;
     for(j__=1;pos2__<right__&&pos2__>0;j__++)
     {
@@ -2090,6 +2188,42 @@ static proc readOutputTXT(string filename__)
       if(pos2__==0||pos2__>right__) {s__ = data__[pos1__,right__-pos1__];}
       else {s__ = data__[pos1__,pos2__-pos1__];}
       mat__[i__][j__] = list();
+
+
+      factors__ = intvec(0:0);
+      exponents__ = intvec(0:0);
+      l__ = find(s__," * ");
+      if(l__>0)
+      {
+        ss__ = s__[1,l__-1];  //ss__ contains the nonlinear factors
+        s__ = s__[l__+3,size(s__)-l__-2];
+        for(p1__=1;s__[p1__]!="(";p1__++) {}
+        for(p2__=size(s__);s__[p2__]!=")";p2__--) {}
+        s__ = s__[p1__+1,p2__-p1__-1];
+        l__ = find(ss__,"q");
+        ss__ = ss__[l__,find(ss__,")",l__)-l__];
+        ss__ = ss__+"*";
+        p1__=0;
+        for(l__=1;1;l__++)
+        {
+          p1__ = find(ss__,"q",p1__+1);
+          if(p1__==0) {break;}
+          p1__++;
+          p2__ = find(ss__,"^",p1__);
+          tmp__ = find(ss__,"*",p1__);
+          if((p2__>tmp__ && tmp__>0) || (p2__==0)) //exponent is 1
+          {
+            execute("factors__[l__]="+ss__[p1__,tmp__-p1__]);
+            exponents__[l__] = 1;
+          }
+          else
+          {
+            execute("factors__[l__]="+ss__[p1__,p2__-p1__]);
+            execute("exponents__[l__]="+ss__[p2__+1,tmp__-p2__-1]);
+          }
+        }
+      }
+      nonlin__[i__][j__] = list(factors__,exponents__);
 
       depth__ = 0;
       s__=s__+" ";
@@ -2148,85 +2282,22 @@ static proc readOutputTXT(string filename__)
   }
   printf("  done! (%s ms)", rtimer-t__);
 
-  return(mat__);
-}
-
-static proc readNonlinFactorsTXT(string filename__, ideal p__)
-{
-  string data__ = read(":r "+filename__);
-  list mat__;
-  int left__,right__=0,0;
-  left__ = find(data__,"{");
-  int pos1__,pos2__=0,0;
-  int p1__,p2__;
-  int tmp__;
-  int i__,j__,k__;
-  list factors__,exponents__;
-  string s__;
-  for(i__=1;1;i__++)
-  {
-    left__ = find(data__,"{",left__+1);
-    if(left__==0) {break;}
-    right__ = find(data__,"}",left__);
-    mat__[i__]=list();
-    pos2__=left__;
-    for(j__=1;pos2__<right__&&pos2__>0;j__++)
-    {
-      pos1__ = pos2__+1;
-      pos2__ = find(data__,",",pos1__);
-      if(pos2__==0||pos2__>right__) {s__ = data__[pos1__,right__-pos1__];}
-      else {s__ = data__[pos1__,pos2__-pos1__];}
-
-      s__ = s__+"*";
-      factors__ = list();
-      exponents__ = list();
-      p1__=0;
-      for(k__=1;1;k__++)
-      {
-        p1__ = find(s__,"p",p1__+1);
-        if(p1__==0) {break;}
-        p1__++;
-        p2__ = find(s__,"^",p1__);
-        tmp__ = find(s__,"*",p1__);
-        if((p2__>tmp__ && tmp__>0) || (p2__==0)) //exponent is 1
-        {
-          execute("factors__[k__]=p__["+s__[p1__,tmp__-p1__]+"]");
-          exponents__[k__] = 1;
-        }
-        else
-        {
-          execute("factors__[k__]=p__["+s__[p1__,p2__-p1__]+"]");
-          execute("exponents__[k__]="+s__[p2__+1,tmp__-p2__-1]);
-        }
-      }
-      mat__[i__][j__] = list(factors__, exponents__);
-    }
-  }
-  return(mat__);
+  return(mat__,nonlin__);
 }
 
 static proc readQfileTXT(string filename__)
 {
   string data__ = read(":r "+filename__);
-  ideal q__,p__;
-  int pos1__,pos2__,tmp__=1,1,1;
+  ideal q__;
+  int pos1__,pos2__=1,1;
 
-  while(1)
-  {
-    pos1__=find(data__,"q",pos2__);
-    tmp__=find(data__,"=",pos2__);
-    if(pos1__==0 || pos1__>tmp__) {break;}
-    pos1__=tmp__+1;
-    pos2__=find(data__,";",pos1__);
-    execute("q__[size(q__)+1]="+data__[pos1__,pos2__-pos1__]);
-  }
   while(1)
   {
     pos1__=find(data__,"=",pos2__);
     if(pos1__==0) {break;}
     pos1__++;
     pos2__=find(data__,";",pos1__);
-    execute("p__[size(p__)+1]="+data__[pos1__,pos2__-pos1__]);
+    execute("q__[size(q__)+1]="+data__[pos1__,pos2__-pos1__]);
   }
-  return(q__,p__);
+  return(q__);
 }
