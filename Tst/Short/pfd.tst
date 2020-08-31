@@ -88,10 +88,10 @@ displaypfd(dec[1][1]);
 displaypfd(dec[1][2]);
 displaypfd(dec[2][1]);
 displaypfd(dec[2][2]);
-checkpfd(list(f1,g1), dec[1][1]);
-checkpfd(list(f2,g2), dec[1][2]);
-checkpfd(list(f3,g3), dec[2][1]);
-checkpfd(list(f4,g4), dec[2][2]);
+checkpfd(list(f11,g11), dec[1][1]);
+checkpfd(list(f12,g12), dec[1][2]);
+checkpfd(list(f21,g21), dec[2][1]);
+checkpfd(list(f22,g22), dec[2][2]);
 kill dec;
 
 
