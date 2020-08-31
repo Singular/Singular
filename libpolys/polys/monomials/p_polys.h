@@ -1977,6 +1977,7 @@ static inline BOOLEAN p_IsConstant(const poly p, const ring r)
 /// either poly(1)  or gen(k)?!
 static inline BOOLEAN p_IsOne(const poly p, const ring R)
 {
+  if (p == NULL) return FALSE; /* TODO check if 0 == 1 */
   p_Test(p, R);
   return (p_IsConstant(p, R) && n_IsOne(p_GetCoeff(p, R), R->cf));
 }
