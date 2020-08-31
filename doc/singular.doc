@@ -1089,6 +1089,7 @@ Comments should be send to the author of the library directly.
 * nets_lib:: Pretty printing
 * nfmodstd_lib:: Groebner bases of ideals in rings over algebraic number fields
 * nfmodsyz_lib:: Syzygy modules of submodules of free modules over algebraic number fields
+* pfd_lib:: Multivartiate partial fraction decomposition
 * realclassify_lib:: Classification of real singularities
 * rootisolation_lib:: real root isolation with intervals
 * rstandard_lib:: Janet bases and border bases for ideals
@@ -1229,6 +1230,10 @@ Todos/Issues:
 @node nfmodsyz_lib
 @subsection nfmodsyz_lib
 @c lib nfmodsyz.lib
+@c ----------------------------------------------------------
+@node pfd_lib
+@subsection pfd_lib
+@c lib pfd.lib
 @c ----------------------------------------------------------
 @node realclassify_lib
 @subsection realclassify_lib
