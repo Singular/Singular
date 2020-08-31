@@ -139,7 +139,7 @@ void ssiCheckCurrRing(const ring r)
     }
     rSetHdl(h);
   }
-  assume(currRing==r);
+  assume((currRing==r) || rEqual(r,currRing));
 }
 // the implementation of the functions:
 void ssiWriteInt(const ssiInfo *d,const int i)
@@ -809,11 +809,16 @@ void ssiReadBlackbox(leftv res, si_link l)
   if (tok>MAX_TOK)
   {
     ring save_ring=currRing;
+    idhdl save_hdl=currRingHdl;
     blackbox *b=getBlackboxStuff(tok);
     res->rtyp=tok;
     b->blackbox_deserialize(&b,&(res->data),l);
     if (save_ring!=currRing)
+    {
       rChangeCurrRing(save_ring);
+      if (save_hdl!=NULL) rSetHdl(save_hdl);
+      else currRingHdl=NULL;
+    }
   }
   else
   {
