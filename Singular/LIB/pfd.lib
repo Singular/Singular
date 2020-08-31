@@ -89,8 +89,8 @@ RETURN:   a partial fraction decomposition of f/g as a list @code{l} where
           lists) of the results is returned.
 NOTE:     The result depends on the monomial ordering. For \"small\" results
           use @code{dp}.
-EXAMPLE:  example pfd; shows an example
-SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat"
+SEE ALSO: checkpfd, evaluatepfd, displaypfd, displaypfd_long, pfdMat
+EXAMPLE:  example pfd; shows an example"
 {
   short = 0;
   int i;
@@ -1167,7 +1167,8 @@ PURPOSE:  read matrix of rational functions from a txt-file and turn it into a
        @* @code{mode=1} (default): save result to an ssi-file of the same name
        @* @code{mode=2}: return result
        @* @code{mode=3}: save to ssi-file AND return result
-SEE ALSO: pfdMat"
+SEE ALSO: pfdMat
+"
 {
   system("--ticks-per-sec",1000);
   short = 0;
@@ -1448,7 +1449,8 @@ PURPOSE:  apply @code{pfd} to all entries of a matrix of rational functions
           not terminate in time for every matrix entry. Other than the files
           created in mode 1-3, these files are saved in the current directory,
           rather than the directory of the input file.
-SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat"
+SEE ALSO: readInputTXT, pfd, checkpfd, checkpfdMat
+"
 {
   system("--ticks-per-sec",1000);
   short = 0;
@@ -1964,7 +1966,8 @@ PURPOSE:  test the output files of @code{pfdMat} for correctness. Input and
           parallel using @ref{parallel_lib}.
        @* The result is printed and as in @code{pfdMat} a logfile is created
           showing the results for each matrix entry.
-SEE ALSO: readInputTXT, pfd, checkpfd, pfdMat"
+SEE ALSO: readInputTXT, pfd, checkpfd, pfdMat
+"
 {
   system("--ticks-per-sec",1000);
   short = 0;
