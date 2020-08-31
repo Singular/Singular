@@ -5,7 +5,7 @@ LIB "pfd.lib";
 
 example pfd;
 
-/* pfd(poly,poly) */
+// pfd(poly,poly) //////////////////////////////////////////////////////////////
 ring r1 = 0, x(1..5), dp;
 poly f = -2*x(1)*x(3)+3*x(3)*x(4)+x(2)*x(5)+x(3)*x(5)-x(4)*x(5);
 poly g = x(1)*x(3)*(-x(2)+x(3)+x(4))*(x(1)-x(5))*x(5);
@@ -31,25 +31,29 @@ checkpfd(list(f,g), dec);
 checkpfd(list(f,g), dec,10);
 kill dec;
 
+
+// pfd(poly,list) (denominator = ideal of factors & intvec of exponents) ///////
 ring r3 = 5, (x,y,z), dp;
-poly f = 2*x^3-x^2*y+x*y^2+y^3-2*x^2*z-2*x*y*z-y^2*z+2*x*z^2+y*z^2-2*z^3;
-poly g = (x^2+3*y)^2*(x-2*y^2)*(x+y+1)^3*(2*x+3*y+4)*(x^2-x*y+y^2);
+poly f = x+y+z+1;
+list g = list(ideal((x^2+y^2+z^2),(x+y^2),(y+z^2),(z+x^2)), intvec(2,1,1,1));
 list dec = pfd(f,g);
 displaypfd(dec);
 checkpfd(list(f,g), dec);
-checkpfd(list(f,g), dec,10);
+checkpfd(list(f,g), dec, 10);
 kill dec;
 
+// different ordering, same polynomials:
 ring r4 = 5, (x,y,z), lp;
 poly f = fetch(r3,f);
-poly g = fetch(r3,g);
+list g = fetch(r3,g);
 list dec = pfd(f,g);
 displaypfd(dec);
 checkpfd(list(f,g), dec);
 checkpfd(list(f,g), dec,10);
 kill dec;
 
-/* pfd(list) */
+
+// pfd(list) ///////////////////////////////////////////////////////////////////
 ring s1 = 0, (x,y,z), dp;
 poly f1 = x*y+y*z+z*x-x-y-z+1;
 poly g1 = (z-2)*x^2*(y+1)^2*(x+2*y^2-z);
@@ -67,7 +71,7 @@ checkpfd(list(f2,g2), dec[2]);
 checkpfd(list(f3,g3), dec[3]);
 kill dec;
 
-/* pfd(matrix) */
+// pfd(matrix) /////////////////////////////////////////////////////////////////
 ring s2 = 3, (x,y,z), dp;
 poly f11 = (x+y+z+1)^3;
 poly g11 = (x-y)*(y-z)^2*(z-x)^3*(x^2+y^2+z^2);
