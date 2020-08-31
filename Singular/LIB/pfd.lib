@@ -11,10 +11,12 @@ This Library implements an algorithm based on the work of E. K. Leinartas to
 write rational functions in mutiple variables as a sum of functions with
 \"smaller\" numerators and denominators.
 This can be used to shorten the IBP reduction coeffcients of multi-loop Feynman
-integrals as shown in [J. Boehm, M. Wittmann, Z. Wu, Y. Xu, Y. Zhang: 'IBP
-reduction coefficients made simple'] (preprint 2020). For this application,
+integrals. For this application,
 we also provide a procedure that applies the algorithm to all entries of a
 matrix of rational functions given as one (possibly very big) txt-file.
+If you use the library pfd.lib, please cite the corresponding paper
+[J. Boehm, M. Wittmann, Z. Wu, Y. Xu, Y. Zhang: 'IBP reduction coefficients 
+made simple'] (preprint 2020).
 
 KEYWORDS: partial fraction; decomposition; Leinartas
 
