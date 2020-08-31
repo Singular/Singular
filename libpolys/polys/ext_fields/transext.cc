@@ -199,7 +199,7 @@ static BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
       poly gcd = singclap_gcd_r( num, den, ntRing );
       if(gcd!=NULL)
       {
-        if((gcd!=NULL) && !p_IsOne(gcd, ntRing) )
+        if( !p_IsOne(gcd, ntRing) )
         {
           Print("ERROR in %s:%d: 1 != GCD between num. & den. poly\n",f,l);
           PrintS("GCD: ");  p_Write(gcd, ntRing);
