@@ -221,7 +221,7 @@ ring jjSetMinpoly(ring r, number a)
   if (DEN((fraction)(p)) != NULL) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
-    if(!p_IsConstantPoly(n,r->cf->extRing))
+    if(!p_IsConstant(n,r->cf->extRing))
     {
       WarnS("denominator must be constant - ignoring it");
     }
@@ -342,7 +342,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   if (!redefine_from_algext && (DEN((fraction)(p)) != NULL)) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
-    if(!p_IsConstantPoly(n,currRing->cf->extRing))
+    if(!p_IsConstant(n,currRing->cf->extRing))
     {
       WarnS("denominator must be constant - ignoring it");
     }

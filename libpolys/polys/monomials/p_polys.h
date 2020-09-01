@@ -1982,18 +1982,7 @@ static inline BOOLEAN p_IsOne(const poly p, const ring R)
   return (p_IsConstant(p, R) && n_IsOne(p_GetCoeff(p, R), R->cf));
 }
 
-static inline BOOLEAN p_IsConstantPoly(const poly p, const ring r)
-{
-  p_Test(p, r);
-  poly pp=p;
-  while(pp!=NULL)
-  {
-    if (! p_LmIsConstantComp(pp, r))
-      return FALSE;
-    pIter(pp);
-  }
-  return TRUE;
-}
+#define p_IsConstantPoly(p,r) p_IsConstant(p,r)
 
 static inline BOOLEAN p_IsUnit(const poly p, const ring r)
 {

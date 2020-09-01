@@ -243,7 +243,7 @@ poly singclap_gcd ( poly f, poly g, const ring r );
 #define   pLmIsConstant(p)          p_LmIsConstant(p,currRing)
 
 /// return TRUE if all monomials of p are constant
-#define   pIsConstantPoly(p)        p_IsConstantPoly(p, currRing)
+#define   pIsConstantPoly(p)        p_IsConstant(p, currRing)
 
 #define   pIsPurePower(p)   p_IsPurePower(p, currRing)
 #define   pIsUnivariate(p)  p_IsUnivariate(p, currRing)
