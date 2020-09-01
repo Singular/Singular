@@ -1361,7 +1361,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   if (!rField_is_Zp(r) && !rField_is_Zp_a(r)) /* Q, Q(a) */
   {
     //if (f!=NULL) // already tested at start of routine
-    number n0=n_Copy(pGetCoeff(f),r->cf);
+    number n0=n_Copy(old_lead_coeff,r->cf);
     if (with_exps==0 || with_exps==3)
       N=n_Copy(n0,r->cf);
     p_Cleardenom(f, r);
@@ -1380,7 +1380,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     //if (f!=NULL) // already tested at start of routine
     if (singclap_factorize_retry==0)
     {
-      number n0=n_Copy(pGetCoeff(f),r->cf);
+      number n0=n_Copy(old_lead_coeff,r->cf);
       if (with_exps==0 || with_exps==3)
         N=n_Copy(n0,r->cf);
       p_Norm(f,r);
