@@ -1239,6 +1239,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, int rt, BOOLEAN toplevel, BOOLEAN is
     }
     if (l->rtyp==IDHDL)
     {
+      if((currRingHdl==NULL) && RingDependend(rt))
+      {
+        WerrorS("basering required");
+        return TRUE;
+      }
       if (rt==BUCKET_CMD) IDTYP((idhdl)l->data)=POLY_CMD;
       else                IDTYP((idhdl)l->data)=rt;
     }
