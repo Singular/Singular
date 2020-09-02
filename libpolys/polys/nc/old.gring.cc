@@ -3360,7 +3360,7 @@ poly pOppose(ring Rop, poly p, const ring dst)
   // coinside???
 
   int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
-  if (!p_IsConstantPoly(p, Rop))
+  if (!p_IsConstant(p, Rop))
   {
     /* we know perm exactly */
     int i;
