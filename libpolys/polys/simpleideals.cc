@@ -403,7 +403,7 @@ BOOLEAN id_IsConstant(ideal id, const ring r)
 
   for (int k = IDELEMS(id)-1; k>=0; k--)
   {
-    if (!p_IsConstant(id->m[k],r))
+    if (!p_IsConstantPoly(id->m[k],r))
       return FALSE;
   }
   return TRUE;

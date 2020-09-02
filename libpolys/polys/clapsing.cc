@@ -825,7 +825,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
   p_Test(f,r);
   p_Test(fac,r);
   int e=0;
-  if (!p_IsConstant(fac,r))
+  if (!p_IsConstantPoly(fac,r))
   {
 #ifdef FACTORIZE2_DEBUG
     printf("start count_Factors(%d), Fdeg=%d, factor deg=%d\n",j,p_Totaldegree(f,r),p_Totaldegree(fac,r));
@@ -1140,7 +1140,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       if (r->cf->extRing->qideal!=NULL)
         prune (a);
 #ifndef SING_NDEBUG
-    if ((r->cf->extRing!=NULL) && (!p_IsConstant(ff,r)))
+    if ((r->cf->extRing!=NULL) && (!p_IsConstantPoly(ff,r)))
     {
       singclap_factorize_retry++;
       if (singclap_factorize_retry<3)
