@@ -614,6 +614,7 @@ ring ssiReadRing(const ssiInfo *d)
       omFree(names[i]);
     }
     omFreeSize(names,N*sizeof(char*));
+    r->ref=1;
     return r;
   }
 }
