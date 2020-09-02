@@ -4613,7 +4613,7 @@ User defined types are (non-empty) lists with a fixed size
 whose element can be accessed by names (and not indices).
 These elements have a predefined type (which can also be a user defined type).
 If these elements depend on a ring they can only be accessed if
-their base ring ist the current base ring.
+their base ring is the current base ring.
 In contrast to usual lists the elements of a user defined type may
 belong to different rings.
 
