@@ -34,6 +34,7 @@ PROCEDURES:
                   normal form, semi group, semi module of differentials,
                   Zariski number and moduli
   modSagbiAlg(G); modular variant of sagbiAlg
+  classSpaceCurve(I); normal form of I if I is simple
 ";
 LIB "algebra.lib";
 LIB "curvepar.lib";
@@ -2433,6 +2434,645 @@ static proc finalTest_sagbi(string command, alias list args, def result)
     }
     return(1);
 }
+
+proc classSpaceCurve(ideal I)
+"USAGE": classSpaceCurve(I);  I ideal
+RETURN: the normal form of I if I is simple, -1 if I is not simple
+EXAMPLE: example classSpaceCurve;  shows an example
+{
+   //======  computes the normal form of parametrized space curves  =====
+   //======                in characteristic p                      =====
+
+   int p=char(basering);
+   list L=weakNF(I);
+   I=L[1];
+   if(size(I)==2){I[3]=0;}
+   ideal K=L[8];
+   //=====             the smooth case                              =====
+
+   if(ord(I[1])==1){return(ideal(var(1),0,0));}
+
+   //=====               the case p=2                               =====
+
+   if(p==2)
+   {
+      if(ord(I[1])>3){return(-1);}
+      if((ord(I[1])==3)&&(ord(I[2])>10)){return(-1);}
+      I=normal2(K,L[2][1]);
+      return(I);
+   }
+
+   //======             from now on p>2                             =====
+
+   //======    the case of multiplicity >4 (not simple)             =====
+   if(ord(I[1])>4)
+   {
+      return(-1);
+   }
+
+   //=====              the case of multiplicity 4                  =====
+
+   if(ord(I[1])==4)
+   {
+      if(ord(I[2])>7)
+      {
+         return(-1);//not simple
+      }
+      if(ord(I[2])==7)
+      {
+         if((p==3)||(p==7)) //not simple in this characteristic
+         {
+            return(-1);
+         }
+         if(((p==5)||(p==13))&&(ord(I[3])!=9))
+         {
+            return(-1);//not simple in this characteristic
+         }
+         I=normal47(K,L[2][1]);
+         return(I);
+      }
+      if(ord(I[2])==5)
+      {
+         I=normal45(K,L[2][1]);
+         return(I);
+      }
+      if(ord(I[2])==6)
+      {
+         int k=L[5];
+         int r=L[6];
+         if(k>0)
+         {
+//            if((p==3)||(p==13)) //not simple in this characteristic
+//            {
+//               return(-1);
+//            }
+            if((p==5)&&(k!=7))
+            {
+               return(-1); //not simple in this characteristic
+            }
+            if((p==7)&&(k>13))
+            {
+               return(-1); //not simple in this characteristic
+            }
+            if((p==11)&&(k>8))
+            {
+               return(-1); //not simple in this characteristic
+            }
+            if((p>=17)&&(k>p-8))
+            {
+               return(-1); //not simple in this characteristic
+            }
+            I=normal46(I,L[2][1],L[5],L[6]);
+            return(I);
+         }
+         if((p==3)&&(r>7))
+         {
+            return(-1); //not simple in this characteristic
+         }
+         if((p==5)&&(r>11))
+         {
+            return(-1); //not simple in this characteristic
+         }
+         if((p==7)&&(r>15))
+         {
+            return(-1); //not simple in this characteristic
+         }
+         if((p==11)&&(r>29))
+         {
+            return(-1); //not simple in this characteristic
+         }
+         if((p==13)&&(r>9))
+         {
+            return(-1); //not simple in this characteristic
+         }
+         if((p>=17)&&(r>p+8))
+         {
+            return(-1); //not simple in this characteristic
+         }
+         I=normal46(I,L[2][1],L[5],L[6]);
+         return(I);
+       }
+   }
+   //======                the case of multiplicity 3             ======
+
+   if(ord(I[1])==3)
+   {
+      int k=L[5];
+      int l=L[7];
+      int r=L[6];
+      if((p==3)&&(k>7))
+      {
+         return(-1); //not simple in this characteristic
+      }
+      if((p==3)&&(k==7)&&((r>8)||(r==0)))
+      {
+         return(-1); //not simple in this characteristic
+      }
+      if((k>=p+9)&&((l==0)||(l>=k+p))&&((r==0)||(r>=k+p)))
+      {
+         return(-1); //not simple in this characteristic
+      }
+      I=normal3(I,L[2][1],L[7]);
+      return(I);
+   }
+
+   //=====                 the case of multiplicity 2             ======
+
+   if(ord(I[1])==2)
+   {
+      I=var(1)^2,var(1)^{ord(I[2])};
+      return(I);
+   }
+   return(-77); //test for error
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=31,t,ds;
+  ideal I=t3+6t4+13t5-13t6+10t7+2t8-6t9-10t10-15t11-6t12+8t13-2t14+t15+8t16,
+          t7+15t8+7t9-11t10-15t11-6t12+8t13-2t14+t15+8t16,
+          t10-11t11-6t12-t13+12t14+4t15-14t16+15t17-12t18+5t19+t20;
+  ideal J=classSpaceCurve(I);
+  J;
+}
+
+static proc weakNF(ideal I)
+{
+   //computes a list with an ideal,the weak normal form
+   //of a parametrized space curve, the semigroup,
+   //an integer max(conductor,ord(the last element
+   //in the ideal)),the reduced saga basis of I, and
+   //k,r (in case of (t^4,t^6+t^k,t^r)) resp. k,r,l
+   //(in case of (t^3,t^k+t^l,t^r)) and the ideal with
+   //coefficients
+   int k,r,l;
+   int s=size(I);
+   int p=char(basering);
+   ideal Is=sagbiAlg(I);
+   list L=semiGroup(Is);
+   int c=L[2];  //the conductor
+   if(size(Is)>2)
+   {
+      //(t^3,t^11,t^13) has as conductor 11, but we cannot cut t^13
+      //we have to change 11 by 13
+      int o=ord(Is[size(Is)]);
+      if(o>c){c=o;}
+   }
+   int e=leadexp(Is[1])[1];
+   if(e mod p!=0)
+   {
+      I=normalMap(Is,c+1);
+   }
+   Is=reducedSagbiAlg(I,c+1);
+   Is=jet(Is,c+1);
+   ideal K=Is;
+   Is=normalizeC(Is);
+   //the sagbi basis Is of I may contain more elements then I
+   //the reduced saga basis of (t^4,t^6+t^8+t^9) is (t^4,t^6+t^9,t^15)
+   //we obtain (t^4,t^6+t^9)
+   I=Is;
+
+   //=====  the special case (t^4,t^6+t^k,t^r)  =====
+   //=====  we compute k and r in this case     =====
+
+   if((ord(Is[1])==4)&&(ord(Is[2])==6))
+   {
+      if(size(Is)==4)
+      {
+         ideal J =Is[1..2];
+         J=sagbiAlg(J);
+         k=ord(J[size(J)]);
+         if(k==ord(Is[size(Is)]))
+         {
+            //the case (t^4,t^6+t^k,t^r) k+6>r=k+4
+            r=ord(Is[size(Is)-1]);
+            I=Is[1..size(Is)-1];
+         }
+         else
+         {
+            //the case (t^4,t^6+t^k,t^r) k+6<r=k+8
+            J=Is;
+            k=ord(Is[size(Is)-1]);
+            r=ord(Is[size(Is)]);
+            J[size(Is)-1]=0;
+            I=simplify(J,2);
+         }
+      }
+      else
+      {
+         if(size(Is[2])>1)
+         {
+            //the case (t^4,t^6+t^k,t^r), r=k-2 or k+2 or infinity
+            ideal J=Is[1..2];
+            J=sagbiAlg(J);
+            k=ord(J[size(J)]);
+            if(ord(J[size(J)])==ord(Is[size(Is)]))
+            {
+               I=Is[1..2];     //r=infinity
+            }
+            else
+            {
+               r=ord(Is[size(Is)]);
+               I=Is;
+            }
+         }
+         else
+         {
+            //the case (t^4,t^6,t^r)
+            r=ord(Is[3]);
+            I=Is;
+         }
+      }
+   }
+   //=====   the special case (t^3,t^k+t^l,t^r)    =====
+   //=====   we compute k,r and l in this case     =====
+   if(ord(Is[1])==3)
+   {
+      k=ord(Is[2])+6;
+      if(size(Is[2])>1)
+      {
+         l=ord(Is[2][2]);
+      }
+      if(size(Is)==3)
+      {
+         r=ord(Is[3]);
+      }
+   }
+   list M=I,L,c,Is,k-6,r,l,K;
+   return(M);
+}
+
+static proc normalizeC(ideal I)
+{
+   //makes all coefficients of the polynomials of I to 1
+   int i,j;
+   poly p,q;
+   for(i=1;i<=size(I);i++)
+   {
+      p=I[i];
+      q=0;
+      for(j=1;j<=size(p);j++)
+      {
+         q=q+leadmonom(p[j]);
+      }
+      I[i]=q;
+   }
+   return(I);
+}
+
+static proc normal47(ideal I, intvec semi)
+{
+//here we compute the normal forms with semigroup <4,7,...>
+
+   if(semi==intvec(4,7))
+   {
+      if(I[2][2]==var(1)^9){return(ideal(var(1)^4,var(1)^7+var(1)^9));}
+      if(I[2][2]==0){return(ideal(var(1)^4,var(1)^7));}
+      return(ideal(var(1)^4,var(1)^7+var(1)^13));
+   }
+   if(semi==intvec(4,7,9))
+   {
+      if(I[2][2]!=0){I[2]=var(1)^7;}
+      return(I);
+   }
+   if(semi==intvec(4,7,10))
+   {
+      I[3]=var(1)^10;
+      if(I[2][2]==var(1)^9)
+      {
+         I[2]=var(1)^7+var(1)^9;
+      }
+      else
+      {
+         I[2]=var(1)^7;
+      }
+      return(I);
+   }
+   if(semi==intvec(4,7,13))
+   {
+      I[3]=var(1)^13;
+      if(I[2][2]==var(1)^9)
+      {
+         I[2]=var(1)^7+var(1)^9;
+      }
+      else
+      {
+         I[2]=var(1)^7;
+      }
+      return(I);
+   }
+   if(semi==intvec(4,7,17))
+   {
+      I[3]=var(1)^17;
+      if(I[2][2]==var(1)^9)
+      {
+         I[2]=var(1)^7+var(1)^9;
+      }
+      if(ord(I[2][2])>9)
+      {
+         number a=leadcoef(I[2][2]);
+         number b=leadcoef(I[2][3]);
+         if(17*a^2==14*b)
+         {
+            I[2]=var(1)^7;
+         }
+         else
+         {
+            I[2]=var(1)^7+var(1)^13;
+         }
+      }
+      return(I);
+   }
+}
+
+static proc normal45(ideal I, intvec semi)
+{
+//here we compute the normal forms with semigroup <4,5,...>
+   int p=char(basering);
+   number a=leadcoef(I[2][2]);
+   number b=leadcoef(I[2][3]);
+   if(semi==intvec(4,5))
+   {
+      if(10*b==11*a^2)
+      {
+         I=var(1)^4,var(1)^5;
+      }
+      else
+      {
+         I=var(1)^4,var(1)^5+var(1)^7;
+      }
+      if((p==5)&&(a!=0))
+      {
+         I=var(1)^4,var(1)^5+var(1)^6;
+      }
+   }
+   if(semi==intvec(4,5,6))
+   {
+      if((p==3)&&(ord(I[3][2])==7))
+      {
+         I=var(1)^4,var(1)^5,var(1)^6+var(1)^7;
+      }
+      else
+      {
+         I=var(1)^4,var(1)^5,var(1)^6;
+      }
+   }
+   if(semi==intvec(4,5,7))
+   {
+      if((p==5)&&(ord(I[2][2])==6))
+      {
+         I=var(1)^4,var(1)^5+var(1)^6,var(1)^7;
+      }
+      else
+      {
+         I=var(1)^4,var(1)^5,var(1)^7;
+      }
+   }
+   if(semi==intvec(4,5,11))
+   {
+      if((p==5)&&(ord(I[2][2])==6))
+      {
+         I=var(1)^4,var(1)^5+var(1)^6,var(1)^11;
+      }
+      else
+      {
+         I=var(1)^4,var(1)^5,var(1)^11;
+         if(11*a^2!=10*b)
+         {
+            I=var(1)^4,var(1)^5+var(1)^7,var(1)^11;
+         }
+      }
+   }
+   return(I);
+}
+
+static proc normal46(ideal I, intvec semi, int k, int r)
+{
+//here we compute the normal forms with semigroup <4,6,...>
+   if(char(basering)==3)
+   {
+      if(ord(I[2][2])==9)
+      {
+         I=var(1)^4,var(1)^6+var(1)^9,var(1)^7;
+      }
+      else
+      {
+         I=var(1)^4,var(1)^6,var(1)^7;
+      }
+      return(I);
+   }
+   if(char(basering)==13)
+   {
+      if(ord(I[3])==7)
+      {
+         I=var(1)^4,var(1)^6,var(1)^7;
+      }
+      if(ord(I[3])==9)
+      {
+         if(ord(I[2][2])==7)
+         {
+            I=var(1)^4,var(1)^6+var(1)^7,var(1)^9;
+         }
+         else
+         {
+            I=var(1)^4,var(1)^6,var(1)^9;
+         }
+      }
+      return(I);
+   }
+   if(size(semi)==4)
+   {
+      I=var(1)^4,var(1)^6+var(1)^k,var(1)^r;
+   }
+   if(size(semi)==3)
+   {
+      if(k<0)
+      {
+         I=var(1)^4,var(1)^6,var(1)^r;
+      }
+      if(r==0)
+      {
+         I=var(1)^4,var(1)^6+var(1)^k;
+      }
+      if((r>0)&&(k>0))
+      {
+         I=var(1)^4,var(1)^6+var(1)^k,var(1)^r;
+      }
+   }
+   return(I);
+}
+
+static proc normal3(ideal I, intvec semi, int l)
+{
+//here we compute the normal forms with semigroup <3,...>
+   if(char(basering)==3)
+   {
+      if(semi==intvec(3,5))
+      {
+         if(ord(I[1][2])==4)
+         {
+            I=var(1)^3+var(1)^4,var(1)^5;
+         }
+         else
+         {
+            I=var(1)^3,var(1)^5;
+         }
+         return(I);
+      }
+      if(semi==intvec(3,5,7))
+      {
+         if(ord(I[1][2])==4)
+         {
+            I=var(1)^3+var(1)^4,var(1)^5,var(1)^7;
+         }
+         else
+         {
+            I=var(1)^3,var(1)^5,var(1)^7;
+         }
+         return(I);
+      }
+      if(semi==intvec(3,7,8))
+      {
+         if(ord(I[1][2])==4)
+         {
+            I=var(1)^3+var(1)^4,var(1)^7,var(1)^8;
+            return(I);
+         }
+         if(ord(I[1][2])==5)
+         {
+            I=var(1)^3+var(1)^5,var(1)^7,var(1)^8;
+         }
+         else
+         {
+            I=var(1)^3,var(1)^7,var(1)^8;
+         }
+         return(I);
+
+      }
+      return(-1);
+   }
+   int k=semi[2];
+   int r;
+   if(size(semi)==3)
+   {
+      r=semi[3];
+   }
+   if(l==0)
+   {
+      if(r==0)
+      {
+         I=var(1)^3,var(1)^k;
+      }
+      else
+      {
+         I=var(1)^3,var(1)^k,var(1)^r;
+      }
+   }
+   else
+   {
+      if(r==0)
+      {
+         I=var(1)^3,var(1)^k+var(1)^l;
+      }
+      else
+      {
+         I=var(1)^3,var(1)^k+var(1)^l,var(1)^r;
+      }
+   }
+   return(I);
+}
+
+static proc normal2(ideal I, intvec semi)
+{
+//here we compute the normal forms in characteristic 2
+   if(ord(I[1])==2)
+   {
+      int k=ord(I[1][2]);
+      if(k>0){I=var(1)^2+var(1)^k,I[2];}
+   }
+   if(semi==intvec(3,4))
+   {
+      if(ord(I[2][2])==5)
+      {
+         I=var(1)^3,var(1)^4+var(1)^5;
+      }
+      else
+      {
+         I=var(1)^3,var(1)^4;
+      }
+   }
+   if(semi==intvec(3,4,5))
+   {
+      I=var(1)^3,var(1)^4,var(1)^5;
+   }
+   if(semi==intvec(3,5))
+   {
+      I=var(1)^3,var(1)^5;
+   }
+   if(semi==intvec(3,5,7))
+   {
+      I=var(1)^3,var(1)^5,var(1)^7;
+   }
+   if(semi==intvec(3,7))
+   {
+      if(ord(I[2][2])==8)
+      {
+         I=var(1)^3,var(1)^7+var(1)^8;
+      }
+      else
+      {
+         I=var(1)^3,var(1)^7;
+      }
+   }
+   if(semi==intvec(3,7,8))
+   {
+      I=var(1)^3,var(1)^7,var(1)^8;
+   }
+   if(semi==intvec(3,7,11))
+   {
+      if(ord(I[2][2])==8)
+      {
+         I=var(1)^3,var(1)^7+var(1)^8,var(1)^11;
+      }
+      else
+      {
+         I=var(1)^3,var(1)^7,var(1)^11;
+      }
+   }
+   if(semi==intvec(3,8,10))
+   {
+      I=var(1)^3,var(1)^8,var(1)^10;
+   }
+   if(semi==intvec(3,8,13))
+   {
+      if(ord(I[2][2])==10)
+      {
+         I=var(1)^3,var(1)^8+var(1)^10,var(1)^13;
+      }
+      else
+      {
+         I=var(1)^3,var(1)^8,var(1)^13;
+      }
+   }
+   if(semi==intvec(3,10,11))
+   {
+      I=var(1)^3,var(1)^10,var(1)^11;
+   }
+   if(semi==intvec(3,10,14))
+   {
+      if(ord(I[2][2])==11)
+      {
+         I=var(1)^3,var(1)^10+var(1)^11,var(1)^14;
+      }
+      else
+      {
+         I=var(1)^3,var(1)^10,var(1)^14;
+      }
+
+   }
+   return(I);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //============================ Examples========================
 /*

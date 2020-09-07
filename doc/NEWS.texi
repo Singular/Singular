@@ -23,6 +23,7 @@
 Changed libraries:
 @itemize
 @item grobcov.lib: new version (@nref{grobcov_lib})
+@item classify_aeq.lib: new procedure @code{classSpaceCurve} (@nref{classify_aeq_lib})
 @end itemize
 
 Changes in the kernel/build system:
