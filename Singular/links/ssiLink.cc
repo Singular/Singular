@@ -77,9 +77,10 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   if (r==currRing)
   {
     r->ref++;
+    currRingHdl=rFindHdl(r,currRingHdl);
     return TRUE;
   }
-  else if (!rEqual(r,currRing,1))
+  else if ((currRing==NULL) || (!rEqual(r,currRing,1)))
   {
     char name[20];
     int nr=0;
@@ -99,8 +100,7 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
       && (rEqual(r,IDRING(h),1)))
       {
         IDRING(h)->ref++;
-        rSetHdl(h);
-        return TRUE;
+        break;
       }
     }
     rSetHdl(h);
@@ -115,7 +115,9 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
 }
 void ssiCheckCurrRing(const ring r)
 {
-  if (r!=currRing)
+  if ((r!=currRing)
+  ||(currRingHdl==NULL)
+  ||(IDRING(currRingHdl)!=r))
   {
     char name[20];
     int nr=0;
