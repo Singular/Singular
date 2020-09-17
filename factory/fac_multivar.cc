@@ -160,10 +160,11 @@ void find_good_prime(const CanonicalForm &f, int &start)
       if  ( i.hasTerms() )
       {
         find_good_prime(i.coeff(),start);
-        if (0==cf_getSmallPrime(start)) return;
+        if (start==cf_getNumSmallPrimes()) return;
         if((i.exp()!=0) && ((i.exp() % cf_getSmallPrime(start))==0))
         {
           start++;
+          if (start==cf_getNumSmallPrimes()) return;
           i=f;
         }
         else  i++;
@@ -175,11 +176,11 @@ void find_good_prime(const CanonicalForm &f, int &start)
   {
     if (f.inZ())
     {
-      if (0==cf_getSmallPrime(start)) return;
+      if (start==cf_getNumSmallPrimes()) return;
       while((!f.isZero()) && (mod(f,cf_getSmallPrime(start))==0))
       {
         start++;
-        if (0==cf_getSmallPrime(start)) return;
+        if (start==cf_getNumSmallPrimes()) return;
       }
     }
 /* should not happen!
@@ -270,7 +271,9 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
           find_good_prime(arg,i);
           find_good_prime(U0,i);
           find_good_prime(U,i);
-          int p=cf_getSmallPrime(i);
+          int p;
+          if (i==cf_getNumSmallPrimes()) p=0;
+          else p=cf_getSmallPrime(i);
           //printf("found:p=%d (%d)\n",p,i);
           if (p==0)
           {
@@ -282,7 +285,7 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
             b = coeffBound_old( U, p );
             prime_number=i;
           }
-	  else prime_number++;
+          else prime_number++;
           // p!=0:
           modpk bb=coeffBound_old(U0,p);
           if (bb.getk() > b.getk() ) b=bb;
