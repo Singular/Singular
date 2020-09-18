@@ -12,7 +12,7 @@
 # include "singularconfig.h"
 # include "misc/auxiliary.h"
 
-#ifdef HAVE_MPFR_H
+#if defined(HAVE_MPFR_H) && defined(HAVE_LIBMPFR)
 #define HAVE_SVD
 #endif
 
