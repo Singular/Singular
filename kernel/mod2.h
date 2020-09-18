@@ -12,7 +12,9 @@
 # include "singularconfig.h"
 # include "misc/auxiliary.h"
 
+#ifdef HAVE_MPFR_H
 #define HAVE_SVD
+#endif
 
 #define SINGULAR_MAJOR_VERSION 4
 #define SINGULAR_MINOR_VERSION 1
