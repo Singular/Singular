@@ -1069,6 +1069,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   {
     goto notImpl;
   }
+  if (errorreported) goto notImpl;
   {
     poly ff=p_Copy(f,r); // a copy for the retry stuff
     // the first factor should be a constant
