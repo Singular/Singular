@@ -358,20 +358,20 @@ CanonicalForm convertNTLGF2X2CF(const GF2X & poly,const Variable & x)
 /// a CFFList of Factory. This routine will be used after a successful
 /// factorization of NTL to convert the result back to Factory.
 ///
-/// Additionally a variable x and the computed multiplicity, as a type ZZp
+/// Additionally a variable x and the computed content, as a type ZZp
 /// of NTL, is needed as parameters indicating the main variable of the
-/// computed canonicalform and the multiplicity of the original polynomial.
+/// computed canonicalform and the conent of the original polynomial.
 /// To guarantee the correct execution of the algorithm the characteristic
 /// has a be an arbitrary prime number.
 ///
 /// INPUT:  A vector of polynomials over ZZp of type vec_pair_ZZ_pX_long and
-///         a variable x and a multiplicity of type ZZp
+///         a variable x and a content of type ZZp
 /// OUTPUT: The converted list of polynomials of type CFFList, all polynomials
 ///         have x as their main variable
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
-                                  (const vec_pair_ZZ_pX_long & e,const ZZ_p & multi,const Variable & x)
+                                  (const vec_pair_ZZ_pX_long & e,const ZZ_p & cont,const Variable & x)
 {
   //printf("convertNTLvec_pair_ZZpX_long2FacCFFList\n");
   CFFList result;
@@ -390,13 +390,12 @@ CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
   {
     result.append(CFFactor(convertNTLZZpX2CF(e[i].a,x),e[i].b));
   }
-  // the multiplicity at pos 1
-  if (!IsOne(multi))
-    result.insert(CFFactor(CanonicalForm(to_long(rep(multi))),1));
+  // the content at pos 1
+  result.insert(CFFactor(CanonicalForm(to_long(rep(cont))),1));
   return result;
 }
 CFFList convertNTLvec_pair_zzpX_long2FacCFFList
-                                  (const vec_pair_zz_pX_long & e,const zz_p multi,const Variable & x)
+                                  (const vec_pair_zz_pX_long & e,const zz_p cont,const Variable & x)
 {
   //printf("convertNTLvec_pair_zzpX_long2FacCFFList\n");
   CFFList result;
@@ -415,9 +414,8 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList
   {
     result.append(CFFactor(convertNTLzzpX2CF(e[i].a,x),e[i].b));
   }
-  // the multiplicity at pos 1
-  if (!IsOne(multi))
-    result.insert(CFFactor(CanonicalForm(to_long(rep(multi))),1));
+  // the content at pos 1
+  result.insert(CFFactor(CanonicalForm(to_long(rep(cont))),1));
   return result;
 }
 
@@ -430,20 +428,20 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList
 /// successful factorization of NTL to convert the result back to Factory.
 /// As usual this is simply a special case of the more general conversion
 /// routine but again speeded up by leaving out unnecessary steps.
-/// Additionally a variable x and the computed multiplicity, as type
+/// Additionally a variable x and the computed content, as type
 /// GF2 of NTL, are needed as parameters indicating the main variable of the
-/// computed canonicalform and the multiplicity of the original polynomial.
+/// computed canonicalform and the content of the original polynomial.
 /// To guarantee the correct execution of the algorithm the characteristic
 /// has a be an arbitrary prime number.
 ///
 /// INPUT:  A vector of polynomials over GF2 of type vec_pair_GF2X_long and
-///         a variable x and a multiplicity of type GF2
+///         a variable x and a content of type GF2
 /// OUTPUT: The converted list of polynomials of type CFFList, all
 ///         polynomials have x as their main variable
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList convertNTLvec_pair_GF2X_long2FacCFFList
-    (const vec_pair_GF2X_long& e, GF2 /*multi*/, const Variable & x)
+    (const vec_pair_GF2X_long& e, GF2 /*cont*/, const Variable & x)
 {
   //printf("convertNTLvec_pair_GF2X_long2FacCFFList\n");
   CFFList result;
@@ -455,8 +453,6 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
   // but this is not
   //important for the factorization, but nevertheless would take computing time
   // so it is omitted.
-
-  //We do not have to worry about the multiplicity in GF2 since it equals one.
 
   // Go through the vector e and compute the CFFList
   // bigone summarizes the result again
@@ -475,6 +471,7 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
     //append the converted polynomial to the CFFList
     result.append(CFFactor(bigone,exponent));
   }
+  result.insert(CFFactor(1,1));
   return result;
 }
 
@@ -738,20 +735,20 @@ ZZX convertFacCF2NTLZZX(const CanonicalForm & f)
 /// Routine for converting a vector of polynomials from ZZ to a list
 /// CFFList of Factory. This routine will be used after a successful
 /// factorization of NTL to convert the result back to Factory.
-/// Additionally a variable x and the computed multiplicity, as a type
+/// Additionally a variable x and the computed content, as a type
 /// ZZ of NTL, is needed as parameters indicating the main variable of the
-/// computed canonicalform and the multiplicity of the original polynomial.
+/// computed canonicalform and the content of the original polynomial.
 /// To guarantee the correct execution of the algorithm the characteristic
 /// has to equal zero.
 ///
 /// INPUT:  A vector of polynomials over ZZ of type vec_pair_ZZX_long and
-///         a variable x and a multiplicity of type ZZ
+///         a variable x and a content of type ZZ
 /// OUTPUT: The converted list of polynomials of type CFFList, all
 ///         have x as their main variable
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList
-convertNTLvec_pair_ZZX_long2FacCFFList (const vec_pair_ZZX_long & e,const ZZ & multi,const Variable & x)
+convertNTLvec_pair_ZZX_long2FacCFFList (const vec_pair_ZZX_long & e,const ZZ & cont,const Variable & x)
 {
   CFFList result;
   ZZX polynom;
@@ -769,8 +766,8 @@ convertNTLvec_pair_ZZX_long2FacCFFList (const vec_pair_ZZX_long & e,const ZZ & m
     //append the converted polynomial to the list
     result.append(CFFactor(bigone,exponent));
   }
-  // the multiplicity at pos 1
-  result.insert(CFFactor(convertZZ2CF(multi),1));
+  // the content at pos 1
+  result.insert(CFFactor(convertZZ2CF(cont),1));
 
   //return the converted list
   return result;
@@ -809,21 +806,21 @@ CanonicalForm convertNTLzzpE2CF(const zz_pE & coefficient,const Variable & x)
 /// Routine for converting a vector of polynomials from ZZpEX to a CFFList
 /// of Factory. This routine will be used after a successful factorization
 /// of NTL to convert the result back to Factory.
-/// Additionally a variable x and the computed multiplicity, as a type
+/// Additionally a variable x and the computed content, as a type
 /// ZZpE of NTL, is needed as parameters indicating the main variable of the
-/// computed canonicalform and the multiplicity of the original polynomial.
+/// computed canonicalform and the content of the original polynomial.
 /// To guarantee the correct execution of the algorithm the characteristic
 /// has a be an arbitrary prime number p and computations have to be done
 /// in an extention of F_p.
 ///
 /// INPUT:  A vector of polynomials over ZZpE of type vec_pair_ZZ_pEX_long and
-///         a variable x and a multiplicity of type ZZpE
+///         a variable x and a content of type ZZpE
 /// OUTPUT: The converted list of polynomials of type CFFList, all polynomials
 ///         have x as their main variable
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList
-convertNTLvec_pair_ZZpEX_long2FacCFFList(const vec_pair_ZZ_pEX_long & e,const ZZ_pE & multi,const Variable & x,const Variable & alpha)
+convertNTLvec_pair_ZZpEX_long2FacCFFList(const vec_pair_ZZ_pEX_long & e,const ZZ_pE & cont,const Variable & x,const Variable & alpha)
 {
   CFFList result;
   ZZ_pEX polynom;
@@ -860,15 +857,14 @@ convertNTLvec_pair_ZZpEX_long2FacCFFList(const vec_pair_ZZ_pEX_long & e,const ZZ
     //append the computed polynomials together with its exponent to the CFFList
     result.append(CFFactor(bigone,exponent));
   }
-  // Start by appending the multiplicity
-  if (!IsOne(multi))
-    result.insert(CFFactor(convertNTLZZpE2CF(multi,alpha),1));
+  // Start by insert the content
+  result.insert(CFFactor(convertNTLZZpE2CF(cont,alpha),1));
 
   //return the computed CFFList
   return result;
 }
 CFFList
-convertNTLvec_pair_zzpEX_long2FacCFFList(const vec_pair_zz_pEX_long & e,const zz_pE & multi,const Variable & x,const Variable & alpha)
+convertNTLvec_pair_zzpEX_long2FacCFFList(const vec_pair_zz_pEX_long & e,const zz_pE & cont,const Variable & x,const Variable & alpha)
 {
   CFFList result;
   zz_pEX polynom;
@@ -905,9 +901,8 @@ convertNTLvec_pair_zzpEX_long2FacCFFList(const vec_pair_zz_pEX_long & e,const zz
     //append the computed polynomials together with its exponent to the CFFList
     result.append(CFFactor(bigone,exponent));
   }
-  // Start by appending the multiplicity
-  if (!IsOne(multi))
-    result.insert(CFFactor(convertNTLzzpE2CF(multi,alpha),1));
+  // Start by appending the constant factor
+  result.insert(CFFactor(convertNTLzzpE2CF(cont,alpha),1));
 
   //return the computed CFFList
   return result;
@@ -944,20 +939,20 @@ CanonicalForm convertNTLGF2E2CF(const GF2E & coefficient,const Variable & x)
 /// of NTL to convert the result back to Factory.
 /// This is a special, but optimized case of the more general conversion
 /// from ZZpE to canonicalform.
-/// Additionally a variable x and the computed multiplicity, as a type GF2E
+/// Additionally a variable x and the computed content, as a type GF2E
 /// of NTL, is needed as parameters indicating the main variable of the
-/// computed canonicalform and the multiplicity of the original polynomial.
+/// computed canonicalform and the content of the original polynomial.
 /// To guarantee the correct execution of the algorithm the characteristic
 /// has to equal two and computations have to be done in an extention of F_2.
 ///
 /// INPUT:  A vector of polynomials over GF2E of type vec_pair_GF2EX_long and
-///         a variable x and a multiplicity of type GF2E
+///         a variable x and a content of type GF2E
 /// OUTPUT: The converted list of polynomials of type CFFList, all polynomials
 ///         have x as their main variable
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
-    (const vec_pair_GF2EX_long & e, const GF2E & multi, const Variable & x, const Variable & alpha)
+    (const vec_pair_GF2EX_long & e, const GF2E & cont, const Variable & x, const Variable & alpha)
 {
   CFFList result;
   GF2EX polynom;
@@ -966,8 +961,6 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
 
   // Maybe, e may additionally be sorted with respect to increasing degree of x, but this is not
   //important for the factorization, but nevertheless would take computing time, so it is omitted
-
-  // multiplicity is always one, so we do not have to worry about that
 
   // Go through the vector e and build up the CFFList
   // As usual bigone summarizes the result during every loop
@@ -993,14 +986,11 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
         }
       }
     }
-
     // append the computed polynomial together with its multiplicity
     result.append(CFFactor(bigone,exponent));
-
   }
 
-  if (!IsOne(multi))
-    result.insert(CFFactor(convertNTLGF2E2CF(multi,alpha),1));
+  result.insert(CFFactor(convertNTLGF2E2CF(cont,alpha),1));
 
   // return the computed CFFList
   return result;
