@@ -129,8 +129,9 @@ CFFList distinctDegreeFactorFFGF ( const CanonicalForm & f, int q )
 
 CFFList distinctDegreeFactorExt ( const CanonicalForm & f, int p, int n )
 {
-    int i;
     Variable x = f.mvar();
+    if (f.degree(x) <= 1) return CFFList(CFFactor(f,1));
+    int i;
     CanonicalForm g = f, h, r = x;
     CFFList F;
     i = 1;
