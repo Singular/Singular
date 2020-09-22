@@ -117,7 +117,7 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
         out_cf("+(",i.coeff(),")");
         if (e!=0)
         {
-          printf("*v(%d)",l);
+          printf("*%c",'a'+l-1);
           if (e!=1) printf("^%d",e);
         }
       }
@@ -560,6 +560,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       if (fz.degree()==1)
       {
         F=CFFList(CFFactor(fz,1));
+        F.insert(CFFactor(ic,1));
       }
       else
       #if defined(HAVE_FLINT) && (__FLINT_RELEASE>=20503)  && (__FLINT_RELEASE!= 20600)
@@ -758,7 +759,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
         zz_pE leadcoeff= LeadCoeff(f1);
 
         //make monic
-        f1=f1 / LeadCoeff(f1);
+        f1=f1 / leadcoeff; //leadcoeff==LeadCoeff(f1);
 
         // factorize
         vec_pair_zz_pEX_long factors;
@@ -773,7 +774,10 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
       // char p, extension, univariate
-      F=FpFactorizeUnivariateCZ( f, false, 1, alpha, Variable() );
+      CanonicalForm c=Lc(f);
+      CanonicalForm fc=f/c;
+      F=FpFactorizeUnivariateCZ( fc, false, 1, alpha, Variable() );
+      F.insert (CFFactor (c, 1));
 #endif
     }
     else // char p, multivariate
