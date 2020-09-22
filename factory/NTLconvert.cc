@@ -471,7 +471,7 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
     //append the converted polynomial to the CFFList
     result.append(CFFactor(bigone,exponent));
   }
-  result.insert(CFFactor(1,1));
+  // no constant factor for char 2: result.insert(CFFactor(1,1));
   return result;
 }
 
@@ -901,7 +901,7 @@ convertNTLvec_pair_zzpEX_long2FacCFFList(const vec_pair_zz_pEX_long & e,const zz
     //append the computed polynomials together with its exponent to the CFFList
     result.append(CFFactor(bigone,exponent));
   }
-  // Start by appending the constant factor
+  // Start by insert the constant factor
   result.insert(CFFactor(convertNTLzzpE2CF(cont,alpha),1));
 
   //return the computed CFFList
@@ -990,7 +990,8 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
     result.append(CFFactor(bigone,exponent));
   }
 
-  result.insert(CFFactor(convertNTLGF2E2CF(cont,alpha),1));
+  if (!IsOne(cont))
+    result.insert(CFFactor(convertNTLGF2E2CF(cont,alpha),1));
 
   // return the computed CFFList
   return result;
