@@ -41,7 +41,7 @@ STATIC_VAR char* lib_file = NULL;
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 void main_init(int argc, char *argv[])
 {
-  char c;
+  int c;
 
   while((c=fe_getopt(argc, argv, "ihdc:sf:"))>=0)
   {
