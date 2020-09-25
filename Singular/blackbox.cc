@@ -39,7 +39,7 @@ void *blackbox_default_Copy(blackbox */*b*/,void */*d*/)
 BOOLEAN blackbox_default_Assign(leftv /*b*/,leftv /*d*/)
 {
   WerrorS("missing blackbox_Assign");
-  return NULL;
+  return TRUE;
 }
 void blackbox_default_Print(blackbox *b,void *d)
 {
