@@ -36,6 +36,11 @@ void *blackbox_default_Copy(blackbox */*b*/,void */*d*/)
   WerrorS("missing blackbox_Copy");
   return NULL;
 }
+BOOLEAN blackbox_default_Assign(leftv /*b*/,leftv /*d*/)
+{
+  WerrorS("missing blackbox_Assign");
+  return NULL;
+}
 void blackbox_default_Print(blackbox *b,void *d)
 {
   char *s=b->blackbox_String(b,d);
@@ -174,6 +179,7 @@ int setBlackboxStuff(blackbox *bb, const char *n)
     if (bb->blackbox_Print==NULL)   bb->blackbox_Print=blackbox_default_Print;
     if (bb->blackbox_Init==NULL)    bb->blackbox_Init=blackbox_default_Init;
     if (bb->blackbox_Copy==NULL)    bb->blackbox_Copy=blackbox_default_Copy;
+    if (bb->blackbox_Assign==NULL)  bb->blackbox_Assign=blackbox_default_Assign;
     if (bb->blackbox_Op1==NULL)     bb->blackbox_Op1=blackboxDefaultOp1;
     if (bb->blackbox_Op2==NULL)     bb->blackbox_Op2=blackboxDefaultOp2;
     if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackboxDefaultOp3;
