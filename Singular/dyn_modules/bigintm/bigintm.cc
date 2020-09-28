@@ -286,7 +286,7 @@ BOOLEAN bigintm_setup()
     //b->blackbox_Print=blackbox_default_Print;
     //b->blackbox_Init=blackbox_default_Init;
     b->blackbox_Copy=bigintm_Copy;
-    b->blackbox_Assign=bigintm_Assign; // TO ASK: no default?!
+    b->blackbox_Assign=bigintm_Assign;
     b->blackbox_Op1=bigintm_Op1;
     b->blackbox_Op2=bigintm_Op2;
     //b->blackbox_Op3=blackboxDefaultOp3;

@@ -3,6 +3,7 @@
 #include "Singular/tok.h"
 #include "Singular/subexpr.h"
 #include "Singular/ipshell.h"
+#include "Singular/ipid.h"
 
 #include "Singular/blackbox.h"
 
@@ -36,10 +37,20 @@ void *blackbox_default_Copy(blackbox */*b*/,void */*d*/)
   WerrorS("missing blackbox_Copy");
   return NULL;
 }
-BOOLEAN blackbox_default_Assign(leftv /*b*/,leftv /*d*/)
+BOOLEAN blackbox_default_Assign(leftv l, leftv r)
 {
-  WerrorS("missing blackbox_Assign");
-  return TRUE;
+  int lt=l->Typ();
+  blackbox* b=getBlackboxStuff(lt);
+  if ((lt==r->Typ())
+  && (l->Data()!=r->Data()))
+  {
+    b->blackbox_destroy(b,(void*)l->Data());
+    if (l->rtyp==IDHDL)
+      IDDATA((idhdl)l->data)=(char*)b->blackbox_Copy(b,r->Data());
+    else
+      l->data=b->blackbox_Copy(b,r->Data());
+  }
+  return FALSE;
 }
 void blackbox_default_Print(blackbox *b,void *d)
 {
