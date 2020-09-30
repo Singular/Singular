@@ -11536,6 +11536,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   assume((strat->tailRing == currRing) || (strat->tailRing->bitmask <= currRing->bitmask));
   /* initial setup or extending */
 
+  if (rIsLPRing(currRing)) return TRUE;
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
   if (expbound >= currRing->bitmask) return FALSE;
   strat->overflow=FALSE;
@@ -11653,6 +11654,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   }
   e = p_GetMaxExp(l, currRing);
   if (e <= 1) e = 2;
+  if (rIsLPRing(currRing)) e = 1;
 
   kStratChangeTailRing(strat, NULL, NULL, e);
 }

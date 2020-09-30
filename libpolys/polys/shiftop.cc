@@ -920,16 +920,20 @@ static BOOLEAN freeAlgebra_weights(const ring old_ring, ring new_ring, int p, in
 ring freeAlgebra(ring r, int d, int ncGenCount)
 {
   if (ncGenCount) r = rCopy0(r);
+  char *varname=(char *)omAlloc(20);
   for (int i = 1; i <= ncGenCount; i++)
   {
-    char *varname=(char *)omAlloc(256);
     sprintf(varname, "ncgen(%d)", i);
     ring save = r;
     r = rPlusVar(r, varname, 0);
-    omFreeSize(varname, 256);
-    if (r==NULL) return NULL; /* error in rPlusVar*/
+    if (r==NULL)
+    {
+      omFreeSize(varname, 20);
+      return NULL; /* error in rPlusVar*/
+    }
     rDelete(save);
   }
+  omFreeSize(varname, 20);
   ring R=rCopy0(r);
   int p;
   if((r->order[0]==ringorder_C)
@@ -939,6 +943,7 @@ ring freeAlgebra(ring r, int d, int ncGenCount)
     p=0;
   // create R->N
   R->N=r->N*d;
+  R->wanted_maxExp=7; /* Tst/Manual/letterplace_liftstd.tst*/
   R->isLPring=r->N;
   R->LPncGenCount=ncGenCount;
   // create R->order
