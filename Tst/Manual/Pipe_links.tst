@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-  link l="|: TZ=Europe/Berlin date --date='@0' --rfc-3339='seconds'";
+  link l="|: echo bla";
   open(l); l;
   read(l);
   close(l);
