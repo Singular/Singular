@@ -292,13 +292,15 @@ internalBCommonDen ( const CanonicalForm & f )
 CanonicalForm
 bCommonDen ( const CanonicalForm & f )
 {
-    if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
+    if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) )
+    {
         // otherwise `bgcd()' returns one
         Off( SW_RATIONAL );
         CanonicalForm result = internalBCommonDen( f );
         On( SW_RATIONAL );
         return result;
-    } else
+    }
+    else
         return CanonicalForm( 1 );
 }
 

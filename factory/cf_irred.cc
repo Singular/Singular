@@ -19,13 +19,6 @@
 #include "FLINTconvert.h"
 #endif
 
-static bool
-is_irreducible ( const CanonicalForm & f )
-{
-    CFFList F = factorize( f );
-    return F.length() == 1 && F.getFirst().exp() == 1;
-}
-
 #if defined(HAVE_NTL) || defined(HAVE_FLINT)
 /// computes a random monic irreducible univariate polynomial in x over Fp of
 /// degree i via NTL/FLINT
@@ -54,6 +47,13 @@ randomIrredpoly (int i, const Variable & x)
   return CFirredpoly;
 }
 #else
+static bool
+is_irreducible ( const CanonicalForm & f )
+{
+    CFFList F = factorize( f );
+    return F.length() == 1 && F.getFirst().exp() == 1;
+}
+
 CanonicalForm
 find_irreducible ( int deg, CFRandom & gen, const Variable & x )
 {

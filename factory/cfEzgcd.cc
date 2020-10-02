@@ -314,10 +314,11 @@ int Hensel (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
 
   CFList evaluation;
   long termEstimate= size (U);
+  int ch=getCharacteristic();
   for (int i= A.min(); i <= A.max(); i++)
   {
     if (!A[i].isZero() &&
-        ((getCharacteristic() > degree (U,i)) || getCharacteristic() == 0))
+        ((ch > degree (U,i)) || ch == 0))
     {
       termEstimate *= degree (U,i)*2;
       termEstimate /= 3;
@@ -904,8 +905,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   CFArray DD( 1, 2 ), lcDD( 1, 2 );
   int degF, degG, delta, count;
   int maxeval;
-  maxeval= tmin((getCharacteristic()/
-                (int)(ilog2(getCharacteristic())*log2exp))*2, maxNumEval);
+  int ch=getCharacteristic();
+  maxeval= tmin((ch/
+                (int)(ilog2(ch)*log2exp))*2, maxNumEval);
   count= 0; // number of eval. used
   REvaluation b, bt;
   int gcdfound = 0;

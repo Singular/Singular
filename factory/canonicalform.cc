@@ -210,8 +210,9 @@ CanonicalForm
 CanonicalForm::mapinto () const
 {
     //ASSERT( is_imm( value ) ||  ! value->inExtension(), "cannot map into different Extension" );
+    int ch=getCharacteristic();
     if ( is_imm( value ) )
-        if ( getCharacteristic() == 0 )
+        if ( ch == 0 )
             if ( is_imm( value ) == FFMARK )
                 return CanonicalForm( int2imm( ff_symmetric( imm2int( value ) ) ) );
             else  if ( is_imm( value ) == GFMARK )
@@ -225,7 +226,7 @@ CanonicalForm::mapinto () const
         else
             return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
     else  if ( value->inBaseDomain() )
-        if ( getCharacteristic() == 0 )
+        if ( ch == 0 )
             #ifndef HAVE_NTL
             if ( value->levelcoeff() == PrimePowerDomain )
             {
@@ -739,8 +740,9 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
     else  if ( value->level() == cf.value->level() ) {
 #if (HAVE_NTL && HAVE_FLINT && __FLINT_RELEASE >= 20400)
 #if (__FLINT_RELEASE >= 20503)
+        int ch=getCharacteristic();
         int l_this,l_cf,m=1;
-        if ((getCharacteristic()>0)
+        if ((ch>0)
         && (CFFactory::gettype() != GaloisFieldDomain)
         &&(!hasAlgVar(*this))
         &&(!hasAlgVar(cf))
@@ -752,7 +754,7 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
         }
         else
         /*-----------------------------------------------------*/
-        if ((getCharacteristic()==0)
+        if ((ch==0)
         &&(!hasAlgVar(*this))
         &&(!hasAlgVar(cf))
         &&((l_cf=size_maxexp(cf,m))>10)

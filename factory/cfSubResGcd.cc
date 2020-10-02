@@ -181,7 +181,6 @@ subResGCD_0( const CanonicalForm & f, const CanonicalForm & g )
     Ci = content( pi ); Ci1 = content( pi1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
     C = gcd( Ci, Ci1 );
-    int d= 0;
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
 #ifdef HAVE_FLINT

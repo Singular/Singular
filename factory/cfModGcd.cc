@@ -1796,7 +1796,6 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   int j= 1;
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
-  int p= getCharacteristic ();
   #ifdef HAVE_FLINT
   // convert mipo
   nmod_poly_t mipo1;
@@ -1813,6 +1812,7 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   fq_nmod_mat_clear (FLINTN,ctx);
   fq_nmod_ctx_clear(ctx);
   #elif defined(HAVE_NTL)
+  int p= getCharacteristic ();
   if (fac_NTL_char != p)
   {
     fac_NTL_char= p;
@@ -1903,7 +1903,6 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   int j= 1;
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
-  int p= getCharacteristic ();
   #ifdef HAVE_FLINT
   // convert mipo
   nmod_poly_t mipo1;
@@ -1917,6 +1916,7 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   // rank
   long rk= fq_nmod_mat_rref (FLINTN,ctx);
   #elif defined(HAVE_NTL)
+  int p= getCharacteristic ();
   if (fac_NTL_char != p)
   {
     fac_NTL_char= p;

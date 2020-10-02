@@ -687,16 +687,17 @@ Premb (const CanonicalForm &f, const CFList &L)
   CanonicalForm tmp= L.getFirst()/content (L.getFirst());
 
   bool isRat= isOn (SW_RATIONAL);
-  if (getCharacteristic() == 0 && !isRat)
+  int ch=getCharacteristic();
+  if (ch == 0 && !isRat)
     On (SW_RATIONAL);
   if (fdivides (tmp, rem))
   {
-    if (getCharacteristic() == 0 && !isRat)
+    if (ch == 0 && !isRat)
       Off (SW_RATIONAL);
     return 0;
   }
 
-  if (getCharacteristic() == 0 && !isRat)
+  if (ch == 0 && !isRat)
     Off (SW_RATIONAL);
 
   rem= normalize (Prem (rem, L.getFirst()));

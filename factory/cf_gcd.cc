@@ -105,6 +105,7 @@ gcd_univar_flint0( const CanonicalForm & F, const CanonicalForm & G )
 #endif
 
 #ifdef HAVE_NTL
+#ifndef HAVE_FLINT
 static CanonicalForm
 gcd_univar_ntl0( const CanonicalForm & F, const CanonicalForm & G )
 {
@@ -117,16 +118,18 @@ gcd_univar_ntl0( const CanonicalForm & F, const CanonicalForm & G )
 static CanonicalForm
 gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
 {
-  if (fac_NTL_char!=getCharacteristic())
+  int ch=getCharacteristic();
+  if (fac_NTL_char!=ch)
   {
-    fac_NTL_char=getCharacteristic();
-    zz_p::init(getCharacteristic());
+    fac_NTL_char=ch;
+    zz_p::init(ch);
   }
   zz_pX F1=convertFacCF2NTLzzpX(F);
   zz_pX G1=convertFacCF2NTLzzpX(G);
   zz_pX R=GCD(F1,G1);
   return  convertNTLzzpX2CF(R,F.mvar());
 }
+#endif
 #endif
 
 //{{{ static CanonicalForm balance_p ( const CanonicalForm & f, const CanonicalForm & q )
@@ -494,13 +497,14 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   bool fc_and_gc_Univariate=fc_isUnivariate && gc_isUnivariate;
   fc = f;
   gc = g;
-  if ( getCharacteristic() != 0 )
+  int ch=getCharacteristic();
+  if ( ch != 0 )
   {
     if (0) {} // dummy, to be able to build without NTL and FLINT
     #if defined(HAVE_FLINT) && ( __FLINT_RELEASE >= 20503)
     if ( isOn( SW_USE_FL_GCD_P)
     && (CFFactory::gettype() != GaloisFieldDomain)
-    && (getCharacteristic()>10)
+    && (ch>10)
     &&(!hasAlgVar(fc)) && (!hasAlgVar(gc)))
     {
       return gcdFlintMP_Zp(fc,gc);
@@ -554,7 +558,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   {
     fc = gcd_poly_0( fc, gc );
   }
-  if ((getCharacteristic()>0)&&(!hasAlgVar(fc))) fc/=fc.lc();
+  if ((ch>0)&&(!hasAlgVar(fc))) fc/=fc.lc();
   return fc;
 }
 

@@ -719,8 +719,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
         nmod_poly_t FLINTmipo, leadingCoeff;
         fq_nmod_ctx_t fq_con;
 
-        nmod_poly_init (FLINTmipo, getCharacteristic());
-        nmod_poly_init (leadingCoeff, getCharacteristic());
+        nmod_poly_init (FLINTmipo, ch);
+        nmod_poly_init (leadingCoeff, ch);
         convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
 
         fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
@@ -744,10 +744,10 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 #ifdef HAVE_NTL
       {
         // use NTL
-        if (fac_NTL_char != getCharacteristic())
+        if (fac_NTL_char != ch)
         {
-          fac_NTL_char = getCharacteristic();
-          zz_p::init(getCharacteristic());
+          fac_NTL_char = ch;
+          zz_p::init(ch);
         }
 
         // set minimal polynomial in NTL
