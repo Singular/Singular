@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
 if HAVE_GFANLIB
-  libgfan_LTLIBRARIES=libgfan.la
+  lib_LTLIBRARIES=libgfan.la
 endif
 
 libgfandir = $(libdir)
