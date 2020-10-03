@@ -50,6 +50,7 @@ TIMING_DEFINE_PRINT(ez_hensel_lift)
 TIMING_DEFINE_PRINT(ez_content)
 TIMING_DEFINE_PRINT(ez_termination)
 
+#ifdef HAVE_NTL // unused otherwise
 static
 int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                     CFMap & N, int& both_non_zero)
@@ -188,6 +189,7 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
 
   return both_non_zero;
 }
+#endif
 
 static inline
 CanonicalForm myShift2Zero (const CanonicalForm& F, CFList& Feval,
@@ -379,6 +381,7 @@ int Hensel (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
 }
 #endif
 
+#ifdef HAVE_NTL // unused otherwise
 static
 bool findeval (const CanonicalForm & F, const CanonicalForm & G,
                CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db,
@@ -444,6 +447,8 @@ bool findeval (const CanonicalForm & F, const CanonicalForm & G,
       return false;
   }
 }
+#endif
+
 static void gcd_mon_rec(CanonicalForm G, CanonicalForm &cf,int *exp,int pl)
 {  // prevoius level: pl
   if (G.inCoeffDomain())
@@ -461,6 +466,7 @@ static void gcd_mon_rec(CanonicalForm G, CanonicalForm &cf,int *exp,int pl)
   }
 }
 
+#ifdef HAVE_NTL // unused otherwise
 static CanonicalForm gcd_mon(CanonicalForm F, CanonicalForm G)
 {
   // assume: size(F)==1
@@ -484,6 +490,7 @@ static CanonicalForm gcd_mon(CanonicalForm F, CanonicalForm G)
   DELETE_ARRAY(exp);
   return res;
 }
+#endif
 
 #ifdef HAVE_NTL // Hensel
 /// real implementation of EZGCD over Z
@@ -859,13 +866,13 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 #endif
 
 #if defined(HAVE_NTL) || defined(HAVE_FLINT)
+#ifdef HAVE_NTL // Hensel
 // parameters for heuristic
 STATIC_VAR int maxNumEval= 200;
 STATIC_VAR int sizePerVars1= 500; //try dense gcd if size/#variables is bigger
 
 /// Extended Zassenhaus GCD for finite fields.
 /// In case things become too dense we switch to a modular algorithm.
-#ifdef HAVE_NTL // Hensel
 CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   if (FF.isZero() && degree(GG) > 0) return GG/Lc(GG);

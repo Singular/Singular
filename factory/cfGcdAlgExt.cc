@@ -656,7 +656,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
 static CanonicalForm
 myicontent ( const CanonicalForm & f, const CanonicalForm & c )
 {
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
     if (f.isOne() || c.isOne())
       return 1;
     if ( f.inBaseDomain() && c.inBaseDomain())
@@ -706,7 +706,7 @@ myicontent ( const CanonicalForm & f, const CanonicalForm & c )
 
 static CanonicalForm myicontent ( const CanonicalForm & f )
 {
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
     return myicontent( f, 0 );
 #else
     return 1;

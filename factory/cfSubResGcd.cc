@@ -49,8 +49,8 @@ subResGCD_p( const CanonicalForm & f, const CanonicalForm & g )
       pi1 = pi1 / Ci1;
     }
     C = gcd( Ci, Ci1 );
-    int d= 0;
     #ifdef HAVE_NTL // gcd_test_one, primitiveElement
+    int d= 0;
     if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
     {
         if ( gcd_test_one( pi1, pi, true, d ) )

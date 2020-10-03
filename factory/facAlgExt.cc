@@ -58,11 +58,11 @@ static CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
   mipo= mipo (x, alpha);
   mipo *= bCommonDen (mipo);
 
-  int degg= degree (g);
-  int degmipo= degree (mipo);
   CanonicalForm norm;
   TIMING_START (fac_alg_resultant);
 #ifdef HAVE_NTL
+  int degg= degree (g);
+  int degmipo= degree (mipo);
   if (degg >= 8 || degmipo >= 8)
     norm= resultantZ (g, mipo, x);
   else

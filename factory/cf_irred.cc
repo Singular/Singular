@@ -30,7 +30,7 @@ randomIrredpoly (int i, const Variable & x)
   nmod_poly_t Irredpoly;
   nmod_poly_init(Irredpoly,p);
   nmod_poly_randtest_monic_irreducible(Irredpoly, FLINTrandom, i+1);
-  CanonicalForm CFirredpoly=convertnmod_poly_t2FacCF(Irredpoly,Variable(1));
+  CanonicalForm CFirredpoly=convertnmod_poly_t2FacCF(Irredpoly,x);
   nmod_poly_clear(Irredpoly);
   #elif defined(HAVE_NTL)
   if (fac_NTL_char != p)
