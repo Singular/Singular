@@ -59,6 +59,7 @@ CFMatrix* cf_HNF(CFMatrix& A)
   return convertNTLmat_ZZ2FacCFMatrix(WW);
 #else
   factoryError("NTL/FLINT missing: cf_HNF");
+  return NULL; // avoid warning
 #endif
 }
 
@@ -83,5 +84,6 @@ CFMatrix* cf_LLL(CFMatrix& A)
   return r;
 #else
   factoryError("NTL/FLINT missing: cf_LLL");
+  return NULL; // avoid warning
 #endif
 }
