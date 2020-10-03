@@ -391,7 +391,8 @@ CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
     result.append(CFFactor(convertNTLZZpX2CF(e[i].a,x),e[i].b));
   }
   // the content at pos 1
-  result.insert(CFFactor(CanonicalForm(to_long(rep(cont))),1));
+  if (!IsOne(cont))
+    result.insert(CFFactor(CanonicalForm(to_long(rep(cont))),1));
   return result;
 }
 CFFList convertNTLvec_pair_zzpX_long2FacCFFList
@@ -415,7 +416,8 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList
     result.append(CFFactor(convertNTLzzpX2CF(e[i].a,x),e[i].b));
   }
   // the content at pos 1
-  result.insert(CFFactor(CanonicalForm(to_long(rep(cont))),1));
+  if (!IsOne(cont))
+    result.insert(CFFactor(CanonicalForm(to_long(rep(cont))),1));
   return result;
 }
 
@@ -858,7 +860,8 @@ convertNTLvec_pair_ZZpEX_long2FacCFFList(const vec_pair_ZZ_pEX_long & e,const ZZ
     result.append(CFFactor(bigone,exponent));
   }
   // Start by insert the content
-  result.insert(CFFactor(convertNTLZZpE2CF(cont,alpha),1));
+  if(!IsOne(cont))
+    result.insert(CFFactor(convertNTLZZpE2CF(cont,alpha),1));
 
   //return the computed CFFList
   return result;
@@ -902,7 +905,8 @@ convertNTLvec_pair_zzpEX_long2FacCFFList(const vec_pair_zz_pEX_long & e,const zz
     result.append(CFFactor(bigone,exponent));
   }
   // Start by insert the constant factor
-  result.insert(CFFactor(convertNTLzzpE2CF(cont,alpha),1));
+  if(!IsOne(cont))
+    result.insert(CFFactor(convertNTLzzpE2CF(cont,alpha),1));
 
   //return the computed CFFList
   return result;
