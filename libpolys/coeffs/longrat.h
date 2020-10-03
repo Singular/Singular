@@ -65,7 +65,7 @@ struct snumber
 #define SR_HDL(A) ((long)(A))
 
 #define SR_INT    1L
-#define INT_TO_SR(INT)  ((number) (((unsigned long)INT << 2) + SR_INT))
+#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
 #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 #define MP_SMALL 1
