@@ -3240,10 +3240,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         if (h==NULL)
         {
-	#if 0
-	  Print("FLINT_P:%d (use Flints gcd for polynomials in char p)\n",isOn(SW_USE_FL_GCD_P));
-	  Print("FLINT_0:%d (use Flints gcd for polynomials in char 0)\n",isOn(SW_USE_FL_GCD_0));
-	#endif
+        #if 0
+          Print("FLINT_P:%d (use Flints gcd for polynomials in char p)\n",isOn(SW_USE_FL_GCD_P));
+          Print("FLINT_0:%d (use Flints gcd for polynomials in char 0)\n",isOn(SW_USE_FL_GCD_0));
+        #endif
           Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
           Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
           Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
@@ -3257,10 +3257,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         {
           int d=(int)(long)h->next->Data();
           char *s=(char *)h->Data();
-	#if 0
+        #if 0
           if (strcmp(s,"FLINT_P")==0) { if (d) On(SW_USE_FL_GCD_P); else Off(SW_USE_FL_GCD_P); } else
           if (strcmp(s,"FLINT_0")==0) { if (d) On(SW_USE_FL_GCD_0); else Off(SW_USE_FL_GCD_0); } else
-	#endif  
+        #endif  
           if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
           if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
           if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
@@ -3851,19 +3851,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (h->Typ()!=POLY_CMD)
       {
         WerrorS("expected system(\"evaluate\",<poly>,..)");
-	return TRUE;
+        return TRUE;
       }
       poly p=(poly)h->Data();
       number *pt=(number*)omAlloc(sizeof(number)*currRing->N);
       for(int i=0;i<currRing->N;i++)
       {
         h=h->next;
-	if ((h==NULL)||(h->Typ()!=NUMBER_CMD))
-	{
-	  WerrorS("system(\"evaluate\",<poly>,<number>..) - expect number");
-	  return TRUE;
-	}
-	pt[i]=(number)h->Data();
+        if ((h==NULL)||(h->Typ()!=NUMBER_CMD))
+        {
+          WerrorS("system(\"evaluate\",<poly>,<number>..) - expect number");
+          return TRUE;
+        }
+        pt[i]=(number)h->Data();
       }
       res->data=maEvalAt(p,pt,currRing);
       res->rtyp=NUMBER_CMD;
