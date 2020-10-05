@@ -56,7 +56,7 @@ int* Zp_roots (const CanonicalForm f)
   }
   zz_pX NTL_f= convertFacCF2NTLzzpX (f);
   vec_zz_p roots= FindRoots (NTL_f);
-  int *res=omAlloc0((1+roots.length())*sizeof(int));
+  int *res=(int*)omAlloc0((1+roots.length())*sizeof(int));
   res[0]=roots.length();
   for(int i=roots.length()-1;i>=0;i--)
   {
