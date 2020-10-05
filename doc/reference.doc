@@ -3665,17 +3665,21 @@ See
 @node laguerre, lead, koszul, Functions
 @subsection laguerre
 @cindex laguerre
+@cindex solve
 @table @code
 @item @strong{Syntax:}
 @code{laguerre (} poly_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
+In characteristic 0:@*
 computes all complex roots of a univariate polynomial using Laguerre's
 algorithm. The second argument defines the precision of the fractional part
 if the ground field is the field of rational numbers, otherwise it will be
 ignored. The third argument (can be 0, 1 or 2) gives the number of extra runs
 for Laguerre's algorithm (with corrupted roots), leading to better results.
+@*In characteristic p:@*
+computes all roots of a univariate polynomial using factorization
 @item @strong{Note:}
 If the ground field is the field of complex numbers, the elements of the
 list are of type number, otherwise of type string.
