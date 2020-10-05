@@ -611,6 +611,7 @@ void ttGen2b()
         case CMD_3:            fprintf(outfile,"CMD_3"); break;
         case CMD_12:           fprintf(outfile,"CMD_12"); break;
         case CMD_123 :         fprintf(outfile,"CMD_123"); break;
+        case CMD_13 :          fprintf(outfile,"CMD_13"); break;
         case CMD_23:           fprintf(outfile,"CMD_23"); break;
         case CMD_M:            fprintf(outfile,"CMD_M"); break;
         case SYSVAR:           fprintf(outfile,"SYSVAR"); break;
