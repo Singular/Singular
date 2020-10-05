@@ -167,6 +167,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjJanetBasis), JANET_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjKBASE),      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING|WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjKBASE),      KBASE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING|WARN_RING} /*ring-cf: warning at top level*/
+,{D(jjLagSolve),   LAGSOLVE_CMD,    LIST_CMD,       POLY_CMD      , NO_NC |NO_RING}
 ,{D(jjLU_DECOMP),  LU_CMD,          LIST_CMD,       MATRIX_CMD    , NO_NC |NO_RING}
 ,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
@@ -1089,7 +1090,7 @@ VAR cmdnames cmds[] =
   { "killattrib",  0, KILLATTR_CMD ,      CMD_12},
   { "koszul",      0, KOSZUL_CMD ,        CMD_23},
   { "kres",        0, KRES_CMD ,          CMD_2},
-  { "laguerre",    0, LAGSOLVE_CMD,       CMD_3},
+  { "laguerre",    0, LAGSOLVE_CMD,       CMD_13},
   { "lead",        0, LEAD_CMD ,          CMD_1},
   { "leadcoef",    0, LEADCOEF_CMD ,      CMD_1},
   { "leadexp",     0, LEADEXP_CMD ,       CMD_1},

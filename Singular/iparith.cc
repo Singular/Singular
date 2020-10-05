@@ -4490,6 +4490,15 @@ static BOOLEAN jjPFAC1(leftv res, leftv v)
   tmp.rtyp = INT_CMD;
   return jjPFAC2(res, v, &tmp);
 }
+static BOOLEAN jjLagSolve(leftv res, leftv v)
+{
+  sleftv a2,a3;
+  memset(&a2,0,sizeof(a2));
+  memset(&a3,0,sizeof(a3));
+  a2.rtyp=INT_CMD; a2.data=(void*)10;
+  a3.rtyp=INT_CMD; a3.data=(void*)1;
+  return nuLagSolve(res,v,&a2,&a3);
+}
 static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 {
   /* computes the LU-decomposition of a matrix M;
