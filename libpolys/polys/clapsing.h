@@ -54,6 +54,7 @@ number singclap_det_bi( bigintmat * m, const coeffs cf);
 
 number   nChineseRemainder(number *x, number *q,int rl, const coeffs r);
 
+int * Zp_roots(poly p, const ring r);
 
 #endif /* INCL_FACTORYSING_H */
 

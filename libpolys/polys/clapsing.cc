@@ -12,6 +12,7 @@
 #include "clapsing.h"
 
 #include "factory/factory.h"
+#include "factory/cf_roots.h"
 
 #include "coeffs/numbers.h"
 #include "coeffs/coeffs.h"
@@ -2030,3 +2031,8 @@ ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFa
 
 #endif /* HAVE_NTL */
 
+int * Zp_roots(poly p, const ring r)
+{
+  CanonicalForm pp=convSingPFactoryP(p,r);
+  return Zp_roots(pp);
+}

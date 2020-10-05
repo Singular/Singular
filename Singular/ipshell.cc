@@ -69,6 +69,8 @@
 
 #include "kernel/maps/gen_maps.h"
 
+#include "polys/clapsing.h"
+
 #ifdef SINGULAR_4_2
 #include "Singular/number2.h"
 #include "coeffs/bigintmat.h"
@@ -4684,11 +4686,31 @@ BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
 
 BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 {
-
   poly gls;
   gls= (poly)(arg1->Data());
   int howclean= (int)(long)arg3->Data();
 
+  if ( gls == NULL || pIsConstant( gls ) )
+  {
+    WerrorS("Input polynomial is constant!");
+    return TRUE;
+  }
+
+  if (rField_is_Zp(currRing))
+  {
+    int* r=Zp_roots(gls, currRing);
+    lists rlist;
+    rlist= (lists)omAlloc( sizeof(slists) );
+    rlist->Init( r[0] );
+    for(int i=r[0];i>0;i--)
+    {
+      rlist->m[i-1].data=n_Init(r[i],currRing);
+      rlist->m[i-1].rtyp=NUMBER_CMD;
+    }
+    res->data=rlist;
+    res->rtyp= LIST_CMD;
+    return FALSE;
+  }
   if ( !(rField_is_R(currRing) ||
          rField_is_Q(currRing) ||
          rField_is_long_R(currRing) ||
@@ -4705,18 +4727,11 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
     setGMPFloatDigits( ii, ii );
   }
 
-  if ( gls == NULL || pIsConstant( gls ) )
-  {
-    WerrorS("Input polynomial is constant!");
-    return TRUE;
-  }
-
   int ldummy;
   int deg= currRing->pLDeg( gls, &ldummy, currRing );
   int i,vpos=0;
   poly piter;
   lists elist;
-  lists rlist;
 
   elist= (lists)omAlloc( sizeof(slists) );
   elist->Init( 0 );
@@ -4774,6 +4789,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   char *dummy;
   int j;
 
+  lists rlist;
   rlist= (lists)omAlloc( sizeof(slists) );
   rlist->Init( elem );
 
@@ -4805,7 +4821,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   delete roots;
 
-  res->rtyp= LIST_CMD;
   res->data= (void*)rlist;
 
   return FALSE;
