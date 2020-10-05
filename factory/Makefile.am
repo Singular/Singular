@@ -53,6 +53,7 @@ SOURCES = \
 		cf_util.cc \
 		cf_binom.cc \
 		cfUnivarGcd.cc \
+		cf_roots.cc \
 		debug.cc \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
@@ -142,6 +143,7 @@ factory_headers = \
 		cf_util.h \
 		cf_binom.h \
 		cfUnivarGcd.h \
+		cf_roots.h \
 		debug.h \
 		DegreePattern.h \
 		ExtensionInfo.h \
