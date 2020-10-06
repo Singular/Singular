@@ -504,7 +504,9 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     #if defined(HAVE_FLINT) && ( __FLINT_RELEASE >= 20503)
     if ( isOn( SW_USE_FL_GCD_P)
     && (CFFactory::gettype() != GaloisFieldDomain)
-    && (ch>10)
+    #ifdef HAVE_NTL
+    && (ch>10) // if we have NTL: it is better for char <11
+    #endif
     &&(!hasAlgVar(fc)) && (!hasAlgVar(gc)))
     {
       return gcdFlintMP_Zp(fc,gc);
