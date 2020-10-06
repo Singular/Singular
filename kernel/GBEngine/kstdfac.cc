@@ -238,14 +238,6 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
 {
   int facdeg=currRing->pFDeg(p,currRing);
   ideal fac=singclap_factorize(pCopy(p),NULL,1,currRing);
-  #ifndef HAVE_NTL
-  if (fac==NULL) // catch "not implemented"
-  {
-    fac=idInit(1,1);
-    fac->m[0]=pCopy(p);
-    errorreported=FALSE;
-  }
-  #endif
   int fac_elems;
   fac_elems=IDELEMS(fac);
   rfac=fac;
