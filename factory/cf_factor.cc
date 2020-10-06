@@ -540,7 +540,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F= FpFactorize (f);
       }
       #else
-      ASSERT( f.isUnivariate(), "multivariate factorization depends on NTL(missing)" );
       factoryError ("multivariate factorization depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
