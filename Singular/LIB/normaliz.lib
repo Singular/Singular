@@ -278,6 +278,7 @@ EXAMPLE:  example startNmz; shows an example
 }
 example
 { "EXAMPLE:"; echo=2;
+  writeNmzPaths();
   startNmz();
 }
 

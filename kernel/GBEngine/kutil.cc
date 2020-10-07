@@ -13768,3 +13768,98 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
   return L->GetLmCurrRing();
 }
 #endif
+
+BOOLEAN kVerify(ideal F, ideal Q)
+{
+  kStrategy strat=new skStrategy;
+  strat->ak = id_RankFreeModule(F,currRing);
+  strat->kModW=kModW=NULL;
+  strat->kHomW=kHomW=NULL;
+  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
+  initBuchMoraPos(strat);
+  initBba(strat);
+  initBuchMora(F, Q,strat);
+  /*initBuchMora:*/
+    strat->tail = pInit();
+    /*- set s -*/
+    strat->sl = -1;
+    /*- set L -*/
+    strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
+    strat->Ll = -1;
+    strat->L = initL(strat->Lmax);
+    /*- set B -*/
+    strat->Bmax = setmaxL;
+    strat->Bl = -1;
+    strat->B = initL();
+    /*- set T -*/
+    strat->tl = -1;
+    strat->tmax = setmaxT;
+    strat->T = initT();
+    strat->R = initR();
+    strat->sevT = initsevT();
+    /*- init local data struct.---------------------------------------- -*/
+    strat->P.ecart=0;
+    strat->P.length=0;
+    strat->P.pLength=0;
+    initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    strat->fromT = FALSE;
+    strat->noTailReduction = FALSE;
+  /*----------------------------------------------------------------------*/
+  /* build pairs */
+  if (strat->fromQ!=NULL)
+  {
+    for(int i=1; i<=strat->sl;i++)
+    {
+      initenterpairs(strat->S[i],i-1,0,strat->fromQ[i],strat);
+    }
+  }
+  else
+  {
+    for(int i=1; i<=strat->sl;i++)
+    {
+      initenterpairs(strat->S[i],i-1,0,FALSE,strat);
+    }
+  }
+  printf("%d pairs created\n",strat->Ll+1);
+  if (TEST_OPT_DEBUG) messageSets(strat);
+  /*---------------------------------------------------------------------*/
+  /* spolys */
+  BOOLEAN all_okay=TRUE;
+  for(int i=strat->Ll;i>=0; i--)
+  {
+    int red_result=1;
+    /* picks the last element from the lazyset L */
+    strat->P = strat->L[i];
+    if (pNext(strat->P.p) == strat->tail)
+    {
+      // deletes the short spoly
+      pLmFree(strat->P.p);
+      strat->P.p = NULL;
+      poly m1 = NULL, m2 = NULL;
+      kCheckSpolyCreation(&(strat->P), strat, m1, m2);
+      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+                    strat->tailRing, m1, m2, strat->R);
+    }
+    if ((strat->P.p == NULL) && (strat->P.t_p == NULL))
+    {
+      red_result = 0;
+    }
+    else
+    {
+      int sl=strat->sl;
+      strat->P.GetP();
+      poly p=redNF(strat->P.p,sl,TRUE,strat);
+      if (p==NULL) red_result=0;
+      else
+      {
+      printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
+      }
+    }
+    if (red_result!=0)
+    {
+      printf("fail: %d, result: %d\n",i,red_result);
+      all_okay=FALSE;
+    }
+  }
+  return all_okay;
+}

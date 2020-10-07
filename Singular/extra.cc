@@ -3870,6 +3870,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+/* ====== verify ============================*/
+    if(strcmp(sys_cmd,"verify")==0)
+    {
+      if (h->Typ()!=IDEAL_CMD)
+      {
+        WerrorS("expected system(\"verify\",<ideal>,..)");
+        return TRUE;
+      }
+      ideal F=(ideal)h->Data();
+      res->data=(char*) kVerify(F,currRing->qideal);
+      res->rtyp=INT_CMD;
+      return FALSE;
+    }
+    else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

@@ -64,6 +64,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w);
 ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M,
               intvec *hilb=NULL, int syzComp=0,int reduced=0);
 
+BOOLEAN kVerify(ideal F,ideal Q);
 
 EXTERN_VAR intvec * kModW;
 EXTERN_VAR intvec * kHomW;
