@@ -1038,6 +1038,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Z(r) || rField_is_Zn(r))
     {
       setCharacteristic( rChar(r) );
+      if (errorreported) goto notImpl; // char too large
       CanonicalForm F( convSingPFactoryP( f,r ) );
       L = factorize( F );
     }
@@ -1046,6 +1047,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     {
       if (rField_is_Q_a (r)) setCharacteristic (0);
       else                   setCharacteristic( rChar(r) );
+      if (errorreported) goto notImpl; // char too large
       if (r->cf->extRing->qideal!=NULL) /*algebraic extension */
       {
         CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
