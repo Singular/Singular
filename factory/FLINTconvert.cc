@@ -358,10 +358,21 @@ void
 convertFacCF2Fmpz_mod_poly_t (fmpz_mod_poly_t result, const CanonicalForm& f,
                               const fmpz_t p)
 {
+  #if (__FLINT_RELEASE >= 20700)
+  fmpz_mod_ctx_t ctx;
+  fmpz_mod_ctx_init(ctx,p);
+  fmpz_mod_poly_init2 (result, degree (f) + 1, ctx);
+  #else
   fmpz_mod_poly_init2 (result, p, degree (f) + 1);
+  #endif
   fmpz_poly_t buf;
   convertFacCF2Fmpz_poly_t (buf, f);
+  #if (__FLINT_RELEASE >= 20700)
+  fmpz_mod_poly_set_fmpz_poly (result, buf, ctx);
+  fmpz_mod_ctx_clear(ctx);
+  #else
   fmpz_mod_poly_set_fmpz_poly (result, buf);
+  #endif
   fmpz_poly_clear (buf);
 }
 
@@ -371,7 +382,17 @@ convertFmpz_mod_poly_t2FacCF (const fmpz_mod_poly_t poly, const Variable& x,
 {
   fmpz_poly_t buf;
   fmpz_poly_init (buf);
+  #if (__FLINT_RELEASE >= 20700)
+  fmpz_t FLINTp;
+  fmpz_init (FLINTp);
+  convertCF2Fmpz (FLINTp, b.getpk());
+  fmpz_mod_ctx_t ctx;
+  fmpz_mod_ctx_init(ctx,FLINTp);
+  fmpz_clear(FLINTp);
+  fmpz_mod_poly_get_fmpz_poly (buf, poly, ctx);
+  #else
   fmpz_mod_poly_get_fmpz_poly (buf, poly);
+  #endif
   CanonicalForm result= convertFmpz_poly_t2FacCF (buf, x);
   fmpz_poly_clear (buf);
   return b (result);
@@ -429,8 +450,13 @@ convertFacCF2Fq_t (fq_t result, const CanonicalForm& f, const fq_ctx_t ctx)
   _fmpz_poly_set_length(result, degree(f)+1);
   for (CFIterator i= f; i.hasTerms(); i++)
     convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff());
+  #if (__FLINT_RELEASE >= 20700)
+  _fmpz_vec_scalar_mod_fmpz (result->coeffs, result->coeffs, degree (f) + 1,
+                             ctx->ctxp->n);
+  #else
   _fmpz_vec_scalar_mod_fmpz (result->coeffs, result->coeffs, degree (f) + 1,
                              &ctx->p);
+  #endif
   _fmpz_poly_normalise (result);
 }
 
@@ -450,8 +476,13 @@ convertFacCF2Fq_poly_t (fq_poly_t result, const CanonicalForm& f,
   for (CFIterator i= f; i.hasTerms(); i++)
   {
     convertFacCF2Fmpz_poly_t (buf, i.coeff());
+    #if (__FLINT_RELEASE >= 20700)
+    _fmpz_vec_scalar_mod_fmpz (buf->coeffs, buf->coeffs, degree (i.coeff()) + 1,
+                               ctx->ctxp->n);
+    #else
     _fmpz_vec_scalar_mod_fmpz (buf->coeffs, buf->coeffs, degree (i.coeff()) + 1,
                                &ctx->p);
+    #endif
     _fmpz_poly_normalise (buf);
     fq_poly_set_coeff (result, i.exp(), buf, ctx);
     fmpz_poly_clear (buf);
