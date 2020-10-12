@@ -7,6 +7,7 @@
 /*
 * ABSTRACT: identfier handling
 */
+#include "misc/options.h"
 #include "Singular/idrec.h"
 #include "Singular/subexpr.h"
 #include "Singular/lists.h"
@@ -102,10 +103,11 @@ void jjNormalizeQRingId(leftv I);
 #define jjNormalizeQRingP(p) jj_NormalizeQRingP(p,currRing)
 void *idrecDataInit(int t);
 
-#define FLAG_STD       0
-#define FLAG_TWOSTD    3
-#define FLAG_QRING     4
-#define FLAG_QRING_DEF 5
+#define FLAG_STD        0 // is a SB wrt. currRing ("isSB")
+#define FLAG_TWOSTD     3 // is a 2-sided SB wrt. currRing (" 2SB")
+#define FLAG_QRING      4 // is normalized wrt. qring ("qringNF")
+#define FLAG_QRING_DEF  5 // is a qring to be defined
+#define FLAG_OTHER_RING 6 // mark newstruct parts as "write-only"
 #define hasFlag(A,F) Sy_inset((F),(A)->flag)
 #define setFlag(A,F) (A)->flag|=Sy_bit(F)
 #define resetFlag(A,F) (A)->flag&=~Sy_bit(F)
