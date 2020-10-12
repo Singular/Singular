@@ -63,6 +63,7 @@ if test "x$flint_found" = "xno" ; then
 
 		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
 		FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath -Wl,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
+		AM_LDFLAGS+="-rpath ${FLINT_HOME}/lib"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
 		CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
