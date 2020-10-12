@@ -94,7 +94,8 @@ static void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmo
 void convertCF2Fmpz (fmpz_t result, const CanonicalForm& f)
 {
   if (f.isImm())
-    fmpz_set_si (result, f.intval());
+    *result=f.intval();
+    //fmpz_set_si (result, f.intval());
   else
   {
     mpz_t gmp_val;
@@ -114,8 +115,9 @@ void convertFacCF2Fmpz_poly_t (fmpz_poly_t result, const CanonicalForm& f)
 
 CanonicalForm convertFmpz2CF (const fmpz_t coefficient)
 {
-  if (fmpz_cmp_si (coefficient, MINIMMEDIATE) >= 0 &&
-      fmpz_cmp_si (coefficient, MAXIMMEDIATE) <= 0)
+  if(!COEFF_IS_MPZ(*coefficient)
+  &&  (fmpz_cmp_si (coefficient, MINIMMEDIATE) >= 0)
+  &&  (fmpz_cmp_si (coefficient, MAXIMMEDIATE) <= 0))
   {
     long coeff= fmpz_get_si (coefficient);
     return CanonicalForm (coeff);

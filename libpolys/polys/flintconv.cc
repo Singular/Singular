@@ -26,14 +26,15 @@
 int convFlintISingI (fmpz_t f)
 {
   int res;
-  res = fmpz_get_si(f);
-  return res;
+  //return fmpz_get_si(f);
+  return (int)*f;
 }
 
 void convSingIFlintI(fmpz_t f, int p)
 {
   fmpz_init(f);
-  fmpz_set_si(f,p);
+  *f=p;
+  //fmpz_set_si(f,p);
   return;
 }
 
@@ -45,12 +46,17 @@ void convFlintNSingN (mpz_t z, fmpz_t f)
 
 number convFlintNSingN (fmpz_t f)
 {
-  mpz_t z;
-  mpz_init(z);
-  fmpz_get_mpz(z,f);
   number n;
-  nlMPZ(z,n,NULL);
-  mpz_clear(z);
+  if(COEFF_IS_MPZ(*f))
+    nlMPZ(COEFF_TO_PTR(*f),n,NULL);
+  else
+  {
+    mpz_t z;
+    mpz_init(z);
+    fmpz_get_mpz(z,f);
+    nlMPZ(z,n,NULL);
+    mpz_clear(z);
+  }
   return n;
 }
 
