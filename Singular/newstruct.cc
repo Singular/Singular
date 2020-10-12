@@ -384,47 +384,36 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
           else if (RingDependend(nm->typ)
           || (al->m[nm->pos].RingDependend()))
           {
+            // remember the ring, if not set
+            if ((currRing!=NULL) && (al->m[nm->pos-1].data==NULL))
+            {
+              al->m[nm->pos-1].data=(void *)currRing;
+              al->m[nm->pos-1].rtyp=RING_CMD;
+              currRing->ref++;
+            }
             if (al->m[nm->pos].data==NULL)
             {
               // NULL belongs to any ring
-              ring r=(ring)al->m[nm->pos-1].data;
-              if (r!=NULL)
+              if ((currRing!=NULL)&&(al->m[nm->pos-1].data!=currRing))
               {
+                ring r=(ring)al->m[nm->pos-1].data;
                 r->ref--;
-                al->m[nm->pos-1].data=NULL;
-                al->m[nm->pos-1].rtyp=DEF_CMD;
+                al->m[nm->pos-1].data=(void *)currRing;
+                al->m[nm->pos-1].rtyp=RING_CMD;
+                currRing->ref++;
               }
+            }
+            else if (al->m[nm->pos-1].data!=currRing)
+            {
+              // object is not from currRing, so mark it for "write-only":
+              al->m[nm->pos].flag|=Sy_bit(FLAG_OTHER_RING);
+              //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
             }
             else
             {
-              //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
-              #if 0
-              if ((al->m[nm->pos-1].data!=(void *)currRing)
-              &&(al->m[nm->pos-1].data!=(void*)0L))
-              {
-                Werror("different ring %lx(data) - %lx(basering)",
-                  (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
-                Werror("name of basering: %s",IDID(currRingHdl));
-                rWrite(currRing,TRUE);PrintLn();
-                idhdl hh=rFindHdl((ring)(al->m[nm->pos-1].data),NULL);
-                const char *nn="??";
-                if (hh!=NULL) nn=IDID(hh);
-                Werror("(possible) name of ring of data: %s",nn);
-                rWrite((ring)(al->m[nm->pos-1].data),TRUE);PrintLn();
-
-                return TRUE;
-              }
-              #endif
+              // object is from currRing, so mark it for "read-write":
+              al->m[nm->pos].flag &= ~Sy_bit(FLAG_OTHER_RING);
             }
-            if(al->m[nm->pos-1].data!=NULL)
-            {
-              ring old=(ring)al->m[nm->pos-1].data;
-              old->ref--;
-            }
-            // remember the ring, if not already set
-            al->m[nm->pos-1].data=(void *)currRing;
-            al->m[nm->pos-1].rtyp=RING_CMD;
-            if (currRing!=NULL)  currRing->ref++;
           }
           else if ((nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
           {

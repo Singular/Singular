@@ -475,6 +475,8 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   number p=(number)a->CopyD(NUMBER_CMD);
   if (res->data!=NULL) nDelete((number *)&res->data);
   nNormalize(p);
@@ -699,6 +701,8 @@ static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   syStrategy r=(syStrategy)a->CopyD(RESOLUTION_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
   int add_row_shift = 0;
@@ -710,6 +714,8 @@ static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr)
 }
 static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   lists l=(lists)a->CopyD(LIST_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
   res->data=(void *)l;
@@ -718,6 +724,8 @@ static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr)
 }
 static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   poly p=(poly)a->CopyD(POLY_CMD);
   pNormalize(p);
   if (e==NULL)
@@ -904,6 +912,8 @@ static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr)
 static BOOLEAN jiA_BUCKET(leftv res, leftv a, Subexpr e)
 // there should be no assign bucket:=bucket, here we have poly:=bucket
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   sBucket_pt b=(sBucket_pt)a->CopyD();
   poly p; int l;
   sBucketDestroyAdd(b,&p,&l);
@@ -915,6 +925,8 @@ static BOOLEAN jiA_BUCKET(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   res->data=(void *)a->CopyD(MATRIX_CMD);
   if (a->rtyp==IDHDL) id_Normalize((ideal)a->Data(), currRing);
@@ -928,11 +940,17 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr)
   {
     setFlag(res,FLAG_STD);
   }
-  if (TEST_V_QRING && (currRing->qideal!=NULL)&& (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currRing->qideal!=NULL))
+  {
+    if (hasFlag(a,FLAG_QRING)) setFlag(res,FLAG_QRING);
+    else                       jjNormalizeQRingId(res);
+  }
   return FALSE;
 }
 static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   if (res->data!=NULL) syKillComputation((syStrategy)res->data);
   res->data=(void *)a->CopyD(RESOLUTION_CMD);
   jiAssignAttr(res,a);
@@ -941,6 +959,8 @@ static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr)
 static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr)
 /* module = poly */
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   ideal I=idInit(1,1);
   I->m[0]=(poly)a->CopyD(POLY_CMD);
@@ -956,6 +976,8 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr)
 }
 static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   matrix m=(matrix)a->CopyD(MATRIX_CMD);
   if (TEST_V_ALLWARN)
@@ -966,11 +988,17 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr)
   MATROWS(m)=1;
   id_Normalize((ideal)m, currRing);
   res->data=(void *)m;
-  if (TEST_V_QRING && (currRing->qideal!=NULL)) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currRing->qideal!=NULL))
+  {
+    if (hasFlag(a,FLAG_QRING)) setFlag(res,FLAG_QRING);
+    else                       jjNormalizeQRingId(res);
+  }
   return FALSE;
 }
 static BOOLEAN jiA_IDEAL_Mo(leftv res, leftv a, Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   ideal m=(ideal)a->CopyD(MODUL_CMD);
   if (m->rank>1)
   {
@@ -982,7 +1010,11 @@ static BOOLEAN jiA_IDEAL_Mo(leftv res, leftv a, Subexpr)
   id_Shift(m,-1,currRing);
   m->rank=1;
   res->data=(void *)m;
-  if (TEST_V_QRING && (currRing->qideal!=NULL)) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currRing->qideal!=NULL))
+  {
+    if (hasFlag(a,FLAG_QRING)) setFlag(res,FLAG_QRING);
+    else                       jjNormalizeQRingId(res);
+  }
   return FALSE;
 }
 static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr)
@@ -1011,6 +1043,8 @@ static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr)
 // assign map -> map
 static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   if (res->data!=NULL)
   {
     omFree((ADDRESS)((map)res->data)->preimage);
@@ -1024,6 +1058,8 @@ static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr)
 // assign ideal -> map
 static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr)
 {
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
   map f=(map)res->data;
   char *rn=f->preimage; // save the old/already assigned preimage ring name
   f->preimage=NULL;
@@ -1043,6 +1079,9 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     WerrorS("qring_id expected");
     return TRUE;
   }
+  void *test_p=a->Data(); // can I access it (newstruct)?
+  if (errorreported) return TRUE;
+
   ring old_ring=(ring)res->Data();
 
   coeffs newcf = currRing->cf;
@@ -2279,7 +2318,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
 }
 void jjNormalizeQRingId(leftv I)
 {
-  if ((currRing->qideal!=NULL) && (!hasFlag(I,FLAG_QRING)))
+  assume ((currRing->qideal!=NULL) && (!hasFlag(I,FLAG_QRING)));
   {
     if (I->e==NULL)
     {

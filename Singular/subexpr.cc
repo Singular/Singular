@@ -709,6 +709,13 @@ void sleftv::Copy(leftv source)
 
 void * sleftv::CopyD(int t)
 {
+  if (Sy_inset(FLAG_OTHER_RING,flag))
+  {
+     flag&=~Sy_bit(FLAG_OTHER_RING);
+     WerrorS("object from another ring");
+     return NULL;
+  }
+
   if ((rtyp!=IDHDL)&&(rtyp!=ALIAS_CMD)&&(e==NULL))
   {
     if (iiCheckRing(t)) return NULL;
@@ -1148,6 +1155,12 @@ void * sleftv::Data()
 {
   if ((rtyp!=IDHDL) && iiCheckRing(rtyp))
      return NULL;
+  if (Sy_inset(FLAG_OTHER_RING,flag))
+  {
+     flag&=~Sy_bit(FLAG_OTHER_RING);
+     WerrorS("object from another ring");
+     return NULL;
+  }
   if (e==NULL)
   {
     switch (rtyp)
