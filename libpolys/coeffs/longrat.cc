@@ -3064,7 +3064,7 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
 //}
 
 VAR int n_SwitchChinRem=0;
-number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF)
+number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray *inv_cache,const coeffs CF)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
   setCharacteristic( 0 ); // only in char 0
@@ -3077,10 +3077,10 @@ number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray
     Q[i]=CF->convSingNFactoryN(q[i],FALSE,CF); // may be larger MAX_INT
   }
   CanonicalForm xnew,qnew;
-  if (n_SwitchChinRem)
+  if (n_SwitchChinRem || (inv_cache==NULL))
     chineseRemainder(X,Q,xnew,qnew);
   else
-    chineseRemainderCached(X,Q,xnew,qnew,inv_cache);
+    chineseRemainderCached(X,Q,xnew,qnew,*inv_cache);
   number n=CF->convFactoryNSingN(xnew,CF);
   if (sym)
   {

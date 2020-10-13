@@ -1349,7 +1349,7 @@ char* naCoeffName(const coeffs r) // currently also for tranext.
   return s;
 }
 
-number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray &inv_cache,const coeffs cf)
+number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray *inv_cache,const coeffs cf)
 {
   poly *P=(poly*)omAlloc(rl*sizeof(poly*));
   number *X=(number *)omAlloc(rl*sizeof(number));
