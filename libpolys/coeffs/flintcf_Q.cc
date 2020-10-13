@@ -441,7 +441,7 @@ static number Farey(number p, number n, const coeffs)
 {
   WerrorS("not yet: Farey");
 }
-static number ChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,CFArray &inv_cache,const coeffs)
+static number ChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,CFArray *inv_cache,const coeffs)
 {
   WerrorS("not yet: ChineseRemainder");
 }
