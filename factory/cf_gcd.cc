@@ -548,9 +548,11 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       fc= ezgcd (fc, gc);
     else
     #endif
+    #if defined(HAVE_NTL) || defined(HAVE_FLINT)
     if (isOn(SW_USE_CHINREM_GCD))
       fc = modGCDZ( fc, gc);
     else
+    #endif
     {
        fc = gcd_poly_0( fc, gc );
     }
