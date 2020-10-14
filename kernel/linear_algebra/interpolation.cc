@@ -495,6 +495,7 @@ static void GeneralDone ()  // to be called before exit to free memory
      omFree(coord_exist);
      pDelete(&comparizon_p1);
      pDelete(&comparizon_p2);
+     omFree(multiplicity);
 }
 
 static void FreeProcData ()  // to be called after one modp computation to free memory
@@ -1515,7 +1516,7 @@ ideal interpolation(const std::vector<ideal>& L, intvec *v)
   // ring data read **********************************************************
 
 
-  multiplicity=(int*)malloc(sizeof(int)*n_points); // TODO: use omalloc!
+  multiplicity=(int*)omAlloc(sizeof(int)*n_points);
   int i;
   for (i=0;i<n_points;i++) multiplicity[i]=(*v)[i];
 
