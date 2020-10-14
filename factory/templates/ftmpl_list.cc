@@ -692,7 +692,7 @@ T prod ( const List<T> & F )
     ListIterator<T> i;
     T p = 1;
     for ( i = F; i.hasItem(); i++ )
-        p = p * i.getItem();
+        p *= i.getItem();
     return p;
 }
 
