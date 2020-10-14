@@ -475,7 +475,7 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
 /// l and topLevel are only used internally, output is monic
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
-#ifdef HAVE_NTL // mapPrimElem
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   CanonicalForm& coF, CanonicalForm& coG,
@@ -1202,14 +1202,14 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   return random;
 }
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
              bool& topLevel, CFList& l);
 #endif
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
              bool& topLevel, CFList& l)
@@ -1220,7 +1220,7 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 }
 #endif
 
-#ifdef HAVE_NTL // mapPrimElem
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
@@ -4145,7 +4145,7 @@ CanonicalForm modGCDZ ( const CanonicalForm & FF, const CanonicalForm & GG )
     fp= mapinto (f);
     gp= mapinto (g);
     TIMING_START (modZ_recursion)
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
     if (size (fp)/maxNumVars > 500 && size (gp)/maxNumVars > 500)
       Dp = modGCDFp (fp, gp, cofp, cogp);
     else
@@ -4189,9 +4189,10 @@ CanonicalForm modGCDZ ( const CanonicalForm & FF, const CanonicalForm & GG )
     {
       if ( dp_deg == d_deg )
       {
-        chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
-        chineseRemainder( cof, q, mapinto (cofp), p, newCof, newq);
-        chineseRemainder( cog, q, mapinto (cogp), p, newCog, newq);
+        CFArray inv(2);
+        chineseRemainderCached( D, q, mapinto( Dp ), p, newD, newq, inv );
+        chineseRemainderCached( cof, q, mapinto (cofp), p, newCof, newq, inv);
+        chineseRemainderCached( cog, q, mapinto (cogp), p, newCog, newq, inv);
         cof= newCof;
         cog= newCog;
         newqh= newq/2;
