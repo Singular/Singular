@@ -54,7 +54,8 @@ void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, cons
 
 void chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew );
 
-void chineseRemainderCached(CFArray &a, CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv);
+void chineseRemainderCached ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew, CFArray &inv );
+void chineseRemainderCached(const CFArray &a, const CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv);
 
 
 CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q );

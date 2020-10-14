@@ -273,7 +273,7 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 }
 
 // returns x where (a * x) % b == 1, inv is a cache
-static inline CanonicalForm chin_mul_inv(CanonicalForm a, CanonicalForm b, int ind, CFArray &inv)
+static inline CanonicalForm chin_mul_inv(const CanonicalForm a, const CanonicalForm b, int ind, CFArray &inv)
 {
   if (inv[ind].isZero())
   {
@@ -287,7 +287,7 @@ static inline CanonicalForm chin_mul_inv(CanonicalForm a, CanonicalForm b, int i
 }
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
-void chineseRemainderCached(CFArray &a, CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv)
+void chineseRemainderCached(const CFArray &a, const CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv)
 {
   CanonicalForm p, sum=0L; prod=1L;
   int i;
@@ -305,3 +305,10 @@ void chineseRemainderCached(CFArray &a, CFArray &n, CanonicalForm &xnew, Canonic
 }
 // http://rosettacode.org/wiki/Chinese_remainder_theorem#C
 
+void chineseRemainderCached ( const CanonicalForm & a, const CanonicalForm &q1, const CanonicalForm & b, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew,CFArray &inv )
+{
+  qnew=q1*q2;
+  CanonicalForm sum=a * chin_mul_inv(q2,q1,0,inv);
+  sum+=b * chin_mul_inv(q1,q2,1,inv);
+  xnew = mod(sum , qnew);
+}
