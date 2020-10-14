@@ -84,7 +84,7 @@ poly p_Farey(poly p, number N, const ring r)
 * assume: q[i]!=0
 * destroys xx
 */
-poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray *inv_cache,const ring R)
+poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cache,const ring R)
 {
   poly r,h,hh;
   int j;

@@ -124,7 +124,7 @@ void   nlGMP(number &i, mpz_t n, const coeffs r); // to be replaced with n_MPZ(n
 number nlMapGMP(number from, const coeffs src, const coeffs dst);
 #  endif
 // for ring similiar to Q/Z (char 0 required):
-number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray *inv_cache,const coeffs CF);
+number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF);
 
 
 #endif

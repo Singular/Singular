@@ -2474,7 +2474,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   ntTest(c);
 }
 
-static number ntChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray *inv_cache,const coeffs cf)
+static number ntChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray &inv_cache,const coeffs cf)
 {
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
 

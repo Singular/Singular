@@ -1911,7 +1911,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
       else
         p[j]=xx[j]->m[i];
     }
-    result->m[i]=p_ChineseRemainder(p,x,q,rl,&inv_cache,r);
+    result->m[i]=p_ChineseRemainder(p,x,q,rl,inv_cache,r);
     for(j=rl-1;j>=0;j--)
     {
       if(i<IDELEMS(xx[j])*xx[j]->nrows) xx[j]->m[i]=p[j];

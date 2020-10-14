@@ -578,7 +578,7 @@ static void nnDelete (number * a, const coeffs r)
 }
 
 
-static number nnChineseRemainder(number *x, number *q,int rl, BOOLEAN sym, CFArray *inv_cache,const coeffs CF)
+static number nnChineseRemainder(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF)
 {
   WerrorS("not yet");
   return NULL;
