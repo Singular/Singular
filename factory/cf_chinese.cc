@@ -307,8 +307,7 @@ void chineseRemainderCached(const CFArray &a, const CFArray &n, CanonicalForm &x
 
 void chineseRemainderCached ( const CanonicalForm & a, const CanonicalForm &q1, const CanonicalForm & b, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew,CFArray &inv )
 {
-  qnew=q1*q2;
-  CanonicalForm sum=a * chin_mul_inv(q2,q1,0,inv);
-  sum+=b * chin_mul_inv(q1,q2,1,inv);
-  xnew = mod(sum , qnew);
+  CFArray A(2); A[0]=a; A[1]=b;
+  CFArray Q(2); Q[0]=q1; Q[1]=q2;
+  chineseRemainderCached(A,Q,xnew,qnew,inv);
 }
