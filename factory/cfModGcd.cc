@@ -452,14 +452,14 @@ Variable chooseExtension (const Variable & alpha)
   return rootOf (newMipo);
 }
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   CanonicalForm& coF, CanonicalForm& coG,
                   Variable & alpha, CFList& l, bool& topLevel);
 #endif
 
-#ifdef HAVE_NTL // modGCDFq
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CanonicalForm
 modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   Variable & alpha, CFList& l, bool& topLevel)
@@ -1989,7 +1989,7 @@ getMonoms (const CanonicalForm& F)
   return result;
 }
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 CFArray
 evaluateMonom (const CanonicalForm& F, const CFList& evalPoints)
 {
