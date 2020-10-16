@@ -31,6 +31,9 @@ public:
       ASSERT( type==FiniteFieldDomain || type==GaloisFieldDomain || type==IntegerDomain || type==RationalDomain || type==PrimePowerDomain, "illegal basic domain!" );
       currenttype = type;
     };
+    #if SIZEOF_LONG == 8
+    static InternalCF * basic ( int value );
+    #endif
     static InternalCF * basic ( long value );
     static InternalCF * basic ( int type, long value );
     static InternalCF * basic ( const char * str );

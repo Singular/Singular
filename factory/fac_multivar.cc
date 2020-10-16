@@ -278,7 +278,7 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
           if (p==0)
           {
             return conv_to_factor_array(CFFactor(arg,1));
-            //printf("out of primes - switch ot non-NTL\n");
+            //printf("out of primes - switch to non-NTL\n");
           }
           else if (((i==0)||(i!=prime_number)))
           {

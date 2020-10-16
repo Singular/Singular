@@ -18,7 +18,11 @@
 inline bool
 mpz_is_imm( const mpz_t mpi )
 {
-    return ( mpz_cmp_si( mpi, MINIMMEDIATE ) >= 0 ) &&
+  if (mpi->_mp_size==0)
+    return true;
+  if ((mpi->_mp_size>1)||(mpi->_mp_size< -1))
+    return false;
+  return ( mpz_cmp_si( mpi, MINIMMEDIATE ) >= 0 ) &&
         ( mpz_cmp_si( mpi, MAXIMMEDIATE ) <= 0 );
 }
 

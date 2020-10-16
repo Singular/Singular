@@ -140,9 +140,15 @@ CanonicalForm::CanonicalForm ()
  * p^n elements.
  *
 **/
+#if SIZEOF_LONG == 8
+CF_INLINE
+CanonicalForm::CanonicalForm ( const int i )
+    : value( CFFactory::basic( i ) )
+#else
 CF_INLINE
 CanonicalForm::CanonicalForm ( const int i )
     : value( CFFactory::basic( (long)i ) )
+#endif
 {
 }
 

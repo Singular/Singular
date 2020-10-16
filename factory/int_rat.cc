@@ -412,7 +412,7 @@ InternalCF* InternalRational::dividesame( InternalCF * c )
     if ( this == c )
     {
         if ( deleteObject() ) delete this;
-        return CFFactory::basic( 1L );
+        return CFFactory::basic( 1 );
     }
     else
     {
@@ -483,14 +483,14 @@ InternalCF* InternalRational::modulosame( InternalCF * c )
 InternalCF* InternalRational::modsame( InternalCF * )
 {
     if ( deleteObject() ) delete this;
-    return CFFactory::basic( 0L );
+    return CFFactory::basic( 0 );
 }
 
 void InternalRational::divremsame( InternalCF * c, InternalCF*& quot, InternalCF*& rem )
 {
     quot = copyObject();
     quot = quot->dividesame( c );
-    rem = CFFactory::basic( 0L );
+    rem = CFFactory::basic( 0 );
 }
 
 bool InternalRational::divremsamet( InternalCF* c, InternalCF*& quot, InternalCF*& rem )
@@ -661,7 +661,7 @@ InternalCF* InternalRational::mulcoeff( InternalCF* c )
         if ( cc == 0 )
         {
             if ( deleteObject() ) delete this;
-            return CFFactory::basic( 0L );
+            return CFFactory::basic( 0 );
         }
         mpz_init_set_si( n, cc );
     }
@@ -716,7 +716,7 @@ InternalCF* InternalRational::dividecoeff( InternalCF* c, bool invert )
         {
             // => invert
             if ( deleteObject() ) delete this;
-            return CFFactory::basic( 0L );
+            return CFFactory::basic( 0 );
         }
         if ( invert )
         {
@@ -799,14 +799,14 @@ InternalCF* InternalRational::modcoeff( InternalCF* c, bool invert )
     ASSERT( ::is_imm( c ) == INTMARK || ! ::is_imm( c ), "integer expected" );
     ASSERT( invert || ! ::is_imm( c ) || imm2int( c ) != 0, "divide by zero" );
     if ( deleteObject() ) delete this;
-    return CFFactory::basic( 0L );
+    return CFFactory::basic( 0 );
 }
 
 void InternalRational::divremcoeff( InternalCF* c, InternalCF*& quot, InternalCF*& rem, bool invert )
 {
     quot = copyObject();
     quot = quot->dividecoeff( c, invert );
-    rem = CFFactory::basic( 0L );
+    rem = CFFactory::basic( 0 );
 }
 
 bool InternalRational::divremcoefft( InternalCF* c, InternalCF*& quot, InternalCF*& rem, bool invert )

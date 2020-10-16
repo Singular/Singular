@@ -57,6 +57,35 @@ CFFactory::basic ( long value )
   }
 }
 
+#if SIZEOF_LONG == 8
+InternalCF *
+CFFactory::basic ( int value )
+{
+  switch(currenttype)
+  {
+    case IntegerDomain:
+            return int2imm( value );
+//     else  if ( currenttype == RationalDomain )
+//         if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+//             return int2imm( value );
+//         else
+//             return new InternalRational( value );
+    case FiniteFieldDomain:
+        return int2imm_p( ff_norm( value ) );
+    case GaloisFieldDomain:
+        return int2imm_gf( gf_int2gf( value ) );
+    #ifndef HAVE_NTL
+    case PrimePowerDomain:
+        return new InternalPrimePower( value );
+    #endif
+    default: {
+        ASSERT( 0, "illegal basic domain!" );
+        return 0;
+    }
+  }
+}
+#endif
+
 InternalCF *
 CFFactory::basic ( int type, long value )
 {
