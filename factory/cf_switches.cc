@@ -29,8 +29,8 @@ CFSwitches::CFSwitches ()
     for ( int i = 0; i < CFSwitchesMax; i++ )
         switches[i] = false;
 // and set the default (recommended) On-values:
-#if defined(HAVE_NTL) || defined(AHVE_FLINT)
-  On(SW_USE_CHINREM_GCD);
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
+  //On(SW_USE_CHINREM_GCD);
 #endif
   On(SW_USE_NTL_SORT);
 #ifdef HAVE_FLINT
