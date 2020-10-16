@@ -884,4 +884,6 @@ static inline void kDeleteLcm(LObject *P)
    P->lcm=NULL;
  }
 }
+
+void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1);
 #endif

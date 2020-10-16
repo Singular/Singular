@@ -41,10 +41,6 @@
 //#define DEBUGF5 1
 #endif
 
-#ifdef HAVE_RINGS
-#include "kernel/ideals.h"
-#endif
-
 // define if enterL, enterT should use memmove instead of doing it manually
 // on topgun, this is slightly faster (see monodromy_l.tst, homog_gonnet.sing)
 #ifndef SunOS_4
@@ -3840,7 +3836,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 */
-void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
+void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR/* = -1*/)
 {
 
   if ((strat->syzComp==0)
@@ -7834,11 +7830,11 @@ void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
       {
         j = kFindDivisibleByInT_Z(strat, &Ln);
         if (j < 0)
-	{
+        {
           break;
         }
-	else
-	{
+        else
+        {
           /* reduction not cancelling a tail term, but reducing its coefficient */
           With = &(strat->T[j]);
           assume(With->GetpLength()==pLength(With->p != __null ? With->p : With->t_p));
@@ -12971,7 +12967,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
             if (TEST_OPT_DEBUG)
-	    {
+            {
               Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
             }
 #endif
@@ -12985,7 +12981,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         {
 #ifdef CRITERION_DEBUG
           if (TEST_OPT_DEBUG)
-	  {
+          {
             Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
           }
 #endif
@@ -13050,7 +13046,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
             pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
             if (TEST_OPT_DEBUG)
-	    {
+            {
               Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
             }
 #endif
@@ -13063,7 +13059,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
         {
 #ifdef CRITERION_DEBUG
           if (TEST_OPT_DEBUG)
-	  {
+          {
             Print("--- chain crit using pair to remove B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
           }
 #endif
@@ -13264,7 +13260,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++)
-	{
+        {
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
@@ -13309,7 +13305,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         new_pair=TRUE;
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++)
-	{
+        {
           poly s = strat->S[j];
           enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
         }
@@ -13517,7 +13513,7 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++)
-	{
+        {
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
@@ -13547,7 +13543,7 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
         new_pair=TRUE;
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++)
-	{
+        {
           poly s = strat->S[j];
           // TODO: cache lastVblock of s[1..k] for later use
           enterOnePairWithShifts(j, s, h, ecart, isFromQ, strat, atR, h_lastVblock, pmLastVblock(s));
@@ -13594,7 +13590,7 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
       {
         // pairs (shifts(s[1..k]),h), (s[1..k],h)
         for (j=0; j<=k; j++)
-	{
+        {
           if ((pGetComp(h)==pGetComp(strat->S[j]))
               || (pGetComp(strat->S[j])==0))
           {
@@ -13768,98 +13764,3 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
   return L->GetLmCurrRing();
 }
 #endif
-
-BOOLEAN kVerify(ideal F, ideal Q)
-{
-  kStrategy strat=new skStrategy;
-  strat->ak = id_RankFreeModule(F,currRing);
-  strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
-  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
-  initBuchMoraPos(strat);
-  initBba(strat);
-  initBuchMora(F, Q,strat);
-  /*initBuchMora:*/
-    strat->tail = pInit();
-    /*- set s -*/
-    strat->sl = -1;
-    /*- set L -*/
-    strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
-    strat->Ll = -1;
-    strat->L = initL(strat->Lmax);
-    /*- set B -*/
-    strat->Bmax = setmaxL;
-    strat->Bl = -1;
-    strat->B = initL();
-    /*- set T -*/
-    strat->tl = -1;
-    strat->tmax = setmaxT;
-    strat->T = initT();
-    strat->R = initR();
-    strat->sevT = initsevT();
-    /*- init local data struct.---------------------------------------- -*/
-    strat->P.ecart=0;
-    strat->P.length=0;
-    strat->P.pLength=0;
-    initS(F, Q,strat); /*sets also S, ecartS, fromQ */
-    strat->fromT = FALSE;
-    strat->noTailReduction = FALSE;
-  /*----------------------------------------------------------------------*/
-  /* build pairs */
-  if (strat->fromQ!=NULL)
-  {
-    for(int i=1; i<=strat->sl;i++)
-    {
-      initenterpairs(strat->S[i],i-1,0,strat->fromQ[i],strat);
-    }
-  }
-  else
-  {
-    for(int i=1; i<=strat->sl;i++)
-    {
-      initenterpairs(strat->S[i],i-1,0,FALSE,strat);
-    }
-  }
-  printf("%d pairs created\n",strat->Ll+1);
-  if (TEST_OPT_DEBUG) messageSets(strat);
-  /*---------------------------------------------------------------------*/
-  /* spolys */
-  BOOLEAN all_okay=TRUE;
-  for(int i=strat->Ll;i>=0; i--)
-  {
-    int red_result=1;
-    /* picks the last element from the lazyset L */
-    strat->P = strat->L[i];
-    if (pNext(strat->P.p) == strat->tail)
-    {
-      // deletes the short spoly
-      pLmFree(strat->P.p);
-      strat->P.p = NULL;
-      poly m1 = NULL, m2 = NULL;
-      kCheckSpolyCreation(&(strat->P), strat, m1, m2);
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R);
-    }
-    if ((strat->P.p == NULL) && (strat->P.t_p == NULL))
-    {
-      red_result = 0;
-    }
-    else
-    {
-      int sl=strat->sl;
-      strat->P.GetP();
-      poly p=redNF(strat->P.p,sl,TRUE,strat);
-      if (p==NULL) red_result=0;
-      else
-      {
-      printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
-      }
-    }
-    if (red_result!=0)
-    {
-      printf("fail: %d, result: %d\n",i,red_result);
-      all_okay=FALSE;
-    }
-  }
-  return all_okay;
-}
