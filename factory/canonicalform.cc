@@ -638,7 +638,9 @@ CanonicalForm &
 CanonicalForm::operator += ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
-    if ( what ) {
+    int lv,cf_lv;
+    if ( what )
+    {
         ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
         if ( (what = is_imm( cf.value )) == FFMARK )
             value = imm_add_p( value, cf.value );
@@ -653,21 +655,24 @@ CanonicalForm::operator += ( const CanonicalForm & cf )
     }
     else  if ( is_imm( cf.value ) )
         value = value->addcoeff( cf.value );
-    else  if ( value->level() == cf.value->level() ) {
+    else  if ( (lv=value->level()) == (cf_lv=cf.value->level()) )
+    {
         if ( value->levelcoeff() == cf.value->levelcoeff() )
             value = value->addsame( cf.value );
         else  if ( value->levelcoeff() > cf.value->levelcoeff() )
             value = value->addcoeff( cf.value );
-        else {
+        else
+	{
             InternalCF * dummy = cf.value->copyObject();
             dummy = dummy->addcoeff( value );
             if ( value->deleteObject() ) delete value;
             value = dummy;
         }
     }
-    else  if ( level() > cf.level() )
+    else  if ( lv > cf_lv /*level() > cf.level()*/ )
         value = value->addcoeff( cf.value );
-    else {
+    else
+    {
         InternalCF * dummy = cf.value->copyObject();
         dummy = dummy->addcoeff( value );
         if ( value->deleteObject() ) delete value;

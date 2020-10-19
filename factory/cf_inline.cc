@@ -124,7 +124,7 @@
 **/
 CF_INLINE
 CanonicalForm::CanonicalForm ()
-    : value( CFFactory::basic( 0L ) )
+    : value( CFFactory::basic( 0 ) )
 {
 }
 

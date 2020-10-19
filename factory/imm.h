@@ -311,6 +311,8 @@ inline InternalCF *
 imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
     long a = imm2int( lhs );
+    if (a == 0L)
+      return int2imm(0);
     long b = imm2int( rhs );
     int sa= 1;
     unsigned FACTORY_INT64 aa, bb;
@@ -336,7 +338,7 @@ imm_mul ( InternalCF * lhs, InternalCF * rhs )
         return res->mulcoeff( rhs );
     }
     #else
-    if ( ( a!=0L ) && ((result/aa!=bb) || (result>(unsigned FACTORY_INT64) MAXIMMEDIATE) ))
+    if ( ((result/aa!=bb) || (result>(unsigned FACTORY_INT64) MAXIMMEDIATE) ))
     {
         InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
         return res->mulcoeff( rhs );
