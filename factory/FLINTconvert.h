@@ -40,6 +40,9 @@ extern "C"
 #include <flint/fq_nmod.h>
 #include <flint/fq_nmod_poly.h>
 #include <flint/fq_nmod_mat.h>
+#if ( __FLINT_RELEASE >= 20503)
+#include <flint/fmpq_mpoly.h>
+#endif
 #endif
 
 EXTERN_VAR flint_rand_t FLINTrandom;
@@ -269,6 +272,10 @@ CanonicalForm mulFlintMP_Zp(const CanonicalForm& F,int lF, const CanonicalForm& 
 CanonicalForm mulFlintMP_QQ(const CanonicalForm& F,int lF, const CanonicalForm& Gi, int lG, int m);
 CanonicalForm gcdFlintMP_Zp(const CanonicalForm& F, const CanonicalForm& G);
 CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G);
+void convFactoryPFlintMP ( const CanonicalForm & f, nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, int N );
+void convFactoryPFlintMP ( const CanonicalForm & f, fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, int N );
+CanonicalForm convFlintMPFactoryP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, int N);
+CanonicalForm convFlintMPFactoryP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, int N);
 #endif
 #endif
 #endif
