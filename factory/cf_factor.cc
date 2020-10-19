@@ -615,26 +615,21 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else // multivariate,  char 0
     {
+      #ifdef HAVE_NTL
+      On (SW_RATIONAL);
       if (issqrfree)
       {
-        #ifdef HAVE_NTL
-        On (SW_RATIONAL);
         CFList factors= ratSqrfFactorize (fz);
         for (CFListIterator i= factors; i.hasItem(); i++)
           F.append (CFFactor (i.getItem(), 1));
-        #else
-        F=ZFactorizeMultivariate(fz, issqrfree);
-        #endif
       }
       else
       {
-        #ifdef HAVE_NTL
-        On (SW_RATIONAL);
         F = ratFactorize (fz);
-        #else
-        F=ZFactorizeMultivariate(fz, issqrfree);
-        #endif
       }
+      #else
+      F=ZFactorizeMultivariate(fz, issqrfree);
+      #endif
     }
 
 end_char0:
