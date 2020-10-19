@@ -3877,7 +3877,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
       }
       ideal F=(ideal)h->Data();
-      res->data=(char*) kVerify(F,currRing->qideal);
+      res->data=(char*)(long) kVerify(F,currRing->qideal);
       res->rtyp=INT_CMD;
       return FALSE;
     }
