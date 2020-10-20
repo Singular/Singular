@@ -64,7 +64,7 @@ extern "C"
 #include <flint/fmpq_mpoly.h>
 
 // planed, but not yet in FLINT:
-#if (__FLINT_RELEASE < 20604)
+#if (__FLINT_RELEASE < 20700)
 // helper for fq_nmod_t -> nmod_poly_t
 static void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
 {
@@ -72,14 +72,35 @@ static void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmo
     a->mod = ctx->modulus->mod;
     nmod_poly_set(a, b);
 }
+#else
+#include <flint/fq_nmod_mpoly.h>
+#endif
 
+#if (__FLINT_RELEASE < 20700)
 // helper for nmod_poly_t -> fq_nmod_t
-static void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx)
+void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx)
 {
     FLINT_ASSERT(a->mod.n == b->mod.n);
     FLINT_ASSERT(a->mod.n == ctx->modulus->mod.n);
     nmod_poly_set(a, b);
     fq_nmod_reduce(a, ctx);
+}
+#else
+void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
+                                                       const fq_nmod_ctx_t ctx)
+{
+    FLINT_ASSERT(a->mod.n == b->mod.n);
+    FLINT_ASSERT(a->mod.n == ctx->modulus->mod.n);
+
+    if (b->length <= 2*(ctx->modulus->length - 1))
+    {
+        nmod_poly_set(a, b);
+        fq_nmod_reduce(a, ctx);
+    }
+    else
+    {
+        nmod_poly_rem(a, b, ctx->modulus);
+    }
 }
 #endif
 
