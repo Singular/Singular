@@ -11046,7 +11046,6 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   // shift changes: from 0 to -1
   assume(L->i_r1 >= -1 && L->i_r1 <= strat->tl);
   assume(L->i_r2 >= -1 && L->i_r2 <= strat->tl);
-  assume(strat->tailRing != currRing);
 
   if (! k_GetLeadTerms(L->p1, L->p2, currRing, m1, m2, strat->tailRing))
     return FALSE;
