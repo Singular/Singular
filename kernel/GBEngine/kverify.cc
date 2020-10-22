@@ -228,6 +228,7 @@ BOOLEAN kVerify(ideal F, ideal Q)
     // removes queues
     queue.free();
     rqueue.free();
+    vmem_deinit();
     return all_okay;
   }
   #endif
