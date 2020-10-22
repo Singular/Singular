@@ -6,8 +6,16 @@
 #include "kernel/polys.h"
 #include "polys/monomials/ring.h"
 #include "kernel/GBEngine/kutil.h"
+#include "Singular/feOpt.h"
 #include <stdlib.h>
 #include <string.h>
+
+#define MULTIPROCESS 1
+#ifdef MULTIPROCESS
+#include "kernel/oswrapper/vspace.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#endif
 
 BOOLEAN kVerify(ideal F, ideal Q)
 {
@@ -60,11 +68,11 @@ BOOLEAN kVerify(ideal F, ideal Q)
       initenterpairs(strat->S[i],i-1,0,FALSE,strat);
     }
   }
-  printf("%d pairs created\n",strat->Ll+1);
+  if (TEST_OPT_PROT) printf("%d pairs created\n",strat->Ll+1);
   if (TEST_OPT_DEBUG) messageSets(strat);
   /*---------------------------------------------------------------------*/
-  #if 1 /* seriell */
   BOOLEAN all_okay=TRUE;
+  #ifndef MULTIPROCESS /* seriell */
   for(int i=strat->Ll;i>=0; i--)
   {
   /* spolys */
@@ -91,132 +99,136 @@ BOOLEAN kVerify(ideal F, ideal Q)
       strat->P.GetP();
       poly p=redNF(strat->P.p,sl,TRUE,strat);
       if (p==NULL) red_result=0;
+      #ifdef KDEBUG
       else
       {
-      printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
+        if (TEST_OPT_DEBUG)
+        {
+          printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
+        }
       }
+      #endif
     }
     if (red_result!=0)
     {
-      printf("fail: %d, result: %d\n",i,red_result);
+      if (TEST_OPT_PROT) printf("fail: %d, result: %d\n",i,red_result);
       all_okay=FALSE;
     }
   }
   return all_okay;
   #endif
   /*---------------------------------------------------------------------*/
-  #if 0
+  #ifdef MULTIPROCESS
+  int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
+  int parent_pid=getpid();
   using namespace vspace;
   vmem_init();
-  // Create a semaphore
-  VRef<Semaphore> sem = vnew<Semaphore>(0);
   // Create a queue of int
   VRef<Queue<int> > queue = vnew<Queue<int> >();
   VRef<Queue<int> > rqueue = vnew<Queue<int> >();
-  pid_t pid[MAX_PROCESS];
-  pid[0] = fork_process();
-  if (pid[0] > 0) // parent
+  for(int i=strat->Ll;i>=0; i--)
   {
-    for(int i=strat->Ll;i>=0; i--)
-    {
-     queue->enqueue(i);
-    }
-    for(int i=MAX_PROCESS-1;i>=0;i--)
-    {
-      queue->enqueue(-1); // stop sign
-    }
-    pid[1]=fork_process();
-    if (pid[1] > 0) // parent
-    {
-      pid[2]=fork_process();
-      if (pid[2] > 0) // parent
-      {
-        pid[3]=fork_process();
-        if(pid[3]>0)
-        {
-          // wait for all process to stop:
-          // each process sends an 0 at end
-          int res;
-          int remaining_childs=4;
-          while(remaining_childs>0)
-          {
-            res=rqueue->dequeue();
-            if (res==0) // a child finished
-            {
-              waitpid(-1,NULL,0); // ? see sig_chld_hdl
-              remaining_childs--;
-            }
-            else if (res==1) // not a GB - clean up and return 0
-            {
-              // clean queue:
-              int dummy;
-              do
-              {
-                dummy=queue->dequeue();
-              } while (dummy>=0);
-              while(remaining_childs>0)
-              {
-                waitpid(-1,NULL,0);
-                remaining_childs--;
-              }
-              queue.free();
-              rqueue.free();
-              return FALSE;
-            }
-          }
-        }
-      }
-    }
+   queue->enqueue(i); // the tasks: process pair L[i]
   }
-/* ------------------------------------------------ */
-/* child */
-  BOOLEAN all_okay=TRUE;
-
-  int ind;
-  do
+  for(int i=cpus;i>=0;i--)
   {
-    ind=queue->dequeue();
-    if (ind==0)
+    queue->enqueue(-1); // stop sign, one for each child
+  }
+  int pid;
+  for (int i=0;i<cpus;i++)
+  {
+    pid = fork_process();
+    if (pid==0) break; //child
+  }
+  if (parent_pid!=getpid()) // child ------------------------------------------
+  {
+    do
     {
-      rqueue->enqueue(0);
-      exit(0);
-    }
-    /* spolys */
-    int red_result=1;
-    /* picks the element from the lazyset L */
-    LObject P;
-    P = strat->L[ind];
-    if (pNext(P.p) == strat->tail)
-    {
-      // deletes the short spoly
-      pLmFree(P.p);
-      P.p = NULL;
-      poly m1 = NULL, m2 = NULL;
-      kCheckSpolyCreation(&P, strat, m1, m2);
-      ksCreateSpoly(&P, NULL, strat->use_buckets,
+      int ind=queue->dequeue();
+      if (ind== -1)
+      {
+        if (TEST_OPT_PROT) printf("child: end of queue\n");
+        rqueue->enqueue(0);
+        exit(0);
+      }
+      int red_result=1;
+      /* picks the element from the lazyset L */
+      LObject P;
+      P = strat->L[ind];
+      if (TEST_OPT_PROT) { printf("."); mflush();}
+      if (pNext(P.p) == strat->tail)
+      {
+        // deletes the short spoly
+        pLmFree(P.p);
+        P.p = NULL;
+        poly m1 = NULL, m2 = NULL;
+        /* spoly */
+        kCheckSpolyCreation(&P, strat, m1, m2);
+        ksCreateSpoly(&P, NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
-    }
-    if ((P.p == NULL) && (P.t_p == NULL))
-    {
-      red_result = 0;
-    }
-    else
-    {
-      int sl=strat->sl;
-      P.GetP();
-      poly p=redNF(P.p,sl,TRUE,strat);
-      if (p==NULL) red_result=0;
+      }
+      if ((P.p == NULL) && (P.t_p == NULL))
+      {
+        red_result = 0;
+      }
       else
       {
-      printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
+        /* reduction */
+        int sl=strat->sl;
+        P.GetP();
+        poly p=redNF(P.p,sl,TRUE,strat);
+        if (p==NULL) red_result=0;
+        #ifdef KDEBUG
+        else
+        {
+          if (TEST_OPT_DEBUG)
+          {
+            printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
+          }
+        }
+        #endif
+      }
+      if (red_result!=0)
+      {
+        if (TEST_OPT_PROT) printf("fail: result: %d\n",red_result);
+        rqueue->enqueue(1);
+        exit(0);
+      }
+    } while(1);
+  }
+  else // parent ---------------------------------------------------
+  {
+    if (TEST_OPT_PROT) printf("childs created\n");
+    // wait for all process to stop:
+    // each process sends an 0 at end or a 1 for failure
+    int res;
+    int remaining_childs=cpus;
+    while(remaining_childs>0)
+    {
+      res=rqueue->dequeue();
+      if (res==0) // a child finished
+      {
+        if (TEST_OPT_PROT) printf("a child finished\n");
+        //waitpid(-1,NULL,0); // ? see sig_chld_hdl
+        remaining_childs--;
+      }
+      else if (res==1) // not a GB - clean up and return 0
+      {
+        if (TEST_OPT_PROT) printf("a child finished res=1\n");
+        remaining_childs--;
+        all_okay=FALSE;
+        // clean queue:
+        int dummy;
+        do
+        {
+          dummy=queue->dequeue();
+        } while (dummy==0);
       }
     }
-    if (red_result!=0)
-    {
-      printf("fail: %d, result: %d\n",i,red_result);
-      rqueue->enqueue(1);
-      exit(0);
-    }
+    // removes queues
+    queue.free();
+    rqueue.free();
+    return all_okay;
   }
   #endif
 }

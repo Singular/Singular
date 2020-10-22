@@ -6,10 +6,10 @@ ${GMP_CPPFLAGS}
 AM_CXXFLAGS=
 
 noinst_LTLIBRARIES=liboswrapper.la
-liboswrapper_la_SOURCES=feread.cc fereadl.c timer.cc rlimit.c
+liboswrapper_la_SOURCES=feread.cc fereadl.c timer.cc rlimit.c vspace.cc
 
 liboswrapper_la_includedir=$(includedir)/singular/kernel/oswrapper
-liboswrapper_la_include_HEADERS=feread.h timer.h rlimit.h
+liboswrapper_la_include_HEADERS=feread.h timer.h rlimit.h vspace.h
 
 
 
