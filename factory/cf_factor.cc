@@ -527,11 +527,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else // char p, multivariate
     {
-      On (SW_RATIONAL);
       #if defined(HAVE_NTL)
       if (issqrfree)
       {
         CFList factors;
+        Variable alpha;
         if (CFFactory::gettype() == GaloisFieldDomain)
           factors= GFSqrfFactorize (f);
         else
@@ -541,12 +541,14 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
       else
       {
+        Variable alpha;
         if (CFFactory::gettype() == GaloisFieldDomain)
           F= GFFactorize (f);
         else
           F= FpFactorize (f);
       }
       #elif defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
+      #if 0
       nmod_mpoly_ctx_t ctx;
       nmod_mpoly_ctx_init(ctx,f.level(),ORD_LEX,getCharacteristic());
       nmod_mpoly_t Flint_f;
@@ -572,8 +574,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       nmod_mpoly_factor_clear(factors,ctx);
       nmod_mpoly_clear(Flint_f,ctx);
       nmod_mpoly_ctx_clear(ctx);
+      #endif
       #else
-      factoryError ("multivariate factorization depends on NTL/FLINT(missing)");
+      factoryError ("multivariate factorization depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -682,9 +685,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       fmpq_mpoly_clear(Flint_f,ctx);
       fmpq_mpoly_ctx_clear(ctx);
       #elif defined(HAVE_NTL)
+      On (SW_RATIONAL);
       if (issqrfree)
       {
-        On (SW_RATIONAL);
         CFList factors= ratSqrfFactorize (fz);
         for (CFListIterator i= factors; i.hasItem(); i++)
           F.append (CFFactor (i.getItem(), 1));
