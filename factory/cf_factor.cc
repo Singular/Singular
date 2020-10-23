@@ -43,6 +43,10 @@
 #include "factory/cf_gmp.h"
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
+#if (__FLINT_RELEASE >= 20700)
+#include <flint/nmod_mpoly_factor.h>
+#include <flint/fmpq_mpoly_factor.h>
+#endif
 #endif
 
 //static bool isUnivariateBaseDomain( const CanonicalForm & f )
@@ -143,7 +147,11 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
          }
       }
       else
-        printf("+%ld",f.intval());
+      {
+        long l=f.intval();
+        if (l<0) printf("%ld",l);
+        else     printf("+%ld",l);
+      }
     }
     else
     {
@@ -507,7 +515,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
 #endif
 #if !defined(HAVE_NTL) && !defined(HAVE_FLINT)
-      // Use Factory without NTL: char p, univariate
+      // Use Factory without NTL and without FLINT: char p, univariate
       {
         if ( isOn( SW_BERLEKAMP ) )
           F=FpFactorizeUnivariateB( f, issqrfree );
@@ -519,11 +527,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else // char p, multivariate
     {
+      On (SW_RATIONAL);
       #if defined(HAVE_NTL)
       if (issqrfree)
       {
         CFList factors;
-        Variable alpha;
         if (CFFactory::gettype() == GaloisFieldDomain)
           factors= GFSqrfFactorize (f);
         else
@@ -533,14 +541,39 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
       else
       {
-        Variable alpha;
         if (CFFactory::gettype() == GaloisFieldDomain)
           F= GFFactorize (f);
         else
           F= FpFactorize (f);
       }
+      #elif defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
+      nmod_mpoly_ctx_t ctx;
+      nmod_mpoly_ctx_init(ctx,f.level(),ORD_LEX,getCharacteristic());
+      nmod_mpoly_t Flint_f;
+      nmod_mpoly_init(Flint_f,ctx);
+      convFactoryPFlintMP(f,Flint_f,ctx,f.level());
+      nmod_mpoly_factor_t factors;
+      nmod_mpoly_factor_init(factors,ctx);
+      if (issqrfree) nmod_mpoly_factor_squarefree(factors,Flint_f,ctx);
+      else           nmod_mpoly_factor(factors,Flint_f,ctx);
+      nmod_mpoly_t fac;
+      nmod_mpoly_init(fac,ctx);
+      CanonicalForm cf_fac;
+      int cf_exp;
+      cf_fac=nmod_mpoly_factor_get_constant_ui(factors,ctx);
+      F.append(CFFactor(cf_fac,1));
+      for(int i=nmod_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
+      {
+         nmod_mpoly_factor_get_base(fac,factors,i,ctx);
+         cf_fac=convFlintMPFactoryP(fac,ctx,f.level());
+         cf_exp=nmod_mpoly_factor_get_exp_si(factors,i,ctx);
+         F.append(CFFactor(cf_fac,cf_exp));
+      }
+      nmod_mpoly_factor_clear(factors,ctx);
+      nmod_mpoly_clear(Flint_f,ctx);
+      nmod_mpoly_ctx_clear(ctx);
       #else
-      factoryError ("multivariate factorization depends on NTL(missing)");
+      factoryError ("multivariate factorization depends on NTL/FLINT(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -615,10 +648,43 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else // multivariate,  char 0
     {
-      #ifdef HAVE_NTL
+      #if 0 //defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
       On (SW_RATIONAL);
+      fmpq_mpoly_ctx_t ctx;
+      fmpq_mpoly_ctx_init(ctx,f.level(),ORD_LEX);
+      fmpq_mpoly_t Flint_f;
+      fmpq_mpoly_init(Flint_f,ctx);
+      convFactoryPFlintMP(fz,Flint_f,ctx,fz.level());
+      fmpq_mpoly_factor_t factors;
+      fmpq_mpoly_factor_init(factors,ctx);
+      int rr;
+      if (issqrfree) rr=fmpq_mpoly_factor_squarefree(factors,Flint_f,ctx);
+      else           rr=fmpq_mpoly_factor(factors,Flint_f,ctx);
+      if (rr==0) printf("fail\n");
+      fmpq_mpoly_t fac;
+      fmpq_mpoly_init(fac,ctx);
+      CanonicalForm cf_fac;
+      int cf_exp;
+      fmpq_t c;
+      fmpq_init(c);
+      fmpq_mpoly_factor_get_constant_fmpq(c,factors,ctx);
+      cf_fac=convertFmpq2CF(c);
+      fmpq_clear(c);
+      if (!cf_fac.isOne()) F.append(CFFactor(cf_fac,1));
+      for(int i=fmpq_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
+      {
+         fmpq_mpoly_factor_get_base(fac,factors,i,ctx);
+         cf_fac=convFlintMPFactoryP(fac,ctx,f.level());
+         cf_exp=fmpq_mpoly_factor_get_exp_si(factors,i,ctx);
+         F.append(CFFactor(cf_fac,cf_exp));
+      }
+      fmpq_mpoly_factor_clear(factors,ctx);
+      fmpq_mpoly_clear(Flint_f,ctx);
+      fmpq_mpoly_ctx_clear(ctx);
+      #elif defined(HAVE_NTL)
       if (issqrfree)
       {
+        On (SW_RATIONAL);
         CFList factors= ratSqrfFactorize (fz);
         for (CFListIterator i= factors; i.hasItem(); i++)
           F.append (CFFactor (i.getItem(), 1));
