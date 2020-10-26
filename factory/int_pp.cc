@@ -239,33 +239,47 @@ InternalCF* InternalPrimePower::dividesame( InternalCF * c )
 
 InternalCF* InternalPrimePower::divsame( InternalCF * c )
 {
-    if ( c == this ) {
+    if ( c == this )
+    {
         if ( deleteObject() ) delete this;
         return CFFactory::basic( 1 );
     }
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
-        mpz_t dummy, a, b;
-        mpz_init( dummy ); mpz_init( a ); mpz_init( b );
+        mpz_t a, b;
+        mpz_init( a ); mpz_init( b );
+        #ifdef SING_NDEBUG
+        mpz_gcdext( NULL, a, b, primepow, MPI( c ) );
+        #else
+        mpz_t dummy; mpz_init( dummy );
         mpz_gcdext( dummy, a, b, primepow, MPI( c ) );
         ASSERT( mpz_cmp_si( dummy, 1 ) == 0, "illegal inversion" );
-        mpz_clear( dummy ); mpz_clear( a );
+        mpz_clear( dummy );
+        #endif
+        mpz_clear( a );
         if ( mpz_cmp_si( b, 0 ) < 0 )
             mpz_add( b, b, primepow );
         mpz_mul( b, b, thempi );
         mpz_mod( b, b, primepow );
         return new InternalPrimePower( b );
     }
-    else {
-        mpz_t dummy, a, b;
-        mpz_init( dummy ); mpz_init( a ); mpz_init( b );
+    else
+    {
+        mpz_t a, b; mpz_init( a ); mpz_init( b );
+        #ifdef SING_NDEBUG
+        mpz_gcdext( NULL, a, b, primepow, MPI( c ) );
+        #else
+        mpz_t dummy; mpz_init( dummy );
         mpz_gcdext( dummy, a, b, primepow, MPI( c ) );
         ASSERT( mpz_cmp_si( dummy, 1 ) == 0, "illegal inversion" );
+        mpz_clear(dummy);
+        #endif
         if ( mpz_cmp_si( b, 0 ) < 0 )
             mpz_add( b, b, primepow );
         mpz_mul( thempi, b, thempi );
         mpz_mod( thempi, thempi, primepow );
-        mpz_clear( dummy ); mpz_clear( a ); mpz_clear( b );
+        mpz_clear( a ); mpz_clear( b );
         return this;
     }
 }
@@ -292,11 +306,17 @@ InternalPrimePower::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF
         rem = CFFactory::basic( 0 );
     }
     else {
-        mpz_t dummy, a, b;
-        mpz_init( dummy ); mpz_init( a ); mpz_init( b );
+        mpz_t a, b;
+        mpz_init( a ); mpz_init( b );
+        #ifdef SING_NDEBUG
+        mpz_gcdext( NULL, a, b, primepow, MPI( c ) );
+        #else
+        mpz_t dummy; mpz_init( dummy );
         mpz_gcdext( dummy, a, b, primepow, MPI( c ) );
         ASSERT( mpz_cmp_si( dummy, 1 ) == 0, "illegal inversion" );
-        mpz_clear( dummy ); mpz_clear( a );
+        mpz_clear( dummy );
+        #endif
+        mpz_clear( a );
         if ( mpz_cmp_si( b, 0 ) < 0 )
             mpz_add( b, b, primepow );
         mpz_mul( b, b, thempi );
