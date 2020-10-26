@@ -4189,10 +4189,9 @@ CanonicalForm modGCDZ ( const CanonicalForm & FF, const CanonicalForm & GG )
     {
       if ( dp_deg == d_deg )
       {
-        CFArray inv(2);
-        chineseRemainderCached( D, q, mapinto( Dp ), p, newD, newq, inv );
-        chineseRemainderCached( cof, q, mapinto (cofp), p, newCof, newq, inv);
-        chineseRemainderCached( cog, q, mapinto (cogp), p, newCog, newq, inv);
+        chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
+        chineseRemainder( cof, q, mapinto (cofp), p, newCof, newq);
+        chineseRemainder( cog, q, mapinto (cogp), p, newCog, newq);
         cof= newCof;
         cog= newCog;
         newqh= newq/2;

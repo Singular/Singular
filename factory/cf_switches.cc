@@ -30,7 +30,7 @@ CFSwitches::CFSwitches ()
         switches[i] = false;
 // and set the default (recommended) On-values:
 #if defined(HAVE_NTL) || defined(HAVE_FLINT)
-  //On(SW_USE_CHINREM_GCD);
+  On(SW_USE_CHINREM_GCD);
 #endif
   On(SW_USE_NTL_SORT);
 #ifdef HAVE_FLINT

@@ -518,7 +518,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       fc= EZGCD_P (fc, gc);
     }
     #endif
-    #if defined(HAVE_FLINT) && ( __FLINT_RELEASE >= 20503)
+    #if defined(HAVE_NTL) || defined(HAVE_FLINT)
     else if (isOn(SW_USE_FF_MOD_GCD) && !fc_and_gc_Univariate)
     {
       Variable a;
