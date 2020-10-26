@@ -527,58 +527,74 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else // char p, multivariate
     {
-      #if defined(HAVE_NTL)
-      if (issqrfree)
+      if (CFFactory::gettype() == GaloisFieldDomain)
       {
-        CFList factors;
-        Variable alpha;
-        if (CFFactory::gettype() == GaloisFieldDomain)
+        #if defined(HAVE_NTL)
+        if (issqrfree)
+        {
+          CFList factors;
+          Variable alpha;
           factors= GFSqrfFactorize (f);
+          for (CFListIterator i= factors; i.hasItem(); i++)
+            F.append (CFFactor (i.getItem(), 1));
+        }
         else
-          factors= FpSqrfFactorize (f);
-        for (CFListIterator i= factors; i.hasItem(); i++)
-          F.append (CFFactor (i.getItem(), 1));
+        {
+          Variable alpha;
+          F= GFFactorize (f);
+        }
+        #else
+        factoryError ("multivariate factorization depends on NTL(missing)");
+        return CFFList (CFFactor (f, 1));
+        #endif
       }
       else
       {
-        Variable alpha;
-        if (CFFactory::gettype() == GaloisFieldDomain)
-          F= GFFactorize (f);
+        #if defined(HAVE_NTL)
+        if (issqrfree)
+        {
+          CFList factors;
+          Variable alpha;
+          factors= FpSqrfFactorize (f);
+          for (CFListIterator i= factors; i.hasItem(); i++)
+            F.append (CFFactor (i.getItem(), 1));
+        }
         else
+        {
+          Variable alpha;
           F= FpFactorize (f);
+        }
+        #elif defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_ctx_init(ctx,f.level(),ORD_LEX,getCharacteristic());
+        nmod_mpoly_t Flint_f;
+        nmod_mpoly_init(Flint_f,ctx);
+        convFactoryPFlintMP(f,Flint_f,ctx,f.level());
+        nmod_mpoly_factor_t factors;
+        nmod_mpoly_factor_init(factors,ctx);
+        if (issqrfree) nmod_mpoly_factor_squarefree(factors,Flint_f,ctx);
+        else           nmod_mpoly_factor(factors,Flint_f,ctx);
+        nmod_mpoly_t fac;
+        nmod_mpoly_init(fac,ctx);
+        CanonicalForm cf_fac;
+        int cf_exp;
+        cf_fac=nmod_mpoly_factor_get_constant_ui(factors,ctx);
+        F.append(CFFactor(cf_fac,1));
+        for(int i=nmod_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
+        {
+          nmod_mpoly_factor_get_base(fac,factors,i,ctx);
+          cf_fac=convFlintMPFactoryP(fac,ctx,f.level());
+          cf_exp=nmod_mpoly_factor_get_exp_si(factors,i,ctx);
+          F.append(CFFactor(cf_fac,cf_exp));
+        }
+        nmod_mpoly_factor_clear(factors,ctx);
+        nmod_mpoly_clear(Flint_f,ctx);
+        nmod_mpoly_ctx_clear(ctx);
+        #else
+        factoryError ("multivariate factorization depends on NTL(missing)");
+        return CFFList (CFFactor (f, 1));
+        #endif
       }
-      #elif defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
-      #if 0
-      nmod_mpoly_ctx_t ctx;
-      nmod_mpoly_ctx_init(ctx,f.level(),ORD_LEX,getCharacteristic());
-      nmod_mpoly_t Flint_f;
-      nmod_mpoly_init(Flint_f,ctx);
-      convFactoryPFlintMP(f,Flint_f,ctx,f.level());
-      nmod_mpoly_factor_t factors;
-      nmod_mpoly_factor_init(factors,ctx);
-      if (issqrfree) nmod_mpoly_factor_squarefree(factors,Flint_f,ctx);
-      else           nmod_mpoly_factor(factors,Flint_f,ctx);
-      nmod_mpoly_t fac;
-      nmod_mpoly_init(fac,ctx);
-      CanonicalForm cf_fac;
-      int cf_exp;
-      cf_fac=nmod_mpoly_factor_get_constant_ui(factors,ctx);
-      F.append(CFFactor(cf_fac,1));
-      for(int i=nmod_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
-      {
-         nmod_mpoly_factor_get_base(fac,factors,i,ctx);
-         cf_fac=convFlintMPFactoryP(fac,ctx,f.level());
-         cf_exp=nmod_mpoly_factor_get_exp_si(factors,i,ctx);
-         F.append(CFFactor(cf_fac,cf_exp));
-      }
-      nmod_mpoly_factor_clear(factors,ctx);
-      nmod_mpoly_clear(Flint_f,ctx);
-      nmod_mpoly_ctx_clear(ctx);
-      #endif
-      #else
-      factoryError ("multivariate factorization depends on NTL(missing)");
-      return CFFList (CFFactor (f, 1));
-      #endif
     }
   }
   else // char 0
@@ -651,7 +667,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else // multivariate,  char 0
     {
-      #if 0 //defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
+      #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
       On (SW_RATIONAL);
       fmpq_mpoly_ctx_t ctx;
       fmpq_mpoly_ctx_init(ctx,f.level(),ORD_LEX);
