@@ -2034,7 +2034,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
       // make sure kTest_TS does not complain about strat->P
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Clear();
 #endif
     }
     if (strat->kHEdgeFound)
@@ -3618,7 +3618,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
           for(;ii<=strat->sl;ii++)
           {
             LObject h;
-            memset(&h,0,sizeof(h));
+            h.Clear();
             h.tailRing=strat->tailRing;
             h.p=strat->S[ii]; strat->S[ii]=NULL;
             strat->initEcart(&h);
@@ -3671,7 +3671,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     {
       messageSets(strat);
     }
-    memset(&(strat->P), 0, sizeof(strat->P));
+    strat->P.Clear();
 #endif
     //kTest_TS(strat);: i_r out of sync in kInterRedBba, but not used!
   }

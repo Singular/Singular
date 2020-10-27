@@ -2031,7 +2031,7 @@ void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp
   std::vector<int> C;
 
   int ds, is, ps;
-  int lpcnt = 0;
+  unsigned long lpcnt = 0;
 
   poly w, wi;
   ideal Jwi;
