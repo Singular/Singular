@@ -187,7 +187,7 @@ struct n_Procs_s
    /// convertion to long, 0 if impossible
    long    (*cfInt)(number &n, const coeffs r);
 
-   /// Converts a non-negative number n into a GMP number, 0 if impossible
+   /// Converts a (integer) number n into a GMP number, 0 if impossible
    void     (*cfMPZ)(mpz_t result, number &n, const coeffs r);
 
    /// changes argument  inline: a:= -a
