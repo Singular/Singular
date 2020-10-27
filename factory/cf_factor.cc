@@ -669,37 +669,37 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     {
       #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
       On (SW_RATIONAL);
-      fmpq_mpoly_ctx_t ctx;
-      fmpq_mpoly_ctx_init(ctx,f.level(),ORD_LEX);
-      fmpq_mpoly_t Flint_f;
-      fmpq_mpoly_init(Flint_f,ctx);
+      fmpz_mpoly_ctx_t ctx;
+      fmpz_mpoly_ctx_init(ctx,f.level(),ORD_LEX);
+      fmpz_mpoly_t Flint_f;
+      fmpz_mpoly_init(Flint_f,ctx);
       convFactoryPFlintMP(fz,Flint_f,ctx,fz.level());
-      fmpq_mpoly_factor_t factors;
-      fmpq_mpoly_factor_init(factors,ctx);
+      fmpz_mpoly_factor_t factors;
+      fmpz_mpoly_factor_init(factors,ctx);
       int rr;
-      if (issqrfree) rr=fmpq_mpoly_factor_squarefree(factors,Flint_f,ctx);
-      else           rr=fmpq_mpoly_factor(factors,Flint_f,ctx);
+      if (issqrfree) rr=fmpz_mpoly_factor_squarefree(factors,Flint_f,ctx);
+      else           rr=fmpz_mpoly_factor(factors,Flint_f,ctx);
       if (rr==0) printf("fail\n");
-      fmpq_mpoly_t fac;
-      fmpq_mpoly_init(fac,ctx);
+      fmpz_mpoly_t fac;
+      fmpz_mpoly_init(fac,ctx);
       CanonicalForm cf_fac;
       int cf_exp;
-      fmpq_t c;
-      fmpq_init(c);
-      fmpq_mpoly_factor_get_constant_fmpq(c,factors,ctx);
-      cf_fac=convertFmpq2CF(c);
-      fmpq_clear(c);
-      if (!cf_fac.isOne()) F.append(CFFactor(cf_fac,1));
-      for(int i=fmpq_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
+      fmpz_t c;
+      fmpz_init(c);
+      fmpz_mpoly_factor_get_constant_fmpz(c,factors,ctx);
+      cf_fac=convertFmpz2CF(c);
+      fmpz_clear(c);
+      F.append(CFFactor(cf_fac,1));
+      for(int i=fmpz_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
       {
-         fmpq_mpoly_factor_get_base(fac,factors,i,ctx);
+         fmpz_mpoly_factor_get_base(fac,factors,i,ctx);
          cf_fac=convFlintMPFactoryP(fac,ctx,f.level());
-         cf_exp=fmpq_mpoly_factor_get_exp_si(factors,i,ctx);
+         cf_exp=fmpz_mpoly_factor_get_exp_si(factors,i,ctx);
          F.append(CFFactor(cf_fac,cf_exp));
       }
-      fmpq_mpoly_factor_clear(factors,ctx);
-      fmpq_mpoly_clear(Flint_f,ctx);
-      fmpq_mpoly_ctx_clear(ctx);
+      fmpz_mpoly_factor_clear(factors,ctx);
+      fmpz_mpoly_clear(Flint_f,ctx);
+      fmpz_mpoly_ctx_clear(ctx);
       #elif defined(HAVE_NTL)
       On (SW_RATIONAL);
       if (issqrfree)
