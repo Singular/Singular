@@ -25,7 +25,6 @@
 
 int convFlintISingI (fmpz_t f)
 {
-  int res;
   //return fmpz_get_si(f);
   return (int)*f;
 }
