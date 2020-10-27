@@ -710,6 +710,29 @@ static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, fmpq_mpoly_t
   }
 }
 
+static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, fmpz_mpoly_t result, fmpz_mpoly_ctx_t ctx, int N )
+{
+  // assume f!=0
+  if ( ! f.inBaseDomain() )
+  {
+    int l = f.level();
+    for ( CFIterator i = f; i.hasTerms(); i++ )
+    {
+      exp[N-l] = i.exp();
+      convFlint_RecPP( i.coeff(), exp, result, ctx, N );
+    }
+    exp[N-l] = 0;
+  }
+  else
+  {
+    fmpz_t c;
+    fmpz_init(c);
+    convertCF2Fmpz(c,f);
+    fmpz_mpoly_push_term_fmpz_ui(result,c,exp,ctx);
+    fmpz_clear(c);
+  }
+}
+
 void convFactoryPFlintMP ( const CanonicalForm & f, nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, int N )
 {
   if (f.isZero()) return;
@@ -729,6 +752,16 @@ void convFactoryPFlintMP ( const CanonicalForm & f, fmpq_mpoly_t res, fmpq_mpoly
   memset(exp,0,N*sizeof(ulong));
   convFlint_RecPP( f, exp, res, ctx, N );
   fmpq_mpoly_reduce(res,ctx);
+  Free(exp,N*sizeof(ulong));
+}
+
+void convFactoryPFlintMP ( const CanonicalForm & f, fmpz_mpoly_t res, fmpz_mpoly_ctx_t ctx, int N )
+{
+  if (f.isZero()) return;
+  ulong * exp = (ulong*)Alloc(N*sizeof(ulong));
+  memset(exp,0,N*sizeof(ulong));
+  convFlint_RecPP( f, exp, res, ctx, N );
+  //fmpz_mpoly_reduce(res,ctx);
   Free(exp,N*sizeof(ulong));
 }
 
@@ -771,6 +804,29 @@ CanonicalForm convFlintMPFactoryP(fmpq_mpoly_t f, fmpq_mpoly_ctx_t ctx, int N)
     result+=term;
   }
   fmpq_clear(c);
+  Free(exp,N*sizeof(ulong));
+  return result;
+}
+
+CanonicalForm convFlintMPFactoryP(fmpz_mpoly_t f, fmpz_mpoly_ctx_t ctx, int N)
+{
+  CanonicalForm result;
+  int d=fmpz_mpoly_length(f,ctx)-1;
+  ulong* exp=(ulong*)Alloc(N*sizeof(ulong));
+  fmpz_t c;
+  fmpz_init(c);
+  for(int i=d; i>=0; i--)
+  {
+    fmpz_mpoly_get_term_coeff_fmpz(c,f,i,ctx);
+    fmpz_mpoly_get_term_exp_ui(exp,f,i,ctx);
+    CanonicalForm term=convertFmpz2CF(c);
+    for ( int i = 0; i <N; i++ )
+    {
+      if (exp[i]!=0) term*=CanonicalForm( Variable( N-i ), exp[i] );
+    }
+    result+=term;
+  }
+  fmpz_clear(c);
   Free(exp,N*sizeof(ulong));
   return result;
 }
