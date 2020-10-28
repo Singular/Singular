@@ -3,7 +3,7 @@
 #include "coeffs/numbers.h" // nRegister, coeffs.h
 #include "coeffs/rmodulon.h" // ZnmInfo
 #include "coeffs/bigintmat.h" // bigintmat
-#include "coeffs/longrat.h" // BIGINTs: nlGMP
+#include "coeffs/longrat.h" // BIGINTs: nlMPZ
 #include "polys/ext_fields/algext.h" // AlgExtInfo
 #include "misc/prime.h" // IsPrime
 #include "Singular/blackbox.h" // blackbox type
@@ -93,8 +93,7 @@ BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b)
   {
     ZnmInfo info;
     mpz_t modBase;
-    mpz_init(modBase);
-    nlGMP(i2,modBase,coeffs_BIGINT); // FIXME? TODO? // extern void   nlGMP(number &i, mpz_t n, const coeffs r); // to be replaced with n_MPZ(modBase,i2,coeffs_BIGINT); // ?
+    nlMPZ(modBase,i2,coeffs_BIGINT);
     info.base= (mpz_ptr)modBase;
     info.exp= 1;
     if (mpz_popcount(modBase)==1) // is a power of 2

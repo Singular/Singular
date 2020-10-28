@@ -1837,7 +1837,7 @@ void rDecomposeRing_41(leftv h,const coeffs C)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
-  LL->m[0].data=nlMapGMP((number) C->modBase, C, coeffs_BIGINT);
+  LL->m[0].data=n_InitMPZ( C->modBase, coeffs_BIGINT);
   LL->m[1].rtyp=INT_CMD;
   LL->m[1].data=(void *) C->modExponent;
   L->m[1].rtyp=LIST_CMD;
@@ -1866,7 +1866,7 @@ void rDecomposeRing(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
-  LL->m[0].data=nlMapGMP((number) R->cf->modBase, R->cf, R->cf); // TODO: what is this?? // extern number nlMapGMP(number from, const coeffs src, const coeffs dst); // FIXME: replace with n_InitMPZ(R->cf->modBase, coeffs_BIGINT); ?
+  LL->m[0].data=n_InitMPZ( R->cf->modBase, R->cf);
   LL->m[1].rtyp=INT_CMD;
   LL->m[1].data=(void *) R->cf->modExponent;
   L->m[1].rtyp=LIST_CMD;
@@ -5836,7 +5836,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       else if (pnn->next->Typ()==BIGINT_CMD)
       {
         number p=(number)pnn->next->CopyD();
-        nlGMP(p,modBase,coeffs_BIGINT); // TODO? // extern void   nlGMP(number &i, mpz_t n, const coeffs r); // FIXME: n_MPZ( modBase, p, coeffs_BIGINT); ?
+		n_MPZ(modBase,p,coeffs_BIGINT);
         n_Delete(&p,coeffs_BIGINT);
       }
     }

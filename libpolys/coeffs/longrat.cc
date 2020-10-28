@@ -62,10 +62,6 @@ BOOLEAN  nlIsMOne(number a, const coeffs r);
 long     nlInt(number &n, const coeffs r);
 number   nlBigInt(number &n);
 
-#ifdef HAVE_RINGS
-number nlMapGMP(number from, const coeffs src, const coeffs dst);
-#endif
-
 BOOLEAN  nlGreaterZero(number za, const coeffs r);
 number   nlInvers(number a, const coeffs r);
 number   nlDiv(number a, number b, const coeffs r);
@@ -165,6 +161,17 @@ number nlShort3_noinline(number x) // assume x->s==3
   return nlShort3(x);
 }
 
+static number nlInitMPZ(mpz_t m, const coeffs)
+{
+  number z = ALLOC_RNUMBER();
+  z->s = 3;
+  #ifdef LDEBUG
+  z->debug=123456;
+  #endif
+  mpz_init_set(z->z, m);
+  z=nlShort3(z);
+  return z;
+}
 
 #if (__GNU_MP_VERSION*10+__GNU_MP_VERSION_MINOR < 31)
 void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
@@ -196,16 +203,9 @@ static number nlMapR(number from, const coeffs src, const coeffs dst);
 /*2
 * convert from a GMP integer
 */
-number nlMapGMP(number from, const coeffs /*src*/, const coeffs /*dst*/)
+static inline number nlMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
-  number z=ALLOC_RNUMBER();
-#if defined(LDEBUG)
-  z->debug=123456;
-#endif
-  mpz_init_set(z->z,(mpz_ptr) from);
-  z->s = 3;
-  z=nlShort3(z);
-  return z;
+  return nlInitMPZ((mpz_ptr)from,dst);
 }
 
 number nlMapZ(number from, const coeffs src, const coeffs dst)
@@ -214,7 +214,7 @@ number nlMapZ(number from, const coeffs src, const coeffs dst)
   {
     return from;
   }
-  return nlMapGMP(from,src,dst);
+  return nlInitMPZ((mpz_ptr)from,dst);
 }
 
 /*2
@@ -502,20 +502,6 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
   return res;
 }
 
-#ifndef P_NUMBERS_H
-
-static number nlInitMPZ(mpz_t m, const coeffs)
-{
-  number z = ALLOC_RNUMBER();
-  z->s = 3;
-  #ifdef LDEBUG
-  z->debug=123456;
-  #endif
-  mpz_init_set(z->z, m);
-  z=nlShort3(z);
-  return z;
-}
-#endif
 
 static number nlMapC(number from, const coeffs src, const coeffs dst)
 {

@@ -360,7 +360,7 @@ static number nrzMapQ(number from, const coeffs src, const coeffs /*dst*/)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  nlGMP(from, erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
+  nlMPZ(erg, from, src);
   return (number) erg;
 }
 
