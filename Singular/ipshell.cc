@@ -1866,7 +1866,7 @@ void rDecomposeRing(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
-  LL->m[0].data=n_InitMPZ( R->cf->modBase, R->cf);
+  LL->m[0].data=n_InitMPZ( R->cf->modBase, coeffs_BIGINT);
   LL->m[1].rtyp=INT_CMD;
   LL->m[1].data=(void *) R->cf->modExponent;
   L->m[1].rtyp=LIST_CMD;
@@ -5836,7 +5836,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
       else if (pnn->next->Typ()==BIGINT_CMD)
       {
         number p=(number)pnn->next->CopyD();
-		n_MPZ(modBase,p,coeffs_BIGINT);
+        n_MPZ(modBase,p,coeffs_BIGINT);
         n_Delete(&p,coeffs_BIGINT);
       }
     }
