@@ -384,7 +384,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
           else if (RingDependend(nm->typ)
           || (al->m[nm->pos].RingDependend()))
           {
-            if (al->m[nm->pos].data==NULL)
+            if ((al->m[nm->pos].data==NULL)||(al->m[nm->pos-1].data==NULL))
             {
               // NULL belongs to any ring
               ring r=(ring)al->m[nm->pos-1].data;
