@@ -57,19 +57,29 @@ CFFactory::basic ( long value )
   }
 }
 
-#if SIZEOF_LONG == 8
 InternalCF *
 CFFactory::basic ( int value )
 {
   switch(currenttype)
   {
     case IntegerDomain:
+#if SIZEOF_LONG == 8
             return int2imm( value );
-//     else  if ( currenttype == RationalDomain )
-//         if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
-//             return int2imm( value );
-//         else
-//             return new InternalRational( value );
+#else
+        if (LIKELY( value >= MINIMMEDIATE && value <= MAXIMMEDIATE ))
+            return int2imm( value );
+        else
+            return new InternalInteger( value );
+#endif
+    case RationalDomain:
+#if SIZEOF_LONG == 8
+            return int2imm( value );
+#else
+        if (LIKELY( value >= MINIMMEDIATE && value <= MAXIMMEDIATE ))
+            return int2imm( value );
+        else
+            return new InternalRational( value );
+#endif
     case FiniteFieldDomain:
         return int2imm_p( ff_norm( value ) );
     case GaloisFieldDomain:
@@ -84,7 +94,6 @@ CFFactory::basic ( int value )
     }
   }
 }
-#endif
 
 InternalCF *
 CFFactory::basic ( int type, long value )
