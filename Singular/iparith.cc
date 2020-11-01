@@ -4023,6 +4023,27 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
 static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
+#ifdef HAVE_SHIFTBBA
+  if (currRing->isLPring)
+  {
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+    {
+      WerrorS("`dim` is not implemented for letterplace rings over rings");
+      return TRUE;
+    }
+#endif
+    if (currRing->qideal != NULL)
+    {
+      WerrorS("qring not supported by `dim` for letterplace rings at the moment");
+      return TRUE;
+    }
+    int gkDim = lp_gkDim((ideal)(v->Data()));
+    if (errorreported || gkDim == -2) return TRUE;
+    res->data = (char *)(long)gkDim;
+    return FALSE;
+  }
+#endif
   if (rHasMixedOrdering(currRing))
   {
      Warn("dim(%s) may be wrong because the mixed monomial ordering",v->Name());
