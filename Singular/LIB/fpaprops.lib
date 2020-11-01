@@ -25,6 +25,7 @@ PROCEDURES:
   lpNoetherian(<GB>);     check whether A/<LM(GB)> is (left/right) Noetherian
   lpIsSemiPrime(<GB>);    check whether A/<LM(GB)> is semi-prime
   lpIsPrime(<GB>);        check whether A/<LM(GB)> is prime
+  lpGkDim(<GB>);          compute the Gelfand Kirillov dimension of A/<GB>
   lpGlDimBound(<GB>);     compute an upper bound for the global dimension of A/<GB>
   lpSubstitute();         substitute a variable with polynomials (ring homomorphism)
   lpCalcSubstDegBound(); utility for lpSubstitute
@@ -41,6 +42,7 @@ proc tstfpaprops()
     example lpIsSemiPrime;
     example lpIsPrime;
     example lpGlDimBound;
+    example lpGkDim;
     example lpSubstitute;
     example lpCalcSubstDegBound;
 };
@@ -448,7 +450,7 @@ a negative answer applies only to A/<LM(G)> and not necessarily to A/<G>.
       } else {
         break;
       }
-    }
+    } kill j;
   } kill i;
 
   return (1);
@@ -874,7 +876,33 @@ static proc ivdivides(list G, intvec iv) {
   return (0);
 }
 
-// lpGkDim now implemented in dynamic module
+proc lpGkDim(ideal G)
+"USAGE: lpGkDim(G); G an ideal in a letterplace ring
+RETURN: int
+PURPOSE: Determines the Gelfand Kirillov dimension of A/<G>
+       -1 means positive infinite
+ASSUME: - basering is a Letterplace ring
+      - G is a Groebner basis
+NOTE: Alias for dim(G)
+"
+{
+  return (dim(G));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  ring R = freeAlgebra(r, 5);
+  ideal I = z; // infinite GK dimension (-1)
+  lpGkDim(I);
+  I = x,y,z; I = std(I); // GK dimension 0
+  lpGkDim(I);
+  I = x*y, x*z, z*y, z*z; I = std(I); // GK dimension 2
+  lpGkDim(I);
+  ideal G = y*x - x*y, z*x - x*z, z*y - y*z; G = std(G);
+  G;
+  lpGkDim(G); // GK dimension 3
+}
 /* proc lpGkDim(ideal G) */
 /* "USAGE: lpGkDim(G); G an ideal in a letterplace ring */
 /* RETURN: int */
@@ -1023,6 +1051,7 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
       break;
     } else {
       if (i == size(G)) { // if last iteration
+        G = twostd(G); // otherwise warning that G is no standard basis
         int gkDim = lpGkDim(G);
         if (gkDim >= 0) {
           return (gkDim);
