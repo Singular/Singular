@@ -550,6 +550,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
       else
       {
+        #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700) && defined(HAVE_NTL)
+        if (!isOn(SW_USE_FL_FAC_P))
+        #endif
         #if defined(HAVE_NTL)
         if (issqrfree)
         {
@@ -558,13 +561,16 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           factors= FpSqrfFactorize (f);
           for (CFListIterator i= factors; i.hasItem(); i++)
             F.append (CFFactor (i.getItem(), 1));
+          goto end_charp;
         }
         else
         {
           Variable alpha;
           F= FpFactorize (f);
+          goto end_charp;
         }
-        #elif defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
+        #endif
+        #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_ctx_init(ctx,f.level(),ORD_LEX,getCharacteristic());
         nmod_mpoly_t Flint_f;
@@ -590,9 +596,12 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         nmod_mpoly_factor_clear(factors,ctx);
         nmod_mpoly_clear(Flint_f,ctx);
         nmod_mpoly_ctx_clear(ctx);
-        #else
+        #endif
+        #if !defined(HAVE_FLINT) || (__FLINT_RELEASE < 20700)
+        #ifndef HAVE_NTL
         factoryError ("multivariate factorization depends on NTL(missing)");
         return CFFList (CFFactor (f, 1));
+        #endif
         #endif
       }
     }
@@ -668,39 +677,44 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     else // multivariate,  char 0
     {
       #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
-      On (SW_RATIONAL);
-      fmpz_mpoly_ctx_t ctx;
-      fmpz_mpoly_ctx_init(ctx,f.level(),ORD_LEX);
-      fmpz_mpoly_t Flint_f;
-      fmpz_mpoly_init(Flint_f,ctx);
-      convFactoryPFlintMP(fz,Flint_f,ctx,fz.level());
-      fmpz_mpoly_factor_t factors;
-      fmpz_mpoly_factor_init(factors,ctx);
-      int rr;
-      if (issqrfree) rr=fmpz_mpoly_factor_squarefree(factors,Flint_f,ctx);
-      else           rr=fmpz_mpoly_factor(factors,Flint_f,ctx);
-      if (rr==0) printf("fail\n");
-      fmpz_mpoly_t fac;
-      fmpz_mpoly_init(fac,ctx);
-      CanonicalForm cf_fac;
-      int cf_exp;
-      fmpz_t c;
-      fmpz_init(c);
-      fmpz_mpoly_factor_get_constant_fmpz(c,factors,ctx);
-      cf_fac=convertFmpz2CF(c);
-      fmpz_clear(c);
-      F.append(CFFactor(cf_fac,1));
-      for(int i=fmpz_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
+      if (isOn(SW_USE_FL_FAC_0))
       {
-         fmpz_mpoly_factor_get_base(fac,factors,i,ctx);
-         cf_fac=convFlintMPFactoryP(fac,ctx,f.level());
-         cf_exp=fmpz_mpoly_factor_get_exp_si(factors,i,ctx);
-         F.append(CFFactor(cf_fac,cf_exp));
+        On (SW_RATIONAL);
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_ctx_init(ctx,f.level(),ORD_LEX);
+        fmpz_mpoly_t Flint_f;
+        fmpz_mpoly_init(Flint_f,ctx);
+        convFactoryPFlintMP(fz,Flint_f,ctx,fz.level());
+        fmpz_mpoly_factor_t factors;
+        fmpz_mpoly_factor_init(factors,ctx);
+        int rr;
+        if (issqrfree) rr=fmpz_mpoly_factor_squarefree(factors,Flint_f,ctx);
+        else           rr=fmpz_mpoly_factor(factors,Flint_f,ctx);
+        if (rr==0) printf("fail\n");
+        fmpz_mpoly_t fac;
+        fmpz_mpoly_init(fac,ctx);
+        CanonicalForm cf_fac;
+        int cf_exp;
+        fmpz_t c;
+        fmpz_init(c);
+        fmpz_mpoly_factor_get_constant_fmpz(c,factors,ctx);
+        cf_fac=convertFmpz2CF(c);
+        fmpz_clear(c);
+        F.append(CFFactor(cf_fac,1));
+        for(int i=fmpz_mpoly_factor_length(factors,ctx)-1; i>=0; i--)
+        {
+           fmpz_mpoly_factor_get_base(fac,factors,i,ctx);
+           cf_fac=convFlintMPFactoryP(fac,ctx,f.level());
+           cf_exp=fmpz_mpoly_factor_get_exp_si(factors,i,ctx);
+           F.append(CFFactor(cf_fac,cf_exp));
+        }
+        fmpz_mpoly_factor_clear(factors,ctx);
+        fmpz_mpoly_clear(Flint_f,ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+        goto end_char0;
       }
-      fmpz_mpoly_factor_clear(factors,ctx);
-      fmpz_mpoly_clear(Flint_f,ctx);
-      fmpz_mpoly_ctx_clear(ctx);
-      #elif defined(HAVE_NTL)
+      #endif
+      #if defined(HAVE_NTL)
       On (SW_RATIONAL);
       if (issqrfree)
       {
@@ -712,8 +726,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       {
         F = ratFactorize (fz);
       }
-      #else
+      #endif
+      #if !defined(HAVE_FLINT) || (__FLINT_RELEASE < 20700)
+      #ifndef HAVE_NTL
       F=ZFactorizeMultivariate(fz, issqrfree);
+      #endif
       #endif
     }
 
@@ -730,6 +747,7 @@ end_char0:
     }
   }
 
+end_charp:
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
   return F;
 }

@@ -40,6 +40,7 @@ CFSwitches::CFSwitches ()
   On(SW_USE_EZGCD);
   On(SW_USE_EZGCD_P);
   On(SW_USE_QGCD);
+  On(SW_USE_FL_FAC_0);
 }
 
 INST_VAR CFSwitches cf_glob_switches;
