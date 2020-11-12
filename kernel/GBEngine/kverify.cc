@@ -142,7 +142,7 @@ BOOLEAN kVerify(ideal F, ideal Q)
   }
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
-    do
+    loop
     {
       int ind=queue->dequeue();
       if (ind== -1)
@@ -194,7 +194,7 @@ BOOLEAN kVerify(ideal F, ideal Q)
         rqueue->enqueue(1);
         exit(0);
       }
-    } while(1);
+    }
   }
   else // parent ---------------------------------------------------
   {
