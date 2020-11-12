@@ -1,4 +1,3 @@
-// https://github.com/rbehrends/vspace
 #include <fcntl.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -740,6 +739,11 @@ public:
     memcpy(buffer, s, len);
     buffer[len] = '\0';
   }
+  VString(size_t len) {
+    _len = len;
+    _buffer = vnew_uninitialized_array<char>(len + 1);
+    _buffer[len] = '\0';
+  }
   ~VString() {
     _buffer.free();
   }
@@ -761,6 +765,11 @@ static inline VRef<VString> vstring(const char *s) {
 static inline VRef<VString> vstring(const char *s, size_t len) {
   return vnew<VString>(s, len);
 }
+
+static inline VRef<VString> vstring(size_t len) {
+  return vnew<VString>(len);
+}
+
 
 template <typename Spec>
 class VMap {
