@@ -35,6 +35,8 @@
 #include "kernel/linear_algebra/linearAlgebra.h"
 #include "kernel/linear_algebra/MinorInterface.h"
 
+#include "kernel/GBEngine/kChinese.h"
+
 #include "kernel/spectrum/GMPrat.h"
 #include "kernel/groebner_walk/walkProc.h"
 #include "kernel/oswrapper/timer.h"
@@ -9739,7 +9741,12 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   else
   {
-    result=id_ChineseRemainder(x,q,rl,currRing); // deletes also x
+    #if 0
+    if (rField_is_Q(currRing))
+      result=id_ChineseRemainder_0(x,q,rl,currRing); // deletes also x
+    else
+    #endif
+      result=id_ChineseRemainder(x,q,rl,currRing); // deletes also x
     c->Clean();
     if ((return_type==POLY_CMD) &&(result!=NULL))
     {
