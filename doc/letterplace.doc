@@ -1248,7 +1248,7 @@ Status: experimental
 @heading News for SINGULAR:LETTERPLACE version @value{VERSION}
 New functions:
 @itemize
-@item added support for free bimodules of a fixed rank (@nef{freeAlgebra BR_LETTERPLACE_BR}, @ref{ncgen})
+@item added support for free bimodules of a fixed rank (@ref{freeAlgebra BR_LETTERPLACE_BR}, @ref{ncgen})
 @item several types of monomial orderings become available, among them three types of elimination orderings
 @item twostd (@ref{twostd (letterplace)}), reduce (@ref{reduce (letterplace)}) and other functions support subbimodules
 @item syz (@ref{syz (letterplace)}), lift (@ref{lift (letterplace)}), liftstd (@ref{liftstd (letterplace)}) implemented
