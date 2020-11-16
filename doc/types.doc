@@ -2346,7 +2346,6 @@ Possible are furthermore
 @itemize @bullet
 @item
 @tex
-% This is quite a hack, but for now it works.
 $Z/p \rightarrow Q,
 \quad
 [i]_p \mapsto i \in [-p/2, \, p/2]
