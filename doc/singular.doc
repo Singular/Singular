@@ -119,44 +119,37 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @end menu
 
 @c ----------------------------------------------------------------------------
-@node Preface, Introduction, Top, Top
+@node Preface
 @chapter Preface
 @cindex Preface
 @include COPYING.texi
 
 @c ----------------------------------------------------------------------------
-@node Introduction, General concepts, Preface, Top
+@node Introduction
 @chapter Introduction
 @cindex Introduction
 
 @include start.tex
 @c ----------------------------------------------------------------------------
-@node General concepts, Data types, Introduction, Top
+@node General concepts
 @chapter General concepts
 @cindex General concepts
 @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types, Functions and system variables, General concepts, Top
+@node Data types
 @chapter Data types
 @cindex Data types
 @include types.tex
 
 @c ----------------------------------------------------------------------------
-@node Functions and system variables, Tricks and pitfalls, Data types, Top
+@node Functions and system variables
 @chapter Functions and system variables
 @cindex Commands
 @include reference.tex
 
 @c ----------------------------------------------------------------------------
-@ifset withplural
-@node Tricks and pitfalls, Non-commutative subsystem, Functions and system variables, Top
-@end ifset
-
-@ifclear withplural
-@node Tricks and pitfalls, Examples, Functions and system variables, Top
-@end ifclear
-
+@node Tricks and pitfalls
 @chapter Tricks and pitfalls
 @cindex Tricks and pitfalls
 @include tricks.tex
@@ -190,32 +183,25 @@ non-commutative rings: @sc{Plural}, @sc{Sca} and @sc{Letterplace}.
 @end ifset
 
 @c ----------------------------------------------------------------------------
-@ifset withplural
-@node Examples, Polynomial data, Non-commutative subsystem, Top
-@end ifset
-
-@ifclear withplural
-@node Examples, Polynomial data, Tricks and pitfalls, Top
-@end ifclear
-
+@node Examples
 @appendix Examples
 @cindex Examples
 @include examples.tex
 
 @c ----------------------------------------------------------------------------
-@node Polynomial data, Mathematical background, Examples, Top
+@node Polynomial data
 @appendix Polynomial data
 @cindex Polynomial data
 @include pdata.tex
 
 @c ----------------------------------------------------------------------------
-@node Mathematical background, SINGULAR libraries, Polynomial data, Top
+@node Mathematical background
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
 
 @c ----------------------------------------------------------------------------
-@node SINGULAR libraries, Release Notes, Mathematical background, Top
+@node SINGULAR libraries
 @appendix SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
@@ -256,7 +242,7 @@ See also @ref{PLURAL libraries} and @ref{LETTERPLACE libraries}.
 @end ifset
 
 @c ----------------------------------------------------------
-@node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
+@node standard_lib
 @section standard_lib
 
 The library @code{standard.lib} provides extensions to the
@@ -280,7 +266,7 @@ with the @code{--no-stdlib} command line option (see
 @c lib standard.lib:par2varRing Fun subsection
 
 @c ----------------------------------------------------------------------------
-@node General purpose, Linear algebra, standard_lib, SINGULAR libraries
+@node General purpose
 @section General purpose
 @cindex General purpose
 
@@ -360,7 +346,7 @@ LIB "all.lib";
 @subsection tasks_lib
 @c lib tasks.lib
 @c ----------------------------------------------------------------------------
-@node Linear algebra, Commutative algebra, General purpose, SINGULAR libraries
+@node Linear algebra
 @section Linear algebra
 @cindex Linear algebra
 
@@ -378,7 +364,7 @@ LIB "all.lib";
 @subsection linalg_lib
 @c lib linalg.lib
 @c ----------------------------------------------------------------------------
-@node Commutative algebra, Algebraic geometry, Linear algebra, SINGULAR libraries
+@node Commutative algebra
 @section Commutative algebra
 @cindex Commutative algebra
 
@@ -537,7 +523,7 @@ LIB "all.lib";
 @subsection toric_lib
 @c lib toric.lib
 @c ---------------------------------------------------------
-@node Algebraic geometry, Singularities, Commutative algebra, SINGULAR libraries
+@node Algebraic geometry
 @section Algebraic geometry
 @cindex Algebraic geometry
 
@@ -631,7 +617,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection JMSConst_lib
 @c lib JMSConst.lib
 @c ----------------------------------------------------------------------------
-@node Singularities, Invariant theory, Algebraic geometry, SINGULAR libraries
+@node Singularities
 @section Singularities
 @cindex Singularities
 
@@ -731,7 +717,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection surfacesignature_lib
 @c lib surfacesignature.lib
 @c ----------------------------------------------------------------------------
-@node Invariant theory, Symbolic-numerical solving, Singularities, SINGULAR libraries
+@node Invariant theory
 @section Invariant theory
 @cindex Invariant theory
 
@@ -764,7 +750,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection stratify_lib
 @c lib stratify.lib
 @c ----------------------------------------------------------------------------
-@node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
+@node Symbolic-numerical solving
 @section Symbolic-numerical solving
 @cindex Symbolic-numerical solving
 
@@ -807,7 +793,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection signcond_lib
 @c lib signcond.lib
 @c ---------------------------------------------------------
-@node Visualization, Coding theory, Symbolic-numerical solving, SINGULAR libraries
+@node Visualization
 @section Visualization
 @cindex Visualization
 
@@ -835,7 +821,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection surfex_lib
 @c lib surfex.lib no_ex
 @c ----------------------------------------------------------------------------
-@node Coding theory, System and Control theory, Visualization, SINGULAR libraries
+@node Coding theory
 @section Coding theory
 @cindex Coding theory
 
@@ -855,7 +841,7 @@ iniD, reslist, sumlist, dividelist, createlist
 
 
 @c ----------------------------------------------------------------------------
-@node System and Control theory, Teaching, Coding theory, SINGULAR libraries
+@node System and Control theory
 @section System and Control theory
 @cindex System and Control theory
 @cindex Control theory
@@ -868,7 +854,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ---------------------------------------------------------
-@node Control theory background, control_lib, ,System and Control theory
+@node Control theory background
 @subsection Control theory background
 
 Control systems are usually described by differential (or
