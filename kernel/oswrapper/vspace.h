@@ -1,3 +1,5 @@
+#ifndef VSPACE_H
+#define VSPACE_H
 #include <fcntl.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -8,6 +10,8 @@
 #include <unistd.h>
 #include <assert.h>
 #include <new> // for placement new
+
+#if !defined(__CYGWIN__)
 
 #if __cplusplus >= 201100
 #define HAVE_CPP_THREADS
@@ -1333,3 +1337,5 @@ public:
 };
 
 }; // namespace vspace
+#endif
+#endif

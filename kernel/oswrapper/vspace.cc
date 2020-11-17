@@ -1,6 +1,8 @@
 // https://github.com/rbehrends/vspace
 #include "vspace.h"
 
+#if !defined(__CYGWIN__)
+
 #ifdef HAVE_CPP_THREADS
 #include <thread>
 #endif
@@ -551,3 +553,4 @@ int EventSet::wait() {
 }
 
 } // namespace vspace
+#endif

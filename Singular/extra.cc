@@ -66,6 +66,7 @@
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kverify.h"
 
 #include "kernel/linear_algebra/linearAlgebra.h"
 
@@ -3877,7 +3878,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
       }
       ideal F=(ideal)h->Data();
-      res->data=(char*)(long) kVerify(F,currRing->qideal);
+      res->data=(char*)(long) kVerify2(F,currRing->qideal);
       res->rtyp=INT_CMD;
       return FALSE;
     }
