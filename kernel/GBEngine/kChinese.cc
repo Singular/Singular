@@ -98,12 +98,14 @@ static long size_number(number n)
   {
     if (n->s==3) 
     {
+      ll+=SIZEOF_LONG*2; /* n->s, mpz size */
       long l=mpz_size1(n->z);
       ll+=l*sizeof(mp_limb_t);
     }
     else
     {
-      long l=mpz_size1(n->z);
+      ll+=SIZEOF_LONG*3; /* n->s, mpz size(n->z) mpz size(n->n)*/
+      size_t l=mpz_size1(n->z);
       ll+=l*sizeof(mp_limb_t);
       l=mpz_size1(n->n);
       ll+=l*sizeof(mp_limb_t);
@@ -203,10 +205,13 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
     WerrorS("format mismatch in CRT");
     return NULL;
   }
+  int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
+  if (2*cpus>=cnt) /* at least 2 polys for each process, 
+                     or switch to seriell version */
+    return id_ChineseRemainder(xx,q,rl,r);
   ideal result=idInit(cnt,xx[0]->rank);
   result->nrows=rw; // for lifting matrices
   result->ncols=cl; // for lifting matrices
-  int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
   int parent_pid=getpid();
   using namespace vspace;
   vmem_init();
@@ -292,7 +297,7 @@ void test_n(poly n)
   char *s=send_poly(buf,12345,n,currRing);
   printf("send len: %d\n",(int)(s-buf));
   long *d=(long*)buf;
-  for(int i=0;i<=ll/8;i++) printf("%ld ",d[i]);
+  for(int i=0;i<=ll/SIZEOF_LONG;i++) printf("%ld ",d[i]);
   printf("\n");
   n=NULL;
   s=get_poly(buf,ll,&n,currRing);
@@ -300,4 +305,5 @@ void test_n(poly n)
   Print(":index: %d\n",ll);
   p_Write(n,currRing);
   PrintLn();
+  omFree(buf);
 }

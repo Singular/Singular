@@ -5,8 +5,8 @@
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
-//long all_farey=0L;
-//long farey_cnt=0L;
+long all_farey=0L;
+long farey_cnt=0L;
 
 #include "kernel/mod2.h"
 
@@ -2118,14 +2118,14 @@ static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
 {
   ideal uu=(ideal)u->Data();
   number vv=(number)v->Data();
-  //timespec buf1,buf2;
-  //clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf1);
+  timespec buf1,buf2;
+  clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf1);
   res->data=(void*)id_Farey(uu,vv,currRing);
-  //clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf2);
-  //const unsigned long SEC = 1000L*1000L*1000L;
-  //all_farey+=((buf2.tv_sec-buf1.tv_sec)*SEC+
-  //                              buf2.tv_nsec-buf1.tv_nsec);
-  //farey_cnt++;
+  clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf2);
+  const unsigned long SEC = 1000L*1000L*1000L;
+  all_farey+=((buf2.tv_sec-buf1.tv_sec)*SEC+
+                                buf2.tv_nsec-buf1.tv_nsec);
+  farey_cnt++;
   return FALSE;
 }
 static BOOLEAN jjFAREY_LI(leftv res, leftv u, leftv v);
@@ -9741,7 +9741,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   else
   {
-    #if 0
+    #if 1
     if (rField_is_Q(currRing))
       result=id_ChineseRemainder_0(x,q,rl,currRing); // deletes also x
     else
