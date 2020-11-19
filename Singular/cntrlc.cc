@@ -375,6 +375,17 @@ static void debug (int method)
     dReportError("Caught Signal 11");
     return;
   }
+  /* REMARK FOR NEWER LINUX SYSTEMS:
+Attaching to a process on Linux with GDB as a normal user may fail with "ptrace:Operation not permitted". By default Linux does not allow attaching to a process which wasn't launched by the debugger (see the Yama security documentation for more details). (https://www.kernel.org/doc/Documentation/security/Yama.txt)
+
+There are ways to workaround this:
+
+    Run the following command as super user: echo 0| sudo tee /proc/sys/kernel/yama/ptrace_scope
+
+    This will set the ptrace level to 0, after this just with user permissions you can attach to processes which are not launched by the debugger.
+
+    On distributions without Yama (such as Raspbian) you can use libcap2-bin to assign ptrace permissions to specific executables: sudo setcap cap_sys_ptrace=eip /usr/bin/gdb
+*/
   int pid;
   char buf[16];
   char * args[4] = { (char*)"gdb", (char*)"Singular", NULL, NULL };
