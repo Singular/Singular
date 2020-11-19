@@ -2961,8 +2961,8 @@ number nlFarey(number nN, number nP, const coeffs r)
          #ifdef LDEBUG
          z->debug=123456;
          #endif
-         z->z=N;
-         z->n=B;
+         memcpy(z->z,N,sizeof(mpz_t));
+         memcpy(z->n,B,sizeof(mpz_t));
          z->s = 0;
          nlNormalize(z,r);
        }
