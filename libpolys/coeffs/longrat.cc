@@ -2961,8 +2961,8 @@ number nlFarey(number nN, number nP, const coeffs r)
          #ifdef LDEBUG
          z->debug=123456;
          #endif
-         mpz_init_set(z->z,N);
-         mpz_init_set(z->n,B);
+         z->z=N;
+         z->n=B;
          z->s = 0;
          nlNormalize(z,r);
        }
@@ -2970,6 +2970,8 @@ number nlFarey(number nN, number nP, const coeffs r)
        {
          // return nN (the input) instead of "fail"
          z=nlCopy(nN,r);
+         mpz_clear(B);
+         mpz_clear(N);
        }
        break;
     }
@@ -2985,11 +2987,9 @@ number nlFarey(number nN, number nP, const coeffs r)
   }
   mpz_clear(tmp);
   mpz_clear(A);
-  mpz_clear(B);
   mpz_clear(C);
   mpz_clear(D);
   mpz_clear(E);
-  mpz_clear(N);
   mpz_clear(P);
   return z;
 }
