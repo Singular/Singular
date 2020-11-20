@@ -1287,7 +1287,7 @@ notImpl:
   {
     n_Delete(&N,r->cf);
   }
-  if ((v!=NULL) && ((*v)!=NULL) &&(withexps==2))
+  if ((v!=NULL) && ((*v)!=NULL) &&(with_exps==2))
   {
      *v = new intvec( 1 );
      (*v)[0]=1;
