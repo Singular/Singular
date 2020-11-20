@@ -1287,8 +1287,14 @@ notImpl:
   {
     n_Delete(&N,r->cf);
   }
-  if (f!=NULL) p_Delete(&f,r);
-  //PrintS("......S\n");
+  if ((v!=NULL) && ((*v)!=NULL) &&(withexps==2))
+  {
+     *v = new intvec( 1 );
+     (*v)[0]=1;
+  }
+  res=idInit(2,1);
+  res->m[0]=p_One(r);
+  res->m[1]=f;
   return res;
 }
 
