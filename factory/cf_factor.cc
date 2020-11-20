@@ -544,7 +544,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F= GFFactorize (f);
         }
         #else
-        factoryError ("multivariate factorization depends on NTL(missing)");
+        factoryError ("multivariate factorization over GF depends on NTL(missing)");
         return CFFList (CFFactor (f, 1));
         #endif
       }
@@ -599,7 +599,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         #endif
         #if !defined(HAVE_FLINT) || (__FLINT_RELEASE < 20700)
         #ifndef HAVE_NTL
-        factoryError ("multivariate factorization depends on NTL(missing)");
+        factoryError ("multivariate factorization depends on NTL/FLINT(missing)");
         return CFFList (CFFactor (f, 1));
         #endif
         #endif
@@ -882,7 +882,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       #ifdef HAVE_NTL
       F= FqFactorize (f, alpha);
       #else
-      factoryError ("univariate factorization  depends on NTL(missing)");
+      factoryError ("multivariate factorization over Z/pZ(alpha) depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -898,7 +898,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       #ifdef HAVE_NTL
       F= ratFactorize (f, alpha);
       #else
-      factoryError ("multivariate factorization  depends on NTL(missing)");
+      factoryError ("multivariate factorization over Q(alpha) depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
