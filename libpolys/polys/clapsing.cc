@@ -1278,7 +1278,18 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
 notImpl:
   prune(a);
   if (res==NULL)
+  {
     WerrorS( feNotImplemented );
+    if ((v!=NULL) && ((*v)!=NULL) &&(with_exps==2))
+    {
+       *v = new intvec( 1 );
+       (*v)[0]=1;
+    }
+    res=idInit(2,1);
+    res->m[0]=p_One(r);
+    res->m[1]=f;
+  }
+  else p_Delete(&f,r);
   if (NN!=NULL)
   {
     n_Delete(&NN,r->cf);
@@ -1287,14 +1298,6 @@ notImpl:
   {
     n_Delete(&N,r->cf);
   }
-  if ((v!=NULL) && ((*v)!=NULL) &&(with_exps==2))
-  {
-     *v = new intvec( 1 );
-     (*v)[0]=1;
-  }
-  res=idInit(2,1);
-  res->m[0]=p_One(r);
-  res->m[1]=f;
   return res;
 }
 
