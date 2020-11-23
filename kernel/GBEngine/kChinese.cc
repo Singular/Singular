@@ -13,6 +13,7 @@
 number nlRInit (long i);
 
 #include "kernel/oswrapper/vspace.h"
+#include "kernel/ideals.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -191,11 +192,10 @@ static long size_poly(poly p, const ring r)
 ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
 {
   int cnt=0;int rw=0; int cl=0;
-  int i,j;
   // find max. size of xx[.]:
-  for(j=rl-1;j>=0;j--)
+  for(int j=rl-1;j>=0;j--)
   {
-    i=IDELEMS(xx[j])*xx[j]->nrows;
+    int i=IDELEMS(xx[j])*xx[j]->nrows;
     if (i>cnt) cnt=i;
     if (xx[j]->nrows >rw) rw=xx[j]->nrows; // for lifting matrices
     if (xx[j]->ncols >cl) cl=xx[j]->ncols; // for lifting matrices
@@ -217,9 +217,9 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   vmem_init();
   // Create a queue of int
   VRef<Queue<int> > queue = vnew<Queue<int> >();
-  for(i=cnt-1;i>=0; i--)
+  for(int i=cnt-1;i>=0; i--)
   {
-    queue->enqueue(i); // the tasks: contruct poly p[i]
+    queue->enqueue(i); // the tasks: construct poly p[i]
   }
   for(int i=cpus;i>=0;i--)
   {
@@ -227,7 +227,7 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   }
   // Create a queue of polys
   VRef<Queue<VRef<VString> > > rqueue = vnew<Queue<VRef<VString> > >();
-  for (i=0;i<cpus;i++)
+  for (int i=0;i<cpus;i++)
   {
     int pid = fork_process();
     if (pid==0) break; //child
@@ -247,7 +247,7 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
         exit(0);
       }
 
-      for(j=rl-1;j>=0;j--)
+      for(int j=rl-1;j>=0;j--)
       {
         if(ind>=IDELEMS(xx[j])*xx[j]->nrows) // out of range of this ideal
           p[j]=NULL;
@@ -257,6 +257,80 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
       poly res=p_ChineseRemainder(p,x,q,rl,inv_cache,r);
       long l=size_poly(res,r);
       //printf("size: %ld kB\n",(l+1023)/1024);
+      VRef<VString> msg = vstring(l+1);
+      char *s=(char*)msg->str();
+      send_poly(s,ind,res,r);
+      rqueue->enqueue(msg);
+      if (TEST_OPT_PROT) printf(".");
+    }
+  }
+  else // parent ---------------------------------------------------
+  {
+    if (TEST_OPT_PROT) printf("%d childs created\n",cpus);
+    VRef<VString> msg;
+    while(cnt>0)
+    {
+      msg=rqueue->dequeue();
+      char *s=(char*)msg->str();
+      int ind;
+      poly p=NULL;
+      get_poly(s,ind,&p,r);
+      //printf("got res[%d]\n",ind);
+      result->m[ind]=p;
+      msg.free();
+      cnt--;
+    }
+    // removes queues
+    queue.free();
+    rqueue.free();
+    vmem_deinit();
+  }
+  return result;
+}
+
+ideal id_Farey_0(ideal x, number N, const ring r)
+{
+  int cnt=IDELEMS(x)*x->nrows;
+  int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
+  if (2*cpus>=cnt) /* at least 2 polys for each process, 
+                     or switch to seriell version */
+    return id_Farey(x,N,r);
+  ideal result=idInit(cnt,x->rank);
+  result->nrows=x->nrows; // for lifting matrices
+  result->ncols=x->ncols; // for lifting matrices
+
+  int parent_pid=getpid();
+  using namespace vspace;
+  vmem_init();
+  // Create a queue of int
+  VRef<Queue<int> > queue = vnew<Queue<int> >();
+  for(int i=cnt-1;i>=0; i--)
+  {
+    queue->enqueue(i); // the tasks: construct poly p[i]
+  }
+  for(int i=cpus;i>=0;i--)
+  {
+    queue->enqueue(-1); // stop sign, one for each child
+  }
+  // Create a queue of polys
+  VRef<Queue<VRef<VString> > > rqueue = vnew<Queue<VRef<VString> > >();
+  for (int i=0;i<cpus;i++)
+  {
+    int pid = fork_process();
+    if (pid==0) break; //child
+  }
+  if (parent_pid!=getpid()) // child ------------------------------------------
+  {
+    loop
+    {
+      int ind=queue->dequeue();
+      if (ind== -1)
+      {
+        exit(0);
+      }
+
+      poly res=p_Farey(x->m[ind],N,r);
+      long l=size_poly(res,r);
       VRef<VString> msg = vstring(l+1);
       char *s=(char*)msg->str();
       send_poly(s,ind,res,r);

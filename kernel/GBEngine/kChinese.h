@@ -16,4 +16,5 @@
 */
 poly p_ChineseRemainder(poly *xx, mpz_ptr *x,mpz_ptr *q, int rl, mpz_ptr *C ,const ring R);
 ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r);
+ideal id_Farey_0(ideal xx, number N, const ring r);
 #endif
