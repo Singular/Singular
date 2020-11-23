@@ -3870,7 +3870,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /* ====== verify ============================*/
-    if(strcmp(sys_cmd,"verify")==0)
+    if(strcmp(sys_cmd,"verifyGB")==0)
     {
       if (h->Typ()!=IDEAL_CMD)
       {
