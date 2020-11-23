@@ -366,6 +366,10 @@ static proc farey_parallel(def farey_arg, bigint farey_N)
     }
     if (arg_type == "bigint" || arg_type == "matrix")
     { return(farey(farey_arg, farey_N)); }
+    if(hasQQCoefficient(basering))
+    {
+      return(farey(farey_arg, farey_N));
+    }
     // else: farey_arg is an ideal or a module
     exportto(Modular, farey_arg);
     exportto(Modular, farey_N);

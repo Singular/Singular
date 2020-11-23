@@ -359,9 +359,7 @@ static proc finalTest_std(string command, alias list args, def result)
     }
 
     /* test if result is a GB */
-    def G = std(result);
-    if (reduce_parallel(G, result)) { return(0); }
-    return(1);
+    return(system("verifyGB",result));
 }
 
 /* return 1, if I_reduce is _not_ in G_reduce,
