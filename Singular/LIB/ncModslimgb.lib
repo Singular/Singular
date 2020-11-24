@@ -176,24 +176,7 @@ EXAMPLE: example ncmodslimgb; shows an example
      H = chinrem(T1,T2);
 
     //Lifting of results to Rationals via Farey map
-    //sequential lifting
-     if(ncores == 1)
-     {
-       J = farey(H,N);
-     }
-    //parallel lifting
-    else
-    {
-      for(i = size(H); i > 0; i--)
-      {
-        arguments_farey[i] = list(ideal(H[i]), N);
-      }
-      results_farey = parallelWaitAll("farey", arguments_farey, 0, ncores);
-      for(i = size(H); i > 0; i--)
-      {
-        J[i] = results_farey[i][1];
-      }
-    }
+    J = farey(H,N);
 
     //Verification steps
     pTest = PTestGB(I,J,L,ncores);
