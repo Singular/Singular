@@ -3875,11 +3875,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       if (h->Typ()!=IDEAL_CMD)
       {
-        WerrorS("expected system(\"verify\",<ideal>,..)");
+        WerrorS("expected system(\"verifyGB\",<ideal>,..)");
         return TRUE;
       }
       ideal F=(ideal)h->Data();
-      res->data=(char*)(long) kVerify2(F,currRing->qideal);
+      int cpus = (long) feOptValue(FE_OPT_CPUS);
+      if (cpus>1)
+        res->data=(char*)(long) kVerify2(F,currRing->qideal);
+      else
+        res->data=(char*)(long) kVerify1(F,currRing->qideal);
       res->rtyp=INT_CMD;
       return FALSE;
     }

@@ -206,8 +206,8 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
     return NULL;
   }
   int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
-  if (2*cpus>=cnt) /* at least 2 polys for each process, 
-                     or switch to seriell version */
+  if ((cpus==1) || (2*cpus>=cnt))
+    /* at least 2 polys for each process, or switch to seriell version */
     return id_ChineseRemainder(xx,q,rl,r);
   ideal result=idInit(cnt,xx[0]->rank);
   result->nrows=rw; // for lifting matrices
