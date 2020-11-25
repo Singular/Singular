@@ -3781,9 +3781,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           // convert first arg. to fmpq_poly_t
           fmpq_poly_t fre, fim;
           convSingPFlintP(fre,(poly)h->Data(),currRing); h=h->next;
-      if (pol_with_complex_coeffs==1) { // convert second arg. to fmpq_poly_t
-          convSingPFlintP(fim,(poly)h->Data(),currRing); h=h->next;
-      }
+          if (pol_with_complex_coeffs==1)
+          { // convert second arg. to fmpq_poly_t
+            convSingPFlintP(fim,(poly)h->Data(),currRing); h=h->next;
+          }
           // convert box-center(re,im), box-size, epsilon
           fmpq_t center_re,center_im,boxsize,eps;
           convSingNFlintN(center_re,(number)h->Data(),currRing->cf); h=h->next;
