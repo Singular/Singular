@@ -20,7 +20,6 @@ kill rng;
 
 system("random",1416823952);
 ring rng = 2,(x,y,z),(lp,C);
-minpoly = 0;
 ideal I = x^2*y+x*z^2+1,x^2*z+z^2,z^3+1;
 
 list ML1 =   minAssGTZ(I, "GTZ" );
