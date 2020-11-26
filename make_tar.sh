@@ -25,8 +25,6 @@ fi
 
 command rm singular-$VERSION/.gdbinit singular-$VERSION/*/.gdbinit singular-$VERSION/*/*/.gdbinit singular-$VERSION/*/*/*/.gdbinit
 command rm singular-$VERSION/IntegerProgramming/README
-command rm -rf singular-$VERSION/modules
-command rm -rf singular-$VERSION/factory/old
 cd singular-$VERSION
 ./autogen.sh
 cd ..
