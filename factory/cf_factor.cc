@@ -924,7 +924,12 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     }
     else //Q(a)[x1,...,xn]
     {
+      #ifdef HAVE_NTL
       F= ratFactorize (f, alpha);
+      #else
+      factoryError ("multivariate factorization over Q(alpha) depends on NTL(missing)");
+      return CFFList (CFFactor (f, 1));
+      #endif
     }
   }
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
