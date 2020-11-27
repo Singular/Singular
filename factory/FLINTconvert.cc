@@ -733,6 +733,29 @@ static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, fmpz_mpoly_t
   }
 }
 
+#if __FLINT_RELEASE >= 20700
+static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, fq_nmod_mpoly_t result, const fq_nmod_mpoly_ctx_t ctx, int N, const fq_nmod_ctx_t fq_ctx )
+{
+  // assume f!=0
+  if ( ! f.inCoeffDomain() )
+  {
+    int l = f.level();
+    for ( CFIterator i = f; i.hasTerms(); i++ )
+    {
+      exp[N-l] = i.exp();
+      convFlint_RecPP( i.coeff(), exp, result, ctx, N, fq_ctx );
+    }
+    exp[N-l] = 0;
+  }
+  else
+  {
+    fq_nmod_t c;
+    convertFacCF2Fq_nmod_t (c, f, fq_ctx);
+    fq_nmod_mpoly_push_term_fq_nmod_ui(result,c,exp,ctx);
+  }
+}
+#endif
+
 void convFactoryPFlintMP ( const CanonicalForm & f, nmod_mpoly_t res, nmod_mpoly_ctx_t ctx, int N )
 {
   if (f.isZero()) return;
@@ -764,6 +787,20 @@ void convFactoryPFlintMP ( const CanonicalForm & f, fmpz_mpoly_t res, fmpz_mpoly
   //fmpz_mpoly_reduce(res,ctx);
   Free(exp,N*sizeof(ulong));
 }
+
+#if __FLINT_RELEASE >= 20700
+void convFactoryPFlintMP ( const CanonicalForm & f, fq_nmod_mpoly_t res, fq_nmod_mpoly_ctx_t ctx, int N, fq_nmod_ctx_t fq_ctx )
+{
+  if (f.isZero()) return;
+  ulong * exp = (ulong*)Alloc(N*sizeof(ulong));
+  memset(exp,0,N*sizeof(ulong));
+  bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
+  if (save_sym_ff) Off (SW_SYMMETRIC_FF);
+  convFlint_RecPP( f, exp, res, ctx, N, fq_ctx );
+  if (save_sym_ff) On(SW_SYMMETRIC_FF);
+  Free(exp,N*sizeof(ulong));
+}
+#endif
 
 CanonicalForm convFlintMPFactoryP(nmod_mpoly_t f, nmod_mpoly_ctx_t ctx, int N)
 {
@@ -952,8 +989,84 @@ CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G)
   return RES;
 }
 
-#endif
+#endif // FLINT 2.5.3
+
+#if __FLINT_RELEASE >= 20700
+CFFList
+convertFLINTFq_nmod_mpoly_factor2FacCFFList (
+                   fq_nmod_mpoly_factor_t fac, 
+                   const fq_nmod_mpoly_ctx_t& ctx,
+                   const int N,
+                   const fq_nmod_ctx_t& fq_ctx,
+                   const Variable alpha)
+{
+  CFFList result;
+
+  long i;
+
+  fq_nmod_t c;
+  fq_nmod_init(c,fq_ctx);
+  fq_nmod_mpoly_factor_get_constant_fq_nmod(c,fac,ctx);
+  result.append(CFFactor(convertFq_nmod_t2FacCF(c,alpha,fq_ctx),1));
+  fq_nmod_clear(c,fq_ctx);
+
+  fq_nmod_mpoly_t p;
+  fq_nmod_mpoly_init(p,ctx);
+  long exp;
+  for (i = 0; i < fac->num; i++)
+  {
+    fq_nmod_mpoly_factor_get_base(p,fac,i,ctx);
+    exp=fq_nmod_mpoly_factor_get_exp_si(fac,i,ctx);
+    result.append (CFFactor (convertFq_nmod_mpoly_t2FacCF (
+                             p,ctx,N,fq_ctx,alpha), exp));
+  }
+  fq_nmod_mpoly_clear(p,ctx);
+  return result;
+}
+
+void
+convertFacCF2Fq_nmod_mpoly_t (fq_nmod_mpoly_t result,
+                        const CanonicalForm& f,
+                        const fq_nmod_mpoly_ctx_t ctx,
+                        const int N,
+                        const fq_nmod_ctx_t fq_ctx
+                       )
+{
+  if (f.isZero()) return;
+  ulong * exp = (ulong*)Alloc(N*sizeof(ulong));
+  memset(exp,0,N*sizeof(ulong));
+  convFlint_RecPP( f, exp, result, ctx, N, fq_ctx );
+  Free(exp,N*sizeof(ulong));
+}
+
+CanonicalForm
+convertFq_nmod_mpoly_t2FacCF (const fq_nmod_mpoly_t f,
+                              const fq_nmod_mpoly_ctx_t& ctx,
+                              const int N,
+                              const fq_nmod_ctx_t& fq_ctx,
+                              const Variable alpha)
+{
+  CanonicalForm result;
+  int d=fq_nmod_mpoly_length(f,ctx)-1;
+  ulong* exp=(ulong*)Alloc(N*sizeof(ulong));
+  fq_nmod_t c;
+  fq_nmod_init(c,fq_ctx);
+  for(int i=d; i>=0; i--)
+  {
+    fq_nmod_mpoly_get_term_coeff_fq_nmod(c,f,i,ctx);
+    fq_nmod_mpoly_get_term_exp_ui(exp,f,i,ctx);
+    CanonicalForm term=convertFq_nmod_t2FacCF(c,alpha,fq_ctx);
+    for ( int i = 0; i <N; i++ )
+    {
+      if (exp[i]!=0) term*=CanonicalForm( Variable( N-i ), exp[i] );
+    }
+    result+=term;
+  }
+  Free(exp,N*sizeof(ulong));
+  return result;
+}
 
 #endif
+#endif // FLINT
 
 

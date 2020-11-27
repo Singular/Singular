@@ -46,6 +46,7 @@
 #if (__FLINT_RELEASE >= 20700)
 #include <flint/nmod_mpoly_factor.h>
 #include <flint/fmpq_mpoly_factor.h>
+#include <flint/fq_nmod_mpoly_factor.h>
 #endif
 #endif
 
@@ -879,10 +880,38 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     }
     else // char p, multivariate
     {
-      #ifdef HAVE_NTL
+      #if (HAVE_FLINT && __FLINT_RELEASE >= 20700)
+        // use FLINT
+        nmod_poly_t FLINTmipo, leadingCoeff;
+        fq_nmod_ctx_t fq_con;
+        fq_nmod_mpoly_ctx_t fq_mpoly_ctx;
+
+        nmod_poly_init (FLINTmipo, ch);
+        convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+        fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+	fq_nmod_mpoly_ctx_init(fq_mpoly_ctx,f.level(),ORD_LEX,fq_con);
+
+        fq_nmod_mpoly_t FLINTF;
+	fq_nmod_mpoly_init(FLINTF,ctx);
+        convertFacCF2Fq_nmod_mpoly_t(FLINTF,f,fq_mpoly_ctx,f.level(),fq_con);
+        fq_nmod_mpoly_factor_t res;
+        fq_nmod_mpoly_factor_init (res, fq_mpoly_ctx);
+        fq_nmod_mpoly_factor (res, FLINTF, fq_mpoly_ctx);
+        F= convertFLINTFq_nmod_mpoly_factor2FacCFFList (res, fq_mpoly_ctx,f.level(),fq_con,alpha);
+        //F.insert (CFFactor (Lc (f), 1));
+
+        fq_nmod_mpoly_factor_clear (res, fq_mpoly_ctx);
+        fq_nmod_mpoly_clear (FLINTF, fq_mpoly_ctx);
+        nmod_poly_clear (FLINTmipo);
+        fq_nmod_mpoly_ctx_clear (fq_mpoly_ctx);
+        fq_nmod_ctx_clear (fq_con);
+        if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
+        return F;
+      #elif defined(HAVE_NTL)
       F= FqFactorize (f, alpha);
       #else
-      factoryError ("multivariate factorization over Z/pZ(alpha) depends on NTL(missing)");
+      factoryError ("multivariate factorization over Z/pZ(alpha) depends on NTL/Flint(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -895,12 +924,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     }
     else //Q(a)[x1,...,xn]
     {
-      #ifdef HAVE_NTL
       F= ratFactorize (f, alpha);
-      #else
-      factoryError ("multivariate factorization over Q(alpha) depends on NTL(missing)");
-      return CFFList (CFFactor (f, 1));
-      #endif
     }
   }
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
