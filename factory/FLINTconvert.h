@@ -42,6 +42,8 @@ extern "C"
 #include <flint/fq_nmod_mat.h>
 #if ( __FLINT_RELEASE >= 20503)
 #include <flint/fmpq_mpoly.h>
+#endif
+#if ( __FLINT_RELEASE >= 20700)
 #include <flint/fq_nmod_mpoly_factor.h>
 #endif
 #endif
@@ -137,6 +139,8 @@ convertFLINTfmpz_poly_factor2FacCFFList (
                                            ///< have
                                         );
 
+
+#if ( __FLINT_RELEASE >= 20700)
 /// conversion of a FLINT factorization over Zp(a) to a CFFList
 CFFList
 convertFLINTFq_nmod_mpoly_factor2FacCFFList (
@@ -146,6 +150,7 @@ convertFLINTFq_nmod_mpoly_factor2FacCFFList (
                    const fq_nmod_ctx_t& fq_ctx,   ///< [in] fq context
                    const Variable alpha           ///< [in] alpha
                                         );
+#endif
 
 /// conversion of a factory univariate poly over Z to a FLINT poly over
 /// Z/p (for non word size p)
@@ -192,6 +197,7 @@ convertFacCF2Fq_nmod_t (fq_nmod_t result,       ///< [in,out] fq_nmod_t
                         const fq_nmod_ctx_t ctx ///< [in] Fq context
                        );
 
+#if ( __FLINT_RELEASE >= 20700)
 /// conversion of a factory polynomial over of F_q to a FLINT fq_nmod_mpoly_t, does not do any
 /// memory allocation for poly
 void
@@ -201,6 +207,7 @@ convertFacCF2Fq_nmod_mpoly_t (fq_nmod_mpoly_t result, ///< [in,out] fq_nmod_mpol
                         const int N,                  ///< [in] #vars
                         const fq_nmod_ctx_t fq_ctx    ///< [in] fq context
                        );
+#endif
 
 /// conversion of a factory element of F_q (for non-word size p) to a FLINT fq_t
 void

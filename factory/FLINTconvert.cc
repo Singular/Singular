@@ -1068,5 +1068,3 @@ convertFq_nmod_mpoly_t2FacCF (const fq_nmod_mpoly_t f,
 
 #endif
 #endif // FLINT
-
-
