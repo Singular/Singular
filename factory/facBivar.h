@@ -23,6 +23,7 @@
 #include "cf_util.h"
 #include "facFqSquarefree.h"
 #include "cf_map.h"
+#include "cf_algorithm.h"
 #include "cfNewtonPolygon.h"
 #include "fac_util.h"
 
