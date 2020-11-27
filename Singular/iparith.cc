@@ -60,6 +60,7 @@ long farey_cnt=0L;
 #include "Singular/subexpr.h"
 #include "Singular/lists.h"
 #include "Singular/maps_ip.h"
+#include "Singular/feOpt.h"
 
 #include "Singular/ipconv.h"
 #include "Singular/ipprint.h"
@@ -2121,7 +2122,8 @@ static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
   //timespec buf1,buf2;
   //clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf1);
   #if 1
-  if (rField_is_Q(currRing))
+  int cpus = (long) feOptValue(FE_OPT_CPUS);
+  if ((cpus>1) && (rField_is_Q(currRing)))
     res->data=(void*)id_Farey_0(uu,vv,currRing);
   else
   #endif
@@ -9746,8 +9748,9 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   else
   {
-    #if 1
-    if (rField_is_Q(currRing))
+    #if 0
+    int cpus = (long) feOptValue(FE_OPT_CPUS);
+    if ((cpus>1) && (rField_is_Q(currRing)))
       result=id_ChineseRemainder_0(x,q,rl,currRing); // deletes also x
     else
     #endif
