@@ -3879,10 +3879,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return TRUE;
       }
       ideal F=(ideal)h->Data();
+      #ifndef __CYGWIN__
       int cpus = (long) feOptValue(FE_OPT_CPUS);
       if (cpus>1)
         res->data=(char*)(long) kVerify2(F,currRing->qideal);
       else
+      #endif
         res->data=(char*)(long) kVerify1(F,currRing->qideal);
       res->rtyp=INT_CMD;
       return FALSE;
