@@ -9,6 +9,8 @@
 #include "Singular/feOpt.h"
 #include "kernel/polys.h"
 
+#ifndef __CYGWIN__
+
 #define mpz_isNeg(A) ((A)->_mp_size<0)
 number nlRInit (long i);
 
@@ -381,3 +383,4 @@ void test_n(poly n)
   PrintLn();
   omFree(buf);
 }
+#endif
