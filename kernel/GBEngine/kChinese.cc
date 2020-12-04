@@ -8,8 +8,9 @@
 #include "coeffs/longrat.h"
 #include "Singular/feOpt.h"
 #include "kernel/polys.h"
+#include "kernel/mod2.h"
 
-#ifndef __CYGWIN__
+#ifdef HAVE_VSPACE
 
 #define mpz_isNeg(A) ((A)->_mp_size<0)
 number nlRInit (long i);

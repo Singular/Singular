@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined(__CYGWIN__)
+#ifdef HAVE_VSPACE
 #include "kernel/oswrapper/vspace.h"
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -119,7 +119,7 @@ BOOLEAN kVerify1(ideal F, ideal Q)
 
 BOOLEAN kVerify2(ideal F, ideal Q)
 {
-#if !defined(__CYGWIN__)
+#ifdef HAVE_VSPACE
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;

@@ -2122,7 +2122,7 @@ static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
   //timespec buf1,buf2;
   //clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf1);
   #if 1
-  #ifndef __CYGWIN__
+  #ifdef HAVE_VSPACE
   int cpus = (long) feOptValue(FE_OPT_CPUS);
   if ((cpus>1) && (rField_is_Q(currRing)))
     res->data=(void*)id_Farey_0(uu,vv,currRing);
@@ -9751,7 +9751,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   else
   {
     #if 0
-    #ifndef __CYGWIN__
+    #ifdef HAVE_VSPACE
     int cpus = (long) feOptValue(FE_OPT_CPUS);
     if ((cpus>1) && (rField_is_Q(currRing)))
       result=id_ChineseRemainder_0(x,q,rl,currRing); // deletes also x

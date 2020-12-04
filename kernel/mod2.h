@@ -58,6 +58,11 @@
 /* Define to use scanner when loading libraries */
 #define HAVE_LIBPARSER
 
+/* define for parallel processes with shared memory */
+#ifndef __CCYGWIN__
+#define HAVE_VSPACE 1
+#endif
+
 /*#define PROFILING*/
 #ifdef PROFILING
 #define PROFILER ,0,0

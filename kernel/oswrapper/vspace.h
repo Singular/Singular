@@ -10,8 +10,9 @@
 #include <unistd.h>
 #include <assert.h>
 #include <new> // for placement new
+#include "kernel/mod2.h"
 
-#if !defined(__CYGWIN__)
+#ifdef HAVE_VSPACE
 
 #if __cplusplus >= 201100
 #define HAVE_CPP_THREADS

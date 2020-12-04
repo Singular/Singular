@@ -1,8 +1,7 @@
 // https://github.com/rbehrends/vspace
 #include "vspace.h"
-
-#if !defined(__CYGWIN__)
-
+#include "kernel/mod2.h"
+#ifdef HAVE_VSPACE
 #ifdef HAVE_CPP_THREADS
 #include <thread>
 #endif
