@@ -46,15 +46,6 @@ AC_SUBST(GMP_LIBS)
 AC_SUBST(LIBS)
 AC_LANG_POP()
 
-#AC_MSG_RESULT($ac_cv_singuname)
-#if test "$ac_cv_singuname" = unknown; then
-#  AC_MSG_WARN(Unknown architecture: Check singuname.sh)
-#  ac_cv_singuname="unknown"
-#fi
-#AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
-#SINGUNAME=$ac_cv_singuname
-#AC_SUBST(SINGUNAME)
-
 AC_CONFIG_FILES([Makefile])
 ## AC_CONFIG_HEADERS([config.h])
 AC_OUTPUT

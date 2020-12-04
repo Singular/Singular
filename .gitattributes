@@ -2,5 +2,3 @@
 .git* export-ignore
 /Tst/ export-ignore
 /doc/ export-ignore
-/factory/old/ export-ignore
-/old_modgen/ export-ignore
