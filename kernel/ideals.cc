@@ -1064,6 +1064,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
   }
 
   if (syz_ring!=orig_ring) rDelete(syz_ring);
+  s_h3->rank=h1->rank;
   SI_RESTORE_OPT2(save2);
   return s_h3;
 }
