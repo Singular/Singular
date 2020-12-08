@@ -7839,6 +7839,12 @@ returns the two-sided standard basis of the two-sided ideal.
 returns a string identifying the architecture for which @sc{Singular}
 was compiled.
 @c ..........................
+@item @code{system("verifyGB",} ideal_expression/module_expression @code{)}
+@cindex verify Groebner base
+@cindex system, verifyGB
+@cindex verifyGB
+checks, if an ideal/module is a Groebner base
+@c ..........................
 @item @code{system("version")}
 @cindex version
 @cindex system, version

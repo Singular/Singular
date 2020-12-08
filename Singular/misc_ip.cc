@@ -840,6 +840,9 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_PLURAL
               StringAppendS("Plural,");
 #endif
+#ifdef HAVE_VSPACE
+              StringAppendS("vspace,");
+#endif
 #ifdef HAVE_DBM
               StringAppendS("DBM,\n\t");
 #else

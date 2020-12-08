@@ -1245,26 +1245,14 @@ Status: experimental
 
 @majorheading NEWS in SINGULAR:LETTERPLACE @value{VERSION}
 
-@ifclear singularmanual
-@macro nref{what}
-\what\
-@end macro
-@end ifclear
-
-@ifset singularmanual
-@macro nref{what}
-@ref{\what\}
-@end macro
-@end ifset
-
 @heading News for SINGULAR:LETTERPLACE version @value{VERSION}
 New functions:
 @itemize
-@item added support for free bimodules of a fixed rank (@nref{freeAlgebra BR_LETTERPLACE_BR}, @nref{ncgen})
+@item added support for free bimodules of a fixed rank (@ref{freeAlgebra BR_LETTERPLACE_BR}, @ref{ncgen})
 @item several types of monomial orderings become available, among them three types of elimination orderings
-@item twostd (@nref{twostd (letterplace)}), reduce (@nref{reduce (letterplace)}) and other functions support subbimodules
-@item syz (@nref{syz (letterplace)}), lift (@nref{lift (letterplace)}), liftstd (@nref{liftstd (letterplace)}) implemented
-@item bracket (@nref{bracket}) and maxideal (@ref{maxideal}) work in Letterplace
+@item twostd (@ref{twostd (letterplace)}), reduce (@ref{reduce (letterplace)}) and other functions support subbimodules
+@item syz (@ref{syz (letterplace)}), lift (@ref{lift (letterplace)}), liftstd (@ref{liftstd (letterplace)}) implemented
+@item bracket (@ref{bracket}) and maxideal (@ref{maxideal}) work in Letterplace
 @item the options @code{redSB}, @code{redTail} are effective for computations related to Groebner bases
 @item the options @code{prot}, @code{mem} are effective for the whole @sc{Letterplace} subsystem
 @end itemize
@@ -1272,15 +1260,15 @@ New functions:
 
 New libraries:
 @itemize
-@item fpaprops_lib: Algorithms for properties of quotient algebras (@nref{fpaprops_lib})
-@item ncHilb.lib: Hilbert functions for non-commutative algebras (@nref{ncHilb_lib})
+@item fpaprops_lib: Algorithms for properties of quotient algebras (@ref{fpaprops_lib})
+@item ncHilb.lib: Hilbert functions for non-commutative algebras (@ref{ncHilb_lib})
 @end itemize
 
 Changed libraries:
 @itemize
-@item fpadim.lib: Vector space dimension, basis and Hilbert series for finitely presented algebras (@nref{fpadim_lib}),
+@item fpadim.lib: Vector space dimension, basis and Hilbert series for finitely presented algebras (@ref{fpadim_lib}),
 numerous enhancements, partially implemented in the kernel
-@item freegb.lib: Main initialization and convenience tools (@nref{freegb_lib})
+@item freegb.lib: Main initialization and convenience tools (@ref{freegb_lib})
 @end itemize
 
 Changes in the kernel/build system:
@@ -1292,23 +1280,23 @@ Changes in the kernel/build system:
 @heading News for SINGULAR:LETTERPLACE version 4-1-2
 New libraries:
 @itemize
-@item fpalgebras.lib: Generation of various algebras in the letterplace case (@nref{fpalgebras_lib})
-@item ncrat.lib: Manipulating non-commutative rational functions (@nref{ncrat_lib})
+@item fpalgebras.lib: Generation of various algebras in the letterplace case (@ref{fpalgebras_lib})
+@item ncrat.lib: Manipulating non-commutative rational functions (@ref{ncrat_lib})
 @end itemize
 
 Changed/updated libraries:
 @itemize
-@item freegb.lib: lpDivision, lpPrint (@nref{freegb_lib})
-@item fpadim.lib (@nref{fpadim_lib})
-@item ncfactor.lib (@nref{ncfactor_lib}) is available for Letterplace rings
+@item freegb.lib: lpDivision, lpPrint (@ref{freegb_lib})
+@item fpadim.lib (@ref{fpadim_lib})
+@item ncfactor.lib (@ref{ncfactor_lib}) is available for Letterplace rings
 @end itemize
 
 Changes in the kernel/build system:
 @itemize
 @item code for free algebras (letterplace rings) rewritten
-(using now the standard @code{+,-,*,^,std},...) (@nref{LETTERPLACE})
-@item new command @code{rightstd} (@nref{rightstd (letterplace)})
-@item extended @code{twostd} to @sc{Letterplace} (@nref{twostd (letterplace)}, @nref{twostd (plural)})
+(using now the standard @code{+,-,*,^,std},...) (@ref{LETTERPLACE})
+@item new command @code{rightstd} (@ref{rightstd (letterplace)})
+@item extended @code{twostd} to @sc{Letterplace} (@ref{twostd (letterplace)}, @ref{twostd (plural)})
 @end itemize
 
 

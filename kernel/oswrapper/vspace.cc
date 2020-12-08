@@ -1,6 +1,7 @@
 // https://github.com/rbehrends/vspace
 #include "vspace.h"
-
+#include "kernel/mod2.h"
+#ifdef HAVE_VSPACE
 #ifdef HAVE_CPP_THREADS
 #include <thread>
 #endif
@@ -551,3 +552,4 @@ int EventSet::wait() {
 }
 
 } // namespace vspace
+#endif

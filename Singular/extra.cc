@@ -66,6 +66,7 @@
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kverify.h"
 
 #include "kernel/linear_algebra/linearAlgebra.h"
 
@@ -3780,9 +3781,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           // convert first arg. to fmpq_poly_t
           fmpq_poly_t fre, fim;
           convSingPFlintP(fre,(poly)h->Data(),currRing); h=h->next;
-      if (pol_with_complex_coeffs==1) { // convert second arg. to fmpq_poly_t
-          convSingPFlintP(fim,(poly)h->Data(),currRing); h=h->next;
-      }
+          if (pol_with_complex_coeffs==1)
+          { // convert second arg. to fmpq_poly_t
+            convSingPFlintP(fim,(poly)h->Data(),currRing); h=h->next;
+          }
           // convert box-center(re,im), box-size, epsilon
           fmpq_t center_re,center_im,boxsize,eps;
           convSingNFlintN(center_re,(number)h->Data(),currRing->cf); h=h->next;
@@ -3869,15 +3871,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /* ====== verify ============================*/
-    if(strcmp(sys_cmd,"verify")==0)
+    if(strcmp(sys_cmd,"verifyGB")==0)
     {
       if (h->Typ()!=IDEAL_CMD)
       {
-        WerrorS("expected system(\"verify\",<ideal>,..)");
+        WerrorS("expected system(\"verifyGB\",<ideal>,..)");
         return TRUE;
       }
       ideal F=(ideal)h->Data();
-      res->data=(char*)(long) kVerify(F,currRing->qideal);
+      #ifdef HAVE_VSPACE
+      int cpus = (long) feOptValue(FE_OPT_CPUS);
+      if (cpus>1)
+        res->data=(char*)(long) kVerify2(F,currRing->qideal);
+      else
+      #endif
+        res->data=(char*)(long) kVerify1(F,currRing->qideal);
       res->rtyp=INT_CMD;
       return FALSE;
     }

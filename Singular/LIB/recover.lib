@@ -1658,8 +1658,8 @@ static proc get_relations_as_bigintmats(list p, int D, bigint C)
       vd=veronese(d,p);
       len=size(maxideal(d));
       A=getmatrix(vd,C,len);
-      //B=use_FLINT_LLL(A);
-      B=use_NTL_LLL(A);
+      B=use_FLINT_LLL(A);
+      //B=use_NTL_LLL(A);
       //B=use_LLL_bigintmat(A);
 
       mats=mats+list(B);
@@ -1682,8 +1682,8 @@ static proc get_relations_radical_as_bigintmats(list P, int D, bigint C)
       vd=veronese_radical(d,P);
       len=size(maxideal(d));
       A=getmatrix(vd,C,len);
-      //B=use_FLINT_LLL(A);
-      B=use_NTL_LLL(A);
+      B=use_FLINT_LLL(A);
+      //B=use_NTL_LLL(A);
       //B=use_LLL_bigintmat(A);
 
       mats=mats+list(B);

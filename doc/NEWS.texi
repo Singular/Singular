@@ -20,16 +20,35 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+New libraries:
+
+@itemize
+@item qmatrix.lib: Quantum matrices, quantum minors and symmetric groups (@nref{qmatrix_lib})
+@item recover.lib: Hybrid numerical/symbolical algorithms (@nref{recover_lib})
+@item redcgs.lib: Reduced Comprehensive Groebner Systems (@nref{redcgs_lib})
+@item ringgb.lib: coefficient rings (@nref{ringgb_lib})
+@item sets.lib: Sets (@nref{sets_lib})
+@item stanleyreisner.lib: T1 and T2 for a general Stanley-Reiser ring (@nref{stanleyreisner_lib}
+@item systhreads.lib: multi-threaded objects (@nref{systhreads_lib})
+@end itemize
+
 Changed libraries:
 @itemize
 @item grobcov.lib: new version (@nref{grobcov_lib})
 @item classify_aeq.lib: new procedure @code{classSpaceCurve} (@nref{classify_aeq_lib})
 @end itemize
 
+New command:
+@itemize
+@item @code{system("verifyGB",I)}: test, if I is a Groebner basis
+@end itemize
+
 Changes in the kernel/build system:
 @itemize
 @item Letterplace: modulo,syz,lift,liftstd (@nref{LETTERPLACE})
 @item FLINT 2.6.x, prepare for FLINT 2.7.0
+@item Singular can be build with NTL or FLINT or both
+(if non is availabel, @code{factroize} and @code{gcd} will not work.)
 @end itemize
 
 @heading News for version 4-1-3

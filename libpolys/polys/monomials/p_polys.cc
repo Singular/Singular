@@ -82,6 +82,7 @@ poly p_Farey(poly p, number N, const ring r)
 * xx[i]: SB mod q[i]
 * assume: char=0
 * assume: q[i]!=0
+* x: work space
 * destroys xx
 */
 poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cache,const ring R)

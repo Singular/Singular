@@ -50,6 +50,12 @@ static const int SW_USE_FL_GCD_0=9;
 static const int SW_BERLEKAMP=10;
 
 static const int SW_FAC_QUADRATICLIFT=11;
+/// set to 1 to prefer flints multivariate factorization over Z/p
+static const int SW_USE_FL_FAC_P=12;
+/// set to 1 to prefer flints multivariate factorization over Z/p
+static const int SW_USE_FL_FAC_0=13;
+/// set to 1 to prefer flints multivariate factorization over Z/p(a)
+static const int SW_USE_FL_FAC_0A=14;
 /*ENDPUBLIC*/
 
 #ifdef HAVE_OMALLOC

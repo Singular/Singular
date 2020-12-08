@@ -6,18 +6,18 @@
 #include "kernel/polys.h"
 #include "polys/monomials/ring.h"
 #include "kernel/GBEngine/kutil.h"
+#include "kernel/GBEngine/kverify.h"
 #include "Singular/feOpt.h"
 #include <stdlib.h>
 #include <string.h>
 
-#define MULTIPROCESS 1
-#ifdef MULTIPROCESS
+#ifdef HAVE_VSPACE
 #include "kernel/oswrapper/vspace.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 #endif
 
-BOOLEAN kVerify(ideal F, ideal Q)
+BOOLEAN kVerify1(ideal F, ideal Q)
 {
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
@@ -72,7 +72,6 @@ BOOLEAN kVerify(ideal F, ideal Q)
   if (TEST_OPT_DEBUG) messageSets(strat);
   /*---------------------------------------------------------------------*/
   BOOLEAN all_okay=TRUE;
-  #ifndef MULTIPROCESS /* seriell */
   for(int i=strat->Ll;i>=0; i--)
   {
   /* spolys */
@@ -116,9 +115,64 @@ BOOLEAN kVerify(ideal F, ideal Q)
     }
   }
   return all_okay;
-  #endif
+}
+
+BOOLEAN kVerify2(ideal F, ideal Q)
+{
+#ifdef HAVE_VSPACE
+  kStrategy strat=new skStrategy;
+  strat->ak = id_RankFreeModule(F,currRing);
+  strat->kModW=kModW=NULL;
+  strat->kHomW=kHomW=NULL;
+  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
+  initBuchMoraPos(strat);
+  initBba(strat);
+  initBuchMora(F, Q,strat);
+  /*initBuchMora:*/
+    strat->tail = pInit();
+    /*- set s -*/
+    strat->sl = -1;
+    /*- set L -*/
+    strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
+    strat->Ll = -1;
+    strat->L = initL(strat->Lmax);
+    /*- set B -*/
+    strat->Bmax = setmaxL;
+    strat->Bl = -1;
+    strat->B = initL();
+    /*- set T -*/
+    strat->tl = -1;
+    strat->tmax = setmaxT;
+    strat->T = initT();
+    strat->R = initR();
+    strat->sevT = initsevT();
+    /*- init local data struct.---------------------------------------- -*/
+    strat->P.ecart=0;
+    strat->P.length=0;
+    strat->P.pLength=0;
+    initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    strat->fromT = FALSE;
+    strat->noTailReduction = FALSE;
+  /*----------------------------------------------------------------------*/
+  /* build pairs */
+  if (strat->fromQ!=NULL)
+  {
+    for(int i=1; i<=strat->sl;i++)
+    {
+      initenterpairs(strat->S[i],i-1,0,strat->fromQ[i],strat);
+    }
+  }
+  else
+  {
+    for(int i=1; i<=strat->sl;i++)
+    {
+      initenterpairs(strat->S[i],i-1,0,FALSE,strat);
+    }
+  }
+  if (TEST_OPT_PROT) printf("%d pairs created\n",strat->Ll+1);
+  if (TEST_OPT_DEBUG) messageSets(strat);
   /*---------------------------------------------------------------------*/
-  #ifdef MULTIPROCESS
+  BOOLEAN all_okay=TRUE;
   int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
   int parent_pid=getpid();
   using namespace vspace;
@@ -142,7 +196,7 @@ BOOLEAN kVerify(ideal F, ideal Q)
   }
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
-    do
+    loop
     {
       int ind=queue->dequeue();
       if (ind== -1)
@@ -194,7 +248,7 @@ BOOLEAN kVerify(ideal F, ideal Q)
         rqueue->enqueue(1);
         exit(0);
       }
-    } while(1);
+    }
   }
   else // parent ---------------------------------------------------
   {
@@ -231,5 +285,7 @@ BOOLEAN kVerify(ideal F, ideal Q)
     vmem_deinit();
     return all_okay;
   }
-  #endif
+#else
+  return kVerify1(F,Q);
+#endif
 }

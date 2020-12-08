@@ -34,6 +34,7 @@
 #include "Singular/subexpr.h"
 #include "Singular/links/silink.h"
 #include "Singular/cntrlc.h"
+#include "Singular/feOpt.h"
 #include "Singular/lists.h"
 #include "Singular/blackbox.h"
 #include "Singular/links/ssiLink.h"
@@ -949,6 +950,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           sigemptyset(&sigint);
           sigaddset(&sigint, SIGINT);
           sigprocmask(SIG_BLOCK, &sigint, NULL);
+          /* set #cpu to 1 for the child:*/
+	  feSetOptValue(FE_OPT_CPUS,1);
 
           link_list hh=(link_list)ssiToBeClosed->next;
           /* we know: l is the first entry in ssiToBeClosed-list */

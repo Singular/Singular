@@ -19,7 +19,7 @@
  * const CFSwitchesMax - maximum number of switches.
  *
 **/
-const int CFSwitchesMax = 12;
+const int CFSwitchesMax = 15;
 
 /** class CFSwitches
  *

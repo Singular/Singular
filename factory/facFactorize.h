@@ -42,12 +42,11 @@ CFList
 multiFactorize (const CanonicalForm& F,     ///< [in] sqrfree poly
                 const Variable& v           ///< [in] some algebraic variable
                );
-
+#ifdef HAVE_NTL // ratBiSqrfFactorize
 /// factorize a squarefree multivariate polynomial over \f$ Q(\alpha) \f$
 ///
 /// @return @a ratSqrfFactorize returns a list of monic factors, the first
 ///         element is the leading coefficient.
-#ifdef HAVE_NTL
 inline
 CFList
 ratSqrfFactorize (const CanonicalForm & G,        ///<[in] a multivariate poly
@@ -67,7 +66,9 @@ ratSqrfFactorize (const CanonicalForm & G,        ///<[in] a multivariate poly
   }
   return result;
 }
+#endif
 
+#ifdef HAVE_NTL // multiFactorize, henselLiftAndEarly, nonMonicHenselLift
 /// factorize a multivariate polynomial over \f$ Q(\alpha) \f$
 ///
 /// @return @a ratFactorize returns a list of monic factors with
@@ -171,6 +172,5 @@ ratFactorize (const CanonicalForm& G,          ///<[in] a multivariate poly
   return result;
 }
 #endif
-
 #endif
 

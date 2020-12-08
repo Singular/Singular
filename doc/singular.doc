@@ -119,44 +119,37 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @end menu
 
 @c ----------------------------------------------------------------------------
-@node Preface, Introduction, Top, Top
+@node Preface
 @chapter Preface
 @cindex Preface
 @include COPYING.texi
 
 @c ----------------------------------------------------------------------------
-@node Introduction, General concepts, Preface, Top
+@node Introduction
 @chapter Introduction
 @cindex Introduction
 
 @include start.tex
 @c ----------------------------------------------------------------------------
-@node General concepts, Data types, Introduction, Top
+@node General concepts
 @chapter General concepts
 @cindex General concepts
 @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types, Functions and system variables, General concepts, Top
+@node Data types
 @chapter Data types
 @cindex Data types
 @include types.tex
 
 @c ----------------------------------------------------------------------------
-@node Functions and system variables, Tricks and pitfalls, Data types, Top
+@node Functions and system variables
 @chapter Functions and system variables
 @cindex Commands
 @include reference.tex
 
 @c ----------------------------------------------------------------------------
-@ifset withplural
-@node Tricks and pitfalls, Non-commutative subsystem, Functions and system variables, Top
-@end ifset
-
-@ifclear withplural
-@node Tricks and pitfalls, Examples, Functions and system variables, Top
-@end ifclear
-
+@node Tricks and pitfalls
 @chapter Tricks and pitfalls
 @cindex Tricks and pitfalls
 @include tricks.tex
@@ -190,32 +183,25 @@ non-commutative rings: @sc{Plural}, @sc{Sca} and @sc{Letterplace}.
 @end ifset
 
 @c ----------------------------------------------------------------------------
-@ifset withplural
-@node Examples, Polynomial data, Non-commutative subsystem, Top
-@end ifset
-
-@ifclear withplural
-@node Examples, Polynomial data, Tricks and pitfalls, Top
-@end ifclear
-
+@node Examples
 @appendix Examples
 @cindex Examples
 @include examples.tex
 
 @c ----------------------------------------------------------------------------
-@node Polynomial data, Mathematical background, Examples, Top
+@node Polynomial data
 @appendix Polynomial data
 @cindex Polynomial data
 @include pdata.tex
 
 @c ----------------------------------------------------------------------------
-@node Mathematical background, SINGULAR libraries, Polynomial data, Top
+@node Mathematical background
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
 
 @c ----------------------------------------------------------------------------
-@node SINGULAR libraries, Release Notes, Mathematical background, Top
+@node SINGULAR libraries
 @appendix SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
@@ -256,7 +242,7 @@ See also @ref{PLURAL libraries} and @ref{LETTERPLACE libraries}.
 @end ifset
 
 @c ----------------------------------------------------------
-@node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
+@node standard_lib
 @section standard_lib
 
 The library @code{standard.lib} provides extensions to the
@@ -280,7 +266,7 @@ with the @code{--no-stdlib} command line option (see
 @c lib standard.lib:par2varRing Fun subsection
 
 @c ----------------------------------------------------------------------------
-@node General purpose, Linear algebra, standard_lib, SINGULAR libraries
+@node General purpose
 @section General purpose
 @cindex General purpose
 
@@ -294,6 +280,7 @@ with the @code{--no-stdlib} command line option (see
 * parallel_lib:: Tools for parallelization
 * poly_lib:: procedures for manipulating polynomials and ideals
 * random_lib:: procedures of random/sparse  matrix and polynomial operations
+* redcgs_lib:: Reduced Comprehensive Groebner Systems
 * resources_lib:: Tools to manage the computational resources
 * ring_lib:: procedures for manipulating rings and maps
 * tasks_lib:: A parallel framework based on tasks
@@ -326,6 +313,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node grobcov_lib
 @subsection grobcov_lib
+@cindex Comprehensive Groebner Systems
 @c lib grobcov.lib
 @c ----------------------------------------------------------
 @node inout_lib
@@ -344,6 +332,12 @@ LIB "all.lib";
 @subsection poly_lib
 @c lib poly.lib
 @c ----------------------------------------------------------
+@node redcgs_lib
+@subsection redcgs_lib
+@cindex Reduced Comprehensive Groebner Systems
+@cindex Comprehensive Groebner Systems
+@c lib redcgs.lib
+@c ----------------------------------------------------------
 @node random_lib
 @subsection random_lib
 @c lib random.lib
@@ -360,7 +354,7 @@ LIB "all.lib";
 @subsection tasks_lib
 @c lib tasks.lib
 @c ----------------------------------------------------------------------------
-@node Linear algebra, Commutative algebra, General purpose, SINGULAR libraries
+@node Linear algebra
 @section Linear algebra
 @cindex Linear algebra
 
@@ -378,7 +372,7 @@ LIB "all.lib";
 @subsection linalg_lib
 @c lib linalg.lib
 @c ----------------------------------------------------------------------------
-@node Commutative algebra, Algebraic geometry, Linear algebra, SINGULAR libraries
+@node Commutative algebra
 @section Commutative algebra
 @cindex Commutative algebra
 
@@ -387,8 +381,10 @@ LIB "all.lib";
 * algebra_lib:: procedures for computing with algebras and maps
 * assprimeszerodim_lib:: associated primes of a zero-dimensional ideal
 * cisimplicial_lib:: is the toric ideal of a simplicial toric variety a complete intersection?
+* curveInv_lib:: invariants of curves
 * elim_lib:: procedures for elimination, saturation and blowing up
 * ellipticcovers_lib::  Gromov Witten numbers of elliptic curves
+* ffmodstd_lib::  Groebner bases in polynomial rings over rational function fields
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
 * integralbasis_lib:: Integral basis in algebraic function fields
@@ -400,6 +396,8 @@ LIB "all.lib";
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
+* nfmodstd_lib:: Groebner bases of ideals in rings over algebraic number fields
+* nfmodsyz_lib:: Syzygy modules of submodules of free modules over algebraic number fields
 * noether_lib:: Noether normalization of an ideal
 * normal_lib:: procedure for normalization
 * normaliz_lib:: integral closure, normalization for monomial ideals, toric ideals
@@ -409,6 +407,7 @@ LIB "all.lib";
 * primitiv_lib:: procedures for finding a primitive element
 * realrad_lib:: procedures for finding the real radical
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
+* rstandard_lib:: Janet bases and border bases for ideals
 * sagbi_lib:: Subalgebras bases Analogous to Groebner bases for ideals
 * sing4ti2_lib:: interface to program 4ti2
 * symodstd_lib:: Groebner bases for symmetric ideals
@@ -432,14 +431,21 @@ LIB "all.lib";
 @subsection cisimplicial_lib
 @c lib cisimplicial.lib
 @c ----------------------------------------------------------
+@node curveInv_lib
+@subsection curveInv_lib
+@c lib curveInv.lib
+@c ----------------------------------------------------------
 @node elim_lib
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
 @node ellipticcovers_lib
 @subsection ellipticcovers_lib
-
 @c lib ellipticcovers.lib
+@c ----------------------------------------------------------
+@node ffmodstd_lib
+@subsection ffmodstd_lib
+@c lib ffmodstd.lib
 @c ----------------------------------------------------------
 @node grwalk_lib
 @subsection grwalk_lib
@@ -485,6 +491,14 @@ LIB "all.lib";
 @subsection mregular_lib
 @c lib mregular.lib
 @c ----------------------------------------------------------
+@node nfmodstd_lib
+@subsection nfmodstd_lib
+@c lib nfmodstd.lib
+@c ----------------------------------------------------------
+@node nfmodsyz_lib
+@subsection nfmodsyz_lib
+@c lib nfmodsyz.lib
+@c ----------------------------------------------------------
 @node noether_lib
 @subsection noether_lib
 @c lib noether.lib
@@ -520,6 +534,10 @@ LIB "all.lib";
 @node reesclos_lib
 @subsection reesclos_lib
 @c lib reesclos.lib
+@c ----------------------------------------------------------
+@node rstandard_lib
+@subsection rstandard_lib
+@c lib rstandard.lib
 @c ---------------------------------------------------------
 @node sagbi_lib
 @subsection sagbi_lib
@@ -537,11 +555,16 @@ LIB "all.lib";
 @subsection toric_lib
 @c lib toric.lib
 @c ---------------------------------------------------------
-@node Algebraic geometry, Singularities, Commutative algebra, SINGULAR libraries
+@node Algebraic geometry
 @section Algebraic geometry
 @cindex Algebraic geometry
 
 @menu
+* brillnoether_lib:: Riemann-Roch spaces of divisors on curves
+* chern_lib:: Symbolic Computations with Chern classes
+* deRham_lib:: Computation of deRham cohomology
+* divisors_lib:: Divisors and P-Divisors
+* hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * numerAlg_lib:: Numerical Algebraic Algorithms
 * numerDecom_lib:: Bertini interface
 * orbitparam_lib:: Parametrizing unipotent orbits
@@ -551,11 +574,32 @@ LIB "all.lib";
 * resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
+* schubert_lib:: Intersection Theory
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 * JMBTest_lib:: performs J-Marked basis test
 * JMSConst_lib::  constructing J-Marked Schemes
 @end menu
 
+@c ----------------------------------------------------------
+@node brillnoether_lib
+@subsection brillnoether_lib
+@c lib brillnoether.lib
+@c ----------------------------------------------------------
+@node chern_lib
+@subsection chern_lib
+@c lib chern.lib
+@c ----------------------------------------------------------
+@node deRham_lib
+@subsection deRham_lib
+@c lib deRham.lib
+@c ----------------------------------------------------------
+@node divisors_lib
+@subsection divisors_lib
+@c lib divisors.lib
+@c ----------------------------------------------------------
+@node hess_lib
+@subsection hess_lib
+@c lib hess.lib
 @c ----------------------------------------------------------
 @node numerAlg_lib
 @subsection numerAlg_lib
@@ -618,6 +662,10 @@ iniD, reslist, sumlist, dividelist, createlist
 @node reszeta_lib
 @subsection reszeta_lib
 @c lib reszeta.lib
+@c ----------------------------------------------------------
+@node schubert_lib
+@subsection schubert_lib
+@c lib schubert.lib
 @c ---------------------------------------------------------
 @node sheafcoh_lib
 @subsection sheafcoh_lib
@@ -631,16 +679,20 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection JMSConst_lib
 @c lib JMSConst.lib
 @c ----------------------------------------------------------------------------
-@node Singularities, Invariant theory, Algebraic geometry, SINGULAR libraries
+@node Singularities
 @section Singularities
 @cindex Singularities
 
 @menu
 * alexpoly_lib:: resolution graph and Alexander polynomial
 * arcpoint_lib:: truncations of arcs at a singular point
+* arnoldclassify_lib:: Arnol'd Classifier of Singularities
 * classify_lib:: procedures for the Arnold-classifier of singularities
+* classify2_lib:: Classification of isolated singularties
+* classify_aeq_lib:: Simple Space Curve singularities in characteristic 0
 * classifyceq_lib:: simple hypersurface singularities in charateristic p > 0
 * classifyci_lib:: isolated complete intersection singularities in char 0
+* classifyMapGerms_lib:: standard basis of the tangent space at the orbit of an algebraic group action
 * curvepar_lib:: procedures for space curves
 * deform_lib:: procedures for computing miniversal deformation
 * equising_lib:: procedures for equisingularity strata
@@ -650,6 +702,7 @@ iniD, reslist, sumlist, dividelist, createlist
 * kskernel_lib:: procedures for kernel  of the kodaira-spencer map
 * mondromy_lib:: procedures to compute the monodromy of a singularity
 * qhmoduli_lib:: procedures for moduli spaces of sqh-singularities
+* realclassify_lib:: Classification of real singularities
 * sing_lib:: procedures for computing invariants of singularities
 * spcurve_lib:: procedures for cm codimension 2 singularities
 * spectrum_lib:: procedures for computing singularity spectra
@@ -664,20 +717,36 @@ iniD, reslist, sumlist, dividelist, createlist
 @node arcpoint_lib
 @subsection arcpoint_lib
 @c lib arcpoint.lib
+@c ----------------------------------------------------------
+@node arnoldclassify_lib
+@subsection arnoldclassify_lib
+@cindex SingularityDBM.lib
+@cindex SingularityDBM_lib
+@c lib arnoldclassify.lib
 @c ---------------------------------------------------------
 @node classify_lib
 @subsection classify_lib
 @c lib classify.lib unix_only
 @c ----------------------------------------------------------
+@node classify2_lib
+@subsection classify2_lib
+@c lib classify2.lib
+@c ----------------------------------------------------------
+@node classify_aeq_lib
+@subsection classify_aeq_lib
+@c lib classify_aeq.lib
+@c ----------------------------------------------------------
 @node classifyceq_lib
 @subsection classifyceq_lib
-
 @c lib classifyceq.lib
 @c ----------------------------------------------------------
 @node classifyci_lib
 @subsection classifyci_lib
-
 @c lib classifyci.lib
+@c ----------------------------------------------------------
+@node classifyMapGerms_lib
+@subsection classifyMapGerms_lib
+@c lib classifyMapGerms.lib
 @c ---------------------------------------------------------
 @node curvepar_lib
 @subsection curvepar_lib
@@ -715,6 +784,10 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection qhmoduli_lib
 @c lib qhmoduli.lib
 @c ----------------------------------------------------------
+@node realclassify_lib
+@subsection realclassify_lib
+@c lib realclassify.lib
+@c ----------------------------------------------------------
 @node sing_lib
 @subsection sing_lib
 @c lib sing.lib
@@ -731,7 +804,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection surfacesignature_lib
 @c lib surfacesignature.lib
 @c ----------------------------------------------------------------------------
-@node Invariant theory, Symbolic-numerical solving, Singularities, SINGULAR libraries
+@node Invariant theory
 @section Invariant theory
 @cindex Invariant theory
 
@@ -764,7 +837,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection stratify_lib
 @c lib stratify.lib
 @c ----------------------------------------------------------------------------
-@node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
+@node Symbolic-numerical solving
 @section Symbolic-numerical solving
 @cindex Symbolic-numerical solving
 
@@ -774,8 +847,10 @@ iniD, reslist, sumlist, dividelist, createlist
 * solve_lib:: procedures to solve polynomial systems
 * triang_lib:: procedures for decomposing zero-dimensional ideals
 * ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
-* zeroset_lib:: procedures for roots and factorization
+* recover_lib:: Hybrid numerical/symbolical algorithms
+* rootisolation_lib:: real root isolation with intervals
 * signcond_lib:: computing realizable sign conditions
+* zeroset_lib:: procedures for roots and factorization
 @end menu
 
 @c ---------------------------------------------------------
@@ -799,15 +874,23 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection ntsolve_lib
 @c lib ntsolve.lib
 @c ---------------------------------------------------------
-@node zeroset_lib
-@subsection zeroset_lib
-@c lib zeroset.lib
+@node recover_lib
+@subsection recover_lib
+@c lib recover.lib
+@c ----------------------------------------------------------
+@node rootisolation_lib
+@subsection rootisolation_lib
+@c lib rootisolation.lib
 @c ---------------------------------------------------------
 @node signcond_lib
 @subsection signcond_lib
 @c lib signcond.lib
 @c ---------------------------------------------------------
-@node Visualization, Coding theory, Symbolic-numerical solving, SINGULAR libraries
+@node zeroset_lib
+@subsection zeroset_lib
+@c lib zeroset.lib
+@c ---------------------------------------------------------
+@node Visualization
 @section Visualization
 @cindex Visualization
 
@@ -835,7 +918,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection surfex_lib
 @c lib surfex.lib no_ex
 @c ----------------------------------------------------------------------------
-@node Coding theory, System and Control theory, Visualization, SINGULAR libraries
+@node Coding theory
 @section Coding theory
 @cindex Coding theory
 
@@ -855,7 +938,7 @@ iniD, reslist, sumlist, dividelist, createlist
 
 
 @c ----------------------------------------------------------------------------
-@node System and Control theory, Teaching, Coding theory, SINGULAR libraries
+@node System and Control theory
 @section System and Control theory
 @cindex System and Control theory
 @cindex Control theory
@@ -868,7 +951,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ---------------------------------------------------------
-@node Control theory background, control_lib, ,System and Control theory
+@node Control theory background
 @subsection Control theory background
 
 Control systems are usually described by differential (or
@@ -992,20 +1075,30 @@ but not for serious computations.
 @cindex Tropical Geometry
 
 @menu
+* cimonom_lib:: complete intersection for toric ideals
 * gfan_lib:: A gfanlib interface for Singular
+* gitfan_lib:: Compute GIT-fans
 * polymake_lib:: interface to polymake and TOPCOM
 * realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * tropical_lib:: interface to gfan
+* tropicalNewton_lib:: Newton polygons in tropical geometry
 @end menu
+@c ----------------------------------------------------------
+@node cimonom_lib
+@subsection cimonom_lib
+@c lib cimonom.lib
 @c ----------------------------------------------------------
 @node gfan_lib
 @subsection gfan_lib
 @c lib gfan.lib
 @c ----------------------------------------------------------
+@node gitfan_lib
+@subsection gitfan_lib
+@c lib gitfan.lib
+@c ----------------------------------------------------------
 @node polymake_lib
 @subsection polymake_lib
 @c lib polymake.lib
-
 @c ----------------------------------------------------------
 @node realizationMatroids_lib
 @subsection realizationMatroids_lib
@@ -1013,9 +1106,11 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node tropical_lib
 @subsection tropical_lib
-
 @c lib tropical.lib
-
+@c ----------------------------------------------------------
+@node tropicalNewton_lib
+@subsection tropicalNewton_lib
+@c lib tropicalNewton.lib
 @c ----------------------------------------------------------------------------
 @node  Miscellaneous libraries
 @section  Miscellaneous libraries
@@ -1024,8 +1119,8 @@ but not for serious computations.
 @menu
 * arr_lib:: algorithms for arrangements of hyperplanes
 * customstd_lib:: additional variants of std
-* phindex_lib::
-* polybori_lib::
+* phindex_lib:: index of real analytic vector fields
+* polybori_lib:: interface for PolyBoRi
 @end menu
 @c ----------------------------------------------------------
 @node arr_lib
@@ -1061,100 +1156,41 @@ see @ref{Libraries}.
 Comments should be send to the author of the library directly.
 
 @menu
-* arnoldclassify_lib:: Arnol'd Classifier of Singularities
 * autgradalg_lib:: automorphism groups of pointedly graded algebras and of Mori dream spaces
-* brillnoether_lib:: Riemann-Roch spaces of divisors on curves
-* chern_lib:: Symbolic Computations with Chern classes
-* cimonom_lib:: complete intersection for toric ideals
-* classify2_lib:: Classification of isolated singularties
-* classify_aeq_lib:: Simple Space Curve singularities in characteristic 0
-* classifyMapGerms_lib:: standard basis of the tangent space at the orbit of an algebraic group action
 * combinat_lib:: Some useful functions from combinatoric
-* curveInv_lib:: invariants of curves
-* deRham_lib:: Computation of deRham cohomology
 * difform_lib:: Procedures for differential forms
-* divisors_lib:: Divisors and P-Divisors
-* ffmodstd_lib::  Groebner bases in polynomial rings over rational function fields
 * finitediff_lib:: finite difference schemes for linear differential equations
-* gitfan_lib:: Compute GIT-fans
 * GND_lib:: General Neron Desingularization
 * goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
 * graal_lib:: localization at prime ideals and their associated graded rings
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
-* hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * methods_lib:: construction procedures
 * modules_lib:: Representations of Modules
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
 * nets_lib:: Pretty printing
-* nfmodstd_lib:: Groebner bases of ideals in rings over algebraic number fields
-* nfmodsyz_lib:: Syzygy modules of submodules of free modules over algebraic number fields
 * pfd_lib:: Multivartiate partial fraction decomposition
-* realclassify_lib:: Classification of real singularities
-* rootisolation_lib:: real root isolation with intervals
-* rstandard_lib:: Janet bases and border bases for ideals
+* qmatrix_lib:: Quantum matrices, quantum minors and symmetric groups
+* ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
-* schubert_lib:: Intersection Theory
+* sets_lib:: Sets
+* stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * swalk_lib:: Sagbi Walk Conversion Algorithm
-* tropicalNewton_lib:: Newton polygons in tropical geometry
+* systhreads_lib:: multi-threaded objects
 * VecField_lib:: vector fields
 @end menu
-@c ----------------------------------------------------------
-@node arnoldclassify_lib
-@subsection arnoldclassify_lib
-@c lib arnoldclassify.lib
 @c ----------------------------------------------------------
 @node autgradalg_lib
 @subsection autgradalg_lib
 @c lib autgradalg.lib
 @c ----------------------------------------------------------
-@node brillnoether_lib
-@subsection brillnoether_lib
-@c lib brillnoether.lib
-@c ----------------------------------------------------------
-@node chern_lib
-@subsection chern_lib
-@c lib chern.lib
-@c ----------------------------------------------------------
-@node cimonom_lib
-@subsection cimonom_lib
-@c lib cimonom.lib
-@c ----------------------------------------------------------
-@node classify2_lib
-@subsection classify2_lib
-@c lib classify2.lib
-@c ----------------------------------------------------------
-@node classify_aeq_lib
-@subsection classify_aeq_lib
-@c lib classify_aeq.lib
-@c ----------------------------------------------------------
-@node classifyMapGerms_lib
-@subsection classifyMapGerms_lib
-@c lib classifyMapGerms.lib
-@c ----------------------------------------------------------
 @node combinat_lib
 @subsection combinat_lib
 @c lib combinat.lib
 @c ----------------------------------------------------------
-@node curveInv_lib
-@subsection curveInv_lib
-@c lib curveInv.lib
-@c ----------------------------------------------------------
-@node deRham_lib
-@subsection deRham_lib
-@c lib deRham.lib
-@c ----------------------------------------------------------
 @node difform_lib
 @subsection difform_lib
 @c lib difform.lib
-@c ----------------------------------------------------------
-@node divisors_lib
-@subsection divisors_lib
-@c lib divisors.lib
-@c ----------------------------------------------------------
-@node ffmodstd_lib
-@subsection ffmodstd_lib
-@c lib ffmodstd.lib
 @c ----------------------------------------------------------
 @node finitediff_lib
 @subsection finitediff_lib
@@ -1181,10 +1217,6 @@ Issues:
 @subsection graal_lib
 @c lib graal.lib
 @c ----------------------------------------------------------
-@node gitfan_lib
-@subsection gitfan_lib
-@c lib gitfan.lib
-@c ----------------------------------------------------------
 @node GND_lib
 @subsection GND_lib
 @c lib GND.lib
@@ -1192,10 +1224,6 @@ Issues:
 @node gradedModules_lib
 @subsection gradedModules_lib
 @c lib gradedModules.lib
-@c ----------------------------------------------------------
-@node hess_lib
-@subsection hess_lib
-@c lib hess.lib
 @c ----------------------------------------------------------
 @node methods_lib
 @subsection methods_lib
@@ -1223,45 +1251,37 @@ Todos/Issues:
 @subsection nets_lib
 @c lib nets.lib
 @c ----------------------------------------------------------
-@node nfmodstd_lib
-@subsection nfmodstd_lib
-@c lib nfmodstd.lib
-@c ----------------------------------------------------------
-@node nfmodsyz_lib
-@subsection nfmodsyz_lib
-@c lib nfmodsyz.lib
-@c ----------------------------------------------------------
 @node pfd_lib
 @subsection pfd_lib
 @c lib pfd.lib
 @c ----------------------------------------------------------
-@node realclassify_lib
-@subsection realclassify_lib
-@c lib realclassify.lib
+@node qmatrix_lib
+@subsection qmatrix_lib
+@c lib qmatrix.lib
 @c ----------------------------------------------------------
-@node rootisolation_lib
-@subsection rootisolation_lib
-@c lib rootisolation.lib
-@c ----------------------------------------------------------
-@node rstandard_lib
-@subsection rstandard_lib
-@c lib rstandard.lib
+@node ringgb_lib
+@subsection ringgb_lib
+@c lib ringgb.lib
 @c ----------------------------------------------------------
 @node rwalk_lib
 @subsection rwalk_lib
 @c lib rwalk.lib
 @c ----------------------------------------------------------
-@node schubert_lib
-@subsection schubert_lib
-@c lib schubert.lib
+@node sets_lib
+@subsection sets_lib
+@c lib sets.lib
+@c ----------------------------------------------------------
+@node stanleyreisner_lib
+@subsection stanleyreisner_lib
+@c lib stanleyreisner.lib
 @c ---------------------------------------------------------
 @node swalk_lib
 @subsection swalk_lib
 @c lib swalk.lib
-@c ----------------------------------------------------------
-@node tropicalNewton_lib
-@subsection tropicalNewton_lib
-@c lib tropicalNewton.lib
+@c ---------------------------------------------------------
+@node systhreads_lib
+@subsection systhreads_lib
+@c lib systhreads.lib
 @c ---------------------------------------------------------
 @node VecField_lib
 @subsection VecField_lib

@@ -5,8 +5,8 @@
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
-//long all_farey=0L;
-//long farey_cnt=0L;
+long all_farey=0L;
+long farey_cnt=0L;
 
 #include "kernel/mod2.h"
 
@@ -35,6 +35,8 @@
 #include "kernel/linear_algebra/linearAlgebra.h"
 #include "kernel/linear_algebra/MinorInterface.h"
 
+#include "kernel/GBEngine/kChinese.h"
+
 #include "kernel/spectrum/GMPrat.h"
 #include "kernel/groebner_walk/walkProc.h"
 #include "kernel/oswrapper/timer.h"
@@ -58,6 +60,7 @@
 #include "Singular/subexpr.h"
 #include "Singular/lists.h"
 #include "Singular/maps_ip.h"
+#include "Singular/feOpt.h"
 
 #include "Singular/ipconv.h"
 #include "Singular/ipprint.h"
@@ -2118,7 +2121,15 @@ static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
   number vv=(number)v->Data();
   //timespec buf1,buf2;
   //clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf1);
-  res->data=(void*)id_Farey(uu,vv,currRing);
+  #if 1
+  #ifdef HAVE_VSPACE
+  int cpus = (long) feOptValue(FE_OPT_CPUS);
+  if ((cpus>1) && (rField_is_Q(currRing)))
+    res->data=(void*)id_Farey_0(uu,vv,currRing);
+  else
+  #endif
+  #endif
+    res->data=(void*)id_Farey(uu,vv,currRing);
   //clock_gettime(CLOCK_THREAD_CPUTIME_ID,&buf2);
   //const unsigned long SEC = 1000L*1000L*1000L;
   //all_farey+=((buf2.tv_sec-buf1.tv_sec)*SEC+
@@ -9760,7 +9771,15 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   else
   {
-    result=id_ChineseRemainder(x,q,rl,currRing); // deletes also x
+    #if 0
+    #ifdef HAVE_VSPACE
+    int cpus = (long) feOptValue(FE_OPT_CPUS);
+    if ((cpus>1) && (rField_is_Q(currRing)))
+      result=id_ChineseRemainder_0(x,q,rl,currRing); // deletes also x
+    else
+    #endif
+    #endif
+      result=id_ChineseRemainder(x,q,rl,currRing); // deletes also x
     c->Clean();
     if ((return_type==POLY_CMD) &&(result!=NULL))
     {

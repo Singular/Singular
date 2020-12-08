@@ -1,4 +1,5 @@
-// https://github.com/rbehrends/vspace
+#ifndef VSPACE_H
+#define VSPACE_H
 #include <fcntl.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -9,6 +10,9 @@
 #include <unistd.h>
 #include <assert.h>
 #include <new> // for placement new
+#include "kernel/mod2.h"
+
+#ifdef HAVE_VSPACE
 
 #if __cplusplus >= 201100
 #define HAVE_CPP_THREADS
@@ -740,6 +744,11 @@ public:
     memcpy(buffer, s, len);
     buffer[len] = '\0';
   }
+  VString(size_t len) {
+    _len = len;
+    _buffer = vnew_uninitialized_array<char>(len + 1);
+    _buffer[len] = '\0';
+  }
   ~VString() {
     _buffer.free();
   }
@@ -761,6 +770,11 @@ static inline VRef<VString> vstring(const char *s) {
 static inline VRef<VString> vstring(const char *s, size_t len) {
   return vnew<VString>(s, len);
 }
+
+static inline VRef<VString> vstring(size_t len) {
+  return vnew<VString>(len);
+}
+
 
 template <typename Spec>
 class VMap {
@@ -1324,3 +1338,5 @@ public:
 };
 
 }; // namespace vspace
+#endif
+#endif
