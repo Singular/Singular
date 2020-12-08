@@ -23,7 +23,8 @@
 New libraries:
 
 @itemize
-@item recover_lib: Hybrid numerical/symbolical algorithms (@nref{recover_lib})
+@item qmatrix.lib: Quantum matrices, quantum minors and symmetric groups (@nref{qmatrix_lib})
+@item recover.lib: Hybrid numerical/symbolical algorithms (@nref{recover_lib})
 @item redcgs.lib: Reduced Comprehensive Groebner Systems (@nref{redcgs_lib})
 @item ringgb.lib: coefficient rings (@nref{ringgb_lib})
 @item sets.lib: Sets (@nref{sets_lib})
