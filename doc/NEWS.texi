@@ -20,6 +20,17 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+New libraries:
+
+@itemize
+@item recover_lib: Hybrid numerical/symbolical algorithms (@nref{recover_lib})
+@item redcgs.lib: Reduced Comprehensive Groebner Systems (@nref{redcgs_lib})
+@item ringgb.lib: coefficient rings (@nref{ringgb_lib})
+@item sets.lib: Sets (@nref{sets_lib})
+@item stanleyreisner.lib: T1 and T2 for a general Stanley-Reiser ring (@nref{stanleyreisner_lib}
+@item systhreads.lib: multi-threaded objects (@nref{systhreads_lib})
+@end itemize
+
 Changed libraries:
 @itemize
 @item grobcov.lib: new version (@nref{grobcov_lib})

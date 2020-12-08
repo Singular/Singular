@@ -280,6 +280,7 @@ with the @code{--no-stdlib} command line option (see
 * parallel_lib:: Tools for parallelization
 * poly_lib:: procedures for manipulating polynomials and ideals
 * random_lib:: procedures of random/sparse  matrix and polynomial operations
+* redcgs_lib:: Reduced Comprehensive Groebner Systems
 * resources_lib:: Tools to manage the computational resources
 * ring_lib:: procedures for manipulating rings and maps
 * tasks_lib:: A parallel framework based on tasks
@@ -312,6 +313,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node grobcov_lib
 @subsection grobcov_lib
+@cindex Comprehensive Groebner Systems
 @c lib grobcov.lib
 @c ----------------------------------------------------------
 @node inout_lib
@@ -329,6 +331,12 @@ LIB "all.lib";
 @node poly_lib
 @subsection poly_lib
 @c lib poly.lib
+@c ----------------------------------------------------------
+@node redcgs_lib
+@subsection redcgs_lib
+@cindex Reduced Comprehensive Groebner Systems
+@cindex Comprehensive Groebner Systems
+@c lib redcgs.lib
 @c ----------------------------------------------------------
 @node random_lib
 @subsection random_lib
@@ -399,6 +407,7 @@ LIB "all.lib";
 * primitiv_lib:: procedures for finding a primitive element
 * realrad_lib:: procedures for finding the real radical
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
+* rstandard_lib:: Janet bases and border bases for ideals
 * sagbi_lib:: Subalgebras bases Analogous to Groebner bases for ideals
 * sing4ti2_lib:: interface to program 4ti2
 * symodstd_lib:: Groebner bases for symmetric ideals
@@ -525,6 +534,10 @@ LIB "all.lib";
 @node reesclos_lib
 @subsection reesclos_lib
 @c lib reesclos.lib
+@c ----------------------------------------------------------
+@node rstandard_lib
+@subsection rstandard_lib
+@c lib rstandard.lib
 @c ---------------------------------------------------------
 @node sagbi_lib
 @subsection sagbi_lib
@@ -561,6 +574,7 @@ LIB "all.lib";
 * resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
+* schubert_lib:: Intersection Theory
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 * JMBTest_lib:: performs J-Marked basis test
 * JMSConst_lib::  constructing J-Marked Schemes
@@ -648,6 +662,10 @@ iniD, reslist, sumlist, dividelist, createlist
 @node reszeta_lib
 @subsection reszeta_lib
 @c lib reszeta.lib
+@c ----------------------------------------------------------
+@node schubert_lib
+@subsection schubert_lib
+@c lib schubert.lib
 @c ---------------------------------------------------------
 @node sheafcoh_lib
 @subsection sheafcoh_lib
@@ -702,6 +720,8 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ----------------------------------------------------------
 @node arnoldclassify_lib
 @subsection arnoldclassify_lib
+@cindex SingularityDBM.lib
+@cindex SingularityDBM_lib
 @c lib arnoldclassify.lib
 @c ---------------------------------------------------------
 @node classify_lib
@@ -827,6 +847,7 @@ iniD, reslist, sumlist, dividelist, createlist
 * solve_lib:: procedures to solve polynomial systems
 * triang_lib:: procedures for decomposing zero-dimensional ideals
 * ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
+* recover_lib:: Hybrid numerical/symbolical algorithms
 * rootisolation_lib:: real root isolation with intervals
 * signcond_lib:: computing realizable sign conditions
 * zeroset_lib:: procedures for roots and factorization
@@ -852,6 +873,10 @@ iniD, reslist, sumlist, dividelist, createlist
 @node ntsolve_lib
 @subsection ntsolve_lib
 @c lib ntsolve.lib
+@c ---------------------------------------------------------
+@node recover_lib
+@subsection recover_lib
+@c lib recover.lib
 @c ----------------------------------------------------------
 @node rootisolation_lib
 @subsection rootisolation_lib
@@ -1052,6 +1077,7 @@ but not for serious computations.
 @menu
 * cimonom_lib:: complete intersection for toric ideals
 * gfan_lib:: A gfanlib interface for Singular
+* gitfan_lib:: Compute GIT-fans
 * polymake_lib:: interface to polymake and TOPCOM
 * realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * tropical_lib:: interface to gfan
@@ -1065,6 +1091,10 @@ but not for serious computations.
 @node gfan_lib
 @subsection gfan_lib
 @c lib gfan.lib
+@c ----------------------------------------------------------
+@node gitfan_lib
+@subsection gitfan_lib
+@c lib gitfan.lib
 @c ----------------------------------------------------------
 @node polymake_lib
 @subsection polymake_lib
@@ -1089,8 +1119,8 @@ but not for serious computations.
 @menu
 * arr_lib:: algorithms for arrangements of hyperplanes
 * customstd_lib:: additional variants of std
-* phindex_lib::
-* polybori_lib::
+* phindex_lib:: index of real analytic vector fields
+* polybori_lib:: interface for PolyBoRi
 @end menu
 @c ----------------------------------------------------------
 @node arr_lib
@@ -1130,7 +1160,6 @@ Comments should be send to the author of the library directly.
 * combinat_lib:: Some useful functions from combinatoric
 * difform_lib:: Procedures for differential forms
 * finitediff_lib:: finite difference schemes for linear differential equations
-* gitfan_lib:: Compute GIT-fans
 * GND_lib:: General Neron Desingularization
 * goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
 * graal_lib:: localization at prime ideals and their associated graded rings
@@ -1141,10 +1170,12 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * nets_lib:: Pretty printing
 * pfd_lib:: Multivartiate partial fraction decomposition
-* rstandard_lib:: Janet bases and border bases for ideals
+* ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
-* schubert_lib:: Intersection Theory
+* sets_lib:: Sets
+* stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * swalk_lib:: Sagbi Walk Conversion Algorithm
+* systhreads_lib:: multi-threaded objects
 * VecField_lib:: vector fields
 @end menu
 @c ----------------------------------------------------------
@@ -1185,10 +1216,6 @@ Issues:
 @subsection graal_lib
 @c lib graal.lib
 @c ----------------------------------------------------------
-@node gitfan_lib
-@subsection gitfan_lib
-@c lib gitfan.lib
-@c ----------------------------------------------------------
 @node GND_lib
 @subsection GND_lib
 @c lib GND.lib
@@ -1227,21 +1254,29 @@ Todos/Issues:
 @subsection pfd_lib
 @c lib pfd.lib
 @c ----------------------------------------------------------
-@node rstandard_lib
-@subsection rstandard_lib
-@c lib rstandard.lib
+@node ringgb_lib
+@subsection ringgb_lib
+@c lib ringgb.lib
 @c ----------------------------------------------------------
 @node rwalk_lib
 @subsection rwalk_lib
 @c lib rwalk.lib
 @c ----------------------------------------------------------
-@node schubert_lib
-@subsection schubert_lib
-@c lib schubert.lib
+@node sets_lib
+@subsection sets_lib
+@c lib sets.lib
+@c ----------------------------------------------------------
+@node stanleyreisner_lib
+@subsection stanleyreisner_lib
+@c lib stanleyreisner.lib
 @c ---------------------------------------------------------
 @node swalk_lib
 @subsection swalk_lib
 @c lib swalk.lib
+@c ---------------------------------------------------------
+@node systhreads_lib
+@subsection systhreads_lib
+@c lib systhreads.lib
 @c ---------------------------------------------------------
 @node VecField_lib
 @subsection VecField_lib
