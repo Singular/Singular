@@ -2194,7 +2194,7 @@ RETURN:  intmat, all lattice points on the relative boundary of p
 EXAMPLE: example boundaryLatticePoints; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2219,7 +2219,7 @@ RETURN:  intvec, all lattice points on the relative boundary of p
 EXAMPLE: example ehrhartPolynomialCoeff; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2241,7 +2241,7 @@ RETURN:  intvec, the f-vector or p
 EXAMPLE: example fVectorP; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2263,7 +2263,7 @@ RETURN:  intmat, encodes the lattice distances between vertices (columns) and fa
 EXAMPLE: example facetVertexLatticeDistances; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2284,7 +2284,7 @@ RETURN:  int, maximal integral width going over all facet normals
 EXAMPLE: example facetWidth; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2305,7 +2305,7 @@ RETURN:  intvec, vector with the integral widths of all facet normals
 EXAMPLE: example facetWidths; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2327,7 +2327,7 @@ NOTE:    the translation v can be computed via gorensteinVector(p)
 EXAMPLE: example gorensteinIndex; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2345,7 +2345,7 @@ NOTE:    the factor n can be computed via gorensteinIndex(p)
 EXAMPLE: example gorensteinVector; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2361,7 +2361,7 @@ RETURN:  intvec, the h* vector of p
 EXAMPLE: example hStarVector; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2384,7 +2384,7 @@ RETURN:  intvec, the h vector of p
 EXAMPLE: example hVector; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2407,7 +2407,7 @@ RETURN:  intmat, the Hilbert basis of c intersected with Z^n
 EXAMPLE: example hilbertBasis; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2427,7 +2427,7 @@ RETURN:  intmat, all lattice points in the relative interior of p
 EXAMPLE: example interiorLatticePoints; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2451,7 +2451,7 @@ RETURN:  1, if p is bounded; 0 otherwise
 EXAMPLE: example isBounded; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2478,7 +2478,7 @@ RETURN:  1, if p has exactly one interior lattice point; 0 otherwise
 EXAMPLE: example isCanonical; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2507,7 +2507,7 @@ RETURN:  1, if p has maximal facet width 1; 0 otherwise
 EXAMPLE: example isCompressed; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2534,7 +2534,7 @@ RETURN:  1, if p is Gorenstein, i.e. reflexive modulo dilatation and translation
 EXAMPLE: example isGorenstein; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2560,7 +2560,7 @@ RETURN:  1, if p contains no lattice points other than the vertices; 0 otherwise
 EXAMPLE: example isLatticeEmpty; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2587,7 +2587,7 @@ RETURN:  1, if the projective toric variety defined by p is projectively normal;
 EXAMPLE: example isNormal; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2609,7 +2609,7 @@ RETURN:  1, if p is reflexive; 0 otherwise
 EXAMPLE: example isReflexive; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2638,7 +2638,7 @@ RETURN:  1, if the input is smooth; 0 otherwise
 EXAMPLE: example isSmooth; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2681,7 +2681,7 @@ RETURN:  1, if p has exactly one interior lattice point and all other lattice po
 EXAMPLE: example isTerminal; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2714,7 +2714,7 @@ RETURN:  1, if p is very ample; 0 otherwise
 EXAMPLE: example isVeryAmple; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2740,7 +2740,7 @@ NOTE:    dimension(p)+1==latticeDegree(p)+latticeCodegree(p)
 EXAMPLE: example latticeCodegree; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2768,7 +2768,7 @@ NOTE:    dimension(p)+1==latticeDegree(p)+latticeCodegree(p)
 EXAMPLE: example latticeDegree; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2796,7 +2796,7 @@ RETURN:  intmat, all lattice points in p
 EXAMPLE: example latticePoints; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2821,7 +2821,7 @@ RETURN:  int, the lattice volume of p
 EXAMPLE: example latticeVolume; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2858,7 +2858,7 @@ NOTE:    the maximal face is independent of the first coordinate of v
 EXAMPLE: example maximalFace; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2883,7 +2883,7 @@ NOTE:    first coordinate of v corresponds to a shift of the maximal value
 EXAMPLE: example maximalValue; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2908,7 +2908,7 @@ NOTE:    the minimal face is independent of the first coordinate of v
 EXAMPLE: example minimalFace; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2933,7 +2933,7 @@ NOTE:    first coordinate of v corresponds to a shift of the minimal value
 EXAMPLE: example minimalValue; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2960,7 +2960,7 @@ RETURN:  cone, if both inputs are cones; polytope, otherwise
 EXAMPLE: example minkowskiSum; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -2985,7 +2985,7 @@ RETURN:  int, the number of lattice points in the relative boundary of p
 EXAMPLE: example nBoundaryLatticePoints; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -3009,7 +3009,7 @@ RETURN:  int, the number of elements in the Hilbert basis of c intersected with 
 EXAMPLE: example nHilbertBasis; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -3029,7 +3029,7 @@ RETURN:  int, the number of lattice points in the relative interior of p
 EXAMPLE: example nInteriorLatticePoints; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -3054,7 +3054,7 @@ RETURN:  intmat, the number of lattice points in p
 EXAMPLE: example nLatticePoints; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -3078,7 +3078,7 @@ RETURN:  fan, the normal fan of p
 EXAMPLE: example normalFan; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -3102,7 +3102,7 @@ RETURN:  list, the first entry is a bigintmat containing all vertices as row vec
 EXAMPLE: example vertexAdjacencyGraph; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -3126,7 +3126,7 @@ RETURN:  list, the first entry is a bigintmat containing all vertices as row vec
 EXAMPLE: example vertexEdgeGraph; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
@@ -3151,7 +3151,7 @@ RETURN:  none
 EXAMPLE: example visual; shows an example
 "
 {
-
+ ERROR("polymake.so not loaded");
 }
 example
 {
