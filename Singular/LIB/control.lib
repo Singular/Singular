@@ -305,7 +305,7 @@ static proc Ext_Our(int i, module R, list #)
 //------------------------------------------------------------------------
 static proc is_zero_Our
 {
-  //just a copy of 'is_zero' from "poly.lib" patched with GKdim
+  //just a copy of 'is_zero' from "polylib.lib" patched with GKdim
   int d = dim_Our(std(#[1]));
   int a = ( d==-1 );
   if( size(#) >1 ) { list L=a,d; return(L); }
