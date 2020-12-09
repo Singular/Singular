@@ -20,10 +20,10 @@ Homomorphism                class of homomorphisms
 PROCEDURES:
 T1(ideal)                   compute first order deformations
 T2(ideal)                   compute second order deformations
-makePoly(poly)              creat a Poly
-fPiece(ideal,poly,poly)             creat a FirstOrderDeformation
-sPiece(ideal,poly,poly)              creat a SecondOrderDeformation
-makeLinks(ideal,poly,poly)  creat a FirstOrderDeformation of the links
+makePoly(poly)              create a Poly
+fPiece(ideal,poly,poly)     create a FirstOrderDeformation
+sPiece(ideal,poly,poly)     create a SecondOrderDeformation
+makeLinks(ideal,poly,poly)  create a FirstOrderDeformation of the links
 
 ";
 
@@ -60,7 +60,7 @@ EXAMPLE: example printFirstOrderDeformation, shows an example"
   list rule=phi.rule;
   ideal source=phi.source;
   setring Rcurrent;
-  //string(phi.source) + "  ->  "+ string (phi.rule);
+  string(phi.source) + "  ->  "+ string (phi.rule);
   nameof(phi)+".source" +"  ->  "+ nameof(phi)+".over"+" / "+ nameof(phi)+".source";
   //nameof(phi.source) +"  ->  "+ nameof(phi.rule)+ " / " nameof(phi.source);
   // print monomial -> lambda * monomial ....
@@ -68,11 +68,12 @@ EXAMPLE: example printFirstOrderDeformation, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x1,x2,x3,x4,x5),lp;
  ideal I = x1*x2,x2*x3,x3*x4,x4*x5,x5*x1;
  list L = T1(I);
  L[1];
+ L;
 }
 
 
@@ -90,11 +91,12 @@ EXAMPLE: example printSecondOrderDeformation, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x1,x2,x3,x4,x5),lp;
  ideal I = x1*x2,x2*x3,x3*x4,x4*x5,x5*x1;
  list L = T2(I);
  L[1];
+ L;
 }
 
 
@@ -116,7 +118,7 @@ EXAMPLE: example printLinksDeformation, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(2)*x(3);
  LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
@@ -141,7 +143,7 @@ EXAMPLE: example printPoly, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring r=0,(x,y,z),lp;
  ideal i=xy;
  qring Q=std(i);
@@ -169,7 +171,7 @@ EXAMPLE: example makePoly; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring r=0,(x,y,z),lp;
  ideal i=xy;
  qring Q=std(i);
@@ -203,10 +205,11 @@ EXAMPLE: example addPolys; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(2)*x(3);
  LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
+ L;
 }
 
 
@@ -235,10 +238,11 @@ EXAMPLE: example fPiece; shows an example
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:";echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
- FirstOrderDeformation phi=fPiece(i,x(4)^2,x(1)*x(0));
+ FirstOrderDeformation phi=fPiece(i,x(4)^2,x(1)*x(2));
+ phi;
 }
 
 
@@ -266,10 +270,11 @@ EXAMPLE: example sPiece; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
  SecondOrderDeformation psi=sPiece(i,x(4)^2,x(1)*x(0));
+ psi;
 }
 
 
@@ -309,10 +314,11 @@ EXAMPLE: example T1; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
  list L=T1(i);
+ L;
 }
 
 
@@ -353,10 +359,11 @@ EXAMPLE: example T2; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
  list L=T2(i);
+ L;
 }
 
 
@@ -382,10 +389,11 @@ EXAMPLE: example T2; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
  LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
+ L;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
