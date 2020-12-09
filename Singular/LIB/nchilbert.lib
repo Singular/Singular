@@ -72,7 +72,7 @@ EXAMPLE:    example ncHilb;
      }
     }
     def Rhelp= ringlist(R);
-    ideal LI = lead(I);
+    module LI = lead(I);
     list L = Rhelp[1],Rhelp[2],Rhelp[3],Rhelp[4];
     // Question: in case of GR-algebra, do we need to replace the factor ideal
     // by its gr-part? Answer: no
