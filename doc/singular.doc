@@ -1255,6 +1255,10 @@ Todos/Issues:
 @subsection pfd_lib
 @c lib pfd.lib
 @c ----------------------------------------------------------
+@node polyclass_lib
+@subsection polyclass_lib
+@c lib polyclass.lib
+@c ----------------------------------------------------------
 @node ringgb_lib
 @subsection ringgb_lib
 @c lib ringgb.lib
