@@ -1,4 +1,4 @@
-version="version systhreads.lib 0.1.0.0 Aug_2016";
+version="version systhreads.lib 0.1.0.0 Aug_2016 ";
 category="General purpose";
 info="
 LIBRARY: systhreads.lib Primitives for Singular's multi-threaded objects
