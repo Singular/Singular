@@ -1170,7 +1170,6 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * nets_lib:: Pretty printing
 * pfd_lib:: Multivartiate partial fraction decomposition
-* qmatrix_lib:: Quantum matrices, quantum minors and symmetric groups
 * ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
 * sets_lib:: Sets
@@ -1254,10 +1253,6 @@ Todos/Issues:
 @node pfd_lib
 @subsection pfd_lib
 @c lib pfd.lib
-@c ----------------------------------------------------------
-@node qmatrix_lib
-@subsection qmatrix_lib
-@c lib qmatrix.lib
 @c ----------------------------------------------------------
 @node ringgb_lib
 @subsection ringgb_lib
