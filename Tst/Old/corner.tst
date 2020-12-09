@@ -1,7 +1,7 @@
 //
 // test script for maxdeg command
 //
-LIB"poly.lib";
+LIB"polylib.lib";
 ring r1 = 32003,(x,y,z),(c,ds);
 option(prot);
 r1;

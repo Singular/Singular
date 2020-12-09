@@ -25,7 +25,7 @@ PROCEDURES:
 ";
 LIB "classify.lib";
 LIB "classify_aeq.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "curvepar.lib";
 LIB "algebra.lib";
 

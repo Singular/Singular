@@ -19,7 +19,7 @@ PROCEDURES:
 
 LIB "inout.lib";
 LIB "general.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 

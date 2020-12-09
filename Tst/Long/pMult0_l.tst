@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "poly.lib";
+LIB "polylib.lib";
 
 list tst_rgen_simple_orderings = list("lp", "dp", "ls", "ds");
 intvec tst_rgen_products = 1;

@@ -203,7 +203,7 @@ example
     print(G);
     ncHilbertMultiplicity(G);
 }
-//copied from poly.lib
+//copied from polylib.lib
 static proc bino(int a, int b)
 {
 //computes binomial var(1)+a over b
@@ -226,11 +226,11 @@ ASSUME:
 - the weights of all the ring variables are positive
 NOTE:
 - the procedure returns an univariate ring and a polynomial called @code{ncHP} in it.
-SEE ALSO: hilbPoly in poly.lib
+SEE ALSO: hilbPoly in polylib.lib
 EXAMPLE:  example ncHilbertPolynomial;
 "
 {
-    //code is similar to hilbpoly in poly.lib
+    //code is similar to hilbpoly in polylib.lib
     // note, that ALL assumes are checked by the procedure ncHilb
     def R=basering;
     int i;

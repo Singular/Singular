@@ -36,7 +36,7 @@ EXAMPLE: example monomialabortstd; shows an example
 }
 example
 { "EXAMPLE:"; echo=2;
-  LIB "poly.lib";
+  LIB "polylib.lib";
   ring r = 0,(x,y,z,u,v),dp;
   // yields normal standard basis since no monomial is found
   ideal I = homog(cyclic(4),v);

@@ -1,4 +1,4 @@
-LIB "poly.lib";
+LIB "polylib.lib";
 example cyclic;
 example freerank;
 example is_zero;

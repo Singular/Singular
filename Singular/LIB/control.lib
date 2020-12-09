@@ -32,7 +32,7 @@ PROCEDURES:
 ";
 
 LIB "homolog.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "primdec.lib";
 LIB "matrix.lib";
 

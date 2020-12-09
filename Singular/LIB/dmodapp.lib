@@ -148,7 +148,7 @@ LIB "dmod.lib";     // for SannfsBM etc
 LIB "general.lib";  // for sort
 LIB "gkdim.lib";
 LIB "nctools.lib";  // for isWeyl etc
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "primdec.lib";  // for primdecGKZ
 LIB "qhmoduli.lib"; // for Max
 LIB "sing.lib";     // for slocus

@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r = 0,x, dp;
 number n = 3/2;
 denominator(n);

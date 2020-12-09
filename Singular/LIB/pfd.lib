@@ -45,7 +45,7 @@ LIB "random.lib";
 LIB "ring.lib";
 LIB "parallel.lib";
 LIB "elim.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 
 /////////////////////////////////////////////////////////////////////////////
 

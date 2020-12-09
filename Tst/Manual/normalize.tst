@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r = 0,(x,y,z),ls;
 poly f = 2x5+3y2+4z3;
 normalize(f);

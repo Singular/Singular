@@ -33,7 +33,7 @@ isAntiEndo(F);   check whether a map F in an antiendomorphism.
 
 LIB "nctools.lib";
 LIB "ncalg.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "primdec.lib";
 LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////

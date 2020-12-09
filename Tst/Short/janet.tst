@@ -6,7 +6,7 @@ ideal i=x*y*z-1,x+y+z,x*y+x*z+y*z; // cyclic 3
 janet(i);
 
 ring r=0,(x(1..5)),dp;
-LIB "poly.lib";
+LIB "polylib.lib";
 ideal i=cyclic(5);
 ideal j=janet(i);
 ideal s=std(j);

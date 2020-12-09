@@ -336,7 +336,7 @@ std_range(2,5, 0, global_orderings);
 
 std_range(6,10, 0,list("dp"));
 tst_status(1);$
-LIB "poly.lib";
+LIB "polylib.lib";
 killall();
 killall("proc");
 exit;

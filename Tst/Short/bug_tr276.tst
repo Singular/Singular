@@ -2,7 +2,7 @@ LIB "tst.lib";
 tst_init();
 
 option(noredefine);option(redSB);
-LIB "matrix.lib";LIB "involut.lib";LIB "nctools.lib";LIB "poly.lib";LIB "finvar.lib";
+LIB "matrix.lib";LIB "involut.lib";LIB "nctools.lib";LIB "polylib.lib";LIB "finvar.lib";
 int homalg_variable_i; int homalg_variable_j; int homalg_variable_k; list homalg_variable_l;
 
 

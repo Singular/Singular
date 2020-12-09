@@ -41,7 +41,7 @@ modNormal(I);        normalization of R/I using modular methods
 
 ";
 
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "ring.lib";
 LIB "normal.lib";
 LIB "modstd.lib";

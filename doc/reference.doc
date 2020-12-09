@@ -4038,7 +4038,7 @@ identifier of type package.
   listvar(r);
   listvar(t1);
   listvar(proc);
-  LIB "poly.lib";
+  LIB "polylib.lib";
   listvar(Poly);
 @c example
 @end smallexample

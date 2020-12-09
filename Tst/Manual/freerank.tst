@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r;
 ideal i=x;
 module M=[x,0,1],[-x,0,-1];

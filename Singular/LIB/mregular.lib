@@ -32,7 +32,7 @@ PROCEDURES:
 LIB "general.lib";
 LIB "algebra.lib";
 LIB "sing.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 //////////////////////////////////////////////////////////////////////////////
 //
 proc regIdeal (ideal i, list #)

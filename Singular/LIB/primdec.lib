@@ -54,7 +54,7 @@ KEYWORDS: primary decomposition
 
 LIB "general.lib";
 LIB "elim.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "random.lib";
 LIB "inout.lib";
 LIB "matrix.lib";

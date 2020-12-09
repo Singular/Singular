@@ -4,7 +4,7 @@
 
 LIB "tst.lib";
 
-LIB "poly.lib";
+LIB "polylib.lib";
 
 tst_init();
 

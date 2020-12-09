@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r=0,(x,y,z),dp;
 ideal i=x^2+x*y^2,x*y+x^2*y,z;
 ideal j=x^2+x*y^2,x*y,z;

@@ -138,7 +138,7 @@ paramet.lib     Thomas Keilen                   keilen@mathematik.uni-kl.de
 perron.lib      Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 phindex.lib
 pointid.lib     Stefan Steidel                  steidel@mathematik.uni-kl.de
-poly.lib        Olaf Bachmann                   obachman@mathematik.uni-kl.de
+polylib.lib     Olaf Bachmann                   obachman@mathematik.uni-kl.de
                 Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Anne Fruehbis-Krueger           anne@mathematik.uni-kl.de
 polymake.lib    Thomas Markwig                  keilen@mathematik.uni-kl.de

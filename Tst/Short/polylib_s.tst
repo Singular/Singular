@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "poly.lib";
+LIB "polylib.lib";
 
 example cyclic;
 

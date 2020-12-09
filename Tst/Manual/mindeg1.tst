@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r = 0,(x,y,z),ls;
 poly f = x5+y2+z3;
 ord(f);                  // ord returns weighted order of leading term!

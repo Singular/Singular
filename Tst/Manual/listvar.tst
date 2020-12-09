@@ -11,6 +11,6 @@ LIB "tst.lib"; tst_init();
   listvar(r);
   listvar(t1);
   listvar(proc);
-  LIB "poly.lib";
-  listvar(Poly);
+  LIB "polylib.lib";
+  listvar(Polylib);
 tst_status(1);$
