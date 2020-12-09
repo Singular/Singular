@@ -41,16 +41,6 @@ poly p_Divide(poly p, poly q, const ring r)
     p_Delete(&q,r);
     return NULL;
   }
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(r))
-  {
-    if (!rField_is_Domain(r))
-    {
-      WerrorS("division only defined over coefficient domains");
-      return NULL;
-    }
-  }
-#endif
   if ((pNext(q)!=NULL)||rIsNCRing(r))
   { /* This means that q != 0 consists of at least two terms*/
     if(p_GetComp(p,r)==0)
