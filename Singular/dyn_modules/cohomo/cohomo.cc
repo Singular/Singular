@@ -5277,7 +5277,7 @@ void firstorderdef_setup(SModulFunctions* p)
   p->iiAddCproc("","findaset",FALSE,fa);
   p->iiAddCproc("","fgp",FALSE,fgp);
   p->iiAddCproc("","fgpl",FALSE,fgpl);
-  p->iiAddCproc("","idcomplements",FALSE,idcomplement);
+  p->iiAddCproc("","idcomplement",FALSE,idcomplement);
   p->iiAddCproc("","genst",FALSE,genstt);
   p->iiAddCproc("","sgp",FALSE,sgp);
   p->iiAddCproc("","sgpl",FALSE,sgpl);
