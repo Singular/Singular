@@ -5325,7 +5325,7 @@ void firstorderdef_setup(SModulFunctions* p)
 
 
 
-extern "C" int SI_MOD_INIT0(cohomo)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(cohomo)(SModulFunctions* p)
 {
   firstorderdef_setup(p);
   return MAX_TOK;
