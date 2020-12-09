@@ -144,7 +144,7 @@ example
  "EXAMPLE:";
  ring r=0,(x,y,z),lp;
  ideal i=xy;
- qring q=std(i);
+ qring Q=std(i);
  poly p=x*y+z;
  Poly q=makePoly(p);
  q;
@@ -172,7 +172,7 @@ example
  "EXAMPLE:";
  ring r=0,(x,y,z),lp;
  ideal i=xy;
- qring q=std(i);
+ qring Q=std(i);
  poly p=x*y+z;
  Poly q=makePoly(p);
  q.over;
