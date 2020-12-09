@@ -23,7 +23,8 @@
 New libraries:
 
 @itemize
-@item maxlike.lib: algabrric statistics (@nref{maxlike_lib})
+@item interval.lib: interval arithmetic (@nref{interval_lib})
+@item maxlike.lib: algebraic statistics (@nref{maxlike_lib})
 @item nchilbert.lib: Hilbert series for LetterPlace algebras (@nref{nchilbert_lib})
 @item polyclass.lib: class of polynomials (@nref{polyclass_lib})
 @item recover.lib: Hybrid numerical/symbolical algorithms (@nref{recover_lib})

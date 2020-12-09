@@ -858,6 +858,10 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection ffsolve_lib
 @c lib ffsolve.lib
 @c ---------------------------------------------------------
+@node interval_lib
+@subsection interval_lib
+@c lib interval.lib
+@c ---------------------------------------------------------
 @node presolve_lib
 @subsection presolve_lib
 @c lib presolve.lib
