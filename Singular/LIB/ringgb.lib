@@ -109,7 +109,7 @@ EXAMPLE: example testZero; shows an example
   printf("Teste %s Belegungen ...", modul^nvars(basering));
   for (; i < modul^nvars(basering); i = i + 1)
   {
-    if ((i + 1) % modul^(nvars(basering)/2) == 0)
+    if ((i + 1) % modul^(nvars(basering) div 2) == 0)
     {
       printf("bisher: %s", i);
     }
