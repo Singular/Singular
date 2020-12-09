@@ -1225,6 +1225,10 @@ Issues:
 @subsection gradedModules_lib
 @c lib gradedModules.lib
 @c ----------------------------------------------------------
+@node maxlike_lib
+@subsection maxlike_lib
+@c lib maxlike.lib
+@c ----------------------------------------------------------
 @node methods_lib
 @subsection methods_lib
 @c lib methods.lib

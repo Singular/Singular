@@ -32,6 +32,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * ncdecomp_lib::  Algorithmic decomposition of a module with central characters
 * ncfactor_lib::  Tools for factorization in some noncommutative algebras
 * ncfrac_lib:: fractions in Ore localizations of a G-algebras
+* nchilbert_lib:: Hilbert series for LetterPlace
 * nchomolog_lib:: Noncommutative Homological Algebra
 * ncloc_lib:: Ore-localization in G-Algebras
 * ncModslimgb_lib:: modular slimgb for Groebner bases in G-algebras
@@ -95,6 +96,10 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @node ncfactor_lib
 @section ncfactor_lib
 @c lib ncfactor.lib
+@c ----------------------------------------------------------
+@node nchilbert_lib
+@section nchilbert_lib
+@c lib nchilbert.lib
 @c ----------------------------------------------------------
 @c @node bimodules_lib
 @c @section bimodules_lib
