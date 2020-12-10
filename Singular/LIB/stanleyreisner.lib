@@ -20,7 +20,7 @@ Homomorphism                class of homomorphisms
 PROCEDURES:
 T1(ideal)                   compute first order deformations
 T2(ideal)                   compute second order deformations
-makePoly(poly)              create a Poly
+makeQPoly(poly)             create a QPoly
 fPiece(ideal,poly,poly)     create a FirstOrderDeformation
 sPiece(ideal,poly,poly)     create a SecondOrderDeformation
 makeLinks(ideal,poly,poly)  create a FirstOrderDeformation of the links
@@ -35,13 +35,13 @@ static proc mod_init()
   LIB "cohomo.so";
   newstruct("FirstOrderDeformation","ideal source, ideal gens, ring over, list dgs, list rule, qring target ");
   newstruct("SecondOrderDeformation","ideal source, list relations, list lamda, list dgs");
-  newstruct("Poly","poly value, qring over");
+  newstruct("QPoly","poly value, qring over");
   newstruct("LinksDeformation","ideal links, poly a, FirstOrderDeformation FirstDeformation, SecondOrderDeformation SecondDeformation");
   system("install","FirstOrderDeformation","print",printFirstOrderDeformation,1);
   system("install","SecondOrderDeformation","print",printSecondOrderDeformation,1);
   system("install","LinksDeformation","print",printLinksDeformation,1);
-  system("install","Poly","+",addPolys,2);
-  system("install","Poly","print",printPoly,1);
+  system("install","QPoly","+",addQPolys,2);
+  system("install","QPoly","print",printQPoly,1);
 }
 
 
@@ -128,12 +128,12 @@ example
 
 
 
-proc printPoly(Poly f)
-"USAGE:  printPoly(f); f = Poly.
+proc printQPoly(QPoly f)
+"USAGE:  printQPoly(f); f = QPoly.
 ASSUME:  f is a polynomial in quotient ring.
 RETURN:  print the polynomial in the quotient ring.
-KEYWORDS: Poly, quotient ring.
-EXAMPLE: example printPoly, shows an example"
+KEYWORDS: QPoly, quotient ring.
+EXAMPLE: example printQPoly, shows an example"
 {
   def Rold = basering;
   def Rcurrent = f.over;
@@ -148,22 +148,22 @@ example
  ideal i=xy;
  qring Q=std(i);
  poly p=x*y+z;
- Poly q=makePoly(p);
+ QPoly q=makeQPoly(p);
  q;
 }
 
 
 
-proc makePoly(poly p)
-"USAGE:  makePoly(p); p = polynomial.
+proc makeQPoly(poly p)
+"USAGE:  makeQPoly(p); p = polynomial.
 ASSUME:  p is a polynomial in basering.
-RETURN:  a Poly which is in a quotient ring.
+RETURN:  a QPoly which is in a quotient ring.
 THEORY:  The procedure will convert a polynomial in basering to a polynomial in a quotient ring.
-KEYWORDS: Poly, quotient ring.
-EXAMPLE: example makePoly; shows an example"
+KEYWORDS: QPoly, quotient ring.
+EXAMPLE: example makeQPoly; shows an example"
 {
   def rc=basering;
-  Poly P;
+  QPoly P;
   P.over=rc;
   //option(redSB);
   P.value=reduce(p,std(0));
@@ -176,20 +176,20 @@ example
  ideal i=xy;
  qring Q=std(i);
  poly p=x*y+z;
- Poly q=makePoly(p);
+ QPoly q=makeQPoly(p);
  q.over;
  q.value;
 }
 
 
 
-proc addPolys(Poly f, Poly g)
-"USAGE:  addPolys(f,g); f = Poly, g = Poly.
+proc addQPolys(QPoly f, QPoly g)
+"USAGE:  addQPolys(f,g); f = QPoly, g = QPoly.
 ASSUME:  f and g are the polynomials in a quotient ring.
 RETURN:  the sum of f and g in the quotient ring.
 THEORY:  The procedure will compute the normal form of f+g.
-KEYWORDS: Poly
-EXAMPLE: example addPolys; shows an example"
+KEYWORDS: QPoly
+EXAMPLE: example addQPolys; shows an example"
 {
   def Rold = basering;
   def Rcurrent = f.over;
@@ -197,7 +197,7 @@ EXAMPLE: example addPolys; shows an example"
   poly ff = f.value;
   poly gg = g.value;
   poly ffplusgg = ff+gg;
-  Poly fplusg;
+  QPoly fplusg;
   fplusg.value = ffplusgg;
   fplusg.over = Rcurrent;
   setring Rold;
