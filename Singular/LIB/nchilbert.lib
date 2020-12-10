@@ -226,7 +226,7 @@ ASSUME:
 - the weights of all the ring variables are positive
 NOTE:
 - the procedure returns an univariate ring and a polynomial called @code{ncHP} in it.
-SEE ALSO: hilbPoly in polylib.lib
+SEE ALSO: hilbPoly
 EXAMPLE:  example ncHilbertPolynomial;
 "
 {
@@ -358,7 +358,7 @@ RETURN: int
 PURPOSE: computes the Gelfand-Kirillov-Dimension of coker(M) via Exp(M)
 ASSUME: basering is G-Algebra
 NOTE:  for zero module -1 is returned
-SEE ALSO:   GKdim, dim(Plural)
+SEE ALSO:   GKdim, dim (plural)
 KEYWORDS: Gelfand-Kirillov dimension, G-Algebra
 EXAMPLE: example GKExp;
 "
