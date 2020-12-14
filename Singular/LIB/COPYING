@@ -1,4 +1,4 @@
-                        SINGULAR version 4-1
+                        SINGULAR version 4-2
                          Singular-libraries
 
                      University of Kaiserslautern
@@ -176,7 +176,7 @@ sheafcoh.lib    Wolfram Decker                  decker@mathematik.uni-kl.de
 signcond.lib    Enrique A. Tobis                etobis@dc.uba.ar
 sing.lib        Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Bernd Martin                    martin@math.tu-cottbus.de
-solve.lib        Moritz Wenk                    wenk@mathematik.uni-kl.de
+solve.lib       Moritz Wenk                     wenk@mathematik.uni-kl.de
 spcurve.lib     Anne Fruehbis-Krueger           anne@mathematik.uni-kl.de
 spectrum.lib    S. Endrass
 standard.lib    Olaf Bachmann                   obachman@mathematik.uni-kl.de

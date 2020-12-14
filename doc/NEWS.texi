@@ -20,6 +20,12 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+
+Syntax changes:
+@itemize
+@item renamed poly.lib to polylib.lib (@nref{polylib_lib})
+@end itemize
+
 New libraries:
 
 @itemize
@@ -37,19 +43,20 @@ New libraries:
 
 Changed libraries:
 @itemize
-@item grobcov.lib: new version (@nref{grobcov_lib})
 @item classify_aeq.lib: new procedure @code{classSpaceCurve} (@nref{classify_aeq_lib})
+@item grobcov.lib: new version (@nref{grobcov_lib})
+@item modular.lib: parallel version for verification via @code{system("verifyGB",I)}
 @end itemize
 
 New command:
 @itemize
-@item @code{system("verifyGB",I)}: test, if I is a Groebner basis
+@item @code{system("verifyGB",I)}: test, if I is a Groebner basis (using parallel processes)
 @end itemize
 
 Changes in the kernel/build system:
 @itemize
 @item Letterplace: modulo,syz,lift,liftstd (@nref{LETTERPLACE})
-@item FLINT 2.6.x, prepare for FLINT 2.7.0
+@item update for using FLINT 2.6.x and for FLINT 2.7.0
 @item Singular can be build with NTL or FLINT or both
 (if non is availabel, @code{factroize} and @code{gcd} will not work.)
 @end itemize

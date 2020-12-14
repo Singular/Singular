@@ -1,4 +1,4 @@
-AC_INIT([libpolys], [4.1.3])
+AC_INIT([libpolys], [4.2.0])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])

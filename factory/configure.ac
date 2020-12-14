@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_INIT([factory], [4.1.3])
+AC_INIT([factory], [4.2.0])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
