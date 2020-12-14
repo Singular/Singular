@@ -235,5 +235,14 @@ There is a 32bit and a 64bit version of Cygwin.
 @cindex howto, install on Macintosh
 
 @strong{Installation of the provided binaries}
-@url{https://www.singular.uni-kl.de/index.php/singular-download/install-mac-os.html}
+@url{https://www.singular.uni-kl.de/index.php/singular-download/install-os-x.html}
+
+If your Mac refuses to open Singular because of an "unidentified developer":
+Open System Preferences. Go to the Security & Privacy tab. Click on
+the lock and enter your password so you can make changes. Change the
+setting for 'Allow apps downloaded from' to 'App Store and identified
+developers'.
+
+You may also check @url{https://support.apple.com/en-en/guide/mac-help/mh40616/mac}
+
 
