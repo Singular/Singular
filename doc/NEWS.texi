@@ -48,14 +48,14 @@ Changed libraries:
 @item modular.lib: parallel version for verification via @code{system("verifyGB",I)}
 @end itemize
 
-New command:
+New commands:
 @itemize
 @item @code{system("verifyGB",I)}: test, if I is a Groebner basis (using parallel processes)
+@item Letterplace: modulo,syz,lift,liftstd, rightStd (@nref{LETTERPLACE})
 @end itemize
 
 Changes in the kernel/build system:
 @itemize
-@item Letterplace: modulo,syz,lift,liftstd (@nref{LETTERPLACE})
 @item update for using FLINT 2.6.x and for FLINT 2.7.0
 @item Singular can be build with NTL or FLINT or both
 (if non is availabel, @code{factroize} and @code{gcd} will not work.)
