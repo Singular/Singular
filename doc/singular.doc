@@ -119,25 +119,25 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @end menu
 
 @c ----------------------------------------------------------------------------
-@node Preface
+@node Preface,Introduction,Top,Top
 @chapter Preface
 @cindex Preface
 @include COPYING.texi
 
 @c ----------------------------------------------------------------------------
 @node Introduction
-@chapter Introduction
+@chapter Introduction,General concepts,Preface,Top
 @cindex Introduction
 
 @include start.tex
 @c ----------------------------------------------------------------------------
-@node General concepts
+@node General concepts,Data types,Introduction,Top
 @chapter General concepts
 @cindex General concepts
 @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types
+@node Data types,Functions and system variables,General concepts,Top
 @chapter Data types
 @cindex Data types
 @include types.tex
@@ -156,7 +156,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Non-commutative subsystem
+@node Non-commutative subsystem,Examples,Tricks and pitfalls,Top
 @chapter Non-commutative subsystem
 @cindex Non-commutative subsystem
 
@@ -183,25 +183,30 @@ non-commutative rings: @sc{Plural}, @sc{Sca} and @sc{Letterplace}.
 @end ifset
 
 @c ----------------------------------------------------------------------------
-@node Examples
+@ifset withplural
+@node Examples,Polynomial data,Non-commutative subsystem,Top
+@end ifset
+@ifclear withplural
+@node Examples,Polynomial data,Tricks and pitfalls,Top
+@end ifclear
 @appendix Examples
 @cindex Examples
 @include examples.tex
 
 @c ----------------------------------------------------------------------------
-@node Polynomial data
+@node Polynomial data,Mathematical background,Examples,Top
 @appendix Polynomial data
 @cindex Polynomial data
 @include pdata.tex
 
 @c ----------------------------------------------------------------------------
-@node Mathematical background
+@node Mathematical background,SINGULAR libraries,Polynomial data,Top
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
 
 @c ----------------------------------------------------------------------------
-@node SINGULAR libraries
+@node SINGULAR libraries,Release Notes,Mathematical background,Top
 @appendix SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
@@ -843,6 +848,7 @@ iniD, reslist, sumlist, dividelist, createlist
 
 @menu
 * ffsolve_lib:: multivariate equation solving over finite fields
+* interval_lib:: interval arithmetic on polynomials
 * presolve_lib:: procedures for pre-solving polynomial equations
 * solve_lib:: procedures to solve polynomial systems
 * triang_lib:: procedures for decomposing zero-dimensional ideals
@@ -1168,6 +1174,7 @@ Comments should be send to the author of the library directly.
 * goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
 * graal_lib:: localization at prime ideals and their associated graded rings
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
+* maxlike_lib:: maximum likelihood estimates
 * methods_lib:: construction procedures
 * modules_lib:: Representations of Modules
 * modwalk_lib:: Groebner basis conversion
