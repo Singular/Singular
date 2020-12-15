@@ -662,8 +662,8 @@ example
 
 // MATRIX FUNCTIONS
 
-proc ivmatInit(numrows, numcols)
-"USAGE: ivmatInit(m, n) m, n int
+proc intervalmatrixInit(numrows, numcols)
+"USAGE: intervalmatrixInit(m, n) m, n int
 RETURN: mxn matrix of [0,0]-intervals
 EXAMPLE: initialises an interval matrix"
 {
@@ -686,7 +686,7 @@ example
     echo = 2;
     ring R = 0,x(1..5),lp;
 
-    ivmat A = ivmatInit(4, 5); A;
+    ivmat A = intervalmatrixInit(4, 5); A;
 }
 
 proc ivmatNrows(ivmat M)
@@ -701,7 +701,7 @@ example
     echo = 2;
     ring R = 0,x,lp;
 
-    ivmat A = ivmatInit(2,3);
+    ivmat A = intervalmatrixInit(2,3);
     nrows(A);
 }
 
@@ -717,7 +717,7 @@ example
     echo = 2;
     ring R = 0,x,lp;
 
-    ivmat A = ivmatInit(2,3);
+    ivmat A = intervalmatrixInit(2,3);
     ncols(A);
 }
 
@@ -733,7 +733,7 @@ EXAMPLE: builds matrix from intervals"
     int ivsize = size(intervals);
     int i, j;
     int counter = 1;
-    ivmat A = ivmatInit(m, n);
+    ivmat A = intervalmatrixInit(m, n);
 
     for (i = 1; i <= m; i++) {
         for (j = 1; j <= n; j++) {
@@ -800,7 +800,7 @@ example
 {
     echo = 2;
     ring R = 0,x,lp;
-    ivmat A = ivmatInit(2,2);             A;
+    ivmat A = intervalmatrixInit(2,2);             A;
     A = ivmatSet(A, 1, 2, bounds2(1, 2));  A;
 }
 
@@ -809,7 +809,7 @@ proc diagMatrix(int n, interval I)
 RETURN: diagonal nxn-matrix E where E[i][i] == I for all 1 <= i <= n
 EXAMPLE: create diagonal matrix"
 {
-    ivmat E = ivmatInit(n, n);
+    ivmat E = intervalmatrixInit(n, n);
     for (int i = 1; i <= n; i++) {
         E.rows[i][i] = I;
     }
@@ -875,7 +875,7 @@ EXAMPLE: compute cofactors"
     int n = ncols(A);
     if (n == 1) { return(A[1][1]); }
 
-    ivmat M = ivmatInit(n-1, n-1);
+    ivmat M = intervalmatrixInit(n-1, n-1);
 
     // create m-1 x n-1 submatrix (minor) without row i, column j
     int k, l;
@@ -907,7 +907,7 @@ RETURN: adjuct matrix i.e. transpose cofactor matrix
 EXAMPLE: compute adjunct matrix"
 {
     int n = size(A[1]);
-    ivmat adj = ivmatInit(n, n);
+    ivmat adj = intervalmatrixInit(n, n);
 
     int i, j;
     for (i = 1; i <= n; i++) {
@@ -1005,7 +1005,7 @@ EXAMPLE: multiply matrices"
 
     if (p <> nrows(B)) { ERROR("Matrices have wrong dimensions!"); }
 
-    ivmat C = ivmatInit(m, n);
+    ivmat C = intervalmatrixInit(m, n);
     int i, j, k;
     interval I;
 
@@ -1027,7 +1027,7 @@ example
     ring R = 0,x,lp;
 
     interval I = bounds2(0, 1);
-    ivmat E = ivmatInit(3,3);
+    ivmat E = intervalmatrixInit(3,3);
     for (int i = 1; i<=3; i++) { E = ivmatSet(E, i, i, I+i); } E;
 
     interval z = 0;
@@ -1242,7 +1242,7 @@ EXAMPLE: evalate Jacobian at box"
     matrix J = jacob(I);
     int m = nrows(J);
     int n = ncols(J);
-    ivmat M = ivmatInit(m, n);
+    ivmat M = intervalmatrixInit(m, n);
 
     int i, j;
 
