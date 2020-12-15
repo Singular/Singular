@@ -35,16 +35,16 @@ det         determinant         determinant
 *           ivmatMultiply       matrix multiplication
 
 PROCEDURES:
-length                  length/size if interval
-bounds                  construct interval for given bounds.
+length()                length/size if interval
+bounds()                construct interval for given bounds.
 
-intervalmatrixInit      initialises an interval matrix
-unitMatrix              unit matrix
-applyMatrix             apply matrix to box
-ivmatGaussian           Gaussian elimination on matrices
+intervalmatrixInit()   initialises an interval matrix
+unitMatrix()            unit matrix
+applyMatrix()           apply matrix to box
+ivmatGaussian()         Gaussian elimination on matrices
 
-evalPolyAtBox           evaluate interval extension of polynomial
-exclusionTest           first version of our exclusion test
+evalPolyAtBox()         evaluate interval extension of polynomial
+exclusionTest()         first version of our exclusion test
 ";
 ///////////////////////////////////////////////////////////////////
 
