@@ -45,6 +45,8 @@ ivmatGaussian2()        Gaussian elimination on matrices
 
 evalPolyAtBox2()        evaluate interval extension of polynomial
 exclusionTest()         first version of our exclusion test
+
+SEE ALSO: rootisolation_lib
 ";
 ///////////////////////////////////////////////////////////////////
 
