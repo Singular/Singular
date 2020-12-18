@@ -1,4 +1,4 @@
-version="version systhreads.lib 0.1.0.0 Aug_2016 ";
+version="version systhreads.lib 4.2.0.0 Dec_2020 "; // $Id$
 category="General purpose";
 info="
 LIBRARY: systhreads.lib Primitives for Singular's multi-threaded objects

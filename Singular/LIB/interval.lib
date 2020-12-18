@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-version="version interval.lib 0.1 Apr_2017 ";
+version="version interval.lib 4.2.0.1 Dec_2020 ";
 info="
 LIBRARY:    interval.lib implements interval arithmetic on polynomials
 AUTHORS:    Dominik Bendle
