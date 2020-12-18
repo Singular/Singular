@@ -225,8 +225,10 @@ BACKUP_LIBS=${LIBS}
 for GMP_HOME in ${GMP_HOME_PATH}
 do
   if test "x$GMP_HOME" != "x/usr"; then
-    GMP_CPPFLAGS="-I${GMP_HOME}/include"
-    GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+    if test -e ${GMP_HOME}/include/gmp.h; then
+      GMP_CPPFLAGS="-I${GMP_HOME}/include"
+      GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+    fi
   else
     GMP_CPPFLAGS=""
     GMP_LIBS="-lgmp"
