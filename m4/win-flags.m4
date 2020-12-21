@@ -23,4 +23,14 @@ dnl libtool requires "-no-undefined" for win32 dll
   fi
 
   AM_CONDITIONAL([SING_WIN], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_SUBSETS], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_FREEALGEBRA], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_PARTIALGB], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_PYOBJECT], [test x$bi_pyobject = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_CUSTOMSTD], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_GITFAN], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_INTERVAL], [test x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_SYSTHREADS], [test x$os_win32 = xyes])
 ])
