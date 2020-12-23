@@ -405,6 +405,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return(FALSE);
     }
     else
+/* ====== verify ============================*/
+    if(strcmp(sys_cmd,"verifyGB")==0)
+    {
+      if (h->Typ()!=IDEAL_CMD)
+      {
+        WerrorS("expected system(\"verifyGB\",<ideal>,..)");
+        return TRUE;
+      }
+      ideal F=(ideal)h->Data();
+      #ifdef HAVE_VSPACE
+      int cpus = (long) feOptValue(FE_OPT_CPUS);
+      if (cpus>1)
+        res->data=(char*)(long) kVerify2(F,currRing->qideal);
+      else
+      #endif
+        res->data=(char*)(long) kVerify1(F,currRing->qideal);
+      res->rtyp=INT_CMD;
+      return FALSE;
+    }
+    else
 /*===== rcolon ===============================================*/
   if(strcmp(sys_cmd,"rcolon") == 0)
   {
@@ -3867,26 +3887,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       res->data=maEvalAt(p,pt,currRing);
       res->rtyp=NUMBER_CMD;
-      return FALSE;
-    }
-    else
-/* ====== verify ============================*/
-    if(strcmp(sys_cmd,"verifyGB")==0)
-    {
-      if (h->Typ()!=IDEAL_CMD)
-      {
-        WerrorS("expected system(\"verifyGB\",<ideal>,..)");
-        return TRUE;
-      }
-      ideal F=(ideal)h->Data();
-      #ifdef HAVE_VSPACE
-      int cpus = (long) feOptValue(FE_OPT_CPUS);
-      if (cpus>1)
-        res->data=(char*)(long) kVerify2(F,currRing->qideal);
-      else
-      #endif
-        res->data=(char*)(long) kVerify1(F,currRing->qideal);
-      res->rtyp=INT_CMD;
       return FALSE;
     }
     else
