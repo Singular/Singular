@@ -337,7 +337,7 @@ We are grateful to L. Schmitz (RWTH Aachen) for his contributions to the develop
 
 References:
 
-[LL09]:  Roberto La Scala and Viktor Levandovskyy, "Letterplace ideals and non-commutative Groebner bases", Journal of Symbolic Computation, Volume 44, Issue 10, October 2009, Pages 1374-1393, see @url{http://dx.doi.org/10.1016/j.jsc.2009.03.002}.
+[LL09]: Roberto La Scala and Viktor Levandovskyy, "Letterplace ideals and non-commutative Groebner bases", Journal of Symbolic Computation, Volume 44, Issue 10, October 2009, Pages 1374-1393, see @url{http://dx.doi.org/10.1016/j.jsc.2009.03.002}.
 
 [LL13]: Roberto La Scala and Viktor Levandovskyy, "Skew polynomial rings, Groebner bases and the letterplace embedding of the free associative algebra", Journal of Symbolic Computation, Volume 48, Issue 1, January 2013, Pages 1374-1393, see @url{http://dx.doi.org/10.1016/j.jsc.2012.05.003} and also @url{http://arxiv.org/abs/1009.4152}.
 
@@ -348,11 +348,11 @@ References:
 [Mora16]: Teo Mora, "Solving Polynomial Equation Systems IV: Volume 4, Buchberger Theory and Beyond.", 
 Cambridge University Press, 2016.
 
-[LMZ20]: Viktor Levandovskyy, Tobias Metzlaff and Karim Abou Zeid, "Computation of free non-commutative Groebner Bases over @math{Z} with @sc{Singular:Letterplace}", Proc. ISSAC 2020, accepted
+[LMZ20]: Viktor Levandovskyy, Tobias Metzlaff and Karim Abou Zeid, "Computation of free non-commutative Groebner Bases over @math{Z} with @sc{Singular:Letterplace}", Proc. ISSAC 2020, Pages 312-319, ACM Press (2020), @url{https://dl.acm.org/doi/10.1145/3373207.3404052}. Video of the talk is at @url{https://av.tib.eu/media/50124}.
 
-[LSZ20]: Viktor Levandovskyy, Hans Schoenemann  and Karim Abou Zeid, "@sc{Letterplace} - a Subsystem of @sc{Singular} for  computations with free algebras via Letterplace Embedding", Proc. ISSAC 2020, accepted
+[LSZ20]: Viktor Levandovskyy, Hans Schoenemann and Karim Abou Zeid, "@sc{Letterplace} - a Subsystem of @sc{Singular} for computations with free algebras via Letterplace Embedding", Proc. ISSAC 2020, 305-311, ACM Press, @url{https://dl.acm.org/doi/10.1145/3373207.3404056}. Video of the talk is at @url{https://av.tib.eu/media/50123}.
 
-[LMSZ20]: Viktor Levandovskyy, Tobias Metzlaff, Hans Schoenemann and Karim Abou Zeid, "Groebner Bases over @math{K<X>} and @math{Z<X>} in theory and practice", Proc. ICMS 2020, accepted
+[SL20]: Leonard Schmitz and Viktor Levandovskyy : Formally Verifying Proofs for Algebraic Identities of Matrices . In: Intelligent Computer Mathematics (Proceedings of the CICM 2020), Pages 222-236, Springer LNAI, LNCS (2020).
 
 @c ---------------------------------------------------------------------------
 
@@ -374,16 +374,57 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @sc{Letterplace} are the same as of @sc{Singular} (see @ref{Control structures}, @ref{System variables}).
 
 @menu
+* dim BR_LETTERPLACE_BR::
 * freeAlgebra BR_LETTERPLACE_BR::
 * lift BR_LETTERPLACE_BR::
 * liftstd BR_LETTERPLACE_BR::
+* modulo BR_LETTERPLACE_BR::
 * ncgen ::
 * reduce BR_LETTERPLACE_BR::
 * rightstd BR_LETTERPLACE_BR::
 * std BR_LETTERPLACE_BR::
+* subst BR_LETTERPLACE_BR::
 * syz BR_LETTERPLACE_BR::
 * twostd BR_LETTERPLACE_BR::
 @end menu
+
+
+@c ------------------------------
+@node dim BR_LETTERPLACE_BR
+@subsection dim BR_LETTERPLACE_BR
+@cindex dim BR_LETTERPLACE_BR
+
+@table @code
+@item @strong{Syntax:}
+  @code{dim(} ideal_expression@code{)}
+@item @strong{Type:}
+int 
+@item @strong{Purpose:}
+Compute the Gelfand-Kirillov dimension of the algebra basering/(input ideal).
+Uses Ufnarovskij graph for computations.
+@item @strong{Note:} 
+the input ideal must be given as a two-sided Groebner basis.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = 0,(x,y,z),dp;
+ring R = freeAlgebra(r, 5); 
+ideal I = z; 
+dim(twostd(I)); // GK dimension is infinite 
+I = x,y,z; 
+dim(twostd(I));
+I = x*y, x*z, z*y, z*z; 
+dim(twostd(I));
+I = y*x - x*y, z*x - x*z, z*y - y*z; 
+I = twostd(I); I;
+dim(I); // 3, as expected for R/I = K[x,y,z]
+@c example
+@end smallexample
+@end table
+@c ref
+See @ref{fpaprops_lib, fpadim_lib}.
+@c ref
 
 @c ------------------------------
 @node freeAlgebra BR_LETTERPLACE_BR
@@ -518,6 +559,50 @@ See
 @ref{lift BR_LETTERPLACE_BR}.
 @c ref
 
+
+@c -------------------------------------------------
+@node modulo BR_LETTERPLACE_BR
+@subsection modulo BR_LETTERPLACE_BR
+@cindex modulo BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@item @strong{Syntax:}
+@code{modulo (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{modulo (} module_expression@code{,} module_expression @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+computes the kernel of the bimodule homomorphism from the free bimodule (determined
+in basering) to its factor-bimodule modulo the second argument. The first argument
+determines the homomorphism via images of the canonical free bimodule generators.
+@*If @code{option(returnSB)} is set, a Groebner basis is returned, otherwise a generating set.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "freegb.lib";
+ring r = 0,(x,y,z),dp;
+ring R = freeAlgebra(r,7,2); // free bimodule of rank 2
+ideal I = x*y*z - z*y*x;
+I = twostd(I); I;
+modulo(y,twostd(0)); // shows the canonical generator of the kernel
+// which can be interpreted as (1 otimes y - y otimes 1)
+module M = modulo(y, I);
+print(M); // as we see (z E y - y E z) generates the kernel 
+// of bimodule homomorphism sending E to y
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{lift BR_LETTERPLACE_BR};
+@ref{liftstd BR_LETTERPLACE_BR};
+@ref{module};
+@ref{ncgen};
+@ref{option};
+@ref{syz BR_LETTERPLACE_BR}.
+@c ref
+
 @c ----------------------------------------
 @node ncgen
 @subsection ncgen
@@ -630,7 +715,8 @@ See also
 ideal or module
 @item @strong{Purpose:}
 Compute a right Groebner basis of the set of generators of the input ideal/module.
-@item @strong{Note:} It is effective also in factor rings.
+@item @strong{Note:} 
+It is also effective in factor rings.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -661,6 +747,51 @@ ideal or module
 @item @strong{Purpose:}
 Alias to @ref{twostd BR_LETTERPLACE_BR}.
 @end table
+
+@c ---------------------------------------
+@node subst BR_LETTERPLACE_BR
+@subsection subst BR_LETTERPLACE_BR
+@cindex subst BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{,...} variable@code{,} poly_expression @code{)}
+@*@code{subst (} vector_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} ideal_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} module_expression@code{,} variable@code{,} poly_expression @code{)}
+@item @strong{Type:}
+poly, vector, ideal or module (corresponding to the first argument)
+@item @strong{Purpose:}
+substitutes one or more ring variable(s)/parameter variable(s) by (a) polynomial(s). Note that in the case of more than one substitution pair,
+the substitutions will be performed sequentially and not simultaneously. The below examples illustrate this behaviour.
+@*Note, that the coefficients must be polynomial when substituting a parameter.
+@item @strong{Note:}
+When dealing with free non-commutative bimodules, their generators @code{ncgen(i)} can be used as variables in @code{subst}
+and therefore substituted in the corresponding vector component @code{gen(i)}.
+@item @strong{Example:}
+@smallexample
+@c example
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),dp;
+  ring R = freeAlgebra(r,5,2); 
+  poly p = z^2 - y*x;
+  subst(p, x, -y);
+  ideal I = z*y*x - x*y*z;
+  subst(I, y, p);
+  subst(I, x, z); // produces zero
+  module M = I*ncgen(1)*gen(1), ncgen(1)*gen(1)*I, I*ncgen(2)*gen(2);
+  M;
+  subst(M, x, z); // produces zero
+  subst(M, ncgen(2), z); // evaluates ncgen(2) at z, see the 2nd component 
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{map};
+@ref{ideal};
+@ref{module}.
+@c ref
 
 @c -------------------------------------------------
 @node syz BR_LETTERPLACE_BR
@@ -745,7 +876,6 @@ See
 @ref{rightstd BR_LETTERPLACE_BR};
 @ref{syz BR_LETTERPLACE_BR}.
 @c ref
-
 
 @c ---------------------------------------------------------------------------
 @node Mathematical background BR_LETTERPLACE_BR
@@ -1251,7 +1381,7 @@ New functions:
 @item added support for free bimodules of a fixed rank (@ref{freeAlgebra BR_LETTERPLACE_BR}, @ref{ncgen})
 @item several types of monomial orderings become available, among them three types of elimination orderings
 @item twostd (@ref{twostd (letterplace)}), reduce (@ref{reduce (letterplace)}) and other functions support subbimodules
-@item syz (@ref{syz (letterplace)}), lift (@ref{lift (letterplace)}), liftstd (@ref{liftstd (letterplace)}) implemented
+@item syz (@ref{syz (letterplace)}), lift (@ref{lift (letterplace)}), liftstd (@ref{liftstd (letterplace)}), modulo (@ref{modulo (letterplace)}) implemented
 @item bracket (@ref{bracket}) and maxideal (@ref{maxideal}) work in Letterplace
 @item the options @code{redSB}, @code{redTail} are effective for computations related to Groebner bases
 @item the options @code{prot}, @code{mem} are effective for the whole @sc{Letterplace} subsystem
