@@ -378,10 +378,12 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 * freeAlgebra BR_LETTERPLACE_BR::
 * lift BR_LETTERPLACE_BR::
 * liftstd BR_LETTERPLACE_BR::
+* modulo BR_LETTERPLACE_BR::
 * ncgen ::
 * reduce BR_LETTERPLACE_BR::
 * rightstd BR_LETTERPLACE_BR::
 * std BR_LETTERPLACE_BR::
+* subst BR_LETTERPLACE_BR::
 * syz BR_LETTERPLACE_BR::
 * twostd BR_LETTERPLACE_BR::
 @end menu
@@ -746,6 +748,51 @@ ideal or module
 Alias to @ref{twostd BR_LETTERPLACE_BR}.
 @end table
 
+@c ---------------------------------------
+@node subst BR_LETTERPLACE_BR
+@subsection subst BR_LETTERPLACE_BR
+@cindex subst BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{,...} variable@code{,} poly_expression @code{)}
+@*@code{subst (} vector_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} ideal_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} module_expression@code{,} variable@code{,} poly_expression @code{)}
+@item @strong{Type:}
+poly, vector, ideal or module (corresponding to the first argument)
+@item @strong{Purpose:}
+substitutes one or more ring variable(s)/parameter variable(s) by (a) polynomial(s). Note that in the case of more than one substitution pair,
+the substitutions will be performed sequentially and not simultaneously. The below examples illustrate this behaviour.
+@*Note, that the coefficients must be polynomial when substituting a parameter.
+@item @strong{Note:}
+When dealing with free non-commutative bimodules, their generators @code{ncgen(i)} can be used as variables in @code{subst}
+and therefore substituted in the corresponding vector component @code{gen(i)}.
+@item @strong{Example:}
+@smallexample
+@c example
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),dp;
+  ring R = freeAlgebra(r,5,2); 
+  poly p = z^2 - y*x;
+  subst(p, x, -y);
+  ideal I = z*y*x - x*y*z;
+  subst(I, y, p);
+  subst(I, x, z); // produces zero
+  module M = I*ncgen(1)*gen(1), ncgen(1)*gen(1)*I, I*ncgen(2)*gen(2);
+  M;
+  subst(M, x, z); // produces zero
+  subst(M, ncgen(2), z); // evaluates ncgen(2) at z, see the 2nd component 
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{map};
+@ref{ideal};
+@ref{module}.
+@c ref
+
 @c -------------------------------------------------
 @node syz BR_LETTERPLACE_BR
 @subsection syz BR_LETTERPLACE_BR
@@ -829,7 +876,6 @@ See
 @ref{rightstd BR_LETTERPLACE_BR};
 @ref{syz BR_LETTERPLACE_BR}.
 @c ref
-
 
 @c ---------------------------------------------------------------------------
 @node Mathematical background BR_LETTERPLACE_BR
