@@ -21,6 +21,14 @@
 
 @heading News for version @value{VERSION}
 
+New commands:
+@itemize
+@item Letterplace: dim, rightStd for qrings @nref{LETTERPLACE})
+@end itemize
+
+
+@heading News for version 4-2-0
+
 Syntax changes:
 @itemize
 @item renamed poly.lib to polylib.lib (@nref{polylib_lib})
