@@ -645,6 +645,7 @@ leftKernel
 LengthSym
 LengthSymElement
 letterplace_bracket
+letterplace_dim
 letterplace_lift
 letterplace_liftstd
 letterplace_maxideal
