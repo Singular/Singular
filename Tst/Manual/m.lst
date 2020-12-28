@@ -649,6 +649,7 @@ letterplace_dim
 letterplace_lift
 letterplace_liftstd
 letterplace_maxideal
+letterplace_map
 letterplace_modulo
 letterplace_multiplication
 letterplace_print
