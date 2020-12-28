@@ -20,12 +20,14 @@
 #include "coeffs/rmodulon.h"
 #include "coeffs/longrat.h"
 
+#include "polys/monomials/p_polys.h"
 #include "polys/monomials/ring.h"
 #include "polys/monomials/maps.h"
 
 #include "polys/prCopy.h"
 #include "polys/matpol.h"
 
+#include "polys/shiftop.h"
 #include "polys/weight.h"
 #include "polys/clapsing.h"
 
@@ -640,8 +642,51 @@ leftv iiMap(map theMap, const char * what)
       theMap->m=(polyset)omReallocSize((ADDRESS)theMap->m,
                                  IDELEMS(theMap)*sizeof(poly),
                                  (src_ring->N)*sizeof(poly));
+#ifdef HAVE_SHIFTBBA
+      if (rIsLPRing(src_ring))
+      {
+        // src_ring [x,y,z,...]
+        // curr_ring [a,b,c,...]
+        //
+        // map=[a,b,c,d] -> [a,b,c,...]
+        // map=[a,b] -> [a,b,0,...]
+
+        short src_lV = src_ring->isLPring;
+        int src_nblocks = src_ring->N / src_lV;
+
+        // add missing NULL generators
+        for(i=IDELEMS(theMap);i<src_lV;i++)
+        {
+          theMap->m[i]=NULL;
+        }
+
+        // remove superfluous generators
+        for(i=src_lV;i<IDELEMS(theMap);i++)
+        {
+          if (theMap->m[i] != NULL)
+          {
+            p_Delete(&(theMap->m[i]), currRing);
+            theMap->m[i] = NULL;
+          }
+        }
+
+        // copy the first block to all other blocks
+        for(i = 1; i < src_nblocks; i++)
+        {
+          for(int j = 0; j < src_lV; j++)
+          {
+            theMap->m[(i * src_lV) + j] = p_Copy(theMap->m[j], currRing);
+          }
+        }
+      }
+      else
+      {
+#endif
       for(i=IDELEMS(theMap);i<src_ring->N;i++)
         theMap->m[i]=NULL;
+#ifdef HAVE_SHIFTBBA
+      }
+#endif
       IDELEMS(theMap)=src_ring->N;
     }
     if (what==NULL)
@@ -715,7 +760,15 @@ leftv iiMap(map theMap, const char * what)
         }
       }
       if (overflow)
+#ifdef HAVE_SHIFTBBA
+        // in Letterplace rings the exponent is always 0 or 1! ignore this warning.
+        if (!rIsLPRing(currRing))
+        {
+#endif
         Warn("possible OVERFLOW in map, max exponent is %ld",currRing->bitmask/2);
+#ifdef HAVE_SHIFTBBA
+        }
+#endif
 #if 0
       if (((tmpW.rtyp==IDEAL_CMD)||(tmpW.rtyp==MODUL_CMD)) && idIs0(IDIDEAL(w)))
       {

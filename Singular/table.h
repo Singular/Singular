@@ -230,7 +230,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjrParStr),    PARSTR_CMD,      STRING_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjDUMMY),      POLY_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjBI2P),       POLY_CMD,        POLY_CMD,       BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
-,{D(jjPREIMAGE_R), PREIMAGE_CMD,    RING_CMD,       MAP_CMD       , NO_NC |ALLOW_RING}
+,{D(jjPREIMAGE_R), PREIMAGE_CMD,    RING_CMD,       MAP_CMD       , ALLOW_LP |ALLOW_RING}
 ,{D(jjPRIME),      PRIME_CMD,       INT_CMD,        INT_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     LIST_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     DEF_CMD       , ALLOW_NC |ALLOW_RING}
@@ -587,7 +587,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjINDEX_V_IV),'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjRING_1),    '[',            RING_CMD,     CRING_CMD, ANY_TYPE, ALLOW_NC | ALLOW_RING}
 ,{D(jjPROC),      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD, ALLOW_NC | ALLOW_RING}
-,{D(jjMAP),       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjMAP),       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjLOAD2),     '(',            NONE,             LIB_CMD,    STRING_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjKLAMMER),   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD, ALLOW_NC | ALLOW_RING}
 ,{D(jjKLAMMER_IV),'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD, ALLOW_NC | ALLOW_RING}
