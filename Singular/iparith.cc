@@ -4050,9 +4050,8 @@ static BOOLEAN jjDIM(leftv res, leftv v)
       return TRUE;
     }
     int gkDim = lp_gkDim((ideal)(v->Data()));
-    if (errorreported || gkDim == -2) return TRUE;
     res->data = (char *)(long)gkDim;
-    return FALSE;
+    return (gkDim == -2);
   }
 #endif
   if (rHasMixedOrdering(currRing))
