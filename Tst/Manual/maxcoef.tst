@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r= 0,(x,y,z),ds;
 poly g = 345x2-1234567890y+7/4z;
 maxcoef(g);

@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version poly.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version polylib.lib 4.2.0.0 Dec_2020 "; // $Id$
 category="General purpose";
 info="
-LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
+LIBRARY:  polylib.lib      Procedures for Manipulating Polys, Ideals, Modules
 AUTHORS:  O. Bachmann, G.-M. Greuel, A. Fruehbis
 
 PROCEDURES:

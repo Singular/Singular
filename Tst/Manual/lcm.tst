@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring  r = 0,(x,y,z),lp;
 poly  p = (x+y)*(y+z);
 poly  q = (z4+2)*(y+z);

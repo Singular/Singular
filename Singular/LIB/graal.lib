@@ -30,7 +30,7 @@ resolutionInLocalization(ideal I, def L); the resolution of I*A_L
 ";
 
 LIB "general.lib";  // for watchdog
-LIB "poly.lib";     // for hilbPoly
+LIB "polylib.lib";     // for hilbPoly
 LIB "standard.lib"; // for res
 
 proc mod_init()

@@ -20,7 +20,7 @@ PROCEDURES:
 LIB "elim.lib";
 LIB "homolog.lib";
 LIB "inout.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 /////////////////////////////////////////////////////////////////////////////
 
 proc isCMcod2(ideal kurve)

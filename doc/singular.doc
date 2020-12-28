@@ -119,25 +119,25 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @end menu
 
 @c ----------------------------------------------------------------------------
-@node Preface
+@node Preface,Introduction,Top,Top
 @chapter Preface
 @cindex Preface
 @include COPYING.texi
 
 @c ----------------------------------------------------------------------------
 @node Introduction
-@chapter Introduction
+@chapter Introduction,General concepts,Preface,Top
 @cindex Introduction
 
 @include start.tex
 @c ----------------------------------------------------------------------------
-@node General concepts
+@node General concepts,Data types,Introduction,Top
 @chapter General concepts
 @cindex General concepts
 @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types
+@node Data types,Functions and system variables,General concepts,Top
 @chapter Data types
 @cindex Data types
 @include types.tex
@@ -156,7 +156,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Non-commutative subsystem
+@node Non-commutative subsystem,Examples,Tricks and pitfalls,Top
 @chapter Non-commutative subsystem
 @cindex Non-commutative subsystem
 
@@ -183,25 +183,30 @@ non-commutative rings: @sc{Plural}, @sc{Sca} and @sc{Letterplace}.
 @end ifset
 
 @c ----------------------------------------------------------------------------
-@node Examples
+@ifset withplural
+@node Examples,Polynomial data,Non-commutative subsystem,Top
+@end ifset
+@ifclear withplural
+@node Examples,Polynomial data,Tricks and pitfalls,Top
+@end ifclear
 @appendix Examples
 @cindex Examples
 @include examples.tex
 
 @c ----------------------------------------------------------------------------
-@node Polynomial data
+@node Polynomial data,Mathematical background,Examples,Top
 @appendix Polynomial data
 @cindex Polynomial data
 @include pdata.tex
 
 @c ----------------------------------------------------------------------------
-@node Mathematical background
+@node Mathematical background,SINGULAR libraries,Polynomial data,Top
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
 
 @c ----------------------------------------------------------------------------
-@node SINGULAR libraries
+@node SINGULAR libraries,Release Notes,Mathematical background,Top
 @appendix SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
@@ -278,7 +283,7 @@ with the @code{--no-stdlib} command line option (see
 * inout_lib:: procedures for manipulating in- and output
 * modular_lib::abstraction layer for modular techniques
 * parallel_lib:: Tools for parallelization
-* poly_lib:: procedures for manipulating polynomials and ideals
+* polylib_lib:: procedures for manipulating polynomials and ideals
 * random_lib:: procedures of random/sparse  matrix and polynomial operations
 * redcgs_lib:: Reduced Comprehensive Groebner Systems
 * resources_lib:: Tools to manage the computational resources
@@ -328,9 +333,9 @@ LIB "all.lib";
 @subsection parallel_lib
 @c lib parallel.lib
 @c ----------------------------------------------------------
-@node poly_lib
-@subsection poly_lib
-@c lib poly.lib
+@node polylib_lib
+@subsection polylib_lib
+@c lib polylib.lib
 @c ----------------------------------------------------------
 @node redcgs_lib
 @subsection redcgs_lib
@@ -843,6 +848,7 @@ iniD, reslist, sumlist, dividelist, createlist
 
 @menu
 * ffsolve_lib:: multivariate equation solving over finite fields
+* interval_lib:: interval arithmetic on polynomials
 * presolve_lib:: procedures for pre-solving polynomial equations
 * solve_lib:: procedures to solve polynomial systems
 * triang_lib:: procedures for decomposing zero-dimensional ideals
@@ -857,6 +863,10 @@ iniD, reslist, sumlist, dividelist, createlist
 @node ffsolve_lib
 @subsection ffsolve_lib
 @c lib ffsolve.lib
+@c ---------------------------------------------------------
+@node interval_lib
+@subsection interval_lib
+@c lib interval.lib
 @c ---------------------------------------------------------
 @node presolve_lib
 @subsection presolve_lib
@@ -1164,13 +1174,14 @@ Comments should be send to the author of the library directly.
 * goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
 * graal_lib:: localization at prime ideals and their associated graded rings
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
+* maxlike_lib:: maximum likelihood estimates
 * methods_lib:: construction procedures
 * modules_lib:: Representations of Modules
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
 * nets_lib:: Pretty printing
 * pfd_lib:: Multivartiate partial fraction decomposition
-* qmatrix_lib:: Quantum matrices, quantum minors and symmetric groups
+* polyclass_lib:: class of polynomials
 * ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
 * sets_lib:: Sets
@@ -1225,6 +1236,10 @@ Issues:
 @subsection gradedModules_lib
 @c lib gradedModules.lib
 @c ----------------------------------------------------------
+@node maxlike_lib
+@subsection maxlike_lib
+@c lib maxlike.lib
+@c ----------------------------------------------------------
 @node methods_lib
 @subsection methods_lib
 @c lib methods.lib
@@ -1255,9 +1270,9 @@ Todos/Issues:
 @subsection pfd_lib
 @c lib pfd.lib
 @c ----------------------------------------------------------
-@node qmatrix_lib
-@subsection qmatrix_lib
-@c lib qmatrix.lib
+@node polyclass_lib
+@subsection polyclass_lib
+@c lib polyclass.lib
 @c ----------------------------------------------------------
 @node ringgb_lib
 @subsection ringgb_lib

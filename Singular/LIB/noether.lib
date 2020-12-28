@@ -33,7 +33,7 @@ PROCEDURES:
 ";
 LIB "elim.lib";
 LIB "algebra.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "ring.lib";
 LIB "presolve.lib";
 

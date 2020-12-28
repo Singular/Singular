@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version stanleyreisner.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version stanleyreisner.lib 4.2.0.0 Dec_2020 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  stanleyreisner.lib   Deformations of Stanley-Reiser ideals
@@ -20,10 +20,10 @@ Homomorphism                class of homomorphisms
 PROCEDURES:
 T1(ideal)                   compute first order deformations
 T2(ideal)                   compute second order deformations
-makePoly(poly)              creat a Poly
-fPiece(ideal,poly,poly)             creat a FirstOrderDeformation
-sPiece(ideal,poly,poly)              creat a SecondOrderDeformation
-makeLinks(ideal,poly,poly)  creat a FirstOrderDeformation of the links
+makeQPoly(poly)             create a QPoly
+fPiece(ideal,poly,poly)     create a FirstOrderDeformation
+sPiece(ideal,poly,poly)     create a SecondOrderDeformation
+makeLinks(ideal,poly,poly)  create a FirstOrderDeformation of the links
 
 ";
 
@@ -35,13 +35,13 @@ static proc mod_init()
   LIB "cohomo.so";
   newstruct("FirstOrderDeformation","ideal source, ideal gens, ring over, list dgs, list rule, qring target ");
   newstruct("SecondOrderDeformation","ideal source, list relations, list lamda, list dgs");
-  newstruct("Poly","poly value, qring over");
+  newstruct("QPoly","poly value, qring over");
   newstruct("LinksDeformation","ideal links, poly a, FirstOrderDeformation FirstDeformation, SecondOrderDeformation SecondDeformation");
   system("install","FirstOrderDeformation","print",printFirstOrderDeformation,1);
   system("install","SecondOrderDeformation","print",printSecondOrderDeformation,1);
   system("install","LinksDeformation","print",printLinksDeformation,1);
-  system("install","Poly","+",addPolys,2);
-  system("install","Poly","print",printPoly,1);
+  system("install","QPoly","+",addQPolys,2);
+  system("install","QPoly","print",printQPoly,1);
 }
 
 
@@ -60,7 +60,7 @@ EXAMPLE: example printFirstOrderDeformation, shows an example"
   list rule=phi.rule;
   ideal source=phi.source;
   setring Rcurrent;
-  //string(phi.source) + "  ->  "+ string (phi.rule);
+  string(phi.source) + "  ->  "+ string (phi.rule);
   nameof(phi)+".source" +"  ->  "+ nameof(phi)+".over"+" / "+ nameof(phi)+".source";
   //nameof(phi.source) +"  ->  "+ nameof(phi.rule)+ " / " nameof(phi.source);
   // print monomial -> lambda * monomial ....
@@ -68,11 +68,12 @@ EXAMPLE: example printFirstOrderDeformation, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x1,x2,x3,x4,x5),lp;
  ideal I = x1*x2,x2*x3,x3*x4,x4*x5,x5*x1;
  list L = T1(I);
  L[1];
+ L;
 }
 
 
@@ -90,11 +91,12 @@ EXAMPLE: example printSecondOrderDeformation, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x1,x2,x3,x4,x5),lp;
  ideal I = x1*x2,x2*x3,x3*x4,x4*x5,x5*x1;
  list L = T2(I);
  L[1];
+ L;
 }
 
 
@@ -116,7 +118,7 @@ EXAMPLE: example printLinksDeformation, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(2)*x(3);
  LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
@@ -126,12 +128,12 @@ example
 
 
 
-proc printPoly(Poly f)
-"USAGE:  printPoly(f); f = Poly.
+proc printQPoly(QPoly f)
+"USAGE:  printQPoly(f); f = QPoly.
 ASSUME:  f is a polynomial in quotient ring.
 RETURN:  print the polynomial in the quotient ring.
-KEYWORDS: Poly, quotient ring.
-EXAMPLE: example printPoly, shows an example"
+KEYWORDS: QPoly, quotient ring.
+EXAMPLE: example printQPoly, shows an example"
 {
   def Rold = basering;
   def Rcurrent = f.over;
@@ -141,27 +143,27 @@ EXAMPLE: example printPoly, shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring r=0,(x,y,z),lp;
  ideal i=xy;
- qring q=std(i);
+ qring Q=std(i);
  poly p=x*y+z;
- Poly q=makePoly(p);
+ QPoly q=makeQPoly(p);
  q;
 }
 
 
 
-proc makePoly(poly p)
-"USAGE:  makePoly(p); p = polynomial.
+proc makeQPoly(poly p)
+"USAGE:  makeQPoly(p); p = polynomial.
 ASSUME:  p is a polynomial in basering.
-RETURN:  a Poly which is in a quotient ring.
+RETURN:  a QPoly which is in a quotient ring.
 THEORY:  The procedure will convert a polynomial in basering to a polynomial in a quotient ring.
-KEYWORDS: Poly, quotient ring.
-EXAMPLE: example makePoly; shows an example"
+KEYWORDS: QPoly, quotient ring.
+EXAMPLE: example makeQPoly; shows an example"
 {
   def rc=basering;
-  Poly P;
+  QPoly P;
   P.over=rc;
   //option(redSB);
   P.value=reduce(p,std(0));
@@ -169,25 +171,25 @@ EXAMPLE: example makePoly; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring r=0,(x,y,z),lp;
  ideal i=xy;
- qring q=std(i);
+ qring Q=std(i);
  poly p=x*y+z;
- Poly q=makePoly(p);
+ QPoly q=makeQPoly(p);
  q.over;
  q.value;
 }
 
 
 
-proc addPolys(Poly f, Poly g)
-"USAGE:  addPolys(f,g); f = Poly, g = Poly.
+proc addQPolys(QPoly f, QPoly g)
+"USAGE:  addQPolys(f,g); f = QPoly, g = QPoly.
 ASSUME:  f and g are the polynomials in a quotient ring.
 RETURN:  the sum of f and g in the quotient ring.
 THEORY:  The procedure will compute the normal form of f+g.
-KEYWORDS: Poly
-EXAMPLE: example addPolys; shows an example"
+KEYWORDS: QPoly
+EXAMPLE: example addQPolys; shows an example"
 {
   def Rold = basering;
   def Rcurrent = f.over;
@@ -195,7 +197,7 @@ EXAMPLE: example addPolys; shows an example"
   poly ff = f.value;
   poly gg = g.value;
   poly ffplusgg = ff+gg;
-  Poly fplusg;
+  QPoly fplusg;
   fplusg.value = ffplusgg;
   fplusg.over = Rcurrent;
   setring Rold;
@@ -203,10 +205,11 @@ EXAMPLE: example addPolys; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(2)*x(3);
  LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
+ L;
 }
 
 
@@ -235,10 +238,11 @@ EXAMPLE: example fPiece; shows an example
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:";echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
- FirstOrderDeformation phi=fPiece(i,x(4)^2,x(1)*x(0));
+ FirstOrderDeformation phi=fPiece(i,x(4)^2,x(1)*x(2));
+ phi;
 }
 
 
@@ -266,10 +270,11 @@ EXAMPLE: example sPiece; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
- SecondOrderDeformation psi=sPiece(i,x(4)^2,x(1)*x(0));
+ SecondOrderDeformation psi=sPiece(i,x(4)^2,x(1)*x(2));
+ psi;
 }
 
 
@@ -309,10 +314,11 @@ EXAMPLE: example T1; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
  list L=T1(i);
+ L;
 }
 
 
@@ -353,10 +359,11 @@ EXAMPLE: example T2; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
  list L=T2(i);
+ L;
 }
 
 
@@ -382,10 +389,11 @@ EXAMPLE: example T2; shows an example"
 }
 example
 {
- "EXAMPLE:";
+ "EXAMPLE:"; echo=2;
  ring R=0,(x(1..4)),lp;
  ideal i=x(1),x(2),x(3),x(4),x(1)*x(4),x(2)*x(4),x(1)*x(3),x(2)*x(3);
- LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(0));
+ LinksDeformation L=makeLinks(i,x(4)^2,x(1)*x(2));
+ L;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

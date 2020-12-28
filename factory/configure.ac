@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_INIT([factory], [4.1.3])
+AC_INIT([factory], [4.2.0])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
@@ -225,8 +225,10 @@ BACKUP_LIBS=${LIBS}
 for GMP_HOME in ${GMP_HOME_PATH}
 do
   if test "x$GMP_HOME" != "x/usr"; then
-    GMP_CPPFLAGS="-I${GMP_HOME}/include"
-    GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+    if test -e ${GMP_HOME}/include/gmp.h; then
+      GMP_CPPFLAGS="-I${GMP_HOME}/include"
+      GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+    fi
   else
     GMP_CPPFLAGS=""
     GMP_LIBS="-lgmp"

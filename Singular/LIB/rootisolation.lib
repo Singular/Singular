@@ -57,6 +57,7 @@ PROCEDURES:
 
 
 KEYWORDS:   real root isolation; interval arithmetic; Newton step
+SEE ALSO: interval_lib
 ";
 LIB "presolve.lib";
 LIB "rootsur.lib";

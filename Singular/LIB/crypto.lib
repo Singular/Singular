@@ -81,7 +81,7 @@ PROCEDURES:
               [parameters in square brackets are optional]
 ";
 
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "atkins.lib";
 
 ///////////////////////////////////////////////////////////////////////////////

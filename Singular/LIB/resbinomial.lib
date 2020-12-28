@@ -58,7 +58,7 @@ PROCEDURES:
 LIB "general.lib";
 LIB "qhmoduli.lib";
 LIB "inout.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "resolve.lib";
 LIB "reszeta.lib";
 LIB "resgraph.lib";

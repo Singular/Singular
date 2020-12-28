@@ -34,7 +34,7 @@ SEE ALSO: sing_lib, deform_lib, spcurve_lib
 ////////////////////////////////////////////////////////////////////////////
 
 // first the ones written in Singular
-LIB "poly.lib";
+LIB "polylib.lib";
 
 // then the ones written in C/C++
 LIB("loctriv.so");

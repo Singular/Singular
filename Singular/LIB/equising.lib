@@ -16,7 +16,7 @@ PROCEDURES:
 ";
 
 LIB "hnoether.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "elim.lib";
 LIB "deform.lib";
 LIB "sing.lib";

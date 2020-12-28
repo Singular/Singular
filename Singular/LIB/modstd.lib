@@ -27,7 +27,7 @@ PROCEDURES:
   modIntersect(I,J); intersection of I and J using modular methods
 ";
 
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "modular.lib";
 
 proc modStd(def I, list #)

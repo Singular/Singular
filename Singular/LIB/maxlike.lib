@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version maxlike.lib 4.1.2.0 Feb_2019 "; //$Id$
+version="version maxlike.lib 4.2.0.0 Dec_2020 "; //$Id$
 category="Algebraic Statistics";
 info="
 LIBRARY:  maxlike.lib  Procedures to compute maximum likelihood estimates

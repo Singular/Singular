@@ -31,7 +31,7 @@ SEE ALSO: locnormal_lib;modnormal_lib
 ";
 
 LIB "general.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "sing.lib";
 LIB "primdec.lib";
 LIB "elim.lib";

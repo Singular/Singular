@@ -45,7 +45,7 @@ PROCEDURES:
  facGBIdeal(id);     GB G of id and linear factors of each element of G
 ";
 
-LIB "poly.lib";
+LIB "polylib.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 

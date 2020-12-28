@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "poly.lib";
+LIB "polylib.lib";
 
 list tst_rgen_charstrs = list("3", "0");
 list tst_rgen_simple_orderings = list("lp", "dp", "Dp", "ls", "ds", "Ds", "Wp","Ws","M");

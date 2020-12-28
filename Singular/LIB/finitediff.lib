@@ -45,7 +45,7 @@ LIB "general.lib";
 LIB "standard.lib";
 LIB "linalg.lib";
 LIB "matrix.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "teachstd.lib";
 LIB "qhmoduli.lib";
 ///////////////////////////////////////////////////////////////////////

@@ -1,0 +1,1418 @@
+///////////////////////////////////////////////////////////////////
+version="version interval.lib 4.2.0.1 Dec_2020 ";
+info="
+LIBRARY:    interval.lib implements interval arithmetic on polynomials
+AUTHORS:    Dominik Bendle
+            Clara Petroll
+
+OVERLOADS:
+// intervals
+[           intervalGet         indexing
+=           intervalAssign      assigning
+==          intervalEqual       equality
+print       intervalPrint       pretty print
++           intervalAdd         addition
+-           intervalNegate      negation (unary)
+-           intervalSubtract    subtraction
+*           intervalMultiply    multiplication
+/           intervalDivide      division
+^           intervalPotentiate  potentiation
+
+// boxes
+=           boxSet              assigning
+[           boxGet              indexing
+==          boxEqual            equality
+print       boxPrint            printing
+-           boxSubtract         subraction
+intersect   boxIntersect        intersection
+
+// intervalmatrices
+[           ivmatGet            indexing
+print       ivmatPrint          printing
+nrows       ivmatNrows          number of rows
+ncols       ivmatNcols          number of columns
+det         determinant         determinant
+*           ivmatMultiply       matrix multiplication
+
+PROCEDURES:
+length2()               length/size if interval
+bounds2()               construct interval for given bounds.
+
+intervalmatrixInit()    initialises an interval matrix
+unitMatrix2()           unit matrix
+applyMatrix()           apply matrix to box
+ivmatGaussian2()        Gaussian elimination on matrices
+
+evalPolyAtBox2()        evaluate interval extension of polynomial
+exclusionTest()         first version of our exclusion test
+
+SEE ALSO: rootisolation_lib
+";
+///////////////////////////////////////////////////////////////////
+
+static proc mod_init()
+{
+    newstruct("interval", "list l");
+    system("install", "interval", "[",      intervalGet,        2);
+    system("install", "interval", "=",      intervalAssign,     1);
+    system("install", "interval", "==",     intervalEqual,      2);
+    system("install", "interval", "string", intervalString,     1);
+    system("install", "interval", "print",  intervalPrint,      1);
+    system("install", "interval", "+",      intervalAdd,        2);
+    system("install", "interval", "-",      intervalNegate,     1);
+    system("install", "interval", "-",      intervalSubtract,   2);
+    system("install", "interval", "*",      intervalMultiply,   2);
+    system("install", "interval", "/",      intervalDivide,     2);
+    system("install", "interval", "^",      intervalPotentiate, 2);
+
+    newstruct("box", "list intervals");
+    system("install", "box", "=",           boxAssign,      1);
+    system("install", "box", "[",           boxGet,         2);
+    system("install", "box", "==",          boxEqual,       2);
+    system("install", "box", "print",       boxPrint,       1);
+    system("install", "box", "-",           boxSubtract,    2);
+    system("install", "box", "intersect",   boxIntersect,   4);
+
+    newstruct("ivmat", "list rows");
+    system("install", "ivmat", "print", ivmatPrint,             1);
+    system("install", "ivmat", "[",     ivmatGet,               2);
+    system("install", "ivmat", "nrows", ivmatNrows,             1);
+    system("install", "ivmat", "ncols", ivmatNcols,             1);
+    system("install", "ivmat", "det",   determinant,            1);
+    system("install", "ivmat", "*",     ivmatMultiplyGeneral,   2);
+}
+
+///////////////////////////////////////////////////////////////////
+
+// INTERVAL FUNCTIONS
+
+proc bounds2(number a, number b)
+"USAGE: bounds2(a, b), a, b number
+RETURN: interval [a, b]."
+{
+    // depends on inplementation (TODO)
+    interval OUT;
+    // bounds need not be supplied in order
+    if (a < b) {
+        OUT.l = list(a, b);
+    } else {
+        OUT.l = list(b, a);
+    }
+
+    return(OUT);
+}
+
+proc intervalAssign(def input)
+"USAGE: I = input, input number, int, ...
+RETURN: interval I
+EXAMPLE: assigning intervals with ="
+{
+    if(typeof(input) == "number") { return(bounds2(input, input)); }
+    if(typeof(input) == "int"   ) { return(intervalAssign(number(input)));  }
+
+    ERROR("input not supported.");
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = 1; I;
+    I = 3/7;        I;
+}
+
+proc intervalGet(interval I, int n)
+"USAGE: I[n], interval I, int n
+RETURN: get lower or upper bound of interval"
+{
+    // depends on implementation (TODO)
+    if (n == 1 || n == 2) {
+        return(I.l[n]);
+    }
+    ERROR("index wrong.");
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+    interval I = bounds2(0/1, 1/1);
+
+    I[1];
+    I[2];
+}
+
+proc intervalEqual(interval I, interval J)
+"USAGE: I == J, I, J interval
+RETURN: 1 if bounds are equal, 0 else
+EXAMPLE: test intervals for equality"
+{
+    return(I[1] == J[1] && I[2] == J[2]);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(0, 1);
+    interval J = bounds2(0, 1);
+    interval K = bounds2(0, 2);
+
+    I == J;
+    I == K;
+}
+
+proc length2(interval I)
+"USAGE: length2(I), I interval
+RETURN: length/size in measure sense
+EXAMPLE: compute length of intervals"
+{
+    return(I[2] - I[1]);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(0, 1);    I;
+    length2(I);
+
+    I = bounds2(-1/2, 3/7);        I;
+    length2(I);
+}
+
+proc intervalString(interval I)
+"USAGE: string(I), I interval
+RETURN: string representation of I
+EXAMPLE: convert interval to string"
+{
+    return(string("[", I[1], ", ", I[2], "]"));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(0, 3/2);
+    string("I = ", I, "!");
+}
+
+proc intervalPrint(interval I)
+"USAGE: I;, I interval
+EXAMPLE: prints interval in readable format"
+{
+    string(I);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(1/5, 7/3);
+    I;
+}
+
+proc intervalAdd(interval I, interval J)
+"USAGE: I + J, I, J interval
+RETURN: I+J
+EXAMPLE: adds two intervalls"
+{
+    // independent of implementation
+    return(bounds2(I[1] + J[1], I[2] + J[2]));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+    interval I = bounds2(0/1, 1/2);    I;
+    interval J = bounds2(2/3, 1/1);    J;
+
+    J = I+J;                                    J;
+}
+
+proc intervalNegate(interval I)
+"USAGE: (-I), I interval
+RETURN: -I
+EXAMPLE: computes negation of interval"
+{
+    return(bounds2(-I[2], -I[1]));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+    interval I = bounds2(1/3, 1/2);    I;
+    I = -I;                                     I;
+}
+
+proc intervalSubtract(interval I, interval J)
+"USAGE: I - J, I, J, interval,
+RETURN: I-J
+EXAMPLE: subtracts two intervals"
+{
+    return(I + (-J));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+    interval I = bounds2(3/2, 14/5);   I;
+    interval J = bounds2(1/7, 2/3);    J;
+
+    J = I - J;                                  J;
+}
+
+proc intervalMultiply(interval I, interval J)
+"USAGE: I * J; I, J interval
+RETURN: product I*J
+EXAMPLE: multiplies intervals (and scalars)"
+{
+    number lo = min(I[1] * J[1], I[1] * J[2], I[2] * J[1], I[2]*J[2]);
+    number up = max(I[1] * J[1], I[1] * J[2], I[2] * J[1], I[2]*J[2]);
+
+    return(bounds2(lo, up));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(1/3, 3/1);    I;
+    interval J = bounds2(-2/5, 1/7);   J;
+
+    J = I * J;                                  J;
+
+    J = 1/2 * J;                                J;
+}
+
+proc intervalDivide(interval I, interval J)
+"USAGE: I/J, I, J, interval
+RETURN: I/J (division)
+EXAMPLE: divide intervals, demonstrate zero case"
+{
+    if (J[1]*J[2] > 0) {
+        interval Jinv = bounds2(1/J[2], 1/J[1]);
+        return(I * Jinv);
+    } else {
+        ERROR("Divisor contains zero.");
+    }
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(1/1, 3/1);    I;
+    interval J = bounds2(2/3, 3/2);    J;
+
+    I/J;
+    J/I;
+
+    I = bounds2(-2/1, 1/2);            I;
+
+    I/J;
+    J/I;
+}
+
+proc intervalPotentiate(interval I, int n)
+"USAGE: I^n, interval I, int n
+RETURN: I^n with stricter bounds than naive multiplication
+EXAMPLE: potentiates an interval"
+{
+    if (n % 2 == 1 || I[1]*I[2] >= 0 || n == 0) {
+        return(bounds2(I[1]^n, I[2]^n));
+    } else {
+        return(bounds2(0, max(I[1]^n, I[2]^n)));
+    }
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(-1/3, 3/2);   I;
+    I^1;
+    I^2;
+    I^3;
+    I^4;
+
+    interval J = bounds2(1/5, 2/5);    J;
+    J^1;
+    J^2;
+    J^3;
+    J^4;
+}
+
+///////////////////////////////////////////////////////////////////
+
+// BOX FUNCTIONS
+
+proc boxAssign(list intervals)
+"USAGE: B = I1,I2,.., I1, I2 interval
+RETURN: Box consisting of given intervals honoring amount of ring variables
+EXAMPLE: construct box from intervals"
+{
+    int v = nvars(basering);
+    int s = size(intervals);
+    box B;
+
+    // make sure box has same number of intervals as ring variables
+    interval z = 0;
+    for (int i = 1; i <= v; i++) {
+        if (i <= s) {
+            if (typeof(intervals[i]) == "interval") {
+                B.intervals[i] = intervals[i];
+            } else {
+                ERROR("Non-interval given.");
+            }
+        } else {
+            B.intervals[i] = z;
+        }
+    }
+
+    return(B);
+}
+example
+{
+    echo = 2;
+
+    ring R = 0,x,lp;
+    interval I = bounds2(1, 2);
+    box B = list(I); B;
+
+    ring S = 0,x(1..15),lp;
+    I = bounds2(1/2, 2/3);
+    B = list(I, I^2, I^3); B;
+}
+
+proc boxSet(box B, int n, interval I)
+"USAGE: boxSet(B, n, I), B box, n int, I interval
+RETURN: B where B[i] == I
+EXAMPLE: modify box"
+{
+    if (n >= 1 && n <= nvars(basering)) {
+        B.intervals[n] = I;
+    }
+    return(B);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x(1..3),lp;
+
+    interval I = 1;
+    box B = list(I); B;
+    B = boxSet(B, 3, bounds2(1, 2));   B;
+}
+
+proc boxPrint(box B)
+"USAGE: B;, B box,
+RETURN: pretty output
+EXAMPLE: output a box"
+{
+    string(B.intervals);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x(1..4),lp;
+
+    interval I = bounds2(1, 2);
+    box B = list(I,I+1,I+2,I+4);  B;
+    B = list(I,I^2);              B;
+}
+
+proc boxGet(box B, int n)
+"USAGE: B[n], B box, n int
+RETURN: n-th interval of box
+EXAMPLE: returns interval"
+{
+    return(B.intervals[n]);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x(1..5),lp;
+
+    interval I = bounds2(1/3, 5);
+    box B = list(I, I/I, I+I, I-1/I, I^4);
+
+    B;
+    B[3];
+}
+
+proc boxEqual(box B, box C)
+"USAGE: B == C, B, C box
+RETURN: 1 if all bounds are equal, 0 else
+EXAMPLE: test boxes for equality"
+{
+    int n = nvars(basering);
+    for (int i = 1; i <= n; i++) {
+        if (!(B[i] == C[i])) { return(0); }
+    }
+    return(1);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(0,1);
+    interval J = bounds2(1,2);
+    box B = list(I, J);
+    box C = list(J, I);
+    box D = list(I, J);
+
+    B == C;
+    B == D;
+}
+
+proc boxSubtract(box B, box C)
+"USAGE: B-C, B, C box
+RETURN: componentwise subtraction"
+{
+    int n = nvars(basering);
+    box OUT;
+    for (int i = 1; i <= n; i++) { OUT.intervals[i] = B[i] - C[i]; };
+    return(OUT);
+}
+
+proc lengthBox(box B)
+"USAGE: lengthBox(B), B box
+RETURN: length/size in measure sense
+EXAMPLE: compute length of boxes"
+{
+    number maximum = 0;
+    int n = nvars(basering);
+
+    for (int i=1; i <= n; i++) { maximum = max(maximum, length2(B[i])); }
+
+    return(maximum);
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+
+    interval I = bounds2(0, 1);    I;
+    interval J = bounds2(1,3);     J;
+
+    box B = list(I, J);
+
+    lengthBox(B);
+}
+
+proc boxCenter(box M)
+"USAGE: boxCenter(M), M ivmat
+RETURN: box containing center elements of M
+EXAMPLE: compute center box"
+{
+    int n = nvars(basering);
+
+    box C;
+    int i;
+
+    for (i = 1; i <= n; i++) {
+        C.intervals[i] = interval((M[i][1] + M[i][2])/2);
+    }
+
+    return(C);
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+    interval I1 = bounds2(1/3, 7/4);
+    interval I2 = bounds2(0,2);
+
+    box B= list(I1,I2);
+
+    boxCenter(B);
+}
+
+proc splitBox(box B, ideal I)
+"USAGE: splitBox(box, I), box list of intervals, I ideal
+RETURN: new list of smaller boxes, such that intersection of borders does not contain zeros of I
+EXAMPLE: split two-dimensional interval into two"
+{
+    // at first split only at largest interval
+    int imax = 1;
+    int n = nvars(basering);
+
+    for (int i = 2; i <= n; i++) {
+        if (length2(B[i]) > length2(B[imax])) { imax = i; }
+    }
+
+    number ratio = 1/2;
+    number mean;
+    box intersection;
+    ideal Inew;
+
+    while(1) {
+        mean = ratio * B[imax][1] + (1 - ratio) * B[imax][2];
+
+        intersection = evalIdealAtBox(I, boxSet(B, imax, mean));
+        for (i = 1; i <= n; i++) {
+            // check if any interval does not contain zero
+            if (intersection[i][1]*intersection[i][2] > 0) { break; }
+        }
+
+        Inew = I + (var(imax) - mean);
+        // check if groebner basis is trivial
+        if (std(Inew) == 1) { break; }
+
+        // else there must?/might be a zero on the intersection,
+        // so decrease ratio slightly
+        ratio = ratio * 9/10;
+
+        // make sure algorithm terminates, after taking too many steps
+        if ( ratio < 1/100 ) { print("splitBox took too long"); break; }
+    }
+
+    // now split boxes
+    box boxLeft  = boxSet(B, imax, bounds2(B[imax][1], mean));
+    box boxRight = boxSet(B, imax, bounds2(mean, B[imax][2]));
+
+    return(list(boxLeft, boxRight));
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+
+    box B = list(bounds2(0,1),
+                 bounds2(0,2));
+
+    B;
+    splitBox(B,1);
+}
+
+proc boxIntersect
+"USAGE: intersect(B1, B2, ...) Bi box
+RETURN: intersection B of the boxes Bi or -1 if the intersection is empty
+EXAMPLE: intersect boxes"
+{
+    int ninput = size(#);
+    if (ninput == 0) { return(-1) };
+
+    int n = nvars(basering);
+    int i, j;
+
+    for (i = 1; i <= ninput; i++) {
+        if (typeof(#[i]) <> "box") {
+            ERROR("Need to intersect boxes.");
+        }
+    }
+
+    box OUT;
+    number lower, upper;
+
+    for (i = 1; i <= n; i++) {
+        lower = #[1][i][1];
+        upper = #[1][i][2];
+        for (j = 2; j <= ninput; j ++) {
+            lower = max(lower, #[j][i][1]);
+            upper = min(upper, #[j][i][2]);
+        }
+
+        if (upper < lower) { return(-1); }
+
+        OUT.intervals[i] = bounds2(lower, upper);
+    }
+
+    return(OUT);
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+
+    interval I = bounds2(0,1);
+    interval J = bounds2(1/2, 3/2);
+
+    box B = list(I, J);
+    box C = list(J, I);
+    box D = list(I, I + 2);
+
+    intersect(B, C);
+    intersect(C, D);
+}
+
+proc boxIsinterior(box A, box B)
+"USAGE: boxIsinterior(A, B), A, B box
+RETURN: 1 if A contained in int(B) else 0
+EXAMPLE: boxIsinterior"
+{
+    int n = nvars(basering);
+    for (int i=1; i<= n; i++) {
+        if (A[i][1] <= B[i][1] || A[i][2] >= B[i][2]){return(0);}
+    }
+    return(1);
+}
+example
+{
+    echo=2;
+    ring R=0,(x,y,z), lp;
+    box A=list(bounds2(1,2), bounds2(2,3), bounds2(1/2,7/2)); A;
+    box B1=list(bounds2(0,5/2), bounds2(1,4), bounds2(0,9)); B1;
+    boxIsinterior(A,B1);
+
+    box B2=list(bounds2(2,4), bounds2(1,4), bounds2(0,9)); B2;
+    boxIsinterior(A,B2);
+}
+
+///////////////////////////////////////////////////////////////////
+
+// MATRIX FUNCTIONS
+
+proc intervalmatrixInit(numrows, numcols)
+"USAGE: intervalmatrixInit(m, n) m, n int
+RETURN: mxn matrix of [0,0]-intervals
+EXAMPLE: initialises an interval matrix"
+{
+    ivmat A;
+    A.rows = list();
+    int i, j;
+    interval z = 0;
+
+    for (i = 1; i <= numrows; i++) {
+        A.rows[i] = list();
+        for (j=1; j <= numcols; j++) {
+            A.rows[i][j] = z;
+        }
+    }
+
+    return(A);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x(1..5),lp;
+
+    ivmat A = intervalmatrixInit(4, 5); A;
+}
+
+proc ivmatNrows(ivmat M)
+"USAGE: nrows(M), M ivmat
+RETURN: number of rows of M
+EXAMPLE: calculate number of rows"
+{
+    return(size(M.rows));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    ivmat A = intervalmatrixInit(2,3);
+    nrows(A);
+}
+
+proc ivmatNcols(ivmat M)
+"USAGE: ncols(M), M ivmat
+RETURN: number of columns of M
+EXAMPLE: calculate number of columns"
+{
+    return(size(M.rows[1]));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    ivmat A = intervalmatrixInit(2,3);
+    ncols(A);
+}
+
+proc ivmatAssign(int m, int n, list #)
+"USAGE: ivmatAssign(m, n, L), m, n int, L list of intervals
+RETURN: interval matrix containing intervals L in row major order
+EXAMPLE: builds matrix from intervals"
+{
+    list intervals;
+    if (size(#) == 1 && typeof(#[1]) == "list") { intervals = #[1]; }
+    else                                        { intervals = #;    }
+
+    int ivsize = size(intervals);
+    int i, j;
+    int counter = 1;
+    ivmat A = intervalmatrixInit(m, n);
+
+    for (i = 1; i <= m; i++) {
+        for (j = 1; j <= n; j++) {
+            if (counter <= ivsize) {
+                A.rows[i][j] = intervals[counter];
+                counter++;
+            }
+        }
+    }
+
+    return(A);
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+
+    interval I = bounds2(1, 2);
+    ivmat A = ivmatAssign(2, 2, I, I^2, I/I, -I);
+    A;
+}
+
+proc ivmatPrint(ivmat A)
+"USAGE: A; A ivmat
+RETURN: nothing
+EXAMPLE: prints a matrix"
+{
+    int m = nrows(A);
+    for (int i = 1; i <= m; i++) {
+        string(A.rows[i]);
+    }
+}
+example
+{
+    example ivmatAssign;
+}
+
+proc ivmatGet(ivmat A, int i)
+"USAGE: A[i], A ivmat, i int
+RETURN: list A[i] of i-th row of A
+EXAMPLE: get single interals of matrix"
+{
+    return(A.rows[i]);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    ivmat A = ivmatAssign(2, 2, bounds2(1, 2));
+    A[1][1];
+    A[1][2];
+}
+
+proc ivmatSet(ivmat A, int i, int j, interval I)
+"USAGE: ivmatSet(A, i, j, I), A ivmat, i, j, int, I interval
+RETURN: ivmat A where A[i][j] == I
+EXAMPLE: assign values of A"
+{
+    A.rows[i][j] = I;
+    return(A);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+    ivmat A = intervalmatrixInit(2,2);             A;
+    A = ivmatSet(A, 1, 2, bounds2(1, 2));  A;
+}
+
+proc diagMatrix(int n, interval I)
+"USAGE: diagMatrix(n, I), n int, I interval
+RETURN: diagonal nxn-matrix E where E[i][i] == I for all 1 <= i <= n
+EXAMPLE: create diagonal matrix"
+{
+    ivmat E = intervalmatrixInit(n, n);
+    for (int i = 1; i <= n; i++) {
+        E.rows[i][i] = I;
+    }
+    return(E);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+    ivmat A = diagMatrix(2, bounds2(1, 2)); A;
+}
+
+proc unitMatrix2(int n)
+"USAGE: unitMatrix2(n)
+RETURN: nxn unit matrix
+EXAMPLE: create unit matrix"
+{
+    return(diagMatrix(n, 1));
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    ivmat E = unitMatrix2(4); E;
+}
+
+proc determinant(ivmat A)
+"USAGE: det(A), A ivmat
+RETURN: determinant calculated by standard interval arithmetic
+EXAMPLE: calculates a determinant"
+{
+    int n = ncols(A);
+    if (n == 1) { return(A[1][1]); }
+
+    interval I = 0;
+    for (int i = 1; i <= n; i++) {
+        I = I + A[1][i] * cofactor(A, 1, i);
+    }
+    return(I);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    ivmat E = unitMatrix2(3); E;
+    det(E);
+
+    E = diagMatrix(3, bounds2(2, 5/2)); E;
+    det(E);
+
+    interval I = bounds2(1/3, 4/3);
+    ivmat A = ivmatAssign(2, 2, I, I+1, I+2, I^2); A;
+    det(A);
+}
+
+proc cofactor(ivmat A, int i, int j)
+"USAGE: cofactor(A, i, j), A ivmat, i, j int
+RETURN: cofactor of A at position (i,j)
+EXAMPLE: compute cofactors"
+{
+    int n = ncols(A);
+    if (n == 1) { return(A[1][1]); }
+
+    ivmat M = intervalmatrixInit(n-1, n-1);
+
+    // create m-1 x n-1 submatrix (minor) without row i, column j
+    int k, l;
+    for (k = 1; k < n; k++) {
+        for (l = 1; l < n; l++) {
+            M.rows[k][l] = A[k + (k>=i)][l + (l>=j)];
+        }
+    }
+
+    return( (-1)^(i+j) * det(M) );
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(1, 2);
+    interval J = bounds2(2, 5/2);
+    interval z = 0;
+
+    ivmat A = ivmatAssign(2,2,I,z,z,J); A;
+
+    cofactor(A, 2, 1);
+}
+
+proc adjunct(ivmat A)
+"USAGE: adjuct(A), A ivmat
+RETURN: adjuct matrix i.e. transpose cofactor matrix
+EXAMPLE: compute adjunct matrix"
+{
+    int n = size(A[1]);
+    ivmat adj = intervalmatrixInit(n, n);
+
+    int i, j;
+    for (i = 1; i <= n; i++) {
+        for (j = 1; j <= n; j++) {
+            adj.rows[i][j] = cofactor(A, j, i);
+        }
+    }
+
+    return(adj);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(1, 2);
+    interval J = bounds2(2, 5/2);
+    interval z = 0;
+
+    ivmat A = ivmatAssign(2,2,I,z,z,J); A;
+
+    adjunct(A);
+}
+
+proc ivmatCenter(ivmat M)
+"USAGE: ivmatCenter(M), M ivmat
+RETURN: martix containing center elements of M
+EXAMPLE: compute center matrix"
+{
+    int m = nrows(M);
+    int n = ncols(M);
+
+    matrix C[m][n];
+    int i, j;
+
+    for (i = 1; i <= m; i++) {
+        for (j = 1; j <= n; j++) {
+            C[i, j] = (M[i][j][1] + M[i][j][2])/2;
+        }
+    }
+
+    return(C);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(1/3, 7/4);
+    ivmat M = diagMatrix(3, I);
+    M = ivmatSet(M, 3, 2, bounds2(1, 3/2)); M;
+
+    ivmatCenter(M);
+}
+
+proc ivmatRadius(ivmat M)
+"USAGE: ivmatRadius(M), M ivmat
+RETURN: martix containing radius elements of M
+EXAMPLE: compute radius matrix"
+{
+    int m = nrows(M);
+    int n = ncols(M);
+
+    matrix C[m][n];
+    int i, j;
+
+    for (i = 1; i <= m; i++) {
+        for (j = 1; j <= n; j++) {
+            C[i, j] = length2(M[i][j])/2;
+        }
+    }
+
+    return(C);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(1/3, 7/4);
+    ivmat M = diagMatrix(3, I);
+    M = ivmatSet(M, 3, 2, bounds2(1, 3/2)); M;
+
+    ivmatRadius(M);
+}
+
+proc ivmatMultiply(ivmat A, ivmat B)
+"USAGE: A*B, A, B ivmat
+RETURN: matrix product of A and B
+EXAMPLE: multiply matrices"
+{
+    int m = nrows(A);
+    int n = ncols(B);
+    int p = ncols(A);
+
+    if (p <> nrows(B)) { ERROR("Matrices have wrong dimensions!"); }
+
+    ivmat C = intervalmatrixInit(m, n);
+    int i, j, k;
+    interval I;
+
+    for (i = 1; i <= m; i++) {
+        for (j = 1; j <= n; j++) {
+            I = 0;
+            for (k = 1; k <= p; k++) {
+                I = I + A[i][k] * B[k][j];
+            }
+            C.rows[i][j] = I;
+        }
+    }
+
+    return(C);
+}
+example
+{
+    echo = 3;
+    ring R = 0,x,lp;
+
+    interval I = bounds2(0, 1);
+    ivmat E = intervalmatrixInit(3,3);
+    for (int i = 1; i<=3; i++) { E = ivmatSet(E, i, i, I+i); } E;
+
+    interval z = 0;
+    interval J1 = bounds2(1/3, 3/7);
+    interval J2 = bounds2(2, 5/2);
+    interval J3 = bounds2(6/7, 8/7);
+    interval J4 = bounds2(1, 2);
+
+    ivmat A = ivmatAssign(3,3, J1, z, J2, J3, J3^2, z, z, J4, J2*J4); A;
+
+    E * A;
+    A * E;
+
+    A * adjunct(A);
+    det(A);
+}
+
+proc ivmatGaussian2(ivmat A)
+"USAGE: ivmatGaussian2(A) A ivmat
+RETURN: 0 if A not invertible, 1,Ainv if A invertible
+EXAMPLE: some matrix"
+{
+    int n = nrows(A);
+    if (n <> ncols(A)) { ERROR("Matrix non-square"); }
+
+    ivmat Ainv = unitMatrix2(n);
+    list tmp;
+    interval TMP;
+
+    int i, j, pos;
+    for (pos = 1; pos <= n; pos++) {
+        i = pos;
+
+        // get non-zero interval on diagonal
+        while(A[i][pos][1] * A[i][pos][2] <= 0) {
+            i++;
+            // if no non-zero intervals exist, then matrix must be singular
+            if (i > n) { return(0); }
+        }
+        if (i <> pos) {
+            tmp = A.rows[i];
+            A.rows[i] = A.rows[pos];
+            A.rows[pos] = tmp;
+
+            tmp = Ainv.rows[i];
+            Ainv.rows[i] = Ainv.rows[pos];
+            Ainv.rows[pos] = tmp;
+        }
+
+        // pivot (pos,pos)
+        TMP = A[pos][pos];
+        A.rows[pos][pos] = interval(1);
+
+        for (j = 1; j <= n; j++) {
+            if (pos <> j) { A.rows[pos][j] = A[pos][j]/TMP; }
+            Ainv.rows[pos][j] = Ainv[pos][j]/TMP;
+        }
+
+        // clear entries above and below
+        for (i = 1; i <= n; i++) {
+            if (i <> pos) {
+                TMP = A[i][pos];
+                A.rows[i][pos] = interval(0);
+                for (j = 1; j <= n; j++) {
+                    if (j <> pos) { A.rows[i][j] = A[i][j] - A[pos][j]*TMP; }
+                    Ainv.rows[i][j] = Ainv[i][j] - Ainv[pos][j]*TMP;
+                }
+            }
+        }
+    }
+    return(1, Ainv);
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+
+    ideal I = 2x2-xy+2y2-2,2x2-3xy+3y2-2;
+    box B = list(bounds2(7/8, 9/8), bounds2(-1/10, 1/20));
+
+    ivmat J = evalJacobianAtBox (I, B); J;
+
+    list result = ivmatGaussian2(J);
+    ivmat Jinv = result[2];
+    Jinv;
+
+    Jinv * J;
+
+    ivmat Jadj = diagMatrix(2, 1/det(J)) * adjunct(J);
+    Jadj;
+
+    Jadj * J;
+}
+
+proc applyMatrix(ivmat A, box b)
+"USAGE: A * b, A ivmat, b box
+RETURN: A*b
+EXAMPLE: apply matrix to box"
+{
+    int n = nvars(basering);
+
+    if (ncols(A) <> n || nrows(A) <> n) { ERROR("Matrix has wrong dimensions"); }
+
+    int i, j;
+    box result;
+    interval tmp;
+
+    for (i = 1; i <= n; i++) {
+        tmp = 0;
+        for (j = 1; j <= n; j++) {
+            tmp = tmp + A[i][j] * b[j];
+        }
+        result.intervals[i] = tmp;
+    }
+
+    return(result);
+}
+example
+{
+    echo = 3;
+    ring R = 0,(x,y,z),lp;
+
+    ideal I = xyz3+z2y2+x,x4+y3+2z+3,xyz+1/2;
+    interval J = bounds2(1/2, 3/2);
+    box B = list(J,J,J);
+
+    ivmat A = evalJacobianAtBox(I, B); A;
+    A*B;
+
+    unitMatrix2(3) * B;
+
+    diagMatrix(3, bounds2(0, 1)) * B;
+}
+
+proc ivmatMultiplyGeneral(ivmat A, B)
+"USAGE: A * B, A ivmat, B ivmat or box
+RETURN: usual matrix product where box is a nx1 matrix
+EXAMPLE: multiply matrices with matrices and boxes"
+{
+    if (typeof(B) == "ivmat") { return(ivmatMultiply(A, B)); }
+    if (typeof(B) == "box")   { return(applyMatrix(A, B)); }
+    ERROR("Type not supported.");
+}
+example
+{
+    example ivmatMultiply;
+    example applyMatrix;
+}
+
+///////////////////////////////////////////////////////////////////
+
+// POLYNOMIAL APPLICATIONS
+
+// naive (?) implementation
+proc evalPolyAtBox2(poly f, box B)
+"USAGE: evalPolyAtBox2(f, B), f poly, B box
+RETURN: interval extension ff(intervals)
+EXAMPLE: computes interval extension of polynomial f"
+{
+    int numvars = nvars(basering);
+
+    // neutral elemen of addition
+    interval resultWhole = 0;
+    interval resultMonom;
+
+    int i;
+    number coeff;
+    intvec exponent;
+
+    // handle each monomial separately
+    while (f <> 0) {
+        coeff = leadcoef(f);
+        exponent = leadexp(f);
+
+        // neutral element of multiplication
+        resultMonom = 1;
+
+        for (i = 1; i <= numvars; i++) {
+            resultMonom = resultMonom * B[i] ^ exponent[i];
+        }
+
+        resultWhole = resultWhole + coeff * resultMonom;
+        f = f - lead(f);
+    }
+
+    return(resultWhole);
+}
+example
+{
+    echo = 2;
+    ring R = 0,x,lp;
+    interval I1 = bounds2(0, 1); I1;
+
+    poly f = x3 + 4x + 3;
+
+    evalPolyAtBox2(f, list(I1));
+
+    ring S = 0,(x,y,z),lp;
+    interval I2 = bounds2(0, 1);
+    box B = list(I2, I2, I2);
+
+    poly f = xyz2 + 2x2 + (3/2)*y3x + z + 1;
+
+    evalPolyAtBox2(f, B);
+}
+
+proc evalJacobianAtBox(ideal I, box B)
+"USAGE: evalJacobianAtBox(I, B), I ideal B box
+RETURN: jacobian matrix of I where polynomials are evaluated at the given box
+EXAMPLE: evalate Jacobian at box"
+{
+    matrix J = jacob(I);
+    int m = nrows(J);
+    int n = ncols(J);
+    ivmat M = intervalmatrixInit(m, n);
+
+    int i, j;
+
+    for (i = 1; i <= m; i++) {
+        for (j = 1; j <=n ; j++) {
+            M.rows[i][j] = evalPolyAtBox2(J[i,j], B);
+        }
+    }
+    return(M);
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+    ideal I = 2x2-xy+2y2-2, 2x2-3xy+3y2-2;
+
+    interval J = bounds2(-1,1);
+    evalJacobianAtBox(I, list(J,J));
+}
+
+proc testPolyBox(ideal I, box B)
+"USAGE: testPolyBox(I, intervals) or testPolyBox(I, I1, I2, ..)
+        I ideal, intervals list of intervals, I1, I2, .. intervals
+RETURN: -1, if ideal has no zeros in given box, 1, if unique zero in given box
+        0 if test is inconclusive
+EXAMPLE: tests the above for intersection of ellipses."
+{
+    int numvars = nvars(basering);
+    int i;
+
+    interval tmp;
+
+    for (i = 1; i <= ncols(I); i++) {
+        tmp = evalPolyAtBox2(I[i], B);
+        // check if 0 contained in every interval
+        // return -1 if not
+        if (tmp[1]*tmp[2] > 0) { return(-1, B); }
+    }
+
+    if (ncols(I) == numvars) {
+        // calculate center as box of intervals instead of numbers
+        // so we may reuse other procedures
+        box Bcenter = boxCenter(B);
+
+        ivmat J = evalJacobianAtBox(I, B);
+        list inverse = ivmatGaussian2(J);
+
+        // only continue if J is invertible , i.e. J contains no singular matrix
+        if (!inverse[1]) { return(0, B); }
+        ivmat Jinverse = inverse[2];
+
+        // calculate Bcenter - f(B)^(-1)f(Bcenter)
+        box fB = evalIdealAtBox(I, Bcenter);
+        fB = Bcenter - (Jinverse * fB);
+
+        def Bint = intersect(B, fB);
+
+        // if intersection is emtpy Bint == -1
+        if (typeof(Bint) == "int") { return(-1, B); }
+        B = Bint;
+
+        // if equality holds, fB is contained in box B
+        // by paper, fB contains unique solution
+        if (fB == B) { return(1, B) };
+    }
+
+    // no condition could be verified
+    return(0, B);
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+    ideal I = 2x2-xy+2y2-2, 2x2-3xy+3y2-2;
+
+    interval unit = bounds2(0, 1);
+    // there may be common zeros in [0,1]x[0,1]
+    testPolyBox(I, list(unit, unit));
+
+    // there are no common zeros in [0,0.5]x[0,0.5]
+    testPolyBox(I, list(unit/2, unit/2));
+}
+
+proc evalIdealAtBox(ideal I, box B)
+"USAGE: evaluate ideal at list of intervals i.e. at a box
+RETURN: list
+EXAMPLE: evalIdealAtBox"
+{
+    list resu;
+
+    for (int j = 1; j <= size(I); j++) {
+        resu[j]=evalPolyAtBox2(I[j], B);
+    }
+
+    return(box(resu));
+}
+example
+{
+    echo = 2;
+    ring R = 0,(x,y),lp;
+    interval I1 = bounds2(0, 1); I1;
+    interval I2 = bounds2(0, 1); I2;
+
+    poly f = xy2 + 2x2 + (3/2)*y3x  + 1;
+    poly g = 3x2 + 2y;
+
+    ideal I = f,g;
+    list intervals = I1,I2;
+
+    evalIdealAtBox(I,intervals);
+}
+
+proc exclusionTest(ideal I, box start, number limitsize)
+"USAGE: exclusion test for roots with interval arithmetic
+RETURN: list of boxes
+EXAMPLE: exclusionTest for intersection of two ellipses"
+{
+    //set of boxes smaller than size
+    list B_size;
+    //set of boxes which exactly contain one solution
+    list B_star;
+    //set of boxes initialised to input
+    list B = list(start);
+    //help set of boxes
+    list B_prime;
+
+    int i;
+    int zeroTest;
+
+    while (size(B) <> 0) {
+        // B_prime is empty set
+        B_prime = list();
+
+        for (i=1; i<=size(B); i++) {
+            //case that maybe there is a root in the box
+            zeroTest, B[i] = testPolyBox(I,B[i]);
+
+            // maybe refine boxes in Bstar in later steps
+            if (zeroTest == 1) { B_star = insert(B_star, B[i]); };
+            if (zeroTest == 0) {
+                //case that box is smaller than the input limitsize
+                if (lengthBox(B[i]) <= limitsize){
+                    B_size = insert(B_size, B[i]);
+                } else {
+                    // else split the box and put the smaller boxes to B_prime
+                    B_prime = B_prime + splitBox(B[i], I);
+                }
+            }
+        }
+
+        // set B=B_prime
+        B = B_prime;
+    }
+    return(B_size, B_star);
+}
+example
+{
+    echo = 2;
+
+    ring R = 0,(x,y),lp;
+    ideal I = 2x2-xy+2y2-2,2x2-3xy+3y2-2;  // V(I) has four elements
+
+    interval i = bounds2(-3/2,3/2);
+    box B = list(i, i);
+
+    list result = exclusionTest(I, B, 1/512);
+    size(result[1]);
+    size(result[2]);
+}
+
+// vim: ft=singular

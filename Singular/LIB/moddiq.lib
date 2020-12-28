@@ -24,7 +24,7 @@ PROCEDURES:
 //  IntermediatePrimaryDecomposition(I); compute intermediate primary decomposition of I
 //                                       by using modular method
 
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "elim.lib";
 LIB "modular.lib";
 LIB "modstd.lib";

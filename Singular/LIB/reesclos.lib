@@ -199,7 +199,7 @@ RETURN:   the integral closure of I, ... I^#[1]. If # is not given, compute
 
     if (computepow==0)              // #[1] not given or ==0 => compute pow
     {
-      if (maxdeg1(image,tw)>pow)    // from poly.lib
+      if (maxdeg1(image,tw)>pow)    // from polylib.lib
       {
         pow=maxdeg1(image,tw);
       }

@@ -7,7 +7,7 @@
 
 static poly p_SubstMon(poly p, int var, poly image, const ring preimage_r, const ring image_r, const nMapFunc nMap, matrix cache)
 {
-  assume(!rIsPluralRing(image_r));
+  assume(!rIsNCRing(image_r));
   poly q=p_NSet(nMap(pGetCoeff(p),preimage_r->cf,image_r->cf),image_r);
   int i;
   poly h=NULL;
@@ -40,7 +40,7 @@ poly p_SubstPoly (poly p, int var, poly image, const ring preimage_r, const ring
 {
   if (p==NULL) return NULL;
 
-  if (rIsPluralRing(image_r))
+  if (rIsNCRing(image_r))
   {
     if((image_r!=preimage_r)
     ||(preimage_r!=currRing))

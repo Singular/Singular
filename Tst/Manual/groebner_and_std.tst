@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r=32003,(a,b,c,d,e,f),lp;
 ideal I=cyclic(6);
 option(prot);

@@ -20,10 +20,27 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+
+New commands:
+@itemize
+@item Letterplace: dim, rightStd for qrings @nref{LETTERPLACE})
+@end itemize
+
+
+@heading News for version 4-2-0
+
+Syntax changes:
+@itemize
+@item renamed poly.lib to polylib.lib (@nref{polylib_lib})
+@end itemize
+
 New libraries:
 
 @itemize
-@item qmatrix.lib: Quantum matrices, quantum minors and symmetric groups (@nref{qmatrix_lib})
+@item interval.lib: interval arithmetic (@nref{interval_lib})
+@item maxlike.lib: algebraic statistics (@nref{maxlike_lib})
+@item nchilbert.lib: Hilbert series for LetterPlace algebras (@nref{nchilbert_lib})
+@item polyclass.lib: class of polynomials (@nref{polyclass_lib})
 @item recover.lib: Hybrid numerical/symbolical algorithms (@nref{recover_lib})
 @item redcgs.lib: Reduced Comprehensive Groebner Systems (@nref{redcgs_lib})
 @item ringgb.lib: coefficient rings (@nref{ringgb_lib})
@@ -34,19 +51,20 @@ New libraries:
 
 Changed libraries:
 @itemize
-@item grobcov.lib: new version (@nref{grobcov_lib})
 @item classify_aeq.lib: new procedure @code{classSpaceCurve} (@nref{classify_aeq_lib})
+@item grobcov.lib: new version (@nref{grobcov_lib})
+@item modular.lib: parallel version for verification via @code{system("verifyGB",I)}
 @end itemize
 
-New command:
+New commands:
 @itemize
-@item @code{system("verifyGB",I)}: test, if I is a Groebner basis
+@item @code{system("verifyGB",I)}: test, if I is a Groebner basis (using parallel processes)
+@item Letterplace: modulo,syz,lift,liftstd, rightStd (@nref{LETTERPLACE})
 @end itemize
 
 Changes in the kernel/build system:
 @itemize
-@item Letterplace: modulo,syz,lift,liftstd (@nref{LETTERPLACE})
-@item FLINT 2.6.x, prepare for FLINT 2.7.0
+@item update for using FLINT 2.6.x and for FLINT 2.7.0
 @item Singular can be build with NTL or FLINT or both
 (if non is availabel, @code{factroize} and @code{gcd} will not work.)
 @end itemize

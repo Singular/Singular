@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version ringgb.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version ringgb.lib 4.2.0.0 Dec_2020 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY:  ringgb.lib     Functions for coefficient rings
@@ -109,7 +109,7 @@ EXAMPLE: example testZero; shows an example
   printf("Teste %s Belegungen ...", modul^nvars(basering));
   for (; i < modul^nvars(basering); i = i + 1)
   {
-    if ((i + 1) % modul^(nvars(basering)/2) == 0)
+    if ((i + 1) % modul^(nvars(basering) div 2) == 0)
     {
       printf("bisher: %s", i);
     }
@@ -134,7 +134,7 @@ example
 { "EXAMPLE:"; echo = 2;
   ring r = (integer, 12), (y,x), dp;
   poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
-  zeroReduce(f);
+  //zeroReduce(f);
   testZero(f);
   poly g = findZeroPoly(x2y3);
   g;

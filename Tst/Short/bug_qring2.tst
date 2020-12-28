@@ -12,7 +12,7 @@ Env.sing        First step in creating non-magma calculations
 //        do not print all the "redefined" warnings when we load the LIBraries.
 option(noredefine) ;
 //        load the stuff we need.
-LIB "poly.lib" ;
+LIB "polylib.lib" ;
 LIB "nctools.lib" ;
 LIB "ncalg.lib" ;
 

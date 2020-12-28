@@ -42,7 +42,7 @@ embedMat(M,m,n);     embeds matrix M in a left upper corner of m times n matrix
 
 
 LIB "ring.lib"; // for rootofUnity
-LIB "poly.lib"; // for newtonDiag
+LIB "polylib.lib"; // for newtonDiag
 LIB "matrix.lib"; // for submat
 
 ///////////////////////////////////////////////////////////////////////////////

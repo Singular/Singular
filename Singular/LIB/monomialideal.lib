@@ -37,7 +37,7 @@ PROCEDURES:
  primdecMon(id,..);    computes a minimal primary decomposition of a monomial
                        ideal id
 ";
-LIB "poly.lib";  // Para "maxdeg1" en "isprimeMon"
+LIB "polylib.lib";  // Para "maxdeg1" en "isprimeMon"
 //---------------------------------------------------------------------------
 //-----------------------   INTERNOS    -------------------------------------
 //---------------------------------------------------------------------------
