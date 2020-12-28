@@ -820,6 +820,18 @@ BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
   return FALSE;
 }
 
+BOOLEAN p_LPDivisibleBy(ideal I, poly p, ring r)
+{
+  for(int i = 0; i < IDELEMS(I); i++)
+  {
+    if (p_LPDivisibleBy(I->m[i], p, r))
+    {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 poly p_LPVarAt(poly p, int pos, const ring r)
 {
   if (p == NULL || pos < 1 || pos > (r->N / r->isLPring)) return NULL;

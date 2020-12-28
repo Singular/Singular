@@ -121,7 +121,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjDET_I),      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjDET_S),      DET_CMD,         POLY_CMD,       SMATRIX_CMD   , NO_NC |NO_RING}
 ,{D(jjDET),        DET_CMD,         POLY_CMD,       MATRIX_CMD    , NO_NC |ALLOW_RING}
-,{D(jjDIM),        DIM_CMD,         INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDIM),        DIM_CMD,         INT_CMD,        IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjDIM),        DIM_CMD,         INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDIM_R),      DIM_CMD,         INT_CMD,        RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMP),       DUMP_CMD,        NONE,           LINK_CMD      , ALLOW_NC |ALLOW_RING}

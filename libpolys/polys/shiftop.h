@@ -53,6 +53,7 @@ int p_mIsInV(poly p, const ring r);
 BOOLEAN p_LPDivisibleBy(poly a, poly b, const ring r);
 BOOLEAN p_LPLmDivisibleBy(poly a, poly b, const ring r);
 BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r);
+BOOLEAN p_LPDivisibleBy(ideal I, poly p, ring r);
 #define pLPDivisibleBy(a, b) p_LPLmDivisibleBy(a, b, currRing)
 #define pLPLmDivisibleBy(a, b) p_LPLmDivisibleBy(a, b, currRing)
 
