@@ -13,7 +13,7 @@ REFERENCES:  [1] Eisenbud, Erman, Schreyer: Tate Resolutions for Products of Pro
       [2] Eisenbud, Erman, Schreyer: Tate Resolutions on Products of Projective Spaces: Cohomology and Direct Image Complexes (2019)
 PROCEDURES:
       productOfProjectiveSpaces(intvec c)                        creates rings S,E corresponding to the product
-      truncate(module M, intvec c)                          truncates module M at c
+      truncateM(module M, intvec c)                          truncates module M at c
       truncateCoker(module M, intvec c)                        truncates the cokernel at c
       symExt(matrix m)                                computes first differential of R(M)
       sufficientlyPositiveMultidegree(module M)                    computes a sufficiently positive multidegree for M
@@ -262,13 +262,13 @@ example
 
 
 ///////////////////////////////////////////////////////////////////////////////
-proc truncate(module M, intvec c)
-"USAGE:   truncate(M,c); M module, c intvec
+proc truncateM(module M, intvec c)
+"USAGE:   truncateM(M,c); M module, c intvec
 PURPOSE: truncate M at c
 ASSUME:  @code{M} is multigraded S-module with S multigraded ring, c is an intvec of the right length
 RETURN:  module, the truncated module M_{>= c}
 NOTE:    Output is the truncated module (multigraded , grading is not shifted), works for arbitrary products
-EXAMPLE: example truncate
+EXAMPLE: example truncateM
 "
 {
   if (gradingAndVectorCompatible(M,c) == 0)
@@ -313,7 +313,7 @@ example
    module te = freemodule(2);
    te = setModuleGrading(te,grading);
    intvec c = 1,1,1;
-   module Mtrunc = truncate(te,c);
+   module Mtrunc = truncateM(te,c);
    Mtrunc;
    getModuleGrading(Mtrunc);
    multiDeg(Mtrunc);
@@ -335,7 +335,7 @@ EXAMPLE: example truncateCoker
 
   module SMod = freemodule(nrows(M));
   SMod = setModuleGrading(SMod,getModuleGrading(M));
-  module result = prune(multiDegModulo(truncate(SMod,c),truncate(M,c)));
+  module result = prune(multiDegModulo(truncateM(SMod,c),truncateM(M,c)));
   return(result);
 }
 example
