@@ -53,7 +53,7 @@ SLIB1 = arr.lib arnoldclassify.lib \
 	realclassify.lib realizationMatroids.lib resources.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib sets.lib SingularityDBM.lib symodstd.lib schubert.lib swalk.lib \
-	tasks.lib tropical.lib tropicalNewton.lib
+	tateProdCplxMegGrad.lib tasks.lib tropical.lib tropicalNewton.lib
 
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
         fpadim.lib fpalgebras.lib fpaprops.lib freegb.lib\
