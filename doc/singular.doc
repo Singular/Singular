@@ -1188,7 +1188,7 @@ Comments should be send to the author of the library directly.
 * stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * swalk_lib:: Sagbi Walk Conversion Algorithm
 * systhreads_lib:: multi-threaded objects
-* tateProdCplxNegGrad_lib: sheaf cohomology on product of projective spaces
+* tateProdCplxNegGrad_lib:: sheaf cohomology on product of projective spaces
 * VecField_lib:: vector fields
 @end menu
 @c ----------------------------------------------------------
