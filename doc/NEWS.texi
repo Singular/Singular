@@ -29,7 +29,7 @@ New commands:
 New libraries:
 
 @itemize
-@item tateCplxMegGrad.lib: sheaf cohomology on product of  projective spaces (@nref{tateCplxMegGra_lib})
+@item tateProdCplxNegGrad.lib: sheaf cohomology on product of projective spaces (@nref{tateProdCplxNegGrad_lib})
 @end itemize
 
 @heading News for version 4-2-0
