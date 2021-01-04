@@ -26,6 +26,11 @@ New commands:
 @item Letterplace: dim, rightStd for qrings @nref{LETTERPLACE})
 @end itemize
 
+New libraries:
+
+@itemize
+@item tateCplxMegGrad.lib: sheaf cohomology on product of  projective spaces (@nref{tateCplxMegGra_lib})
+@end itemize
 
 @heading News for version 4-2-0
 
