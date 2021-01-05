@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-version="version JMBTest.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version JMBTest.lib 4.2.0.2 dec_2021 "; // $Id$
 category="Algebraic Geometry";
 // summary description of the library
 info="
@@ -47,16 +47,10 @@ LIB "monomialideal.lib";
 LIB "ring.lib";
 ////////////////////////////////////////////////////////////////////
 static proc mod_init()
-"USAGE:     mod_init();
-RETURN:   struct: jmp
-EXAMPLE:  example  mod_init; shows an example"
 {
 newstruct("jmp", "poly h, poly t");
 }
-example
-{ "EXAMPLE:"; echo = 2;
-  mod_init();
-}
+
 ////////////////////////////////////////////////////////////////////
 proc Terns(list G, int c)
 "USAGE:    Terns(G,c); G list, c int

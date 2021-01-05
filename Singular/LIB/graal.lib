@@ -1,5 +1,5 @@
-graalMixed////////////////////////////////////////////////////////////////////////////
-version="version graal.lib 4.1.2.0 Feb_2019 "; // $Id$
+////////////////////////////////////////////////////////////////////////////
+version="version graal.lib 4.2.0.1 Jan_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  graal.lib          localization at prime ideals and their associated graded rings
@@ -33,7 +33,7 @@ LIB "general.lib";  // for watchdog
 LIB "polylib.lib";     // for hilbPoly
 LIB "standard.lib"; // for res
 
-proc mod_init()
+static proc mod_init()
 {
   /***
    * graalBearer is a structure that contains those objects
