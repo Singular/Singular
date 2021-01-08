@@ -862,6 +862,19 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
   return NULL;      // default
 }
 
+static number nrnInitMPZ(mpz_t m, const coeffs r)
+{
+  mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
+  mpz_init_set(erg,m);
+  mpz_mod(erg, erg, r->modNumber);
+  return (number) erg;
+}
+
+static void nrnMPZ(mpz_t m, number &n, const coeffs)
+{
+  mpz_init_set(m, (mpz_ptr)n);
+}
+
 /*
  * set the exponent (allocate and init tables) (TODO)
  */
@@ -1021,6 +1034,8 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nrnCoeffIsEqual;
   r->cfKillChar    = nrnKillChar;
   r->cfQuot1       = nrnQuot1;
+  r->cfInitMPZ     = nrnInitMPZ;
+  r->cfMPZ         = nrnMPZ;
 #if SI_INTEGER_VARIANT==2
   r->cfWriteFd     = nrzWriteFd;
   r->cfReadFd      = nrzReadFd;
