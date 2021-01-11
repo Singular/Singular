@@ -31,7 +31,7 @@ int* Zp_roots (const CanonicalForm f)
     nmod_poly_factor_t fac;
     nmod_poly_factor_init(fac);
     nmod_poly_roots(fac,FLINT_f,0);
-    int *res=(int*)omAlloc0((1+fac->num)*sizeof(int));
+    int *res=NEW_ARRAY(int,1+fac->num);
 
     int j=1;
     for(int i=fac->num-1; i>=0;i--)
@@ -56,7 +56,7 @@ int* Zp_roots (const CanonicalForm f)
   }
   zz_pX NTL_f= convertFacCF2NTLzzpX (f);
   vec_zz_p roots= FindRoots (NTL_f);
-  int *res=(int*)omAlloc0((1+roots.length())*sizeof(int));
+  int *res=NEW_ARRAY(int,1+roots.length());
   res[0]=roots.length();
   for(int i=roots.length()-1;i>=0;i--)
   {
