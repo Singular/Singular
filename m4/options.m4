@@ -298,9 +298,21 @@ AC_ARG_ENABLE(python_module, AS_HELP_STRING([--enable-python_module], [Enable py
 ])
 
 
+
 AC_DEFUN([SING_BUILTIN_MODULES],
 [
 ## m4_pushdef([_symbol],[m4_cr_Letters[]m4_cr_digits[]_])dnl
+  AC_CANONICAL_HOST
+  AC_MSG_CHECKING(checking host)
+  case $host_os in
+    *cygwin* | *mingw*) os_win32=yes;;
+    *) os_win32=no;;
+  esac
+  if test x$os_win32 = xyes; then
+    AC_MSG_RESULT(windows)
+  else
+    AC_MSG_RESULT(unix)
+ fi
  AC_MSG_CHECKING([built-in modules])
 
  AC_ARG_VAR( [BUILTIN_LIBS], [LIB FLAGS for buildins] )
@@ -400,23 +412,23 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AC_SUBST(BUILTIN_MODULES)
 
  AM_CONDITIONAL([SI_BUILTIN_STATICDEMO], [test x$bi_staticdemo = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_SUBSETS], [test x$bi_subsets = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_FREEALGEBRA], [test x$bi_freealgebra = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_PARTIALGB], [test x$bi_partialgb = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$bi_syzextra = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_SUBSETS], [test x$bi_subsets = xtrue -o x$os_win32 = xyes])
+ AM_CONDITIONAL([SI_BUILTIN_FREEALGEBRA], [test x$bi_freealgebra = xtrue -o x$os_win32=xyes])
+ AM_CONDITIONAL([SI_BUILTIN_PARTIALGB], [test x$bi_partialgb = xtrue -o x$os_win32=xyes])
+ AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$bi_syzextra = xtrue -o x$os_win32=xyes])
  AM_CONDITIONAL([SI_BUILTIN_PYOBJECT], [test x$bi_pyobject = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$bi_gfanlib = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$bi_gfanlib = xtrue -o x$os_win32=xyes])
  AM_CONDITIONAL([SI_BUILTIN_POLYMAKE], [test x$bi_polymake = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_PYTHON_MODULE], [test x$bi_python = xtrue])
  AM_CONDITIONAL([HAVE_PYTHON_MODULE], [test x$ENABLE_PYTHON_MODULE = xyes])
- AM_CONDITIONAL([SI_BUILTIN_CUSTOMSTD], [test x$bi_customstd = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_CUSTOMSTD], [test x$bi_customstd = xtrue -o x$os_win32=xyes])
  AM_CONDITIONAL([SI_BUILTIN_SINGMATHIC], [test x$bi_singmathic = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_BIGINTM], [test x$bi_bigintm = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_ORDER], [test x$bi_Order = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_GITFAN], [test x$bi_gitfan = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_INTERVAL], [test x$bi_interval = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_SYSTHREADS], [test x$bi_systhreads = xtrue])
- AM_CONDITIONAL([SI_BUILTIN_LOCTRIV], [test x$bi_loctriv = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_GITFAN], [test x$bi_gitfan = xtrue -o x$os_win32=xyes])
+ AM_CONDITIONAL([SI_BUILTIN_INTERVAL], [test x$bi_interval = xtrue -o x$os_win32=xyes])
+ AM_CONDITIONAL([SI_BUILTIN_SYSTHREADS], [test x$bi_systhreads = xtrue -o x$os_win32=xyes])
+ AM_CONDITIONAL([SI_BUILTIN_LOCTRIV], [test x$bi_loctriv = xtrue -o x$os_win32=xyes])
  AM_CONDITIONAL([SI_BUILTIN_MACHINELEARNING], [test x$bi_machinelearning = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])
