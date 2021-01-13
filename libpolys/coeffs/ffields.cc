@@ -720,6 +720,25 @@ static number nfMapGGrev(number c, const coeffs src, const coeffs)
     return (number)(long)src->m_nfCharQ; /* 0 */
 }
 
+static number nfMapViaInt(number c, const coeffs src, const coeffs dst)
+{
+  int i=src->cfInt(c,src);
+  if (i==0) return (number)(long)dst->m_nfCharQ;
+  while (i <  0)    i += dst->m_nfCharP;
+  while (i >= dst->m_nfCharP) i -= dst->m_nfCharP;
+  if (i==0) return (number)(long)dst->m_nfCharQ;
+  unsigned short cc=0;
+  while (i>1)
+  {
+    cc=dst->m_nfPlus1Table[cc];
+    i--;
+  }
+#ifdef LDEBUG
+  nfTest((number)(long)cc, dst);
+#endif
+  return (number)(long)cc;
+}
+
 /*2
 * set map function nMap ... -> GF(p,n)
 */
@@ -763,10 +782,19 @@ static nMapFunc nfSetMap(const coeffs src, const coeffs dst)
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
 
-  if (src->rep==n_rep_gap_rat) /*Q, Z */
+  if (src->rep==n_rep_gap_rat) /*Q, bigint */
   {
     return nlModP; // FIXME? TODO? // extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to Zp // FIXME!
   }
+  if (nCoeff_is_Z(src)) /* Z*/
+  {
+    return nfMapViaInt;
+  }
+  if (nCoeff_is_Zp(src) && (src->ch==dst->m_nfCharP)) /* Zp*/
+  {
+    return nfMapViaInt;
+  }
+
 
   return NULL;     /* default */
 }
