@@ -720,23 +720,31 @@ static number nfMapGGrev(number c, const coeffs src, const coeffs)
     return (number)(long)src->m_nfCharQ; /* 0 */
 }
 
+static number nfMapMPZ(number c, const coeffs src, const coeffs dst)
+{
+  mpz_t tmp;
+  mpz_init(tmp);
+  mpz_mod_ui(tmp,(mpz_ptr)c,dst->m_nfCharP);
+  long l=mpz_get_si(tmp);
+  return nfInit(l,dst);
+}
+
+static number nfInitMPZ(mpz_t m, const coeffs cf)
+{
+  mpz_t tmp;
+  mpz_init(tmp);
+  mpz_mod_ui(tmp,m,cf->m_nfCharP);
+  long l=mpz_get_si(tmp);
+  return nfInit(l,cf);
+}
+
 static number nfMapViaInt(number c, const coeffs src, const coeffs dst)
 {
-  int i=src->cfInt(c,src);
+  long i=src->cfInt(c,src);
   if (i==0) return (number)(long)dst->m_nfCharQ;
   while (i <  0)    i += dst->m_nfCharP;
   while (i >= dst->m_nfCharP) i -= dst->m_nfCharP;
-  if (i==0) return (number)(long)dst->m_nfCharQ;
-  unsigned short cc=0;
-  while (i>1)
-  {
-    cc=dst->m_nfPlus1Table[cc];
-    i--;
-  }
-#ifdef LDEBUG
-  nfTest((number)(long)cc, dst);
-#endif
-  return (number)(long)cc;
+  return nfInit(i,dst);
 }
 
 /*2
@@ -788,7 +796,7 @@ static nMapFunc nfSetMap(const coeffs src, const coeffs dst)
   }
   if (nCoeff_is_Z(src)) /* Z*/
   {
-    return nfMapViaInt;
+    return nfMapMPZ;
   }
   if (nCoeff_is_Zp(src) && (src->ch==dst->m_nfCharP)) /* Zp*/
   {
@@ -864,6 +872,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   //r->cfIntMod= ndIntMod;
   r->cfExactDiv= nfDiv;
   r->cfInit = nfInit;
+  r->cfInitMPZ = nfInitMPZ;
   //r->cfSize  = ndSize;
   r->cfInt  = nfInt;
   #ifdef HAVE_RINGS
