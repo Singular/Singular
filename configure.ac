@@ -89,6 +89,8 @@ AC_SUBST(CC)
 AC_CHECK_LIB(rt,clock_gettime)
 
 # Check whether --with-gmp was given.
+AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
+                    [provide a non-standard location of gmp])])
 DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 if test "$with_gmp" = yes ; then
