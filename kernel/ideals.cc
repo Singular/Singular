@@ -939,7 +939,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
 
   k=si_max(1L,id_RankFreeModule(h1,currRing));
 
-  if ((k==1) && (!lift3)) si_opt_2 |=Sy_bit(V_IDLIFT);
+  if ((!lift3)&&(!TEST_OPT_RETURN_SB)) si_opt_2 |=Sy_bit(V_IDLIFT);
 
   ring orig_ring = currRing;
   ring syz_ring = rAssure_SyzOrder(orig_ring,TRUE);
