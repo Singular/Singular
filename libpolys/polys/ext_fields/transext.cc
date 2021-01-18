@@ -2514,6 +2514,31 @@ static number ntFarey(number p, number n, const coeffs cf)
   return ((number)result);
 }
 
+static number ntInitMPZ(mpz_t m, const coeffs r)
+{
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  number n=n_InitMPZ(m,r->extRing->cf);
+  NUM(result)=p_NSet(n,r->extRing);
+  return ((number)result);
+}
+
+static void ntMPZ(mpz_t m, number &n, const coeffs r)
+{
+  mpz_init(m);
+  if (n!=NULL)
+  {
+    fraction nn=(fraction)n;
+    if (DENIS1(nn))
+    {
+      if (p_IsConstant(NUM(nn),r->extRing))
+      {
+        n_MPZ(m,pGetCoeff(NUM(nn)),r->extRing->cf);
+	return;
+      }
+    }
+  }
+}
+
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
 
@@ -2584,6 +2609,8 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->nCoeffIsEqual  = ntCoeffIsEqual;
   cf->cfInvers       = ntInvers;
   cf->cfKillChar     = ntKillChar;
+  cf->cfInitMPZ      = ntInitMPZ;
+  cf->cfMPZ          = ntMPZ;
 
   if( rCanShortOut(ntRing) )
     cf->cfWriteShort = ntWriteShort;
