@@ -8,7 +8,7 @@
 #if SI_INTEGER_VARIANT == 3
 
 //make sure that a small number is an immediate integer
-//bascially coped from longrat.cc nlShort3
+//bascially copied from longrat.cc nlShort3
 //TODO: is there any point in checking 0 first???
 //TODO: it is not clear that this works in 32/64 bit everywhere.
 //      too many hacks.
