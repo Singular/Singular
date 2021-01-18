@@ -2088,7 +2088,8 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
      some field Z/pZ: */
   if (h==0)
   {
-    if ((src->rep==n_rep_gap_rat) || (src->rep==n_rep_gap_gmp))
+    if (((src->rep==n_rep_gap_rat) || (src->rep==n_rep_gap_gmp))
+    && (nCoeff_is_Q(dst->extRing->cf) || nCoeff_is_Z(dst->extRing->cf)))
       return ntMap00;                                 /// Q or Z   -->  Q(T)
     if (src->rep==n_rep_gmp)
       return ntMapZ0;                                 /// Z   -->  K(T)
