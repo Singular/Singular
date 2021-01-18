@@ -58,6 +58,7 @@ EXTERN_VAR BOOLEAN siCntrlc;
 #define V_UPTORADICAL 18
 #define V_FINDMONOM  19
 #define V_COEFSTRAT  20
+// set V_IDLIFT for liftstd(A,B) command (no syzygies wanted)
 #define V_IDLIFT     21
 #define V_LENGTH     22
 //#define V_REPORT_STD 23
