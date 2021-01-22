@@ -328,6 +328,11 @@ static number npPar(int i, coeffs r)
 }
 #endif
 
+static number npInitMPZ(mpz_t m, const coeffs r)
+{
+  return (number)mpz_fdiv_ui(m, r->ch);
+}
+
 BOOLEAN npInitChar(coeffs r, void* p)
 {
   assume( getCoeffType(r) == n_Zp );
@@ -358,6 +363,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfInit = npInit;
   //r->cfSize  = ndSize;
   r->cfInt  = npInt;
+  r->cfInitMPZ = npInitMPZ;
   #ifdef HAVE_RINGS
   //r->cfDivComp = NULL; // only for ring stuff
   //r->cfIsUnit = NULL; // only for ring stuff
@@ -566,15 +572,7 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
 */
 static number npMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
-  mpz_ptr erg = (mpz_ptr) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
-  mpz_init(erg);
-
-  mpz_mod_ui(erg, (mpz_ptr) from, dst->ch);
-  number r = (number) mpz_get_si(erg);
-
-  mpz_clear(erg);
-  omFree((void *) erg);
-  return (number) r;
+  return (number)mpz_fdiv_ui((mpz_ptr) from, dst->ch);
 }
 
 static number npMapZ(number from, const coeffs src, const coeffs dst)
