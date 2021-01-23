@@ -184,7 +184,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, int& i)
   } while (1);
 }
 
-#ifdef HAVE_NTL // henselLiftAndEarly
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // henselLiftAndEarly
 CFList biFactorize (const CanonicalForm& F, const Variable& v)
 {
   if (F.inCoeffDomain())

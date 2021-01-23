@@ -924,10 +924,10 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     }
     else //Q(a)[x1,...,xn]
     {
-      #ifdef HAVE_NTL
+      #if defined(HAVE_NTL) || defined(HAVE_FLINT)
       F= ratFactorize (f, alpha);
       #else
-      factoryError ("multivariate factorization over Q(alpha) depends on NTL(missing)");
+      factoryError ("multivariate factorization over Q(alpha) depends on NTL or FLINT (missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
