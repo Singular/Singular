@@ -1147,7 +1147,7 @@ deleteFactors (CFList& factors, int* factorsFoundIndex)
   factors= result;
 }
 
-#ifdef HAVE_NTL // henselLift12
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // henselLift12
 CFList
 henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                     earlyFactors, DegreePattern& degs, int& liftBound,

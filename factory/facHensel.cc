@@ -473,7 +473,7 @@ void sortList (CFList& list, const Variable& x)
 CFList
 diophantine (const CanonicalForm& F, const CFList& factors);
 
-#ifdef HAVE_NTL // diophantine
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diophantine
 CFList
 diophantineHensel (const CanonicalForm & F, const CFList& factors,
                    const modpk& b)
@@ -776,10 +776,11 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
 }
 
 
+
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
 /// over \f$ Q(\alpha) \f$ by first computing mod \f$p\f$ and if no zero divisor
 /// occurred compute it mod \f$p^k\f$
-#ifdef HAVE_NTL // XGCD, zzp_eX
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // XGCD, zzp_eX
 CFList
 diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
                const CFList& factors, modpk& b, const Variable& alpha)
@@ -861,6 +862,8 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
   }
   else
     buf2= divNTL (F, i.getItem(), b);
+
+#ifdef HAVE_NTL
   ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
   ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (gamma)));
   ZZ_pE::init (NTLmipo);
@@ -870,6 +873,48 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
   XGCD (NTLbuf3, NTLS, NTLT, NTLbuf1, NTLbuf2);
   result.append (b (convertNTLZZ_pEX2CF (NTLS, x, gamma)));
   result.append (b (convertNTLZZ_pEX2CF (NTLT, x, gamma)));
+#else   // flint
+  fmpz_t bigpk;
+  fq_ctx_t fqctx;
+  fmpz_mod_poly_t FLINTmipo;
+  fq_poly_t FLINTS, FLINTT, FLINTbuf3, FLINTbuf1, FLINTbuf2;
+  fq_t fcheck;
+
+  fmpz_init(bigpk); // does convert expect an initalized object?
+  convertCF2Fmpz(bigpk, b.getpk());
+
+  convertFacCF2Fmpz_mod_poly_t(FLINTmipo, getMipo(gamma), bigpk);
+
+#if __FLINT_RELEASE >= 20700
+  fmpz_mod_ctx_t bigpk_ctx;
+  fmpz_mod_ctx_init(bigpk_ctx, bigpk);
+  fq_ctx_init_modulus(fqctx, FLINTmipo, bigpk_ctx, "Z");
+  fmpz_mod_ctx_clear(bigpk_ctx);
+#else
+  fq_ctx_init_modulus(fqctx, FLINTmipo, "Z");
+#endif
+
+  fq_init(fcheck, fqctx);
+  fq_poly_init(FLINTS, fqctx);
+  fq_poly_init(FLINTT, fqctx);
+  fq_poly_init(FLINTbuf3, fqctx);
+  //fq_poly_init(FLINTbuf1, fqctx); //convert expects uninitialized!
+  //fq_poly_init(FLINTbuf2, fqctx); //convert expects uninitialized!
+  convertFacCF2Fq_poly_t(FLINTbuf1, buf1, fqctx);
+  convertFacCF2Fq_poly_t(FLINTbuf2, buf2, fqctx);
+
+  fq_poly_xgcd_euclidean_f(fcheck, FLINTbuf3, FLINTS, FLINTT,
+                                                  FLINTbuf1, FLINTbuf2, fqctx);
+  if (!fq_is_one(fcheck, fqctx))
+  {
+    printf("factory error: non-invertible element encountered\n");
+    abort();
+  }
+
+  result.append(b(convertFq_poly_t2FacCF(FLINTS, x, alpha, fqctx)));
+  result.append(b(convertFq_poly_t2FacCF(FLINTT, x, alpha, fqctx)));
+#endif
+
   if (i.hasItem())
     i++;
   for (; i.hasItem(); i++)
@@ -878,21 +923,55 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
       buf1= divNTL (Freplaced, i.getItem(), b);
     else
       buf1= divNTL (F, i.getItem(), b);
+
+#ifdef HAVE_NTL
     XGCD (NTLbuf3, NTLS, NTLT, NTLbuf3, convertFacCF2NTLZZ_pEX (buf1, NTLmipo));
     S= convertNTLZZ_pEX2CF (NTLS, x, gamma);
+#else // HAVE_FLINT
+    fq_poly_clear(FLINTbuf1, fqctx); //convert expects uninitialized!
+    convertFacCF2Fq_poly_t(FLINTbuf1, buf1, fqctx);
+    fq_poly_xgcd_euclidean_f(fcheck, FLINTbuf3, FLINTS, FLINTT,
+                                                  FLINTbuf3, FLINTbuf1, fqctx);
+    if (!fq_is_one(fcheck, fqctx))
+    {
+      printf("factory error: non-invertible element encountered\n");
+      abort();
+    }
+
+    S= convertFq_poly_t2FacCF(FLINTS, x, alpha, fqctx);
+#endif
+
     CFListIterator k= bufFactors;
     for (CFListIterator j= result; j.hasItem(); j++, k++)
     {
       j.getItem()= mulNTL (j.getItem(), S, b);
       j.getItem()= modNTL (j.getItem(), k.getItem(), b);
     }
+#if HAVE_NTL
     result.append (b (convertNTLZZ_pEX2CF (NTLT, x, gamma)));
+#else
+    result.append (b (convertFq_poly_t2FacCF(FLINTT, x, alpha, fqctx)));
+#endif
   }
+
+#if HAVE_NTL
+  // no cleanup for ntl
+#else
+  fmpz_clear(bigpk);
+  fq_clear(fcheck, fqctx);
+  fq_poly_clear(FLINTS, fqctx);
+  fq_poly_clear(FLINTT, fqctx);
+  fq_poly_clear(FLINTbuf3, fqctx);
+  fq_poly_clear(FLINTbuf1, fqctx);
+  fq_poly_clear(FLINTbuf2, fqctx);
+  fq_ctx_clear(fqctx);
+#endif
+
   return result;
 }
 #endif
 
-#ifdef HAVE_NTL // diophantineQa
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diophantineQa
 CFList
 diophantine (const CanonicalForm& F, const CanonicalForm& G,
              const CFList& factors, modpk& b)
@@ -945,7 +1024,7 @@ diophantine (const CanonicalForm& F, const CanonicalForm& G,
 }
 #endif
 
-#ifdef HAVE_NTL // diophantineQa
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diophantineQa
 CFList
 diophantine (const CanonicalForm& F, const CFList& factors)
 {
@@ -1157,7 +1236,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
   }
 }
 
-#ifdef HAVE_NTL // diopantineQa
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diopantineQa
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
               CFList& diophant, CFMatrix& M, modpk& b, bool sort)
@@ -1217,7 +1296,7 @@ henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
 }
 #endif
 
-#ifdef HAVE_NTL //henselLift12
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) //henselLift12
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
               CFList& diophant, CFMatrix& M, bool sort)

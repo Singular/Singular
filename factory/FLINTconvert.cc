@@ -112,16 +112,19 @@ void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 
 #include "FLINTconvert.h"
 
+// TODO!! decide if the input to convertCF2Fmpz is expected to be:
+//  initialized, or
+//  uninitialized
 void convertCF2Fmpz (fmpz_t result, const CanonicalForm& f)
 {
   if (f.isImm())
-    *result=f.intval();
+    *result=f.intval();                     // assumes uninitialized
     //fmpz_set_si (result, f.intval());
   else
   {
     mpz_t gmp_val;
     f.mpzval(gmp_val);
-    fmpz_set_mpz (result, gmp_val);
+    fmpz_set_mpz (result, gmp_val);         // assumes initialized
     mpz_clear (gmp_val);
   }
 }
@@ -131,7 +134,7 @@ void convertFacCF2Fmpz_poly_t (fmpz_poly_t result, const CanonicalForm& f)
   fmpz_poly_init2 (result, degree (f)+1);
   _fmpz_poly_set_length(result, degree(f)+1);
   for (CFIterator i= f; i.hasTerms(); i++)
-    convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff());
+    convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff()); // assumes initialized
 }
 
 CanonicalForm convertFmpz2CF (const fmpz_t coefficient)
@@ -298,7 +301,7 @@ convertFmpq_poly_t2FacCF (const fmpq_poly_t p, const Variable& x)
 void convertFacCF2Fmpz_array (fmpz* result, const CanonicalForm& f)
 {
   for (CFIterator i= f; i.hasTerms(); i++)
-    convertCF2Fmpz (&result[i.exp()], i.coeff());
+    convertCF2Fmpz (&result[i.exp()], i.coeff()); // assumes ?
 }
 
 void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
@@ -311,7 +314,7 @@ void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
   _fmpq_poly_set_length (result, degree (f) + 1);
   CanonicalForm den= bCommonDen (f);
   convertFacCF2Fmpz_array (fmpq_poly_numref (result), f*den);
-  convertCF2Fmpz (fmpq_poly_denref (result), den);
+  convertCF2Fmpz (fmpq_poly_denref (result), den); // assumes initialized
 
   if (!isRat)
     Off (SW_RATIONAL);
@@ -408,7 +411,7 @@ convertFmpz_mod_poly_t2FacCF (const fmpz_mod_poly_t poly, const Variable& x,
   #if (__FLINT_RELEASE >= 20700)
   fmpz_t FLINTp;
   fmpz_init (FLINTp);
-  convertCF2Fmpz (FLINTp, b.getpk());
+  convertCF2Fmpz (FLINTp, b.getpk()); // assumes initialized
   fmpz_mod_ctx_t ctx;
   fmpz_mod_ctx_init(ctx,FLINTp);
   fmpz_clear(FLINTp);
@@ -469,17 +472,17 @@ void
 convertFacCF2Fq_t (fq_t result, const CanonicalForm& f, const fq_ctx_t ctx)
 {
   fmpz_poly_init2 (result, fq_ctx_degree(ctx));
-  ASSERT (degree (f) < fq_ctx_degree (ctx), "input is not reduced");
-  _fmpz_poly_set_length(result, degree(f)+1);
+  _fmpz_poly_set_length(result, fq_ctx_degree(ctx));
+
   for (CFIterator i= f; i.hasTerms(); i++)
-    convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff());
-  #if (__FLINT_RELEASE >= 20700)
-  _fmpz_vec_scalar_mod_fmpz (result->coeffs, result->coeffs, degree (f) + 1,
-                             ctx->ctxp->n);
-  #else
-  _fmpz_vec_scalar_mod_fmpz (result->coeffs, result->coeffs, degree (f) + 1,
-                             &ctx->p);
-  #endif
+  {
+    ASSERT(i.exp() < result->length, "input is not reduced");
+    convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff()); // assumes initialized
+  }
+
+  _fmpz_vec_scalar_mod_fmpz (result->coeffs, result->coeffs, result->length,
+                             fq_ctx_prime(ctx));
+
   _fmpz_poly_normalise (result);
 }
 
@@ -494,21 +497,15 @@ convertFacCF2Fq_poly_t (fq_poly_t result, const CanonicalForm& f,
                         const fq_ctx_t ctx)
 {
   fq_poly_init2 (result, degree (f)+1, ctx);
+
   _fq_poly_set_length (result, degree (f) + 1, ctx);
-  fmpz_poly_t buf;
+
   for (CFIterator i= f; i.hasTerms(); i++)
   {
-    convertFacCF2Fmpz_poly_t (buf, i.coeff());
-    #if (__FLINT_RELEASE >= 20700)
-    _fmpz_vec_scalar_mod_fmpz (buf->coeffs, buf->coeffs, degree (i.coeff()) + 1,
-                               ctx->ctxp->n);
-    #else
-    _fmpz_vec_scalar_mod_fmpz (buf->coeffs, buf->coeffs, degree (i.coeff()) + 1,
-                               &ctx->p);
-    #endif
-    _fmpz_poly_normalise (buf);
+    fq_t buf;
+    convertFacCF2Fq_t (buf, i.coeff(), ctx);
     fq_poly_set_coeff (result, i.exp(), buf, ctx);
-    fmpz_poly_clear (buf);
+    fq_clear (buf, ctx);
   }
 }
 
@@ -581,7 +578,7 @@ void convertFacCFMatrix2Fmpz_mat_t (fmpz_mat_t M, const CFMatrix &m)
   {
     for(j=m.columns();j>0;j--)
     {
-      convertCF2Fmpz (fmpz_mat_entry (M,i-1,j-1), m(i,j));
+      convertCF2Fmpz (fmpz_mat_entry (M,i-1,j-1), m(i,j)); // assumes initialized
     }
   }
 }
@@ -727,7 +724,7 @@ static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, fmpz_mpoly_t
   {
     fmpz_t c;
     fmpz_init(c);
-    convertCF2Fmpz(c,f);
+    convertCF2Fmpz(c,f); // assumes initialized
     fmpz_mpoly_push_term_fmpz_ui(result,c,exp,ctx);
     fmpz_clear(c);
   }
