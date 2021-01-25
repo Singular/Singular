@@ -153,7 +153,7 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
 }
 
 
-#ifdef HAVE_NTL // ratBiSqrfFactorize
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // ratBiSqrfFactorize
 void
 factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
                                      int& minFactorsLength, bool& irred,
@@ -192,7 +192,7 @@ factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
 }
 #endif
 
-#ifdef HAVE_NTL // precomputeLeadingCoeff,
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // precomputeLeadingCoeff,
 // henselLiftAndEarly, nonMonicHenselLift
 CFList
 multiFactorize (const CanonicalForm& F, const Variable& v)
