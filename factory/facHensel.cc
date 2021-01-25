@@ -160,6 +160,9 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
   bufFactors.insert (factors.getFirst () (0,2));
   CanonicalForm inv, leadingCoeff= Lc (F);
   CFListIterator i= bufFactors;
+
+  result = CFList();    // empty the list before writing into it?!
+
   if (bufFactors.getFirst().inCoeffDomain())
   {
     if (i.hasItem())
@@ -788,6 +791,15 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
   bool fail= false;
   CFList recResult;
   CanonicalForm modMipo, mipo;
+#if HAVE_NTL
+  // no variables for ntl
+#else
+  fmpz_t bigpk;
+  fq_ctx_t fqctx;
+  fq_poly_t FLINTS, FLINTT, FLINTbuf3, FLINTbuf1, FLINTbuf2;
+  fq_t fcheck;
+#endif
+
   //here SW_RATIONAL is off
   On (SW_RATIONAL);
   mipo= getMipo (alpha);
@@ -809,8 +821,9 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
     tryDiophantine (recResult, mapinto (F), mapinto (factors), modMipo, fail);
     if (fail)
     {
+next_prime:
       int i= 0;
-      while (cf_getBigPrime (i) < p)
+      while (cf_getBigPrime (i) <= p)
         i++;
       findGoodPrime (F, i);
       findGoodPrime (G, i);
@@ -873,25 +886,21 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
   XGCD (NTLbuf3, NTLS, NTLT, NTLbuf1, NTLbuf2);
   result.append (b (convertNTLZZ_pEX2CF (NTLS, x, gamma)));
   result.append (b (convertNTLZZ_pEX2CF (NTLT, x, gamma)));
-#else   // flint
-  fmpz_t bigpk;
-  fq_ctx_t fqctx;
-  fmpz_mod_poly_t FLINTmipo;
-  fq_poly_t FLINTS, FLINTT, FLINTbuf3, FLINTbuf1, FLINTbuf2;
-  fq_t fcheck;
+#else // HAVE_FLINT
 
   fmpz_init(bigpk); // does convert expect an initalized object?
   convertCF2Fmpz(bigpk, b.getpk());
-
+  fmpz_mod_poly_t FLINTmipo;
   convertFacCF2Fmpz_mod_poly_t(FLINTmipo, getMipo(gamma), bigpk);
-
 #if __FLINT_RELEASE >= 20700
   fmpz_mod_ctx_t bigpk_ctx;
   fmpz_mod_ctx_init(bigpk_ctx, bigpk);
   fq_ctx_init_modulus(fqctx, FLINTmipo, bigpk_ctx, "Z");
   fmpz_mod_ctx_clear(bigpk_ctx);
+  fmpz_mod_poly_clear(FLINTmipo, bigpk_ctx);
 #else
   fq_ctx_init_modulus(fqctx, FLINTmipo, "Z");
+  fmpz_mod_poly_clear(FLINTmipo);
 #endif
 
   fq_init(fcheck, fqctx);
@@ -907,8 +916,17 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
                                                   FLINTbuf1, FLINTbuf2, fqctx);
   if (!fq_is_one(fcheck, fqctx))
   {
-    printf("factory error: non-invertible element encountered\n");
-    abort();
+    fmpz_clear(bigpk);
+    fq_clear(fcheck, fqctx);
+    fq_poly_clear(FLINTS, fqctx);
+    fq_poly_clear(FLINTT, fqctx);
+    fq_poly_clear(FLINTbuf3, fqctx);
+    fq_poly_clear(FLINTbuf1, fqctx);
+    fq_poly_clear(FLINTbuf2, fqctx);
+    fq_ctx_clear(fqctx);
+    setReduce (alpha, false);
+    fail = true;
+    goto next_prime;
   }
 
   result.append(b(convertFq_poly_t2FacCF(FLINTS, x, alpha, fqctx)));
@@ -927,15 +945,24 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
 #ifdef HAVE_NTL
     XGCD (NTLbuf3, NTLS, NTLT, NTLbuf3, convertFacCF2NTLZZ_pEX (buf1, NTLmipo));
     S= convertNTLZZ_pEX2CF (NTLS, x, gamma);
-#else // HAVE_FLINT
+#else
     fq_poly_clear(FLINTbuf1, fqctx); //convert expects uninitialized!
     convertFacCF2Fq_poly_t(FLINTbuf1, buf1, fqctx);
     fq_poly_xgcd_euclidean_f(fcheck, FLINTbuf3, FLINTS, FLINTT,
                                                   FLINTbuf3, FLINTbuf1, fqctx);
     if (!fq_is_one(fcheck, fqctx))
     {
-      printf("factory error: non-invertible element encountered\n");
-      abort();
+      fmpz_clear(bigpk);
+      fq_clear(fcheck, fqctx);
+      fq_poly_clear(FLINTS, fqctx);
+      fq_poly_clear(FLINTT, fqctx);
+      fq_poly_clear(FLINTbuf3, fqctx);
+      fq_poly_clear(FLINTbuf1, fqctx);
+      fq_poly_clear(FLINTbuf2, fqctx);
+      fq_ctx_clear(fqctx);
+      setReduce (alpha, false);
+      fail = true;
+      goto next_prime;
     }
 
     S= convertFq_poly_t2FacCF(FLINTS, x, alpha, fqctx);
