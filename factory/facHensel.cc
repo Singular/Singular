@@ -948,8 +948,12 @@ next_prime:
 #else
     fq_poly_clear(FLINTbuf1, fqctx); //convert expects uninitialized!
     convertFacCF2Fq_poly_t(FLINTbuf1, buf1, fqctx);
-    fq_poly_xgcd_euclidean_f(fcheck, FLINTbuf3, FLINTS, FLINTT,
+
+    // xgcd aliasing bug in <= 2.7.1
+    fq_poly_xgcd_euclidean_f(fcheck, FLINTbuf2, FLINTS, FLINTT,
                                                   FLINTbuf3, FLINTbuf1, fqctx);
+    fq_poly_swap(FLINTbuf3, FLINTbuf2, fqctx);
+
     if (!fq_is_one(fcheck, fqctx))
     {
       fmpz_clear(bigpk);
