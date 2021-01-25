@@ -1358,7 +1358,7 @@ henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
   return;
 }
 
-#ifdef HAVE_NTL // diophantine
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diophantine
 CFList
 biDiophantine (const CanonicalForm& F, const CFList& factors, int d)
 {
@@ -1774,7 +1774,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
   return;
 }
 
-#ifdef HAVE_NTL // biDiophantine
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // biDiophantine
 CFList
 henselLift23 (const CFList& eval, const CFList& factors, int* l, CFList&
               diophant, CFArray& Pi, CFMatrix& M)
@@ -1883,7 +1883,7 @@ henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
   return result;
 }
 
-#ifdef HAVE_NTL // henselLift23
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // henselLift23
 CFList
 henselLift (const CFList& eval, const CFList& factors, int* l, int lLength,
             bool sort)
@@ -2143,7 +2143,7 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
   return;
 }
 
-#ifdef HAVE_NTL // diophantine
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diophantine
 void
 nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
                       CFArray& Pi, CFList& diophant, CFMatrix& M,
@@ -2302,7 +2302,7 @@ diophantine (const CFList& recResult, const CFList& factors,
   return result;
 }
 
-#ifdef HAVE_NTL // diophantine
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diophantine
 void
 nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
                     CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
@@ -2557,7 +2557,7 @@ CanonicalForm replaceLC (const CanonicalForm& F, const CanonicalForm& c)
   }
 }
 
-#ifdef HAVE_NTL // nonMonicHenselStep
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // nonMonicHenselStep
 CFList
 nonMonicHenselLift232(const CFList& eval, const CFList& factors, int* l, CFList&
                       diophant, CFArray& Pi, CFMatrix& M, const CFList& LCs1,
@@ -2621,7 +2621,7 @@ nonMonicHenselLift232(const CFList& eval, const CFList& factors, int* l, CFList&
 }
 #endif
 
-#ifdef HAVE_NTL // nonMonicHenselStep
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // nonMonicHenselStep
 CFList
 nonMonicHenselLift2 (const CFList& F, const CFList& factors, const CFList& MOD,
                     CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
@@ -2686,7 +2686,7 @@ nonMonicHenselLift2 (const CFList& F, const CFList& factors, const CFList& MOD,
 }
 #endif
 
-#ifdef HAVE_NTL // nonMonicHenselStep
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // nonMonicHenselStep
 CFList
 nonMonicHenselLift2 (const CFList& eval, const CFList& factors, int* l, int
                     lLength, bool sort, const CFList& LCs1, const CFList& LCs2,
@@ -2740,7 +2740,7 @@ nonMonicHenselLift2 (const CFList& eval, const CFList& factors, int* l, int
 }
 #endif
 
-#ifdef HAVE_NTL // diophantine
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // diophantine
 CFList
 nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
                       CFList& LCs, CFList& diophant, CFArray& Pi, int liftBound,
@@ -2844,7 +2844,7 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
 }
 #endif
 
-#ifdef HAVE_NTL // nonMonicHenselStep
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // nonMonicHenselStep
 CFList
 nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
                     CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
