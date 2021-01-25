@@ -1473,7 +1473,7 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
     return 1;
 }
 
-#ifdef HAVE_NTL // nonMonicHenselLift12
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // nonMonicHenselLift12
 CFList
 precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
                         const Variable& alpha, const CFList& evaluation,
