@@ -2933,7 +2933,7 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
 }
 #endif
 
-#ifdef HAVE_NTL // nonMonicHenselLift23
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // nonMonicHenselLift23
 CFList
 nonMonicHenselLift (const CFList& eval, const CFList& factors,
                     CFList* const& LCs, CFList& diophant, CFArray& Pi,

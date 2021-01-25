@@ -979,7 +979,7 @@ CanonicalForm lcmContent (const CanonicalForm& A, CFList& contentAi)
   return result;
 }
 
-#ifdef HAVE_NTL // henselLift23
+#if defined(HAVE_NTL) || defined(HAVE_FLINT) // henselLift23
 CFList
 henselLiftAndEarly (CanonicalForm& A, CFList& MOD, int*& liftBounds, bool&
                     earlySuccess, CFList& earlyFactors, const CFList& Aeval,
