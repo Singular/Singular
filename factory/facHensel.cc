@@ -889,7 +889,7 @@ next_prime:
 #else // HAVE_FLINT
 
   fmpz_init(bigpk); // does convert expect an initalized object?
-  convertCF2Fmpz(bigpk, b.getpk());
+  convertCF2initFmpz(bigpk, b.getpk());
   fmpz_mod_poly_t FLINTmipo;
   convertFacCF2Fmpz_mod_poly_t(FLINTmipo, getMipo(gamma), bigpk);
 #if __FLINT_RELEASE >= 20700

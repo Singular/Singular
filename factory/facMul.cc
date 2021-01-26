@@ -52,10 +52,10 @@ void kronSubQa (fmpz_poly_t result, const CanonicalForm& A, int d)
   for (CFIterator i= A; i.hasTerms(); i++)
   {
     if (i.coeff().inBaseDomain())
-      convertCF2Fmpz (fmpz_poly_get_coeff_ptr (result, i.exp()*d), i.coeff());
+      convertCF2initFmpz (fmpz_poly_get_coeff_ptr (result, i.exp()*d), i.coeff());
     else
       for (j= i.coeff(); j.hasTerms(); j++)
-        convertCF2Fmpz (fmpz_poly_get_coeff_ptr (result, i.exp()*d+j.exp()),
+        convertCF2initFmpz (fmpz_poly_get_coeff_ptr (result, i.exp()*d+j.exp()),
                         j.coeff());
   }
   _fmpz_poly_normalise(result);
@@ -435,7 +435,7 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
         fmpz_init (FLINTp);
 
-        convertCF2Fmpz (FLINTp, b.getpk());
+        convertCF2initFmpz (FLINTp, b.getpk());
 
         convertFacCF2Fmpz_mod_poly_t (FLINTmipo, mipo, FLINTp);
 
@@ -492,7 +492,7 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       {
         fmpz_t FLINTpk;
         fmpz_init (FLINTpk);
-        convertCF2Fmpz (FLINTpk, b.getpk());
+        convertCF2initFmpz (FLINTpk, b.getpk());
         fmpz_mod_poly_t FLINTF, FLINTG;
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
@@ -543,7 +543,7 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
           fq_ctx_t fq_con;
 
           fmpz_init (FLINTp);
-          convertCF2Fmpz (FLINTp, b.getpk());
+          convertCF2initFmpz (FLINTp, b.getpk());
 
           convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
 
@@ -755,7 +755,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       {
         fmpz_t FLINTpk;
         fmpz_init (FLINTpk);
-        convertCF2Fmpz (FLINTpk, b.getpk());
+        convertCF2initFmpz (FLINTpk, b.getpk());
         fmpz_mod_poly_t FLINTF, FLINTG;
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
@@ -805,7 +805,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
         fmpz_init (FLINTp);
 
-        convertCF2Fmpz (FLINTp, b.getpk());
+        convertCF2initFmpz (FLINTp, b.getpk());
 
         convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
 
@@ -945,7 +945,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         fq_t FLINTF, FLINTG;
 
         fmpz_init (FLINTp);
-        convertCF2Fmpz (FLINTp, b.getpk());
+        convertCF2initFmpz (FLINTp, b.getpk());
 
         convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
 
@@ -1007,7 +1007,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         fq_t FLINTG;
 
         fmpz_init (FLINTp);
-        convertCF2Fmpz (FLINTp, b.getpk());
+        convertCF2initFmpz (FLINTp, b.getpk());
 
         convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
 
@@ -1065,7 +1065,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       {
         fmpz_t FLINTpk;
         fmpz_init (FLINTpk);
-        convertCF2Fmpz (FLINTpk, b.getpk());
+        convertCF2initFmpz (FLINTpk, b.getpk());
         fmpz_mod_poly_t FLINTF, FLINTG;
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
@@ -1114,7 +1114,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         fq_poly_t FLINTF, FLINTG;
 
         fmpz_init (FLINTp);
-        convertCF2Fmpz (FLINTp, b.getpk());
+        convertCF2initFmpz (FLINTp, b.getpk());
 
         convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
 

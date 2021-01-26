@@ -492,7 +492,7 @@ convertFacCF2Fq_t (fq_t result, const CanonicalForm& f, const fq_ctx_t ctx)
   for (CFIterator i= f; i.hasTerms(); i++)
   {
     ASSERT(i.exp() < result->length, "input is not reduced");
-    convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff()); // assumes initialized
+    convertCF2initFmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff()); // assumes initialized
   }
 
   _fmpz_vec_scalar_mod_fmpz (result->coeffs, result->coeffs, result->length,
@@ -593,7 +593,7 @@ void convertFacCFMatrix2Fmpz_mat_t (fmpz_mat_t M, const CFMatrix &m)
   {
     for(j=m.columns();j>0;j--)
     {
-      convertCF2Fmpz (fmpz_mat_entry (M,i-1,j-1), m(i,j)); // assumes initialized
+      convertCF2initFmpz (fmpz_mat_entry (M,i-1,j-1), m(i,j)); // assumes initialized
     }
   }
 }
@@ -739,7 +739,7 @@ static void convFlint_RecPP ( const CanonicalForm & f, ulong * exp, fmpz_mpoly_t
   {
     fmpz_t c;
     fmpz_init(c);
-    convertCF2Fmpz(c,f); // assumes initialized
+    convertCF2initFmpz(c,f); // assumes initialized
     fmpz_mpoly_push_term_fmpz_ui(result,c,exp,ctx);
     fmpz_clear(c);
   }

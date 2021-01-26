@@ -210,7 +210,7 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 #ifdef HAVE_FLINT
    fmpz_t FLINTq;
    fmpz_init(FLINTq);
-   convertCF2Fmpz(FLINTq,q);
+   convertCF2initFmpz(FLINTq,q);
    fmpz_t FLINTc;
    fmpz_init(FLINTc);
    fmpq_t FLINTres;
@@ -230,7 +230,7 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 #ifdef HAVE_FLINT
           if (c.inZ())
           {
-             convertCF2Fmpz(FLINTc,c);
+             convertCF2initFmpz(FLINTc,c);
              fmpq_reconstruct_fmpz(FLINTres,FLINTc,FLINTq);
              result += power (x, i.exp())*(convertFmpq2CF(FLINTres));
           }

@@ -58,7 +58,14 @@ EXTERN_VAR flint_rand_t FLINTrandom;
 
 /// conversion of a factory integer to fmpz_t
 void
-convertCF2Fmpz (fmpz_t result,         ///< [in,out] an fmpz_t
+convertCF2Fmpz (fmpz_t result,         ///< [out] an fmpz_t
+                const CanonicalForm& f ///< [in] a CanonicalForm wrapping an
+                                       ///< integer
+               );
+
+/// conversion of a factory integer to fmpz_t(init.)
+void
+convertCF2initFmpz (fmpz_t result,     ///< [in,out] an fmpz_t
                 const CanonicalForm& f ///< [in] a CanonicalForm wrapping an
                                        ///< integer
                );
