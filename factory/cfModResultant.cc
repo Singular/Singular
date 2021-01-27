@@ -554,7 +554,7 @@ symmetricRemainder (const CanonicalForm& f, const CanonicalForm& q)
   }
   return result;
 }
-#ifdef HAVE_NTL // mapPrimitiveElem
+
 CanonicalForm
 resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
             bool prob)
@@ -682,6 +682,5 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
     On (SW_RATIONAL);
   return swapvar (result, X, x);
 }
-#endif
 #endif
 

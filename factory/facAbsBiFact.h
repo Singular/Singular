@@ -16,7 +16,6 @@
 
 #include "canonicalform.h"
 
-#ifdef HAVE_NTL
 /// main absolute factorization routine, expects bivariate poly which is
 /// irreducible over Q
 ///
@@ -32,7 +31,6 @@ CFAFList absBiFactorizeMain (const CanonicalForm& F, ///<[in] s.a.
                                                      ///< factors should be
                                                      ///< returned
                             );
-#endif
 
 /// normalize factors, i.e. make factors monic
 static inline
