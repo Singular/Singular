@@ -916,6 +916,7 @@ int redHomog (LObject* h,kStrategy strat)
   int li;
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
+  h->PrepareRed(strat->use_buckets);
   loop
   {
     j = kFindDivisibleByInT(strat, h);
@@ -1658,6 +1659,7 @@ int redLazy (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   poly h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
+  h->PrepareRed(strat->use_buckets);
   loop
   {
     j = kFindDivisibleByInT(strat, h);
