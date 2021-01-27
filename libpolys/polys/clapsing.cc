@@ -1959,7 +1959,7 @@ intvec* singntl_LLL(intvec*  m)
 }
 #endif
 
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
 {
   p_Test(f, r);
@@ -2039,7 +2039,7 @@ ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFa
 #else
 ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
 {
-  WerrorS("NTL missing");
+  WerrorS("NTL/FLINT missing: absFactorize");
   return NULL;
 }
 
