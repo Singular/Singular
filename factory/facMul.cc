@@ -545,7 +545,13 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
           fmpz_init (FLINTp);
           convertCF2initFmpz (FLINTp, b.getpk());
 
-          convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
+          CanonicalForm mipo=getMipo (alpha);
+          bool rat=isOn(SW_RATIONAL);
+          On(SW_RATIONAL);
+          CanonicalForm cd = bCommonDen(mipo);
+          mipo *= cd;
+          if (!rat) Off(SW_RATIONAL);
+          convertFacCF2Fmpz_mod_poly_t (FLINTmipo, mipo, FLINTp);
 
           #if (HAVE_FLINT && __FLINT_RELEASE >= 20700)
           fmpz_mod_ctx_t fmpz_ctx;
@@ -807,7 +813,13 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
         convertCF2initFmpz (FLINTp, b.getpk());
 
-        convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
+        CanonicalForm mipo=getMipo (alpha);
+        bool rat=isOn(SW_RATIONAL);
+        On(SW_RATIONAL);
+        CanonicalForm cd = bCommonDen(mipo);
+        mipo *= cd;
+        if (!rat) Off(SW_RATIONAL);
+        convertFacCF2Fmpz_mod_poly_t (FLINTmipo, mipo, FLINTp);
 
         #if (HAVE_FLINT && __FLINT_RELEASE >= 20700)
         fmpz_mod_ctx_t fmpz_ctx;
