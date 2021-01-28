@@ -612,7 +612,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
         break;
     for (CFListIterator iter= uniFactors; iter.hasItem(); iter++)
       iter.getItem()= replacevar (iter.getItem(), vv, v);
-    prune (vv);
+    //prune (vv);
   }
 
   On (SW_RATIONAL);
