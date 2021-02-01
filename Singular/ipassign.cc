@@ -170,62 +170,54 @@ static void jjMINPOLY_red(idhdl h)
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
 }
-ring jjSetMinpoly(ring r, number a)
+// change the coeff cf=K[x] (of type n_transExt) to K[x]/a
+// return NULL in error case
+coeffs jjSetMinpoly(coeffs cf, number a)
 {
-  if ( !nCoeff_is_transExt(r->cf) )
+  if ( !nCoeff_is_transExt(cf) )
   {
-    if(!nCoeff_is_algExt(r->cf) )
+    if(!nCoeff_is_algExt(cf) )
     {
       WerrorS("cannot set minpoly for these coeffients");
       return NULL;
     }
   }
-  if (rVar(r->cf->extRing)!=1)
+  if (rVar(cf->extRing)!=1)
   {
-    WerrorS("only univarite minpoly allowed");
+    WerrorS("only univariate minpoly allowed");
     return NULL;
   }
 
-  assume (r->idroot==NULL);
+  number p = n_Copy(a,cf);
+  n_Normalize(p, cf);
 
-  number p = n_Copy(a,r->cf);
-  n_Normalize(p, r->cf);
-
-  if (n_IsZero(p, r->cf))
+  if (n_IsZero(p, cf))
   {
-    n_Delete(&p, r->cf);
-    if( nCoeff_is_transExt(r->cf) )
-    {
-      return r;
-    }
-    WarnS("cannot set minpoly to 0 / alg. extension?");
-    return NULL;
+    n_Delete(&p, cf);
+    return cf;
   }
-  r=rCopy(r);
-  // remove all object currently in the ring
 
   AlgExtInfo A;
 
-  A.r = rCopy(r->cf->extRing); // Copy  ground field!
+  A.r = rCopy(cf->extRing); // Copy  ground field!
   // if minpoly was already set:
-  if( r->cf->extRing->qideal != NULL ) id_Delete(&(A.r->qideal),A.r);
+  if( cf->extRing->qideal != NULL ) id_Delete(&(A.r->qideal),A.r);
   ideal q = idInit(1,1);
   if ((p==NULL) ||(NUM((fraction)p)==NULL))
   {
     WerrorS("Could not construct the alg. extension: minpoly==0");
     // cleanup A: TODO
     rDelete( A.r );
-    rDelete(r);
     return NULL;
   }
   if (DEN((fraction)(p)) != NULL) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
-    if(!p_IsConstant(n,r->cf->extRing))
+    if(!p_IsConstant(n,cf->extRing))
     {
       WarnS("denominator must be constant - ignoring it");
     }
-    p_Delete(&n,r->cf->extRing);
+    p_Delete(&n,cf->extRing);
     DEN((fraction)(p))=NULL;
   }
 
@@ -239,17 +231,12 @@ ring jjSetMinpoly(ring r, number a)
   coeffs new_cf = nInitChar(n_algExt, &A);
   if (new_cf==NULL)
   {
-    WerrorS("Could not construct the alg. extension: llegal minpoly?");
+    WerrorS("Could not construct the alg. extension: illegal minpoly?");
     // cleanup A: TODO
     rDelete( A.r );
-    rDelete(r);
     return NULL;
   }
-  else
-  {
-    nKillChar(r->cf); r->cf=new_cf;
-  }
-  return r;
+  return new_cf;
 }
 
 static BOOLEAN jjMINPOLY(leftv, leftv a)

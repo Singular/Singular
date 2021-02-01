@@ -170,7 +170,7 @@ extern const struct sValCmdM dArithM[];
 /* ================================================================== */
 /* Assigments : */
 BOOLEAN iiAssign(leftv left, leftv right, BOOLEAN toplevel=TRUE);
-ring jjSetMinpoly(ring r, number a);
+coeffs jjSetMinpoly(coeffs cf, number a);
 
 typedef BOOLEAN (*proci)(leftv,leftv,Subexpr);
 struct sValAssign_sys
