@@ -2165,7 +2165,12 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         goto err_fetch;
       }
     }
-    if ((iiOp!=FETCH_CMD) || (r->N!=currRing->N) || (rPar(r)!=rPar(currRing)))
+    if (
+        (iiOp!=FETCH_CMD) || (r->N!=currRing->N) || (rPar(r)!=rPar(currRing))
+#ifdef HAVE_SHIFTBBA
+          || rIsLPRing(currRing)
+#endif
+        )
     {
       perm=(int *)omAlloc0((r->N+1)*sizeof(int));
       if (par_perm_size!=0)
@@ -2204,10 +2209,19 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       }
       else
       {
-        unsigned i;
-        if (par_perm_size!=0)
-          for(i=si_min(rPar(r),rPar(currRing));i>0;i--) par_perm[i-1]=-i;
-        for(i=si_min(r->N,currRing->N);i>0;i--) perm[i]=i;
+#ifdef HAVE_SHIFTBBA
+        if (rIsLPRing(currRing))
+        {
+          maFetchPermLP(r, currRing, perm);
+        }
+        else
+#endif
+        {
+          unsigned i;
+          if (par_perm_size!=0)
+            for(i=si_min(rPar(r),rPar(currRing));i>0;i--) par_perm[i-1]=-i;
+          for(i=si_min(r->N,currRing->N);i>0;i--) perm[i]=i;
+        }
       }
     }
     if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))

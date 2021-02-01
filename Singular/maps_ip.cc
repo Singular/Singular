@@ -124,7 +124,12 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       }
       break;
     case BUCKET_CMD:
-      if ((what==FETCH_CMD)&& (preimage_r->cf==currRing->cf))
+      if (
+          (what==FETCH_CMD) && (preimage_r->cf==currRing->cf)
+#ifdef HAVE_SHIFTBBA
+          && !rIsLPRing(currRing)
+#endif
+          )
         res->data=(void *)prCopyR(sBucketPeek((sBucket_pt)data), preimage_r, currRing);
       else
         if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
@@ -138,7 +143,12 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       break;
     case POLY_CMD:
     case VECTOR_CMD:
-      if ((what==FETCH_CMD)&& (preimage_r->cf==currRing->cf))
+      if (
+          (what==FETCH_CMD) && (preimage_r->cf==currRing->cf)
+#ifdef HAVE_SHIFTBBA
+          && !rIsLPRing(currRing)
+#endif
+          )
         res->data=(void *)prCopyR( (poly)data, preimage_r, currRing);
       else
         if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
@@ -168,7 +178,12 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         tmpR=((map)data)->preimage;
         ((matrix)data)->rank=((matrix)data)->rows();
       }
-      if ((what==FETCH_CMD)&& (preimage_r->cf == currRing->cf))
+      if (
+          (what==FETCH_CMD) && (preimage_r->cf == currRing->cf)
+#ifdef HAVE_SHIFTBBA
+          && !rIsLPRing(currRing)
+#endif
+         )
       {
         for (i=R*C-1;i>=0;i--)
         {
