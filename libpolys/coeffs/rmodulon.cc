@@ -247,7 +247,14 @@ static number nrnInvers(number c, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  mpz_invert(erg, (mpz_ptr)c, r->modNumber);
+  if (nrnIsZero(c,r))
+  {
+    WerrorS(nDivBy0);
+  }
+  else
+  {
+    mpz_invert(erg, (mpz_ptr)c, r->modNumber);
+  }
   return (number) erg;
 }
 
@@ -546,7 +553,12 @@ static int nrnDivComp(number a, number b, const coeffs r)
 
 static number nrnDiv(number a, number b, const coeffs r)
 {
-  if (r->is_field)
+  if (nrnIsZero(b,r))
+  {
+    WerrorS(nDivBy0);
+    return nrnInit(0,r);
+  }
+  else if (r->is_field)
   {
     number inv=nrnInvers(b,r);
     number erg=nrnMult(a,inv,r);
@@ -612,14 +624,6 @@ static number nrnMod(number a, number b, const coeffs r)
   mpz_clear(g);
   omFreeBin(g, gmp_nrz_bin);
   return (number)rr;
-}
-
-static number nrnIntDiv(number a, number b, const coeffs r)
-{
-  mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
-  mpz_init(erg);
-  mpz_tdiv_q(erg, (mpz_ptr)a, (mpz_ptr)b);
-  return (number)erg;
 }
 
 /* CF: note that Z/nZ has (at least) two distinct euclidean structures

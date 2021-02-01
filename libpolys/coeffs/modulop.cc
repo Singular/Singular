@@ -233,7 +233,11 @@ const char * npRead (const char *s, number *a, const coeffs r)
     *a = (number)(long)z;
   else
   {
-    if ((z==0)&&(n==0)) WerrorS(nDivBy0);
+    if ((z==0)&&(n==0))
+    {
+      WerrorS(nDivBy0);
+      *a=(number)0L;
+    }
     else
     {
 #ifdef NV_OPS

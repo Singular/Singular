@@ -445,13 +445,13 @@ static number Div(number a, number b, const coeffs c)
   const fmpq_rat_ptr x = (fmpq_rat_ptr) a;
   const fmpq_rat_ptr y = (fmpq_rat_ptr) b;
   const fmpq_ctx_ptr ctx = (fmpq_ctx_ptr) ((data_ptr)c->data)->ctx;
+  fmpq_rat_ptr res = (fmpq_rat_ptr) omAlloc(sizeof(fmpq_rat_struct));
+  fmpq_rat_init(res, c);
   if (fmpq_mpoly_is_zero(y->num, ctx))
   {
     WerrorS(nDivBy0);
-    return NULL;
+    return (number)res;
   }
-  fmpq_rat_ptr res = (fmpq_rat_ptr) omAlloc(sizeof(fmpq_rat_struct));
-  fmpq_rat_init(res, c);
   if (fmpq_mpoly_equal(x->den, y->num, ctx)) /* denominators equal */
   {
     fmpq_mpoly_mul(res->num, x->num, y->den, ctx);
@@ -530,16 +530,16 @@ static number Div(number a, number b, const coeffs c)
 
 static number ExactDiv(number a, number b, const coeffs c)
 {
-  fmpq_rat_ptr res = (fmpq_rat_ptr) omAlloc(sizeof(fmpq_rat_struct));
   const fmpq_rat_ptr x = (fmpq_rat_ptr) a;
   const fmpq_rat_ptr y = (fmpq_rat_ptr) b;
   const fmpq_ctx_ptr ctx = (fmpq_ctx_ptr) ((data_ptr)c->data)->ctx;
+  fmpq_rat_ptr res = (fmpq_rat_ptr) omAlloc(sizeof(fmpq_rat_struct));
+  fmpq_rat_init(res, c);
   if (fmpq_mpoly_is_zero(y->num, ctx))
   {
      WerrorS(nDivBy0);
-     return NULL;
+     return (number)res;
   }
-  fmpq_rat_init(res, c);
   fmpq_mpoly_div(res->num, x->num, y->num, ctx);
   assume(fmpq_mpoly_is_one(x->den, ctx));
   assume(fmpq_mpoly_is_one(y->den, ctx));

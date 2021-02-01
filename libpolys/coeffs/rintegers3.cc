@@ -743,7 +743,12 @@ static int nrzDivComp(number a, number b, const coeffs r)
 static number nrzDiv (number a,number b, const coeffs)
 {
   assume(SR_TO_INT(b));
-  if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
+  if (nrzIsZero(b))
+  {
+    WerrorS(nDivBy0);
+    return INT_TO_SR(0);
+  }
+  else if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
     //if (SR_TO_INT(a) % SR_TO_INT(b))
     //{
@@ -809,7 +814,12 @@ static number nrzExactDiv (number a,number b, const coeffs)
 {
   assume(SR_TO_INT(b));
   mpz_t aa, bb;
-  if (n_Z_IS_SMALL(a))
+  if (nrzIsZero(b))
+  {
+    WerrorS(nDivBy0);
+    return INT_TO_SR(0);
+  }
+  else if (n_Z_IS_SMALL(a))
     mpz_init_set_si(aa, SR_TO_INT(a));
   else
     mpz_init_set(aa, (mpz_ptr) a);
@@ -856,7 +866,7 @@ static number  nrzInvers (number c, const coeffs r)
   if (!nrzIsUnit((number) c, r))
   {
     WerrorS("Non invertible element.");
-    return (number)NULL;
+    return nrzInit(0,r);
   }
   return c; // has to be 1 or -1....
 }
