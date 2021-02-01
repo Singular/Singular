@@ -2287,8 +2287,22 @@ void p_Content(poly ph, const ring r)
   {
     p_SetCoeff(ph,n_Init(1,cf),r);
   }
-  if (cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
-  number h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
+  if ((cf->cfSubringGcd==ndGcd)
+  || (cf->cfGcd==ndGcd)) /* trivial gcd*/
+    return;
+  number h;
+  if ((rField_is_Q(r))
+  || (rField_is_Q_a(r))
+  || (rField_is_Zp_a)(r)
+  || (rField_is_Z(r))
+  )
+  {
+    h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
+  }
+  else
+  {
+    h=n_Copy(pGetCoeff(ph),cf);
+  }
   poly p;
   if(n_IsOne(h,cf))
   {
