@@ -1151,6 +1151,7 @@ but not for serious computations.
 * combinat_lib:: Some useful functions from combinatoric
 * customstd_lib:: additional variants of std
 * methods_lib:: construction procedures
+* nets_lib:: Pretty printing
 * phindex_lib:: index of real analytic vector fields
 * polybori_lib:: interface for PolyBoRi
 @end menu
@@ -1170,6 +1171,10 @@ but not for serious computations.
 @node methods_lib
 @subsection methods_lib
 @c lib methods.lib
+@c ----------------------------------------------------------
+@node nets_lib
+@subsection nets_lib
+@c lib nets.lib
 @c ----------------------------------------------------------
 @node phindex_lib
 @subsection phindex_lib
@@ -1204,7 +1209,6 @@ Comments should be send to the author of the library directly.
 * maxlike_lib:: maximum likelihood estimates
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
-* nets_lib:: Pretty printing
 * pfd_lib:: Multivartiate partial fraction decomposition
 * polyclass_lib:: class of polynomials
 * ringgb_lib:: Functions for coefficient rings
@@ -1267,10 +1271,6 @@ Todos/Issues:
 @end itemize
 
 @c lib multigrading.lib
-@c ----------------------------------------------------------
-@node nets_lib
-@subsection nets_lib
-@c lib nets.lib
 @c ----------------------------------------------------------
 @node pfd_lib
 @subsection pfd_lib
