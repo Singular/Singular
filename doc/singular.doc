@@ -574,6 +574,7 @@ LIB "all.lib";
 * chern_lib:: Symbolic Computations with Chern classes
 * deRham_lib:: Computation of deRham cohomology
 * divisors_lib:: Divisors and P-Divisors
+* goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
 * hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * numerAlg_lib:: Numerical Algebraic Algorithms
 * numerDecom_lib:: Bertini interface
@@ -606,6 +607,10 @@ LIB "all.lib";
 @node divisors_lib
 @subsection divisors_lib
 @c lib divisors.lib
+@c ----------------------------------------------------------
+@node goettsche_lib
+@subsection goettsche_lib
+@c lib goettsche.lib
 @c ----------------------------------------------------------
 @node hess_lib
 @subsection hess_lib
@@ -1180,7 +1185,6 @@ Comments should be send to the author of the library directly.
 * difform_lib:: Procedures for differential forms
 * finitediff_lib:: finite difference schemes for linear differential equations
 * GND_lib:: General Neron Desingularization
-* goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
 * graal_lib:: localization at prime ideals and their associated graded rings
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
 * maxlike_lib:: maximum likelihood estimates
@@ -1225,10 +1229,6 @@ Issues:
 
 @c lib finitediff.lib
 
-@c ----------------------------------------------------------
-@node goettsche_lib
-@subsection goettsche_lib
-@c lib goettsche.lib
 @c ----------------------------------------------------------
 @node graal_lib
 @subsection graal_lib
