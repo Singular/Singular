@@ -1154,6 +1154,7 @@ but not for serious computations.
 * nets_lib:: Pretty printing
 * phindex_lib:: index of real analytic vector fields
 * polybori_lib:: interface for PolyBoRi
+* sets_lib:: Sets
 @end menu
 @c ----------------------------------------------------------
 @node arr_lib
@@ -1178,15 +1179,15 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node phindex_lib
 @subsection phindex_lib
-
 @c lib phindex.lib
-
 @c ----------------------------------------------------------
 @node polybori_lib
 @subsection polybori_lib
-
 @c lib polybori.lib tag:pyobject
-
+@c ----------------------------------------------------------
+@node sets_lib
+@subsection sets_lib
+@c lib sets.lib
 @c ----------------------------------------------------------------------------
 @node Experimental libraries
 @section Experimental libraries
@@ -1213,7 +1214,6 @@ Comments should be send to the author of the library directly.
 * polyclass_lib:: class of polynomials
 * ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
-* sets_lib:: Sets
 * stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * swalk_lib:: Sagbi Walk Conversion Algorithm
 * systhreads_lib:: multi-threaded objects
@@ -1287,10 +1287,6 @@ Todos/Issues:
 @node rwalk_lib
 @subsection rwalk_lib
 @c lib rwalk.lib
-@c ----------------------------------------------------------
-@node sets_lib
-@subsection sets_lib
-@c lib sets.lib
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
