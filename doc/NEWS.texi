@@ -29,6 +29,7 @@ New commands:
 New libraries:
 
 @itemize
+@item decomp.lib: functional decomposition of polynomials (@nref{decomp_lib})
 @item tateProdCplxNegGrad.lib: sheaf cohomology on product of projective spaces (@nref{tateProdCplxNegGrad_lib})
 @end itemize
 

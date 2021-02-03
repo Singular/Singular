@@ -387,6 +387,7 @@ LIB "all.lib";
 * assprimeszerodim_lib:: associated primes of a zero-dimensional ideal
 * cisimplicial_lib:: is the toric ideal of a simplicial toric variety a complete intersection?
 * curveInv_lib:: invariants of curves
+* decomp_lib:: Funtional decomposition os polynomials
 * elim_lib:: procedures for elimination, saturation and blowing up
 * ellipticcovers_lib::  Gromov Witten numbers of elliptic curves
 * ffmodstd_lib::  Groebner bases in polynomial rings over rational function fields
@@ -439,6 +440,10 @@ LIB "all.lib";
 @node curveInv_lib
 @subsection curveInv_lib
 @c lib curveInv.lib
+@c ----------------------------------------------------------
+@node decomp_lib
+@subsection decomp_lib
+@c lib decomp.lib
 @c ----------------------------------------------------------
 @node elim_lib
 @subsection elim_lib
