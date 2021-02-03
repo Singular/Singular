@@ -399,6 +399,7 @@ LIB "all.lib";
 * moddiq_lib:: ideal quotient and saturation using modular methods
 * modnormal_lib:: Normalization of affine domains using modular methods
 * modstd_lib:: Groebner basis of ideals via modular computations
+* modules_lib:: Representations of Modules
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
@@ -485,6 +486,10 @@ LIB "all.lib";
 @subsection modnormal_lib
 @c lib modnormal.lib
 @c ---------------------------------------------------------
+@node modules_lib
+@subsection modules_lib
+@c lib modules.lib
+@c ----------------------------------------------------------
 @node modstd_lib
 @subsection modstd_lib
 @c lib modstd.lib
@@ -1145,6 +1150,7 @@ but not for serious computations.
 * arr_lib:: algorithms for arrangements of hyperplanes
 * combinat_lib:: Some useful functions from combinatoric
 * customstd_lib:: additional variants of std
+* methods_lib:: construction procedures
 * phindex_lib:: index of real analytic vector fields
 * polybori_lib:: interface for PolyBoRi
 @end menu
@@ -1160,6 +1166,10 @@ but not for serious computations.
 @node customstd_lib
 @subsection customstd_lib
 @c lib customstd.lib
+@c ----------------------------------------------------------
+@node methods_lib
+@subsection methods_lib
+@c lib methods.lib
 @c ----------------------------------------------------------
 @node phindex_lib
 @subsection phindex_lib
@@ -1192,8 +1202,6 @@ Comments should be send to the author of the library directly.
 * GND_lib:: General Neron Desingularization
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
 * maxlike_lib:: maximum likelihood estimates
-* methods_lib:: construction procedures
-* modules_lib:: Representations of Modules
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
 * nets_lib:: Pretty printing
@@ -1245,14 +1253,6 @@ Issues:
 @node maxlike_lib
 @subsection maxlike_lib
 @c lib maxlike.lib
-@c ----------------------------------------------------------
-@node methods_lib
-@subsection methods_lib
-@c lib methods.lib
-@c ----------------------------------------------------------
-@node modules_lib
-@subsection modules_lib
-@c lib modules.lib
 @c ----------------------------------------------------------
 @node modwalk_lib
 @subsection modwalk_lib
