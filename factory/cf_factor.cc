@@ -553,23 +553,27 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       {
         #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700) && defined(HAVE_NTL)
         if (!isOn(SW_USE_FL_FAC_P))
+	{
         #endif
         #if defined(HAVE_NTL)
-        if (issqrfree)
-        {
-          CFList factors;
-          Variable alpha;
-          factors= FpSqrfFactorize (f);
-          for (CFListIterator i= factors; i.hasItem(); i++)
-            F.append (CFFactor (i.getItem(), 1));
-          goto end_charp;
-        }
-        else
-        {
-          Variable alpha;
-          F= FpFactorize (f);
-          goto end_charp;
-        }
+          if (issqrfree)
+          {
+            CFList factors;
+            Variable alpha;
+            factors= FpSqrfFactorize (f);
+            for (CFListIterator i= factors; i.hasItem(); i++)
+              F.append (CFFactor (i.getItem(), 1));
+            goto end_charp;
+          }
+          else
+          {
+            Variable alpha;
+            F= FpFactorize (f);
+            goto end_charp;
+          }
+        #endif
+        #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700) && defined(HAVE_NTL)
+	}
         #endif
         #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20700)
         nmod_mpoly_ctx_t ctx;
@@ -882,7 +886,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     {
       #if (HAVE_FLINT && __FLINT_RELEASE >= 20700)
         // use FLINT
-        nmod_poly_t FLINTmipo, leadingCoeff;
+		nmod_poly_t FLINTmipo;
         fq_nmod_ctx_t fq_con;
         fq_nmod_mpoly_ctx_t ctx;
 
