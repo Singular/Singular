@@ -937,7 +937,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
   BITSET save2;
   SI_SAVE_OPT2(save2);
 
-  k=si_max(1L,id_RankFreeModule(h1,currRing));
+  k=si_max(1,inputIsIdeal);
 
   if ((!lift3)&&(!TEST_OPT_RETURN_SB)) si_opt_2 |=Sy_bit(V_IDLIFT);
 

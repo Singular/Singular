@@ -7695,6 +7695,7 @@ static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
     idhdl hw=(idhdl)w->data;
     GbVariant alg=syGetAlgorithm((char*)u4->Data(),currRing,I);
     // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+    res->rtyp = u->Typ();
     res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(hv->data.umatrix),testHomog,
                                 &(hw->data.uideal),alg);
