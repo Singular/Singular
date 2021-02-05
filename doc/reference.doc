@@ -3951,8 +3951,8 @@ See
 @cindex liftstd
 @table @code
 @item @strong{Syntax:}
-@code{liftstd (} ideal_expression@code{,} matrix_name@code{[,} module_name@code{][,} string_expression @code{])}
-@*@code{liftstd (} module_expression@code{,} matrix_name@code{[,} module_name@code{][,} string_expression @code{])}
+@code{liftstd (} ideal_expression@code{,} matrix_name@code{[,} module_name@code{][,} string_expression @code{][,} int_expression @code{])}
+@*@code{liftstd (} module_expression@code{,} matrix_name@code{[,} module_name@code{][,} string_expression @code{][,} int_expression @code{])}
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
@@ -3966,6 +3966,10 @@ If working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and 
 @*If a module name is given as a third argument, the syzygy module will be returned.
 @*An optional string argument specifies the Groebner base algorithm to use.
 Possible values are @code{"std"} and @code{"slimgb"}.
+@*Given an optional integer argument (say @code{n}), the algorithm only takes the first @code{n} polynomials resp. vectors in @code{m} into account
+when computing the transformation matrix and (if applicable) the syzygy module. This allows to compute the relative transformation matrix or
+syzygy module of the first @code{n} polynomials resp. vectors in @code{m} modulo the remaining polynomials resp. vectors.
+(For syzygies, the same can be achieved using @ref{modulo}.)
 @item @strong{Example:}
 @smallexample
 @c example

@@ -6796,6 +6796,28 @@ static BOOLEAN jjLIFTSTD_ALG(leftv res, leftv u, leftv v, leftv w)
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
+static BOOLEAN jjLIFTSTD_LIMIT(leftv res, leftv u, leftv v, leftv w)
+{
+  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
+  idhdl hv=(idhdl)v->data;
+  int limit=(int)((long)(w->Data()));
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                                &(hv->data.umatrix),testHomog,
+                                NULL,GbDefault,limit);
+  setFlag(res,FLAG_STD); v->flag=0;
+  return FALSE;
+}
 static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
@@ -7700,48 +7722,95 @@ static BOOLEAN jjLIFT_4(leftv res, leftv U)
     return TRUE;
   }
 }
-static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
+static BOOLEAN jjLIFTSTD_M(leftv res, leftv U)
 {
-  const short t1[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
-  const short t2[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+  // we have 4 or 5 arguments
   leftv u=U;
   leftv v=u->next;
-  leftv w=v->next;
-  leftv u4=w->next;
-  if (v->rtyp!=IDHDL) return TRUE;
-  if (w->rtyp!=IDHDL) return TRUE;
-  if (iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+  leftv u3=v->next;
+  leftv u4=u3->next;
+  leftv u5=u4->next; // might be NULL
+
+  ideal *syz=NULL;
+  GbVariant alg=GbDefault;
+  int limit=INT_MAX;
+
+  if(u5==NULL)
   {
-    // see jjLIFTSTD3
-#ifdef HAVE_SHIFTBBA
-    if (rIsLPRing(currRing))
+    // test all three possibilities for 4 arguments
+    const short t1[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+    const short t2[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+    const short t3[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,INT_CMD};
+    const short t4[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,INT_CMD};
+    const short t5[]={4,IDEAL_CMD,MATRIX_CMD,STRING_CMD,INT_CMD};
+    const short t6[]={4,MODUL_CMD,MATRIX_CMD,STRING_CMD,INT_CMD};
+
+    if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
     {
-      if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
-      {
-        Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
-        return TRUE;
-      }
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
     }
-#endif
-    ideal I=(ideal)u->Data();
-    idhdl hv=(idhdl)v->data;
-    idhdl hw=(idhdl)w->data;
-    GbVariant alg=syGetAlgorithm((char*)u4->Data(),currRing,I);
-    // CopyD for IDEAL_CMD and MODUL_CMD are identical:
-    res->rtyp = u->Typ();
-    res->data = (char *)idLiftStd((ideal)u->Data(),
-                                &(hv->data.umatrix),testHomog,
-                                &(hw->data.uideal),alg);
-    setFlag(res,FLAG_STD); v->flag=0; w->flag=0;
-    return FALSE;
+    else if(iiCheckTypes(U,t3)||iiCheckTypes(U,t4))
+    {
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      limit=(int)((long)(u4->Data()));
+    }
+    else if(iiCheckTypes(U,t5)||iiCheckTypes(U,t6))
+    {
+      alg=syGetAlgorithm((char*)u3->Data(),currRing,(ideal)u->Data());
+      limit=(int)((long)(u4->Data()));
+    }
+    else
+    {
+      Werror("%s(`ideal`/`module`,`matrix`[,`module`][,`string`][,`int`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
   }
   else
   {
-    Werror("%s(`ideal`,`matrix`,`module`,`string`)\n"
-           "or (`module`,`matrix`,`module`,`string`) expected",
-           Tok2Cmdname(iiOp));
-    return TRUE;
+    // we have 5 arguments
+    const short t1[]={5,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,INT_CMD};
+    const short t2[]={5,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,INT_CMD};
+    if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+    {
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
+      limit=(int)((long)(u5->Data()));
+    }
+    else
+    {
+      Werror("%s(`ideal`/`module`,`matrix`[,`module`][,`string`][,`int`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
   }
+
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
+
+  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
+  idhdl hv=(idhdl)v->data;
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  res->rtyp = u->Typ();
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                              &(hv->data.umatrix),testHomog,
+                              syz,alg,limit);
+  setFlag(res,FLAG_STD); v->flag=0;
+  if(syz!=NULL)
+    u3->flag=0;
+  return FALSE;
 }
 BOOLEAN jjLIST_PL(leftv res, leftv v)
 {
