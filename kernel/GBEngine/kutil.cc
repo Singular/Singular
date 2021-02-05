@@ -10012,7 +10012,7 @@ void initBuchMoraCrit(kStrategy strat)
      /* enterOnePairNormal get rational part in it */
   }
 #endif
-  if (TEST_OPT_IDLIFT  /* i.e. also strat->syzComp==1 */
+  if (TEST_OPT_IDLIFT && strat->syzComp==1
   && (!rIsPluralRing(currRing)))
     strat->enterOnePair=enterOnePairLift;
 
