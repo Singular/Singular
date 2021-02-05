@@ -7691,6 +7691,16 @@ static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
   if (iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
   {
     // see jjLIFTSTD3
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+      {
+        Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+        return TRUE;
+      }
+    }
+#endif
     ideal I=(ideal)u->Data();
     idhdl hv=(idhdl)v->data;
     idhdl hw=(idhdl)w->data;

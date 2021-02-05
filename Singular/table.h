@@ -939,7 +939,7 @@ const struct sValCmdM dArithM[]=
 ,{D(jjLIFT_4),    LIFT_CMD,        MATRIX_CMD,          4  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/2  , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/3  , ALLOW_NC |ALLOW_RING}
-,{D(jjLIFTSTD_4), LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/4  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjLIFTSTD_4), LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/4  , ALLOW_NC |ALLOW_RING}
 ,{D(jjLIST_PL),   LIST_CMD,        LIST_CMD,           -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjLU_INVERSE),LUI_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
 ,{D(jjLU_SOLVE),  LUS_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
