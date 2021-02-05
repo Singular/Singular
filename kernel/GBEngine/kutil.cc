@@ -2257,7 +2257,6 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
 {
   assume(ALLOW_PROD_CRIT(strat));
   assume(!rIsPluralRing(currRing));
-  assume(strat->syzComp==1);
   assume(i<=strat->sl);
 
   if ((strat->S[i]==NULL) || (p==NULL))
@@ -10012,7 +10011,7 @@ void initBuchMoraCrit(kStrategy strat)
      /* enterOnePairNormal get rational part in it */
   }
 #endif
-  if (TEST_OPT_IDLIFT  /* i.e. also strat->syzComp==1 */
+  if (TEST_OPT_IDLIFT
   && (!rIsPluralRing(currRing)))
     strat->enterOnePair=enterOnePairLift;
 
