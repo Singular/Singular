@@ -6751,7 +6751,7 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
   return FALSE;
 }
-static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
+static BOOLEAN jjLIFTSTD_SYZ(leftv res, leftv u, leftv v, leftv w)
 {
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   if ((w->rtyp!=IDHDL)||(w->e!=NULL)) return TRUE;
@@ -6772,6 +6772,28 @@ static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
                                 &(hv->data.umatrix),testHomog,
                                 &(hw->data.uideal));
   setFlag(res,FLAG_STD); v->flag=0; w->flag=0;
+  return FALSE;
+}
+static BOOLEAN jjLIFTSTD_ALG(leftv res, leftv u, leftv v, leftv w)
+{
+  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
+  idhdl hv=(idhdl)v->data;
+  GbVariant alg=syGetAlgorithm((char*)w->Data(),currRing,(ideal)u->Data());
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                                &(hv->data.umatrix),testHomog,
+                                NULL,alg);
+  setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
