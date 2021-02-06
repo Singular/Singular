@@ -2867,6 +2867,7 @@ See
 @node homog, hres, hilb, Functions
 @subsection homog
 @cindex homog
+@cindex homogeneous
 
 @table @code
 @item @strong{Syntax:}
