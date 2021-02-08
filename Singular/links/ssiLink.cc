@@ -951,7 +951,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           sigaddset(&sigint, SIGINT);
           sigprocmask(SIG_BLOCK, &sigint, NULL);
           /* set #cpu to 1 for the child:*/
-	  feSetOptValue(FE_OPT_CPUS,1);
+          feSetOptValue(FE_OPT_CPUS,1);
 
           link_list hh=(link_list)ssiToBeClosed->next;
           /* we know: l is the first entry in ssiToBeClosed-list */
@@ -1141,7 +1141,10 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         char* ssh_command = (char*)omAlloc(256);
         char* ser_host = (char*)omAlloc(64);
         gethostname(ser_host,64);
-        sprintf(ssh_command,"ssh %s %s -q --batch --link=ssi --MPhost=%s --MPport=%d &",cli_host,path,ser_host,portno);
+        if (strcmp(cli_host,"localhost")==0) /*avoid "ssh localhost" as key may change*/
+          sprintf(ssh_command,"%s -q --batch --link=ssi --MPhost=%s --MPport=%d &",path,ser_host,portno);
+        else
+          sprintf(ssh_command,"ssh %s %s -q --batch --link=ssi --MPhost=%s --MPport=%d &",cli_host,path,ser_host,portno);
         //Print("client on %s started:%s\n",cli_host,path);
         omFree(path);
         omFree(cli_host);
