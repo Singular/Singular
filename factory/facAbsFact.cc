@@ -44,6 +44,7 @@ TIMING_DEFINE_PRINT(abs_fac_lcheuristic)
 TIMING_DEFINE_PRINT(abs_fac_cleardenom)
 TIMING_DEFINE_PRINT(abs_fac_compress)
 
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
 /// steps 4)-8) of Algorithm B.7.8. from Greuel, Pfister "A Singular
 /// Introduction to Commutative Algebra"
 CFAFList
@@ -97,7 +98,6 @@ RothsteinTragerResultant (const CanonicalForm& F, const CanonicalForm& w, int s,
 
   return CFAFList (CFAFactor (factor, getMipo (beta), 1));
 }
-
 
 /// Algorithm B.7.8 from Greuel, Pfister "A Singular Introduction to Commutative
 /// Algebra"
@@ -937,4 +937,4 @@ tryAgainWithoutHeu:
 
   return factors;
 }
-
+#endif
