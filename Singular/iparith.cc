@@ -2151,7 +2151,8 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     int *par_perm=NULL;
     int par_perm_size=0;
     BOOLEAN bo;
-    if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
+    nMap=n_SetMap(r->cf,currRing->cf);
+    if (nMap==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
       if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
@@ -2164,6 +2165,10 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       {
         goto err_fetch;
       }
+    }
+    else
+    {
+      par_perm_size=rPar(r);
     }
     if ((iiOp!=FETCH_CMD) || (r->N!=currRing->N) || (rPar(r)!=rPar(currRing)))
     {
@@ -2210,7 +2215,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         for(i=si_min(r->N,currRing->N);i>0;i--) perm[i]=i;
       }
     }
-    if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))
+    if (BVERBOSE(V_IMAP))
     {
       unsigned i;
       for(i=0;i<(unsigned)si_min(r->N,currRing->N);i++)
@@ -7919,73 +7924,84 @@ static BOOLEAN jjRESERVED0(leftv, leftv)
 
 static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 {
-	unsigned i=1;
-	int l = 0;
-	int k = 0;
-	lists L = (lists)omAllocBin(slists_bin);
-	struct blackbox_list *bb_list = NULL;
-	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
+  unsigned i=1;
+  int l = 0;
+  int k = 0;
+  lists L = (lists)omAllocBin(slists_bin);
+  struct blackbox_list *bb_list = NULL;
+  unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
 
-	if ((3*nCount) < sArithBase.nCmdUsed) {
-		nCount++;
-	}
-	bb_list = getBlackboxTypes();
-	// count the  number of entries;
-	for (i=0; i<nCount; i++) {
-		l++;
-		if (i + 1 + nCount < sArithBase.nCmdUsed) {
-			l++;
-		}
-		if(i+1+2*nCount<sArithBase.nCmdUsed) {
-			l++;
-		}
-	}
-	for (i = 0; i < bb_list->count; i++) {
-		if (bb_list->list[i] != NULL) {
-			l++;
-		}
-	}
-	// initiate list
-	L->Init(l);
-	k = 0;
-	for (i=0; i<nCount; i++) {
-		L->m[k].rtyp = STRING_CMD;
-		L->m[k].data = omStrDup(sArithBase.sCmds[i+1].name);
-		k++;
-		// Print("%-20s", sArithBase.sCmds[i+1].name);
-		if (i + 1 + nCount < sArithBase.nCmdUsed) {
-			L->m[k].rtyp = STRING_CMD;
-			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+nCount].name);
-			k++;
-			// Print("%-20s", sArithBase.sCmds[i+1 + nCount].name);
-		}
-		if(i+1+2*nCount<sArithBase.nCmdUsed) {
-			L->m[k].rtyp = STRING_CMD;
-			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+2*nCount].name);
-			k++;
-			// Print("%-20s", sArithBase.sCmds[i+1+2*nCount].name);
-		}
-		// PrintLn();
-	}
+  if ((3*nCount) < sArithBase.nCmdUsed)
+  {
+    nCount++;
+  }
+  bb_list = getBlackboxTypes();
+  // count the  number of entries;
+  for (i=0; i<nCount; i++)
+  {
+    l++;
+    if (i + 1 + nCount < sArithBase.nCmdUsed)
+    {
+      l++;
+    }
+    if(i+1+2*nCount<sArithBase.nCmdUsed)
+    {
+      l++;
+    }
+  }
+  for (i = 0; i < bb_list->count; i++)
+  {
+    if (bb_list->list[i] != NULL)
+    {
+      l++;
+    }
+  }
+  // initiate list
+  L->Init(l);
+  k = 0;
+  for (i=0; i<nCount; i++)
+  {
+    L->m[k].rtyp = STRING_CMD;
+    L->m[k].data = omStrDup(sArithBase.sCmds[i+1].name);
+    k++;
+    // Print("%-20s", sArithBase.sCmds[i+1].name);
+    if (i + 1 + nCount < sArithBase.nCmdUsed)
+    {
+      L->m[k].rtyp = STRING_CMD;
+      L->m[k].data = omStrDup(sArithBase.sCmds[i+1+nCount].name);
+      k++;
+      // Print("%-20s", sArithBase.sCmds[i+1 + nCount].name);
+    }
+    if(i+1+2*nCount<sArithBase.nCmdUsed)
+    {
+      L->m[k].rtyp = STRING_CMD;
+      L->m[k].data = omStrDup(sArithBase.sCmds[i+1+2*nCount].name);
+      k++;
+      // Print("%-20s", sArithBase.sCmds[i+1+2*nCount].name);
+    }
+    // PrintLn();
+  }
 
-	// assign blackbox types
-	for (i = 0; i < bb_list->count; i++) {
-		if (bb_list->list[i] != NULL) {
-			L->m[k].rtyp = STRING_CMD;
-			// already used strdup in getBlackBoxTypes
-			L->m[k].data = bb_list->list[i];
-			k++;
-		}
-	}
-	// free the struct (not the list entries itself, which were allocated
-	// by strdup)
-	omfree(bb_list->list);
-	omfree(bb_list);
+  // assign blackbox types
+  for (i = 0; i < bb_list->count; i++)
+  {
+    if (bb_list->list[i] != NULL)
+    {
+      L->m[k].rtyp = STRING_CMD;
+      // already used strdup in getBlackBoxTypes
+      L->m[k].data = bb_list->list[i];
+      k++;
+    }
+  }
+  // free the struct (not the list entries itself, which were allocated
+  // by strdup)
+  omfree(bb_list->list);
+  omfree(bb_list);
 
-	// pass the resultant list to the res datastructure
-	res->data=(void *)L;
+  // pass the resultant list to the res datastructure
+  res->data=(void *)L;
 
-	return FALSE;
+  return FALSE;
 }
 static BOOLEAN jjSTRING_PL(leftv res, leftv v)
 {
