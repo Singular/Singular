@@ -196,14 +196,6 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         }
         idDelete((ideal *)&s);
       }
-      if (nCoeff_is_algExt(currRing->cf))
-      {
-        for (i=R*C-1;i>=0;i--)
-        {
-          m->m[i]=p_MinPolyNormalize(m->m[i], currRing);
-          pTest(m->m[i]);
-        }
-      }
       if(w->rtyp==MAP_CMD)
       {
         ((map)data)->preimage=tmpR;
