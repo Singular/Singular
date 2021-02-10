@@ -2166,10 +2166,6 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         goto err_fetch;
       }
     }
-    else
-    {
-      par_perm_size=rPar(r);
-    }
     if ((iiOp!=FETCH_CMD) || (r->N!=currRing->N) || (rPar(r)!=rPar(currRing)))
     {
       perm=(int *)omAlloc0((r->N+1)*sizeof(int));
@@ -2215,7 +2211,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         for(i=si_min(r->N,currRing->N);i>0;i--) perm[i]=i;
       }
     }
-    if (BVERBOSE(V_IMAP))
+    if ((iiOp==FETCH_CMD) && (BVERBOSE(V_IMAP)))
     {
       unsigned i;
       for(i=0;i<(unsigned)si_min(r->N,currRing->N);i++)
