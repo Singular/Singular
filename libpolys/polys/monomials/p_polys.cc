@@ -2556,7 +2556,15 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     p_SetCoeff(ph,n_Init(1,r->cf),r);
     return;
   }
-  if ((pNext(pNext(ph))==NULL)||(!rField_is_Q(r)))
+  if (pNext(pNext(ph))==NULL)
+  {
+    return;
+  }
+  if (!(rField_is_Q(r))
+  && (!rField_is_Q_a(r))
+  && (!rField_is_Zp_a(r))
+  && (!rField_is_Z(r))
+  )
   {
     return;
   }
@@ -2589,7 +2597,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
   p = ph;
   if (!n_GreaterZero(pGetCoeff(p),r->cf)) h=n_InpNeg(h,r->cf);
   if(n_IsOne(h,r->cf)) return;
-  //if (TEST_OPT_PROT) PrintS("c");
+  if (TEST_OPT_PROT) PrintS("c");
   while (p!=NULL)
   {
 #if 1
