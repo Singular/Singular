@@ -2115,6 +2115,7 @@ different ground fields).
 @*@code{fetch} offers a convenient way to change
 variable names or orderings, or to map objects from a ring to a quotient
 ring of that ring or vice versa.
+@*@code{option(Imap);} reports the mapping.
 @item @strong{Note:}
 Compared with @code{imap}, @code{fetch} uses the position of the ring
 variables, not their names.
@@ -2146,6 +2147,7 @@ variables, not their names.
 @end table
 @c ref
 See
+@ref{option};
 @ref{imap};
 @ref{map};
 @ref{ring};
@@ -5477,7 +5479,8 @@ The last set of options controls the output of @sc{Singular}:
 @table @asis
 @item @code{Imap}
 @cindex Imap, option
-shows the mapping of variables with the fetch and imap commands.
+@cindex option Imap
+shows the mapping of variables with the fetch commands.
 @item @code{debugLib}
 @cindex debugLib, option
 warns about syntax errors when loading a library.
