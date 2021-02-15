@@ -167,6 +167,7 @@ public:
   // manipulations
   KINLINE void pNorm();
   KINLINE void pCleardenom();
+  KINLINE void pContent();
 
 #ifdef KDEBUG
   void wrp();
@@ -704,6 +705,7 @@ int ksReducePoly(LObject* PR,
                  TObject* PW,
                  poly spNoether = NULL,
                  number *coef = NULL,
+                 poly *mon =NULL,
                  kStrategy strat = NULL);
 
 /* like ksReducePoly, but if the reducer has only 1 term we still
