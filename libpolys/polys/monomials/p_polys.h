@@ -211,6 +211,7 @@ void      p_ProjectiveUnique(poly p,const ring r);
 
 void      p_ContentForGB(poly p, const ring r);
 void      p_Content(poly p, const ring r);
+void      p_Content_n(poly p, number &c,const ring r);
 #if 1
 // currently only used by Singular/janet
 void      p_SimpleContent(poly p, int s, const ring r);

@@ -2336,6 +2336,75 @@ content_finish:
   if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
 }
 
+void p_Content_n(poly ph, number &c,const ring r)
+{
+  if (ph==NULL)
+  {
+    c=n_Init(1,r->cf);
+    return;
+  }
+  const coeffs cf=r->cf;
+  if (pNext(ph)==NULL)
+  {
+    c=pGetCoeff(ph);
+    p_SetCoeff0(ph,n_Init(1,cf),r);
+  }
+  if ((cf->cfSubringGcd==ndGcd)
+  || (cf->cfGcd==ndGcd)) /* trivial gcd*/
+  {
+    c=n_Init(1,r->cf);
+    return;
+  }
+  number h;
+  if ((rField_is_Q(r))
+  || (rField_is_Q_a(r))
+  || (rField_is_Zp_a)(r)
+  || (rField_is_Z(r))
+  )
+  {
+    h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
+  }
+  else
+  {
+    h=n_Copy(pGetCoeff(ph),cf);
+  }
+  poly p;
+  if(n_IsOne(h,cf))
+  {
+    goto content_finish;
+  }
+  p=ph;
+  // take the SubringGcd of all coeffs
+  while (p!=NULL)
+  {
+    n_Normalize(pGetCoeff(p),cf);
+    number d=n_SubringGcd(h,pGetCoeff(p),cf);
+    n_Delete(&h,cf);
+    h = d;
+    if(n_IsOne(h,cf))
+    {
+      goto content_finish;
+    }
+    pIter(p);
+  }
+  // if found<>1, divide by it
+  p = ph;
+  while (p!=NULL)
+  {
+    number d = n_ExactDiv(pGetCoeff(p),h,cf);
+    p_SetCoeff(p,d,r);
+    pIter(p);
+  }
+content_finish:
+  c=h;
+  // and last: check leading sign:
+  if(!n_GreaterZero(pGetCoeff(ph),r->cf))
+  {
+    c = n_InpNeg(c,r->cf);
+    ph = p_Neg(ph,r);
+  }
+}
+
 #define CLEARENUMERATORS 1
 
 void p_ContentForGB(poly ph, const ring r)
