@@ -735,7 +735,7 @@ int redRing_Z (LObject* h,kStrategy strat)
     }
     else
     {
-      ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+      ksReducePoly(h, &(strat->T[j]), NULL, NULL, NULL, strat);
     }
     /* printf("\nAfter small red: ");pWrite(h->p); */
     if (h->GetLmTailRing() == NULL)
@@ -841,7 +841,7 @@ int redRing (LObject* h,kStrategy strat)
     }
     //printf("\nFound one: ");pWrite(strat->T[j].p);
     //enterT(*h, strat);
-    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
+    ksReducePoly(h, &(strat->T[j]), NULL, NULL, NULL, strat); // with debug output
     //printf("\nAfter small red: ");pWrite(h->p);
     if (h->GetLmTailRing() == NULL)
     {
@@ -969,7 +969,7 @@ int redHomog (LObject* h,kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
-    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, NULL, strat);
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif
@@ -1714,7 +1714,7 @@ int redLazy (LObject* h,kStrategy strat)
     }
 #endif
 
-    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, NULL, strat);
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif
@@ -1936,7 +1936,7 @@ int redHoney (LObject* h, kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
-    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),NULL,strat);
+    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),NULL,NULL, strat);
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif
@@ -2547,7 +2547,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
-        strat->P.pCleardenom();
+        if (TEST_OPT_IDLIFT) 
+          strat->P.pContent();
+	else
+          strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT,!TEST_OPT_CONTENTSB);
@@ -4777,7 +4780,7 @@ int redFirstShift (LObject* h,kStrategy strat)
       strat->T[j].wrp();
     }
 #endif
-    ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
+    ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)

@@ -186,6 +186,7 @@ int ksReducePoly(LObject* PR,
                  TObject* PW,
                  poly spNoether,
                  number *coef,
+                 poly *mon,
                  kStrategy strat)
 {
 #ifdef KDEBUG
@@ -238,7 +239,7 @@ int ksReducePoly(LObject* PR,
   }
 #endif
 
-  if (t2==NULL)           // Divisor is just one term, therefore it will
+  if ((t2==NULL)&&(mon==NULL)) // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
@@ -292,7 +293,7 @@ int ksReducePoly(LObject* PR,
   {
     if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
-
+  if(mon!=NULL) *mon=pHead(lm);
 
   // and finally,
 #ifdef HAVE_SHIFTBBA
