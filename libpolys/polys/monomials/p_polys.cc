@@ -2638,34 +2638,40 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     return;
   }
   number d=p_InitContent(ph,r);
+  number h=d;
   if (n_Size(d,r->cf)<=smax)
   {
+    n_Delete(&h,r->cf);
     //if (TEST_OPT_PROT) PrintS("G");
     return;
   }
 
   poly p=ph;
-  number h=d;
   if (smax==1) smax=2;
   while (p!=NULL)
   {
-#if 0
-    d=n_Gcd(h,pGetCoeff(p),r->cf);
+#if 1
+    d=n_SubringGcd(h,pGetCoeff(p),r->cf);
     n_Delete(&h,r->cf);
     h = d;
 #else
-    STATISTIC(n_Gcd); nlInpGcd(h,pGetCoeff(p),r->cf);
+    n_InpGcd(h,pGetCoeff(p),r->cf);
 #endif
     if(n_Size(h,r->cf)<smax)
     {
       //if (TEST_OPT_PROT) PrintS("g");
+      n_Delete(&h,r->cf);
       return;
     }
     pIter(p);
   }
   p = ph;
   if (!n_GreaterZero(pGetCoeff(p),r->cf)) h=n_InpNeg(h,r->cf);
-  if(n_IsOne(h,r->cf)) return;
+  if(n_IsOne(h,r->cf))
+  {
+    n_Delete(&h,r->cf);
+    return;
+  }
   if (TEST_OPT_PROT) PrintS("c");
   while (p!=NULL)
   {
