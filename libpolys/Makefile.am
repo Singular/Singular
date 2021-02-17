@@ -39,7 +39,7 @@ else
 endif
 
 
-libpolys_LTLIBRARIES = libpolys.la
+lib_LTLIBRARIES = libpolys.la
 libpolysdir = $(libdir)
 
 SOURCES = \
@@ -132,7 +132,7 @@ libpolys_la_SOURCES = ${SOURCES}
 EXTRA_libpolys_la_SOURCES = polys/templates/p_Procs_Static.cc polys/templates/p_Procs_Dynamic.cc
 
 libpolys_la_LDFLAGS= $(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
-libpolys_la_LIBADD = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS}
+libpolys_la_LIBADD = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${top_builddir}/../factory/libfactory.la
 
 
 #################################################
