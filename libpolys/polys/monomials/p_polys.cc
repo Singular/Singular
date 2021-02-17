@@ -38,15 +38,15 @@
 
 
 #ifdef HAVE_PLURAL
-#include "nc/nc.h"
-#include "nc/sca.h"
+#include "polys/nc/nc.h"
+#include "polys/nc/sca.h"
 #endif
 
 #ifdef HAVE_SHIFTBBA
 #include "polys/shiftop.h"
 #endif
 
-#include "clapsing.h"
+#include "polys/clapsing.h"
 
 /*
  * lift ideal with coeffs over Z (mod N) to Q via Farey

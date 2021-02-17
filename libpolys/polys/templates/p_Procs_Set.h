@@ -16,7 +16,7 @@
 #include "reporter/reporter.h"
 #include "misc/auxiliary.h"
 #ifdef HAVE_SHIFTBBA
-#include "shiftop.h"
+#include "polys/shiftop.h"
 #endif
 
 // extract p_Procs properties from a ring

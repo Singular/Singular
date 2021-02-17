@@ -36,13 +36,13 @@ const BOOLEAN p_procs_dynamic = TRUE;
 #define LINKAGE extern "C"
 #define p_Procs_Kernel
 
-#include "templates/p_Procs.inc"
+#include "polys/templates/p_Procs.inc"
 
-#include "templates/p_Procs_Dynamic.h"
+#include "polys/templates/p_Procs_Dynamic.h"
 // include general p_Proc stuff
-#include "templates/p_Procs_Impl.h"
+#include "polys/templates/p_Procs_Impl.h"
 
-#include "mod_raw.h"
+#include "polys/mod_raw.h"
 
 // define to bound for length of p_Proc name
 #define MAX_PROCNAME_LEN 200
@@ -266,7 +266,7 @@ while(0)
 #define DoSetProc DoReallySetProc
 #endif
 
-#include "templates/p_Procs_Set.h"
+#include "polys/templates/p_Procs_Set.h"
 
 #endif
 

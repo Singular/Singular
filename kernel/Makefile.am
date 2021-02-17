@@ -14,7 +14,7 @@ SOURCES = polys.cc \
 
 libkernelCommon_la_SOURCES  = $(SOURCES)
 libkernelCommon_la_LIBADD   = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
-${abs_top_builddir}/libpolys/polys/libpolys.la
+${abs_top_builddir}/libpolys/libpolys.la
 libkernelCommon_la_LDFLAGS = $(SINGULAR_LDFLAGS)
 
 ###### libkerneldir = $(libdir)/singular
