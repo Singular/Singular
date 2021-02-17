@@ -26,7 +26,7 @@ else
   else
 
     # Check whether --with-gmp was given.
-    DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+    DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
     GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
     if test "$with_gmp" = yes ; then
       GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"

@@ -210,7 +210,7 @@ AC_CHECK_LIB(m, atof, , [ AC_MSG_ERROR(libm.a not found) ])
 # Check whether --with-gmp was given.
 AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
                     [provide a non-standard location of gmp])])
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
 if test "${with_gmp+set}" = set; then :
   if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"

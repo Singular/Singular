@@ -15,7 +15,7 @@ dnl NTL_CPPFLAGS and NTL_LIBS
 
 AC_DEFUN([LB_CHECK_NTL],
 [
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
 
 AC_ARG_WITH(ntl,
 [  --with-ntl=<path>|yes|no  Use NTL library. If argument is no, you do not have
