@@ -541,8 +541,6 @@ void init_signals()
   ErrorCallback=HALT;
 #endif
 #endif
-// factory error handling: -----------------------------------------------
-  factoryError=WerrorS;
 
 // signal handler -------------------------------------------------------
   #ifdef SIGSEGV

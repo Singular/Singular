@@ -1477,6 +1477,8 @@ void siInit(char *name)
     SI_RESTORE_OPT(save1,save2);
   }
   // interpreter error handling
+  #ifndef __CYGWIN__
   factoryError=callWerrorS; // to honour later changes of variable WerrorS
+  #endif
   errorreported = 0;
 }
