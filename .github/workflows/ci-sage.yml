@@ -269,18 +269,23 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
+        os: [ macos-10.15, macos-11.0 ]
         tox_system_factor: [homebrew-macos, homebrew-macos-python3_xcode, homebrew-macos-python3_xcode-nokegonly, conda-forge-macos]
         tox_packages_factor: [minimal, standard]
+        xcode_version_factor: [11.7, default, 12.3]
 
     needs: [dist]
 
     env:
       TOX_ENV: local-${{ matrix.tox_system_factor }}-${{ matrix.tox_packages_factor }}
-      LOGS_ARTIFACT_NAME: logs-commit-${{ github.sha }}-tox-local-${{ matrix.tox_system_factor }}-${{ matrix.tox_packages_factor }}
+      LOGS_ARTIFACT_NAME: logs-commit-${{ github.sha }}-tox-local-${{ matrix.tox_system_factor }}-${{ matrix.tox_packages_factor }}-${{ matrix.os }}-xcode_${{ matrix.xcode_version_factor }}
       DOCKER_TARGETS: configured with-targets with-targets-optional
 
     steps:
 
+      - name: Select Xcode version
+        run: |
+          if [ ${{ matrix.xcode_version_factor }} != default ]; then sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode_version_factor }}.app; fi
       - name: Check out SageMath
         uses: actions/checkout@v2
         with:
