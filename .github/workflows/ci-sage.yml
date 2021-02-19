@@ -42,6 +42,8 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    # Allow to run manually
 
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
