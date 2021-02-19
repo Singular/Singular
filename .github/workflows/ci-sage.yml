@@ -223,7 +223,7 @@ jobs:
       - name: Install test prerequisites
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install python-tox python3-setuptools
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install tox python3-setuptools
       - name: Update Sage packages from upstream artifact
         run: |
           (export PATH=$(pwd)/build/bin:$PATH; (cd upstream && bash -x update-pkgs.sh) && sed -i.bak '/upstream/d' .dockerignore && echo "/:toolchain:/i ADD upstream upstream" | sed -i.bak -f - build/bin/write-dockerfile.sh && git diff)
