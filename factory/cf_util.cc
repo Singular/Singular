@@ -14,6 +14,7 @@
 
 #include "globaldefs.h"
 #include "config.h"
+#include "cf_util.h"
 
 
 /** int ipower ( int b, int m )

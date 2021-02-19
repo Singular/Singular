@@ -29,7 +29,7 @@ class CanonicalForm;
 /**
  * factory's class for variables
 **/
-class Variable
+class FACTORY_PUBLIC Variable
 {
 private:
     int _level;
@@ -89,7 +89,7 @@ public:
  *  Use it to define algebraic variables
  *  @note: algebraic variables have a level < 0
 **/
-Variable rootOf( const CanonicalForm &, char name = '@' );
+Variable FACTORY_PUBLIC rootOf( const CanonicalForm &, char name = '@' );
 
 inline int level( const Variable & v ) { return v.level(); }
 inline char name( const Variable & v ) { return v.name(); }
@@ -102,7 +102,7 @@ bool hasMipo( const Variable & alpha );
 char getDefaultVarName();
 char getDefaultExtName();
 
-void prune (Variable& alpha);
+void FACTORY_PUBLIC prune (Variable& alpha);
 void prune1 (const Variable& alpha);
 int ExtensionLevel();
 

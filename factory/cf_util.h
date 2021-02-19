@@ -9,7 +9,7 @@ int ilog2 (int a);
 
 /*BEGINPUBLIC*/
 int igcd (int a, int b);
-int ipower ( int b, int n );
+int FACTORY_PUBLIC ipower ( int b, int n );
 void factoryError_intern(const char *s);
 EXTERN_VAR void (*factoryError)(const char *s);
 /*ENDPUBLIC*/

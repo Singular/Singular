@@ -6,6 +6,7 @@
 #include "templates/ftmpl_functions.h"
 #include "cf_primes.h"
 #include "cfGcdUtil.h"
+#include "cfUnivarGcd.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"

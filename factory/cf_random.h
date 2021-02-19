@@ -93,7 +93,7 @@ public:
 int factoryrandom( int n );
 
 /// random seed initializer
-void factoryseed( int s );
+void FACTORY_PUBLIC factoryseed( int s );
 
 /*ENDPUBLIC*/
 

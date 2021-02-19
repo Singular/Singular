@@ -31,7 +31,7 @@ CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G
 #endif
 
 /*BEGINPUBLIC*/
-CanonicalForm
+CanonicalForm FACTORY_PUBLIC
 extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b );
 /*ENDPUBLIC*/
 

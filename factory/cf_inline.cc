@@ -78,6 +78,9 @@
 
 #include "config.h"
 
+#ifdef __CYGWIN__
+#undef CF_USE_INLINE
+#endif
 
 #include "cf_assert.h"
 
@@ -498,7 +501,11 @@ operator - ( const CanonicalForm & cf )
  *
  * @sa CanonicalForm::operator +=()
 **/
+#ifdef CF_USE_INLINE
 CF_INLINE CanonicalForm
+#else
+CF_INLINE CanonicalForm FACTORY_PUBLIC
+#endif
 operator + ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     CanonicalForm result( lhs );
@@ -507,7 +514,7 @@ operator + ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 }
 
 #ifndef INCL_CF_INLINE_CC
-CF_INLINE CanonicalForm
+CF_INLINE CanonicalForm FACTORY_PUBLIC
 operator - ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     CanonicalForm result( lhs );
@@ -519,7 +526,11 @@ operator - ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 /**
  * @sa CanonicalForm::operator *=()
 **/
+#ifdef CF_USE_INLINE
 CF_INLINE CanonicalForm
+#else
+CF_INLINE CanonicalForm FACTORY_PUBLIC
+#endif
 operator * ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     CanonicalForm result( lhs );
@@ -531,7 +542,7 @@ operator * ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 /**
  * @sa CanonicalForm::operator /=()
 **/
-CF_INLINE CanonicalForm
+CF_INLINE CanonicalForm FACTORY_PUBLIC
 operator / ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     CanonicalForm result( lhs );
@@ -542,7 +553,7 @@ operator / ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 /**
  * @sa CanonicalForm::operator %=()
 **/
-CF_INLINE CanonicalForm
+CF_INLINE CanonicalForm FACTORY_PUBLIC
 operator % ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     CanonicalForm result( lhs );

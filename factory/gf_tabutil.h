@@ -11,7 +11,7 @@
 
 // #include "config.h"
 
-int gf_tab_numdigits62 ( int q );
+int FACTORY_PUBLIC gf_tab_numdigits62 ( int q );
 
 char conv62 ( int i );
 
@@ -19,6 +19,6 @@ void convert62 ( int i, int n, char * p );
 
 int convback62 ( char c );
 
-int convertback62 ( char * p, int n );
+int FACTORY_PUBLIC convertback62 ( char * p, int n );
 
 #endif /* ! INCL_GF_TABUTIL_H */

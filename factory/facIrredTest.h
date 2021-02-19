@@ -37,7 +37,7 @@ double numZeros (const CanonicalForm& F, ///< [in] some poly over Z/p with n
 ///
 /// @return probIrredTest returns 1 for irreducibility, -1 for reducibility
 ///         or 0 if the test is not applicable
-int probIrredTest (const CanonicalForm& F, ///< [in] some poly over Z/p
+int FACTORY_PUBLIC probIrredTest (const CanonicalForm& F, ///< [in] some poly over Z/p
                    double error            ///< [in] 0 < error < 1
                   );
 

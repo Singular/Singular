@@ -38,7 +38,7 @@ CFAFList absFactorizeMain (const CanonicalForm& F ///<[in] irred poly over Q
 ///         factor is defined (note: in case the factor is already defined over
 ///         Q[t]/(t), 1 is returned), and the multiplicity of the
 ///         absolute irreducible factor
-CFAFList absFactorize (const CanonicalForm& G ///<[in] poly over Q
+CFAFList FACTORY_PUBLIC absFactorize (const CanonicalForm& G ///<[in] poly over Q
                       );
 /*ENDPUBLIC*/
 

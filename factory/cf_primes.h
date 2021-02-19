@@ -9,21 +9,21 @@
 #ifndef INCL_CF_PRIMES_H
 #define INCL_CF_PRIMES_H
 
-// #include "config.h"
+#include "globaldefs.h"
 
 /*BEGINPUBLIC*/
 
-int cf_getPrime( int i );
+int FACTORY_PUBLIC cf_getPrime( int i );
 
-int cf_getNumPrimes();
+int FACTORY_PUBLIC cf_getNumPrimes();
 
-int cf_getSmallPrime( int i );
+int FACTORY_PUBLIC cf_getSmallPrime( int i );
 
-int cf_getNumSmallPrimes();
+int FACTORY_PUBLIC cf_getNumSmallPrimes();
 
-int cf_getBigPrime( int i );
+int FACTORY_PUBLIC cf_getBigPrime( int i );
 
-int cf_getNumBigPrimes();
+int FACTORY_PUBLIC cf_getNumBigPrimes();
 
 /*ENDPUBLIC*/
 
