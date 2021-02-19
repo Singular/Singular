@@ -94,7 +94,8 @@ EXTRA_DIST = \
 	polys/templates/pp_Mult_Coeff_mm_DivSelectMult__T.cc \
 	polys/templates/pp_Mult_mm_Noether__T.cc polys/operations/p_Mult_q.h \
 	polys/templates/p_kBucketSetLm__T.cc polys/templates/p_Minus_mm_Mult_qq__T.cc \
-	polys/templates/p_Merge_q__T.cc polys/templates/p_Add_q__T.cc polys/templates/p_Neg__T.cc
+	polys/templates/p_Merge_q__T.cc polys/templates/p_Add_q__T.cc polys/templates/p_Neg__T.cc \
+	coeffs/rintegers2.cc coeffs/rintegers3.cc
 
 
 p_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON}
