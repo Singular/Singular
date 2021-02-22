@@ -5024,7 +5024,7 @@ EXAMPLE: example checkRoot; shows examples
   }
   printlevel=printlevel+1;
   def save = basering;
-  def @A = SannfsBM(F);
+  def @A = SannfsBM(F,eng);
   setring @A;
   poly F = imap(save,F);
   number a = imap(save,a);
