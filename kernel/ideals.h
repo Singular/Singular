@@ -188,7 +188,7 @@ static inline intvec *idSort(ideal id,BOOLEAN nolex=TRUE)
   return id_Sort(id, nolex, currRing);
 }
 
-ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
+ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL, matrix *T=NULL);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 
 // intvec *idQHomWeight(ideal id);

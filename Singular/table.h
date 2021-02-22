@@ -849,6 +849,8 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjMATRIX_Id),      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjMATRIX_Mo),      MATRIX_CMD, MATRIX_CMD, MODUL_CMD,  INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjMATRIX_Ma),      MATRIX_CMD, MATRIX_CMD, MATRIX_CMD, INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjMODULO3),        MODULO_CMD, MODUL_CMD,  IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, ALLOW_NC |ALLOW_RING}
+,{D(jjMODULO3),        MODULO_CMD, MODUL_CMD,  MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjSMATRIX_Mo),     SMATRIX_CMD,SMATRIX_CMD,MODUL_CMD,  INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjSMATRIX_Mo),     SMATRIX_CMD,SMATRIX_CMD,SMATRIX_CMD,INT_CMD,    INT_CMD, ALLOW_NC |ALLOW_RING}
 #ifdef OLD_RES
@@ -1113,7 +1115,7 @@ VAR cmdnames cmds[] =
   { "minres",      0, MINRES_CMD ,        CMD_1},
   { "mod",         0, '%' ,               MULDIV_OP},
   { "module",      0, MODUL_CMD ,         RING_DECL_LIST},
-  { "modulo",      0, MODULO_CMD ,        CMD_2},
+  { "modulo",      0, MODULO_CMD ,        CMD_23},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},
   { "monomial",    0, MONOM_CMD ,         CMD_1},
   { "mpresmat",    0, MPRES_CMD,          CMD_2},

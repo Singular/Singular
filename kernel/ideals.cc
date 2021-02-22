@@ -2283,9 +2283,10 @@ static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
 * represents (h1+h2)/h2=h1/(h1 intersect h2)
 */
 //ideal idModulo (ideal h2,ideal h1)
-ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
+ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T)
 {
   intvec *wtmp=NULL;
+  if (T!=NULL) idDelete((ideal*)T);
 
   int i,k,rk,flength=0,slength,length;
   poly p,q;
@@ -2404,11 +2405,13 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   }
 
   idTest(s_temp);
-  unsigned save_opt;
+  unsigned save_opt,save_opt2;
   SI_SAVE_OPT1(save_opt);
+  SI_SAVE_OPT2(save_opt2);
   si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
   SI_RESTORE_OPT1(save_opt);
+  SI_RESTORE_OPT2(save_opt2);
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
   if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))
@@ -2420,16 +2423,58 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   }
   if (wtmp!=NULL) delete wtmp;
 
-  for (i=0;i<IDELEMS(s_temp1);i++)
+  if (T==NULL)
   {
-    if ((s_temp1->m[i]!=NULL)
-    && (((int)pGetComp(s_temp1->m[i]))<=length))
+    for (i=0;i<IDELEMS(s_temp1);i++)
     {
-      p_Delete(&(s_temp1->m[i]),currRing);
+      if (s_temp1->m[i]!=NULL)
+      {
+        if (((int)pGetComp(s_temp1->m[i]))<=length)
+        {
+          p_Delete(&(s_temp1->m[i]),currRing);
+        }
+        else
+        {
+          p_Shift(&(s_temp1->m[i]),-length,currRing);
+        }
+      }
     }
-    else
+  }
+  else
+  {
+    *T=mpNew(IDELEMS(s_temp1),IDELEMS(h2));
+    for (i=0;i<IDELEMS(s_temp1);i++)
     {
-      p_Shift(&(s_temp1->m[i]),-length,currRing);
+      if (s_temp1->m[i]!=NULL)
+      {
+        if (((int)pGetComp(s_temp1->m[i]))<=length)
+        {
+	  do
+	  {
+            p_LmDelete(&(s_temp1->m[i]),currRing);
+	  } while((int)pGetComp(s_temp1->m[i])<=length);
+          poly q = prMoveR( s_temp1->m[i], syz_ring,orig_ring);
+          s_temp1->m[i] = NULL;
+          if (q!=NULL)
+          {
+	    q=pReverse(q);
+	    do
+            {
+              poly p = q;
+              long t=pGetComp(p);
+              pIter(q);
+              pNext(p) = NULL;
+              pSetComp(p,0);
+              pSetmComp(p);
+              MATELEM(*T,(int)t-length,i) = pAdd(MATELEM(*T,(int)t-k,i),p);
+            } while (q != NULL);
+          }
+        }
+        else
+        {
+          p_Shift(&(s_temp1->m[i]),-length,currRing);
+        }
+      }
     }
   }
   s_temp1->rank = rk;

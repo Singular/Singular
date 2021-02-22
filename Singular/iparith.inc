@@ -686,6 +686,8 @@
 // operation: matrix (ideal, int, int)  ->  matrix
 // operation: matrix (module, int, int)  ->  matrix
 // operation: matrix (matrix, int, int)  ->  matrix
+// operation: modulo (ideal, ideal, matrix)  ->  module
+// operation: modulo (module, module, matrix)  ->  module
 // operation: smatrix (module, int, int)  ->  smatrix
 // operation: smatrix (smatrix, int, int)  ->  smatrix
 // operation: newstruct (string, string, string)  ->  nothing
@@ -1484,7 +1486,7 @@ void iiInitCmdName()
   iiArithAddCmd("minres",              0, 450, CMD_1, 123);
   iiArithAddCmd("mod",                 0,  37, '/', 124);
   iiArithAddCmd("module",              0, 278, 313, 125);
-  iiArithAddCmd("modulo",              0, 451, CMD_2, 126);
+  iiArithAddCmd("modulo",              0, 451, CMD_23, 126);
   iiArithAddCmd("monitor",             0, 452, CMD_12, 127);
   iiArithAddCmd("monomial",            0, 292, CMD_1, 128);
   iiArithAddCmd("mpresmat",            0, 453, CMD_2, 129);

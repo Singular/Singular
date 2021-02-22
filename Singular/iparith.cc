@@ -6716,6 +6716,57 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
   res->data = (char *)m;
   return FALSE;
 }
+static BOOLEAN jjMODULO3(leftv res, leftv u, leftv v, leftv w)
+{
+  if (w->rtyp!=IDHDL) return TRUE; /* idhdhl required */
+  intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  tHomog hom=testHomog;
+  if (w_u!=NULL)
+  {
+    w_u=ivCopy(w_u);
+    hom=isHomog;
+  }
+  intvec *w_v=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  if (w_v!=NULL)
+  {
+    w_v=ivCopy(w_v);
+    hom=isHomog;
+  }
+  if ((w_u!=NULL) && (w_v==NULL))
+    w_v=ivCopy(w_u);
+  if ((w_v!=NULL) && (w_u==NULL))
+    w_u=ivCopy(w_v);
+  ideal u_id=(ideal)u->Data();
+  ideal v_id=(ideal)v->Data();
+  if (w_u!=NULL)
+  {
+     if ((*w_u).compare((w_v))!=0)
+     {
+       WarnS("incompatible weights");
+       delete w_u; w_u=NULL;
+       hom=testHomog;
+     }
+     else
+     {
+       if ((!idTestHomModule(u_id,currRing->qideal,w_v))
+       || (!idTestHomModule(v_id,currRing->qideal,w_v)))
+       {
+         WarnS("wrong weights");
+         delete w_u; w_u=NULL;
+         hom=testHomog;
+       }
+     }
+  }
+  idhdl h=(idhdl)w->data;
+  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u, &(h->data.umatrix));
+  if (w_u!=NULL)
+  {
+    atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
+  }
+  delete w_v;
+  //if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
+  return FALSE;
+}
 static BOOLEAN jjSMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
   int mi=(int)(long)v->Data();
