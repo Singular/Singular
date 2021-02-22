@@ -2407,7 +2407,8 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   unsigned save_opt;
   SI_SAVE_OPT1(save_opt);
   si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
-  ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
+  ideal s_temp1 = t_rep_gb(currRing, s_temp, length);
+  //ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
   SI_RESTORE_OPT1(save_opt);
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
