@@ -1,0 +1,400 @@
+////////////////////////////////////////////////////////////////
+version="version hodge.lib 4.2.0.0 Feb_2021 "; // $Id$
+category="Noncommutative";
+info="
+LIBRARY:  hodge.lib  Algorithms for Hodge ideals
+
+AUTHORS:  Guillem Blanco, email: guillem.blanco@kuleuven.be
+
+OVERVIEW:
+A library for computing the Hodge ideals [MP19] of Q-divisors associated to any reduced hypersurface @math{f \\in R}.
+@* The implemented algorithm [Bla21] is based on the characterization of the Hodge ideals in terms of the @math{V}-filtration of Malgrange and Kashiwara on @math{R_f f^s}, see [MP20].
+@* As a consequence, this library provides also an algorithm to compute the multiplier ideals and the jumping numbers of any hypersurface, see [BS05].
+
+REFERENCES:
+@*[Bla21] G. Blanco, An algorithm for Hodge ideals, to appear.
+@*[BS05] N. Budur, M. Saito, Multiplier ideals, V-filtration, and spectrum, J. Algebraic Geom. 14 (2005), no. 2, 269-282. 2, 4
+@*[MP19] M. Mustata, M. Popa: Hodge ideals, Mem. Amer. Math. Soc. 262 (2019), no. 1268
+@*[MP20] M. Mustata, M. Popa: Hodge ideals for Q-divisors, V-filtration, and minimal exponent, Forum Math. Sigma 8 (2020), no. e19, 41 pp.
+
+KEYWORDS: Hodge ideals; V-filtration; Multiplier ideals; Jumping numbers;
+
+PROCEDURES:
+  Vfiltration(f, p [, eng]);  compute @math{R}-generators for the @math{V}-filtration on @math{R_f f^s} truncated up to degree @math{p} in @math{\\partial_t}.
+  hodgeIdeals(f, p [, eng]);  compute the Hodge ideals of @math{f^\\alpha} up to level @math{p}, for a reduced hypersurface @math{f \\in R}.
+  multIdeals(f, p [, eng]);   compute the multiplier ideals of a hypersurface @math{f \\in R}.
+  nextHodgeIdeal(f, I, p);  given the @math{p}-th Hodge ideal @math{I} of @math{f^\\alpha} compute the @math{p+1}-th Hodge ideal assuming that the Hodge filtration of the underlying mixed Hodge module is generated at level less than or equal to @math{p}.
+
+SEE ALSO: dmodapp_lib
+";
+
+LIB "dmod.lib"; // SannfsBM, vec2poly, bFactor
+
+// Test whether the polynomial f is reduced or not.
+static proc isReduced(poly f) {
+  // Compute square-free part.
+  ideal j = jacob(f); poly g = f;
+  for (int i = 1; i <= size(j); i++) { g = gcd(g, j[i]); }
+  return(g == 1);
+}
+
+// The Q-polynomial as defined by Mustata & Popa.
+static proc Qpoly(int k, number a) {
+  poly Q = 1;
+  for (int i = 1; i <= k; i++) { Q = Q*(a+i-1); }
+  return(Q);
+}
+
+// The procedure to compute the truncated V-filtration.
+proc Vfiltration(poly f, int p, list #)
+"USAGE:    Vfiltration(f, p [, eng]);     f a poly, p a non-negative integer, eng an optional integer.
+RETURN:    ring
+PURPOSE:   compute @math{R}-generators for the @math{V}-filtration on @math{R_f f^s} truncated up to degree @math{p} in @math{\\partial_t}.
+NOTE:      activate the output ring with the @code{setring} command.
+@*In the output ring, the list @code{Vfilt} contains the @math{V}-filtration.
+@*The value of @code{eng} controls the algorithm used for Groebner basis computations.
+@*See the @code{engine} procedure from @ref{dmodapp_lib} for the available algorithms.
+DISPLAY:   If @code{printlevel}=1, progress debug messages will be printed.
+EXAMPLE:   example Vfiltration; shows an example
+"
+{
+  // The level 'p' must be a non-negative integer.
+  if (p < 0) { ERROR("Level p must be non-negative."); }
+  // The base ring must be non-commutative.
+  if (size(ringlist(basering)) > 4) { ERROR("Base ring must be commutative."); }
+
+  // Default engine & option.
+  int slimgb_ = 0; int eng = slimgb_;
+  // The first optional argument must be an integer.
+  if (size(#) >= 1) {
+    if (typeof(#[1]) == "int") { eng = int(#[1]); }
+    else { ERROR("First argument must be an integer."); }
+    // The check that the engine number is valid will be done by the engine.
+  }
+
+  // Save basering & set basic variables.
+  def @R = basering; int N = nvars(@R);
+  int ppl = printlevel - voice + 2; int i, j; string str;
+  list Names = ringlist(@R)[2]; list Dnames;
+  for (i = 1; i <= N; i++) { Dnames = Dnames + list("D" + Names[i]); }
+
+  // No variable can be named 't' or 'Dt'.
+  for (i = 1; i <= size(Names); i++) {
+    if (Names[i] == "t" || Names[i] == "Dt" || Names[i] == "a") {
+      ERROR("Variable names should not include 't', 'Dt' or 'a'");
+    }
+  }
+
+  // Compute s-parametric annhilator of f via BM algorithm & move to D[s].
+  dbprint(ppl, "// -1-1- Computing the annhilator of f^s...");
+  // SannfsBM returns a ring with elimination ordering for s.
+  def @Ds = SannfsBM(f, slimgb_); setring(@Ds);
+  dbprint(ppl, "// -1-2- Annhilator of f^s computed in @Ds");
+
+  list RL = ringlist(basering); list RL1;
+  RL1[1] = RL[1]; //char.
+  RL1[2] = list("s") + Dnames + Names;
+  //RL1[3] = list(list("dp", 1:1), list("dp", 1:N), list("dp", 1:N), list("C", 0));
+  RL1[3] = list(list("c", 0), list("dp", 1:1), list("dp", 1:N), list("dp", 1:N));
+  RL1[4] = RL[4]; //min. poly.
+  // Make new ring non-commutative.
+  ring @Ds1 = ring(RL1); matrix @Dmat[2*N+1][2*N+1];
+  for (i = 1; i <= N; i++) { @Dmat[i+1, N+1+i] = -1; }
+  def @Ds2 = nc_algebra(1, @Dmat); setring @Ds2; kill @Ds1;
+
+  // Move annihilator & f to the new ring.
+  ideal Annfs = imap(@Ds, LD); poly f = imap(@R, f);
+
+  // Compute the B-S polynomial of f.
+  dbprint(ppl, "// -2-1- Computing Groebner basis of Ann f^s + <f>...");
+  // The partial derivatives trick might make everything run a bit faster.
+  ideal I = engine(Annfs+f+jacob(f), eng);
+  dbprint(ppl, "// -2-2- Groebner basis of Ann f^s + <f> computed");
+  dbprint(ppl, "// -2-3- Intersecting Ann f^s + <f> with QQ[s]...");
+  // Add the missing s = -1 root.
+  poly bfct = vec2poly(pIntersect(s, I))*(var(1)+1);
+  list BS = bFactor(bfct);
+  dbprint(ppl, "// -2-4- Intersection of Ann f^s + <f> with QQ[s] finished");
+
+  // Shifts feigen = delete(eigen, i); mul = delete(mul, i);or the annihilator of f^s.
+  int m = -p; int k = 1;
+  ideal J = subst(Annfs, s, s+m)+f^(k-m);
+
+  // Shift roots of the BS to (0, 1], this avoids having to compute the BS of J.
+  list eigen; list mul;
+  for (i = 1; i <= size(BS[1]); i++) {
+    for (j = 0; j <= p; j++) {
+      if (BS[1][i]+j < 0) {
+        eigen = eigen+list(number(-BS[1][i]-j));
+        mul = mul+list(BS[2][i]);
+      }
+    } // Sort shifted eigen.
+  } list S = sort(eigen); eigen = S[1]; mul = mul[S[2]];
+
+  // Remove duplicates & keep max. multiplicity.
+  for (i = 1; i <= size(eigen) - 1; i++) {
+    j = 1; while (eigen[i] == eigen[i+j]) { mul[i] = max(mul[i], mul[i+j]); j++; }
+    while (j != 1) { eigen = delete(eigen, i+j-1); mul = delete(mul, i+j-1); j--; }
+  }
+
+  // Compute the kernels of the eigenvalues in 'eigen' in J.
+  str = sprintf("// -3-1- Computing the kernels of the eigenvalues of Dt*t... (p = %p)",
+    p); dbprint(ppl, str);
+  list Ker; ideal K;
+  for (i = 1; i <= size(eigen); i++) {
+    str = sprintf("// -3-1-%p- Kernel for eigenvalue %p, multiplicity %p... (%p/%p)",
+      i, eigen[i], mul[i], i, size(eigen)); dbprint(ppl, str);
+    // *NO* need to add f^(k-m) as Ker[i] contains J = Annf^(s+m) + f^(k-m).
+    Ker[i] = ideal(modulo(s + eigen[i], J));
+    // If there are multiplicities, iterate the generalized eigenspaces.
+    for (j = 1; j < mul[i]; j++) {
+      // Reduce the number of generators before calling modulo.
+      K = engine(Ker[i], eng);
+      Ker[i] = ideal(modulo(s + eigen[i], K));
+    }
+  }
+
+  // Compress the kernels of the eigenvalues greater than 1.
+  for (i = size(eigen)-1; i > 0 && eigen[i] > 1; i--) {
+    Ker[i] = Ker[i] + Ker[i+1]; Ker = delete(Ker, i+1);
+    eigen = delete(eigen, i+1); mul = delete(mul, i+1);
+  }
+  // Heuristically, it is better to compute a Groebner basis here before
+  // doing the elimination of the variables.
+  dbprint(ppl, "// -3-3- Computing Groebner basis of kernels...");
+  for (i = 1; i <= size(Ker); i++) { Ker[i] = engine(Ker[i], eng); }
+
+  // Create new ring with elimination order for _Dx.
+  list RL = ringlist(basering); list RL1;
+  RL1[1] = RL[1]; //char.
+  RL1[2] = Dnames + list("s") + Names;
+  RL1[3] = list(list("dp", 1:N), list("dp", 1:(N+1)), list("C", 0)); //orders.
+  RL1[4] = RL[4]; //min. poly.
+  // Make new ring non-commutative.
+  ring @Ds3 = ring(RL1);
+  matrix @Dmat[2*N+1][2*N+1];
+  for (i = 1; i <= N; i++) { @Dmat[i, N+i+1] = -1; }
+  def @Ds4 = nc_algebra(1, @Dmat); setring @Ds4; kill @Ds3;
+  dbprint(ppl, "// -4-1- The elimination ring @Ds4(_Dx,s,_x) is ready...");
+
+  // Map things to the new ring and eliminate
+  dbprint(ppl, "// -4-2- Moving kernels to the new elimination ring...");
+  list Ker = imap(@Ds2, Ker); poly f = imap(@Ds2, f); list eigen = imap(@Ds2, eigen);
+
+  dbprint(ppl, "// -4-3- Starting the elimination of _Dx in the V-filtration...");
+  int n = size(Ker); list S; S[n] = engine(Ker[n], eng); list H;
+  for (i = n - 1; i > 0; i--) {
+    str = sprintf("// -4-3-%p- Elimination for eigenvalue %p... (%p/%p)", n-i,
+      eigen[i], n-i, n); dbprint(ppl, str);
+    S[i] = engine(Ker[i] + S[i+1], eng);
+    H[i] = nselect(S[i], 1..N);
+  }
+  dbprint(ppl, "// -4-4- The variables _Dx are eliminated");
+
+  // Create new commutative ring with block order (s)(x_).
+  list RL = ringlist(basering); list RL1;
+  RL1[1] = RL[1]; //char.
+  RL1[2] = list("s") + Names; //vars.
+  RL1[3] = list(list("dp", 1), list("dp", 1:N), list("C", 0)); //orders.
+  RL1[4] = RL[4]; //min. poly.
+  // Make new ring non-commutative.
+  ring @R1 = ring(RL1); setring(@R1);
+  dbprint(ppl, "// -4-5- The commutative ring s,_x is ready");
+
+  // Compute Groebner bases for H in the new ring.
+  list H = imap(@Ds4, H);
+  dbprint(ppl, "// -4-6- Computing Groebner basis of the H ideals in the new ring...");
+  for (i = 1; i <= size(H); i++) { H[i] = slimgb(H[i]); }
+  dbprint(ppl, "// -4-7- Groebner basis of the H ideals computed");
+
+  // Create new ring (Dt,t,x_) where s -> -Dt*t.
+  list RL = ringlist(basering); list RL1;
+  RL1[1] = RL[1]; //char.
+  RL1[2] = list("Dt", "t") + Names; //vars.
+  RL1[3] = list(list("dp", 1:2), list("dp", 1:N), list("C", 0)); //orders.
+  RL1[4] = RL[4]; //min. poly.
+  // Make new ring non-commutative.
+  ring @Ds5 = ring(RL1);
+  matrix @Dmat[N+2][N+2]; @Dmat[1, 2] = -1;
+  def @Ds6 = nc_algebra(1, @Dmat); setring @Ds6; kill @Ds5;
+  dbprint(ppl, "// -5-1- The ring @Ds6(t,Dt,_x) is ready");
+
+  // Move things to the new (Dt,t,x_) ring.
+  def Max = maxideal(1); ideal J = -Dt*t;
+  for (i = 3; i <= N + 2; i++) { J = J + Max[i]; }
+  dbprint(ppl, "// -5-2- Moving H ideals to the new (Dt,t,_x) ring...");
+  map Map = @R1, J; list H = Map(H);
+  poly f = imap(@Ds4, f); list eigen = imap(@Ds4, eigen);
+
+  // Subtitute t = f and *exactly* divide H ideals by f^p.
+  dbprint(ppl, "// -5-3- Substituting t = f and dividing by f^p...");
+  list Vfilt;
+  for (i = 1; i <= size(H); i++) {
+    // Append the corresponding eigenvalue and its multiplicity to the output.
+    Vfilt[i] = list(list(), poly(eigen[i]), mul[i]);
+    for (j = 1; j <= size(H[i]); j++) {
+      if (leadexp(H[i][j])[1] <= p) {
+        Vfilt[i][1] = Vfilt[i][1] + list(subst(H[i][j], var(2), f)/f^p);
+      }
+    }
+  } export(Vfilt); return(@Ds6);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,(x,y),dp;
+  poly f = y^2-x^3;
+  def D = Vfiltration(f, 1);
+  setring D; Vfilt;
+}
+
+proc hodgeIdeals(poly f, int p, list #)
+"USAGE:    hodgeIdeals(f, p [, eng]);    f a reduced poly, p a non-negative integer, eng an optional integer.
+RETURN:    ring
+PURPOSE:   compute the Hodge ideals of @math{f^\\alpha} up to level @math{p}, for a reduced hypersurface @math{f}.
+NOTE:      activate the output ring with the @code{setring} command.
+@*In the output ring, the list of ideals @code{hodge} contains the Hodge ideals of @math{f}.
+@*The value of @code{eng} controls the algorithm used for Groebner basis computations.
+@*See the @code{engine} procedure from @ref{dmodapp_lib} for the available algorithms.
+DISPLAY:   If @code{printlevel}=1, progress debug messages will be printed.
+EXAMPLE:   example hodgeIdeals; shows an example
+"
+{
+  // Equation 'f' must be reduced.
+  if (!isReduced(f)) { ERROR("Polynomial f must be reduced."); }
+
+  def @R = basering; int N = nvars(@R);
+  list Trans = ringlist(@R)[1];
+  list Names = ringlist(@R)[2];
+  // Check for name collisions within Transcendental parameters.
+  int i, j;
+  if (size(Trans) != 1) {
+    for (i = 1; i <= size(Trans[2]); i++) {
+      if (Trans[2][i] == "t" || Trans[2][i] == "Dt" || Trans[2][i] == "a") {
+        ERROR("Transcendental parameters should not include 't', 'Dt' or 'a'");
+      }
+    }
+  }
+
+  int ppl = printlevel - voice + 2;
+  printlevel = printlevel + 1;
+  // Start by computing the Vfiltration of f truncated at level p.
+  def @Ddt = Vfiltration(f, p, #); setring(@Ddt);
+  printlevel = printlevel - 1;
+
+  // Commutative (x_) ring with trascendental parameter 'a'.
+  list RL = ringlist(basering); list RL1;
+  if (size(RL[1]) == 0) { // no transcendental parameters in basering.
+    RL1[1] = list(RL[1], list("a"), list(list("lp", 1)), ideal(0));
+  } else { // trascendental parameters already in basering.
+    RL1[1] = RL[1]; RL1[1][2] = RL1[1][2] + list("a");
+    RL1[1][3][1][2] = RL1[1][3][1][2],1;
+  }
+  RL1[2] = list("Dt") + Names; //vars.
+  RL1[3] = list(list("dp", 1), list("dp", 1:N), list("C", 0)); //orders.
+  RL1[4] = RL[4]; //min. poly.
+  // Make new ring non-commutative.
+  ring @R2 = ring(RL1); setring(@R2);
+  dbprint(ppl, "// -6-1- The commutative ring (a),_x is ready");
+  list Vfilt = imap(@Ddt, Vfilt); poly f = imap(@R, f);
+
+  option(redSB);
+  // Finally step, compute Hodge ideals using Theorem A' of Mustata & Popa.
+  dbprint(ppl, "// -6-2- Computing Hodge ideals...");
+  list hodge; ideal Iq; poly g, mon; int q, l, dg;
+  // For each eigenvalue...
+  for (i = 1; i <= size(Vfilt); i++) {
+    hodge[i] = list(list(), Vfilt[i][2], Vfilt[i][3]);
+    // For each level q = 0,1,..,p we have a the q-th Hodge ideal 'Iq'.
+    for (q = 0; q <= p; q++) { Iq = 0;
+      // For each generator of H[i], compute a generator g of the Hodge ideal.
+      for (j = 1; j <= size(Vfilt[i][1]); j++) { g = 0;
+        // Select only the generators of H[i] with degree <= q in Dt.
+        if (leadexp(Vfilt[i][1][j])[1] <= q) {
+          // For each monomial term of the j-th generator of H[i]...
+          for (l = 1; l <= size(Vfilt[i][1][j]); l++) {
+            mon = Vfilt[i][1][j][l]; dg = leadexp(mon)[1];
+            // Apply Theorem A' of Mustata & Popa.
+            g = g + Qpoly(dg, a)*f^(q-dg)*(mon/Dt^dg);
+          } // Add a new element of the q-th Hodge ideal.
+        } Iq = Iq + g;
+      // Save a reduced GB of the q-th Hodge ideal of the i-th eigenvalue.
+      } hodge[i][1] = hodge[i][1] + list(slimgb(Iq));
+    }
+  } option(noredSB);
+
+  export(hodge); return(@R2);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,(x,y),dp;
+  poly f = y^2-x^3;
+  def Ra = hodgeIdeals(f, 2);
+  setring Ra; hodge;
+}
+
+proc multIdeals(poly f, list #)
+"USAGE:    multIdeals(f, [, eng]);    f a reduced poly, eng an optional integer.
+RETURN:    list
+PURPOSE:   compute the multiplier ideals of a hypersurface @math{f \\in R}.
+NOTE:      The value of @code{eng} controls the algorithm used for Groebner basis computations.
+@* See the @code{engine} procedure from @ref{dmodapp_lib} for the available algorithms.
+DISPLAY:   If @code{printlevel}=1, progress debug messages will be printed.
+EXAMPLE:   example multIdeals; shows an example
+"
+{
+  // Compute the Vfiltration of f truncated at level 0.
+  printlevel = printlevel + 1;
+  def @Ddt = Vfiltration(f, 0, #);
+  printlevel = printlevel - 1;
+
+  // Compute Hodge ideals using Theorem 0.1 of Budur & Saito.
+  list Vfilt = imap(@Ddt, Vfilt);
+  list multIdeals; int i, j;
+  option(redSB);
+  for (i = 1; i <= size(Vfilt); i++) {
+    multIdeals[i] = list(ideal(), Vfilt[i][2], Vfilt[i][3]);
+    for (j = 1; j <= size(Vfilt[i][1]); j++) {
+      multIdeals[i][1] = multIdeals[i][1] + Vfilt[i][1][j];
+    } // Cosmetic Groebner basis.
+    multIdeals[i][1] = slimgb(ideal(multIdeals[i][1]));
+  } option(noredSB);
+
+  return(multIdeals);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,(x,y),dp;
+  poly f = y^2-x^3;
+  multIdeals(f);
+}
+
+// If I is the p-th Hodge ideal and the Hodge filtration is generated at
+// level p, return the (p+1)-th Hodge ideal.
+proc nextHodgeIdeal(poly f, ideal I, int p)
+"USAGE:    nextHodgeIdeal(f, I, p);  f a poly, I an ideal, p a non-negative integer
+RETURN:    ideal
+PURPOSE:   given the @math{p}-th Hodge ideal @math{I} of @math{f^\\alpha} compute the @math{p+1}-th Hodge ideal assuming that
+@*the Hodge filtration of the underlying mixed Hodge module is generated at level less than or equal to @math{p}.
+EXAMPLE:   example nextHodgeIdeal; shows an example
+"
+{
+  int N = nvars(basering); ideal J = f*I; int i, j;
+  for (i = 1; i <= size(I); i++) {
+    for (j = 1; j <= N; j++) {
+      J = J + (f*diff(I[i], var(j)) - (a + p)*I[i]*diff(f, var(j)));
+    }
+  } return(slimgb(J));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,(x,y),dp;
+  poly f = y^2-x^3;
+  def Ra = hodgeIdeals(f, 2);
+  setring(Ra);
+  int p = 1;
+  nextHodgeIdeal(y^2-x^3, hodge[3][1][p+1], p);
+}
