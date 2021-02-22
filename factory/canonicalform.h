@@ -49,8 +49,10 @@
 /*ENDPUBLIC*/
 
 #ifdef CF_USE_INLINE
+#ifndef __CYGWIN__
 #undef CF_INLINE
 #define CF_INLINE inline
+#endif
 #else
 #undef CF_INLINE
 #define CF_INLINE
@@ -224,7 +226,9 @@ mod ( const CanonicalForm&, const CanonicalForm& );
 /*ENDPUBLIC*/
 
 #ifdef CF_USE_INLINE
+#ifndef __CYGWIN__
 #include "cf_inline.cc"
+#endif
 #endif
 
 /*BEGINPUBLIC*/
