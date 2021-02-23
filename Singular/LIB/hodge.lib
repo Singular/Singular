@@ -17,7 +17,7 @@ REFERENCES:
 @*[MP19] M. Mustata, M. Popa: Hodge ideals, Mem. Amer. Math. Soc. 262 (2019), no. 1268
 @*[MP20] M. Mustata, M. Popa: Hodge ideals for Q-divisors, V-filtration, and minimal exponent, Forum Math. Sigma 8 (2020), no. e19, 41 pp.
 
-KEYWORDS: Hodge ideals; V-filtration; Multiplier ideals; Jumping numbers;
+KEYWORDS: Hodge ideals; V-filtration; Multiplier ideals; Jumping numbers
 
 PROCEDURES:
   Vfiltration(f, p [, eng]);  compute @math{R}-generators for the @math{V}-filtration on @math{R_f f^s} truncated up to degree @math{p} in @math{\\partial_t}.
