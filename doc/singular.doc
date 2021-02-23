@@ -1207,6 +1207,7 @@ Comments should be send to the author of the library directly.
 * finitediff_lib:: finite difference schemes for linear differential equations
 * GND_lib:: General Neron Desingularization
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
+* hodge_lib:: Algorithms for Hodge ideals
 * maxlike_lib:: maximum likelihood estimates
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
@@ -1253,6 +1254,10 @@ Issues:
 @node gradedModules_lib
 @subsection gradedModules_lib
 @c lib gradedModules.lib
+@c ----------------------------------------------------------
+@node hodge_lib
+@subsection hodge_lib
+@c lib hodge.lib
 @c ----------------------------------------------------------
 @node maxlike_lib
 @subsection maxlike_lib

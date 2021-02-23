@@ -42,7 +42,7 @@ SLIB1 = arr.lib arnoldclassify.lib \
         ffsolve.lib ffmodstd.lib decomp.lib template.lib \
         findifs.lib finitediff.lib \
         gfan.lib gitfan.lib gradedModules.lib GND.lib graal.lib goettsche.lib \
-	hess.lib hdepth.lib \
+	hess.lib hdepth.lib hodge.lib\
 	JMBTest.lib JMSConst.lib \
         locnormal.lib \
 	methods.lib modules.lib multigrading.lib modwalk.lib\
