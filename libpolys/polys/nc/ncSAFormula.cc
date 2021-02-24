@@ -36,13 +36,13 @@
 
 #include "coeffs/numbers.h"
 
-#include "polys/nc/ncSAFormula.h"
+#include "nc/ncSAFormula.h"
 // for CFormulaPowerMultiplier
 
-#include "polys/monomials/ring.h"
-#include "polys/monomials/p_polys.h"
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
 
-#include "polys/nc/sca.h"
+#include "nc/sca.h"
 
 
 

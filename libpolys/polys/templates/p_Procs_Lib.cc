@@ -28,5 +28,5 @@
 #include "polys/templates/p_MemCopy.h"
 #include "polys/kbuckets.h"
 
-#include "polys/templates/p_Procs.inc"
+#include "templates/p_Procs.inc"
 

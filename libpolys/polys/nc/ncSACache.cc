@@ -37,10 +37,10 @@ namespace
 
 #include "coeffs/numbers.h"
 
-#include "polys/nc/ncSACache.h" // for CCacheHash etc classes
+#include "nc/ncSACache.h" // for CCacheHash etc classes
 
-#include "polys/monomials/ring.h"
-#include "polys/monomials/p_polys.h"
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
 
 
 void CGlobalCacheHash::History(const EHistoryType t, const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const poly p)

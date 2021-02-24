@@ -33,8 +33,8 @@
 #endif
 
 
-#include "polys/ext_fields/algext.h"
-#include "polys/ext_fields/transext.h"
+#include "ext_fields/algext.h"
+#include "ext_fields/transext.h"
 
 
 #define BITS_PER_LONG 8*SIZEOF_LONG

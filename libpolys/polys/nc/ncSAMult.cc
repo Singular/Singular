@@ -32,17 +32,17 @@
 #endif
 
 # define PLURAL_INTERNAL_DECLARATIONS
-#include "polys/nc/nc.h"
-#include "polys/nc/sca.h"
+#include "nc/nc.h"
+#include "nc/sca.h"
 
 #include "misc/options.h"
 #include "coeffs/numbers.h"
 
 
-#include "polys/monomials/ring.h"
-#include "polys/monomials/p_polys.h"
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
 
-#include "polys/nc/ncSAMult.h" // for CMultiplier etc classes
+#include "nc/ncSAMult.h" // for CMultiplier etc classes
 // #include "nc/sca.h" // for SCA
 
 
