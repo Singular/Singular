@@ -81,7 +81,7 @@ LIBPOLYSHEADERS = polys/monomials/ring.h polys/monomials/monomials.h \
         coeffs/flintcf_Qrat.h coeffs/flintcf_Q.h coeffs/flintcf_Zn.h
 
 libpolys_la_includedir  =$(includedir)/singular
-libpolys_la_include_HEADERS=${LIBPOLYSHEADERS}
+nobase_libpolys_la_include_HEADERS=${LIBPOLYSHEADERS}
 
 EXTRA_DIST = \
 	polys/prCopy.pl polys/prCopyTemplate.cc \
