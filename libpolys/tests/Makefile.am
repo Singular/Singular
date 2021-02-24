@@ -17,12 +17,13 @@ nodist_coeffs_test_SOURCES = coeffs_test_runner.cpp
 nodist_polys_test_SOURCES = polys_test_runner.cpp
 nodist_rings_test_SOURCES = rings_test_runner.cpp
 
-coeffs_test_LDADD = ${top_builddir}/libpolys.la \
+coeffs_test_LDADD = ${top_builddir}/coeffs/libcoeffs.la \
+${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la \
 $(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
 $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
-simple_test_LDADD = $(coeffs_test_LDADD)
-polys_test_LDADD = $(coeffs_test_LDADD)
+simple_test_LDADD = ${top_builddir}/polys/libpolys.la $(coeffs_test_LDADD)
+polys_test_LDADD = ${top_builddir}/polys/libpolys.la $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
 BUILT_SOURCES = gftables MOD \
@@ -32,8 +33,8 @@ gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
 
 MOD:
-	if [ -d "${top_builddir}/libpolys/.libs" ]; then \
-	  ln -snf ${top_builddir}/libpolys/.libs/ ${abs_builddir}/MOD; \
+	if [ -d "${top_builddir}/libpolys/polys/.libs" ]; then \
+	  ln -snf ${top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD; \
 	fi
 
 # How to generate *_runner.cpp

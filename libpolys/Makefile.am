@@ -148,30 +148,24 @@ polys/templates/p_Procs.inc: polys/p_Procs_Generate.cc
 	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXX_FOR_BUILD)" \
 	CXXFLAGS="$(CXXFLAGS_FOR_BUILD)" \
 	CPPFLAGS="-I${abs_top_srcdir} -I${abs_top_builddir} -I${top_srcdir} -I${top_builddir} ${FACTORY_INCLUDES} $(CPPFLAGS_FOR_BUILD) ${USE_P_PROCS_STATIC}" \
-	LDFLAGS="" LIBS="" p_Procs_Generate${BUILD_EXEEXT}
+	LDFLAGS="" LIBS="" p_Procs_Generate
 	./p_Procs_Generate$(BUILD_EXEEXT) > ./polys/templates/p_Procs.inc
 
 polys/prCopy.inc: polys/prCopy.pl
 	perl ${srcdir}/polys/prCopy.pl >  polys/prCopy.inc
 
-CLEANFILES = $(BUILT_SOURCES) p_Procs_Generate${BUILD_EXEEXT}
+CLEANFILES = $(BUILT_SOURCES) p_Procs_Generate
 
 ######################################################################
 
-TESTS = test1 test2
+TESTS = test
 check_PROGRAMS = $(TESTS)
 
-test1_LDADD=libpolys.la \
+test_LDADD=libpolys.la \
 $(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
 $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
-test1_SOURCES=coeffs/test.cc
-
-test2_LDADD=libpolys.la \
-$(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
-$(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
-
-test2_SOURCES=polys/test.cc
+test_SOURCES=test.cc
 
 gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}/gftables
