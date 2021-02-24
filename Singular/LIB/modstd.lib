@@ -912,3 +912,20 @@ poly f = x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)
 ideal i = jacob(f);
 */
 
+proc modStdL(def I, list #)
+{
+  link l="ssi:tcp localhost:"+system("Singular");
+  write(l,quote(option(noloadLib))); // suppress "loaded..."
+  read(l); //dummy
+  write(l,quote(load("modstd.lib","with"))); // load library
+  read(l); //dummy
+  if (size(#)==0)
+  {
+    write(l,quote(modStd(eval(I))));
+  }
+  else
+  {
+    write(l,quote(modStd(eval(I),eval(#[1]))));
+  }
+  return(read(l));
+}
