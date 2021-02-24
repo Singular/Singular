@@ -6283,50 +6283,6 @@ static idhdl rSimpleFindHdl(const ring r, const idhdl root, const idhdl n)
 }
 
 extern BOOLEAN jjPROC(leftv res, leftv u, leftv v);
-ideal kGroebner(ideal F, ideal Q)
-{
-  //test|=Sy_bit(OPT_PROT);
-  idhdl save_ringhdl=currRingHdl;
-  ideal resid;
-  idhdl new_ring=NULL;
-  if ((currRingHdl==NULL) || (IDRING(currRingHdl)!=currRing))
-  {
-    currRingHdl=enterid(" GROEBNERring",0,RING_CMD,&IDROOT,FALSE);
-    new_ring=currRingHdl;
-    IDRING(currRingHdl)=currRing;
-  }
-  sleftv v; v.Init(); v.rtyp=IDEAL_CMD; v.data=(char *) F;
-  idhdl h=ggetid("groebner");
-  sleftv u; u.Init(); u.rtyp=IDHDL; u.data=(char *) h;
-            u.name=IDID(h);
-
-  sleftv res; res.Init();
-  if(jjPROC(&res,&u,&v))
-  {
-    resid=kStd(F,Q,testHomog,NULL);
-  }
-  else
-  {
-    //printf("typ:%d\n",res.rtyp);
-    resid=(ideal)(res.data);
-  }
-  // cleanup GROEBNERring, save_ringhdl, u,v,(res )
-  if (new_ring!=NULL)
-  {
-    idhdl h=IDROOT;
-    if (h==new_ring) IDROOT=h->next;
-    else
-    {
-      while ((h!=NULL) &&(h->next!=new_ring)) h=h->next;
-      if (h!=NULL) h->next=h->next->next;
-    }
-    if (h!=NULL) omFreeSize(h,sizeof(*h));
-  }
-  currRingHdl=save_ringhdl;
-  u.CleanUp();
-  v.CleanUp();
-  return resid;
-}
 
 static void jjINT_S_TO_ID(int n,int *e, leftv res)
 {

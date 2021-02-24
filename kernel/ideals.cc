@@ -126,7 +126,7 @@ ideal idMinBase (ideal h1)
 }
 
 
-ideal idSectWithElim (ideal h1,ideal h2)
+static ideal idSectWithElim (ideal h1,ideal h2, GbVariant alg)
 // does not destroy h1,h2
 {
   if (TEST_OPT_PROT) PrintS("intersect by elimination method\n");
@@ -184,7 +184,7 @@ ideal idSectWithElim (ideal h1,ideal h2)
   idDelete(&h1);
   idDelete(&h2);
   // eliminate t:
-  ideal res=idElimination(h,t);
+  ideal res=idElimination(h,t,NULL,alg);
   // cleanup
   idDelete(&h);
   pDelete(&t);
@@ -335,7 +335,7 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
     && (currRing->OrdSgn==1)
     && (!rIsPluralRing(currRing))
     && ((TEST_V_INTERSECT_ELIM) || (!TEST_V_INTERSECT_SYZ)))
-      return idSectWithElim(first,second);
+      return idSectWithElim(first,second,alg);
     else length = 1;
   }
   if (TEST_OPT_PROT) PrintS("intersect by syzygy methods\n");
@@ -380,91 +380,17 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
     }
   }
   intvec *w=NULL;
-  if (alg==GbDefault) alg=GbStd;
-  if (alg==GbStd)
+
+  if ((alg!=GbDefault)
+  && (alg!=GbGroebner)
+  && (alg!=GbModstd)
+  && (alg!=GbSlimgb)
+  && (alg!=GbStd))
   {
-    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
-    temp1 = kStd(temp,currRing->qideal,testHomog,&w,NULL,length);
-    if (w!=NULL) delete w;
-    idDelete(&temp);
+    WarnS("wrong algorithm for GB");
+    alg=GbDefault;
   }
-  else if (alg==GbSlimgb)
-  {
-    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
-    temp1 = t_rep_gb(currRing, temp, temp->rank);
-    idDelete(&temp);
-  }
-  else if (alg==GbGroebner)
-  {
-    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
-    BOOLEAN err;
-    temp1=(ideal)iiCallLibProc1("groebner",temp,MODUL_CMD,err);
-    if (err)
-    {
-      Werror("error %d in >>groebner<<",err);
-      temp1=idInit(1,1);
-    }
-  }
-  else if (alg==GbModstd)
-  {
-    if (TEST_OPT_PROT) { PrintS("modStd:"); mflush(); }
-    BOOLEAN err;
-    void *args[]={temp,(void*)1,NULL};
-    int arg_t[]={MODUL_CMD,INT_CMD,0};
-    leftv temp0=ii_CallLibProcM("modStd",args,arg_t,currRing,err);
-    temp1=(ideal)temp0->data;
-    omFreeBin((ADDRESS)temp0,sleftv_bin);
-    if (err)
-    {
-      Werror("error %d in >>modStd<<",err);
-      temp1=idInit(1,1);
-    }
-  }
-  else if (alg==GbStdSat)
-  {
-    if (TEST_OPT_PROT) { PrintS("std:sat:"); mflush(); }
-    BOOLEAN err;
-    // search for 2nd block of vars
-    int i=0;
-    int block=-1;
-    loop
-    {
-      if ((currRing->order[i]!=ringorder_c)
-      && (currRing->order[i]!=ringorder_C)
-      && (currRing->order[i]!=ringorder_s))
-      {
-        if (currRing->order[i]==0) { err=TRUE;break;}
-        block++;
-        if (block==1) { block=i; break;}
-      }
-      i++;
-    }
-    if (block>0)
-    {
-      if (TEST_OPT_PROT)
-      {
-        Print("sat(%d..%d)\n",currRing->block0[block],currRing->block1[block]);
-        mflush();
-      }
-      ideal v=idInit(currRing->block1[block]-currRing->block0[block]+1,1);
-      for(i=currRing->block0[block];i<=currRing->block1[block];i++)
-      {
-        v->m[i-currRing->block0[block]]=pOne();
-        pSetExp(v->m[i-currRing->block0[block]],i,1);
-        pSetm(v->m[i-currRing->block0[block]]);
-      }
-      void *args[]={temp,v,NULL};
-      int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
-      leftv temp0=ii_CallLibProcM("satstd",args,arg_t,currRing,err);
-      temp1=(ideal)temp0->data;
-      omFreeBin((ADDRESS)temp0, sleftv_bin);
-    }
-    if (err)
-    {
-      Werror("error %d in >>satstd<<",err);
-      temp1=idInit(1,1);
-    }
-  }
+  temp1=idGroebner(temp,length,alg);
 
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
@@ -522,8 +448,9 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
      idSkipZeroes(temp1);
      return temp1;
   }
-  else //temp1=kInterRed(result,currRing->qideal);
-    return result;
+  //else
+  //  temp1=kInterRed(result,currRing->qideal);
+  return result;
 }
 
 /*2
@@ -606,53 +533,16 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
     }
   }
   /* std computation --------------------------------------------*/
-  if (alg==GbDefault) alg=GbStd;
-  if (alg==GbStd)
+  if ((alg!=GbDefault)
+  && (alg!=GbGroebner)
+  && (alg!=GbModstd)
+  && (alg!=GbSlimgb)
+  && (alg!=GbStd))
   {
-    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
-    tempstd = kStd(bigmat,currRing->qideal,testHomog,&w,NULL,syzComp);
-    if (w!=NULL) delete w;
-    idDelete(&bigmat);
+    WarnS("wrong algorithm for GB");
+    alg=GbDefault;
   }
-  else if (alg==GbSlimgb)
-  {
-    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
-    tempstd = t_rep_gb(currRing, bigmat, syzComp);
-    idDelete(&bigmat);
-  }
-  else if (alg==GbGroebner)
-  {
-    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
-    BOOLEAN err;
-    tempstd=(ideal)iiCallLibProc1("groebner",bigmat,MODUL_CMD,err);
-    if (err)
-    {
-      Werror("error %d in >>groebner<<",err);
-      tempstd=idInit(1,1);
-    }
-  }
-//  else if (alg==GbModstd): requires ideal, not module
-//  {
-//    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
-//    BOOLEAN err;
-//    tempstd=(ideal)iiCallLibProc1("modStd",bigmat,MODUL_CMD,err);
-//    if (err)
-//    {
-//      Werror("error %d in >>modStd<<",err);
-//      tempstd=idInit(1,1);
-//    }
-//  }
-  //else if (alg==GbSba): requires order C,...
-  //{
-  //  if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
-  //  tempstd = kSba(bigmat,currRing->qideal,hom,w,1,0,NULL,syzComp);
-  //  idDelete(&bigmat);
-  //}
-  else
-  {
-    tempstd=idInit(1,1);
-    Werror("wrong algorithm %d for SB",(int)alg);
-  }
+  tempstd=idGroebner(bigmat,syzComp,alg);
 
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
@@ -1914,68 +1804,21 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
     idDelete(&q);
     h=s;
   }
-  // compute kStd
-#if 1
-  //rWrite(tmpR);PrintLn();
-  //BITSET save1;
-  //SI_SAVE_OPT1(save1);
-  //si_opt_1 |=1;
-  //Print("h: %d gen, rk=%d\n",IDELEMS(h),h->rank);
-  //extern char * showOption();
-  //Print("%s\n",showOption());
-  if (alg==GbDefault) alg=GbStd;
-  if (alg==GbStd)
-  {
-    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
-    hh = kStd(h,NULL,hom,&w,hilb);
-  }
-  else if (alg==GbSlimgb)
-  {
-    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
-    hh = t_rep_gb(currRing, h, 0);
-  }
-  else if (alg==GbGroebner)
-  {
-    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
-    BOOLEAN err;
-    hh=(ideal)iiCallLibProc1("groebner",idCopy(h),MODUL_CMD,err);
-    if (err)
-    {
-      Werror("error %d in >>groebner<<",err);
-      hh=idInit(1,1);
-    }
-  }
-  else if (alg==GbModstd)
-  {
-    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
-    BOOLEAN err;
-    void *args[]={idCopy(h),(void*)1,NULL};
-    int arg_t[]={IDEAL_CMD,INT_CMD,0};
-    leftv temp0=ii_CallLibProcM("modStd",args,arg_t,currRing,err);
-    hh=(ideal)temp0->data;
-    omFreeBin((ADDRESS)temp0,sleftv_bin);
-    if (err)
-    {
-      Werror("error %d in >>modStd<<",err);
-      hh=idInit(1,1);
-    }
-  }
-  else if (alg==GbSba)
-  {
-    if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
-    hh = kSba(h,currRing->qideal,hom,&w,1,0,NULL);
-  }
-  else
-  {
-    hh=idInit(1,1);
-    Werror("wrong algorithm %d for SB",(int)alg);
-  }
-  //SI_RESTORE_OPT1(save1);
-  idDelete(&h);
-#else
-  extern ideal kGroebner(ideal F, ideal Q);
-  hh=kGroebner(h,NULL);
+  // compute GB
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing)) alg = GbStd;
 #endif
+  if ((alg!=GbDefault)
+  && (alg!=GbGroebner)
+  && (alg!=GbModstd)
+  && (alg!=GbSlimgb)
+  && (alg!=GbSba)
+  && (alg!=GbStd))
+  {
+    WarnS("wrong algorithm for GB");
+    alg=GbDefault;
+  }
+  hh=idGroebner(h,0,alg,hilb);
   // go back to the original ring
   rChangeCurrRing(origR);
   i = IDELEMS(hh)-1;
