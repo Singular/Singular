@@ -193,6 +193,111 @@ ideal idSectWithElim (ideal h1,ideal h2)
   rDelete(r);
   return res;
 }
+
+static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL, intvec* w=NULL)
+{
+  ideal temp1;
+  tHomog hom;
+  if (w==NULL)
+    hom=(tHomog)idHomModule(temp,currRing->qideal,&w); //sets w to weight vector or NULL
+  else
+  {
+    w=ivCopy(w);
+    hom=isHomog;
+  }
+  if ((alg==GbStd)||(alg==GbDefault))
+  {
+    if (TEST_OPT_PROT &&(alg==GbStd)) { PrintS("std:"); mflush(); }
+    temp1 = kStd(temp,currRing->qideal,hom,&w,hilb,syzComp);
+    idDelete(&temp);
+  }
+  else if (alg==GbSlimgb)
+  {
+    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
+    temp1 = t_rep_gb(currRing, temp, temp->rank);
+    idDelete(&temp);
+  }
+  else if (alg==GbGroebner)
+  {
+    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
+    BOOLEAN err;
+    temp1=(ideal)iiCallLibProc1("groebner",temp,MODUL_CMD,err);
+    if (err)
+    {
+      Werror("error %d in >>groebner<<",err);
+      temp1=idInit(1,1);
+    }
+  }
+  else if (alg==GbModstd)
+  {
+    if (TEST_OPT_PROT) { PrintS("modStd:"); mflush(); }
+    BOOLEAN err;
+    void *args[]={temp,(void*)1,NULL};
+    int arg_t[]={MODUL_CMD,INT_CMD,0};
+    leftv temp0=ii_CallLibProcM("modStd",args,arg_t,currRing,err);
+    temp1=(ideal)temp0->data;
+    omFreeBin((ADDRESS)temp0,sleftv_bin);
+    if (err)
+    {
+      Werror("error %d in >>modStd<<",err);
+      temp1=idInit(1,1);
+    }
+  }
+  else if (alg==GbSba)
+  {
+    if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
+    temp1 = kSba(temp,currRing->qideal,hom,&w,1,0,NULL);
+    if (w!=NULL) delete w;
+  }
+  else if (alg==GbStdSat)
+  {
+    if (TEST_OPT_PROT) { PrintS("std:sat:"); mflush(); }
+    BOOLEAN err;
+    // search for 2nd block of vars
+    int i=0;
+    int block=-1;
+    loop
+    {
+      if ((currRing->order[i]!=ringorder_c)
+      && (currRing->order[i]!=ringorder_C)
+      && (currRing->order[i]!=ringorder_s))
+      {
+        if (currRing->order[i]==0) { err=TRUE;break;}
+        block++;
+        if (block==1) { block=i; break;}
+      }
+      i++;
+    }
+    if (block>0)
+    {
+      if (TEST_OPT_PROT)
+      {
+        Print("sat(%d..%d)\n",currRing->block0[block],currRing->block1[block]);
+        mflush();
+      }
+      ideal v=idInit(currRing->block1[block]-currRing->block0[block]+1,1);
+      for(i=currRing->block0[block];i<=currRing->block1[block];i++)
+      {
+        v->m[i-currRing->block0[block]]=pOne();
+        pSetExp(v->m[i-currRing->block0[block]],i,1);
+        pSetm(v->m[i-currRing->block0[block]]);
+      }
+      void *args[]={temp,v,NULL};
+      int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
+      leftv temp0=ii_CallLibProcM("satstd",args,arg_t,currRing,err);
+      temp1=(ideal)temp0->data;
+      omFreeBin((ADDRESS)temp0, sleftv_bin);
+    }
+    if (err)
+    {
+      Werror("error %d in >>satstd<<",err);
+      temp1=idInit(1,1);
+    }
+  }
+  if (w!=NULL) delete w;
+  return temp1;
+}
+
 /*2
 * h3 := h1 intersect h2
 */
@@ -2283,7 +2388,7 @@ static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
 * represents (h1+h2)/h2=h1/(h1 intersect h2)
 */
 //ideal idModulo (ideal h2,ideal h1)
-ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T)
+ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant alg)
 {
   intvec *wtmp=NULL;
   if (T!=NULL) idDelete((ideal*)T);
@@ -2409,7 +2514,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T)
   SI_SAVE_OPT1(save_opt);
   SI_SAVE_OPT2(save_opt2);
   si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
-  ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
+  ideal s_temp1 = idGroebner(s_temp,length,alg);
   SI_RESTORE_OPT1(save_opt);
   SI_RESTORE_OPT2(save_opt2);
 
@@ -2488,10 +2593,6 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T)
     // Hmm ... here seems to be a memory leak
     // However, simply deleting it causes memory trouble
     // idDelete(&s_temp);
-  }
-  else
-  {
-    idDelete(&temp);
   }
   idTest(s_temp1);
   return s_temp1;
