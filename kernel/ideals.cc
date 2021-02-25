@@ -205,6 +205,9 @@ static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL,
     w=ivCopy(w);
     hom=isHomog;
   }
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing)) alg = GbStd;
+#endif
   if ((alg==GbStd)||(alg==GbDefault))
   {
     if (TEST_OPT_PROT &&(alg==GbStd)) { PrintS("std:"); mflush(); }
@@ -646,104 +649,19 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w, GbVarian
 
   idTest(h2);
 
-#ifdef HAVE_SHIFTBBA
-  if (rIsLPRing(currRing)) alg = GbStd;
-#endif
-  ideal h3=NULL;
-  if (alg==GbDefault) alg=GbStd;
-  if (alg==GbStd)
+  if ((alg!=GbDefault)
+  && (alg!=GbGroebner)
+  && (alg!=GbModstd)
+  && (alg!=GbSlimgb)
+  && (alg!=GbStd))
   {
-    if (TEST_OPT_PROT) { PrintS("std:"); mflush(); }
-    h3 = kStd(h2,currRing->qideal,hom,w,NULL,syzcomp);
-  }
-  else if (alg==GbSlimgb)
-  {
-    if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
-    h3 = t_rep_gb(currRing, h2, syzcomp);
-  }
-  else if (alg==GbGroebner)
-  {
-    if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
-    BOOLEAN err;
-    h3=(ideal)iiCallLibProc1("groebner",idCopy(h2),MODUL_CMD,err);
-    if (err)
-    {
-      Werror("error %d in >>groebner<<",err);
-      h3=idInit(1,1);
-    }
-  }
-  else if (alg==GbModstd)
-  {
-    if (TEST_OPT_PROT) { PrintS("modstd:"); mflush(); }
-    BOOLEAN err;
-    void *args[]={idCopy(h2),(void*)1,NULL};
-    int arg_t[]={MODUL_CMD,INT_CMD,0};
-    leftv temp0=ii_CallLibProcM("modStd",args,arg_t,currRing,err);
-    h3=(ideal)temp0->data;
-    omFreeBin((ADDRESS)temp0,sleftv_bin);
-    if (err)
-    {
-      Werror("error %d in >>modStd<<",err);
-      h3=idInit(1,1);
-    }
-  }
-  else if (alg==GbStdSat)
-  {
-    if (TEST_OPT_PROT) { PrintS("std:sat:"); mflush(); }
-    BOOLEAN err;
-    // search for 2nd block of vars
-    int i=0;
-    int block=-1;
-    loop
-    {
-      if ((currRing->order[i]!=ringorder_c)
-      && (currRing->order[i]!=ringorder_C)
-      && (currRing->order[i]!=ringorder_s))
-      {
-        if (currRing->order[i]==0) { err=TRUE;break;}
-        block++;
-        if (block==1) { block=i; break;}
-      }
-      i++;
-    }
-    if (block>0)
-    {
-      if (TEST_OPT_PROT)
-      {
-        Print("sat(%d..%d)\n",currRing->block0[block],currRing->block1[block]);
-        mflush();
-      }
-      ideal v=idInit(currRing->block1[block]-currRing->block0[block]+1,1);
-      for(i=currRing->block0[block];i<=currRing->block1[block];i++)
-      {
-        v->m[i-currRing->block0[block]]=pOne();
-        pSetExp(v->m[i-currRing->block0[block]],i,1);
-        pSetm(v->m[i-currRing->block0[block]]);
-      }
-      void *args[]={idCopy(h2),v,NULL};
-      int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
-      leftv temp0=ii_CallLibProcM("satstd",args,arg_t,currRing,err);
-      h3=(ideal)temp0->data;
-      omFreeBin((ADDRESS)temp0,sleftv_bin);
-    }
-    if (err)
-    {
-      Werror("error %d in >>satstd<<",err);
-      h3=idInit(1,1);
-    }
-  }
-  //else if (alg==GbSba): requires order C,...
-  //{
-  //  if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
-  //  h3 = kSba(h2,currRing->qideal,hom,w,1,0,NULL,syzcomp);
-  //}
-  else
-  {
-    h3=idInit(1,1);
-    Werror("wrong algorithm %d for SB",(int)alg);
+    WarnS("wrong algorithm for GB");
+    alg=GbDefault;
   }
 
-  idDelete(&h2);
+  ideal h3;
+  if (w!=NULL) h3=idGroebner(h2,syzcomp,alg,NULL,*w);
+  else         h3=idGroebner(h2,syzcomp,alg);
   return h3;
 }
 
@@ -1805,9 +1723,6 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
     h=s;
   }
   // compute GB
-#ifdef HAVE_SHIFTBBA
-  if (rIsLPRing(currRing)) alg = GbStd;
-#endif
   if ((alg!=GbDefault)
   && (alg!=GbGroebner)
   && (alg!=GbModstd)
