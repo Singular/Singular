@@ -188,16 +188,8 @@ AC_DEFUN([SING_USE_RESOURCES],
 
 AC_DEFUN([SING_USE_FACTORY],
 [
- AC_MSG_CHECKING(whether factory should be enabled)
+  ENABLE_FACTORY="yes"
 
- AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
- [if test $enableval = yes; then
-     ENABLE_FACTORY="yes"
-  else
-     ENABLE_FACTORY="no"
-  fi],[ENABLE_FACTORY="yes"])
-
- if test x$ENABLE_FACTORY = xyes; then
 
   FACTORY_INCLUDES="-I$ac_abs_top_srcdir -I$ac_abs_top_srcdir/factory -I$ac_abs_top_srcdir/factory/include"
   if test "x$ac_abs_top_srcdir" != "x$ac_abs_top_builddir"; then
@@ -221,7 +213,6 @@ AC_DEFUN([SING_USE_FACTORY],
 
   PKG_REQUIRE="$PKG_REQUIRE factory"
   AC_SUBST(PKG_REQUIRE)
- fi
 
 
  AM_CONDITIONAL([ENABLE_FACTORY],[test x$ENABLE_FACTORY = xyes])
@@ -231,20 +222,10 @@ AC_DEFUN([SING_USE_FACTORY],
 
 AC_DEFUN([SING_CHECK_FACTORY],
 [
-AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
-[if test $enableval = yes; then
-     ENABLE_FACTORY="yes"
- else
-     ENABLE_FACTORY="no"
- fi
-],[ENABLE_FACTORY="yes"])
+  ENABLE_FACTORY="yes"
 
   AC_ARG_VAR( [FACTORY_INCLUDES], [INCLUDES for FACTORY] )
   AC_ARG_VAR( [FACTORY_LIBS], [LIBS for FACTORY] )
-
-  AC_MSG_CHECKING(whether factory should be enabled)
-  if test "x$ENABLE_FACTORY" = xyes; then
-    AC_MSG_RESULT(yes)
 
     AC_MSG_CHECKING([  FACTORY_INCLUDES?..])
     AC_MSG_RESULT(${FACTORY_INCLUDES:-unset})
@@ -276,9 +257,6 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
 
     PKG_REQUIRE="$PKG_REQUIRE factory"
     AC_SUBST(PKG_REQUIRE)
-  else
-    AC_MSG_RESULT(no)
-  fi
 
   AM_CONDITIONAL([ENABLE_FACTORY],[test x$ENABLE_FACTORY = xyes])
   AC_MSG_RESULT($ENABLE_FACTORY)
