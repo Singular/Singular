@@ -297,6 +297,21 @@ AC_ARG_ENABLE(python_module, AS_HELP_STRING([--enable-python_module], [Enable py
 ],[ENABLE_PYTHON_MODULE="no"])
 ])
 
+AC_DEFUN([SING_DISABLE_MODULES], [dnl
+  m4_foreach([MOD], [staticdemo, subsets, freealgebra, partialgb, syzextra,
+                     pyobject, gfanlib, polymake, python, customstd,
+                     singmathic, bigintm, Order, gitfan, interval, systhreads,
+                     loctriv, cohomo, machinelearning], [dnl
+    AC_ARG_ENABLE(MOD[-module],
+                  AS_HELP_STRING([--disable-]MOD[-module], [Disable building module ]MOD), [dnl
+      dnl Nothing to do
+    ], [dnl
+      dnl Per default, all modules are enabled
+      AS_VAR_SET([enable_]MOD[_module], [yes])
+    ])dnl
+    AM_CONDITIONAL([ENABLE_]m4_toupper(MOD)[_MODULE], [test x$enable_]MOD[_module != xno])dnl
+  ])dnl
+])
 
 AC_DEFUN([SING_BUILTIN_MODULES],
 [
