@@ -196,6 +196,9 @@ static ideal idSectWithElim (ideal h1,ideal h2, GbVariant alg)
 
 static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL, intvec* w=NULL)
 {
+  //Print("syz=%d\n",syzComp);
+  //PrintS(showOption());
+  //PrintLn();
   ideal temp1;
   tHomog hom;
   if (w==NULL)
@@ -2271,7 +2274,8 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
   unsigned save_opt,save_opt2;
   SI_SAVE_OPT1(save_opt);
   SI_SAVE_OPT2(save_opt2);
-  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
+  if (T==NULL) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
+  si_opt_1 |= Sy_bit(OPT_REDTAIL);
   ideal s_temp1 = idGroebner(s_temp,length,alg);
   SI_RESTORE_OPT1(save_opt);
   SI_RESTORE_OPT2(save_opt2);
@@ -2329,7 +2333,8 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
               pNext(p) = NULL;
               pSetComp(p,0);
               pSetmComp(p);
-              MATELEM(*T,(int)t-length,i) = pAdd(MATELEM(*T,(int)t-k,i),p);
+	      pTest(p);
+              MATELEM(*T,(int)t-length,i) = pAdd(MATELEM(*T,(int)t-length,i),p);
             } while (q != NULL);
           }
         }
@@ -2359,7 +2364,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
 /*
 *computes module-weights for liftings of homogeneous modules
 */
-intvec * idMWLift(ideal mod,intvec * weights)
+static intvec * idMWLift(ideal mod,intvec * weights)
 {
   if (idIs0(mod)) return new intvec(2);
   int i=IDELEMS(mod);
@@ -3012,7 +3017,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
   if (alg==GbSlimgb) // test conditions for slimgb
   {
     if(rHasGlobalOrdering(r)
-    &&(!rIsPluralRing(r))
+    &&(!rIsNCRing(r))
     &&(r->qideal==NULL)
     &&(!rField_is_Ring(r)))
     {
@@ -3024,7 +3029,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
   else if (alg==GbSba) // cond. for sba
   {
     if(rField_is_Domain(r)
-    &&(!rIsPluralRing(r))
+    &&(!rIsNCRing(r))
     &&(rHasGlobalOrdering(r)))
     {
       return GbSba;
@@ -3043,7 +3048,7 @@ GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
       WarnS(">>modStd<< not found");
     }
     else if(rField_is_Q(r)
-    &&(!rIsPluralRing(r))
+    &&(!rIsNCRing(r))
     &&(rHasGlobalOrdering(r)))
     {
       return GbModstd;

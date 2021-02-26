@@ -145,8 +145,6 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest=NULL,
 
 void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R, short *w= NULL );
 
-intvec * idMWLift(ideal mod,intvec * weights);
-
 ideal   idQuot (ideal h1,ideal h2,
                 BOOLEAN h1IsStb=FALSE, BOOLEAN resultIsIdeal=FALSE);
 
