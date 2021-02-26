@@ -172,7 +172,7 @@ SING_CHECK_POLYMAKE
 SING_CHECK_PLURAL
 
 SING_CHECK_PYTHON_MODULE
-
+SING_DISABLE_MODULES
 SING_BUILTIN_MODULES
 
 AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
