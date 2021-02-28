@@ -52,8 +52,8 @@ env:
   SPKG:        singular
   # Sage distribution packages to build
   TARGETS_PRE: build/make/Makefile
-  TARGETS:     SAGE_CHECK=yes singular
-  TARGETS_OPTIONAL: SAGE_CHECK=warn pynac pysingular
+  TARGETS:     SAGE_CHECK=yes singular pynac
+  TARGETS_OPTIONAL: SAGE_CHECK=warn pysingular
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:   sagemath/sage
   SAGE_REF:    develop
