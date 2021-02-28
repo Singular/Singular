@@ -205,22 +205,22 @@ public:
 CF_INLINE CanonicalForm
 operator + ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 operator - ( const CanonicalForm&, const CanonicalForm& );
 
 CF_INLINE CanonicalForm
 operator * ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 operator / ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 operator % ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 div ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 mod ( const CanonicalForm&, const CanonicalForm& );
 
 /*ENDPUBLIC*/
