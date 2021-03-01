@@ -16,7 +16,7 @@
 #include "omalloc/omalloc.h"
 
 #include <time.h>
-#if defined(HAVE_PYTHON_MOD) && defined(HAVE_PYTHON)
+#ifdef HAVE_PYTHON
 #include <boost/python.hpp>
 #include <Python.h>
 #include <Python.h>
