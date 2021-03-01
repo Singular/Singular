@@ -1,5 +1,4 @@
 #include "kernel/mod2.h"
-#ifdef HAVE_PYTHON_MOD
 #include <sstream>
 #include <boost/python.hpp>
 #include "factory/factory.h"
@@ -46,4 +45,3 @@ void export_CF(){
     .def(self-=int())
     .def(self/=int());
 }
-#endif

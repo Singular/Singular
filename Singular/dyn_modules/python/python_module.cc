@@ -16,7 +16,6 @@
 #include "omalloc/omalloc.h"
 
 #include <time.h>
-#if defined(HAVE_PYTHON_MOD) && defined(HAVE_PYTHON)
 #include <boost/python.hpp>
 #include <Python.h>
 #include <Python.h>
@@ -84,4 +83,3 @@ extern "C" int SI_MOD_INIT(python_module)(SModulFunctions* psModulFunctions)
   PrintS("no python_mod support\n");
   return MAX_TOK;
 }
-#endif

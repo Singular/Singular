@@ -1,5 +1,4 @@
 #include "kernel/mod2.h"
-#ifdef HAVE_PYTHON_MOD
 #include <boost/python.hpp>
 #include "Number.h"
 #include "number_wrap.h"
@@ -47,4 +46,3 @@ void export_number()
     .def(self/=int())
     .def("ring",Number_get_Ring);
 }
-#endif
