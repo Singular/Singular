@@ -1,4 +1,5 @@
 #include "kernel/mod2.h"
+#ifdef HAVE_PYTHON
 #include <sstream>
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -561,3 +562,4 @@ void export_interpreter()
   def("transfer_to_python",buildPyObjectFromIdhdl);
   def("is_builtin", is_builtin);
 }
+#endif

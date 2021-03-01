@@ -1,4 +1,5 @@
 #include "kernel/mod2.h"
+#ifdef HAVE_PYTON
 #include <boost/python.hpp>
 #include "Poly.h"
 #include "vector_wrap.h"
@@ -32,3 +33,4 @@ void export_vector(){
     .def(Number() * self)
     .def("ring",Vector_get_Ring);
 }
+#endif

@@ -1,4 +1,5 @@
 #include "kernel/mod2.h"
+#ifdef HAVE_PYTHON
 #include <boost/python.hpp>
 #include "Poly.h"
 #include "boost/python/numeric.hpp"
@@ -52,3 +53,4 @@ void export_playground()
   def("foo",foo);
   def("foo2",foo2);
 }
+#endif

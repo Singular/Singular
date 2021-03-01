@@ -1,4 +1,5 @@
 #include "kernel/mod2.h"
+#ifdef HAVE_PYTHON
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "IIntvec.h"
@@ -32,3 +33,4 @@ boost::python::class_<Intvec>("IntVector")
      .def(boost::python::init <>())
      .def(boost::python::vector_indexing_suite<Intvec>());
 }
+#endif

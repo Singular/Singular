@@ -1,4 +1,5 @@
 #include "kernel/mod2.h"
+#ifdef HAVE_PYTHON
 #include <boost/python.hpp>
 #include "Poly.h"
 #include "Ideal.h"
@@ -77,3 +78,4 @@ void export_module()
      .def(vector_indexing_suite<Module>());
 
 }
+#endif

@@ -1,4 +1,5 @@
 #include "kernel/mod2.h"
+#ifdef HAVE_PYTHON
 #include <boost/python.hpp>
 #include "Singular/ipshell.h"
 #include "ring_wrap.h"
@@ -35,3 +36,4 @@ boost::python::class_<Ring>("Ring", "reference to a Singular ring")
      .def("set", ring_set,"equivalent to the singular command setring, which is not mapped as it is a command")
      .def(boost::python::init <>());
 }
+#endif
