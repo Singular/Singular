@@ -41,9 +41,7 @@ if !SI_BUILTIN_PYTHON_MODULE
 endif
 endif
 
-if HAVE_PYTHON_MODULE
- python_module_la_LIBADD   += -lboost_python-${PYTHON_VERSION} ${PYTHON_LSPEC}
-endif
+python_module_la_LIBADD   += -lboost_python-${PYTHON_VERSION} ${PYTHON_LSPEC}
 
 python_module_la_CXXFLAGS = ${AM_CXXFLAGS}
 
