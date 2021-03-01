@@ -168,14 +168,12 @@ SING_DISABLE_MODULES
 SING_BUILTIN_MODULES
 
 AX_PYTHON_DEFAULT()
-AS_IF([test x$enable_python_module != xno -o x$enable_pyobject_module != xno], [
   AX_PYTHON_WITH()
   AX_PYTHON_ENABLE()
   AX_PYTHON_PATH()
   AX_PYTHON_VERSION_ENSURE([2.7])
   AX_PYTHON_CSPEC
   AX_PYTHON_LSPEC
-])
 
 AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
 [if test "x$enableval" = "xyes"; then
