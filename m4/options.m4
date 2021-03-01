@@ -299,7 +299,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
 
  AC_ARG_VAR( [BUILTIN_LIBS], [LIB FLAGS for buildins] )
  AC_ARG_WITH(builtinmodules,
-   AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: staticdemo,bigintm,syzextra]),
+   AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: none]),
    [if test "x$with_builtinmodules" = "xyes"; then
     with_builtinmodules=syzextra
    fi],
