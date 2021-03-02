@@ -16,7 +16,9 @@ dnl Apparently, this is required for using an AC_CHECK_HEADER within AS_IF(...),
 AC_USE_SYSTEM_EXTENSIONS
 
 AM_MAINTAINER_MODE([enable])
-AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
+dnl Use a newer tar format for "make dist" that supports longer file names
+dnl https://www.gnu.org/software/automake/manual/html_node/List-of-Automake-options.html
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects tar-ustar]) # -Wno-extra-portability -Werror silent-rules
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
