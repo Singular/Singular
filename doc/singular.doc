@@ -126,18 +126,18 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @node Introduction
-@chapter Introduction
+@chapter Introduction,General concepts,Preface,Top
 @cindex Introduction
 
 @include start.tex
 @c ----------------------------------------------------------------------------
-@node General concept
+@node General concepts,Data types,Introduction,Top
 @chapter General concepts
 @cindex General concepts
 @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types
+@node Data types,Functions and system variables,General concepts,Top
 @chapter Data types
 @cindex Data types
 @include types.tex
