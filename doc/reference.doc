@@ -3943,7 +3943,8 @@ See
 @ref{module};
 @ref{std};
 @ref{syz};
-@ref{liftstd}.
+@ref{liftstd};
+@ref[modulo}.
 @c ref
 @c -----------------------------------------
 @node liftstd, listvar, lift, Functions
@@ -3951,12 +3952,8 @@ See
 @cindex liftstd
 @table @code
 @item @strong{Syntax:}
-@code{liftstd (} ideal_expression@code{,} matrix_name @code{)}
-@*@code{liftstd (} module_expression@code{,} matrix_name @code{)}
-@*@code{liftstd (} ideal_expression@code{,} matrix_name@code{,} module_name @code{)}
-@*@code{liftstd (} module_expression@code{,} matrix_name@code{,} module_name @code{)}
-@*@code{liftstd (} ideal_expression@code{,} matrix_name@code{,} module_name@code{,} string_expression @code{)}
-@*@code{liftstd (} module_expression@code{,} matrix_name@code{,} module_name@code{,} string_expression @code{)}
+@code{liftstd (} ideal_expression@code{,} matrix_name@code{[,} module_name@code{][,} string_expression @code{][,} ideal_expression @code{])}
+@*@code{liftstd (} module_expression@code{,} matrix_name@code{[,} module_name@code{][,} string_expression @code{][,} module_expression @code{])}
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
@@ -3966,10 +3963,14 @@ matrix from the given ideal, resp.@: module, to the standard basis.
 basis returned by @code{liftstd}, and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)},
 resp.@: @code{sm=module(matrix(m)*T)}.
-@*In an optional third argument the syzygy module will be returned.
-if working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and @code{sm=reduce(ideal(matrix(m)*T),0)}.
-@*An optional 4th argument specifies the Groebner base algorithm to use.
+If working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and @code{sm=reduce(ideal(matrix(m)*T),0)}.
+@*If a module name is given as a third argument, the syzygy module will be returned.
+@*An optional string argument specifies the Groebner base algorithm to use.
 Possible values are @code{"std"} and @code{"slimgb"}.
+@*Given an optional last argument (say @code{n}), the algorithm computes a standard bases of @code{(m+n)}, syzygies of @code{m} modulo @code{n}, and the transformation matrix only for @code{m}.
+These are relative transformation matrix resp. the
+syzygy module of @code{n} modulo @code{m}.
+(For syzygies, the same can be achieved using @ref{modulo}.)
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3996,6 +3997,7 @@ See
 @ref{std};
 @ref{syz};
 @ref{lift};
+@ref{modulo};
 @ref{matrix}.
 @c ref
 @c ---------------------------------------
