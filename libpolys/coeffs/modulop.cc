@@ -326,7 +326,7 @@ static number npRandom(siRandProc p, number, number, const coeffs cf)
 
 
 #ifndef HAVE_GENERIC_MULT
-static number npPar(int i, coeffs r)
+static number npPar(int, coeffs r)
 {
   return (number)(long)r->npExpTable[1];
 }
@@ -606,7 +606,7 @@ static number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs d
   return (number) (f.intval());
 }
 
-nMapFunc npSetMap(const coeffs src, const coeffs dst)
+nMapFunc npSetMap(const coeffs src, const coeffs)
 {
 #ifdef HAVE_RINGS
   if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src))

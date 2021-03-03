@@ -720,7 +720,7 @@ static number nfMapGGrev(number c, const coeffs src, const coeffs)
     return (number)(long)src->m_nfCharQ; /* 0 */
 }
 
-static number nfMapMPZ(number c, const coeffs src, const coeffs dst)
+static number nfMapMPZ(number c, const coeffs, const coeffs dst)
 {
   mpz_t tmp;
   mpz_init(tmp);
