@@ -10,7 +10,7 @@
 %**start
 @end ignore
 
-@node LETTERPLACE, , ,Non-commutative subsystem
+@node LETTERPLACE
 @section LETTERPLACE
 @cindex LETTERPLACE
 @cindex Letterplace
