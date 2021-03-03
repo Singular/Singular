@@ -6809,8 +6809,7 @@ static BOOLEAN jjMODULO3S(leftv res, leftv u, leftv v, leftv w)
        }
      }
   }
-  idhdl h=(idhdl)w->data;
-  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u, &(h->data.umatrix),alg);
+  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u, NULL,alg);
   if (w_u!=NULL)
   {
     atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
@@ -6903,7 +6902,6 @@ static BOOLEAN jjLIFTSTD_LIMIT(leftv res, leftv u, leftv v, leftv w)
 {
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   idhdl hv=(idhdl)v->data;
-  int limit=(int)((long)(w->Data()));
 #ifdef HAVE_SHIFTBBA
   if (rIsLPRing(currRing))
   {
@@ -6917,7 +6915,7 @@ static BOOLEAN jjLIFTSTD_LIMIT(leftv res, leftv u, leftv v, leftv w)
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(hv->data.umatrix),testHomog,
-                                NULL,GbDefault,limit);
+                                NULL,GbDefault,(ideal)w->Data());
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
@@ -7836,17 +7834,17 @@ static BOOLEAN jjLIFTSTD_M(leftv res, leftv U)
 
   ideal *syz=NULL;
   GbVariant alg=GbDefault;
-  int limit=INT_MAX;
+  ideal h11=NULL;
 
   if(u5==NULL)
   {
     // test all three possibilities for 4 arguments
     const short t1[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
     const short t2[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
-    const short t3[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,INT_CMD};
-    const short t4[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,INT_CMD};
-    const short t5[]={4,IDEAL_CMD,MATRIX_CMD,STRING_CMD,INT_CMD};
-    const short t6[]={4,MODUL_CMD,MATRIX_CMD,STRING_CMD,INT_CMD};
+    const short t3[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,IDEAL_CMD};
+    const short t4[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,MODUL_CMD};
+    const short t5[]={4,IDEAL_CMD,MATRIX_CMD,STRING_CMD,IDEAL_CMD};
+    const short t6[]={4,MODUL_CMD,MATRIX_CMD,STRING_CMD,MODUL_CMD};
 
     if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
     {
@@ -7860,34 +7858,33 @@ static BOOLEAN jjLIFTSTD_M(leftv res, leftv U)
       if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
       idhdl hw=(idhdl)u3->data;
       syz=&(hw->data.uideal);
-      limit=(int)((long)(u4->Data()));
+      h11=(ideal)u4->Data();
     }
     else if(iiCheckTypes(U,t5)||iiCheckTypes(U,t6))
     {
       alg=syGetAlgorithm((char*)u3->Data(),currRing,(ideal)u->Data());
-      limit=(int)((long)(u4->Data()));
+      h11=(ideal)u4->Data();
     }
     else
     {
-      Werror("%s(`ideal`/`module`,`matrix`[,`module`][,`string`][,`int`]) expected",Tok2Cmdname(iiOp));
+      Werror("%s(`ideal/module`,`matrix`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
       return TRUE;
     }
   }
   else
   {
     // we have 5 arguments
-    const short t1[]={5,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,INT_CMD};
-    const short t2[]={5,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,INT_CMD};
+    const short t1[]={5,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,IDEAL_CMD};
+    const short t2[]={5,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,MODUL_CMD};
     if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
     {
       idhdl hw=(idhdl)u3->data;
       syz=&(hw->data.uideal);
       alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
-      limit=(int)((long)(u5->Data()));
     }
     else
     {
-      Werror("%s(`ideal`/`module`,`matrix`[,`module`][,`string`][,`int`]) expected",Tok2Cmdname(iiOp));
+      Werror("%s(`ideal/module`,`matrix`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
       return TRUE;
     }
   }
@@ -7909,7 +7906,7 @@ static BOOLEAN jjLIFTSTD_M(leftv res, leftv U)
   res->rtyp = u->Typ();
   res->data = (char *)idLiftStd((ideal)u->Data(),
                               &(hv->data.umatrix),testHomog,
-                              syz,alg,limit);
+                              syz,alg,h11);
   setFlag(res,FLAG_STD); v->flag=0;
   if(syz!=NULL)
     u3->flag=0;
@@ -7964,6 +7961,73 @@ BOOLEAN jjLIST_PL(leftv res, leftv v)
     }
   }
   res->data=(char *)L;
+  return FALSE;
+}
+static BOOLEAN jjMODULO4(leftv res, leftv u)
+{
+  leftv v=u->next;
+  leftv w=v->next;
+  leftv u4=w->next;
+  GbVariant alg;
+  ideal u_id,v_id;
+  // we have 4 arguments
+  const short t1[]={4,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD,STRING_CMD};
+  const short t2[]={4,MODUL_CMD,MODUL_CMD,MATRIX_CMD,STRING_CMD};
+  if(iiCheckTypes(u,t1)||iiCheckTypes(u,t2)||(w->rtyp!=IDHDL))
+  {
+    u_id=(ideal)u->Data();
+    v_id=(ideal)v->Data();
+    alg=syGetAlgorithm((char*)u4->Data(),currRing,u_id);
+  }
+  else
+  {
+    Werror("%s(`ideal/module`,`ideal/module`[,`matrix`][,`string`]) expected",Tok2Cmdname(iiOp));
+    return TRUE;
+  }
+  intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  tHomog hom=testHomog;
+  if (w_u!=NULL)
+  {
+    w_u=ivCopy(w_u);
+    hom=isHomog;
+  }
+  intvec *w_v=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  if (w_v!=NULL)
+  {
+    w_v=ivCopy(w_v);
+    hom=isHomog;
+  }
+  if ((w_u!=NULL) && (w_v==NULL))
+    w_v=ivCopy(w_u);
+  if ((w_v!=NULL) && (w_u==NULL))
+    w_u=ivCopy(w_v);
+  if (w_u!=NULL)
+  {
+     if ((*w_u).compare((w_v))!=0)
+     {
+       WarnS("incompatible weights");
+       delete w_u; w_u=NULL;
+       hom=testHomog;
+     }
+     else
+     {
+       if ((!idTestHomModule(u_id,currRing->qideal,w_v))
+       || (!idTestHomModule(v_id,currRing->qideal,w_v)))
+       {
+         WarnS("wrong weights");
+         delete w_u; w_u=NULL;
+         hom=testHomog;
+       }
+     }
+  }
+  idhdl h=(idhdl)w->data;
+  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u, &(h->data.umatrix),alg);
+  if (w_u!=NULL)
+  {
+    atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
+  }
+  delete w_v;
+  //if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjNAMES0(leftv res, leftv)
