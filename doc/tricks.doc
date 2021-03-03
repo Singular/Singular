@@ -14,7 +14,7 @@
 @menu
 * Tricks and pitfalls::
 @end menu
-@node Tricks and pitfalls, Examples, Functions and system variables, Top
+@node Tricks and pitfalls
 @chapter Tricks and pitfalls
 %**end
 @end ignore

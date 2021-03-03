@@ -7,7 +7,7 @@ LIBRARY:  hodge.lib  Algorithms for Hodge ideals
 AUTHORS:  Guillem Blanco, email: guillem.blanco@kuleuven.be
 
 OVERVIEW:
-A library for computing the Hodge ideals [MP19] of Q-divisors associated to any reduced hypersurface @math{f \\in R}.
+A library for computing the Hodge ideals [MP19] of Q-divisors associated to any reduced hypersurface @math{f \in R}.
 @* The implemented algorithm [Bla21] is based on the characterization of the Hodge ideals in terms of the @math{V}-filtration of Malgrange and Kashiwara on @math{R_f f^s}, see [MP20].
 @* As a consequence, this library provides also an algorithm to compute the multiplier ideals and the jumping numbers of any hypersurface, see [BS05].
 
@@ -20,10 +20,10 @@ REFERENCES:
 KEYWORDS: Hodge ideals; V-filtration; Multiplier ideals; Jumping numbers
 
 PROCEDURES:
-  Vfiltration(f, p [, eng]);  compute @math{R}-generators for the @math{V}-filtration on @math{R_f f^s} truncated up to degree @math{p} in @math{\\partial_t}.
-  hodgeIdeals(f, p [, eng]);  compute the Hodge ideals of @math{f^\\alpha} up to level @math{p}, for a reduced hypersurface @math{f \\in R}.
-  multIdeals(f, p [, eng]);   compute the multiplier ideals of a hypersurface @math{f \\in R}.
-  nextHodgeIdeal(f, I, p);  given the @math{p}-th Hodge ideal @math{I} of @math{f^\\alpha} compute the @math{p+1}-th Hodge ideal assuming that the Hodge filtration of the underlying mixed Hodge module is generated at level less than or equal to @math{p}.
+  Vfiltration(f, p [, eng]);  compute @math{R}-generators for the @math{V}-filtration on @math{R_f f^s} truncated up to degree @math{p} in @math{\partial_t}.
+  hodgeIdeals(f, p [, eng]);  compute the Hodge ideals of @math{f^\alpha} up to level @math{p}, for a reduced hypersurface @math{f \in R}.
+  multIdeals(f, p [, eng]);   compute the multiplier ideals of a hypersurface @math{f \in R}.
+  nextHodgeIdeal(f, I, p);  given the @math{p}-th Hodge ideal @math{I} of @math{f^\alpha} compute the @math{p+1}-th Hodge ideal assuming that the Hodge filtration of the underlying mixed Hodge module is generated at level less than or equal to @math{p}.
 
 SEE ALSO: dmodapp_lib
 ";
@@ -49,7 +49,7 @@ static proc Qpoly(int k, number a) {
 proc Vfiltration(poly f, int p, list #)
 "USAGE:    Vfiltration(f, p [, eng]);     f a poly, p a non-negative integer, eng an optional integer.
 RETURN:    ring
-PURPOSE:   compute @math{R}-generators for the @math{V}-filtration on @math{R_f f^s} truncated up to degree @math{p} in @math{\\partial_t}.
+PURPOSE:   compute @math{R}-generators for the @math{V}-filtration on @math{R_f f^s} truncated up to degree @math{p} in @math{\partial_t}.
 NOTE:      activate the output ring with the @code{setring} command.
 @*In the output ring, the list @code{Vfilt} contains the @math{V}-filtration.
 @*The value of @code{eng} controls the algorithm used for Groebner basis computations.
@@ -251,7 +251,7 @@ example
 proc hodgeIdeals(poly f, int p, list #)
 "USAGE:    hodgeIdeals(f, p [, eng]);    f a reduced poly, p a non-negative integer, eng an optional integer.
 RETURN:    ring
-PURPOSE:   compute the Hodge ideals of @math{f^\\alpha} up to level @math{p}, for a reduced hypersurface @math{f}.
+PURPOSE:   compute the Hodge ideals of @math{f^\alpha} up to level @math{p}, for a reduced hypersurface @math{f}.
 NOTE:      activate the output ring with the @code{setring} command.
 @*In the output ring, the list of ideals @code{hodge} contains the Hodge ideals of @math{f}.
 @*The value of @code{eng} controls the algorithm used for Groebner basis computations.
@@ -337,7 +337,7 @@ example
 proc multIdeals(poly f, list #)
 "USAGE:    multIdeals(f, [, eng]);    f a reduced poly, eng an optional integer.
 RETURN:    list
-PURPOSE:   compute the multiplier ideals of a hypersurface @math{f \\in R}.
+PURPOSE:   compute the multiplier ideals of a hypersurface @math{f \in R}.
 NOTE:      The value of @code{eng} controls the algorithm used for Groebner basis computations.
 @* See the @code{engine} procedure from @ref{dmodapp_lib} for the available algorithms.
 DISPLAY:   If @code{printlevel}=1, progress debug messages will be printed.
@@ -376,7 +376,7 @@ example
 proc nextHodgeIdeal(poly f, ideal I, int p)
 "USAGE:    nextHodgeIdeal(f, I, p);  f a poly, I an ideal, p a non-negative integer
 RETURN:    ideal
-PURPOSE:   given the @math{p}-th Hodge ideal @math{I} of @math{f^\\alpha} compute the @math{p+1}-th Hodge ideal assuming that
+PURPOSE:   given the @math{p}-th Hodge ideal @math{I} of @math{f^\alpha} compute the @math{p+1}-th Hodge ideal assuming that
 @*the Hodge filtration of the underlying mixed Hodge module is generated at level less than or equal to @math{p}.
 EXAMPLE:   example nextHodgeIdeal; shows an example
 "
