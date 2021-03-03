@@ -856,7 +856,8 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 *computes a standard basis for h1 and stores the transformation matrix
 * in ma
 */
-ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
+ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg, 
+  ideal h11)
 {
   int  i, j, t, inputIsIdeal=id_RankFreeModule(h1,currRing);
   long k;
@@ -894,8 +895,14 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
     s_h1 = idrCopyR_NoSort(h1,orig_ring,syz_ring);
   else
     s_h1 = h1;
+  ideal s_h11=NULL;
+  if (h11!=NULL)
+  {
+    s_h11=idrCopyR_NoSort(h11,orig_ring,syz_ring);
+  }
 
-  ideal s_h3=idPrepare(s_h1,NULL,hi,k,&w,alg); // main (syz) GB computation
+
+  ideal s_h3=idPrepare(s_h1,s_h11,hi,k,&w,alg); // main (syz) GB computation
 
   ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank);
 
@@ -920,7 +927,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
         {
           if (pGetComp(pNext(q)) > k)
           {
-            s_h2->m[j] = pNext(q);
+            s_h2->m[i-1] = pNext(q);
             pNext(q) = NULL;
           }
           else
@@ -961,13 +968,13 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
   if (syz_ring!=orig_ring)
   {
     idDelete(&s_h1);
+    if (s_h11!=NULL) idDelete(&s_h11);
     rChangeCurrRing(orig_ring);
   }
 
   *ma = mpNew(j,i);
 
-  i = 1;
-  for (j=0; j<IDELEMS(s_h2); j++)
+  for (j=0; j<i; j++)
   {
     if (s_h2->m[j] != NULL)
     {
@@ -985,10 +992,9 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg)
           t=pGetComp(p);
           pSetComp(p,0);
           pSetmComp(p);
-          MATELEM(*ma,t-k,i) = pAdd(MATELEM(*ma,t-k,i),p);
+          MATELEM(*ma,t-k,j+1) = pAdd(MATELEM(*ma,t-k,j+1),p);
         }
       }
-      i++;
     }
   }
   idDelete(&s_h2);

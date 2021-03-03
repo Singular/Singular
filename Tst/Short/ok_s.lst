@@ -122,6 +122,7 @@ gcd_univar_p_s
 gcd_univar_p_alpha_s
 homalg
 invar_lib
+liftstd_m
 modular_s
 modstd_s
 modules
