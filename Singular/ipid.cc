@@ -878,7 +878,8 @@ BOOLEAN iiAlias(leftv p)
       case MAP_CMD:
          {
            map im = IDMAP(pp);
-           omFree((ADDRESS)im->preimage);
+           omFree((ADDRESS)im->preimage); 
+	   im->preimage=NULL;// and continue
          }
          // continue as ideal:
       case IDEAL_CMD:

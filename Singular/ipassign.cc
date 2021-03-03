@@ -2231,7 +2231,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         return b;
       }
       //no break, handle the rest like an ideal:
-      map_assign=TRUE;
+      map_assign=TRUE; // and continue
     }
     case MATRIX_CMD:
     case IDEAL_CMD:

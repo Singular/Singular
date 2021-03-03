@@ -175,7 +175,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                       }
                     }
                     break;
-    case MODUL_CMD: Print(", rk %d", (int)(IDIDEAL(h)->rank));
+    case MODUL_CMD: Print(", rk %d", (int)(IDIDEAL(h)->rank));// and continue
     case IDEAL_CMD: Print(", %u generator(s)",
                     IDELEMS(IDIDEAL(h))); break;
     case MAP_CMD:
@@ -2630,7 +2630,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         {
            case ringorder_ws:
            case ringorder_Ws:
-              R->OrdSgn=-1;
+              R->OrdSgn=-1; // and continue
            case ringorder_aa:
            case ringorder_a:
            case ringorder_wp:
@@ -5386,7 +5386,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       {
           case ringorder_ws:
           case ringorder_Ws:
-            typ=-1;
+            typ=-1; // and continue
           case ringorder_wp:
           case ringorder_Wp:
             R->wvhdl[n]=(int*)omAlloc((iv->length()-1)*sizeof(int));
@@ -5403,7 +5403,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_ds:
           case ringorder_Ds:
           case ringorder_rs:
-            typ=-1;
+            typ=-1; // and continue
           case ringorder_lp:
           case ringorder_dp:
           case ringorder_Dp:
