@@ -32,7 +32,7 @@ BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 
 EXTERN_VAR omBin gmp_nrz_bin;
 
-coeffs nrnInitCfByName(char *s,n_coeffType n)
+coeffs nrnInitCfByName(char *s,n_coeffType)
 {
   const char start[]="ZZ/bigint(";
   const int start_len=strlen(start);
@@ -51,7 +51,9 @@ coeffs nrnInitCfByName(char *s,n_coeffType n)
     if (((*s)==')') && (*(s+1)=='^'))
     {
       s=s+2;
-      s=nEati(s,&(info.exp),0);
+      int i;
+      s=nEati(s,&i,0);
+      info.exp=(unsigned long)i;
       return nInitChar(n_Znm,(void*) &info);
     }
     else
