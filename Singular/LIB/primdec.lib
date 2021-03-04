@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version primdec.lib 4.2.0.0 Mar_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -7097,7 +7097,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc prepareAss(ideal i)
 "USAGE:   prepareAss(I); I ideal
-RETURN:  list, the radicals of the maximal dimensional components of I.
+RETURN:  list of radicals of the equidimensional components of I
 NOTE:    Uses algorithm of Eisenbud/Huneke/Vasconcelos.
 EXAMPLE: example prepareAss; shows an example
 "
@@ -7125,7 +7125,7 @@ EXAMPLE: example prepareAss; shows an example
   {
     list re=mres(i,0);
   }
-  for(e=cod;e<=nvars(basering);e++)
+  for(e=nvars(basering);e>=cod;e--)
   {
      ann=AnnExt_R(e,re);
 
