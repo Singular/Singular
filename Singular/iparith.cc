@@ -6898,27 +6898,6 @@ static BOOLEAN jjLIFTSTD_ALG(leftv res, leftv u, leftv v, leftv w)
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
-static BOOLEAN jjLIFTSTD_LIMIT(leftv res, leftv u, leftv v, leftv w)
-{
-  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
-  idhdl hv=(idhdl)v->data;
-#ifdef HAVE_SHIFTBBA
-  if (rIsLPRing(currRing))
-  {
-    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
-    {
-      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
-      return TRUE;
-    }
-  }
-#endif
-  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
-  res->data = (char *)idLiftStd((ideal)u->Data(),
-                                &(hv->data.umatrix),testHomog,
-                                NULL,GbDefault,(ideal)w->Data());
-  setFlag(res,FLAG_STD); v->flag=0;
-  return FALSE;
-}
 static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
