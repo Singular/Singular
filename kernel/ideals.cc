@@ -202,7 +202,7 @@ static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL,
   ideal temp1;
   if (w==NULL)
   {
-    //if (hom==testHomog)
+    if (hom==testHomog)
       hom=(tHomog)idHomModule(temp,currRing->qideal,&w); //sets w to weight vector or NULL
   }
   else
@@ -590,8 +590,8 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
 */
 /* construct a "matrix" (h11 may be NULL)
  *      h1  h11
- *      E_n 0   
- * and compute a (column) GB of it, with a syzComp=rows(h1)=rows(h11)     
+ *      E_n 0
+ * and compute a (column) GB of it, with a syzComp=rows(h1)=rows(h11)
  * currRing must be a syz-ring with syzComp set
  * result is a "matrix":
  *      G   0
@@ -857,7 +857,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 *computes a standard basis for h1 and stores the transformation matrix
 * in ma
 */
-ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg, 
+ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz, GbVariant alg,
   ideal h11)
 {
   int  i, j, t, inputIsIdeal=id_RankFreeModule(h1,currRing);
@@ -2522,7 +2522,13 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
   }
   else
   {
-    *T=mpNew(IDELEMS(h2),IDELEMS(h2));
+    int m=0;
+    for (i=0;i<IDELEMS(s_temp1);i++)
+    {
+      if (((int)pGetComp(s_temp1->m[i]))<=length) m=i;
+      else break;
+    }
+    *T=mpNew(IDELEMS(h2),m+1);
     for (i=0;i<IDELEMS(s_temp1);i++)
     {
       if (s_temp1->m[i]!=NULL)
@@ -2547,12 +2553,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
               p_SetComp(p,0,orig_ring);
               p_SetmComp(p,orig_ring);
               p_Test(p,orig_ring);
-	      poly a=MATELEM(*T,(int)t-length,i+1);
-	      p_Test(a,orig_ring);
-	      a=p_Add_q(a,p,orig_ring);
-	      p_Test(a,orig_ring);
-              //MATELEM(*T,(int)t-length,i+1) = p_Add_q(MATELEM(*T,(int)t-length,i+1),p,orig_ring);
-	      MATELEM(*T,(int)t-length,i+1)=a;
+              MATELEM(*T,(int)t-length,i+1) = p_Add_q(MATELEM(*T,(int)t-length,i+1),p,orig_ring);
             } while (q != NULL);
           }
         }
