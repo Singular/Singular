@@ -194,15 +194,17 @@ static ideal idSectWithElim (ideal h1,ideal h2, GbVariant alg)
   return res;
 }
 
-static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL, intvec* w=NULL)
+static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL, intvec* w=NULL, tHomog hom=testHomog)
 {
   //Print("syz=%d\n",syzComp);
   //PrintS(showOption());
   //PrintLn();
   ideal temp1;
-  tHomog hom;
   if (w==NULL)
-    hom=(tHomog)idHomModule(temp,currRing->qideal,&w); //sets w to weight vector or NULL
+  {
+    //if (hom==testHomog)
+      hom=(tHomog)idHomModule(temp,currRing->qideal,&w); //sets w to weight vector or NULL
+  }
   else
   {
     w=ivCopy(w);
@@ -470,7 +472,6 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
   ideal bigmat,tempstd,result;
   poly p;
   int isIdeal=0;
-  intvec * w=NULL;
 
   /* find 0-ideals and max rank -----------------------------------*/
   for (i=0;i<length;i++)
@@ -689,8 +690,8 @@ static ideal idPrepare (ideal  h1, ideal h11, tHomog hom, int syzcomp, intvec **
   }
 
   ideal h3;
-  if (w!=NULL) h3=idGroebner(h2,syzcomp,alg,NULL,*w);
-  else         h3=idGroebner(h2,syzcomp,alg);
+  if (w!=NULL) h3=idGroebner(h2,syzcomp,alg,NULL,*w,hom);
+  else         h3=idGroebner(h2,syzcomp,alg,NULL,NULL,hom);
   return h3;
 }
 
@@ -2179,7 +2180,7 @@ static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
 */
 
 #ifdef HAVE_SHIFTBBA
-ideal idModuloLP (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant alg)
+ideal idModuloLP (ideal h2,ideal h1, tHomog, intvec ** w, matrix *T, GbVariant alg)
 {
   intvec *wtmp=NULL;
   if (T!=NULL) idDelete((ideal*)T);
@@ -2381,7 +2382,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
   intvec *wtmp=NULL;
   if (T!=NULL) idDelete((ideal*)T);
 
-  int i,k,rk,flength=0,slength,length;
+  int i,rk,flength=0,slength,length;
   poly p,q;
 
   if (idIs0(h2))
@@ -2521,7 +2522,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
   }
   else
   {
-    *T=mpNew(IDELEMS(s_temp1),IDELEMS(h2));
+    *T=mpNew(IDELEMS(h2),IDELEMS(h2));
     for (i=0;i<IDELEMS(s_temp1);i++)
     {
       if (s_temp1->m[i]!=NULL)
@@ -2540,19 +2541,24 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
             do
             {
               poly p = q;
-              long t=pGetComp(p);
+              long t=p_GetComp(p,orig_ring);
               pIter(q);
               pNext(p) = NULL;
-              pSetComp(p,0);
-              pSetmComp(p);
-              pTest(p);
-              MATELEM(*T,(int)t-length,i) = p_Add_q(MATELEM(*T,(int)t-length,i),p,orig_ring);
+              p_SetComp(p,0,orig_ring);
+              p_SetmComp(p,orig_ring);
+              p_Test(p,orig_ring);
+	      poly a=MATELEM(*T,(int)t-length,i+1);
+	      p_Test(a,orig_ring);
+	      a=p_Add_q(a,p,orig_ring);
+	      p_Test(a,orig_ring);
+              //MATELEM(*T,(int)t-length,i+1) = p_Add_q(MATELEM(*T,(int)t-length,i+1),p,orig_ring);
+	      MATELEM(*T,(int)t-length,i+1)=a;
             } while (q != NULL);
           }
         }
         else
         {
-          p_Shift(&(s_temp1->m[i]),-length,currRing);
+          p_Shift(&(s_temp1->m[i]),-length,syz_ring);
         }
       }
     }
@@ -2579,6 +2585,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
 /*
 *computes module-weights for liftings of homogeneous modules
 */
+#if 0
 static intvec * idMWLift(ideal mod,intvec * weights)
 {
   if (idIs0(mod)) return new intvec(2);
@@ -2591,6 +2598,7 @@ static intvec * idMWLift(ideal mod,intvec * weights)
   }
   return result;
 }
+#endif
 
 /*2
 *sorts the kbase for idCoef* in a special way (lexicographically
@@ -3218,7 +3226,8 @@ ideal id_Satstd(const ideal I, ideal J, const ring r)
 GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
 {
   GbVariant alg=GbDefault;
-  if (strcmp(n,"slimgb")==0) alg=GbSlimgb;
+  if (strcmp(n,"default")==0) alg=GbDefault;
+  else if (strcmp(n,"slimgb")==0) alg=GbSlimgb;
   else if (strcmp(n,"std")==0) alg=GbStd;
   else if (strcmp(n,"sba")==0) alg=GbSba;
   else if (strcmp(n,"singmatic")==0) alg=GbSingmatic;
