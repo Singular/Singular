@@ -1208,6 +1208,7 @@ Comments should be send to the author of the library directly.
 * GND_lib:: General Neron Desingularization
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
 * hodge_lib:: Algorithms for Hodge ideals
+* lrcalc_lib:: interface to the Littlewood-Richardson Calculator by Anders Buch
 * maxlike_lib:: maximum likelihood estimates
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
@@ -1258,6 +1259,10 @@ Issues:
 @node hodge_lib
 @subsection hodge_lib
 @c lib hodge.lib
+@c ----------------------------------------------------------
+@node lrcalc_lib
+@subsection lrcalc_lib
+@c lib lrcalc.lib
 @c ----------------------------------------------------------
 @node maxlike_lib
 @subsection maxlike_lib
