@@ -2525,8 +2525,8 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
     int m=0;
     for (i=0;i<IDELEMS(s_temp1);i++)
     {
-      if (((int)pGetComp(s_temp1->m[i]))<=length) m=i;
-      else break;
+      poly f=s_temp1->m[i];
+      if ((f!=NULL) && (((int)pGetComp(f))<=length)) m=i;
     }
     *T=mpNew(IDELEMS(h2),m+1);
     for (i=0;i<IDELEMS(s_temp1);i++)
