@@ -854,7 +854,7 @@ Uses @code{satstd} instead of @code{std}, see @ref{satstd}. Requires @ref{custom
 
 Funtions with such a choice of the algorithm:
 @itemize
-@item @ref{eiminate}
+@item @ref{eliminate}
 @item @ref{intersect}
 @item @ref{modulo}
 @item @ref{liftstd}
