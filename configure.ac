@@ -325,4 +325,10 @@ AC_CONFIG_FILES([redhat/Makefile])
 AC_CONFIG_FILES([redhat/singular.spec])
 AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
 
+AC_CHECK_PROG(MAKEINFO, [makeinfo])
+AC_CHECK_PROG(TEXI2PDF, [texi2pdf])
+AC_CHECK_PROG(TEXINDEX, [texindex])
+AC_CHECK_PROG(DVIPS, [dvips])
+AC_CONFIG_FILES([doc/Makefile])
+
 AC_OUTPUT

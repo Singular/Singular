@@ -10,7 +10,8 @@ SHELL=/bin/sh
 ##
 SINGUNAME       = spielwiese
 
-bindir	        = @bindir@
+bindir	        = @top_build_dir@/Singular
+EXEEXT          = @EXEEXT@
 
 ##
 ## needed programs
@@ -20,23 +21,19 @@ UUDECODE        = uudecode
 
 PERL            = perl
 TEX             = tex
-MAKEINFO        = makeinfo --force
+MAKEINFO        = @MAKEINFO@ --force
 TEXI2PDF        = @TEXI2PDF@
 TEXINDEX        = @TEXINDEX@
 # use our local texi2html
 TEXI2HTML       = ./texi2html
-DVIPS           = dvips
+DVIPS           = @DVIPS@
 
 VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
-SINGULAR        = /scratch/hannes/billbo-sw/Singular/Singular
+SINGULAR        = ${bindir}
 SINGULAR_LIB_DIR= ../Singular/LIB
-ifeq ($(SINGUNAME),"ix86-Win")
-LIBPARSE        = ${bindir}/libparse.exe
-else
-LIBPARSE        = ./libparse
-endif
+LIBPARSE        = ${bindir}/libparse${EXEEXT}
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum

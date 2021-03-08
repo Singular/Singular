@@ -6,6 +6,7 @@ kernel Singular \
 dox emacs redhat desktop
 
 EXTRA_DIST = README README.md README.pkg autogen.sh doxy redhat/singular.spec.in GPL2 GPL3
+EXTRA_DIST += doc/Makefile.in
 
 bin_SCRIPTS = libsingular-config
 
