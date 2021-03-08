@@ -806,7 +806,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_FLINT
               StringAppend("FLINT(%s),",FLINT_VERSION);
 #endif
-//              StringAppendS("factory(" FACTORYVERSION "),\n\t");
+//              StringAppendS("factory(" FACTORYVERSION "),");
               StringAppendS("\n\t");
 #ifndef HAVE_OMALLOC
               StringAppendS("xalloc,");

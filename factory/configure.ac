@@ -432,12 +432,10 @@ AC_SUBST(MAKEHEADERFLAGS)
 #AC_SUBST(installtargets)
 #AC_SUBST(uninstalltargets)
 
-factory_version="4.1.3"
 factory_configuration="'$ac_configure_args' in `pwd`"
-AC_SUBST(factory_version)
 
-AH_TEMPLATE([FACTORYVERSION], [factory version])
-AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version")
+AH_TEMPLATE([FACTORYVERSION], [VERSION])
+AC_DEFINE_UNQUOTED([FACTORYVERSION], "$VERSION")
 
 AH_TEMPLATE([FACTORYCONFIGURATION], [factory configuration])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration")
