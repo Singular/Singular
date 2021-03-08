@@ -826,9 +826,9 @@ print(mostd2);
 * slim Groebner bases::
 @end menu
 
-Several operations with ideals resp. modules uses Groebner abses to compute their result.
+Several operations with ideals resp. modules uses Groebner bases to compute their result.
 Most allow an optional string argument to select the algorithm.
-The possible arguments are
+The possible arguments for the algorithm are
 @itemize
 @item @code{default}
 @item @code{std}
