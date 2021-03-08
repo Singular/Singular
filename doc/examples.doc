@@ -830,26 +830,36 @@ Several operations with ideals resp. modules uses Groebner abses to compute thei
 Most allow an optional string argument to select the algorithm.
 The possible arguments are
 @itemize
-@item default
-@item std
+@item @code{default}
+@item @code{std}
 see @ref{std}
-@item slimgb
+@item @code{slimgb}
 see @ref{slimgb}
-@item  sba
+@item  @code{sba}
 see @ref{sba}
-@item singmatic
+@item @code{singmatic}
 see @ref{singmatic}. Requires @code{singmatic.so}
-@item groebner
+@item @code{groebner}
 see @ref{groebner}
-@item{modstd}
+@item @code{modstd}
 see @ref{modStd}. Requires @ref{modstd_lib}
-@item ffmod
+@item @code{ffmod}
 see @ref{ffmodStd}, Requires  @ref{ffmodstd_lib}
-@item  nfmod
+@item  @code{nfmod}
 see @ref{nfmodStd}. Requires @ref{nfmodstd_lib}
-@item std:sat
+@item @code{std:sat}
+Uses @code{satstd} instead of @code{std}, see @ref{satstd]. Requires @ref{customstzd.lib}
 @end itemize
 
+
+Funtions with such a choice of the algorithm:
+@itemize
+@item @ref{eiminate}
+@item @ref{intersect}
+@item @ref{modulo}
+@item @ref{liftstd}
+@item @ref{syz}
+@end itemize
 
 @c ----------------------------------------------------------------------------
 @node groebner and std, Groebner basis conversion, Dynamic modules, Computing Groebner and Standard Bases
