@@ -826,6 +826,31 @@ print(mostd2);
 * slim Groebner bases::
 @end menu
 
+Several operations with ideals resp. modules uses Groebner abses to compute their result.
+Most allow an optional string argument to select the algorithm.
+The possible arguments are
+@itemize
+@item default
+@item std
+see @ref{std}
+@item slimgb
+see @ref{slimgb}
+@item  sba
+see @ref{sba}
+@item singmatic
+see @ref{singmatic}. Requires @code{singmatic.so}
+@item groebner
+see @ref{groebner}
+@item{modstd}
+see @ref{modStd}. Requires @ref{modstd_lib}
+@item ffmod
+see @ref{ffmodStd}, Requires  @ref{ffmodstd_lib}
+@item  nfmod
+see @ref{nfmodStd}. Requires @ref{nfmodstd_lib}
+@item std:sat
+@end itemize
+
+
 @c ----------------------------------------------------------------------------
 @node groebner and std, Groebner basis conversion, Dynamic modules, Computing Groebner and Standard Bases
 @subsection groebner and std
