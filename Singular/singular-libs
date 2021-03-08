@@ -46,11 +46,11 @@ SLIB1 = arr.lib arnoldclassify.lib \
 	JMBTest.lib JMSConst.lib \
         locnormal.lib \
 	methods.lib modules.lib multigrading.lib modwalk.lib\
-	nets.lib ncfrac.lib ncloc.lib ncModslimgb.lib\
+	nets.lib ncfrac.lib ncloc.lib \
 	numerAlg.lib numerDecom.lib \
         olga.lib orbitparam.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \
-	realclassify.lib realizationMatroids.lib resources.lib \
+	realizationMatroids.lib resources.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib sets.lib SingularityDBM.lib symodstd.lib schubert.lib swalk.lib \
 	tateProdCplxNegGrad.lib tasks.lib tropical.lib tropicalNewton.lib
@@ -66,4 +66,5 @@ PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
 
 # contributed libs, status not yet decided
 SLIB2 = KVequiv.lib deflation.lib invar.lib lejeune.lib ncHilb.lib ncrat.lib \
-	mathml.lib maxlike.lib recover.lib difform.lib autgradalg.lib
+	mathml.lib maxlike.lib recover.lib autgradalg.lib dummy.lib \
+	interval.lib lrcalc.lib nchilbert.lib systhreads.lib VecField.lib
