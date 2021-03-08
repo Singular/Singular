@@ -848,7 +848,7 @@ see @ref{ffmodStd}, Requires  @ref{ffmodstd_lib}
 @item  @code{nfmod}
 see @ref{nfmodStd}. Requires @ref{nfmodstd_lib}
 @item @code{std:sat}
-Uses @code{satstd} instead of @code{std}, see @ref{satstd]. Requires @ref{customstzd.lib}
+Uses @code{satstd} instead of @code{std}, see @ref{satstd]. Requires @ref{customstd_lib}
 @end itemize
 
 
