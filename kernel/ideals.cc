@@ -695,164 +695,6 @@ static ideal idPrepare (ideal  h1, ideal h11, tHomog hom, int syzcomp, intvec **
   return h3;
 }
 
-/*2
-* compute the syzygies of h1 in R/quot,
-* weights of components are in w
-* if setRegularity, return the regularity in deg
-* do not change h1,  w
-*/
-ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
-                  BOOLEAN setRegularity, int *deg, GbVariant alg)
-{
-  ideal s_h1;
-  int   j, k, length=0,reg;
-  BOOLEAN isMonomial=TRUE;
-  int ii, idElemens_h1;
-
-  assume(h1 != NULL);
-
-  idElemens_h1=IDELEMS(h1);
-#ifdef PDEBUG
-  for(ii=0;ii<idElemens_h1 /*IDELEMS(h1)*/;ii++) pTest(h1->m[ii]);
-#endif
-  if (idIs0(h1))
-  {
-    ideal result=idFreeModule(idElemens_h1/*IDELEMS(h1)*/);
-    return result;
-  }
-  int slength=(int)id_RankFreeModule(h1,currRing);
-  k=si_max(1,slength /*id_RankFreeModule(h1)*/);
-
-  assume(currRing != NULL);
-  ring orig_ring=currRing;
-  ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);
-  if (setSyzComp) rSetSyzComp(k,syz_ring);
-
-  if (orig_ring != syz_ring)
-  {
-    rChangeCurrRing(syz_ring);
-    s_h1=idrCopyR_NoSort(h1,orig_ring,syz_ring);
-  }
-  else
-  {
-    s_h1 = h1;
-  }
-
-  idTest(s_h1);
-
-  BITSET save_opt;
-  SI_SAVE_OPT1(save_opt);
-  si_opt_1|=Sy_bit(OPT_REDTAIL_SYZ);
-
-  ideal s_h3=idPrepare(s_h1,NULL,h,k,w,alg); // main (syz) GB computation
-
-  SI_RESTORE_OPT1(save_opt);
-
-  if (s_h3==NULL)
-  {
-    if (orig_ring != syz_ring)
-    {
-      rChangeCurrRing(orig_ring);
-      rDelete(syz_ring);
-    }
-    return idFreeModule( idElemens_h1 /*IDELEMS(h1)*/);
-  }
-
-  if (orig_ring != syz_ring)
-  {
-    idDelete(&s_h1);
-    for (j=0; j<IDELEMS(s_h3); j++)
-    {
-      if (s_h3->m[j] != NULL)
-      {
-        if (p_MinComp(s_h3->m[j],syz_ring) > k)
-          p_Shift(&s_h3->m[j], -k,syz_ring);
-        else
-          p_Delete(&s_h3->m[j],syz_ring);
-      }
-    }
-    idSkipZeroes(s_h3);
-    s_h3->rank -= k;
-    rChangeCurrRing(orig_ring);
-    s_h3 = idrMoveR_NoSort(s_h3, syz_ring, orig_ring);
-    rDelete(syz_ring);
-    #ifdef HAVE_PLURAL
-    if (rIsPluralRing(orig_ring))
-    {
-      id_DelMultiples(s_h3,orig_ring);
-      idSkipZeroes(s_h3);
-    }
-    #endif
-    idTest(s_h3);
-    return s_h3;
-  }
-
-  ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
-
-  for (j=IDELEMS(s_h3)-1; j>=0; j--)
-  {
-    if (s_h3->m[j] != NULL)
-    {
-      if (p_MinComp(s_h3->m[j],syz_ring) <= k)
-      {
-        e->m[j] = s_h3->m[j];
-        isMonomial=isMonomial && (pNext(s_h3->m[j])==NULL);
-        p_Delete(&pNext(s_h3->m[j]),syz_ring);
-        s_h3->m[j] = NULL;
-      }
-    }
-  }
-
-  idSkipZeroes(s_h3);
-  idSkipZeroes(e);
-
-  if ((deg != NULL)
-  && (!isMonomial)
-  && (!TEST_OPT_NOTREGULARITY)
-  && (setRegularity)
-  && (h==isHomog)
-  && (!rIsPluralRing(currRing))
-  && (!rField_is_Ring(currRing))
-  )
-  {
-    assume(orig_ring==syz_ring);
-    ring dp_C_ring = rAssure_dp_C(syz_ring); // will do rChangeCurrRing later
-    if (dp_C_ring != syz_ring)
-    {
-      rChangeCurrRing(dp_C_ring);
-      e = idrMoveR_NoSort(e, syz_ring, dp_C_ring);
-    }
-    resolvente res = sySchreyerResolvente(e,-1,&length,TRUE, TRUE);
-    intvec * dummy = syBetti(res,length,&reg, *w);
-    *deg = reg+2;
-    delete dummy;
-    for (j=0;j<length;j++)
-    {
-      if (res[j]!=NULL) idDelete(&(res[j]));
-    }
-    omFreeSize((ADDRESS)res,length*sizeof(ideal));
-    idDelete(&e);
-    if (dp_C_ring != orig_ring)
-    {
-      rChangeCurrRing(orig_ring);
-      rDelete(dp_C_ring);
-    }
-  }
-  else
-  {
-    idDelete(&e);
-  }
-  assume(orig_ring==currRing);
-  idTest(s_h3);
-  if (currRing->qideal != NULL)
-  {
-    ideal ts_h3=kStd(s_h3,currRing->qideal,h,w);
-    idDelete(&s_h3);
-    s_h3 = ts_h3;
-  }
-  return s_h3;
-}
-
 ideal idExtractG_T_S(ideal s_h3,matrix *T,ideal *S,long syzComp,
     int h1_size,BOOLEAN inputIsIdeal,const ring oring, const ring sring)
 {
@@ -954,6 +796,143 @@ ideal idExtractG_T_S(ideal s_h3,matrix *T,ideal *S,long syzComp,
     {
       (*S)->m[i] = prMoveR_NoSort((*S)->m[i], sring,oring);
     }
+  }
+  return s_h3;
+}
+
+/*2
+* compute the syzygies of h1 in R/quot,
+* weights of components are in w
+* if setRegularity, return the regularity in deg
+* do not change h1,  w
+*/
+ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
+                  BOOLEAN setRegularity, int *deg, GbVariant alg)
+{
+  ideal s_h1;
+  int   j, k, length=0,reg;
+  BOOLEAN isMonomial=TRUE;
+  int ii, idElemens_h1;
+
+  assume(h1 != NULL);
+
+  idElemens_h1=IDELEMS(h1);
+#ifdef PDEBUG
+  for(ii=0;ii<idElemens_h1 /*IDELEMS(h1)*/;ii++) pTest(h1->m[ii]);
+#endif
+  if (idIs0(h1))
+  {
+    ideal result=idFreeModule(idElemens_h1/*IDELEMS(h1)*/);
+    return result;
+  }
+  int slength=(int)id_RankFreeModule(h1,currRing);
+  k=si_max(1,slength /*id_RankFreeModule(h1)*/);
+
+  assume(currRing != NULL);
+  ring orig_ring=currRing;
+  ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);
+  if (setSyzComp) rSetSyzComp(k,syz_ring);
+
+  if (orig_ring != syz_ring)
+  {
+    rChangeCurrRing(syz_ring);
+    s_h1=idrCopyR_NoSort(h1,orig_ring,syz_ring);
+  }
+  else
+  {
+    s_h1 = h1;
+  }
+
+  idTest(s_h1);
+
+  BITSET save_opt;
+  SI_SAVE_OPT1(save_opt);
+  si_opt_1|=Sy_bit(OPT_REDTAIL_SYZ);
+
+  ideal s_h3=idPrepare(s_h1,NULL,h,k,w,alg); // main (syz) GB computation
+
+  SI_RESTORE_OPT1(save_opt);
+
+  if (orig_ring != syz_ring)
+  {
+    ideal S=idInit(IDELEMS(s_h3),IDELEMS(h1));
+    s_h3=idExtractG_T_S(s_h3,NULL,&S,k,IDELEMS(h1),FALSE,orig_ring,syz_ring);
+    idDelete(&s_h1);
+    idDelete(&s_h3);
+    rDelete(syz_ring);
+    #ifdef HAVE_PLURAL
+    if (rIsPluralRing(orig_ring))
+    {
+      id_DelMultiples(S,orig_ring);
+    }
+    #endif
+    idSkipZeroes(S);
+    idTest(S);
+    return S;
+  }
+
+  ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
+
+  for (j=IDELEMS(s_h3)-1; j>=0; j--)
+  {
+    if (s_h3->m[j] != NULL)
+    {
+      if (p_MinComp(s_h3->m[j],syz_ring) <= k)
+      {
+        e->m[j] = s_h3->m[j];
+        isMonomial=isMonomial && (pNext(s_h3->m[j])==NULL);
+        p_Delete(&pNext(s_h3->m[j]),syz_ring);
+        s_h3->m[j] = NULL;
+      }
+    }
+  }
+
+  idSkipZeroes(s_h3);
+  idSkipZeroes(e);
+
+  if ((deg != NULL)
+  && (!isMonomial)
+  && (!TEST_OPT_NOTREGULARITY)
+  && (setRegularity)
+  && (h==isHomog)
+  && (!rIsPluralRing(currRing))
+  && (!rField_is_Ring(currRing))
+  )
+  {
+    assume(orig_ring==syz_ring);
+    ring dp_C_ring = rAssure_dp_C(syz_ring); // will do rChangeCurrRing later
+    if (dp_C_ring != syz_ring)
+    {
+      rChangeCurrRing(dp_C_ring);
+      e = idrMoveR_NoSort(e, syz_ring, dp_C_ring);
+    }
+    resolvente res = sySchreyerResolvente(e,-1,&length,TRUE, TRUE);
+    intvec * dummy = syBetti(res,length,&reg, *w);
+    *deg = reg+2;
+    delete dummy;
+    for (j=0;j<length;j++)
+    {
+      if (res[j]!=NULL) idDelete(&(res[j]));
+    }
+    omFreeSize((ADDRESS)res,length*sizeof(ideal));
+    idDelete(&e);
+    if (dp_C_ring != orig_ring)
+    {
+      rChangeCurrRing(orig_ring);
+      rDelete(dp_C_ring);
+    }
+  }
+  else
+  {
+    idDelete(&e);
+  }
+  assume(orig_ring==currRing);
+  idTest(s_h3);
+  if (currRing->qideal != NULL)
+  {
+    ideal ts_h3=kStd(s_h3,currRing->qideal,h,w);
+    idDelete(&s_h3);
+    s_h3 = ts_h3;
   }
   return s_h3;
 }
