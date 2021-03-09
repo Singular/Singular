@@ -1,4 +1,6 @@
 AC_INIT([singular], [4.2.0], [singular@mathematik.uni-kl.de])
+
+AC_SUBST([VERSION_DATE], 2021)
 AC_DEFINE([VERSION_DATE],["Dec 2020"],[release date])
 
 _AC_SRCDIRS(["$ac_dir"])
@@ -325,10 +327,13 @@ AC_CONFIG_FILES([redhat/Makefile])
 AC_CONFIG_FILES([redhat/singular.spec])
 AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
 
-AC_CHECK_PROG(MAKEINFO, [makeinfo])
-AC_CHECK_PROG(TEXI2PDF, [texi2pdf])
-AC_CHECK_PROG(TEXINDEX, [texindex])
-AC_CHECK_PROG(DVIPS, [dvips])
+AC_CHECK_PROGS([MAKEINFO], [makeinfo])
+AC_CHECK_PROGS([TEXI2PDF], [texi2pdf])
+AC_CHECK_PROGS([TEXINDEX], [texindex])
+AC_CHECK_PROGS([DVIPS], [dvips])
 AC_CONFIG_FILES([doc/Makefile])
+AC_CONFIG_FILES([doc/version.texi])
+AC_CONFIG_LINKS([doc/pyobject.doc:doc/pyobject.${enable_pyobject_module}.doc
+                 doc/cones.doc:doc/cones.yes.doc])
 
 AC_OUTPUT

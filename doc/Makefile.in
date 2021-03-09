@@ -10,7 +10,7 @@ SHELL=/bin/sh
 ##
 SINGUNAME       = spielwiese
 
-bindir	        = @top_build_dir@/Singular
+bindir	        = @top_builddir@/Singular
 EXEEXT          = @EXEEXT@
 
 ##
@@ -31,8 +31,8 @@ DVIPS           = @DVIPS@
 VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
-SINGULAR        = ${bindir}
-SINGULAR_LIB_DIR= ../Singular/LIB
+SINGULAR        = @top_builddir@/Singular/Singular
+SINGULAR_LIB_DIR= @top_srcdir@/Singular/LIB
 LIBPARSE        = ${bindir}/libparse${EXEEXT}
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
