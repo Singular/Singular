@@ -75,10 +75,7 @@ HTML_TUTOR_TOP     = tutor.htm
 ###########################################################
 # File sets
 #
-STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
-			  README_download.texi README_ftp.texi \
-			  README_distribution.texi README_src.texi \
-			  INSTALL_win.texi
+STANDALONE_TEXI_FILES	= COPYING.texi NEWS.texi  lib2doc.texi
 
 DOC2TEX_FILES	= cones.tex countedref.tex decodegb.tex \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
