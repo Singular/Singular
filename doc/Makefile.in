@@ -10,7 +10,9 @@ SHELL=/bin/sh
 ##
 SINGUNAME       = spielwiese
 
-bindir	        = @top_builddir@/Singular
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
+bindir	        = ${top_builddir}/Singular
 EXEEXT          = @EXEEXT@
 
 ##
@@ -31,8 +33,10 @@ DVIPS           = @DVIPS@
 VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
-SINGULAR        = @top_builddir@/Singular/Singular
-SINGULAR_LIB_DIR= @top_srcdir@/Singular/LIB
+SINGULAR        = ${top_builddir}/Singular/Singular
+SINGULAR_LIB_DIR= ${top_srcdir}/Singular/LIB
+# from Singular/Makefile.am, extended by dynmodules stuff:
+TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/Singular/LIB:${top_srcdir}/Singular/LIB:${top_builddir}/libpolys/polys/.libs:${top_builddir}/factory/gftables:$$(for d in ${top_builddir}/Singular/dyn_modules/*/.libs; do printf $$d:; done)' SINGULAR_ROOT_DIR='${top_builddir}'
 LIBPARSE        = ${bindir}/libparse${EXEEXT}
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
@@ -41,11 +45,11 @@ CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 DOC2TEX_EXAMPLE_EXCLUSIONS = -exclude polymake
 # which tags to avoid:
 TAG		= polymake
-DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+DOC2TEX         = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
 		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
 
-DOC2TEX_M        = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+DOC2TEX_M        = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
 		  -exdir ${EX_SUBDIR}
 
