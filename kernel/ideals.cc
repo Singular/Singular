@@ -855,20 +855,31 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   if (orig_ring != syz_ring)
   {
-    ideal S=idInit(IDELEMS(s_h3),IDELEMS(h1));
-    s_h3=idExtractG_T_S(s_h3,NULL,&S,k,IDELEMS(h1),FALSE,orig_ring,syz_ring);
     idDelete(&s_h1);
-    idDelete(&s_h3);
+    for (j=0; j<IDELEMS(s_h3); j++)
+    {
+      if (s_h3->m[j] != NULL)
+      {
+        if (p_MinComp(s_h3->m[j],syz_ring) > k)
+          p_Shift(&s_h3->m[j], -k,syz_ring);
+        else
+          p_Delete(&s_h3->m[j],syz_ring);
+      }
+    }
+    idSkipZeroes(s_h3);
+    s_h3->rank -= k;
+    rChangeCurrRing(orig_ring);
+    s_h3 = idrMoveR_NoSort(s_h3, syz_ring, orig_ring);
     rDelete(syz_ring);
     #ifdef HAVE_PLURAL
     if (rIsPluralRing(orig_ring))
     {
-      id_DelMultiples(S,orig_ring);
+      id_DelMultiples(s_h3,orig_ring);
+      idSkipZeroes(s_h3);
     }
     #endif
-    idSkipZeroes(S);
-    idTest(S);
-    return S;
+    idTest(s_h3);
+    return s_h3;
   }
 
   ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
@@ -2370,7 +2381,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
   intvec *wtmp=NULL;
   if (T!=NULL) idDelete((ideal*)T);
 
-  int i,rk,flength=0,slength,length;
+  int i,flength=0,slength,length;
   poly p,q;
 
   if (idIs0(h2))
@@ -2408,7 +2419,6 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
     }
     //Print("weights:");wtmp->show(1);PrintLn();
   }
-  rk = IDELEMS(h2);
   ideal s_temp1;
   ring orig_ring=currRing;
   ring syz_ring=rAssure_SyzOrder(orig_ring, TRUE);
