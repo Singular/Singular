@@ -334,6 +334,6 @@ AC_CHECK_PROGS([DVIPS], [dvips])
 AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([doc/version.texi])
 AC_CONFIG_LINKS([doc/pyobject.doc:doc/pyobject.${enable_pyobject_module}.doc
-                 doc/cones.doc:doc/cones.yes.doc])
+                 doc/cones.doc:doc/cones.no.doc])
 
 AC_OUTPUT
