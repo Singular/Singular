@@ -7859,6 +7859,7 @@ static BOOLEAN jjLIFTSTD_M(leftv res, leftv U)
       idhdl hw=(idhdl)u3->data;
       syz=&(hw->data.uideal);
       alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
+      h11=(ideal)u5->Data();
     }
     else
     {
