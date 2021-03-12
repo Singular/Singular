@@ -40,5 +40,6 @@ endif
 endif
 
 if HAVE_GFANLIB
+# Use objects from the libtool convenience library
  gfanlib_la_LIBADD   += ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 endif
