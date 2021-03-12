@@ -906,7 +906,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ---------------------------------------------------------
 @node recover_lib
 @subsection recover_lib
-@c lib recover.lib
+@c lib recover.lib tag:bertini
 @c ----------------------------------------------------------
 @node rootisolation_lib
 @subsection rootisolation_lib
