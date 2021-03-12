@@ -857,6 +857,35 @@ static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 }
 BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
+  // the variables:
+  assume( getCoeffType(r) == n_GF );
+
+  GFInfo* p = (GFInfo *)(parameter);
+  assume (p->GFChar > 0);
+  assume (p->GFDegree > 0);
+  if ((IsPrime(p->GFChar)==p->GFChar)&&(p->GFDegree==1)) /* for oscar-system/Singular.jl/issues/177 */
+  {
+    return npInitChar(r,(void*)(long)p->GFChar);
+  }
+  if(p->GFChar > (2<<15))
+  {
+#ifndef SING_NDEBUG
+    WarnS("illegal characteristic");
+#endif
+    return TRUE;
+  }
+
+  const double check= log ((double) (p->GFChar));
+
+  #define sixteenlog2 11.09035489
+  if( (p->GFDegree * check) > sixteenlog2 )
+  {
+#ifndef SING_NDEBUG
+    Warn("Sorry: illegal size: %u ^ %u", p->GFChar, p->GFDegree );
+#endif
+    return TRUE;
+  }
+
   r->is_field=TRUE;
   r->is_domain=TRUE;
   r->rep=n_rep_gf;
@@ -914,12 +943,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->cfDBTest=nfDBTest;
 #endif
 
-  // the variables:
-  assume( getCoeffType(r) == n_GF );
-
-  GFInfo* p = (GFInfo *)(parameter);
-  assume (p->GFChar > 0);
-  assume (p->GFDegree > 0);
 
   const char * name = p->GFPar_name;
 
@@ -946,29 +969,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
-
-  if ((IsPrime(p->GFChar)==p->GFChar)&&(p->GFDegree==1)) /* for oscar-system/Singular.jl/issues/177 */
-  {
-    return npInitChar(r,(void*)(long)p->GFChar);
-  }
-  if(p->GFChar > (2<<15))
-  {
-#ifndef SING_NDEBUG
-    WarnS("illegal characteristic");
-#endif
-    return TRUE;
-  }
-
-  const double check= log ((double) (p->GFChar));
-
-  #define sixteenlog2 11.09035489
-  if( (p->GFDegree * check) > sixteenlog2 )
-  {
-#ifndef SING_NDEBUG
-    Warn("Sorry: illegal size: %u ^ %u", p->GFChar, p->GFDegree );
-#endif
-    return TRUE;
-  }
 
   int c = (int)pow ((double)p->GFChar, (double)p->GFDegree);
 
