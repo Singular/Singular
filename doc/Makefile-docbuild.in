@@ -42,7 +42,7 @@ DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 # which tags to avoid:
-DOC2TEX_EXAMPLE_EXCLUSIONS = -exclude polymake -exclude bertini
+DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@
 @ENABLE_PYOBJECT_MODULE_FALSE@ DOC2TEX_EXAMPLE_EXCLUSIONS += -exclude pyobject
 # which tags to avoid:
 TAG		= polymake

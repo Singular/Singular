@@ -331,6 +331,24 @@ AC_CHECK_PROGS([MAKEINFO], [makeinfo])
 AC_CHECK_PROGS([TEXI2PDF], [texi2pdf])
 AC_CHECK_PROGS([TEXINDEX], [texindex])
 AC_CHECK_PROGS([DVIPS], [dvips])
+
+dnl Check for executables used by library files.
+dnl Found by: git grep 'system("\(sh\|executable\)"'
+AS_VAR_SET([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude polymake "])
+AC_CHECK_PROGS([QEPCAD], [qepcad])
+AS_IF([test -z "$QEPCAD"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude qepcad "])])
+AC_CHECK_PROGS([FOURTITWO_HILBERT], [hilbert 4ti2-hilbert])
+AC_CHECK_PROGS([FOURTITWO_MARKOV], [markov 4ti2-markov])
+AC_CHECK_PROGS([FOURTITWO_GRAVER], [graver 4ti2-graver])
+AC_CHECK_PROGS([BERTINI], [bertini])
+AS_IF([test -z "$BERTINI"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude bertini "])])
+AC_CHECK_PROGS([DOT], [dot])
+AC_CHECK_PROGS([SURF], [surf])
+AC_CHECK_PROGS([GFAN_TROPICALBASIS], [gfan_tropicalbasis])  dnl and more gfan_tropical...
+AC_SUBST([DOC2TEX_EXAMPLE_EXCLUSIONS])
+
 AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([doc/Makefile-docbuild])
 AC_CONFIG_FILES([doc/version.texi])
