@@ -1,9 +1,12 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
+
+if HAVE_GFANLIB
 # We build libgfan as a libtool convenience library.
 # It is not installed; instead, its objects will be spliced into the
 # module Singular/dyn_modules/gfanlib
 noinst_LTLIBRARIES = libgfan.la
+endif
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -DGMPRATIONAL
 
