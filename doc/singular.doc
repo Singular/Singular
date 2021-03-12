@@ -1128,7 +1128,7 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node polymake_lib
 @subsection polymake_lib
-@c lib polymake.lib
+@c lib polymake.lib tag:polymake
 @c ----------------------------------------------------------
 @node realizationMatroids_lib
 @subsection realizationMatroids_lib
