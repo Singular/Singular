@@ -14,6 +14,13 @@
 /images/*.gif
 /images/*.jpg
 /images/*.xbm
+/QEPCAD-*
+/qepcad*
+/*.dot*
+/*.dir
+/*.pag
+/input
+/sing4ti2.*
 /save_i
 /*.ascii
 /*.dvi
