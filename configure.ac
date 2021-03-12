@@ -332,6 +332,7 @@ AC_CHECK_PROGS([TEXI2PDF], [texi2pdf])
 AC_CHECK_PROGS([TEXINDEX], [texindex])
 AC_CHECK_PROGS([DVIPS], [dvips])
 AC_CONFIG_FILES([doc/Makefile])
+AC_CONFIG_FILES([doc/Makefile-docbuild])
 AC_CONFIG_FILES([doc/version.texi])
 AC_CONFIG_LINKS([doc/pyobject.doc:doc/pyobject.${enable_pyobject_module}.doc
                  doc/cones.doc:doc/cones.no.doc])
