@@ -3,7 +3,10 @@ dist_man1_MANS = Singular.man ESingular.man TSingular.man
 # Docbuild scripts
 EXTRA_DIST =					\
 	Makefile-docbuild.in version.texi.in	\
-	help.cnf
+	help.cnf				\
+	doc2idx.pl				\
+	doc2tex.pl				\
+	pl2doc.pl
 
 # Text
 EXTRA_DIST +=					\
@@ -13,7 +16,13 @@ EXTRA_DIST +=					\
 	Development-model.md			\
 	How-To-Contribute.md			\
 	Porting-instructions.md			\
-	external-packages-dynamic-modules.md
+	external-packages-dynamic-modules.md	\
+	build_standards				\
+	dir_structure				\
+	DEPENDENCIES				\
+	HOWTO-libsingular			\
+	HOWTO.ispell				\
+	STYLEGUIDE
 
 # .doc files
 EXTRA_DIST +=					\
@@ -48,21 +57,12 @@ EXTRA_DIST +=					\
 # Other
 EXTRA_DIST += 					\
 	COPYING.texi				\
-	DEPENDENCIES				\
-	HOWTO-libsingular			\
-	HOWTO.ispell				\
-	Hans 2010-10-06.jpg			\
 	Includes.dot				\
 	Makefile-docbuild.in			\
 	Makefile.lib2doc			\
 	NEWS.texi				\
-	STYLEGUIDE				\
 	bad_lib0.lib				\
-	build_standards				\
 	changes_in_singular4.texi		\
-	dir_structure				\
-	doc2idx.pl				\
-	doc2tex.pl				\
 	elementsInTermsOfGeneratorsG25.sing	\
 	images/Mybg.gif.uu			\
 	images/a_begin.gif.uu			\
@@ -147,8 +147,6 @@ EXTRA_DIST += 					\
 	memory/OMALLOC.texi			\
 	orbits.gp				\
 	orbitsG25.gp				\
-	packages				\
-	pl2doc.pl				\
 	sample.lib				\
 	sample_lib0.lib				\
 	simple-make				\
