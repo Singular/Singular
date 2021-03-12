@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version algebra.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version algebra.lib 4.2.0.1 Mar_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -65,11 +65,11 @@ EXAMPLE: example algebra_containment; shows an example
     int n = nvars(br);
     int m = ncols(A);
     int i;
-    string mp=string(minpoly);
     //-----------------
     // neu CL 10/05:
     int is_qring;
-    if (size(ideal(br))>0) {
+    if (size(ideal(br))>0)
+    {
       is_qring=1;
       ideal IdQ = ideal(br);
     }
@@ -84,19 +84,20 @@ EXAMPLE: example algebra_containment; shows an example
     {
      l3[size(l3)+1] = "y("+string(yy)+")";
     }
-    ring R = create_ring(ringlist(br)[1], l3, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly"); 
-    if (mp!="0")
-    { execute ("minpoly=number("+mp+");"); }
-    ideal vars=x(1..n);
-    map emb=br,vars;
-    ideal A=ideal(emb(A));
-    poly check=emb(p);
+    list RL=ringlist(br);
+    RL[2]=l3; //vars
+    RL[3]=list(list("dp",1:n),list("dp",1:m)); //ord
+    RL[4]=ideal(0); // reset qring
+    ring R=ring(RL);
+    ideal A=fetch(br,A);
+    poly check=fetch(br,p);
     for (i=1;i<=m;i=i+1)
-    { A[i]=A[i]-y(i);
+    {
+      A[i]=A[i]-y(i);
     }
     //-----------------
     // neu CL 10/05:
-    if (is_qring) { A = A,emb(IdQ); }
+    if (is_qring) { A = A,fetch(br,IdQ); }
     //-----------------
     A=std(A);
     check=reduce(check,A);
@@ -107,14 +108,14 @@ EXAMPLE: example algebra_containment; shows an example
   // if so, then the sum of the first n leading exponents is 0, hence i=1
   // use i also to control the display
     i = (sum(leadexp(check),1..n)==0);
-  degBound = DEGB;
+    degBound = DEGB;
     if( #[1] == 0 )
     { dbprint(printlevel-voice+3,"// "+string(check));
       return(i);
     }
     else
     { list l = i,R;
-      kill A,vars,emb;
+      kill A;
       export check;
       dbprint(printlevel-voice+3,"
 // 'algebra_containment' created a ring as 2nd element of the list.
