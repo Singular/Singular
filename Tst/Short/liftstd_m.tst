@@ -18,12 +18,15 @@ print(S);
 print(liftstd(module(A),T,"std"));
 print(T);
 
-print(liftstd(A1,T,A2));
-print(T);
-
 print(liftstd(module(A),T,S,"std"));
 print(T);
 print(S);
+
+// relative versions
+
+// the three-argument relative version is not implemented and would overwrite A2
+// print(liftstd(A1,T,A2));
+// print(T);
 
 print(liftstd(A1,T,S,A2));
 print(T);
