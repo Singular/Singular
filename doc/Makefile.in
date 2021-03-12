@@ -43,6 +43,7 @@ EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 # which tags to avoid:
 DOC2TEX_EXAMPLE_EXCLUSIONS = -exclude polymake -exclude bertini
+@ENABLE_PYOBJECT_MODULE_FALSE@ DOC2TEX_EXAMPLE_EXCLUSIONS += -exclude pyobject
 # which tags to avoid:
 TAG		= polymake
 DOC2TEX         = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
