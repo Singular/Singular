@@ -164,3 +164,21 @@ EXTRA_DIST += 					\
 	tutor.tex				\
 	usercard.tex				\
 	version.texi.in
+
+all-local:
+	$(MAKE) -f Makefile-docbuild all
+
+clean-local:
+	$(MAKE) -f Makefile-docbuild clean
+
+mostlyclean-local:
+	$(MAKE) -f Makefile-docbuild mostlyclean
+
+distclean-local:
+	$(MAKE) -f Makefile-docbuild distclean
+
+maintainer-clean-local:
+	$(MAKE) -f Makefile-docbuild maintainer-clean
+
+singular.hlp:
+	$(MAKE) -f Makefile-docbuild $@
