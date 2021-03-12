@@ -142,8 +142,7 @@ static int ndParDeg(number n, const coeffs r)
 
 static number ndParameter(const int, const coeffs r)
 {
-  Werror("ndParameter: n_Parameter is not implemented/relevant for (coeff_type = %d)",getCoeffType(r));
-  return NULL;
+  return r->cfInit(1,r);
 }
 
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
