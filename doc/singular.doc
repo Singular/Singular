@@ -1300,7 +1300,7 @@ Todos/Issues:
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
-@c lib stanleyreisner.lib
+@c lib stanleyreisner.lib tag:crash
 @c ---------------------------------------------------------
 @node swalk_lib
 @subsection swalk_lib
