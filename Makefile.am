@@ -6,6 +6,9 @@ kernel Singular \
 dox emacs redhat desktop
 
 DIST_SUBDIRS = $(SUBDIRS) doc
+if ENABLE_DOC_BUILD
+SUBDIRS += doc
+endif
 
 EXTRA_DIST = README README.md README.pkg autogen.sh doxy redhat/singular.spec.in GPL2 GPL3
 

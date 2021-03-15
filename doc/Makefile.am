@@ -180,3 +180,25 @@ maintainer-clean-local:
 
 singular.hlp:
 	$(MAKE) -f Makefile-docbuild $@
+
+if ENABLE_DOC_BUILD
+EXTRA_DIST += doc.tbz2
+doc.tbz2:
+	$(MAKE) -f Makefile-docbuild singular.hlp html
+	chmod -R a+rX singular.hlp html
+	$(AMTAR) jcf $@ singular.hlp html
+dist-hook:
+	@if [ -n "$(DOC2TEX_EXAMPLE_EXCLUSIONS)" ]; then					\
+	  echo >&2 "#######################################################################";	\
+	  echo >&2 "WARNING: This distribution will ship a version of the documentation";	\
+	  echo >&2 "that excludes some modules because of missing optional libraries:";		\
+	  echo >&2 "DOC2TEX_EXAMPLE_EXCLUSIONS = $(DOC2TEX_EXAMPLE_EXCLUSIONS)";		\
+	  echo >&2 "#######################################################################";   \
+        fi
+else
+dist-hook:
+	@echo >&2 "#######################################################################"
+	@echo >&2 "WARNING: This distribution will not contain the Singular documentation."
+	@echo >&2 "Use 'configure --enable-doc-build' to build and ship the documentation."
+	@echo >&2 "#######################################################################"
+endif
