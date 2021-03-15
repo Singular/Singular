@@ -43,4 +43,17 @@ print(T);
 print(S);
 
 // with liftstd: G=liftStd(M1,T,S, M2): S=modulo(M1,M2,T)
+
+//  ----- test with reduce
+matrix T1,T2;
+matrix G=liftstd(A1,T1,S,"std",A2);
+print(T1);
+print(S);
+reduce(G-A1*T1,A2);
+ 
+S=modulo(A1,A2,T2,"std");
+print(T2);
+print(S);
+reduce(G-A1*T2,A2);
+
 tst_status(1);$
