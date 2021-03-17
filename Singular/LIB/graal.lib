@@ -210,6 +210,7 @@ static proc findGeneralPosition(ideal m)
   {
     def origin = basering;
     ring ringForGeneralPosition = create_ring(ringlist(basering)[1], "("+varstr(basering)+")", "lp", "no_minpoly");
+    setring ringForGeneralPosition;
     ideal m = fetch(origin,m);
     newRing = 1;
   }
@@ -360,6 +361,7 @@ EXAMPLE:  example graalMixed; shows an example
   else
     { string pars; string vars = varstr(basering); }
   ring Q0 = create_ring("("+charstr(basering)+pars+")", "("+vars+")", "dp");
+  setring Q0;
   ideal J0 = imap(Q,J);
   Gr.Q0 = Q0;
   Gr.J0 = J0;
@@ -429,6 +431,7 @@ EXAMPLE:  example graalMixed; shows an example
    * construct Ky and sigmainI
    **/
   ring KKy = create_ring(ringlist(Q0)[1], "("+string(l4)+","+varstr(Q0,nvars(Q0))+")", "(c,dp("+string(s)+"),dp(1))", "no_minpoly");
+  setring KKy;
   poly minpolyOfK = imap(Q0,g(n));
   qring Ky = std(minpolyOfK);
 

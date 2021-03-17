@@ -254,13 +254,13 @@ poly pp_Divide(poly p, poly q, const ring r)
           if((rFieldType(r)==n_transExt)
           &&(convSingTrP(I->m[i],r))
           &&(convSingTrP(q,r))
-	  &&(!rIsNCRing(r)))
+          &&(!rIsNCRing(r)))
           {
             h=singclap_pdivide(I->m[i],q,r);
           }
           else if ((r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
           &&(!rField_is_Ring(r))
-	  &&(!rIsNCRing(r)))
+          &&(!rIsNCRing(r)))
             h=singclap_pdivide(I->m[i],q,r);
           else
           {
