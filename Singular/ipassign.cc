@@ -1928,6 +1928,7 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   BOOLEAN b;
   sleftv tmp;
   memset(&tmp,0,sizeof(sleftv));
+  //tmp.flag=ld->flag;
   if (/*(ld->rtyp!=LIST_CMD)
   &&*/(ld->e==NULL)
   && (ld->Typ()!=r->Typ()))
@@ -2002,7 +2003,6 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
   }
   else if (l->attribute!=NULL)
     atKillAll((idhdl)l);
-  l->flag=0;
   if (ll==1)
   {
     /* l[..] = ... */
