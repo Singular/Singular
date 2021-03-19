@@ -13,18 +13,20 @@ Author: monerjan
 #include "misc/int64vec.h"
 
 #include "gfanlib/config.h"
-#ifdef HAVE_CDD_SETOPER_H
-#include <cdd/setoper.h>
-#include <cdd/cdd.h>
-#include <cdd/cddmp.h>
-#elif HAVE_CDDLIB_SETOPER_H
+#ifdef HAVE_CDDLIB_SETOPER_H
 #include <cddlib/setoper.h>
 #include <cddlib/cdd.h>
 #include <cddlib/cddmp.h>
 #else
+#ifdef HAVE_CDD_SETOPER_H
+#include <cdd/setoper.h>
+#include <cdd/cdd.h>
+#include <cdd/cddmp.h>
+#else
 #include <setoper.h>
 #include <cdd.h>
 #include <cddmp.h>
+#endif
 #endif
 #include "bbfan.h"
 #include "bbcone.h"

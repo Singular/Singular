@@ -14,13 +14,13 @@
 #include <config.h>
 extern "C"
 {
-#ifdef HAVE_CDD_SETOPER_H
-#include <cdd/setoper.h>
-#include <cdd/cdd.h>
-#else
 #ifdef HAVE_CDDLIB_SETOPER_H
 #include <cddlib/setoper.h>
 #include <cddlib/cdd.h>
+#else
+#ifdef HAVE_CDD_SETOPER_H
+#include <cdd/setoper.h>
+#include <cdd/cdd.h>
 #else
 #include <setoper.h>
 #include <cdd.h>
