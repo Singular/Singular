@@ -9454,9 +9454,8 @@ void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR)
   int maxPossibleShift = p_mLPmaxPossibleShift(p.p, strat->tailRing);
   for (int i = maxPossibleShift; i > 0; i--)
   {
-
-    LObject qq;
-    qq.p = pLPCopyAndShiftLM(p.p, i); // don't use Set() because it'll test the poly order
+    LObject qq(p_Copy(p.p, strat->tailRing));
+    p_mLPshift(qq.p, i, strat->tailRing);
     qq.shift = i;
     strat->initEcart(&qq); // initEcartBBA sets length, pLength, FDeg and ecart
     int atS = posInS(strat, strat->sl, qq.p, qq.ecart); // S needs to stay sorted because this is for example assumed when searching S later
