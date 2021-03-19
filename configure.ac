@@ -16,7 +16,9 @@ dnl Apparently, this is required for using an AC_CHECK_HEADER within AS_IF(...),
 AC_USE_SYSTEM_EXTENSIONS
 
 AM_MAINTAINER_MODE([enable])
-AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
+dnl Use a newer tar format for "make dist" that supports longer file names
+dnl https://www.gnu.org/software/automake/manual/html_node/List-of-Automake-options.html
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects tar-ustar]) # -Wno-extra-portability -Werror silent-rules
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
@@ -89,7 +91,9 @@ AC_SUBST(CC)
 AC_CHECK_LIB(rt,clock_gettime)
 
 # Check whether --with-gmp was given.
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
+                    [provide a non-standard location of gmp])])
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
 GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
@@ -134,14 +138,6 @@ AC_CONFIG_GOOGLE_PERFTOOLS()
 
 LB_CHECK_CCLUSTER()
 
-AX_PYTHON_DEFAULT()
-AX_PYTHON_WITH()
-AX_PYTHON_ENABLE()
-AX_PYTHON_PATH()
-AX_PYTHON_VERSION_ENSURE([2.7])
-AX_PYTHON_CSPEC
-AX_PYTHON_LSPEC
-
 LB_CHECK_MATHICGB
 
 AC_FUNC_ERROR_AT_LINE
@@ -169,9 +165,17 @@ SING_CHECK_POLYMAKE
 
 SING_CHECK_PLURAL
 
-SING_CHECK_PYTHON_MODULE
-
+SING_ENABLE_MODULES
+SING_DISABLE_MODULES
 SING_BUILTIN_MODULES
+
+AX_PYTHON_DEFAULT()
+  AX_PYTHON_WITH()
+  AX_PYTHON_ENABLE()
+  AX_PYTHON_PATH()
+  AX_PYTHON_VERSION_ENSURE([2.7])
+  AX_PYTHON_CSPEC
+  AX_PYTHON_LSPEC
 
 AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
 [if test "x$enableval" = "xyes"; then

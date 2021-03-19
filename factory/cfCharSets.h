@@ -64,7 +64,7 @@ ListCFList
 charSeries (const CFList& L);
 
 /// irreducible characteristic series
-ListCFList
+ListCFList FACTORY_PUBLIC
 irrCharSeries (const CFList & PS);
 
 // the next three give you a heuristically optimal reorderd list of the
@@ -81,7 +81,7 @@ Varlist neworder (const CFList & PolyList);
 CFList newordercf (const CFList & PolyList);
 
 // the same as neworder(...) only returning a list of int 's (i.e. the levels)
-IntList neworderint (const CFList & PolyList);
+IntList FACTORY_PUBLIC neworderint (const CFList & PolyList);
 
 // for library internal use only:
 // next function reorders the variables in PS:

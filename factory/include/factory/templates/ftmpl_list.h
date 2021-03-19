@@ -48,7 +48,7 @@ public:
 };
 
 template <class T>
-class List
+class FACTORY_PUBLIC List
 {
 private:
     ListItem<T> *first;
@@ -84,7 +84,7 @@ OSTREAM& operator<< ( OSTREAM & os, const List<T> & l );
 #endif /* NOSTREAMIO */
 
 template <class T>
-class ListIterator {
+class FACTORY_PUBLIC ListIterator {
 private:
     List<T> *theList;
     ListItem<T> *current;

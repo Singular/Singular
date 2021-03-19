@@ -226,28 +226,37 @@ static int nrzDivComp(number a, number b, const coeffs r)
   return 0;
 }
 
-static number nrzDiv (number a,number b, const coeffs)
+static number nrzDiv (number a,number b, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  mpz_ptr r = (mpz_ptr) omAllocBin(gmp_nrz_bin);
-  mpz_init(r);
-  mpz_tdiv_qr(erg, r, (mpz_ptr) a, (mpz_ptr) b);
-  //if (!nrzIsZero((number) r, R))
-  //{
-  //  WerrorS("Division by non divisible element.");
-  //  WerrorS("Result is without remainder.");
-  //}
-  mpz_clear(r);
-  omFreeBin(r, gmp_nrz_bin);
+  if (nrzIsZero(b,r))
+  {
+    WerrorS(nDivBy0);
+  }
+  else
+  {
+    mpz_ptr r = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+    mpz_init(r);
+    mpz_tdiv_qr(erg, r, (mpz_ptr) a, (mpz_ptr) b);
+    mpz_clear(r);
+    omFreeBin(r, gmp_nrz_bin);
+  }
   return (number) erg;
 }
 
-static number nrzExactDiv (number a,number b, const coeffs)
+static number nrzExactDiv (number a,number b, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  mpz_tdiv_q(erg, (mpz_ptr) a, (mpz_ptr) b);
+  if (nrzIsZero(b,r))
+  {
+    WerrorS(nDivBy0);
+  }
+  else
+  {
+    mpz_tdiv_q(erg, (mpz_ptr) a, (mpz_ptr) b);
+  }
   return (number) erg;
 }
 
@@ -330,7 +339,7 @@ static number  nrzInvers (number c, const coeffs r)
   if (!nrzIsUnit((number) c, r))
   {
     WerrorS("Non invertible element.");
-    return (number)NULL;
+    return nrzInit(0,r);
   }
   return nrzCopy(c,r);
 }

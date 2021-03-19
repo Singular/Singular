@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 SUBDIRS=include/factory
 
 AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include -I${srcdir} \
+-DFACTORY_BUILDING_DLL \
 $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
 $(FLINT_CFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS) $(SINGULAR_CFLAGS)
 
@@ -11,7 +12,7 @@ lib_LTLIBRARIES = libfactory.la
 libfactory_la_LIBADD     =$(RESOURCES_LIBS) $(OMALLOC_LIBS) \
 $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS)
 
-libfactory_la_LDFLAGS    = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
+libfactory_la_LDFLAGS    = -no-undefined $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
 
 # factory source files
 SOURCES = \

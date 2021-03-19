@@ -188,16 +188,8 @@ AC_DEFUN([SING_USE_RESOURCES],
 
 AC_DEFUN([SING_USE_FACTORY],
 [
- AC_MSG_CHECKING(whether factory should be enabled)
+  ENABLE_FACTORY="yes"
 
- AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
- [if test $enableval = yes; then
-     ENABLE_FACTORY="yes"
-  else
-     ENABLE_FACTORY="no"
-  fi],[ENABLE_FACTORY="yes"])
-
- if test x$ENABLE_FACTORY = xyes; then
 
   FACTORY_INCLUDES="-I$ac_abs_top_srcdir -I$ac_abs_top_srcdir/factory -I$ac_abs_top_srcdir/factory/include"
   if test "x$ac_abs_top_srcdir" != "x$ac_abs_top_builddir"; then
@@ -221,7 +213,6 @@ AC_DEFUN([SING_USE_FACTORY],
 
   PKG_REQUIRE="$PKG_REQUIRE factory"
   AC_SUBST(PKG_REQUIRE)
- fi
 
 
  AM_CONDITIONAL([ENABLE_FACTORY],[test x$ENABLE_FACTORY = xyes])
@@ -231,20 +222,10 @@ AC_DEFUN([SING_USE_FACTORY],
 
 AC_DEFUN([SING_CHECK_FACTORY],
 [
-AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
-[if test $enableval = yes; then
-     ENABLE_FACTORY="yes"
- else
-     ENABLE_FACTORY="no"
- fi
-],[ENABLE_FACTORY="yes"])
+  ENABLE_FACTORY="yes"
 
   AC_ARG_VAR( [FACTORY_INCLUDES], [INCLUDES for FACTORY] )
   AC_ARG_VAR( [FACTORY_LIBS], [LIBS for FACTORY] )
-
-  AC_MSG_CHECKING(whether factory should be enabled)
-  if test "x$ENABLE_FACTORY" = xyes; then
-    AC_MSG_RESULT(yes)
 
     AC_MSG_CHECKING([  FACTORY_INCLUDES?..])
     AC_MSG_RESULT(${FACTORY_INCLUDES:-unset})
@@ -276,27 +257,40 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
 
     PKG_REQUIRE="$PKG_REQUIRE factory"
     AC_SUBST(PKG_REQUIRE)
-  else
-    AC_MSG_RESULT(no)
-  fi
 
   AM_CONDITIONAL([ENABLE_FACTORY],[test x$ENABLE_FACTORY = xyes])
   AC_MSG_RESULT($ENABLE_FACTORY)
 
 ])
 
-AC_DEFUN([SING_CHECK_PYTHON_MODULE],
-[
-AC_ARG_ENABLE(python_module, AS_HELP_STRING([--enable-python_module], [Enable python_module.so]),
-[if test $enableval = yes; then
-     ENABLE_PYTHON_MODULE="yes"
-     AC_DEFINE(HAVE_PYTHON_MOD,1,[Enable python_module.so])
- else
-     ENABLE_PYTHON_MODULE="no"
- fi
-],[ENABLE_PYTHON_MODULE="no"])
+AC_DEFUN([SING_ENABLE_MODULES], [dnl
+  m4_foreach([MOD], [staticdemo, bigintm, Order, python], [dnl
+    AC_ARG_ENABLE(MOD[-module],
+                  AS_HELP_STRING([--enable-]MOD[-module], [Enable building optional module ]MOD), [dnl
+      dnl Nothing to do
+    ], [dnl
+      dnl Per default, these modules are disabled
+      AS_VAR_SET([enable_]MOD[_module], [no])
+    ])dnl
+    AM_CONDITIONAL([ENABLE_]m4_toupper(MOD)[_MODULE], [test x$enable_]MOD[_module != xno])dnl
+  ])dnl
 ])
 
+AC_DEFUN([SING_DISABLE_MODULES], [dnl
+  m4_foreach([MOD], [subsets, freealgebra, partialgb, syzextra,
+                     gfanlib, polymake, customstd, pyobject,
+                     singmathic, gitfan, interval, systhreads,
+                     loctriv, cohomo, machinelearning], [dnl
+    AC_ARG_ENABLE(MOD[-module],
+                  AS_HELP_STRING([--disable-]MOD[-module], [Disable building module ]MOD), [dnl
+      dnl Nothing to do
+    ], [dnl
+      dnl Per default, these modules are enabled
+      AS_VAR_SET([enable_]MOD[_module], [yes])
+    ])dnl
+    AM_CONDITIONAL([ENABLE_]m4_toupper(MOD)[_MODULE], [test x$enable_]MOD[_module != xno])dnl
+  ])dnl
+])
 
 AC_DEFUN([SING_BUILTIN_MODULES],
 [
@@ -305,7 +299,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
 
  AC_ARG_VAR( [BUILTIN_LIBS], [LIB FLAGS for buildins] )
  AC_ARG_WITH(builtinmodules,
-   AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: staticdemo,bigintm,syzextra]),
+   AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: none]),
    [if test "x$with_builtinmodules" = "xyes"; then
     with_builtinmodules=syzextra
    fi],
@@ -408,7 +402,6 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_GFANLIB], [test x$bi_gfanlib = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_POLYMAKE], [test x$bi_polymake = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_PYTHON_MODULE], [test x$bi_python = xtrue])
- AM_CONDITIONAL([HAVE_PYTHON_MODULE], [test x$ENABLE_PYTHON_MODULE = xyes])
  AM_CONDITIONAL([SI_BUILTIN_CUSTOMSTD], [test x$bi_customstd = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SINGMATHIC], [test x$bi_singmathic = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_BIGINTM], [test x$bi_bigintm = xtrue])

@@ -6,6 +6,7 @@
 #include "templates/ftmpl_functions.h"
 #include "cf_primes.h"
 #include "cfGcdUtil.h"
+#include "cfUnivarGcd.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
@@ -184,7 +185,6 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     b= 0;
     return f;
   }
-#ifdef HAVE_NTL
 #ifdef HAVE_FLINT
   if (( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
   &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
@@ -206,7 +206,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     nmod_poly_clear (R);
     return r;
   }
-#else
+#elif defined(HAVE_NTL)
   if (( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
   &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
@@ -247,7 +247,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     fmpq_poly_clear (R);
     return r;
   }
-#else
+#elif defined(HAVE_NTL)
   if (( getCharacteristic() ==0)
   && (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
@@ -300,7 +300,6 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
       return r;
     }
   }
-#endif
 #endif
   // may contain bug in the co-factors, see track 107
   CanonicalForm contf = content( f );

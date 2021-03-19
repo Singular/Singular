@@ -26,6 +26,13 @@ New commands:
 @item Letterplace: dim, rightStd for qrings @nref{LETTERPLACE})
 @end itemize
 
+New libraries:
+
+@itemize
+@item decomp.lib: functional decomposition of polynomials (@nref{decomp_lib})
+@item hodge.lib: algorithms for Hodge ideals (@nref{hodge_lib})
+@item tateProdCplxNegGrad.lib: sheaf cohomology on product of projective spaces (@nref{tateProdCplxNegGrad_lib})
+@end itemize
 
 @heading News for version 4-2-0
 

@@ -32,7 +32,7 @@ BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 
 EXTERN_VAR omBin gmp_nrz_bin;
 
-coeffs nrnInitCfByName(char *s,n_coeffType n)
+coeffs nrnInitCfByName(char *s,n_coeffType)
 {
   const char start[]="ZZ/bigint(";
   const int start_len=strlen(start);
@@ -51,7 +51,9 @@ coeffs nrnInitCfByName(char *s,n_coeffType n)
     if (((*s)==')') && (*(s+1)=='^'))
     {
       s=s+2;
-      s=nEati(s,&(info.exp),0);
+      int i;
+      s=nEati(s,&i,0);
+      info.exp=(unsigned long)i;
       return nInitChar(n_Znm,(void*) &info);
     }
     else
@@ -247,7 +249,14 @@ static number nrnInvers(number c, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  mpz_invert(erg, (mpz_ptr)c, r->modNumber);
+  if (nrnIsZero(c,r))
+  {
+    WerrorS(nDivBy0);
+  }
+  else
+  {
+    mpz_invert(erg, (mpz_ptr)c, r->modNumber);
+  }
   return (number) erg;
 }
 
@@ -546,7 +555,12 @@ static int nrnDivComp(number a, number b, const coeffs r)
 
 static number nrnDiv(number a, number b, const coeffs r)
 {
-  if (r->is_field)
+  if (nrnIsZero(b,r))
+  {
+    WerrorS(nDivBy0);
+    return nrnInit(0,r);
+  }
+  else if (r->is_field)
   {
     number inv=nrnInvers(b,r);
     number erg=nrnMult(a,inv,r);
@@ -612,14 +626,6 @@ static number nrnMod(number a, number b, const coeffs r)
   mpz_clear(g);
   omFreeBin(g, gmp_nrz_bin);
   return (number)rr;
-}
-
-static number nrnIntDiv(number a, number b, const coeffs r)
-{
-  mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
-  mpz_init(erg);
-  mpz_tdiv_q(erg, (mpz_ptr)a, (mpz_ptr)b);
-  return (number)erg;
 }
 
 /* CF: note that Z/nZ has (at least) two distinct euclidean structures
@@ -862,6 +868,19 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
   return NULL;      // default
 }
 
+static number nrnInitMPZ(mpz_t m, const coeffs r)
+{
+  mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
+  mpz_init_set(erg,m);
+  mpz_mod(erg, erg, r->modNumber);
+  return (number) erg;
+}
+
+static void nrnMPZ(mpz_t m, number &n, const coeffs)
+{
+  mpz_init_set(m, (mpz_ptr)n);
+}
+
 /*
  * set the exponent (allocate and init tables) (TODO)
  */
@@ -1021,6 +1040,8 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nrnCoeffIsEqual;
   r->cfKillChar    = nrnKillChar;
   r->cfQuot1       = nrnQuot1;
+  r->cfInitMPZ     = nrnInitMPZ;
+  r->cfMPZ         = nrnMPZ;
 #if SI_INTEGER_VARIANT==2
   r->cfWriteFd     = nrzWriteFd;
   r->cfReadFd      = nrzReadFd;

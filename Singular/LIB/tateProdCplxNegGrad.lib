@@ -1,0 +1,2412 @@
+///////////////////////////////////////////////////////////////////////////////
+// version ="version tateProdCplxNegGrad.lib 4.2.0.1 Dec_2020 "; //$id$
+info = "
+LIBRARY:   tateProdCplxNegGrad.lib for computing sheaf cohomology on product of projective spaces
+AUTHOR:   Clara Petroll (petroll@mathematik.uni-kl.de)
+OVERVIEW:  In this library, we use Tate resolutions for computing sheaf cohomology of coherent sheaves on products of projective spaces.
+      The algorithms can be used for arbitrary products. We work over the multigraded Cox ring and the corresponding exterior
+      algebra. Multigraded complexes are realized as the newstruct @code{multigradedcomplex}.
+
+      The main algorithm is the one for computing subquotient complexes of a Tate resolution. It allows to compute cohomologytables,
+      respectively hash table of the dimensions of sheaf cohomology groups.
+REFERENCES:  [1] Eisenbud, Erman, Schreyer: Tate Resolutions for Products of Projective Spaces, Acta Mathematica Vietnamica (2015)
+      [2] Eisenbud, Erman, Schreyer: Tate Resolutions on Products of Projective Spaces: Cohomology and Direct Image Complexes (2019)
+PROCEDURES:
+      productOfProjectiveSpaces(intvec c)                        creates rings S,E corresponding to the product
+      truncateM(module M, intvec c)                          truncates module M at c
+      truncateCoker(module M, intvec c)                        truncates the cokernel at c
+      symExt(matrix m)                                computes first differential of R(M)
+      sufficientlyPositiveMultidegree(module M)                    computes a sufficiently positive multidegree for M
+      tateResolution(module M, intvec low, intvec high)            computes subquotient complex of Tate resolution T(F)
+      cohomologyMatrix(module M, intvec low, intvec high)            computes cohomologymatrix of corresponding sheaf
+      cohomologyMatrixFromResolution(multigradedcomplex T, intvec low, intvec high)  computes dimensions of sheaf cohomology groups contained in T
+      eulerPolynomialTable(module M, intvec low, intvec high)          computes table of Euler polynomials
+      cohomologyHashTable(module M, intvec low, intvec high)          computes cohomology hash table
+      twist(module M,intvec c)                            twists module M by c
+      beilinsonWindow(multigradedcomplex T)                      computes Beilinson window of T
+      regionComplex(multigradedcomplex T, intvec d, intvec I, intvec J, intvec K)    computes region complex
+      strand(multigradedcomplex T, intvec c, intvec J)                computes strand
+      firstQuadrantComplex(multigradedcomplex T, intvec c)              computes first quadrant complex
+      lastQuadrantComplex(multigradedcomplex T, intvec c)                computes last quadrant complex
+      proc shift(multigradedcomplex A, int i)                      shifts the multigraded complex by i
+";
+
+
+///////////////////////////////////////////////////////////////////////////////
+//include necessary libraries
+LIB "multigrading.lib";
+LIB "matrix.lib";
+LIB "ring.lib";
+LIB "methods.lib";
+
+// Idee: in multigradedcomplex noch zusaetzlich ring E speichern
+static proc mod_init()
+{
+  newstruct("bundle","module m, int iscoker");
+  system("install","bundle","print",printBundle,1);
+  newstruct("multigradedcomplex","list differentials, list modules, int shift");
+  system("install","multigradedcomplex","print",printMultigradedComplex,1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc printMultigradedComplex(multigradedcomplex C)
+"USAGE:  printMultigradedComplex(C); C multigradedcomplex
+RETURN:  nothing, prints a multigraded complex
+EXAMPLE: example printMultigradedComplex
+"
+{
+  int sizeStringCplx, sizeStringDegrees, i,j;
+  string addedStringCplx, addedStringDegrees;
+
+  if (size(C.modules)==0)
+  {
+    print(0);
+  }
+  else
+  {
+    list exponents;
+    string cplx;
+    string degrees;
+    for (i = 1; i<= size(C.modules)-1; i++)
+    {
+      if (size(C.modules[i]) > 0)
+      {
+        addedStringCplx = "E^" + string(size(C.modules[i])) + "  <--  ";
+        sizeStringCplx = size(addedStringCplx);
+        addedStringDegrees = string(-C.shift + i -1);
+        sizeStringDegrees = size(addedStringDegrees);
+
+        if(sizeStringDegrees <= sizeStringCplx)
+        {
+          for (j = sizeStringDegrees + 1; j<= sizeStringCplx; j++)
+          {
+            addedStringDegrees = addedStringDegrees + " ";
+          }
+        }
+
+        if(sizeStringDegrees > sizeStringCplx)
+        {
+          for (j = sizeStringCplx + 1; j<= sizeStringDegrees; j++)
+          {
+            addedStringCplx = addedStringCplx + " ";
+          }
+        }
+
+        cplx = cplx + addedStringCplx;
+        degrees = degrees + addedStringDegrees;
+
+      }
+      else
+      {
+        addedStringCplx = "0" + "  <--  ";
+        sizeStringCplx = size(addedStringCplx);
+        addedStringDegrees = string(-C.shift + i -1);
+        sizeStringDegrees = size(addedStringDegrees);
+
+        if(sizeStringDegrees <= sizeStringCplx)
+        {
+          for (j = sizeStringDegrees + 1; j<= sizeStringCplx; j++)
+          {
+            addedStringDegrees = addedStringDegrees + " ";
+          }
+        }
+
+        if(sizeStringDegrees > sizeStringCplx)
+        {
+          for (j = sizeStringCplx + 1; j<= sizeStringDegrees; j++)
+          {
+            addedStringCplx = addedStringCplx + " ";
+          }
+        }
+
+
+        cplx = cplx + addedStringCplx;
+        degrees = degrees + addedStringDegrees;
+      }
+    }
+
+    if (size(C.modules[size(C.modules)]) > 0)
+    {
+      cplx = cplx + "E^" + string(size(C.modules[size(C.modules)]));
+      degrees = degrees + string(-C.shift + size(C.modules) -1);
+    }
+    else
+    {
+      cplx = cplx + "0";
+      degrees = degrees + string(-C.shift + size(C.modules) -1);
+    }
+
+    print(cplx);
+    print(degrees);
+  }
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec c = 1,1;
+  def (S,E) = productOfProjectiveSpaces(c);
+  intvec low = -3,-3;
+  intvec high = 3,3;
+  setring(S);
+  module M = 0;
+  intmat gradeM[2][1] = -1,-1;
+  M = setModuleGrading(M,gradeM);
+  multigradedcomplex tate;
+  (E,tate) = tateResolution(M,low,high);
+  setring(E);
+  printMultigradedComplex(tate);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc createMultigradedComplex(list reso)
+"USAGE:    createMultigradeComplex(reso); reso list
+PURPOSE:  transforms a list representing a multigraded complex into the type multigradedcomplex
+ASSUME:    first entry of reso is the homological shift, other entries are the differentials (note: with multigrading!)
+RETURN:    multigradedcomplex Reso
+"
+{
+  multigradedcomplex Reso;
+  Reso.shift = reso[1];
+  Reso.differentials = delete(reso,1);
+
+  // create the free modules corresponding to the differentials
+  list mods;
+  module M;
+  for (int i = 1; i <= size(Reso.differentials); i++)
+  {
+    M = freemodule(nrows(Reso.differentials[i]));
+    M = setModuleGrading(M,getModuleGrading(Reso.differentials[i]));
+    mods = insert(mods,M,size(mods));
+  }
+
+  // last special case
+  M = freemodule(ncols(Reso.differentials[size(Reso.differentials)]));
+  M = setModuleGrading(M,multiDeg(Reso.differentials[size(Reso.differentials)]));
+  mods = insert(mods,M,size(mods));
+  Reso.modules = mods;
+  return(Reso);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc productOfProjectiveSpaces(intvec c)
+"USAGE:  productOfProjectiveSpaces(c); c intvec
+PURPOSE: creates two rings S and E corresponding to the product of projective spaces P^{c_1} x...x P^{c_t}
+ASSUME:  input are two integers or an intvec
+RETURN:  two rings S,E (homogeneous coordinate ring and the exterior algebra of P^{c_1} x P^{c_2} x...)
+"
+{
+  if (isSmaller(c-c,c) != 1)
+  {
+    ERROR("Entries of input vector have to be positive.")
+  }
+
+  int i,j,k;
+  ring S = 0,(x(0)(0..c[1])),dp;
+  for (i=2; i<= size(c); i++)
+  {
+    ring SHelp(i) = 0,(x(i-1)(0..c[i])),dp;
+    setring(SHelp(i));
+    for (j = 0; j<= c[i];j++)
+    {
+      S = addvarsTo(S,string(var(j+1)),0);
+    }
+  }
+
+  ring ES = 0,(e(0)(0..c[1])),dp;
+  for (i=2; i<= size(c); i++)
+  {
+    ring EHelp(i) = 0,(e(i-1)(0..c[i])),dp;
+    setring(EHelp(i));
+    for (j = 0; j<= c[i];j++)
+    {
+      ES = addvarsTo(ES,string(var(j+1)),0);
+    }
+  }
+  setring(ES);
+  ring E = Exterior();
+
+  // set multigrading
+  intmat grading[size(c)][sum(c)+ size(c)];
+  k = 1;
+  for (i = 1; i<= size(c); i++)
+  {
+    for (j = 1; j<= c[i] + 1 ; j++)
+    {
+      grading[i,k] = 1;
+      k = k+1;
+    }
+  }
+
+  setring(S);
+  setBaseMultigrading(grading);
+  setring(E);
+  setBaseMultigrading(-grading);
+
+  return(S,E);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   intvec c = 1,2;
+   def (S,E) = productOfProjectiveSpaces(c);
+   print(S);
+   print(E);
+
+   intvec d = 2,1,2;
+   def (S2,E2) = productOfProjectiveSpaces(d);
+   print(S2);
+   print(E2);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc truncateM(module M, intvec c)
+"USAGE:   truncateM(M,c); M module, c intvec
+PURPOSE: truncate M at c
+ASSUME:  @code{M} is multigraded S-module with S multigraded ring, c is an intvec of the right length
+RETURN:  module, the truncated module M_{>= c}
+NOTE:    Output is the truncated module (multigraded , grading is not shifted), works for arbitrary products
+EXAMPLE: example truncateM
+"
+{
+  if (gradingAndVectorCompatible(M,c) == 0)
+  {
+    ERROR("Grading of module and the vector are not compatible.")
+  }
+
+  intmat MGrading = getModuleGrading(M);
+  // determine the free module in which M lives
+  int n = nrows(M);
+
+  // compute the module with which we have to intersect the module M in order to obtain generators of the truncation
+  ideal F;
+  int i,j;
+  intvec d;
+  module T;
+  for (i = 1; i <= n; i++)
+  {
+    d = c - getColumnIntmat(MGrading,i);
+
+    for (j = 1; j<= size(d); j++)
+    {
+      if (d[j] < 0){d[j] = 0;}
+    }
+
+    F = multiDegBasis(d);
+    T = T + F*gen(i);
+  }
+
+  // now compute the intersection of M and T
+  module intersection = intersect(M,T);
+  intersection = setModuleGrading(intersection,MGrading);
+  return(intersection);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   intvec c = 1,1,1;
+   def(S,E) = productOfProjectiveSpaces(c);
+   setring(S);
+   intmat grading[3][2] = 0,0,0,0,0,0;
+   module te = freemodule(2);
+   te = setModuleGrading(te,grading);
+   intvec c = 1,1,1;
+   module Mtrunc = truncateM(te,c);
+   Mtrunc;
+   getModuleGrading(Mtrunc);
+   multiDeg(Mtrunc);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc truncateCoker(module M, intvec c)
+"USAGE:   truncateCoker(M,c);  M module, c intvec
+PURPOSE: truncate cokernel coker(M) at the multidegree c
+RETURN:  module, which is a presentation matrix of the truncation of coker(M) at c
+EXAMPLE: example truncateCoker
+"
+{
+  if (gradingAndVectorCompatible(M,c) == 0)
+  {
+    ERROR("Grading of module and the vector are not compatible.")
+  }
+
+  module SMod = freemodule(nrows(M));
+  SMod = setModuleGrading(SMod,getModuleGrading(M));
+  module result = prune(multiDegModulo(truncateM(SMod,c),truncateM(M,c)));
+  return(result);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  // example 1
+  intvec c1 = 1,1,1;
+  def(S1,E1) = productOfProjectiveSpaces(c1);
+  setring(S1);
+  module M1= 0;
+  intmat grading1[3][1] = 0,0,0;
+  M1 = setModuleGrading(M1,grading1);
+  truncateCoker(M1,c1);
+
+  // example 2
+  intvec c2 = 1,1;
+  def (S2,E2) = productOfProjectiveSpaces(c2);
+  setring(S2);
+  module M2 = 0;
+  intmat grading2[2][1] = 0,0;
+  M2 = setModuleGrading(M2,grading2);
+  truncateCoker(M2,c2);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc symExt(matrix m)
+"USAGE:  symExt(m); m matrix
+PURPOSE: computes differential R(M_0) -> R(M_1) for the module M over S corresponding to the linear presentation matrix m, however, in order to
+     get the result, m has to be fetched to the exterior algebra E
+ASSUME:  m a matrix, linear presentation matrix over S; Note: also works for nonlinear matrices, but makes no sense to use it in this case
+RETURN:  matrix B representing R(M_0) -> R(M_1)
+NOTE:    output lives in S (not as in Macaulay2 in the ring E, to get the same result, just fetch the matrix to E)
+EXAMPLE: example symExt
+"
+{
+  matrix MT = transpose(jacobM(m));
+  matrix JN = syz(MT);
+  matrix ML[nvars(basering)][1] = maxideal(1);
+  matrix A = transpose(outer(ML,unitmat(nrows(m))));
+  matrix B = transpose(A*JN);
+  return(B);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   intvec c = 1,2;
+   def (S,E) = productOfProjectiveSpaces(c);
+   setring(S);
+   matrix m[4][2] = x(0)(0), x(1)(0),x(0)(1),0,0,x(1)(1), 0,x(1)(2);
+   matrix A = symExt(m);
+   print(A);
+   setring(E);
+   print(fetch(S,A));
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc sufficientlyPositiveMultidegree(module M)
+"USAGE:  sufficientlyPositiveMultidegree(M); M module
+PURPOSE: computes a sufficiently positive multidegree for coker(M)
+ASSUME:  M is multigraded S-module
+RETURN:  intvec that is sufficiently positive for M
+EXAMPLE: example sufficientlyPositiveMultidegree
+"
+{
+  if (M ==0)
+  {
+    list T = M;
+  }
+  else
+  {
+    module free = freemodule(nrows(M));
+    free = setModuleGrading(free, getModuleGrading(M));
+    list T = multiDegResolution(multiDegModulo(free,M),0,1);
+  }
+  int lengthResolution = size(T);
+  matrix lowerbounds;
+  intvec mulReg;
+
+  for (int i = 1; i<= lengthResolution; i++)
+  {
+    lowerbounds = concat(lowerbounds, matrix(getModuleGrading(T[i])));
+  }
+
+  lowerbounds = submat(lowerbounds,1..nrows(lowerbounds),2..ncols(lowerbounds));
+  mulReg = int(max(lowerbounds[1,1..ncols(lowerbounds)]));
+  for (int j = 2; j <= nrows(lowerbounds); j++)
+  {
+    mulReg = mulReg, int(max(lowerbounds[j,1..ncols(lowerbounds)]));
+  }
+  return(mulReg);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  // example 1
+  intvec c1 = 1,2;
+  def (S1,E1) = productOfProjectiveSpaces(c1);
+  setring(S1);
+  module M1 = x(0)(0),x(1)(0)^3 + x(1)(1)^3 +x(1)(2)^3;
+  intmat grading1[2][1] = 0,0;
+  M1 = setModuleGrading(M1,grading1);
+  sufficientlyPositiveMultidegree(M1);
+
+  // example 2
+  intvec c2 = 1,1;
+  def (S2,E2) = productOfProjectiveSpaces(c2);
+  setring(S2);
+  intmat grading2[2][1] = -1,-1;
+  module M2 = 0;
+  M2 = setModuleGrading(M2,grading2);
+  sufficientlyPositiveMultidegree(M2);
+
+  // example 3
+  intvec c3 = 1,1,1;
+  def (S3,E3) = productOfProjectiveSpaces(c3);
+  setring(S3);
+  module M3 = 0;
+  intmat grading3[3][1] = -1,-1,-1;
+  M3 = setModuleGrading(M3,grading3);
+  sufficientlyPositiveMultidegree(M3);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc tateResolution(module M, intvec low, intvec high)
+"USAGE:  tateResolution(M,low,high); M module, L list, low intvec, high intvec
+PURPOSE: compute tate resolution of coker(M) where M is Z^t-graded S-module
+ASSUME:   M a module over multigraded ring S
+RETURN:  (E,tate), tate a multigradedcomplex, E the ring in which tate has to be viewed,
+     however note that tate is not ring dependent
+EXAMPLE: example tateResolution
+"
+{
+  if (gradingAndVectorCompatible(M,low) == 0)
+  {
+    ERROR("Grading of module and the vectors are not compatible.");
+  }
+  if (isLEQ(low,high) == 0)
+  {
+    ERROR("intvec low has to be lower or equal to the intvec high.");
+  }
+
+  intvec dims = getDimensionVector(getVariableWeights(basering));
+  def (S2,E) = productOfProjectiveSpaces(dims);
+  def S = basering;
+  intvec regs = sufficientlyPositiveMultidegree(M);
+
+  intvec hi = max(regs[1],high[1]+1);
+  for (int i = 2; i <= size(regs); i++)
+  {
+    hi = hi, max(regs[i],high[i]+1);
+  }
+
+  // now truncate M at hi
+  module N = truncateCoker(M,hi);
+
+  matrix A = symExt(N);
+
+  setring(E);
+  matrix A = fetch(S,A);
+  intmat ASourceGrading[size(hi)][ncols(A)];
+  intmat ATargetGrading[size(hi)][nrows(A)] = getTargetGrading(A,ASourceGrading);
+  module AMod = setModuleGrading(module(A),ATargetGrading);
+  AMod = twist(AMod,-hi);
+
+  int n = sum(hi)-sum(low) - size(low) + 2;
+  def reso = multiDegResolution(AMod,n,1);
+  reso = insert(reso,0);
+  multigradedcomplex tate = createMultigradedComplex(reso);
+
+  // for output as in M2, comment the delete commands out and shift by sum(hi)- size(regs) + 2 instead
+  tate = deleteFirstEntry(tate);
+  tate = deleteFirstEntry(tate);
+  tate = shift(tate,sum(hi)-size(regs));
+
+  return(E,tate);
+
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  // example 1
+  intvec c1 = 1,1,1;
+  intvec low1 = 0,0,0;
+  intvec high1 = 0,1,0;
+  def (S1,E1) = productOfProjectiveSpaces(c1);
+  setring(S1);
+  module M1 = 0;
+  intmat grading1[3][1] = -1,-1,-1;
+  M1 = setModuleGrading(M1,grading1);
+  multigradedcomplex tate1;
+  (E1,tate1) = tateResolution(M1,low1,high1);
+  setring(E1);
+  tate1;
+  tate1.differentials;
+
+  // example 2
+  intvec c2 = 1,2;
+  def (S2,E2) = productOfProjectiveSpaces(c2);
+  setring(S2);
+  intvec low2 = -3,-3;
+  intvec high2 = 0,0;
+  module M2 = x(0)(0),x(1)(0)^3 + x(1)(1)^3 +x(1)(2)^3;;
+  intmat grading2[2][1] = 0,0;
+  M2 = setModuleGrading(M2,grading2);
+  multigradedcomplex tate2;
+  (E2,tate2) = tateResolution(M2,low2,high2);
+  setring(E2);
+  tate2;
+
+  // example 3
+  intvec c3 = 1,1;
+  def (S3,E3) = productOfProjectiveSpaces(c3);
+  intvec low3 = -3,-3;
+  intvec high3 = 3,3;
+  setring(S3);
+  module M3 = 0;
+  intmat grading3[2][1] = -1,-1;
+  M3 = setModuleGrading(M3,grading3);
+  multigradedcomplex tate3;
+  (E3,tate3) = tateResolution(M3,low3,high3);
+  setring(E3);
+  tate3;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc cohomologyMatrix(module M, intvec low, intvec high)
+"USAGE:  cohomologyMatrix(M,L,low,high); M module, L list, low intvec, high intvec
+PURPOSE: computes the cohomology matrix of the sheaf corresponding to coker(M)
+ASSUME:  M module over S, L list of two rings S and E (e.g. result of productOfProjectiveSpaces)
+         first entry L[1] = S and L[2] = E, integer vectors low <= high
+RETURN:  ring Z in which cohomology matrix lives, it is exported in the variable cohomologymat, cohomologymat covers all cohomology
+     groups of twists in the range between low and high
+EXAMPLE: example cohomologyMatrix
+"
+{
+  if (gradingAndVectorCompatible(M,low) == 0)
+  {
+    ERROR("Grading of module and the vectors are not compatible.");
+  }
+  if (isLEQ(low,high) == 0)
+  {
+    ERROR("intvec low has to be lower or equal to the intvec high.")
+  }
+  if (size(low) != 2)
+  {
+    ERROR("cohomologyMatrixCoker only works for product of two projective spaces, i.e. Z^2 gradings.";)
+  }
+
+  def (E,tate) = tateResolution(M,low, high);
+  setring(E);
+  list reso = tate.differentials;
+  int n = nvars(E)-2; // i.e. if P = P^{n_1} x P^{n_2}, then n = n_1+n_2
+
+  int i,j,k,d,numhk;
+  ring Z = 0,h,dp; // in this ring we compute the cohomologymatrix
+  setring(Z);
+  matrix cohomologymat[high[2]-low[2]+1][high[1]-low[1]+1];
+
+  for (i = low[1]; i <= high[1]; i++)  //iterate over rows
+  {
+    for (j = low[2]; j <= high[2]; j++)
+    {
+      for (k=0; k<= n; k++)
+      {
+        d = -i-j-k;
+        setring(E);
+        numhk = 0;
+        if (d+1+ tate.shift>= 1 && d+1+tate.shift <= size(tate.modules))
+        {
+          numhk = countMultiDegree(intvec(i,j),getModuleGrading(tate.modules[d+1+tate.shift]));
+        }
+        setring(Z);
+        cohomologymat[high[2]-j+1,-low[1]+i+1] = cohomologymat[high[2]-j+1,-low[1]+i+1] + numhk * h^k;
+      }
+    }
+  }
+  export(cohomologymat);
+  return(Z);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  // example 1
+  intvec c1 = 1,1;
+  def (S1,E1) = productOfProjectiveSpaces(c1);
+  intvec low1 = -3,-3;
+  intvec high1 = 3,3;
+  setring(S1);
+  module M1 = 0;
+  intmat grading1[2][1] = -1,-1;
+  M1 = setModuleGrading(M1,grading1);
+  ring Z1 = cohomologyMatrix(M1,low1,high1);
+  setring(Z1);
+  print(cohomologymat);
+
+  // example 2
+  intvec c2 = 1,2;
+  def (S2,E2) = productOfProjectiveSpaces(c2);
+  intvec low2 = -3,-3;
+  intvec high2 = 0,0;
+  setring(S2);
+  module M2 = 0;
+  intmat grading2[2][1] = 0,0;
+  M2 = setModuleGrading(M2,grading2);
+  ring Z2 = cohomologyMatrix(M2,low2,high2);
+  setring(Z2);
+  print(cohomologymat);
+
+  // example 3
+  setring(S2);
+  module M3 = x(0)(0),x(1)(0)^3 + x(1)(1)^3 +x(1)(2)^3;
+  intmat grading3[2][1] = 0,0;
+  M3 = setModuleGrading(M3,grading3);
+  ring Z3 = cohomologyMatrix(M3,low2,high2);
+  setring(Z3);
+  print(cohomologymat);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc cohomologyMatrixFromResolution(multigradedcomplex T, intvec low, intvec high)
+"USAGE:  cohomologyMatrixFromResolution(T,low,high); T multigradedcomplex, low intvec, high intvec
+PURPOSE: computes the cohomology matrix corresponding to the multigraded complex T (part of a Tate resolution)
+ASSUME:  T is a multigraded complex representing a part of a Tate resolution (for example output of tateResolution), basering is E
+RETURN:  ring Z in which cohomology matrix lives, it is exported in the variable cohomologymat, cohomologymat stores information in the range between
+     low and high
+EXAMPLE: example cohomologyMatrixFromResolution
+"
+{
+  if (size(T.modules[1]) == 0 && size(T.modules) > 1)
+  {
+    if (gradingAndVectorCompatible(T.modules[2],low) == 0)
+    {
+      ERROR("Grading of Tate resolution and the vectors are not compatible.");
+    }
+  }
+  else
+  {
+    if (gradingAndVectorCompatible(T.modules[1],low) == 0)
+    {
+      ERROR("Grading of Tate resolution and the vectors are not compatible.");
+    }
+  }
+  if (isLEQ(low,high) == 0)
+  {
+    ERROR("intvec low has to be lower or equal to the intvec high.");
+  }
+  if (size(low) != 2)
+  {
+    ERROR("cohomologyMatrixCoker only works for product of two projective spaces, i.e. Z^2 gradings.");
+  }
+
+  ring E = basering;
+  int n = nvars(E)-2; // i.e. if P = P^{n_1} x P^{n_2}, then n = n_1+n_2
+  // now compute the cohomology table from the tate resolution
+  int i,j,k,d,numhk;
+  ring Z = 0,h,dp; // in this ring we compute the cohomologymatrix
+  setring(Z);
+  matrix cohomologymat[high[2]-low[2]+1][high[1]-low[1]+1];
+
+  for (i = low[1]; i <= high[1]; i++)  //iterate over rows
+  {
+    for (j = low[2]; j <= high[2]; j++)
+    {
+      // compute the entry (i,j) of the cohomologymatrix
+      for (k=0; k<= n; k++)
+      {
+        // compute coefficient of h^k in entry (i,j)
+        // find these information in the term d = -i-j-k
+        d = -i-j-k;
+        // as we don't shift the resolution by some homological degree, the dth term corresponds
+        // to the (d+1+T.shift)th entry in T
+        setring(E);
+        numhk = 0;
+        if (d+1+T.shift >= 1 && d+1+T.shift <= size(T.modules))
+        {
+          if (size(T.modules[d+1+T.shift]) == 0)
+          {
+            numhk = 0;
+          }
+          else
+          {
+            numhk = countMultiDegree(intvec(i,j),getModuleGrading(T.modules[d+1+T.shift]));
+          }
+        }
+        setring(Z);
+        cohomologymat[high[2]-j+1,-low[1]+i+1] = cohomologymat[high[2]-j+1,-low[1]+i+1] + numhk * h^k;
+      }
+    }
+  }
+  export(cohomologymat);
+  return(Z);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec c = 1,1;
+  def (S,E) = productOfProjectiveSpaces(c);
+  intvec low = -3,-3;
+  intvec high = 3,3;
+  setring(S);
+  module M = 0;
+  intmat grading[2][1] = -1,-1;
+  M = setModuleGrading(M,grading);
+  multigradedcomplex tate;
+  (E,tate) = tateResolution(M,low,high);
+  setring(E);
+  ring Z = cohomologyMatrixFromResolution(tate,low,high);
+  setring(Z);
+  print(cohomologymat);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+proc eulerPolynomialTable(module M, intvec low, intvec high)
+"USAGE:  eulerPolynomialTable(M,low,high); M module, L list, low intvec, high intvec
+PURPOSE: computes hash table of euler polynomials of twists of coker(M) in the range between low and high
+ASSUME:  M module, note that at the moment M is a module over S,
+RETURN:  (Z,eulerpolynomialtable), where eulerpolynomialtable is a hash table with entries in the ring Z = ZZ[h]
+NOTE:    this function works for arbitrary products P^{n_1} x \cdots x P^{n_t} and corresponding Z^t-gradings, entries can be accessed via
+     eulerpolynomialtable*(a_1,...,a_t) where a=(a_1,...,a_t) is a multidegree betweeen low and high
+EXAMPLE: example eulerPolynomialTable
+"
+{
+  if (gradingAndVectorCompatible(M,low) == 0)
+  {
+    ERROR("Grading of module and the vector low are not compatible.")
+  }
+  if (isLEQ(low,high) == 0)
+  {
+    ERROR("intvec low has to be lower or equal to the intvec high.")
+  }
+
+  int n = nvars(basering)-size(low);
+  def (E,tate) = tateResolution(M,low, high);
+  setring(E);
+
+  int i,j,k,d,numhk;
+  ring Z = 0,h,dp; // in this ring we compute the eulerpolynomialtable
+  setring(Z);
+  HashTable eulerpolynomialtable;
+  poly eulerpoly;
+
+  matrix A = vectorsLEQ(high-low);
+  intvec entry;
+  for (i = 1; i<= ncols(A); i++)
+  {
+    entry = int(A[1,i]);
+
+    for (k = 2; k <= nrows(A); k++)
+    {
+      entry = entry,int(A[k,i]);
+    }
+    entry = entry +low;
+    // now compute euler polynomial
+    setring(Z);
+    eulerpoly = 0;
+
+    for (k=0; k<= n; k++)
+    {
+      d = -sum(entry)-k;
+      setring(E);
+      numhk = 0;
+      if (d+1+tate.shift >= 1 && d+1+tate.shift <= size(tate.modules))
+      {
+        numhk = countMultiDegree(entry,getModuleGrading(tate.modules[d+1+tate.shift]));
+      }
+      setring(Z);
+      eulerpoly = eulerpoly +  numhk * h^k;
+    }
+    eulerpolynomialtable  = eulerpolynomialtable + hashTable(list(entry),list(eulerpoly));
+  }
+  return(Z,eulerpolynomialtable);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  // example 1
+  intvec c1 = 1,1;
+  def (S1,E1) = productOfProjectiveSpaces(c1);
+  intvec low1 = -3,-3;
+  intvec high1 = 3,3;
+  setring(S1);
+  module M1 = 0;
+  intmat grading1[2][1] = -1,-1;
+  M1 = setModuleGrading(M1,grading1);
+  def (Z1,eulerTable1) = eulerPolynomialTable(M1,low1,high1);
+  setring(Z1);
+  print(eulerTable1);
+  eulerTable1*low1;
+
+  setring(S1);
+  ring Z = cohomologyMatrix(M1,low1,high1);
+  setring(Z);
+  print(cohomologymat);
+
+  // example 2
+  intvec c2 =  1,1,1;
+  def (S2,E2) = productOfProjectiveSpaces(c2);
+  setring(S2);
+  intvec low2 = 0,0,0;
+  intvec high2 = 1,1,1;
+  module M2 = 0;
+  intmat grading2[3][1] = -1,-1,-1;
+  M2 = setModuleGrading(M2,grading2);
+  def (Z2,eulerTable2) = eulerPolynomialTable(M2,low2,high2);
+  setring(Z2);
+  print(eulerTable2);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+proc cohomologyHashTable(module M, intvec low, intvec high)
+"USAGE:  cohomologyHashTable(M,L,low,high); M module, low intvec, high intvec
+PURPOSE: computes hashtable of sheaf cohomology groups of twists in the range between between low and high corresponding to coker(M)
+ASSUME:  M module representing a sheaf F on the product of t projective spaces,
+     note that at the moment M is a module over S,
+RETURN:  cohomologytable where cohomologytable is a hash table with
+       integer vectors in ZZ^{t+1} as keys, entries can be accessed via cohomologytable*(c_1,...,c_t,i) = dim(H^i(F(c_1,...,c_t)))
+NOTE:    this function works for arbitrary products P^{n_1} x \cdots x P^{n_t} and corresponding Z^t-gradings
+EXAMPLE: example cohomologyHashTable
+"
+{
+  if (gradingAndVectorCompatible(M,low) == 0)
+  {
+    ERROR("Grading of module and the vector low are not compatible.")
+  }
+  if (isLEQ(low,high) == 0)
+  {
+    ERROR("intvec low has to be lower or equal to the intvec high.")
+  }
+
+  int n = nvars(basering)-size(low); // ie if P = P^{n_1} x \cdtos x P^{n_t}, then n = n_1 + \cdots + n_t
+  def (E,tate) = tateResolution(M,low, high);
+  setring(E);
+  int i,j,k,d,numhk;
+  HashTable cohomologytable;
+
+  matrix A = vectorsLEQ(high-low);
+  intvec entry;
+  for (i = 1; i<= ncols(A); i++)
+  {
+    entry = int(A[1,i]);
+
+    for (k = 2; k <= nrows(A); k++)
+    {
+      entry = entry,int(A[k,i]);
+    }
+    entry = entry +low;
+
+    for (k=0; k<= n; k++)
+    {
+      // compute vorfaktor of h^k in entry (i,j)
+      // find these information in the term d = -i-j-k
+      d = -sum(entry)-k;
+      // as we don't shift the resolution by some homological degree, the dth term corresponds
+      // to the (d+tate.shift)th entry in reso
+      setring(E);
+      numhk = 0;
+      if (d+1+tate.shift >= 1 && d+1+tate.shift <= size(tate.modules))
+      {
+        numhk = countMultiDegree(entry,getModuleGrading(tate.modules[d+1+tate.shift]));
+        cohomologytable  = cohomologytable + hashTable(list(intvec(entry,k)),list(numhk));
+      }
+    }
+  }
+
+  return(cohomologytable);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec c = 1,1;
+  def (S,E) = productOfProjectiveSpaces(c);
+  intvec low = -3,-3;
+  intvec high = 3,3;
+  setring(S);
+  module M = 0;
+  intmat grading[2][1] = -1,-1;
+  M = setModuleGrading(M,grading);
+  def cohomologytable = cohomologyHashTable(M,low,high);
+  print(cohomologytable);
+  intvec d = 3,3,0;
+  cohomologytable*d;
+
+  def (Z,eulerTable) = eulerPolynomialTable(M,low,high);
+  setring(Z);
+  print(eulerTable);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+proc twist(module M,intvec c)
+"USAGE:  twist(M,c); M module, c intvec
+PURPOSE: twists the module M by c
+ASSUME:  M is a multigraded module
+RETURN:  M with the new grading
+EXAMPLE: example twist
+"
+{
+  if (gradingAndVectorCompatible(M,c) == 0)
+  {
+    ERROR("Grading of module and the vector are not compatible.")
+  }
+  intmat MGrading = getModuleGrading(M);
+  MGrading = MGrading - matrixWithSpecificEntries(nrows(MGrading),ncols(MGrading),c);
+  module Mtwisted = setModuleGrading(M,MGrading);
+  return(Mtwisted);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec c = 1,1;
+  def (S,E) = productOfProjectiveSpaces(c);
+  setring(S);
+  module M = freemodule(2);
+  intmat gradeM[2][2] = 0,1,0,1;
+  M = setModuleGrading(M,gradeM);
+  getModuleGrading(M);
+  intvec c = 2,2;
+  module Mtwist = twist(M,c);
+  getModuleGrading(Mtwist);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc beilinsonWindow(multigradedcomplex T)
+"USAGE:  beilinsonWindow(T); T multigradedcomplex
+PURPSOSE:compute the subquotient complex of T consisting of summands generated in degrees 0 <= a <= n
+ASSUME:  T is a multigraded complex of free E-modules
+RETURN:  multigradedcomplex, the Beilinson window of T
+NOTE:    The returend summands are the only ones that contribute to the Beilinson monad.
+EXAMPLE: example beilinsonWindow
+"
+{
+  int i,j;
+  intvec b,c;
+  matrix A,B;
+  intmat grad;
+
+  intvec n = getDimensionVector(getVariableWeights(basering));
+
+  // go through all modules in the complex
+  for (i = size(T.modules); i >= 1; i--)
+  {
+    c = inBeilinsonWindow(getModuleGrading(T.modules[i]),n);
+    if (size(c)>1)
+    {
+      // need to determine the module grading
+      T.modules[i] = setModuleGrading(freemodule(size(c)-1),deleteColumnsIntmat(getModuleGrading(T.modules[i]),c));
+
+      if(i > 2 && i <= size(T.differentials))
+      {
+        //delete rows and columns in the corresponding maps
+        // delete rows in T.differentials[i] and adjust the module grading
+        A = matrix(T.differentials[i]);
+        A = deleteRows(A,c);
+        T.differentials[i] = setModuleGrading(module(A),deleteColumnsIntmat(getModuleGrading(T.differentials[i]),c));
+        //delete columns in T.differentials[i-1] if i > 2
+        //delete columns in T.differentials[i-1]
+        A = matrix(T.differentials[i-1]);
+        A = deleteColumns(A,c);
+        T.differentials[i-1] = setModuleGrading(module(A),getModuleGrading(T.differentials[i-1]));
+      }
+      else
+      {
+        if(i == 1)
+        {
+          //only have to delete rows
+          A = matrix(T.differentials[i]);
+          A = deleteRows(A,c);
+          T.differentials[i] = setModuleGrading(module(A),deleteColumnsIntmat(getModuleGrading(T.differentials[i]),c));
+        }
+        else
+        {
+          // only have to delete columns
+          A = matrix(T.differentials[i-1]);
+          A = deleteColumns(A,c);
+          T.differentials[i-1] = setModuleGrading(module(A),getModuleGrading(T.differentials[i-1]));
+        }
+      }
+    }
+    else
+    {
+      T.modules[i] = freemodule(0);
+    }
+
+  }
+
+  T = deleteZerosMultigradedComplex(T);
+
+  return(T);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 1,1;
+  def (S,E) = productOfProjectiveSpaces(f);
+  intvec low = -3,-3;
+  intvec high = 3,3;
+  setring(S);
+  module M = 0;
+  intmat MGrading[2][1] = -1,-1;
+  M = setModuleGrading(M,MGrading);
+  multigradedcomplex tate;
+  (E,tate) = tateResolution(M,low,high);
+  setring(E);
+  multigradedcomplex W = beilinsonWindow(tate);
+  W;
+
+  intvec c = 1,1,1;
+  intvec low2 = 0,0,0;
+  intvec high2 = 0,1,0;
+  def (S2,E2) = productOfProjectiveSpaces(c);
+  setring(S2);
+  module M2 = 0;
+  intmat gradeM[3][1] = -1,-1,-1;
+  M2 = setModuleGrading(M2,gradeM);
+  multigradedcomplex tate2;
+  (E2,tate2) = tateResolution(M2,low2,high2);
+  setring(E2);
+  multigradedcomplex W2 = beilinsonWindow(tate2);
+  W2;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc regionComplex(multigradedcomplex T, intvec d, intvec I, intvec J, intvec K)
+"USAGE:  regionComplex(T,d,I,J,K); T multigradedcomplex, d intvec, I intvec, J intvec, K intvec
+PURPOSE: compute the region complex of T w.r.t. the sets I,J,K and the vector d
+ASSUME:  I,J,K are intvecs representing disjoint subsets of {1,...,t}, T is a complex in ring E, zero represents the empty set
+RETURN:  multigraded complex which is the region complex T_d(I,J,K) of T
+EXAMPLE: example regionComplex
+"
+{
+  if (isDisjoint(I,J,K) == 0)
+  {
+    ERROR("I,J,K have to be disjoint.");
+  }
+
+  int i;
+  intvec c;
+  matrix A,B;
+  intmat grad;
+
+  // go through all modules in the complex T
+  for (i = size(T.modules); i>= 1; i--)
+  {
+    c = goodColumns(getModuleGrading(T.modules[i]),d,I,J,K);
+    // analogous procedure to beilinsonWindow
+    if (size(c)>1)
+    {
+      // need to determine the module grading
+      T.modules[i] = setModuleGrading(freemodule(size(c)-1),deleteColumnsIntmat(getModuleGrading(T.modules[i]),c));
+
+      if(i > 2 && i <= size(T.differentials))
+      {
+        //delete rows and columns in the corresponding maps
+        // delete rows in T.differentials[i] and adjust the module grading
+        A = matrix(T.differentials[i]);
+        A = deleteRows(A,c);
+        T.differentials[i] = setModuleGrading(module(A),deleteColumnsIntmat(getModuleGrading(T.differentials[i]),c));
+        //delete columns in T.differentials[i-1] if i > 2
+        //delete columns in T.differentials[i-1]
+        A = matrix(T.differentials[i-1]);
+        A = deleteColumns(A,c);
+        T.differentials[i-1] = setModuleGrading(module(A),getModuleGrading(T.differentials[i-1]));
+      }
+      else
+      {
+        if(i == 1)
+        {
+          //only have to delete rows
+          A = matrix(T.differentials[i]);
+          A = deleteRows(A,c);
+          T.differentials[i] = setModuleGrading(module(A),deleteColumnsIntmat(getModuleGrading(T.differentials[i]),c));
+        }
+        else
+        {
+          // only have to delete columns
+          A = matrix(T.differentials[i-1]);
+          A = deleteColumns(A,c);
+          T.differentials[i-1] = setModuleGrading(module(A),getModuleGrading(T.differentials[i-1]));
+        }
+      }
+    }
+    else
+    {
+      T.modules[i] = freemodule(0);
+    }
+  }
+  // delete not necessary zeros in T
+  T = deleteZerosMultigradedComplex(T);
+  return(T);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 1,1;
+  def (S,E) = productOfProjectiveSpaces(f);
+  intvec low = -3,-3;
+  intvec high = 3,3;
+  setring(S);
+  module M = 0;
+  intmat MGrading[2][1] = -1,-1;
+  M = setModuleGrading(M,MGrading);
+  multigradedcomplex tate;
+  (E,tate) = tateResolution(M,low,high);
+  setring(E);
+  tate;
+
+  ring Z = cohomologyMatrixFromResolution(tate,low,high);
+  setring(Z);
+  print(cohomologymat);
+
+  setring(E);
+  intvec  c= 0,-3;
+  intvec I = 0;
+  intvec J = 0,1;
+  intvec K = 0,2;
+  multigradedcomplex U = regionComplex(tate,c,I,J,K);
+  U;
+
+  Z = cohomologyMatrixFromResolution(U,low,high);
+  setring(Z);
+  print(cohomologymat);
+
+  setring(E);
+  multigradedcomplex V = regionComplex(tate,c,I,J,J);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc strand(multigradedcomplex T, intvec c, intvec J)
+"USAGE:  strand(T,c,J)
+PURPOSE: compute the strand of T w.r.t. the set J and the vector c
+RETURN:  subquotient complex of T which is the strand of T
+EXAMPLE: example strand
+"
+{
+  // if first entry of I is not 0, then add 0 for better compatibility
+  if (J[1] != 0)
+  {
+    J = 0,J;
+  }
+  intvec I,K;
+
+  return(regionComplex(T,c,I,J,K));
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 1,1;
+  def (S,E) = productOfProjectiveSpaces(f);
+  intvec low = -3,-3;
+  intvec high = 3,3;
+  setring(S);
+  module M = 0;
+  intmat MGrading[2][1] = -1,-1;
+  M = setModuleGrading(M,MGrading);
+  multigradedcomplex tate;
+  (E,tate) = tateResolution(M,low,high);
+  setring(E);
+
+  ring Z = cohomologyMatrixFromResolution(tate,low,high);
+  setring(Z);
+  print(cohomologymat);
+
+  setring(E);
+  intvec  c= 0,-3;
+  intvec J = 1;
+  multigradedcomplex U = strand(tate,c,J);
+  U;
+
+  Z = cohomologyMatrixFromResolution(U,low,high);
+  setring(Z);
+  print(cohomologymat);
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+proc firstQuadrantComplex(multigradedcomplex T, intvec c)
+"USAGE:  firstQuadrantComplex(T,c); T multigradedcomplex, c intvec
+PURPOSE: compute the first quadrant complex of T w.r.t. the set J and the vector c
+RETURN:  subquotient complex of T which is the first quadrand complex of T
+"
+{
+  intvec K = 0,1..size(c);
+  intvec I,J;
+  return(regionComplex(T,c,I,J,K));
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc lastQuadrantComplex(multigradedcomplex T, intvec c)
+"USAGE:  lastQuadrantComplex(T,c); T multigradedcomplex, c intvec
+PURPOSE: compute the last quadrant complex of T w.r.t. the set J and the vector c
+RETURN:  subquotient complex of T which is the strand of T
+"
+{
+  intvec I = 0,1..size(c);
+  intvec J,K;
+  return(regionComplex(T,c,I,J,K));
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc sortedBases(int i)
+"USAGE:  computes a list sortedB where in each entry k we have sortedB[k] = all monomials of degree k*e_i
+      (sorted)
+ASSUME: We are working over a multigraded ring
+RETURN:  list sortedB
+EXAMPLE: example sortedB
+"
+{
+  intvec d = 1..nrows(getVariableWeights(basering));
+  d = d-d;
+  d[i] = 1;
+  int j,n;
+  n = countMultiDegree(d, getVariableWeights(basering));
+  list sortedB;
+  for (j = 0; j <= n; j++)
+  {
+    sortedB = insert(sortedB,multiDegBasis(j*d),size(sortedB));
+  }
+  return(sortedB);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 2,3;
+  def (S,E) = productOfProjectiveSpaces(f);
+  setring(E);
+  list sortedB = sortedBases(1);
+  sortedB;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc diffAntiCommutative(ideal I, ideal J)
+"USAGE:  differentiate the second input by the first
+ASSUME: We are working over anticommutative E
+RETURN:  matrix D
+EXAMPLE: example diffAntiCommutative
+"
+{
+  matrix D = diff(I,J);
+  //now have to correct the signs since Singular does not do it right...?
+  int i,j;
+  for (i = 1; i<= nrows(D); i++)
+  {
+    for(j = 1; j<=ncols(D);j++)
+    {
+      if (D[i,j]*I[i] == -J[j])
+      {
+        D[i,j] = -D[i,j];
+      }
+    }
+  }
+  return(D);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 2,3;
+  def (S,E) = productOfProjectiveSpaces(f);
+  setring(E);
+  list sortedB = sortedBases(1);
+  sortedB[2];
+  sortedB[3];
+
+  print(diff(sortedB[],sortedB[3]));
+
+  print(diffAntiCommutative(sortedB[2],sortedB[3]));
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc koszulmap(int i, list sortedB)
+"USAGE:  computes the ith koszul map
+ASSUME: basering ist E, assume sortedB is a list of sorted bases (result of sortedBases)
+NOTE: in contrast to the function in M2 we remain in the ring E, to get the real koszul map have to substitute vars of S
+RETURN:  matrix K
+EXAMPLE: example koszulmap
+"
+{
+  matrix D;
+  if (i == 0)
+  {
+    D = matrix(0);
+  }
+  else
+  {
+    intvec d = multiDeg(sortedB[2][1]);
+    D = diffAntiCommutative(sortedB[i],sortedB[i+1]);
+  }
+  return(D);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 2,3;
+  def (S,E) = productOfProjectiveSpaces(f);
+  setring(E);
+  list sortedB = sortedBases(2);
+
+  matrix K1 = koszulmap(1,sortedB);
+  matrix K2 = koszulmap(2,sortedB);
+
+  setring(S);
+
+  print(fetch(E,K1));
+  print(fetch(E,K2));
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc simpleBeilinsonBundle(int a, int w, list L)
+"USAGE:  computes a basic beilinson bundle (i.e. the pullback of a single projective space factor),
+      with notation in the paper: it computes \wedge^a U_w
+ASSUME:  the current basering is S, L ist list with entry E (ring);
+    if P = P^{n_1} x....xP^{n_t}, then 1<=w <= t and 0 <= a <= n_w,
+    if the inputs are not in this range, then the zero module is returned
+NOTE:
+RETURN: a bundle (associated sheaf to module over S), the associated sheaf to the cokernel of it is the beilinson bundle
+EXAMPLE: example simpleBeilinsonBundle
+"
+{
+  ring S = basering;
+  def E = L[1];
+  int t = nrows(getVariableWeights(S));
+  bundle B;
+  module M;
+
+  if ( w<1 || w>t)
+  {
+    return(B); // return the zero module
+  }
+
+  // initialize unit vector with one in position w
+  intvec d = (1..t) - (1..t);
+  d[w] = 1;
+  int j;
+  int nw = countMultiDegree(d, getVariableWeights(S));
+
+  if ( a < 0 || a > nw )
+  {
+    return(B); // return the zero bundle
+  }
+
+
+  if ( a == 0)
+  {
+    M = freemodule(1);
+    intmat gradeM[t][1];
+    M = setModuleGrading(M,gradeM);
+    B.m = M;
+
+  }
+  else
+  {
+    if (a == nw +1)
+    {
+      M = freemodule(1);
+      intmat gradeM[t][1]
+      gradeM[w,1] = 1;
+      M = setModuleGrading(M,gradeM);
+      B.m = M;
+    }
+    else
+    {
+      setring(E);
+      list sortedB = sortedBases(w);
+      matrix K = koszulmap(a + 2,sortedB);
+      setring(S);
+      matrix K = fetch(E,K);
+      // have to add multigrading
+      B.iscoker = 1;
+      M = module(K);
+      intmat gradeM[t][nrows(M)];
+      M = setModuleGrading(M,gradeM);
+      B.m = twist(M,-d);   //STIMMT DAS SO WIRKLICH?
+      }
+  }
+  return(B);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 2,3;
+  def (S,E) = productOfProjectiveSpaces(f);
+  setring(S);
+  bundle B = simpleBeilinsonBundle(1,1,E);
+  print(B);
+  getModuleGrading(B.m);
+
+  simpleBeilinsonBundle(1,2,E);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc beilinsonBundle(intvec a, list L)
+"USAGE:  computes a beilinson bundle (i.e. the pullback of a single projective space factor),
+      with notation in the paper: it computes U^a
+ASSUME:  the current basering is S, L ist list with entry E (ring);
+    if P = P^{n_1} x....xP^{n_t}, size(a)=t and 0 <= a_i <= n_i
+    if the inputs are not in this range, then the zero module is returned
+NOTE:
+RETURN: a bundle (associated sheaf to module over S), the associated sheaf to the cokernel of it is the beilinson bundle
+EXAMPLE: example beilinsonBundle
+"
+{
+  ring S = basering;
+  int t = nrows(getVariableWeights(S));
+  if(size(a) != t)
+  {
+    ERROR("Size of input vector a and number t of projective spaces are not compatible.")
+  }
+  int i;
+  bundle B = simpleBeilinsonBundle(a[1],1,L);
+  for (i =  2; i<= t; i++)
+  {
+    B = tensorBundle(B,simpleBeilinsonBundle(a[i],i,L));
+  }
+  return(B);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 2,3;
+  def (S,E) = productOfProjectiveSpaces(f);
+  setring(S);
+  intvec c = 1,1;
+  bundle B = beilinsonBundle(c,E);
+  B;
+
+  bundle B1 = simpleBeilinsonBundle(1,1,E);
+  bundle B2 = simpleBeilinsonBundle(1,2,E);
+  bundle B3 = tensorBundle(B1,B2);
+  B3;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc printBundle(bundle B)
+"USAGE:  prints a bundle
+RETURN: nothing
+"
+{
+  if(B.iscoker == 1)
+  {
+    print("coker");
+    print(B.m);
+  }
+
+  else
+  {
+    print(B.m)
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc tensorBundle(bundle B1, bundle B2)
+"USAGE:  computes the tensor product of the bundles
+RETURN: a bundle
+EXAMPLE: example tensorBundle
+"
+{
+  bundle B;
+
+  // first have to consider the two special cases
+  if (B1.iscoker == 0 || B2.iscoker == 0)
+  {
+    if (B1.iscoker == 0)
+    {
+      if (B1.m == 0)
+      {
+        // return 0
+        B = B1;
+      }
+      else
+      {
+        // then B1.m is just the free module of rank 1
+        B = B2;
+      }
+    }
+    else
+    {
+      if (B2.m == 0)
+      {
+        // return 0
+        B = B2;
+      }
+      else
+      {
+        // then B2.m is just the free module of rank 1
+        B = B1;
+      }
+    }
+  }
+  else
+  {
+    B.iscoker = 1;
+    B.m = multiDegTensor(B1.m,B2.m);
+  }
+  return(B);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 2,3;
+  def (S,E) = productOfProjectiveSpaces(f);
+  setring(S);
+  bundle B1 = simpleBeilinsonBundle(1,1,E);
+  bundle B2 = simpleBeilinsonBundle(1,2,E);
+
+  bundle B3 = simpleBeilinsonBundle(1,0,E); // zero bundle
+  bundle B4 = simpleBeilinsonBundle(0,1,E);
+
+  bundle B5 = tensorBundle(B1,B2);
+  B5;
+
+  bundle B6 = tensorBundle(B2,B3);
+  B6;
+
+  bundle B7 = tensorBundle(B2,B4);
+  B7;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc directSumBundle(bundle B1, bundle B2)
+"USAGE:  computes the direct sum of the bundles B1 and B2
+RETURN: a bundle
+EXAMPLE: example directSumBundle
+"
+{
+  bundle B;
+  module M;
+  // first have to consider the special cases
+  if (B1.iscoker == 0 || B2.iscoker == 0)
+  {
+    if (B1.iscoker == 0)
+    {
+      if(B1.m == 0 || B2.m == 0)
+      {
+        // return B2
+        B = B2;
+      }
+      else
+      {
+        // then B1.m is just the free module of rank 1
+        if(B2.iscoker == 0)
+        {
+          // both bundles are the bundles corresponding to S^1
+          M = freemodule(2);
+          intmat grading[2][2];
+          M = setModuleGrading(M,grading);
+          B.m = M;
+        }
+        else
+        {
+          // have to add zero row to B2.m
+          matrix z[ncols(B2.m)][1];
+          M = module(transpose(concat(z,transpose(B2.m))));
+          intmat grading = concatIntmat(getModuleGrading(B1.m),getModuleGrading(B2.m));
+          M = setModuleGrading(M,grading);
+          B.iscoker = 1;
+          B.m = M;
+        }
+      }
+    }
+    else
+    {
+      if (B2.m == 0)
+      {
+        // return B1
+        B = B1;
+      }
+      else
+      {
+        // then B2.m is just the free module of rank 1
+        // have to add zero row to B1.m
+        matrix z[ncols(B1.m)][1];
+        M = module(transpose(concat(transpose(B1.m),z)));
+        intmat grading = concatIntmat(getModuleGrading(B1.m),getModuleGrading(B2.m));
+        M = setModuleGrading(M,grading);
+        B.iscoker = 1;
+        B.m = M;
+      }
+    }
+  }
+  else
+  {
+    intmat grading = concatIntmat(getModuleGrading(B1.m), getModuleGrading(B2.m));
+    // need to construct the new matrix
+    matrix M1[nrows(B1.m)][ncols(B2.m)];
+    matrix M2[nrows(B2.m)][ncols(B1.m)];
+    M1 = transpose(concat(B1.m,M1));
+    M2 = transpose(concat(M2,B2.m));
+    M = module(transpose(concat(M1,M2)));
+    M = setModuleGrading(M,grading);
+    B.iscoker = 1;
+    B.m = M;
+  }
+
+  return(B);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec f = 2,3;
+  def (S,E) = productOfProjectiveSpaces(f);
+  setring(S);
+
+  bundle B1 = simpleBeilinsonBundle(1,1,E);
+  bundle B2 = simpleBeilinsonBundle(1,2,E);
+  bundle B3 = simpleBeilinsonBundle(1,0,E); // zero bundle
+  bundle B4 = simpleBeilinsonBundle(0,1,E);
+
+  bundle B5 = directSumBundle(B1,B2);
+  B5;
+
+  bundle B6 = directSumBundle(B3,B2);
+  B6;
+
+  bundle B7 = directSumBundle(B1,B4);
+  B7;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc concatIntmat(intmat A, intmat B)
+{
+  if (nrows(A) != nrows(B))
+  {
+    nrows(A);
+    nrows(B);
+    ERROR("A and B do not have the same number of rows");
+  }
+  // return the concatenated matrix [A; B]
+  int i,j;
+  intmat AB[nrows(A)][ncols(A)+ncols(B)];
+
+  for (i = 1; i <= nrows(AB); i++)
+  {
+    for (j = 1; j <= ncols(AB); j++)
+    {
+      if(j <= ncols(A))
+      {
+        AB[i,j] = A[i,j];
+      }
+      else
+      {
+        AB[i,j] = B[i,j-ncols(A)];
+      }
+    }
+  }
+  return(AB)
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc shift(multigradedcomplex A, int i)
+"USAGE:  computes A[i], the shifted multigraded complex
+RETURN: shifted multigradedcomplex
+"
+{
+  A.shift = A.shift + i;
+  if ( i%2 == 0)
+  {
+    return(A);
+  }
+  else
+  {
+    for (int k = 1; k<= size(A.differentials); k++)
+    {
+      A.differentials[k] = setModuleGrading(module(-A.differentials[k]), getModuleGrading(A.differentials[k]));
+    }
+    return(A);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// static procedures
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc jacobM(matrix M) //kopiert aus sheafcoh.lib
+{
+  // computes the jacobian matrix of the input matrix
+   int n=nvars(basering);
+   matrix B=transpose(diff(M,var(1)));
+   int i;
+   for(i=2;i<=n;i++)
+   {
+     B=concat(B,transpose(diff(M,var(i))));
+   }
+   return(transpose(B));
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+static proc countMultiDegree(intvec c, intmat multiDegrees)
+"USAGE:  counts how often a multidegree occurs in the matrix multiDegrees
+ASSUME:  nrows(multiDegrees) == length(c);
+RETURN:  cohomologyMatrix in ZZ[h] (klappt aber leider irgendwie nicht, wegen Ringwechsel in Funktion)
+"
+{
+  // iterate through the columns of matrix multiDegrees and count how often c arises as a colum
+  int numc;
+  int i;
+  for (i=1;i<=ncols(multiDegrees);i++)
+  {
+    if(submat(multiDegrees,1..nrows(multiDegrees),i) == c)
+    {
+      numc= numc +1;
+    }
+  }
+  return(numc);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc subtractIntMat(intmat A, int d)
+{
+  //uses subtract to subtract d from all the columns
+  matrix result;
+  intvec c;
+
+  for (int i = 1; i<= ncols(A);i++)
+  {
+    c = A[1,i],A[2,i];
+    result = concat(result, matrix(subtract(c,d)));
+  }
+
+  result = submat(result,1..2,2..ncols(result));
+
+  return(result);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc subtract(intvec c, int d)
+{
+  //if size(c) != 2 then error
+  // assume d >0
+  //subtract in total d from the intvec c (go through all possibilities)
+  // there are in total d+1 possibilities
+  intmat result[2][d+1];
+  int i = d;
+  int j = 0;
+  for (int k = 1; k<=d+1;k++)
+  {
+    result[1,k] = c[1]-i;
+    result[2,k] = c[2]-j;
+    i = i-1;
+    j = j+1;
+  }
+  return(result)
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc matrixWithSpecificEntries(int a, int b, intvec c)
+{
+  // ith row has entries c[i]
+  int i,j;
+  intmat A[a][b];
+  for (i =1; i<= a; i++)
+  {
+    for (j =1; j<= b; j++)
+    {
+      A[i,j] = c[i];
+    }
+  }
+  return(A);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc deleteZerosReso(list L)
+"USAGE:  deletes all the zero entries in the list which represents a complex
+RETURN:  list
+NOTE:  the shift of homological degreee stored in the first entry of L has to be adjusted
+"
+{
+  int i=2;
+  int flag = 1;
+  while (flag)
+  {
+
+    if (size(L) <= 1)
+    {
+      // nothing more to do, list is just zero and ist just an empty complex
+      flag = 0;
+    }
+
+    else
+    {
+      // check whether entry is the zero module (size(L[i]) == 0)
+      // or if the entry is the zero matrix (L[i] == 0)
+      if (L[i] == 0 || size(L[i]) == 0)
+      {
+        // delete list entry
+        L = delete(L,2);
+        L[1] = L[1]-1;
+      }
+      else
+      {
+        flag = 0;
+      }
+    }
+  }
+
+  int n = size(L);
+  for (i = n; i >= 2; i--)
+  {
+    if (L[i] == 0 || size(L[i]) == 0)
+    {
+      L = delete(L,i);
+    }
+  }
+  return(L);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc deleteColumnsIntmat(intmat A, intvec c)
+"USAGE:  delete the columns of A not corresponding to the indices in c[2],..., c[size(c)]
+ASSUME:  first entry of c is zero and will not be considered, entries in c are in the right range
+RETURN:   intmat with deleted columns
+"
+{
+  if (size(c) == 1)
+  {
+    intmat C[1][1] =0;
+    return(C);
+  }
+  intvec d = c[2..size(c)];
+  intmat K[nrows(A)][size(c)-1] = A[1..nrows(A),d];
+  return(K);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc deleteRows(matrix A, intvec c)
+"USAGE:  delete the rows of A not corresponding to the indices in c[2],..., c[size(c)]
+ASSUME:  first entry of c is zero and will not be considered, entries in c are in the right range
+RETURN:   matrix with deleted rows
+NOTE:
+EXAMPLE:
+KEYWORDS:
+"
+{
+  matrix B = deleteColumns(transpose(A),c);
+  return(transpose(B));
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc deleteColumns(matrix A, intvec c)
+"USAGE:  delete the columns of A not in c[2],..., c[size(c)]
+ASSUME:  first entry of c is zero and will not be considered, entries in c are in the right range
+RETURN:   matrix with deleted columns
+NOTE:
+EXAMPLE:
+KEYWORDS:
+"
+{
+  if (size(c) == 1)
+  {
+    return(matrix(0));
+  }
+
+  intvec d = c[2..size(c)];
+  A = submat(A,1..nrows(A),d);
+  return(A);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc goodColumns(intmat A, intvec c, intvec I, intvec J, intvec K)
+"USAGE:  compute columns of A which have entries in the desired range
+ASSUME:  I,J,K are disjoint subsets of {1,...,t},
+RETURN:  intvec c which is just 0 if no column is in the desired range, otherwise first entry is
+    zero and the other entries are the indices of columns in the desired range
+NOTE:
+EXAMPLE:
+KEYWORDS:
+"
+{
+  // need to filter which columns satisfy a_i < c_i for i in I
+  // a_i = c_i for i in J, a_i >= c_i for i in K
+  intvec d;
+  for (int i = 1; i <= ncols(A); i++)
+  {
+    if (isGood(intvec(A[1..nrows(A), i]),c, I,J,K))
+    {
+      d = d, i;
+    }
+  }
+  return(d);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc isGood(intvec a, intvec c, intvec I, intvec J, intvec K)
+{
+  // return 1 if the vector a satisfies a_i < c_i for i in I
+  // a_i = c_i for i in J, a_i >= c_i for i in K
+  int i;
+
+  for (i = 2; i <= size(I); i++)
+  {
+     if (a[I[i]] >= c[I[i]])
+     {
+       return(0);
+     }
+  }
+
+  for (i = 2; i <= size(J); i++)
+  {
+    if (a[J[i]] != c[J[i]])
+     {
+       return(0);
+     }
+  }
+
+  for (i = 2; i <= size(K); i++)
+  {
+    if (a[K[i]] < c[K[i]])
+     {
+       return(0);
+     }
+  }
+  return(1);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc isDisjoint(intvec I, intvec J, intvec K)
+"USAGE:  test whether the entries of I,J,K are disjoint (not consider 0)
+NOTE: total dumm und aufwaendig...
+RETURN:  1 or 0
+"
+{
+  int i,j,k;
+  for (i = 1; i <= size(I); i++)
+  {
+    for (j = 1; j <= size(J); j++)
+    {
+      for (k = 1; k <= size(K); k++)
+      {
+        if (I[i] != 0 && (I[i] == J[j] || I[i] == K[k]))
+        {
+          return(0);
+        }
+
+        if (J[j] != 0 && J[j] == K[k])
+        {
+          return(0);
+        }
+      }
+    }
+  }
+  return(1);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc getColumnIntmat(intmat A, int i)
+"USAGE:   returns intvec corresponding to ith column if the matrix
+ASSUME:
+RETURN: intvec
+"
+{
+  intvec b = A[1,i];
+  for (int k = 2; k<= nrows(A); k++)
+  {
+    b = b, A[k,i];
+  }
+  return(b);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc getTargetGrading(matrix A, intmat sourceGrading)
+"USAGE:  computes the shifts in the target of A when we regard A as a homogeneous map
+ASSUME:  A a (homogeneous) matrix, souceGrading has represents the twists in the source when m is regarded as a mapping,
+assume we are over a Z^2-graded ring
+RETURN:  intmat, the shifts in the target
+NOTE:
+EXAMPLE: example getTargetGrading
+KEYWORDS:
+"
+{
+  // consider the map F1 = \oplus S(-d_j) \to F0 = \oplus S(-c_i)
+  int cols = ncols(A);
+  int rows = nrows(A);
+  intmat targetGrading[nrows(sourceGrading)][rows];
+
+  // TODO : Check if sourceGrading has the right size
+
+  int i,j;
+  int nonzeroentry;
+  for (i = 1; i<= rows; i++)
+  {
+    nonzeroentry = 1;
+    while(nonzeroentry <= cols )
+    {
+
+      if (A[i,nonzeroentry]!= 0)
+        {
+        // apply formula and compute c_i
+
+        for (j = 1; j<= nrows(sourceGrading); j++)
+        {
+          targetGrading[j,i] = sourceGrading[j,nonzeroentry] - multiDeg(poly(A[i,nonzeroentry]))[j];
+        }
+
+        // do the following to stop the while loop
+        break;
+        }
+      nonzeroentry = nonzeroentry + 1;
+    }
+    if (nonzeroentry == (cols + 1))
+    {
+      ERROR("Matrix has a zero row.")
+    }
+  }
+
+  return(targetGrading);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   intvec c = 1,2;
+   def (S,E) = productOfProjectiveSpaces(c);
+   setring(S);
+   matrix m[4][2] = x(0)(0), x(1)(0),x(0)(1),0,0,x(1)(1), 0,x(1)(2);
+   print(m);
+  intmat sourceGrading[2][2] = 1,0,0,1;
+  getTargetGrading(m,sourceGrading);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc getSourceGrading(matrix A, intmat targetGrading)
+"USAGE:  computes the shifts in the target of A when we regard A as a homogeneous map
+ASSUME:  A a (homogeneous) matrix, souceGrading has represents the twists in the source when m is regarded as a mapping,
+assume we are over a Z^2-graded ring
+RETURN:  intmat, the shifts in the target
+EXAMPLE: example getSourceGrading
+"
+{
+  // TODO: Eine der beiden Funktionen ist eigentlich unnoetig, kann man auch auf die andere zurueckfuehren
+
+  // consider the map F1 = \oplus S(-d_j) \to F0 = \oplus S(-c_i)
+  int cols = ncols(A);
+  int rows = nrows(A);
+  intmat sourceGrading[2][cols];
+
+  // TODO : Check if targetGrading has the right size
+
+  int i;
+  int nonzeroentry;
+  for (i = 1; i<= cols; i++)
+  {
+    nonzeroentry = 1;
+    while(nonzeroentry <= rows )
+    {
+
+      if (A[nonzeroentry,i]!= 0)
+        {
+          // apply formula and compute c_i
+          sourceGrading[1,i] = targetGrading[1,nonzeroentry] + multiDeg(poly(A[nonzeroentry,i]))[1];
+          sourceGrading[2,i] = targetGrading[2,nonzeroentry] + multiDeg(poly(A[nonzeroentry,i]))[2];
+
+          // in this case stop the while loop
+          break;
+        }
+      nonzeroentry = nonzeroentry + 1;
+    }
+    if (nonzeroentry == (rows + 1))
+    {
+      ERROR("Matrix has a zero column.")
+    }
+  }
+  return(sourceGrading);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  intvec c = 1,2;
+  def (S,E) = productOfProjectiveSpaces(c);
+  setring(S);
+  matrix m[4][2] = x(0)(0), x(1)(0),x(0)(1),0,0,x(1)(1), 0,x(1)(2);
+  print(m);
+  intmat targetGrading[2][4] = 0,0,0,0,0,0,0,0;
+  getSourceGrading(m,targetGrading);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc isLEQ(intvec c, intvec d)
+"USAGE:  checks whether the intvec c is lower or equal to the intvec d (componentwise)
+RETURN:  int 1 if c <= d, otherwise return 0
+EXAMPLE: example isLEQ
+"
+{
+  if (size(c) != size(d))
+  {
+    ERROR("The input vectors need to have the same size.")
+  }
+
+  for (int i = 1; i<= size(c); i++)
+  {
+    if (c[i] > d[i])
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  ring R = 0,x,dp;
+  intvec c1 = 3,4;
+  intvec c2 = 5,5;
+  intvec c3 = 6,7,8;
+  isLEQ(c1,c2);
+  isLEQ(c2,c1);
+  isLEQ(c1,c1);
+  isLEQ(c1,c3);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc isSmaller(intvec c, intvec d)
+"USAGE:  isSmaller(c,d); c intvec, d intvec
+ASSUME:  c and d are integer vectors
+RETURN:  int 1 if c < d, otherwise return 0
+EXAMPLE: example isLEQ
+"
+{
+  if (size(c) != size(d))
+  {
+    ERROR("The input vectors need to have the same size.")
+  }
+
+  for (int i = 1; i<= size(c); i++)
+  {
+    if (c[i] >= d[i])
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  ring R = 0,x,dp;
+  intvec c1 = 3,4;
+  intvec c2 = 5,5;
+  intvec c3 = 6,7,8;
+  isLEQ(c1,c2);
+  isLEQ(c2,c1);
+  isLEQ(c1,c1);
+  isLEQ(c1,c3);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc vectorsLEQ(intvec c)
+"USAGE:  compute all vectors >= 0 and <= c
+ASSUME:  c has nonnegative entries
+RETURN:  intmat A where the columns represent all the vectors which are <= c, >= 0
+EXAMPLE: example vectorsLEQ
+"
+{
+  int i,j,k,numcolumns;
+  matrix A[size(c)][1];
+  matrix v[size(c)][1];
+  for (i = 1; i<= size(c); i++)
+  {
+    numcolumns = ncols(A);
+    for(j = 1; j<= numcolumns; j++)
+    {
+      for (k = 1; k <= c[i]; k++)
+      {
+        v = v-v;
+        v[i,1] = k;
+        A = concat(A,v+submat(A,1..nrows(A),j));
+      }
+    }
+  }
+
+  return(A);
+  //lowerbounds = concat(lowerbounds, matrix(getModuleGrading(T[i])));
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  ring R = 0,x,dp;
+  intvec c = 1,2,3;
+  matrix A = vectorsLEQ(c);
+  print(A);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc inBeilinsonWindow(intmat D, intvec n)
+"USAGE:  compute the indices of all multidegrees in D in the range 0 \leq a \leq n
+RETURN:  intvec c where the entries represent the indices of multidegrees in the range,
+    the first entry is always 0, outputs the zero vector if all multidegrees are not in desired range.
+EXAMPLE: example inBeilinsonWindow
+"
+{
+  if (nrows(D) != size(n))
+  {
+    ERROR("The number of columns and size of n have to be equal.")
+  }
+
+  intvec c;
+  intvec zero = n-n;
+  int i,j;
+  int rows = nrows(D);
+  intvec dcol = n;
+  for (i = 1; i <= ncols(D); i++)
+  {
+    for(j = 1; j<= rows; j++)
+    {
+      dcol[j] = D[j,i];
+    }
+    if(isLEQ(dcol,zero) && isLEQ(-n,dcol))
+    {
+      c = c,i;
+    }
+  }
+  return(c);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  ring R = 0,x,dp;
+  intvec n = 1,2,3;
+  intmat D[3][5] = 1,1,0,6,1,2,3,1,0,0,3,2,4,5,0;
+  print(D);
+  intvec c = inBeilinsonWindow(D,n);
+  print(c);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc deleteZerosMultigradedComplex(multigradedcomplex T)
+"USAGE:  delete superflous zeros in a multigraded complex
+RETURN:  multigradedcomplex with deleted zeros
+"
+{
+  int nmods = size(T.modules);
+  int nonzeros;
+  int flag = 1;
+  int i = nmods-1;
+  while(flag && i>0)
+  {
+    if (size(T.modules[i]) == 0 && size(T.modules[i+1]) == 0)
+    {
+      T.modules = delete(T.modules,i+1);
+      T.differentials = delete(T.differentials,i);
+    }
+    else
+    {
+      if (size(T.modules[i]) != 0 && size(T.modules[i+1]) == 0)
+      {
+        T.differentials[i] = module(matrix(0));
+        flag = 0;
+      }
+      else
+      {
+        flag = 0;
+      }
+    }
+    i = i-1;
+  }
+
+  flag = 1;
+  while(flag && (size(T.modules) >= 2))
+  {
+    if (size(T.modules[1]) == 0 && size(T.modules[2]) == 0)
+    {
+      T.modules = delete(T.modules,1);
+      T.differentials = delete(T.differentials,1);
+      T.shift = T.shift -1;
+    }
+    else
+    {
+      if (size(T.modules[1]) == 0 && size(T.modules[2]) != 0)
+      {
+        T.differentials[1] = module(matrix(0));
+        flag = 0;
+      }
+      else
+      {
+        flag = 0;
+      }
+    }
+  }
+
+  if (size(T.modules) == 0)
+  {
+    T.modules = list();
+    T.differentials = list();
+    T.shift = 0;
+  }
+  return(T);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc getDimensionVector(intmat variableWeights)
+"USAGE:  compute the indices of all multidegrees in D in the range 0 \leq a \leq n
+RETURN:  intvec n
+"
+{
+  int i;
+  intvec n = 1..nrows(variableWeights);
+  intvec b;
+  int j = 1;
+  for (i=1; i<= nrows(variableWeights); i++)
+  {
+    b = intvec(variableWeights[1..nrows(variableWeights), j]);
+    n[i] = countMultiDegree(b,variableWeights);
+    j = j + n[i];
+    n[i] = n[i]-1;
+  }
+  return(n);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc gradingAndVectorCompatible(module M, intvec c)
+{
+  if(nrows(getModuleGrading(M)) == size(c))
+  {
+    return(1);
+  }
+  else
+  {
+    return(0);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc deleteFirstEntry(multigradedcomplex tate)
+{
+  tate.modules = delete(tate.modules,1);
+  tate.differentials = delete(tate.differentials,1);
+  return(tate);
+}
+

@@ -14,7 +14,7 @@
 #endif /* NOSTREAMIO */
 
 template <class T>
-class Array {
+class FACTORY_PUBLIC Array {
 private:
     T * data;
     int _min;

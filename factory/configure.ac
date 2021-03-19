@@ -208,7 +208,9 @@ DX_INIT_DOXYGEN($PACKAGE_NAME, doxygen.cfg, $srcdir/docu)
 AC_CHECK_LIB(m, atof, , [ AC_MSG_ERROR(libm.a not found) ])
 
 # Check whether --with-gmp was given.
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
+                    [provide a non-standard location of gmp])])
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
 if test "${with_gmp+set}" = set; then :
   if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
@@ -430,12 +432,10 @@ AC_SUBST(MAKEHEADERFLAGS)
 #AC_SUBST(installtargets)
 #AC_SUBST(uninstalltargets)
 
-factory_version="4.1.3"
 factory_configuration="'$ac_configure_args' in `pwd`"
-AC_SUBST(factory_version)
 
-AH_TEMPLATE([FACTORYVERSION], [factory version])
-AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version")
+AH_TEMPLATE([FACTORYVERSION], [VERSION])
+AC_DEFINE_UNQUOTED([FACTORYVERSION], "$VERSION")
 
 AH_TEMPLATE([FACTORYCONFIGURATION], [factory configuration])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration")

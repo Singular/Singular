@@ -411,7 +411,12 @@ static number nr2mDiv(number a, number b, const coeffs r)
         b = (number)((unsigned long)b / 2);
       }
     }
-    if ((unsigned long)b % 2 == 0)
+    if ((long)b==0L)
+    {
+      WerrorS(nDivBy0);
+      return (number)0L;
+    }
+    else if ((unsigned long)b % 2 == 0)
     {
       WerrorS("Division not possible, even by cancelling zero divisors.");
       WerrorS("Result is integer division without remainder.");

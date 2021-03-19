@@ -2151,7 +2151,8 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     int *par_perm=NULL;
     int par_perm_size=0;
     BOOLEAN bo;
-    if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
+    nMap=n_SetMap(r->cf,currRing->cf);
+    if (nMap==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
       if (nCoeff_is_Extension(r->cf) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
@@ -2224,7 +2225,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         }
       }
     }
-    if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))
+    if ((iiOp==FETCH_CMD) && (BVERBOSE(V_IMAP)))
     {
       unsigned i;
       for(i=0;i<(unsigned)si_min(r->N,currRing->N);i++)
@@ -3015,7 +3016,6 @@ static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idQuot((ideal)u->Data(),(ideal)v->Data(),
     hasFlag(u,FLAG_STD),u->Typ()==v->Typ());
-  id_DelMultiples((ideal)(res->data),currRing);
   if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
@@ -6729,6 +6729,108 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
   res->data = (char *)m;
   return FALSE;
 }
+static BOOLEAN jjMODULO3(leftv res, leftv u, leftv v, leftv w)
+{
+  if (w->rtyp!=IDHDL) return TRUE; /* idhdhl required */
+  intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  tHomog hom=testHomog;
+  if (w_u!=NULL)
+  {
+    w_u=ivCopy(w_u);
+    hom=isHomog;
+  }
+  intvec *w_v=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  if (w_v!=NULL)
+  {
+    w_v=ivCopy(w_v);
+    hom=isHomog;
+  }
+  if ((w_u!=NULL) && (w_v==NULL))
+    w_v=ivCopy(w_u);
+  if ((w_v!=NULL) && (w_u==NULL))
+    w_u=ivCopy(w_v);
+  ideal u_id=(ideal)u->Data();
+  ideal v_id=(ideal)v->Data();
+  if (w_u!=NULL)
+  {
+     if ((*w_u).compare((w_v))!=0)
+     {
+       WarnS("incompatible weights");
+       delete w_u; w_u=NULL;
+       hom=testHomog;
+     }
+     else
+     {
+       if ((!idTestHomModule(u_id,currRing->qideal,w_v))
+       || (!idTestHomModule(v_id,currRing->qideal,w_v)))
+       {
+         WarnS("wrong weights");
+         delete w_u; w_u=NULL;
+         hom=testHomog;
+       }
+     }
+  }
+  idhdl h=(idhdl)w->data;
+  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u, &(h->data.umatrix));
+  if (w_u!=NULL)
+  {
+    atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
+  }
+  delete w_v;
+  //if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
+  return FALSE;
+}
+static BOOLEAN jjMODULO3S(leftv res, leftv u, leftv v, leftv w)
+{
+  if (w->rtyp!=IDHDL) return TRUE; /* idhdhl required */
+  intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  tHomog hom=testHomog;
+  if (w_u!=NULL)
+  {
+    w_u=ivCopy(w_u);
+    hom=isHomog;
+  }
+  intvec *w_v=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  if (w_v!=NULL)
+  {
+    w_v=ivCopy(w_v);
+    hom=isHomog;
+  }
+  if ((w_u!=NULL) && (w_v==NULL))
+    w_v=ivCopy(w_u);
+  if ((w_v!=NULL) && (w_u==NULL))
+    w_u=ivCopy(w_v);
+  ideal u_id=(ideal)u->Data();
+  GbVariant alg=syGetAlgorithm((char*)w->Data(),currRing,u_id);
+  ideal v_id=(ideal)v->Data();
+  if (w_u!=NULL)
+  {
+     if ((*w_u).compare((w_v))!=0)
+     {
+       WarnS("incompatible weights");
+       delete w_u; w_u=NULL;
+       hom=testHomog;
+     }
+     else
+     {
+       if ((!idTestHomModule(u_id,currRing->qideal,w_v))
+       || (!idTestHomModule(v_id,currRing->qideal,w_v)))
+       {
+         WarnS("wrong weights");
+         delete w_u; w_u=NULL;
+         hom=testHomog;
+       }
+     }
+  }
+  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u, NULL,alg);
+  if (w_u!=NULL)
+  {
+    atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
+  }
+  delete w_v;
+  //if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
+  return FALSE;
+}
 static BOOLEAN jjSMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
   int mi=(int)(long)v->Data();
@@ -6764,7 +6866,7 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
   return FALSE;
 }
-static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
+static BOOLEAN jjLIFTSTD_SYZ(leftv res, leftv u, leftv v, leftv w)
 {
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   if ((w->rtyp!=IDHDL)||(w->e!=NULL)) return TRUE;
@@ -6785,6 +6887,28 @@ static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
                                 &(hv->data.umatrix),testHomog,
                                 &(hw->data.uideal));
   setFlag(res,FLAG_STD); v->flag=0; w->flag=0;
+  return FALSE;
+}
+static BOOLEAN jjLIFTSTD_ALG(leftv res, leftv u, leftv v, leftv w)
+{
+  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
+  idhdl hv=(idhdl)v->data;
+  GbVariant alg=syGetAlgorithm((char*)w->Data(),currRing,(ideal)u->Data());
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                                &(hv->data.umatrix),testHomog,
+                                NULL,alg);
+  setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
@@ -7691,37 +7815,95 @@ static BOOLEAN jjLIFT_4(leftv res, leftv U)
     return TRUE;
   }
 }
-static BOOLEAN jjLIFTSTD_4(leftv res, leftv U)
+static BOOLEAN jjLIFTSTD_M(leftv res, leftv U)
 {
-  const short t1[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
-  const short t2[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+  // we have 4 or 5 arguments
   leftv u=U;
   leftv v=u->next;
-  leftv w=v->next;
-  leftv u4=w->next;
-  if (v->rtyp!=IDHDL) return TRUE;
-  if (w->rtyp!=IDHDL) return TRUE;
-  if (iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+  leftv u3=v->next;
+  leftv u4=u3->next;
+  leftv u5=u4->next; // might be NULL
+
+  ideal *syz=NULL;
+  GbVariant alg=GbDefault;
+  ideal h11=NULL;
+
+  if(u5==NULL)
   {
-    // see jjLIFTSTD3
-    ideal I=(ideal)u->Data();
-    idhdl hv=(idhdl)v->data;
-    idhdl hw=(idhdl)w->data;
-    GbVariant alg=syGetAlgorithm((char*)u4->Data(),currRing,I);
-    // CopyD for IDEAL_CMD and MODUL_CMD are identical:
-    res->data = (char *)idLiftStd((ideal)u->Data(),
-                                &(hv->data.umatrix),testHomog,
-                                &(hw->data.uideal),alg);
-    setFlag(res,FLAG_STD); v->flag=0; w->flag=0;
-    return FALSE;
+    // test all three possibilities for 4 arguments
+    const short t1[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+    const short t2[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD};
+    const short t3[]={4,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,IDEAL_CMD};
+    const short t4[]={4,MODUL_CMD,MATRIX_CMD,MODUL_CMD,MODUL_CMD};
+    const short t5[]={4,IDEAL_CMD,MATRIX_CMD,STRING_CMD,IDEAL_CMD};
+    const short t6[]={4,MODUL_CMD,MATRIX_CMD,STRING_CMD,MODUL_CMD};
+
+    if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+    {
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
+    }
+    else if(iiCheckTypes(U,t3)||iiCheckTypes(U,t4))
+    {
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      h11=(ideal)u4->Data();
+    }
+    else if(iiCheckTypes(U,t5)||iiCheckTypes(U,t6))
+    {
+      alg=syGetAlgorithm((char*)u3->Data(),currRing,(ideal)u->Data());
+      h11=(ideal)u4->Data();
+    }
+    else
+    {
+      Werror("%s(`ideal/module`,`matrix`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
   }
   else
   {
-    Werror("%s(`ideal`,`matrix`,`module`,`string`)\n"
-           "or (`module`,`matrix`,`module`,`string`) expected",
-           Tok2Cmdname(iiOp));
-    return TRUE;
+    // we have 5 arguments
+    const short t1[]={5,IDEAL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,IDEAL_CMD};
+    const short t2[]={5,MODUL_CMD,MATRIX_CMD,MODUL_CMD,STRING_CMD,MODUL_CMD};
+    if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+    {
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
+      h11=(ideal)u5->Data();
+    }
+    else
+    {
+      Werror("%s(`ideal/module`,`matrix`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
   }
+
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
+
+  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
+  idhdl hv=(idhdl)v->data;
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  res->rtyp = u->Typ();
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                              &(hv->data.umatrix),testHomog,
+                              syz,alg,h11);
+  setFlag(res,FLAG_STD); v->flag=0;
+  if(syz!=NULL)
+    u3->flag=0;
+  return FALSE;
 }
 BOOLEAN jjLIST_PL(leftv res, leftv v)
 {
@@ -7772,6 +7954,73 @@ BOOLEAN jjLIST_PL(leftv res, leftv v)
     }
   }
   res->data=(char *)L;
+  return FALSE;
+}
+static BOOLEAN jjMODULO4(leftv res, leftv u)
+{
+  leftv v=u->next;
+  leftv w=v->next;
+  leftv u4=w->next;
+  GbVariant alg;
+  ideal u_id,v_id;
+  // we have 4 arguments
+  const short t1[]={4,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD,STRING_CMD};
+  const short t2[]={4,MODUL_CMD,MODUL_CMD,MATRIX_CMD,STRING_CMD};
+  if(iiCheckTypes(u,t1)||iiCheckTypes(u,t2)||(w->rtyp!=IDHDL))
+  {
+    u_id=(ideal)u->Data();
+    v_id=(ideal)v->Data();
+    alg=syGetAlgorithm((char*)u4->Data(),currRing,u_id);
+  }
+  else
+  {
+    Werror("%s(`ideal/module`,`ideal/module`[,`matrix`][,`string`]) expected",Tok2Cmdname(iiOp));
+    return TRUE;
+  }
+  intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  tHomog hom=testHomog;
+  if (w_u!=NULL)
+  {
+    w_u=ivCopy(w_u);
+    hom=isHomog;
+  }
+  intvec *w_v=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  if (w_v!=NULL)
+  {
+    w_v=ivCopy(w_v);
+    hom=isHomog;
+  }
+  if ((w_u!=NULL) && (w_v==NULL))
+    w_v=ivCopy(w_u);
+  if ((w_v!=NULL) && (w_u==NULL))
+    w_u=ivCopy(w_v);
+  if (w_u!=NULL)
+  {
+     if ((*w_u).compare((w_v))!=0)
+     {
+       WarnS("incompatible weights");
+       delete w_u; w_u=NULL;
+       hom=testHomog;
+     }
+     else
+     {
+       if ((!idTestHomModule(u_id,currRing->qideal,w_v))
+       || (!idTestHomModule(v_id,currRing->qideal,w_v)))
+       {
+         WarnS("wrong weights");
+         delete w_u; w_u=NULL;
+         hom=testHomog;
+       }
+     }
+  }
+  idhdl h=(idhdl)w->data;
+  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u, &(h->data.umatrix),alg);
+  if (w_u!=NULL)
+  {
+    atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
+  }
+  delete w_v;
+  //if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjNAMES0(leftv res, leftv)
@@ -7932,73 +8181,84 @@ static BOOLEAN jjRESERVED0(leftv, leftv)
 
 static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 {
-	unsigned i=1;
-	int l = 0;
-	int k = 0;
-	lists L = (lists)omAllocBin(slists_bin);
-	struct blackbox_list *bb_list = NULL;
-	unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
+  unsigned i=1;
+  int l = 0;
+  int k = 0;
+  lists L = (lists)omAllocBin(slists_bin);
+  struct blackbox_list *bb_list = NULL;
+  unsigned nCount = (sArithBase.nCmdUsed-1) / 3;
 
-	if ((3*nCount) < sArithBase.nCmdUsed) {
-		nCount++;
-	}
-	bb_list = getBlackboxTypes();
-	// count the  number of entries;
-	for (i=0; i<nCount; i++) {
-		l++;
-		if (i + 1 + nCount < sArithBase.nCmdUsed) {
-			l++;
-		}
-		if(i+1+2*nCount<sArithBase.nCmdUsed) {
-			l++;
-		}
-	}
-	for (i = 0; i < bb_list->count; i++) {
-		if (bb_list->list[i] != NULL) {
-			l++;
-		}
-	}
-	// initiate list
-	L->Init(l);
-	k = 0;
-	for (i=0; i<nCount; i++) {
-		L->m[k].rtyp = STRING_CMD;
-		L->m[k].data = omStrDup(sArithBase.sCmds[i+1].name);
-		k++;
-		// Print("%-20s", sArithBase.sCmds[i+1].name);
-		if (i + 1 + nCount < sArithBase.nCmdUsed) {
-			L->m[k].rtyp = STRING_CMD;
-			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+nCount].name);
-			k++;
-			// Print("%-20s", sArithBase.sCmds[i+1 + nCount].name);
-		}
-		if(i+1+2*nCount<sArithBase.nCmdUsed) {
-			L->m[k].rtyp = STRING_CMD;
-			L->m[k].data = omStrDup(sArithBase.sCmds[i+1+2*nCount].name);
-			k++;
-			// Print("%-20s", sArithBase.sCmds[i+1+2*nCount].name);
-		}
-		// PrintLn();
-	}
+  if ((3*nCount) < sArithBase.nCmdUsed)
+  {
+    nCount++;
+  }
+  bb_list = getBlackboxTypes();
+  // count the  number of entries;
+  for (i=0; i<nCount; i++)
+  {
+    l++;
+    if (i + 1 + nCount < sArithBase.nCmdUsed)
+    {
+      l++;
+    }
+    if(i+1+2*nCount<sArithBase.nCmdUsed)
+    {
+      l++;
+    }
+  }
+  for (i = 0; i < bb_list->count; i++)
+  {
+    if (bb_list->list[i] != NULL)
+    {
+      l++;
+    }
+  }
+  // initiate list
+  L->Init(l);
+  k = 0;
+  for (i=0; i<nCount; i++)
+  {
+    L->m[k].rtyp = STRING_CMD;
+    L->m[k].data = omStrDup(sArithBase.sCmds[i+1].name);
+    k++;
+    // Print("%-20s", sArithBase.sCmds[i+1].name);
+    if (i + 1 + nCount < sArithBase.nCmdUsed)
+    {
+      L->m[k].rtyp = STRING_CMD;
+      L->m[k].data = omStrDup(sArithBase.sCmds[i+1+nCount].name);
+      k++;
+      // Print("%-20s", sArithBase.sCmds[i+1 + nCount].name);
+    }
+    if(i+1+2*nCount<sArithBase.nCmdUsed)
+    {
+      L->m[k].rtyp = STRING_CMD;
+      L->m[k].data = omStrDup(sArithBase.sCmds[i+1+2*nCount].name);
+      k++;
+      // Print("%-20s", sArithBase.sCmds[i+1+2*nCount].name);
+    }
+    // PrintLn();
+  }
 
-	// assign blackbox types
-	for (i = 0; i < bb_list->count; i++) {
-		if (bb_list->list[i] != NULL) {
-			L->m[k].rtyp = STRING_CMD;
-			// already used strdup in getBlackBoxTypes
-			L->m[k].data = bb_list->list[i];
-			k++;
-		}
-	}
-	// free the struct (not the list entries itself, which were allocated
-	// by strdup)
-	omfree(bb_list->list);
-	omfree(bb_list);
+  // assign blackbox types
+  for (i = 0; i < bb_list->count; i++)
+  {
+    if (bb_list->list[i] != NULL)
+    {
+      L->m[k].rtyp = STRING_CMD;
+      // already used strdup in getBlackBoxTypes
+      L->m[k].data = bb_list->list[i];
+      k++;
+    }
+  }
+  // free the struct (not the list entries itself, which were allocated
+  // by strdup)
+  omfree(bb_list->list);
+  omfree(bb_list);
 
-	// pass the resultant list to the res datastructure
-	res->data=(void *)L;
+  // pass the resultant list to the res datastructure
+  res->data=(void *)L;
 
-	return FALSE;
+  return FALSE;
 }
 static BOOLEAN jjSTRING_PL(leftv res, leftv v)
 {

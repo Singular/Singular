@@ -43,36 +43,36 @@ static char * nlEatLong(char *s, mpz_ptr i)
   return s;
 }
 
-static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
+static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void *)
 {
   return (r->type==n);
 }
-static void SetChar(const coeffs r)
+static void SetChar(const coeffs)
 {
   // dummy
 }
-static number Mult(number a, number b, const coeffs c)
+static number Mult(number a, number b, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   fmpq_poly_mul(res,(fmpq_poly_ptr)a,(fmpq_poly_ptr)b);
   return (number)res;
 }
-static number Sub(number a, number b, const coeffs c)
+static number Sub(number a, number b, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   fmpq_poly_sub(res,(fmpq_poly_ptr)a,(fmpq_poly_ptr)b);
   return (number)res;
 }
-static number Add(number a, number b, const coeffs c)
+static number Add(number a, number b, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   fmpq_poly_add(res,(fmpq_poly_ptr)a,(fmpq_poly_ptr)b);
   return (number)res;
 }
-static number Div(number a, number b, const coeffs c)
+static number Div(number a, number b, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
@@ -94,7 +94,7 @@ static number Div(number a, number b, const coeffs c)
   }
   return (number)res;
 }
-static number ExactDiv(number a, number b, const coeffs c)
+static number ExactDiv(number a, number b, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
@@ -106,32 +106,34 @@ static number ExactDiv(number a, number b, const coeffs c)
     fmpq_poly_div(res,(fmpq_poly_ptr)a,(fmpq_poly_ptr)b);
   return (number)res;
 }
-static number IntMod(number a, number b, const coeffs c)
+#if 0
+static number IntMod(number a, number b, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   fmpq_poly_rem(res,(fmpq_poly_ptr)a,(fmpq_poly_ptr)b);
   return (number)res;
 }
-static number Init (long i, const coeffs r)
+#endif
+static number Init (long i, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   fmpq_poly_set_si(res,i);
   return (number)res;
 }
-static number InitMPZ (mpz_t i, const coeffs r)
+static number InitMPZ (mpz_t i, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   fmpq_poly_set_mpz(res,i);
   return (number)res;
 }
-static int Size (number n, const coeffs r)
+static int Size (number n, const coeffs)
 {
   return fmpq_poly_degree((fmpq_poly_ptr)n);
 }
-static long Int (number &n, const coeffs r)
+static long Int (number &n, const coeffs)
 {
   if (fmpq_poly_degree((fmpq_poly_ptr)n)==0)
   {
@@ -154,7 +156,7 @@ static long Int (number &n, const coeffs r)
   }
   return 0;
 }
-static void MPZ(mpz_t result, number &n, const coeffs r)
+static void MPZ(mpz_t result, number &n, const coeffs)
 {
   mpz_init(result);
   if (fmpq_poly_degree((fmpq_poly_ptr)n)==0)
@@ -172,12 +174,12 @@ static void MPZ(mpz_t result, number &n, const coeffs r)
     mpq_clear(m);
   }
 }
-static number Neg(number a, const coeffs r)
+static number Neg(number a, const coeffs)
 {
   fmpq_poly_neg((fmpq_poly_ptr)a,(fmpq_poly_ptr)a);
   return a;
 }
-static number Invers(number a, const coeffs r)
+static number Invers(number a, const coeffs)
 {
   if(fmpq_poly_is_zero((fmpq_poly_ptr)a))
   {
@@ -197,22 +199,22 @@ static number Invers(number a, const coeffs r)
     return NULL;
   }
 }
-static number Copy(number a, const coeffs r)
+static number Copy(number a, const coeffs)
 {
  fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
  fmpq_poly_init(res);
  fmpq_poly_set(res,(fmpq_poly_ptr)a);
  return (number)res;
 }
-//static number RePart(number a, const coeffs r)
+//static number RePart(number a, const coeffs)
 //{
 //}
-//static number ImPart(number a, const coeffs r)
+//static number ImPart(number a, const coeffs)
 //{
 //}
-static BOOLEAN IsOne (number a, const coeffs r);
-static BOOLEAN IsZero (number a, const coeffs r);
-//static void WriteLong(number &a, const coeffs r)
+static BOOLEAN IsOne (number a, const coeffs);
+static BOOLEAN IsZero (number a, const coeffs);
+//static void WriteLong(number &a, const coeffs)
 //{
 //}
 static void WriteShort(number a, const coeffs r)
@@ -311,27 +313,27 @@ static const char* Read(const char * st, number * a, const coeffs r)
     fmpq_poly_neg((fmpq_poly_ptr)(*a),(fmpq_poly_ptr)(*a));
   return s;
 }
-static void Normalize(number &a, const coeffs r)
+static void Normalize(number &a, const coeffs)
 {
   fmpq_poly_canonicalise((fmpq_poly_ptr)a);
 }
-static BOOLEAN Greater (number a, number b, const coeffs r)
+static BOOLEAN Greater (number a, number b, const coeffs)
 {
   return (fmpq_poly_cmp((fmpq_poly_ptr)a,(fmpq_poly_ptr)b)>0);
 }
-static BOOLEAN Equal (number a, number b, const coeffs r)
+static BOOLEAN Equal (number a, number b, const coeffs)
 {
   return (fmpq_poly_equal((fmpq_poly_ptr)a,(fmpq_poly_ptr)b));
 }
-static BOOLEAN IsZero (number a, const coeffs r)
+static BOOLEAN IsZero (number a, const coeffs)
 {
   return fmpq_poly_is_zero((fmpq_poly_ptr)a);
 }
-static BOOLEAN IsOne (number a, const coeffs r)
+static BOOLEAN IsOne (number a, const coeffs)
 {
   return fmpq_poly_is_one((fmpq_poly_ptr)a);
 }
-static BOOLEAN IsMOne (number k, const coeffs r)
+static BOOLEAN IsMOne (number k, const coeffs)
 {
   if (fmpq_poly_length((fmpq_poly_ptr)k)>0) return FALSE;
   fmpq_poly_canonicalise((fmpq_poly_ptr)k);
@@ -355,28 +357,28 @@ static BOOLEAN IsMOne (number k, const coeffs r)
   mpq_clear(m);
   return (result);
 }
-static BOOLEAN GreaterZero (number k, const coeffs r)
+static BOOLEAN GreaterZero (number, const coeffs)
 {
   // does it have a leading sign?
   // no: 0 and 1 do not have, everything else is in (...)
   return TRUE;
 }
-static void Power(number a, int i, number * result, const coeffs r)
+static void Power(number a, int i, number * result, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   *result=(number)res;
   fmpq_poly_pow((fmpq_poly_ptr)(*result),(fmpq_poly_ptr)a,i);
 }
-static number GetDenom(number &n, const coeffs r)
+static number GetDenom(number &n, const coeffs)
 {
  fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
  fmpq_poly_init(res);
- fmpz_ptr den=fmpq_poly_denref(res);
+ fmpz_ptr den=fmpq_poly_denref((fmpq_poly_ptr)n);
  fmpq_poly_set_fmpz(res,den);
  return (number)res;
 }
-static number GetNumerator(number &n, const coeffs r)
+static number GetNumerator(number &n, const coeffs)
 {
  fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
  fmpq_poly_init(res);
@@ -385,14 +387,14 @@ static number GetNumerator(number &n, const coeffs r)
  fmpq_poly_scalar_mul_fmpz(res,res,den);
  return (number)res;
 }
-static number Gcd(number a, number b, const coeffs r)
+static number Gcd(number a, number b, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
   fmpq_poly_gcd(res,(fmpq_poly_ptr)a,(fmpq_poly_ptr)b);
   return (number)res;
 }
-static number ExtGcd(number a, number b, number *s, number *t,const coeffs r)
+static number ExtGcd(number a, number b, number *s, number *t,const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
@@ -401,11 +403,12 @@ static number ExtGcd(number a, number b, number *s, number *t,const coeffs r)
   fmpq_poly_xgcd(res,(fmpq_poly_ptr)*s,(fmpq_poly_ptr)*t,(fmpq_poly_ptr)a,(fmpq_poly_ptr)b);
   return (number)res;
 }
-static number Lcm(number a, number b, const coeffs r)
+static number Lcm(number, number, const coeffs)
 {
   WerrorS("not yet: Lcm");
+  return NULL;
 }
-static void Delete(number * a, const coeffs r)
+static void Delete(number * a, const coeffs)
 {
   if ((*a)!=NULL)
   {
@@ -414,18 +417,19 @@ static void Delete(number * a, const coeffs r)
     *a=NULL;
   }
 }
-static nMapFunc SetMap(const coeffs src, const coeffs dst)
+static nMapFunc SetMap(const coeffs, const coeffs)
 {
   WerrorS("not yet: SetMap");
   return NULL;
 }
-//static void InpMult(number &a, number b, const coeffs r)
+//static void InpMult(number &a, number b, const coeffs)
 //{
 //}
-//static void InpAdd(number &a, number b, const coeffs r)
+//static void InpAdd(number &a, number b, const coeffs)
 //{
 //}
-static number Init_bigint(number i, const coeffs dummy, const coeffs dst)
+#if 0
+static number Init_bigint(number i, const coeffs, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
@@ -437,19 +441,22 @@ static number Init_bigint(number i, const coeffs dummy, const coeffs dst)
     fmpq_poly_set_mpz(res,i->z);
   return (number)res;
 }
-static number Farey(number p, number n, const coeffs)
+#endif
+static number Farey(number, number, const coeffs)
 {
   WerrorS("not yet: Farey");
+  return NULL;
 }
-static number ChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,CFArray &inv_cache,const coeffs)
+static number ChineseRemainder(number *, number *,int , BOOLEAN ,CFArray &,const coeffs)
 {
   WerrorS("not yet: ChineseRemainder");
+  return NULL;
 }
-static int ParDeg(number x,const coeffs r)
+static int ParDeg(number x,const coeffs)
 {
   return fmpq_poly_degree((fmpq_poly_ptr)x);
 }
-static number Parameter(const int i, const coeffs r)
+static number Parameter(const int, const coeffs)
 {
   fmpq_poly_ptr res=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(res);
@@ -506,13 +513,15 @@ static number ReadFd(const ssiInfo *d, const coeffs)
 }
 // cfClearContent
 // cfClearDenominators
-static number ConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+static number ConvFactoryNSingN( const CanonicalForm, const coeffs)
 {
   WerrorS("not yet: ConvFactoryNSingN");
+  return NULL;
 }
-static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
+static CanonicalForm ConvSingNFactoryN( number, BOOLEAN, const coeffs )
 {
   WerrorS("not yet: ConvSingNFactoryN");
+  return CanonicalForm(0);
 }
 char * CoeffName(const coeffs r)
 {
@@ -539,7 +548,7 @@ coeffs flintQInitCfByName(char *s,n_coeffType n)
   return NULL;
 }
 #ifdef LDEBUG
-static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
+static BOOLEAN DBTest(number, const char *, const int, const coeffs)
 {
   return TRUE;
 }

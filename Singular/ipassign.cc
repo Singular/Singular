@@ -170,62 +170,54 @@ static void jjMINPOLY_red(idhdl h)
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
 }
-ring jjSetMinpoly(ring r, number a)
+// change the coeff cf=K[x] (of type n_transExt) to K[x]/a
+// return NULL in error case
+coeffs jjSetMinpoly(coeffs cf, number a)
 {
-  if ( !nCoeff_is_transExt(r->cf) )
+  if ( !nCoeff_is_transExt(cf) )
   {
-    if(!nCoeff_is_algExt(r->cf) )
+    if(!nCoeff_is_algExt(cf) )
     {
       WerrorS("cannot set minpoly for these coeffients");
       return NULL;
     }
   }
-  if (rVar(r->cf->extRing)!=1)
+  if (rVar(cf->extRing)!=1)
   {
-    WerrorS("only univarite minpoly allowed");
+    WerrorS("only univariate minpoly allowed");
     return NULL;
   }
 
-  assume (r->idroot==NULL);
+  number p = n_Copy(a,cf);
+  n_Normalize(p, cf);
 
-  number p = n_Copy(a,r->cf);
-  n_Normalize(p, r->cf);
-
-  if (n_IsZero(p, r->cf))
+  if (n_IsZero(p, cf))
   {
-    n_Delete(&p, r->cf);
-    if( nCoeff_is_transExt(r->cf) )
-    {
-      return r;
-    }
-    WarnS("cannot set minpoly to 0 / alg. extension?");
-    return NULL;
+    n_Delete(&p, cf);
+    return cf;
   }
-  r=rCopy(r);
-  // remove all object currently in the ring
 
   AlgExtInfo A;
 
-  A.r = rCopy(r->cf->extRing); // Copy  ground field!
+  A.r = rCopy(cf->extRing); // Copy  ground field!
   // if minpoly was already set:
-  if( r->cf->extRing->qideal != NULL ) id_Delete(&(A.r->qideal),A.r);
+  if( cf->extRing->qideal != NULL ) id_Delete(&(A.r->qideal),A.r);
   ideal q = idInit(1,1);
   if ((p==NULL) ||(NUM((fraction)p)==NULL))
   {
     WerrorS("Could not construct the alg. extension: minpoly==0");
     // cleanup A: TODO
     rDelete( A.r );
-    rDelete(r);
     return NULL;
   }
   if (DEN((fraction)(p)) != NULL) // minpoly must be a fraction with poly numerator...!!
   {
     poly n=DEN((fraction)(p));
-    if(!p_IsConstant(n,r->cf->extRing))
+    if(!p_IsConstant(n,cf->extRing))
     {
       WarnS("denominator must be constant - ignoring it");
     }
-    p_Delete(&n,r->cf->extRing);
+    p_Delete(&n,cf->extRing);
     DEN((fraction)(p))=NULL;
   }
 
@@ -239,17 +231,12 @@ ring jjSetMinpoly(ring r, number a)
   coeffs new_cf = nInitChar(n_algExt, &A);
   if (new_cf==NULL)
   {
-    WerrorS("Could not construct the alg. extension: llegal minpoly?");
+    WerrorS("Could not construct the alg. extension: illegal minpoly?");
     // cleanup A: TODO
     rDelete( A.r );
-    rDelete(r);
     return NULL;
   }
-  else
-  {
-    nKillChar(r->cf); r->cf=new_cf;
-  }
-  return r;
+  return new_cf;
 }
 
 static BOOLEAN jjMINPOLY(leftv, leftv a)
@@ -473,15 +460,28 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
   }
   return FALSE;
 }
+static inline void jjCheck_FLAG_OTHER_RING(leftv res)
+{
+  if (Sy_inset(FLAG_OTHER_RING,res->flag))
+  {
+    if ((res-1)->data!=currRing)
+    {
+      if ((res-1)->data!=NULL)
+      {
+        ring rr=(ring)(res-1)->data;
+        rr->ref--;
+      }
+      (res-1)->data=currRing;
+      (res-1)->rtyp=RING_CMD;
+      currRing->ref++;
+    }
+  }
+}
 static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
   number p=(number)a->CopyD(NUMBER_CMD);
   if (res->data!=NULL) nDelete((number *)&res->data);
   nNormalize(p);
@@ -708,11 +708,7 @@ static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
   syStrategy r=(syStrategy)a->CopyD(RESOLUTION_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
   int add_row_shift = 0;
@@ -726,11 +722,8 @@ static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  // FLAG_OTHER_RING is only set for ring dep. types, so currRing!=NULL
+  jjCheck_FLAG_OTHER_RING(res);
   lists l=(lists)a->CopyD(LIST_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
   res->data=(void *)l;
@@ -741,11 +734,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
   poly p=(poly)a->CopyD(POLY_CMD);
   pNormalize(p);
   if (e==NULL)
@@ -932,13 +921,9 @@ static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr)
 static BOOLEAN jiA_BUCKET(leftv res, leftv a, Subexpr e)
 // there should be no assign bucket:=bucket, here we have poly:=bucket
 {
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
+  jjCheck_FLAG_OTHER_RING(res);
   sBucket_pt b=(sBucket_pt)a->CopyD();
   poly p; int l;
   sBucketDestroyAdd(b,&p,&l);
@@ -950,13 +935,9 @@ static BOOLEAN jiA_BUCKET(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr)
 {
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
+  jjCheck_FLAG_OTHER_RING(res);
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   res->data=(void *)a->CopyD(MATRIX_CMD);
   if (a->rtyp==IDHDL) id_Normalize((ideal)a->Data(), currRing);
@@ -980,12 +961,8 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr)
 static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
   if (errorreported) return TRUE;
+  jjCheck_FLAG_OTHER_RING(res);
   if (res->data!=NULL) syKillComputation((syStrategy)res->data);
   res->data=(void *)a->CopyD(RESOLUTION_CMD);
   jiAssignAttr(res,a);
@@ -995,12 +972,8 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr)
 /* module = poly */
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
   if (errorreported) return TRUE;
+  jjCheck_FLAG_OTHER_RING(res);
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   ideal I=idInit(1,1);
   I->m[0]=(poly)a->CopyD(POLY_CMD);
@@ -1018,11 +991,7 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   matrix m=(matrix)a->CopyD(MATRIX_CMD);
   if (TEST_V_ALLWARN)
@@ -1044,11 +1013,7 @@ static BOOLEAN jiA_IDEAL_Mo(leftv res, leftv a, Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
   ideal m=(ideal)a->CopyD(MODUL_CMD);
   if (m->rank>1)
   {
@@ -1095,11 +1060,7 @@ static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
   if (res->data!=NULL)
   {
     omFree((ADDRESS)((map)res->data)->preimage);
@@ -1115,11 +1076,7 @@ static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr)
 {
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
   map f=(map)res->data;
   char *rn=f->preimage; // save the old/already assigned preimage ring name
   f->preimage=NULL;
@@ -1141,11 +1098,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   }
   void *test_p=a->Data(); // can I access it (newstruct)?
   if (errorreported) return TRUE;
-  if (Sy_inset(FLAG_OTHER_RING,res->flag))
-  {
-    (res-1)->data=currRing;
-    (res-1)->rtyp=RING_CMD;
-  }
+  jjCheck_FLAG_OTHER_RING(res);
 
   ring old_ring=(ring)res->Data();
 
@@ -1975,6 +1928,7 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   BOOLEAN b;
   sleftv tmp;
   memset(&tmp,0,sizeof(sleftv));
+  //tmp.flag=ld->flag;
   if (/*(ld->rtyp!=LIST_CMD)
   &&*/(ld->e==NULL)
   && (ld->Typ()!=r->Typ()))
@@ -2049,7 +2003,6 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
   }
   else if (l->attribute!=NULL)
     atKillAll((idhdl)l);
-  l->flag=0;
   if (ll==1)
   {
     /* l[..] = ... */
@@ -2244,7 +2197,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         return b;
       }
       //no break, handle the rest like an ideal:
-      map_assign=TRUE;
+      map_assign=TRUE; // and continue
     }
     case MATRIX_CMD:
     case IDEAL_CMD:

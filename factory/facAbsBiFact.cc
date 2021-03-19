@@ -207,7 +207,6 @@ choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec,
   return 0;
 }
 
-#ifdef HAVE_NTL // henselLiftAndEarly
 //G is assumed to be bivariate, irreducible over Q, primitive wrt x and y, compressed
 CFAFList absBiFactorizeMain (const CanonicalForm& G, bool full)
 {
@@ -469,7 +468,7 @@ differentevalpoint:
     CanonicalForm otherFactor=
     convertFmpz_poly_t2FacCF ((fmpz_poly_t &)liftedFactors->p[1],x);
     modpk pk= modpk (p, k);
-#else
+#elif defined(HAVE_NTL)
     modpk pk= modpk (p, k);
     ZZX NTLFi=convertFacCF2NTLZZX (pk (Fi*pk.inverse (lc(Fi))));
     setCharacteristic (p);
@@ -502,6 +501,8 @@ differentevalpoint:
 
     CanonicalForm otherFactor=
                   convertNTLZZX2CF (liftedFactors[1], x);
+#else
+   factoryError("absBiFactorizeMain: NTL/FLINT missing");
 #endif
 
     Off (SW_SYMMETRIC_FF);
@@ -849,5 +850,4 @@ differentevalpoint:
 
   return result;
 }
-#endif
 #endif

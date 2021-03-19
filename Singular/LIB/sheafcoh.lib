@@ -126,28 +126,35 @@ EXAMPLE: example truncate; shows an example
 KEYWORDS: truncated module
 "
 {
-  if ( typeof(attrib(phi,"isHomog"))=="string" ) {
-    if (size(phi)==0) {
+  if ( typeof(attrib(phi,"isHomog"))=="string" )
+  {
+    if (size(phi)==0)
+    {
       // assign weights 0 to generators of R^n (n=nrows(phi))
       intvec v;
       v[nrows(phi)]=0;
       attrib(phi,"isHomog",v);
     }
-    else {
+    else
+    {
       ERROR("No admissible degree vector assigned");
     }
   }
-  else {
+  else
+  {
    intvec v=attrib(phi,"isHomog");
   }
   int i,m,dummy;
   int s = nrows(phi);
   module L; // TOO BIG!!!
-  for (i=1; i<=s; i++) {
-    if (d>v[i]) {
+  for (i=1; i<=s; i++)
+  {
+    if (d>v[i])
+    {
       L = L+maxideal(d-v[i])*gen(i);
     }
-    else {
+    else
+    {
       L = L+gen(i);
     }
   }
@@ -226,18 +233,22 @@ KEYWORDS: truncated module
 
   dbprint(PL-1, "// M is a SB! ");
 
-  if ( typeof(attrib(M,"isHomog"))=="string" ) {
-    if (size(M)==0) {
+  if ( typeof(attrib(M,"isHomog"))=="string" )
+  {
+    if (size(M)==0)
+    {
       // assign weights 0 to generators of R^n (n=nrows(M))
       intvec v;
       v[nrows(M)]=0;
       attrib(M,"isHomog",v);
     }
-    else {
+    else
+    {
       ERROR("No admissible degree vector assigned");
     }
   }
-  else {
+  else
+  {
    intvec v=attrib(M,"isHomog");
   }
 
@@ -246,42 +257,37 @@ KEYWORDS: truncated module
   int i,m,dummy;
   int s = nrows(M);
 
-   int tKBaseBegin = timer;
-    module L = kbase(M, d); // TODO: check whether this is always correct!?!
+  int tKBaseBegin = timer;
+  module L = kbase(M, d); // TODO: check whether this is always correct!?!
 
+  dbprint(PL-1, "// L = kbase(M,d): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
+  dbprint(PL-2, L);
+  dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
 
-    dbprint(PL-1, "// L = kbase(M,d): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
-    dbprint(PL-2, L);
-    dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
+  int tModuloBegin = timer;
+  L = modulo(L,M);
 
-   int tModuloBegin = timer;
-    L = modulo(L,M);
+  dbprint(PL-1, "// L = modulo(L,M): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
+  dbprint(PL-2, L);
+  dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
 
-    dbprint(PL-1, "// L = modulo(L,M): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
-    dbprint(PL-2, L);
-    dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
+  int tPruneBegin = timer;
+  L = prune(L);
 
-   int tPruneBegin = timer;
-    L = prune(L);
+  dbprint(PL-1, "// L = prune(L): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
+  dbprint(PL-2, L);
+  dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
 
-    dbprint(PL-1, "// L = prune(L): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
-    dbprint(PL-2, L);
-    dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
+  int tPruneEnd = timer;
+  L = minbase(L);
+  int tMinBaseEnd = timer;
 
-   int tPruneEnd = timer;
-    L = minbase(L);
-   int tMinBaseEnd = timer;
-
-    dbprint(PL-1, "// L = minbase(L): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
-    dbprint(PL-2, L);
-    dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
-
-
-
+  dbprint(PL-1, "// L = minbase(L): "+string(nrows(L)) + " x " + string(ncols(L)) +"");
+  dbprint(PL-2, L);
+  dbprint(PL-1, "// weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
 
   if (size(L)!=0)
   {
-
     // it only remains to set the degrees for L:
     // ------------------------------------------
     m = v[1];
@@ -297,7 +303,6 @@ KEYWORDS: truncated module
 
   dbprint(PL-1, "// corrected weighting(L): ["+ string(attrib(L, "isHomog")) + "]");
 
-
   if(PL > 0)
   {
   "
@@ -312,52 +317,47 @@ KEYWORDS: truncated module
   }
 
   option(set, save);
-
   return(L);
 }
 example
 {"EXAMPLE:";
-   echo = 2;
-   ring R=0,(x,y,z,u,v),dp;
-   module M=maxideal(3);
-   homog(M);
-   // compute presentation matrix for truncated module (R/<x,y,z,u>^3)_(>=2)
-   int t=timer;
-   module M2t=truncate(M,2);
-   t = timer - t;
-   "// Simple truncate: ", t;
-   t=timer;
-   module M2=truncateFast(std(M),2);
-   t = timer - t;
-   "// Fast truncate: ", t;
-   print(M2);
-   "// Check: M2t == M2?: ", size(NF(M2, std(M2t))) + size(NF(M2t, std(M2)));
+  echo = 2;
+  ring R=0,(x,y,z,u,v),dp;
+  module M=maxideal(3);
+  homog(M);
+  // compute presentation matrix for truncated module (R/<x,y,z,u>^3)_(>=2)
+  int t=timer;
+  module M2t=truncate(M,2);
+  t = timer - t;
+  "// Simple truncate: ", t;
+  t=timer;
+  module M2=truncateFast(std(M),2);
+  t = timer - t;
+  "// Fast truncate: ", t;
+  print(M2);
+  "// Check: M2t == M2?: ", size(NF(M2, std(M2t))) + size(NF(M2t, std(M2)));
 
-   dimGradedPart(M2,1);
-   dimGradedPart(M2,2);
-   // this should coincide with:
-   dimGradedPart(M,2);
-   // shift grading by 1:
-   intvec v=1;
-   attrib(M,"isHomog",v);
-   t=timer;
-   M2t=truncate(M,2);
-   t = timer - t;
-   "// Simple truncate: ", t;
-   t=timer;
-   M2=truncateFast(std(M),2);
-   t = timer - t;
-   "// Fast truncate: ", t;
-   print(M2);
-   "// Check: M2t == M2?: ", size(NF(M2, std(M2t))) + size(NF(M2t, std(M2))); //?
-   dimGradedPart(M2,3);
+  dimGradedPart(M2,1);
+  dimGradedPart(M2,2);
+  // this should coincide with:
+  dimGradedPart(M,2);
+  // shift grading by 1:
+  intvec v=1;
+  attrib(M,"isHomog",v);
+  t=timer;
+  M2t=truncate(M,2);
+  t = timer - t;
+  "// Simple truncate: ", t;
+  t=timer;
+  M2=truncateFast(std(M),2);
+  t = timer - t;
+  "// Fast truncate: ", t;
+  print(M2);
+  "// Check: M2t == M2?: ", size(NF(M2, std(M2t))) + size(NF(M2t, std(M2))); //?
+  dimGradedPart(M2,3);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 proc dimGradedPart(module phi, int d)
 "USAGE:   dimGradedPart(M,d);  M module, d int
@@ -370,31 +370,39 @@ EXAMPLE: example dimGradedPart; shows an example
 KEYWORDS: graded module, graded piece
 "
 {
-  if ( typeof(attrib(phi,"isHomog"))=="string" ) {
-    if (size(phi)==0) {
+  if ( typeof(attrib(phi,"isHomog"))=="string" )
+  {
+    if (size(phi)==0)
+    {
       // assign weights 0 to generators of R^n (n=nrows(phi))
       intvec v;
       v[nrows(phi)]=0;
     }
     else { ERROR("No admissible degree vector assigned"); }
   }
-  else {
+  else
+  {
     intvec v=attrib(phi,"isHomog");
   }
   int s = nrows(phi);
   int i,m,dummy;
   module L,LL;
-  for (i=1; i<=s; i++) {
-    if (d>v[i]) {
+  for (i=1; i<=s; i++)
+  {
+    if (d>v[i])
+    {
       L = L+maxideal(d-v[i])*gen(i);
       LL = LL+maxideal(d+1-v[i])*gen(i);
     }
-    else {
+    else
+    {
       L = L+gen(i);
-      if (d==v[i]) {
+      if (d==v[i])
+      {
         LL = LL+maxideal(1)*gen(i);
       }
-      else {
+      else
+      {
         LL = LL+gen(i);
       }
     }
@@ -434,14 +442,17 @@ EXAMPLE: example CM_regularity; shows an example
 KEYWORDS: Castelnuovo-Mumford regularity
 "
 {
-  if ( typeof(attrib(M,"isHomog"))=="string" ) {
-    if (size(M)==0) {
+  if ( typeof(attrib(M,"isHomog"))=="string" )
+  {
+    if (size(M)==0)
+    {
       // assign weights 0 to generators of R^n (n=nrows(M))
       intvec v;
       v[nrows(M)]=0;
       attrib(M,"isHomog",v);
     }
-    else {
+    else
+    {
       ERROR("No admissible degree vector assigned");
     }
   }
@@ -449,27 +460,29 @@ KEYWORDS: Castelnuovo-Mumford regularity
   if( attrib(CM_regularity,"Algorithm") == "minres_res" )
   {
     def L = minres( res(M,0) ); // let's try it out!
-  } else
+  }
+  else
   {
     def L = mres(M,0);
   }
 
   intmat BeL = betti(L);
   int r = nrows(module(matrix(BeL)));  // last non-zero row
-  if (typeof(attrib(BeL,"rowShift"))!="string") {
+  if (typeof(attrib(BeL,"rowShift"))!="string")
+  {
     int shift = attrib(BeL,"rowShift");
   }
   return(r+shift-1);
 }
 example
 {"EXAMPLE:";
-   echo = 2;
-   ring R=0,(x,y,z,u),dp;
-   resolution T1=mres(maxideal(1),0);
-   module M=T1[3];
-   intvec v=2,2,2,2,2,2;
-   attrib(M,"isHomog",v);
-   CM_regularity(M);
+  echo = 2;
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  attrib(M,"isHomog",v);
+  CM_regularity(M);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -578,20 +591,20 @@ EXAMPLE: example sheafCohBGG; shows an example
 }
 example
 {"EXAMPLE:";
-   echo = 2;
-   // cohomology of structure sheaf on P^4:
-   //-------------------------------------------
-   ring r=0,x(1..5),dp;
-   module M=0;
-   def A=sheafCohBGG(M,-9,4);
-   // cohomology of cotangential bundle on P^3:
-   //-------------------------------------------
-   ring R=0,(x,y,z,u),dp;
-   resolution T1=mres(maxideal(1),0);
-   module M=T1[3];
-   intvec v=2,2,2,2,2,2;
-   attrib(M,"isHomog",v);
-   def B=sheafCohBGG(M,-8,4);
+  echo = 2;
+  // cohomology of structure sheaf on P^4:
+  //-------------------------------------------
+  ring r=0,x(1..5),dp;
+  module M=0;
+  def A=sheafCohBGG(M,-9,4);
+  // cohomology of cotangential bundle on P^3:
+  //-------------------------------------------
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  attrib(M,"isHomog",v);
+  def B=sheafCohBGG(M,-8,4);
 }
 
 
@@ -605,7 +618,8 @@ static proc showResult( def R, int l, int h )
   if(typeof(R)=="resolution")
   {
     Betti = betti(R);
-  } else
+  }
+  else
   {
     if(typeof(R)!="intmat")
     {
@@ -642,27 +656,33 @@ static proc showResult( def R, int l, int h )
   intmat newBetti[ n + 1 ][ iWTH ];
   int i, j;
 
-  for (j=1; j<=row; j++) {
-    for (i=l; i<=h; i++) {
-      if( (n+2-shift-j)>0 ) {
-
-        if (  (k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1)) {
+  for (j=1; j<=row; j++)
+  {
+    for (i=l; i<=h; i++)
+    {
+      if( (n+2-shift-j)>0 )
+      {
+        if (  (k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1))
+        {
           newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
         }
         else { newBetti[n+2-shift-j,i-l+1]=-1; }
-
       }
     }
   }
 
-  for (j=2; j<=n+1; j++) {
-    for (i=1; i<min(j, iWTH); i++) {
+  for (j=2; j<=n+1; j++)
+  {
+    for (i=1; i<min(j, iWTH); i++)
+    {
       newBetti[j,i]= -1;
     }
   }
 
-  for (j=1; j<=n; j++) {
-    for (i=iWTH; i>=k+j; i--) {
+  for (j=1; j<=n; j++)
+  {
+    for (i=iWTH; i>=k+j; i--)
+    {
       newBetti[j,i]=0; // -1;
     }
   }
@@ -672,7 +692,6 @@ static proc showResult( def R, int l, int h )
     "Cohomology table:";
     displayCohom(newBetti, l, h, n);
   }
-
   return(newBetti);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -899,74 +918,73 @@ EXAMPLE: example sheafCohBGG2; shows an example
 }
 example
 {"EXAMPLE:";
-   echo = 2;
-   int pl = printlevel;
-   int l,h, t;
+  echo = 2;
+  int pl = printlevel;
+  int l,h, t;
 
-   //-------------------------------------------
-   // cohomology of structure sheaf on P^4:
-   //-------------------------------------------
-   ring r=32001,x(1..5),dp;
+  //-------------------------------------------
+  // cohomology of structure sheaf on P^4:
+  //-------------------------------------------
+  ring r=32001,x(1..5),dp;
 
-   module M= getStructureSheaf(); // OO_P^4
+  module M= getStructureSheaf(); // OO_P^4
 
-   l = -12; h = 12; // range of twists: l..h
+  l = -12; h = 12; // range of twists: l..h
 
-   printlevel = 0;
-   //////////////////////////////////////////////
-   t = timer;
+  printlevel = 0;
+  //////////////////////////////////////////////
+  t = timer;
 
-   def A = sheafCoh(M, l, h); // global Ext method:
+  def A = sheafCoh(M, l, h); // global Ext method:
 
-   "Time: ", timer - t;
-   //////////////////////////////////////////////
-   t = timer;
+  "Time: ", timer - t;
+  //////////////////////////////////////////////
+  t = timer;
 
-   A = sheafCohBGG(M, l, h);  // BGG method (without optimization):
+  A = sheafCohBGG(M, l, h);  // BGG method (without optimization):
 
-   "Time: ", timer - t;
-   //////////////////////////////////////////////
-   t = timer;
+  "Time: ", timer - t;
+  //////////////////////////////////////////////
+  t = timer;
 
-   A = sheafCohBGG2(M, l, h); // BGG method (with optimization)
+  A = sheafCohBGG2(M, l, h); // BGG method (with optimization)
 
-   "Time: ", timer - t;
-   //////////////////////////////////////////////
-   printlevel = pl;
+  "Time: ", timer - t;
+  //////////////////////////////////////////////
+  printlevel = pl;
 
-   kill A, r;
+  kill A, r;
 
-   //-------------------------------------------
-   // cohomology of cotangential bundle on P^3:
-   //-------------------------------------------
-   ring R=32001,(x,y,z,u),dp;
+  //-------------------------------------------
+  // cohomology of cotangential bundle on P^3:
+  //-------------------------------------------
+  ring R=32001,(x,y,z,u),dp;
 
-   module M = getCotangentialBundle();
+  module M = getCotangentialBundle();
 
-   l = -12; h = 11; // range of twists: l..h
+  l = -12; h = 11; // range of twists: l..h
 
+  //////////////////////////////////////////////
+  printlevel = 0;
+  t = timer;
 
-   //////////////////////////////////////////////
-   printlevel = 0;
-   t = timer;
+  def B = sheafCoh(M, l, h); // global Ext method:
 
-   def B = sheafCoh(M, l, h); // global Ext method:
+  "Time: ", timer - t;
+  //////////////////////////////////////////////
+  t = timer;
 
-   "Time: ", timer - t;
-   //////////////////////////////////////////////
-   t = timer;
+  B = sheafCohBGG(M, l, h);  // BGG method (without optimization):
 
-   B = sheafCohBGG(M, l, h);  // BGG method (without optimization):
+  "Time: ", timer - t;
+  //////////////////////////////////////////////
+  t = timer;
 
-   "Time: ", timer - t;
-   //////////////////////////////////////////////
-   t = timer;
+  B = sheafCohBGG2(M, l, h); // BGG method (with optimization)
 
-   B = sheafCohBGG2(M, l, h); // BGG method (with optimization)
-
-   "Time: ", timer - t;
-   //////////////////////////////////////////////
-   printlevel = pl;
+  "Time: ", timer - t;
+  //////////////////////////////////////////////
+  printlevel = pl;
 }
 
 
@@ -1002,7 +1020,8 @@ EXAMPLE: example dimH; shows an example
   }
   int Result;
   int n=nvars(basering)-1;
-  if ((i>0) and (i<=n)) {
+  if ((i>0) and (i<=n))
+  {
     list L=Ext_R(n-i,M,1)[2];
     def N=L[1];
     return(dimGradedPart(N,-n-1-d));
@@ -1018,23 +1037,24 @@ EXAMPLE: example dimH; shows an example
                                 - dimGradedPart(N1,-n-1-d);
       return(Result);
     }
-    else {
+    else
+    {
       return(0);
     }
   }
 }
 example
 {"EXAMPLE:";
-   echo = 2;
-   ring R=0,(x,y,z,u),dp;
-   resolution T1=mres(maxideal(1),0);
-   module M=T1[3];
-   intvec v=2,2,2,2,2,2;
-   attrib(M,"isHomog",v);
-   dimH(0,M,2);
-   dimH(1,M,0);
-   dimH(2,M,1);
-   dimH(3,M,-5);
+  echo = 2;
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  attrib(M,"isHomog",v);
+  dimH(0,M,2);
+  dimH(1,M,0);
+  dimH(2,M,1);
+  dimH(3,M,-5);
 }
 
 
@@ -1099,7 +1119,8 @@ EXAMPLE: example sheafCoh; shows an example
   {
      N=L[j];
      attrib(N,"isSB",1);
-     if (dim(N)>=0) {
+     if (dim(N)>=0)
+     {
        for (i=l; i<=h; i++)
        {
          newBetti[j,i-l+1]=dimGradedPart(N,-n-1-i);
@@ -1111,22 +1132,22 @@ EXAMPLE: example sheafCoh; shows an example
 }
 example
 {"EXAMPLE:";
-   echo = 2;
-   //
-   // cohomology of structure sheaf on P^4:
-   //-------------------------------------------
-   ring r=0,x(1..5),dp;
-   module M=0;
-   def A=sheafCoh(0,-7,2);
-   //
-   // cohomology of cotangential bundle on P^3:
-   //-------------------------------------------
-   ring R=0,(x,y,z,u),dp;
-   resolution T1=mres(maxideal(1),0);
-   module M=T1[3];
-   intvec v=2,2,2,2,2,2;
-   attrib(M,"isHomog",v);
-   def B=sheafCoh(M,-6,2);
+  echo = 2;
+  //
+  // cohomology of structure sheaf on P^4:
+  //-------------------------------------------
+  ring r=0,x(1..5),dp;
+  module M=0;
+  def A=sheafCoh(0,-7,2);
+  //
+  // cohomology of cotangential bundle on P^3:
+  //-------------------------------------------
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  attrib(M,"isHomog",v);
+  def B=sheafCoh(M,-6,2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1169,7 +1190,8 @@ NOTE:    The intmat is displayed in a diagram of the following form: @*
   }
   string Row="    ";
   string Row1="----";
-  for (i=l; i<=h; i++) {
+  for (i=l; i<=h; i++)
+  {
     for (j=1; j<=maxL-size(string(i)); j++)
     {
       Row=Row+" ";
@@ -1276,44 +1298,44 @@ proc getStructureSheaf(list #)
 }
 example
 {"EXAMPLE:";
-   echo = 2; int pl = printlevel;
-   printlevel = voice;
+  echo = 2; int pl = printlevel;
+  printlevel = voice;
 
 
-   ////////////////////////////////////////////////////////////////////////////////
-   ring r;
-   module M = getStructureSheaf();
-   "Basering: ";
-   basering;
-   "Module: ", string(M), ", grading is given by weights: ", attrib(M, "isHomog");
+  //////////////////////////////////////////////////////////////////////////////
+  ring r;
+  module M = getStructureSheaf();
+  "Basering: ";
+  basering;
+  "Module: ", string(M), ", grading is given by weights: ", attrib(M, "isHomog");
 
-   def A=sheafCohBGG2(M,-9,9);
-   print(A);
+  def A=sheafCohBGG2(M,-9,9);
+  print(A);
 
-   ////////////////////////////////////////////////////////////////////////////////
-   setring r;
-   module M = getStructureSheaf(ideal(var(1)), 0);
+  //////////////////////////////////////////////////////////////////////////////
+  setring r;
+  module M = getStructureSheaf(ideal(var(1)), 0);
 
-   "Basering: ";
-   basering;
-   "Module: ", string(M), ", grading is given by weights: ", attrib(M, "isHomog");
+  "Basering: ";
+  basering;
+  "Module: ", string(M), ", grading is given by weights: ", attrib(M, "isHomog");
 
-   def A=sheafCohBGG2(M,-9,9);
-   print(A);
+  def A=sheafCohBGG2(M,-9,9);
+  print(A);
 
-   ////////////////////////////////////////////////////////////////////////////////
-   setring r;
-   def Q = getStructureSheaf(ideal(var(1)), 1); // returns a new ring!
-   setring Q; // M was exported in the new ring!
+  //////////////////////////////////////////////////////////////////////////////
+  setring r;
+  def Q = getStructureSheaf(ideal(var(1)), 1); // returns a new ring!
+  setring Q; // M was exported in the new ring!
 
-   "Basering: ";
-   basering;
-   "Module: ", string(M), ", grading is given by weights: ", attrib(M, "isHomog");
+  "Basering: ";
+  basering;
+  "Module: ", string(M), ", grading is given by weights: ", attrib(M, "isHomog");
 
-   def A=sheafCohBGG2(M,-9,9);
-   print(A);
+  def A=sheafCohBGG2(M,-9,9);
+  print(A);
 
-   printlevel = pl;
+  printlevel = pl;
 }
 
 
@@ -1347,9 +1369,6 @@ proc getIdealSheaf(ideal I)
   //  attrib(M);
   return(M);
 }
-
-
-
 
 
 /*

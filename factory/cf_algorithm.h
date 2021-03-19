@@ -36,7 +36,7 @@ CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Vari
 
 void psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable & x );
 
-CanonicalForm bCommonDen ( const CanonicalForm & f );
+CanonicalForm FACTORY_PUBLIC bCommonDen ( const CanonicalForm & f );
 
 bool fdivides ( const CanonicalForm & f, const CanonicalForm & g );
 
@@ -50,12 +50,12 @@ CanonicalForm euclideanNorm ( const CanonicalForm & f );
 //}}}
 
 //{{{ function declarations from cf_chinese.cc
-void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew );
+void FACTORY_PUBLIC chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew );
 
-void chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew );
+void FACTORY_PUBLIC chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew );
 
-void chineseRemainderCached ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew, CFArray &inv );
-void chineseRemainderCached(const CFArray &a, const CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv);
+void FACTORY_PUBLIC chineseRemainderCached ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew, CFArray &inv );
+void FACTORY_PUBLIC chineseRemainderCached(const CFArray &a, const CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv);
 
 
 CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q );
@@ -68,11 +68,11 @@ bool isPurePoly(const CanonicalForm & f);
 
 bool isPurePoly_m(const CanonicalForm & f);
 
-CFFList factorize ( const CanonicalForm & f, bool issqrfree = false );
+CFFList FACTORY_PUBLIC factorize ( const CanonicalForm & f, bool issqrfree = false );
 
-CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
+CFFList FACTORY_PUBLIC factorize ( const CanonicalForm & f, const Variable & alpha );
 
-CFFList sqrFree ( const CanonicalForm & f, bool sort= false );
+CFFList FACTORY_PUBLIC sqrFree ( const CanonicalForm & f, bool sort= false );
 
 CanonicalForm homogenize( const CanonicalForm & f, const Variable & x);
 CanonicalForm homogenize( const CanonicalForm & f, const Variable & x,
@@ -87,13 +87,13 @@ void getTerms( const CanonicalForm & f, const CanonicalForm & t, CFList & result
 //{{{ function declarations from cf_linsys.cc
 bool linearSystemSolve ( CFMatrix & M );
 
-CanonicalForm determinant ( const CFMatrix & M, int n );
+CanonicalForm FACTORY_PUBLIC determinant ( const CFMatrix & M, int n );
 //}}}
 
 //{{{ function declarations from cf_resultant.cc
 CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
 
-CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
+CanonicalForm FACTORY_PUBLIC resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
 //}}}
 
 /** inline CanonicalForm abs ( const CanonicalForm & f )

@@ -1999,6 +1999,12 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 
   if (strat->sugarCrit && ALLOW_PROD_CRIT(strat))
   {
+    if (strat->fromT && (strat->ecartS[i]>ecart))
+    {
+      pLmFree(Lp.lcm);
+      return;
+      /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
+    }
     if((!((strat->ecartS[i]>0)&&(ecart>0)))
     && pHasNotCF(p,strat->S[i]))
     {
@@ -2020,14 +2026,7 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
       pLmFree(Lp.lcm);
       return;
     }
-    else
-      Lp.ecart = si_max(ecart,strat->ecartS[i]);
-    if (strat->fromT && (strat->ecartS[i]>ecart))
-    {
-      pLmFree(Lp.lcm);
-      return;
-      /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
-    }
+    Lp.ecart = si_max(ecart,strat->ecartS[i]);
     /*
     *the set B collects the pairs of type (S[j],p)
     *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
@@ -2066,6 +2065,12 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
   {
     if (ALLOW_PROD_CRIT(strat))
     {
+      if (strat->fromT && (strat->ecartS[i]>ecart))
+      {
+        pLmFree(Lp.lcm);
+        return;
+        /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
+      }
       // if currRing->nc_type!=quasi (or skew)
       // TODO: enable productCrit for super commutative algebras...
       if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
@@ -2086,12 +2091,6 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
           strat->cp++;
           pLmFree(Lp.lcm);
           return;
-      }
-      if (strat->fromT && (strat->ecartS[i]>ecart))
-      {
-        pLmFree(Lp.lcm);
-        return;
-        /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
       }
       /*
       *the set B collects the pairs of type (S[j],p)
@@ -2235,8 +2234,8 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
   }
 }
 
-/// p_HasNotCF for the IDLIFT case: ignore component
-static BOOLEAN p_HasNotCF_Lift(poly p1, poly p2, const ring r)
+/// p_HasNotCF for the IDLIFT case and syzComp==1: ignore component
+static inline BOOLEAN p_HasNotCF_Lift(poly p1, poly p2, const ring r)
 {
   int i = rVar(r);
   loop
@@ -2251,14 +2250,16 @@ static BOOLEAN p_HasNotCF_Lift(poly p1, poly p2, const ring r)
 
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p) for idLift(I,T)
+*  (in the special case: idLift for ideals, i.e. strat->syzComp==1)
+*  (prod.crit applies)
 */
 
 static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(ALLOW_PROD_CRIT(strat));
   assume(!rIsPluralRing(currRing));
-  assume(strat->syzComp==1);
   assume(i<=strat->sl);
+  assume(strat->syzComp==1);
 
   if ((strat->S[i]==NULL) || (p==NULL))
     return;
@@ -10012,7 +10013,8 @@ void initBuchMoraCrit(kStrategy strat)
      /* enterOnePairNormal get rational part in it */
   }
 #endif
-  if (TEST_OPT_IDLIFT  /* i.e. also strat->syzComp==1 */
+  if (TEST_OPT_IDLIFT
+  && (strat->syzComp==1)
   && (!rIsPluralRing(currRing)))
     strat->enterOnePair=enterOnePairLift;
 

@@ -72,7 +72,7 @@ void divrem2 (const CanonicalForm& F, ///< [in] bivariate, compressed polynomial
 /// Uses an algorithm based on Burnikel, Ziegler "Fast recursive division".
 ///
 /// @sa divrem2()
-void divrem (
+void FACTORY_PUBLIC divrem (
            const CanonicalForm& F, ///< [in] multivariate, compressed polynomial
            const CanonicalForm& G, ///< [in] multivariate, compressed polynomial
            CanonicalForm& Q,       ///< [in,out] dividend

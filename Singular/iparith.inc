@@ -683,9 +683,15 @@
 // operation: lift (module, module, matrix)  ->  matrix
 // operation: liftstd (ideal, matrix, module)  ->  ideal
 // operation: liftstd (module, matrix, module)  ->  module
+// operation: liftstd (ideal, matrix, string)  ->  ideal
+// operation: liftstd (module, matrix, string)  ->  module
 // operation: matrix (ideal, int, int)  ->  matrix
 // operation: matrix (module, int, int)  ->  matrix
 // operation: matrix (matrix, int, int)  ->  matrix
+// operation: modulo (ideal, ideal, matrix)  ->  module
+// operation: modulo (ideal, ideal, string)  ->  module
+// operation: modulo (module, module, matrix)  ->  module
+// operation: modulo (module, module, string)  ->  module
 // operation: smatrix (module, int, int)  ->  smatrix
 // operation: smatrix (smatrix, int, int)  ->  smatrix
 // operation: newstruct (string, string, string)  ->  nothing
@@ -750,6 +756,7 @@
 // operation: liftstd (...)  ->  ideal ( 2 arguments )
 // operation: liftstd (...)  ->  ideal ( 3 arguments )
 // operation: liftstd (...)  ->  ideal ( 4 arguments )
+// operation: liftstd (...)  ->  ideal ( 5 arguments )
 // operation: list (...)  ->  list ( any number of arguments )
 // operation: luinverse (...)  ->  list ( number of arguments >0 )
 // operation: lusolve (...)  ->  list ( number of arguments >0 )
@@ -757,6 +764,9 @@
 // operation: minor (...)  ->  ideal ( number of arguments >0 )
 // operation: module (...)  ->  module ( 1 arguments )
 // operation: module (...)  ->  module ( any number of arguments )
+// operation: modulo (...)  ->  module ( 2 arguments )
+// operation: modulo (...)  ->  module ( 3 arguments )
+// operation: modulo (...)  ->  module ( 4 arguments )
 // operation: names (...)  ->  list ( 1 arguments )
 // operation: names (...)  ->  list ( 0 arguments )
 // operation: $INVALID$ (...)  ->  $INVALID$ ( 2 arguments )
@@ -1484,7 +1494,7 @@ void iiInitCmdName()
   iiArithAddCmd("minres",              0, 450, CMD_1, 123);
   iiArithAddCmd("mod",                 0,  37, '/', 124);
   iiArithAddCmd("module",              0, 278, 313, 125);
-  iiArithAddCmd("modulo",              0, 451, CMD_2, 126);
+  iiArithAddCmd("modulo",              0, 451, CMD_M, 126);
   iiArithAddCmd("monitor",             0, 452, CMD_12, 127);
   iiArithAddCmd("monomial",            0, 292, CMD_1, 128);
   iiArithAddCmd("mpresmat",            0, 453, CMD_2, 129);

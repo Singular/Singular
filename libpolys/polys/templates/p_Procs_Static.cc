@@ -27,12 +27,12 @@ const BOOLEAN p_procs_dynamic = FALSE;
 #define LINKAGE
 
 #define p_Procs_Static
-#include "templates/p_Procs.inc"
+#include "polys/templates/p_Procs.inc"
 
 // include generated configuration
-#include "templates/p_Procs_Static.h"
+#include "polys/templates/p_Procs_Static.h"
 // include general p_Proc stuff
-#include "templates/p_Procs_Impl.h"
+#include "polys/templates/p_Procs_Impl.h"
 
 // define DoSetProc and InitSetProcs
 // cast_A_to_B<what##_Proc_Ptr, what##_Proc_Ptr> ???
@@ -60,7 +60,7 @@ while(0)
 
 // include routines for setting p_ProcsSet
 
-#include "templates/p_Procs_Set.h"
+#include "polys/templates/p_Procs_Set.h"
 
 
 

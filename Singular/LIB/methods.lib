@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version methods.lib 4.1.2.0 Feb_2019 "; //$Id$
+version="version methods.lib 4.2.0.1 Jan_2021 "; //$Id$
 category="Miscellaneous";
 info="
 LIBRARY:  methods.lib    installing methods in Singular
@@ -36,7 +36,7 @@ selectKey                      select a key in a HashTable, can also be used by 
 addHashTables                  add two HashTables, can also be used by +
 ";
 
-proc mod_init()
+static proc mod_init()
 {
   newstruct("HashTable","list keys, list values");
   system("install","HashTable","print",printHashTable,1);

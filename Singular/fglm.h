@@ -23,12 +23,14 @@ BOOLEAN fglmProc( leftv result, leftv first, leftv second );
 // 0-dimensional Ideal and if q is really reduced.
 //  Returns TRUE if an error occoured.
 BOOLEAN fglmQuotProc( leftv result, leftv first, leftv second );
+ideal fglmQuot( ideal first, poly second );
 
 // FindUnivariatePolys (test)
 BOOLEAN FindUnivariateWrapper( ideal source, ideal & dest );
 
 // wrapper for FindUnivariatePolys (test)
 BOOLEAN findUniProc( leftv result, leftv first);
+ideal findUni( ideal first );
 
 // homogeneous FGLM
 ideal fglmhomProc(leftv first, leftv second);

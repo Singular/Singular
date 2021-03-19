@@ -47,6 +47,8 @@ AC_SEARCH_LIBS(sem_wait,[rt pthreads pthread],[],[
 ])
 
 # Check whether --with-gmp was given.
+AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
+                    [provide a non-standard location of gmp])])
 if test "${with_gmp+set}" = set; then :
   if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"

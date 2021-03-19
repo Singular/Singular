@@ -41,7 +41,7 @@ typedef term * termList;
  * @note a (multivariate) polynomial is viewed as a univariate poly in its main
  *       variable
 **/
-class CFIterator {
+class FACTORY_PUBLIC CFIterator {
 private:
     CanonicalForm data;
     termList cursor;

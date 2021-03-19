@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version polybori.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version polybori.lib 4.2.0.1 Jan_2021 "; // $Id$
 category="Miscellaneous";
 
 // summary description of the library
@@ -111,12 +111,6 @@ KEYWORDS: library, polybori.lib; polybori; polybori.lib; library; pyobject; news
 // initialization of datatypes and constant structures
 
 static proc mod_init()
-"USAGE: mod_init()
-RETURN: none
-NOTE: load PolyBoRi and introduce the structures zdd and bpoly
-SEE ALSO: boolean_ideal, boolean_std
-KEYWORDS: PolyBoRi, Boolean Groebner Basis
-"
 {
   if (typeof(Pyobject)!="package")
   {

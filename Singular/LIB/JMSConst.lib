@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-version="version JMSConst.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version JMSConst.lib 4.2.0.0 Jan_2021 "; // $Id$
 category="Algebraic Geometry";
 // summary description of the library
 info="
@@ -253,15 +253,8 @@ for(ll=1; ll<=size(P);ll++)
 }
 ////////////////////////////////////////////////////////////////////
 static proc mod_init()
-"USAGE:     mod_init();
-RETURN:   struct: jmp
-EXAMPLE:  example  mod_init; shows an example"
 {
-newstruct("jmp", "poly h, poly t");
-}
-example
-{ "EXAMPLE:"; echo = 2;
-  mod_init();
+  newstruct("jmp", "poly h, poly t");
 }
 ////////////////////////////////////////////////////////////////////
 proc Terns(list G, int c)

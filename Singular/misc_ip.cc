@@ -806,7 +806,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_FLINT
               StringAppend("FLINT(%s),",FLINT_VERSION);
 #endif
-//              StringAppendS("factory(" FACTORYVERSION "),\n\t");
+//              StringAppendS("factory(" FACTORYVERSION "),");
               StringAppendS("\n\t");
 #ifndef HAVE_OMALLOC
               StringAppendS("xalloc,");
@@ -1477,6 +1477,8 @@ void siInit(char *name)
     SI_RESTORE_OPT(save1,save2);
   }
   // interpreter error handling
+  #ifndef __CYGWIN__
   factoryError=callWerrorS; // to honour later changes of variable WerrorS
+  #endif
   errorreported = 0;
 }

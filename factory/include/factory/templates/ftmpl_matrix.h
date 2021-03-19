@@ -25,7 +25,7 @@ OSTREAM& operator<< (OSTREAM &, const Matrix<T> &);
 #endif
 
 template <class T>
-class Matrix
+class FACTORY_PUBLIC Matrix
 {
 private:
     int NR, NC;

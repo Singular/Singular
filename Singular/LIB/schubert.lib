@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version schubert.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version schubert.lib 4.2.0.1 Jan_2021 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:    schubert.lib    Proceduces for Intersection Theory
@@ -117,12 +117,6 @@ LIB "ring.lib";
 ////////////////////////////////////////////////////////////////////////////////
 
 static proc mod_init()
-"USAGE:     mod_init();
-THEORY:     This is to create new objects in this library such as variety,
-            sheaf, stack, and graph.
-KEYWORDS:   variety, sheaf, stack, graph
-EXAMPLE:    example mod_init(); shows an example
-"
 {
     newstruct("variety","int dimension, ring baseRing, ideal relations");
     newstruct("sheaf","variety currentVariety, poly ChernCharacter");
@@ -138,11 +132,6 @@ EXAMPLE:    example mod_init(); shows an example
     system("install","sheaf","^",symmetricPowerSheaf,2);
     system("install","graph","print",printGraphG,1);
     system("install","stack","print",printStack,1);
-}
-example
-{
-    "EXAMPLE:"; echo=2;
-    mod_init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -387,6 +387,7 @@ LIB "all.lib";
 * assprimeszerodim_lib:: associated primes of a zero-dimensional ideal
 * cisimplicial_lib:: is the toric ideal of a simplicial toric variety a complete intersection?
 * curveInv_lib:: invariants of curves
+* decomp_lib:: Funtional decomposition os polynomials
 * elim_lib:: procedures for elimination, saturation and blowing up
 * ellipticcovers_lib::  Gromov Witten numbers of elliptic curves
 * ffmodstd_lib::  Groebner bases in polynomial rings over rational function fields
@@ -398,6 +399,7 @@ LIB "all.lib";
 * moddiq_lib:: ideal quotient and saturation using modular methods
 * modnormal_lib:: Normalization of affine domains using modular methods
 * modstd_lib:: Groebner basis of ideals via modular computations
+* modules_lib:: Representations of Modules
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
@@ -440,6 +442,10 @@ LIB "all.lib";
 @subsection curveInv_lib
 @c lib curveInv.lib
 @c ----------------------------------------------------------
+@node decomp_lib
+@subsection decomp_lib
+@c lib decomp.lib
+@c ----------------------------------------------------------
 @node elim_lib
 @subsection elim_lib
 @c lib elim.lib
@@ -480,6 +486,10 @@ LIB "all.lib";
 @subsection modnormal_lib
 @c lib modnormal.lib
 @c ---------------------------------------------------------
+@node modules_lib
+@subsection modules_lib
+@c lib modules.lib
+@c ----------------------------------------------------------
 @node modstd_lib
 @subsection modstd_lib
 @c lib modstd.lib
@@ -569,6 +579,8 @@ LIB "all.lib";
 * chern_lib:: Symbolic Computations with Chern classes
 * deRham_lib:: Computation of deRham cohomology
 * divisors_lib:: Divisors and P-Divisors
+* goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
+* graal_lib:: localization at prime ideals and their associated graded rings
 * hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * numerAlg_lib:: Numerical Algebraic Algorithms
 * numerDecom_lib:: Bertini interface
@@ -601,6 +613,14 @@ LIB "all.lib";
 @node divisors_lib
 @subsection divisors_lib
 @c lib divisors.lib
+@c ----------------------------------------------------------
+@node goettsche_lib
+@subsection goettsche_lib
+@c lib goettsche.lib
+@c ----------------------------------------------------------
+@node graal_lib
+@subsection graal_lib
+@c lib graal.lib
 @c ----------------------------------------------------------
 @node hess_lib
 @subsection hess_lib
@@ -1128,30 +1148,46 @@ but not for serious computations.
 
 @menu
 * arr_lib:: algorithms for arrangements of hyperplanes
+* combinat_lib:: Some useful functions from combinatoric
 * customstd_lib:: additional variants of std
+* methods_lib:: construction procedures
+* nets_lib:: Pretty printing
 * phindex_lib:: index of real analytic vector fields
 * polybori_lib:: interface for PolyBoRi
+* sets_lib:: Sets
 @end menu
 @c ----------------------------------------------------------
 @node arr_lib
 @subsection arr_lib
 @c lib arr.lib
 @c ---------------------------------------------------------
+@node combinat_lib
+@subsection combinat_lib
+@c lib combinat.lib
+@c ----------------------------------------------------------
 @node customstd_lib
 @subsection customstd_lib
 @c lib customstd.lib
 @c ----------------------------------------------------------
+@node methods_lib
+@subsection methods_lib
+@c lib methods.lib
+@c ----------------------------------------------------------
+@node nets_lib
+@subsection nets_lib
+@c lib nets.lib
+@c ----------------------------------------------------------
 @node phindex_lib
 @subsection phindex_lib
-
 @c lib phindex.lib
-
 @c ----------------------------------------------------------
 @node polybori_lib
 @subsection polybori_lib
-
 @c lib polybori.lib tag:pyobject
-
+@c ----------------------------------------------------------
+@node sets_lib
+@subsection sets_lib
+@c lib sets.lib
 @c ----------------------------------------------------------------------------
 @node Experimental libraries
 @section Experimental libraries
@@ -1167,37 +1203,29 @@ Comments should be send to the author of the library directly.
 
 @menu
 * autgradalg_lib:: automorphism groups of pointedly graded algebras and of Mori dream spaces
-* combinat_lib:: Some useful functions from combinatoric
 * difform_lib:: Procedures for differential forms
 * finitediff_lib:: finite difference schemes for linear differential equations
 * GND_lib:: General Neron Desingularization
-* goettsche_lib:: Goettsche's formula for the Betti numbers of the Hilbert scheme
-* graal_lib:: localization at prime ideals and their associated graded rings
 * gradedModules_lib::Operations with graded modules/matrices/resolutions
+* hodge_lib:: Algorithms for Hodge ideals
+* lrcalc_lib:: interface to the Littlewood-Richardson Calculator by Anders Buch
 * maxlike_lib:: maximum likelihood estimates
-* methods_lib:: construction procedures
-* modules_lib:: Representations of Modules
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
-* nets_lib:: Pretty printing
 * pfd_lib:: Multivartiate partial fraction decomposition
 * polyclass_lib:: class of polynomials
 * ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
-* sets_lib:: Sets
 * stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * swalk_lib:: Sagbi Walk Conversion Algorithm
 * systhreads_lib:: multi-threaded objects
+* tateProdCplxNegGrad_lib:: sheaf cohomology on product of projective spaces
 * VecField_lib:: vector fields
 @end menu
 @c ----------------------------------------------------------
 @node autgradalg_lib
 @subsection autgradalg_lib
 @c lib autgradalg.lib
-@c ----------------------------------------------------------
-@node combinat_lib
-@subsection combinat_lib
-@c lib combinat.lib
 @c ----------------------------------------------------------
 @node difform_lib
 @subsection difform_lib
@@ -1220,14 +1248,6 @@ Issues:
 @c lib finitediff.lib
 
 @c ----------------------------------------------------------
-@node goettsche_lib
-@subsection goettsche_lib
-@c lib goettsche.lib
-@c ----------------------------------------------------------
-@node graal_lib
-@subsection graal_lib
-@c lib graal.lib
-@c ----------------------------------------------------------
 @node GND_lib
 @subsection GND_lib
 @c lib GND.lib
@@ -1236,17 +1256,17 @@ Issues:
 @subsection gradedModules_lib
 @c lib gradedModules.lib
 @c ----------------------------------------------------------
+@node hodge_lib
+@subsection hodge_lib
+@c lib hodge.lib
+@c ----------------------------------------------------------
+@node lrcalc_lib
+@subsection lrcalc_lib
+@c lib lrcalc.lib
+@c ----------------------------------------------------------
 @node maxlike_lib
 @subsection maxlike_lib
 @c lib maxlike.lib
-@c ----------------------------------------------------------
-@node methods_lib
-@subsection methods_lib
-@c lib methods.lib
-@c ----------------------------------------------------------
-@node modules_lib
-@subsection modules_lib
-@c lib modules.lib
 @c ----------------------------------------------------------
 @node modwalk_lib
 @subsection modwalk_lib
@@ -1261,10 +1281,6 @@ Todos/Issues:
 @end itemize
 
 @c lib multigrading.lib
-@c ----------------------------------------------------------
-@node nets_lib
-@subsection nets_lib
-@c lib nets.lib
 @c ----------------------------------------------------------
 @node pfd_lib
 @subsection pfd_lib
@@ -1282,10 +1298,6 @@ Todos/Issues:
 @subsection rwalk_lib
 @c lib rwalk.lib
 @c ----------------------------------------------------------
-@node sets_lib
-@subsection sets_lib
-@c lib sets.lib
-@c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
 @c lib stanleyreisner.lib
@@ -1297,6 +1309,10 @@ Todos/Issues:
 @node systhreads_lib
 @subsection systhreads_lib
 @c lib systhreads.lib
+@c ---------------------------------------------------------
+@node tateProdCplxNegGrad_lib
+@subsection tateProdCplxNegGrad_lib
+@c lib tateProdCplxNegGrad.lib
 @c ---------------------------------------------------------
 @node VecField_lib
 @subsection VecField_lib

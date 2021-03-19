@@ -23,6 +23,7 @@
 **/
 
 #include "factory/factoryconf.h"
+#include "factory/globaldefs.h"
 #include <stdint.h>
 #include "factory/si_log2.h"
 #ifdef HAVE_OMALLOC

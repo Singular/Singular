@@ -49,8 +49,10 @@
 /*ENDPUBLIC*/
 
 #ifdef CF_USE_INLINE
+#ifndef __CYGWIN__
 #undef CF_INLINE
 #define CF_INLINE inline
+#endif
 #else
 #undef CF_INLINE
 #define CF_INLINE
@@ -75,7 +77,7 @@ inline int is_imm ( const InternalCF * const ptr )
  *
  * @sa int_poly.h, variable.h, ffops.h, gfops.h, imm.h, int_int.h, int_rat.h
 **/
-class CanonicalForm
+class FACTORY_PUBLIC CanonicalForm
 #ifdef HAVE_OMALLOC
 #ifndef XMEMORY_H
        : public omallocClass
@@ -178,7 +180,7 @@ public:
     // arithmetic operators
     friend CF_NO_INLINE CanonicalForm operator - ( const CanonicalForm& );
 
-    friend void divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
+    friend void FACTORY_PUBLIC divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
     friend bool divremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
     friend bool tryDivremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm&, const CanonicalForm&, bool& );
 
@@ -203,28 +205,30 @@ public:
 CF_INLINE CanonicalForm
 operator + ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 operator - ( const CanonicalForm&, const CanonicalForm& );
 
 CF_INLINE CanonicalForm
 operator * ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 operator / ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 operator % ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 div ( const CanonicalForm&, const CanonicalForm& );
 
-CF_NO_INLINE CanonicalForm
+CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 mod ( const CanonicalForm&, const CanonicalForm& );
 
 /*ENDPUBLIC*/
 
 #ifdef CF_USE_INLINE
+#ifndef __CYGWIN__
 #include "cf_inline.cc"
+#endif
 #endif
 
 /*BEGINPUBLIC*/
@@ -232,13 +236,13 @@ mod ( const CanonicalForm&, const CanonicalForm& );
 //{{{ function declarations from canonicalform.cc
 CanonicalForm blcm ( const CanonicalForm & f, const CanonicalForm & g );
 
-CanonicalForm power ( const CanonicalForm & f, int n );
+CanonicalForm FACTORY_PUBLIC power ( const CanonicalForm & f, int n );
 
-CanonicalForm power ( const Variable & v, int n );
+CanonicalForm FACTORY_PUBLIC power ( const Variable & v, int n );
 //}}}
 
 //{{{ function declarations from cf_gcd.cc
-CanonicalForm gcd ( const CanonicalForm&, const CanonicalForm& );
+CanonicalForm FACTORY_PUBLIC gcd ( const CanonicalForm&, const CanonicalForm& );
 
 CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g );
 
@@ -258,7 +262,7 @@ CanonicalForm vcontent ( const CanonicalForm & f, const Variable & x );
 //{{{ function declarations from cf_ops.cc
 CanonicalForm swapvar ( const CanonicalForm &, const Variable &, const Variable & );
 
-CanonicalForm replacevar ( const CanonicalForm &, const Variable &, const Variable & );
+CanonicalForm FACTORY_PUBLIC replacevar ( const CanonicalForm &, const Variable &, const Variable & );
 
 int getNumVars( const CanonicalForm & f );
 
@@ -368,17 +372,17 @@ headdegree ( const CanonicalForm & f ) { return totaldegree( head( f ) ); }
 //}}}
 
 //{{{ other function declarations
-void setCharacteristic( int c ); // -> Fp && Q
+void FACTORY_PUBLIC setCharacteristic( int c ); // -> Fp && Q
 void setCharacteristic( int c, int n ); // -> PrimePower
 void setCharacteristic( int c, int n, char name ); // -> GF(q)
 
-int getCharacteristic();
+int FACTORY_PUBLIC getCharacteristic();
 int getGFDegree();
 CanonicalForm getGFGenerator();
 
-void On( int );
-void Off( int );
-bool isOn( int );
+void FACTORY_PUBLIC On( int );
+void FACTORY_PUBLIC Off( int );
+bool FACTORY_PUBLIC isOn( int );
 //}}}
 
 //{{{ type definitions

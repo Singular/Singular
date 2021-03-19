@@ -518,7 +518,7 @@ static number nnMap(number from, const coeffs aRing, const coeffs r)
   }
 }
 
-nMapFunc nnSetMap(const coeffs src, const coeffs dst)
+nMapFunc nnSetMap(const coeffs, const coeffs)
 {
   return nnMap;
 }
@@ -578,7 +578,7 @@ static void nnDelete (number * a, const coeffs r)
 }
 
 
-static number nnChineseRemainder(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF)
+static number nnChineseRemainder(number *, number *,int , BOOLEAN , CFArray &,const coeffs )
 {
   WerrorS("not yet");
   return NULL;

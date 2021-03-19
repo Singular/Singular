@@ -12,23 +12,29 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        configflags: ["", "--without-ntl --with-flint"]
+        configflags: ["", "--with-ntl --with-flint", "--without-ntl --with-flint"]
 
     steps:
       - uses: actions/checkout@v2
       - name: "Install dependencies"
         run: |
+               FLINT_JLL="https://github.com/JuliaBinaryWrappers/FLINT_jll.jl/releases/download/FLINT-v200.700.0%2B0/FLINT.v200.700.0"
                if [ "$RUNNER_OS" == "Linux" ]; then
                     # sharutils is for uudecode
                     sudo apt install sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev 4ti2 normaliz
-                    # install new enough FLINT (>= 2.6.0)
-                    wget -O FLINT.tar.gz "https://github.com/JuliaBinaryWrappers/FLINT_jll.jl/releases/download/FLINT-v2.6.0%2B0/FLINT.v2.6.0.x86_64-linux-gnu.tar.gz"
+                    # install new enough FLINT
+                    wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-linux-gnu.tar.gz"
                     sudo tar -C /usr -xvf FLINT.tar.gz
                     rm -f FLINT.tar.gz
                elif [ "$RUNNER_OS" == "macOS" ]; then
-                    brew install autoconf automake libtool gmp readline mpfr ntl flint cddlib
+                    brew install autoconf automake libtool gmp readline mpfr ntl cddlib
                     # TODO: 4ti2?
                     # TODO: normaliz?
+                    # install new enough FLINT
+                    wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-apple-darwin.tar.gz"
+                    sudo mkdir -p /usr/local
+                    sudo tar -C /usr/local -xvf FLINT.tar.gz
+                    rm -f FLINT.tar.gz
                else
                     echo "$RUNNER_OS not supported"
                     exit 1
@@ -38,5 +44,17 @@ jobs:
       - run: make -j3
       - run: make check
       - run: make install
+      - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Old/universal.lst
+        if: ${{ always() }}
+      #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Buch/buch.lst
+      #  if: ${{ always() }}
+      - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Plural/short.lst
+        if: ${{ always() }}
+      - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Plural/dmod.lst
+        if: ${{ always() }}
+      - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Short/ok_s.lst
+        if: ${{ always() }}
+      #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Long/ok_l.lst
+      #  if: ${{ always() }}
 
 # TODO: code coverage?

@@ -347,6 +347,63 @@ fglmProc( leftv result, leftv first, leftv second )
     return (state != FglmOk);
 }
 
+ideal fglmQuot( ideal first, poly second )
+{
+    FglmState state = FglmOk;
+
+    ideal sourceIdeal = first;
+    poly quot = second;
+    ideal destIdeal = NULL;
+
+    state = fglmIdealcheck( sourceIdeal );
+    if ( state == FglmOk )
+    {
+      if ( quot == NULL ) state= FglmPolyIsZero;
+      else if ( pIsConstant( quot ) ) state= FglmPolyIsOne;
+    }
+
+    if ( state == FglmOk )
+    {
+      if ( fglmquot( sourceIdeal, quot, destIdeal ) == FALSE )
+        state= FglmNotReduced;
+    }
+
+    switch (state)
+    {
+        case FglmOk:
+            break;
+        case FglmHasOne:
+            destIdeal= idInit(1,1);
+            (destIdeal->m)[0]= pOne();
+            state= FglmOk;
+            break;
+        case FglmNotZeroDim:
+            WerrorS( "The ideal has to be 0-dimensional" );
+            destIdeal= idInit(1,1);
+            break;
+        case FglmNotReduced:
+            WerrorS( "The poly has to be reduced" );
+            destIdeal= idInit(1,1);
+            break;
+        case FglmPolyIsOne:
+            int k;
+            destIdeal= idInit( IDELEMS(sourceIdeal), 1 );
+            for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
+              (destIdeal->m)[k]= pCopy( (sourceIdeal->m)[k] );
+            state= FglmOk;
+            break;
+        case FglmPolyIsZero:
+            destIdeal= idInit(1,1);
+            (destIdeal->m)[0]= pOne();
+            state= FglmOk;
+            break;
+        default:
+            destIdeal= idInit(1,1);
+    }
+
+    return destIdeal;
+}
+
 // fglmQuotProc: Calculate I:f with FGLM methods.
 // Checks the input-data, and calls fglmquot (see fglmzero.cc).
 // Returns the new groebnerbasis if I:f or 0 if an error occoured.
@@ -414,6 +471,68 @@ fglmQuotProc( leftv result, leftv first, leftv second )
     return (state != FglmOk);
 } // fglmQuotProt
 
+ideal findUni( ideal first )
+{
+    ideal sourceIdeal;
+    ideal destIdeal = NULL;
+    FglmState state;
+
+    sourceIdeal = first;
+
+    state= fglmIdealcheck( sourceIdeal );
+    if ( state == FglmOk )
+    {
+      // check for special cases: if the input contains
+      // univariate polys, try to reduce the problem
+      int i,k;
+      int count=0;
+      BOOLEAN * purePowers = (BOOLEAN *)omAlloc0( currRing->N*sizeof( BOOLEAN ) );
+      for ( k= IDELEMS( sourceIdeal ) - 1; k >= 0; k-- )
+      {
+        if((i=pIsUnivariate(sourceIdeal->m[k]))>0)
+        {
+          if (purePowers[i-1]==0)
+          {
+            purePowers[i-1]=k;
+            count++;
+            if (count==currRing->N) break;
+          }
+        }
+      }
+      if (count==currRing->N)
+      {
+        destIdeal=idInit(currRing->N,1);
+        for(k=currRing->N-1; k>=0; k--) destIdeal->m[k]=pCopy(sourceIdeal->m[purePowers[k]]);
+      }
+      omFreeSize((ADDRESS)purePowers, currRing->N*sizeof( BOOLEAN ) );
+      if (destIdeal!=NULL)
+            state = FglmOk;
+      else if ( FindUnivariateWrapper( sourceIdeal, destIdeal ) == FALSE )
+            state = FglmNotReduced;
+    }
+    switch (state)
+    {
+        case FglmOk:
+            break;
+        case FglmHasOne:
+            destIdeal= idInit(1,1);
+            (destIdeal->m)[0]= pOne();
+            state= FglmOk;
+            break;
+        case FglmNotZeroDim:
+            WerrorS( "The ideal has to be 0-dimensional" );
+            destIdeal= idInit(1,1);
+            break;
+        case FglmNotReduced:
+            Werror( "The ideal has to be reduced" );
+            destIdeal= idInit(1,1);
+            break;
+        default:
+            destIdeal= idInit(1,1);
+    }
+
+    return destIdeal;
+}
 // The main function for finduni().
 // Checks the input-data, and calls FindUnivariateWrapper (see fglmzero.cc).
 // Returns an ideal containing the univariate Polynomials or 0 if an error

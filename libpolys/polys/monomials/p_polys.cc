@@ -2287,8 +2287,22 @@ void p_Content(poly ph, const ring r)
   {
     p_SetCoeff(ph,n_Init(1,cf),r);
   }
-  if (cf->cfSubringGcd==ndGcd) /* trivial gcd*/ return;
-  number h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
+  if ((cf->cfSubringGcd==ndGcd)
+  || (cf->cfGcd==ndGcd)) /* trivial gcd*/
+    return;
+  number h;
+  if ((rField_is_Q(r))
+  || (rField_is_Q_a(r))
+  || (rField_is_Zp_a)(r)
+  || (rField_is_Z(r))
+  )
+  {
+    h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
+  }
+  else
+  {
+    h=n_Copy(pGetCoeff(ph),cf);
+  }
   poly p;
   if(n_IsOne(h,cf))
   {
@@ -2320,6 +2334,75 @@ content_finish:
   n_Delete(&h,r->cf);
   // and last: check leading sign:
   if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
+}
+
+void p_Content_n(poly ph, number &c,const ring r)
+{
+  if (ph==NULL)
+  {
+    c=n_Init(1,r->cf);
+    return;
+  }
+  const coeffs cf=r->cf;
+  if (pNext(ph)==NULL)
+  {
+    c=pGetCoeff(ph);
+    p_SetCoeff0(ph,n_Init(1,cf),r);
+  }
+  if ((cf->cfSubringGcd==ndGcd)
+  || (cf->cfGcd==ndGcd)) /* trivial gcd*/
+  {
+    c=n_Init(1,r->cf);
+    return;
+  }
+  number h;
+  if ((rField_is_Q(r))
+  || (rField_is_Q_a(r))
+  || (rField_is_Zp_a)(r)
+  || (rField_is_Z(r))
+  )
+  {
+    h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
+  }
+  else
+  {
+    h=n_Copy(pGetCoeff(ph),cf);
+  }
+  poly p;
+  if(n_IsOne(h,cf))
+  {
+    goto content_finish;
+  }
+  p=ph;
+  // take the SubringGcd of all coeffs
+  while (p!=NULL)
+  {
+    n_Normalize(pGetCoeff(p),cf);
+    number d=n_SubringGcd(h,pGetCoeff(p),cf);
+    n_Delete(&h,cf);
+    h = d;
+    if(n_IsOne(h,cf))
+    {
+      goto content_finish;
+    }
+    pIter(p);
+  }
+  // if found<>1, divide by it
+  p = ph;
+  while (p!=NULL)
+  {
+    number d = n_ExactDiv(pGetCoeff(p),h,cf);
+    p_SetCoeff(p,d,r);
+    pIter(p);
+  }
+content_finish:
+  c=h;
+  // and last: check leading sign:
+  if(!n_GreaterZero(pGetCoeff(ph),r->cf))
+  {
+    c = n_InpNeg(c,r->cf);
+    ph = p_Neg(ph,r);
+  }
 }
 
 #define CLEARENUMERATORS 1
@@ -2542,40 +2625,54 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     p_SetCoeff(ph,n_Init(1,r->cf),r);
     return;
   }
-  if ((pNext(pNext(ph))==NULL)||(!rField_is_Q(r)))
+  if (pNext(pNext(ph))==NULL)
+  {
+    return;
+  }
+  if (!(rField_is_Q(r))
+  && (!rField_is_Q_a(r))
+  && (!rField_is_Zp_a(r))
+  && (!rField_is_Z(r))
+  )
   {
     return;
   }
   number d=p_InitContent(ph,r);
+  number h=d;
   if (n_Size(d,r->cf)<=smax)
   {
+    n_Delete(&h,r->cf);
     //if (TEST_OPT_PROT) PrintS("G");
     return;
   }
 
   poly p=ph;
-  number h=d;
   if (smax==1) smax=2;
   while (p!=NULL)
   {
-#if 0
-    d=n_Gcd(h,pGetCoeff(p),r->cf);
+#if 1
+    d=n_SubringGcd(h,pGetCoeff(p),r->cf);
     n_Delete(&h,r->cf);
     h = d;
 #else
-    STATISTIC(n_Gcd); nlInpGcd(h,pGetCoeff(p),r->cf);
+    n_InpGcd(h,pGetCoeff(p),r->cf);
 #endif
     if(n_Size(h,r->cf)<smax)
     {
       //if (TEST_OPT_PROT) PrintS("g");
+      n_Delete(&h,r->cf);
       return;
     }
     pIter(p);
   }
   p = ph;
   if (!n_GreaterZero(pGetCoeff(p),r->cf)) h=n_InpNeg(h,r->cf);
-  if(n_IsOne(h,r->cf)) return;
-  //if (TEST_OPT_PROT) PrintS("c");
+  if(n_IsOne(h,r->cf))
+  {
+    n_Delete(&h,r->cf);
+    return;
+  }
+  if (TEST_OPT_PROT) PrintS("c");
   while (p!=NULL)
   {
 #if 1

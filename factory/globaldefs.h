@@ -15,4 +15,14 @@
 #define THREAD_VAR __thread
 #endif
 
+#if defined(__CYGWIN__)
+  #ifdef FACTORY_BUILDING_DLL
+    #define FACTORY_PUBLIC __declspec(dllexport)
+  #else
+    #define FACTORY_PUBLIC __declspec(dllimport)
+  #endif
+#else
+  #define FACTORY_PUBLIC
+#endif
+
 #endif // _SINGULAR_GLOBALDEFS_H

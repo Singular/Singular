@@ -137,15 +137,13 @@ ideal   idMultSect(resolvente arg, int length, GbVariant a=GbDefault);
 //ideal   idSyzygies (ideal h1, tHomog h,intvec **w);
 ideal   idSyzygies (ideal h1, tHomog h,intvec **w, BOOLEAN setSyzComp=TRUE,
                     BOOLEAN setRegularity=FALSE, int *deg = NULL, GbVariant a=GbDefault);
-ideal   idLiftStd  (ideal h1, matrix *m, tHomog h=testHomog, ideal *syz=NULL, GbVariant a=GbDefault);
+ideal   idLiftStd  (ideal h1, matrix *m, tHomog h=testHomog, ideal *syz=NULL, GbVariant a=GbDefault, ideal h11=NULL);
 
 ideal   idLift (ideal mod, ideal submod,ideal * rest=NULL,
              BOOLEAN goodShape=FALSE, BOOLEAN isSB=TRUE,BOOLEAN divide=FALSE,
              matrix *unit=NULL, GbVariant a=GbDefault);
 
 void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R, short *w= NULL );
-
-intvec * idMWLift(ideal mod,intvec * weights);
 
 ideal   idQuot (ideal h1,ideal h2,
                 BOOLEAN h1IsStb=FALSE, BOOLEAN resultIsIdeal=FALSE);
@@ -188,7 +186,8 @@ static inline intvec *idSort(ideal id,BOOLEAN nolex=TRUE)
   return id_Sort(id, nolex, currRing);
 }
 
-ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
+ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL,
+                  matrix *T=NULL, GbVariant a=GbDefault);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 
 // intvec *idQHomWeight(ideal id);

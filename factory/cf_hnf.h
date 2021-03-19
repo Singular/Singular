@@ -19,7 +19,7 @@
  *
 **/
 
-CFMatrix* cf_HNF(CFMatrix& A);
+CFMatrix* FACTORY_PUBLIC cf_HNF(CFMatrix& A);
 
 /**
  * performs LLL reduction.
@@ -41,7 +41,7 @@ CFMatrix* cf_HNF(CFMatrix& A);
  * @note: uses NTL or FLINT
 **/
 
-CFMatrix* cf_LLL(CFMatrix& A);
+CFMatrix* FACTORY_PUBLIC cf_LLL(CFMatrix& A);
 
 /*ENDPUBLIC*/
 

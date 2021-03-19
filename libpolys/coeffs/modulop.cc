@@ -233,7 +233,11 @@ const char * npRead (const char *s, number *a, const coeffs r)
     *a = (number)(long)z;
   else
   {
-    if ((z==0)&&(n==0)) WerrorS(nDivBy0);
+    if ((z==0)&&(n==0))
+    {
+      WerrorS(nDivBy0);
+      *a=(number)0L;
+    }
     else
     {
 #ifdef NV_OPS
@@ -322,11 +326,16 @@ static number npRandom(siRandProc p, number, number, const coeffs cf)
 
 
 #ifndef HAVE_GENERIC_MULT
-static number npPar(int i, coeffs r)
+static number npPar(int, coeffs r)
 {
   return (number)(long)r->npExpTable[1];
 }
 #endif
+
+static number npInitMPZ(mpz_t m, const coeffs r)
+{
+  return (number)mpz_fdiv_ui(m, r->ch);
+}
 
 BOOLEAN npInitChar(coeffs r, void* p)
 {
@@ -358,6 +367,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfInit = npInit;
   //r->cfSize  = ndSize;
   r->cfInt  = npInt;
+  r->cfInitMPZ = npInitMPZ;
   #ifdef HAVE_RINGS
   //r->cfDivComp = NULL; // only for ring stuff
   //r->cfIsUnit = NULL; // only for ring stuff
@@ -566,15 +576,7 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
 */
 static number npMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
-  mpz_ptr erg = (mpz_ptr) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
-  mpz_init(erg);
-
-  mpz_mod_ui(erg, (mpz_ptr) from, dst->ch);
-  number r = (number) mpz_get_si(erg);
-
-  mpz_clear(erg);
-  omFree((void *) erg);
-  return (number) r;
+  return (number)mpz_fdiv_ui((mpz_ptr) from, dst->ch);
 }
 
 static number npMapZ(number from, const coeffs src, const coeffs dst)
@@ -604,7 +606,7 @@ static number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs d
   return (number) (f.intval());
 }
 
-nMapFunc npSetMap(const coeffs src, const coeffs dst)
+nMapFunc npSetMap(const coeffs src, const coeffs)
 {
 #ifdef HAVE_RINGS
   if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src))

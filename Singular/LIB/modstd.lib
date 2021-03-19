@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version modstd.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version modstd.lib 4.2.0.0 Feb_2020 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner bases of ideals/modules using modular methods
@@ -784,6 +784,58 @@ example
    L = primeList(I,5,L);
    size(L);
    L[size(L)];
+}
+
+proc modStdL(def I, list #)
+"USAGE:   modStdL(I[, exactness]); I ideal/module, exactness int
+RETURN:   a standard basis of I
+NOTE:     The procedure computes a standard basis of I (over the rational
+          numbers) by using modular methods via an external Singular.
+       @* An optional parameter 'exactness' can be provided.
+          If exactness = 1(default), the procedure computes a standard basis
+          of I for sure; if exactness = 0, it computes a standard basis of I
+          with high probability.
+SEE ALSO: modular, modStd
+EXAMPLE:  example modStdL; shows an example"
+{
+  link l="ssi:tcp localhost:"+system("Singular");
+  write(l,quote(option(noloadLib))); // suppress "loaded..."
+  read(l); //dummy: return value of option
+  write(l,quote(load("modstd.lib","with"))); // load library
+  read(l); //dummy: return value of load
+  if (size(#)==0)
+  {
+    write(l,quote(modStd(eval(I))));
+  }
+  else
+  {
+    write(l,quote(modStd(eval(I),eval(#[1]))));
+  }
+  return(read(l));
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    ideal J = modStdL(I);
+    J;
+    I = homog(I, t);
+    J = modStdL(I);
+    J;
+
+    ring R2 = 0, (x,y,z), ds;
+    ideal I = jacob(x5+y6+z7+xyz);
+    ideal J = modStdL(I, 0);
+    J;
+
+    ring R3 = 0, x(1..4), lp;
+    ideal I = cyclic(4);
+    ideal J1 = modStdL(I, 1);   // default
+    ideal J2 = modStdL(I, 0);
+    size(reduce(J1, J2));
+    size(reduce(J2, J1));
 }
 
 ////////////////////////////// further examples ////////////////////////////////

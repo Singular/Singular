@@ -141,6 +141,7 @@ static number ngcInvers(number a, const coeffs R)
   if (((gmp_complex*)a)->isZero())
   {
     WerrorS(nDivBy0);
+    r = new gmp_complex( 0 );
   }
   else
   {
@@ -193,7 +194,7 @@ static number ngcDiv (number a, number b, const coeffs r)
   {
     // a/0 = error
     WerrorS(nDivBy0);
-    return NULL;
+    return (number)new gmp_complex( 0 );
   }
   gmp_complex* res = new gmp_complex( (*(gmp_complex*)a) / (*(gmp_complex*)b) );
   return (number)res;

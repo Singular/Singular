@@ -138,6 +138,7 @@ static number ngfInvers(number a, const coeffs r)
   if (((gmp_float*)a)->isZero() )
   {
     WerrorS(nDivBy0);
+    f= new gmp_float( 0 );
   }
   else
   {
@@ -185,14 +186,18 @@ static number ngfMult (number a, number b, const coeffs R)
 static number ngfDiv (number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
-
+  
+  gmp_float* f;
   if ( ((gmp_float*)b)->isZero() )
   {
     // a/0 = error
     WerrorS(nDivBy0);
-    return NULL;
+    f= new gmp_float( 0 );
   }
-  gmp_float* f= new gmp_float( (*(gmp_float*)a) / (*(gmp_float*)b) );
+  else
+  {
+    f= new gmp_float( (*(gmp_float*)a) / (*(gmp_float*)b) );
+  }
   return (number)f;
 }
 

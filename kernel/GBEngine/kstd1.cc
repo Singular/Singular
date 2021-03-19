@@ -140,7 +140,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat, bool 
     L.Copy();
     h->GetP();
     h->length=h->pLength=pLength(h->p);
-    ret = ksReducePoly(&L, with, strat->kNoetherTail(), NULL, strat);
+    ret = ksReducePoly(&L, with, strat->kNoetherTail(), NULL, NULL, strat);
     if (ret)
     {
       if (ret < 0) return ret;
@@ -156,7 +156,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat, bool 
     *h = L;
   }
   else
-    ret = ksReducePoly(h, with, strat->kNoetherTail(), NULL, strat);
+    ret = ksReducePoly(h, with, strat->kNoetherTail(), NULL, NULL, strat);
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -816,7 +816,7 @@ int redFirst (LObject* h,kStrategy strat)
       strat->T[j].wrp();
     }
 #endif
-    ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
+    ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, NULL, strat);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
