@@ -108,6 +108,7 @@ void *idrecDataInit(int t);
 #define FLAG_QRING      4 // is normalized wrt. qring ("qringNF")
 #define FLAG_QRING_DEF  5 // is a qring to be defined
 #define FLAG_OTHER_RING 6 // mark newstruct parts as "write-only"
+#define FLAG_RING       7 // mark newstruct parts as "ring dep."
 #define hasFlag(A,F) Sy_inset((F),(A)->flag)
 #define setFlag(A,F) (A)->flag|=Sy_bit(F)
 #define resetFlag(A,F) (A)->flag&=~Sy_bit(F)

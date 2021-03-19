@@ -407,16 +407,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               al->m[nm->pos].flag &= ~Sy_bit(FLAG_OTHER_RING);
 
             }
-            //if(al->m[nm->pos-1].data==NULL)
-            {
-              // remember the ring, if not already set
-              if (currRing!=NULL)
-              {
-                currRing->ref++;
-                al->m[nm->pos-1].data=(void *)currRing;
-                al->m[nm->pos-1].rtyp=RING_CMD;
-              }
-            }
+            al->m[nm->pos].flag|=Sy_bit(FLAG_RING);
           }
           else if ((nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
           {
