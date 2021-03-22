@@ -604,7 +604,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node chern_lib
 @subsection chern_lib
-@c lib chern.lib
+@c lib chern.lib tag:lrcalc
 @c ----------------------------------------------------------
 @node deRham_lib
 @subsection deRham_lib
