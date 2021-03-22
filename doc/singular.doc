@@ -1262,7 +1262,7 @@ Issues:
 @c ----------------------------------------------------------
 @node lrcalc_lib
 @subsection lrcalc_lib
-@c lib lrcalc.lib
+@c lib lrcalc.lib tag:lrcalc
 @c ----------------------------------------------------------
 @node maxlike_lib
 @subsection maxlike_lib
