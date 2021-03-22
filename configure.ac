@@ -344,6 +344,9 @@ AS_IF([test -z "$LRCALC"], [
 AC_CHECK_PROGS([NORMALIZ], [normaliz])
 AS_IF([test -z "$NORMALIZ"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude normaliz "])])
+AC_CHECK_PROGS([GFAN], [gfan_version])
+AS_IF([test -z "$GFAN"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude gfan "])])
 AS_IF([test -z "$PYTHON"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude pyobject "])])
 AC_CHECK_PROGS([FOURTITWO_HILBERT], [hilbert 4ti2-hilbert])
