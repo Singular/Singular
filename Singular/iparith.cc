@@ -9932,8 +9932,24 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   lists pl=NULL;
   intvec *p=NULL;
-  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
-  else                    p=(intvec*)v->Data();
+  if (v->Typ()==LIST_CMD)
+  {
+    pl=(lists)v->Data();
+    if (pl->nr!=rl-1)
+    {
+      WerrorS("wromg number of primes");
+      return TRUE;
+    }
+  }
+  else
+  {
+    p=(intvec*)v->Data();
+    if (p->length()!=rl)
+    {
+      WerrorS("wromg number of primes");
+      return TRUE;
+    }
+  }
   ideal result;
   ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
   number *xx=NULL;
