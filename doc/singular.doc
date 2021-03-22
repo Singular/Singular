@@ -1136,7 +1136,7 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node tropical_lib
 @subsection tropical_lib
-@c lib tropical.lib
+@c lib tropical.lib tag:gfan
 @c ----------------------------------------------------------
 @node tropicalNewton_lib
 @subsection tropicalNewton_lib
