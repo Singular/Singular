@@ -1,4 +1,6 @@
 AC_INIT([singular], [4.2.0], [singular@mathematik.uni-kl.de])
+
+AC_SUBST([VERSION_DATE], 2021)
 AC_DEFINE([VERSION_DATE],["Dec 2020"],[release date])
 
 _AC_SRCDIRS(["$ac_dir"])
@@ -324,5 +326,48 @@ AC_CONFIG_FILES([emacs/Makefile])
 AC_CONFIG_FILES([redhat/Makefile])
 AC_CONFIG_FILES([redhat/singular.spec])
 AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
+
+AC_CHECK_PROGS([MAKEINFO], [makeinfo])
+AC_CHECK_PROGS([TEXI2PDF], [texi2pdf])
+AC_CHECK_PROGS([TEXINDEX], [texindex])
+AC_CHECK_PROGS([DVIPS], [dvips])
+
+dnl Check for executables used by library files.
+dnl Found by: git grep 'system("\(sh\|executable\)"'
+AS_VAR_SET([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude polymake "])
+AC_CHECK_PROGS([QEPCAD], [qepcad])
+AS_IF([test -z "$QEPCAD"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude qepcad "])])
+AC_CHECK_PROGS([LRCALC], [lrcalc])
+AS_IF([test -z "$LRCALC"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude lrcalc "])])
+AC_CHECK_PROGS([NORMALIZ], [normaliz])
+AS_IF([test -z "$NORMALIZ"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude normaliz "])])
+AC_CHECK_PROGS([GFAN], [gfan_version])
+AS_IF([test -z "$GFAN"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude gfan "])])
+AS_IF([test -z "$PYTHON"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude pyobject "])])
+AC_CHECK_PROGS([FOURTITWO_HILBERT], [hilbert 4ti2-hilbert])
+AC_CHECK_PROGS([FOURTITWO_MARKOV], [markov 4ti2-markov])
+AC_CHECK_PROGS([FOURTITWO_GRAVER], [graver 4ti2-graver])
+AC_CHECK_PROGS([BERTINI], [bertini])
+AS_IF([test -z "$BERTINI"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude bertini "])])
+AC_CHECK_PROGS([DOT], [dot])
+AC_CHECK_PROGS([SURF], [surf])
+AC_CHECK_PROGS([GFAN_TROPICALBASIS], [gfan_tropicalbasis])  dnl and more gfan_tropical...
+AC_SUBST([DOC2TEX_EXAMPLE_EXCLUSIONS])
+
+AC_CONFIG_FILES([doc/Makefile])
+AC_CONFIG_FILES([doc/Makefile-docbuild])
+AC_CONFIG_FILES([doc/version.texi])
+AC_CONFIG_LINKS([doc/pyobject.doc:doc/pyobject.${enable_pyobject_module}.doc
+                 doc/cones.doc:doc/cones.no.doc])
+AC_ARG_ENABLE([doc-build],
+              [AS_HELP_STRING([--enable-doc-build],
+                              [Enable building the Singular documentation])])
+AM_CONDITIONAL([ENABLE_DOC_BUILD], [test "$enable_doc_build" = yes])
 
 AC_OUTPUT
