@@ -906,7 +906,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ---------------------------------------------------------
 @node recover_lib
 @subsection recover_lib
-@c lib recover.lib
+@c lib recover.lib tag:bertini
 @c ----------------------------------------------------------
 @node rootisolation_lib
 @subsection rootisolation_lib
@@ -1128,7 +1128,7 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node polymake_lib
 @subsection polymake_lib
-@c lib polymake.lib
+@c lib polymake.lib tag:polymake
 @c ----------------------------------------------------------
 @node realizationMatroids_lib
 @subsection realizationMatroids_lib
@@ -1300,7 +1300,7 @@ Todos/Issues:
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
-@c lib stanleyreisner.lib
+@c lib stanleyreisner.lib tag:crash
 @c ---------------------------------------------------------
 @node swalk_lib
 @subsection swalk_lib

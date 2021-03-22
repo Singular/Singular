@@ -5,6 +5,11 @@ libpolys gfanlib IntegerProgramming \
 kernel Singular \
 dox emacs redhat desktop
 
+DIST_SUBDIRS = $(SUBDIRS) doc
+if ENABLE_DOC_BUILD
+SUBDIRS += doc
+endif
+
 EXTRA_DIST = README README.md README.pkg autogen.sh doxy redhat/singular.spec.in GPL2 GPL3
 
 bin_SCRIPTS = libsingular-config
@@ -23,8 +28,6 @@ uninstall-local:
 configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = singularconfig.h
 DISTCLEANFILES = $(nodist_configheader_HEADERS)
-
-dist_man1_MANS = doc/Singular.man doc/ESingular.man doc/TSingular.man
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = Singular.pc

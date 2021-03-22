@@ -10,7 +10,10 @@ SHELL=/bin/sh
 ##
 SINGUNAME       = spielwiese
 
-bindir	        = @bindir@
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
+bindir	        = ${top_builddir}/Singular
+EXEEXT          = @EXEEXT@
 
 ##
 ## needed programs
@@ -20,36 +23,35 @@ UUDECODE        = uudecode
 
 PERL            = perl
 TEX             = tex
-MAKEINFO        = makeinfo --force
+MAKEINFO        = @MAKEINFO@ --force
 TEXI2PDF        = @TEXI2PDF@
 TEXINDEX        = @TEXINDEX@
 # use our local texi2html
 TEXI2HTML       = ./texi2html
-DVIPS           = dvips
+DVIPS           = @DVIPS@
 
 VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
-SINGULAR        = /scratch/hannes/billbo-sw/Singular/Singular
-SINGULAR_LIB_DIR= ../Singular/LIB
-ifeq ($(SINGUNAME),"ix86-Win")
-LIBPARSE        = ${bindir}/libparse.exe
-else
-LIBPARSE        = ./libparse
-endif
+SINGULAR        = ${top_builddir}/Singular/Singular
+SINGULAR_LIB_DIR= ${top_srcdir}/Singular/LIB
+# from Singular/Makefile.am, extended by dynmodules stuff:
+TESTS_ENVIRONMENT = unset DISPLAY && SINGULARPATH='${top_builddir}/Singular/LIB:${top_srcdir}/Singular/LIB:${top_builddir}/libpolys/polys/.libs:${top_builddir}/factory/gftables:'"$$(for d in ${top_builddir}/Singular/dyn_modules/*/.libs; do printf $$d:; done)" SINGULAR_ROOT_DIR='${top_builddir}' PATH="${top_builddir}/IntegerProgramming:$$PATH"
+LIBPARSE        = ${bindir}/libparse${EXEEXT}
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 # which tags to avoid:
-DOC2TEX_EXAMPLE_EXCLUSIONS = -exclude polymake
+DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@ -exclude crash
+@ENABLE_PYOBJECT_MODULE_FALSE@ DOC2TEX_EXAMPLE_EXCLUSIONS += -exclude pyobject
 # which tags to avoid:
 TAG		= polymake
-DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
-                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
+DOC2TEX         = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
 
-DOC2TEX_M        = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
-                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
+DOC2TEX_M        = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR}
 
 PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}

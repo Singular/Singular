@@ -82,6 +82,7 @@ jobs:
           && mkdir -p upstream && cp build/pkgs/${{ env.SPKG }}/src/*.tar.gz upstream/${{ env.SPKG }}-git.tar.gz \
           && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=optional" > upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
+          && echo 'echo ntl flint readline mpfr cddlib 4ti2 qepcad > ../build/pkgs/singular/dependencies' >> upstream/update-pkgs.sh \
           && ls -l upstream/
       - uses: actions/upload-artifact@v2
         with:
