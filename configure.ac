@@ -341,6 +341,9 @@ AS_IF([test -z "$QEPCAD"], [
 AC_CHECK_PROGS([LRCALC], [lrcalc])
 AS_IF([test -z "$LRCALC"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude lrcalc "])])
+AC_CHECK_PROGS([NORMALIZ], [normaliz])
+AS_IF([test -z "$NORMALIZ"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude normaliz "])])
 AS_IF([test -z "$PYTHON"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude pyobject "])])
 AC_CHECK_PROGS([FOURTITWO_HILBERT], [hilbert 4ti2-hilbert])
