@@ -618,6 +618,27 @@ ring ssiReadRing(const ssiInfo *d)
     }
     omFreeSize(names,N*sizeof(char*));
     rIncRefCnt(r);
+    // check if such ring already exist as ssiRing*
+    char name[20];
+    int nr=0;
+    idhdl h=NULL;
+    loop
+    {
+      sprintf(name,"ssiRing%d",nr); nr++;
+      h=IDROOT->get(name, 0);
+      if (h==NULL)
+      {
+        break;
+      }
+      else if ((IDTYP(h)==RING_CMD)
+      && (r!=IDRING(h))
+      && (rEqual(r,IDRING(h),1)))
+      {
+	rDelete(r);
+        r=rIncRefCnt(IDRING(h));
+        break;
+      }
+    }
     return r;
   }
 }
