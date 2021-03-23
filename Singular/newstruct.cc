@@ -367,16 +367,15 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
           }
           if (search_ring)
           {
-            ring r;
+            ring r=(ring)al->m[nm->pos-1].data;
             res->rtyp=RING_CMD;
-            res->data=al->m[nm->pos-1].data;
-            r=(ring)res->data;
             if (r==NULL)
             {
-              res->data=(void *)currRing; r=currRing;
-              if (r!=NULL) rIncRefCnt(r);
-              else WerrorS("ring of this member is not set and no basering found");
+              r=currRing;
+              if (r==NULL)
+                WerrorS("ring of this member is not set and no basering found");
             }
+            if (r!=NULL) res->data=rIncRefCnt(r);
             a1->CleanUp();
             a2->CleanUp();
             return r==NULL;

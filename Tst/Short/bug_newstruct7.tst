@@ -18,6 +18,11 @@ def rr=erg.r_I;
 setring rr;
 erg.I;
 
+erg.r_I;
+erg.r_I;
+erg.r_I;
+erg.r_I;
+
 
 tst_status(1);$
 
