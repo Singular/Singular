@@ -1797,8 +1797,14 @@ EXAMPLE: example fglm_solve; shows an example
     {
         prec=#[1];
     }
-
-    def R = lex_solve(stdfglm(fi),prec);
+    def save=basering;
+    list L=ringlist(save);
+    L[3]=list(list("lp",1:nvars(save)),list("C",1));
+    def Rlex=ring(L);
+    setring Rlex;
+    ideal fi=fetch(save,fi);
+    fi=stdfglm(fi);
+    def R = lex_solve(fi,prec);
     dbprint( printlevel-voice+3,"
 // 'fglm_solve' created a ring, in which a list rlist of numbers (the
 // complex solutions) is stored.
@@ -1810,7 +1816,7 @@ EXAMPLE: example fglm_solve; shows an example
 example
 {
     "EXAMPLE:";echo=2;
-    ring r = 0,(x,y),lp;
+    ring r = 0,(x,y),dp;
     // compute the intersection points of two curves
     ideal s =  x2 + y2 - 10, x2 + xy + 2y2 - 16;
     def R = fglm_solve(s,10);
