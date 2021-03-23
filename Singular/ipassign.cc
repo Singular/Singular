@@ -470,11 +470,10 @@ static inline ring jjCheck_FLAG_OTHER_RING(leftv res)
       if ((res-1)->data!=NULL)
       {
         old_r=(ring)(res-1)->data;
-        old_r->ref--;
+        rDecRefCnt(old_r);
       }
-      (res-1)->data=currRing;
+      (res-1)->data=rIncRefCnt(currRing);
       (res-1)->rtyp=RING_CMD;
-      currRing->ref++;
     }
   }
   res->flag &= ~(Sy_bit(FLAG_OTHER_RING) |Sy_bit(FLAG_RING));
@@ -1199,7 +1198,7 @@ static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
       return TRUE;
     }
   }
-  r->ref++;
+  rIncRefCnt(r);
   jiAssignAttr(res,a);
   return FALSE;
 }

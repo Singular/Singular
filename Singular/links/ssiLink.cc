@@ -77,7 +77,7 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   //  Print("no ring, switch to ssiRing%d\n",nr);
   if (r==currRing)
   {
-    r->ref++;
+    rIncRefCnt(r);
     currRingHdl=rFindHdl(r,currRingHdl);
     return TRUE;
   }
@@ -93,14 +93,14 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
       if (h==NULL)
       {
         h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
-        IDRING(h)=r;
-        r->ref=2; /*d->r and h */
+        IDRING(h)=rIncRefCnt(r);
+        r->ref=2;/*ref==2: d->r and h */
         break;
       }
       else if ((IDTYP(h)==RING_CMD)
       && (rEqual(r,IDRING(h),1)))
       {
-        IDRING(h)->ref++;
+        rIncRefCnt(IDRING(h));
         break;
       }
     }
@@ -110,7 +110,7 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   else
   {
     rKill(r);
-    currRing->ref++;
+    rIncRefCnt(currRing);
     return TRUE;
   }
 }
@@ -130,8 +130,8 @@ void ssiCheckCurrRing(const ring r)
       if (h==NULL)
       {
         h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
-        IDRING(h)=r;
-        r->ref=2; /*d->r and h */
+        IDRING(h)=rIncRefCnt(r);
+        r->ref=2;/*ref==2: d->r and h */
         break;
       }
       else if ((IDTYP(h)==RING_CMD)
@@ -317,7 +317,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   }
   if (r!=NULL)
   {
-    /*d->*/r->ref++;
+    /*d->*/rIncRefCnt(r);
   }
   ssiWriteRing_R(d,r);
 }
@@ -617,7 +617,7 @@ ring ssiReadRing(const ssiInfo *d)
       omFree(names[i]);
     }
     omFreeSize(names,N*sizeof(char*));
-    r->ref=1;
+    rIncRefCnt(r);
     return r;
   }
 }
@@ -1428,7 +1428,7 @@ leftv ssiRead1(si_link l)
              d->r=ssiReadRing(d);
              if (errorreported) return NULL;
              res->data=(char*)d->r;
-             if (d->r!=NULL) d->r->ref++;
+             if (d->r!=NULL) rIncRefCnt(d->r);
              res->rtyp=RING_CMD;
              if (t==15) // setring
              {

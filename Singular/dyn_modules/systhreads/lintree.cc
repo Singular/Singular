@@ -901,7 +901,7 @@ void LinTree::set_last_ring(void *r) {
   if (last_ring)
     rKill((ring) last_ring);
   last_ring = r;
-  if (r) ((ring) r)->ref++;
+  if (r) rIncRefCnt((ring) r);
 }
 
 LinTree::~LinTree() {

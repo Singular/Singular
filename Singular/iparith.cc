@@ -3746,8 +3746,7 @@ static BOOLEAN jjSetRing(leftv, leftv u)
       ending++;
       sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
       h=enterid(name_buffer,0,RING_CMD,&IDROOT);
-      IDRING(h)=r;
-      r->ref++;
+      IDRING(h)=rIncRefCnt(r);
     }
     rSetHdl(h);
   }
@@ -7932,8 +7931,8 @@ BOOLEAN jjLIST_PL(leftv res, leftv v)
       }
       if (rt==RING_CMD)
       {
-        L->m[i].rtyp=rt;  L->m[i].data=h->Data();
-        ((ring)L->m[i].data)->ref++;
+        L->m[i].rtyp=rt;
+        L->m[i].data=rIncRefCnt(((ring)h->Data()));
       }
       else
         L->m[i].Copy(h);
