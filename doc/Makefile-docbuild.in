@@ -185,10 +185,10 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 	${LIBPARSE} -i $< > $@
 
 %_noFun.doc : %.pl pl2doc.pl
-	export PERLLIB=.;${PL2DOC_M}  -no_fun -o $@  $<
+	export PERLLIB=. PERL5LIB=.; ${PL2DOC_M}  -no_fun -o $@  $<
 
 %.doc : %.pl pl2doc.pl
-	export PERLLIB=.;${PL2DOC} -o $@ $<
+	export PERLLIB=. PERL5LIB=.; ${PL2DOC} -o $@ $<
 
 # do not delete intermediate .pl and .doc files
 .PRECIOUS: %.doc %_noFun.doc ${DOC_SUBDIR}/%_lib.pl
@@ -224,7 +224,7 @@ endif
 #
 html: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML} $(STANDALONE_TEXI_FILES)
 ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex s-plural.tex s-letterplace.tex
-	export PERLLIB=.;${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
+	export PERLLIB=. PERL5LIB=.;${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
 # html stuff
