@@ -4516,7 +4516,7 @@ static poly p_Invers(int n,poly u,intvec *w, const ring R)
   }
   p_Delete(&u1,R);
   p_Delete(&v1,R);
-  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(int));
   return v;
 }
 
