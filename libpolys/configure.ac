@@ -53,7 +53,7 @@ if test "${with_gmp+set}" = set; then :
   if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
    elif test "$with_gmp" != no ; then
-	GMP_HOME_PATH="$with_gmp ${DEFAULT_CHECKING_PATH}"
+	GMP_HOME_PATH="$with_gmp"
     fi
 else
   GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"

@@ -100,7 +100,7 @@ GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 elif test "$with_gmp" != no ; then
-	GMP_HOME_PATH="$with_gmp ${DEFAULT_CHECKING_PATH}"
+	GMP_HOME_PATH="$with_gmp"
 fi
 
 BACKUP_CFLAGS=${CFLAGS}
@@ -112,6 +112,7 @@ do
     if test -e ${GMP_HOME}/include/gmp.h; then
       GMP_CPPFLAGS="-I${GMP_HOME}/include"
       GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+      break
     fi
   fi
 done

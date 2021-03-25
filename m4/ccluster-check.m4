@@ -9,7 +9,7 @@ AC_ARG_WITH(ccluster,
 		[if test "$withval" = yes ; then
 			CCLUSTER_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 	         elif test "$withval" != no ; then
-			CCLUSTERMP_HOME_PATH="$withval ${DEFAULT_CHECKING_PATH}"
+			CCLUSTERMP_HOME_PATH="$withval"
 	        fi],
 		[CCLUSTER_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
 

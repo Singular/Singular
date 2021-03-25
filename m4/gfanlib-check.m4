@@ -31,7 +31,7 @@ else
     if test "$with_gmp" = yes ; then
       GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
     elif test "$with_gmp" != no ; then
-      GMP_HOME_PATH="$with_gmp ${DEFAULT_CHECKING_PATH}"
+      GMP_HOME_PATH="$with_gmp"
     fi
 
     BACKUP_CFLAGS=${CFLAGS}
