@@ -2331,7 +2331,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 
           /* == now the work starts == */
 
-          short * iv=iv2array(v, currRing);
+          int * iv=iv2array(v, currRing);
           poly r=0;
           poly hp=ppJetW(f,n,iv);
           int s=MATCOLS(m);

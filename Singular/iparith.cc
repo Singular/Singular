@@ -1828,12 +1828,12 @@ static BOOLEAN jjCONTRACT(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
 {
-  short *iv=iv2array((intvec *)v->Data(),currRing);
+  int *iv=iv2array((intvec *)v->Data(),currRing);
   ideal I=(ideal)u->Data();
   int d=-1;
   int i;
   for(i=IDELEMS(I);i>=0;i--) d=si_max(d,(int)p_DegW(I->m[i],iv,currRing));
-  omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(short) );
+  omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(int) );
   res->data = (char *)((long)d);
   return FALSE;
 }
@@ -1842,9 +1842,9 @@ static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
   poly p=(poly)u->Data();
   if (p!=NULL)
   {
-    short *iv=iv2array((intvec *)v->Data(),currRing);
+    int *iv=iv2array((intvec *)v->Data(),currRing);
     const long d = p_DegW(p,iv,currRing);
-    omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(short) );
+    omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(int) );
     res->data = (char *)(d);
   }
   else
@@ -6148,9 +6148,9 @@ static BOOLEAN jjINTERSEC3S(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
-  short *iw=iv2array((intvec *)w->Data(),currRing);
+  int *iw=iv2array((intvec *)w->Data(),currRing);
   res->data = (char *)ppJetW((poly)u->Data(),(int)(long)v->Data(),iw);
-  omFreeSize( (ADDRESS)iw, (rVar(currRing)+1)*sizeof(short) );
+  omFreeSize( (ADDRESS)iw, (rVar(currRing)+1)*sizeof(int) );
   return FALSE;
 }
 static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
@@ -7122,11 +7122,11 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   ideal Q=(ideal)w2.Data();
 
   int n=(int)(long)v3->Data();
-  short *w=NULL;
+  int *w=NULL;
   if(v4!=NULL)
   {
     w = iv2array((intvec *)v4->Data(),currRing);
-    short * w0 = w + 1;
+    int * w0 = w + 1;
     int i = currRing->N;
     while( (i > 0) && ((*w0) > 0) )
     {
@@ -7144,7 +7144,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   w1.CleanUp();
   w2.CleanUp();
   if(w!=NULL)
-    omFreeSize( (ADDRESS)w, (rVar(currRing)+1)*sizeof(short) );
+    omFreeSize( (ADDRESS)w, (rVar(currRing)+1)*sizeof(int) );
 
   lists L=(lists) omAllocBin(slists_bin);
   L->Init(2);

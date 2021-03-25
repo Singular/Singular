@@ -143,7 +143,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest=NULL,
              BOOLEAN goodShape=FALSE, BOOLEAN isSB=TRUE,BOOLEAN divide=FALSE,
              matrix *unit=NULL, GbVariant a=GbDefault);
 
-void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R, short *w= NULL );
+void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R, int *w= NULL );
 
 ideal   idQuot (ideal h1,ideal h2,
                 BOOLEAN h1IsStb=FALSE, BOOLEAN resultIsIdeal=FALSE);

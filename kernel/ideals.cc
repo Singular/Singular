@@ -1315,7 +1315,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
 *computes division of P by Q with remainder up to (w-weighted) degree n
 *P, Q, and w are not changed
 */
-void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
+void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,int *w)
 {
   long N=0;
   int i;

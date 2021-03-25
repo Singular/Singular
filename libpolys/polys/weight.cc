@@ -197,9 +197,9 @@ void kEcartWeights(poly* s, int sl, short *eweight, const ring R)
   omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));
 }
 
-short * iv2array(intvec * iv, const ring R)
+int * iv2array(intvec * iv, const ring R)
 {
-  short *s=(short *)omAlloc0((rVar(R)+1)*sizeof(short));
+  int *s=(int *)omAlloc0((rVar(R)+1)*sizeof(int));
   int len=0;
   if(iv!=NULL)
     len=si_min(iv->length(),rVar(R)); // usually: rVar(R)==length()
@@ -228,7 +228,7 @@ long totaldegreeWecart(poly p, ring r)
 *computes the degree of the leading term of the polynomial
 *with respect to given weights
 */
-long totaldegreeWecart_IV(poly p, ring r, const short *w)
+long totaldegreeWecart_IV(poly p, ring r, const int *w)
 {
   int i;
   long j =0;
