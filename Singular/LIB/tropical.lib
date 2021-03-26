@@ -211,7 +211,7 @@ KEYWORDS:        tropical curves; tropical polynomials
 //////////////////////////////////////////////////////////////////////////////
 LIB "random.lib";
 LIB "solve.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "elim.lib";
 LIB "linalg.lib";
 LIB "polymake.lib";
@@ -8686,7 +8686,6 @@ EXAMPLE:     example groebnerCone;  shows an example"
 example
 {
    "EXAMPLE:"; echo=2;
-   LIB "poly.lib";
    ring r = 0,(x,y,z),dp;
    ideal I = cyclic(3);
    option(redSB);
@@ -8717,7 +8716,6 @@ EXAMPLE:     example maximalGroebnerCone;  shows an example"
 example
 {
    "EXAMPLE:"; echo=2;
-   LIB "poly.lib";
    ring r = 0,(x,y,z),dp;
    ideal I = cyclic(3);
    option(redSB);
@@ -8751,7 +8749,6 @@ EXAMPLE:     example homogeneitySpace;  shows an example"
 example
 {
    "EXAMPLE:"; echo=2;
-   LIB "poly.lib";
    ring r = 0,(x,y,z),dp;
    ideal I = cyclic(3);
    option(redSB);
@@ -8780,7 +8777,6 @@ EXAMPLE:     example initial;  shows an example"
 example
 {
    "EXAMPLE:"; echo=2;
-   LIB "poly.lib";
    ring r = 0,(x,y,z),dp;
    ideal I = cyclic(3);
    intvec w = 1,1,1;

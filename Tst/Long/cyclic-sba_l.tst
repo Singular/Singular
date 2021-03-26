@@ -6,7 +6,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"poly.lib";
+LIB"polylib.lib";
 
 proc cyclicn(int z)
 {

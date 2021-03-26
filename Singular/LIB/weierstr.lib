@@ -15,7 +15,7 @@ PROCEDURES:
 ";
 
 LIB "mondromy.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc generalOrder (poly f)

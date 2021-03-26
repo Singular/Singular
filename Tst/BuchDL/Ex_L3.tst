@@ -440,7 +440,7 @@ reduce(1,Jf2,1);
 //->   1
 
 setring R; // ---- Alternatively ---------
-if (not(defined(rad_con))){ LIB "poly.lib"; }
+if (not(defined(rad_con))){ LIB "polylib.lib"; }
 rad_con(f1,I);      // result is 1 iff f is in radical(I)
 //->   1
 rad_con(f2,I);

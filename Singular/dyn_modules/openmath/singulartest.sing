@@ -2,7 +2,7 @@ ring r=0,(x,y,z,a,b),lp;
 poly f=37x3y+x2yz;
 ideal i=x*(x-1),y;
 LIB "primdec.lib";
-//LIB "poly.lib";
+//LIB "polylib.lib";
 ideal p1=x2,y;
 ideal p2=(x-1),(y-5)^2;
 ideal p3=(x)^2;

@@ -617,7 +617,7 @@ We write a procedure returning a string that enables us to create
 automatically the ideal of cyclic roots over the basering with n
 variables. The procedure assumes that the variables consist of a single
 letter each (hence no indexed variables are allowed; the procedure
-@code{cyclic} in @code{poly.lib} does not have this restriction). Then
+@code{cyclic} in @code{polylib.lib} does not have this restriction). Then
 we compute a standard basis of this ideal and some numerical
 information.  (This ideal is used as a classical benchmark for standard
 basis computations).
@@ -869,7 +869,7 @@ recommended to set this option.
 
 @smallexample
 @c example
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r=32003,(a,b,c,d,e,f),lp;
 ideal I=cyclic(6);
 option(prot);

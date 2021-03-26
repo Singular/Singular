@@ -373,6 +373,7 @@ See
 @subsection bareiss
 @cindex bareiss
 @cindex linear algebra
+qcindex Gauss
 
 @table @code
 @item @strong{Syntax:}
@@ -4038,7 +4039,7 @@ identifier of type package.
   listvar(r);
   listvar(t1);
   listvar(proc);
-  LIB "poly.lib";
+  LIB "polylib.lib";
   listvar(Poly);
 @c example
 @end smallexample
@@ -4131,6 +4132,7 @@ See
 @cindex ludecomp
 @cindex LU-decomposition of a matrix of numbers
 @cindex linear algebra
+qcindex Gauss
 
 @table @code
 @item @strong{Syntax:}
@@ -4175,7 +4177,8 @@ P, L, and U.
 @end table
 @c ref
 See
-@ref{luinverse}.
+@ref{luinverse};
+@ref{lusolve}.
 @c ref
 @c ---------------------------------------
 @node luinverse, lusolve, ludecomp, Functions
@@ -4183,6 +4186,7 @@ See
 @cindex luinverse
 @cindex inverse of a matrix via its LU-decomposition
 @cindex linear algebra
+qcindex Gauss
 
 @table @code
 @item @strong{Syntax:}
@@ -4247,7 +4251,8 @@ The method will give a warning for any non-quadratic matrix A.
 @end table
 @c ref
 See
-@ref{ludecomp}.
+@ref{ludecomp};
+@ref{lusolve}.
 @c ref
 @c ---------------------------------------
 @node lusolve, max, luinverse, Functions
@@ -4255,6 +4260,7 @@ See
 @cindex lusolve
 @cindex solve a linear equation system A*x = b via the LU-decomposition of A
 @cindex linear algebra
+qcindex Gauss
 
 @table @code
 @item @strong{Syntax:}
@@ -4315,7 +4321,8 @@ the given polynomial ring, only.
 @end table
 @c ref
 See
-@ref{ludecomp}.
+@ref{ludecomp};
+@ref{luinverse}.
 @c ref
 @c ---------------------------------------
 @node max, maxideal, lusolve, Functions

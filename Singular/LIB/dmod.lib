@@ -115,8 +115,8 @@ LIB "gkdim.lib";
 LIB "gmssing.lib";
 LIB "control.lib";  // for genericity
 LIB "dmodapp.lib"; // for e.g. engine
-LIB "poly.lib";
 LIB "dmodideal.lib"; // for usage in annfspecial
+LIB "polylib.lib";
 
 proc testdmodlib()
 {

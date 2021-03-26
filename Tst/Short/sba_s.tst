@@ -6,7 +6,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"poly.lib";
+LIB"polylib.lib";
 
 proc katsuran(int z)
 {
@@ -200,7 +200,7 @@ for (k=6; k>2; k--)
 }
 
 tst_status(1);$
-LIB "poly.lib";
+LIB "polylib.lib";
 killall();
 killall("proc");
 exit;

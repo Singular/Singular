@@ -33,7 +33,7 @@ PROCEDURES:
 LIB "general.lib";
 LIB "deform.lib";
 LIB "matrix.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 

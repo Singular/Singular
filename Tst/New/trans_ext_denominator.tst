@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 
-LIB "poly.lib"; // MASTER's denominator
+LIB "polylib.lib"; // MASTER's denominator
 
 ring Q=(0),x,dp;
 

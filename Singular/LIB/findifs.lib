@@ -38,7 +38,7 @@ SEE ALSO: latex_lib, finitediff_lib
 
 
 LIB "latex.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 
 proc tst_findif()
 {

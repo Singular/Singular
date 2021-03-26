@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r = 0,(x,y,z),wp(1,2,3);
 poly f = x+y2+z3;
 deg(f);            //deg returns weighted degree (in case of 1 block)!

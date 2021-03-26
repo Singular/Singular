@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1291366966:3120- 13145 :3-1-2:ix86-Linux:mamawutz:236408 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:236420
-1 >> tst_memory_1 :: 1291366966:3120- 13145 :3-1-2:ix86-Linux:mamawutz:668900 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:668900
-1 >> tst_memory_2 :: 1291366966:3120- 13145 :3-1-2:ix86-Linux:mamawutz:701684 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:701684
-1 >> tst_timer_1 :: 1291366966:3120- 13145 :3-1-2:ix86-Linux:mamawutz:13 1292524760:3120- 13145 :3-1-2:ix86-Linux:mamawutz:12
+1 >> tst_memory_0 :: 1607523367:4133, 64 bit:4.1.3:x86_64-Linux:mini:198584
+1 >> tst_memory_1 :: 1607523367:4133, 64 bit:4.1.3:x86_64-Linux:mini:2152792
+1 >> tst_memory_2 :: 1607523367:4133, 64 bit:4.1.3:x86_64-Linux:mini:2193896
+1 >> tst_timer_1 :: 1607523367:4133, 64 bit:4.1.3:x86_64-Linux:mini:5

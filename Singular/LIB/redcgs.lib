@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version redcgs.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version redcgs.lib 4.2.0.0 Dec_2020 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehensive Groebner Systems.
@@ -126,7 +126,7 @@ memberpos(f,J);      Returns the list of two integers: the value 0 or 1 dependin
                      does not belong).
 subset(F,G);         If all elements of F belong to the ideal G it returns 1,
                      and 0 otherwise.
-pdivi(f,F);          Pseudodivision of a polynomial f by an ideal F in @R. Returns a
+pdivi2(f,F);         Pseudodivision of a polynomial f by an ideal F in @R. Returns a
                      list (r,q,m) such that m*f=r+sum(q.G).
 facvar(ideal J)      Returns all the free-square factors of the elements
                      of ideal J (non repeated). Integer factors are ignored,
@@ -429,15 +429,15 @@ proc simpqcoeffs(poly n,poly m)
 }
 
 
-// pdivi : pseudodivision of a polynomial f by an ideal F in @R
+// pdivi2 : pseudodivision of a polynomial f by an ideal F in @R
 //         in the ring @R
 // input:
 //   poly f0  (given in the ring @R)
 //   ideal F0 (given in the ring @R)
 // output:
 //   list (poly r, ideal q, poly mu)
-proc pdivi(poly f,ideal F)
-"USAGE:   pdivi(f,F);
+proc pdivi2(poly f,ideal F)
+"USAGE:   pdivi2(f,F);
           poly f: the polynomial to be divided
           ideal F: the divisor ideal
 RETURN:   A list (poly r, ideal q, poly m). r is the remainder of the
@@ -446,7 +446,7 @@ RETURN:   A list (poly r, ideal q, poly m). r is the remainder of the
 NOTE:     Pseudodivision of a polynomial f by an ideal F in @R. Returns a
           list (r,q,m) such that m*f=r+sum(q.G).
 KEYWORDS: division, reduce
-EXAMPLE:  pdivi; shows an example"
+EXAMPLE:  example pdivi2; shows an example"
 {
   int i;
   int j;
@@ -504,7 +504,7 @@ example
   setglobalrings();
   poly f=(ab-ac)*xy+(ab)*x+(5c);
   ideal F=ax+b,cy+a;
-  def r=pdivi(f,F);
+  def r=pdivi2(f,F);
   r;
   r[3]*f-(r[2][1]*F[1]+r[2][2]*F[2])-r[1];
 }
@@ -630,7 +630,7 @@ RETURN:   a reduced polynomial g of f, whose coefficients are reduced
           modulo N and having no factor in W.
 NOTE:     Should be called from ring @R. Ideals N and W must be polynomials
           in the parameters forming a red-specification (see definition)         the papers).
-KEYWORDS: division, pdivi, reduce
+KEYWORDS: division, pdivi2, reduce
 EXAMPLE:  pnormalform; shows an example"
 {
     def RR=basering;
@@ -932,7 +932,7 @@ proc redgb(ideal F, ideal N, ideal W)
   for (i=1;i<=size(F);i++)
   {
     H=delfromideal(F,i);
-    G[i]=pnormalform(pdivi(F[i],H)[1],N,W);
+    G[i]=pnormalform(pdivi2(F[i],H)[1],N,W);
   }
   return(G);
 }
@@ -1218,7 +1218,7 @@ proc discussSpolys(ideal B, list r, list P)
       if (not(crit))
       {
         S=pspol(F[i],F[j]);
-        KK=pdivi(S,F);
+        KK=pdivi2(S,F);
         S=KK[1];
         if (S!=0)
         {
@@ -3759,7 +3759,7 @@ proc postredgb(ideal F)
   for (i=1;i<=size(F);i++)
   {
     H=delfromideal(F,i);
-    G[i]=pdivi(F[i],H)[1];
+    G[i]=pdivi2(F[i],H)[1];
   }
   return(G);
 }

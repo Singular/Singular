@@ -55,7 +55,7 @@ diagonalizeMatrixSimul(list l);          find transformation which simultaneousl
 invertAlgebraMorphism(map p,int n);      return inverse of p exact up to degree n
 ";
 
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "linalg.lib";
 LIB "matrix.lib";
 LIB "arr.lib";

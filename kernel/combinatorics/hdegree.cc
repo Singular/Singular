@@ -17,6 +17,7 @@
 #include "kernel/combinatorics/hutil.h"
 #include "kernel/combinatorics/hilb.h"
 #include "kernel/combinatorics/stairc.h"
+#include "reporter/reporter.h"
 
 VAR int  hCo, hMu, hMu2;
 VAR omBin indlist_bin = omGetSpecBin(sizeof(indlist));
@@ -1567,4 +1568,297 @@ ende:
   }
 }
  */
+#endif
+
+#ifdef HAVE_SHIFTBBA
+
+/*
+ * Computation of the Gel'fand-Kirillov Dimension
+ */
+
+#include "polys/shiftop.h"
+#include <vector>
+
+static std::vector<int> countCycles(const intvec* _G, int v, std::vector<int> path, std::vector<BOOLEAN> visited, std::vector<BOOLEAN> cyclic, std::vector<int> cache)
+{
+  intvec* G = ivCopy(_G); // modifications must be local
+
+  if (cache[v] != -2) return cache; // value is already cached
+
+  visited[v] = TRUE;
+  path.push_back(v);
+
+  int cycles = 0;
+  for (int w = 0; w < G->cols(); w++)
+  {
+    if (IMATELEM(*G, v + 1, w + 1)) // edge v -> w exists in G
+    {
+      if (!visited[w])
+      { // continue with w
+        cache = countCycles(G, w, path, visited, cyclic, cache);
+        if (cache[w] == -1)
+        {
+          cache[v] = -1;
+          return cache;
+        }
+        cycles = si_max(cycles, cache[w]);
+      }
+      else
+      { // found new cycle
+        int pathIndexOfW = -1;
+        for (int i = path.size() - 1; i >= 0; i--) {
+          if (cyclic[path[i]] == 1) { // found an already cyclic vertex
+            cache[v] = -1;
+            return cache;
+          }
+          cyclic[path[i]] = TRUE;
+
+          if (path[i] == w) { // end of the cycle
+            assume(IMATELEM(*G, v + 1, w + 1) != 0);
+            IMATELEM(*G, v + 1, w + 1) = 0; // remove edge v -> w
+            pathIndexOfW = i;
+            break;
+          } else {
+            assume(IMATELEM(*G, path[i - 1] + 1, path[i] + 1) != 0);
+            IMATELEM(*G, path[i - 1] + 1, path[i] + 1) = 0; // remove edge vi-1 -> vi
+          }
+        }
+        assume(pathIndexOfW != -1); // should never happen
+        for (int i = path.size() - 1; i >= pathIndexOfW; i--) {
+          cache = countCycles(G, path[i], path, visited, cyclic, cache);
+          if (cache[path[i]] == -1)
+          {
+            cache[v] = -1;
+            return cache;
+          }
+          cycles = si_max(cycles, cache[path[i]] + 1);
+        }
+      }
+    }
+  }
+  cache[v] = cycles;
+
+  delete G;
+  return cache;
+}
+
+// -1 is infinity
+static int graphGrowth(const intvec* G)
+{
+  // init
+  int n = G->cols();
+  std::vector<int> path;
+  std::vector<BOOLEAN> visited;
+  std::vector<BOOLEAN> cyclic;
+  std::vector<int> cache;
+  visited.resize(n, FALSE);
+  cyclic.resize(n, FALSE);
+  cache.resize(n, -2);
+
+  // get max number of cycles
+  int cycles = 0;
+  for (int v = 0; v < n; v++)
+  {
+    cache = countCycles(G, v, path, visited, cyclic, cache);
+    if (cache[v] == -1)
+      return -1;
+    cycles = si_max(cycles, cache[v]);
+  }
+  return cycles;
+}
+
+static void _lp_computeStandardWords(ideal words, int n, ideal M, int& last)
+{
+  // assume <M> != <1>
+  if (n <= 0){
+    words->m[0] = pOne();
+    last = 0;
+    return;
+  }
+
+  _lp_computeStandardWords(words, n - 1, M, last);
+
+  int nVars = currRing->isLPring - currRing->LPncGenCount;
+
+  for (int j = nVars - 1; j >= 0; j--)
+  {
+    for (int i = last; i >= 0; i--)
+    {
+      int index = (j * (last + 1)) + i;
+
+      if (words->m[i] != NULL)
+      {
+        if (j > 0) {
+          words->m[index] = pCopy(words->m[i]);
+        }
+
+        int varOffset = ((n - 1) * currRing->isLPring) + 1;
+        pSetExp(words->m[index], varOffset + j, 1);
+        pSetm(words->m[index]);
+        pTest(words->m[index]);
+
+        if (p_LPDivisibleBy(M, words->m[index], currRing))
+        {
+          pDelete(&words->m[index]);
+          words->m[index] = NULL;
+        }
+      }
+    }
+  }
+
+  last = nVars * last + nVars - 1;
+}
+
+static ideal lp_computeStandardWords(int n, ideal M)
+{
+  int nVars = currRing->isLPring - currRing->LPncGenCount;
+
+  int maxElems = 1;
+  for (int i = 0; i < n; i++) // maxElems = nVars^n
+    maxElems *= nVars;
+  ideal words = idInit(maxElems);
+  int last;
+  _lp_computeStandardWords(words, n, M, last);
+  idSkipZeroes(words);
+  return words;
+}
+
+// NULL if graph is undefined
+intvec* lp_ufnarovskiGraph(ideal G, ideal &standardWords)
+{
+  long l = 0;
+  for (int i = 0; i < IDELEMS(G); i++)
+    l = si_max(pTotaldegree(G->m[i]), l);
+  l--;
+  if (l <= 0)
+  {
+    WerrorS("Ufnarovski graph not implemented for l <= 0");
+    return NULL;
+  }
+  int lV = currRing->isLPring;
+
+  standardWords = lp_computeStandardWords(l, G);
+
+  int n = IDELEMS(standardWords);
+  intvec* UG = new intvec(n, n, 0);
+  for (int i = 0; i < n; i++)
+  {
+    for (int j = 0; j < n; j++)
+    {
+      poly v = standardWords->m[i];
+      poly w = standardWords->m[j];
+
+      // check whether v*x1 = x2*w (overlap)
+      bool overlap = true;
+      for (int k = 1; k <= (l - 1) * lV; k++)
+      {
+        if (pGetExp(v, k + lV) != pGetExp(w, k)) {
+          overlap = false;
+          break;
+        }
+      }
+
+      if (overlap)
+      {
+        // create the overlap
+        poly p = pMult(pCopy(v), p_LPVarAt(w, l, currRing));
+
+        // check whether the overlap is normal
+        bool normal = true;
+        for (int k = 0; k < IDELEMS(G); k++)
+        {
+          if (p_LPDivisibleBy(G->m[k], p, currRing))
+          {
+            normal = false;
+            break;
+          }
+        }
+
+        if (normal)
+        {
+          IMATELEM(*UG, i + 1, j + 1) = 1;
+        }
+      }
+    }
+  }
+  return UG;
+}
+
+// -1 is infinity, -2 is error
+int lp_gkDim(const ideal _G)
+{
+  id_Test(_G, currRing);
+
+  if (rField_is_Ring(currRing)) {
+      WerrorS("GK-Dim not implemented for rings");
+      return -2;
+  }
+
+  for (int i=IDELEMS(_G)-1;i>=0; i--)
+  {
+    if (_G->m[i] != NULL)
+    {
+      if (pGetComp(_G->m[i]) != 0)
+      {
+        WerrorS("GK-Dim not implemented for modules");
+        return -2;
+      }
+      if (pGetNCGen(_G->m[i]) != 0)
+      {
+        WerrorS("GK-Dim not implemented for bi-modules");
+        return -2;
+      }
+    }
+  }
+
+  ideal G = id_Head(_G, currRing); // G = LM(G) (and copy)
+  idSkipZeroes(G); // remove zeros
+  id_DelLmEquals(G, currRing); // remove duplicates
+
+  // check if G is the zero ideal
+  if (IDELEMS(G) == 1 && G->m[0] == NULL)
+  {
+    // NOTE: this is needed because if the ideal is <0>, then idSkipZeroes keeps this element, and IDELEMS is still 1!
+    int lV = currRing->isLPring;
+    int ncGenCount = currRing->LPncGenCount;
+    if (lV - ncGenCount == 0)
+      return 0;
+    if (lV - ncGenCount == 1)
+      return 1;
+    if (lV - ncGenCount >= 2)
+      return -1;
+  }
+
+  // get the max deg
+  long maxDeg = 0;
+  for (int i = 0; i < IDELEMS(G); i++)
+  {
+    maxDeg = si_max(maxDeg, pTotaldegree(G->m[i]));
+
+    // also check whether G = <1>
+    if (pIsConstantComp(G->m[i]))
+    {
+      WerrorS("GK-Dim not defined for 0-ring");
+      return -2;
+    }
+  }
+
+  // early termination if G \subset X
+  if (maxDeg <= 1)
+  {
+    int lV = currRing->isLPring;
+    int ncGenCount = currRing->LPncGenCount;
+    if (IDELEMS(G) == lV - ncGenCount) // V = {1} no edges
+      return 0;
+    if (IDELEMS(G) == lV - ncGenCount - 1) // V = {1} with loop
+      return 1;
+    if (IDELEMS(G) <= lV - ncGenCount - 2) // V = {1} with more than one loop
+      return -1;
+  }
+
+  ideal standardWords;
+  intvec* UG = lp_ufnarovskiGraph(G, standardWords);
+  if (errorreported || UG == NULL) return -2;
+  return graphGrowth(UG);
+}
 #endif

@@ -18,7 +18,7 @@ PROCEDURES:
 ";
 
 LIB "inout.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "matrix.lib";
 LIB "general.lib";
 LIB "rootsur.lib";

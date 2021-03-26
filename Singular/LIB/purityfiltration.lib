@@ -37,7 +37,7 @@ KEYWORDS: D-module; ext-module; filtration; projective dimension; resolution; pu
 
 LIB "nctools.lib";
 LIB "matrix.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "general.lib";
 LIB "control.lib";
 LIB "nchomolog.lib";

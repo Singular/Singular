@@ -39,7 +39,7 @@ LIB "involut.lib";
 LIB "crypto.lib"; //for introot
 LIB "matrix.lib"; //for submatrix
 LIB "solve.lib"; //for solve
-LIB "poly.lib"; //for content
+LIB "polylib.lib"; //for content
 LIB "fpadim.lib"; //for letterplace
 
 proc tst_ncfactor()

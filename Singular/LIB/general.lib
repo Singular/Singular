@@ -35,7 +35,7 @@ PROCEDURES:
 ";
 
 LIB "inout.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "matrix.lib";
 LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////

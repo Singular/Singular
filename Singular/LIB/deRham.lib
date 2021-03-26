@@ -38,7 +38,7 @@ LIB "general.lib";
 //LIB "dmod.lib";
 LIB "bfun.lib";
 LIB "dmodapp.lib";
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "schreyer.lib";
 LIB "dmodloc.lib";
 

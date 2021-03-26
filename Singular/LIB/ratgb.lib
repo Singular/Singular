@@ -46,7 +46,7 @@ Transnational Access Program of RISC Linz, Austria
 SEE ALSO: jacobson_lib, olga_lib
 ";
 
-LIB "poly.lib";
+LIB "polylib.lib";
 LIB "dmodapp.lib"; // for Appel1, Appel2, Appel4
 
 

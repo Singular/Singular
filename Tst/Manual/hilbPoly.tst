@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r = 0,(b,c,t,h),dp;
 ideal I=
 bct-t2h+2th2+h3,

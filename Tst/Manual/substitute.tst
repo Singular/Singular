@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r = 0,(b,c,t),dp;
 ideal I = -bc+4b2c2t,bc2t-5b2c;
 substitute(I,c,b+c,t,0,b,b-1);

@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring R=0,(x,y,z),dp;
 ideal I=x2+y2,z2;
 poly f=x4+y4;

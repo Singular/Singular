@@ -5,7 +5,7 @@ LIB("syzextra.so");
 system("--min-time", "0.01");
 system("--ticks-per-sec", 100);
 
-LIB "poly.lib"; // for numerator & denominator
+LIB "polylib.lib"; // for numerator & denominator
 
 option(redSB); option(redTail); // assumed for the results of kStd!
 option(prot);

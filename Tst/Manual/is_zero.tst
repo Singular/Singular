@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-LIB "poly.lib";
+LIB "polylib.lib";
 ring r;
 module m = [x],[y],[1,z];
 is_zero(m,1);

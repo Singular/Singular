@@ -34,7 +34,7 @@ PROCEDURES:
 ";
 
 LIB "general.lib" // for "sort"
-LIB "poly.lib" // for "maxdeg"
+LIB "polylib.lib" // for "maxdeg"
 
 
 /******************************************************/
