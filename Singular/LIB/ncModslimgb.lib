@@ -27,7 +27,9 @@ PROCEDURES:
 
 LIB "parallel.lib";
 LIB "resources.lib";
+LIB "nctools.lib";
 LIB "dmod.lib";
+
 
 static proc mod_init()
 {
@@ -400,20 +402,21 @@ RETURN:  1 if p does not divide any coefficient of any defining relation of
 EXAMPLE: example PrimeTestCommutatorRel; shows an example
 {
   list rl = ringlist(basering);
-  matrix commrelmatC = rl[5];
-  matrix commrelmatD = rl[6];
-  int nvar=nvars(basering);
+  int nvar = nvars(basering);
+  matrix commrelmatC = UpOneMatrix(nvar);
+  matrix commrelmatD[nvar][nvar];
+  if (size(rl) == 6)
+  {
+    commrelmatC = rl[5];
+    commrelmatD = rl[6];
+  }
   int i, j, k;
   poly f; number cnt;
-
-
   for(i = 1; i <= nvar; i++)
   {
     for(j = i+1; j <= nvar; j++)
     {
-
       cnt = leadcoef(commrelmatC[i,j]);
-
       if(cnt == 0)
       {
         ERROR("wrong relations");
@@ -540,9 +543,16 @@ EXAMPLE: example ModpSlim; shows an example
 {
   def R0 = basering;
   list rl = ringlist(R0);
-
-  matrix commrelmatC = rl[5];
-  matrix commrelmatD = rl[6];
+  int nvar = nvars(basering);
+  matrix commrelmatC = UpOneMatrix(nvar);
+  matrix commrelmatD[nvar][nvar];
+  if (size(rl) == 6)
+  {
+    commrelmatC = rl[5];
+    commrelmatD = rl[6];
+  }
+//  matrix commrelmatC = rl[5];
+//  matrix commrelmatD = rl[6];
   rl[1] = p;
   def @rr = ring(rl);
   setring @rr;
@@ -640,8 +650,16 @@ RETURN:  1 (respectively 0) if for a randomly chosen prime p which is not in L
   int ptest;
   def R = basering;
   list r = ringlist(R);
-  matrix commrelC = r[5];
-  matrix commrelD = r[6];
+  int nvar = nvars(basering);
+  matrix commrelC = UpOneMatrix(nvar);
+  matrix commrelD[nvar][nvar];
+  if (size(r) == 6)
+  {
+    commrelC = r[5];
+    commrelD = r[6];
+  }
+//  matrix commrelC = r[5];
+//  matrix commrelD = r[6];
   while(!ptest)
   {
     ptest = 1;
