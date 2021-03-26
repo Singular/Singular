@@ -922,7 +922,7 @@ EXAMPLE:  example annRat; shows examples
   dbprint(ppl-1, mir);
   // use annfspecial
   dbprint(ppl,"// -3-[annRat] running annfspecial ");
-  ideal AF = annfspecial(LD,f,mir,-1); // ann f^{-1}
+  ideal AF = annfspecialOld(LD,f,mir,-1); // ann f^{-1}
   //  LD = subst(LD,s,j);
   //  LD = engine(LD,0);
   // modify the ring: throw s away
@@ -2901,7 +2901,8 @@ EXAMPLE: example deRhamCohom; shows example
     kill v,iv,BS,LDf;
   }
   dbprint(ppl,"// Computing Ann(f^" + string(l0) + ")...");
-  LD = annfspecial(LD,f,l0,l0); // Ann(f^l0)
+  LD = annfspecialOld(LD,f,l0,l0); // Ann(f^l0)
+  // VL dec 2020: since l0 is an integer, no need to update with new annfspecial
   // create new ring without s
   list RL = ringlist(A);
   RL = RL[1..4];
