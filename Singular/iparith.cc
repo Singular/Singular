@@ -5360,6 +5360,26 @@ static BOOLEAN jjVARSTR1(leftv res, leftv v)
 static BOOLEAN jjVDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
+#ifdef HAVE_SHIFTBBA
+  if (currRing->isLPring)
+  {
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+    {
+      WerrorS("`vdim` is not implemented for letterplace rings over rings");
+      return TRUE;
+    }
+#endif
+    if (currRing->qideal != NULL)
+    {
+      WerrorS("qring not supported by `vdim` for letterplace rings at the moment");
+      return TRUE;
+    }
+    int kDim = lp_kDim((ideal)(v->Data()));
+    res->data = (char *)(long)kDim;
+    return (kDim == -2);
+  }
+#endif
   res->data = (char *)(long)scMult0Int((ideal)v->Data(),currRing->qideal);
   return FALSE;
 }

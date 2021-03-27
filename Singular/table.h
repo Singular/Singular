@@ -309,7 +309,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjVARIABLES_ID),VARIABLES_CMD,  IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjVARIABLES_ID),VARIABLES_CMD,  IDEAL_CMD,      MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD    , ALLOW_NC |ALLOW_RING}
-,{D(jjVDIM),       VDIM_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
+,{D(jjVDIM),       VDIM_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_NC |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjVDIM),       VDIM_CMD,        INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjVAR1),       VAR_CMD,         POLY_CMD,       INT_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjVARSTR1),    VARSTR_CMD,      STRING_CMD,     INT_CMD       , ALLOW_NC |ALLOW_RING}
