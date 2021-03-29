@@ -611,9 +611,7 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   }
   poly u_p=(poly)u->CopyD(POLY_CMD);
   if ((u_p!=NULL)
-  #ifdef HAVE_SHIFTBBA
   && (!rIsLPRing(currRing))
-  #endif
   && ((v_i!=0) &&
       ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i/2)))
   {
@@ -4034,7 +4032,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
 #ifdef HAVE_SHIFTBBA
-  if (currRing->isLPring)
+  if (rIsLPRing(currRing))
   {
 #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
@@ -4282,10 +4280,11 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
 static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
 {
 #ifdef HAVE_SHIFTBBA
-  if (currRing->isLPring)
+  if (rIsLPRing(currRing))
   {
     int deg = (int)(long)v->Data();
-    if (deg > currRing->N/currRing->isLPring) {
+    if (deg > currRing->N/currRing->isLPring)
+    {
       WerrorS("degree bound of Letterplace ring is to small");
       return TRUE;
     }
@@ -5171,9 +5170,9 @@ static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
   res->data = (char *)ivTranp((intvec*)(v->Data()));
   return FALSE;
 }
-#ifdef HAVE_PLURAL
 static BOOLEAN jjOPPOSITE(leftv res, leftv a)
 {
+#ifdef HAVE_PLURAL
   ring    r = (ring)a->Data();
   //if (rIsPluralRing(r))
   if (r->OrdSgn==1)
@@ -5186,9 +5185,13 @@ static BOOLEAN jjOPPOSITE(leftv res, leftv a)
     res->data = rCopy(r);
   }
   return FALSE;
+#else
+  return TRUE;
+#endif
 }
 static BOOLEAN jjENVELOPE(leftv res, leftv a)
 {
+#ifdef HAVE_PLURAL
   ring    r = (ring)a->Data();
   if (rIsPluralRing(r))
   {
@@ -5197,9 +5200,13 @@ static BOOLEAN jjENVELOPE(leftv res, leftv a)
   }
   else  res->data = rCopy(r);
   return FALSE;
+#else
+  return TRUE;
+#endif
 }
 static BOOLEAN jjTWOSTD(leftv res, leftv a)
 {
+#ifdef HAVE_PLURAL
   ideal result;
   ideal v_id=(ideal)a->Data();
   if (rIsPluralRing(currRing))
@@ -5212,11 +5219,13 @@ static BOOLEAN jjTWOSTD(leftv res, leftv a)
   setFlag(res,FLAG_STD);
   setFlag(res,FLAG_TWOSTD);
   return FALSE;
-}
+#else
+  return TRUE;
 #endif
-#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)// do not place above jjSTD in this file because we need to reference it
+}
 static BOOLEAN jjRIGHTSTD(leftv res, leftv v)
 {
+#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)// do not place above jjSTD in this file because we need to reference it
   if (rIsLPRing(currRing))
   {
     if (rField_is_numeric(currRing))
@@ -5271,8 +5280,10 @@ static BOOLEAN jjRIGHTSTD(leftv res, leftv v)
   {
     return jjSTD(res, v);
   }
-}
+#else
+  return TRUE;
 #endif
+}
 static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
   int t=(int)(long)v->data;
@@ -5361,7 +5372,7 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
 #ifdef HAVE_SHIFTBBA
-  if (currRing->isLPring)
+  if (rIsLPRing(currRing))
   {
 #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
@@ -6591,13 +6602,11 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
-#ifdef HAVE_SHIFTBBA
     if (rIsLPRing(currRing))
     {
       WerrorS("Substituting parameters not implemented for Letterplace rings.");
       return TRUE;
     }
-#endif
     res->data=pSubstPar(p,-ringvar,monomexpr);
   }
   return FALSE;
@@ -6640,13 +6649,11 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
-#ifdef HAVE_SHIFTBBA
     if (rIsLPRing(currRing))
     {
       WerrorS("Substituting parameters not implemented for Letterplace rings.");
       return TRUE;
     }
-#endif
     res->data = idSubstPar(id,-ringvar,monomexpr);
   }
   return FALSE;
@@ -9843,7 +9850,6 @@ int iiArithAddCmd(
 
 static BOOLEAN check_valid(const int p, const int op)
 {
-  #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
     if ((p & NC_MASK)==NO_NC)
@@ -9858,7 +9864,6 @@ static BOOLEAN check_valid(const int p, const int op)
     }
     /* else, ALLOW_PLURAL */
   }
-  #ifdef HAVE_SHIFTBBA
   else if (rIsLPRing(currRing))
   {
     if ((p & ALLOW_LP)==0)
@@ -9867,9 +9872,6 @@ static BOOLEAN check_valid(const int p, const int op)
       return TRUE;
     }
   }
-  #endif
-  #endif
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     if ((p & RING_MASK)==0 /*NO_RING*/)
@@ -9890,7 +9892,6 @@ static BOOLEAN check_valid(const int p, const int op)
       WarnS("considering the image in Q[...]");
     }
   }
-#endif
   return FALSE;
 }
 // --------------------------------------------------------------------
