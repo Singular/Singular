@@ -11,6 +11,7 @@ Manual/letterplace_reduce.tst
 Manual/letterplace_print.tst
 Manual/letterplace_std_Z.tst
 Manual/letterplace_maxideal.tst
+Manual/letterplace_vdim.tst
 
 Manual/lpNoetherian.tst
 Manual/lpIsPrime.tst
