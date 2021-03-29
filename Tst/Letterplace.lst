@@ -12,12 +12,10 @@ Manual/letterplace_print.tst
 Manual/letterplace_std_Z.tst
 Manual/letterplace_maxideal.tst
 
-Manual/lpGkDim.tst
 Manual/lpNoetherian.tst
 Manual/lpIsPrime.tst
 Manual/lpIsSemiPrime.tst
 Manual/lpGlDimBound.tst
-Manual/lpKDim.tst
 Manual/lpKDimCheck.tst
 Manual/lpUfnarovskiGraph.tst
 Manual/lpMonomialBasis.tst
