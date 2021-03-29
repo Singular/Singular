@@ -1055,7 +1055,7 @@ NOTE: if I = LM(I), then the global dimension is equal the Gelfand
     } else {
       if (i == size(G)) { // if last iteration
         G = twostd(G); // otherwise warning that G is no standard basis
-        int gkDim = lpGkDim(G);
+        int gkDim = dim(G);
         if (gkDim >= 0) {
           return (gkDim);
         }
