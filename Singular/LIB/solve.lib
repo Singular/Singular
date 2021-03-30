@@ -1923,7 +1923,14 @@ EXAMPLE: example triangLf_solve; shows an example
         prec=#[1];
     }
 
-    def R=triang_solve(triangLfak(stdfglm(fi)),prec);
+    def save=basering;
+    list L=ringlist(save);
+    L[3]=list(list("lp",1:nvars(save)),list("C",1));
+    def Rlex=ring(L);
+    setring Rlex;
+    ideal fi=fetch(save,fi);
+    fi=stdfglm(fi);
+    def R=triang_solve(triangLfak(fi),prec);
     dbprint( printlevel-voice+3,"
 // 'triangLf_solve' created a ring, in which a list rlist of numbers (the
 // complex solutions) is stored.
@@ -1965,7 +1972,14 @@ EXAMPLE: example triangM_solve; shows an example
         prec=#[1];
     }
 
-    def R = triang_solve(triangM(stdfglm(fi)),prec);
+    def save=basering;
+    list L=ringlist(save);
+    L[3]=list(list("lp",1:nvars(save)),list("C",1));
+    def Rlex=ring(L);
+    setring Rlex;
+    ideal fi=fetch(save,fi);
+    fi=stdfglm(fi);
+    def R = triang_solve(triangM(fi),prec);
     dbprint( printlevel-voice+3,"
 // 'triangM_solve' created a ring, in which a list rlist of numbers (the
 // complex solutions) is stored.
@@ -2006,7 +2020,14 @@ EXAMPLE: example triangL_solve; shows an example
         prec=#[1];
     }
 
-    def R=triang_solve(triangL(stdfglm(fi)),prec);
+    def save=basering;
+    list L=ringlist(save);
+    L[3]=list(list("lp",1:nvars(save)),list("C",1));
+    def Rlex=ring(L);
+    setring Rlex;
+    ideal fi=fetch(save,fi);
+    fi=stdfglm(fi);
+    def R=triang_solve(triangL(fi),prec);
     dbprint( printlevel-voice+3,"
 // 'triangL_solve' created a ring, in which a list rlist of numbers (the
 // complex solutions) is stored.
