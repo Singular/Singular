@@ -1921,7 +1921,7 @@ from the output list. Thus the zero set of the intersection of the output
 ideals is contained in the zero set V of the first input ideal
 and contains the complement in V of the zero set of the second input ideal.
 @item @strong{Note:}
-Not implemented for baserings over real ground fields and galois fields
+Not implemented for baserings over real ground fields and Galois fields
 (that is, only
 implemented for ground fields for which @ref{factorize} is implemented).
 @item @strong{Example:}
@@ -2104,7 +2104,7 @@ maps objects between rings.
 in the first case the i-th variable of the source ring is mapped to the i-th
 variable of the basering.
 If the basering has less variables than the source ring these variables are mapped to zero.
-In the 2nd and 3rd form the intvec describes the permation of the variables:
+In the 3rd and 4th arguments the intvec describes the permutation of the variables:
 an i at position j maps the variable @code{var(j)} of the source to the variable
 @code{var(i)} of the destination. Negative numbers (and the fourth argument)
 describe mapping of parameters.
