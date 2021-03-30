@@ -67,11 +67,12 @@ Groebner bases, Journal of Symbolic Computation, 2009.
 associative algebras, Diploma thesis, RWTH Aachen, 2010.
 
 PROCEDURES:
-lpKDimCheck(G);            checks whether the K-dimension of A/<G> is finite
-lpKDim(G[,d,n]);           computes the K-dimension of A/<G>
-lpMonomialBasis(d, donly, J); computes a list of monomials not contained in J
-lpHilbert(G[,d,n]);        computes the truncated Hilbert series of A/<G>
-lpSickleDim(G[,d,n]);      computes the mistletoes and the K-dimension of A/<G>
+teach_lpKDimCheck(G);          deprecated, kept for teaching purposes. checks whether the K-dimension of A/<G> is finite. use dim(G) == 0 instead.
+lpKDim(G);                     alias for vdim(G)
+teach_lpKDim(G[,d,n]);         deprecated, kept for teaching purposes. computes the K-dimension of A/<G>. use vdim(G) instead.
+lpMonomialBasis(d, donly, J);  computes a list of monomials not contained in J
+lpHilbert(G[,d,n]);            computes the truncated Hilbert series of A/<G>
+teach_lpSickleDim(G[,d,n]);    deprecated, kept for teaching purposes. computes the mistletoes and the K-dimension of A/<G>. use vdim(G) instead.
 
 SEE ALSO: freegb_lib, fpaprops_lib, ncHilb_lib
 ";
@@ -100,14 +101,14 @@ proc tstfpadim()
   example lpDHilbert;
   example lpDHilbertSickle;
   example lpHilbert;
-  example lpKDimCheck;
-  example lpKDim;
+  example teach_lpKDimCheck;
+  example teach_lpKDim;
   example lpMis2Base;
   example lpMis2Dim;
   example lpOrdMisLex;
   example lpSickle;
   example lpSickleHil;
-  example lpSickleDim;
+  example teach_lpSickleDim;
   example sickle;
   example lpMonomialBasis;
 }
@@ -1798,15 +1799,15 @@ example
 // compatibiltiy, do not put in header
 proc lpDimCheck(ideal G)
 {
-  return(lpKDimCheck(G));
+  return(teach_lpKDimCheck(G));
 }
 
-proc lpKDimCheck(ideal G)
-"USAGE: lpKDimCheck(G);
+proc teach_lpKDimCheck(ideal G)
+"USAGE: teach_lpKDimCheck(G);
 RETURN: int, 1 if K-dimension of the factor algebra is infinite, 0 otherwise
 PURPOSE:Checking a factor algebra for finiteness of the K-dimension
 ASSUME: - basering is a Letterplace ring.
-EXAMPLE: example lpKDimCheck; shows examples
+EXAMPLE: example teach_lpKDimCheck; shows examples
 "
 {int n = lpVarBlockSize(basering);
   list L;
@@ -1825,12 +1826,26 @@ example
   // Groebner basis
   ideal I = x*x, y*x*y, x*y*x;
   // Groebner basis
-  lpKDimCheck(G); // invokes procedure, factor algebra is of finite K-dimension
-  lpKDimCheck(I); // invokes procedure, factor algebra is of infinite Kdimension
+  teach_lpKDimCheck(G); // invokes procedure, factor algebra is of finite K-dimension
+  teach_lpKDimCheck(I); // invokes procedure, factor algebra is of infinite Kdimension
 }
 
-proc lpKDim(ideal G, list #)
-"USAGE: lpKDim(G[,degbound, n]); G an ideal, degbound, n optional integers
+proc lpKDim(ideal G)
+"USAGE: lpKDim(G); G an ideal in a letterplace ring
+RETURN: int
+PURPOSE: Computes the K-dimension of A/<G>
+           -1 means infinity
+ASSUME: - basering is a Letterplace ring
+           - G is a Groebner basis
+NOTE: - Alias for vdim(G)
+"
+{
+  print("WARNING: `lpKDim` is deprecated, you can use `vdim` instead.");
+  return (vdim(G));
+}
+
+proc teach_lpKDim(ideal G, list #)
+"USAGE: teach_lpKDim(G[,degbound, n]); G an ideal, degbound, n optional integers
 RETURN: int, the K-dimension of the factor algebra
 PURPOSE:Compute the K-dimension of a factor algebra, given via an ideal
 ASSUME: - basering is a Letterplace ring
@@ -1841,7 +1856,7 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*    - n is the number of variables, which can be set to a different number.
 @*      Default: attrib(basering, lV).
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
-EXAMPLE: example lpKDim; shows examples
+EXAMPLE: example teach_lpKDim; shows examples
 "
 {int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
@@ -1858,10 +1873,10 @@ example
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x;
   // ideal G contains a Groebner basis
-  lpKDim(G); //procedure invoked with ring parameters
+  teach_lpKDim(G); //procedure invoked with ring parameters
   // the factor algebra is finite, so the degree bound given by the Letterplace
   // ring is not necessary
-  lpKDim(G,0); // procedure without any degree bound
+  teach_lpKDim(G,0); // procedure without any degree bound
 }
 
 static proc lpMis2Base(ideal M)
@@ -1971,8 +1986,8 @@ example
   lpSickle(G,0); // procedure without any degree bound
 }
 
-proc lpSickleDim(ideal G, list #)
-"USAGE: lpSickleDim(G[,degbound,n]); G an ideal, degbound, n optional integers
+proc teach_lpSickleDim(ideal G, list #)
+"USAGE: teach_lpSickleDim(G[,degbound,n]); G an ideal, degbound, n optional integers
 RETURN: list
 PURPOSE:Compute the K-dimension and the mistletoes of K<X>/<G>
 ASSUME: - basering is a Letterplace ring.
@@ -1985,7 +2000,7 @@ NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
 @*    - n is the number of variables, which can be set to a different number.
 @*      Default: attrib(basering, lV).
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
-EXAMPLE: example lpSickleDim; shows examples
+EXAMPLE: example teach_lpSickleDim; shows examples
 "
 {int degbound = lpDegBound(basering);int n = lpVarBlockSize(basering);
   if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
@@ -2003,10 +2018,10 @@ example
   def R = freeAlgebra(r, 5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
   ideal G = x*x, y*y,x*y*x; // G is a monomial Groebner basis
-  lpSickleDim(G); // invokes the procedure with ring parameters
+  teach_lpSickleDim(G); // invokes the procedure with ring parameters
   // the factor algebra is finite, so the degree bound, given
   // by the Letterplace ring is not necessary
-  lpSickleDim(G,0); // procedure without any degree bound
+  teach_lpSickleDim(G,0); // procedure without any degree bound
 }
 
 static proc lpSickleHil(ideal G, list #)
@@ -2061,11 +2076,11 @@ ASSUME: - basering is a Letterplace ring.
 NOTE:   The returned object will always be a list, but the entries of the
 @*      returned list may be very different
 @* case m=1,d=1,h=1: see lpDHilbertSickle
-@* case m=1,d=1,h=0: see lpSickleDim
+@* case m=1,d=1,h=0: see teach_lpSickleDim
 @* case m=1,d=0,h=1: see lpSickleHil
 @* case m=1,d=0,h=0: see lpSickle (this is the default case)
 @* case m=0,d=1,h=1: see lpDHilbert
-@* case m=0,d=1,h=0: see lpKDim
+@* case m=0,d=1,h=0: see teach_lpKDim
 @* case m=0,d=0,h=1: see lpHilbert
 @* case m=0,d=0,h=0: returns an error
 @*    - If degbound is set, there will be a degree bound added. 0 means no
@@ -2085,7 +2100,7 @@ EXAMPLE: example sickle; shows examples
       else        {return(lpSickleHil(G,degbound,lpVarBlockSize(basering)));}
     }
     else
-    {if (h == 0) {return(lpSickleDim(G,degbound,lpVarBlockSize(basering)));}
+    {if (h == 0) {return(teach_lpSickleDim(G,degbound,lpVarBlockSize(basering)));}
       else {return(lpDHilbertSickle(G,degbound,lpVarBlockSize(basering)));}
     }
   }
@@ -2095,7 +2110,7 @@ EXAMPLE: example sickle; shows examples
       else        {return(lpHilbert(G,degbound,lpVarBlockSize(basering)));}
     }
     else
-    {if (h == 0) {return(lpKDim(G,degbound,lpVarBlockSize(basering)));}
+    {if (h == 0) {return(teach_lpKDim(G,degbound,lpVarBlockSize(basering)));}
       else {return(lpDHilbert(G,degbound,lpVarBlockSize(basering)));}
     }
   }
@@ -2178,7 +2193,7 @@ example
    option(prot);
    option(redSB);option(redTail);option(mem);
    ideal J = system("freegb",I,d,3);
-   lpKDimCheck(J);
+   teach_lpKDimCheck(J);
    sickle(J,1,1,1,d);//Computes mistletoes, K-dimension and the Hilbert series
 
 
@@ -2194,7 +2209,7 @@ example
    option(prot);
    option(redSB);option(redTail);option(mem);
    ideal J = system("freegb",I,d,3);
-   lpKDimCheck(J);
+   teach_lpKDimCheck(J);
    sickle(J,1,1,1,d);
 
 
@@ -2209,7 +2224,7 @@ example
    option(prot);
    option(redSB);option(redTail);option(mem);
    ideal J = system("freegb",I,d,3);
-   lpKDimCheck(J);
+   teach_lpKDimCheck(J);
    sickle(J,1,1,1,d);
  */
 
@@ -2227,7 +2242,7 @@ z*z*z*z + y*x*y*x - x*y*y*x - 3*z*y*x*z, x*x*x + y*x*y - x*y*x, z*y*x-x*y*z + z*
 option(prot);
 option(redSB);option(redTail);option(mem);
 ideal J = system("freegb",I,d,nvars(r));
-lpKDimCheck(J);
+teach_lpKDimCheck(J);
 sickle(J,1,1,1,d); // dimension is 24872
 
 
@@ -2240,7 +2255,7 @@ ideal I = x*y + y*z, x*x + x*y - y*x - y*y;
 option(prot);
 option(redSB);option(redTail);option(mem);
 ideal J = system("freegb",I,d,3);
-lpKDimCheck(J);
+teach_lpKDimCheck(J);
 sickle(J,1,1,1,d);
  */
 
