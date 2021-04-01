@@ -91,7 +91,6 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	],
 	[
 	ntl_found="no"
-	ntl_checked="$checked $NTL_HOME"
 	unset NTL_CPPFLAGS
 	unset NTL_LIBS
 	])
@@ -134,7 +133,6 @@ dnl try again with -std=c++11 (for NTL >=10 with threads)
 	],
 	[
 	ntl_found="no"
-	ntl_checked="$checked $NTL_HOME"
 	unset NTL_CPPFLAGS
 	unset NTL_LIBS
 	])
