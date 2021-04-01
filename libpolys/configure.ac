@@ -68,9 +68,15 @@ do
     if test -e ${GMP_HOME}/include/gmp.h; then
       GMP_CPPFLAGS="-I${GMP_HOME}/include"
       GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+      break
     fi
   fi
 done
+if test -z "${GMP_LIBS}"
+then
+  GMP_LIBS="-lgmp"
+fi
+
 CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
 LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
 AC_SUBST(GMP_CPPFLAGS)

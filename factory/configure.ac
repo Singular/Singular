@@ -210,7 +210,7 @@ AC_CHECK_LIB(m, atof, , [ AC_MSG_ERROR(libm.a not found) ])
 # Check whether --with-gmp was given.
 AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
                     [provide a non-standard location of gmp])])
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
+DEFAULT_CHECKING_PATH="/opt/homebrew /opt/local /sw /usr/local /usr"
 if test "${with_gmp+set}" = set; then :
   if test "$with_gmp" = yes ; then
 	GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
@@ -230,14 +230,16 @@ do
     if test -e ${GMP_HOME}/include/gmp.h; then
       GMP_CPPFLAGS="-I${GMP_HOME}/include"
       GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+      break
     fi
-  else
-    GMP_CPPFLAGS=""
-    GMP_LIBS="-lgmp"
   fi
   CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
   LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
 done
+if test -z "${GMP_LIBS}"
+then
+  GMP_LIBS="-lgmp"
+fi
 AC_SUBST(GMP_CPPFLAGS)
 AC_SUBST(GMP_LIBS)
 
