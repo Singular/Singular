@@ -2,7 +2,6 @@
 
 AC_DEFUN([SING_CHECK_READLINE],
 [
-## DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 
 #AC_ARG_WITH([readline],
 #  [AS_HELP_STRING([--without-readline],

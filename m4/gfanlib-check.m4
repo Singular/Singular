@@ -26,30 +26,7 @@ else
   else
 
     # Check whether --with-gmp was given.
-    DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
-    GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
-    if test "$with_gmp" = yes ; then
-      GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
-    elif test "$with_gmp" != no ; then
-      GMP_HOME_PATH="$with_gmp"
-    fi
-
-    BACKUP_CFLAGS=${CFLAGS}
-    BACKUP_LIBS=${LIBS}
-
-    for GMP_HOME in ${GMP_HOME_PATH}
-    do
-      if test "x$GMP_HOME" != "x/usr"; then
-        if test -e ${GMP_HOME}/include/gmp.h; then
-          GMP_CPPFLAGS="-I${GMP_HOME}/include"
-          GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
-        fi
-      fi
-    done
-    if test -z "${GMP_LIBS}"
-    then
-      GMP_LIBS="-lgmp"
-    fi
+    AC_REQUIRE([SING_CHECK_GMP])
 
     AC_LANG_PUSH(C++)
     AC_CHECK_LIB([cddgmp], [dd_free_global_constants],

@@ -2,7 +2,7 @@
 
 AC_DEFUN([LB_CHECK_CCLUSTER],
 [
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
+DEFAULT_CHECKING_PATH="/opt/homebrew /opt/local /sw /usr/local /usr"
 
 AC_ARG_WITH(ccluster,
 [  --with-ccluster= <path>|yes Use ccluster library.  ],
@@ -34,7 +34,7 @@ for CCLUSTER_HOME in ${CCLUSTER_HOME_PATH}
 		LIBS="${BACKUP_LIBS} ${CCLUSTER_LIBS}"
 		AC_SUBST(CCLUSTER_LIBS)
 		AC_SUBST(CCLUSTER_CPPFLAGS)
-
+                break
 	fi
 done
 AC_LANG_POP([C])
