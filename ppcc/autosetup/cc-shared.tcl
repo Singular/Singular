@@ -28,7 +28,7 @@ define SHOBJ_LDFLAGS -shared
 define SH_CFLAGS -fPIC
 define SH_LDFLAGS -shared
 define SH_LINKFLAGS -rdynamic
-define SH_LINKRPATH "-Wl,-rpath -Wl,%s"
+define SH_LINKRPATH "-Wl,-rpath,%s"
 define SH_SOEXT .so
 define SH_SOEXTVER .so.%s
 define SH_SOPREFIX -Wl,-soname,

@@ -18,7 +18,7 @@ do
   if test "x$GMP_HOME" != "x/usr"; then
     if test -e ${GMP_HOME}/include/gmp.h; then
       GMP_CPPFLAGS="-I${GMP_HOME}/include"
-      GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath -Wl,${GMP_HOME}/lib -lgmp"
+      GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath,${GMP_HOME}/lib -lgmp"
       break
     fi
   fi
