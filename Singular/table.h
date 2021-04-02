@@ -918,7 +918,7 @@ const struct sValCmdM dArithM[]=
 ,{D(jjDIVISION4), DIVISION_CMD,    LIST_CMD,            4      , NO_NC |NO_RING}
 ,{D(jjDBPRINT),   DBPRINT_CMD,     NONE,               -2      , ALLOW_NC |ALLOW_RING}
 //,{D(jjEXPORTTO_M),  EXPORTTO_CMD,    NONE,             -2      , ALLOW_NC |ALLOW_RING}
-,{D(jjCALL2ARG),  FETCH_CMD,       ANY_TYPE/*or set by p*/,2   , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL2ARG),  FETCH_CMD,       ANY_TYPE/*or set by p*/,2   , ALLOW_NC |ALLOW_RING}
 ,{D(jjFETCH_M),   FETCH_CMD,       ANY_TYPE/*or set by p*/,3   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjFETCH_M),   FETCH_CMD,       ANY_TYPE/*or set by p*/,4   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL1ARG),  IDEAL_CMD,       IDEAL_CMD,          1       , ALLOW_NC |ALLOW_RING}
