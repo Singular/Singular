@@ -13,7 +13,7 @@ dnl FLINT_CFLAGS and FLINT_LIBS
 
 AC_DEFUN([LB_CHECK_FLINT],
 [
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
+DEFAULT_CHECKING_PATH="/opt/homebrew /opt/local /sw /usr/local /usr"
 
 AC_ARG_WITH(flint,
 [  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
@@ -73,6 +73,9 @@ if test "x$flint_found" = "xno" ; then
 		[],
 		[]
 		)
+                if test "x$flint_found" = "xyes" ; then
+                    break
+                  fi
 		fi
 	done
 fi
