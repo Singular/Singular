@@ -29,7 +29,9 @@
 This section describes mathematical notions and definitions used in
 the @sc{Letterplace} subsystem of @sc{Singular}.
 
-All algebras are assumed to be associative @math{K}-algebras for some field @math{K}.
+All algebras are assumed to be associative @math{R}-algebras for @math{R} being a field @math{K} 
+or a ring @math{Z}.
+ 
 
 @table @strong
 @item @strong{What is and what does @sc{Letterplace}?}
@@ -50,16 +52,19 @@ and a @strong{degree (length) bound} @math{d}.
 
 This encodes a sub-@math{K}-vector space (also called a filtered part) of @math{K} @math{<x_1},@dots{},@math{x_n >},
 spanned by all monomials of @strong{length} at most @math{d}. 
-Analogously for free @math{R}-submodules of a free @math{R}-module.
+Analogously for free @math{R}-subbimodules of a free @math{R}-bimodule of a fixed rank.
 
 Within such a construction we offer the computations of Groebner (also known as Groebner-Shirshov) bases,
 normal forms, syzygies and many more.
-We address both ideals and submodules of the free bimodule of the fixed rank.
+
+We address both two-sided ideals and subbimodules of the free bimodule of the fixed rank. 
 
 A variety of monomial and module orderings is supported, including @strong{elimination} orderings for both
-variables and bimodule components. A monomial ordering has to be a well-ordering.
+variables and bimodule components. 
+A monomial ordering has to be a well-ordering.
 
 @sc{Letterplace} works with every field, supported by @sc{Singular}, and with the coefficient ring @math{Z}.
+
 Note, that the elements of the coefficient field (or a ring) mutually commute with all variables.
 @end table
 
@@ -80,13 +85,17 @@ and call it, say, @code{r}.
 
 Then, decide what should be the degree (length) bound @math{d},
 that is how long may the words (monomials in the free algebra) become
-and run the procedure @code{freeAlgebra(r, d)}.
+and run the procedure @code{freeAlgebra(r, d)}. 
 
-This procedure creates free algebra @math{K<X>} with a monomial ordering,
-corresponding to the one in the original commutative ring @math{K[X]}, see @ref{Monomial orderings on free algebras}.
+In the case you wish to work with subbimodules of the free bimodule of rank @math{k}, 
+use @code{freeAlgebra(r, d, k)} instead of the previous.
+
+The @code{freeAlgebra}.  procedure creates free algebra @math{K<X>} resp. the free bimodule 
+of rank @math{k} over @math{K<X>} subject to a monomial (module) ordering, corresponding to 
+the one in the original commutative ring @math{K[X]}, see @ref{Monomial orderings on free algebras}.
 @c commutative Letterplace ring 
 
-Polynomial arithmetics in this @math{K}-algebra is the usual one: @code{+,-,*} while
+Polynomial (vector) arithmetics in this @math{K}-algebra is the usual one: @code{+,-,*,^} while
  of course, @code{x*y} and @code{y*x} are different monomials while @code{x*7=7*x}.
 
 Let us define an ideal @code{I} as a list of polynomials in the
@@ -94,29 +103,99 @@ free algebra and run, for example, @code{twostd} (see @ref{twostd (letterplace)}
 The answer is a two-sided Groebner basis @code{J} of the two-sided ideal @math{I} 
 up to the length bound @code{d}.
 
-Then, we want to compute the two-sided normal form of @code{xyzy} with respect to @code{J} 
+Then, we want to compute the following: 
+1. The two-sided normal form of @code{xyzy} with respect to @code{J} 
 using the function @code{reduce} (see @ref{reduce (letterplace)}).
+2. By introducing a factor algebra @math{K<x,y,z>/J} of type @code{qring},
+ and demonstrate the functions @code{reduce} and @code{rightstd} (for right
+ Groebner bases) over the factor algebra.
+3. By creating the free @code{R}-bimodule of rank 8, we demonstrate how
+embeddins works with @code{imap} and also, how to express a subbimodule
+(or a single element) in terms of bimodule generators with @code{lift}.
+In other words, we compute and compare presentations of a polynomials with respect to
+the original generating set of ideal and with respect to a Groebner basis.
+4. In the same free @code{R}-bimodule we will compute the module of
+bisyzygies of @code{J} and do some syzygy tests.
+5. We demonstrate the bimodule membership problem: a boolean answer via @code{NF}
+and the certified version (with a Groebner presentation) via @code{lift}.
+6. We show how elimination of module components works for bimodules.
 
 We illustrate the approach with the following example:
 
 @smallexample
 @c example
+//******* Part 1 *******//
 LIB "freegb.lib";
 ring r = 0,(x,y,z),dp; // the ordering on the free algebra will be degree right lex
-ring R = freeAlgebra(r, 4);  // 4 the is degree (length) bound;
-ideal I = x*y + y*z, x*x + x*y - z; // define a non-graded ideal
+ring R = freeAlgebra(r, 5);  // 5 the is degree (length) bound;
+ideal I = x*y + y*z, x*x + x*y - z; // define an ideal via the set of polynomials
 ideal J = twostd(I);
-J;
+J; // as we see, with respect to the current ordering this Groebner basis 
+// tends to be infinite. Increasing the bound and recomputing helps to check it.
 poly p = reduce(x*y*z*y,J);
-p; // since p!=0, x*y*z*y is not contained in J
-
-// Now, we introduce a factor algebra K<x,y,z>/J} of type qring,
-// and demonstrate the functions reduce and rightstd:
-
-qring Q = J; // J is a Groebner basis
+p; // since p!=0, x*y*z*y is not contained in J up to length 5
+// however this does not imply a definite answer on whether p is in J
+poly q = x*(y+1)*z*y-x*y*z^2;
+reduce(q, J); // 0, thus q is in J
+//******* Part 2 *******//
+qring Q = J; // J is a Groebner basis, computed above
 poly p = reduce(x*x, twostd(0)); // the canonical representative of x*x in Q
 p;
 rightstd(ideal(p)); // right Groebner basis of the right ideal, generated by p in Q
+//******* Part 3 *******//
+setring r;
+ring R8 = freeAlgebra(r, 5, 8);  // 5 the is length bound; 8 is the rank of the free bimodule
+ideal J = imap(R, J); // we map J identically from R (of rank 1)
+J = twostd(J); 
+poly q = imap(R, q);
+NF(q, J); // NF is an alias to reduce, we have rechecked that q is in J
+matrix L = lift(J, q); // creates the presentation for q in terms of J
+// since J is a Groebner basis, this is a Groebner presentation of q
+print(transpose(matrix(L))); // J has 8 generators and these are the needed coefficients
+// here, the generators of the free bimodule are ncgen(1)*gen(1), ... , ncgen(8)*gen(8)
+// the output means, that substituting ncgen(i) by the i-th generator of J, we get q
+J[1]*z*y - J[1]*z*z  - J[5] - q; // 0, so this is the seeked expression of q
+testLift(J,L); // recovers q from the lift matrix
+// Let us compare now this nice Groebner presentation with the one
+// obtained from the original set of generators
+ideal I = imap(R,I); // note: I is not a Groebner basis of itself
+matrix M = lift(I, q); // creates the presentation for q in terms of I
+M; // presentation is longer and more complicated than the one in L
+testLift(I,M); // a routine test to ensure that indeed we recover q
+//******* Part 4 *******//
+// Let us compute the module of bisyzygies of J and analyze it
+module S = syz(J); size(S); // 18
+S[6]; // consider, for example, this element
+// plugging the i-th generator of J instead of ncgen(i), we obtain a bisyzygy:
+J[1]*z*y - J[1]*z*z - x*J[3] - J[5]; //0
+module S2 = S[6..8]; // pick just three generators
+testSyz(J,S2); // tests the bisyzygy property for the generators
+//******* Part 5 *******//
+option(redSB); option(redTail); // to compute minimal and tail-reduced bases
+module GS = twostd(S); size(GS); // 30
+// let us construct a vector, belonging to GS:
+vector v = GS[11]*y - x*GS[7] + z*GS[3]*z;
+print(v);
+NF(v, GS); // 0, by the construction
+// now we wish to compute the expression of v via GS
+ring r3 = 0,(x,y,z),(c,dp);
+ring R30 = freeAlgebra(r3,5,30);
+module GS = imap(R8,GS);
+vector v = imap(R8,v);
+matrix L = lift(GS,v); // via printing we see only three components involved:
+L[3,1]; // =z*ncgen(3)*z, as well as 
+L[7,1]; // =-x*ncgen(7) and 
+L[11,1]; // =ncgen(11)*y
+//******* Part 6 *******//
+// Notice, that the module ordering is (c,dp): it is a position-over-term ordering
+// which eliminates module components in an descending way.
+GS = GS[1..5]; // consider just first five syzygies,  for a smaller example
+GS = twostd(GS); // a nice finite Groebner basis
+print(matrix(GS)); // shows the structure
+// As we can see, intersections of the subbimodule GS with the free bimodules
+// generated by all but first resp. all but first two bimodule generators
+// are not empty and given by vectors having zero in the first resp. 
+// in the first two components.
 @c example
 @end smallexample
 
@@ -149,15 +228,16 @@ print(matrix(I)); // pretty prints the generators
 
 As we can see, over @math{Z<x,y>} the ideal @math{<2x,3y>} has
 a finite Groebner basis and indeed
-@math{Z<x,y>/<2x,3y> =} @math{Z<x,y>/<2x,3y,yx,xy> =} @math{Z<x,y>/<2x,3y,yx-xy,xy> =} 
-@math{Z[x,y]/<2x,3y,xy>} holds.
+@math{Z<x,y>/<2x,3y> =} @math{Z<x,y>/<2x,3y,yx,xy> =} @math{Z<x,y>/<2x,3y,yx-xy,xy>} 
+and the later is naturally isomorphic to 
+@math{Z[x,y]/<2x,3y,xy>} as a @math{Z}-algebra.
 
 Now, we analyze the same ideal in the ring with one more variable @math{z}:
 @smallexample
 @c example
 LIB "freegb.lib";
 ring r = integer,(x,y,z),Dp;
-ring R = freeAlgebra(r,5,2); // length bound is 5
+ring R = freeAlgebra(r,5); // length bound is 5
 ideal I = 2*x, 3*y; 
 I = twostd(I); 
 print(matrix(I)); // pretty prints the generators
@@ -165,10 +245,10 @@ print(matrix(I)); // pretty prints the generators
 @end smallexample
 
 Now we see, that this Groebner basis is potentially infinite and 
-the following argument delivers a proof. Namely, @math{y*z^i*x} and 
-@math{x*z^i*y} are present in the ideal for all @math{i>=0}.
+the following argument delivers a proof. Namely, @math{y z^i x} and 
+@math{x z^i y} are present in the ideal for all @math{i>=0}.
 How can we do this? We wish to express @math{y*z^i*x} and 
-@math{x*z^i*y} via the original generators:
+@math{x*z^i*y} via the original generators by means of @code{lift}:
 @smallexample
 @c example
 LIB "freegb.lib";
@@ -186,14 +266,15 @@ print(T2);
 
 The columns of matrices, returned by @code{lift}, encode the presentation of new
 elements in terms of generators. From this we conjecture, that in particular 
-@math{-y*z^i*(2x) + (3y)*z^i*x = y*z^i*x} holds for all @math{i>=0}
+@math{-y z^i*(2x) + (3y)*z^i x = y z^i x} holds for all @math{i>=0}
 and indeed, confirm it via a routine computation by hands.
 
 @c Next bigger example and comparison with Q
 
 @strong{Comparing computations over Q with computations over Z}.
-In the next example, we first compute over @math{Q} and a bit later 
-compare the result with computations over @math{Z}.
+
+In the next example, we first compute over the field of rationals @math{Q} and 
+a bit later compare the result with computations over the ring of integers @math{Z}.
 @smallexample
 @c example
 LIB "freegb.lib"; // initialization of free algebras
@@ -205,8 +286,7 @@ option(intStrategy); // avoid divisions by coefficients
 ideal J = twostd(I); // compute a two-sided GB of I
 J; // prints generators of J  
 LIB "fpadim.lib"; // load the library for K-dimensions
-lpMonomialBasis(7,0,J); // compute all monomials 
-// of length up to 7 in Q<x,y,z>/J
+lpMonomialBasis(7,0,J); // all monomials of length up to 7 in Q<x,y,z>/J
 @c example
 @end smallexample
 
@@ -231,7 +311,9 @@ J; // prints generators of J
 @end smallexample
 
 The output has plenty of elements in each degree (which is the same as length 
-because of the degree ordering), what hints at potentially infinite Groebner basis. 
+because of the degree ordering), what hints at 
+potentially infinite Groebner basis. 
+
 Indeed, one can show that for every @math{i>=2} the ideal @math{J} contains an element 
 with the leading monomial @math{x y^i z}.
 
@@ -240,10 +322,13 @@ with the leading monomial @math{x y^i z}.
 @subsection Functionality and release notes of @sc{Letterplace}
 @cindex Functionality and release notes of Letterplace
 
-With the present functionality it is possible to compute two-sided Groebner basis
-of an arbitrary two-sided ideal in a free associative algebra up to a given degree.
+Over free associative algebras over fields or over a ring @math{Z},
+one can perform many different computations with arbitrary two-sided ideals.
+It is possible to define a free bimodule of a fixed finite rank and also
+work with subbimodules of such. Groebner bases and related tools are thoroughly
+implemented, with respect to a variety of monomial module orderings.
 
-The weights of variables are nonnegative and are determined by the current monomial ordering.
+The variables can be weighted by nonnegative weights, which are determined by the monomial ordering.
 
 Restrictions/conventions of the @sc{Letterplace} subsystem:
 @itemize
@@ -251,8 +336,9 @@ Restrictions/conventions of the @sc{Letterplace} subsystem:
 up to which a partial Groebner basis will be computed. The initialization
 routine @code{freeAlgebra (letterplace)} constructs the ring with this bound. 
 For increasing the length bound one needs to define another ring and to use 
-@code{imap} for mapping the objects over. 
-@item All the computations happen up to the explicitly fixed length bound.
+@code{imap} for mapping the objects back and forth. 
+@item All the computations happen up to the length bound, which is
+explicitly fixed during the definition of the current ring.
 @item The options @code{redSB, redTail} are effective for computations involving Groebner bases,
 @item The options @code{prot, mem} are effective for the whole @sc{Letterplace} subsystem.
 @item For monomial orderings, which are not compatible with the length, the following error
@@ -260,7 +346,7 @@ message might appear:
 @code{degree bound of Letterplace ring is 11, but at least 12 is needed for this multiplication}
 In such a situation, activating @code{option(redSB)}, @code{option(redTail)} and increaing the
 length (degree) bound might help. Though there are situations, where nothing leads to a finite
-computation.
+computation simply while the nature of non-Noetherian rings is so.
 @end itemize
 
 Operations for polynomials in Letterplace rings are the usual ones: 
@@ -281,7 +367,7 @@ print(matrix(maxideal(2))); // all monomials of length 2
 bracket(x,y);
 poly f = x*x + x*y - z;
 bracket(f,x);
-bracket(f,x,2);
+bracket(f,x,2); // left-normed iterated bracket [f,[f,x]]
 @c example
 @end smallexample
 
@@ -375,7 +461,9 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 
 @menu
 * dim BR_LETTERPLACE_BR::
+* fetch BR_LETTERPLACE_BR::
 * freeAlgebra BR_LETTERPLACE_BR::
+* imap BR_LETTERPLACE_BR::
 * lift BR_LETTERPLACE_BR::
 * liftstd BR_LETTERPLACE_BR::
 * modulo BR_LETTERPLACE_BR::
@@ -386,6 +474,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 * subst BR_LETTERPLACE_BR::
 * syz BR_LETTERPLACE_BR::
 * twostd BR_LETTERPLACE_BR::
+* vdim 
 @end menu
 
 
@@ -393,7 +482,6 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @node dim BR_LETTERPLACE_BR
 @subsection dim BR_LETTERPLACE_BR
 @cindex dim BR_LETTERPLACE_BR
-
 @table @code
 @item @strong{Syntax:}
   @code{dim(} ideal_expression@code{)}
@@ -426,11 +514,75 @@ dim(I); // 3, as expected for R/I = K[x,y,z]
 See @ref{fpaprops_lib, fpadim_lib}.
 @c ref
 
+@c ---------------------------------------
+@node fetch BR_LETTERPLACE_BR
+@subsection fetch BR_LETTERPLACE_BR
+@cindex fetch BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{fetch (} ring_name@code{,} name @code{)}
+@*@code{fetch (} ring_name@code{,} name@code{,} intvec_expression @code{)}
+@item @strong{Type:}
+number, poly, vector, ideal, module, matrix or list
+(the same type as the second argument)
+@item @strong{Purpose:}
+maps objects between rings.
+@code{fetch} is the identity map between rings and qrings,
+in the first case the i-th variable of the source ring is mapped to the i-th
+variable of the basering.
+If the basering has less variables than the source ring these variables are mapped to zero.
+The intvec in the 3rd argument describes the permutation of the variables:
+an i at position j maps the variable @code{var(j)} of the source to the variable
+@code{var(i)} of the destination.
+@*A zero means that that variable/parameter is mapped to 0.
+@*The coefficient fields must be compatible.
+(See @ref{map} for a description of possible mappings between
+different ground fields).
+@* @code{fetch} offers a convenient way to change
+variable names or orderings, or to map objects from a ring to a factor ring of 
+that ring or vice versa.
+@* @code{option(Imap);} reports the mapping.
+@item @strong{Note:}
+Compared with @code{imap}, @code{fetch} uses the position of the ring
+variables, not their names.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = (0,a),(x,y,z),dp;
+  ring R = freeAlgebra(r,4,2); // free bimodule of rank 2
+  poly p = z^2/a - a*y;
+  ideal I = x,y,z,a*z*y*x - x*y + 7;
+  module M = (x*y*a +3)*ncgen(1)*gen(1), ncgen(2)*gen(2)*z, ncgen(2)*gen(2)*(x*y*a - 7);
+  M; // note that a stands on the left
+  ring r2 = 0,(a,z,y,x),dp; // note: a is a variable in r2
+  ring R2 = freeAlgebra(r2,6,2);
+  fetch(R,p); // correctly processes incorrect input
+  fetch(R,I);
+  fetch(R,M);
+  setring R; // now we show the factor ring behavior
+  ideal J = y*x-x*y,z; J = twostd(J); J;
+  qring Q = J;
+  fetch(R,p);
+  NF(_, twostd(0)); // the canonical representative in Q 
+  fetch(R,I);
+  NF(_, twostd(0)); // the canonical representative in Q 
+  fetch(R,M);
+  NF(_, twostd(0)); // the canonical representative in Q 
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{imap BR_LETTERPLACE_BR};
+@ref{map};
+@ref{ring};
+@ref{qring}.
+@c ref
+
 @c ------------------------------
 @node freeAlgebra BR_LETTERPLACE_BR
 @subsection freeAlgebra BR_LETTERPLACE_BR
 @cindex freeAlgebra BR_LETTERPLACE_BR
-
 @table @code
 @item @strong{Syntax:}
 @*@code{freeAlgebra(} ring_expression r, int_expression d @code{)}
@@ -461,6 +613,52 @@ attrib(R2,"isLetterplaceRing");
 @end table
 @c ref
 See @ref{Monomial orderings on free algebras}.
+@c ref
+
+@c ---------------------------------------
+@node imap BR_LETTERPLACE_BR
+@subsection imap BR_LETTERPLACE_BR
+@cindex imap BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{imap (} ring_name@code{,} name @code{)}
+@item @strong{Type:}
+number, poly, vector, ideal, module, matrix or list
+(the same type as the second argument)
+@item @strong{Purpose:}
+identity map on common subrings.  @code{imap} is the map between rings
+and qrings with compatible ground fields which is the identity on
+variables and parameters of the same name and 0 otherwise.
+(See @ref{map} for a description of possible mappings between
+different ground fields).
+Useful for embeddings as well as for mappings from/to rings with/without parameters. 
+Compared with @code{fetch}, @code{imap} uses the names of variables and parameters.
+Unlike @code{map} and @code{fetch}, @code{imap} can map parameters to variables,
+by forgetting the commutativity of parameters with each other and with variables.
+@*Mapping rational functions which are not polynomials to polynomials is undefined.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = (0,a),(x,y,z),dp;
+  ring R = freeAlgebra(r,4,2); // free bimodule of rank 2
+  poly p = z^2/a - a*y;
+  ideal I = x,y,z,a*z*y*x - x*y + 7;
+  module M = (x*y*a +3)*ncgen(1)*gen(1), ncgen(2)*gen(2)*z, ncgen(2)*gen(2)*(x*y*a - 7);
+  M; // note that a stands on the left
+  ring r2 = 0,(a,z,y,x),dp; // note: a is a variable in r2
+  ring R2 = freeAlgebra(r2,6,2);
+  imap(R,p); // correctly processes incorrect input
+  imap(R,I);
+  imap(R,M);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{fetch BR_LETTERPLACE_BR};
+@ref{map};
+@ref{qring};
+@ref{ring}.
 @c ref
 
 @c -------------------------------------------------
@@ -877,6 +1075,47 @@ See
 @ref{syz BR_LETTERPLACE_BR}.
 @c ref
 
+
+@c ---------------------------------------
+@node vdim BR_LETTERPLACE_BR
+@subsection vdim BR_LETTERPLACE_BR
+@cindex vdim BR_LETTERPLACE_BR
+@table @code
+@item @strong{Syntax:}
+@code{vdim (} ideal_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+computes the vector space dimension respective to the ground field
+of the ring modulo the ideal,
+generated by the leading terms of the given generators.
+If the generators form a standard basis,
+this is the same as the vector space dimension of the ring, resp.@:
+free module, modulo the ideal, resp.@: module.
+@*If the ideal is not finite dimensional over the ground field, -1 is returned.
+@*The non-commutative analog of the @ref{kbase} command is @ref{lpMonomialBasis} from 
+@ref{fpadim_lib}.
+@item @strong{Example:}
+@smallexample
+@c example
+  LIB "fpadim.lib";
+  ring r = 0,(x,y),dp;
+  ring R = freeAlgebra(r,5);
+  ideal I = x*x + x, y*y+y, x*y*x + x;
+  ideal G = twostd(I); G;
+  vdim(G); // 6
+  lpMonomialBasis(5,0,G); // lists the K-basis explicitly
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{dim BR_LETTERPLACE_BR};
+@ref{twostd BR_LETTERPLACE_BR};
+@ref{fpadim_lib}.
+@c ref
+
+
 @c ---------------------------------------------------------------------------
 @node Mathematical background BR_LETTERPLACE_BR
 @section Mathematical background BR_LETTERPLACE_BR
@@ -1049,12 +1288,14 @@ With respect to the ordering @samp{Wp(1, 2, 1)}, the test monomials are ordered 
 @tex
 Let $w^{(i)}$ be weights uniquely determined by $w^{(i)}(x_j)=\delta_{i,j}$ for $1\leq i,j\leq n$ where $\delta$ denotes the Kronecker delta. Let $<_n$ be the $w^{(n)}$-weight extension of the left lexicographical ordering on $\langle X\rangle$ and inductively $<_i$ be the $w^{(i)}$-weight extension of $<_{i+1}$ for all $1\leq i<n$.
 The monomial ordering lp corresponds to $<_1$ and eliminates $x_1,...,x_j$ for all $1\leq j<n$.
+We refer to it as to {\bf left elimination ordering}.
 @end tex
 @ifinfo
 Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_n} be the @math{w^n}-weight extension of the left lexicographical ordering on @math{<X>} and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i+1} for all @math{1<= i< n}.
 @end ifinfo
 
-The monomial ordering @samp{lp} corresponds to @math{<_1} and eliminates @{@math{x_1},@dots{},@math{x_j}@} for all @math{1}<=@math{j}<@math{n}.
+The monomial ordering @samp{lp} corresponds to @math{<_1} and eliminates @{@math{x_1},@dots{},@math{x_j}@} for all @math{1}<=@math{j}<@math{n}. 
+We refer to it as to @strong{left elimination ordering}.
 
 With respect to the ordering @samp{lp}, the test monomials are ordered as follows:
 @math{x_1 x_1 x_1 > x_1 x_2 x_3 > x_3 x_2 x_1 > x_1 x_3 > x_3 x_1 > x_1 > x_2 x_2 > x_2 x_3 > x_2 > x_3 x_3 x_3 > x_3}
@@ -1062,12 +1303,13 @@ With respect to the ordering @samp{lp}, the test monomials are ordered as follow
 @tex
 Let $w^{(i)}$ be weights uniquely determined by $w^{(i)}(x_j)=\delta_{i,j}$ for $1\leq i,j\leq n$ where $\delta$ denotes the Kronecker delta. Let $<_1$ be the $w^{(1)}$-weight extension of the left lexicographical ordering on $\langle X\rangle$ and inductively $<_i$ be the $w^{(i)}$-weight extension of $<_{i-1}$ for all $1<i\leq n$.
 The monomial ordering \texttt{rp} corresponds to $<_n$ and eliminates $\{x_j,\ldots,x_n\}$ for all $1<j\leq n$.
+We refer to it as to {\bf right elimination ordering}.
 @end tex
 @ifinfo
 Let @math{w^i} be weights uniquely determined by @math{w^i(x_j)=\d^i_j}$ for @math{1}<=@math{i},@math{j}<=@math{n} where @math{d} denotes the Kronecker delta. Let @math{<_1} be the @math{w^n}-weight extension of the left lexicographical ordering on <@math{X}> and inductively @math{<_i} be the @math{w^i}-weight extension of @math{<_i-1} for all @math{1}<@math{i}<=@math{n}.
 @end ifinfo
 
-The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{@math{x_j},@dots{},@math{x_n}@} for all @math{1 < j <= n}.
+The monomial ordering @samp{rp} corresponds to @math{<_n} and eliminates @{@math{x_j},@dots{},@math{x_n}@} for all @math{1 < j <= n}. We refer to it as to @strong{right elimination ordering}.
 
 With respect to the ordering @samp{rp}, the test monomials are ordered as follows:
 @math{x_3 x_3 x_3 > x_1 x_2 x_3 > x_3 x_2 x_1 > x_2 x_3 > x_1 x_3 > x_3 x_1 > x_3 > x_2 x_2 > x_2 > x_1 x_1 x_1 > x_1}
@@ -1116,13 +1358,19 @@ $p,s \in X$, such that $w = p \cdot v \cdot s$,
 @end ifinfo
  in other words @math{v} is a subword of @math{w}.
 
+
+Let @math{T := K\langle x_1,\dots,x_n \rangle} be the free algebra and 
+$<$ be a fixed monomial ordering on $T$.
+
 @tex
-For a subset $G \subset K\langle x_1,\dots,x_n \rangle =: T$,
+For a subset $G \subset K\langle x_1,\dots,x_n \rangle$,
 define the \textbf{leading ideal} of $G$ to be the two-sided ideal
 $LM(G) \; = \; {}_{T} \langle$ $\; \{lm(g) \;|\; g \in G\setminus\{0\} \}$ $\; \rangle_{T} \subseteq T$.
 
-Let $<$ be a fixed monomial ordering on $T$.
-We say that a subset $G \subset I$ is a \textbf{(two-sided) Groebner basis} for the ideal $I$ with respect to $<$, if $LM(G) = LM(I)$. That is $\forall f\in I\setminus\{0\}$ there exists $g\in G$, such that
+
+A subset $G \subset I$ is a \textbf{(two-sided) Groebner basis} for the ideal $I$ with respect to $<$, if $LM(G) = LM(I)$. 
+
+That is $\forall f\in I\setminus\{0\}$ there exists $g\in G$, such that
 $lm(g)$ divides $lm(f)$.
 @end tex
 
@@ -1130,7 +1378,7 @@ The notion of @strong{Groebner-Shirshov} basis applies to more general algebraic
 but means the same as Groebner basis for associative algebras.
 
 @ifinfo
-For a subset @math{G} in @math{K< x_1},@dots{},@math{x_n > =: T},
+For a subset @math{G} in @math{K< x_1},@dots{},@math{x_n >},
 define a @strong{leading ideal} of @math{G} to be the two-sided ideal
 @math{LM(G)  =}  @{ @math{lm(g) | g} in @math{G}\@{0@} @} in @math{T}.
 
@@ -1150,10 +1398,12 @@ up to weighted degree bound @math{d}, then
 it is the complete finite Groebner basis, if and only if @math{G(2d-1)=G(d)} holds.
 
 @strong{Note:} If the set of input polynomials is @strong{not} weighted homogeneous with respect to the 
- weights of the ring variables, and a Groebner is @strong{not} finite, then actually not much can be
- said precisely on the properties of the given ideal. By increasing the length bound bigger generating
- sets will be computed, but in contrast to the weighted homogeneous case some polynomials in
- of small length first enter the basis after computing up to a much higher length bound.
+ weights of the ring variables, and a Groebner is @strong{not} finite, 
+ 
+ then actually not much can be said precisely on the properties of the given ideal. 
+ By increasing the length bound bigger generating sets will be computed, but in contrast to the 
+ weighted homogeneous case some polynomials in  of small length first enter the basis after 
+ computing up to a much higher length bound.
 
 @c ---------------------------------------------------------------------------
 @node Bimodules and syzygies and lifts
@@ -1234,7 +1484,7 @@ N_i = \sum_{j=1}^m \sum_k \ell_{jk} M_j r_{jk} = \sum_{j=1}^m T_{ij} M_j,
 @end display
 @end ifinfo
 
-where T_ij are elements from the enveloping algebra 
+where @math{T_ij} are elements from the enveloping algebra 
 @tex
 $R \langle X \rangle \otimes R \langle X \rangle,$
 @end tex
@@ -1428,9 +1678,3 @@ Changes in the kernel/build system:
 @item new command @code{rightstd} (@ref{rightstd (letterplace)})
 @item extended @code{twostd} to @sc{Letterplace} (@ref{twostd (letterplace)}, @ref{twostd (plural)})
 @end itemize
-
-
-
-
-
-
