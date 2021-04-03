@@ -25,11 +25,9 @@ do
       GMP_CPPFLAGS=""
       GMP_LIBS="-lgmp"
     fi
-    AC_CHECK_HEADERS([gmp.h], [
-      AC_CHECK_LIB(gmp, __gmpz_init, [
-        gmp_found=yes
-        break
-      ])
+    AC_TRY_LINK([#include <gmp.h>],
+                [mpz_t a; mpz_init (a);], [
+      gmp_found=yes
     ])
 done
 if test "$gmp_found" != yes; then

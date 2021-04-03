@@ -46,13 +46,11 @@ if test "$FLINT_HOME_PATH" = "$DEFAULT_CHECKING_PATH" ; then
 	CFLAGS=" ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 	LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-	AC_CHECK_HEADER([flint/fmpz.h],
-		[AC_CHECK_LIB(flint,fmpz_init,
-			[flint_found="yes"],
-			[],
-			[])],
-		[],
-		[])
+        AC_TRY_LINK([#include <flint/fmpz.h>
+                    ],
+                    [fmpz_t x; fmpz_init(x);], [
+                flint_found="yes"
+        ])
 fi
 
 dnl if flint was not previously found, search FLINT_HOME_PATH
@@ -67,16 +65,12 @@ if test "x$flint_found" = "xno" ; then
 		CFLAGS="${FLINT_CFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-                AC_CHECK_HEADER([flint/fmpz.h], [
-		AC_CHECK_LIB(flint,fmpz_init,
-		[flint_found="yes"],
-		[],
-		[]
-		)
+                AC_TRY_LINK([#include <flint/fmpz.h>
+                            ],
+                            [fmpz_t x; fmpz_init(x);], [
+                        flint_found="yes"
+                        break
                 ])
-                if test "x$flint_found" = "xyes" ; then
-                    break
-                  fi
 	done
 fi
 
