@@ -2,7 +2,7 @@ AC_DEFUN([SING_CHECK_GMP], [
 # Check whether --with-gmp was given.
 AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
                     [provide a non-standard location of gmp])])
-DEFAULT_CHECKING_PATH="/opt/homebrew /opt/local /sw /usr/local /usr"
+AC_REQUIRE([SING_DEFAULT_CHECKING_PATH])
 GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 if test "$with_gmp" = yes ; then
         GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
