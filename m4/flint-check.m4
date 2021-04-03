@@ -43,7 +43,7 @@ if test "$FLINT_HOME_PATH" = "$DEFAULT_CHECKING_PATH" ; then
 	FLINT_LIBS="-lflint -lmpfr -lgmp"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
-	CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
+	CFLAGS=" ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 	LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
 	AC_CHECK_HEADER([flint/fmpz.h],
@@ -59,24 +59,24 @@ dnl if flint was not previously found, search FLINT_HOME_PATH
 if test "x$flint_found" = "xno" ; then
 	for FLINT_HOME in ${FLINT_HOME_PATH}
 	do
-		if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
 		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
 		FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
-		CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
+		CFLAGS="${FLINT_CFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
+                AC_CHECK_HEADER([flint/fmpz.h], [
 		AC_CHECK_LIB(flint,fmpz_init,
 		[flint_found="yes"],
 		[],
 		[]
 		)
+                ])
                 if test "x$flint_found" = "xyes" ; then
                     break
                   fi
-		fi
 	done
 fi
 
