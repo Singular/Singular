@@ -2,7 +2,7 @@
 
 AC_DEFUN([LB_CHECK_CCLUSTER],
 [
-DEFAULT_CHECKING_PATH="/opt/homebrew /opt/local /sw /usr/local /usr"
+AC_REQUIRE([SING_DEFAULT_CHECKING_PATH])
 
 AC_ARG_WITH(ccluster,
 [  --with-ccluster= <path>|yes Use ccluster library.  ],
