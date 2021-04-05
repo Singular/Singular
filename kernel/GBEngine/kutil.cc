@@ -9454,6 +9454,8 @@ void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR)
   int maxPossibleShift = p_mLPmaxPossibleShift(p.p, strat->tailRing);
   for (int i = maxPossibleShift; i > 0; i--)
   {
+    // NOTE: don't use "shared tails" here. In rare cases it can cause problems
+    // in `kNF2` because of lazy poly normalizations.
     LObject qq(p_Copy(p.p, strat->tailRing));
     p_mLPshift(qq.p, i, strat->tailRing);
     qq.shift = i;
