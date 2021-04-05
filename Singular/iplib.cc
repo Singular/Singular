@@ -595,8 +595,7 @@ static void iiCallLibProcBegin()
     }
     // need to define a ring-hdl for currRingHdl
     tmp_ring=enterid(" tmpRing",myynest,RING_CMD,&IDROOT,FALSE);
-    IDRING(tmp_ring)=currRing;
-    currRing->ref++;
+    IDRING(tmp_ring)=rIncRefCnt(currRing);
     rSetHdl(tmp_ring);
   }
 }
@@ -605,7 +604,7 @@ static void iiCallLibProcEnd(idhdl save_ringhdl, ring save_ring)
   if ((currRing!=NULL)
   &&(currRing!=save_ring))
   {
-    currRing->ref--;
+    rDecRefCnt(currRing);
     idhdl hh=IDROOT;
     idhdl prev=NULL;
     while((hh!=currRingHdl) && (hh!=NULL)) { prev=hh; hh=hh->next; }

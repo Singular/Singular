@@ -682,7 +682,7 @@ long p_WTotaldegree(poly p, const ring r)
   return  j;
 }
 
-long p_DegW(poly p, const short *w, const ring R)
+long p_DegW(poly p, const int *w, const ring R)
 {
   p_Test(p, R);
   assume( w != NULL );
@@ -4426,7 +4426,7 @@ poly p_Jet(poly p, int m,const ring R)
   return r;
 }
 
-poly pp_JetW(poly p, int m, short *w, const ring R)
+poly pp_JetW(poly p, int m, int *w, const ring R)
 {
   poly r=NULL;
   poly t=NULL;
@@ -4453,7 +4453,7 @@ poly pp_JetW(poly p, int m, short *w, const ring R)
   return r;
 }
 
-poly p_JetW(poly p, int m, short *w, const ring R)
+poly p_JetW(poly p, int m, int *w, const ring R)
 {
   while((p!=NULL) && (totaldegreeWecart_IV(p,R,w)>m)) p_LmDelete(&p,R);
   if (p==NULL) return NULL;
@@ -4500,11 +4500,11 @@ static poly p_Invers(int n,poly u,intvec *w, const ring R)
   poly v=p_NSet(u0,R);
   if(n==0)
     return v;
-  short *ww=iv2array(w,R);
+  int *ww=iv2array(w,R);
   poly u1=p_JetW(p_Sub(p_One(R),__p_Mult_nn(u,u0,R),R),n,ww,R);
   if(u1==NULL)
   {
-    omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+    omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(int));
     return v;
   }
   poly v1=__p_Mult_nn(p_Copy(u1,R),u0,R);
@@ -4516,14 +4516,14 @@ static poly p_Invers(int n,poly u,intvec *w, const ring R)
   }
   p_Delete(&u1,R);
   p_Delete(&v1,R);
-  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(int));
   return v;
 }
 
 
 poly p_Series(int n,poly p,poly u, intvec *w, const ring R)
 {
-  short *ww=iv2array(w,R);
+  int *ww=iv2array(w,R);
   if(p!=NULL)
   {
     if(u==NULL)
@@ -4531,7 +4531,7 @@ poly p_Series(int n,poly p,poly u, intvec *w, const ring R)
     else
       p=p_JetW(p_Mult_q(p,p_Invers(n-p_MinDeg(p,w,R),u,w,R),R),n,ww,R);
   }
-  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(int));
   return p;
 }
 

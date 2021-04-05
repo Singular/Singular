@@ -611,9 +611,7 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   }
   poly u_p=(poly)u->CopyD(POLY_CMD);
   if ((u_p!=NULL)
-  #ifdef HAVE_SHIFTBBA
   && (!rIsLPRing(currRing))
-  #endif
   && ((v_i!=0) &&
       ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i/2)))
   {
@@ -1828,12 +1826,12 @@ static BOOLEAN jjCONTRACT(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
 {
-  short *iv=iv2array((intvec *)v->Data(),currRing);
+  int *iv=iv2array((intvec *)v->Data(),currRing);
   ideal I=(ideal)u->Data();
   int d=-1;
   int i;
   for(i=IDELEMS(I);i>=0;i--) d=si_max(d,(int)p_DegW(I->m[i],iv,currRing));
-  omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(short) );
+  omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(int) );
   res->data = (char *)((long)d);
   return FALSE;
 }
@@ -1842,9 +1840,9 @@ static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
   poly p=(poly)u->Data();
   if (p!=NULL)
   {
-    short *iv=iv2array((intvec *)v->Data(),currRing);
+    int *iv=iv2array((intvec *)v->Data(),currRing);
     const long d = p_DegW(p,iv,currRing);
-    omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(short) );
+    omFreeSize( (ADDRESS)iv, (rVar(currRing)+1)*sizeof(int) );
     res->data = (char *)(d);
   }
   else
@@ -3760,8 +3758,7 @@ static BOOLEAN jjSetRing(leftv, leftv u)
       ending++;
       sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
       h=enterid(name_buffer,0,RING_CMD,&IDROOT);
-      IDRING(h)=r;
-      r->ref++;
+      IDRING(h)=rIncRefCnt(r);
     }
     rSetHdl(h);
   }
@@ -4049,7 +4046,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
 #ifdef HAVE_SHIFTBBA
-  if (currRing->isLPring)
+  if (rIsLPRing(currRing))
   {
 #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
@@ -4297,10 +4294,11 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
 static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
 {
 #ifdef HAVE_SHIFTBBA
-  if (currRing->isLPring)
+  if (rIsLPRing(currRing))
   {
     int deg = (int)(long)v->Data();
-    if (deg > currRing->N/currRing->isLPring) {
+    if (deg > currRing->N/currRing->isLPring)
+    {
       WerrorS("degree bound of Letterplace ring is to small");
       return TRUE;
     }
@@ -5186,9 +5184,9 @@ static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
   res->data = (char *)ivTranp((intvec*)(v->Data()));
   return FALSE;
 }
-#ifdef HAVE_PLURAL
 static BOOLEAN jjOPPOSITE(leftv res, leftv a)
 {
+#ifdef HAVE_PLURAL
   ring    r = (ring)a->Data();
   //if (rIsPluralRing(r))
   if (r->OrdSgn==1)
@@ -5201,9 +5199,13 @@ static BOOLEAN jjOPPOSITE(leftv res, leftv a)
     res->data = rCopy(r);
   }
   return FALSE;
+#else
+  return TRUE;
+#endif
 }
 static BOOLEAN jjENVELOPE(leftv res, leftv a)
 {
+#ifdef HAVE_PLURAL
   ring    r = (ring)a->Data();
   if (rIsPluralRing(r))
   {
@@ -5212,9 +5214,13 @@ static BOOLEAN jjENVELOPE(leftv res, leftv a)
   }
   else  res->data = rCopy(r);
   return FALSE;
+#else
+  return TRUE;
+#endif
 }
 static BOOLEAN jjTWOSTD(leftv res, leftv a)
 {
+#ifdef HAVE_PLURAL
   ideal result;
   ideal v_id=(ideal)a->Data();
   if (rIsPluralRing(currRing))
@@ -5227,11 +5233,13 @@ static BOOLEAN jjTWOSTD(leftv res, leftv a)
   setFlag(res,FLAG_STD);
   setFlag(res,FLAG_TWOSTD);
   return FALSE;
-}
+#else
+  return TRUE;
 #endif
-#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)// do not place above jjSTD in this file because we need to reference it
+}
 static BOOLEAN jjRIGHTSTD(leftv res, leftv v)
 {
+#if defined(HAVE_SHIFTBBA) || defined(HAVE_PLURAL)// do not place above jjSTD in this file because we need to reference it
   if (rIsLPRing(currRing))
   {
     if (rField_is_numeric(currRing))
@@ -5286,8 +5294,10 @@ static BOOLEAN jjRIGHTSTD(leftv res, leftv v)
   {
     return jjSTD(res, v);
   }
-}
+#else
+  return TRUE;
 #endif
+}
 static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
   int t=(int)(long)v->data;
@@ -5375,6 +5385,26 @@ static BOOLEAN jjVARSTR1(leftv res, leftv v)
 static BOOLEAN jjVDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+    {
+      WerrorS("`vdim` is not implemented for letterplace rings over rings");
+      return TRUE;
+    }
+#endif
+    if (currRing->qideal != NULL)
+    {
+      WerrorS("qring not supported by `vdim` for letterplace rings at the moment");
+      return TRUE;
+    }
+    int kDim = lp_kDim((ideal)(v->Data()));
+    res->data = (char *)(long)kDim;
+    return (kDim == -2);
+  }
+#endif
   res->data = (char *)(long)scMult0Int((ideal)v->Data(),currRing->qideal);
   return FALSE;
 }
@@ -6163,9 +6193,9 @@ static BOOLEAN jjINTERSEC3S(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
-  short *iw=iv2array((intvec *)w->Data(),currRing);
+  int *iw=iv2array((intvec *)w->Data(),currRing);
   res->data = (char *)ppJetW((poly)u->Data(),(int)(long)v->Data(),iw);
-  omFreeSize( (ADDRESS)iw, (rVar(currRing)+1)*sizeof(short) );
+  omFreeSize( (ADDRESS)iw, (rVar(currRing)+1)*sizeof(int) );
   return FALSE;
 }
 static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
@@ -6586,13 +6616,11 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
-#ifdef HAVE_SHIFTBBA
     if (rIsLPRing(currRing))
     {
       WerrorS("Substituting parameters not implemented for Letterplace rings.");
       return TRUE;
     }
-#endif
     res->data=pSubstPar(p,-ringvar,monomexpr);
   }
   return FALSE;
@@ -6635,13 +6663,11 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   }
   else
   {
-#ifdef HAVE_SHIFTBBA
     if (rIsLPRing(currRing))
     {
       WerrorS("Substituting parameters not implemented for Letterplace rings.");
       return TRUE;
     }
-#endif
     res->data = idSubstPar(id,-ringvar,monomexpr);
   }
   return FALSE;
@@ -7137,11 +7163,11 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   ideal Q=(ideal)w2.Data();
 
   int n=(int)(long)v3->Data();
-  short *w=NULL;
+  int *w=NULL;
   if(v4!=NULL)
   {
     w = iv2array((intvec *)v4->Data(),currRing);
-    short * w0 = w + 1;
+    int * w0 = w + 1;
     int i = currRing->N;
     while( (i > 0) && ((*w0) > 0) )
     {
@@ -7159,7 +7185,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   w1.CleanUp();
   w2.CleanUp();
   if(w!=NULL)
-    omFreeSize( (ADDRESS)w, (rVar(currRing)+1)*sizeof(short) );
+    omFreeSize( (ADDRESS)w, (rVar(currRing)+1)*sizeof(int) );
 
   lists L=(lists) omAllocBin(slists_bin);
   L->Init(2);
@@ -7946,8 +7972,8 @@ BOOLEAN jjLIST_PL(leftv res, leftv v)
       }
       if (rt==RING_CMD)
       {
-        L->m[i].rtyp=rt;  L->m[i].data=h->Data();
-        ((ring)L->m[i].data)->ref++;
+        L->m[i].rtyp=rt;
+        L->m[i].data=rIncRefCnt(((ring)h->Data()));
       }
       else
         L->m[i].Copy(h);
@@ -9838,7 +9864,6 @@ int iiArithAddCmd(
 
 static BOOLEAN check_valid(const int p, const int op)
 {
-  #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
     if ((p & NC_MASK)==NO_NC)
@@ -9853,7 +9878,6 @@ static BOOLEAN check_valid(const int p, const int op)
     }
     /* else, ALLOW_PLURAL */
   }
-  #ifdef HAVE_SHIFTBBA
   else if (rIsLPRing(currRing))
   {
     if ((p & ALLOW_LP)==0)
@@ -9862,9 +9886,6 @@ static BOOLEAN check_valid(const int p, const int op)
       return TRUE;
     }
   }
-  #endif
-  #endif
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     if ((p & RING_MASK)==0 /*NO_RING*/)
@@ -9885,7 +9906,6 @@ static BOOLEAN check_valid(const int p, const int op)
       WarnS("considering the image in Q[...]");
     }
   }
-#endif
   return FALSE;
 }
 // --------------------------------------------------------------------
@@ -9946,8 +9966,24 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   lists pl=NULL;
   intvec *p=NULL;
-  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
-  else                    p=(intvec*)v->Data();
+  if (v->Typ()==LIST_CMD)
+  {
+    pl=(lists)v->Data();
+    if (pl->nr!=rl-1)
+    {
+      WerrorS("wromg number of primes");
+      return TRUE;
+    }
+  }
+  else
+  {
+    p=(intvec*)v->Data();
+    if (p->length()!=rl)
+    {
+      WerrorS("wromg number of primes");
+      return TRUE;
+    }
+  }
   ideal result;
   ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
   number *xx=NULL;

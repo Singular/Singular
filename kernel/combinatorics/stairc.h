@@ -33,6 +33,7 @@ ideal scKBase(int deg, ideal  s, ideal Q=NULL, intvec * mv=NULL);
 
 #if HAVE_SHIFTBBA
 int lp_gkDim(const ideal G);
+int lp_kDim(const ideal G);
 intvec * lp_ufnarovskiGraph(ideal G, ideal &standardWords);
 #endif
 

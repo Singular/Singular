@@ -78,6 +78,7 @@ _config.h.in
 /Singular/ESingular
 /Singular/feOptGen
 /Singular/gftables
+/Singular/libparse
 /Singular/mpsr_Tok.xx
 /Singular/ndbm.dl_og
 /Singular/sing_dbm.dl_og

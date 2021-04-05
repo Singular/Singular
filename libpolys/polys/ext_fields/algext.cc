@@ -1322,8 +1322,9 @@ void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& 
 
 void naKillChar(coeffs cf)
 {
-   if ((--cf->extRing->ref) == 0)
-     rDelete(cf->extRing);
+  rDecRefCnt(cf->extRing);
+  if(cf->extRing->ref<0)
+    rDelete(cf->extRing);
 }
 
 char* naCoeffName(const coeffs r) // currently also for tranext.
@@ -1386,7 +1387,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   assume( cf != NULL );
   assume(getCoeffType(cf) == n_algExt);                     // coeff type;
 
-  e->r->ref ++; // increase the ref.counter for the ground poly. ring!
+  rIncRefCnt(e->r); // increase the ref.counter for the ground poly. ring!
   const ring R = e->r; // no copy!
   cf->extRing  = R;
 
@@ -1635,7 +1636,7 @@ BOOLEAN n2pInitChar(coeffs cf, void * infoStruct)
 
   assume( cf != NULL );
 
-  e->r->ref ++; // increase the ref.counter for the ground poly. ring!
+  rIncRefCnt(e->r); // increase the ref.counter for the ground poly. ring!
   const ring R = e->r; // no copy!
   cf->extRing  = R;
 

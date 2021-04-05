@@ -244,6 +244,7 @@ void   rWrite(ring r, BOOLEAN details)
   nblocks--;
 
 
+  //Print("ref:%d, C->ref:%d\n",r->ref,C->ref);
   PrintS("// coefficients: ");
   if( nCoeff_is_algExt(C) )
   {
@@ -1351,7 +1352,7 @@ int rSum(ring r1, ring r2, ring &sum)
   if (r1==r2)
   {
     sum=r1;
-    r1->ref++;
+    rIncRefCnt(r1);
     return 0;
   }
   return rSumInternal(r1,r2,sum,TRUE,FALSE);

@@ -13,7 +13,7 @@ dnl FLINT_CFLAGS and FLINT_LIBS
 
 AC_DEFUN([LB_CHECK_FLINT],
 [
-DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local /opt/homebrew"
+AC_REQUIRE([SING_DEFAULT_CHECKING_PATH])
 
 AC_ARG_WITH(flint,
 [  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
@@ -43,37 +43,34 @@ if test "$FLINT_HOME_PATH" = "$DEFAULT_CHECKING_PATH" ; then
 	FLINT_LIBS="-lflint -lmpfr -lgmp"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
-	CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
+	CFLAGS=" ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 	LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-	AC_CHECK_HEADER([flint/fmpz.h],
-		[AC_CHECK_LIB(flint,fmpz_init,
-			[flint_found="yes"],
-			[],
-			[])],
-		[],
-		[])
+        AC_TRY_LINK([#include <flint/fmpz.h>
+                    ],
+                    [fmpz_t x; fmpz_init(x);], [
+                flint_found="yes"
+        ])
 fi
 
 dnl if flint was not previously found, search FLINT_HOME_PATH
 if test "x$flint_found" = "xno" ; then
 	for FLINT_HOME in ${FLINT_HOME_PATH}
 	do
-		if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
 		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
-		FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath -Wl,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
+		FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
-		CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
+		CFLAGS="${FLINT_CFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-		AC_CHECK_LIB(flint,fmpz_init,
-		[flint_found="yes"],
-		[],
-		[]
-		)
-		fi
+                AC_TRY_LINK([#include <flint/fmpz.h>
+                            ],
+                            [fmpz_t x; fmpz_init(x);], [
+                        flint_found="yes"
+                        break
+                ])
 	done
 fi
 

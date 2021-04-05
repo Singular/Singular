@@ -1416,7 +1416,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
         if ((IDTYP(h)==RING_CMD)
         && (v->Data()==IDDATA(h)))
         {
-          IDRING(h)->ref++;
+          rIncRefCnt(IDRING(h));
           keepring=TRUE;
           IDLEV(h)=toLev;
           //WarnS("keepring");
@@ -1436,7 +1436,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
     }
     h=(idhdl)v->data;
     IDLEV(h)=toLev;
-    if (keepring) IDRING(h)->ref--;
+    if (keepring) rDecRefCnt(IDRING(h));
     iiNoKeepRing=FALSE;
     //Print("export %s\n",IDID(h));
   }
@@ -6272,7 +6272,7 @@ void rKill(ring r)
     rDelete(r);
     return;
   }
-  r->ref--;
+  rDecRefCnt(r);
 }
 
 void rKill(idhdl h)

@@ -1555,13 +1555,13 @@ ideal id_JetW(const ideal i,int d, intvec * iv, const ring R)
   }
   else
   {
-    short *w=iv2array(iv,R);
+    int *w=iv2array(iv,R);
     int k;
     for(k=0; k<IDELEMS(i); k++)
     {
       r->m[k]=pp_JetW(i->m[k],d,w,R);
     }
-    omFreeSize((ADDRESS)w,(rVar(R)+1)*sizeof(short));
+    omFreeSize((ADDRESS)w,(rVar(R)+1)*sizeof(int));
   }
   return r;
 }

@@ -77,7 +77,7 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   //  Print("no ring, switch to ssiRing%d\n",nr);
   if (r==currRing)
   {
-    r->ref++;
+    rIncRefCnt(r);
     currRingHdl=rFindHdl(r,currRingHdl);
     return TRUE;
   }
@@ -93,14 +93,14 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
       if (h==NULL)
       {
         h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
-        IDRING(h)=r;
-        r->ref=2; /*d->r and h */
+        IDRING(h)=rIncRefCnt(r);
+        r->ref=2;/*ref==2: d->r and h */
         break;
       }
       else if ((IDTYP(h)==RING_CMD)
       && (rEqual(r,IDRING(h),1)))
       {
-        IDRING(h)->ref++;
+        rIncRefCnt(IDRING(h));
         break;
       }
     }
@@ -110,7 +110,7 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
   else
   {
     rKill(r);
-    currRing->ref++;
+    rIncRefCnt(currRing);
     return TRUE;
   }
 }
@@ -130,8 +130,8 @@ void ssiCheckCurrRing(const ring r)
       if (h==NULL)
       {
         h=enterid(name,0,RING_CMD,&IDROOT,FALSE);
-        IDRING(h)=r;
-        r->ref=2; /*d->r and h */
+        IDRING(h)=rIncRefCnt(r);
+        r->ref=2;/*ref==2: d->r and h */
         break;
       }
       else if ((IDTYP(h)==RING_CMD)
@@ -317,7 +317,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   }
   if (r!=NULL)
   {
-    /*d->*/r->ref++;
+    /*d->*/rIncRefCnt(r);
   }
   ssiWriteRing_R(d,r);
 }
@@ -617,7 +617,28 @@ ring ssiReadRing(const ssiInfo *d)
       omFree(names[i]);
     }
     omFreeSize(names,N*sizeof(char*));
-    r->ref=1;
+    rIncRefCnt(r);
+    // check if such ring already exist as ssiRing*
+    char name[20];
+    int nr=0;
+    idhdl h=NULL;
+    loop
+    {
+      sprintf(name,"ssiRing%d",nr); nr++;
+      h=IDROOT->get(name, 0);
+      if (h==NULL)
+      {
+        break;
+      }
+      else if ((IDTYP(h)==RING_CMD)
+      && (r!=IDRING(h))
+      && (rEqual(r,IDRING(h),1)))
+      {
+	rDelete(r);
+        r=rIncRefCnt(IDRING(h));
+        break;
+      }
+    }
     return r;
   }
 }
@@ -1039,6 +1060,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           WerrorS("ERROR opening socket");
           l->data=NULL;
+          SI_LINK_CLOSE_P(l);
           omFree(d);
           return TRUE;
         }
@@ -1054,6 +1076,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           {
             WerrorS("ERROR on binding (no free port available?)");
             l->data=NULL;
+            SI_LINK_CLOSE_P(l);
             omFree(d);
             return TRUE;
           }
@@ -1066,6 +1089,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           WerrorS("ERROR on accept");
           l->data=NULL;
+          SI_LINK_CLOSE_P(l);
           omFree(d);
           return TRUE;
         }
@@ -1082,6 +1106,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       {
         Werror("invalid mode >>%s<< for ssi",mode);
         l->data=NULL;
+        SI_LINK_CLOSE_P(l);
         omFree(d);
         return TRUE;
       }
@@ -1099,6 +1124,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           WerrorS("ERROR opening socket");
           l->data=NULL;
+          SI_LINK_CLOSE_P(l);
           omFree(d);
           return TRUE;
         }
@@ -1114,6 +1140,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           {
             WerrorS("ERROR on binding (no free port available?)");
             l->data=NULL;
+            SI_LINK_CLOSE_P(l);
             return TRUE;
           }
         }
@@ -1127,6 +1154,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           WerrorS("ERROR: no host specified");
           l->data=NULL;
+          SI_LINK_CLOSE_P(l);
           omFree(d);
           omFree(path);
           omFree(cli_host);
@@ -1158,6 +1186,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           WerrorS("ERROR on accept");
           l->data=NULL;
+          SI_LINK_CLOSE_P(l);
           omFree(d);
           return TRUE;
         }
@@ -1189,9 +1218,19 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         if (portno!=0)
         {
           sockfd = socket(AF_INET, SOCK_STREAM, 0);
-          if (sockfd < 0) { WerrorS("ERROR opening socket"); return TRUE; }
+          if (sockfd < 0)
+          {
+            WerrorS("ERROR opening socket");
+            SI_LINK_CLOSE_P(l);
+            return TRUE;
+          }
           server = gethostbyname(host);
-          if (server == NULL) {  WerrorS("ERROR, no such host");  return TRUE; }
+          if (server == NULL)
+          {
+            WerrorS("ERROR, no such host");
+            SI_LINK_CLOSE_P(l);
+            return TRUE;
+          }
           memset((char *) &serv_addr, 0, sizeof(serv_addr));
           serv_addr.sin_family = AF_INET;
           memcpy((char *)&serv_addr.sin_addr.s_addr,
@@ -1199,7 +1238,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
                 server->h_length);
           serv_addr.sin_port = htons(portno);
           if (si_connect(sockfd,(sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
-          { Werror("ERROR connecting(errno=%d)",errno); return TRUE; }
+          {
+            Werror("ERROR connecting(errno=%d)",errno);
+            SI_LINK_CLOSE_P(l);
+            return TRUE;
+          }
           //PrintS("connected\n");mflush();
           d->f_read=s_open(sockfd);
           d->fd_read=sockfd;
@@ -1211,6 +1254,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         else
         {
           l->data=NULL;
+          SI_LINK_CLOSE_P(l);
           omFree(d);
           return TRUE;
         }
@@ -1253,6 +1297,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           omFree(d);
           l->data=NULL;
+          SI_LINK_CLOSE_P(l);
           return TRUE;
         }
       }
@@ -1404,7 +1449,7 @@ leftv ssiRead1(si_link l)
              d->r=ssiReadRing(d);
              if (errorreported) return NULL;
              res->data=(char*)d->r;
-             if (d->r!=NULL) d->r->ref++;
+             if (d->r!=NULL) rIncRefCnt(d->r);
              res->rtyp=RING_CMD;
              if (t==15) // setring
              {
