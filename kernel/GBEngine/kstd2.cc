@@ -3781,21 +3781,6 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
-#ifdef HAVE_SHIFTBBA
-  // only LM of elements in S is shifted
-  // necessary to prevent deleting the tail multiple times
-  if (rIsLPRing(currRing))
-  {
-    for (int j = 0; j < IDELEMS(strat->Shdl); j++)
-    {
-      if (strat->Shdl->m[j]!=NULL && pmFirstVblock(strat->Shdl->m[j]) > 1)
-      {
-        // otherwise the tail would be freed multiple times
-        pNext(strat->Shdl->m[j]) = NULL;
-      }
-    }
-  }
-#endif
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
@@ -3950,21 +3935,6 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
-#ifdef HAVE_SHIFTBBA
-  // only LM of elements in S is shifted
-  // necessary to prevent deleting the tail multiple times
-  if (rIsLPRing(currRing))
-  {
-    for (int j = 0; j < IDELEMS(strat->Shdl); j++)
-    {
-      if (strat->Shdl->m[j]!=NULL && pmFirstVblock(strat->Shdl->m[j]) > 1)
-      {
-        // otherwise the tail would be freed multiple times
-        pNext(strat->Shdl->m[j]) = NULL;
-      }
-    }
-  }
-#endif
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
