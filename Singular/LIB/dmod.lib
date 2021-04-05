@@ -61,7 +61,8 @@ Guide:
 PROCEDURES:
 
 annfs(F[,S,eng]);       compute Ann F^s0 in D and Bernstein polynomial for a poly F
-annfspecial(I, F, m, n);  compute Ann F^n from Ann F^s for a polynomial F and a number n
+annfspecial(F, n);    compute Ann F^n for a given polynomial F and a number n
+annfspecialOld(I, F, m, n);  compute Ann F^n from I=Ann F^s for a polynomial F and a number n
 Sannfs(F[,S,eng]);      compute Ann F^s in D[s] for a polynomial F
 Sannfslog(F[,eng]);     compute Ann^(1) F^s in D[s] for a polynomial F
 bernsteinBM(F[,eng]);   compute global Bernstein polynomial for a polynomial F (algorithm of Briancon-Maisonobe)
@@ -92,6 +93,8 @@ Weyl algebra; Bernstein operator; logarithmic annihilator ideal; parametric anni
 hyperplane arrangement; Oaku-Takayama algorithm; Briancon-Maisonobe algorithm; LOT algorithm
 ";
 
+// VL Dec 2020: moved annfspecial to annfspecialOld [later: reimplement]; updated dmodapp calls of it
+// VL Dec 2020: created annfspecial by using dmodideal.lib
 // reworked by JM+VL on 9.3.2010: Sannfslog
 // added by VL on 2.3.2010: bernsteinLift
 // ****** commented out for better readability by VL on 2.3.2010
@@ -112,6 +115,7 @@ LIB "gkdim.lib";
 LIB "gmssing.lib";
 LIB "control.lib";  // for genericity
 LIB "dmodapp.lib"; // for e.g. engine
+LIB "dmodideal.lib"; // for usage in annfspecial
 LIB "polylib.lib";
 
 proc testdmodlib()
@@ -126,6 +130,7 @@ proc testdmodlib()
   example bernsteinBM;
   example operatorBM;
   example annfspecial;
+  example annfspecialOld;
   example annfsParamBM;
   example annfsBMI;
   example checkRoot;
@@ -4593,8 +4598,47 @@ example
   rs;
 }
 
-proc annfspecial(ideal I, poly F, int mir, number n)
-"USAGE:  annfspecial(I,F,mir,n);  I an ideal, F a poly, int mir, number n
+proc annfspecial(poly F, number n)
+"USAGE:  annfspecial(F,n);  F a poly, number n
+RETURN:  ring
+PURPOSE: compute the annihilator ideal of F^n in the Weyl Algebra
+@*           for the given rational number n
+ASSUME: basering is commutative, the number n is rational.
+NOTE: Activate the output ring by @code{setring} command. 
+In the ring the ideal called @code{annfalpha} is exported.
+@* We compute the real annihilator for any rational value of n (both
+@*    generic and exceptional). The implementation fixes a bug in 
+@*    the Algorithm 5.3.15 from Saito-Sturmfels-Takayama.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example annfspecial; shows examples
+"
+{
+   // using dmodideal.lib 
+  ideal f = F;
+  ideal alpha = n;
+  def @A = annfalphaI(f,alpha);
+  return(@A);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  poly F = x3-y2;  
+  bernsteinBM(F); // the roots of Bernstein-Sato poly: -7/6, -1, -5/6 
+  // *** first example: generic root
+  def A = annfspecial(F,-5/6); 
+  setring A; print(annfalpha); kill A; setring r;
+  // *** second example:  exceptional root since its distance to -1 is integer 2
+  def A = annfspecial(F,1);
+  setring A;  print(annfalpha); kill A; setring r;
+  // *** third example: exceptional root since its distance to -5/6 is integer 1
+  def A = annfspecial(F,1/6);
+  setring A;  print(annfalpha); kill A;
+}
+
+proc annfspecialOld(ideal I, poly F, int mir, number n)
+"USAGE:  annfspecialOld(I,F,mir,n);  I an ideal, F a poly, int mir, number n
 RETURN:  ideal
 PURPOSE: compute the annihilator ideal of F^n in the Weyl Algebra
 @*           for the given rational number n
@@ -4604,10 +4648,11 @@ ASSUME:  The basering is D[s] and contains 's' explicitly as a variable,
 @*   and the number n is rational.
 NOTE: We compute the real annihilator for any rational value of n (both
 @*       generic and exceptional). The implementation goes along the lines of
-@*       the Algorithm 5.3.15 from Saito-Sturmfels-Takayama.
+@*       the Algorithm 5.3.15 from Saito-Sturmfels-Takayama, which has a bug.
+@*       This procedure is correct for integer values of n.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
-EXAMPLE: example annfspecial; shows examples
+EXAMPLE: example annfspecialOld; shows examples
 "
 {
 
@@ -4673,9 +4718,9 @@ example
   def  A = SannfsBM(F);
   setring A;
   poly F = x3-y2;
-  annfspecial(LD,F,-1,3/4); // generic root
-  annfspecial(LD,F,-1,-2);  // integer but still generic root
-  annfspecial(LD,F,-1,1);   // exceptional root
+  annfspecialOld(LD,F,-1,3/4); // generic root
+  annfspecialOld(LD,F,-1,-2);  // integer but still generic root
+  annfspecialOld(LD,F,-1,1);   // exceptional integer root
 }
 
 /*

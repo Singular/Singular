@@ -72,7 +72,7 @@ poly p_One(const ring r);
 
 int p_MinDeg(poly p,intvec *w, const ring R);
 
-long p_DegW(poly p, const short *w, const ring R);
+long p_DegW(poly p, const int *w, const ring R);
 
 /// return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, const ring r);
@@ -2097,8 +2097,8 @@ void p_SetModDeg(intvec *w, ring r);
 /*------------ Jet ----------------------------------*/
 poly pp_Jet(poly p, int m, const ring R);
 poly p_Jet(poly p, int m,const ring R);
-poly pp_JetW(poly p, int m, short *w, const ring R);
-poly p_JetW(poly p, int m, short *w, const ring R);
+poly pp_JetW(poly p, int m, int *w, const ring R);
+poly p_JetW(poly p, int m, int *w, const ring R);
 
 poly n_PermNumber(const number z, const int *par_perm, const int OldPar, const ring src, const ring dst);
 

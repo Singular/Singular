@@ -10,7 +10,10 @@ SHELL=/bin/sh
 ##
 SINGUNAME       = spielwiese
 
-bindir	        = @bindir@
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
+bindir	        = ${top_builddir}/Singular
+EXEEXT          = @EXEEXT@
 
 ##
 ## needed programs
@@ -20,36 +23,34 @@ UUDECODE        = uudecode
 
 PERL            = perl
 TEX             = tex
-MAKEINFO        = makeinfo --force
+MAKEINFO        = @MAKEINFO@ --force
 TEXI2PDF        = @TEXI2PDF@
 TEXINDEX        = @TEXINDEX@
 # use our local texi2html
 TEXI2HTML       = ./texi2html
-DVIPS           = dvips
+DVIPS           = @DVIPS@
 
 VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
-SINGULAR        = /scratch/hannes/billbo-sw/Singular/Singular
-SINGULAR_LIB_DIR= ../Singular/LIB
-ifeq ($(SINGUNAME),"ix86-Win")
-LIBPARSE        = ${bindir}/libparse.exe
-else
-LIBPARSE        = ./libparse
-endif
+SINGULAR        = ${top_builddir}/Singular/Singular
+SINGULAR_LIB_DIR= ${top_srcdir}/Singular/LIB
+# from Singular/Makefile.am, extended by dynmodules stuff:
+TESTS_ENVIRONMENT = unset DISPLAY && SINGULARPATH="$$(for d in ${top_builddir}/Singular/dyn_modules/*/.libs; do printf $$d:; done)" PATH="${top_builddir}/IntegerProgramming:$$PATH"
+LIBPARSE        = ${top_builddir}/Singular/libparse${EXEEXT}
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 # which tags to avoid:
-DOC2TEX_EXAMPLE_EXCLUSIONS = -exclude polymake
+DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@ -exclude crash
 # which tags to avoid:
 TAG		= polymake
-DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
-                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
+DOC2TEX         = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
 
-DOC2TEX_M        = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
-                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
+DOC2TEX_M        = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR}
 
 PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
@@ -184,17 +185,17 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 	${LIBPARSE} -i $< > $@
 
 %_noFun.doc : %.pl pl2doc.pl
-	${PL2DOC_M}  -no_fun -o $@  $<
+	export PERLLIB=. PERL5LIB=.; ${PL2DOC_M}  -no_fun -o $@  $<
 
 %.doc : %.pl pl2doc.pl
-	${PL2DOC} -o $@ $<
+	export PERLLIB=. PERL5LIB=.; ${PL2DOC} -o $@ $<
 
 # do not delete intermediate .pl and .doc files
 .PRECIOUS: %.doc %_noFun.doc ${DOC_SUBDIR}/%_lib.pl
 
 # index file for help
 singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
-	${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
+	export PERLLIB=.;${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
 ###########################################################
 
@@ -210,10 +211,10 @@ endif
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
 
 %.${SINGUNAME}.html : %.texi
-	${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -split none -out_file $@ $<
+	export PERLLIB=.;${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -split none -out_file $@ $<
 
 %.html : %.texi
-	${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -split none -out_file $@ $<
+	export PERLLIB=.;${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -split none -out_file $@ $<
 
 % : %.txt
 	cp $< $@
@@ -223,7 +224,7 @@ endif
 #
 html: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML} $(STANDALONE_TEXI_FILES)
 ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex s-plural.tex s-letterplace.tex
-	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
+	export PERLLIB=. PERL5LIB=.;${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
 # html stuff

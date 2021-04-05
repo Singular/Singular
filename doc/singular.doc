@@ -604,7 +604,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node chern_lib
 @subsection chern_lib
-@c lib chern.lib
+@c lib chern.lib tag:lrcalc
 @c ----------------------------------------------------------
 @node deRham_lib
 @subsection deRham_lib
@@ -906,7 +906,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ---------------------------------------------------------
 @node recover_lib
 @subsection recover_lib
-@c lib recover.lib
+@c lib recover.lib tag:bertini
 @c ----------------------------------------------------------
 @node rootisolation_lib
 @subsection rootisolation_lib
@@ -1128,7 +1128,7 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node polymake_lib
 @subsection polymake_lib
-@c lib polymake.lib
+@c lib polymake.lib tag:polymake
 @c ----------------------------------------------------------
 @node realizationMatroids_lib
 @subsection realizationMatroids_lib
@@ -1136,7 +1136,7 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node tropical_lib
 @subsection tropical_lib
-@c lib tropical.lib
+@c lib tropical.lib tag:gfan
 @c ----------------------------------------------------------
 @node tropicalNewton_lib
 @subsection tropicalNewton_lib
@@ -1262,7 +1262,7 @@ Issues:
 @c ----------------------------------------------------------
 @node lrcalc_lib
 @subsection lrcalc_lib
-@c lib lrcalc.lib
+@c lib lrcalc.lib tag:lrcalc
 @c ----------------------------------------------------------
 @node maxlike_lib
 @subsection maxlike_lib
@@ -1300,7 +1300,7 @@ Todos/Issues:
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
-@c lib stanleyreisner.lib
+@c lib stanleyreisner.lib tag:crash
 @c ---------------------------------------------------------
 @node swalk_lib
 @subsection swalk_lib

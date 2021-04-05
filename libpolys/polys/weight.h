@@ -18,9 +18,9 @@ void kEcartWeights(poly* s, int sl, short *eweight, const ring R);
 //BOOLEAN kQHWeight(leftv res,leftv v);
 long maxdegreeWecart(poly p,int *l, ring r);
 long totaldegreeWecart(poly p, ring r);
-long totaldegreeWecart_IV(poly p, ring r, const short *w);
+long totaldegreeWecart_IV(poly p, ring r, const int *w);
 
-short * iv2array(intvec * iv, const ring R);
+int * iv2array(intvec * iv, const ring R);
 
 // internal:
 extern "C" THREAD_VAR double (*wFunctional)(int *degw, int *lpol, int npol,

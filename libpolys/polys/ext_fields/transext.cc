@@ -2157,7 +2157,8 @@ nMapFunc ntSetMap_T(const coeffs src, const coeffs dst)
 
 static void ntKillChar(coeffs cf)
 {
-  if ((--cf->extRing->ref) == 0)
+  rDecRefCnt(cf->extRing);
+  if (cf->extRing->ref < 0)
     rDelete(cf->extRing);
 }
 static number ntConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
@@ -2557,7 +2558,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   ring R = e->r;
   assume(R != NULL);
 
-  R->ref ++; // increase the ref.counter for the ground poly. ring!
+  rIncRefCnt(R); // increase the ref.counter for the ground poly. ring!
 
   cf->extRing           = R;
   /* propagate characteristic up so that it becomes

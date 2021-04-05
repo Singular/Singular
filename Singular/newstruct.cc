@@ -367,16 +367,15 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
           }
           if (search_ring)
           {
-            ring r;
+            ring r=(ring)al->m[nm->pos-1].data;
             res->rtyp=RING_CMD;
-            res->data=al->m[nm->pos-1].data;
-            r=(ring)res->data;
             if (r==NULL)
             {
-              res->data=(void *)currRing; r=currRing;
-              if (r!=NULL) r->ref++;
-              else WerrorS("ring of this member is not set and no basering found");
+              r=currRing;
+              if (r==NULL)
+                WerrorS("ring of this member is not set and no basering found");
             }
+            if (r!=NULL) res->data=rIncRefCnt(r);
             a1->CleanUp();
             a2->CleanUp();
             return r==NULL;
@@ -390,7 +389,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               ring r=(ring)al->m[nm->pos-1].data;
               if (r!=NULL)
               {
-                r->ref--;
+                rDecRefCnt(r);
                 al->m[nm->pos-1].data=NULL;
                 al->m[nm->pos-1].rtyp=DEF_CMD;
               }
@@ -407,26 +406,17 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               al->m[nm->pos].flag &= ~Sy_bit(FLAG_OTHER_RING);
 
             }
-            //if(al->m[nm->pos-1].data==NULL)
-            {
-              // remember the ring, if not already set
-              if (currRing!=NULL)
-              {
-                currRing->ref++;
-                al->m[nm->pos-1].data=(void *)currRing;
-                al->m[nm->pos-1].rtyp=RING_CMD;
-              }
-            }
+            al->m[nm->pos].flag|=Sy_bit(FLAG_RING);
           }
           else if ((nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
           {
             if(al->m[nm->pos-1].data!=NULL)
             {
               ring old=(ring)al->m[nm->pos-1].data;
-              old->ref--;
+              rDecRefCnt(old);
             }
             al->m[nm->pos-1].data=(void*)currRing;
-            if (currRing!=NULL) currRing->ref++;
+            if (currRing!=NULL) rIncRefCnt(currRing);
           }
           Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
           r->start = nm->pos+1;
@@ -548,7 +538,7 @@ void *newstruct_Init(blackbox *b)
     {
       l->m[nm->pos-1].rtyp=RING_CMD;
       l->m[nm->pos-1].data=currRing; //idrecDataInit may create ringdep obj.
-      if (currRing!=NULL) currRing->ref++;
+      if (currRing!=NULL) rIncRefCnt(currRing);
     }
     l->m[nm->pos].data=idrecDataInit(nm->typ);
     nm=nm->next;

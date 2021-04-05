@@ -15,8 +15,7 @@ interval::interval(const ring r)
 {
   lower = n_Init(0, r->cf);
   upper = n_Init(0, r->cf);
-  R = r;
-  R->ref++;
+  R = rIncRefCnt(r);
 }
 
 interval::interval(number a, const ring r)
@@ -24,31 +23,28 @@ interval::interval(number a, const ring r)
   // dangerous: check if a is in coefs r->cf
   lower = a;
   upper = n_Copy(a, r->cf);
-  R = r;
-  R->ref++;
+  R = rIncRefCnt(r);
 }
 
 interval::interval(number a, number b, const ring r)
 {
   lower = a;
   upper = b;
-  R = r;
-  R->ref++;
+  R = rIncRefCnt(r);
 }
 
 interval::interval(interval *I)
 {
   lower = n_Copy(I->lower, I->R->cf);
   upper = n_Copy(I->upper, I->R->cf);
-  R = I->R;
-  R->ref++;
+  R = rIncRefCnt(I->R);
 }
 
 interval::~interval()
 {
   n_Delete(&lower, R->cf);
   n_Delete(&upper, R->cf);
-  R->ref--;
+  rDecRefCnt(R);
 }
 
 interval& interval::setRing(ring r)
@@ -67,9 +63,8 @@ interval& interval::setRing(ring r)
       lower = lo;
       upper = up;
     }
-    R->ref--;
-    r->ref++;
-    R = r;
+    rDecRefCnt(R);
+    R = rIncRefCnt(r);
   }
 
   return *this;
@@ -89,12 +84,12 @@ box::box()
       intervals[i] = new interval();
     }
   }
-  R->ref++;
+  rIncRefCnt(R);
 }
 
 box::box(box* B)
 {
-  R = B->R;
+  R = rIncRefCnt(B->R);
   int i, n = R->N;
   intervals = (interval**) omAlloc0(n * sizeof(interval*));
   if (intervals != NULL)
@@ -104,7 +99,6 @@ box::box(box* B)
       intervals[i] = new interval(B->intervals[i]);
     }
   }
-  R->ref++;
 }
 
 box::~box()
@@ -115,7 +109,7 @@ box::~box()
     delete intervals[i];
   }
   omFree((void**) intervals);
-  R->ref--;
+  rDecRefCnt(R);
 }
 
 // note: does not copy input

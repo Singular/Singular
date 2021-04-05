@@ -67,7 +67,7 @@ defines a @code{python} object.
 
 @item Example:
 @smallexample
-@c example
+@c example error
   pyobject empty;
   empty;
 
@@ -104,7 +104,7 @@ an int expression (see @ref{Type conversion and casting})
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example error
   pyobject pystr = "python string ";
   pystr;
   pyobject pyint = 2;
@@ -157,7 +157,7 @@ get attribute (class member) of a python object
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example error
 pyobject two = 2;
 pyobject three = 3;
 
@@ -209,7 +209,7 @@ list, get and set attributes (class members) of a pyobject (see @ref{attrib})
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example error
   pyobject pystr = "Kublai Khan";
 
   // Additional functionality through attrib
@@ -232,7 +232,7 @@ deletes an attribute from a pyobject (see @ref{killattrib})
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example error
 LIB("pyobject.so");
 python_run("def new_pyobj(): pass");
 attrib(new_pyobj, "new_attr", "something");
@@ -276,7 +276,7 @@ Evaluates a python expression (given as a string) and returns the result
 as pyobject.
 @item @strong{Example:}
 @smallexample
-@c example
+@c example error
   LIB("pyobject.so");
   python_eval("17 + 4");
   typeof(_);
@@ -298,7 +298,7 @@ pyobject
 Imports python module (given as a string) in the @sc{Singular} context.
 @item @strong{Example:}
 @smallexample
-@c example
+@c example error
   LIB("pyobject.so");
   python_import("os");
   name;                         // e. g. 'posix'
@@ -322,7 +322,7 @@ Executes python commands (given as a string) in @code{python} context
 and syncs the contexts afterwards.
 @item @strong{Example:}
 @smallexample
-@c example
+@c example error
   LIB("pyobject.so");
   python_run("def newfunc(*args): return list(args)");
   newfunc(1, 2, 3);          // newfunc also known to SINGULAR now

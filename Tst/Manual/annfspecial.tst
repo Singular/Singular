@@ -1,15 +1,15 @@
 LIB "tst.lib"; tst_init();
 LIB "dmod.lib";
 ring r = 0,(x,y),dp;
-poly F = x3-y2;
-def  B = annfs(F);  setring B;
-minIntRoot(BS[1],0);
-// So, the minimal integer root is -1
-setring r;
-def  A = SannfsBM(F);
-setring A;
-poly F = x3-y2;
-annfspecial(LD,F,-1,3/4); // generic root
-annfspecial(LD,F,-1,-2);  // integer but still generic root
-annfspecial(LD,F,-1,1);   // exceptional root
+poly F = x3-y2;  
+bernsteinBM(F); // the roots of Bernstein-Sato poly: -7/6, -1, -5/6 
+// *** first example: generic root
+def A = annfspecial(F,-5/6); 
+setring A; print(annfalpha); kill A; setring r;
+// *** second example:  exceptional root since its distance to -1 is integer 2
+def A = annfspecial(F,1);
+setring A;  print(annfalpha); kill A; setring r;
+// *** third example: exceptional root since its distance to -5/6 is integer 1
+def A = annfspecial(F,1/6);
+setring A;  print(annfalpha); kill A;
 tst_status(1);$

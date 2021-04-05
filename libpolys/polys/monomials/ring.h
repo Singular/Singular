@@ -843,4 +843,7 @@ ring rPlusVar(const ring r, char *v,int left);
 
 /// undo rPlusVar
 ring rMinusVar(const ring r, char *v);
+
+static inline ring rIncRefCnt(ring r) { r->ref++; return r; }
+static inline void rDecRefCnt(ring r) { r->ref--; }
 #endif
