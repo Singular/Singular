@@ -90,7 +90,7 @@ for NTL_HOME in ${NTL_HOME_PATH}
 	unset NTL_LIBS
 	])
 dnl try again with -std=c++11 (for NTL >=10 with threads)
-	if test "x$NTL_HOME" != "x/usr"; then
+	if test "$NTL_HOME" != "DEFAULTS"; then
 		NTL_CPPFLAGS="-std=c++11 -I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
