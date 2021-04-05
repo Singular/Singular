@@ -13,22 +13,22 @@ dnl FLINT_CFLAGS and FLINT_LIBS
 
 AC_DEFUN([LB_CHECK_FLINT],
 [
-DEFAULT_CHECKING_PATH="/opt/homebrew /opt/local /sw /usr/local /usr"
+AC_REQUIRE([SING_DEFAULT_CHECKING_PATH])
 
 AC_ARG_WITH(flint,
-[  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
-                            the library installed on your machine (set as
-			    default). If argument is yes or <empty> that means
-			    the library is reachable with the standard search
-			    path (/usr or /usr/local). Otherwise you give the
-			    <path> to the directory which contain the library.
+[  --with-flint=<path>|yes|no  Use FLINT library. By default (yes), Singular will
+                            try to find the library and use it if found.
+                            If argument is no, Singular will not use the
+                            library even if it could be found on your machine.
+                            Otherwise you can give the <path> to the directory
+                            which contains the library.
 	     ],
 	     [if test "x$withval" = xyes ; then
-			FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+			FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"
 	      elif test "x$withval" != xno ; then
 			FLINT_HOME_PATH="$withval"
 	     fi],
-	     [FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
+	     [FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"])
 
 dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}
@@ -37,48 +37,28 @@ BACKUP_LIBS=${LIBS}
 AC_LANG_PUSH([C])
 
 flint_found="no"
-dnl check for system installed libraries if FLINT_HOME_PATH is the default
-if test "$FLINT_HOME_PATH" = "$DEFAULT_CHECKING_PATH" ; then
-	FLINT_CFLAGS=""
-	FLINT_LIBS="-lflint -lmpfr -lgmp"
-
-	# we suppose that mpfr and mpir to be in the same place or available by default
-	CFLAGS="${BACKUP_CFLAGS} ${GMP_CPPFLAGS}"
-	LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
-
-	AC_CHECK_HEADER([flint/fmpz.h],
-		[AC_CHECK_LIB(flint,fmpz_init,
-			[flint_found="yes"],
-			[],
-			[])],
-		[],
-		[])
-fi
-
 dnl if flint was not previously found, search FLINT_HOME_PATH
-if test "x$flint_found" = "xno" ; then
-	for FLINT_HOME in ${FLINT_HOME_PATH}
-	do
-		if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
-
+for FLINT_HOME in ${FLINT_HOME_PATH}
+do
+        if test "$FLINT_HOME" = DEFAULTS; then
+                FLINT_CFLAGS=""
+                FLINT_LIBS="-lflint -lmpfr -lgmp"
+        else
 		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
-		FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath -Wl,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
+		FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
+        fi
 
 	# we suppose that mpfr and mpir to be in the same place or available by default
-		CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CPPFLAGS}"
+		CFLAGS="${FLINT_CFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-		AC_CHECK_LIB(flint,fmpz_init,
-		[flint_found="yes"],
-		[],
-		[]
-		)
-                if test "x$flint_found" = "xyes" ; then
-                    break
-                  fi
-		fi
-	done
-fi
+                AC_TRY_LINK([#include <flint/fmpz.h>
+                            ],
+                            [fmpz_t x; fmpz_init(x);], [
+                        flint_found="yes"
+                        break
+                ])
+done
 
 AC_LANG_POP([C])
 

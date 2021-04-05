@@ -2230,7 +2230,7 @@ int lp_kDim(const ideal _G)
     }
   }
   if (TEST_OPT_PROT)
-    Print("Simplified Ufnarovski graph to %ldx%ld.\n", vvUG.size(), vvUG.size());
+    Print("Simplified Ufnarovski graph to %dx%d.\n", (int)vvUG.size(), (int)vvUG.size());
 
   // for normal words of length >= maxDeg
   // use Ufnarovski graph

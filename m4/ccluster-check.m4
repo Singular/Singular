@@ -2,7 +2,7 @@
 
 AC_DEFUN([LB_CHECK_CCLUSTER],
 [
-DEFAULT_CHECKING_PATH="/opt/homebrew /opt/local /sw /usr/local /usr"
+AC_REQUIRE([SING_DEFAULT_CHECKING_PATH])
 
 AC_ARG_WITH(ccluster,
 [  --with-ccluster= <path>|yes Use ccluster library.  ],
@@ -27,7 +27,7 @@ for CCLUSTER_HOME in ${CCLUSTER_HOME_PATH}
 	        AC_MSG_RESULT(found)
 
 	        CCLUSTER_CPPFLAGS="-I${CCLUSTER_HOME}/include/ccluster"
-		CCLUSTER_LIBS="-L${CCLUSTER_HOME}/lib -Wl,-rpath -Wl,${CCLUSTER_HOME}/lib -lccluster"
+		CCLUSTER_LIBS="-L${CCLUSTER_HOME}/lib -Wl,-rpath,${CCLUSTER_HOME}/lib -lccluster"
 		AC_DEFINE(HAVE_CCLUSTER,1,[Define if Ccluster is installed])
 
 		CFLAGS="${BACKUP_CFLAGS} ${CCLUSTER_CPPFLAGS}"
