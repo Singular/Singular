@@ -333,7 +333,9 @@ AC_CONFIG_LINKS([doc/pyobject.doc:doc/pyobject.${enable_pyobject_module}.doc
                  doc/cones.doc:doc/cones.no.doc])
 AC_ARG_ENABLE([doc-build],
               [AS_HELP_STRING([--enable-doc-build],
-                              [Enable building the Singular documentation])])
+                              [Enable building the Singular documentation])], [
+  AS_IF([test "$enable_doc_build" = yes], [optional_Singular_programs=libparse])
+])
 AM_CONDITIONAL([ENABLE_DOC_BUILD], [test "$enable_doc_build" = yes])
 
 AC_OUTPUT
