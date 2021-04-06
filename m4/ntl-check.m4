@@ -26,12 +26,12 @@ AC_ARG_WITH(ntl,
 			    <path> to the directory which contain the library.
 	     ],
 	     [if test "$withval" = yes ; then
-			NTL_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+			NTL_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"
 	      elif test "$withval" != no ; then
 			NTL_HOME_PATH="$withval"
 			NTL_SHOULD_BE_PRESENT="yes"
 	     fi],
-	     [NTL_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
+	     [NTL_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"])
 
 min_ntl_version=ifelse([$1], ,1.0,$1)
 
@@ -49,7 +49,7 @@ fi
 
 for NTL_HOME in ${NTL_HOME_PATH}
  do
-	if test "x$NTL_HOME" != "x/usr"; then
+	if test "$NTL_HOME" != "DEFAULTS"; then
 		NTL_CPPFLAGS="-I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
@@ -90,7 +90,7 @@ for NTL_HOME in ${NTL_HOME_PATH}
 	unset NTL_LIBS
 	])
 dnl try again with -std=c++11 (for NTL >=10 with threads)
-	if test "x$NTL_HOME" != "x/usr"; then
+	if test "$NTL_HOME" != "DEFAULTS"; then
 		NTL_CPPFLAGS="-std=c++11 -I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else

@@ -7,11 +7,11 @@ AC_REQUIRE([SING_DEFAULT_CHECKING_PATH])
 AC_ARG_WITH(ccluster,
 [  --with-ccluster= <path>|yes Use ccluster library.  ],
 		[if test "$withval" = yes ; then
-			CCLUSTER_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+			CCLUSTER_HOME_PATH="${DEFAULT_CHECKING_PATH} /usr"
 	         elif test "$withval" != no ; then
-			CCLUSTERMP_HOME_PATH="$withval"
+			CCLUSTER_HOME_PATH="$withval"
 	        fi],
-		[CCLUSTER_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
+		[CCLUSTER_HOME_PATH="${DEFAULT_CHECKING_PATH} /usr"])
 
 dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}
