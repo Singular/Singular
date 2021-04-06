@@ -316,6 +316,8 @@ AS_IF([test -z "$PYTHON"], [
 AC_CHECK_PROGS([FOURTITWO_HILBERT], [hilbert 4ti2-hilbert])
 AC_CHECK_PROGS([FOURTITWO_MARKOV], [markov 4ti2-markov])
 AC_CHECK_PROGS([FOURTITWO_GRAVER], [graver 4ti2-graver])
+AS_IF([test -z "$FOURTITWO_HILBERT" -o -z "$FOURTITWO_MARKOV" -o -z "$FOURTITWO_GRAVER"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude sing4ti2 "])])
 AC_CHECK_PROGS([BERTINI], [bertini])
 AS_IF([test -z "$BERTINI"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude bertini "])])
