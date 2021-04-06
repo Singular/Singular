@@ -36,7 +36,7 @@ VERBOSE         = 1 # override this with make VERBOSE=2
 SINGULAR        = ${top_builddir}/Singular/Singular
 SINGULAR_LIB_DIR= ${top_srcdir}/Singular/LIB
 # from Singular/Makefile.am, extended by dynmodules stuff:
-TESTS_ENVIRONMENT = unset DISPLAY && SINGULARPATH="$$(for d in ${top_builddir}/Singular/dyn_modules/*/.libs; do printf $$d:; done)" PATH="${top_builddir}/IntegerProgramming:$$PATH"
+TESTS_ENVIRONMENT = unset DISPLAY SINGULAR_EXECUTABLE && SINGULARPATH="$$(for d in ${top_builddir}/Singular/dyn_modules/*/.libs; do printf $$d:; done)" PATH="${top_builddir}/IntegerProgramming:$$PATH"
 LIBPARSE        = ${top_builddir}/Singular/libparse${EXEEXT}
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
