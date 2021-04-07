@@ -104,10 +104,6 @@ inline static unsigned long* initsevS (int maxnr)
 {
   return (unsigned long*)omAlloc0(maxnr*sizeof(unsigned long));
 }
-inline static int* initS_2_R (int maxnr)
-{
-  return (int*)omAlloc0(maxnr*sizeof(int));
-}
 
 /************************************
  * construct the set s from F u {P} *
@@ -123,7 +119,6 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
 
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
-  strat->S_2_R=initS_2_R(i);
   strat->fromQ=NULL;
   strat->Shdl=idInit(i,F->rank);
   strat->S=strat->Shdl->m;
@@ -293,7 +288,6 @@ static ideal kInterRedCC(ideal F, ideal Q)
   strat->tl          = -1;
   strat->tmax        = setmaxT;
   strat->T           = initT();
-  strat->R           = initR();
   strat->sevT        = initsevT();
   if(rHasLocalOrMixedOrdering(currRing))
   {
@@ -324,8 +318,6 @@ static ideal kInterRedCC(ideal F, ideal Q)
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,(currRing->N+1)*sizeof(BOOLEAN));
   omfree(strat->sevT);
-  omfree(strat->S_2_R);
-  omfree(strat->R);
 
   if(strat->fromQ)
   {

@@ -1166,7 +1166,7 @@ int ksReducePolySigRing(LObject* PR,
  ***************************************************************/
 void ksCreateSpoly(LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing,
-                   poly m1, poly m2, TObject** R)
+                   poly m1, poly m2)
 {
 #ifdef KDEBUG
   create_count++;
@@ -1224,26 +1224,6 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
-
-  if (R != NULL)
-  {
-    if (Pair->i_r1 == -1)
-    {
-      l1 = pLength(p1) - 1;
-    }
-    else
-    {
-      l1 = (R[Pair->i_r1])->GetpLength() - 1;
-    }
-    if ((Pair->i_r2 == -1)||(R[Pair->i_r2]==NULL))
-    {
-      l2 = pLength(p2) - 1;
-    }
-    else
-    {
-      l2 = (R[Pair->i_r2])->GetpLength() - 1;
-    }
-  }
 
   // get m2 * a2
   if (spNoether != NULL)

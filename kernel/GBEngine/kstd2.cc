@@ -681,10 +681,6 @@ int redRing_Z (LObject* h,kStrategy strat)
           j = kFindDivisibleByInT(strat, h);
           if(j < 0)
           {
-            if(strat->tl >= 0)
-              h->i_r1 = strat->tl;
-            else
-              h->i_r1 = -1;
             if (h->GetLmTailRing() == NULL)
             {
               if (h->lcm!=NULL) pLmDelete(h->lcm);
@@ -826,10 +822,6 @@ int redRing (LObject* h,kStrategy strat)
       j = kFindDivisibleByInT(strat, h);
       if(j < 0)
       {
-        if(strat->tl >= 0)
-            h->i_r1 = strat->tl;
-        else
-            h->i_r1 = -1;
         if (h->GetLmTailRing() == NULL)
         {
           kDeleteLcm(h);
@@ -1206,7 +1198,8 @@ int redSig (LObject* h,kStrategy strat)
     PrintS("--------------------------------\n");
     printf("INDEX OF REDUCER T: %d\n",ii);
 #endif
-    sigSafe = ksReducePolySig(h, &(strat->T[ii]), strat->S_2_R[ii], NULL, NULL, strat);
+    int jj=kFindInT(strat->S[ii],strat->T,strat->tl);
+    sigSafe = ksReducePolySig(h, &(strat->T[ii]), jj, NULL, NULL, strat);
 #if SBA_PRINT_REDUCTION_STEPS
     if (sigSafe != 3)
       sba_reduction_steps++;
@@ -1337,10 +1330,6 @@ int redSigRing (LObject* h,kStrategy strat)
       j = kFindDivisibleByInT(strat, h,start);
       if(j < 0)
       {
-        if(strat->tl >= 0)
-            h->i_r1 = strat->tl;
-        else
-            h->i_r1 = -1;
         if (h->GetLmTailRing() == NULL)
         {
           kDeleteLcm(h);
@@ -1362,7 +1351,7 @@ int redSigRing (LObject* h,kStrategy strat)
           }
           else
           {
-            //strat->enterS(*h, strat->sl+1, strat, strat->tl);
+            //strat->enterS(*h, strat->sl+1, strat);
             return 0;
           }
         }
@@ -1430,7 +1419,8 @@ int redSigRing (LObject* h,kStrategy strat)
     Print("--------------------------------\n");
     printf("INDEX OF REDUCER T: %d\n",ii);
 #endif
-    sigSafe = ksReducePolySigRing(h, &(strat->T[ii]), strat->S_2_R[ii], NULL, NULL, strat);
+    int jj=kFindInT(strat->S[ii],strat->T,strat->tl);
+    sigSafe = ksReducePolySigRing(h, &(strat->T[ii]), jj, NULL, NULL, strat);
     if(h->p == NULL && h->sig == NULL)
     {
       //Trivial case catch
@@ -2487,7 +2477,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R);
+                    strat->tailRing, m1, m2);
     }
     else if (strat->P.p1 == NULL)
     {
@@ -2598,11 +2588,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         enterT(strat->P, strat);
         if (rField_is_Ring(currRing))
-          superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
         else
-          enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
         // posInS only depends on the leading term
-        strat->enterS(strat->P, pos, strat, strat->tl);
+        strat->enterS(strat->P, pos, strat);
 #if 0
         int pl=pLength(strat->P.p);
         if (pl==1)
@@ -2633,10 +2623,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
           enterT(strat->P, strat);
           if (rField_is_Ring(currRing))
-            superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+            superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
           else
-            enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-          strat->enterS(strat->P, pos, strat, strat->tl);
+            enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+          strat->enterS(strat->P, pos, strat);
         }
       }
     }
@@ -2688,7 +2678,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->completeReduce_retry=FALSE;
         cleanT(strat);strat->tailRing=currRing;
         int i;
-        for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
         completeReduce(strat);
       }
       if (strat->completeReduce_retry)
@@ -2927,7 +2916,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       //Update: now the element is at the corect place
       //i+1 because on the 0 position is the sigdrop element
       enterT(strat->L[strat->Ll-(i)],strat);
-      strat->enterS(strat->L[strat->Ll-(i)], strat->sl+1, strat, strat->tl);
+      strat->enterS(strat->L[strat->Ll-(i)], strat->sl+1, strat);
     }
     strat->Ll = strat->Ll - strat->sbaEnterS;
     strat->sbaEnterS = -1;
@@ -3028,7 +3017,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
         // create the real one
         ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-            strat->tailRing, m1, m2, strat->R);
+            strat->tailRing, m1, m2);
 
       }
       else if (strat->P.p1 == NULL)
@@ -3105,7 +3094,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       else
       {
-        strat->enterS(strat->P, 0, strat, strat->tl);
+        strat->enterS(strat->P, 0, strat);
         if (TEST_OPT_PROT)
           PrintS("-");
         break;
@@ -3206,7 +3195,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // Best case scenerio: remains the leading term
       if(rField_is_Ring(currRing) && strat->sigdrop)
       {
-        strat->enterS(strat->P, 0, strat, strat->tl);
+        strat->enterS(strat->P, 0, strat);
         break;
       }
 #endif
@@ -3225,7 +3214,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
         else
         {
-          strat->enterS(strat->P, 0, strat, strat->tl);
+          strat->enterS(strat->P, 0, strat);
           break;
         }
       }
@@ -3288,14 +3277,14 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pWrite(strat->P.sig);
       */
       if (rField_is_Ring(currRing))
-        superenterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+        superenterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat);
       else
-        enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+        enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat);
       if(rField_is_Ring(currRing) && strat->sigdrop)
         break;
       if(rField_is_Ring(currRing))
         strat->P.sevSig = p_GetShortExpVector(strat->P.sig,currRing);
-      strat->enterS(strat->P, pos, strat, strat->tl);
+      strat->enterS(strat->P, pos, strat);
       if(strat->sbaOrder != 1)
       {
         BOOLEAN overwrite = FALSE;
@@ -3554,7 +3543,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->completeReduce_retry=FALSE;
         cleanT(strat);strat->tailRing=currRing;
         int i;
-        for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
         completeReduce(strat);
       }
       if (strat->completeReduce_retry)
@@ -3607,7 +3595,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     for(;k>=0 && strat->L[k].p1 == NULL && strat->L[k].p2 == NULL;k--)
     {
       //printf("\nAdded k = %i\n",k);
-      strat->enterS(strat->L[k], strat->sl+1, strat, strat->tl);
+      strat->enterS(strat->L[k], strat->sl+1, strat);
       //printf("\nThis elements was added from L on pos %i\n",strat->sl);pWrite(strat->S[strat->sl]);pWrite(strat->sig[strat->sl]);
     }
   }
@@ -3778,8 +3766,6 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   omFree(strat->ecartS);
   assume(strat->T==NULL);//omfree(strat->T);
   assume(strat->sevT==NULL);//omfree(strat->sevT);
-  assume(strat->R==NULL);//omfree(strat->R);
-  omfree(strat->S_2_R);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
@@ -3848,8 +3834,6 @@ poly kNF2Bound (ideal F,ideal Q,poly q,int bound,kStrategy strat, int lazyReduce
   omFree(strat->ecartS);
   assume(strat->T==NULL);//omfree(strat->T);
   assume(strat->sevT==NULL);//omfree(strat->sevT);
-  assume(strat->R==NULL);//omfree(strat->R);
-  omfree(strat->S_2_R);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
@@ -3932,8 +3916,6 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   omFree(strat->ecartS);
   assume(strat->T==NULL);//omfree(strat->T);
   assume(strat->sevT==NULL);//omfree(strat->sevT);
-  assume(strat->R==NULL);//omfree(strat->R);
-  omfree(strat->S_2_R);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
@@ -4007,8 +3989,6 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
   omFree(strat->ecartS);
   assume(strat->T==NULL);//omfree(strat->T);
   assume(strat->sevT==NULL);//omfree(strat->sevT);
-  assume(strat->R==NULL);//omfree(strat->R);
-  omfree(strat->S_2_R);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
@@ -4128,7 +4108,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       }
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-          strat->tailRing, m1, m2, strat->R);
+          strat->tailRing, m1, m2);
     }
     else if (strat->P.p1 == NULL)
     {
@@ -4236,7 +4216,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       {
         enterT(strat->P, strat);
         // posInS only depends on the leading term
-        strat->enterS(strat->P, pos, strat, strat->tl);
+        strat->enterS(strat->P, pos, strat);
 //#if 1
 #ifdef DEBUGF5
         PrintS("ELEMENT ADDED TO GCURR DURING INTERRED: ");
@@ -4444,7 +4424,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R);
+                    strat->tailRing, m1, m2);
     }
     else if (strat->P.p1 == NULL)
     {
@@ -4560,9 +4540,9 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
         enterT(strat->P, strat);
-        enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+        enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
         // posInS only depends on the leading term
-        strat->enterS(strat->P, pos, strat, strat->tl);
+        strat->enterS(strat->P, pos, strat);
         if (!strat->rightGB)
           enterTShift(strat->P, strat);
       }
@@ -4582,8 +4562,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           // and add pairs
           int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
           enterT(strat->P, strat);
-          enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-          strat->enterS(strat->P, pos, strat, strat->tl);
+          enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+          strat->enterS(strat->P, pos, strat);
           if (!strat->rightGB)
             enterTShift(strat->P,strat);
         }
@@ -4642,7 +4622,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->completeReduce_retry=FALSE;
         cleanT(strat);strat->tailRing=currRing;
         int i;
-        for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
         WarnS("reduction with S is not yet supported by Letterplace"); // if this ever happens, we'll know
         completeReduce(strat);
       }

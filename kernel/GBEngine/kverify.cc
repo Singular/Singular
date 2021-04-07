@@ -43,7 +43,6 @@ BOOLEAN kVerify1(ideal F, ideal Q)
     strat->tl = -1;
     strat->tmax = setmaxT;
     strat->T = initT();
-    strat->R = initR();
     strat->sevT = initsevT();
     /*- init local data struct.---------------------------------------- -*/
     strat->P.ecart=0;
@@ -86,7 +85,7 @@ BOOLEAN kVerify1(ideal F, ideal Q)
       poly m1 = NULL, m2 = NULL;
       kCheckSpolyCreation(&(strat->P), strat, m1, m2);
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R);
+                    strat->tailRing, m1, m2);
     }
     if ((strat->P.p == NULL) && (strat->P.t_p == NULL))
     {
@@ -144,7 +143,6 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     strat->tl = -1;
     strat->tmax = setmaxT;
     strat->T = initT();
-    strat->R = initR();
     strat->sevT = initsevT();
     /*- init local data struct.---------------------------------------- -*/
     strat->P.ecart=0;
@@ -219,7 +217,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
         /* spoly */
         kCheckSpolyCreation(&P, strat, m1, m2);
         ksCreateSpoly(&P, NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R);
+                    strat->tailRing, m1, m2);
       }
       if ((P.p == NULL) && (P.t_p == NULL))
       {
