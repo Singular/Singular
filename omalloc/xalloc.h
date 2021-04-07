@@ -284,7 +284,7 @@ enum omError_e
 #define omrealloc(A,NS)          omRealloc(A,NS)
 #define omreallocSize(A,OS,NS)   omRealloc(A,NS)
 #define omRealloc0Size(A,OS,NS)  omRealloc0(A,NS)
-#define omrealloc0Size(A,OS,NS)  omRealloc(A,NS)
+#define omrealloc0Size(A,OS,NS)  omRealloc0(A,NS)
 #define omMarkAsStaticAddr(A)
 #define omMemCpyW(A,B,S)         memcpy(A,B,(S)<<2)
 #define omMemcpyW(A,B,S)         memcpy(A,B,(S)<<2)
