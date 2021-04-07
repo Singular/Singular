@@ -316,6 +316,8 @@ AS_IF([test -z "$PYTHON"], [
 AC_CHECK_PROGS([FOURTITWO_HILBERT], [hilbert 4ti2-hilbert])
 AC_CHECK_PROGS([FOURTITWO_MARKOV], [markov 4ti2-markov])
 AC_CHECK_PROGS([FOURTITWO_GRAVER], [graver 4ti2-graver])
+AS_IF([test -z "$FOURTITWO_HILBERT" -o -z "$FOURTITWO_MARKOV" -o -z "$FOURTITWO_GRAVER"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude sing4ti2 "])])
 AC_CHECK_PROGS([BERTINI], [bertini])
 AS_IF([test -z "$BERTINI"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude bertini "])])
@@ -331,7 +333,9 @@ AC_CONFIG_LINKS([doc/pyobject.doc:doc/pyobject.${enable_pyobject_module}.doc
                  doc/cones.doc:doc/cones.no.doc])
 AC_ARG_ENABLE([doc-build],
               [AS_HELP_STRING([--enable-doc-build],
-                              [Enable building the Singular documentation])])
+                              [Enable building the Singular documentation])], [
+  AS_IF([test "$enable_doc_build" = yes], [optional_Singular_programs=libparse])
+])
 AM_CONDITIONAL([ENABLE_DOC_BUILD], [test "$enable_doc_build" = yes])
 
 AC_OUTPUT
