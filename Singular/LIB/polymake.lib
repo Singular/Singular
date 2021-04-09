@@ -1439,7 +1439,9 @@ example
    // the Newton polygon of the following polynomial
    //     has precisely one interior point
    poly f=x22y11+x19y10+x17y9+x16y9+x12y7+x9y6+x7y5+x2y3;
-   list polygon=newtonPolytopeLP(f);
+   list polygon=list(intvec(22,11),intvec(19,10),intvec(17,9),
+                     intvec(16,9), intvec(12,7),intvec(9,6),
+		     intvec(7,5),intvec(2,3));
    // its lattice points are
    polygon;
    // find its normal form
