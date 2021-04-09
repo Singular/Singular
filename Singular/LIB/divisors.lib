@@ -56,8 +56,6 @@ multformaldivisor(int,formaldivisor)            multiply a formal divisor by an 
 degreeFormalDivisor(formaldivisor)              degree of a formal divisor
 
 makePDivisor(List)                              make a formal polyhedral sum of divisors
-evaluatePDivisor(pdivisor,intvec)               evaluate a polyhedral divisor
-                                                to an integer formal divisor
 pdivisorplus(pdivisor,pdivisor)                 add two polyhedral divisors
 
 
@@ -753,112 +751,5 @@ polytope C2 = polytopeViaPoints(rays2);
 return(list(C,C2));
 }
 
-
-proc evaluatePDivisor(pdivisor D,intvec v)
-"USAGE:  evaluatePDivisor(D,v); D = pdivisor, v = intvec.@*
-ASSUME:  D is a polyhedral divisor on X and v is a point in the dual of the
-         tailcone of the coefficients.
-RETURN:  a formal divisor on X
-THEORY:  Will evaluate the polyhedral sum to an integer formal sum.
-KEYWORDS: divisors, polyhedra
-EXAMPLE: example evaluatePDivisor; shows an example
-"
-{
-formaldivisor vD;
-list L = D.summands;
-cone C = D.tail;
-cone dC = dualCone(C);
-list vL;
-int i;
-intvec vv = 0,v;
-if (!(containsInSupport(dC,vv)))
-  {ERROR("the linear form given should be in the dual tail cone");}
-for (i=1; i<=size(L);i++){
-        vL[i]=list();
-        vL[i][2]=L[i][2];
-  vL[i][1]=Polymake::minimalValue(L[i][1],vv);
-}
-vD.summands = vL;
-return(vD);}
-example
-{ "EXAMPLE:";
-LIB("polymake.so");
-ring r=31991,(x,y,z),dp;
-ideal I = y^2*z - x*(x-z)*(x+3*z);
-qring Q = std(I);
-divisor A = makeDivisor(ideal(x,z),ideal(1));
-divisor B = makeDivisor(ideal(x,y),ideal(1));
-intmat M[4][4]= 1,4,0,0,
-                1,0,3,0,
-                0,0,0,2,
-                1,1,1,1;
-polytope PP = polytopeViaPoints(M);
-pdivisor pD = makePDivisor(list(list(PP,A),list(PP,B)));
-intvec v=1,1,1;
-evaluatePDivisor(pD,v);
-}
-
-
-
-
-
-proc pdivisorplus(pdivisor A, pdivisor B)
-"USAGE:  pdivisorplus(A ,B); A + B; A = pdivisor, B = pdivisor. @*
-ASSUME:  A and B are polyhedral divisors on X.
-RETURN:  a pdivisor on X
-THEORY:  The procedure will add the polyhedral formal sums by doing Minkowski sums.
-KEYWORDS: divisors, polyhedra
-EXAMPLE: example pdivisorplus; shows an example
-"
-{
-pdivisor C;
-int i,p;
-int j=1;
-if (!(A.tail==B.tail)) {ERROR("tail cones should be equal");}
-list L;
-list LA=A.summands;
-list LB=B.summands;
-for (i=1; i<=size(LA);i++){
-   p=position(LA[i][2],L);
-   if (p==0) {
-        L[j]=list();
-        L[j][2]=LA[i][2];
-        L[j][1]=LA[i][1];
-        j=j+1;
-   } else {
-        L[p][1]=Polymake::minkowskiSum(L[p][1],LA[i][1]);
-   };
-}
-for (i=1; i<=size(LB);i++){
-   p=position(LB[i][2],L);
-   if (p==0) {
-        L[j]=list();
-        L[j][2]=LB[i][2];
-        L[j][1]=LB[i][1];
-        j=j+1;
-   } else {
-        L[p][1]=Polymake::minkowskiSum(L[p][1],LB[i][1]);
-   };
-}
-C.summands = L;
-C.tail = A.tail;
-return(C);
-}
-example
-{ "EXAMPLE:";
-LIB("polymake.so");
-ring r=31991,(x,y,z),dp;
-ideal I = y^2*z - x*(x-z)*(x+3*z);
-qring Q = std(I);
-divisor A = makeDivisor(ideal(x,z),ideal(1));
-divisor B = makeDivisor(ideal(x,y),ideal(1));
-intmat M[4][4]= 1,4,0,0,
-                1,0,3,0,
-                0,0,0,2,
-                1,1,1,1;
-polytope PP = polytopeViaPoints(M);
-pdivisor pD = makePDivisor(list(list(PP,A),list(PP,B)));
-pdivisorplus(pD,pD);
-}
 
 

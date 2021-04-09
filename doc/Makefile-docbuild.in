@@ -44,7 +44,6 @@ CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 # which tags to avoid:
 DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@ -exclude crash
 # which tags to avoid:
-TAG		= polymake
 DOC2TEX         = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
@@ -53,7 +52,7 @@ DOC2TEX_M        = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDI
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR}
 
-PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
+PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
 PL2DOC_M	= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
 
 # t2h stuff
