@@ -127,7 +127,6 @@ SING_CHECK_READLINE
 SING_CHECK_DBM
 
 SING_CHECK_GFANLIB
-SING_CHECK_POLYMAKE
 
 SING_CHECK_PLURAL
 
@@ -262,7 +261,6 @@ AC_CONFIG_FILES([Singular/dyn_modules/bigintm/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/Order/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/syzextra/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/gfanlib/Makefile])
-AC_CONFIG_FILES([Singular/dyn_modules/polymake/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/python/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/customstd/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/pyobject/Makefile])
@@ -298,7 +296,7 @@ AC_CHECK_PROGS([DVIPS], [dvips])
 
 dnl Check for executables used by library files.
 dnl Found by: git grep 'system("\(sh\|executable\)"'
-AS_VAR_SET([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude polymake "])
+AS_VAR_SET([DOC2TEX_EXAMPLE_EXCLUSIONS], [""])
 AC_CHECK_PROGS([QEPCAD], [qepcad])
 AS_IF([test -z "$QEPCAD"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude qepcad "])])
@@ -311,6 +309,9 @@ AS_IF([test -z "$NORMALIZ"], [
 AC_CHECK_PROGS([GFAN], [gfan_version])
 AS_IF([test -z "$GFAN"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude gfan "])])
+AC_CHECK_PROGS([TOPCOM], [topcom])
+AS_IF([test -z "$TOPCOM"], [
+  AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude topcom "])])
 AS_IF([test -z "$PYTHON"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude pyobject "])])
 AC_CHECK_PROGS([FOURTITWO_HILBERT], [hilbert 4ti2-hilbert])
