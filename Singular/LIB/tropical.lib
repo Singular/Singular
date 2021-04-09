@@ -87,7 +87,6 @@ THEORY:
                          in Q; latex must be installed on your computer
 @*  - tropicalJInvariant computes the tropical j-invaiant of a tropical
                          elliptic curve
-@*  - jInvariant         computes the j-invariant of an elliptic curve
 
 PROCEDURES FOR TROPICAL LIFTING:
   tropicalLifting()          computes a point in the tropical variety
@@ -103,7 +102,6 @@ PROCEDURES FOR DRAWING TROPICAL CURVES:
 PROCEDURES FOR J-INVARIANTS:
   tropicalJInvariant()       computes the tropical j-invariant of a tropical curve
   weierstrassForm()          computes the Weierstrass form of a cubic polynomial
-  jInvariant()               computes the j-invariant of a cubic polynomial
 
 GENERAL PROCEDURES:
   conicWithTangents()  computes a conic through five points with tangents
@@ -3761,9 +3759,6 @@ example
    // the form x -> x+t^b, with b a rational number, on the tropicalisation and
    // the j-invariant of a cubic over the Puiseux series.
    f=t7*y3+t3*y2+t*(x3+xy2+y+1)+xy;
-   // - the j-invariant, and hence its valuation,
-   //   does not change under the transformation
-   jInvariant(f,"ord");
    // - b=3/2, then the cycle length of the tropical cubic equals -val(j-inv)
    list g32=tropicalSubst(f,2,x,x+t3,y,y);
    tropicalJInvariant(g32);
