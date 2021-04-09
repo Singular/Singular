@@ -3806,7 +3806,6 @@ EXAMPLE: example testLift; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  LIB "freegb.lib";
   ring r = 0,(x,y),(c,Dp);
   ring R = freeAlgebra(r, 7, 2);
   ideal I = std(x*y*x + 1);
@@ -3839,7 +3838,6 @@ EXAMPLE: example testSyz; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  LIB "freegb.lib";
   ring r = 0,(x,y),(c,Dp);
   ring R = freeAlgebra(r, 7, 2);
   ideal I = twostd(x*y*x + 1);
