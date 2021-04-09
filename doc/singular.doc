@@ -1183,7 +1183,7 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node polybori_lib
 @subsection polybori_lib
-@c lib polybori.lib tag:pyobject
+@c lib polybori.lib tag:pyobject no_ex
 @c ----------------------------------------------------------
 @node sets_lib
 @subsection sets_lib
@@ -1300,7 +1300,7 @@ Todos/Issues:
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
-@c lib stanleyreisner.lib tag:crash
+@c lib stanleyreisner.lib
 @c ---------------------------------------------------------
 @node swalk_lib
 @subsection swalk_lib
