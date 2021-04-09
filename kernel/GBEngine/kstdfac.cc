@@ -27,10 +27,12 @@ static void copyT (kStrategy o,kStrategy n)
   int i,j;
   poly  p;
   TSet t=(TSet)omAlloc0(o->tmax*sizeof(TObject));
+  TObject** r = (TObject**)omAlloc0(o->tmax*sizeof(TObject*));
 
   for (j=0; j<=o->tl; j++)
   {
     t[j] = o->T[j];
+    r[t[j].i_r] = &t[j];
     p = o->T[j].p;
     i = -1;
     loop
@@ -52,6 +54,7 @@ static void copyT (kStrategy o,kStrategy n)
     t[j].pLength =  pLength(p);
   }
   n->T=t;
+  n->R=r;
 }
 
 /*3
@@ -84,7 +87,7 @@ static void copyL (kStrategy o,kStrategy n)
     l[j].p2=NULL;
     l[j].t_p = NULL;
 
-    // copy .p1 ----------------------------------------------
+    // copy .p1 , i_r1----------------------------------------------
     p = o->L[j].p1;
     i = -1;
     loop
@@ -95,16 +98,18 @@ static void copyL (kStrategy o,kStrategy n)
       {
         WarnS("poly p1 not found in T:");wrp(p);PrintLn();
         l[j].p1=pCopy(p);
+        l[j].i_r1=-1;
         break;
       }
       if (p == o->T[i].p)
       {
         l[j].p1=n->T[i].p;
+        l[j].i_r1=n->T[i].i_r;
         break;
       }
     }
 
-    // copy .p2 ----------------------------------------------
+    // copy .p2 , i_r2----------------------------------------------
     p = o->L[j].p2;
     i = -1;
     loop
@@ -115,11 +120,13 @@ static void copyL (kStrategy o,kStrategy n)
       {
         WarnS("poly p2 not found in T:");wrp(p);PrintLn();
         l[j].p2=pCopy(p);
+        l[j].i_r2=-1;
         break;
       }
       if (p == o->T[i].p)
       {
         l[j].p2=n->T[i].p;
+        l[j].i_r2=n->T[i].i_r;
         break;
       }
     }
@@ -132,6 +139,9 @@ static void copyL (kStrategy o,kStrategy n)
     l[j].pLength=o->L[j].pLength;
     // copy .sev -----------------------------------------------
     l[j].sev=o->L[j].sev;
+    l[j].i_r = o->L[j].i_r;
+    //l[j].i_r1 = o->L[j].i_r1;
+    //l[j].i_r2 = o->L[j].i_r2;
   }
   n->L=l;
 }
@@ -160,6 +170,8 @@ kStrategy kStratCopy(kStrategy o)
   memcpy(s->ecartS,o->ecartS,IDELEMS(o->Shdl)*sizeof(int));
   s->sevS=(unsigned long *)omAlloc(IDELEMS(o->Shdl)*sizeof(unsigned long));
   memcpy(s->sevS,o->sevS,IDELEMS(o->Shdl)*sizeof(unsigned long));
+  s->S_2_R=(int*)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
+  memcpy(s->S_2_R,o->S_2_R,IDELEMS(o->Shdl)*sizeof(int));
   s->sevT=(unsigned long *)omAlloc(o->tmax*sizeof(unsigned long));
   memcpy(s->sevT,o->sevT,o->tmax*sizeof(unsigned long));
   if(o->fromQ!=NULL)
@@ -342,7 +354,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
       }
       enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
       enterT(n->P,n);
-      n->enterS(n->P,pos,n);
+      n->enterS(n->P,pos,n, n->tl);
 
       /* construct D */
       if (IDELEMS(fac)>1)
@@ -560,6 +572,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
 
       for(i=IDELEMS(fac)-1;i>=0;i--)
       {
+        int ii;
         kStrategy n=strat;
         if (i>=1)
         {
@@ -612,7 +625,23 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
         }
         enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
         enterT(n->P,n);
-        n->enterS(n->P,pos,n);
+        n->enterS(n->P,pos,n, n->tl);
+        {
+          int i=n->Ll;
+          for(;i>=0;i--)
+          {
+            n->L[i].i_r1= -1;
+            for(ii=0; ii<=n->tl; ii++)
+            {
+              if (n->R[ii]->p==n->L[i].p1)  { n->L[i].i_r1=ii;break; }
+            }
+            n->L[i].i_r2= -1;
+            for(ii=0; ii<=n->tl; ii++)
+            {
+              if (n->R[ii]->p==n->L[i].p2)  { n->L[i].i_r2=ii;break; }
+            }
+          }
+        }
         kTest_TS(n);
         /* construct D */
         if (IDELEMS(fac)>1)

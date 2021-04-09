@@ -73,7 +73,8 @@ public:
   long FDeg;    // pFDeg(p)
   int ecart,
     length,     // as of pLDeg
-    pLength;    // either == 0, or == pLength(p)
+    pLength,    // either == 0, or == pLength(p)
+    i_r;        // index of TObject in R set, or -1 if not in T
 
 #ifdef HAVE_SHIFTBBA
   int shift;
@@ -185,6 +186,7 @@ public:
 
   poly  lcm;   /*- the lcm of p1,p2 -*/
   kBucket_pt bucket;
+  int   i_r1, i_r2;
   unsigned checked; // this is the index of S up to which
                       // the corresponding LObject was already checked in
                       // critical pair creation => when entering the
@@ -278,11 +280,11 @@ public:
                 LObject* L,const kStrategy strat);
   int (*posInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
-  void (*enterS)(LObject &h, int pos,kStrategy strat);
+  void (*enterS)(LObject &h, int pos,kStrategy strat, int atR/* =-1*/ );
   void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
   int (*posInLOld)(const LSet Ls,const int Ll,
                    LObject* Lo,const kStrategy strat);
-  void (*enterOnePair) (int i,poly p,int ecart, int isFromQ,kStrategy strat);
+  void (*enterOnePair) (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR /*= -1*/);
   void (*chainCrit) (poly p,int ecart,kStrategy strat);
   BOOLEAN (*syzCrit) (poly sig, unsigned long not_sevSig, kStrategy strat);
   BOOLEAN (*rewCrit1) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/);
@@ -333,6 +335,10 @@ public:
   intvec * kHomW;
   // procedure for ShalloCopy from tailRing  to currRing
   pShallowCopyDeleteProc p_shallow_copy_delete;
+  // pointers to Tobjects R[i] is ith Tobject which is generated
+  TObject**  R;
+  // S_2_R[i] yields Tobject which corresponds to S[i]
+  int*      S_2_R;
   ring tailRing;
   omBin lmBin;
   omBin tailBin;
@@ -416,9 +422,9 @@ static inline LSet initL (int nr=setmaxL)
 { return (LSet)omAlloc(nr*sizeof(LObject)); }
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
-void enterSBba (LObject &p,int atS,kStrategy strat);
-void enterSBbaShift (LObject &p,int atS,kStrategy strat);
-void enterSSba (LObject &p,int atS,kStrategy strat);
+void enterSBba (LObject &p,int atS,kStrategy strat, int atR = -1);
+void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR = -1);
+void enterSSba (LObject &p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (const kStrategy strat, const int length, const poly p,
@@ -508,8 +514,8 @@ int redRing_Z (LObject* h,kStrategy strat);
 int redRiloc (LObject* h,kStrategy strat);
 void enterExtendedSpoly(poly h,kStrategy strat);
 void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat);
-void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat);
-void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy strat);
+void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
+void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring tailRing);
 long ind2(long arg);
 
@@ -522,8 +528,8 @@ int redHomog (LObject* h,kStrategy strat);
 int redSig (LObject* h,kStrategy strat);
 int redSigRing (LObject* h,kStrategy strat);
 //adds hSig to be able to check with F5's criteria when entering pairs!
-void enterpairsSig (poly h, poly hSig, int from, int k, int ec, int pos,kStrategy strat);
-void enterpairs (poly h, int k, int ec, int pos,kStrategy strat);
+void enterpairsSig (poly h, poly hSig, int from, int k, int ec, int pos,kStrategy strat, int atR = -1);
+void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat);
@@ -573,7 +579,7 @@ void exitSba (kStrategy strat);
 void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
-void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat);
+void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritOpt_1 (poly,int,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
@@ -778,7 +784,7 @@ KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red);
 // Assume:  Pair->p1 != NULL && Pair->p2
 void ksCreateSpoly(LObject* Pair, poly spNoether = NULL,
                    int use_buckets=0, ring tailRing=currRing,
-                   poly m1 = NULL, poly m2 = NULL);
+                   poly m1 = NULL, poly m2 = NULL, TObject** R = NULL);
 
 /*2
 * creates the leading term of the S-polynomial of p1 and p2
@@ -807,6 +813,10 @@ KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = c
 //      FALSE, otherwise
 BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
 #ifdef HAVE_RINGS
+// return TRUE if gcdpoly creation of R[atR] and S[atS] does not violate
+//             exponent bound of strat->tailRing
+//      FALSE, otherwise
+BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat);
 poly preIntegerCheck(ideal F, ideal Q);
 void postReduceByMon(LObject* h, kStrategy strat);
 void postReduceByMonSig(LObject* h, kStrategy strat);
@@ -847,11 +857,11 @@ poly pCopyL2p(LObject h, kStrategy strat);
 
 void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
-void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int ecartq, int qisFromQ, int shiftcount, int ifromS);
+void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);
 
-void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat);
+void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
 
-void superenterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat);
+void superenterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
 
 poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize);
 
@@ -877,5 +887,5 @@ static inline void kDeleteLcm(LObject *P)
  }
 }
 
-void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat);
+void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1);
 #endif

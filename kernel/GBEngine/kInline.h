@@ -34,13 +34,13 @@
 // #define HAVE_LM_BIN
 
 
+
 KINLINE TObject* skStrategy::S_2_T(int i)
 {
   assume(i>= 0 && i<=sl);
-  int j=kFindInT(S[i],T,tl);
-  if (j<0) return NULL;
-  TObject* TT = &T[j];
-  assume(TT->p == S[i]);
+  assume(S_2_R[i] >= 0 && S_2_R[i] <= tl);
+  TObject* TT = R[S_2_R[i]];
+  assume(TT != NULL && TT->p == S[i]);
   return TT;
 }
 
@@ -48,13 +48,20 @@ KINLINE TObject* skStrategy::s_2_t(int i)
 {
   if (i >= 0 && i <= sl)
   {
-    int sri = kFindInT(S[i], T, tl);
+    int sri= S_2_R[i];
+    if ((sri >= 0) && (sri <= tl))
+    {
+      TObject* t = R[sri];
+      if ((t != NULL) && (t->p == S[i]))
+        return t;
+    }
+    // last but not least, try kFindInT
+    sri = kFindInT(S[i], T, tl);
     if (sri >= 0)
       return &(T[sri]);
   }
   return NULL;
 }
-
 
 KINLINE poly skStrategy::kNoetherTail()
 {
@@ -80,8 +87,14 @@ KINLINE TSet initT ()
   for (int i=setmaxT-1; i>=0; i--)
   {
     T[i].tailRing = currRing;
+    T[i].i_r = -1;
   }
   return T;
+}
+
+KINLINE TObject** initR()
+{
+  return (TObject**) omAlloc0(setmaxT*sizeof(TObject*));
 }
 
 KINLINE unsigned long* initsevT()
@@ -97,6 +110,7 @@ KINLINE void sTObject::Set(ring r)
 KINLINE void sTObject::Init(ring r)
 {
   memset(this, 0, sizeof(sTObject));
+  i_r = -1;
   Set(r);
 }
 KINLINE sTObject::sTObject(ring r)
@@ -548,6 +562,9 @@ KINLINE void sLObject::Delete()
 KINLINE void sLObject::Init(ring r)
 {
   memset(this, 0, sizeof(sLObject));
+  i_r1 = -1;
+  i_r2 = -1;
+  i_r = -1;
   Set(r);
 }
 KINLINE sLObject::sLObject(ring r)
@@ -857,6 +874,48 @@ KINLINE sLObject& sLObject::operator=(const sTObject& t)
   memset(this, 0, sizeof(*this));
   memcpy(this, &t, sizeof(sTObject));
   return *this;
+}
+
+KINLINE TObject* sLObject::T_1(const skStrategy* s)
+{
+  if (p1 == NULL) return NULL;
+  if (i_r1 == -1) i_r1 = kFindInT(p1, s->T, s->tl);
+  assume(i_r1 >= 0 && i_r1 <= s->tl);
+  TObject* T = s->R[i_r1];
+  assume(T->p == p1);
+  return T;
+}
+
+KINLINE TObject* sLObject::T_2(const skStrategy* strat)
+{
+  if (p1 == NULL) return NULL;
+  assume(p2 != NULL);
+  if (i_r2 == -1) i_r2 = kFindInT(p2, strat->T, strat->tl);
+  assume(i_r2 >= 0 && i_r2 <= strat->tl);
+  TObject* T = strat->R[i_r2];
+  assume(T->p == p2);
+  return T;
+}
+
+KINLINE void    sLObject::T_1_2(const skStrategy* strat,
+                                TObject* &T_1, TObject* &T_2)
+{
+  if (p1 == NULL)
+  {
+    T_1 = NULL;
+    T_2 = NULL;
+    return;
+  }
+  assume(p1 != NULL && p2 != NULL);
+  if (i_r1 == -1) i_r1 = kFindInT(p1, strat->T, strat->tl);
+  if (i_r2 == -1) i_r2 = kFindInT(p2, strat->T, strat->tl);
+  assume(i_r1 >= 0 && i_r1 <= strat->tl);
+  assume(i_r2 >= 0 && i_r2 <= strat->tl);
+  T_1 = strat->R[i_r1];
+  T_2 = strat->R[i_r2];
+  assume(T_1->p == p1);
+  assume(T_2->p == p2);
+  return;
 }
 
 /***************************************************************

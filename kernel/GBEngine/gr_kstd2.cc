@@ -1225,7 +1225,7 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
           if (strat->sl==-1) pos=0;
           else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
-          strat->enterS(strat->P,pos,strat);
+          strat->enterS(strat->P,pos,strat,-1);
         }
 //      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }

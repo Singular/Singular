@@ -992,7 +992,7 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
   }
   wlen_type pq = pQuality (h, c, len);
   i = simple_posInS (c->strat, h, len, pq);
-  c->strat->enterS (P, i, c->strat);
+  c->strat->enterS (P, i, c->strat, -1);
 
   c->strat->lenS[i] = len;
   assume (pLength (c->strat->S[i]) == c->strat->lenS[i]);
@@ -1030,6 +1030,7 @@ static void move_forward_in_S (int old_pos, int new_pos, kStrategy strat)
   poly p = strat->S[old_pos];
   int ecart = strat->ecartS[old_pos];
   long sev = strat->sevS[old_pos];
+  int s_2_r = strat->S_2_R[old_pos];
   int length = strat->lenS[old_pos];
   assume (length == pLength (strat->S[old_pos]));
   wlen_type length_w;
@@ -1041,6 +1042,7 @@ static void move_forward_in_S (int old_pos, int new_pos, kStrategy strat)
     strat->S[i] = strat->S[i - 1];
     strat->ecartS[i] = strat->ecartS[i - 1];
     strat->sevS[i] = strat->sevS[i - 1];
+    strat->S_2_R[i] = strat->S_2_R[i - 1];
   }
   if(strat->lenS != NULL)
     for(i = old_pos; i > new_pos; i--)
@@ -1052,6 +1054,7 @@ static void move_forward_in_S (int old_pos, int new_pos, kStrategy strat)
   strat->S[new_pos] = p;
   strat->ecartS[new_pos] = ecart;
   strat->sevS[new_pos] = sev;
+  strat->S_2_R[new_pos] = s_2_r;
   strat->lenS[new_pos] = length;
   if(strat->lenSw != NULL)
     strat->lenSw[new_pos] = length_w;
@@ -1064,6 +1067,7 @@ static void move_backward_in_S (int old_pos, int new_pos, kStrategy strat)
   poly p = strat->S[old_pos];
   int ecart = strat->ecartS[old_pos];
   long sev = strat->sevS[old_pos];
+  int s_2_r = strat->S_2_R[old_pos];
   int length = strat->lenS[old_pos];
   assume (length == pLength (strat->S[old_pos]));
   wlen_type length_w;
@@ -1075,6 +1079,7 @@ static void move_backward_in_S (int old_pos, int new_pos, kStrategy strat)
     strat->S[i] = strat->S[i + 1];
     strat->ecartS[i] = strat->ecartS[i + 1];
     strat->sevS[i] = strat->sevS[i + 1];
+    strat->S_2_R[i] = strat->S_2_R[i + 1];
   }
   if(strat->lenS != NULL)
     for(i = old_pos; i < new_pos; i++)
@@ -1086,6 +1091,7 @@ static void move_backward_in_S (int old_pos, int new_pos, kStrategy strat)
   strat->S[new_pos] = p;
   strat->ecartS[new_pos] = ecart;
   strat->sevS[new_pos] = sev;
+  strat->S_2_R[new_pos] = s_2_r;
   strat->lenS[new_pos] = length;
   if(strat->lenSw != NULL)
     strat->lenSw[new_pos] = length_w;
@@ -3333,6 +3339,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   strat->ecartS = (intset) omAlloc (i * sizeof (int));  /*initec(i); */
   strat->sevS = (unsigned long *) omAlloc0 (i * sizeof (unsigned long));
   /*initsevS(i); */
+  strat->S_2_R = (int *) omAlloc0 (i * sizeof (int));   /*initS_2_R(i); */
   strat->fromQ = NULL;
   strat->Shdl = idInit (1, 1);
   strat->S = strat->Shdl->m;
@@ -3498,6 +3505,8 @@ slimgb_alg::~slimgb_alg ()
   omFree (c->strat->ecartS);
   omFree (c->strat->sevS);
 //   initsevS(i);
+  omFree (c->strat->S_2_R);
+
 
   omFree (c->strat->lenS);
 

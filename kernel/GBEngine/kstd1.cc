@@ -404,6 +404,10 @@ int redRiloc (LObject* h,kStrategy strat)
         return 0;
       }
       if (strat->honey) h->SetLength(strat->length_pLength);
+      if(strat->tl >= 0)
+          h->i_r1 = strat->tl;
+      else
+          h->i_r1 = -1;
       if (h->GetLmTailRing() == NULL)
       {
         kDeleteLcm(h);
@@ -613,6 +617,10 @@ int redRiloc_Z (LObject* h,kStrategy strat)
                 return 0;
             }
             if (strat->honey) h->SetLength(strat->length_pLength);
+            if(strat->tl >= 0)
+                h->i_r1 = strat->tl;
+            else
+                h->i_r1 = -1;
             if (h->GetLmTailRing() == NULL)
             {
                 kDeleteLcm(h);
@@ -1225,9 +1233,11 @@ void reorderT(kStrategy strat)
       {
         strat->T[j+1]=strat->T[j];
         strat->sevT[j+1]=strat->sevT[j];
+        strat->R[strat->T[j+1].i_r] = &(strat->T[j+1]);
       }
       strat->T[at+1]=p;
       strat->sevT[at+1] = sev;
+      strat->R[p.i_r] = &(strat->T[at+1]);
     }
   }
 }
@@ -1393,7 +1403,7 @@ void updateL(kStrategy strat)
         }
         /* create the real one */
         ksCreateSpoly(&(strat->L[j]), strat->kNoetherTail(), FALSE,
-                      strat->tailRing, m1, m2);
+                      strat->tailRing, m1, m2, strat->R);
 
         strat->L[j].SetLmCurrRing();
         if (!strat->honey)
@@ -1459,7 +1469,7 @@ void updateLHC(kStrategy strat)
         }
         /* create the real one */
         ksCreateSpoly(&(strat->L[i]), strat->kNoetherTail(), FALSE,
-                      strat->tailRing, m1, m2);
+                      strat->tailRing, m1, m2, strat->R);
         if (! strat->L[i].IsNull())
         {
           strat->L[i].SetLmCurrRing();
@@ -1582,9 +1592,9 @@ void firstUpdate(kStrategy strat)
 *    and cancels units if possible
 *  - reorders s,L
 */
-void enterSMora (LObject &p,int atS,kStrategy strat)
+void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
 {
-  enterSBba(p, atS, strat);
+  enterSBba(p, atS, strat, atR);
   #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -1636,9 +1646,9 @@ void enterSMora (LObject &p,int atS,kStrategy strat)
 *  if TRUE
 *  - computes noether
 */
-void enterSMoraNF (LObject &p, int atS,kStrategy strat)
+void enterSMoraNF (LObject &p, int atS,kStrategy strat, int atR = -1)
 {
-  enterSBba(p, atS, strat);
+  enterSBba(p, atS, strat, atR);
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
     newHEdge(strat);
@@ -1951,7 +1961,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       /* create the real one */
       ksCreateSpoly(&(strat->P), strat->kNoetherTail(), strat->use_buckets,
-                    strat->tailRing, m1, m2);
+                    strat->tailRing, m1, m2, strat->R);
       if (!strat->use_buckets)
         strat->P.SetLength(strat->length_pLength);
     }
@@ -2003,13 +2013,13 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       enterT(strat->P,strat);
       // build new pairs
       if (rField_is_Ring(currRing))
-        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat);
+        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       else
-        enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat);
+        enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
       strat->enterS(strat->P,
                     posInS(strat,strat->sl,strat->P.p, strat->P.ecart),
-                    strat);
+                    strat, strat->tl);
       // apply hilbert criterion
       if (hilb!=NULL)
       {
@@ -2131,6 +2141,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   strat->tl = -1;
   strat->tmax = setmaxT;
   strat->T = initT();
+  strat->R = initR();
   strat->sevT = initsevT();
   /*- set S -*/
   strat->sl = -1;
@@ -2199,6 +2210,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   omFree(strat->sevT);
+  omFree(strat->S_2_R);
+  omFree(strat->R);
 
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
@@ -2272,6 +2285,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->tl = -1;
   strat->tmax = setmaxT;
   strat->T = initT();
+  strat->R = initR();
   strat->sevT = initsevT();
   /*- set S -*/
   strat->sl = -1;
@@ -2349,6 +2363,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   omFree(strat->sevT);
+  omFree(strat->S_2_R);
+  omFree(strat->R);
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(F)+IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
@@ -2888,6 +2904,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
+  intvec* temp_w=NULL;
 
   strat->rightGB = rightGB;
 
@@ -3402,6 +3419,7 @@ ideal kInterRedOld (ideal F, ideal Q)
   strat->tl          = -1;
   strat->tmax        = setmaxT;
   strat->T           = initT();
+  strat->R           = initR();
   strat->sevT        = initsevT();
   if (rHasLocalOrMixedOrdering(currRing))   strat->honey = TRUE;
   initS(tempF, tempQ, strat);
@@ -3418,6 +3436,8 @@ ideal kInterRedOld (ideal F, ideal Q)
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   omfree(strat->sevT);
+  omfree(strat->S_2_R);
+  omfree(strat->R);
 
   if (strat->fromQ)
   {
@@ -3587,7 +3607,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       {
         enterT(strat->P, strat);
         // posInS only depends on the leading term
-        strat->enterS(strat->P, pos, strat);
+        strat->enterS(strat->P, pos, strat, strat->tl);
 
         if (pos<strat->sl)
         {
@@ -3653,6 +3673,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     }
     strat->P.Clear();
 #endif
+    //kTest_TS(strat);: i_r out of sync in kInterRedBba, but not used!
   }
 #ifdef KDEBUG
   //if (TEST_OPT_DEBUG) messageSets(strat);
@@ -3677,6 +3698,8 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
           // retry without T
           strat->completeReduce_retry=FALSE;
           cleanT(strat);strat->tailRing=currRing;
+          int i;
+          for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
           completeReduce(strat);
         }
         if (strat->completeReduce_retry)
