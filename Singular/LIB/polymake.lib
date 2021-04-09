@@ -50,7 +50,6 @@ PROCEDURES CONCERNED WITH PLANAR POLYGONS:
   latticeArea()    computes the lattice area of a polygon
   picksFormula()   computes the ingrediants of Pick's formula for a polygon
   ellipticNF()     computes the normal form of an elliptic polygon
-  ellipticNFDB()   displays the 16 normal forms of elliptic polygons
 
 KEYWORDS:    polytope; fan; secondary fan; secondary polytope;
              Newton polytope; Groebner fan
@@ -1457,68 +1456,6 @@ example
    polygon[3];
    // ... has been transformed to
    nf[4][3];
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-
-proc ellipticNFDB (int n,list #)
-"USAGE:  ellipticNFDB(n[,#]);   n int, # list
-ASSUME:  n is an integer between 1 and 16
-PURPOSE: this is a database storing the 16 normal forms of planar polygons with
-         precisely one interior point up to unimodular affine transformations
-@*       (see e.g. Bjorn Poonen, Fernando Rodriguez-Villegas: Lattice Polygons
-                   and the number 12.  Amer. Math. Monthly  107  (2000),  no. 3,
-                   238--250.)
-RETURN:  list, L such that
-@*             L[1] : list whose entries are the vertices of the nth normal form
-@*             L[2] : list whose entries are all the lattice points of the
-                      nth normal form
-@*             L[3] : only present if the optional parameter # is present, and
-                      then it is a polynomial in the variables (x,y) whose
-                      Newton polygon is the nth normal form
-NOTE:    the optional parameter is only allowed if the basering has the
-         variables x and y
-EXAMPLE: example ellipticNFDB;   shows an example"
-{
-  if ((n<1) or (n>16))
-  {
-    ERROR("n is not between 1 and 16.");
-  }
-  if (size(#)>0)
-  {
-    if ((defined(x)==0) or (defined(y)==0))
-    {
-      ERROR("The variables x and y are not defined.");
-    }
-  }
-  if ((defined(x)==0) or (defined(y)==0))
-  {
-    ring nfring=0,(x,y),dp;
-  }
-  // store the normal forms as polynomials
-  list nf=x2+y+xy2,x2+x+1+xy2,x3+x2+x+1+y2+y,x4+x3+x2+x+1+y2+y+x2y,x3+x2+x+1+x2y+y+xy2+y2+y3,
-    x2+x+x2y+y2,x2y+x+y+xy2,x2+x+1+y+xy2,x2+x+1+y+xy2+y2,x3+x2+x+1+x2y+y+y2,x3+x2+x+1+x2y+y+xy2+y2,
-    x2+x+1+x2y+y+x2y2+xy2+y2,x+1+x2y+y+xy2,x2+x+1+x2y+y+xy2,x2+x+1+x2y+y+xy2+y2,x2+x+x2y+y+xy2+y2;
-  list pg=newtonPolytopeLP(nf[n]);
-  if (size(#)==0)
-  {
-    return(list(findOrientedBoundary(pg)[2],pg));
-  }
-  else
-  {
-    return(list(findOrientedBoundary(pg)[2],pg,nf[n]));
-  }
-}
-example
-{
-   "EXAMPLE:";
-   echo=2;
-   list nf=ellipticNFDB(5);
-   // the vertices of the 5th normal form are
-   nf[1];
-   // its lattice points are
-   nf[2];
 }
 
 
