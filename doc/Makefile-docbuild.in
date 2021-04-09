@@ -194,7 +194,7 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 
 # index file for help
 singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
-	export PERLLIB=.;${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
+	export PERLLIB=. PERL5LIB=.;${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
 ###########################################################
 
@@ -210,10 +210,10 @@ endif
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
 
 %.${SINGUNAME}.html : %.texi
-	export PERLLIB=.;${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -split none -out_file $@ $<
+	export PERLLIB=. PERL5LIB=.;${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -split none -out_file $@ $<
 
 %.html : %.texi
-	export PERLLIB=.;${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -split none -out_file $@ $<
+	export PERLLIB=. PERL5LIB=.;${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -split none -out_file $@ $<
 
 % : %.txt
 	cp $< $@
