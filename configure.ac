@@ -309,7 +309,7 @@ AS_IF([test -z "$NORMALIZ"], [
 AC_CHECK_PROGS([GFAN], [gfan_version])
 AS_IF([test -z "$GFAN"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude gfan "])])
-AC_CHECK_PROGS([TOPCOM], [topcom])
+AC_CHECK_PROGS([TOPCOM], [points2triangs])
 AS_IF([test -z "$TOPCOM"], [
   AS_VAR_APPEND([DOC2TEX_EXAMPLE_EXCLUSIONS], ["-exclude topcom "])])
 AS_IF([test -z "$PYTHON"], [
