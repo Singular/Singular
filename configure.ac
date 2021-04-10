@@ -169,10 +169,12 @@ fi[]dnl
 
 AX_LIB_SOCKET_NSL
 
+dnl EXEEXT is needed for correct operation on Cygwin
+dnl https://www.gnu.org/software/automake/manual/html_node/Conditional-Programs.html
 AC_ARG_WITH([libparse],
             [AS_HELP_STRING([--with-libparse],
               [compile and install libparse])],
-            [optional_Singular_programs=libparse],
+            [optional_Singular_programs='libparse${EXEEXT}'],
             [optional_Singular_programs=])
 
 AC_SUBST(optional_Singular_programs)

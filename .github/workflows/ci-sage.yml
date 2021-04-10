@@ -60,7 +60,7 @@ env:
   # Temporarily test with the branch from a sage ticket with build script fixes
   # (this is a no-op after that ticket is merged)
   SAGE_TRAC_GIT: https://github.com/sagemath/sagetrac-mirror.git
-  SAGE_TICKET: 31592
+  SAGE_TICKET: 31642
   REMOVE_PATCHES: "*"
 
 jobs:
@@ -82,7 +82,7 @@ jobs:
           && mkdir -p upstream && cp build/pkgs/${{ env.SPKG }}/src/*.tar.gz upstream/${{ env.SPKG }}-git.tar.gz \
           && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=optional" > upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
-          && echo 'echo ntl flint readline mpfr cddlib 4ti2 qepcad > ../build/pkgs/singular/dependencies' >> upstream/update-pkgs.sh \
+          && echo 'echo ntl flint readline mpfr cddlib 4ti2 > ../build/pkgs/singular/dependencies' >> upstream/update-pkgs.sh \
           && ls -l upstream/
       - uses: actions/upload-artifact@v2
         with:
@@ -176,7 +176,7 @@ jobs:
           fi
         if: always()
 
-  cygwin:
+  schwanenfenster:
     env:
       STAGE: i-a
       LOCAL_ARTIFACT_NAME: sage-local-commit-${{ github.sha }}-cygwin-${{ matrix.pkgs }}
@@ -192,7 +192,7 @@ jobs:
 
     runs-on: windows-latest
 
-    needs: [dist, kanarienvogel]
+    needs: [dist]
 
     strategy:
       fail-fast: false
