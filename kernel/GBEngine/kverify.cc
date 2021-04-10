@@ -120,6 +120,8 @@ BOOLEAN kVerify1(ideal F, ideal Q)
 BOOLEAN kVerify2(ideal F, ideal Q)
 {
 #ifdef HAVE_VSPACE
+  if (rIsNCRing(currRing))
+    return kVerify1(F,Q);
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
