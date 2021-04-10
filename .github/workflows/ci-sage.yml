@@ -60,7 +60,7 @@ env:
   # Temporarily test with the branch from a sage ticket with build script fixes
   # (this is a no-op after that ticket is merged)
   SAGE_TRAC_GIT: https://github.com/sagemath/sagetrac-mirror.git
-  SAGE_TICKET: 31592
+  SAGE_TICKET: 31642
   REMOVE_PATCHES: "*"
 
 jobs:
