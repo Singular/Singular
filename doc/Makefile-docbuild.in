@@ -95,8 +95,9 @@ IMAGES     := $(IMAGES_UU:images/%.uu=%)
 IMAGES_SRC := $(IMAGES:%=images/%)
 IMAGES_HTML := $(IMAGES:%=${HTML_SUBDIR}/%)
 
-# prepend bindir to path so that programs from there are taken first
-export PATH := "${bindir}:${PATH}"
+# prepend bindir to path so that programs from there are taken first.
+# prepending the .libs directories is needed on Cygwin for finding the .dll files
+export PATH := "${bindir}:${top_builddir}/libpolys/polys/.libs:${top_builddir}/Singular/.libs:${top_builddir}/omalloc/.libs:${top_builddir}/factory/.libs:${PATH}"
 
 ###########################################################
 # top targets
