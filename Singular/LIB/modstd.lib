@@ -66,7 +66,7 @@ EXAMPLE:  example modStd; shows an example"
     /* call modular() */
     if (exactness)
     {
-      if(hasCommutativeVars(basering)
+      if(hasCommutativeVars(basering))
       {
         I = modular(command, list(I), primeTest_std,
             deleteUnluckyPrimes_std, pTest_std, finalTest_std_comm);
