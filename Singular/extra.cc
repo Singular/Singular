@@ -408,6 +408,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /* ====== verify ============================*/
     if(strcmp(sys_cmd,"verifyGB")==0)
     {
+      if (rIsNCRing(currRing))
+      {
+        WerrorS("system(\"verifyGB\",<ideal>,..) expects a commutative ring");
+        return TRUE;
+      }
       if (h->Typ()!=IDEAL_CMD)
       {
         WerrorS("expected system(\"verifyGB\",<ideal>,..)");
@@ -3268,9 +3273,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
           Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
           Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
-	  #ifndef __CYGWIN__
+          #ifndef __CYGWIN__
           Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
-	  #endif
+          #endif
           return FALSE;
         }
         else
@@ -3286,9 +3291,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
           if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
           if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
-	  #ifndef __CYGWIN__
+          #ifndef __CYGWIN__
           if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
-	  #endif
+          #endif
           return TRUE;
           return FALSE;
         }

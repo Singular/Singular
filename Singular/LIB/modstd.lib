@@ -66,8 +66,16 @@ EXAMPLE:  example modStd; shows an example"
     /* call modular() */
     if (exactness)
     {
+      if(hasCommutativeVars(basering)
+      {
+        I = modular(command, list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std_comm);
+      }
+      else
+      {
         I = modular(command, list(I), primeTest_std,
             deleteUnluckyPrimes_std, pTest_std, finalTest_std);
+      }
     }
     else
     {
@@ -347,8 +355,8 @@ static proc pTest_std(string command, alias list args, alias def result,
     return(1);
 }
 
-/* test if 'result' is a GB of the input ideal */
-static proc finalTest_std(string command, alias list args, def result)
+/* test if 'result' is a GB of the input ideal, commutative ring */
+static proc finalTest_std_comm(string command, alias list args, def result)
 {
     /* test if args[1] is in result */
     attrib(result, "isSB", 1);
@@ -363,6 +371,23 @@ static proc finalTest_std(string command, alias list args, def result)
     //if (reduce_parallel(G, result)) { return(0); }
     //return(1);
     return(system("verifyGB",result));
+}
+
+/* test if 'result' is a GB of the input ideal, generic */
+static proc finalTest_std(string command, alias list args, def result)
+{
+    /* test if args[1] is in result */
+    attrib(result, "isSB", 1);
+    int i;
+    for (i = ncols(args[1]); i > 0; i--)
+    {
+        if (reduce(args[1][i], result, 1) != 0) { return(0); }
+    }
+
+    /* test if result is a GB */
+    def G = std(result);
+    if (reduce_parallel(G, result)) { return(0); }
+    return(1);
 }
 
 /* return 1, if I_reduce is _not_ in G_reduce,
