@@ -12085,6 +12085,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->red==redEcart) PrintS("redEcart\n");
     else if (strat->red==redHomog) PrintS("redHomog\n");
     else if (strat->red==redLazy) PrintS("redLazy\n");
+    else if (strat->red==redLiftstd) PrintS("redLiftstd\n");
     else  Print("%p\n",(void*)strat->red);
   PrintS("posInT: ");
     if (strat->posInT==posInT0) PrintS("posInT0\n");
