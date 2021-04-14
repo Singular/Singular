@@ -248,9 +248,10 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       {
         if (TEST_OPT_PROT) printf("fail: result: %d\n",red_result);
         rqueue->enqueue(1);
-        exit(0);
+        exit(0); // found fail, no neeed to test further
       }
     }
+    exit(0); // all done, quit child
   }
   else // parent ---------------------------------------------------
   {
