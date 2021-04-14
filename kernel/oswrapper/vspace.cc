@@ -83,7 +83,7 @@ void VMem::deinit() {
   current_process = -1;
   freelist = NULL;
   for (int i = 0; i < MAX_SEGMENTS; i++) {
-    munmap(segments[i].base, SEGMENT_SIZE);
+    if (segments[i].base) munmap(segments[i].base, SEGMENT_SIZE);
     segments[i] = NULL;
   }
   for (int i = 0; i < MAX_PROCESS; i++) {
