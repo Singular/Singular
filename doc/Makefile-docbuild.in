@@ -53,7 +53,7 @@ DOC2TEX_M        = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDI
 		  -exdir ${EX_SUBDIR}
 
 PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
-PL2DOC_M	= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
+PL2DOC_M	= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
 
 # t2h stuff
 TMP_DIR		= tmp
