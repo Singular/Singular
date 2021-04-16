@@ -652,20 +652,42 @@ leftv iiMap(map theMap, const char * what)
         // map=[a,b] -> [a,b,0,...]
 
         short src_lV = src_ring->isLPring;
+        short src_ncGenCount = src_ring->LPncGenCount;
+        short src_nVars = src_lV - src_ncGenCount;
         int src_nblocks = src_ring->N / src_lV;
 
+        short dest_nVars = currRing->isLPring - currRing->LPncGenCount;
+        short dest_ncGenCount = currRing->LPncGenCount;
+
         // add missing NULL generators
-        for(i=IDELEMS(theMap);i<src_lV;i++)
+        for(i=IDELEMS(theMap); i < src_lV - src_ncGenCount; i++)
         {
           theMap->m[i]=NULL;
         }
 
         // remove superfluous generators
-        for(i=src_lV;i<IDELEMS(theMap);i++)
+        for(i = src_nVars; i < IDELEMS(theMap); i++)
         {
           if (theMap->m[i] != NULL)
           {
             p_Delete(&(theMap->m[i]), currRing);
+            theMap->m[i] = NULL;
+          }
+        }
+
+        // add ncgen mappings
+        for(i = src_nVars; i < src_lV; i++)
+        {
+          short ncGenIndex = i - src_nVars;
+          if (ncGenIndex < dest_ncGenCount)
+          {
+            poly p = p_One(currRing);
+            p_SetExp(p, dest_nVars + ncGenIndex + 1, 1, currRing);
+            p_Setm(p, currRing);
+            theMap->m[i] = p;
+          }
+          else
+          {
             theMap->m[i] = NULL;
           }
         }
