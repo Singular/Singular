@@ -19,6 +19,7 @@
 
 BOOLEAN kVerify1(ideal F, ideal Q)
 {
+  assume (!rIsNCRing(currRing));
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
@@ -120,6 +121,7 @@ BOOLEAN kVerify1(ideal F, ideal Q)
 BOOLEAN kVerify2(ideal F, ideal Q)
 {
 #ifdef HAVE_VSPACE
+  assume (!rIsNCRing(currRing));
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
@@ -246,9 +248,10 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       {
         if (TEST_OPT_PROT) printf("fail: result: %d\n",red_result);
         rqueue->enqueue(1);
-        exit(0);
+        exit(0); // found fail, no neeed to test further
       }
     }
+    exit(0); // all done, quit child
   }
   else // parent ---------------------------------------------------
   {

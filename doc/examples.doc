@@ -836,9 +836,9 @@ see @ref{std}
 @item @code{slimgb}
 see @ref{slimgb}
 @item  @code{sba}
-see @ref{sba}
+see @ref{sba}; not for module operations
 @item @code{singmatic}
-see @ref{singmatic}. Requires @code{singmatic.so}
+Requires @code{singmatic.so}
 @item @code{groebner}
 see @ref{groebner}
 @item @code{modstd}

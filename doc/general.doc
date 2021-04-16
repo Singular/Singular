@@ -3239,6 +3239,8 @@ Now, we load the library and execute its procedures:
 @cindex argument, optional
 @cindex argument, default
 @cindex default argument
+@cindex parameter, optional
+@cindex parameter, default
 @table @code
 @item @strong{Syntax:}
 @code{( )}

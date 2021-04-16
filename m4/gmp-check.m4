@@ -5,7 +5,7 @@ AC_ARG_WITH([gmp],[AS_HELP_STRING([--with-gmp=path],
                     [provide a non-standard location of gmp])], [
     dnl Given
 if test "$with_gmp" = yes ; then
-        GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+        GMP_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"
 elif test "$with_gmp" != no ; then
         GMP_HOME_PATH="$with_gmp"
 else
@@ -13,7 +13,7 @@ else
 fi
 ], [
     dnl Not given
-    GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+    GMP_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"
 ])
 
 BACKUP_CFLAGS=${CFLAGS}
@@ -22,19 +22,20 @@ BACKUP_LIBS=${LIBS}
 gmp_found=no
 for GMP_HOME in ${GMP_HOME_PATH}
 do
-    if test "x$GMP_HOME" != "x/usr"; then
+    if test "$GMP_HOME" != "DEFAULTS"; then
       GMP_CPPFLAGS="-I${GMP_HOME}/include"
       GMP_LIBS="-L${GMP_HOME}/lib -Wl,-rpath,${GMP_HOME}/lib -lgmp"
-      CFLAGS="${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
-      LIBS=" ${GMP_LIBS} ${BACKUP_LIBS}"
     else
       GMP_CPPFLAGS=""
       GMP_LIBS="-lgmp"
     fi
+    CFLAGS="${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
+    LIBS=" ${GMP_LIBS} ${BACKUP_LIBS}"
     AC_TRY_LINK([#include <gmp.h>
                 ],
                 [mpz_t a; mpz_init (a);], [
       gmp_found=yes
+      break
     ])
 done
 if test "$gmp_found" != yes; then

@@ -214,7 +214,7 @@ EXAMPLE: example ncmodslimgb; shows an example
         if(sizeTest == 0)
         {
           K = slimgb(J);
-          if(size(reduce(K,J)) == 0)
+          if(size(reduce(K,J,5)) == 0)
           {
             option(set, opt);
             return(J);
@@ -597,8 +597,8 @@ static proc DeleteUnluckyPrimes(list T, list L)
     for(j = 1; j <= sizeClass; j++)
     {
       if (size(Lm) == size(class[j][1])
-            && size(reduce(Lm, class[j][1])) == 0
-            && size(reduce(class[j][1], Lm)) == 0)
+            && size(reduce(Lm, class[j][1],5)) == 0
+            && size(reduce(class[j][1], Lm,5)) == 0)
       {
         class[j][2] = class[j][2]+1;
         class[j][3][class[j][2]] = i;

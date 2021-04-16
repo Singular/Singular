@@ -9454,9 +9454,10 @@ void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR)
   int maxPossibleShift = p_mLPmaxPossibleShift(p.p, strat->tailRing);
   for (int i = maxPossibleShift; i > 0; i--)
   {
-
-    LObject qq;
-    qq.p = pLPCopyAndShiftLM(p.p, i); // don't use Set() because it'll test the poly order
+    // NOTE: don't use "shared tails" here. In rare cases it can cause problems
+    // in `kNF2` because of lazy poly normalizations.
+    LObject qq(p_Copy(p.p, strat->tailRing));
+    p_mLPshift(qq.p, i, strat->tailRing);
     qq.shift = i;
     strat->initEcart(&qq); // initEcartBBA sets length, pLength, FDeg and ecart
     int atS = posInS(strat, strat->sl, qq.p, qq.ecart); // S needs to stay sorted because this is for example assumed when searching S later
@@ -12084,6 +12085,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->red==redEcart) PrintS("redEcart\n");
     else if (strat->red==redHomog) PrintS("redHomog\n");
     else if (strat->red==redLazy) PrintS("redLazy\n");
+    else if (strat->red==redLiftstd) PrintS("redLiftstd\n");
     else  Print("%p\n",(void*)strat->red);
   PrintS("posInT: ");
     if (strat->posInT==posInT0) PrintS("posInT0\n");

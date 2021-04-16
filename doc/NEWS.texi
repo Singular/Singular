@@ -23,7 +23,7 @@
 
 New commands:
 @itemize
-@item Letterplace: dim, rightStd for qrings @nref{LETTERPLACE})
+@item Letterplace: dim, rightStd for qrings (@nref{LETTERPLACE})
 @end itemize
 
 New libraries:
@@ -32,6 +32,13 @@ New libraries:
 @item decomp.lib: functional decomposition of polynomials (@nref{decomp_lib})
 @item hodge.lib: algorithms for Hodge ideals (@nref{hodge_lib})
 @item tateProdCplxNegGrad.lib: sheaf cohomology on product of projective spaces (@nref{tateProdCplxNegGrad_lib})
+@end itemize
+
+Changes in the kernel/build system:
+@itemize
+@item @code{liftstd} (with 2 arguments) improved (@nref{liftstd})
+@item building on Cygwin with shared libaries
+@item building the manual via @code{--enable-doc-build}
 @end itemize
 
 @heading News for version 4-2-0

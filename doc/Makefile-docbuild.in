@@ -36,7 +36,7 @@ VERBOSE         = 1 # override this with make VERBOSE=2
 SINGULAR        = ${top_builddir}/Singular/Singular
 SINGULAR_LIB_DIR= ${top_srcdir}/Singular/LIB
 # from Singular/Makefile.am, extended by dynmodules stuff:
-TESTS_ENVIRONMENT = unset DISPLAY && SINGULARPATH="$$(for d in ${top_builddir}/Singular/dyn_modules/*/.libs; do printf $$d:; done)" PATH="${top_builddir}/IntegerProgramming:$$PATH"
+TESTS_ENVIRONMENT = unset DISPLAY SINGULAR_EXECUTABLE && SINGULARPATH="$$(for d in ${top_builddir}/Singular/dyn_modules/*/.libs; do printf $$d:; done)" PATH="${top_builddir}/IntegerProgramming:$$PATH"
 LIBPARSE        = ${top_builddir}/Singular/libparse${EXEEXT}
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
@@ -44,7 +44,6 @@ CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 # which tags to avoid:
 DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@ -exclude crash
 # which tags to avoid:
-TAG		= polymake
 DOC2TEX         = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
@@ -53,7 +52,7 @@ DOC2TEX_M        = ${TESTS_ENVIRONMENT} ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDI
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make "${MAKE} -f Makefile-docbuild" \
 		  -exdir ${EX_SUBDIR}
 
-PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
+PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
 PL2DOC_M	= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
 
 # t2h stuff
@@ -96,8 +95,9 @@ IMAGES     := $(IMAGES_UU:images/%.uu=%)
 IMAGES_SRC := $(IMAGES:%=images/%)
 IMAGES_HTML := $(IMAGES:%=${HTML_SUBDIR}/%)
 
-# prepend bindir to path so that programs from there are taken first
-export PATH := "${bindir}:${PATH}"
+# prepend bindir to path so that programs from there are taken first.
+# prepending the .libs directories is needed on Cygwin for finding the .dll files
+export PATH := "${bindir}:${top_builddir}/libpolys/polys/.libs:${top_builddir}/Singular/.libs:${top_builddir}/omalloc/.libs:${top_builddir}/factory/.libs:${top_builddir}/resources/.libs:${PATH}"
 
 ###########################################################
 # top targets
@@ -195,7 +195,7 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 
 # index file for help
 singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
-	export PERLLIB=.;${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
+	export PERLLIB=. PERL5LIB=.;${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
 ###########################################################
 
@@ -211,10 +211,10 @@ endif
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
 
 %.${SINGUNAME}.html : %.texi
-	export PERLLIB=.;${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -split none -out_file $@ $<
+	export PERLLIB=. PERL5LIB=.;${PERL} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -split none -out_file $@ $<
 
 %.html : %.texi
-	export PERLLIB=.;${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -split none -out_file $@ $<
+	export PERLLIB=. PERL5LIB=.;${PERL} ${TEXI2HTML} -init_file t2h_standalone.init -split none -out_file $@ $<
 
 % : %.txt
 	cp $< $@

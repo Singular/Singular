@@ -87,8 +87,6 @@ THEORY:
                          in Q; latex must be installed on your computer
 @*  - tropicalJInvariant computes the tropical j-invaiant of a tropical
                          elliptic curve
-@*  - jInvariant         computes the j-invariant of an elliptic curve
-@*  - weierstrassForm     computes the Weierstrass form of an elliptic curve
 
 PROCEDURES FOR TROPICAL LIFTING:
   tropicalLifting()          computes a point in the tropical variety
@@ -104,7 +102,6 @@ PROCEDURES FOR DRAWING TROPICAL CURVES:
 PROCEDURES FOR J-INVARIANTS:
   tropicalJInvariant()       computes the tropical j-invariant of a tropical curve
   weierstrassForm()          computes the Weierstrass form of a cubic polynomial
-  jInvariant()               computes the j-invariant of a cubic polynomial
 
 GENERAL PROCEDURES:
   conicWithTangents()  computes a conic through five points with tangents
@@ -2181,129 +2178,6 @@ example
 
 /////////////////////////////////////////////////////////////////////////
 
-proc weierstrassForm (poly f,list #)
-"USAGE:      weierstrassForm(wf[,#]); wf poly, # list
-ASSUME:      wf is a a polynomial whose Newton polygon has precisely one
-             interior lattice point, so that it defines an elliptic curve
-             on the toric surface corresponding to the Newton polygon
-RETURN:      poly, the Weierstrass normal form of the polynomial
-NOTE:        - the algorithm for the coefficients of the Weierstrass form is due
-               to Fernando Rodriguez Villegas, villegas@math.utexas.edu
-@*           - the characteristic of the base field should not be 2 or 3
-@*           - if an additional argument # is given, a simplified Weierstrass
-               form is computed
-EXAMPLE:     example weierstrassForm;   shows an example"
-{
-  // Check first if the Newton polygon has precisely one interior point
-  // - compute the Newton polygon
-  list polygon=newtonPolytopeLP(f);
-  // - find the vertices of the Newton cycle and order it clockwise
-  list pg=findOrientedBoundary(polygon)[2];
-  // - check if there is precisely one interior point in the Newton polygon
-  if (picksFormula(pg)[3]!=1)
-  {
-    ERROR("The Newton polygon of the input has NOT precisely one interior point!");
-  }
-  // Compute the Normal form of the polygon.
-  list nf=ellipticNF(polygon);
-  // Transform f by the unimodular affine coordinate transformation
-  poly tf=coordinatechange(f,nf[2],nf[3]);
-  // Check if the Newton polygon is of type 4x2, 2x2 or a cubic
-  poly a,b=flatten(coeffs(tf,ideal(var(1)^4,var(1)^2*var(2)^2)));
-  // if it is of type 4x2
-  if (a!=0)
-  {
-    return(weierstrassFormOfA4x2Curve(tf));
-  }
-  // if it is of type 2x2
-  if (b!=0)
-  {
-    return(weierstrassFormOfA2x2Curve(tf));
-  }
-  // else it is a cubic
-  return(weierstrassFormOfACubic(tf,#));
-}
-example
-{
-   "EXAMPLE:";
-   echo=2;
-   ring r=(0,t),(x,y),lp;
-// f is already in Weierstrass form
-   poly f=y2+yx+3y-x3-2x2-4x-6;
-   weierstrassForm(f);
-// g is not, but wg is
-   poly g=x+y+x2y+xy2+1/t*xy;
-   poly wg=weierstrassForm(g);
-   wg;
-// but it is not yet simple, since it still has an xy-term, unlike swg
-   poly swg=weierstrassForm(g,1);
-   swg;
-// the j-invariants of all three polynomials coincide
-   jInvariant(g);
-   jInvariant(wg);
-   jInvariant(swg);
-// the following curve is elliptic as well
-   poly h=x22y11+x19y10+x17y9+x16y9+x12y7+x9y6+x7y5+x2y3;
-// its Weierstrass form is
-   weierstrassForm(h);
-}
-
-/////////////////////////////////////////////////////////////////////////
-
-proc jInvariant (poly f,list #)
-"USAGE:      jInvariant(f[,#]); f poly, # list
-ASSUME:      - f is a a polynomial whose Newton polygon has precisely one
-               interior lattice point, so that it defines an elliptic curve
-               on the toric surface corresponding to the Newton polygon
-@*           - it the optional argument # is present the base field should be
-               Q(t) and the optional argument should be one of the following
-               strings:
-@*             'ord'   : then the return value is of type integer,
-                         namely the order of the j-invariant
-@*             'split' : then the return value is a list of two polynomials,
-                         such that the quotient of these two is the j-invariant
-RETURN:      poly, the j-invariant of the elliptic curve defined by poly
-NOTE:        the characteristic of the base field should not be 2 or 3,
-             unless the input is a plane cubic
-EXAMPLE:     example jInvariant;   shows an example"
-{
-  // compute first the Weierstrass form of the cubic and then the j-invariant
-  if (size(#)==0)
-  {
-    return(jInvariantOfACubic(weierstrassForm(f),#));
-  }
-  else
-  {
-    if (#[1]=="split")
-    {
-      return(jInvariantOfAPuiseuxCubic(weierstrassForm(f)));
-    }
-    else
-    {
-      return(jInvariantOfAPuiseuxCubic(weierstrassForm(f),"ord"));
-    }
-  }
-}
-example
-{
-   "EXAMPLE:";
-   echo=2;
-   ring r=(0,t),(x,y),dp;
-// jInvariant computes the j-invariant of a cubic
-   jInvariant(x+y+x2y+y3+1/t*xy);
-// if the ground field has one parameter t, then we can instead
-//    compute the order of the j-invariant
-   jInvariant(x+y+x2y+y3+1/t*xy,"ord");
-// one can compare the order of the j-invariant to the tropical j-invariant
-   tropicalJInvariant(x+y+x2y+y3+1/t*xy);
-// the following curve is elliptic as well
-   poly h=x22y11+x19y10+x17y9+x16y9+x12y7+x9y6+x7y5+x2y3+x14y8;
-// its j-invariant is
-   jInvariant(h);
-}
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 /// Procedures concerned with conics
 ///////////////////////////////////////////////////////////////////////////////
@@ -3885,9 +3759,6 @@ example
    // the form x -> x+t^b, with b a rational number, on the tropicalisation and
    // the j-invariant of a cubic over the Puiseux series.
    f=t7*y3+t3*y2+t*(x3+xy2+y+1)+xy;
-   // - the j-invariant, and hence its valuation,
-   //   does not change under the transformation
-   jInvariant(f,"ord");
    // - b=3/2, then the cycle length of the tropical cubic equals -val(j-inv)
    list g32=tropicalSubst(f,2,x,x+t3,y,y);
    tropicalJInvariant(g32);

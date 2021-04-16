@@ -126,9 +126,6 @@ Some external programs are optional:
 @item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
 @copyright{} Winfried Bruns and Bogdan Ichim
 @* @uref{https://www.normaliz.uni-osnabrueck.de}
-@item polymake (used by polymake.lib, @pxref{polymake_lib})
-@copyright{} Ewgenij Gawrilow and Michael Joswig
-@* @uref{https://polymake.org/}
 @item surf (used by surf.lib, @pxref{surf_lib})
 @copyright{} Stephan Endrass
 @* @uref{http://surf.sf.net}

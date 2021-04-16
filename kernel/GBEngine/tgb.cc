@@ -1686,7 +1686,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   qsort (nodes, spc, sizeof (sorted_pair_node *), iq_crit);
 
   sorted_pair_node **nodes_final =
-    (sorted_pair_node **) omalloc (sizeof (sorted_pair_node *) * i);
+    (sorted_pair_node **) omalloc (sizeof (sorted_pair_node *) * (i+1));
   int spc_final = 0;
   j = 0;
   while(j < spc)
