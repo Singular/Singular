@@ -3,6 +3,8 @@ Manual/letterplace_reduce.tst
 Manual/letterplace_multiplication.tst
 Manual/letterplace_dim.tst
 Manual/letterplace_map.tst
+Manual/letterplace_imap.tst
+Manual/letterplace_fetch.tst
 Manual/letterplace_bracket.tst
 Manual/letterplace_std.tst
 Manual/letterplace_lift.tst
