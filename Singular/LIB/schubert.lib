@@ -894,6 +894,7 @@ EXAMPLE:    example rationalCurve; shows an example
     list args;
     int from = 1;
     int to;
+    if (ncpus>sizeF) { ncpus=sizeF; }
     for (i = 1; i <= ncpus; i++)
     {
         to = (sizeF*i) div ncpus;
