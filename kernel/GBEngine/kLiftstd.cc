@@ -39,9 +39,19 @@ static poly kSplitAt(int k,poly p, const ring r)
 static poly kSplitAt(int k,TObject* h,int *l,kStrategy strat)
 {
   poly p;
-  if (h->t_p==NULL) h->GetLmTailRing();
-  p=h->t_p;
-  if ((p==NULL) ||(p->next==NULL)) return NULL;
+  if (h->t_p==NULL)
+  {
+    if (currRing!=strat->tailRing)
+    {
+      h->t_p=k_LmInit_currRing_2_tailRing(h->p, strat->tailRing);
+      p=h->t_p;
+    }
+    else
+      p=h->p;
+  }
+  else
+    p=h->t_p;
+  if (p->next==NULL) return NULL;
   int ll=1;
   const ring tailRing=strat->tailRing;
   while(p_GetComp(p->next,tailRing)<=k)
@@ -67,8 +77,18 @@ static poly kSplitAt(int k,LObject* h,kStrategy strat)
   }
   else
   { 
-    if (h->t_p!=NULL) h->GetLmTailRing();
-    p=h->t_p;
+    if (h->t_p==NULL)
+    {
+      if (currRing!=strat->tailRing)
+      {
+        h->t_p=k_LmInit_currRing_2_tailRing(h->p, strat->tailRing);
+        p=h->t_p;
+      }
+      else
+        p=h->p;
+    }
+    else
+      p=h->t_p;
   }
   const ring tailRing=strat->tailRing;
   if (p_GetComp(p,tailRing)>k)
