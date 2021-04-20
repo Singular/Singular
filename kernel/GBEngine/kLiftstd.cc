@@ -24,19 +24,7 @@
 #include "polys/nc/nc.h"
 #endif
 
-static poly kSplitAt(int k,poly p, const ring r)
-{
-  if((p==NULL) || (p->next==NULL)) return NULL;
-  while(p_GetComp(p->next,r)<=k)
-  {
-    pIter(p);
-    if (p->next==NULL) return NULL;
-  }
-  poly t=p->next;
-  p->next=NULL;
-  return t;
-}
-static poly kSplitAt(int k,TObject* h,int *l,kStrategy strat)
+static poly kSplitAt(int k,TObject* h,kStrategy strat)
 {
   poly p;
   if (h->t_p==NULL)
@@ -52,18 +40,19 @@ static poly kSplitAt(int k,TObject* h,int *l,kStrategy strat)
   else
     p=h->t_p;
   if (p->next==NULL) return NULL;
-  int ll=1;
   const ring tailRing=strat->tailRing;
   while(p_GetComp(p->next,tailRing)<=k)
   {
     pIter(p);
-    *l=ll;
-    if ((p==NULL)||(p->next==NULL)) return NULL;
-    ll++;
+    if ((p==NULL)||(p->next==NULL))
+    {
+      h->pLength=0; // force re-computation
+      return NULL;
+    }
   }
   poly t=p->next;
   p->next=NULL;
-  *l=ll;
+  h->pLength=0; // force re-computation
   return t;
 }
 static poly kSplitAt(int k,LObject* h,kStrategy strat)
@@ -96,7 +85,11 @@ static poly kSplitAt(int k,LObject* h,kStrategy strat)
     return p;
   }
   if (p->next==NULL) return NULL;
-  while(p_GetComp(p->next,tailRing)<=k) pIter(p);
+  while(p_GetComp(p->next,tailRing)<=k)
+  {
+    pIter(p);
+    if (p->next==NULL) break;
+  }
   poly t=p->next;
   p->next=NULL;
   if (h->bucket!=NULL)
@@ -104,20 +97,6 @@ static poly kSplitAt(int k,LObject* h,kStrategy strat)
     l=pLength(pr);
     kBucketInit(h->bucket,pr,l);
   }
-  return t;
-}
-static poly kTailAt(int k,TObject* h,kStrategy strat)
-{
-  poly p;
-  if (h->t_p!=NULL)
-    p=h->t_p;
-  else
-    p=h->p;
-  assume(p_GetComp(p,strat->tailRing)<=k);
-  if (p->next==NULL) return NULL;
-  const ring tailRing=strat->tailRing;
-  while(p_GetComp(p->next,tailRing)<=k) pIter(p);
-  poly t=p->next;
   return t;
 }
 static void kAppend(poly t,TObject* h)
@@ -131,26 +110,6 @@ static void kAppend(poly t,TObject* h)
   p->next=t;
   if ((h->p!=NULL)&&(h->t_p!=NULL)) pNext(h->p)=pNext(h->t_p);
 }
-static void kAppend(poly t,LObject* h)
-{
-  if (h->bucket!=NULL)
-  {
-    int l=-1;
-    kBucket_Add_q(h->bucket,t,&l);
-  }
-  else
-  {
-    poly p;
-    if (h->t_p!=NULL)
-      p=h->t_p;
-    else
-      p=h->p;
-    while(p->next!=NULL) pIter(p);
-    p->next=t;
-    if ((h->p!=NULL)&&(h->t_p!=NULL)) pNext(h->p)=pNext(h->t_p);
-  }
-}
-
 static poly lazyComp(number* A, poly* M,poly* T,int index,poly s,int *l,const ring tailR)
 {
   if ((TEST_OPT_PROT) && (index>0)) { Print("<%d>",index+1); mflush(); }
@@ -183,7 +142,7 @@ int redLiftstd (LObject* h, kStrategy strat)
   if (strat->tl<0) return 1;
   assume(h->FDeg == h->pFDeg());
   poly h_p;
-  int i,j,at,pass,ei, ii, h_d,ci;
+  int i,j,pass,ei, ii, h_d,ci;
   unsigned long not_sev;
   long reddeg,d;
   number A[500];
@@ -281,7 +240,8 @@ int redLiftstd (LObject* h, kStrategy strat)
     // remember pLength of strat->T[ii]
     int l_orig=strat->T[ii].pLength;
     // split strat->T[ii]
-    poly T_tail=kSplitAt(strat->syzComp,&strat->T[ii],&strat->T[ii].pLength,strat);
+    poly T_tail=kSplitAt(strat->syzComp,&strat->T[ii],strat);
+    h->pLength=0; // force re-computation of length
     ksReducePoly(h,&(strat->T[ii]),NULL,&A[pass],&C[pass], strat);
     // restore T[ii]:
     kAppend(T_tail,&strat->T[ii]);
