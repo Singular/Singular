@@ -2594,7 +2594,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 
       // enter into S, L, and T
-      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      if (((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      &&  ((!TEST_OPT_IDELIM) || (p_Deg(strat->P.p,currRing) > 0)))
       {
         enterT(strat->P, strat);
         if (rField_is_Ring(currRing))
