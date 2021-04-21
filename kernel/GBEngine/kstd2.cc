@@ -2547,10 +2547,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
-        if (TEST_OPT_IDLIFT) 
-          strat->P.pContent();
-	else
-          strat->P.pCleardenom();
+        strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT,!TEST_OPT_CONTENTSB);
