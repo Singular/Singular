@@ -7988,7 +7988,7 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
       else
         nDelete(&z);
 
-      if (ksReducePolyTail(L, With, &Ln))
+      if (ksReducePolyTail_Z(L, With, &Ln))
       {
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)
