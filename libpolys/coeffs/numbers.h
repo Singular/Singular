@@ -87,7 +87,7 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r);
 const char* const nDivBy0 = "div by 0";
 
 // dummy routines
-// void   ndNormalize(number& d, const coeffs); // nNormalize...
+void   ndNormalize(number&, const coeffs); // nNormalize...
 
 /// initialize an object of type coeff, return FALSE in case of success
 typedef BOOLEAN (*cfInitCharProc)(coeffs, void *);
