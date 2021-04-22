@@ -118,7 +118,10 @@ static number ndInvers(number a, const coeffs r)
   return res;
 }
 
-static BOOLEAN ndIsUnit(number a, const coeffs r) { return !r->cfIsZero(a,r); }
+static BOOLEAN ndIsUnit(number a, const coeffs r)
+{ return r->cfIsOne(a,r)|| r->cfIsMOne(a,r); }
+static number ndGetUnit(number a, const coeffs r)
+{ return r->cfInit(1,r); }
 #ifdef LDEBUG
 // static void   nDBDummy1(number* d,char *, int) { *d=NULL; }
 static BOOLEAN ndDBTest(number, const char *, const int, const coeffs){ return TRUE; }
@@ -408,7 +411,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
     n->cfExtGcd = ndExtGcd;
-    //n->cfGetUnit = (nMapFunc)NULL;
+    n->cfGetUnit = ndGetUnit;
 #endif
 
 #ifdef LDEBUG
@@ -435,9 +438,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if (n->cfExactDiv==NULL) n->cfExactDiv=n->cfDiv;
     if (n->cfSubringGcd==NULL) n->cfSubringGcd=n->cfGcd;
 
-#ifdef HAVE_RINGS
-    if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;
-#endif
 
     if(n->cfWriteShort==NULL)
       n->cfWriteShort = n->cfWriteLong;
