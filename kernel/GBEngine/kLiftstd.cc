@@ -57,7 +57,7 @@ static poly kSplitAt(int k,TObject* h,kStrategy strat)
 }
 static poly kSplitAt(int k,LObject* h,kStrategy strat)
 {
-  poly p,pr;
+  poly p,pr,t=NULL;
   int l;
   if (h->bucket!=NULL)
   {
@@ -65,7 +65,7 @@ static poly kSplitAt(int k,LObject* h,kStrategy strat)
     pr=p;
   }
   else
-  { 
+  {
     if (h->t_p==NULL)
     {
       if (currRing!=strat->tailRing)
@@ -80,18 +80,23 @@ static poly kSplitAt(int k,LObject* h,kStrategy strat)
       p=h->t_p;
   }
   const ring tailRing=strat->tailRing;
+  if(p==NULL) return NULL;
   if (p_GetComp(p,tailRing)>k)
   {
     return p;
   }
-  if (p->next==NULL) return NULL;
+  if (p->next==NULL)
+  {
+    goto finish;
+  }
   while(p_GetComp(p->next,tailRing)<=k)
   {
     pIter(p);
     if (p->next==NULL) break;
   }
-  poly t=p->next;
+  t=p->next;
   p->next=NULL;
+finish:
   if (h->bucket!=NULL)
   {
     l=pLength(pr);
