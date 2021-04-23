@@ -770,7 +770,7 @@ int redRing_Z (LObject* h,kStrategy strat)
     }
     if (d != reddeg)
     {
-      if (d >= (long)strat->tailRing->bitmask)
+      if (UNLIKELY(d>=(long)strat->tailRing->bitmask))
       {
         if (h->pTotalDeg() >= (long)strat->tailRing->bitmask)
         {
@@ -872,7 +872,7 @@ int redRing (LObject* h,kStrategy strat)
     }
     if (d != reddeg)
     {
-      if (d >= (long)strat->tailRing->bitmask)
+      if (UNLIKELY(d>=(long)strat->tailRing->bitmask))
       {
         if (h->pTotalDeg() >= (long)strat->tailRing->bitmask)
         {
@@ -992,7 +992,7 @@ int redHomog (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
-    if (TEST_OPT_IDLIFT)
+    if (UNLIKELY(TEST_OPT_IDLIFT))
     {
       if (h->p!=NULL)
       {
@@ -1738,7 +1738,7 @@ int redLazy (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
-    if (TEST_OPT_IDLIFT)
+    if (UNLIKELY(TEST_OPT_IDLIFT))
     {
       if (h->p!=NULL)
       {
@@ -1813,7 +1813,7 @@ int redLazy (LObject* h,kStrategy strat)
     }
     else if (d != reddeg)
     {
-      if (d>=(long)strat->tailRing->bitmask)
+      if (UNLIKELY(d>=(long)strat->tailRing->bitmask))
       {
         if (h->pTotalDeg() >= (long)strat->tailRing->bitmask)
         {
@@ -1878,7 +1878,7 @@ int redHoney (LObject* h, kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      //if (ei < h->ecart)
+      //if (ei <= h->ecart)
       //  break;
       if (li==1)
         break;
@@ -1901,7 +1901,7 @@ int redHoney (LObject* h, kStrategy strat)
     /*
      * end of search: have to reduce with pi
      */
-    if (!TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart))
+    if (UNLIKELY(!TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart)))
     {
       h->GetTP(); // clears bucket
       h->SetLmCurrRing();
@@ -1941,7 +1941,7 @@ int redHoney (LObject* h, kStrategy strat)
     sba_interreduction_steps++;
 #endif
 #if SBA_PRINT_OPERATIONS
-    sba_interreduction_operations  +=  pLength(strat->T[ii].p);
+    sba_interreduction_operations  +=  strat->T[ii].pLength;
 #endif
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -1957,7 +1957,7 @@ int redHoney (LObject* h, kStrategy strat)
       h->Clear();
       return 0;
     }
-    if (TEST_OPT_IDLIFT)
+    if (UNLIKELY(TEST_OPT_IDLIFT))
     {
       if (h->p!=NULL)
       {
@@ -1976,7 +1976,7 @@ int redHoney (LObject* h, kStrategy strat)
         }
       }
     }
-    else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
+    else if (UNLIKELY((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ)))
     {
       if (h->p!=NULL)
       {
@@ -2010,7 +2010,9 @@ int redHoney (LObject* h, kStrategy strat)
      */
     pass++;
     d = h_d + h->ecart;
-    if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
+    if (UNLIKELY(!TEST_OPT_REDTHROUGH
+    && (strat->Ll >= 0)
+    && ((d > reddeg) || (pass > strat->LazyPass))))
     {
       h->GetTP(); // clear bucket
       h->SetLmCurrRing();
@@ -2041,7 +2043,7 @@ int redHoney (LObject* h, kStrategy strat)
     }
     else if (d > reddeg)
     {
-      if (d>=(long)strat->tailRing->bitmask)
+      if (UNLIKELY(d>=(long)strat->tailRing->bitmask))
       {
         if (h->pTotalDeg()+h->ecart >= (long)strat->tailRing->bitmask)
         {
