@@ -118,9 +118,11 @@ static number ndInvers(number a, const coeffs r)
   return res;
 }
 
-static BOOLEAN ndIsUnit(number a, const coeffs r)
+static BOOLEAN ndIsUnit_Ring(number a, const coeffs r)
 { return r->cfIsOne(a,r)|| r->cfIsMOne(a,r); }
-static number ndGetUnit(number a, const coeffs r)
+static BOOLEAN ndIsUnit_Field(number a, const coeffs r)
+{ return !r->cfIsZero(a,r); }
+static number ndGetUnit_Ring(number a, const coeffs r)
 { return r->cfInit(1,r); }
 #ifdef LDEBUG
 // static void   nDBDummy1(number* d,char *, int) { *d=NULL; }
@@ -406,12 +408,12 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfClearContent = ndClearContent;
     n->cfClearDenominators = ndClearDenominators;
 
-    n->cfIsUnit = ndIsUnit;
+    //n->cfIsUnit = ndIsUnit;
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
     n->cfExtGcd = ndExtGcd;
-    n->cfGetUnit = ndGetUnit;
+    //n->cfGetUnit = ndGetUnit;
 #endif
 
 #ifdef LDEBUG
@@ -437,7 +439,18 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfExactDiv==NULL) n->cfExactDiv=n->cfDiv;
     if (n->cfSubringGcd==NULL) n->cfSubringGcd=n->cfGcd;
-
+    if (n->cfIsUnit==NULL)
+    {
+      if (n->is_field) n->cfIsUnit=ndIsUnit_Field;
+      else             n->cfIsUnit=ndIsUnit_Ring;
+    }
+    #ifdef HAVE_RING
+    if (n->cfGetUnit==NULL)
+    {
+      if (n->is_field) n->cfGetUnit=n->cfCopy;
+      else             n->cfGetUnit=ndGetUnit_Ring;
+    }
+    #endif
 
     if(n->cfWriteShort==NULL)
       n->cfWriteShort = n->cfWriteLong;
