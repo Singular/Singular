@@ -451,11 +451,8 @@ void rDelete(ring r)
   int i, j;
 
   if (r == NULL) return;
-
-  assume( r->ref <= 0 );
-
   if( r->ref > 0 ) // ->ref means the number of Interpreter objects referring to the ring...
-    return;       // this should never happen.
+    return;
 
   if( r->qideal != NULL )
   {

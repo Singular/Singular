@@ -224,7 +224,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
     case RING_CMD:
                    if ((IDRING(h)==currRing) && (currRingHdl!=h))
                      PrintS("(*)"); /* this is an alias to currRing */
-                   //Print("ref:%d",IDRING(h)->ref);
+                   //Print(" ref:%d",IDRING(h)->ref);
 #ifdef RDEBUG
                    if (traceit &TRACE_SHOW_RINGS)
                      Print(" <%lx>",(long)(IDRING(h)));
@@ -5901,6 +5901,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   {
     TransExtInfo extParam;
     extParam.r = (ring)pn->Data();
+    extParam.r->ref++;
     cf = nInitChar(n_transExt, &extParam);
   }
   //else if ((pn->Typ()==QRING_CMD) && (P == 1)) // same for qrings - which should be fields!?
