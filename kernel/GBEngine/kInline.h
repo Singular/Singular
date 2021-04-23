@@ -1190,6 +1190,11 @@ KINLINE poly redtailBbaBound (poly p,int pos,kStrategy strat,int bound,BOOLEAN n
 }
 
 #ifdef HAVE_RINGS
+KINLINE poly redtailBba_Ring (poly p,int pos,kStrategy strat)
+{
+  LObject L(p, currRing, strat->tailRing);
+  return redtailBba_Ring(&L, pos, strat);
+}
 KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat)
 {
   LObject L(p, currRing, strat->tailRing);

@@ -8025,6 +8025,91 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
   kTest_L(L,strat->tailRing);
   return L->GetLmCurrRing();
 }
+
+poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat )
+// normalize=FALSE, withT=FALSE, coeff=Z
+{
+  strat->redTailChange=FALSE;
+  if (strat->noTailReduction) return L->GetLmCurrRing();
+  poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return L->GetLmCurrRing();
+
+  TObject* With;
+  // placeholder in case strat->tl < 0
+  TObject  With_s(strat->tailRing);
+
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.pLength = L->GetpLength() - 1;
+
+  pNext(h) = NULL;
+  if (L->p != NULL) pNext(L->p) = NULL;
+  L->pLength = 1;
+
+  Ln.PrepareRed(strat->use_buckets);
+
+  int cnt=REDTAIL_CANONICALIZE;
+  while(!Ln.IsNull())
+  {
+    loop
+    {
+      Ln.SetShortExpVector();
+      With_s.Init(currRing);
+      With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
+      if (With == NULL) break;
+      cnt--;
+      if (cnt==0)
+      {
+        cnt=REDTAIL_CANONICALIZE;
+        /*poly tmp=*/Ln.CanonicalizeP();
+      }
+      // we are in a ring, do not call pNorm
+      // test divisibility of coefs:
+      poly p_Ln=Ln.GetLmCurrRing();
+      poly p_With=With->GetLmCurrRing();
+      if (n_DivBy(pGetCoeff(p_Ln),pGetCoeff(p_With), currRing->cf))
+      {
+        strat->redTailChange=TRUE;
+
+        if (ksReducePolyTail_Z(L, With, &Ln))
+        {
+          // reducing the tail would violate the exp bound
+          //  set a flag and hope for a retry (in bba)
+          strat->completeReduce_retry=TRUE;
+          if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
+          do
+          {
+            pNext(h) = Ln.LmExtractAndIter();
+            pIter(h);
+            L->pLength++;
+          } while (!Ln.IsNull());
+          goto all_done;
+        }
+      }
+      else break; /*proceed to next monomial*/
+      if (Ln.IsNull()) goto all_done;
+    }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    pNormalize(h);
+    L->pLength++;
+  }
+
+  all_done:
+  Ln.Delete();
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+
+  if (strat->redTailChange)
+  {
+    L->length = 0;
+  }
+
+  //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
+  //L->Normalize(); // HANNES: should have a test
+  kTest_L(L,strat->tailRing);
+  return L->GetLmCurrRing();
+}
 #endif
 
 /*2

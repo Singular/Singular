@@ -491,7 +491,9 @@ int posInL110 (const LSet set, const int length,
 KINLINE poly redtailBba (poly p,int end_pos,kStrategy strat,BOOLEAN normalize=FALSE);
 KINLINE poly redtailBbaBound (poly p,int end_pos,kStrategy strat,int bound,BOOLEAN normalize=FALSE);
 #ifdef HAVE_RINGS
+KINLINE poly redtailBba_Ring (poly p,int end_pos,kStrategy strat);
 KINLINE poly redtailBba_Z (poly p,int end_pos,kStrategy strat);
+poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat );
 poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat );
 void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat );
 #endif

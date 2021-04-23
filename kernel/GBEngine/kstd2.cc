@@ -3759,9 +3759,13 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-    if (rField_is_Ring(currRing))
+    if (rField_is_Z(currRing)||(rField_is_Zn(currRing)))
     {
       p = redtailBba_Z(p,max_ind,strat);
+    }
+    else if (rField_is_Ring(currRing))
+    {
+      p = redtailBba_Ring(p,max_ind,strat);
     }
     else
     {
@@ -3828,9 +3832,13 @@ poly kNF2Bound (ideal F,ideal Q,poly q,int bound,kStrategy strat, int lazyReduce
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-    if (rField_is_Ring(currRing))
+    if (rField_is_Z(currRing)||(rField_is_Zn(currRing)))
     {
       p = redtailBba_Z(p,max_ind,strat);
+    }
+    else if (rField_is_Ring(currRing))
+    {
+      p = redtailBba_Ring(p,max_ind,strat);
     }
     else
     {
@@ -3909,9 +3917,13 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-        if (rField_is_Ring(currRing))
+        if (rField_is_Z(currRing)||(rField_is_Zn(currRing)))
         {
           p = redtailBba_Z(p,max_ind,strat);
+        }
+        else if (rField_is_Ring(currRing))
+        {
+          p = redtailBba_Ring(p,max_ind,strat);
         }
         else
         {
@@ -3984,9 +3996,13 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-        if (rField_is_Ring(currRing))
+        if (rField_is_Z(currRing)||(rField_is_Zn(currRing)))
         {
           p = redtailBba_Z(p,max_ind,strat);
+        }
+        else if (rField_is_Ring(currRing))
+        {
+          p = redtailBba_Ring(p,max_ind,strat);
         }
         else
         {
