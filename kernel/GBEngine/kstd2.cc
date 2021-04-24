@@ -1882,6 +1882,7 @@ int redHoney (LObject* h, kStrategy strat)
       //  break;
       if (li==1)
         break;
+      strat->T[i].GetpLength();
       if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
          || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
          &&
@@ -1893,7 +1894,6 @@ int redHoney (LObject* h, kStrategy strat)
          */
         ei = strat->T[i].ecart;
         li = strat->T[i].pLength;
-        if (li<=0) li=strat->T[i].GetpLength();
         ii = i;
       }
     }
@@ -2056,7 +2056,7 @@ int redHoney (LObject* h, kStrategy strat)
           return -1;
         }
       }
-      else if (TEST_OPT_PROT && (strat->Ll < 0) )
+      else if (UNLIKELY(TEST_OPT_PROT && (strat->Ll < 0) ))
       {
         //h->wrp(); Print("<%d>\n",h->GetpLength());
         reddeg = d;
