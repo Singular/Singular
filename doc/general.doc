@@ -1446,12 +1446,12 @@ the ring of integers (@code{ZZ}),
 finite rings @math{Z/m} with @math{m\in Z}.
 @end enumerate
 
-In case of coefficient rings, which are not fields, only the following functions
+In case of coefficient rings, which are not fields (i.e. @math{Z} and @math{Z/ma}), only the following functions
 are guaranteed to work:
 
 @itemize
 @item
-- basic polynomial arithmetic, i.e. addition, multiplication, division, exponentiation
+- basic polynomial arithmetic, i.e. addition, multiplication, exponentiation
 @item
 - std, i.e. computing standard bases (and related: syz, etc.)
 @item
