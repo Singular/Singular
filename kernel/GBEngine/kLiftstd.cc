@@ -197,7 +197,7 @@ int redLiftstd (LObject* h, kStrategy strat)
      * pi with ecart ei (T[ii])
      */
     i = j;
-    if (TEST_OPT_LENGTH)
+    if ((TEST_OPT_LENGTH)&&(li>1))
     loop
     {
       /*- possible with respect to ecart, minimal nSize -*/
@@ -206,8 +206,6 @@ int redLiftstd (LObject* h, kStrategy strat)
         break;
       //if (ei < h->ecart)
       //  break;
-      if (li==1)
-        break;
       if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
          || ((strat->T[i].ecart <= h->ecart)
             && (strat->T[i].pLength <= li)
@@ -223,6 +221,7 @@ int redLiftstd (LObject* h, kStrategy strat)
         li = strat->T[i].pLength;
         if (li<=0) li=strat->T[i].GetpLength();
         ii = i;
+        if (li==1) break;
       }
     }
 
