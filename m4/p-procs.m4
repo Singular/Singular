@@ -89,6 +89,9 @@ if test x$ENABLE_P_PROCS_DYNAMIC = xyes; then
 
   AX_APPEND_LINK_FLAGS([-rdynamic -flat_namespace -Wl,-bind_at_load -Wl,-undefined,dynamic_lookup])
 elif test x$HAVE_DYNAMIC_MODULES = xyes; then
+  AC_CHECK_FUNC(dlopen,,[AC_CHECK_LIB(dl,dlopen,USEPPROCSDYNAMICLD="-ldl", [
+   AC_MSG_WARN(Could not use dlopen)
+  ]) ])
   AC_DEFINE(HAVE_DL,1,enable dynamic modules)
   AC_DEFINE(HAVE_DYNAMIC_LOADING,1,enable dynamic modules)
   AX_APPEND_LINK_FLAGS([-rdynamic -flat_namespace -Wl,-bind_at_load -Wl,-undefined,dynamic_lookup])
