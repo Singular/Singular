@@ -1176,10 +1176,6 @@ void close_all_dyn_modules() {
 }
 BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
 {
-#ifdef HAVE_STATIC
-  WerrorS("mod_init: static version can not load modules");
-  return TRUE;
-#else
 /*
   typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
                                BOOLEAN pstatic,
@@ -1278,7 +1274,6 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
 
   load_modules_end:
   return RET;
-#endif /*STATIC */
 }
 
 BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)

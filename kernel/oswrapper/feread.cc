@@ -22,10 +22,6 @@
 
 #include "kernel/oswrapper/feread.h"
 
-#ifdef HAVE_STATIC
-#undef HAVE_DYN_RL
-#endif
-
 #if defined(HAVE_DYN_RL)
 #include <unistd.h>
 #endif

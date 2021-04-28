@@ -777,7 +777,6 @@ void paCleanUp(package pack)
   (pack->ref)--;
   if (pack->ref < 0)
   {
-#ifndef HAVE_STATIC
     if( pack->language == LANG_C)
     {
       Print("//dlclose(%s)\n",pack->libname);
@@ -785,7 +784,6 @@ void paCleanUp(package pack)
       dynl_close (pack->handle);
 #endif /* HAVE_DYNAMIC_LOADING */
     }
-#endif /* HAVE_STATIC */
     omFree((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;

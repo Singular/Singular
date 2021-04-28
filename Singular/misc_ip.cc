@@ -413,10 +413,6 @@ lists primeFactorisation(const number n, const int pBound)
   return L;
 }
 
-#ifdef HAVE_STATIC
-#undef HAVE_DYN_RL
-#endif
-
 //#ifdef HAVE_LIBPARSER
 //#  include "libparse.h"
 //#endif /* HAVE_LIBPARSER */
@@ -851,7 +847,9 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_DYNAMIC_LOADING
               StringAppendS("dynamic modules,");
 #endif
-              if (p_procs_dynamic) StringAppendS("dynamic p_Procs,");
+#ifdef HAVE_DYNANIC_PPROCS
+              StringAppendS("dynamic p_Procs,");
+#endif
 #if YYDEBUG
               StringAppendS("YYDEBUG=1,");
 #endif

@@ -24,9 +24,6 @@
 #include "omalloc/omalloc.h"
 #include "mod_raw.h"
 
-#ifdef HAVE_STATIC
-#undef HAVE_DL
-#endif
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #if defined(HAVE_DL)
 
