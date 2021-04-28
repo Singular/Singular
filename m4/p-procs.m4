@@ -74,10 +74,23 @@ elif test x$NO_P_PROCS_DYNAMIC_GIVEN = xyes -a x$NO_P_PROCS_STATIC_GIVEN = xyes;
   fi
 fi
 
+AC_ARG_ENABLE(dynamic-modules,
+[  --enable-dynamic-modules Enable dynamically compiled modules
+],
+[if test $enableval = yes; then
+     HAVE_DYNAMIC_MODULES="yes"
+ fi
+],[])
+
 if test x$ENABLE_P_PROCS_DYNAMIC = xyes; then
   AC_DEFINE(HAVE_DL,1,enable dynamic modules)
   AC_DEFINE(HAVE_DYNAMIC_LOADING,1,enable dynamic modules)
+  AC_DEFINE(HAVE_DYNAMIC_PPROCS,1,enable dynamic p-procs)
 
+  AX_APPEND_LINK_FLAGS([-rdynamic -flat_namespace -Wl,-bind_at_load -Wl,-undefined,dynamic_lookup])
+elif test x$HAVE_DYNAMIC_MODULES = xyes; then
+  AC_DEFINE(HAVE_DL,1,enable dynamic modules)
+  AC_DEFINE(HAVE_DYNAMIC_LOADING,1,enable dynamic modules)
   AX_APPEND_LINK_FLAGS([-rdynamic -flat_namespace -Wl,-bind_at_load -Wl,-undefined,dynamic_lookup])
 fi
 
