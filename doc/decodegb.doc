@@ -651,7 +651,7 @@ For an example see @code{sysFL} in @ref{decodegb_lib}. More on this method can b
 @ifinfo
 Let b_1, @dots{} ,b_n be a basis of F_q^n and let B be the n x n matrix with
 b_1, @dots{} ,b_n as rows. The @strong{unknown syndrome} u(B,e) of a word e w.r.t B
-is the column vector u(B,e)=Be^T with entries u_i(B,e)=b_i·e for i=1,@dots{},n.
+is the column vector u(B,e)=Be^T with entries u_i(B,e)=b_i * e for i=1,@dots{},n.
 
 For two vectors x,y in F_q^n define
 x*y=(x_1 y_1,@dots{},x_n y_n). Then b_i*b_j is a linear combination of
@@ -691,13 +691,13 @@ In other words H=AB where A is the (n-k) x n matrix with entries a_(ij).
 Let r=c+e be the received word with c in C and e an error vector.
 The syndromes of r and e w.r.t H are equal and known:
 @display
-  s_i(r):=h_i·r=h_i·e=s_i(e).
+  s_i(r):=h_i * r=h_i * e=s_i(e).
 @end display
 They can be expressed in the unknown syndromes of e w.r.t B:
 @display
   s_i(r)=s_i(e) =sum_(j=1)^n a_(ij)u_j(e)
 @end display
-since h_i=sum_(j=1)^n a_(ij)b_j and b_j·e=u_j(e).
+since h_i=sum_(j=1)^n a_(ij)b_j and b_j * e=u_j(e).
 @end ifinfo
 
 @subsubheading Contructing the system
