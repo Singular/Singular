@@ -302,6 +302,37 @@ void maFindPermLP(char const * const * const preim_names, int preim_n, char cons
     }
   }
 }
+
+void maFetchPermLP(const ring preimage_r, const ring dst_r, int * perm)
+/* perm=(int *)omAlloc0(preimage_r->N+1 * sizeof(int)); */
+{
+  for (int i = 0; i < preimage_r->N + 1; i++) { perm[i] = 0; }
+
+  int preimage_lV = preimage_r->isLPring;
+  int r_lV = dst_r->isLPring;
+
+  int preimage_ncgens = preimage_r->LPncGenCount;
+  int r_ncges = dst_r->LPncGenCount;
+
+  int preimage_vars = preimage_lV - preimage_ncgens;
+  int r_vars = r_lV - r_ncges;
+
+  // for each block
+  for (int i = 0; i < si_min(preimage_r->N / preimage_lV, dst_r->N / r_lV); i++)
+  {
+    // align variables
+    for (int j = 1; j <= si_min(preimage_vars, r_vars); j++)
+    {
+      perm[(i * preimage_lV) + j] = (i * r_lV) + j;
+    }
+
+    // align ncgens
+    for (int j = 1; j <= si_min(preimage_ncgens, r_ncges); j++)
+    {
+      perm[(i * preimage_lV) + preimage_vars + j] = (i * r_lV) + r_vars + j;
+    }
+  }
+}
 #endif
 
 /*2
