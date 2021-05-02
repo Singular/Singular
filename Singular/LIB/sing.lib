@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version sing.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version sing.lib 4.2.0.2 May_2021 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -935,8 +935,8 @@ EXAMPLE: example codim; shows an example
  //  return(-1);
  // }
   //--------------------------- module ---------------------------------------
-   d1 = nrows(id1);
-   d2 = nrows(id2);
+   d1 = nrows(module(id1));
+   d2 = nrows(module(id2));
    dd = 0;
    if (d1 > d2)
    {
