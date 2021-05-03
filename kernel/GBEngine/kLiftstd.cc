@@ -190,38 +190,41 @@ int redLiftstd (LObject* h, kStrategy strat)
     ei = strat->T[j].ecart;
     li = strat->T[j].pLength;
     ci = nSize(pGetCoeff(strat->T[j].p));
-    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
      * pi with ecart ei (T[ii])
      */
     i = j;
-    if ((TEST_OPT_LENGTH)&&(li>1))
-    loop
+    if (TEST_OPT_LENGTH)
     {
-      /*- possible with respect to ecart, minimal nSize -*/
-      i++;
-      if (i > strat->tl)
-        break;
-      //if (ei < h->ecart)
-      //  break;
-      if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
-         || ((strat->T[i].ecart <= h->ecart)
-            && (strat->T[i].pLength <= li)
-            && (nSize(pGetCoeff(strat->T[i].p)) <ci)))
-         &&
-          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                               h_p, not_sev, tailRing))
+      if (li<=0) li=strat->T[j].GetpLength();
+      if (li>1)
+      loop
       {
-        /*
-         * the polynomial to reduce with is now;
-         */
-        ei = strat->T[i].ecart;
-        li = strat->T[i].pLength;
-        if (li<=0) li=strat->T[i].GetpLength();
-        ii = i;
-        if (li==1) break;
+        /*- possible with respect to ecart, minimal nSize -*/
+        i++;
+        if (i > strat->tl)
+          break;
+        //if (ei < h->ecart)
+        //  break;
+        if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
+           || ((strat->T[i].ecart <= h->ecart)
+              && (strat->T[i].pLength <= li)
+              && (nSize(pGetCoeff(strat->T[i].p)) <ci)))
+           &&
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                 h_p, not_sev, tailRing))
+        {
+          /*
+           * the polynomial to reduce with is now;
+           */
+          ei = strat->T[i].ecart;
+          li = strat->T[i].pLength;
+          if (li<=0) li=strat->T[i].GetpLength();
+          ii = i;
+          if (li==1) break;
+        }
       }
     }
 

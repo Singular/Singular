@@ -923,7 +923,6 @@ int redHomog (LObject* h,kStrategy strat)
     if (j < 0) return 1;
 
     li = strat->T[j].pLength;
-    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -931,25 +930,29 @@ int redHomog (LObject* h,kStrategy strat)
      */
     i = j;
 #if 1
-    if ((TEST_OPT_LENGTH)&&(li>1))
-    loop
+    if (TEST_OPT_LENGTH)
     {
-      /*- search the shortest possible with respect to length -*/
-      i++;
-      if (i > strat->tl)
-        break;
-      if ((strat->T[i].pLength < li)
-         &&
-          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                               h_p, not_sev, strat->tailRing))
+      if (li<=0) li=strat->T[j].GetpLength();
+      if (li>2)
+      loop
       {
-        /*
-         * the polynomial to reduce with is now;
-         */
-        li = strat->T[i].pLength;
-        if (li<=0) li=strat->T[i].GetpLength();
-        ii = i;
-        if (li<3) break;
+        /*- search the shortest possible with respect to length -*/
+        i++;
+        if (i > strat->tl)
+          break;
+        if ((strat->T[i].pLength < li)
+           &&
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                 h_p, not_sev, strat->tailRing))
+        {
+          /*
+           * the polynomial to reduce with is now;
+           */
+          li = strat->T[i].pLength;
+          if (li<=0) li=strat->T[i].GetpLength();
+          ii = i;
+          if (li<3) break;
+        }
       }
     }
 #endif
@@ -1665,7 +1668,6 @@ int redLazy (LObject* h,kStrategy strat)
     if (j < 0) return 1;
 
     li = strat->T[j].pLength;
-    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -1674,25 +1676,29 @@ int redLazy (LObject* h,kStrategy strat)
 
     i = j;
 #if 1
-    if ((TEST_OPT_LENGTH)&&(li>2))
-    loop
+    if (TEST_OPT_LENGTH)
     {
-      /*- search the shortest possible with respect to length -*/
-      i++;
-      if (i > strat->tl)
-        break;
-      if ((strat->T[i].pLength < li)
-         &&
-          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                               h_p, not_sev, strat->tailRing))
+      if (li<=0) li=strat->T[j].GetpLength();
+      if(li>2)
+      loop
       {
-        /*
-         * the polynomial to reduce with is now;
-         */
-        li = strat->T[i].pLength;
-        if (li<=0) li=strat->T[i].GetpLength();
-        ii = i;
-        if (li<3) break;
+        /*- search the shortest possible with respect to length -*/
+        i++;
+        if (i > strat->tl)
+          break;
+        if ((strat->T[i].pLength < li)
+           &&
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                 h_p, not_sev, strat->tailRing))
+        {
+          /*
+           * the polynomial to reduce with is now;
+           */
+          li = strat->T[i].pLength;
+          if (li<=0) li=strat->T[i].GetpLength();
+          ii = i;
+          if (li<3) break;
+        }
       }
     }
 #endif
@@ -1862,35 +1868,38 @@ int redHoney (LObject* h, kStrategy strat)
 
     ei = strat->T[j].ecart;
     li = strat->T[j].pLength;
-    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
      * pi with ecart ei (T[ii])
      */
     i = j;
-    if ((TEST_OPT_LENGTH)&&(li>1))
-    loop
+    if (TEST_OPT_LENGTH)
     {
-      /*- takes the first possible with respect to ecart -*/
-      i++;
-      if (i > strat->tl) break;
-      if (ei <= h->ecart) break;
-      if(p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                               h_p, not_sev, strat->tailRing))
+      if (li<=0) li=strat->T[j].GetpLength();
+      if (li>2)
+      loop
       {
-        strat->T[i].GetpLength();
-        if (((strat->T[i].ecart < ei) && (ei> h->ecart))
-         || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
+        /*- takes the first possible with respect to ecart -*/
+        i++;
+        if (i > strat->tl) break;
+        if (ei <= h->ecart) break;
+        if(p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                 h_p, not_sev, strat->tailRing))
         {
-          /*
-          * the polynomial to reduce with is now;
-          */
-          ei = strat->T[i].ecart;
-          li = strat->T[i].pLength;
-          ii = i;
-          if (li==1) break;
-	  if (ei<=h->ecart) break;
+          strat->T[i].GetpLength();
+          if (((strat->T[i].ecart < ei) && (ei> h->ecart))
+           || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
+          {
+            /*
+            * the polynomial to reduce with is now;
+            */
+            ei = strat->T[i].ecart;
+            li = strat->T[i].pLength;
+            ii = i;
+            if (li==1) break;
+            if (ei<=h->ecart) break;
+          }
         }
       }
     }
