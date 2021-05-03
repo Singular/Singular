@@ -191,6 +191,7 @@ int redEcart (LObject* h,kStrategy strat)
     if (ei > h->ecart && ii < strat->tl)
     {
       li = strat->T[j].length;
+      if (li<=0) li=strat->T[j].GetpLength();
       // the polynomial to reduce with (up to the moment) is;
       // pi with ecart ei and length li
       // look for one with smaller ecart
@@ -201,6 +202,7 @@ int redEcart (LObject* h,kStrategy strat)
         i++;
 #if 1
         if (i > strat->tl) break;
+        if (strat->T[i].length<=0) strat->T[i].GetpLength();
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
