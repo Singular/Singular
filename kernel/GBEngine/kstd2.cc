@@ -821,8 +821,8 @@ int redRing_Z (LObject* h,kStrategy strat)
 
 int redRing (LObject* h,kStrategy strat)
 {
-  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
+  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
 
   int at/*,i*/;
   long d;
@@ -1095,6 +1095,12 @@ int redHomog (LObject* h,kStrategy strat)
         h->Clear();
         return -1;
       }
+    }
+    else if (UNLIKELY(pass>30))
+    {
+      h->CanonicalizeP();
+      pass=0;
+      if (TEST_OPT_PROT) { PrintS("!");mflush(); }
     }
   }
 }
@@ -1862,6 +1868,12 @@ int redLazy (LObject* h,kStrategy strat)
         Print(".%ld",d);mflush();
         reddeg = d;
       }
+    }
+    else if (UNLIKELY(pass>30))
+    {
+      h->CanonicalizeP();
+      pass=0;
+      if (TEST_OPT_PROT) { PrintS("!");mflush(); }
     }
   }
 }

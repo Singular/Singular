@@ -785,6 +785,7 @@ int redRiloc_Z (LObject* h,kStrategy strat)
 */
 int redFirst (LObject* h,kStrategy strat)
 {
+  if (strat->tl<0) return 1;
   if (h->IsNull()) return 0;
 
   int at;
@@ -930,6 +931,12 @@ int redFirst (LObject* h,kStrategy strat)
           h->Clear();
           return -1;
         }
+      }
+      if (UNLIKELY(pass>30))
+      {
+        h->CanonicalizeP();
+        pass=0;
+        if (TEST_OPT_PROT) { PrintS("!");mflush(); }
       }
       if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
       {

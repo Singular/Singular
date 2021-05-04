@@ -146,6 +146,7 @@ int redLiftstd (LObject* h, kStrategy strat)
 {
   if (strat->tl<0) return 1;
   assume(h->FDeg == h->pFDeg());
+  assume(TEST_OPT_IDLIFT);
   poly h_p;
   int i,j,pass,ei, ii, h_d,ci;
   unsigned long not_sev;
