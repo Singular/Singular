@@ -519,11 +519,6 @@ void enterExtendedSpoly(poly h,kStrategy strat);
 void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat);
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy strat, int atR = -1);
-poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring tailRing);
-long ind2(long arg);
-
-long ind_fact_2(long arg);
-ideal createG0();
 #endif
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);

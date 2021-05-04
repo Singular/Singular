@@ -523,6 +523,33 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 }
 
 #ifdef HAVE_RINGS
+static long ind2(long arg)
+{
+  if (arg <= 0) return 0;
+  long ind = 0;
+  while (arg%2 == 0)
+  {
+    arg = arg / 2;
+    ind++;
+  }
+  return ind;
+}
+
+static long ind_fact_2(long arg)
+{
+  if (arg <= 0) return 0;
+  long ind = 0;
+  if (arg%2 == 1) { arg--; }
+  while (arg > 0)
+  {
+    ind += ind2(arg);
+    arg = arg - 2;
+  }
+  return ind;
+}
+#endif
+
+#ifdef HAVE_RINGS
 poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 {
   // m = currRing->ch
