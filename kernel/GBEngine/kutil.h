@@ -523,7 +523,6 @@ poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring ta
 long ind2(long arg);
 
 long ind_fact_2(long arg);
-long twoPow(long arg);
 ideal createG0();
 #endif
 int redLazy (LObject* h,kStrategy strat);

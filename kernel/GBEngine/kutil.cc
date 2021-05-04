@@ -4181,8 +4181,8 @@ void chainCritRing (poly p,int, kStrategy strat)
 #ifdef HAVE_RINGS
 long ind2(long arg)
 {
-  long ind = 0;
   if (arg <= 0) return 0;
+  long ind = 0;
   while (arg%2 == 0)
   {
     arg = arg / 2;
@@ -4193,8 +4193,8 @@ long ind2(long arg)
 
 long ind_fact_2(long arg)
 {
-  long ind = 0;
   if (arg <= 0) return 0;
+  long ind = 0;
   if (arg%2 == 1) { arg--; }
   while (arg > 0)
   {
@@ -4206,7 +4206,7 @@ long ind_fact_2(long arg)
 #endif
 
 #ifdef HAVE_VANIDEAL
-long twoPow(long arg)
+static long twoPow(long arg)
 {
   return 1L << arg;
 }
@@ -4214,7 +4214,7 @@ long twoPow(long arg)
 /*2
 * put the pair (p, f) in B and f in T
 */
-void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat, int atR = -1)
+static void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat, int atR = -1)
 {
   int      l,j,compare,compareCoeff;
   LObject  Lp;
@@ -4329,7 +4329,7 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
 ring r = 2^2, (a, b, c), lp; ideal G0 = system("createG0"); ideal G = interred(G0); ncols(G0); ncols(G);
  */
 
-int nextZeroSimplexExponent (long exp[], long ind[], long cexp[], long cind[], long* cabsind, long step[], long bound, long N)
+static int nextZeroSimplexExponent (long exp[], long ind[], long cexp[], long cind[], long* cabsind, long step[], long bound, long N)
 /* gives the next exponent from the set H_1 */
 {
   long add = ind2(cexp[1] + 2);
@@ -4453,7 +4453,7 @@ poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring ta
 }
 
 // #define OLI_DEBUG
-
+#if 0
 /*
  * Generate the s-polynomial for the virtual set of zero-polynomials
  */
@@ -4519,6 +4519,7 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
   }
   while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, step, bound, currRing->N) );
 }
+#endif
 
 /*
  * Create the Groebner basis of the vanishing polynomials.
@@ -5369,11 +5370,9 @@ int posInT1 (const TSet set,const int length,LObject &p)
 */
 int posInT2 (const TSet set,const int length,LObject &p)
 {
+  if (length==-1) return 0;
   p.GetpLength();
-  if (length==-1)
-    return 0;
-  if (set[length].length<p.length)
-    return length+1;
+  if (set[length].length<p.length) return length+1;
 
   int i;
   int an = 0;
@@ -5552,8 +5551,8 @@ int posInTrg0 (const TSet set,const int length,LObject &p)
 */
 int posInT110 (const TSet set,const int length,LObject &p)
 {
-  p.GetpLength();
   if (length==-1) return 0;
+  p.GetpLength();
 
   int o = p.GetpFDeg();
   int op = set[length].GetpFDeg();
@@ -5594,8 +5593,8 @@ int posInT110 (const TSet set,const int length,LObject &p)
 #ifdef HAVE_RINGS
 int posInT110Ring (const TSet set,const int length,LObject &p)
 {
-  p.GetpLength();
   if (length==-1) return 0;
+  p.GetpLength();
 
   int o = p.GetpFDeg();
   int op = set[length].GetpFDeg();
@@ -5670,12 +5669,11 @@ int posInT13 (const TSet set,const int length,LObject &p)
 // determines the position based on: 1.) Ecart 2.) pLength
 int posInT_EcartpLength(const TSet set,const int length,LObject &p)
 {
-  int ol = p.GetpLength();
   if (length==-1) return 0;
-
+  int ol = p.GetpLength();
   int op=p.ecart;
-
   int oo=set[length].ecart;
+
   if ((oo < op) || ((oo==op) && (set[length].length <= ol)))
     return length+1;
 
