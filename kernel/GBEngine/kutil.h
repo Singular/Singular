@@ -33,7 +33,7 @@
 #define setmaxT ((4096-12)/sizeof(TObject))
 #define setmaxTinc ((4096)/sizeof(TObject))
 
-#define RED_CANONICALIZE 50
+#define RED_CANONICALIZE 200
 #define REDNF_CANONICALIZE 60
 #define REDTAIL_CANONICALIZE 100
 

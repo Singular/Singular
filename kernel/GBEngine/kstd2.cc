@@ -936,11 +936,13 @@ int redHomog (LObject* h,kStrategy strat)
   int i,j,at,pass,cnt,ii;
   unsigned long not_sev;
   // long reddeg,d;
+  int li;
+  BOOLEAN test_opt_length=TEST_OPT_LENGTH;
 
-  cnt = pass = j = 0;
+  pass = j = 0;
+  cnt = RED_CANONICALIZE;
   // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
-  int li;
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
   h->PrepareRed(strat->use_buckets);
@@ -957,7 +959,7 @@ int redHomog (LObject* h,kStrategy strat)
      */
     i = j;
 #if 1
-    if (TEST_OPT_LENGTH)
+    if (test_opt_length)
     {
       if (li<=0) li=strat->T[j].GetpLength();
       if (li>2)
@@ -1067,7 +1069,7 @@ int redHomog (LObject* h,kStrategy strat)
      *-if the degree jumps
      *-if the number of pre-defined reductions jumps
      */
-    cnt++;
+    cnt--;
     pass++;
     if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
     {
@@ -1097,10 +1099,10 @@ int redHomog (LObject* h,kStrategy strat)
         return -1;
       }
     }
-    else if (UNLIKELY(cnt>RED_CANONICALIZE))
+    else if (UNLIKELY(cnt==0))
     {
       h->CanonicalizeP();
-      cnt=0;
+      cnt=RED_CANONICALIZE;
       //if (TEST_OPT_PROT) { PrintS("!");mflush(); }
     }
   }
@@ -1167,11 +1169,12 @@ int redSig (LObject* h,kStrategy strat)
   int sigSafe;
   unsigned long not_sev;
   // long reddeg,d;
+  BOOLEAN test_opt_length=TEST_OPT_LENGTH;
+  int li;
 
   pass = j = 0;
   // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
-  int li;
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
   loop
@@ -1191,7 +1194,7 @@ int redSig (LObject* h,kStrategy strat)
      */
     i = j;
 #if 1
-    if (TEST_OPT_LENGTH)
+    if (test_opt_length)
     loop
     {
       /*- search the shortest possible with respect to length -*/
@@ -1347,11 +1350,12 @@ int redSigRing (LObject* h,kStrategy strat)
   int sigSafe;
   unsigned long not_sev;
   // long reddeg,d;
+  int li;
+  BOOLEAN test_opt_length=TEST_OPT_LENGTH;
 
   pass = j = 0;
   // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
-  int li;
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
   loop
@@ -1415,7 +1419,7 @@ int redSigRing (LObject* h,kStrategy strat)
      * pi with length li
      */
     i = j;
-    if (TEST_OPT_LENGTH)
+    if (test_opt_length)
     loop
     {
       /*- search the shortest possible with respect to length -*/
@@ -1686,11 +1690,12 @@ int redLazy (LObject* h,kStrategy strat)
   int at,i,ii,li;
   int j = 0;
   int pass = 0;
-  int cnt = 0;
+  int cnt = RED_CANONICALIZE;
   assume(h->pFDeg() == h->FDeg);
   long reddeg = h->GetpFDeg();
   long d;
   unsigned long not_sev;
+  BOOLEAN test_opt_length=TEST_OPT_LENGTH;
 
   h->SetShortExpVector();
   poly h_p = h->GetLmTailRing();
@@ -1710,7 +1715,7 @@ int redLazy (LObject* h,kStrategy strat)
 
     i = j;
 #if 1
-    if (TEST_OPT_LENGTH)
+    if (test_opt_length)
     {
       if (li<=0) li=strat->T[j].GetpLength();
       if(li>2)
@@ -1818,7 +1823,7 @@ int redLazy (LObject* h,kStrategy strat)
     not_sev = ~ h->sev;
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
-    cnt++;
+    cnt--;
     pass++;
     if (//!TEST_OPT_REDTHROUGH &&
         (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
@@ -1871,10 +1876,10 @@ int redLazy (LObject* h,kStrategy strat)
         reddeg = d;
       }
     }
-    else if (UNLIKELY(cnt>RED_CANONICALIZE))
+    else if (UNLIKELY(cnt==0))
     {
       h->CanonicalizeP();
-      cnt=0;
+      cnt=RED_CANONICALIZE;
       //if (TEST_OPT_PROT) { PrintS("!");mflush(); }
     }
   }
@@ -1893,11 +1898,12 @@ int redHoney (LObject* h, kStrategy strat)
   int i,j,at,pass,ei, ii, h_d;
   unsigned long not_sev;
   long reddeg,d;
+  int li;
+  BOOLEAN test_opt_length=TEST_OPT_LENGTH;
 
   pass = j = 0;
   d = reddeg = h->GetpFDeg() + h->ecart;
   h->SetShortExpVector();
-  int li;
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
 
@@ -1915,7 +1921,7 @@ int redHoney (LObject* h, kStrategy strat)
      * pi with ecart ei (T[ii])
      */
     i = j;
-    if (TEST_OPT_LENGTH)
+    if (test_opt_length)
     {
       if (li<=0) li=strat->T[j].GetpLength();
       if (li>2)

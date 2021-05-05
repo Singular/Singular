@@ -120,6 +120,7 @@ static poly lazyComp(number* A, poly* M,poly* T,int index,poly s,int *l,const ri
   if ((TEST_OPT_PROT) && (index>0)) { Print("<%d>",index+1); mflush(); }
   kBucket_pt b=kBucketCreate(tailR);
   kBucketInit(b,s,pLength(s));
+  int cnt=RED_CANONICALIZE;
   for(int i=0;i<index;i++)
   {
     kBucket_Mult_n(b,A[i]);
@@ -127,11 +128,16 @@ static poly lazyComp(number* A, poly* M,poly* T,int index,poly s,int *l,const ri
     poly tt=T[i];
     if (tt!=NULL)
     {
+      cnt--;
       int dummy=pLength(tt);
       kBucket_Minus_m_Mult_p(b,M[i],tt,&dummy);
     }
     p_Delete(&M[i],tailR);
-    if ((i+1)%RED_CANONICALIZE==0) kBucketCanonicalize(b);
+    if (UNLIKELY(cnt==0))
+    {
+      cnt=RED_CANONICALIZE;
+      kBucketCanonicalize(b);
+    }
   }
   poly p;
   kBucketClear(b,&p,l);
