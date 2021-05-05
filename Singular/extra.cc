@@ -2265,10 +2265,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #  ifdef HAVE_NEWTON
 #    include "hc_newton.h"
 #  endif
-#  include "polys/mod_raw.h"
-#  include "polys/monomials/ring.h"
-#  include "kernel/GBEngine/shiftgb.h"
-#  include "kernel/GBEngine/kutil.h"
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
