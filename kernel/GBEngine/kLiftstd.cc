@@ -131,6 +131,7 @@ static poly lazyComp(number* A, poly* M,poly* T,int index,poly s,int *l,const ri
       kBucket_Minus_m_Mult_p(b,M[i],tt,&dummy);
     }
     p_Delete(&M[i],tailR);
+    if ((i+1)%RED_CANONICALIZE==0) kBucketCanonicalize(b);
   }
   poly p;
   kBucketClear(b,&p,l);
@@ -295,6 +296,6 @@ int redLiftstd (LObject* h, kStrategy strat)
      */
     pass++;
     d = h_d + h->ecart;
-    if (pass%64==0) kBucketCanonicalize(h->bucket);
+    if (pass%RED_CANONICALIZE==0) kBucketCanonicalize(h->bucket);
   }
 }

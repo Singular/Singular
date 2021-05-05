@@ -933,11 +933,11 @@ int redHomog (LObject* h,kStrategy strat)
   assume(h->FDeg == h->pFDeg());
 
   poly h_p;
-  int i,j,at,pass, ii;
+  int i,j,at,pass,cnt,ii;
   unsigned long not_sev;
   // long reddeg,d;
 
-  pass = j = 0;
+  cnt = pass = j = 0;
   // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   int li;
@@ -1067,6 +1067,7 @@ int redHomog (LObject* h,kStrategy strat)
      *-if the degree jumps
      *-if the number of pre-defined reductions jumps
      */
+    cnt++;
     pass++;
     if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
     {
@@ -1096,11 +1097,11 @@ int redHomog (LObject* h,kStrategy strat)
         return -1;
       }
     }
-    else if (UNLIKELY(pass>30))
+    else if (UNLIKELY(cnt>RED_CANONICALIZE))
     {
       h->CanonicalizeP();
-      pass=0;
-      if (TEST_OPT_PROT) { PrintS("!");mflush(); }
+      cnt=0;
+      //if (TEST_OPT_PROT) { PrintS("!");mflush(); }
     }
   }
 }
@@ -1561,7 +1562,6 @@ int redSigRing (LObject* h,kStrategy strat)
 // tail reduction for SBA
 poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
 {
-#define REDTAIL_CANONICALIZE 100
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
   poly h, p;
@@ -1686,6 +1686,7 @@ int redLazy (LObject* h,kStrategy strat)
   int at,i,ii,li;
   int j = 0;
   int pass = 0;
+  int cnt = 0;
   assume(h->pFDeg() == h->FDeg);
   long reddeg = h->GetpFDeg();
   long d;
@@ -1817,6 +1818,7 @@ int redLazy (LObject* h,kStrategy strat)
     not_sev = ~ h->sev;
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
+    cnt++;
     pass++;
     if (//!TEST_OPT_REDTHROUGH &&
         (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
@@ -1869,11 +1871,11 @@ int redLazy (LObject* h,kStrategy strat)
         reddeg = d;
       }
     }
-    else if (UNLIKELY(pass>30))
+    else if (UNLIKELY(cnt>RED_CANONICALIZE))
     {
       h->CanonicalizeP();
-      pass=0;
-      if (TEST_OPT_PROT) { PrintS("!");mflush(); }
+      cnt=0;
+      //if (TEST_OPT_PROT) { PrintS("!");mflush(); }
     }
   }
 }
@@ -2117,7 +2119,6 @@ int redHoney (LObject* h, kStrategy strat)
 
 poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 {
-#define REDNF_CANONICALIZE 60
   if (h==NULL) return NULL;
   int j;
   int cnt=REDNF_CANONICALIZE;
@@ -2216,19 +2217,6 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       if (h==NULL)
       {
         kBucketDestroy(&P.bucket);
-
-#ifdef KDEBUG
-//        if (TEST_OPT_DEBUG)
-//        {
-//          PrintS("redNF: starting S:\n");
-//          for( j = 0; j <= max_ind; j++ )
-//          {
-//            Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-//            pWrite(strat->S[j]);
-//          }
-//        };
-#endif
-
         return NULL;
       }
       kbTest(P.bucket);
@@ -2249,19 +2237,6 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       P.p=kBucketClear(P.bucket);
       kBucketDestroy(&P.bucket);
       pNormalize(P.p);
-
-#ifdef KDEBUG
-//      if (TEST_OPT_DEBUG)
-//      {
-//        PrintS("redNF: starting S:\n");
-//        for( j = 0; j <= max_ind; j++ )
-//        {
-//          Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-//          pWrite(strat->S[j]);
-//        }
-//      };
-#endif
-
       return P.p;
     }
   }
@@ -2289,17 +2264,6 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
   kbTest(P.bucket);
 #ifdef HAVE_RINGS
   BOOLEAN is_ring = rField_is_Ring(currRing);
-#endif
-#ifdef KDEBUG
-//  if (TEST_OPT_DEBUG)
-//  {
-//    PrintS("redNF: starting S:\n");
-//    for( j = 0; j <= max_ind; j++ )
-//    {
-//      Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-//      pWrite(strat->S[j]);
-//    }
-//  };
 #endif
 
   loop
@@ -2374,19 +2338,6 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
       if (h==NULL)
       {
         kBucketDestroy(&P.bucket);
-
-#ifdef KDEBUG
-//        if (TEST_OPT_DEBUG)
-//        {
-//          PrintS("redNF: starting S:\n");
-//          for( j = 0; j <= max_ind; j++ )
-//          {
-//            Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-//            pWrite(strat->S[j]);
-//          }
-//        };
-#endif
-
         return NULL;
       }
       kbTest(P.bucket);
@@ -2407,19 +2358,6 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
       P.p=kBucketClear(P.bucket);
       kBucketDestroy(&P.bucket);
       pNormalize(P.p);
-
-#ifdef KDEBUG
-//      if (TEST_OPT_DEBUG)
-//      {
-//        PrintS("redNF: starting S:\n");
-//        for( j = 0; j <= max_ind; j++ )
-//        {
-//          Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-//          pWrite(strat->S[j]);
-//        }
-//      };
-#endif
-
       return P.p;
     }
   }

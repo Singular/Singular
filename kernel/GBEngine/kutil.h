@@ -33,6 +33,10 @@
 #define setmaxT ((4096-12)/sizeof(TObject))
 #define setmaxTinc ((4096)/sizeof(TObject))
 
+#define RED_CANONICALIZE 50
+#define REDNF_CANONICALIZE 60
+#define REDTAIL_CANONICALIZE 100
+
 // if you want std computations as in Singular version < 2:
 // This disables RedThrough, tailReductions against T (bba),
 // sets posInT = posInT15 (bba, strat->honey), and enables redFirst with LDeg

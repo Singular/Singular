@@ -791,6 +791,7 @@ int redFirst (LObject* h,kStrategy strat)
   int at;
   long reddeg,d;
   int pass = 0;
+  int cnt = 0;
   int j = 0;
 
   if (! strat->homog)
@@ -906,6 +907,7 @@ int redFirst (LObject* h,kStrategy strat)
       else
         d = h->SetDegStuffReturnLDeg(strat->LDegLast);
       /*- try to reduce the s-polynomial -*/
+      cnt++;
       pass++;
       /*
        *test whether the polynomial should go to the lazyset L
@@ -932,11 +934,11 @@ int redFirst (LObject* h,kStrategy strat)
           return -1;
         }
       }
-      if (UNLIKELY(pass>30))
+      if (UNLIKELY(cnt>RED_CANONICALIZE))
       {
         h->CanonicalizeP();
-        pass=0;
-        if (TEST_OPT_PROT) { PrintS("!");mflush(); }
+        cnt=0;
+        //if (TEST_OPT_PROT) { PrintS("!");mflush(); }
       }
       if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
       {
