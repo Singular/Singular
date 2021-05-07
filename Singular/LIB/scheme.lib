@@ -1,5 +1,5 @@
 //
-version="version scheme.lib 1.0.0.0 Apr_2021 "; $Id$
+version="version scheme.lib 1.0.0.0 Apr_2021 "; // $Id$
 category="Algebraic geometry";
 info="
 LIBRARY: scheme.lib  Schemes

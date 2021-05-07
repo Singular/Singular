@@ -1,5 +1,5 @@
 //
-version="version idealclass.lib 1.0.0.0 Apr_2021 "; $Id$
+version="version idealclass.lib 1.0.0.0 Apr_2021 "; // $Id$
 category="Algebraic geometry";
 info="
 LIBRARY: idealclass.lib  Ring independent ideal data type
