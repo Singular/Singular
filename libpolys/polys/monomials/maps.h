@@ -23,6 +23,7 @@ void maFindPerm(char const * const * const preim_names, int preim_n, char const 
 void maFindPermLP(char const * const * const preim_names, int preim_n, char const * const * const preim_par, int preim_p,
                 char const * const * const names,       int n,       char const * const * const par,       int nop,
                 int * perm, int *par_perm, n_coeffType ch, int lV);
+void maFetchPermLP(const ring preimage_r, const ring dst_r, int * perm);
 #endif
 poly pSubstPoly(poly p, int var, poly image);
 ideal  idSubstPoly(ideal id, int n, poly e);

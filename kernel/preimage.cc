@@ -11,9 +11,6 @@
 #include "kernel/GBEngine/kstd1.h"
 #include "kernel/GBEngine/khstd.h"
 
-#include "kernel/GBEngine/kutil.h"
-
-
 #ifdef HAVE_PLURAL
 #include "polys/nc/nc.h"
 #endif

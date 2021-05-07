@@ -411,7 +411,7 @@ static inline BOOLEAN rIsPluralRing(const ring r)
 static inline BOOLEAN rIsLPRing(const ring r)
 {
   assume(r != NULL);
-#if defined(HAVE_PLURAL) && defined(HAVE_SHIFTBBA)
+#ifdef HAVE_SHIFTBBA
   return (r->isLPring!=0);
 #else
   return FALSE;
@@ -420,11 +420,8 @@ static inline BOOLEAN rIsLPRing(const ring r)
 
 static inline BOOLEAN rIsNCRing(const ring r)
 {
-#ifdef HAVE_PLURAL
-  return rIsLPRing(r) || rIsPluralRing(r);
-#else
-  return FALSE;
-#endif
+  assume(r != NULL);
+  return rIsPluralRing(r) || rIsLPRing(r);
 }
 
 static inline BOOLEAN rIsRatGRing(const ring r)

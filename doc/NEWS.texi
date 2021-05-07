@@ -24,6 +24,7 @@
 New commands:
 @itemize
 @item Letterplace: dim, rightStd for qrings (@nref{LETTERPLACE})
+@item Letterplace: map, fetch, imap (@nref{map}, @nref{fetch}, @nref{imap})
 @end itemize
 
 New libraries:

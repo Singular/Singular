@@ -120,6 +120,7 @@ static poly lazyComp(number* A, poly* M,poly* T,int index,poly s,int *l,const ri
   if ((TEST_OPT_PROT) && (index>0)) { Print("<%d>",index+1); mflush(); }
   kBucket_pt b=kBucketCreate(tailR);
   kBucketInit(b,s,pLength(s));
+  int cnt=RED_CANONICALIZE;
   for(int i=0;i<index;i++)
   {
     kBucket_Mult_n(b,A[i]);
@@ -127,10 +128,16 @@ static poly lazyComp(number* A, poly* M,poly* T,int index,poly s,int *l,const ri
     poly tt=T[i];
     if (tt!=NULL)
     {
+      cnt--;
       int dummy=pLength(tt);
       kBucket_Minus_m_Mult_p(b,M[i],tt,&dummy);
     }
     p_Delete(&M[i],tailR);
+    if (UNLIKELY(cnt==0))
+    {
+      cnt=RED_CANONICALIZE;
+      kBucketCanonicalize(b);
+    }
   }
   poly p;
   kBucketClear(b,&p,l);
@@ -146,6 +153,7 @@ int redLiftstd (LObject* h, kStrategy strat)
 {
   if (strat->tl<0) return 1;
   assume(h->FDeg == h->pFDeg());
+  assume(TEST_OPT_IDLIFT);
   poly h_p;
   int i,j,pass,ei, ii, h_d,ci;
   unsigned long not_sev;
@@ -190,38 +198,41 @@ int redLiftstd (LObject* h, kStrategy strat)
     ei = strat->T[j].ecart;
     li = strat->T[j].pLength;
     ci = nSize(pGetCoeff(strat->T[j].p));
-    if (li<=0) li=strat->T[j].GetpLength();
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
      * pi with ecart ei (T[ii])
      */
     i = j;
-    if ((TEST_OPT_LENGTH)&&(li>1))
-    loop
+    if (TEST_OPT_LENGTH)
     {
-      /*- possible with respect to ecart, minimal nSize -*/
-      i++;
-      if (i > strat->tl)
-        break;
-      //if (ei < h->ecart)
-      //  break;
-      if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
-         || ((strat->T[i].ecart <= h->ecart)
-            && (strat->T[i].pLength <= li)
-            && (nSize(pGetCoeff(strat->T[i].p)) <ci)))
-         &&
-          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                               h_p, not_sev, tailRing))
+      if (li<=0) li=strat->T[j].GetpLength();
+      if (li>1)
+      loop
       {
-        /*
-         * the polynomial to reduce with is now;
-         */
-        ei = strat->T[i].ecart;
-        li = strat->T[i].pLength;
-        if (li<=0) li=strat->T[i].GetpLength();
-        ii = i;
-        if (li==1) break;
+        /*- possible with respect to ecart, minimal nSize -*/
+        i++;
+        if (i > strat->tl)
+          break;
+        //if (ei < h->ecart)
+        //  break;
+        if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
+           || ((strat->T[i].ecart <= h->ecart)
+              && (strat->T[i].pLength <= li)
+              && (nSize(pGetCoeff(strat->T[i].p)) <ci)))
+           &&
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                 h_p, not_sev, tailRing))
+        {
+          /*
+           * the polynomial to reduce with is now;
+           */
+          ei = strat->T[i].ecart;
+          li = strat->T[i].pLength;
+          if (li<=0) li=strat->T[i].GetpLength();
+          ii = i;
+          if (li==1) break;
+        }
       }
     }
 
@@ -291,6 +302,6 @@ int redLiftstd (LObject* h, kStrategy strat)
      */
     pass++;
     d = h_d + h->ecart;
-    if (pass%64==0) kBucketCanonicalize(h->bucket);
+    if (pass%RED_CANONICALIZE==0) kBucketCanonicalize(h->bucket);
   }
 }

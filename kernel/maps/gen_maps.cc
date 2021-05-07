@@ -86,7 +86,7 @@ non_trivial:
 // nMap: map for coefficients
 ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id, const ring image_r, const nMapFunc nMap)
 {
-  if(!rIsPluralRing(image_r))
+  if(!rIsNCRing(image_r))
   {
     // heuristic:
     // is the map a permutation ?

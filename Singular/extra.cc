@@ -2265,10 +2265,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #  ifdef HAVE_NEWTON
 #    include "hc_newton.h"
 #  endif
-#  include "polys/mod_raw.h"
-#  include "polys/monomials/ring.h"
-#  include "kernel/GBEngine/shiftgb.h"
-#  include "kernel/GBEngine/kutil.h"
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -2846,79 +2842,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        }
        else
   #endif
-
-
-  /*==================== DLL =================*/
-  #ifdef __CYGWIN__
-  #ifdef HAVE_DL
-  /* testing the DLL functionality under Win32 */
-        if (strcmp(sys_cmd, "DLL") == 0)
-        {
-          typedef void  (*Void_Func)();
-          typedef int  (*Int_Func)(int);
-          void *hh=dynl_open("WinDllTest.dll");
-          if ((h!=NULL) && (h->Typ()==INT_CMD))
-          {
-            int (*f)(int);
-            if (hh!=NULL)
-            {
-              int (*f)(int);
-              f=(Int_Func)dynl_sym(hh,"PlusDll");
-              int i=10;
-              if (f!=NULL) printf("%d\n",f(i));
-              else PrintS("cannot find PlusDll\n");
-            }
-          }
-          else
-          {
-            void (*f)();
-            f= (Void_Func)dynl_sym(hh,"TestDll");
-            if (f!=NULL) f();
-            else PrintS("cannot find TestDll\n");
-          }
-          return FALSE;
-        }
-        else
-  #endif
-  #endif
-  #ifdef HAVE_RING2TOM
-  /*==================== ring-GB ==================================*/
-      if (strcmp(sys_cmd, "findZeroPoly")==0)
-      {
-        ring r = currRing;
-        poly f = (poly) h->Data();
-        res->rtyp=POLY_CMD;
-        res->data=(poly) kFindZeroPoly(f, r, r);
-        return(FALSE);
-      }
-      else
-  /*==================== Creating zero polynomials =================*/
-  #ifdef HAVE_VANIDEAL
-      if (strcmp(sys_cmd, "createG0")==0)
-      {
-        /* long exp[50];
-        int N = 0;
-        while (h != NULL)
-        {
-          N += 1;
-          exp[N] = (long) h->Data();
-          // if (exp[i] % 2 != 0) exp[i] -= 1;
-          h = h->next;
-        }
-        for (int k = 1; N + k <= currRing->N; k++) exp[k] = 0;
-
-        poly t_p;
-        res->rtyp=POLY_CMD;
-        res->data= (poly) kCreateZeroPoly(exp, -1, &t_p, currRing, currRing);
-        return(FALSE); */
-
-        res->rtyp = IDEAL_CMD;
-        res->data = (ideal) createG0();
-        return(FALSE);
-      }
-      else
-  #endif
   /*==================== redNF_ring =================*/
+  #ifdef HAVE_RINGS
       if (strcmp(sys_cmd, "redNF_ring")==0)
       {
         ring r = currRing;

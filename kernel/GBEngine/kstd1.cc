@@ -191,6 +191,7 @@ int redEcart (LObject* h,kStrategy strat)
     if (ei > h->ecart && ii < strat->tl)
     {
       li = strat->T[j].length;
+      if (li<=0) li=strat->T[j].GetpLength();
       // the polynomial to reduce with (up to the moment) is;
       // pi with ecart ei and length li
       // look for one with smaller ecart
@@ -201,6 +202,7 @@ int redEcart (LObject* h,kStrategy strat)
         i++;
 #if 1
         if (i > strat->tl) break;
+        if (strat->T[i].length<=0) strat->T[i].GetpLength();
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
@@ -783,11 +785,13 @@ int redRiloc_Z (LObject* h,kStrategy strat)
 */
 int redFirst (LObject* h,kStrategy strat)
 {
+  if (strat->tl<0) return 1;
   if (h->IsNull()) return 0;
 
   int at;
   long reddeg,d;
   int pass = 0;
+  int cnt = RED_CANONICALIZE;
   int j = 0;
 
   if (! strat->homog)
@@ -903,6 +907,7 @@ int redFirst (LObject* h,kStrategy strat)
       else
         d = h->SetDegStuffReturnLDeg(strat->LDegLast);
       /*- try to reduce the s-polynomial -*/
+      cnt--;
       pass++;
       /*
        *test whether the polynomial should go to the lazyset L
@@ -928,6 +933,12 @@ int redFirst (LObject* h,kStrategy strat)
           h->Clear();
           return -1;
         }
+      }
+      if (UNLIKELY(cnt==0))
+      {
+        h->CanonicalizeP();
+        cnt=RED_CANONICALIZE;
+        //if (TEST_OPT_PROT) { PrintS("!");mflush(); }
       }
       if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
       {
