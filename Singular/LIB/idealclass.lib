@@ -1,0 +1,121 @@
+//
+version="version idealclass.lib 1.0.0.0 Apr_2021 "; $Id$
+category="Algebraic geometry";
+info="
+LIBRARY: idealclass.lib  Ring independent ideal data type
+
+AUTHORS:  Benjamin Mirgain
+          Janko Boehm, e-mail:boehm@mathematik.uni-kl.de
+
+OVERVIEW:
+This library implements a ring independent ideal type used in scheme.lib. You can use
++, * and ^ for addition, multiplication and exponentiation. The key in contains the
+base ring of the ideal, the key value contains the ideal. You can call the constructor
+by assigning an ideal of the type ideal to an ideal of the type Ideal via =.
+
+KEYWORDS:
+ideals
+
+PROCEDURES:
+makeIdeal(I);  constructor for the Ideal type
+";
+
+static proc mod_init()
+{
+  newstruct("Ideal","ring in, ideal value");
+  system("install","Ideal","print",printIdeal,1);
+  system("install","Ideal","string",stringIdeal,4);
+  system("install","Ideal","+",addIdeal,2);
+  system("install","Ideal","*",multIdeal,2);
+  system("install","Ideal","^",expIdeal,2);
+  system("install","Ideal","=",makeIdeal,1);
+}
+
+
+proc makeIdeal(ideal i)
+"USAGE: makeIdeal(I); I ideal
+RETURN: make a ring independent Ideal from Ideal
+EXAMPLE: example makePoly, shows an example"
+{
+Ideal I;
+I.in=basering;
+I.value=i;
+return(I);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y),dp;
+Ideal I=ideal(2x3+x2y-1,y2+3);
+Ideal J=ideal(x+y,y2+1);
+I+J;
+I*J;
+J^2;
+}
+
+
+static proc printIdeal(Ideal I)
+"USAGE: printIdeal(I); I Ideal
+RETURN: print Ideal
+EXAMPLE: example printIdeal, shows an example"
+{
+def R=basering;
+def SS=I.in;
+setring SS;
+I.value;
+setring R;
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y),dp;
+Ideal I=ideal(4x3+2x2y-1,5y2-xy+3);
+I;
+}
+
+
+
+static proc stringIdeal(Ideal I)
+{
+def R=basering;
+def S=I.in;
+setring S;
+string st=string(I.value);
+setring R;
+return(st);
+}
+
+
+
+static proc addIdeal(Ideal I,Ideal J)
+{
+def R=basering;
+def S1=I.in;
+setring S1;
+Ideal IplusJ=I.value+J.value;
+setring R;
+return(IplusJ);
+}
+
+
+
+static proc multIdeal(Ideal I,Ideal J)
+{
+def R=basering;
+def S1=I.in;
+setring S1;
+Ideal ItimesJ=(I.value)*(J.value);
+setring R;
+return(ItimesJ);
+}
+
+
+
+
+static proc expIdeal(Ideal I,int n)
+{
+def R=basering;
+def S1=I.in;
+setring S1;
+Ideal Iexpn=(I.value)^n;
+setring R;
+return(Iexpn);}
+

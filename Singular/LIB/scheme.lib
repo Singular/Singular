@@ -1,0 +1,3825 @@
+//
+version="version scheme.lib 1.0.0.0 Apr_2021 "; $Id$
+category="Algebraic geometry";
+info="
+LIBRARY: scheme.lib  Schemes
+
+AUTHORS:  Benjamin Mirgain
+          Janko Boehm, e-mail:boehm@mathematik.uni-kl.de
+
+OVERVIEW:
+The library implements various new classes centered around schemes.
+
+The chart type represents an affine chart of the form Spec R/I, with I being an ideal and
+R being the ring it is defined in. There is a constructor for charts which can be called by
+assigning an ideal using =.
+
+The ratFunc type represents a rational function and is made to be ring independent. This type
+is used to define morphisms between charts and schemes. You can use +, -, *, /, == for addition,
+substraction, multiplication, division and comparison. The constructor can be called by
+assigning one or two polynomials to a rational function via =.
+
+The chartmap type represents a morphism from an open subset of a chart to another chart, it
+contains two charts preim and im, representing the image and preimage of the morphism, as well as
+an ideal dom, being ideal defining the locus that is the complement of the open subset of preim
+which is the domain of the chartmap, furthermore it contains a list ratFuncs containing the
+rational functions which are the images of the variables of the ring in im under the ring morphism
+induced by the charmap. You can use * in order to compute the composition of two chartmaps, as
+long as they are compatible. The contructor of chartmaps can be called by using =.
+
+The scheme type is made up of two lists one containing the charts covering the scheme and the other
+containing the gluing morphisms between the charts.
+
+The divisor type represents a divisor of scheme.
+It contains a scheme space, representing the ambient space the divisor is in,
+as well as two lists schemes and mults, the forst containing the schemes
+which make up the divisor and the second containg the corresponding multiplicities. You can add and
+substract divisors via + and -.
+
+The morphism type represents a morphism between two schemes, it contains two schemes preim and im,
+representing the image and preimage of the morphism, as well as a list chartmaps containing the
+chartmaps between the charts of preim and the charts of im induced by the morphism. You can use *
+to compute the composition of two morphisms.
+
+Lastly the blowUpMap type is a type which represents the morphism of a blow up. In contrast two the
+morphism type it also contains all the relevant information of a blow up. It contains four schemes
+base, representing the base scheme, blow, representing the blow up, center, representing the center
+of the blow up, and exDiv, representing the exceptional divisor. Furthermore the list maps contains
+the maps contains the chartmaps defining the morphism.
+
+
+
+KEYWORDS: schemes, divisors
+
+PROCEDURES:
+blowUp(X,Y); computes the blow up of scheme X along the center Y
+ChartmapCompIdeal(phi,I); Computes the inverse image under phi of the closed subscheme defined by the ideal I
+ChartmapCompChartmap(phi,psi); Computes the composition of the chartmap phi with the chartmap psi
+ChartToScheme(U); converts chart U to a scheme
+CompleteIntersectionCover(X,W); Computes a scheme isomorphic to X, where each chart is a complete intersection
+dimension(X); computes the dimension of the scheme X
+FibreProduct(X,Y); computes the fibre product of the scheme X with the scheme Y
+HybrSmoothTest(X); smoothness test for scheme X, only works for equidimensional X
+intersection(X,Y); computes the scheme theoretic intersection of the schemes X and Y
+IntersectionNumber(D1,...); computes the intersection of the divisors D1,...
+InvImage(Y,phi); computes the inverse image of the scheme Y under the morphism phi
+IrredDec(X); computes the scheme theoretical irreducible decomposition of the scheme X
+isReduced(X); checks whether given scheme is reduced
+isSmooth(X); checks whether given scheme is smooth
+makeAffineScheme(I); constructs the affine scheme Spec R/I, where R=basering
+makeChart(I); constructor for chart type
+makeChartmap(U,V,Dom,L); constructor for chartmap type
+makeDivisor((Y1,m1),(Y2,m2),...,X); constructor for divisor type
+makeMorphism(X,Y,L); constructor for morphism type
+makeProjScheme(I); constructs the projective scheme Proj R/I, where R=basering and I homogeneous
+makeratFunc(f[,g]); constructor for ratFunc type
+MorphismCompMorphism(phi,psi); Computes the composition of the morphism phi with the morphism psi
+PolyCompratFunc(P,r_1,...,r_n); replaces the variables of the Poly P by the ratFuncs r_1,...,r_n
+ratFuncCompratFunc(F,r_1,...,r_n); replaces the variables of the ratFunc F by the ratFuncs r_1,...,r_n
+ReducedScheme(X); computes the reduced scheme of a given scheme X
+strictTransform(X,pi); strict transformation of X along the blowUpMap pi
+union(X,Y); computes the scheme theoretic union of the schemes X and Y
+";
+
+LIB "idealclass.lib";
+LIB "sing.lib";
+LIB "elim.lib";
+LIB "polyclass.lib";
+LIB "primdec.lib";
+LIB "matrix.lib";
+LIB "grobcov.lib";
+
+static proc mod_init()
+{
+  newstruct("chart","ring in, ideal value");
+  newstruct("chartmap","chart preim, chart im, ideal dom, list ratFuncs");
+  newstruct("scheme","list cover, list maps");
+  newstruct("morphism","scheme preim, scheme im, list chartmaps");
+  newstruct("divisor","scheme space, list schemes, list mults");
+  newstruct("ratFunc","ring in, poly num, poly den");
+  newstruct("blowUpMap","scheme blow, scheme base, scheme exDiv, scheme center, list maps");
+
+  system("install","chart","=",makeChart,1);
+  system("install","chartmap","=",makeChartmap,1);
+  system("install","chart","print",printChart,1);
+  system("install","chartmap","print",printChartmap,1);
+  system("install","chart","==",equalChart,2);
+  system("install","chart","!=",notequalChart,2);
+  system("install","chartmap","==",equalChartmap,2);
+  system("install","chartmap","!=",notequalChartmap,2);
+  system("install","scheme","==",equalScheme,2);
+  system("install","scheme","!=",notequalScheme,2);
+  system("install","scheme","print",printScheme,1);
+  system("install","ratFunc","=",makeratFunc,1);
+  system("install","ratFunc","print",printratFunc,1);
+  system("install","ratFunc","string",stringratFunc,4);
+  system("install","ratFunc","+",addratFunc,2);
+  system("install","ratFunc","-",subratFunc,2);
+  system("install","ratFunc","*",multratFunc,2);
+  system("install","ratFunc","/",divideratFunc,2);
+  system("install","ratFunc","==",equalratFunc,2);
+  system("install","ratFunc","!=",notequalratFunc,2);
+  system("install","ratFunc","^",expratFunc,2);
+  system("install","chartmap","[",ChartmapCompIdeal,2);
+  system("install","chartmap","*",ChartmapCompChartmap,2);
+  system("install","divisor","=",makeDivisor,1);
+  system("install","divisor","+",AddDivisor,2);
+  system("install","divisor","-",SubDivisor,2);
+  system("install","divisor","*",intTimesDivisor,2);
+  system("install","morphism","=",makeMorphism,1);
+  system("install","morphism","*",MorphismCompMorphism,2);
+}
+
+
+///////////////////////////////////////////////////
+//    Intersection Number
+///////////////////////////////////////////////////
+
+//Used for calculations in IntersectionNumber
+static proc partSum(scheme X, int i, int lower, int upper, ideal S)
+{
+    int result=0;
+    int l=lower;
+    ideal I;
+    while(l<=upper)
+    {
+          I=X.maps[i][l].dom;
+          def L=sat(S,I);
+          result=result+vdim(L[1]);
+          result=result-partSum(X,i,l+1,upper,L[1]);
+          l=l+1;
+          kill L;
+    }
+    return(result);
+}
+
+
+proc IntersectionNumber(list #)
+"USAGE: IntersectionNumber(D1,D2,...,Dn); D1,D2,... divisors
+ASSUME: The inputs all lie in general position in the same ambient space and
+        the number of inputs is equal to the dimension of the ambient space
+RETURN: The intersection number of the inputs
+EXAMPLE: example IntersectionNumber; shows an example"
+{
+    def S=basering;
+    int i,j,k,l;
+    if(typeof(#[1])!="divisor")
+    {   ERROR("Wrong inputs!");}
+    scheme X=#[1].space;
+    if(size(#)!=dimension(X))
+    {   ERROR("Wrong number of inputs!");}
+    for(k=1; k<=size(#); k=k+1)
+    {
+       if(typeof(#[k])!="divisor")
+       {   ERROR("Wrong inputs!");}
+       if(#[k].space!=X)
+       {   ERROR("Incompatible inputs!");}
+    }
+    scheme Z;
+    int result=0;
+    intvec iv;
+    int n=1;
+    for(i=1; i<=size(#); i=i+1)
+    {
+       n=n*size(#[i].schemes);
+    }
+    for(i=1;i<=n;i=i+1)
+    {
+        j=i-1;
+        for(k=1; k<=size(#); k=k+1)
+        {
+           iv[k]=(j % size(#[k].schemes))+1;
+           j=j div size(#[k].schemes);
+        }
+        j=iv[1];
+        Z=#[1].schemes[j];
+        for(k=2; k<=size(#); k=k+1)
+        {
+            j=iv[k];
+            Z=intersection(Z,#[k].schemes[j]);
+        }
+        if(dimension(Z)!=0)
+        {   ERROR("Divisors not in general position!");}
+        for(l=1;l<=size(X.cover);l=l+1)
+        {
+            def R=X.cover[l].in;
+            setring R;
+            int d=vdim(std(Z.cover[l].value+X.cover[l].value));
+            k=l+1;
+            while((d>0) and (k<=size(X.cover)))
+            {
+                ideal K=X.maps[l][k].dom;
+                def L=sat(Z.cover[l].value+X.cover[l].value,K);
+                kill K;
+                d=d-vdim(L[1]);
+                d=d+partSum(X,l,l+1,k-1,L[1]);
+                k=k+1;
+                kill L;
+            }
+            for(k=1; k<=size(#); k=k+1)
+            {
+                j=iv[k];
+                d=d*#[k].mults[j];
+            }
+            result=result+d;
+            kill d,R;
+        }
+        setring S;
+    }
+
+    setring S;
+    return(result);
+}
+example
+{
+"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(0);
+scheme Y=makeProjScheme(ideal(x-z),X);
+divisor A=list(Y,2),X;
+Y=makeProjScheme(ideal(x2-zy),X);
+scheme Z=makeProjScheme(ideal(x2z-z2y+y3),X);
+divisor B=list(Y,1),list(Z,1),X;
+Y=makeProjScheme(ideal(y),X);
+divisor C=list(Y,1),X;
+IntersectionNumber(3*C-A,B);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//      Chart stuff
+//////////////////////////////////////////////////////////////////////////
+
+proc makeChart(ideal I)
+"USAGE: makeChart(I); ideal I
+RETURN: chart representing Spec R/I, where R=basering
+EXAMPLE: example makeChart; shows an example"
+{
+   chart C;
+   C.in=basering;
+   C.value=I;
+   return(C);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+chart U=ideal(x2-yz);
+U;
+}
+
+// For comparing charts
+static proc equalChart(chart U, chart V)
+{
+   if(U.in!=V.in)
+   {
+      return(0);
+   }else{
+      def R=basering;
+      def S=U.in;
+      setring S;
+
+      if((std(quotient(U.value,V.value))!=1)&&(std(quotient(V.value,U.value))!=1))
+      {
+         setring R;
+         return(0);
+      }
+
+      setring R;
+      return(1);
+   }
+}
+
+// Also for comparing charts
+static proc notequalChart(chart U, chart V)
+{
+   return(!equalChart(U,V));
+}
+
+
+proc makeChartmap(chart Preim, chart Im, list #)
+"USAGE: makeChartmap(Preim,Im,Dom,L); Preim,Im=charts, Dom=ideal/Ideal, L=list
+        makeChartmap(Preim,Im,L); Preim,Im=charts, L=list
+ASSUME: Dom has to belong to the ring Preim.in
+        The list L is supposed to contain the entries of the list ratFuncs from the output
+        If n=size(Dom) and m=nvars(Im.in), then the list L should either be a list of n
+        lists with m ratFunc types each, or it should be a list of n*m ratFunc types in which
+        case the first m entries fill up the first list of ratFuncs and so on.
+RETURN: chartmap with the given input as data, if Dom is not given as an input, then it
+        is the ideal dom from the output will represent the largest possible domain
+EXAMPLE: example makeChartmap; creates an example"
+{
+   chartmap result;
+   result.preim=Preim;
+   result.im=Im;
+   int i,j;
+   intvec iv;
+
+   def R=basering;
+   def S=Preim.in;
+   def SS=Im.in;
+
+   setring S;
+   ideal Dom;
+   poly f;
+   if((typeof(#[1])=="ideal")||(typeof(#[1])=="Ideal"))
+   {
+      if(typeof(#[1])=="Ideal")
+      {
+         Dom=#[1].value;
+      }
+      else
+      {
+         Dom=#[1];
+      }
+      result.dom=Dom;
+      #=delete(#,1);
+      if(typeof(#[1])=="list")
+      {
+         if(typeof(#[1][1])=="ratFunc")
+         {
+            if(size(#)>1)
+            {
+            if(size(#)!=size(Dom))
+            {   ERROR("Incorrect number of inputs!");}
+            result.ratFuncs=#;
+            }else{
+            #=#[1];
+            }
+         }else{
+         #=#[1];
+         if(typeof(#[1])=="list")
+         {
+         if(size(#)!=size(Dom))
+         {   ERROR("Incorrect number of inputs!");}
+         result.ratFuncs=#;
+         }}
+      }
+      if(typeof(#[1])=="ratFunc")
+      {
+         if(size(#)!=size(Dom)*nvars(SS))
+         {   ERROR("Incorrect number of inputs!");}
+         for(i=1; i<=size(Dom); i=i+1)
+         {
+            result.ratFuncs[i]=list();
+            for(j=1; j<=nvars(SS); j=j+1)
+            {
+               result.ratFuncs[i][j]=#[(i-1)*nvars(SS)+j];
+            }
+         }
+      }
+   }
+   else
+   {
+      if(typeof(#[1])=="list")
+      {
+         f=1;
+         for(j=1; j<=size(#); j=j+1)
+         {
+            f=1;
+            for(i=1; i<=size(#[j]); i=i+1)
+            {
+                f=lcm(f,#[j][i].den);
+            }
+            Dom=Dom+f;
+         }
+         result.dom=Dom;
+         result.ratFuncs=#;
+      }
+      if(typeof(#[1])=="ratFunc")
+      {
+         if((size(#)%nvars(SS))!=0)
+         {   ERROR("Incorrect number of inputs!");}
+         int s=size(#) div nvars(SS);
+         for(i=1; i<=s; i=i+1)
+         {
+            result.ratFuncs[i]=list();
+            f=1;
+            for(j=1; j<=nvars(SS); j=j+1)
+            {
+               f=lcm(f,#[(i-1)*nvars(SS)+j].den);
+               result.ratFuncs[i][j]=#[(i-1)*nvars(SS)+j];
+            }
+            Dom=Dom+f;
+         }
+         result.dom=Dom;
+      }
+   }
+
+   kill Dom,f;
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(a,b,c,d),dp;
+chart U=ad-bc;
+Ideal I=ideal(c,d);
+ratFunc F=a,c;
+ratFunc G=b,d;
+list L=list(list(F),list(G));
+ring S=0,(x),dp;
+chart V=0;
+
+chartmap phi=U,V,I,L;
+phi;
+
+chartmap psi=U,V,I,F,G;
+psi==phi;
+
+psi=U,V,L;
+psi==phi;
+
+psi=U,V,F,G;
+psi==phi;
+}
+
+// Print routine for chart
+static proc printChart(chart C)
+{
+   def R=basering;
+   def S=C.in;
+   setring S;
+   "ring = "+string(S);
+   "quotient = "+string(C.value);
+   setring R;
+}
+
+// Print routine for chartmap
+static proc printChartmap(chartmap phi)
+{
+   def B=basering;
+   def R=phi.preim.in;
+   def S=phi.im.in;
+   int i,k;
+
+   setring R;
+   "Preimage ring: ("+string(R)+")/("+string(phi.preim.value)+")";
+   "Domain: D("+string(phi.dom)+")";
+   setring S;
+   "Image ring: ("+string(S)+")/("+string(phi.im.value)+")";
+   string st;
+   int n=size(phi.ratFuncs);
+   int m=nvars(S);
+   for(k=1; k<=n; k=k+1)
+   {
+   setring R;
+   "Map restricted to D("+string(phi.dom[k])+"):";
+   st="     ("+varstr(R)+") -----> ( ";
+   for(i=1; i<m; i=i+1)
+   {
+      st=st+string(phi.ratFuncs[k][i])+" , ";
+   }
+   st=st+string(phi.ratFuncs[k][m])+" )";
+   st;
+   }
+   setring B;
+}
+
+// Used for comparing chartmaps
+static proc equalChartmap(chartmap phi, chartmap psi)
+{
+   if((phi.preim!=psi.preim)||(phi.im!=psi.im))
+   {
+      return(0);
+   }
+
+   def R=basering;
+   def S=phi.preim.in;
+   setring S;
+
+   if(size(phi.dom)!=size(psi.dom))
+   {
+      setring R;
+      return(0);
+   }
+
+   int i,j;
+   for(i=1; i<=size(phi.dom); i=i+1)
+   {
+      if(phi.dom[i]!=psi.dom[i])
+      {
+         setring R;
+         return(0);
+      }
+   }
+
+
+   for(i=1; i<=size(phi.dom); i=i+1)
+   {
+      for(j=1; j<=size(phi.ratFuncs[i]); j=j+1)
+      {
+         poly f=phi.ratFuncs[i][j].num*psi.ratFuncs[i][j].den-psi.ratFuncs[i][j].num*phi.ratFuncs[i][j].den;
+         if(std(reduce(f,sat(phi.preim.value,ideal(phi.dom[i]))[1]))!=0)
+         {
+            setring R;
+            return(0);
+         }
+         kill f;
+      }
+   }
+
+   setring R;
+   return(1);
+}
+
+// Used for comparing chartmaps
+static proc notequalChartmap(chartmap phi, chartmap psi)
+{
+   return(!equalChartmap(phi,psi));
+}
+
+// Used for comparing schemes
+static proc equalScheme(scheme X, scheme Y)
+{
+   int i,j;
+
+   if(size(X.cover)!=size(Y.cover))
+   {
+      return(0);
+   }
+
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      if(X.cover[i]!=Y.cover[i])
+      {
+         return(0);
+      }
+   }
+
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      for(j=1; j<=size(X.cover); j=j+1)
+      {
+         if(X.maps[i][j]!=Y.maps[i][j])
+         {
+            return(0);
+         }
+      }
+   }
+
+   return(1);
+}
+
+// Used for comparing schemes
+proc notequalScheme(scheme X, scheme Y)
+{
+   return(!equalScheme(X,Y));
+}
+
+// Print routine for schemes
+static proc printScheme(scheme X)
+{
+   def R=basering;
+   int i,j,k,m,l;
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      "Chart U"+string(i)+":";
+      X.cover[i];
+   }
+   "";
+   chartmap phi;
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      for(j=1; j<=size(X.cover); j=j+1)
+      {
+         "Map U"+string(i)+" -> U"+string(j)+":";
+
+         phi=X.maps[i][j];
+         def T=phi.preim.in;
+         def S=phi.im.in;
+
+         setring T;
+         "Domain: D("+string(phi.dom)+")";
+
+         setring S;
+         string st;
+         m=nvars(S);
+         for(k=1; k<=size(phi.ratFuncs); k=k+1)
+         {
+         setring T;
+         "Map restricted to D("+string(phi.dom[k])+"):";
+         st="     ("+varstr(T)+") -----> ( ";
+         for(l=1; l<m; l=l+1)
+         {
+            st=st+string(phi.ratFuncs[k][l])+" , ";
+         }
+         st=st+string(phi.ratFuncs[k][m])+" )";
+         st;
+         "";
+         }
+         kill st;
+         kill T,S;
+      }
+   }
+   setring R;
+}
+
+
+proc ChartToScheme(chart U)
+"USAGE: ChartToScheme(U); chart U
+RETURN: scheme type corresponding to the affine scheme that corresponds to U
+EXAMPLE: example ChartToScheme; creates an example"
+{
+    def R=basering;
+    scheme result;
+
+    result.cover[1]=U;
+    def S=U.in;
+    setring S;
+
+    list L;
+    ratFunc r;
+    for(int i=1;i<=nvars(S);i=i+1)
+    {
+       r=var(i);
+       L[i]=r;
+    }
+    chartmap Phi=U,U,L;
+    result.maps=list(list(Phi));
+
+    setring R;
+    return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y),dp;
+chart U=x2-y3;
+scheme X=ChartToScheme(U);
+X;
+scheme Y=makeAffineScheme(x2-y3);
+X==Y;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//  Basic constructions of schemes
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+proc makeAffineScheme(ideal I, list #)
+"USAGE: makeAffineScheme(I[,X]); I ideal, X scheme
+RETURN: affine Space V(I), if scheme X is given, then V(I) is created as a subscheme of X
+EXAMPLE: example makeAffineScheme; shows an example"
+{
+    scheme result;
+
+    if(size(#)==0)
+    {
+    chart U=I;
+    result.cover=list(U);
+
+    list L;
+    ratFunc r;
+    for(int i=1;i<=nvars(basering);i=i+1)
+    {
+       r=var(i);
+       L[i]=r;
+    }
+    chartmap Phi=U,U,L;
+    result.maps=list(list(Phi));
+    }
+
+    if((size(#)==1)&&(typeof(#[1])=="scheme"))
+    {
+    scheme X=#[1];
+    def R=basering;
+    def S=X.cover[1].in;
+    if((nvars(R)!=nvars(S))||(size(X.cover)!=1))
+    {   ERROR("Inputs not compatible");}
+
+    setring S;
+    ideal J=0;
+    for(int i=1;i<=nvars(S);i=i+1)
+    {
+       J=J,var(i);
+    }
+    J=delete(J,1);
+    map phi=R,J;
+
+    chart U=phi(I);
+    if(std(reduce(X.cover[1].value,std(U.value)))!=0)
+    {   ERROR("Inputs not compatible");}
+    result.cover=result.cover+list(U);
+    result.maps=X.maps;
+
+    result.maps[1][1].preim=U;
+    result.maps[1][1].im=U;
+
+    setring R;
+    }
+
+    return(result);
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring R=0,(x,y),dp;
+   scheme X=makeAffineScheme(ideal(0));
+   X.cover;
+   X.maps;
+   scheme Y=makeAffineScheme(ideal(x2-y3-y2),X);
+   Y.cover;
+   Y.maps;
+}
+
+
+
+
+
+proc makeProjScheme(ideal I, list #)
+"USAGE: makeProjScheme(I[,X]); I ideal, X scheme
+RETURN: projective Space V(I), if scheme X is given, then V(I) is created as a subscheme of X
+EXAMPLE: example makeProjScheme; shows an example"
+{
+    scheme result;
+    if(!homog(I))
+    {   ERROR("Ideal has to be homogeneous");}
+    def R=basering;
+
+    if(size(#)==0)
+    {
+    ring S;
+
+    int n=nvars(R);
+    int i,j;
+    chart U;
+    for(i=1;i<=n;i=i+1)
+    {
+       list rl=ringlist(R);
+       rl[2]=delete(rl[2],i);
+       rl[3]=list(list("dp",1:(n-1)),list("C",0));
+       S=ring(rl);
+
+       setring S;
+       ideal J=0;
+       for(j=1;j<=n;j=j+1)
+       {
+          if(j<i)
+          {   J=J,var(j);}
+          if(j==i)
+          {   J=J,1;}
+          if(j>i)
+          {   J=J,var(j-1);}
+       }
+       J=delete(J,1);
+       map phi=R,J;
+       kill J;
+       U=phi(I);
+       kill phi;
+
+       result.cover[i]=U;
+    }
+    setring R;
+
+    chartmap phi;
+    chart Preim;
+    chart Im;
+    int k;
+    list L;
+    for(i=1;i<=n;i=i+1)
+    {
+       result.maps[i]=list();
+       for(j=1;j<=n;j=j+1)
+       {
+          Preim=result.cover[i];
+          Im=result.cover[j];
+
+          S=Preim.in;
+          setring S;
+          L=list();
+          for(k=1;k<=n;k=k+1)
+          {
+             if(k!=j)
+             {
+             if(i<j)
+             {
+                if(k<i)
+                {   ratFunc rat=var(k),var(j-1);}
+                if(k==i)
+                {   ratFunc rat=1,var(j-1);}
+                if((k>i))
+                {   ratFunc rat=var(k-1),var(j-1);}
+             }
+             if(i==j)
+             {
+                if(k<j)
+                {   ratFunc rat=var(k);}
+                if(k>j)
+                {   ratFunc rat=var(k-1);}
+             }
+             if(i>j)
+             {
+                if((k<i))
+                {   ratFunc rat=var(k),var(j);}
+                if(k==i)
+                {   ratFunc rat=1,var(j);}
+                if((k>i))
+                {   ratFunc rat=var(k-1),var(j);}
+             }
+             L=L+list(rat);
+             kill rat;
+             }
+          }
+          phi=Preim,Im,L;
+
+          result.maps[i][j]=phi;
+       }
+    }
+    }
+
+    if((size(#)==1)&&(typeof(#[1])=="scheme"))
+    {
+    scheme X=#[1];
+    if(nvars(R)!=size(X.cover))
+    {   ERROR("Inputs are incompatible");}
+
+    ring S;
+    int n=nvars(R);
+    int i,j;
+    for(i=1;i<=n;i=i+1)
+    {
+       S=X.cover[i].in;
+       if(nvars(S)!=n-1)
+       {   ERROR("Inputs are incompatible");}
+
+       setring S;
+       ideal J=0;
+       for(j=1;j<=n;j=j+1)
+       {
+          if(j<i)
+          {   J=J,var(j);}
+          if(j==i)
+          {   J=J,1;}
+          if(j>i)
+          {   J=J,var(j-1);}
+       }
+       J=delete(J,1);
+       map phi=R,J;
+       kill J;
+
+       chart U=phi(I);
+       if(reduce(X.cover[i].value,std(U.value))!=0)
+       {   ERROR("Inputs are incompatible");}
+       result.cover[i]=U;
+       kill phi,U;
+    }
+
+    result.maps=X.maps;
+    for(i=1;i<=n;i=i+1)
+    {
+       for(j=1;j<=n;j=j+1)
+       {
+          result.maps[i][j].preim=result.cover[i];
+          result.maps[i][j].im=result.cover[j];
+       }
+    }
+    }
+
+    setring R;
+    return(result);
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring R=0,(x,y,z),dp;
+   scheme X=makeProjScheme(ideal(0));
+   X;
+   scheme Y=makeProjScheme(ideal(x2z-y3-y2z),X);
+   Y;
+}
+
+
+
+proc FibreProduct(scheme X, scheme Y)
+"USAGE: FibreProduct(X,Y); X,Y scheme
+RETURN: The Fibre Product of X and Y
+EXAMPLE: example FibreProduct; shows an example"
+{
+   scheme result;
+   def R=basering;
+   int i,j,n,m,k,l;
+   intvec iv,jv;
+
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+   for(j=1; j<=size(Y.cover); j=j+1)
+   {
+      def Sx=X.cover[i].in;
+      def Sy=Y.cover[j].in;
+      def S=ringtensor(Sx,Sy);
+      setring S;
+
+      n=nvars(Sx);
+      m=nvars(Sy);
+      ideal Xvars,Yvars;
+      for(k=1; k<=n; k=k+1)
+      {
+         Xvars=Xvars+var(k);
+      }
+      for(k=1; k<=m; k=k+1)
+      {
+         Yvars=Yvars+var(n+k);
+      }
+      map fx=Sx,Xvars;
+      map fy=Sy,Yvars;
+
+      setring Sx;
+      ideal Ix=X.cover[i].value;
+      setring Sy;
+      ideal Iy=Y.cover[j].value;
+      setring S;
+      chart U=fx(Ix)+fy(Iy);
+      result.cover=result.cover+list(U);
+
+      setring Sx;
+      kill Ix;
+      setring Sy;
+      kill Iy;
+      setring S;
+      kill U,fx,fy,Xvars,Yvars;
+      kill Sx,Sy,S;
+   }}
+
+   list Dx,Dy,Xpartmaps,Ypartmaps,Partmaps,Maps;
+   chartmap Phi;
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+   for(j=1; j<=size(Y.cover); j=j+1)
+   {
+   Maps=list();
+   for(k=1; k<=size(X.cover); k=k+1)
+   {
+   for(l=1; l<=size(Y.cover); l=l+1)
+   {
+      Dx=list();
+      Dy=list();
+      Xpartmaps=list();
+      Ypartmaps=list();
+      Partmaps=list();
+
+      def Sx=X.cover[i].in;
+      def Sy=Y.cover[j].in;
+      def S=result.cover[(i-1)*size(Y.cover)+j].in;
+      setring S;
+
+      ideal Xvars,Yvars,Dom;
+      for(n=1; n<=nvars(Sx); n=n+1)
+      {
+         Xvars=Xvars+var(n);
+      }
+      for(n=1; n<=nvars(Sy); n=n+1)
+      {
+         Yvars=Yvars+var(n+nvars(Sx));
+      }
+      map fx=Sx,Xvars;
+      map fy=Sy,Yvars;
+
+      Poly P;
+      ratFunc F;
+      for(n=1; n<=size(X.maps[i][k].ratFuncs); n=n+1)
+      {
+         Xpartmaps[n]=list();
+         setring Sx;
+         poly f,g;
+         setring S;
+         for(m=1; m<=size(X.maps[i][k].ratFuncs[n]); m=m+1)
+         {
+            setring Sx;
+            f=X.maps[i][k].ratFuncs[n][m].num;
+            g=X.maps[i][k].ratFuncs[n][m].den;
+            setring S;
+            F=fx(f),fx(g);
+            Xpartmaps[n][m]=F;
+         }
+         setring Sx;
+         f=X.maps[i][k].dom[n];
+         setring S;
+         Dx[n]=fx(f);
+
+         setring Sx;
+         kill f,g;
+         setring S;
+      }
+
+      for(n=1; n<=size(Y.maps[j][l].ratFuncs); n=n+1)
+      {
+         Ypartmaps[n]=list();
+         setring Sy;
+         poly f,g;
+         setring S;
+         for(m=1; m<=size(Y.maps[j][l].ratFuncs[n]); m=m+1)
+         {
+            setring Sy;
+            f=Y.maps[j][l].ratFuncs[n][m].num;
+            g=Y.maps[j][l].ratFuncs[n][m].den;
+            setring S;
+            F=fy(f),fy(g);
+            Ypartmaps[n][m]=F;
+         }
+         setring Sy;
+         f=Y.maps[j][l].dom[n];
+         setring S;
+         Dy[n]=fy(f);
+
+         setring Sy;
+         kill f,g;
+         setring S;
+      }
+
+      for(n=1; n<=size(X.maps[i][k].ratFuncs); n=n+1)
+      {
+      for(m=1; m<=size(Y.maps[j][l].ratFuncs); m=m+1)
+      {
+         Dom=Dom+Dx[n]*Dy[m];
+         Partmaps=Partmaps+Xpartmaps[n]+Ypartmaps[m];
+      }}
+
+      Phi=result.cover[(i-1)*size(Y.cover)+j],result.cover[(k-1)*size(Y.cover)+l],Dom,Partmaps;
+      Maps=Maps+list(Phi);
+
+      setring S;
+      kill P,F,fx,fy,Xvars,Yvars,Dom;
+      kill Sx,Sy,S;
+   }}
+   result.maps=result.maps+list(Maps);
+   }}
+
+   return(result);
+}
+example
+{"EXAMPLE:"; "echo=2";
+ring R=0,(x(1..3)),dp;
+scheme X=makeProjScheme(ideal(x(1)^2-x(2)*x(3)));
+ring S=0,(y(1..2)),dp;
+scheme Y=makeProjScheme(ideal(y(1)-y(2)));
+
+scheme Z=FibreProduct(X,Y);
+Z;
+}
+
+
+proc intersection(scheme X, scheme Y)
+"USAGE: intersection(X,Y); X,Y scheme
+RETURN: Scheme theoretic intersection of X and Y
+EXAMPLE: example intersection; shows an example"
+{
+   if(size(X.cover)!=size(Y.cover))
+   {   ERROR("Inputs not compatible");}
+
+   def R=basering;
+   scheme result;
+   int i,j;
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      if(X.cover[i].in!=Y.cover[i].in)
+      {   ERROR("Inputs not compatible");}
+
+      def S=X.cover[i].in;
+      setring S;
+      chart U=X.cover[i].value+Y.cover[i].value;
+      result.cover[i]=U;
+
+      kill U;
+      kill S;
+   }
+
+   result.maps=X.maps;
+
+   for(i=1; i<=size(result.cover); i=i+1)
+   {
+      for(j=1; j<=size(result.cover); j=j+1)
+      {
+         result.maps[i][j].preim=result.cover[i];
+         result.maps[i][j].im=result.cover[j];
+      }
+   }
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(0);
+scheme Y=makeProjScheme(ideal(x2-yz),X);
+scheme Z=makeProjScheme(ideal(xy2-z3),X);
+
+scheme S=intersection(Y,Z);
+S;
+}
+
+
+
+proc union(scheme X, scheme Y)
+"USAGE: union(X,Y); X,Y scheme
+RETURN: Scheme theoretic union of X and Y
+EXAMPLE: example union; shows an example"
+{
+   if(size(X.cover)!=size(Y.cover))
+   {   ERROR("Inputs not compatible");}
+
+   def R=basering;
+   scheme result;
+   int i,j;
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      if(X.cover[i].in!=Y.cover[i].in)
+      {   ERROR("Inputs not compatible");}
+
+      def S=X.cover[i].in;
+      setring S;
+      chart U=intersect(X.cover[i].value,Y.cover[i].value);
+      result.cover[i]=U;
+
+      kill U;
+      kill S;
+   }
+
+   result.maps=X.maps;
+
+   for(i=1; i<=size(result.cover); i=i+1)
+   {
+      for(j=1; j<=size(result.cover); j=j+1)
+      {
+         result.maps[i][j].preim=result.cover[i];
+         result.maps[i][j].im=result.cover[j];
+      }
+   }
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(0);
+scheme Y=makeProjScheme(ideal(x2-yz),X);
+scheme Z=makeProjScheme(ideal(xy2-z3),X);
+
+scheme S=union(Y,Z);
+S;
+}
+
+
+proc ReducedScheme(scheme X)
+"USAGE: ReducedScheme(X); X scheme
+RETURN: The associated reduced scheme
+EXAMPLE: example ReducedScheme; shows an example"
+{
+   def R=basering;
+   scheme result;
+   int i,j;
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      def S=X.cover[i].in;
+      setring S;
+      chart U=radical(X.cover[i].value);
+      result.cover[i]=U;
+
+      kill U;
+      kill S;
+   }
+
+   result.maps=X.maps;
+
+   for(i=1; i<=size(result.cover); i=i+1)
+   {
+      for(j=1; j<=size(result.cover); j=j+1)
+      {
+         result.maps[i][j].preim=result.cover[i];
+         result.maps[i][j].im=result.cover[j];
+      }
+   }
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(x2y3z4);
+"Original Scheme:";
+X;
+
+"Reduced Scheme:";
+scheme S=ReducedScheme(X);
+S;
+}
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//  Schemes Miscelanious
+//////////////////////////////////////////////////////////////////////////////////////////
+
+proc dimension(scheme X)
+"USAGE: dimension(X); X scheme
+RETURN: The dimension of the scheme X
+EXAMPLE: example dimension; shows an example"
+{
+    def R=basering;
+    int d=-1;
+    for(int i=1; i<=size(X.cover); i=i+1)
+    {
+       def S=X.cover[i].in;
+       setring S;
+       if(d<dim(std(X.cover[i].value)))
+       {   d=dim(std(X.cover[i].value));}
+       kill S;
+    }
+
+    setring R;
+    return(d);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeAffineScheme(x-yz);
+dimension(X);
+
+X=makeProjScheme(x);
+dimension(X);
+
+X=makeProjScheme(ideal(x,y));
+dimension(X);
+
+X=makeProjScheme(ideal(x,y,z));
+dimension(X);
+}
+
+
+
+proc IrredDec(scheme X)
+"USAGE: IrredDec(X); X scheme
+RETURN: A list L of the irreducible components and their associated points
+            L[i][1] is the i-th irreducible component
+            L[i][2] is the associated point of the i-th component
+EXAMPLE: example IrredDec; shows an example"
+{
+    def R=basering;
+    list Dec;
+
+    int i,j,k,t;
+    for(i=1; i<=size(X.cover); i=i+1)
+    {
+       def S=X.cover[i].in;
+       setring S;
+       list L=primdecGTZ(X.cover[i].value);
+       for(j=1; j<=size(L); j=j+1)
+       {
+          Ideal Q,P;
+          Q=L[j][1];
+          P=L[j][2];
+          scheme Y,Z;
+          if(std(Q.value)!=1)
+          {
+          Y.maps=X.maps;
+          Z.maps=X.maps;
+          t=1;
+          for(k=1; k<=size(Dec); k=k+1)
+          {
+             if((std(quotient(P.value,Dec[k][2].cover[i].value))==1)&&(std(quotient(Dec[k][2].cover[i].value,P.value))==1))
+             {
+                t=0;
+             }
+          }
+          if(t)
+          {
+             for(k=1; k<=size(X.cover); k=k+1)
+             {
+                Ideal QQ,PP;
+                chart CQ,CP;
+                def T=X.cover[k].in;
+                setring T;
+                QQ=ChartmapCompIdeal(X.maps[k][i],Q);
+                PP=ChartmapCompIdeal(X.maps[k][i],P);
+                CQ=QQ.value;
+                CP=PP.value;
+                Y.cover[k]=CQ;
+                Z.cover[k]=CP;
+                kill T;
+                kill CQ,CP,QQ,PP;
+             }
+             Dec=Dec+list(list(Y,Z));
+          }
+          setring S;
+          }
+          kill Q,P;
+          kill Y,Z;
+       }
+
+       kill L;
+       kill S;
+    }
+
+    if(size(Dec)==0)
+    {
+       Dec=list(list(X,X));
+    }
+
+    setring R;
+    return(Dec);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(ideal(x2,xy));
+list L=IrredDec(X);
+
+L[1][1].cover;
+
+L[2][1].cover;
+
+X==union(L[1][1],L[2][1]);
+}
+
+
+proc isReduced(scheme X)
+"USAGE: isReduced(X); X scheme
+RETURN: 1 if the scheme is reduced; 0 otherwise
+EXAMPLE: example isReduced; shows an example"
+{
+   def R=basering;
+   for(int i=1; i<=size(X.cover); i=i+1)
+   {
+      def S=X.cover[i].in;
+      setring S;
+      if(std(quotient(X.cover[i].value,radical(X.cover[i].value)))!=1)
+      {
+         setring R;
+         return(0);
+      }
+
+      kill S;
+   }
+
+   setring R;
+   return(1);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(x2y3z4);
+"Original Scheme is not reduced:";
+isReduced(X);
+
+"Reduced Scheme is reduced:";
+scheme S=ReducedScheme(X);
+isReduced(S);
+}
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//    divisor stuff
+////////////////////////////////////////////////////////////////////////////////
+
+proc makeDivisor(list #)
+"USAGE: makeDivisor((Y1,m1)[,(Y2,m2),...],X); Y1,Y2,.. scheme , m1,m2,.. int , X scheme
+RETURN: The divisor D=m1*[Y1]+m2*[Y2]+...
+EXAMPLE: example makeDivisor; shows an example"
+{
+   def R=basering;
+   if(typeof(#[size(#)])!="scheme")
+   { ERROR("Last entry must a scheme")}
+   scheme X=#[size(#)];
+
+   divisor result;
+   result.space=X;
+   for(int i=1; i<=size(#)-1; i=i+1)
+   {
+      result.schemes[i]=#[i][1];
+      result.mults[i]=#[i][2];
+   }
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(0);
+
+scheme Y=makeProjScheme(ideal(x-z),X);
+divisor A=list(Y,2),X;
+
+Y=makeProjScheme(ideal(x2-zy),X);
+scheme Z=makeProjScheme(ideal(x2z-z2y+y3),X);
+divisor B=list(Y,1),list(Z,1),X;
+
+Y=makeProjScheme(ideal(y),X);
+divisor C=list(Y,1),X;
+
+divisor D=A+3*B-C;
+D.schemes;
+D.mults;
+
+divisor E=2*A-4*B;
+E.schemes;
+E.mults;
+
+divisor F=D+E;
+F.schemes;
+F.mults;
+}
+
+
+// Addition of divisors
+static proc AddDivisor(divisor C, divisor D)
+{
+    if(C.space!=D.space)
+    {   ERROR("Divisors incompatible.");}
+
+    def R=basering;
+    divisor result=C;
+    result.space=C.space;
+    int i,k,check;
+    for(i=1; i<=size(D.schemes); i=i+1)
+    {
+       check=0;
+       k=1;
+       while((k<=size(result.schemes))&&(check==0))
+       {
+          if(D.schemes[i]==result.schemes[k])
+          {
+             check=1;
+             result.mults[k]=result.mults[k]+D.mults[i];
+             if(result.mults[k]==0)
+             {
+                result.schemes=delete(result.schemes,k);
+                result.mults=delete(result.mults,k);
+             }
+          }
+          k=k+1;
+       }
+
+       if(check==0)
+       {
+          result.schemes=result.schemes+list(D.schemes[i]);
+          result.mults=result.mults+list(D.mults[i]);
+       }
+    }
+
+    setring R;
+    return(result);
+}
+
+
+// Substraction of divisors
+static proc SubDivisor(divisor C, divisor D)
+{
+    divisor result=(-1)*D;
+    result=result+C;
+    return(result);
+}
+
+
+// Multiplication of a divisor with an integer
+static proc intTimesDivisor(int n, divisor D)
+{
+    divisor result;
+    result.space=D.space;
+    if(n!=0)
+    {
+    result.schemes=D.schemes;
+    for(int i=1; i<=size(D.schemes); i=i+1)
+    {
+       result.mults[i]=n*D.mults[i];
+    }}
+    return(result);
+}
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//    ratFunc stuff
+////////////////////////////////////////////////////////////////////////////////
+
+proc makeratFunc(poly num, list #)
+"USAGE: makeratFunc(f[,g]); poly f,g
+RETURN: rational function f/g, if no g is put in then g is set to 1 by default
+EXAMPLE: example makeratFunc; creates an example"
+{
+ratFunc r;
+r.in=basering;
+if(size(#)==0)
+{
+   r.num=num;
+   r.den=1;
+} else {
+   if(#[1]==0)
+   {   ERROR("Denominator cannot be 0!");}
+   poly g=gcd(num,#[1]);
+   g=g*leadcoef(#[1]);
+   r.num=num/g;
+   r.den=#[1]/g;
+}
+return(r);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y),dp;
+ratFunc F=x2,xy;
+F;
+ratFunc G=x2+y3;
+G;
+ratFunc H=1,x;
+H;
+
+G+H-F;
+F*G;
+F^3;
+F/G;
+
+F==H;
+1/(y*F)==H;
+}
+
+// Print routine for ratFunc
+static proc printratFunc(ratFunc r)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   if(r.den==1)
+   {
+      string(r.num);
+   } else {
+      string(r.num)+" / "+string(r.den);
+   }
+   setring R;
+}
+
+
+// Gives ratFunc as a string
+static proc stringratFunc(ratFunc r)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   if(r.den==1)
+   {
+      string st=string(r.num);
+   } else {
+      string st=string(r.num)+" / "+string(r.den);
+   }
+   setring R;
+   return(st);
+}
+
+
+// Used for comparing ratFuncs
+static proc equalratFunc(ratFunc r, ratFunc q)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   int requalq = (r.num*q.den)==(r.den*q.num);
+   setring R;
+   return(requalq);
+}
+
+
+// Used for comparing ratFuncs
+static proc notequalratFunc(ratFunc F, ratFunc G)
+{
+   return(!equalratFunc(F,G));
+}
+
+
+// Multiplication of ratFuncs
+static proc multratFunc(ratFunc r, ratFunc q)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   ratFunc rtimesq = r.num*q.num, r.den*q.den;
+   setring R;
+   return(rtimesq);
+}
+
+
+// Division of ratFuncs
+static proc divideratFunc(ratFunc r, ratFunc q)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   ratFunc zero=0,1;
+   if(q==zero)
+   {  ERROR("Cannot divide by zero!!!")}
+   ratFunc rdivq = r.num*q.den, r.den*q.num;
+   setring R;
+   return(rdivq);
+}
+
+
+// Addition of ratFuncs
+static proc addratFunc(ratFunc r, ratFunc q)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   ratFunc rplusq = r.num*q.den+r.den*q.num, r.den*q.den;
+   setring R;
+   return(rplusq);
+}
+
+
+// Substraction of ratFuncs
+static proc subratFunc(ratFunc r, ratFunc q)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   ratFunc rminusq = r.num*q.den-r.den*q.num, r.den*q.den;
+   setring R;
+   return(rminusq);
+}
+
+
+// Exponents of ratFuncs
+static proc expratFunc(ratFunc r, int n)
+{
+   def R=basering;
+   def SS=r.in;
+   setring SS;
+   ratFunc zero=0,1;
+   ratFunc rexpn;
+   if(n>=0)
+   {
+      rexpn=r.num^n,r.den^n;
+   } else {
+      if(r==zero)
+      {   ERROR("Negative exponent not allowed for 0!!!");}
+      rexpn=r.den^(-n),r.num^(-n);
+   }
+   setring R;
+   return(rexpn);
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//   Composition stuff
+////////////////////////////////////////////////////////////////////////////////
+
+
+proc PolyCompratFunc(Poly F, list #)
+"USAGE: PolyCompratFunc(F,r_1,...,r_n); F Poly, r_1,...,r_n ratFunc
+ASSUME: r_1,...,r_n belong to the same ring and n=nvars(F.in)
+RETURN: F(r_1,...,r_n)
+EXAMPLE: example PolyCompratFunc; creates an example"
+{
+   def R=basering;
+   def S=F.in;
+   setring S;
+   poly Fp=F.value;
+   int n=size(#);
+   if(n!=nvars(S))
+   {   ERROR("Wrong number of arguments!!!");}
+
+   list rl=ringlist(S);
+   list newvars=list();
+   for(int k=1; k<=n; k=k+1)
+   {
+      newvars=newvars+list("x("+string(k)+")");
+   }
+   newvars=newvars+list("t");
+   rl[2]=newvars;
+   rl[3][1][2]=rl[3][1][2],1;
+   def newS=ring(rl);
+   setring newS;
+
+   ideal I=var(1);
+   for(k=2; k<=n; k=k+1)
+   {
+      I=I,ideal(var(k));
+   }
+   map phi=S,I;
+   poly f=phi(Fp);
+   f=homog(f,t);
+   int d=deg(f);
+
+   def SS=#[1].in;
+   setring SS;
+   poly g=1;
+   for(k=1; k<=n; k=k+1)
+   {
+      g=g*#[k].den;
+   }
+   ideal J=(g/#[1].den)*#[1].num;
+   for(k=2; k<=n; k=k+1)
+   {
+      J=J,ideal((g/#[k].den)*#[k].num);
+   }
+   J=J,ideal(g);
+   map psi=newS,J;
+   ratFunc result=psi(f),g^d;
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y),dp;
+Poly F=x2-xy+y3;
+
+ring S=0,(u,v,w),dp;
+ratFunc r1=u,v;
+ratFunc r2=w,u;
+
+ratFunc G=PolyCompratFunc(F,r1,r2);
+G;
+}
+
+
+proc ratFuncCompratFunc(ratFunc r, list #)
+"USAGE: ratFuncCompratFunc(F,r_1,...,r_n); F ratFunc, r_1,...,r_n ratFunc
+ASSUME: r_1,...,r_n belong to the same ring and n=nvars(F.in)
+RETURN: F(r_1,...,r_n)
+EXAMPLE: example ratFuncCompratFunc; creates an example"
+{
+   def R=basering;
+   def S=r.in;
+   setring S;
+   if(size(#)!=nvars(S))
+   {   ERROR("Wrong number of arguments!!!");}
+   ratFunc result=PolyCompratFunc(r.num,#)/PolyCompratFunc(r.den,#);
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y),dp;
+ratFunc F=x2+y,x-y;
+
+ring S=0,(u,v,w),dp;
+ratFunc r1=u,v;
+ratFunc r2=u+w,v-w;
+
+ratFunc G=ratFuncCompratFunc(F,r1,r2);
+G;
+}
+
+
+
+proc ChartmapCompIdeal(chartmap phi, Ideal I)
+"USAGE: ChartmapCompIdeal(phi,I); phi chartmap, I ideal
+ASSUME: I.in=phi.im.in
+RETURN: Ideal defining the inverse image under phi of the closed subscheme defined by I
+EXAMPLE: example ChartmapCompIdeal; creates an example"
+{
+   def R=basering;
+   def S=phi.preim.in;
+   def SS=phi.im.in;
+   setring SS;
+   int m=size(phi.ratFuncs);
+   int n=size(I.value);
+   int i,j;
+   ratFunc r;
+   list L,LL;
+   Ideal II;
+   for(i=1; i<=m; i=i+1)
+   {
+      setring SS;
+      LL=list();
+      for(j=1;j<=n;j=j+1)
+      {
+         r=PolyCompratFunc(I.value[j],phi.ratFuncs[i]);
+         LL=LL+list(r);
+      }
+      setring S;
+      poly k=0;
+      for(j=1;j<=n;j=j+1)
+      {
+         k=lcm(k,LL[j].den);
+      }
+      II=0;
+      poly f;
+      for(j=1;j<=n;j=j+1)
+      {
+         f=k/LL[j].den;
+         II=II+ideal(f*LL[j].num);
+      }
+      kill f,k;
+      II.value=II.value+phi.preim.value;
+      II=sat(II.value,phi.dom[i])[1];
+      L[i]=II;
+   }
+
+   setring S;
+   ideal J=1;
+   Ideal result;
+   for(i=1; i<=m; i=i+1)
+   {
+      J=intersect(J,L[i].value);
+   }
+   result=std(J);
+
+   setring R;
+   return(result);
+}
+example
+{
+ring R=0,(a,b,c,d),dp;
+chart U=ideal(ad-bc,ac-bd);
+Ideal Dom=ideal(c,d);
+ratFunc F1=a,c;
+ratFunc F2=b,c;
+ratFunc G1=b,d;
+ratFunc G2=a,d;
+ring S=0,(x,y),dp;
+chart V=0;
+Ideal I=ideal(x,y);
+chartmap phi=U,V,Dom,F1,F2,G1,G2;
+
+Ideal J=ChartmapCompIdeal(phi,I);
+J;
+}
+
+
+
+proc ChartmapCompChartmap(chartmap phi, chartmap psi)
+{
+   if(phi.preim.in!=psi.im.in)
+   {   ERROR("Chartmaps not compatible");}
+
+   def R=basering;
+   def S=psi.preim.in;
+   def SS=phi.preim.in;
+   list Maps;
+   int i,j,k;
+   ratFunc G,F;
+   setring S;
+   ideal Dom;
+   int l=1;
+   for(i=1; i<=size(psi.ratFuncs); i=i+1)
+   {
+      for(j=1; j<=size(phi.ratFuncs); j=j+1)
+      {
+         setring SS;
+         G=phi.dom[j];
+         F=ratFuncCompratFunc(G,psi.ratFuncs[i]);
+         setring S;
+         Dom[l]=lcm(F.num,psi.dom[i]);
+         for(k=1; k<=nvars(phi.im.in); k=k+1)
+         {
+            Maps=Maps+list(ratFuncCompratFunc(phi.ratFuncs[j][k],psi.ratFuncs[i]));
+         }
+         l=l+1;
+      }
+   }
+
+   chartmap result=psi.preim,phi.im,Dom,Maps;
+   kill Dom;
+   setring R;
+   return(result);
+}
+example
+{
+ring R=0,(a,b,c,d),dp;
+chart U=ideal(ad-bc,ac-bd);
+Ideal Dom1=ideal(c,d);
+ratFunc F1=a,c;
+ratFunc F2=b,c;
+ratFunc F3=1;
+ratFunc G1=b,d;
+ratFunc G2=a,d;
+ratFunc G3=1;
+
+ring S=0,(x,y,z),dp;
+chart V=xy-z2;
+chartmap psi=U,V,Dom1,F1,F2,F3,G1,G2,G3;
+Ideal Dom2=ideal(y,z);
+ratFunc H1=z,y;
+ratFunc H2=x,z;
+
+ring T=0,(x),dp;
+chart W=0;
+chartmap phi=V,W,Dom2,H1,H2;
+
+phi*psi;
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//  Morphism Stuff
+/////////////////////////////////////////////////////////////////////////////////////
+
+proc makeMorphism(scheme Preim, scheme Im, list Maps)
+"USAGE: makeMorphism(Preim,Im,Maps); Preim,Im schemes, Maps list
+ASSUME: Maps contains lists of the form (phi,i,j), where i,j are integers and phi is a chartmap
+        from the Preim.cover[i] to Im.cover[j]
+RETURN: morphism psi from Preim to Im such that psi.chartmaps[Maps[k][2]][Maps[k][3]]=Maps[k][1]
+        for each k
+EXAMPLE: example makeMorphism; gives an example"
+{
+   morphism result;
+   def R=basering;
+
+   result.preim=Preim;
+   result.im=Im;
+
+   int i,j,k;
+   for(i=1; i<=size(Preim.cover); i=i+1)
+   {
+      result.chartmaps[i]=list();
+      for(j=1; j<=size(Im.cover); j=j+1)
+      {
+         chartmap phi;
+         phi.preim=Preim.cover[i];
+         phi.im=Im.cover[j];
+
+         def S=Preim.cover[i].in;
+         setring S;
+         phi.dom=ideal(0);
+
+         result.chartmaps[i][j]=phi;
+
+         kill S;
+         kill phi;
+      }
+   }
+
+   for(k=1; k<=size(Maps); k=k+1)
+   {
+      i=Maps[k][2];
+      j=Maps[k][3];
+      result.chartmaps[i][j]=Maps[k][1];
+   }
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(xz-y2);
+ring S=0,(a,b),dp;
+scheme Y=makeProjScheme(0);
+
+def T=X.cover[1].in;
+setring T;
+Ideal Dom=1;
+ratFunc F=y;
+chartmap phi=X.cover[1],Y.cover[1],Dom,F;
+list L=list(list(phi,1,1));
+kill T;
+
+def T=X.cover[1].in;
+setring T;
+Dom=y;
+F=1,y;
+phi=X.cover[1],Y.cover[2],Dom,F;
+L=L+list(list(phi,1,2));
+kill T;
+
+def T=X.cover[2].in;
+setring T;
+Dom=1;
+F=z;
+phi=X.cover[2],Y.cover[1],Dom,F;
+L=L+list(list(phi,2,1));
+kill T;
+
+def T=X.cover[2].in;
+setring T;
+Dom=1;
+F=x;
+phi=X.cover[2],Y.cover[2],Dom,F;
+L=L+list(list(phi,2,2));
+kill T;
+
+def T=X.cover[3].in;
+setring T;
+Dom=x;
+F=y,x;
+phi=X.cover[3],Y.cover[1],Dom,F;
+L=L+list(list(phi,3,1));
+kill T;
+
+def T=X.cover[3].in;
+setring T;
+Dom=1;
+F=y;
+phi=X.cover[3],Y.cover[2],Dom,F;
+L=L+list(list(phi,3,2));
+
+
+morphism psi=X,Y,L;
+psi.preim.cover;
+psi.im.cover;
+psi.chartmaps;
+}
+
+
+
+proc MorphismCompMorphism(morphism phi, morphism psi)
+"USAGE: MorphismCompMorphism(phi,psi); phi,psi morphism
+RETURN: Composition of phi with psi
+EXAMPLE: example MorphismCompMorphism; gives an example"
+{
+   if(phi.preim!=psi.im)
+   {
+      ERROR("Inputs not compatible");
+   }
+
+   def R=basering;
+   morphism result;
+
+   result.preim=psi.preim;
+   result.im=phi.im;
+
+   int i,j,k,l;
+   for(i=1; i<=size(psi.preim.cover); i=i+1)
+   {
+      result.chartmaps[i]=list();
+      for(j=1; j<=size(phi.im.cover); j=j+1)
+      {
+         chartmap f;
+         f.preim=psi.preim.cover[i];
+         f.im=phi.im.cover[j];
+
+         def S=psi.preim.cover[i].in;
+         setring S;
+         f.dom=ideal(0);
+
+         for(k=1; k<=size(phi.preim.cover); k=k+1)
+         {
+            chartmap g=phi.chartmaps[k][j]*psi.chartmaps[i][k];
+
+            if(std(g.dom)!=0)
+            {
+               f.dom=f.dom,g.dom;
+               f.dom=simplify(f.dom,2);
+               f.ratFuncs=f.ratFuncs+g.ratFuncs;
+            }
+
+            kill g;
+         }
+
+         k=1;
+         while(k<=size(f.dom))
+         {
+             poly p=f.dom[k];
+             l=1;
+             while(l<=size(f.dom))
+             {
+                if(k==l)
+                {
+                   l=l+1;
+                }else{
+                if(l<k)
+                {
+                   if(reduce(f.dom[l],p)==0)
+                   {
+                      f.dom=delete(f.dom,l);
+                      f.ratFuncs=delete(f.ratFuncs,l);
+                      k=k-1;
+                   }else{
+                      l=l+1;
+                   }
+                }else{
+                   if(reduce(f.dom[l],p)==0)
+                   {
+                      f.dom=delete(f.dom,l);
+                      f.ratFuncs=delete(f.ratFuncs,l);
+                   }else{
+                      l=l+1;
+                   }
+                }}
+             }
+
+             k=k+1;
+
+             kill p;
+         }
+
+         result.chartmaps[i][j]=f;
+
+         kill S;
+         kill f;
+      }
+   }
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(xz-y2);
+ring S=0,(a,b),dp;
+scheme Y=makeProjScheme(0);
+
+def T=X.cover[1].in;
+setring T;
+Ideal Dom=1;
+ratFunc F=y;
+chartmap f=X.cover[1],Y.cover[1],Dom,F;
+list L=list(list(f,1,1));
+kill T;
+
+def T=X.cover[1].in;
+setring T;
+Dom=y;
+F=1,y;
+f=X.cover[1],Y.cover[2],Dom,F;
+L=L+list(list(f,1,2));
+kill T;
+
+def T=X.cover[2].in;
+setring T;
+Dom=1;
+F=z;
+f=X.cover[2],Y.cover[1],Dom,F;
+L=L+list(list(f,2,1));
+kill T;
+
+def T=X.cover[2].in;
+setring T;
+Dom=1;
+F=x;
+f=X.cover[2],Y.cover[2],Dom,F;
+L=L+list(list(f,2,2));
+kill T;
+
+def T=X.cover[3].in;
+setring T;
+Dom=x;
+F=y,x;
+f=X.cover[3],Y.cover[1],Dom,F;
+L=L+list(list(f,3,1));
+kill T;
+
+def T=X.cover[3].in;
+setring T;
+Dom=1;
+F=y;
+f=X.cover[3],Y.cover[2],Dom,F;
+L=L+list(list(f,3,2));
+
+morphism phi=X,Y,L;
+kill T;
+
+
+def T=Y.cover[1].in;
+setring T;
+Dom=1;
+F=b;
+ratFunc G=b2;
+f=Y.cover[1],X.cover[1],Dom,F,G;
+L=list(list(f,1,1));
+kill T;
+
+def T=Y.cover[1].in;
+setring T;
+Dom=b;
+F=1,b;
+G=b;
+f=Y.cover[1],X.cover[2],Dom,F,G;
+L=L+list(list(f,1,2));
+kill T;
+
+def T=Y.cover[1].in;
+setring T;
+Dom=b;
+F=1,b2;
+G=1,b;
+f=Y.cover[1],X.cover[3],Dom,F,G;
+L=L+list(list(f,1,3));
+kill T;
+
+def T=Y.cover[2].in;
+setring T;
+Dom=a;
+F=1,a;
+G=1,a2;
+f=Y.cover[2],X.cover[1],Dom,F,G;
+L=L+list(list(f,2,1));
+kill T;
+
+def T=Y.cover[2].in;
+setring T;
+Dom=a;
+F=a;
+G=1,a;
+f=Y.cover[2],X.cover[2],Dom,F,G;
+L=L+list(list(f,2,2));
+kill T;
+
+def T=Y.cover[2].in;
+setring T;
+Dom=1;
+F=a2;
+G=a;
+f=Y.cover[2],X.cover[3],Dom,F,G;
+L=L+list(list(f,2,3));
+
+morphism psi=Y,X,L;
+
+morphism id=psi*phi;
+id.chartmaps;
+}
+
+
+proc ChartmapToMorphism(chartmap phi)
+"USAGE: ChartmapToMorphism(phi); phi chartmap
+RETURN: morphism corresponding to phi
+EXAMPLE: example ChartmapToMorphism; gives an example"
+{
+   morphism result;
+
+   result.preim=ChartToScheme(phi.preim);
+   result.im=ChartToScheme(phi.im);
+   result.chartmaps=list(list(phi));
+
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y),dp;
+chart U=0;
+Ideal Dom=1;
+list L=list(makeratFunc(x),makeratFunc(y),makeratFunc(1));
+ring S=0,(a,b,c),dp;
+chart V=0;
+chartmap phi=U,V,Dom,L;
+
+morphism Phi=ChartmapToMorphism(phi);
+Phi.preim;
+Phi.im;
+Phi.chartmaps;
+}
+
+
+proc BlowUpMapToMorphism(blowUpMap phi)
+"USAGE: BlowUpMapToMorphism(phi); phi blowUpMap
+RETURN: morphism corresponding to phi
+EXAMPLE: example BlowUpMapToMorphism; gives an example"
+{
+   morphism result=phi.blow,phi.base,list();
+
+   int i,j;
+   for(i=1; i<=size(phi.blow.cover); i=i+1)
+   {
+      j=phi.maps[i][2];
+      result.chartmaps[i][j]=phi.maps[i][1];
+   }
+
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(0);
+scheme Z=makeProjScheme(ideal(x-z,y-z),X);
+
+list L=blowUp(X,Z);
+
+morphism Pi=BlowUpMapToMorphism(L[2]);
+Pi.preim.cover;
+Pi.im.cover;
+Pi.chartmaps;
+}
+
+
+
+proc InvImage(scheme X, morphism phi)
+"USAGE: InvImage(x,phi); X scheme, phi morphism
+RETURN: Inverse image of X under phi
+EXAMPLE: example InvImage; gives an example"
+{
+   def R=basering;
+   scheme result;
+
+   int i,j;
+   for(i=1; i<=size(phi.preim.cover); i=i+1)
+   {
+      def S=phi.preim.cover[i].in;
+      setring S;
+      ideal I=1;
+      Ideal J;
+      for(j=1; j<=size(phi.im.cover); j=j+1)
+      {
+         def T=phi.im.cover[j].in;
+         setring S;
+         if(std(phi.chartmaps[i][j].dom)!=0)
+         {
+         setring T;
+         J=ChartmapCompIdeal(phi.chartmaps[i][j],X.cover[j].value);
+         setring S;
+         I=intersect(I,J.value);
+         }
+
+         kill T;
+      }
+      setring S;
+      I=std(I+phi.preim.cover[i].value);
+      chart U=I;
+      result.cover[i]=U;
+
+      kill I;
+      kill J,S,U;
+   }
+
+   result.maps=phi.preim.maps;
+
+   for(i=1; i<=size(result.cover); i=i+1)
+   {
+      for(j=1; j<=size(result.cover); j=j+1)
+      {
+         result.maps[i][j].preim=result.cover[i];
+         result.maps[i][j].im=result.cover[j];
+      }
+   }
+
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(xz-y2);
+ring S=0,(a,b),dp;
+scheme Y=makeProjScheme(0);
+
+def T=X.cover[1].in;
+setring T;
+Ideal Dom=1;
+ratFunc F=y;
+chartmap f=X.cover[1],Y.cover[1],Dom,F;
+list L=list(list(f,1,1));
+kill T;
+
+def T=X.cover[1].in;
+setring T;
+Dom=y;
+F=1,y;
+f=X.cover[1],Y.cover[2],Dom,F;
+L=L+list(list(f,1,2));
+kill T;
+
+def T=X.cover[2].in;
+setring T;
+Dom=1;
+F=z;
+f=X.cover[2],Y.cover[1],Dom,F;
+L=L+list(list(f,2,1));
+kill T;
+
+def T=X.cover[2].in;
+setring T;
+Dom=1;
+F=x;
+f=X.cover[2],Y.cover[2],Dom,F;
+L=L+list(list(f,2,2));
+kill T;
+
+def T=X.cover[3].in;
+setring T;
+Dom=x;
+F=y,x;
+f=X.cover[3],Y.cover[1],Dom,F;
+L=L+list(list(f,3,1));
+kill T;
+
+def T=X.cover[3].in;
+setring T;
+Dom=1;
+F=y;
+f=X.cover[3],Y.cover[2],Dom,F;
+L=L+list(list(f,3,2));
+
+morphism phi=X,Y,L;
+
+setring S;
+scheme Z=makeProjScheme(ideal(3a-2b),Y);
+
+scheme Zinv=InvImage(Z,phi);
+Zinv;
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//    Blow-Up
+////////////////////////////////////////////////////////////////////////////////////
+
+proc blowUp(scheme X, scheme C)
+"USAGE: blowUp(X,C);  X,C scheme
+ASSUME: C is a subscheme of X
+RETURN: return a list l=(B,pi,E),
+          B scheme, is the blow-up of X in the center C
+          pi blowUpMap, is the map corresponding to the blow-up and contains all the relevant information
+          E scheme, is the exeptional divisor of the blow-up
+EXAMPLE: example blowUp;  shows an example
+"
+{
+   scheme B;
+   blowUpMap pi;
+   scheme E;
+   list Bcover=list();
+   list maps=list();
+   list eD=list();
+
+   pi.base=X;
+   for(int i=1; i<=size(C.cover); i=i+1)
+   {
+       def S=C.cover[i].in;
+       setring S;
+       C.cover[i].value=std(C.cover[i].value);
+       kill S;
+   }
+   pi.center=C;
+
+   int n=size(X.cover);
+   for(i=1; i<=n; i=i+1)
+   {
+      def R=X.cover[i].in;
+      setring R;
+      int m=nvars(R);
+      C.cover[i].value=simplify(C.cover[i].value,2);
+      int l=size(C.cover[i].value);
+      ideal A=C.cover[i].value;
+      ideal Base=X.cover[i].value;
+      for(int j=1; j<=l; j=j+1)
+      {
+         def S=changevar("x()");
+
+         list newvars;
+         for(int k=1; k<=l; k=k+1)
+         {
+            if(k!=j)
+            {   newvars=newvars+list("y("+string(k)+")");}
+         }
+         if(size(newvars)!=0)
+         {
+            S=addvarsTo(S,newvars,0);
+         }
+
+         setring S;
+         chart U=ideal(0);
+         chartmap phi;
+         phi.preim=U;
+         phi.im=X.cover[i];
+         phi.dom=1;
+         phi.ratFuncs[1]=list();
+         for(k=1; k<=m; k=k+1)
+         {
+            ratFunc r=var(k);
+            phi.ratFuncs[1]=phi.ratFuncs[1]+list(r);
+            kill r;
+         }
+
+
+
+         setring S;
+         ideal I=0;
+         ideal J=0;
+         for(k=1; k<=m; k=k+1)
+         {
+            I=I+ideal(var(k));
+         }
+         map f=R,I;
+         J=f(A);
+         I=f(Base);
+         for(k=1; k<=l; k=k+1)
+         {
+            if(k!=j)
+            {
+               I=I+ideal(J[j]*y(k)-J[k]);
+            }
+         }
+         U.value=sat(I,ideal(J[j]))[1];
+         phi.preim=U;
+         Bcover=Bcover+list(U);
+         maps=maps+list(list(phi,i,j));
+         eD=eD+list(makeChart(std(U.value+J)));
+
+
+         kill J,newvars,S,I,U,phi,k;
+         setring R;
+      }
+
+      kill R,m,l,j;
+   }
+
+   pi.maps=maps;
+   B.cover=Bcover;
+   int m=size(B.cover);
+   int j,r,s,k,l,ll,e,kPreim,kIm,ny,nx,nn;
+   list L,facts;
+   ring R;
+   for(i=1; i<=m; i=i+1)
+   {
+      L=list();
+      for(j=1; j<=m; j=j+1)
+      {
+         kPreim=maps[i][3];
+         kIm=maps[j][3];
+         r=maps[i][2];
+         s=maps[j][2];
+         if(r!=s)
+         {
+            chartmap phi;
+            phi.preim=B.cover[i];
+            phi.im=B.cover[j];
+
+            chartmap psi=X.maps[r][s];
+            def S=X.cover[r].in;
+            def SS=X.cover[s].in;
+            def T=B.cover[i].in;
+            def TT=B.cover[j].in;
+
+            setring T;
+            ideal I;
+            for(k=1; k<=nvars(S); k=k+1)
+            {
+               I[k]=x(k);
+            }
+            map g=S,I;
+            kill I;
+
+            setring S;
+            poly f,p,q;
+            for(k=1; k<=size(psi.dom); k=k+1)
+            {
+               facts=list();
+               f=psi.dom[k];
+               e=sat(C.cover[r].value,ideal(f))[2];
+               setring SS;
+               for(l=1; l<=size(C.cover[s].value); l=l+1)
+               {
+                  facts[l]=list();
+                  ratFunc F=PolyCompratFunc(makePoly(C.cover[s].value[l]),psi.ratFuncs[k]);
+                  setring S;
+                  list LL=pdivi(F.num*f^e,C.cover[r].value);
+                  nn=size(C.cover[r].value);
+                  for(ll=1; ll<=nn; ll=ll+1)
+                  {
+                     p=LL[2][ll];
+                     setring T;
+                     facts[l][ll]=makePoly(g(p));
+                     setring S;
+                  }
+                  kill LL;
+                  setring S;
+                  p=F.den*f^e;
+                  setring T;
+                  facts[l][nn+1]=makePoly(g(p));
+
+                  kill F;
+                  setring SS;
+               }
+
+               setring T;
+               ratFunc F,G;
+               poly pt;
+               for(l=1; l<=size(facts[kIm])-1; l=l+1)
+               {
+                  if(l!=kPreim)
+                  {
+                  pt=pt+facts[kIm][l].value*y(l);
+                  }else{
+                  pt=pt+facts[kIm][l].value;
+                  }
+               }
+               pt=pt*g(f);
+               phi.dom[k]=pt;
+               phi.ratFuncs[k]=list();
+               F=pt,facts[kIm][size(facts[kIm])].value;
+               kill pt;
+
+               for(l=1; l<=nvars(SS); l=l+1)
+               {
+                  G=ratFuncCompratFunc(psi.ratFuncs[k][l],maps[i][1].ratFuncs[1]);
+                  phi.ratFuncs[k]=phi.ratFuncs[k]+list(G);
+               }
+
+               for(l=1; l<=size(facts); l=l+1)
+               {
+                  if(l!=kIm)
+                  {
+                  G=0;
+                  for(ll=1; ll<=size(facts[l])-1; ll=ll+1)
+                  {
+                     if(ll!=kPreim)
+                     {
+                     G=G+makeratFunc(facts[l][ll].value*y(ll),facts[l][size(facts[l])].value);
+                     }else{
+                     G=G+makeratFunc(facts[l][ll].value,facts[l][size(facts[l])].value);
+                     }
+                  }
+                  phi.ratFuncs[k]=phi.ratFuncs[k]+list(G/F);
+                  }
+               }
+
+               kill F,G;
+               setring S;
+            }
+
+            L=L+list(phi);
+
+            setring S;
+            kill f,p,q;
+
+            setring T;
+            kill g;
+
+            kill phi,psi,S,SS,T,TT;
+         }
+         else
+         {
+            def S=X.cover[r].in;
+            nx=nvars(S);
+
+            def T=B.cover[i].in;
+            chartmap phi;
+            phi.preim=B.cover[i];
+            phi.im=B.cover[j];
+            setring T;
+            phi.ratFuncs[1]=list();
+            if(kPreim==kIm)
+            {
+               phi.dom=1;
+               for(k=1;k<=nx;k=k+1)
+               {
+                   ratFunc q=x(k);
+                   phi.ratFuncs[1]=phi.ratFuncs[1]+list(q);
+                   kill q;
+               }
+               ny=nvars(T)-nx+1;
+               for(k=1;k<=ny;k=k+1)
+               {
+                   if(k!=kPreim)
+                   {
+                      ratFunc q=y(k);
+                      phi.ratFuncs[1]=phi.ratFuncs[1]+list(q);
+                      kill q;
+                   }
+               }
+            }else{
+               phi.dom=y(kIm);
+               for(k=1;k<=nx;k=k+1)
+               {
+                   ratFunc q=x(k);
+                   phi.ratFuncs[1]=phi.ratFuncs[1]+list(q);
+                   kill q;
+               }
+               ny=nvars(T)-nx+1;
+               for(k=1;k<=ny;k=k+1)
+               {
+                   if(k!=kIm)
+                   {
+                      if(k!=kPreim){
+                      ratFunc q=y(k),y(kIm);
+                      }else{
+                      ratFunc q=1,y(kIm);
+                      }
+                      phi.ratFuncs[1]=phi.ratFuncs[1]+list(q);
+                      kill q;
+                   }
+               }
+            }
+
+            L=L+list(phi);
+            kill S,T,phi;
+            setring R;
+         }
+      }
+      B.maps=B.maps+list(L);
+   }
+
+   E.cover=eD;
+   E.maps=B.maps;
+   for(i=1; i<=size(E.cover); i=i+1)
+   {
+      for(j=1; j<=size(E.cover); j=j+1)
+      {
+            E.maps[i][j].preim=E.cover[i];
+            E.maps[i][j].im=E.cover[j];
+      }
+   }
+
+   pi.blow=B;
+   pi.exDiv=E;
+   return(list(B,pi,E));
+}
+example
+{ "EXAMPLE";
+   ring R=0,(x,y,z),dp;
+   scheme X=makeProjScheme(ideal(0));
+   scheme Y=makeProjScheme(ideal(x-z,y-z),X);
+   list L=blowUp(X,Y);
+
+   "Affine cover of the blow-up";
+   L[1].cover;
+
+   "Maps between the affine charts";
+   L[1].maps;
+
+   "Exeptional divisor";
+   L[3].cover;
+}
+
+
+
+proc strictTransform(Y,blowUpMap pi)
+"USAGE: strinctTransform(Y,pi);
+RETURN: the strict transform of subscheme Y under the blow-up map pi
+EXAMPLE: example strictTransform, shows an example"
+{
+   if(typeof(Y)=="scheme")
+   {
+      def B=basering;
+      scheme result;
+      result.maps=pi.blow.maps;
+      int n=size(pi.blow.cover);
+      for(int k=1; k<=n; k=k+1)
+      {
+         int m=pi.maps[k][2];
+         def R=Y.cover[m].in;
+         def S=pi.blow.cover[k].in;
+
+         setring R;
+         ideal base=Y.cover[m].value;
+         int nx=nvars(R);
+
+         setring S;
+         ideal I=var(1);
+         for(int i=2; i<=nx; i=i+1)
+         {
+            I=I,ideal(var(i));
+         }
+         map phi=R,I;
+         ideal J=phi(base);
+         J=J+pi.blow.cover[k].value;
+
+         ideal E=pi.exDiv.cover[k].value;
+
+         J=sat(J,E)[1];
+         chart U=J;
+         result.cover=result.cover+list(U);
+
+         kill S,i,I,E,nx,U,J,phi,m;
+         setring R;
+         kill base;
+         kill R;
+      }
+
+      for(int i=1; i<=n; i=i+1)
+      {
+         for(int j=1; j<=n; j=j+1)
+         {
+            result.maps[i][j].preim=result.cover[i];
+            result.maps[i][j].im=result.cover[j];
+         }
+         kill j;
+      }
+
+      setring B;
+      return(result);
+   }
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring R=0,(x,y),dp;
+   scheme X=makeAffineScheme(ideal(0));
+   scheme Y=makeAffineScheme(ideal(x2-y3-y2));
+   scheme Z=makeAffineScheme(ideal(x,y));
+   list L=blowUp(X,Z);
+   scheme blowY=strictTransform(Y,L[2]);
+   blowY.maps;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//  Smoothness Test
+//////////////////////////////////////////////////////////////////////////////////
+
+
+// Used in CompleteIntersectionCover and HybrSmoothTest
+static proc findMaxMinors(ideal I, matrix J)
+"USAGE: findMaxMinors(I,J); I ideal, J matrix
+ASSUME: J is Jacobi matrix of II
+RETURN: A list of lists of the form (h,A,iv) where h is a maximal minor of J and iv contains
+        the colomns used in the formation of h and A is the matrix of cofactors of the matrix
+        forming h
+"
+{
+   list Minors;
+   ideal Inew=std(I);
+   poly h;
+   int n=ncols(J);
+   int r=nrows(J);
+   if(r>1)
+   {
+   matrix M[r][r];
+   matrix A[r][r];
+   matrix B[r][r];
+   intvec iv=1..r;
+   int done;
+   int k,l,c,i,j;
+   k=r;
+   c=0;
+   while((k>0)&&(Inew!=1))
+   {
+      M=submat(J,1..r,iv);
+      h=det(M);
+      if(h!=0)
+      {
+         c=c+1;
+         for(i=1; i<=r; i=i+1)
+         {
+         for(j=1; j<=r; j=j+1)
+         {
+            B=permrow(M,i,r);
+            B=permcol(B,j,r);
+            A[i,j]=det(submat(B,1..r-1,1..r-1))*(-1)^(i+j);
+         }}
+         A=transpose(A);
+         Minors[c]=list(h,A,iv);
+         Inew=std(radical(Inew+h));
+      }
+
+      k=r-1;
+      if(iv[r]<n)
+      {
+         iv[r]=iv[r]+1;
+      }else{
+         done=0;
+         while(!done)
+         {
+            if(iv[k]>=(iv[k+1]-1))
+            {
+               k=k-1;
+               if(k<=0)
+               { done=1;}
+            }else{ done=1;}
+         }
+         if(k>0)
+         {
+            iv[k]=iv[k]+1;
+            l=1;
+            while(k+l<=r)
+            {
+               iv[k+l]=iv[k+l-1]+1;
+               l=l+1;
+            }
+         }
+      }
+   }
+   return(Minors);
+   }else{
+   matrix A[r][r];
+   int i,c;
+   intvec iv;
+   c=0;
+   i=1;
+   while((i<=n)&&(Inew!=1))
+   {
+      iv=i;
+      h=J[1,i];
+      if(h!=0)
+      {
+         c=c+1;
+         A[1,1]=1;
+         Minors[c]=list(h,A,iv);
+         Inew=std(radical(Inew+h));
+      }
+      i=i+1;
+   }
+   return(Minors);
+   }
+}
+
+
+proc CompleteIntersectionCover(list #)
+"USAGE: CompleteIntersectionCover(X,W); X,W schemes
+ASSUME: X is a subscheme of W, X and W are equidimensional and smooth and the charts of W are
+        complete intersections
+RETURN: A list L where:
+            L[1] is a scheme isomorphic to X where each chart is a complete intersection
+            L[2] is the morphism representing the isomorphism X->L[1]
+            L[3] is the morphism representing the isomorphism L[1]->X
+EXAMPLE: example CompleteIntersectionCover; gives an example"
+{
+if((size(#)==1)&&(typeof(#[1])=="ideal"))
+{
+   def R=basering;
+   ideal I=#[1];
+   scheme resultScheme;
+   morphism resultMap,resultInvMap;
+   if((std(I)==0)||(std(I)==1))
+   {
+      resultScheme=makeAffineScheme(std(I));
+      resultMap.preim=resultScheme;
+      resultMap.im=resultScheme;
+      resultMap.chartmaps=resultScheme.maps;
+      resultInvMap.preim=resultScheme;
+      resultInvMap.im=resultScheme;
+      resultInvMap.chartmaps=resultScheme.maps;
+      return(list(resultScheme,resultMap,resultInvMap));
+   }
+   else
+   {
+      matrix J=jacob(I);
+      int i,j,n,k,l,ci,cj;
+      scheme X,W;
+      list L,K;
+      ideal H=std(radical(I));
+      n=0;
+      for(i=1; i<=size(I); i=i+1)
+      {
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            if(H!=1)
+            {
+            if(reduce(J[i,j],H)!=0)
+            {
+            n=n+1;
+            L[n]=J[i,j];
+            K[n]=i;
+            H=std(radical(H+J[i,j]));
+            }}
+         }
+      }
+
+      list CoverSchemes,PreCoverCharts,PreCoverMaps,CoverMaps,CoverInvMaps;
+      for(k=1; k<=n; k=k+1)
+      {
+         poly h=L[k];
+         def S=changevar("x()",R);
+         S=extendring(1,"t","dp",0,S);
+         setring S;
+         ideal VarR=var(2);
+         for(j=2; j<=nvars(R); j=j+1)
+         {
+            VarR=VarR,var(j+1);
+         }
+         map phi=R,VarR;
+         i=K[k];
+         poly hnew=phi(h);
+         poly g=t*hnew-1;
+
+         ideal Inew=phi(I);
+         poly f=Inew[i];
+         Inew[i]=Inew[1];
+         Inew[1]=f;
+         Inew=g,Inew;
+
+         W=makeAffineScheme(ideal(g,f));
+         X=makeAffineScheme(Inew,W);
+
+         PreCoverCharts[k]=X.cover[1];
+         list LL=CompleteIntersectionCover(Inew,ideal(g,f));
+         CoverSchemes[k]=LL[1];
+         CoverMaps[k]=LL[2];
+         CoverInvMaps[k]=LL[3];
+         kill LL;
+
+         kill phi,hnew,Inew,g,VarR;
+         kill S;
+         setring R;
+         kill h;
+      }
+
+      for(i=1; i<=n; i=i+1)
+      {
+         list Maps;
+         poly h;
+         chart Preim=PreCoverCharts[i];
+         def S=Preim.in;
+         setring S;
+         ideal VarR=var(2);
+         for(j=2; j<=nvars(R); j=j+1)
+         {
+            VarR=VarR,var(j+1);
+         }
+         map psi=R,VarR;
+         setring R;
+
+         for(j=1; j<=n; j=j+1)
+         {
+            chartmap phi;
+            phi.preim=Preim;
+            phi.im=PreCoverCharts[j];
+            h=L[j];
+            setring S;
+            poly hnew=psi(h);
+            phi.dom=hnew;
+            list RatFuncs;
+            RatFuncs[1]=makeratFunc(1,hnew);
+            for(k=1; k<=nvars(R); k=k+1)
+            {
+               RatFuncs[k+1]=makeratFunc(var(k+1));
+            }
+            phi.ratFuncs[1]=RatFuncs;
+            Maps[j]=phi;
+
+            kill hnew,RatFuncs;
+            setring R;
+            kill phi;
+         }
+         PreCoverMaps[i]=Maps;
+
+         setring S;
+         kill psi;
+         kill Maps,Preim,S;
+         setring R;
+         kill h;
+      }
+
+      X=makeAffineScheme(I);
+      list Maps;
+      resultMap.preim=X;
+      resultInvMap.im=X;
+      for(i=1; i<=n; i=i+1)
+      {
+         resultScheme.cover=resultScheme.cover+CoverSchemes[i].cover;
+
+         chartmap phi,psi;
+         phi.preim=X.cover[1]; phi.im=PreCoverCharts[i];
+         psi.im=X.cover[1]; psi.preim=PreCoverCharts[i];
+         list phiRatFuncs;
+         list psiRatFuncs;
+
+         phiRatFuncs[1]=makeratFunc(1,L[i]);
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            phiRatFuncs=phiRatFuncs+list(makeratFunc(var(j)));
+         }
+         phi.dom=ideal(L[i]);
+         phi.ratFuncs[1]=phiRatFuncs;
+
+         def S=PreCoverCharts[i].in;
+         setring S;
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            psiRatFuncs=psiRatFuncs+list(makeratFunc(var(j+1)));
+         }
+         psi.dom=1;
+         psi.ratFuncs[1]=psiRatFuncs;
+         setring R;
+
+
+         for(k=1; k<=size(CoverSchemes[i].cover); k=k+1)
+         {
+            Maps=Maps+list(CoverMaps[i].chartmaps[1][k]*phi);
+            resultInvMap.chartmaps=resultInvMap.chartmaps+list(list(psi*CoverInvMaps[i].chartmaps[k][1]));
+         }
+         kill phi,psi,phiRatFuncs,psiRatFuncs,S;
+      }
+      resultMap.chartmaps=list(Maps);
+
+
+      ci=0;
+      chartmap phi;
+      for(i=1; i<=n; i=i+1)
+      {
+      for(k=1; k<=size(CoverSchemes[i].cover); k=k+1)
+      {
+         ci=ci+1;
+         cj=0;
+         Maps=list();
+         for(j=1; j<=n; j=j+1)
+         {
+         for(l=1; l<=size(CoverSchemes[j].cover); l=l+1)
+         {
+            cj=cj+1;
+            if(i==j)
+            {
+               Maps[cj]=CoverSchemes[i].maps[k][l];
+            }else{
+               phi=CoverMaps[j].chartmaps[1][l];
+               phi=phi*PreCoverMaps[i][j];
+               phi=phi*CoverInvMaps[i].chartmaps[k][1];
+               Maps[cj]=phi;
+            }
+         }}
+         resultScheme.maps[ci]=Maps;
+      }}
+      resultMap.im=resultScheme;
+      resultInvMap.preim=resultScheme;
+
+      return(list(resultScheme,resultMap,resultInvMap));
+   }
+}
+
+if((size(#)==2)&&(typeof(#[1])=="ideal")&&(typeof(#[2])=="ideal"))
+{
+   def R=basering;
+   ideal IX=#[1];
+   ideal IW=#[2];
+   if(std(IW)==0)
+   {   return(CompleteIntersectionCover(IX));}
+   int k;
+   int r=size(IW);
+   int s=size(IX);
+   if(r>s)
+   {   ERROR("Incompatible Inputs");}
+   for(k=1; k<=r; k=k+1)
+   {   if(IW[k]!=IX[k]){ERROR("Incompatible Inputs");}}
+   scheme resultScheme;
+   morphism resultMap,resultInvMap;
+   if(dim(std(IX))==dim(std(IW)))
+   {
+      resultScheme=makeAffineScheme(IW);
+      resultMap.preim=resultScheme;
+      resultMap.im=resultScheme;
+      resultMap.chartmaps=resultScheme.maps;
+      resultInvMap.preim=resultScheme;
+      resultInvMap.im=resultScheme;
+      resultInvMap.chartmaps=resultScheme.maps;
+      return(list(resultScheme,resultMap,resultInvMap));
+   }
+   else
+   {
+      matrix JX=jacob(IX);
+      matrix JW=jacob(IW);
+      int i,j,n,m,l,ci,cj;
+      scheme X,W;
+      list L,K;
+
+      list Minors=findMaxMinors(IW,JW);
+      m=size(Minors);
+      n=0;
+      for(k=1; k<=m; k=k+1)
+      {
+         matrix v[s][1];
+         for(i=1; i<=s; i=i+1)
+         {
+            v[i,1]=IX[i];
+         }
+         matrix M=dsum(Minors[k][2],diag(Minors[k][1],s-r));
+         ideal I=M*v;
+         matrix J=jacob(I);
+         intvec iv=Minors[k][3];
+         for(i=r+1; i<=s; i=i+1)
+         {
+            for(j=1; j<=r; j=j+1)
+            {
+               poly g=-diff(IX[i],var(iv[j]));
+               J=addrow(J,j,g,i);
+               kill g;
+            }
+         }
+
+         ideal H=std(radical(IW));
+         for(i=r+1; i<=s; i=i+1)
+         {
+         l=1;
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            if(reduce(Minors[k][1],H)!=0)
+            {
+            if(j!=iv[l])
+            {
+            if(reduce(J[i,j],H)!=0)
+            {
+            n=n+1;
+            L[n]=J[i,j]*Minors[k][1];
+            K[n]=i;
+            H=std(radical(H+J[i,j]));
+            }}
+            else{
+            if(l<r){l=l+1;}
+            }}
+         }
+         }
+
+         kill v,M,I,J,iv,H;
+      }
+
+      list CoverSchemes,PreCoverCharts,PreCoverMaps,CoverMaps,CoverInvMaps;
+      for(k=1; k<=n; k=k+1)
+      {
+         poly h=L[k];
+         def S=changevar("x()",R);
+         S=extendring(1,"t","dp",0,S);
+         setring S;
+         ideal VarR=var(2);
+         for(j=2; j<=nvars(R); j=j+1)
+         {
+            VarR=VarR,var(j+1);
+         }
+         map phi=R,VarR;
+         i=K[k];
+         poly hnew=phi(h);
+         poly g=t*hnew-1;
+         poly f;
+
+         ideal IXnew=phi(IX);
+         ideal IWnew=phi(IW);
+         if(std(IWnew)!=0)
+         {
+         f=IXnew[i];
+         IXnew[i]=IXnew[r+1];
+         IXnew[r+1]=f;
+         IXnew=g,IXnew;
+         IWnew=g,IWnew,f;
+         }else{
+         f=IXnew[i];
+         IXnew[i]=IXnew[1];
+         IXnew[1]=f;
+         IXnew=g,IXnew;
+         IWnew=g,f;
+         }
+
+         W=makeAffineScheme(IWnew);
+         X=makeAffineScheme(IXnew,W);
+
+         PreCoverCharts[k]=X.cover[1];
+         list LL=CompleteIntersectionCover(IXnew,IWnew);
+         CoverSchemes[k]=LL[1];
+         CoverMaps[k]=LL[2];
+         CoverInvMaps[k]=LL[3];
+         kill LL;
+
+         kill phi,hnew,VarR,f,g,IXnew,IWnew;
+         setring R;
+         kill S;
+         kill h;
+      }
+
+      for(i=1; i<=n; i=i+1)
+      {
+         list Maps;
+         poly h;
+         chart Preim=PreCoverCharts[i];
+         def S=Preim.in;
+         setring S;
+         ideal VarR=var(2);
+         for(j=2; j<=nvars(R); j=j+1)
+         {
+            VarR=VarR,var(j+1);
+         }
+         map psi=R,VarR;
+         setring R;
+
+         for(j=1; j<=n; j=j+1)
+         {
+            chartmap phi;
+            phi.preim=Preim;
+            phi.im=PreCoverCharts[j];
+            h=L[j];
+            setring S;
+            poly hnew=psi(h);
+            phi.dom=hnew;
+            list RatFuncs;
+            RatFuncs[1]=makeratFunc(1,hnew);
+            for(k=1; k<=nvars(R); k=k+1)
+            {
+               RatFuncs[k+1]=makeratFunc(var(k+1));
+            }
+            phi.ratFuncs[1]=RatFuncs;
+            Maps[j]=phi;
+
+            kill hnew,RatFuncs;
+            setring R;
+            kill phi;
+         }
+         PreCoverMaps[i]=Maps;
+         setring S;
+         kill VarR,psi;
+         setring R;
+         kill Maps,Preim,S,h;
+      }
+
+      X=makeAffineScheme(IX);
+      list Maps;
+      resultMap.preim=X;
+      resultInvMap.im=X;
+      for(i=1; i<=n; i=i+1)
+      {
+         resultScheme.cover=resultScheme.cover+CoverSchemes[i].cover;
+
+         chartmap phi,psi;
+         phi.preim=X.cover[1]; phi.im=PreCoverCharts[i];
+         psi.im=X.cover[1]; psi.preim=PreCoverCharts[i];
+         list phiRatFuncs;
+         list psiRatFuncs;
+
+         phiRatFuncs[1]=makeratFunc(1,L[i]);
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            phiRatFuncs=phiRatFuncs+list(makeratFunc(var(j)));
+         }
+         phi.dom=ideal(L[i]);
+         phi.ratFuncs[1]=phiRatFuncs;
+
+         def S=PreCoverCharts[i].in;
+         setring S;
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            psiRatFuncs=psiRatFuncs+list(makeratFunc(var(j+1)));
+         }
+         psi.dom=1;
+         psi.ratFuncs[1]=psiRatFuncs;
+         setring R;
+
+         for(k=1; k<=size(CoverSchemes[i].cover); k=k+1)
+         {
+            Maps=Maps+list(CoverMaps[i].chartmaps[1][k]*phi);
+            resultInvMap.chartmaps=resultInvMap.chartmaps+list(list(psi*CoverInvMaps[i].chartmaps[k][1]));
+         }
+         kill phi,psi,phiRatFuncs,psiRatFuncs,S;
+      }
+      resultMap.chartmaps=list(Maps);
+
+      ci=0;
+      chartmap phi;
+      for(i=1; i<=n; i=i+1)
+      {
+      for(k=1; k<=size(CoverSchemes[i].cover); k=k+1)
+      {
+         ci=ci+1;
+         cj=0;
+         Maps=list();
+         for(j=1; j<=n; j=j+1)
+         {
+         for(l=1; l<=size(CoverSchemes[j].cover); l=l+1)
+         {
+            cj=cj+1;
+            if(i==j)
+            {
+               Maps[cj]=CoverSchemes[i].maps[k][l];
+            }else{
+               phi=CoverMaps[j].chartmaps[1][l];
+               phi=phi*PreCoverMaps[i][j];
+               phi=phi*CoverInvMaps[i].chartmaps[k][1];
+               Maps[cj]=phi;
+            }
+         }}
+         resultScheme.maps[ci]=Maps;
+      }}
+      resultMap.im=resultScheme;
+      resultInvMap.preim=resultScheme;
+
+      return(list(resultScheme,resultMap,resultInvMap));
+   }
+}
+
+if((size(#)==2)&&(typeof(#[1])=="scheme")&&(typeof(#[2])=="scheme"))
+{
+   def R=basering;
+   scheme X=#[1];
+   scheme W=#[2];
+   scheme resultScheme;
+   int i,j,k,l;
+   int n=size(X.cover);
+   morphism resultMap,resultInvMap;
+
+   list CoverSchemes,CoverMaps,CoverInvMaps;
+   for(i=1; i<=n; i=i+1)
+   {
+      def S=X.cover[i].in;
+      setring S;
+      ideal IX=X.cover[i].value;
+      ideal IW=W.cover[i].value;
+      list LL=CompleteIntersectionCover(IX,IW);
+      CoverSchemes[i]=LL[1];
+      CoverMaps[i]=LL[2];
+      CoverInvMaps[i]=LL[3];
+
+      kill IX,IW;
+      setring R;
+      kill S,LL;
+   }
+
+
+   list Maps;
+   resultMap.preim=X;
+   resultInvMap.im=X;
+   for(i=1; i<=n; i=i+1)
+   {
+      resultScheme.cover=resultScheme.cover+CoverSchemes[i].cover;
+   }
+
+   for(i=1; i<=n; i=i+1)
+   {
+      Maps=list();
+      for(j=1; j<=n; j=j+1)
+      {
+      for(k=1; k<=size(CoverSchemes[j].cover); k=k+1)
+      {
+         if(i!=j)
+         {
+            chartmap phi;
+            phi.preim=X.cover[i];
+            phi.im=CoverSchemes[j].cover[k];
+
+            def S=X.cover[i].in;
+            setring S;
+            phi.dom=0;
+
+            def SS=CoverSchemes[j].cover[k].in;
+            phi.ratFuncs[1]=list();
+            for(l=1; l<=nvars(SS); l=l+1)
+            {
+               phi.ratFuncs[1]=phi.ratFuncs[1]+list(makeratFunc(0));
+            }
+            Maps=Maps+list(phi);
+            kill phi,S,SS;
+            setring R;
+         }else{
+            Maps=Maps+list(CoverMaps[i].chartmaps[1][k]);
+         }
+      }}
+      resultMap.chartmaps[i]=Maps;
+   }
+
+   for(j=1; j<=n; j=j+1)
+   {
+   for(k=1; k<=size(CoverSchemes[j].cover); k=k+1)
+   {
+      Maps=list();
+      for(i=1; i<=n; i=i+1)
+      {
+         if(i!=j)
+         {
+            chartmap phi;
+            phi.im=X.cover[i];
+            phi.preim=CoverSchemes[j].cover[k];
+
+            def S=CoverSchemes[j].cover[k].in;
+            setring S;
+            phi.dom=0;
+
+            def SS=X.cover[i].in;
+            phi.ratFuncs[1]=list();
+            for(l=1; l<=nvars(SS); l=l+1)
+            {
+               phi.ratFuncs[1]=phi.ratFuncs[1]+list(makeratFunc(0));
+            }
+            Maps=Maps+list(phi);
+            kill phi,S,SS;
+            setring R;
+         }else{
+            Maps=Maps+list(CoverInvMaps[i].chartmaps[k][1]);
+         }
+      }
+      resultInvMap.chartmaps=resultInvMap.chartmaps+list(Maps);
+   }}
+
+   for(i=1; i<=n; i=i+1)
+   {
+   for(k=1; k<=size(CoverSchemes[i].cover); k=k+1)
+   {
+      Maps=list();
+      for(j=1; j<=n; j=j+1)
+      {
+      for(l=1; l<=size(CoverSchemes[j].cover); l=l+1)
+      {
+         chartmap phi=CoverMaps[j].chartmaps[1][l];
+         phi=phi*X.maps[i][j];
+         phi=phi*CoverInvMaps[i].chartmaps[k][1];
+         Maps=Maps+list(phi);
+         kill phi;
+      }}
+      resultScheme.maps=resultScheme.maps+list(Maps);
+   }}
+   resultMap.im=resultScheme;
+   resultInvMap.preim=resultScheme;
+
+   return(list(resultScheme,resultMap,resultInvMap));
+}
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(0);
+scheme Z=makeProjScheme(ideal(x-z,y-z)*ideal(x+z,y-z),X);
+
+list LL=CompleteIntersectionCover(Z,X);
+LL[1];
+}
+
+
+
+proc HybrSmoothTest(list #)
+"USAGE: HybrSmoothTest(X[,W]); X,W schemes
+RETURN: 1 if X is smooth, 0 otherwise
+EXAMPLE: example HybrSmoothTest; shows an example"
+{
+if((size(#)==2)&&(typeof(#[1])=="chart")&&(typeof(#[2])=="chart"))
+{
+   int result=1;
+   def T=basering;
+   if(#[1].in!=#[2].in)
+   {   ERROR("Incompatible Inputs");}
+   def R=#[1].in;
+   setring R;
+   ideal IX=#[1].value;
+   ideal IW=#[2].value;
+   int k;
+   int r=size(IW);
+   int s=size(IX);
+   if(r>s)
+   {   ERROR("Incompatible Inputs");}
+   for(k=1; k<=r; k=k+1)
+   {   if(IW[k]!=IX[k]){~:ERROR("Incompatible Inputs");}}
+   if(dim(std(IX))==dim(std(IW)))
+   {
+      if((std(reduce(std(IX),std(IW)))==0)&&(std(reduce(std(IW),std(IX)))==0))
+      {   result=1;}
+      else
+      {   result=0;}
+      setring T;
+      return(result);
+   }
+   else
+   {
+      matrix JX=jacob(IX);
+      matrix JW=jacob(IW);
+      int i,j,n,m,l,ci,cj;
+      list L,K;
+      if(std(IW)!=0)
+      {
+      list Minors=findMaxMinors(IW,JW);
+      m=size(Minors);
+      n=0;
+      for(k=1; k<=m; k=k+1)
+      {
+         matrix v[s][1];
+         for(i=1; i<=s; i=i+1)
+         {
+            v[i,1]=IX[i];
+         }
+         matrix M=dsum(Minors[k][2],diag(Minors[k][1],s-r));
+         ideal I=M*v;
+         matrix J=jacob(I);
+         intvec iv=Minors[k][3];
+         for(i=r+1; i<=s; i=i+1)
+         {
+            for(j=1; j<=r; j=j+1)
+            {
+               poly g=-diff(IX[i],var(iv[j]));
+               J=addrow(J,j,g,i);
+               kill g;
+            }
+         }
+
+         ideal H=std(radical(IW));
+         for(i=r+1; i<=s; i=i+1)
+         {
+         l=1;
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            if(reduce(Minors[k][1],H)!=0)
+            {
+            if(j!=iv[l])
+            {
+            if(reduce(J[i,j],H)!=0)
+            {
+            n=n+1;
+            L[n]=J[i,j]*Minors[k][1];
+            K[n]=i;
+            H=std(radical(H+J[i,j]));
+            }}
+            else{
+            if(l<r){l=l+1;}
+            }}
+         }
+         }
+
+         if(std(H)!=1)
+         {   result=0;
+             return(result);
+         }
+
+         kill v,M,I,J,iv,H;
+      }
+      }else{
+      ideal H=std(radical(IX));
+      matrix J=jacob(IX);
+      n=0;
+      for(i=1; i<=size(IX); i=i+1)
+      {
+         for(j=1; j<=nvars(R); j=j+1)
+         {
+            if(H!=1)
+            {
+            if(reduce(J[i,j],H)!=0)
+            {
+            n=n+1;
+            L[n]=J[i,j];
+            K[n]=i;
+            H=std(radical(H+J[i,j]));
+            }}
+         }
+      }
+      if(H!=1)
+      {   result=0;
+          return(result);
+      }
+      }
+
+
+      for(k=1; k<=n; k=k+1)
+      {
+         poly h=L[k];
+         def S=changevar("x()",R);
+         S=extendring(1,"t","dp",0,S);
+         setring S;
+         setring S;
+         ideal VarR=var(2);
+         for(j=2; j<=nvars(R); j=j+1)
+         {
+            VarR=VarR,var(j+1);
+         }
+         map phi=R,VarR;
+         i=K[k];
+         poly hnew=phi(h);
+         poly g=t*hnew-1;
+         poly f;
+
+         ideal IXnew=phi(IX);
+         ideal IWnew=phi(IW);
+         if(std(IWnew)!=0)
+         {
+         f=IXnew[i];
+         IXnew[i]=IXnew[r+1];
+         IXnew[r+1]=f;
+         IXnew=g,IXnew;
+         IWnew=g,IWnew,f;
+         }else{
+         f=IXnew[i];
+         IXnew[i]=IXnew[1];
+         IXnew[1]=f;
+         IXnew=g,IXnew;
+         IWnew=g,f;
+         }
+
+         chart X=IXnew;
+         chart W=IWnew;
+         if(!HybrSmoothTest(X,W))
+         {   result=0;
+             return(result);
+         }
+
+
+         kill phi,hnew,VarR,f,g,IXnew,IWnew,X,W;
+         kill S;
+         setring R;
+         kill h;
+       }
+
+       setring T;
+       return(result);
+    }
+}
+
+if((size(#)==1)&&(typeof(#[1])=="scheme"))
+{
+   def R=basering;
+   int result=1;
+   scheme X=#[1];
+   for(int n=1; n<=size(X.cover); n=n+1)
+   {
+      def S=X.cover[n].in;
+      setring S;
+      chart W=0;
+      setring R;
+      kill S;
+      if(!HybrSmoothTest(X.cover[n],W))
+      {   result=0;}
+      kill W;
+   }
+   return(result);
+}
+
+if((size(#)==2)&&(typeof(#[1])=="scheme")&&(typeof(#[2])=="scheme"))
+{
+   int result=1;
+   scheme X=#[1];
+   scheme W=#[2];
+   if(size(W.cover)!=size(X.cover))
+   {   ERROR("Incompatible Inputs");}
+   for(int n=1; n<=size(X.cover); n=n+1)
+   {
+      if(!HybrSmoothTest(X.cover[n],W.cover[n]))
+      {   result=0;}
+   }
+   return(result);
+}
+}
+example
+{"EXAMPLE:"; "echo=1";
+
+ring R=0,(x,y),dp;
+"Example of a smooth scheme";
+scheme X=makeAffineScheme(ideal(y-x2));
+HybrSmoothTest(X);
+
+"Example of a scheme that isn't smooth";
+scheme Y=makeAffineScheme(ideal(y2-x3));
+HybrSmoothTest(Y);
+
+"Blowing up resolves singularities";
+scheme C=makeAffineScheme(ideal(x,y),Y);
+scheme Z=blowUp(Y,C)[1];
+HybrSmoothTest(Z);
+}
+
+
+
+proc isSmooth(scheme X)
+"USAGE: isSmooth(X); scheme X
+RETURN: 1 if X is smooth, 0 otherwise
+EXAMPLE: example isSmooth; gives an example"
+{
+   def R=basering;
+   int i,j,k;
+
+   if(!isReduced(X))
+   {   return(0);}
+
+   list Dec=IrredDec(X);
+   for(i=1; i<=size(X.cover); i=i+1)
+   {
+      def S=X.cover[i].in;
+      setring S;
+      for(j=1; j<=size(Dec)-1; j=j+1)
+      {
+      for(k=j+1; k<=size(Dec); k=k+1)
+      {
+         if(std(Dec[j][1].cover[i].value+Dec[k][1].cover[i].value)!=1)
+         {
+            return(0);
+         }
+      }}
+      kill S;
+   }
+
+   setring R;
+   for(j=1; j<=size(Dec); j=j+1)
+   {
+      if(!HybrSmoothTest(Dec[j][1]))
+      {
+         return(0);
+      }
+   }
+
+   setring R;
+   return(1);
+}
+example
+{"EXAMPLE:";
+ring R=0,(x,y,z),dp;
+scheme X=makeProjScheme(x2y3z5);
+isSmooth(X);
+
+X=makeProjScheme(ideal(xyz-x3));
+isSmooth(X);
+
+X=makeAffineScheme(ideal(x2y-x));
+isSmooth(X);
+
+X=makeProjScheme(y2x-x3-x2z);
+isSmooth(X);
+
+scheme Z=makeProjScheme(ideal(x,y),X);
+list L=blowUp(X,Z);
+isSmooth(L[1]);
+}
