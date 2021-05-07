@@ -1,6 +1,6 @@
 //
-version="version idealclass.lib 1.0.0.0 Apr_2021 ";
-category="Algebraic geometry"; 
+version="version idealclass.lib 1.0.0.0 Apr_2021 "; $Id$
+category="Algebraic geometry";
 info="
 LIBRARY: idealclass.lib  Ring independent ideal data type
 
@@ -9,9 +9,9 @@ AUTHORS:  Benjamin Mirgain
 
 OVERVIEW:
 This library implements a ring independent ideal type used in scheme.lib. You can use
-+, * and ^ for addition, multiplication and exponentiation. The key in contains the 
-base ring of the ideal, the key value contains the ideal. You can call the constructor 
-by asigning an ideal of the type ideal to an ideal of the type Ideal via =.
++, * and ^ for addition, multiplication and exponentiation. The key in contains the
+base ring of the ideal, the key value contains the ideal. You can call the constructor
+by assigning an ideal of the type ideal to an ideal of the type Ideal via =.
 
 KEYWORDS:
 ideals
