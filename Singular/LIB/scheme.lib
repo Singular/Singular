@@ -232,7 +232,7 @@ EXAMPLE: example IntersectionNumber; shows an example"
 }
 example
 {
-"EXAMPLE:";
+"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(0);
 scheme Y=makeProjScheme(ideal(x-z),X);
@@ -262,7 +262,7 @@ EXAMPLE: example makeChart; shows an example"
    return(C);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 chart U=ideal(x2-yz);
 U;
@@ -411,7 +411,7 @@ EXAMPLE: example makeChartmap; creates an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(a,b,c,d),dp;
 chart U=ad-bc;
 Ideal I=ideal(c,d);
@@ -642,7 +642,7 @@ EXAMPLE: example ChartToScheme; creates an example"
     return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y),dp;
 chart U=x2-y3;
 scheme X=ChartToScheme(U);
@@ -1051,7 +1051,7 @@ EXAMPLE: example FibreProduct; shows an example"
    return(result);
 }
 example
-{"EXAMPLE:"; "echo=2";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x(1..3)),dp;
 scheme X=makeProjScheme(ideal(x(1)^2-x(2)*x(3)));
 ring S=0,(y(1..2)),dp;
@@ -1102,7 +1102,7 @@ EXAMPLE: example intersection; shows an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(0);
 scheme Y=makeProjScheme(ideal(x2-yz),X);
@@ -1154,7 +1154,7 @@ EXAMPLE: example union; shows an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(0);
 scheme Y=makeProjScheme(ideal(x2-yz),X);
@@ -1199,7 +1199,7 @@ EXAMPLE: example ReducedScheme; shows an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(x2y3z4);
 "Original Scheme:";
@@ -1241,7 +1241,7 @@ EXAMPLE: example dimension; shows an example"
     return(d);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeAffineScheme(x-yz);
 dimension(X);
@@ -1330,7 +1330,7 @@ EXAMPLE: example IrredDec; shows an example"
     return(Dec);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(ideal(x2,xy));
 list L=IrredDec(X);
@@ -1366,7 +1366,7 @@ EXAMPLE: example isReduced; shows an example"
    return(1);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(x2y3z4);
 "Original Scheme is not reduced:";
@@ -1410,7 +1410,7 @@ EXAMPLE: example makeDivisor; shows an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(0);
 
@@ -1535,7 +1535,7 @@ if(size(#)==0)
 return(r);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y),dp;
 ratFunc F=x2,xy;
 F;
@@ -1740,7 +1740,7 @@ EXAMPLE: example PolyCompratFunc; creates an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y),dp;
 Poly F=x2-xy+y3;
 
@@ -1769,7 +1769,7 @@ EXAMPLE: example ratFuncCompratFunc; creates an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y),dp;
 ratFunc F=x2+y,x-y;
 
@@ -1974,7 +1974,7 @@ EXAMPLE: example makeMorphism; gives an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(xz-y2);
 ring S=0,(a,b),dp;
@@ -2128,7 +2128,7 @@ EXAMPLE: example MorphismCompMorphism; gives an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(xz-y2);
 ring S=0,(a,b),dp;
@@ -2259,7 +2259,7 @@ EXAMPLE: example ChartmapToMorphism; gives an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y),dp;
 chart U=0;
 Ideal Dom=1;
@@ -2292,7 +2292,7 @@ EXAMPLE: example BlowUpMapToMorphism; gives an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(0);
 scheme Z=makeProjScheme(ideal(x-z,y-z),X);
@@ -2360,7 +2360,7 @@ EXAMPLE: example InvImage; gives an example"
    return(result);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(xz-y2);
 ring S=0,(a,b),dp;
@@ -2732,7 +2732,7 @@ EXAMPLE: example blowUp;  shows an example
    return(list(B,pi,E));
 }
 example
-{ "EXAMPLE";
+{ "EXAMPLE"; echo=2;
    ring R=0,(x,y,z),dp;
    scheme X=makeProjScheme(ideal(0));
    scheme Y=makeProjScheme(ideal(x-z,y-z),X);
@@ -3526,7 +3526,7 @@ if((size(#)==2)&&(typeof(#[1])=="scheme")&&(typeof(#[2])=="scheme"))
 }
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(0);
 scheme Z=makeProjScheme(ideal(x-z,y-z)*ideal(x+z,y-z),X);
@@ -3745,7 +3745,7 @@ if((size(#)==2)&&(typeof(#[1])=="scheme")&&(typeof(#[2])=="scheme"))
 }
 }
 example
-{"EXAMPLE:"; "echo=1";
+{"EXAMPLE:"; echo=2;
 
 ring R=0,(x,y),dp;
 "Example of a smooth scheme";
@@ -3805,7 +3805,7 @@ EXAMPLE: example isSmooth; gives an example"
    return(1);
 }
 example
-{"EXAMPLE:";
+{"EXAMPLE:"; echo=2;
 ring R=0,(x,y,z),dp;
 scheme X=makeProjScheme(x2y3z5);
 isSmooth(X);

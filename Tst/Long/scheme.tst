@@ -1,6 +1,8 @@
 LIB "tst.lib";
 tst_init();
 
+LIB"scheme.lib";
+
 // Testing ratFunc stuff
 ring R=0,(x,y),dp;
 ratFunc F=x2,xy;
