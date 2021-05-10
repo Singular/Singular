@@ -34,6 +34,7 @@ bug_slimsyz
 bug_solve
 bug_ssi_algring
 bug_ssi_attr
+bug_subst
 bug_zp
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
