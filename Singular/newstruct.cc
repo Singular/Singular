@@ -139,6 +139,7 @@ lists lCopy_newstruct(lists L)
       {
         if (L->m[n-1].data!=(void*)currRing)
           rChangeCurrRing((ring)(L->m[n-1].data));
+        L->m[n].flag=0;
         N->m[n].Copy(&L->m[n]);
       }
       else
