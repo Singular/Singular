@@ -455,6 +455,8 @@ static proc printChartmap(chartmap phi)
 
    setring R;
    "Preimage ring: ("+string(R)+")/("+string(phi.preim.value)+")";
+   def domR=phi.r_dom;
+   setring domR;
    "Domain: D("+string(phi.dom)+")";
    setring S;
    "Image ring: ("+string(S)+")/("+string(phi.im.value)+")";
@@ -463,15 +465,16 @@ static proc printChartmap(chartmap phi)
    int m=nvars(S);
    for(k=1; k<=n; k=k+1)
    {
-   setring R;
-   "Map restricted to D("+string(phi.dom[k])+"):";
-   st="     ("+varstr(R)+") -----> ( ";
-   for(i=1; i<m; i=i+1)
-   {
-      st=st+string(phi.ratFuncs[k][i])+" , ";
-   }
-   st=st+string(phi.ratFuncs[k][m])+" )";
-   st;
+     setring domR;
+     "Map restricted to D("+string(phi.dom[k])+"):";
+     st="     ("+varstr(R)+") -----> ( ";
+     setring R;
+     for(i=1; i<m; i=i+1)
+     {
+       st=st+string(phi.ratFuncs[k][i])+" , ";
+     }
+     st=st+string(phi.ratFuncs[k][m])+" )";
+     st;
    }
    setring B;
 }
