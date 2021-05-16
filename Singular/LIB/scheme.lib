@@ -1802,6 +1802,7 @@ EXAMPLE: example ChartmapCompIdeal; creates an example"
    ratFunc r;
    list L,LL;
    Ideal II;
+   def domR=phi.r_dom;
    for(i=1; i<=m; i=i+1)
    {
       setring SS;
@@ -1826,8 +1827,14 @@ EXAMPLE: example ChartmapCompIdeal; creates an example"
       }
       kill f,k;
       II.value=II.value+phi.preim.value;
-      II=sat(II.value,phi.dom[i])[1];
+      setring domR;
+      poly tmp=phi.dom[i];
+      setring S;
+      if (S!=domR) { poly tmp=fetch(domR,tmp);}
+      II=sat(II.value,tmp)[1];
+      kill tmp;
       L[i]=II;
+      if (S!=domR) { setring domR;kill tmp;setring S;}
    }
 
    setring S;
