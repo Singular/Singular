@@ -166,11 +166,12 @@ void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r)
         omFreeBin(coeff, macoeffBin);
       }
       while (next != NULL);
-      if (mp->dest != NULL)
-      {
-        assume(dest_r != NULL);
-        p_Delete(&(mp->dest), dest_r);
-      }
+      mp->coeff=NULL;
+    }
+    if (mp->dest != NULL)
+    {
+      assume(dest_r != NULL);
+      p_Delete(&(mp->dest), dest_r);
     }
   }
   omFreeBin(mp, mapolyBin);
