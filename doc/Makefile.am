@@ -163,6 +163,9 @@ EXTRA_DIST += 					\
 	usercard.tex				\
 	version.texi.in
 
+clean-local:
+	-rm -rf examples d2t_singular
+
 all-local:
 	$(MAKE) -f Makefile-docbuild all
 
