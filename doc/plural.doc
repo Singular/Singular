@@ -95,7 +95,7 @@ Unless stated otherwise, an expression of type @code{ideal} as understood by @sc
 as a list of generators of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
  @* For a @strong{two-sided ideal} @code{T}, use the command @ref{twostd BR_PLURAL_BR} for computing
 the two-sided Groebner basis of @code{T}.
- @* For a @strong{right ideal} @code{I}, use @ref{rightStd} from @code{nctools_lib} for computing the right
+ @* For a @strong{right ideal} @code{I}, use @ref{rightstd (letterplace)} from @code{nctools_lib} for computing the right
  Groebner basis of @code{I}.
 
 @item @code{module} BR_PLURAL_BR
@@ -3740,7 +3740,7 @@ For computing a left normal form of @code{f} with respect to @code{G}, use @ref{
 
 The right ideal membership is analogous to the left one:
 
-for computing a right Groebner basis @code{G} of @code{I}, use @ref{rightStd} from @ref{nctools_lib},
+for computing a right Groebner basis @code{G} of @code{I}, use @ref{rightstd (letterplace)} from @ref{nctools_lib},
 
 for computing a right normal form of @code{f} with respect to @code{G}, use @ref{rightNF} from @ref{nctools_lib}.
 
