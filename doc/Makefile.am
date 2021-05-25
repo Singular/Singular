@@ -164,18 +164,19 @@ EXTRA_DIST += 					\
 	version.texi.in
 
 clean-local:
-	-rm -rf examples d2t_singular singular.tex manual.tex
+	/bin/rm -rf examples d2t_singular singular.tex manual.tex
 	/bin/rm -f .singular_hist doe.tmp dump.ascii example.mp example.txt
 	/bin/rm -f save_i test.ascii test.mp
 	/bin/rm -f Z* *.tst *.pag *.dir *.lst *.log *.aux *.cp *.cps
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
 	/bin/rm -f s-plural.tex s-plulibs.tex s-letterplace.tex
-	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
-	/bin/rm -f manual.hlp
-	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
-	/bin/rm -rf ${STANDALONE_HTML_FILES} ${STANDALONE_FILES} ${STANDALONE_TXT_FILES}
-	/bin/rm -f INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
+	/bin/rm -f singular.hlp manual.hlp singular.idx
+	/bin/rm -rf html
+	/bin/rm -f cones.tex countedref.tex decodegb.tex
+	/bin/rm -f examples.tex general.tex ti_ip.tex math.tex reference.tex
+	/bin/rm -f start.tex types.tex pdata.tex tricks.tex platform.tex
+	/bin/rm -f plural.tex letterplace.tex plulibs.tex sca.tex pyobject.tex
 
 all-local:
 	$(MAKE) -f Makefile-docbuild all
