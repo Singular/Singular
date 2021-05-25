@@ -141,6 +141,7 @@ libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 
 ########################### Singular* #########################
+dist_man1_MANS = Singular.man ESingular.man TSingular.man
 
 EXTRA_PROGRAMS =  libparse Singulard
 

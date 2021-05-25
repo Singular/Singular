@@ -1,5 +1,3 @@
-dist_man1_MANS = Singular.man ESingular.man TSingular.man
-
 # Docbuild scripts
 EXTRA_DIST =					\
 	Makefile-docbuild.in version.texi.in	\
