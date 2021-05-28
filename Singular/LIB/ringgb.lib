@@ -337,7 +337,7 @@ zeroReduce(p1-p2);
 zeroReduce(p1-p3);
 zeroReduce(p2-p3);
 
-// Ref: A. Peymandoust G. De Micheli, “Application of Symbolic Computer Algebra in High-Level Data-Flow
-// Synthesis,” IEEE Transactions on CAD/ICAS, Vol. 22, No. 9, September 2003, pp.1154-1165.
+// Ref: A. Peymandoust G. De Micheli, "Application of Symbolic Computer Algebra in High-Level Data-Flow
+// Synthesis," IEEE Transactions on CAD/ICAS, Vol. 22, No. 9, September 2003, pp.1154-1165.
 
 */

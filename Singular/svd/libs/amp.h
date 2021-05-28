@@ -290,11 +290,11 @@ namespace amp
     template<unsigned int Precision>
     mpfr_srcptr ampf<Precision>::getReadPtr() const
     {
-        // TODO: ïîäóìàòü, íóæíî ëè ñäåëàòü, ÷òîáû è ïðè getRead, è ïðè
-        //       getWrite ñîçäàâàëàñü íîâàÿ instance mpfr_t.
-        //       ýòî ìîæåò áûòü íóæíî äëÿ êîððåêòíîé îáðàáîòêè ñèòóàöèé âèäà
-        //       mpfr_÷åãî_òî_òàì( a.getWritePtr(), a.getReadPtr())
-        //       âðîäå áû íóæíî, à òî åñëè òàì çàâÿçàíî íà side-effects...
+        // TODO: Ð¿Ð¾Ð´ÑƒÐ¼Ð°Ñ‚ÑŒ, Ð½ÑƒÐ¶Ð½Ð¾ Ð»Ð¸ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¸ Ð¿Ñ€Ð¸ getRead, Ð¸ Ð¿Ñ€Ð¸
+        //       getWrite ÑÐ¾Ð·Ð´Ð°Ð²Ð°Ð»Ð°ÑÑŒ Ð½Ð¾Ð²Ð°Ñ instance mpfr_t.
+        //       ÑÑ‚Ð¾ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð½ÑƒÐ¶Ð½Ð¾ Ð´Ð»Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ð¹ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ ÑÐ¸Ñ‚ÑƒÐ°Ñ†Ð¸Ð¹ Ð²Ð¸Ð´Ð°
+        //       mpfr_Ñ‡ÐµÐ³Ð¾_Ñ‚Ð¾_Ñ‚Ð°Ð¼( a.getWritePtr(), a.getReadPtr())
+        //       Ð²Ñ€Ð¾Ð´Ðµ Ð±Ñ‹ Ð½ÑƒÐ¶Ð½Ð¾, Ð° Ñ‚Ð¾ ÐµÑÐ»Ð¸ Ñ‚Ð°Ð¼ Ð·Ð°Ð²ÑÐ·Ð°Ð½Ð¾ Ð½Ð° side-effects...
         return rval->value;
     }
 

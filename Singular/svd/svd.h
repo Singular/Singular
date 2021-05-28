@@ -106,7 +106,7 @@ namespace svd
         VTNeeded    -   0, 1 or 2. See the description of the parameter VT.
         AdditionalMemory -
                         If the parameter:
-                         * equals 0, the algorithm doesn’t use additional
+                         * equals 0, the algorithm doesn't use additional
                            memory (lower requirements, lower performance).
                          * equals 1, the algorithm uses additional
                            memory of size min(M,N)*min(M,N) of real numbers.
@@ -125,7 +125,7 @@ namespace svd
                         within [0..M-1, 0..Min(M,N)-1].
                         if UNeeded=2, U contains matrix U wholly. Array whose
                         indexes range within [0..M-1, 0..M-1].
-        VT          -   if VTNeeded=0, VT isn’t changed, the right singular vectors
+        VT          -   if VTNeeded=0, VT isn't changed, the right singular vectors
                         are not calculated.
                         if VTNeeded=1, VT contains right singular vectors (first
                         min(M,N) rows of matrix V^T). Array whose indexes range
