@@ -2034,7 +2034,7 @@ int ssiReservePort(int clients)
 {
   if (ssiReserved_P!=0)
   {
-    WerrorS("ERROR already a reverved port requested");
+    WerrorS("ERROR already a reserved port requested");
     return 0;
   }
   int portno;
@@ -2070,7 +2070,7 @@ si_link ssiCommandLink()
 {
   if (ssiReserved_P==0)
   {
-    WerrorS("ERROR no reverved port requested");
+    WerrorS("ERROR no reserved port requested");
     return NULL;
   }
   struct sockaddr_in cli_addr;
