@@ -269,7 +269,7 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   }
   else // parent ---------------------------------------------------
   {
-    if (TEST_OPT_PROT) printf("%d childs created\n",cpus);
+    if (TEST_OPT_PROT) printf("%d children created\n",cpus);
     VRef<VString> msg;
     while(cnt>0)
     {
@@ -343,7 +343,7 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   }
   else // parent ---------------------------------------------------
   {
-    if (TEST_OPT_PROT) printf("%d childs created\n",cpus);
+    if (TEST_OPT_PROT) printf("%d children created\n",cpus);
     VRef<VString> msg;
     while(cnt>0)
     {
