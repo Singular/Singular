@@ -96,7 +96,7 @@ namespace reflections
 
     This subroutine is the modification of the DLARFG subroutines from
     the LAPACK library. It has a similar functionality except for the
-    fact that it doesn’t handle errors when the intermediate results
+    fact that it doesn't handle errors when the intermediate results
     cause an overflow.
 
 
