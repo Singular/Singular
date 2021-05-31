@@ -154,7 +154,7 @@ Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS}
 
-Singular_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
+Singular_LDFLAGS = ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 Singulard_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
@@ -167,7 +167,6 @@ dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win surfex
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
-# ESingular_LDFLAGS = -static ${AM_LDFLAGS}
 ESingular_LDADD =  ${top_builddir}/libpolys/reporter/libreporter.la \
 ${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
 ${top_builddir}/resources/libsingular_resources.la
@@ -177,7 +176,6 @@ ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 
 #### same for TSingular
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
-# TSingular_LDFLAGS = -static ${AM_LDFLAGS}
 TSingular_LDADD = ${top_builddir}/libpolys/reporter/libreporter.la \
 ${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
 ${top_builddir}/resources/libsingular_resources.la
@@ -192,7 +190,7 @@ libparse_CPPFLAGS = ${AM_CPPFLAGS} -DSTANDALONE_PARSER
 libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 libparse_LDADD =
-libparse_LDFLAGS = -static ${AM_LDFLAGS}
+libparse_LDFLAGS = ${AM_LDFLAGS}
 
 #########################################################
 # the Singular library (*.lib files)
