@@ -177,15 +177,15 @@ clean-local:
 	/bin/rm -f plural.tex letterplace.tex plulibs.tex sca.tex pyobject.tex
 
 all-local:
-	$(MAKE) -f Makefile-docbuild all
+	$(MAKE) -j1 -f Makefile-docbuild all
 
 singular.hlp:
-	$(MAKE) -f Makefile-docbuild $@
+	$(MAKE) -j1 -f Makefile-docbuild $@
 
 if ENABLE_DOC_BUILD
 EXTRA_DIST += doc.tbz2
 doc.tbz2:
-	$(MAKE) -f Makefile-docbuild singular.hlp html
+	$(MAKE) -j1 -f Makefile-docbuild singular.hlp html
 	chmod -R a+rX singular.hlp html
 	$(AMTAR) jcf $@ singular.hlp html
 dist-hook:
