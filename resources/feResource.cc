@@ -62,14 +62,18 @@ VAR feResourceConfig_s feResourceConfigs[] =
    "%D/factory;"
    "%r/share/factory;"
    "%b/LIB;"
+   "%b/../LIB;" // not installed, shared is in .libs/Singular
    "%b/../factory;"
+   "%b/../../factory;" // not installed, shared is in .libs/Singular
    // path for dynamic modules, should match ProcDir:
    "%b/MOD;"
+   "%b/../MOD;" // Singular in .libs/Singular
    "%r/lib/singular/MOD;"
    "%r/libexec/singular/MOD;"
    LIB_DIR "/singular/MOD;"
    LIBEXEC_DIR "/singular/MOD;"
-   "%b",
+   "%b;"
+   "%b/..", // Singular in .libs/Singular
    (char *)""},
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/Singular",          (char *)""},
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "",                  (char *)""},
