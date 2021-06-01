@@ -147,7 +147,7 @@ AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoload
 ENABLE_COUNTEDREF_AUTOLOAD=yes
 fi], ENABLE_COUNTEDREF_AUTOLOAD=no)
 
-if test x"${ENABLE_COUNTEDREF_AUTOLOAD}" == xyes; then
+if test x"${ENABLE_COUNTEDREF_AUTOLOAD}" = xyes; then
   AC_DEFINE([SI_COUNTEDREF_AUTOLOAD],1,[Enable autoloading of reference counted types])
   AC_SUBST(SI_COUNTEDREF_AUTOLOAD)
 fi
