@@ -80,6 +80,7 @@ VAR feResourceConfig_s feResourceConfigs[] =
   // should be changed to %b/../lib/singular/pProcs/:
   {"ProcDir",   'P',    feResPath,  "SINGULAR_PROCS_DIR",
      "%b/MOD;"
+     "%b/../MOD;" // Singular in .libs/Singular
      "%r/lib/singular/MOD;"
      "%r/libexec/singular/MOD;"
      LIB_DIR "/singular/MOD;"   /*debian: -> /usr/lib/singular/MOD */
