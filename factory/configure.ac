@@ -261,8 +261,7 @@ fi
 
 if test "x$enable_timing" != xno; then
   AC_CHECK_HEADERS(sys/param.h sys/times.h, ,
-    [ AC_MSG_ERROR(\`sys/times.h' or \`sys/param.h' not found.  Try
-                  \`configure --disable-timing') ])
+    [ AC_MSG_ERROR(sys/times.h or sys/param.h not found, try --disable-timing) ])
 fi
 
 # font-lock-trick: '

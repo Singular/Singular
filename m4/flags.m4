@@ -27,7 +27,7 @@ AC_MSG_RESULT(${CXX:-unset})
 ])
 
 AC_DEFUN([SING_RESET_FLAGS], [
- AC_MSG_WARN([Please note that we set empty defaults for \`CFLAGS' and \`CXXFLAGS' (instead of \`-g -O')])
+ AC_MSG_WARN([Please note that we set empty defaults for CFLAGS and CXXFLAGS])
  : ${CFLAGS:=""}
  : ${CXXFLAGS:=""}
 ])
