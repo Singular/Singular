@@ -2849,6 +2849,14 @@ static void go_on (slimgb_alg * c)
     free_sorted_pair_node (s, c->r);
     if(!h)
       continue;
+
+    if(TEST_OPT_IDLIFT
+    && p_GetComp(h, currRing) > c->syz_comp)
+    {
+      pDelete(&h);
+      continue;
+    }
+
     p[i] = h;
     i++;
   }
