@@ -9,9 +9,13 @@ LIB "tst.lib"; tst_init();
   matrix(sm)-matrix(i)*T;
   module s;
   sm=liftstd(i,T,s);
+  size(module(matrix(sm)-matrix(i)*T))==0;
+  size(module(matrix(i)*matrix(s)))==0;
   print(s);
   sm=liftstd(i,T,s,"std");
   print(s);
   sm=liftstd(i,T,s,"slimgb");
   print(s);
+  size(module(matrix(sm)-matrix(i)*T))==0;
+  size(module(matrix(i)*matrix(s)))==0;
 tst_status(1);$

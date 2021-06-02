@@ -226,7 +226,7 @@ static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL,
   else if (alg==GbSlimgb)
   {
     if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
-    temp1 = t_rep_gb(currRing, temp, temp->rank);
+    temp1 = t_rep_gb(currRing, temp, syzComp);
     idDelete(&temp);
   }
   else if (alg==GbGroebner)
