@@ -1186,13 +1186,12 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
   char *plib = iiConvName(newlib);
   BOOLEAN RET=TRUE;
   int token;
-  char FullName[256];
-
-  memset(FullName,0,sizeof(FullName));
+  int l=si_max(strlen(fullname),strlen(newlib))+3;
+  char *FullName=(char*)omAlloc0(l);
 
   if( *fullname != '/' &&  *fullname != '.' )
     sprintf(FullName, "./%s", newlib);
-  else strncpy(FullName, fullname,255);
+  else strncpy(FullName, fullname,l);
 
 
   if(IsCmd(plib, token))
@@ -1228,6 +1227,7 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
   if (dynl_check_opened(FullName))
   {
     if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as C library", fullname);
+    omFreeSize(FullName,l);
     return FALSE;
   }
   if((IDPACKAGE(pl)->handle=dynl_open(FullName))==(void *)NULL)
@@ -1273,6 +1273,7 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
   }
 
   load_modules_end:
+  omFreeSize(FullName,l);
   return RET;
 }
 
