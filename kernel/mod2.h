@@ -59,7 +59,7 @@
 #define HAVE_LIBPARSER
 
 /* define for parallel processes with shared memory */
-#ifndef __CCYGWIN__
+#if !defined(__CCYGWIN__) && !defined(__APPLE__)
 #define HAVE_VSPACE 1
 #endif
 
