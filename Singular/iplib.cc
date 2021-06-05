@@ -1186,7 +1186,7 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
   char *plib = iiConvName(newlib);
   BOOLEAN RET=TRUE;
   int token;
-  int l=si_max(strlen(fullname),strlen(newlib))+3;
+  int l=si_max((int)strlen(fullname),(int)strlen(newlib))+3;
   char *FullName=(char*)omAlloc0(l);
 
   if( *fullname != '/' &&  *fullname != '.' )
