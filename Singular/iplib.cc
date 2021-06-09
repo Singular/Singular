@@ -41,6 +41,9 @@
 
 #define MODULE_SUFFIX_STRING EXPANDED_STRINGIFY(MODULE_SUFFIX)
 
+#ifndef SINGULAR_PATH_LENGTH
+#define SINGULAR_PATH_LENGTH 512
+#endif
 
 #ifdef HAVE_DYNAMIC_LOADING
 BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
@@ -194,7 +197,7 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
 */
 char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
-  char buf[256], *s = NULL, *p;
+  char buf[SINGULAR_PATH_LENGTH], *s = NULL, *p;
   long procbuflen;
 
   FILE * fp = feFopen( pi->libname, "rb", NULL, TRUE );
@@ -750,7 +753,7 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
     if((LT = type_of_LIB(libname, libnamebuf)) > LT_NOTFOUND)
     {
       char *s=omStrDup(libname);
-      char libnamebuf[256];
+      char libnamebuf[SINGULAR_PATH_LENGTH];
 
       if (LT==LT_SINGULAR)
         LoadResult = iiLibCmd(s, FALSE, FALSE,TRUE);
@@ -1062,13 +1065,13 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   char *plib = iiConvName(newlib);
   BOOLEAN RET=TRUE;
   int token;
-  char FullName[256];
+  char FullName[SINGULAR_PATH_LENGTH];
 
-  memset(FullName,0,256);
+  memset(FullName,0,SINGULAR_PATH_LENGTH);
 
   if( *fullname != '/' &&  *fullname != '.' )
     sprintf(FullName, "./%s", newlib);
-  else strncpy(FullName, fullname,255);
+  else strncpy(FullName, fullname, SINGULAR_PATH_LENGTH - 1);
 
 
   if(IsCmd(plib, token))
@@ -1196,10 +1199,10 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
   {
     package s=currPack;
     currPack=IDPACKAGE(pl);
-    char buff[256];
-    buff[255]='\0';
-    strncpy(buff,p,255);
-    strncat(buff,"_help",255-strlen(p));
+    char buff[SINGULAR_PATH_LENGTH];
+    buff[SINGULAR_PATH_LENGTH - 1]='\0';
+    strncpy(buff,p,SINGULAR_PATH_LENGTH - 1);
+    strncat(buff,"_help",SINGULAR_PATH_LENGTH-1-strlen(p));
     idhdl h=enterid(omStrDup(buff),0,STRING_CMD,&IDROOT,FALSE);
     IDSTRING(h)=omStrDup(help);
     currPack=s;
@@ -1314,7 +1317,7 @@ void piShowProcList()
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 //char *iiLineNo(char *procname, int lineno)
 //{
-//  char buf[256];
+//  char buf[SINGULAR_PATH_LENGTH];
 //  idhdl pn = ggetid(procname);
 //  procinfo *pi = IDPROC(pn);
 //
