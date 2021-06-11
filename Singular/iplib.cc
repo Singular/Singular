@@ -17,6 +17,10 @@
 #include "Singular/fevoices.h"
 #include "Singular/lists.h"
 
+#ifndef SINGULAR_PATH_LENGTH
+#define SINGULAR_PATH_LENGTH 512
+#endif
+
 #include <ctype.h>
 
 #if SIZEOF_LONG == 8
@@ -192,7 +196,7 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
 */
 char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
-  char buf[256], *s = NULL, *p;
+  char buf[SINGULAR_PATH_LENGTH], *s = NULL, *p;
   long procbuflen;
 
   FILE * fp = feFopen( pi->libname, "rb", NULL, TRUE );
@@ -1365,10 +1369,10 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
   {
     package s=currPack;
     currPack=IDPACKAGE(pl);
-    char buff[256];
-    buff[255]='\0';
-    strncpy(buff,p,255);
-    strncat(buff,"_help",255-strlen(p));
+    char buff[SINGULAR_PATH_LENGTH];
+    buff[SINGULAR_PATH_LENGTH-1]='\0';
+    strncpy(buff,p,SINGULAR_PATH_LENGTH-1);
+    strncat(buff,"_help",SINGULAR_PATH_LENGTH-1-strlen(p));
     idhdl h=enterid(buff,0,STRING_CMD,&IDROOT,FALSE);
     IDSTRING(h)=omStrDup(help);
     currPack=s;
