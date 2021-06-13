@@ -21,8 +21,6 @@ _config.h.in
 /AUTOGEN_generated_stuff
 /desktop/Singular-manual.desktop
 /desktop/Singular.desktop
-/doc/NTL
-/doc/uname.texi
 /doc/version.texi
 /factory/factory.h
 /factory/factoryconf.h

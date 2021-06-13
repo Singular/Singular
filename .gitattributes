@@ -1,4 +1,3 @@
 *.gz.uu diff=gz.uu
 .git* export-ignore
 /Tst/ export-ignore
-/doc/ export-ignore
