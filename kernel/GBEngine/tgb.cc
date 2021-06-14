@@ -39,7 +39,7 @@ static const int delay_factor = 3;
 #define ADD_LATER_SIZE 500
 #if 1
 STATIC_VAR omBin lm_bin = NULL;
-static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified=FALSE);
+static void add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified=FALSE);
 static void multi_reduction(red_object* los, int & losl, slimgb_alg* c);
 static void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c);
 static BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c);
@@ -961,7 +961,7 @@ static int bucket_guess (kBucket * bucket)
   return sum;
 }
 
-static int
+static void
 add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
                   BOOLEAN simplified)
 {
@@ -974,6 +974,7 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
 //   else
 //     i=simple_posInS(c->strat,h,len,c->isDifficultField);
 
+  if (TEST_OPT_IDLIFT &&(pGetComp(h) > c->syz_comp)) return;
   LObject P;
   memset (&P, 0, sizeof (P));
   P.tailRing = c->r;
@@ -998,8 +999,6 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
   assume (pLength (c->strat->S[i]) == c->strat->lenS[i]);
   if(c->strat->lenSw != NULL)
     c->strat->lenSw[i] = pq;
-
-  return i;
 }
 
 static void length_one_crit (slimgb_alg * c, int pos, int len)
@@ -2983,7 +2982,8 @@ static void go_on (slimgb_alg * c)
   if(TEST_OPT_PROT)
     Print ("%i]", i);
 
-  poly *add_those = (poly *) omalloc (i * sizeof (poly));
+  poly *add_those = (poly *) omalloc0 (i * sizeof (poly));
+  int num_to_add=0;
   for(j = 0; j < i; j++)
   {
     int len;
@@ -3003,11 +3003,22 @@ static void go_on (slimgb_alg * c)
     }
     //}
     p_Test (p, c->r);
-    add_those[j] = p;
+
+    if (p!=NULL)
+    {
+      if (TEST_OPT_IDLIFT && (p_GetComp(p,currRing) > c->syz_comp))
+      {
+        p_Delete(&p,currRing);
+      }
+      else
+      {
+        add_those[num_to_add++] = p;
+      }
+    }
 
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
-  mass_add (add_those, i, c);
+  mass_add (add_those, num_to_add, c);
   omFree (add_those);
   omFree (buf);
 
@@ -4618,16 +4629,17 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
 //   {
 
 static int
-multi_reduction_clear_zeroes (red_object * los, int losl, int l, int u)
+multi_reduction_clear_zeroes (red_object * los, int losl, int l, int u, int syzComp)
 {
   int deleted = 0;
   int i = l;
   int last = -1;
   while(i <= u)
   {
-    if(los[i].p == NULL)
+    if((los[i].p == NULL)
+    || (TEST_OPT_IDLIFT && (p_GetComp(los[i].p,currRing) > syzComp)))
     {
-      kBucketDestroy (&los[i].bucket);
+      kBucketDeleteAndDestroy (&los[i].bucket);
 //      delete los[i];//here we assume los are constructed with new
       //destroy resources, must be added here
       if(last >= 0)
@@ -4792,7 +4804,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
       }
       qsort (los, pn_noro, sizeof (red_object), red_object_better_gen);
       int deleted =
-        multi_reduction_clear_zeroes (los, losl, pn_noro, curr_pos);
+        multi_reduction_clear_zeroes (los, losl, pn_noro, curr_pos, c->syz_comp);
       losl -= deleted;
       curr_pos -= deleted;
       break;
@@ -4842,7 +4854,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
       }
     }
     int deleted = multi_reduction_clear_zeroes (los, losl, erg.to_reduce_l,
-                                                erg.to_reduce_u);
+                                                erg.to_reduce_u, c->syz_comp);
     if(erg.fromS == FALSE)
       curr_pos = si_max (erg.to_reduce_u, erg.reduce_by);
     else
