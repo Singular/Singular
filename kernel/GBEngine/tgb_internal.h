@@ -272,7 +272,7 @@ class slimgb_alg
   #ifdef TGB_RESORT_PAIRS
   BOOLEAN used_b;
   #endif
-  unsigned long pTotaldegree(poly p)
+  inline unsigned long pTotaldegree(poly p)
   {
       pTest(p);
       //assume(pDeg(p,r)==::p_Totaldegree(p,r));
@@ -280,13 +280,13 @@ class slimgb_alg
       return p->exp[deg_pos];
       //return ::pTotaldegree(p,this->r);
   }
-  int pTotaldegree_full(poly p)
+  inline int pTotaldegree_full(poly p)
   {
     int rr=0;
-    while(p)
+    while(p!=NULL)
     {
       int d=this->pTotaldegree(p);
-      rr=si_max(rr,d);
+      if (d>rr) rr=d;
       pIter(p);
     }
     return rr;
@@ -1442,7 +1442,6 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
 
 }
 #endif
-wlen_type pELength(poly p, ring r);
 int terms_sort_crit(const void* a, const void* b);
 //void simplest_gauss_modp(number* a, int nrows,int ncols);
 // a: a[0,0],a[0,1]....a[nrows-1,ncols-1]
