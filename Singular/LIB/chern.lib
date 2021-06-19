@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 4.1.3.0 Apr_2020 ";  // $Id$
+version = "version chern.lib 4.1.3.0 Apr_2020 "; // $Id$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes,
@@ -199,7 +199,7 @@ NOTE:     constants are not considered symmetric
   {
    l2[size(l2)+1] = "A@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly"); 
+  ring r@ = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly");
   ideal V=fetch(br@,V);
   poly f=fetch(br@,f);
   int i;
@@ -1127,7 +1127,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
   int ii;
-  list l5 = ringlist(basering)[2];  
+  list l5 = ringlist(basering)[2];
   l5[size(l5)+1] = "t@";
   for (ii = 1; ii <= r; ii++)
   {
@@ -1272,7 +1272,7 @@ NOTE:     Implementation of the formula of Manivel
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
   int ii;
-  list l6 = ringlist(basering)[2];  
+  list l6 = ringlist(basering)[2];
   l6[size(l6)+1] = "t@";
   for (ii = 1; ii <= r; ii++)
   {
@@ -1751,7 +1751,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   c=c[1..r];
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
-  list l8 = ringlist(basering)[2];  
+  list l8 = ringlist(basering)[2];
   l8[size(l8)+1] = "t@";
   for (int ii = 1; ii <= r; ii++)
   {
@@ -2057,7 +2057,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   c=c[1..r];
   def br@=basering; // remember the base ring
   // add  additional variables to the base ring
-  list l10 = ringlist(basering)[2];  
+  list l10 = ringlist(basering)[2];
   l10[size(l10)+1] = "t@";
   for (int ii = 1; ii <= r; ii++)
   {
@@ -2185,7 +2185,7 @@ NOTE:     returns an empty list if l is empty
   {
     def br@=basering; // remember the base ring
     // add  additional variables to the base ring
-    list l11 = ringlist(basering)[2];  
+    list l11 = ringlist(basering)[2];
     l11[size(l11)+1] = "a@";
     for (int ii = 1; ii <= n; ii++)
     {
@@ -3399,7 +3399,7 @@ NOTE:
 {
   int n=nvars(basering);
   def br@=basering; // remember the base ring
-  ring r@ = create_ring(ringlist(basering)[1], "("+varstr(basering)+",homvar@)", "dp", "no_minpoly");
+  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+",homvar@)","dp","no_minpoly");
   ideal I=fetch(br@,I);
   ideal J=homog(I, homvar@);
   ideal JJ=J, homvar@;
