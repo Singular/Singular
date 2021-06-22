@@ -422,6 +422,16 @@ static number nlMapR(number from, const coeffs src, const coeffs dst)
   return re;
 }
 
+static number nlMapR_BI(number from, const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(src) == n_R );
+
+  double f=nrFloat(from); // FIXME? TODO? // extern float   nrFloat(number n);
+  if (f==0.0) return INT_TO_SR(0);
+  long l=long(f);
+  return nlInit(l,dst);
+}
+
 static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(src) == n_long_R );
@@ -502,6 +512,18 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
   return res;
 }
 
+static number nlMapLongR_BI(number from, const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(src) == n_long_R );
+
+  gmp_float *ff=(gmp_float*)from;
+  if (mpf_fits_slong_p(ff->t))
+  {
+    long l=mpf_get_si(ff->t);
+    return nlInit(l,dst);
+  }
+  return nlInit(0,dst);
+}
 
 static number nlMapC(number from, const coeffs src, const coeffs dst)
 {
@@ -2458,11 +2480,17 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
   }
   if ((src->rep==n_rep_float) && nCoeff_is_R(src))
   {
-    return nlMapR;
+    if (dst->is_field) /* R -> Q */
+      return nlMapR;
+    else
+      return nlMapR_BI; /* R -> bigint */
   }
   if ((src->rep==n_rep_gmp_float) && nCoeff_is_long_R(src))
   {
-    return nlMapLongR; /* long R -> Q */
+    if (dst->is_field)
+      return nlMapLongR; /* long R -> Q */
+    else
+      return nlMapLongR_BI;
   }
   if (nCoeff_is_long_C(src))
   {

@@ -147,7 +147,7 @@ public:
   };
 #endif
 
-private:
+public:
   mpf_t t;
 };
 
