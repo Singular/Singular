@@ -419,25 +419,14 @@ static number ngfMapQ(number from, const coeffs src, const coeffs dst)
   gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
   return (number)res;
 }
+
 static number ngfMapZ(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
-  assume( aRing->rep == n_rep_gap_gmp);
+  assume( aRing->rep == n_rep_gmp);
 
-  if ( from != NULL )
-  {
-    if (SR_HDL(from) & SR_INT)
-    {
-      gmp_float f_i= gmp_float(SR_TO_INT(from));
-      gmp_float *res=new gmp_float(f_i);
-      return (number)res;
-    }
-    gmp_float f_i=(mpz_ptr)from;
-    gmp_float *res=new gmp_float(f_i);
-    return (number)res;
-  }
-  else
-    return NULL;
+  gmp_float *res=new gmp_float((mpz_ptr)from);
+  return (number)res;
 }
 
 static number ngfMapR(number from, const coeffs src, const coeffs dst)
@@ -480,7 +469,11 @@ static nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
   {
     return ngfMapQ;
   }
-  if (src->rep==n_rep_gap_gmp) /*Q, Z*/
+  if (src->rep==n_rep_gap_gmp) /*Q, bigint*/
+  {
+    return ngfMapQ;
+  }
+  if (src->rep==n_rep_gmp) /* Z*/
   {
     return ngfMapZ;
   }
