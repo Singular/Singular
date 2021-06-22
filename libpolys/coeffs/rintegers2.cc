@@ -373,6 +373,17 @@ static number nrzMapQ(number from, const coeffs src, const coeffs /*dst*/)
   return (number) erg;
 }
 
+static number nrzMaplongR(number from, const coeffs src, const coeffs dst)
+{
+  gmp_float *ff=(gmp_float*)from;
+  if (mpf_fits_slong_p(ff->t))
+  {
+    long l=mpf_get_si(ff->t);
+    return nrzInit(l,dst);
+  }
+  return nrzInit(0,dst);
+}
+
 static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
 {
   /* dst = currRing */
@@ -397,6 +408,10 @@ static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   if (getCoeffType(src)==n_Q /*nCoeff_is_Q(src) or coeffs_BIGINT*/)
   {
     return nrzMapQ;
+  }
+  if (nCoeff_is_long_R(src))
+  {
+    return nrzMaplongR;
   }
   return NULL;      // default
 }
