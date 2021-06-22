@@ -9048,10 +9048,9 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, 
 }
 BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 {
-  res->Init();
-
   if (!errorreported)
   {
+    res->Init();
 #ifdef SIQ
     if (siq>0)
     {
@@ -9093,7 +9092,6 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     }
     if (errorreported) return TRUE;
 
-    iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
     return iiExprArith1Tab(res,a,op, dArith1+i,at,dConvertTypes);
   }
