@@ -987,12 +987,14 @@ number nlIntDiv (number a, number b, const coeffs r)
 #endif
   assume(a->s==3);
   assume(b->s==3);
-  mpz_init_set(u->z,a->z);
   /* u=u/b */
+  mpz_t rr;
+  mpz_init(rr);
+  mpz_mod(rr,a->z,b->z);
   u->s = 3;
-  number rr=nlIntMod(a,b,r);
-  if (SR_HDL(rr) &  SR_INT) mpz_sub_ui(u->z,u->z,SR_TO_INT(rr));
-  else                      mpz_sub(u->z,u->z,rr->z);
+  mpz_init(u->z);
+  mpz_sub(u->z,a->z,rr);
+  mpz_clear(rr);
   mpz_divexact(u->z,u->z,b->z);
   if (aa!=NULL)
   {
@@ -1413,6 +1415,7 @@ number nlGcd(number a, number b, const coeffs r)
   nlTest(result, r);
   return result;
 }
+
 static int int_extgcd(int a, int b, int * u, int* x, int * v, int* y)
 {
   int q, r;
@@ -2961,9 +2964,11 @@ void nlInpIntDiv(number &a, number b, const coeffs r)
   }
   else
   {
-    number rr=nlIntMod(a,b,r);
-    if (SR_HDL(rr) &  SR_INT) mpz_sub_ui(a->z,a->z,SR_TO_INT(rr));
-    else                      mpz_sub(a->z,a->z,rr->z);
+    mpz_t rr;
+    mpz_init(rr);
+    mpz_mod(rr,a->z,b->z);
+    mpz_sub(a->z,a->z,rr);
+    mpz_clear(rr);
     mpz_divexact(a->z,a->z,b->z);
     a=nlShort3_noinline(a);
   }
