@@ -1362,8 +1362,6 @@ number nlGcd(number a, number b, const coeffs r)
   {
     long i=SR_TO_INT(a);
     long j=SR_TO_INT(b);
-    if((i==0L)||(j==0L))
-      return INT_TO_SR(1);
     long l;
     i=ABS(i);
     j=ABS(j);
