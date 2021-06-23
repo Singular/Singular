@@ -303,6 +303,7 @@ static number nrzSmallestQuotRem (number a, number b, number * r, const coeffs )
   return (number) qq;
 }
 
+/*
 static number nrzQuotRem (number a, number b, number * r, const coeffs )
 {
   mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
@@ -321,6 +322,7 @@ static number nrzQuotRem (number a, number b, number * r, const coeffs )
   }
   return (number) qq;
 }
+*/
 
 static number nrzIntMod (number a,number b, const coeffs)
 {
@@ -381,7 +383,22 @@ static number nrzMaplongR(number from, const coeffs src, const coeffs dst)
     long l=mpf_get_si(ff->t);
     return nrzInit(l,dst);
   }
-  return nrzInit(0,dst);
+  char *out=floatToStr(*(gmp_float*)from, src->float_len);
+  char *p=strchr(out,'.');
+  *p='\0';
+  mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_init(erg);
+  if (out[0]=='-')
+  {
+    mpz_set_str(erg,out+1,10);
+    mpz_mul_si(erg, erg, -1);
+  }
+  else
+  {
+    mpz_set_str(erg,out,10);
+  }
+  omFree( (void *)out );
+  return (number) erg;
 }
 
 static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)

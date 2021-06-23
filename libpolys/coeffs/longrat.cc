@@ -522,7 +522,27 @@ static number nlMapLongR_BI(number from, const coeffs src, const coeffs dst)
     long l=mpf_get_si(ff->t);
     return nlInit(l,dst);
   }
-  return nlInit(0,dst);
+  char *out=floatToStr(*(gmp_float*)from, src->float_len);
+  char *p=strchr(out,'.');
+  *p='\0';
+  number res;
+  res = ALLOC_RNUMBER();
+#if defined(LDEBUG)
+  res->debug=123456;
+#endif
+  res->s=3;
+  mpz_init(res->z);
+  if (out[0]=='-')
+  {
+    mpz_set_str(res->z,out+1,10);
+    res=nlNeg(res,dst);
+  }
+  else
+  {
+    mpz_set_str(res->z,out,10);
+  }
+  omFree( (void *)out );
+  return res;
 }
 
 static number nlMapC(number from, const coeffs src, const coeffs dst)
