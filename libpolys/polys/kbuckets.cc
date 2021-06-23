@@ -1443,8 +1443,8 @@ int ksCheckCoeff(number *a, number *b, const coeffs r)
   }
   else
   {
-    an = n_ExactDiv(an, cn, r); n_Normalize(an,r);
-    bn = n_ExactDiv(bn, cn, r); n_Normalize(bn,r);
+    an = n_ExactDiv(an, cn, r);
+    bn = n_ExactDiv(bn, cn, r);
   }
   n_Delete(&cn, r);
   if (n_IsOne(an, r))
