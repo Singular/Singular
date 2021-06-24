@@ -877,8 +877,6 @@ number   nlExactDiv(number a, number b, const coeffs r)
     WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
-  if (a==INT_TO_SR(0))
-    return INT_TO_SR(0);
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
@@ -944,8 +942,6 @@ number nlIntDiv (number a, number b, const coeffs r)
     WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
-  if (a==INT_TO_SR(0))
-    return INT_TO_SR(0);
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
@@ -3230,7 +3226,7 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   while (numberCollectionEnumerator.MoveNext() )
   {
     number& n = numberCollectionEnumerator.Current();
-    number t=nlIntDiv(n, cand, cf); // simple integer exact division, no ratios to remain
+    number t=nlExactDiv(n, cand, cf); // simple integer exact division, no ratios to remain
     nlDelete(&n, cf);
     n = t;
   }
@@ -3461,7 +3457,7 @@ static number nlLcm(number a,number b,const coeffs r)
 {
   number g=nlGcd(a,b,r);
   number n1=nlMult(a,b,r);
-  number n2=nlIntDiv(n1,g,r);
+  number n2=nlExactDiv(n1,g,r);
   nlDelete(&g,r);
   nlDelete(&n1,r);
   return n2;
