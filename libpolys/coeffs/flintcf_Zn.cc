@@ -344,6 +344,7 @@ static number ExtGcd(number a, number b, number *s, number *t,const coeffs r)
 static number Lcm(number a, number b, const coeffs r)
 {
   WerrorS("not yet: Lcm");
+  return NULL;
 }
 static void Delete(number * a, const coeffs r)
 {
@@ -388,10 +389,12 @@ static number Init_bigint(number i, const coeffs dummy, const coeffs dst)
 static number Farey(number p, number n, const coeffs)
 {
   WerrorS("not yet: Farey");
+  return NULL;
 }
 static number ChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,CFArray &inv_cache,const coeffs)
 {
   WerrorS("not yet: ChineseRemainder");
+  return NULL;
 }
 static int ParDeg(number x,const coeffs r)
 {
@@ -408,10 +411,13 @@ static number Parameter(const int i, const coeffs r)
 // cfClearDenominators
 static number ConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 {
+  WerrorS("not yet: ConvFactoryNSingN");
+  return NULL;
 }
 static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
   WerrorS("not yet: ConvSingNFactoryN");
+  return NULL;
 }
 static char * CoeffName(const coeffs r)
 {
