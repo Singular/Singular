@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////
-version="version lrcalc.lib 4.1.2.0 Feb_2019 ";      //$Id$
+version="version lrcalc.lib 4.1.2.0 Feb_2019 ";   //$Id$
 category="Littlewood-Richardson coefficients";
 info="
 LIBRARY:  lrcalc.lib    An interface to the Littlewood-Richardson Calculator by Anders Buch
 
-AUTHOR:  Oleksandr Iena,      oleksandr.iena@uni.lu,  yena@mathematik.uni-kl.de
+AUTHOR:  Oleksandr Iena,      o.g.yena@gmail.com
 
 OVERVIEW:
   An interface to the documented functions of the Littlewood-Richardson Calculator
