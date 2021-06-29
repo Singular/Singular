@@ -3943,6 +3943,7 @@ std::vector<std::vector<int> > links_new(poly a, ideal Xo, ideal Sigma, int vert
     return lkn;
   }
   WerrorS("Cannot find the links smartly!");
+  return {};
 }
 
 
