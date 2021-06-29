@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version goettsche.lib 0.931 Feb_2019"; //$Id$
+version = "version goettsche.lib 0.931 Feb_2019 "; //$Id$
 info="
 LIBRARY:  goettsche.lib     Drezet's formula for the Betti numbers of the moduli space
                             of Kronecker modules;
