@@ -108,7 +108,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  AX_APPEND_LINK_FLAGS(${FLAGS})
 
  if test "x${ENABLE_DEBUG}" = xyes; then
-  DBGFLAGS="-g -ftrapv -fdiagnostics-show-option -Wall -Wextra -fno-delete-null-pointer-checks"
+  DBGFLAGS="-g -ftrapv -fdiagnostics-show-option -Wall -Wextra"
   #  -pedantic too strict ??? -Wvla -Wno-long-long ???
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${DBGFLAGS}, [CFLAGS])
@@ -122,7 +122,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  ## for clang: -Wunneeded-internal-declaration
 
  if test "x${ENABLE_OPTIMIZATION}" != xno; then
-  OPTFLAGS="-g0 -O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wunknown-pragmas -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops -fno-delete-null-pointer-checks"
+  OPTFLAGS="-g0 -O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wunknown-pragmas -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops"
   #  -O3 - crashes gcc???!!!
   # -fpermissive
   AC_LANG_PUSH([C])

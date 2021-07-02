@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I../m4
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES) $(CCLUSTER_CPPFLAGS)  $(GMP_CPPFLAGS) $(FLINT_CFLAGS)
 
-AM_CXXFLAGS=$(NTL_CPPFLAGS)
+AM_CXXFLAGS=$(NTL_CPPFLAGS) -fno-delete-null-pointer-checks
 
 all-local: all.lib gftables MOD ${abs_builddir}/LIB Singular$(EXEEXT) ESingular$(EXEEXT) TSingular$(EXEEXT)
 
