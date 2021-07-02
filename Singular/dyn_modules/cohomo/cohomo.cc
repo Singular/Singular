@@ -3930,7 +3930,6 @@ std::vector<std::vector<int> > links_new(poly a, ideal Xo, ideal Sigma, int vert
     return lko;
   if(ord==2)
   {
-
     lk1=phi1(a, Sigma);
     lk2=phi2(a, Xo, Sigma, vert);
     lkn=vsMinusvs(lko, lk1);
@@ -3943,7 +3942,7 @@ std::vector<std::vector<int> > links_new(poly a, ideal Xo, ideal Sigma, int vert
     return lkn;
   }
   WerrorS("Cannot find the links smartly!");
-  return {};
+  return lko;
 }
 
 
