@@ -26,7 +26,6 @@
        ("hyperel.lib")
        ("finitediff.lib")
        ("crypto.lib")
-       ("atkins.lib")
        ("aksaka.lib")
      )
      ("System and Control Theory"
