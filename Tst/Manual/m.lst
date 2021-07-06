@@ -175,8 +175,6 @@ convertdata
 convloc
 coords
 corank
-Cornacchia
-CornacchiaModified
 cornerMonomials
 countPoints
 createBO
@@ -246,7 +244,6 @@ dimGradedPart
 dimH
 dimMon
 dim_slocus
-disc
 discr
 discrepancy
 displayHNE
@@ -825,7 +822,6 @@ ncdetection
 ncols
 ncRelations
 ndcond
-newTest
 newtonDiag
 newtonpoly
 nf_icis
@@ -1073,7 +1069,6 @@ rncItProjEven
 rncItProjOdd
 rootofUnity
 roots
-rootsModp
 round
 rowred
 rvar
@@ -1180,7 +1175,6 @@ sprintf
 spsemicont
 spsub
 sqfrNorm
-sqr
 sqrfree
 squarefree
 squareRoot
@@ -1332,7 +1326,6 @@ writeNmzData
 writeNmzPaths
 Writing_procedures_and_libraries
 WSemigroup
-wUnit
 wurzel
 xchange
 zerodec

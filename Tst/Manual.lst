@@ -86,7 +86,6 @@ Manual/chaincrit.tst
 Manual/changevar.tst
 Manual/closetex.tst
 Manual/coeffs_1.tst
-Manual/Cornacchia.tst
 Manual/Declaration_of_objects_of_a_user_defined_type.tst
 Manual/def_declarations.tst
 Manual/delete.tst
@@ -283,7 +282,6 @@ Manual/variablesStandard.tst
 Manual/vdim.tst
 Manual/voice.tst
 Manual/whichvariable.tst
-Manual/wUnit.tst
 Manual/A_Z.tst
 Manual/algDependent.tst
 Manual/allprint.tst
@@ -299,7 +297,6 @@ Manual/chinrestp.tst
 Manual/coef.tst
 Manual/coeffs.tst
 Manual/ComplexValue.tst
-Manual/CornacchiaModified.tst
 Manual/denominator.tst
 Manual/derivate.tst
 Manual/det_B.tst
@@ -939,7 +936,6 @@ Manual/Qso3Casimir.tst
 Manual/regularity.tst
 Manual/reslist.tst
 Manual/roots.tst
-Manual/rootsModp.tst
 Manual/round.tst
 Manual/SDLoc.tst
 Manual/serreRelations.tst
@@ -1001,7 +997,6 @@ Manual/modulo_BR_PLURAL_BR.tst
 Manual/moduloSlim.tst
 Manual/multiDegSyzygy.tst
 Manual/ndcond.tst
-Manual/newTest.tst
 Manual/pos_def.tst
 Manual/primary_invariants_random.tst
 Manual/primdecGTZ.tst
@@ -1239,7 +1234,6 @@ Manual/lpSickleDim.tst
 Manual/monodromyB.tst
 Manual/semigroup.tst
 Manual/signcnd.tst
-Manual/sqr.tst
 Manual/sysFL.tst
 Manual/wurzel.tst
 Manual/belongSemigroup.tst
@@ -1327,7 +1321,6 @@ Manual/Weierstrass.tst
 Manual/ellipticAllPoints.tst
 Manual/isEquising.tst
 Manual/psigncnd.tst
-Manual/disc.tst
 Manual/primdecZ.tst
 Manual/irreddecMon.tst
 Manual/decodeSV.tst

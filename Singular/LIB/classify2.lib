@@ -57,16 +57,15 @@ complexType(I);     classifier returning the type and modality
 ";
 
 
+LIB "polyclass.lib";
+//LIB "sing.lib";
+LIB "absfact.lib";
+LIB "primdec.lib";
 
 static proc mod_init()
 {
   LIB "gfanlib.so";
 }
-
-  LIB "polyclass.lib";
-  //LIB "sing.lib";
-  LIB "absfact.lib";
-  LIB "primdec.lib";
 
 
 

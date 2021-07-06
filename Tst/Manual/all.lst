@@ -31,8 +31,6 @@ Classification_of_hypersurface_singularities.tst
 Command_line_options.tst
 ComplexValue.tst
 Computation_of_Ext.tst
-Cornacchia.tst
-CornacchiaModified.tst
 Critical_points.tst
 CurveParam.tst
 CurveRes.tst
@@ -422,7 +420,6 @@ dimH.tst
 dimMon.tst
 dim_BR_PLURAL_BR.tst
 dim_slocus.tst
-disc.tst
 discr.tst
 discrepancy.tst
 displayHNE.tst
@@ -944,7 +941,6 @@ nc_algebra.tst
 ncdetection.tst
 ncols.tst
 ndcond.tst
-newTest.tst
 newtonDiag.tst
 newtonpoly.tst
 nf_icis.tst
@@ -1176,7 +1172,6 @@ rncItProjEven.tst
 rncItProjOdd.tst
 rootofUnity.tst
 roots.tst
-rootsModp.tst
 round.tst
 rowred.tst
 rvar.tst
@@ -1277,7 +1272,6 @@ sprintf.tst
 spsemicont.tst
 spsub.tst
 sqfrNorm.tst
-sqr.tst
 sqrfree.tst
 squareRoot.tst
 squarefree.tst
@@ -1402,7 +1396,6 @@ view.tst
 visualize.tst
 voice.tst
 vwfilt.tst
-wUnit.tst
 waitall.tst
 waitfirst.tst
 watchdog.tst

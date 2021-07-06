@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version crypto.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version crypto.lib 4.2.1.0 Jul_2021 "; // $Id$
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -15,6 +15,7 @@ OVERVIEW:
 
 
 PROCEDURES:
+ bubblesort(L)              sorts elements of the list L
  decimal(s);                number corresponding to the hexadecimal number s
  eexgcdN(L)                 T with sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
  lcmN(a,b)                  compute lcm(a,b)
@@ -82,10 +83,41 @@ PROCEDURES:
 ";
 
 LIB "polylib.lib";
-LIB "atkins.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+proc bubblesort(list L)
+"USAGE: bubblesort(L);
+RETURN: list L, sort in decreasing order
+EXAMPLE:example bubblesort; shows an example
+"
+{
+  def b;
+  int n,i,j;
+  while(j==0)
+  {
+    i=i+1;
+    j=1;
+    for(n=1;n<=size(L)-i;n++)
+    {
+      if(L[n]<L[n+1])
+      {
+        b=L[n];
+        L[n]=L[n+1];
+        L[n+1]=b;
+        j=0;
+      }
+    }
+  }
+  return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+    ring r = 0,x,dp;
+    list L=-567,-233,446,12,-34,8907;
+    bubblesort(L);
+}
 
 //=============================================================================
 //=========================== basic prozedures ================================

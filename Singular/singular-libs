@@ -5,7 +5,7 @@
 #
 
 SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
-	arcpoint.lib assprimeszerodim.lib atkins.lib brnoeth.lib \
+	arcpoint.lib assprimeszerodim.lib brnoeth.lib \
 	cisimplicial.lib classify.lib \
 	compregb.lib control.lib crypto.lib curvepar.lib decodegb.lib \
 	deform.lib elim.lib  equising.lib  finvar.lib  general.lib gmspoly.lib \

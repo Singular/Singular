@@ -1051,7 +1051,6 @@ but not for serious computations.
 
 @menu
 * aksaka_lib:: Algorithms for primality testing in polynomial time
-* atkins_lib:: Procedures for teaching cryptography
 * crypto_lib:: Procedures for teaching cryptography
 * hyperel_lib:: Divisors in the jacobian of hyperelliptic curves
 * teachstd_lib:: Procedures for teaching standard bases
@@ -1063,11 +1062,6 @@ but not for serious computations.
 @node aksaka_lib
 @subsection aksaka_lib
 @c lib aksaka.lib
-
-@c ---------------------------------------------------------
-@node atkins_lib
-@subsection atkins_lib
-@c lib atkins.lib
 
 @c ---------------------------------------------------------
 @node crypto_lib

@@ -963,7 +963,6 @@ Manual/Qso3Casimir.tst
 Manual/regularity.tst
 Manual/reslist.tst
 Manual/roots.tst
-Manual/rootsModp.tst
 Manual/round.tst
 Manual/SDLoc.tst
 Manual/serreRelations.tst
@@ -1025,7 +1024,6 @@ Manual/modulo_BR_PLURAL_BR.tst
 Manual/moduloSlim.tst
 Manual/multiDegSyzygy.tst
 Manual/ndcond.tst
-Manual/newTest.tst
 Manual/pos_def.tst
 Manual/primary_invariants_random.tst
 Manual/primdecGTZ.tst
@@ -1352,7 +1350,6 @@ Manual/Weierstrass.tst
 Manual/ellipticAllPoints.tst
 Manual/isEquising.tst
 Manual/psigncnd.tst
-Manual/disc.tst
 Manual/primdecZ.tst
 Manual/irreddecMon.tst
 Manual/decodeSV.tst
