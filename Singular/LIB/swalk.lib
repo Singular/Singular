@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////
-version="version swalk.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version swalk.lib 4.2.1.0 Jul_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: swalk.lib               Sagbi Walk Conversion Algorithm
@@ -26,7 +26,7 @@ SEE ALSO: grwalk_lib; rwalk_lib
 ";
 
 LIB "sagbi.lib";
-LIB "atkins.lib";
+LIB "crypto.lib";
 //////////////////////////////////////////////////////////////////////////////
 proc swalk(ideal Gox, list #)
 "USAGE:  swalk(i[,v,w]); i ideal, v,w int vectors

@@ -42,7 +42,6 @@ attributed to the National Research Foundation, South Africa.
 
 
 PROCEDURES:
- round(r);                      rounds r to the nearest number in Z
  realclassify(f);               real classification of singularities of modality 0 and 1 up to stable equivalence
  realmorsesplit(f);             splitting lemma in the real case
  milnornumber(f);               Milnor number
@@ -69,59 +68,6 @@ static proc mod_init()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc round(number r)
-"USAGE: round(r);
-RETURN: the nearest number to r out of Z
-ASSUME: r should be a rational or a real number
-EXAMPLE:example round; shows an example
-"
-{
-  number a=absValue(r);
-  number v=r/a;
-
-  number d=10;
-  int e;
-  while(1)
-  {
-    e=e+1;
-    if(a-d^e<0)
-    {
-      e=e-1;
-      break;
-    }
-  }
-
-  number b=a;
-  int k;
-  for(k=0;k<=e;k++)
-  {
-    while(1)
-    {
-      b=b-d^(e-k);
-      if(b<0)
-      {
-        b=b+d^(e-k);
-        break;
-      }
-    }
-  }
-
-  if(b<1/2)
-  {
-    return(v*(a-b));
-  }
-  else
-  {
-    return(v*(a+1-b));
-  }
-}
-example
-{ "EXAMPLE:"; echo = 2;
-    ring R = (real,50),x,dp;
-    number r=7357683445788723456321.6788643224;
-    round(r);
-}
-
 proc expo(number z, int k)
 "USAGE: expo(z,k);
 RETURN: e^z to the order k

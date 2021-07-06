@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version recover.lib 4.2.0.0 Dec_2020 "; // $Id$
+version="version recover.lib 4.2.1.0 Jul_2021 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  recover.lib  Hybrid numerical/symbolical algorithms for algebraic geometry
@@ -61,7 +61,7 @@ PROCEDURES:
 LIB "matrix.lib";
 LIB "linalg.lib";
 LIB "inout.lib";
-LIB "atkins.lib";
+LIB "crypto.lib";
 
 /////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////    static procs for rounding      ///////////////////////////////

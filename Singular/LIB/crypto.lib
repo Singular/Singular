@@ -15,6 +15,7 @@ OVERVIEW:
 
 
 PROCEDURES:
+ round(r);                  rounds r to the nearest number in Z
  bubblesort(L)              sorts elements of the list L
  decimal(s);                number corresponding to the hexadecimal number s
  eexgcdN(L)                 T with sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
@@ -85,6 +86,59 @@ PROCEDURES:
 LIB "polylib.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
+
+proc round(number r)
+"USAGE: round(r);
+RETURN: the nearest number to r out of Z
+ASSUME: r should be a rational or a real number
+EXAMPLE:example round; shows an example
+"
+{
+  number a=absValue(r);
+  number v=r/a;
+
+  number d=10;
+  int e;
+  while(1)
+  {
+    e=e+1;
+    if(a-d^e<0)
+    {
+      e=e-1;
+      break;
+    }
+  }
+
+  number b=a;
+  int k;
+  for(k=0;k<=e;k++)
+  {
+    while(1)
+    {
+      b=b-d^(e-k);
+      if(b<0)
+      {
+        b=b+d^(e-k);
+        break;
+      }
+    }
+  }
+
+  if(b<1/2)
+  {
+    return(v*(a-b));
+  }
+  else
+  {
+    return(v*(a+1-b));
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+    ring R = (real,50),x,dp;
+    number r=7357683445788723456321.6788643224;
+    round(r);
+}
 
 
 proc bubblesort(list L)
