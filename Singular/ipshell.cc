@@ -6467,6 +6467,13 @@ BOOLEAN iiApplyIDEAL(leftv, leftv, int, leftv)
 BOOLEAN iiApplyLIST(leftv res, leftv a, int op, leftv proc)
 {
   lists aa=(lists)a->Data();
+  if (aa->nr==-1) /* empty list*/
+  {
+    lists l=(lists)omAllocBin(slists_bin);
+    l->Init();
+    res->data=(void *)l;
+    return FALSE;
+  }
   sleftv tmp_out;
   sleftv tmp_in;
   leftv curr=res;
