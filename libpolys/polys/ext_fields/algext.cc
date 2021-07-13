@@ -342,6 +342,12 @@ number naInit(long i, const coeffs cf)
   else        return (number)p_ISet(i, naRing);
 }
 
+static number naInitMPZ(mpz_t m, const coeffs r)
+{
+  number n=n_InitMPZ(m,r->extRing->cf);
+  return (number)p_NSet(n,r->extRing);
+}
+
 long naInt(number &a, const coeffs cf)
 {
   naTest(a);
@@ -1655,6 +1661,7 @@ BOOLEAN n2pInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = naIsOne;
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
+  cf->cfInitMPZ      = naInitMPZ;
   cf->cfFarey        = naFarey;
   cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
