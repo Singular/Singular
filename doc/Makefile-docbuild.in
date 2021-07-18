@@ -109,9 +109,9 @@ export PATH := "${bindir}:${top_builddir}/libpolys/polys/.libs:${top_builddir}/S
 all: info dvi html singular.idx
 
 # info stuff
-info: singular.hlp
+info: singular.info
 
-singular.hlp: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterplace.tex
+singular.info: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterplace.tex
 	- ${MAKEINFO} --no-split singular.tex
 
 # dvi stuff
@@ -194,8 +194,8 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 .PRECIOUS: %.doc %_noFun.doc ${DOC_SUBDIR}/%_lib.pl
 
 # index file for help
-singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
-	export PERLLIB=. PERL5LIB=.;${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
+singular.idx: singular.info ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
+	export PERLLIB=. PERL5LIB=.;${PERL} doc2idx.pl singular.info ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
 ###########################################################
 

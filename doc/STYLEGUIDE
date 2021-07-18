@@ -35,7 +35,7 @@
   auch im vorherigen und naechsten @node geaendert werden muss.
   Bei Aenderung von (Sub)sections daran denken, die Menues auf den neuen
   Stand zu bringen.
-  Fehlerhafte @node- und @menu-Strukturen sieht man, wenn man singular.hlp
+  Fehlerhafte @node- und @menu-Strukturen sieht man, wenn man singular.info
   erzeugt.
 
 + bislang wurde von texinfo nach einem @tex Kommando zu viel space

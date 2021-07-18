@@ -37,4 +37,4 @@ perl ./texi2html -init_file t2h_singular.init \
   -l2h -short_ext -l2h_tmp tmp -subdir html -prefix simple \
   -top_file index.htm  singular.doc
 #
-echo "created: singular.hlp (info), singular.dvi, html/index.htm"
+echo "created: singular.info (info), singular.dvi, html/index.htm"

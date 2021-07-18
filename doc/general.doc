@@ -262,8 +262,8 @@ can be specified by setting the environment variable
 
 @item
 The @code{info} based help browsers @code{tkinfo}, @code{xinfo}, @code{info}, and
-@code{builtin} need the (info) file @code{singular.hlp} which will be looked
-for at @code{$RootDir/info/singular.hlp} (see @ref{Loading a library}
+@code{builtin} need the (info) file @code{singular.info} which will be looked
+for at @code{$RootDir/info/singular.info} (see @ref{Loading a library}
 for more info on @code{$RootDir}).  An alternative
 location of the info file of the manual can be specified by setting the
 environment variable @code{SINGULAR_INFO_FILE}.

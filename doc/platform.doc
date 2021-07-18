@@ -150,7 +150,7 @@ $SINGULAR_EXECUTABLE
   @item $prefix/libexec/singular/MOD
   @end itemize
 @item SINGULAR_INFO_FILE
-@*@code{singular.hlp}, default: $SINGULAR_DATA_DIR/info/singular.hlp
+@*@code{singular.info}, default: $SINGULAR_DATA_DIR/info/singular.info
 @item SINGULAR_IDX_FILE
 @*the help index, default: $SINGULAR_DATA_DIR/singular/singular.idx
 @item SINGULAR_HTML_DIR

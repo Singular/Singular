@@ -32,7 +32,7 @@ What to install ?
   - index file
     (currently: %b/../doc/singular.idx)
   - info file
-    (currently: %b/../info/singular.hlp)
+    (currently: %b/../info/singular.info)
   - HTML
     (currently: %b/../html)
   - examples (planned)
