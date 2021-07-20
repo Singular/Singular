@@ -1096,7 +1096,7 @@ static void idLift_setUnit(int e_mod, matrix *unit)
 * of mod
 */
 /// represents the generators of submod in terms of the generators of mod
-/// (Matrix(SM)*U = (Matrix(M)-Matrix(rest))*matrix(result))
+/// (Matrix(SM)*U-Matrix(rest)) = Matrix(M)*Matrix(result)
 /// goodShape: maximal non-zero index in generators of SM <= that of M
 /// isSB: generators of M form a Groebner basis
 /// divide: allow SM not to be a submodule of M
