@@ -3824,6 +3824,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+/* ====== DivRem ============================*/
+    if(strcmp(sys_cmd,"DivRem")==0)
+    {
+      const short t1[]={2,POLY_CMD,POLY_CMD};
+      if (iiCheckTypes(h,t1,1))
+      {
+        poly p=(poly)h->CopyD();
+        poly q=(poly)h->next->CopyD();
+        poly rest;
+        res->data=p_DivRem(p,q,rest,currRing);
+        res->rtyp=POLY_CMD;
+        Print("rest:");pWrite(rest);
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("expected system(\"DivRem\",<poly>,<poly>)");
+        return TRUE;
+      }
+    }
+    else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
