@@ -1095,7 +1095,12 @@ static void idLift_setUnit(int e_mod, matrix *unit)
 *computes a representation of the generators of submod with respect to those
 * of mod
 */
-
+/// represents the generators of submod in terms of the generators of mod
+/// (Matrix(SM)*U = (Matrix(M)-Matrix(rest))*matrix(result))
+/// goodShape: maximal non-zero index in generators of SM <= that of M
+/// isSB: generators of M form a Groebner basis
+/// divide: allow SM not to be a submodule of M
+/// U is an diagonal matrix of units (non-constant only in local rings)
 ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
              BOOLEAN isSB, BOOLEAN divide, matrix *unit, GbVariant alg)
 {
