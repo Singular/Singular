@@ -1101,6 +1101,7 @@ static void idLift_setUnit(int e_mod, matrix *unit)
 /// isSB: generators of M form a Groebner basis
 /// divide: allow SM not to be a submodule of M
 /// U is an diagonal matrix of units (non-constant only in local rings)
+/// rest is: 0 if SM in M, SM if not divide, NF(SM,std(M)) if divide
 ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
              BOOLEAN isSB, BOOLEAN divide, matrix *unit, GbVariant alg)
 {
