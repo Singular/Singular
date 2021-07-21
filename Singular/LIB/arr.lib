@@ -350,7 +350,7 @@ EXAMPLE:    example arrDelete; shows an example"
         if(u[v[k]] != 0){ u[v[k]] = 0; i++; }   // i = #elts that need to be deleted
     }
 
-    if( i == n){return (emptyArr); }
+    if( i == n){arr emptyArr; return (emptyArr); }
 
 // create intvec of the remaining indices
     v = 1..(n-i); i=1;
