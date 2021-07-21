@@ -2243,7 +2243,7 @@ poly p_Power(poly p, int i, const ring r)
           if (rc == NULL)
             return p_MonPower(p,i,r);
           /* else: binom ?*/
-          int char_p=rChar(r);
+          int char_p=rInternalChar(r);
           if ((char_p>0) && (i>char_p)
           && ((rField_is_Zp(r,char_p)
             || (rField_is_Zp_a(r,char_p)))))

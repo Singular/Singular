@@ -123,7 +123,7 @@ fglmConsistency( ring sring, ring dring, int * vperm )
     int k;
     FglmState state= FglmOk;
 
-    if ( rChar(sring) != rChar(dring) )
+    if ( sring->cf != dring->cf )
     {
         WerrorS( "rings must have same characteristic" );
         state= FglmIncompatibleRings;

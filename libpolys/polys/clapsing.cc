@@ -86,7 +86,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Z(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     res=convFactoryPSingP( gcd( F, G ) , r);
     if ( rField_is_Zp(r))
@@ -98,7 +98,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   else if ( r->cf->extRing!=NULL )
   {
     if ( rField_is_Q_a(r)) setCharacteristic( 0 );
-    else                   setCharacteristic( rChar(r) );
+    else                   setCharacteristic( rInternalChar(r) );
     if (r->cf->extRing->qideal!=NULL)
     {
       bool b1=isOn(SW_USE_QGCD);
@@ -125,7 +125,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     WerrorS( feNotImplemented );
   else
   { // handle user type coeffs:
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     res=convFactoryPSingP( gcd( F, G ) , r);
   }
@@ -178,7 +178,7 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
     bool b1=isOn(SW_USE_EZGCD_P);
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     F=convSingPFactoryP( f,r );
     G=convSingPFactoryP( g,r );
     GCD=gcd(F,G);
@@ -214,7 +214,7 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
   else if ( r->cf->extRing )
   {
     if ( rField_is_Q_a(r)) setCharacteristic( 0 );
-    else                   setCharacteristic( rChar(r) );
+    else                   setCharacteristic( rInternalChar(r) );
     if (r->cf->extRing->qideal!=NULL)
     {
       bool b1=isOn(SW_USE_QGCD);
@@ -325,7 +325,7 @@ poly singclap_resultant ( poly f, poly g , poly x, const ring r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
     Variable X(i);
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res=convFactoryPSingP( resultant( F, G, X),r );
     Off(SW_RATIONAL);
@@ -335,7 +335,7 @@ poly singclap_resultant ( poly f, poly g , poly x, const ring r)
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
-    else               setCharacteristic( rChar(r) );
+    else               setCharacteristic( rInternalChar(r) );
     Variable X(i+rPar(r));
     if (r->cf->extRing->qideal!=NULL)
     {
@@ -462,7 +462,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const 
   if ( rField_is_Q(r) || rField_is_Zp(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r) );
     CanonicalForm FpG=F+G;
     if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
@@ -483,7 +483,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const 
   else if ( r->cf->extRing!=NULL )
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
-    else                 setCharacteristic( rChar(r) );
+    else                 setCharacteristic( rInternalChar(r) );
     CanonicalForm Fa,Gb;
     if (r->cf->extRing->qideal!=NULL)
     {
@@ -548,14 +548,14 @@ poly singclap_pmult ( poly f, poly g, const ring r )
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
     if (rField_is_Z(r)) Off(SW_RATIONAL);
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res = convFactoryPSingP( F * G,r );
   }
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
-    else               setCharacteristic( rChar(r) );
+    else               setCharacteristic( rInternalChar(r) );
     if (r->cf->extRing->qideal!=NULL)
     {
       CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
@@ -625,7 +625,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
   if (rField_is_Zp(r) || rField_is_Q(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res = convFactoryPSingP( F / G,r );
   }
@@ -633,7 +633,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
-    else               setCharacteristic( rChar(r) );
+    else               setCharacteristic( rInternalChar(r) );
     if (r->cf->extRing->qideal!=NULL)
     {
       CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
@@ -672,7 +672,7 @@ poly singclap_pmod ( poly f, poly g, const ring r )
   if (rField_is_Zp(r) || rField_is_Q(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     CanonicalForm Q,R;
     divrem(F,G,Q,R);
@@ -683,7 +683,7 @@ poly singclap_pmod ( poly f, poly g, const ring r )
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
-    else               setCharacteristic( rChar(r) );
+    else               setCharacteristic( rInternalChar(r) );
     if (r->cf->extRing->qideal!=NULL)
     {
       CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
@@ -1037,7 +1037,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     }
     if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Z(r) || rField_is_Zn(r))
     {
-      setCharacteristic( rChar(r) );
+      setCharacteristic( rInternalChar(r) );
       if (errorreported) goto notImpl; // char too large
       CanonicalForm F( convSingPFactoryP( f,r ) );
       L = factorize( F );
@@ -1046,7 +1046,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     else if (r->cf->extRing!=NULL)
     {
       if (rField_is_Q_a (r)) setCharacteristic (0);
-      else                   setCharacteristic( rChar(r) );
+      else                   setCharacteristic( rInternalChar(r) );
       if (errorreported) goto notImpl; // char too large
       if (r->cf->extRing->qideal!=NULL) /*algebraic extension */
       {
@@ -1413,14 +1413,14 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   if (rField_is_Q(r) || rField_is_Zp(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) );
     L = sqrFree( F );
   }
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a (r)) setCharacteristic (0);
-    else                   setCharacteristic( rChar(r) );
+    else                   setCharacteristic( rInternalChar(r) );
     if (r->cf->extRing->qideal!=NULL)
     {
       CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
@@ -1438,7 +1438,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   #if 0
   else if (rField_is_GF())
   {
-    int c=rChar(r);
+    int c=rInternalChar(r);
     setCharacteristic( c, primepower(c) );
     CanonicalForm F( convSingGFFactoryGF( f ) );
     if (F.isUnivariate())
@@ -1549,7 +1549,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
   if (rField_is_Q(r) || rField_is_Zp(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     for(i=0;i<IDELEMS(I);i++)
     {
       poly p=I->m[i];
@@ -1565,7 +1565,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
   // and over Q(a) / Fp(a)
   else if (nCoeff_is_transExt (r->cf))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     for(i=0;i<IDELEMS(I);i++)
     {
       poly p=I->m[i];
@@ -1636,7 +1636,7 @@ char* singclap_neworder ( ideal I, const ring r)
   if (rField_is_Q(r) || rField_is_Zp(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     for(i=0;i<IDELEMS(I);i++)
     {
       poly p=I->m[i];
@@ -1651,7 +1651,7 @@ char* singclap_neworder ( ideal I, const ring r)
   // and over Q(a) / Fp(a)
   else if (nCoeff_is_transExt (r->cf))
   {
-    setCharacteristic( rChar(r) );
+    setCharacteristic( rInternalChar(r) );
     for(i=0;i<IDELEMS(I);i++)
     {
       poly p=I->m[i];

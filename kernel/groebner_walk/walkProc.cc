@@ -55,7 +55,7 @@ walkConsistency( ring sring, ring dring, int * vperm )
     int k;
     WalkState state= WalkOk;
 
-    if ( rChar(sring) != rChar(dring) )
+    if ( sring->cf != dring->cf )
     {
         WerrorS( "rings must have same characteristic" );
         state= WalkIncompatibleRings;
