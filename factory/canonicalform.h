@@ -172,27 +172,27 @@ public:
     int ilog2() const;
 
     // comparison operators
-    friend bool operator == ( const CanonicalForm&, const CanonicalForm& );
-    friend bool operator != ( const CanonicalForm&, const CanonicalForm& );
-    friend bool operator > ( const CanonicalForm&, const CanonicalForm& );
-    friend bool operator < ( const CanonicalForm&, const CanonicalForm& );
+    friend FACTORY_PUBLIC bool operator == ( const CanonicalForm&, const CanonicalForm& );
+    friend FACTORY_PUBLIC bool operator != ( const CanonicalForm&, const CanonicalForm& );
+    friend FACTORY_PUBLIC bool operator > ( const CanonicalForm&, const CanonicalForm& );
+    friend FACTORY_PUBLIC bool operator < ( const CanonicalForm&, const CanonicalForm& );
 
     // arithmetic operators
-    friend CF_NO_INLINE CanonicalForm operator - ( const CanonicalForm& );
+    friend CF_NO_INLINE FACTORY_PUBLIC CanonicalForm operator - ( const CanonicalForm& );
 
-    friend void FACTORY_PUBLIC divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
-    friend bool divremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
-    friend bool tryDivremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm&, const CanonicalForm&, bool& );
+    friend FACTORY_PUBLIC void divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
+    friend FACTORY_PUBLIC bool divremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
+    friend FACTORY_PUBLIC bool tryDivremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm&, const CanonicalForm&, bool& );
 
-    friend CanonicalForm bgcd ( const CanonicalForm &, const CanonicalForm & );
-    friend CanonicalForm bextgcd ( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, CanonicalForm & );
+    friend FACTORY_PUBLIC CanonicalForm bgcd ( const CanonicalForm &, const CanonicalForm & );
+    friend FACTORY_PUBLIC CanonicalForm bextgcd ( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, CanonicalForm & );
 
     // input/output
 #ifndef NOSTREAMIO
    void print( OSTREAM&, char * ) const;
    void print( OSTREAM& ) const;
-   friend OSTREAM& operator << ( OSTREAM&, const CanonicalForm& );
-   friend ISTREAM& operator >> ( ISTREAM&, CanonicalForm& );
+   friend FACTORY_PUBLIC OSTREAM& operator << ( OSTREAM&, const CanonicalForm& );
+   friend FACTORY_PUBLIC ISTREAM& operator >> ( ISTREAM&, CanonicalForm& );
 #endif /* NOSTREAMIO */
 
     // obsolete methods
@@ -234,7 +234,7 @@ mod ( const CanonicalForm&, const CanonicalForm& );
 /*BEGINPUBLIC*/
 
 //{{{ function declarations from canonicalform.cc
-CanonicalForm blcm ( const CanonicalForm & f, const CanonicalForm & g );
+CanonicalForm FACTORY_PUBLIC blcm ( const CanonicalForm & f, const CanonicalForm & g );
 
 CanonicalForm FACTORY_PUBLIC power ( const CanonicalForm & f, int n );
 
@@ -244,23 +244,23 @@ CanonicalForm FACTORY_PUBLIC power ( const Variable & v, int n );
 //{{{ function declarations from cf_gcd.cc
 CanonicalForm FACTORY_PUBLIC gcd ( const CanonicalForm&, const CanonicalForm& );
 
-CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g );
+CanonicalForm FACTORY_PUBLIC gcd_poly ( const CanonicalForm & f, const CanonicalForm & g );
 
-CanonicalForm lcm ( const CanonicalForm&, const CanonicalForm& );
+CanonicalForm FACTORY_PUBLIC lcm ( const CanonicalForm&, const CanonicalForm& );
 
-CanonicalForm pp ( const CanonicalForm& );
+CanonicalForm FACTORY_PUBLIC pp ( const CanonicalForm& );
 
-CanonicalForm content ( const CanonicalForm& );
+CanonicalForm FACTORY_PUBLIC content ( const CanonicalForm& );
 
-CanonicalForm content ( const CanonicalForm&, const Variable& );
+CanonicalForm FACTORY_PUBLIC content ( const CanonicalForm&, const Variable& );
 
-CanonicalForm icontent ( const CanonicalForm & f );
+CanonicalForm FACTORY_PUBLIC icontent ( const CanonicalForm & f );
 
-CanonicalForm vcontent ( const CanonicalForm & f, const Variable & x );
+CanonicalForm FACTORY_PUBLIC vcontent ( const CanonicalForm & f, const Variable & x );
 //}}}
 
 //{{{ function declarations from cf_ops.cc
-CanonicalForm swapvar ( const CanonicalForm &, const Variable &, const Variable & );
+CanonicalForm FACTORY_PUBLIC swapvar ( const CanonicalForm &, const Variable &, const Variable & );
 
 CanonicalForm FACTORY_PUBLIC replacevar ( const CanonicalForm &, const Variable &, const Variable & );
 
