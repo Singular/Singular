@@ -1453,6 +1453,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
       }
       else
       {
+        WerrorS("object with a different type exists");
         return TRUE;
       }
     }
@@ -1525,10 +1526,7 @@ BOOLEAN iiExport (leftv v, int toLev)
     else
     {
       if(iiInternalExport(v, toLev))
-      {
-        r->CleanUp();
-        return TRUE;
-      }
+        nok=TRUE;
     }
     v=v->next;
   }
