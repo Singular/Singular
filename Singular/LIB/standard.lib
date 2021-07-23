@@ -73,13 +73,13 @@ EXAMPLE: example stdfglm; shows an example"
     }
     if (sQ!=0 )
     {
-      ring Rfglm = create_ring(ringlist(P)[1], "("+varstr(P)+")", os, "no_minpoly");
+      ring Rfglm = create_ring(ring_list(P)[1], "("+varstr(P)+")", os, "no_minpoly");
       ideal Qideal = fetch(P,Qideal);
       qring Pfglm = groebner(Qideal,"std","slimgb");
     }
     else
     {
-      ring Pfglm = create_ring(ringlist(P)[1], "("+varstr(P)+")", os, "no_minpoly");
+      ring Pfglm = create_ring(ring_list(P)[1], "("+varstr(P)+")", os, "no_minpoly");
     }
     if ( sM!=0 )
     {
@@ -88,7 +88,7 @@ EXAMPLE: example stdfglm; shows an example"
   }
   else
   {
-    list BRlist = ringlist(P);
+    list BRlist = ring_list(P);
     int nvarP = nvars(P);
     intvec w;                       //for ringweights of basering P
     int k;
@@ -190,7 +190,7 @@ EXAMPLE: example stdhilb;  shows an example"
   }
 
   // save ordering of basering P for later use
-  list ord_P = ringlist(P)[3];     //ordering of basering in ringlist
+  list ord_P = ring_list(P)[3];    //ordering of basering in ringlist
   string ordstr_P = ordstr(P);     //ordering of basering as string
   int nvarP = nvars(P);
 
@@ -317,7 +317,7 @@ EXAMPLE: example stdhilb;  shows an example"
   //Phelp has the same ordering as P on common variables. In Phelp
   //a quotient ideal from P is added to the input
 
-  list BRlist = ringlist(Philb);
+  list BRlist = ring_list(Philb);
   BRlist[3] = list();
   int so = size(ord_P);
   if( ord_P[so][1] =="c" || ord_P[so][1] =="C" )
@@ -450,7 +450,7 @@ example
    ring P = 0,(y,z,u,v),lp;
    ideal i = y+u2+uv3, z+uv3;            //i is an lp-SB but not a dp_SB
    qring Q = std(i);
-   list LQ = ringlist(Q);
+   list LQ = ring_list(Q);
    LQ[3][1][1]="dp";
    def Q1 = ring(quotientList(LQ));
    setring Q1;
@@ -593,7 +593,7 @@ EXAMPLE: example hilbRing; shows an example
   {
     int is_qring =1;
   }
-  list BRlist = ringlist(P);
+  list BRlist = ring_list(P);
   BRlist[4] = ideal(0);      //kill quotient ideal in BRlist
 
   int nvarP = nvars(P);
@@ -752,7 +752,7 @@ EXAMPLE: example qslimgb; shows an example"
   //case of a qring; since slimgb does not know qrings we
   //delete the quotient ideal and add it to i
 
-  list BRlist = ringlist(P);
+  list BRlist = ring_list(P);
   BRlist[4] = ideal(0);
   def Phelp = ring(BRlist);
   kill BRlist;
@@ -914,7 +914,7 @@ EXAMPLE: example groebner;  shows an example"
      was_qring = 1;
      //is_homog = homog(Qideal); //remembers if Qideal was homog (homog(0)=1)
   }
-  list BRlist = ringlist(P);     //ringlist of basering
+  list BRlist = ring_list(P);     //ringlist of basering
 
   // save ordering of basering P for later use
   list ord_P = BRlist[3];       //should be available in all rings
@@ -1310,7 +1310,7 @@ See also
      p_opt = 1;
    }
 
-   if( (size(ideal(basering)) > 0) || (size(ringlist(P)) > 4) )
+   if( (size(ideal(basering)) > 0) || (size(ring_list(P)) > 4) )
    {
      // the quick hack for qrings - seems to fit most needs
      // (lres is not implemented for qrings, sres is not so efficient)
@@ -1580,7 +1580,7 @@ proc quotient3(module a,module b)   //89sec
 RETURN:  the quotient of m1 and m2"
 {
   def @newP=basering;
-  ring @newr = create_ring(ringlist(basering)[1], "("+varstr(basering)+", @t, @w)", "dp", "no_minpoly");
+  ring @newr = create_ring(ring_list(basering)[1], "("+varstr(basering)+", @t, @w)", "dp", "no_minpoly");
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -1601,7 +1601,7 @@ proc quotient5(module a,module b)   //89sec
 RETURN:  the quotient of m1 and m2"
 {
   def @newP=basering;
-  ring @newr = create_ring(ringlist(basering)[1], "("+varstr(basering)+", @t)", "dp", "no_minpoly");
+  ring @newr = create_ring(ring_list(basering)[1], "("+varstr(basering)+", @t)", "dp", "no_minpoly");
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -1623,7 +1623,7 @@ proc quotient4(module a,module b)   //95sec
 RETURN:  the quotient of m1 and m2"
 {
   def @newP=basering;
-  ring @newr = create_ring(ringlist(basering)[1], "("+varstr(basering)+", @t)", "dp", "no_minpoly");
+  ring @newr = create_ring(ring_list(basering)[1], "("+varstr(basering)+", @t)", "dp", "no_minpoly");
   module b=imap(@newP,b);
   module a=imap(@newP,a);
   int i;
@@ -1641,7 +1641,7 @@ RETURN:  the quotient of m1 and m2"
 static proc intersect1(ideal i,ideal j)
 {
   def R=basering;
-  ring gnir = create_ring(ringlist(basering)[1], "("+varstr(basering)+",@t)", "(C,dp)", "no_minpoly");
+  ring gnir = create_ring(ring_list(basering)[1], "("+varstr(basering)+",@t)", "(C,dp)", "no_minpoly");
   ideal i=var(nvars(basering))*imap(R,i)+(var(nvars(basering))-1)*imap(R,j);
   ideal j=eliminate(i,var(nvars(basering)));
   setring R;
@@ -2553,7 +2553,7 @@ static proc parse_var(string v)
   if (v[1, 4] == "var(" && defined(basering))
   {
     int i = int(v[5,size(v)-5]);
-    v = ringlist(basering)[2][i];
+    v = ring_list(basering)[2][i];
   }
   return(v);
 }
@@ -2650,7 +2650,7 @@ proc create_ring(def l1, def l2, def l3, list #)
 "USAGE:  create_ring(l1, l2, l3[, l4, \"no_minpoly\"]);
          l1 int or list, l2 list or string, l3 list or string, l4 ideal
 RETURN:  ring(list(l1, l2, l3, l4))
-NOTE:    l1, l2, l3, l4 are assumed to be the four entries of ringlist(R)
+NOTE:    l1, l2, l3, l4 are assumed to be the four entries of ring_list(R)
          where R is the ring to be returned.
          @* Optional arguments: If l4 is not given, it is assumend to be
          ideal(0). If \"no_minpoly\" is given, then the minimal polynomial
@@ -2754,9 +2754,9 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring R = (0,a), x, lp;
-  ringlist(R);
+  ring_list(R);
   minpoly = a^2+1;
   qring Q = ideal(x^3-2);
-  ring S = create_ring(ringlist(Q)[1], "(x,y,t)", "dp", "no_minpoly");
+  ring S = create_ring(ring_list(Q)[1], "(x,y,t)", "dp", "no_minpoly");
   basering;
 }
