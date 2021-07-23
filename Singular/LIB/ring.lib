@@ -129,7 +129,7 @@ EXAMPLE: example changeord; shows an example
    if( size(#)==0 ) { def @r=basering; }
    if( size(#)==1 ) { def @r=#[1]; }
    setring @r;
-   list rl=ringlist(@r);
+   list rl=ring_list(@r);
    rl[3]=@o;
    def Rnew=ring(rl);
    setring save_ring;
@@ -419,7 +419,7 @@ EXAMPLE: example extendring; shows an example
       if( @k>0 and o[size(o)]!=")" ) { o=o+"("+string(@k)+")"; }
    }
 //------------------------ prepare string of new ring -------------------------
-   list @ringlist=ringlist(@r);
+   list @ringlist=ring_list(@r);
    list @varlist=A_Z_L(va,n);
    if (@i==0)
    {
@@ -769,7 +769,7 @@ EXAMPLE: example preimageLoc ; shows an example
     {
       ideal I=ideal(S);
       minpoly_string=string(minpoly);
-      list l8 = ringlist(S)[2];
+      list l8 = ring_list(S)[2];
       ring S0 = create_ring(ringlist(S)[1], l8, "dp", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       ideal I=imap(S,I);
@@ -1167,7 +1167,7 @@ KEYWORDS: plural
 EXAMPLE: example hasCommutativeVars; shows an example
 "
 {
-  list rl=ringlist(rng);
+  list rl=ring_list(rng);
   return (size(rl)==4);
 }
 example
@@ -1254,7 +1254,7 @@ RETURN:  a ring with the oderinging changed to the (simple) ordering s
 EXAMPLE: example changeordTo(); shows an example
 "
 {
-  list rl=ringlist(r);
+  list rl=ring_list(r);
   rl[3]=list(list("C",0),list(o,1:nvars(r)));
   def rr=ring(rl);
   return(rr);
@@ -1276,7 +1276,7 @@ RETURN:  a ring with the additional variables
 EXAMPLE: example addvarsTo(); shows an example
 "
 {
-  list rl=ringlist(r);
+  list rl=ring_list(r);
   int n=nvars(r);
   rl[2]=rl[2]+vars;
   if (blockorder==0)
