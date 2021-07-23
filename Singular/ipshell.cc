@@ -2235,10 +2235,16 @@ lists rDecompose(const ring r)
     L->m[0].rtyp=LIST_CMD;
     L->m[0].data=(void*)Lc;
   }
-  else
+  else if (rField_is_Zp(r) || rField_is_Q(r))
   {
     L->m[0].rtyp=INT_CMD;
     L->m[0].data=(void *)(long)r->cf->ch;
+  }
+  else
+  {
+    L->m[0].rtyp=CRING_CMD;
+    L->m[0].data=(void *)r->cf;
+    r->cf->ref++;
   }
   // ----------------------------------------
   // 1: list (var)
