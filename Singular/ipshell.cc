@@ -2021,6 +2021,108 @@ BOOLEAN rDecompose_CF(leftv res,const coeffs C)
   return FALSE;
 }
 
+// common part of rDecompse and rDecompose_list_cf:
+static void rDecompose_23456(const ring r, lists L)
+{
+  // ----------------------------------------
+  // 1: list (var)
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(r->N);
+  int i;
+  for(i=0; i<r->N; i++)
+  {
+    LL->m[i].rtyp=STRING_CMD;
+    LL->m[i].data=(void *)omStrDup(r->names[i]);
+  }
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+  // ----------------------------------------
+  // 2: list (ord)
+  LL=(lists)omAlloc0Bin(slists_bin);
+  i=rBlocks(r)-1;
+  LL->Init(i);
+  i--;
+  lists LLL;
+  for(; i>=0; i--)
+  {
+    intvec *iv;
+    int j;
+    LL->m[i].rtyp=LIST_CMD;
+    LLL=(lists)omAlloc0Bin(slists_bin);
+    LLL->Init(2);
+    LLL->m[0].rtyp=STRING_CMD;
+    LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
+
+    if((r->order[i] == ringorder_IS)
+    || (r->order[i] == ringorder_s)) //|| r->order[i] == ringorder_S)
+    {
+      assume( r->block0[i] == r->block1[i] );
+      const int s = r->block0[i];
+      assume( (-2 < s && s < 2)||(r->order[i] != ringorder_IS));
+
+      iv=new intvec(1);
+      (*iv)[0] = s;
+    }
+    else if (r->block1[i]-r->block0[i] >=0 )
+    {
+      int bl=j=r->block1[i]-r->block0[i];
+      if (r->order[i]==ringorder_M)
+      {
+        j=(j+1)*(j+1)-1;
+        bl=j+1;
+      }
+      else if (r->order[i]==ringorder_am)
+      {
+        j+=r->wvhdl[i][bl+1];
+      }
+      iv=new intvec(j+1);
+      if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
+      {
+        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j+(j>bl)];
+      }
+      else switch (r->order[i])
+      {
+        case ringorder_dp:
+        case ringorder_Dp:
+        case ringorder_ds:
+        case ringorder_Ds:
+        case ringorder_lp:
+        case ringorder_ls:
+        case ringorder_rp:
+          for(;j>=0; j--) (*iv)[j]=1;
+          break;
+        default: /* do nothing */;
+      }
+    }
+    else
+    {
+      iv=new intvec(1);
+    }
+    LLL->m[1].rtyp=INTVEC_CMD;
+    LLL->m[1].data=(void *)iv;
+    LL->m[i].data=(void *)LLL;
+  }
+  L->m[2].rtyp=LIST_CMD;
+  L->m[2].data=(void *)LL;
+  // ----------------------------------------
+  // 3: qideal
+  L->m[3].rtyp=IDEAL_CMD;
+  if (r->qideal==NULL)
+    L->m[3].data=(void *)idInit(1,1);
+  else
+    L->m[3].data=(void *)idCopy(r->qideal);
+  // ----------------------------------------
+#ifdef HAVE_PLURAL // NC! in rDecompose
+  if (rIsPluralRing(r))
+  {
+    L->m[4].rtyp=MATRIX_CMD;
+    L->m[4].data=(void *)mp_Copy(r->GetNC()->C, r, r);
+    L->m[5].rtyp=MATRIX_CMD;
+    L->m[5].data=(void *)mp_Copy(r->GetNC()->D, r, r);
+  }
+#endif
+}
+
 lists rDecompose_list_cf(const ring r)
 {
   assume( r != NULL );
@@ -2056,99 +2158,7 @@ lists rDecompose_list_cf(const ring r)
   L->m[0].rtyp=CRING_CMD;
   L->m[0].data=(char*)r->cf; r->cf->ref++;
   // ----------------------------------------
-  // 1: list (var)
-  lists LL=(lists)omAlloc0Bin(slists_bin);
-  LL->Init(r->N);
-  int i;
-  for(i=0; i<r->N; i++)
-  {
-    LL->m[i].rtyp=STRING_CMD;
-    LL->m[i].data=(void *)omStrDup(r->names[i]);
-  }
-  L->m[1].rtyp=LIST_CMD;
-  L->m[1].data=(void *)LL;
-  // ----------------------------------------
-  // 2: list (ord)
-  LL=(lists)omAlloc0Bin(slists_bin);
-  i=rBlocks(r)-1;
-  LL->Init(i);
-  i--;
-  lists LLL;
-  for(; i>=0; i--)
-  {
-    intvec *iv;
-    int j;
-    LL->m[i].rtyp=LIST_CMD;
-    LLL=(lists)omAlloc0Bin(slists_bin);
-    LLL->Init(2);
-    LLL->m[0].rtyp=STRING_CMD;
-    LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
-
-    if(r->order[i] == ringorder_IS) //  || r->order[i] == ringorder_s || r->order[i] == ringorder_S)
-    {
-      assume( r->block0[i] == r->block1[i] );
-      const int s = r->block0[i];
-      assume( -2 < s && s < 2);
-
-      iv=new intvec(1);
-      (*iv)[0] = s;
-    }
-    else if (r->block1[i]-r->block0[i] >=0 )
-    {
-      int bl=j=r->block1[i]-r->block0[i];
-      if (r->order[i]==ringorder_M)
-      {
-        j=(j+1)*(j+1)-1;
-        bl=j+1;
-      }
-      else if (r->order[i]==ringorder_am)
-      {
-        j+=r->wvhdl[i][bl+1];
-      }
-      iv=new intvec(j+1);
-      if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
-      {
-        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j+(j>bl)];
-      }
-      else switch (r->order[i])
-      {
-        case ringorder_dp:
-        case ringorder_Dp:
-        case ringorder_ds:
-        case ringorder_Ds:
-        case ringorder_lp:
-          for(;j>=0; j--) (*iv)[j]=1;
-          break;
-        default: /* do nothing */;
-      }
-    }
-    else
-    {
-      iv=new intvec(1);
-    }
-    LLL->m[1].rtyp=INTVEC_CMD;
-    LLL->m[1].data=(void *)iv;
-    LL->m[i].data=(void *)LLL;
-  }
-  L->m[2].rtyp=LIST_CMD;
-  L->m[2].data=(void *)LL;
-  // ----------------------------------------
-  // 3: qideal
-  L->m[3].rtyp=IDEAL_CMD;
-  if (r->qideal==NULL)
-    L->m[3].data=(void *)idInit(1,1);
-  else
-    L->m[3].data=(void *)idCopy(r->qideal);
-  // ----------------------------------------
-#ifdef HAVE_PLURAL // NC! in rDecompose
-  if (rIsPluralRing(r))
-  {
-    L->m[4].rtyp=MATRIX_CMD;
-    L->m[4].data=(void *)mp_Copy(r->GetNC()->C, r, r);
-    L->m[5].rtyp=MATRIX_CMD;
-    L->m[5].data=(void *)mp_Copy(r->GetNC()->D, r, r);
-  }
-#endif
+  rDecompose_23456(r,L);
   return L;
 }
 
@@ -2247,102 +2257,7 @@ lists rDecompose(const ring r)
     r->cf->ref++;
   }
   // ----------------------------------------
-  // 1: list (var)
-  lists LL=(lists)omAlloc0Bin(slists_bin);
-  LL->Init(r->N);
-  int i;
-  for(i=0; i<r->N; i++)
-  {
-    LL->m[i].rtyp=STRING_CMD;
-    LL->m[i].data=(void *)omStrDup(r->names[i]);
-  }
-  L->m[1].rtyp=LIST_CMD;
-  L->m[1].data=(void *)LL;
-  // ----------------------------------------
-  // 2: list (ord)
-  LL=(lists)omAlloc0Bin(slists_bin);
-  i=rBlocks(r)-1;
-  LL->Init(i);
-  i--;
-  lists LLL;
-  for(; i>=0; i--)
-  {
-    intvec *iv;
-    int j;
-    LL->m[i].rtyp=LIST_CMD;
-    LLL=(lists)omAlloc0Bin(slists_bin);
-    LLL->Init(2);
-    LLL->m[0].rtyp=STRING_CMD;
-    LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
-
-    if((r->order[i] == ringorder_IS)
-    || (r->order[i] == ringorder_s)) //|| r->order[i] == ringorder_S)
-    {
-      assume( r->block0[i] == r->block1[i] );
-      const int s = r->block0[i];
-      assume( (-2 < s && s < 2)||(r->order[i] != ringorder_IS));
-
-      iv=new intvec(1);
-      (*iv)[0] = s;
-    }
-    else if (r->block1[i]-r->block0[i] >=0 )
-    {
-      int bl=j=r->block1[i]-r->block0[i];
-      if (r->order[i]==ringorder_M)
-      {
-        j=(j+1)*(j+1)-1;
-        bl=j+1;
-      }
-      else if (r->order[i]==ringorder_am)
-      {
-        j+=r->wvhdl[i][bl+1];
-      }
-      iv=new intvec(j+1);
-      if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
-      {
-        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j+(j>bl)];
-      }
-      else switch (r->order[i])
-      {
-        case ringorder_dp:
-        case ringorder_Dp:
-        case ringorder_ds:
-        case ringorder_Ds:
-        case ringorder_lp:
-        case ringorder_ls:
-        case ringorder_rp:
-          for(;j>=0; j--) (*iv)[j]=1;
-          break;
-        default: /* do nothing */;
-      }
-    }
-    else
-    {
-      iv=new intvec(1);
-    }
-    LLL->m[1].rtyp=INTVEC_CMD;
-    LLL->m[1].data=(void *)iv;
-    LL->m[i].data=(void *)LLL;
-  }
-  L->m[2].rtyp=LIST_CMD;
-  L->m[2].data=(void *)LL;
-  // ----------------------------------------
-  // 3: qideal
-  L->m[3].rtyp=IDEAL_CMD;
-  if (r->qideal==NULL)
-    L->m[3].data=(void *)idInit(1,1);
-  else
-    L->m[3].data=(void *)idCopy(r->qideal);
-  // ----------------------------------------
-#ifdef HAVE_PLURAL // NC! in rDecompose
-  if (rIsPluralRing(r))
-  {
-    L->m[4].rtyp=MATRIX_CMD;
-    L->m[4].data=(void *)mp_Copy(r->GetNC()->C, r, r);
-    L->m[5].rtyp=MATRIX_CMD;
-    L->m[5].data=(void *)mp_Copy(r->GetNC()->D, r, r);
-  }
-#endif
+  rDecompose_23456(r,L);
   return L;
 }
 
