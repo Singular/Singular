@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version tropical.lib 4.1.2.0 Feb_2019 ";
+version="version tropical.lib 4.2.1.1 Jul_2021 ";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -334,7 +334,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
   // in order to avoid unpleasant surprises with the names of the variables
   // we change to a ring where the variables have names t and x(1),...,x(n)
   def ALTERRING=basering;
-  list RL=ringlist(ALTERRING);
+  list RL=ring_list(ALTERRING);
   if (nvars(basering)==2)
   {
     RL[2]=list("t","x(1)");
@@ -470,7 +470,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
   // pass to a ring which represents Q[t]_<t>[x1,...,xn]
   // for this, unfortunately, t has to be the last variable !!!
   ideal variablen;
-  list RL=ringlist(basering);
+  list RL=ring_list(basering);
   for (j=2;j<=nvars(basering);j++)
   {
     variablen=variablen+var(j);
@@ -479,7 +479,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
   RL[2][size(RL[2])]="t";
   RL[3]=list(list("dp",1:(nvars(basering)-1)),list("lp",1));
   ring GRUNDRING = ring(RL);
-  list RL=ringlist(GRUNDRING);
+  list RL=ring_list(GRUNDRING);
   list VARIABLEN;
   ideal variablen;
   for (j=1;j<=nvars(basering)-1;j++)
@@ -508,7 +508,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
   // compute next the dimension of i in K(t)[x] and cut the ideal down to dim 0
   if (iszerodim==0) // do so only if is_dim_zero is not set
   {
-    RL=ringlist(basering);
+    RL=ring_list(basering);
     RL[1]=list(RL[1],list("t"),list(list("lp",1)),ideal(0));
     RL[2]=VARIABLEN;
     RL[3]=list(list("dp",1:size(VARIABLEN)));
@@ -588,8 +588,8 @@ EXAMPLE: example tropicalLifting;   shows an example"
         // we need a ring where the parameters X_1,...,X_k
         // from LIFTRING are present,
         // and where also the variables of CUTDOWNRING live
-	list RL=ringlist(LIFTRING);
-	list RL2=ringlist(CUTDOWNRING);
+	list RL=ring_list(LIFTRING);
+	list RL2=ring_list(CUTDOWNRING);
 	RL[2]=RL2[2];
 	RL[3]=list(list("dp",1:nvars(CUTDOWNRING)));
         ring REPLACEMENTRING = ring(RL);
@@ -1088,7 +1088,7 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
     {
       poly mp=minpoly;
       def OLDRING=basering;
-      list RL=ringlist(OLDRING);
+      list RL=ring_list(OLDRING);
       RL[2]=RL[2]+RL[1][2];
       RL[1]=RL[1][1];
       RL[3]=list(list("ds",1:size(RL[2])));
@@ -1740,7 +1740,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
     if (char(basering)!=0)
     {
       string polynomstring=string(f);
-      list RL=ringlist(basering);
+      list RL=ring_list(basering);
       RL[1][1]=0;
       RL[3]=list(list("dp",1:nvars(basering)));
       ring drawring = ring(RL);
@@ -2540,7 +2540,7 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
   // AND WE THEREFORE HAVE TO MOVE IT BACK TO THE FRONT!
   // THIS IS NOT DOCUMENTED FOR THE GENERAL USER!!!!
   def BASERING=basering;
-  list RL=ringlist(BASERING);
+  list RL=ring_list(BASERING);
   list VARIABLEN;
   int j;
   if (size(#)>0)
@@ -2560,7 +2560,7 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
     VARIABLEN=RL[2];
   }
   // we want to homogenise the ideal i ....
-  RL=ringlist(basering);
+  RL=ring_list(basering);
   RL[2]=list("@s")+RL[2];
   RL[3]=list(list("dp",1:size(RL[2])));
   ring HOMOGRING = ring(RL);
@@ -2578,7 +2578,7 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
     whomog[j+1]=w[j]+M;
   }
   intmat O=weightVectorToOrderMatrix(whomog);
-  list RL=ringlist(basering);
+  list RL=ring_list(basering);
   RL[3]=list(list("M",O));
   ring WEIGHTRING = ring(RL);
   // map i to the new ring and compute a GB of i, then dehomogenise i,
@@ -2626,7 +2626,7 @@ EXAMPLE:     example initialForm;   shows an example"
 {
   def BASERING=basering;
   intmat O=weightVectorToOrderMatrix(w);
-  list RL=ringlist(basering);
+  list RL=ring_list(basering);
   RL[3]=list(list("M",O));
   ring INITIALRING = ring(RL);
   poly f=imap(BASERING,f);
@@ -2701,7 +2701,7 @@ EXAMPLE:     example initialIdeal;   shows an example"
 {
   def BASERING=basering;
   intmat O=weightVectorToOrderMatrix(w);
-  list RL=ringlist(BASERING);
+  list RL=ring_list(BASERING);
   RL[3]=list(list("M",O));
   ring INITIALRING = ring(RL);
   ideal i=imap(BASERING,i);
@@ -3412,7 +3412,7 @@ RETURN:  int, 1 if f is in the radical of i, 0 else
 EXAMPLE:     example radicalMemberShip;   shows an example"
 {
   def BASERING=basering;
-  list RL=ringlist(BASERING);
+  list RL=ring_list(BASERING);
   RL[2]=list("@T")+RL[2];
   RL[3]=list(list("dp",1:1))+RL[3];
   ring RADRING = ring(RL);
@@ -3927,7 +3927,7 @@ NOTE:        needs the libraries random.lib and primdec.lib;
   list erglini;
   list ergl;
   list VARIABLEN;
-  list RL=ringlist(BASERING);
+  list RL=ring_list(BASERING);
   for (j1=1;j1<=nvars(basering)-1;j1++)
   {
     variablen=variablen+var(j1); // read the set of variables
@@ -4145,7 +4145,7 @@ NOTE:        needs the libraries random.lib and primdec.lib;
         }
         // return pideal, the initial and the list ergl which tells us
         // which variables we replaced by which form
-	RL=ringlist(BASERING);
+	RL=ring_list(BASERING);
 	RL[2]=VARIABLEN+list("t");
         RL[3]=list(list("dp",1:size(VARIABLEN)),list("lp",1:1));
         ring BASERINGLESS1 = ring(RL);
@@ -4225,7 +4225,7 @@ NOTE:        needs the libraries random.lib and primdec.lib;
     }
   }
   setring BASERING;
-  ring BASERINGLESS2 = create_ring(ringlist(BASERING)[1], "("+string(variablen)+",t)", "(dp("+string(ncols(variablen))+"),lp(1))", "no_minpoly");
+  ring BASERINGLESS2 = create_ring(ring_list(BASERING)[1], "("+string(variablen)+",t)", "(dp("+string(ncols(variablen))+"),lp(1))", "no_minpoly");
   // using the 0/1-vector which tells us which variables belong
   // to the set of smallest entries of wvec
   // we construct a set of d random linear
@@ -4573,7 +4573,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   def BASERING=basering;
   if ((numberdeletedvariables>0) and (anzahlvariablen>1)) // if only t remains,
   { // all true variables are gone
-    ring NEURING = create_ring(ringlist(basering)[1], "("+string(variablen)+")", "(dp("+string(size(variablen)-1)+"),lp(1))", "no_minpoly");
+    ring NEURING = create_ring(ring_list(basering)[1], "("+string(variablen)+")", "(dp("+string(size(variablen)-1)+"),lp(1))", "no_minpoly");
     ideal i=imap(BASERING,i);
     ideal gesamt_m=imap(BASERING,gesamt_m);
   }
@@ -4589,7 +4589,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     if (nogfan!=1)
     {
       // pass to a ring which has variables which are suitable for gfan
-      ring GFANRING = create_ring(ringlist(basering)[1], "(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z)", "dp", "no_minpoly");
+      ring GFANRING = create_ring(ring_list(basering)[1], "(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z)", "dp", "no_minpoly");
       ideal phiideal=b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z;
       phiideal[nvars(PREGFANRING)]=a; // map t to a
       map phi=PREGFANRING,phiideal;
@@ -4764,7 +4764,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     }
     else
     {
-      ring PARARing = create_ring(ringlist(basering)[1], "t", "ls", "no_minpoly");
+      ring PARARing = create_ring(ring_list(basering)[1], "t", "ls", "no_minpoly");
     }
     ideal PARA; // will contain the parametrisation
     // we start by initialising the entries to be zero;
@@ -4852,7 +4852,7 @@ NOTE:        the procedure is called from inside the recursive procedure
   {
     variablen=variablen+var(j);
   }
-  ring INITIALRING = create_ring(ringlist(basering)[1], "("+string(variablen)+")", "dp", "no_minpoly");
+  ring INITIALRING = create_ring(ring_list(basering)[1], "("+string(variablen)+")", "dp", "no_minpoly");
   ideal ini=imap(BASERING,ini);
   // compute the associated primes of the initialideal
   // ordering the maximal ideals shall help to avoid
@@ -4958,7 +4958,7 @@ NOTE:    the procedure is called from inside the recursive procedure
     {
      l3[zz] = "X("+string(zz)+")";
     }
-    ring TRANSFORMRING = create_ring(ringlist(basering)[1], "("+string(variablen)+","+string(l3)+",t)", "(dp("+string(anzahlvariablen-1)+"),dp("+string(nvars(BASERING)+neuvar-anzahlvariablen)+"),lp(1))", "no_minpoly");
+    ring TRANSFORMRING = create_ring(ring_list(basering)[1], "("+string(variablen)+","+string(l3)+",t)", "(dp("+string(anzahlvariablen-1)+"),dp("+string(nvars(BASERING)+neuvar-anzahlvariablen)+"),lp(1))", "no_minpoly");
     // map i into the new ring
     ideal i=imap(BASERING,i);
     // define a map phi which maps the true variables, which are not
@@ -5104,7 +5104,7 @@ NOTE:        the procedure is called by tinitialform"
   }
   else
   {
-    ring TINRING = create_ring(ringlist(basering)[1], "("+string(variablen)+")", "dp", "no_minpoly");
+    ring TINRING = create_ring(ring_list(basering)[1], "("+string(variablen)+")", "dp", "no_minpoly");
   }
   ideal tin=imap(BASERING,tin);
   poly monom=imap(BASERING,monom);
@@ -5491,7 +5491,7 @@ NOTE:     the procedure is called from tropicalLifting"
     {
       setring LIFTRing;
       poly mp=minpoly;
-      ring TESTRing = create_ring(ringlist(LIFTRing)[1], "("+varstr(BASERING)+")", "dp", "no_minpoly");
+      ring TESTRing = create_ring(ring_list(LIFTRing)[1], "("+varstr(BASERING)+")", "dp", "no_minpoly");
       minpoly=number(imap(LIFTRing,mp));
       ideal i=imap(BASERING,i);
     }
@@ -5879,7 +5879,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         }
         else
         {
-          ring PARARing = create_ring(ringlist(basering)[1], "t", "ls", "no_minpoly");
+          ring PARARing = create_ring(ring_list(basering)[1], "t", "ls", "no_minpoly");
         }
         ideal PARA; // will contain the parametrisation
         // we start by initialising the entries to be zero;
@@ -6072,7 +6072,7 @@ NOTE:    - the procedure is called from inside the recursive
         elring=elring+"dp(1),";
       }
       elring=elring+"lp(1));";
-      ring ELIMINATERING = create_ring(ringlist(basering)[1], "("+string(simplify(reduce(maxideal(1),std(var(lastvar))),2))+")", elring, "no_minpoly");
+      ring ELIMINATERING = create_ring(ring_list(basering)[1], "("+string(simplify(reduce(maxideal(1),std(var(lastvar))),2))+")", elring, "no_minpoly");
       ideal i=imap(BASERING,I); // move the ideal I to the new ring
       // if not yet all variables have been checked,
       // then go on with the next smaller variable,
@@ -6140,7 +6140,7 @@ NOTE:    - the procedure is called from inside the recursive
         }
         else
         {
-          ring SATURATERING = create_ring(ringlist(basering)[1], "("+varstr(basering)+")", "("+ordstr(basering)+")", "no_minpoly");
+          ring SATURATERING = create_ring(ring_list(basering)[1], "("+varstr(basering)+")", "("+ordstr(basering)+")", "no_minpoly");
           ideal i=imap(BASERING,i);
           export(i);
           setring BASERING;
@@ -6206,7 +6206,7 @@ NOTE:    - the procedure is called from inside the recursive
       elring=elring+"dp(1),";
     }
     elring=elring+"lp(1));";
-    ring ELIMINATERING = create_ring(ringlist(basering)[1], "("+string(variablen)+")", elring, "no_minpoly");
+    ring ELIMINATERING = create_ring(ring_list(basering)[1], "("+string(variablen)+")", elring, "no_minpoly");
     ideal i=imap(BASERING,i);
     ideal m=imap(BASERING,m);
     export(i);
@@ -6248,7 +6248,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure
 {
   def BASERING=basering;
   string tvar=string(var(nvars(basering)));
-  list RL_BASERING=ringlist(BASERING);
+  list RL_BASERING=ring_list(BASERING);
   list TVAR=RL_BASERING[2];
   int j,k,l; // indices
   // store the weighted degrees of the elements of i in an integer vector
@@ -6277,7 +6277,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure
   // collect the true variables x_1,...,x_n plus @a, if it is defined in BASERING
   ideal variablen;
   list VARIABLEN;
-  list RL=ringlist(basering);
+  list RL=ring_list(basering);
   for (j=1;j<=nvars(basering)-1;j++)
   {
     variablen=variablen+var(j);
@@ -6311,7 +6311,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure
     // the latter condition says that @a is not in BASERING;
     // if some of the maximal ideals needs a field extension,
     // then everything will live in this ring
-    RL=ringlist(BASERING);
+    RL=ring_list(BASERING);
     if ((maximalideals[j][1]!=0) and (nvars(BASERING)==anzahlvariablen))
     {
       // define the extension ring which contains

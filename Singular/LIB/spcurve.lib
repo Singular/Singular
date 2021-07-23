@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-version="version spcurve.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version spcurve.lib 4.2.1.1 Jul_2021 "; // $Id$
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
@@ -359,8 +359,8 @@ EXAMPLE: example qhmatrix; shows an example"
 // its maximal minors are, and check, whether M is really quasihomogeneous
 //---------------------------------------------------------------------------
   intvec a=weight(m);
-  list l1 = ringlist(r)[2];
-  ring rneu = create_ring(ringlist(r)[1], l1, "Ws(" + string(a) + ")", "no_minpoly");
+  list l1 = ring_list(r)[2];
+  ring rneu = create_ring(ring_list(r)[1], l1, "Ws(" + string(a) + ")", "no_minpoly");
   def M=imap(r,M);
   int difset=0;
   list l;
@@ -786,7 +786,7 @@ EXAMPLE:   example KSpencerKernel; shows an example"
     ERROR("The matrix was not n x (n+1) or not quasihomogenous");
   }
   string orderKSK;
-  ring r = create_ring(ringlist(rt)[1], "(x,y,z)", "Ws(" + string(wl[1]) + ")", "no_minpoly");
+  ring r = create_ring(ring_list(rt)[1], "(x,y,z)", "Ws(" + string(wl[1]) + ")", "no_minpoly");
   matrix M=imap(rt,M);
   int ne=size(M);
   if (defined(desiredorder)>1)
@@ -838,9 +838,9 @@ EXAMPLE:   example KSpencerKernel; shows an example"
     {
      l2[zz] = "e("+string(zz)+")";
     }
-    list l3 = ringlist(basering)[2];
+    list l3 = ring_list(basering)[2];
     l2 = l2+l3;
-    ring re = create_ring(ringlist(r)[1], l2, orderKSK, "no_minpoly");
+    ring re = create_ring(ring_list(r)[1], l2, orderKSK, "no_minpoly");
   }
   else
   {
@@ -849,9 +849,9 @@ EXAMPLE:   example KSpencerKernel; shows an example"
     {
      l4[zz] = "e("+string(zz)+")";
     }
-    list l5 = ringlist(basering)[2];
+    list l5 = ring_list(basering)[2];
     l4 = l4+l5;
-    ring re = create_ring(ringlist(r)[1], l4, "Ws(" + string((-1)*intvec(wl[2])) + ","+ string(wl[1]) + ")", "no_minpoly");
+    ring re = create_ring(ring_list(r)[1], l4, "Ws(" + string((-1)*intvec(wl[2])) + ","+ string(wl[1]) + ")", "no_minpoly");
   }
   module temp=imap(r,t1qh);
   ideal t1qh=mod2id(temp,iv);
