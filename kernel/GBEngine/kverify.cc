@@ -255,7 +255,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   }
   else // parent ---------------------------------------------------
   {
-    if (TEST_OPT_PROT) printf("childs created\n");
+    if (TEST_OPT_PROT) printf("%d childs created\n",cpus);
     // wait for all process to stop:
     // each process sends an 0 at end or a 1 for failure
     int res;
@@ -265,13 +265,13 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       res=rqueue->dequeue();
       if (res==0) // a child finished
       {
-        if (TEST_OPT_PROT) printf("a child finished\n");
+        if (TEST_OPT_PROT) { printf("c");mflush(); }
         //waitpid(-1,NULL,0); // ? see sig_chld_hdl
         remaining_childs--;
       }
       else if (res==1) // not a GB - clean up and return 0
       {
-        if (TEST_OPT_PROT) printf("a child finished res=1\n");
+        if (TEST_OPT_PROT) { printf("C"); mflush(); }
         remaining_childs--;
         all_okay=FALSE;
         // clean queue:
