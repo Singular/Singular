@@ -9394,7 +9394,7 @@ int
 @item @strong{Purpose:}
 The standard basis computation is stopped if the total
 (weighted) degree
-exceeds @code{degBound}.
+exceeds @code{degBound} - used in @code{std}, @code{slimgb}, @code{system("verifyGB",..)}
 @* @code{degBound} should not be used for a global ordering with inhomogeneous
 input, if the ordering is not @code{dp} or @code{Dp}.
 (Remark: elimination requires always an eliminiation ordering).
@@ -9418,7 +9418,8 @@ See
 @ref{deg};
 @ref{int};
 @ref{option};
-@ref{std}.
+@ref{std};
+@ref{system}.
 @c ref
 @c -----------------------------------------------------
 @node echo, minpoly, degBound, System variables

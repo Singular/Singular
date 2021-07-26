@@ -95,19 +95,34 @@ BOOLEAN kVerify1(ideal F, ideal Q)
     }
     else
     {
-      int sl=strat->sl;
-      strat->P.GetP();
-      poly p=redNF(strat->P.p,sl,TRUE,strat);
-      if (p==NULL) red_result=0;
-      #ifdef KDEBUG
+      if (TEST_OPT_DEGBOUND
+            && (currRing->pFDeg(strat->P.p,currRing)>Kstd1_deg))
+      {
+        /*
+        * omit pair
+        * if 24 IN test and the degree of P is bigger then
+        *a predefined number Kstd1_deg
+        */
+        strat->P.Delete();
+        red_result=0;
+        if (TEST_OPT_PROT) { printf("D"); mflush(); }
+      }
       else
       {
-        if (TEST_OPT_DEBUG)
+        int sl=strat->sl;
+        strat->P.GetP();
+        poly p=redNF(strat->P.p,sl,TRUE,strat);
+        if (p==NULL) red_result=0;
+        #ifdef KDEBUG
+        else
         {
-          printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
+          if (TEST_OPT_DEBUG)
+          {
+            printf("p: ");p_wrp(p,currRing, currRing); printf("\n");
+          }
         }
+        #endif
       }
-      #endif
     }
     if (red_result!=0)
     {
@@ -172,6 +187,21 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     }
   }
   if (TEST_OPT_PROT) printf("%d pairs created\n",strat->Ll+1);
+  if (TEST_OPT_DEGBOUND)
+  {
+    for(int i=strat->Ll; i>=0; i--)
+    {
+      if (currRing->pFDeg(strat->L[i].p,currRing)>Kstd1_deg)
+      {
+        /*
+        * omit pairs if 24 IN test and the degree of L[i] is bigger then
+        *a predefined number Kstd1_deg
+        */
+        deleteInL(strat->L,&strat->Ll,i,strat);
+        if (TEST_OPT_PROT) { printf("D"); mflush(); }
+      }
+    }
+  }
   if (TEST_OPT_DEBUG) messageSets(strat);
   /*---------------------------------------------------------------------*/
   BOOLEAN all_okay=TRUE;
