@@ -102,7 +102,7 @@ EXAMPLE: example actionIsProper; shows an example
   def bsr=basering;
 
   //changes the basering bsr to bsr[@t]
-  ring s = create_ring(ringlist(basering)[1],"("+varstr(basering)+",@t)","dp","no_minpoly");
+  ring s = create_ring(ring_list(basering)[1],"("+varstr(basering)+",@t)","dp","no_minpoly");
   poly inv,delta,tee,j;
   ideal id=imap(bsr,id);
   matrix @m[size(id)+1][1];
@@ -219,7 +219,7 @@ EXAMPLE: example reduction; shows an example
   {
     l2[size(l2)+1] = "@("+string(ii)+")";
   }
-  ring s = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly");
+  ring s = create_ring(ring_list(basering)[1], l2, "dp", "no_minpoly");
   //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
      ideal dom=imap(bsr,dom);
      for (i=1;i<=z;i++)

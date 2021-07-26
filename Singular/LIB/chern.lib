@@ -199,7 +199,7 @@ NOTE:     constants are not considered symmetric
   {
    l2[size(l2)+1] = "A@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l2, "dp", "no_minpoly");
   ideal V=fetch(br@,V);
   poly f=fetch(br@,f);
   int i;
@@ -702,7 +702,7 @@ NOTE:     uses the elimination and is extremely inefficient,
     {
      l3[size(l3)+1] = "a@("+string(ii)+")";
     }
-    ring r@ = create_ring(ringlist(basering)[1], l3, "lp", "no_minpoly");
+    ring r@ = create_ring(ring_list(basering)[1], l3, "lp", "no_minpoly");
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c in the bigger ring
     poly rez;
@@ -1043,7 +1043,7 @@ NOTE:     makes sense only for (lists of) polynomials;
   {
    l4[size(l4)+1] = "b@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l4, "lp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l4, "lp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c=F(c); // embed c in the bigger ring
   list C=F(C); // embed C in the bigger ring
@@ -1137,7 +1137,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   {
    l5[size(l5)+1] = "C@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l5, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l5, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c, C;
   int i;
@@ -1282,7 +1282,7 @@ NOTE:     Implementation of the formula of Manivel
   {
    l6[size(l6)+1] = "C@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l6, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l6, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c, C;
   int i;
@@ -1625,7 +1625,7 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   {
    l7[size(l7)+1] = "a@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l7, "lp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l7, "lp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c=F(c); // embed c into the bigger ring
   list rez; // the Chern classes of the symmetric power are going to be written here
@@ -1757,7 +1757,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   {
    l8[size(l8)+1] = "c@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l8, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l8, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
   for(i=1;i<=r;i++)
@@ -1929,7 +1929,7 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
   {
    l9[size(l9)+1] = "a@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l9, "lp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l9, "lp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c = F(c); // embed c into the bigger ring
   list rez; // the result should be computed here
@@ -2063,7 +2063,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   {
    l10[size(l10)+1] = "c@("+string(ii)+")";
   }
-  ring r@ = create_ring(ringlist(basering)[1], l10, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l10, "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
   for(i=1;i<=r;i++)
@@ -2191,7 +2191,7 @@ NOTE:     returns an empty list if l is empty
     {
      l11[size(l11)+1] = "c@("+string(ii)+")";
     }
-    ring r@ = create_ring(ringlist(basering)[1], l11, "dp", "no_minpoly");
+    ring r@ = create_ring(ring_list(basering)[1], l11, "dp", "no_minpoly");
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c into the bigger ring
     list prev;
@@ -2279,7 +2279,7 @@ NOTE:     returns an empty list if l is empty,
     {
      l12[size(l12)+1] = "a@("+string(ii)+")";
     }
-    ring r@ = create_ring(ringlist(basering)[1], l12, "lp", "no_minpoly");
+    ring r@ = create_ring(ring_list(basering)[1], l12, "lp", "no_minpoly");
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c into the bigger ring
     int j;
@@ -3166,7 +3166,7 @@ NOTE:
    l13[size(l13)+1] = "t@("+string(ii)+")";
   }
   l13[size(l13)+1] = "u@";
-  ring r@ = create_ring(ringlist(basering)[1], l13, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l13, "dp", "no_minpoly");
   ideal I=fetch(br@,I); // the ideal generated by I in the new ring
   ideal J(0..n); // define n+1 ideals J(0), ... , J(n)
   // compute the ideal of the Rees algebra of the ideal I:
@@ -3265,7 +3265,7 @@ NOTE:
    l14[size(l14)+1] = "t@("+string(ii)+")";
   }
   l14[size(l14)+1] = "u@";
-  ring r@ = create_ring(ringlist(basering)[1], l14, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l14, "dp", "no_minpoly");
   ideal I=fetch(br@,I); // the ideal generated by I in the new ring
   ideal J(0..n); // define n+1 ideals J(0), ... , J(n)
   // compute the ideal of the Rees algebra of the ideal I:
@@ -3399,7 +3399,7 @@ NOTE:
 {
   int n=nvars(basering);
   def br@=basering; // remember the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+",homvar@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+",homvar@)","dp","no_minpoly");
   ideal I=fetch(br@,I);
   ideal J=homog(I, homvar@);
   ideal JJ=J, homvar@;
@@ -3982,7 +3982,7 @@ NOTE:
    l15[size(l15)+1] = "t@("+string(ii)+")";
   }
   l15[size(l15)+1] = "u@";
-  ring r@ = create_ring(ringlist(basering)[1], l15, "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], l15, "dp", "no_minpoly");
   ideal I=fetch(br@,I);
   ideal J(0..n);
   for(i=1; i<=sz; i++)

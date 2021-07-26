@@ -157,7 +157,7 @@ EXAMPLE: example ImageGroup; shows an example
   {
    l1[size(l1)+1] = "t("+string(yy)+")";
   }
-  ring RIGS = create_ring(ringlist(basering)[1], l1, "lp", "no_minpoly");
+  ring RIGS = create_ring(ring_list(basering)[1], l1, "lp", "no_minpoly");
   execute("minpoly = number(" + @mPoly + ");");
   ideal mapIdeal, groupid, actionid;
   int offset;
@@ -430,7 +430,7 @@ EXAMPLE: example LinearizeAction; shows an example
         if(defined(RLAB)) { kill RLAB;}
         def RLAB = basering;
         if(defined(RLAR)) { kill RLAR;}
-        ring RLAR = create_ring(ringlist(basering)[1], "(" + varstr(basering)+ ",t(" + string(nrt) + "))", "(" + order + ")", "no_minpoly");
+        ring RLAR = create_ring(ring_list(basering)[1], "(" + varstr(basering)+ ",t(" + string(nrt) + "))", "(" + order + ")", "no_minpoly");
         execute("minpoly = number(" + @mPoly + ");");
 
         ideal basis, action, G, reduceIdeal;
@@ -889,7 +889,7 @@ EXAMPLE: example NullCone; shows an example
   {
    l2[size(l2)+1] = "Y("+string(zz)+")";
   }
-  ring RNCR = create_ring(ringlist(basering)[1], l2, order, "no_minpoly");
+  ring RNCR = create_ring(ring_list(basering)[1], l2, order, "no_minpoly");
   execute("poly aaa = number(" + @minPoly + ");");
   if (aaa!=0) { minpoly = number(aaa); }
   ideal action, G, I, J, N, generators;

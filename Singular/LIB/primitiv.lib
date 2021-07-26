@@ -40,9 +40,9 @@ EXAMPLE:  example primitive;  shows an example
 "
 {
  def altring=basering;
- ring deglexring = create_ring(ringlist(altring)[1],"("+varstr(altring)+")","dp","no_minpoly");
+ ring deglexring = create_ring(ring_list(altring)[1],"("+varstr(altring)+")","dp","no_minpoly");
  ideal j;
- ring lexring = create_ring(ringlist(altring)[1],"("+varstr(altring)+")","lp","no_minpoly");
+ ring lexring = create_ring(ring_list(altring)[1],"("+varstr(altring)+")","lp","no_minpoly");
  ideal i=fetch(altring,i);
 
  int k,schlecht,Fehlversuche,maxtry;

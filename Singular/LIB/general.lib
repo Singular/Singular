@@ -767,7 +767,7 @@ EXAMPLE: example sort; shows an example
    {
       if ( typeof(#[1])=="string" )
       {
-         ring r1 = create_ring(ringlist(P)[1],"("+varstr(P)+")","("+#[1]+")","no_minpoly");
+         ring r1 = create_ring(ring_list(P)[1],"("+varstr(P)+")","("+#[1]+")","no_minpoly");
          def i = imap(P,id);
          v = sortvec(i);
          setring P;

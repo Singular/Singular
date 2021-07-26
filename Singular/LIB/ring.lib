@@ -770,11 +770,11 @@ EXAMPLE: example preimageLoc ; shows an example
       ideal I=ideal(S);
       minpoly_string=string(minpoly);
       list l8 = ring_list(S)[2];
-      ring S0 = create_ring(ringlist(S)[1], l8, "dp", "no_minpoly");
+      ring S0 = create_ring(ring_list(S)[1], l8, "dp", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       ideal I=imap(S,I);
       list pr=primdecGTZ(I);
-      ring SL = create_ring(ringlist(S)[1], l8, "("+ordstr(S)+")", "no_minpoly");
+      ring SL = create_ring(ring_list(S)[1], l8, "("+ordstr(S)+")", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       list pr=imap(S0,pr);
       ideal I0=std(pr[1][1]);
@@ -807,12 +807,12 @@ EXAMPLE: example preimageLoc ; shows an example
       ideal J=ideal(@R);
       list l9 = ringlist(@R)[2];
       minpoly_string=string(minpoly);
-      ring R0 = create_ring(ringlist(@R)[1], l9, "dp", "no_minpoly");
+      ring R0 = create_ring(ring_list(@R)[1], l9, "dp", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       ideal J=imap(@R,J);
       list pr=primdecGTZ(J);
       setring(@R);
-      ring RL = create_ring(ringlist(@R)[1], l9, "("+ordstr(@R)+")", "no_minpoly");
+      ring RL = create_ring(ring_list(@R)[1], l9, "("+ordstr(@R)+")", "no_minpoly");
       execute("minpoly="+minpoly_string+";");
       list pr=imap(R0,pr);
       ideal J0=std(pr[1][1]);

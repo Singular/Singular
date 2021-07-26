@@ -159,7 +159,7 @@ static proc Klassifiziere (poly f)
   }
   @ringdisplay = "setring RingB;";
   if(defined(RingB)!=0) { kill RingB; }
-  ring RingB = create_ring(ringlist(basering)[1], "("+A_Z("x", n)+")", "(c,ds)", "no_minpoly");
+  ring RingB = create_ring(ring_list(basering)[1], "("+A_Z("x", n)+")", "(c,ds)", "no_minpoly");
   export RingB;
   setring ring_top;
 
@@ -255,7 +255,7 @@ static proc Funktion1bis (poly f, list cstn)
      map PhiG=ring_top,maxideal(1);// Konstruiere Id auf r
      PhiG = MapReduce(PhiG);
 
-     ring RingB = create_ring(ringlist(basering)[1], "("+A_Z("x",corank)+")", "(c,ds)", "no_minpoly");
+     ring RingB = create_ring(ring_list(basering)[1], "("+A_Z("x",corank)+")", "(c,ds)", "no_minpoly");
      export RingB;
      setring ring_rest;
    }

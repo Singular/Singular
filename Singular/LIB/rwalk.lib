@@ -208,7 +208,7 @@ kill OSCTW;
 int reduction=1;
 int printout=0;
 def xR = basering;
-ring ostR = create_ring(ringlist(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
+ring ostR = create_ring(ring_list(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
 def old_ring = basering;
 
 ideal G = fetch(xR, Go);
@@ -260,7 +260,7 @@ kill OSCTW;
 int reduction=1;
 int printout=0;
 def xR = basering;
-ring ostR = create_ring(ringlist(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
+ring ostR = create_ring(ring_list(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
 def old_ring = basering;
 
 ideal G = fetch(xR, Go);
@@ -309,7 +309,7 @@ EXAMPLE: example frandwalk; shows an example"
    kill OSCTW;
    def xR = basering;
 
-   ring ostR = create_ring(ringlist(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
+   ring ostR = create_ring(ring_list(xR)[1], "("+varstr(xR)+")", ord_str, "no_minpoly");
    def old_ring = basering;
    //print("//** help ring = " + string(basering));
    ideal G = fetch(xR, Go);

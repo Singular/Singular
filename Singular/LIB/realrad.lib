@@ -42,7 +42,7 @@ EXAMPE: example realrad; shows an example"
   def r=basering;
   int n=nvars(basering);
   // for faster Groebner basis and dimension compuations
-  ring schnell = create_ring(ringlist(r)[1], "("+varstr(r)+")", "dp", "no_minpoly");
+  ring schnell = create_ring(ring_list(r)[1], "("+varstr(r)+")", "dp", "no_minpoly");
   def ri=basering;
 
   list reddim;//reduct dimension to 0
@@ -209,7 +209,7 @@ EXAMPLE:   example realzero; shows an example"
  def r_alt=basering;
  //store the ring
  //for a ring chance to the ordering lp;
- ring r_neu = create_ring(ringlist(basering)[1], "("+varstr(basering)+")", "lp", "no_minpoly");
+ ring r_neu = create_ring(ring_list(basering)[1], "("+varstr(basering)+")", "lp", "no_minpoly");
  setring r_neu;
  ideal boeser,max;
  prepared[1]=ideal(1);
@@ -357,12 +357,12 @@ EXAMPLE:   example radzero; shows no example"
    }
    else
    {
-     ring rhelp = create_ring(ringlist(r)[1], "(" +varstr(r)+ ",@t)", "dp", "no_minpoly");
+     ring rhelp = create_ring(ring_list(r)[1], "(" +varstr(r)+ ",@t)", "dp", "no_minpoly");
      ideal trans=homog(imap(r,trans),@t);
 
      ideal trans1=std(trans);
      @hilb=hilb(trans1,1);
-     ring rhelp1 = create_ring(ringlist(r)[1], "(" +varstr(rhelp)+ ")", "lp", "no_minpoly");
+     ring rhelp1 = create_ring(ring_list(r)[1], "(" +varstr(rhelp)+ ")", "lp", "no_minpoly");
      ideal trans=homog(imap(r,trans),@t);
      kill rhelp;
      trans=std(trans,@hilb);
@@ -550,7 +550,7 @@ EXAMPLE: decision shows an example
    lessvar=string(varlist);
 
    parvar=string(var(n));
-   ring r_neu = create_ring(ringlist(r)[1], "(@t,"+parvar+","+lessvar+")", "dp", "no_minpoly");
+   ring r_neu = create_ring(ring_list(r)[1], "(@t,"+parvar+","+lessvar+")", "dp", "no_minpoly");
    poly f=imap(r,f);
    list varlist=imap(r,varlist);
    ideal jac=jacob(@t+f);
@@ -650,7 +650,7 @@ EXAMPLE: decision shows an example
    ///////////found polynomial p /////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////////////
    //Compute an isolating set for p
-   ring iso = create_ring(ringlist(r)[1], parvar, "lp", "no_minpoly");
+   ring iso = create_ring(ring_list(r)[1], parvar, "lp", "no_minpoly");
    poly p=imap(r,p);
    isol=isolset(p);
    setring r;
@@ -659,7 +659,7 @@ EXAMPLE: decision shows an example
    for (@z=1;@z<=size(isol);@z++)
    {
      g=subst(f,var(n),isol[@z]);
-     ring rless = create_ring(ringlist(r)[1], "("+lessvar+")", "lp", "no_minpoly");
+     ring rless = create_ring(ring_list(r)[1], "("+lessvar+")", "lp", "no_minpoly");
      poly g=imap(r,g);
      tester=tester*decision(g);
      setring r;
@@ -921,7 +921,7 @@ EXAMPLE: is_in_shape shows an example;
       vari=vari+","+string(perm[i][j]);
     }
     vari=vari[2..size(vari)];
-    ring r_neu = create_ring(ringlist(r)[1], "("+vari+")", "lp", "no_minpoly");
+    ring r_neu = create_ring(ring_list(r)[1], "("+vari+")", "lp", "no_minpoly");
     ideal id=imap(r,m);
     id=groebner(id);
     k=search_first(id,2,2);

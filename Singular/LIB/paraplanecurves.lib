@@ -1364,15 +1364,15 @@ SEE ALSO: genus
    int w = printlevel-voice+2;  // w=printlevel (default: w=0)
    int d = deg(F);
    def R = basering;
-   ring S = create_ring(ringlist(R)[1], "(x,y,t)", "dp", "no_minpoly");
-   ring C = create_ring(ringlist(R)[1], "(x,y)", "ds", "no_minpoly");
+   ring S = create_ring(ring_list(R)[1], "(x,y,t)", "dp", "no_minpoly");
+   ring C = create_ring(ring_list(R)[1], "(x,y)", "ds", "no_minpoly");
    int genus=(d-1)*(d-2) div 2;
    if(w>=1){"the arithmetic genus of the plane curve:";genus;pause();}
 
    int delt,deltaloc,deltainf,tau,tauinf,cusps,iloc,iglob,l,nsing,
        tauloc,tausing,k,rat,nbranchinf,nbranch,nodes,cuspsinf,nodesinf;
    list inv;
-   ring newR = create_ring(ringlist(R)[1], "(x,y)", "dp", "no_minpoly");
+   ring newR = create_ring(ring_list(R)[1], "(x,y)", "dp", "no_minpoly");
    //the singularities at the affine part
    map sigma=R,var(1),var(2),1;
    ideal I=sigma(F);
@@ -1555,7 +1555,7 @@ KEYWORDS: delta invariant; Tjurina number
 {
    option(redSB);
    def R=basering;
-   ring S = create_ring(ringlist(R)[1], "(x,y)", "lp", "no_minpoly");
+   ring S = create_ring(ring_list(R)[1], "(x,y)", "lp", "no_minpoly");
    map phi=R,x,y;
    ideal singL=phi(singL);
    singL=simplify(std(singL),1);
@@ -1568,7 +1568,7 @@ KEYWORDS: delta invariant; Tjurina number
    {
       map alpha=S,var(1)-singL[2][2],var(2)-singL[1][2];
       f=alpha(f);
-      ring C = create_ring(ringlist(S)[1], "("+varstr(S)+")", "ds", "no_minpoly");
+      ring C = create_ring(ring_list(S)[1], "("+varstr(S)+")", "ds", "no_minpoly");
       poly f=imap(S,f);
       ideal singL=imap(S,singL);
       if((w>=1)&&(ord(f)>=2))
@@ -1611,7 +1611,7 @@ KEYWORDS: delta invariant; Tjurina number
          co=leadcoef(singL[1]);
       }
 
-      ring B = create_ring(ringlist(S)[1], "a", "dp", "no_minpoly");
+      ring B = create_ring(ring_list(S)[1], "a", "dp", "no_minpoly");
       map beta=S,a,a;
       poly p=beta(p);
 

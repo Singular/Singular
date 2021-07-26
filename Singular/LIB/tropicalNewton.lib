@@ -509,7 +509,7 @@ EXAMPLE: example tropicalPointNewton; shows an example
   subststr = string(subststr[1..size(subststr)-1])+");";
   execute(subststr);
 
-  ring s = create_ring(ringlist(origin)[1], "("+vars+")", "lp", "no_minpoly");
+  ring s = create_ring(ring_list(origin)[1], "("+vars+")", "lp", "no_minpoly");
   ideal J = imap(origin,J);
   int tstdlp = timer;
   dbprint("computing triangular decomposition (picking first factor)");
@@ -737,7 +737,7 @@ EXAMPLE: example switchRingsAndComputeInitialIdeal; shows an example
   def origin = basering;
   intvec wOne = oneVector(nvars(origin));
   list ordering = list(list("a", wOne), list("wp", w));
-  ring rInitialIdeal = create_ring(ringlist(origin)[1], "("+varstr(origin)+")", ordering, "no_minpoly");
+  ring rInitialIdeal = create_ring(ring_list(origin)[1], "("+varstr(origin)+")", ordering, "no_minpoly");
   ideal I = imap(origin,I);
   int tinI = timer;
   option(redSB);

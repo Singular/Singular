@@ -209,7 +209,7 @@ static proc findGeneralPosition(ideal m)
   if (L[3][1][1]!="lp" || L[3][1][2]!=nvars(basering))
   {
     def origin = basering;
-    ring ringForGeneralPosition = create_ring(ringlist(basering)[1], "("+varstr(basering)+")", "lp", "no_minpoly");
+    ring ringForGeneralPosition = create_ring(ring_list(basering)[1], "("+varstr(basering)+")", "lp", "no_minpoly");
     setring ringForGeneralPosition;
     ideal m = fetch(origin,m);
     newRing = 1;
@@ -412,7 +412,7 @@ EXAMPLE:  example graalMixed; shows an example
   {
    l4[zz] = "Y("+string(zz)+")";
   }
-  ring Q0y = create_ring(ringlist(basering)[1], "("+string(l4)+","+varstr(basering)+")", "(ds("+string(s)+"),c,"+ostring+")", "no_minpoly");
+  ring Q0y = create_ring(ring_list(basering)[1], "("+string(l4)+","+varstr(basering)+")", "(ds("+string(s)+"),c,"+ostring+")", "no_minpoly");
   setring Q0y;
   ideal H = imap(Gr.A,H);
   ideal J = imap(Gr.A,L);
@@ -430,7 +430,7 @@ EXAMPLE:  example graalMixed; shows an example
   /***
    * construct Ky and sigmainI
    **/
-  ring KKy = create_ring(ringlist(Q0)[1], "("+string(l4)+","+varstr(Q0,nvars(Q0))+")", "(c,dp("+string(s)+"),dp(1))", "no_minpoly");
+  ring KKy = create_ring(ring_list(Q0)[1], "("+string(l4)+","+varstr(Q0,nvars(Q0))+")", "(c,dp("+string(s)+"),dp(1))", "no_minpoly");
   setring KKy;
   poly minpolyOfK = imap(Q0,g(n));
   qring Ky = std(minpolyOfK);

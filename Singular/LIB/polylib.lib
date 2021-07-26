@@ -735,7 +735,7 @@ EXAMPLE: example rad_con; shows an example
       l2[ii] = "@x("+string(ii)+")";
     }
     l2[n+1] = "@z";
-    ring R = create_ring(ringlist(br)[1], l2, "dp", "no_minpoly");
+    ring R = create_ring(ring_list(br)[1], l2, "dp", "no_minpoly");
   }
   else
   {
@@ -744,7 +744,7 @@ EXAMPLE: example rad_con; shows an example
     {
      l2[ii+1] = "@x("+string(ii)+")";
     }
-    ring R = create_ring(ringlist(br)[1], l2, "(dp(1),"+ordstr(br)+")", "no_minpoly");
+    ring R = create_ring(ring_list(br)[1], l2, "(dp(1),"+ordstr(br)+")", "no_minpoly");
   }
   if (mp!="0")
   {
@@ -1113,7 +1113,7 @@ EXAMPLE: example subrInterred; shows an example
 //----------------------------------------------------------------------
 // do the interreduction and convert back
 //----------------------------------------------------------------------
-  ring rtemp = create_ring(ringlist(basering)[1], "(" + string(itemp)+ ")", "(C,dp)", "no_minpoly");
+  ring rtemp = create_ring(ring_list(basering)[1], "(" + string(itemp)+ ")", "(C,dp)", "no_minpoly");
   def motemp=imap(r,motemp);
   intvec save=option(get);
   option(redSB);

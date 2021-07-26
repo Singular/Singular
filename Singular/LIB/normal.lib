@@ -2416,16 +2416,16 @@ EXAMPLE: example genus; shows an example
    }
    poly p=I[1];
 
-   ring S = create_ring(ringlist(R)[1],"(x,y,t)","dp","no_minpoly");
+   ring S = create_ring(ring_list(R)[1],"(x,y,t)","dp","no_minpoly");
    ideal L=maxideal(1);
-   ring C = create_ring(ringlist(R)[1], "(x,y)", "ds", "no_minpoly");
+   ring C = create_ring(ring_list(R)[1], "(x,y)", "ds", "no_minpoly");
    ideal I;
-   ring A = create_ring(ringlist(R)[1], "(x,t)", "dp", "no_minpoly");
+   ring A = create_ring(ring_list(R)[1], "(x,t)", "dp", "no_minpoly");
    map phi=S,1,x,t;
    map psi=S,x,1,t;
    poly g,h;
    ideal I,I1;
-   ring B = create_ring(ringlist(R)[1], "(x,t)", "ds", "no_minpoly");
+   ring B = create_ring(ring_list(R)[1], "(x,t)", "ds", "no_minpoly");
    setring S;
    if(o)
    {
@@ -2503,7 +2503,7 @@ EXAMPLE: example genus; shows an example
       }
       "singularities at (x,y,1):";"";
    }
-   ring newR = create_ring(ringlist(R)[1], "(x,y)", "dp", "no_minpoly");
+   ring newR = create_ring(ring_list(R)[1], "(x,y)", "dp", "no_minpoly");
    //the singularities at the affine part
    map sigma=S,var(1),var(2),1;
    ideal I=sigma(F);
@@ -2718,7 +2718,7 @@ EXAMPLE: example deltaLoc;  shows an example
          co=leadcoef(singL[1]);
       }
 
-      ring B = create_ring(ringlist(R)[1], "(a)", "dp", "no_minpoly");
+      ring B = create_ring(ring_list(R)[1], "(a)", "dp", "no_minpoly");
       map beta=S,a,a;
       poly p=beta(p);
 

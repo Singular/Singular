@@ -693,7 +693,7 @@ static proc esComputation (int typ, poly p_F, list #)
     // define a new ring without deformation-parameters and change to it:
     string str;
     string minpolyStr = string(minpoly);
-    ring HNERing = create_ring(ringlist(basering)[1], "(x,y)", "ls", "no_minpoly");
+    ring HNERing = create_ring(ring_list(basering)[1], "(x,y)", "ls", "no_minpoly");
     if (minpolyStr!="0")
     {str = "minpoly ="+ minpolyStr+";";execute(str);}
     ring_is_changed=1;
@@ -1189,7 +1189,7 @@ static proc esComputation (int typ, poly p_F, list #)
       ordStr = "dp(" + string(b_left) + "),dp";
       ideal qId = ideal(basering);
 
-      ring Shortring = create_ring(ringlist(basering)[1], "("+ LL[1] +")", "("+ ordStr  +")", "no_minpoly");
+      ring Shortring = create_ring(ring_list(basering)[1], "("+ LL[1] +")", "("+ ordStr  +")", "no_minpoly");
       execute(minPolyStr);
       // ring has changed to "Shortring"
 
@@ -1390,7 +1390,7 @@ EXAMPLE: example tau_es; shows an example.
   }
 
   def old_ring=basering;
-  ring @myRing = create_ring(ringlist(basering)[1], "("+varstr(basering)+")", "ds", "no_minpoly");
+  ring @myRing = create_ring(ring_list(basering)[1], "("+varstr(basering)+")", "ds", "no_minpoly");
   poly f=imap(old_ring,f);
 
   ideal Jacobi_Id = jacob(f);

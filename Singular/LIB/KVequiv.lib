@@ -448,7 +448,7 @@ EXAMPLE:@code{example lft_vf;} gives an example
   string ringstr="ring baserw=" + charstr(baser) + ",(" + varstr(baser) +
                  "),(c,ws(" + string(ivm) + "));";
   execute(ringstr);
-  //ring baserw = create_ring(ringlist(baser)[1], "(" + varstr(baser) +")", "(c,ws(" + string(ivm) + "))", "no_minpoly");
+  //ring baserw = create_ring(ring_list(baser)[1], "(" + varstr(baser) +")", "(c,ws(" + string(ivm) + "))", "no_minpoly");
   def mapi=imap(baser,mapi);
 //---------------------------------------------------------------------------
 // compute the unperturbed K_V tangent space
@@ -487,7 +487,7 @@ EXAMPLE:@code{example lft_vf;} gives an example
   }
   list l2 = ringlist(basering)[2];
   l1 = l1+l2;
-  ring rexa = create_ring(ringlist(basering)[1], l1, "(c,ws(" + string((-1)*wv) + "," + string(ivm) + "),dp)", "no_minpoly");*/
+  ring rexa = create_ring(ring_list(basering)[1], l1, "(c,ws(" + string((-1)*wv) + "," + string(ivm) + "),dp)", "no_minpoly");*/
   def mapi=imap(rxa,mapi);
   ideal eid=e(1..ncols(mapi));            // for later use
   def KVt=imap(rxa,KVt);
@@ -591,7 +591,7 @@ EXAMPLE:@code{example lft_vf;} gives an example
                       "),(c,ws(" + string((-1)*wv) + "," + string(ivm) +
                       "," + string(oiv) + "));";
   execute(rchange);
-//ring rexaw = create_ring(ringlist(basering)[1], "(" + varstr(basering) +")", "(c,ws(" + string((-1)*wv) + "," + string(ivm) +"," + string(oiv) + "))", "no_minpoly");
+//ring rexaw = create_ring(ring_list(basering)[1], "(" + varstr(basering) +")", "(c,ws(" + string((-1)*wv) + "," + string(ivm) +"," + string(oiv) + "))", "no_minpoly");
   ideal qid=imap(rexa,qid);
   def eid=imap(rexa,eid);
   def mx=imap(rexa,mx);

@@ -74,7 +74,7 @@ EXAMPLE: example regIdeal; shows some examples
    {
     l1[zz+1] = "x("+string(zz)+")";
    }
-   ring r1 = create_ring(ringlist(r0)[1], l1, "dp", "no_minpoly");
+   ring r1 = create_ring(ring_list(r0)[1], l1, "dp", "no_minpoly");
    ideal i,sbi,I,J,K,chcoord,m;
    poly P;
    map phi;
@@ -320,7 +320,7 @@ EXAMPLE: example regIdeal; shows some examples
      {
       l6[zz+1] = "x("+string(zz)+")";
      }
-     ring nr = create_ring(ringlist(r0)[1], l6, "dp", "no_minpoly");
+     ring nr = create_ring(ring_list(r0)[1], l6, "dp", "no_minpoly");
      ideal I;
      I = imap(r1,I);
      H=maxdeg1(minbase(quotient(I,maxideal(1))))+1;
@@ -351,7 +351,7 @@ EXAMPLE: example regIdeal; shows some examples
      {
       l7[zz+1] = "x("+string(zz)+")";
      }
-     ring nr = create_ring(ringlist(r0)[1], l7, "dp", "no_minpoly");
+     ring nr = create_ring(ring_list(r0)[1], l7, "dp", "no_minpoly");
      ideal J=imap(r1,J);
      attrib(J,"isSB",1);
      h=maxdeg1(minbase(quotient(J,maxideal(1))))+1;
@@ -411,7 +411,7 @@ EXAMPLE: example regIdeal; shows some examples
    {
     l8[zz+1] = "x("+string(zz)+")";
    }
-   ring nr = create_ring(ringlist(r0)[1], l8, "dp", "no_minpoly");
+   ring nr = create_ring(ring_list(r0)[1], l8, "dp", "no_minpoly");
    ideal I,K,KK,LL;
    I=imap(r1,I);
    attrib(I,"isSB",1);
@@ -428,7 +428,7 @@ EXAMPLE: example regIdeal; shows some examples
      {
       l9[zz+1] = "x("+string(zz)+")";
      }
-     ring mr = create_ring(ringlist(r0)[1], l9, "dp", "no_minpoly");
+     ring mr = create_ring(ring_list(r0)[1], l9, "dp", "no_minpoly");
      ideal K,KK;
      KK=imap(nr,KK);
      attrib(KK,"isSB",1);
@@ -448,7 +448,7 @@ EXAMPLE: example regIdeal; shows some examples
    {
     l10[zz+1] = "x("+string(zz)+")";
    }
-   ring mr = create_ring(ringlist(r0)[1], l10, "dp", "no_minpoly");
+   ring mr = create_ring(ring_list(r0)[1], l10, "dp", "no_minpoly");
    ideal KK,K;
    KK=imap(nr,KK);
    attrib(KK,"isSB",1);
@@ -623,7 +623,7 @@ EXAMPLE: example depthIdeal; shows some examples
    {
     l11[zz+1] = "x("+string(zz)+")";
    }
-   ring r1 = create_ring(ringlist(r0)[1], l11, "dp", "no_minpoly");
+   ring r1 = create_ring(ring_list(r0)[1], l11, "dp", "no_minpoly");
    ideal i,sbi,I,J,K,chcoord,m;
    poly P;
    map phi;
@@ -1040,7 +1040,7 @@ EXAMPLE: example satiety; shows some examples
    {
     l16[zz+1] = "x("+string(zz)+")";
    }
-   ring r1 = create_ring(ringlist(r0)[1], l16, "dp", "no_minpoly");
+   ring r1 = create_ring(ring_list(r0)[1], l16, "dp", "no_minpoly");
    ideal i,sbi,I,K,chcoord,m,KK;
    poly P;
    map phi;
@@ -1543,7 +1543,7 @@ EXAMPLE: example NoetherPosition; shows some examples
    {
     l17[zz+1] = "x("+string(zz)+")";
    }
-   ring r1 = create_ring(ringlist(r0)[1], l17, "dp", "no_minpoly");
+   ring r1 = create_ring(ring_list(r0)[1], l17, "dp", "no_minpoly");
    ideal i,sbi,I,K,chcoord,m;
    poly P;
    map phi;
@@ -1696,7 +1696,7 @@ EXAMPLE: example is_NP; shows some examples
    {
     l18[zz+1] = "x("+string(zz)+")";
    }
-   ring r1 = create_ring(ringlist(r0)[1], l18, "dp", "no_minpoly");
+   ring r1 = create_ring(ring_list(r0)[1], l18, "dp", "no_minpoly");
    ideal i,sbi,I,J;
    i = fetch(r0,i);
    sbi=std(i);
@@ -1781,7 +1781,7 @@ EXAMPLE: example is_nested; shows some examples
    {
     l19[zz+1] = "x("+string(zz)+")";
    }
-   ring r1 = create_ring(ringlist(r0)[1], l19, "dp", "no_minpoly");
+   ring r1 = create_ring(ring_list(r0)[1], l19, "dp", "no_minpoly");
    ideal I,K,KK,LL;
    I = fetch(r0,i);
    I=minbase(I);

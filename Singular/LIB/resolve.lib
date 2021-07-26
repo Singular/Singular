@@ -336,7 +336,7 @@ EXAMPLE: example blowUp2;  shows an example
   {
    l5[nvars(S)+ii] = "y("+string(ii)+")";
   }
-  ring R = create_ring(ringlist(basering)[1], l5, "dp", "no_minpoly");     // ring for describing the transforms
+  ring R = create_ring(ring_list(basering)[1], l5, "dp", "no_minpoly");     // ring for describing the transforms
   def C=fetch(S,C);
   list l6;
   for (ii = 1; ii<= nvars(S); ii++)
@@ -348,7 +348,7 @@ EXAMPLE: example blowUp2;  shows an example
    l6[nvars(S)+ii] = "y("+string(ii)+")";
   }
   l6[size(l6)+1] = "t";
-  ring Rt = create_ring(ringlist(basering)[1], l6, "(dp("+string(ncols(C)+nvars(S))+"),dp(1))", "no_minpoly");
+  ring Rt = create_ring(ring_list(basering)[1], l6, "(dp("+string(ncols(C)+nvars(S))+"),dp(1))", "no_minpoly");
   def J=fetch(S,J);
   def C=fetch(S,C);
 //--- we need to eliminate t from J,y(1)-t*C[1],...y(m)-t*C[m]
@@ -412,7 +412,7 @@ EXAMPLE: example blowUp2;  shows an example
          {
             laM=subst(laM,var(templist[4][j]),0);
          }
-         ring Rnew = create_ring(ringlist(basering)[1], "("+string(templist[1])+")", "dp", "no_minpoly");
+         ring Rnew = create_ring(ring_list(basering)[1], "("+string(templist[1])+")", "dp", "no_minpoly");
          ideal Jnew=imap(R,Jsub);
          ideal eD=imap(R,Esub);
          ideal bM=imap(R,laM);
@@ -655,7 +655,7 @@ EXAMPLE: example blowUpBO;  shows an example
          newvar=string(N[1]);
          v=N[4];
          for(j=1;j<=size(v);j++){BO[5]=subst(BO[5],var(v[j]),0);}
-         ring R1 = create_ring(ringlist(R0)[1], "("+newvar+")", "dp", "no_minpoly");
+         ring R1 = create_ring(ring_list(R0)[1], "("+newvar+")", "dp", "no_minpoly");
          list BO=imap(R0,BO);
          ideal C=imap(R0,C);
          n=nvars(R1);
@@ -687,7 +687,7 @@ EXAMPLE: example blowUpBO;  shows an example
    {
     l2[ii] = "x("+string(ii)+")";
    }
-   ring R = create_ring(ringlist(R0)[1], l2, "dp", "no_minpoly");
+   ring R = create_ring(ring_list(R0)[1], l2, "dp", "no_minpoly");
    list BO=fetch(R1,BO);
    ideal C=fetch(R1,C);
    list Cmstd=mstd(C);
@@ -732,7 +732,7 @@ EXAMPLE: example blowUpBO;  shows an example
    {
     l3[size(l3)+1] = "y("+string(ii)+")";
    }
-   ring S = create_ring(ringlist(R)[1], l3, "dp", "no_minpoly"); 
+   ring S = create_ring(ring_list(R)[1], l3, "dp", "no_minpoly"); 
    list resu;
    list B;
    list l4 = ringlist(R)[2];
@@ -741,7 +741,7 @@ EXAMPLE: example blowUpBO;  shows an example
     l4[size(l4)+1] = "y("+string(ii)+")";
    }
    l4[size(l4)+1] = "t";
-   ring T = create_ring(ringlist(R)[1], l4, "dp", "no_minpoly");
+   ring T = create_ring(ring_list(R)[1], l4, "dp", "no_minpoly");
    ideal C=imap(R,C);
    ideal W=imap(R,W);
    execute("map phi=S,"+varstr(R)+",t*C;")
@@ -1147,7 +1147,7 @@ EXAMPLE: example blowUpBO;  shows an example
               B[5]=subst(B[5],var(v[j]),0);
               laM=subst(laM,var(v[j]),0);
            }
-           ring R2 = create_ring(ringlist(S)[1], "("+newvar+")", "dp", "no_minpoly");
+           ring R2 = create_ring(ring_list(S)[1], "("+newvar+")", "dp", "no_minpoly");
            list BO=imap(S,B);
            ideal laM=imap(S,laM);
         }
@@ -3020,7 +3020,7 @@ static proc CoverCenter(list BO,int b, ideal Jb)
        @p=K[merk[i]];
 //--- hypersurface is V(@f)
        @f=Jb[fvec[i]];
-       ring R1 = create_ring(ringlist(R)[1], "(@y,"+varstr(R)+")", "dp", "no_minpoly");
+       ring R1 = create_ring(ring_list(R)[1], "(@y,"+varstr(R)+")", "dp", "no_minpoly");
        poly p=imap(R,@p);
        poly f=imap(R,@f);
        list @ce;
@@ -4269,7 +4269,7 @@ EXAMPLE: example resolve;  shows an example
              }
              kill tr,L;
           }
-          ring R1 = create_ring(ringlist(S)[1], "(@z,"+varstr(S)+")", "dp", "no_minpoly");
+          ring R1 = create_ring(ring_list(S)[1], "(@z,"+varstr(S)+")", "dp", "no_minpoly");
           poly p=imap(S,@p);
           list BO=imap(S,BO);
           list invSat=imap(S,invSat);
@@ -4836,7 +4836,7 @@ static proc testBlowUp(list BO,ideal cent,list tmpList, int j, int extra)
       if(size(N[1])<n)
       {
          string newvar=string(N[1]);
-         ring R1 = create_ring(ringlist(R)[1], "("+newvar+")", "dp", "no_minpoly");
+         ring R1 = create_ring(ring_list(R)[1], "("+newvar+")", "dp", "no_minpoly");
          list BO=imap(R,BO);
          ideal cent=imap(R,cent);
          n=nvars(R1);

@@ -180,7 +180,7 @@ KEYWORDS: Noether position
   {
    l1[zz+1] = "x("+string(zz)+")";
   }
-  ring r1 = create_ring(ringlist(r0)[1], l1, "dp", "no_minpoly");
+  ring r1 = create_ring(ring_list(r0)[1], l1, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L;
   list #;
   poly P;
@@ -275,7 +275,7 @@ NOTE:    It uses the procedure  modNpos_test to test Noether position.
    {
      l2[zz+1] = "x("+string(zz)+")";
    }
-   ring r1 = create_ring(ringlist(r0)[1], l2, "dp", "no_minpoly");
+   ring r1 = create_ring(ring_list(r0)[1], l2, "dp", "no_minpoly");
    ideal i,sbi,I,K,chcoord,m,L;
    poly P;
    list #;
@@ -368,7 +368,7 @@ THEORY:  The last variable is in generic position if the quotient of the ideal
   {
     l3[zz+1] = "x("+string(zz)+")";
   }
-  ring r1 = create_ring(ringlist(r0)[1], l3, "dp", "no_minpoly");
+  ring r1 = create_ring(ring_list(r0)[1], l3, "dp", "no_minpoly");
   ideal I,i;
   i = fetch(r0,i);
   attrib(i,"isSB",1);
@@ -404,7 +404,7 @@ KEYWORDS: saturation
   {
     l4[zz+1] = "x("+string(zz)+")";
   }
-  ring r1 = create_ring(ringlist(r0)[1], l4, "dp", "no_minpoly");
+  ring r1 = create_ring(ring_list(r0)[1], l4, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L;
   poly P;
   map phi;
@@ -497,7 +497,7 @@ KEYWORDS: saturation
   {
     l5[zz+1] = "x("+string(zz)+")";
   }
-  ring r1 = create_ring(ringlist(r0)[1], l5, "dp", "no_minpoly");
+  ring r1 = create_ring(ring_list(r0)[1], l5, "dp", "no_minpoly");
   ideal i,sbi,I,K,chcoord,m,L,sbi1,lsbi1,id1;
   vector V1;
   list #,LL,PL,Gb1,VGb1,Gb2,VGb2,Res1,Res2;
@@ -603,7 +603,7 @@ KEYWORDS: regularity
   {
     l6[zz+1] = "x("+string(zz)+")";
   }
-  ring r1 = create_ring(ringlist(r0)[1], l6, "dp", "no_minpoly");
+  ring r1 = create_ring(ring_list(r0)[1], l6, "dp", "no_minpoly");
   ideal i,sbi,I,J,K,L;
   list #;
   poly P;
@@ -685,7 +685,7 @@ KEYWORDS: regularity
     {
       l7[zz+1] = "x("+string(zz)+")";
     }
-    ring mr = create_ring(ringlist(r1)[1], l7, "dp", "no_minpoly");
+    ring mr = create_ring(ring_list(r1)[1], l7, "dp", "no_minpoly");
     ideal i,sbi,I,J,K,L,T;
     poly P;
     map phi;
@@ -772,7 +772,7 @@ KEYWORDS: regularity
       {
         l8[zz+1] = "x("+string(zz)+")";
       }
-      ring mr = create_ring(ringlist(r0)[1], l8, "dp", "no_minpoly");
+      ring mr = create_ring(ring_list(r0)[1], l8, "dp", "no_minpoly");
       ideal sbi,I,L,K,T;
       map phi;
       sbi=imap(r1,sbi);
@@ -815,7 +815,7 @@ KEYWORDS: regularity
     {
       l9[zz+1] = "x("+string(zz)+")";
     }
-    ring mr = create_ring(ringlist(r0)[1], l9, "dp", "no_minpoly");
+    ring mr = create_ring(ring_list(r0)[1], l9, "dp", "no_minpoly");
     ideal sbi,I,L,K,T;
     map phi;
     sbi=imap(r1,sbi);
@@ -860,7 +860,7 @@ KEYWORDS: regularity
   {
    l12[zz+1] = "x("+string(zz)+")";
   }
-  ring r1 = create_ring(ringlist(r0)[1], l12, "dp", "no_minpoly");
+  ring r1 = create_ring(ring_list(r0)[1], l12, "dp", "no_minpoly");
   ideal i,sbi,I,J,K,L,lsbi1,lsbi2;
   list #;
   poly P;

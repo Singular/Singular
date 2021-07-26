@@ -285,7 +285,7 @@ EXAMPLE: example CenCharDec; shows examples
    l1[zz] = "@z("+string(zz)+")";
   }
   setring(@A);
-  ring @@Z = create_ring(ringlist(@A)[1], l1, "dp", "no_minpoly");
+  ring @@Z = create_ring(ring_list(@A)[1], l1, "dp", "no_minpoly");
   setring @@Z;
   ideal @JcapZ = imap(@ZplusA,@JcapZ);
   dbprint(ppl,"// -1-3- starting the cosmetic Groebner basis in Z");
@@ -440,7 +440,7 @@ EXAMPLE: example IntersectWithSub; shows an example
   {
    l2[zz] = "z("+string(zz)+")";
   }
-  ring @Z = create_ring(ringlist(basering)[1], l2, "Dp", "no_minpoly");
+  ring @Z = create_ring(ring_list(basering)[1], l2, "Dp", "no_minpoly");
   setring B;
   map F = @Z,Z;
   setring @Z;

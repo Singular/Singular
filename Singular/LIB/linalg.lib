@@ -369,7 +369,7 @@ EXAMPLE:  example diag_test; shows an example"
   //speichern des aktuellen Rings
   def BR=basering;
   //setze R[t]
-  ring rt = create_ring(ringlist(basering)[1], "(@t,"+varstr(basering)+")", "lp", "no_minpoly");
+  ring rt = create_ring(ring_list(basering)[1], "(@t,"+varstr(basering)+")", "lp", "no_minpoly");
   execute("minpoly="+mp+";");
   matrix A=imap(BR,A);
 

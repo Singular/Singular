@@ -201,7 +201,7 @@ EXAMPLE: example module_containment; shows an example
     {
      l4[size(l4)+1] = "z("+string(zz)+")";
     }
-    ring R = create_ring(ringlist(br)[1], l4, "(lp("+string(n)+"),dp("+string(m)+"),lp("+string(n)+"))", "no_minpoly");
+    ring R = create_ring(ring_list(br)[1], l4, "(lp("+string(n)+"),dp("+string(m)+"),lp("+string(n)+"))", "no_minpoly");
     if (mp!="0")
     { execute ("minpoly=number("+mp+");"); }
     ideal vars = x(1..n);
@@ -307,7 +307,7 @@ EXAMPLE: example inSubring; shows an example
   {
    l5[size(l5)+1] = "y("+string(yy)+")";
   }
-  ring r1 = create_ring(ringlist(basering)[1], l5, "lp", "no_minpoly");
+  ring r1 = create_ring(ring_list(basering)[1], l5, "lp", "no_minpoly");
   if (mp!="0")
   { execute ("minpoly=number("+mp+");"); }
   ideal va = x(1..n);
@@ -401,7 +401,7 @@ EXAMPLE: example algDependent; shows an example
       {
        l6[size(l6)+1] = "y("+string(@xx)+")";
       }
-      ring R1 = create_ring(ringlist(br)[1], l6, "dp", "no_minpoly");
+      ring R1 = create_ring(ring_list(br)[1], l6, "dp", "no_minpoly");
       if (mp!="0")
       { execute ("minpoly=number("+mp+");"); }
       setring br;
@@ -419,7 +419,7 @@ EXAMPLE: example algDependent; shows an example
     {
      l7[n+@yy] = "y("+string(@yy)+")";
     }
-    ring R2 = create_ring(ringlist(br)[1], l7, "dp", "no_minpoly");
+    ring R2 = create_ring(ring_list(br)[1], l7, "dp", "no_minpoly");
     if (mp!="0")
     { execute ("minpoly=number("+mp+");"); }
     if( tt == 1 )
@@ -456,7 +456,7 @@ EXAMPLE: example algDependent; shows an example
          l8[n+@yy] = "y("+string(@yy)+")";
         }
         setring(br);
-        ring R3 = create_ring(ringlist(br)[1], l8, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly");
+        ring R3 = create_ring(ring_list(br)[1], l8, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly");
         if (mp!="0")
         { execute ("minpoly=number("+mp+");"); }
         if ( s != 0 )
@@ -560,7 +560,7 @@ EXAMPLE: example alg_kernel; shows an example
     {
      l9[size(l9)+1] = "@("+string(xx)+")";
     }
-    ring R = create_ring(ringlist(basering)[1], "("+string(l9)+","+varstr(pr)+")", "dp", "no_minpoly");
+    ring R = create_ring(ring_list(basering)[1], "("+string(l9)+","+varstr(pr)+")", "dp", "no_minpoly");
     if (mp!="0")
     { execute ("minpoly=number("+mp+");"); }
     ideal ker = fetch(S,ker);       //in order to have variable names correct
@@ -720,7 +720,7 @@ EXAMPLE: example is_surjective; shows an example
     {
      l10[size(l10)+1] = "y("+string(zz)+")";
     }
-    ring R = create_ring(ringlist(br)[1], l10, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly");
+    ring R = create_ring(ring_list(br)[1], l10, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly");
 
     if (mp!="0")
     { execute ("minpoly=number("+mp+");"); }
@@ -803,7 +803,7 @@ EXAMPLE: example is_bijective; shows an example
     {
      l11[size(l11)+1] = "y("+string(zz)+")";
     }
-    ring R = create_ring(ringlist(br)[1], l11, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly");
+    ring R = create_ring(ring_list(br)[1], l11, "(dp("+string(n)+"),dp("+string(m)+"))", "no_minpoly");
     if (mp!="0")
     { execute ("minpoly=number("+mp+");"); }
     ideal vars = x(1..n);
@@ -1116,7 +1116,7 @@ EXAMPLE: example mapIsFinite; shows an example
   {
     l2[ii] = "y("+string(ii)+")";
   }
-  ring @bsr = create_ring(ringlist(bsr)[1], l2, "("+os+")", "no_minpoly");
+  ring @bsr = create_ring(ring_list(bsr)[1], l2, "("+os+")", "no_minpoly");
   ideal J = fetch(bsr,J);
   ideal PHI = fetch(bsr,PHI);
 
@@ -1130,7 +1130,7 @@ EXAMPLE: example mapIsFinite; shows an example
   {
    l12[size(l12)+1] = "x("+string(zz)+")";
   }
-  ring @rr = create_ring(ringlist(bsr)[1], l12, "(lp("+string(m)+"),dp)", "no_minpoly");
+  ring @rr = create_ring(ring_list(bsr)[1], l12, "(lp("+string(m)+"),dp)", "no_minpoly");
   ideal J = imap(@bsr,J);
   ideal PHI = imap(@bsr,PHI);
   ideal M;

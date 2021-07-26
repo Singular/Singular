@@ -1252,7 +1252,7 @@ static proc createAutMatrix(list BL)
   {
    l3[n0+ii] = "Y("+string(ii)+")";
   }
-  ring S = create_ring(ringlist(basering)[1], l3, "dp("+string(n0+n0*n)+")", "no_minpoly");
+  ring S = create_ring(ring_list(basering)[1], l3, "dp("+string(n0+n0*n)+")", "no_minpoly");
   setring S;
   setBaseMultigrading(QS);
 
@@ -1552,7 +1552,7 @@ static proc sortMons(list BL){
   {
    l6[zz] = "Y("+string(nvars(basering)+1-zz)+")";
   }
-  ring S = create_ring(ringlist(basering)[1], l6, "dp", "no_minpoly");
+  ring S = create_ring(ring_list(basering)[1], l6, "dp", "no_minpoly");
   setring S;  //creates a ring of shape '0, Y(nvars(basering)..1), dp'
 
   map f = R, Y(1..nvars(basering));
@@ -1811,7 +1811,7 @@ static proc getFullRingS(intmat Q, int n0, int n1){
    l4[n0+ii] = "Y("+string(ii)+")";
   }
   l4[size(l4)+1] = "Z";
-  ring S = create_ring(ringlist(basering)[1], l4, "(dp("+string(n0+n1)+"),dp(1))", "no_minpoly");
+  ring S = create_ring(ring_list(basering)[1], l4, "(dp("+string(n0+n1)+"),dp(1))", "no_minpoly");
   setring S;
   setBaseMultigrading(QS);
 
@@ -2496,7 +2496,7 @@ static proc adjoinVar(int n0){
       S2str = S2str + ", Z)";
     }
   }
-  ring S2 = create_ring(ringlist(basering)[1], S2str, "(dp("+string(nvars(basering) - n0)+"), dp(1))", "no_minpoly");
+  ring S2 = create_ring(ring_list(basering)[1], S2str, "(dp("+string(nvars(basering) - n0)+"), dp(1))", "no_minpoly");
   return(S2);
 }
 
@@ -3061,7 +3061,7 @@ EXAMPLE: example autX; shows an example
   {
    l5[ii] = "T("+string(ii)+")"; 
   }
-  ring S = create_ring(ringlist(RR)[1], l5, "dp", "no_minpoly");
+  ring S = create_ring(ring_list(RR)[1], l5, "dp", "no_minpoly");
   setring S;
   setring RR;
 
@@ -3333,7 +3333,7 @@ EXAMPLE: example shrink; shows an example
   }
 
   s = s + ")";
-  ring S = create_ring(ringlist(R)[1], s, "(dp(" + string(n-1) + "), dp(1))", "no_minpoly");     //charstr: e.g. 0,a
+  ring S = create_ring(ring_list(R)[1], s, "(dp(" + string(n-1) + "), dp(1))", "no_minpoly");     //charstr: e.g. 0,a
 
   // map the ideal to Small:
   ideal Ishrink = imap(R, I);

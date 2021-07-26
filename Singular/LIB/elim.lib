@@ -585,7 +585,7 @@ EXAMPLE: example elim2; shows examples
    string mpoly=string(minpoly);
 //-------------- create new ring and map objects to new ring ------------------
    def br = basering;
-   ring @newr = create_ring(ringlist(br)[1], "("+varstr(br)+")", ordering, "no_minpoly");
+   ring @newr = create_ring(ring_list(br)[1], "("+varstr(br)+")", ordering, "no_minpoly");
    if (mpoly!="0") { execute("minpoly="+mpoly+";"); }
    def i = imap(br,id);
    poly vars = imap(br,vars);
@@ -646,7 +646,7 @@ EXAMPLE: example elim1; shows examples
    if( ord(p)==0 ) { string ordering = "ls"; }
    if( ord(p)>0 ) { string ordering = "dp"; }
 //-------------- create new ring and map objects to new ring ------------------
-   ring @newr = create_ring(ringlist(br)[1], "("+varstr(br)+")", ordering, "no_minpoly");
+   ring @newr = create_ring(ring_list(br)[1], "("+varstr(br)+")", ordering, "no_minpoly");
    def id = fetch(br,id);
    poly vars = fetch(br,vars);
 //---------- now eliminate in new ring and map back to old ring ---------------

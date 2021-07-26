@@ -82,7 +82,7 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   // now there are at least 5 non-negative Betti numbers b_0, b_1, b_2, b_3, b_4
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   // compute the generating function by the Goettsche's formula up to degree n in t@
   poly rez=1;
@@ -145,7 +145,7 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   // now there are at least 5 non-negative Betti numbers b_0, b_1, b_2, b_3, b_4
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1], "("+varstr(basering)+",z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], "("+varstr(basering)+",z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   // compute the generating function by the Goettsche's formula up to degree n in t@
   poly rez=1;
@@ -209,7 +209,7 @@ NOTE:     an empty list is returned if n<0 or b is not a list of non-negative in
   // now there are at least 5 non-negative Betti numbers b_0, b_1, b_2, b_3, b_4
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int k,i;
@@ -268,7 +268,7 @@ NOTE:     zero is returned if n<0 or r<=0
   // now n is non-negative and r is positive
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   // compute the generating function by the Nakajima-Yoshioka formula up to degree n in t@
   poly rez=1;
@@ -323,7 +323,7 @@ NOTE:     zero is returned if n<0 or r<=0
   // now n is non-negative and r is positive
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   // compute the generating function by the Nakajima-Yoshioka formula up to degree n in t@
   poly rez=1;
@@ -378,7 +378,7 @@ NOTE:     an empty list is returned if n<0 or r<=0
   // now n is non-negative and r is positive
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int k,i;
@@ -435,7 +435,7 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   int d=size(b);
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int i;
@@ -486,7 +486,7 @@ NOTE:     zero is returned if n<0 or b is not a list of non-negative integers
   int d=size(b);
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int i;
@@ -537,7 +537,7 @@ NOTE:     an empty list is returned if n<0 or b is not a list of non-negative in
   int d=size(b);
   def br@=basering; // remember the base ring
   // add additional variables z@, t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1],"("+varstr(basering)+", z@, t@)","dp","no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=1;
   int i;
@@ -595,7 +595,7 @@ NOTE:     if m and n are not coprime, the result does not necessary make sense
   }
   def br@=basering; // remember the base ring
   // add additional variable t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1], "("+varstr(basering)+", t@)", "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], "("+varstr(basering)+", t@)", "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=(1-t@^2)*PPolyW(q, m, n, t@, d);
   ideal I=t@^(2*d+1);
@@ -638,7 +638,7 @@ NOTE:     if m and n are not coprime, the result does not necessary make sense
   }
   def br@=basering; // remember the base ring
   // add additional variable t@ to the base ring
-  ring r@ = create_ring(ringlist(basering)[1], "("+varstr(basering)+", t@)", "dp", "no_minpoly");
+  ring r@ = create_ring(ring_list(basering)[1], "("+varstr(basering)+", t@)", "dp", "no_minpoly");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   poly rez=(1-t@^2)*PPolyW(q, m, n, t@, d);
   ideal I=t@^(2*d+1);

@@ -662,7 +662,7 @@ EXAMPLE: example alexanderpolynomial;  shows an example
   {
     l2[ii+1] = "t("+string(ii)+")";
   }
-  ring ALEXring = create_ring(ringlist(basering)[1], l2, "dp", "no_minpoly");
+  ring ALEXring = create_ring(ring_list(basering)[1], l2, "dp", "no_minpoly");
   poly hilfspoly=1;
   poly alexnumerator=1;    // numerator of the Alexander polynomial
   poly alexdenominator=1;  // denominator of the Alexander polynomial
