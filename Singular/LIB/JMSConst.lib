@@ -207,7 +207,7 @@ attrib(Borid,"isSB",1);
        }
 int qc=NumNewVar(B, NumN);
 //Now I must define the NEW RING, putting the c parameters inside.
-list L=ringlist(r);
+list L=ring_list(r);
 list L2;
 L2[1]=L[1];
 L2[2]=list();
@@ -729,7 +729,7 @@ EXAMPLE:  example FinalVm; shows an example"
 {
   //multiply and reduce, degree by degree
   intvec u=NewWeight(nvars(r)+1);
-  list L=ringlist(r);
+  list L=ring_list(r);
   L[2]=insert(L[2],"t",size(L[2]));
   list ordlist="a",u;
   L[3]=insert(L[3],ordlist,0);
@@ -1071,7 +1071,7 @@ EXAMPLE:  example SchemeEq; shows an example"
   { pd=pd*var(i);}
   //CHANGE RING
   intvec u=NewWeight(nvars(r)+1);
-  list L=ringlist(r);
+  list L=ring_list(r);
   L[2]=insert(L[2],"t",size(L[2]));
   //print(L[2]);
   list ordlist="a",u;
@@ -1211,7 +1211,7 @@ example
  int qc=NumNewVar(B, NumN);
  //Now I must define the NEW RING,
  //putting the c parameters inside.
- list L=ringlist(r);
+ list L=ring_list(r);
  list L2;
  L2[1]=L[1];
  L2[2]=list();
@@ -1295,7 +1295,7 @@ EXAMPLE:  example JMarkedScheme; shows an example"
       {
         //Now I must define the NEW RING,
         //putting the c parameters inside.
-        list L=ringlist(r);
+        list L=ring_list(r);
         list L2;
         L2[1]=L[1];
         L2[2]=list();

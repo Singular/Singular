@@ -529,7 +529,7 @@ EXAMPLE:  example NewWeight; shows an example"
 {
   //multiply and reduce, degree by degree
   intvec u=NewWeight(nvars(r)+1);
-  list L=ringlist(r);
+  list L=ring_list(r);
   L[2]=insert(L[2],"t",size(L[2]));
   list ordlist="a",u;
   L[3]=insert(L[3],ordlist,0);
@@ -861,7 +861,7 @@ EXAMPLE:  example TestJMark; shows an example"
     jmp mi=V1[1][1];
     int minimo=Min(deg(mi.h));
     intvec u=NewWeight(nvars(r)+1);
-    list L=ringlist(r);
+    list L=ring_list(r);
     L[2]=insert(L[2],"t",size(L[2]));
     list ordlist="a",u;
     L[3]=insert(L[3],ordlist,0);

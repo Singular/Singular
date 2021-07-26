@@ -214,7 +214,7 @@ EXAMPLE: example reduction; shows an example
      poly v=product(maxideal(1));
 
   //------------- changes the basering bsr to bsr[@(0),...,@(z)] ----------
-  list l2 = ringlist(basering)[2];
+  list l2 = ring_list(basering)[2];
   for (int ii = 0; ii <= z; ii++)
   {
     l2[size(l2)+1] = "@("+string(ii)+")";

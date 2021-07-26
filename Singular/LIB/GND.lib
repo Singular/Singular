@@ -661,7 +661,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
       "We do not compute the kernel since of \"injective\" argument in the input";
     }
   }
-  ideal I = ringlist(Bfalse)[4];
+  ideal I = ring_list(Bfalse)[4];
   setring Bfalsebase;
   list whereP = H(imap(Bfalse,I),nry,imap(all,xid));
   if(debug)
@@ -814,8 +814,8 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   def B1false2 = Bfalse + newvarring;
   setring B1false2;
   poly frp1 = -imap(Apreal,d)+imap(Bfalse,Pprim)*var(nvars(B1false2));
-  qring B1false = std(fetch(B1false2,frp1) + ringlist(B1false2)[4]);
-  ideal B1falseideal = ringlist(B1false)[4];
+  qring B1false = std(fetch(B1false2,frp1) + ring_list(B1false2)[4]);
+  ideal B1falseideal = ring_list(B1false)[4];
   setring Apreal;
   def vid = imap(Ap,vid);
   vid[ncols(vid)+1] = z;
@@ -1014,7 +1014,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
       "s =",ss;
     }
   }
-  ideal dquot = ringlist(D)[4];
+  ideal dquot = ring_list(D)[4];
 
 //            Start constructing E
 
