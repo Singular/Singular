@@ -47,6 +47,7 @@ ideal rightgb(ideal F, ideal Q);
 //extern int syzComp;
   /*stop building pairs after that component --> ideals.cc, syz.cc */
 EXTERN_VAR int LazyPass,LazyDegree,Kstd1_mu,Kstd1_deg;
+EXTERN_VAR poly HCtest;
   /*parameters for Lazy or global stops --> ipshell.cc, grammar.y*/
 EXTERN_VAR BITSET kOptions;
   /*the known test options (a constant)*/

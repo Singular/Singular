@@ -92,6 +92,7 @@ VAR BITSET validOpts=Sy_bit(0)
                 |Sy_bit(30)
                 |Sy_bit(31);
 
+VAR poly HCtest=NULL;
 //static BOOLEAN posInLOldFlag;
            /*FALSE, if posInL == posInL10*/
 // returns TRUE if mora should use buckets, false otherwise
@@ -1491,8 +1492,7 @@ void updateLHC(kStrategy strat)
         }
       }
     }
-    else
-      deleteHC(&(strat->L[i]), strat);
+    deleteHC(&(strat->L[i]), strat);
     if (strat->L[i].IsNull())
       deleteInL(strat->L,&strat->Ll,i,strat);
     else
@@ -1872,6 +1872,12 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
+  if (HCtest!=NULL)
+  {
+    strat->kNoether=pCopy(HCtest);
+    strat->kHEdgeFound=TRUE;
+    strat->update=TRUE;
+  }
   initBuchMoraCrit(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initMora(F,strat);
@@ -1908,6 +1914,15 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (strat->homog && strat->red == redFirst)
     if(!idIs0(F) &&(!rField_is_Ring(currRing)))
       kStratInitChangeTailRing(strat);
+  if(strat->kNoether!=NULL) 
+  {
+    strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
+    firstUpdate(strat);
+    /*- cuts elements in L above noether and reorders L -*/
+    updateLHC(strat);
+    /*- reorders L with respect to posInL -*/
+    reorderL(strat);
+  }
 #endif
 
   if (BVERBOSE(23))
@@ -2010,7 +2025,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.p = redtail(&(strat->P),strat->sl,strat);
       if (strat->P.p==NULL)
       {
-        WerrorS("expoent overflow - wrong ordering");
+        WerrorS("exponent overflow - wrong ordering");
         return(idInit(1,1));
       }
       // set ecart -- might have changed because of tail reductions

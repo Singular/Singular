@@ -281,6 +281,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     {
       if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
+        if (TEST_OPT_PROT) {  PrintS("h"); mflush(); }
         p_Delete(&pNext(p1), L->tailRing);
         if (p1 == p)
         {
@@ -323,6 +324,27 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         kBucketDestroy(&bucket);
     }
     kTest_L(L,strat->tailRing);
+  }
+}
+
+void deleteHCBucket(LObject *L, kStrategy strat)
+{
+  if (strat->kHEdgeFound)
+  {
+    kTest_L(L,strat->tailRing);
+    poly p1;
+    if (L->bucket != NULL)
+    {
+      for (int i=1; i<= (int) L->bucket->buckets_used; i++)
+      {
+        poly p=L->bucket->buckets[i];
+        if(p_Cmp(pNext(p),strat->kNoetherTail(), L->tailRing) == -1)
+	{
+          if (TEST_OPT_PROT) {  PrintS("h"); mflush(); }
+          p_Delete(&pNext(p), L->tailRing);
+	}
+      }
+    }
   }
 }
 

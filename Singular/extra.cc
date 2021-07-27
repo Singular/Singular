@@ -419,13 +419,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       ideal F=(ideal)h->Data();
-      #ifdef HAVE_VSPACE
-      int cpus = (long) feOptValue(FE_OPT_CPUS);
-      if (cpus>1)
-        res->data=(char*)(long) kVerify2(F,currRing->qideal);
-      else
-      #endif
-        res->data=(char*)(long) kVerify1(F,currRing->qideal);
+      if (h->next==NULL)
+      {
+        #ifdef HAVE_VSPACE
+        int cpus = (long) feOptValue(FE_OPT_CPUS);
+        if (cpus>1)
+          res->data=(char*)(long) kVerify2(F,currRing->qideal);
+        else
+        #endif
+          res->data=(char*)(long) kVerify1(F,currRing->qideal);
+      }
+      else return TRUE;
       res->rtyp=INT_CMD;
       return FALSE;
     }
@@ -3843,6 +3847,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         WerrorS("expected system(\"DivRem\",<poly>,<poly>)");
         return TRUE;
       }
+    }
+    else
+/*==================== HCpoly =================*/
+    if (strcmp(sys_cmd,"HCpoly")==0)
+    {
+      if (h->Typ()!=POLY_CMD) return TRUE;
+      pDelete(&HCtest);
+      HCtest=(poly)h->CopyD();
+      return FALSE;
     }
     else
 /*==================== Error =================*/
