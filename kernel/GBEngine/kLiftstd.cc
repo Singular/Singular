@@ -10,6 +10,7 @@
 // define if no buckets should be used
 // #define NO_BUCKETS
 
+#include "omalloc/omalloc.h"
 #include "kernel/GBEngine/kutil.h"
 #include "misc/options.h"
 #include "kernel/polys.h"
@@ -144,6 +145,7 @@ static poly lazyComp(number* A, poly* M,poly* T,int index,poly s,int *l,const ri
   kBucketDestroy(&b);
   return p;
 }
+
 /*2
 *  reduction procedure for the sugar-strategy (honey)
 * reduces h with elements from T choosing first possible
@@ -158,11 +160,11 @@ int redLiftstd (LObject* h, kStrategy strat)
   int i,j,pass,ei, ii, h_d,ci;
   unsigned long not_sev;
   long reddeg,d;
-  number A[500];
-  poly C[500];
-  poly T[500];
-  memset(T,0,sizeof(T));
-  memset(C,0,sizeof(T));
+  #define START_REDUCE 512
+  int red_size=START_REDUCE;
+  number *A=(number*)omAlloc0(red_size*sizeof(number));
+  poly *C=(poly*)omAlloc0(red_size*sizeof(poly));
+  poly *T=(poly*)omAlloc0(red_size*sizeof(poly));
   const ring tailRing=strat->tailRing;
 
   pass = j = 0;
@@ -192,6 +194,9 @@ int redLiftstd (LObject* h, kStrategy strat)
       int l;
       poly p=lazyComp(A,C,T,pass,h_tail,&l,strat->tailRing);
       kBucket_Add_q(h->bucket,p,&l);
+      omFreeSize(A,red_size*sizeof(number));
+      omFreeSize(T,red_size*sizeof(poly));
+      omFreeSize(C,red_size*sizeof(poly));
       return 1;
     }
 
@@ -283,6 +288,9 @@ int redLiftstd (LObject* h, kStrategy strat)
       p_Delete(&h_tail,tailRing);
       kDeleteLcm(h);
       h->Clear();
+      omFreeSize(A,red_size*sizeof(number));
+      omFreeSize(T,red_size*sizeof(poly));
+      omFreeSize(C,red_size*sizeof(poly));
       return 0;
     }
     h->SetShortExpVector();
@@ -303,5 +311,14 @@ int redLiftstd (LObject* h, kStrategy strat)
     pass++;
     d = h_d + h->ecart;
     if (pass%RED_CANONICALIZE==0) kBucketCanonicalize(h->bucket);
+    // if cache is to small, double its size:
+    if (pass>=red_size-1)
+    {
+      A=(number*)omRealloc0Size(A,red_size*sizeof(number),2*red_size*sizeof(number));
+      C=(poly*)omRealloc0Size(C,red_size*sizeof(poly),2*red_size*sizeof(poly));
+      T=(poly*)omRealloc0Size(T,red_size*sizeof(poly),2*red_size*sizeof(poly));
+      if(TEST_OPT_PROT) {Print("+%d+",red_size);mflush();}
+      red_size*=2;
+    }
   }
 }
