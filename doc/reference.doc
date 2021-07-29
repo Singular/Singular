@@ -9598,7 +9598,7 @@ Both notations may be used as input.
 change of the basering sets @code{short} to the previous value for
 that ring. In other words, the value of the variable @code{short} is
 "ring-local".
-@*If the names are long, or the ring non-commutative, @code{short} can not be schaged to 1.
+@*If the names are long, or the ring non-commutative, @code{short} can not be changed to 1.
 @item @strong{Example:}
 @smallexample
 @c example
