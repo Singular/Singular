@@ -7862,7 +7862,7 @@ checks, if an ideal/module is a Groebner base
 @cindex version
 @cindex system, version
 returns the version number of @sc{Singular} as int.
-(Version a-b-c-d returns a*10000+b*1000+c*100+d)
+(Version a-b-c-d returns a*1000+b*100+c*10+d)
 @c ..........................
 @item @code{system("with")}
 @cindex system, with
