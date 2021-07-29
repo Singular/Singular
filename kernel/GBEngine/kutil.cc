@@ -10689,7 +10689,11 @@ BOOLEAN newHEdge(kStrategy strat)
   scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
 #endif
   if (strat->kHEdge==NULL) return FALSE;
-  if (strat->t_kHEdge != NULL) p_LmFree(strat->t_kHEdge, strat->tailRing);
+  if (strat->t_kHEdge != NULL)
+  {
+    p_LmFree(strat->t_kHEdge, strat->tailRing);
+    strat->t_kHEdge=NULL;
+  }
   if (strat->tailRing != currRing)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
   /* compare old and new noether*/
@@ -10722,7 +10726,11 @@ BOOLEAN newHEdge(kStrategy strat)
   {
     if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
     strat->kNoether=newNoether;
-    if (strat->t_kNoether != NULL) p_LmFree(strat->t_kNoether, strat->tailRing);
+    if (strat->t_kNoether != NULL)
+    {
+      p_LmFree(strat->t_kNoether, strat->tailRing);
+      strat->t_kNoether=NULL;
+    }
     if (strat->tailRing != currRing)
       strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
 
