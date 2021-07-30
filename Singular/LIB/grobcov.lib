@@ -5772,7 +5772,7 @@ EXAMPLE: locus; shows an example"
   list GG;
   //Options
   list DD=#;
-  int nax=size(ringlist(RR)[1][2]);              // number of parameters + tracer variables
+  int nax=npars(RR);              // number of parameters + tracer variables
   int nuv=nvars(RR);                                 // number of variables
   int na=0; int nx=nax;
   int moverdim=nx;                                  // number of tracer variables
@@ -6410,7 +6410,7 @@ EXAMPLE:  AssocTanToEnv; shows an example"
   ideal vmov;
   int nv=nvars(RR);
   for(i=1;i<=nv;i++){vmov[size(vmov)+1]=var(i);}
-//  int numpars=size(ringlist(RR)[1][2]);
+//  int numpars=npars(RR);
 //  int version=0;
 //  if(nv<4){version=1;}
   int comment=0;

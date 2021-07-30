@@ -442,8 +442,8 @@ SEE ALSO:   curveAdjustModule, curveExtDerModule"
 
     // Adjust the generators of Der_P to the new variables T(1),...,T(k),x(1),...,x(n)
     // if there are new variables - check number of blocks
-    if(size(ringlist(basering)[3]) >= 3){
-        k = size(ringlist(basering)[3][1][2]);
+    if(size(ring_list(basering)[3]) >= 3){
+        k = size(ring_list(basering)[3][1][2]);
         Der_P = curveAdjustModule(Der_P,k);
     }
 

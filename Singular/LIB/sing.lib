@@ -588,7 +588,7 @@ EXAMPLE: example T_1; shows an example
 "
 {
    def RR=basering;
-   list RRL=ringlist(RR);
+   list RRL=ring_list(RR);
    if(RRL[4]!=0)
    {
       int aa=size(#);
@@ -692,7 +692,7 @@ EXAMPLE: example T_2; shows an example
 "
 {
    def RR=basering;
-   list RRL=ringlist(RR);
+   list RRL=ring_list(RR);
    if(RRL[4]!=0)
    {
       int aa=size(#);
@@ -790,7 +790,7 @@ EXAMPLE: example T_12; shows an example
 "
 {
    def RR=basering;
-   list RRL=ringlist(RR);
+   list RRL=ring_list(RR);
    if(RRL[4]!=0)
    {
       int aa=size(#);

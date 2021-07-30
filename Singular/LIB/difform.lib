@@ -341,7 +341,7 @@ KEYWORDS:   differential algebra; universal derivation
 SEE ALSO:   diffAlgebra, diffAlgebraStructure, diffAlgebraGens"
 {
 
-    int n = size(ringlist(basering)[2]) div 2;
+    int n = nvars(basering) div 2;
     int k = size(I);
     int i,j;
     ideal d_I;
@@ -385,7 +385,7 @@ SEE ALSO:   difformListSort, difformIsBigger, difformIsSmaller"
 {
 
     int n = size(#);
-    int k = size(ringlist(basering)[2]) div 2;
+    int k = nvars(basering) div 2;
     int i;
     string gen_ord = "";
     string ringvar_ord = "";
@@ -525,7 +525,7 @@ NOTE:       - if all generators of the differential algebra are needed, apply th
 KEYWORDS:   generators; graded
 EXAMPLE:    example diffAlgebraListGen; shows an example"
 {
-    int n = size(ringlist(basering)[2]);
+    int n = nvars(basering);
     int i,k,j;
     int degr = -1;
     list var_list;
@@ -703,7 +703,7 @@ EXAMPLE:    example difformCoef; shows an example"
     def diff_Alg = basering;
 
     poly f = df.form;
-    int n = size(ringlist(basering)[2]) div 2;
+    int n = nvars(basering) div 2;
     int i;
 
     // Build the wedge product of all differential forms dx_i
@@ -1422,7 +1422,7 @@ EXAMPLE:    example difformDeg; shows an example"
     setring Omega_R;
 
     // Degree of a difform is the degree of the poly with weights 0 for the basering variables
-    int n = size(ringlist(Omega_R)[2]) div 2;
+    int n = nvars(Omega_R) div 2;
     int i;
     intvec var_weights;
 
@@ -1471,7 +1471,7 @@ EXAMPLE:    example difformIsHomog; shows an example"
 {
     setring Omega_R;
 
-    int n = size(ringlist(Omega_R)[2]) div 2;
+    int n = nvars(Omega_R) div 2;
     int i;
     intvec var_weights;
 
@@ -1572,7 +1572,7 @@ SEE ALSO:   difformCoef, difformDeg
 EXAMPLE:    example difformHomogDecomp; shows an example"
 {
     // Highest degree is the nr. of variables in the basering
-    int n = size(ringlist(basering)[2]);
+    int n = nvars(basering);
     int i,j,k;
     difform current_gen;
     poly current_coef;
@@ -1885,7 +1885,7 @@ EXAMPLE:    example difformUnivDer; shows an example"
 {
     difform df = 0;
     difform d_var;
-    int n = size(ringlist(basering)[2]);
+    int n = nvars(basering);
     int i;
 
     // Build the image under the universal derivation
@@ -2068,7 +2068,7 @@ SEE ALSO:   derivationFromList, difformIsGen, difformListCont"
     int i;
 
     // Need an image for any generator
-    if(n != size(ringlist(basering)[2]))
+    if(n != nvars(basering))
     {
         ERROR("Given list has wrong size!");
     }

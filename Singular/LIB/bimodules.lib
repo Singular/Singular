@@ -87,7 +87,7 @@ proc bistdIdeal (ideal M)
   option(set,optionsave);
   setring save;
   list L = ringlist(save);
-  if (size(ringlist(save)) > 4)
+  if (size(ring_list(save)) > 4)
   {
     L = delete(L,6);
     L = delete(L,5);}
@@ -155,7 +155,7 @@ EXAMPLE: example bistd; shows examples
   //   option(set,optionsave);
   setring save;
   list L = ringlist(save);
-  if (size(ringlist(save)) > 4)
+  if (size(ring_list(save)) > 4)
   {L = delete(L,6);L = delete(L,5);}
   def Scom = ring(L);
   setring Scom;

@@ -61,7 +61,7 @@ EXAMPLE:   example Vfiltration; shows an example
   // The level 'p' must be a non-negative integer.
   if (p < 0) { ERROR("Level p must be non-negative."); }
   // The base ring must be non-commutative.
-  if (size(ringlist(basering)) > 4) { ERROR("Base ring must be commutative."); }
+  if (size(ring_list(basering)) > 4) { ERROR("Base ring must be commutative."); }
 
   // Default engine & option.
   int slimgb_ = 0; int eng = slimgb_;

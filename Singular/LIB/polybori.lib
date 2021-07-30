@@ -350,7 +350,7 @@ proc boolean_poly_ring(def r)
 
   int i;
   int counter=0;
-  for (i=1; i<=size(ringlist(r)[3]); i++)
+  for (i=1; i<=size(ring_list(r)[3]); i++)
   {
     if (rl[3][i][1]<>"C")
     {

@@ -104,11 +104,11 @@ static proc numberOfYs()
   list L = ringlist(basering);
   if (L[3][1][1]!="c")
   {
-    return(size(ringlist(basering)[3][1][2]));
+    return(size(ring_list(basering)[3][1][2]));
   }
   else
   {
-    return(size(ringlist(basering)[3][2][2]));
+    return(size(ring_list(basering)[3][2][2]));
   }
 }
 

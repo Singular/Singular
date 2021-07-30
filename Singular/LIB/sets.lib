@@ -112,7 +112,7 @@ proc isEqualMap(def a, def b)
   {
     return(0);
   }
-  for(int i=1;i<=size(ringlist(preimage(a))[2]);i++){        //check if the two maps are the same
+  for(int i=1;i<=size(ring_list(preimage(a))[2]);i++){        //check if the two maps are the same
         if(a[i]!=b[i]){                                        //in every component
                 return(0);
   }

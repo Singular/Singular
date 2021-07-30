@@ -470,7 +470,7 @@ EXAMPLE: example netMap; shows an example
   Source=string(nameof(preimage(f)));
   Target=string(nameof(basering));
   Output[1]="Map"+": "+Source+" --> "+Target;
-  v=size(ringlist(preimage(f))[2]);
+  v=nvars(preimage(f));
   empty=size(Output[1]);
   Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][1])+" -> "+string(f[1]);
 
@@ -520,7 +520,7 @@ EXAMPLE: example netMap2; shows an example
   Source=string(nameof(preimage(f)));
   Target=string(nameof(basering));
   Output[1]=Map+": "+Source+" --> "+Target;
-  v=size(ringlist(preimage(f))[2]);
+  v=nvars(preimage(f));
   empty=size(Output[1]);
   Output[1]=Output[1]+" , "+string(ringlist(preimage(f))[2][1])+" -> "+string(f[1]);
 

@@ -3478,7 +3478,7 @@ SEE ALSO: ncfactor
   }
   def r = basering;
   list factorizeOutput;
-  if (size(ringlist(basering))<=4 && (attrib(r, "isLetterplaceRing") == 0) )
+  if (size(ring_list(basering))<=4 && (attrib(r, "isLetterplaceRing") == 0) )
   {//commutative ring case
     dbprint(p,dbprintWhitespace + "We are in a commutative ring. Factoring h using factorize.");
     factorizeOutput = factorize(h);
@@ -9559,7 +9559,7 @@ SEE ALSO: facSubWeyl, ncfactor
   for (i = 1; i<=voice;i++)
   {dbprintWhitespace = dbprintWhitespace + " ";}
   dbprint(p,dbprintWhitespace+"Checking if given ring is commutative.");
-  if (size(ringlist(basering))<=4)
+  if (size(ring_list(basering))<=4)
   {//basering was commutative
     return(0);
   }//basering was commutative
