@@ -103,7 +103,7 @@ char * newstruct_String(blackbox *b, void *d)
         }
         else
         {
-          char *tmp2=omStrDup(l->m[a->pos].String());
+          char *tmp2=l->m[a->pos].String();
           if ((strlen(tmp2)>80)||(strchr(tmp2,'\n')!=NULL))
           {
             StringAppendS("<");
