@@ -1191,13 +1191,13 @@ EXAMPLE: example netPoly; shows an example
             Up=Up+emptyString( size( string( leadcoef(Q) ) ) );
           }// (2.1.2.2
         } // (2.1.2)
-        S=size( ringlist(basering)[2] ); //variables
+        S=nvars(basering); //variables
         for ( i=1; i<=S; i++) { // (2.1.1)
           if ( leadexp(Q)[i] == 0 ) { // (2.1.1.1)
           }
             else { // (2.1.1.2))
             Down=Down+string( ringlist( basering )[2][i] );
-            Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
+            Up=Up+emptyString( size( ring_list( basering )[2][i] ));
             if ( leadexp(Q)[i] == 1 ){ // (2.1.1.2.1))
             } // (2.1.1.2.1)
             else { // (2.1.1.2.2)
@@ -1235,13 +1235,13 @@ EXAMPLE: example netPoly; shows an example
           } // (2.2.2.2)
         } // (2.2.2)
 
-        S=size( ringlist(basering)[2] ); //variables
+        S=nvars(basering); //variables
         for ( i=1; i<=S; i++) { // (2.2.3)
           if ( leadexp(Q)[i] == 0 ) { // (2.2.3.1)
           } // (2.2.3.1)
             else { // (2.2.3.2)
             Down=Down+string( ringlist( basering )[2][i] );
-            Up=Up+emptyString( size (string( ringlist( basering )[2][i] ) ) );
+            Up=Up+emptyString( size( ringlist( basering )[2][i] ) );
             if ( leadexp(Q)[i] == 1 ){ // (2.2.3.2.1)
             } // (2.2.3.2.1)
             else { // (2.2.3.2.2)
