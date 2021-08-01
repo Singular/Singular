@@ -266,7 +266,6 @@ public:
   KINLINE void HeadNormalize();
 };
 
-
 EXTERN_VAR int HCord;
 
 class skStrategy
@@ -327,11 +326,9 @@ public:
   TSet T;
   LSet L;
   LSet    B;
-  poly    kHEdge;
   poly    kNoether;
-  poly    t_kHEdge; // same polys in tailring
+  poly    t_kNoether; // same polys in tailring
   KINLINE poly    kNoetherTail();
-  poly    t_kNoether;
   BOOLEAN * NotUsedAxis;
   BOOLEAN * pairtest;/*used for enterOnePair*/
   poly tail;

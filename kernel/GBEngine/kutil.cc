@@ -245,7 +245,7 @@ static inline int pLPDivComp(poly p, poly q)
 
 VAR int     HCord;
 VAR int     Kstd1_deg;
-VAR int     Kstd1_mu=32000;
+VAR int     Kstd1_mu=INT_MAX;
 
 /*2
 *deletes higher monomial of p, re-compute ecart and length
@@ -9742,7 +9742,7 @@ void initBuchMoraCrit(kStrategy strat)
   if (rField_is_Ring(currRing))
   {
     strat->sugarCrit = FALSE;
-    strat->Gebauer = FALSE ;
+    strat->Gebauer = FALSE;
     strat->honey = FALSE;
   }
   #ifdef KDEBUG
@@ -10017,13 +10017,11 @@ void initBuchMoraPosRing (kStrategy strat)
 void initBuchMora (ideal F,ideal Q,kStrategy strat)
 {
   strat->interpt = BTEST1(OPT_INTERRUPT);
-  strat->kHEdge=NULL;
-  if (rHasGlobalOrdering(currRing)) strat->kHEdgeFound=FALSE;
   /*- creating temp data structures------------------- -*/
-  strat->cp = 0;
-  strat->c3 = 0;
+  //strat->cp = 0; // already by skStragy()
+  //strat->c3 = 0; // already by skStragy()
 #ifdef HAVE_SHIFTBBA
-  strat->cv = 0;
+  strat->cv = 0; // already by skStragy()
 #endif
   strat->tail = pInit();
   /*- set s -*/
@@ -10043,13 +10041,16 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->R = initR();
   strat->sevT = initsevT();
   /*- init local data struct.---------------------------------------- -*/
-  strat->P.ecart=0;
-  strat->P.length=0;
-  strat->P.pLength=0;
+  //strat->P.ecart=0; // already by skStragy()
+  //strat->P.length=0; // already by skStragy()
+  //strat->P.pLength=0; // already by skStragy()
   if (rHasLocalOrMixedOrdering(currRing))
   {
-    if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
-    if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
+    if (strat->kNoether!=NULL)
+    {
+      pSetComp(strat->kNoether, strat->ak);
+      pSetComp(strat->kNoetherTail(), strat->ak);
+    }
   }
   if(rField_is_Ring(currRing))
   {
@@ -10229,7 +10230,7 @@ void initSbaPos (kStrategy strat)
 void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
 {
   strat->interpt = BTEST1(OPT_INTERRUPT);
-  strat->kHEdge=NULL;
+  strat->kNoether=NULL;
   if (rHasGlobalOrdering(currRing)) strat->kHEdgeFound=FALSE;
   /*- creating temp data structures------------------- -*/
   strat->cp = 0;
@@ -10258,8 +10259,11 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->P.length=0;
   if (rHasLocalOrMixedOrdering(currRing))
   {
-    if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
-    if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
+    if (strat->kNoether!=NULL)
+    {
+      pSetComp(strat->kNoether, strat->ak);
+      pSetComp(strat->kNoetherTail(), strat->ak);
+    }
   }
   if(rField_is_Ring(currRing))
   {
@@ -10670,7 +10674,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
 
 
 /*2
-* computes the new strat->kHEdge and the new pNoether,
+* computes the new strat->kNoether and the new pNoether,
 * returns TRUE, if pNoether has changed
 */
 BOOLEAN newHEdge(kStrategy strat)
@@ -10682,22 +10686,22 @@ BOOLEAN newHEdge(kStrategy strat)
 
 #if 0
   if (currRing->weight_all_1)
-    scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
+    scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether, strat->tailRing);
   else
-    scComputeHCw(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
+    scComputeHCw(strat->Shdl,NULL,strat->ak,strat->kNoether, strat->tailRing);
 #else
-  scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
+  scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether, strat->tailRing);
 #endif
-  if (strat->kHEdge==NULL) return FALSE;
-  if (strat->t_kHEdge != NULL)
+  if (strat->kNoether==NULL) return FALSE;
+  if (strat->t_kNoether != NULL)
   {
-    p_LmFree(strat->t_kHEdge, strat->tailRing);
-    strat->t_kHEdge=NULL;
+    p_LmFree(strat->t_kNoether, strat->tailRing);
+    strat->t_kNoether=NULL;
   }
   if (strat->tailRing != currRing)
-    strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
+    strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
   /* compare old and new noether*/
-  newNoether = pLmInit(strat->kHEdge);
+  newNoether = pLmInit(strat->kNoether);
   pSetCoeff0(newNoether,nInit(1));
   j = p_FDeg(newNoether,currRing);
   for (i=1; i<=(currRing->N); i++)
@@ -10717,7 +10721,7 @@ BOOLEAN newHEdge(kStrategy strat)
     if (TEST_OPT_DEBUG)
     {
       Print("H(%d):",j);
-      wrp(strat->kHEdge);
+      wrp(strat->kNoether);
       PrintLn();
     }
     #endif
@@ -11312,20 +11316,13 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   strat->p_shallow_copy_delete
     = pGetShallowCopyDeleteProc(currRing, new_tailRing);
 
-  if (strat->kHEdge != NULL)
-  {
-    if (strat->t_kHEdge != NULL)
-      p_LmFree(strat->t_kHEdge, strat->tailRing);
-    strat->t_kHEdge=k_LmInit_currRing_2_tailRing(strat->kHEdge, new_tailRing);
-  }
-
   if (strat->kNoether != NULL)
   {
     if (strat->t_kNoether != NULL)
       p_LmFree(strat->t_kNoether, strat->tailRing);
-    strat->t_kNoether=k_LmInit_currRing_2_tailRing(strat->kNoether,
-                                                   new_tailRing);
+    strat->t_kNoether=k_LmInit_currRing_2_tailRing(strat->kNoether, new_tailRing);
   }
+
   kTest_TS(strat);
   if (TEST_OPT_PROT)
     PrintS("]");
@@ -11610,8 +11607,6 @@ skStrategy::~skStrategy()
     omMergeStickyBinIntoBin(tailBin,
                             ((tailRing != NULL) ? tailRing->PolyBin:
                              currRing->PolyBin));
-  if (t_kHEdge != NULL)
-    p_LmFree(t_kHEdge, tailRing);
   if (t_kNoether != NULL)
     p_LmFree(t_kNoether, tailRing);
 

@@ -318,7 +318,7 @@ static ideal kInterRedCC(ideal F, ideal Q)
   {
     completeReduce(strat);
   }
-  if(strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
+  if(strat->kNoether!=NULL) pLmFree(&strat->kNoether);
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));

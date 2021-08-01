@@ -46,9 +46,8 @@ ideal rightgb(ideal F, ideal Q);
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;
   /*stop building pairs after that component --> ideals.cc, syz.cc */
-EXTERN_VAR int LazyPass,LazyDegree,Kstd1_mu,Kstd1_deg;
-EXTERN_VAR poly HCtest;
-  /*parameters for Lazy or global stops --> ipshell.cc, grammar.y*/
+EXTERN_VAR int Kstd1_mu,Kstd1_deg;
+  /*parameters for global stops --> ipshell.cc, grammar.y*/
 EXTERN_VAR BITSET kOptions;
   /*the known test options (a constant)*/
 EXTERN_VAR BITSET validOpts;

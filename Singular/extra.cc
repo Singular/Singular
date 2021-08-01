@@ -3849,15 +3849,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-/*==================== HCpoly =================*/
-    if (strcmp(sys_cmd,"HCpoly")==0)
-    {
-      if (h->Typ()!=POLY_CMD) return TRUE;
-      pDelete(&HCtest);
-      HCtest=(poly)h->CopyD();
-      return FALSE;
-    }
-    else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

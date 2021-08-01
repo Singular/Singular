@@ -92,7 +92,6 @@ VAR BITSET validOpts=Sy_bit(0)
                 |Sy_bit(30)
                 |Sy_bit(31);
 
-VAR poly HCtest=NULL;
 //static BOOLEAN posInLOldFlag;
            /*FALSE, if posInL == posInL10*/
 // returns TRUE if mora should use buckets, false otherwise
@@ -1872,12 +1871,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
-  if (HCtest!=NULL)
-  {
-    strat->kNoether=pCopy(HCtest);
-    strat->kHEdgeFound=TRUE;
-    strat->update=TRUE;
-  }
   initBuchMoraCrit(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initMora(F,strat);
@@ -1892,6 +1885,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if ((currRing->ppNoether)!=NULL)
   {
     strat->kHEdgeFound = TRUE;
+    strat->kNoether=pCopy(currRing->ppNoether);
   }
   if (strat->kHEdgeFound && strat->update)
   {
@@ -1914,9 +1908,8 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (strat->homog && strat->red == redFirst)
     if(!idIs0(F) &&(!rField_is_Ring(currRing)))
       kStratInitChangeTailRing(strat);
-  if(strat->kNoether!=NULL) 
+  if(strat->kNoether!=NULL)
   {
-    strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
     firstUpdate(strat);
     /*- cuts elements in L above noether and reorders L -*/
     updateLHC(strat);
@@ -2082,6 +2075,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       }
     }
+    HCord=strat->HCord;
     kTest_TS(strat);
   }
   /*- complete reduction of the standard basis------------------------ -*/
@@ -2092,12 +2086,12 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*- polynomials used for HECKE: HC, noether -*/
   if (TEST_OPT_FINDET)
   {
-    if (strat->kHEdge!=NULL)
-      Kstd1_mu=currRing->pFDeg(strat->kHEdge,currRing);
+    if (strat->kNoether!=NULL)
+      Kstd1_mu=currRing->pFDeg(strat->kNoether,currRing);
     else
       Kstd1_mu=-1;
   }
-  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
+  if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
   strat->update = TRUE; //???
   strat->lastAxis = 0; //???
   if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
@@ -2247,8 +2241,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
     omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
     strat->fromQ=NULL;
   }
-  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
-  if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
+  if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
@@ -2399,8 +2392,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
     strat->fromQ=NULL;
   }
-  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
-  if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
+  if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //    pFDeg=strat->pOrigFDeg;
@@ -2621,7 +2613,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   currRing->pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
-  HCord=strat->HCord;
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   return r;
@@ -2754,7 +2745,6 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     }
     currRing->pLexOrder = b;
   //Print("%d reductions canceled \n",strat->cel);
-    HCord=strat->HCord;
     //delete(strat);
     if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
     return r;
@@ -2906,7 +2896,6 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       }
       currRing->pLexOrder = b;
     //Print("%d reductions canceled \n",strat->cel);
-      HCord=strat->HCord;
       sigdrop = strat->sigdrop;
       sbaEnterS = strat->sbaEnterS;
       blockred = strat->blockred;
@@ -3018,7 +3007,6 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   }
   currRing->pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
-  HCord=strat->HCord;
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   assume(idIsInV(r));
@@ -3146,7 +3134,6 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     kModW = NULL;
   }
   currRing->pLexOrder = b;
-  HCord=strat->HCord;
   if ((delete_w)&&(temp_w!=NULL)) delete temp_w;
   if ((IDELEMS(r)==1) && (r->m[0]!=NULL) && pIsConstant(r->m[0]) && (strat->ak==0))
   {
@@ -3458,7 +3445,7 @@ ideal kInterRedOld (ideal F, ideal Q)
     completeReduce(strat);
   //else if (TEST_OPT_PROT) PrintLn();
   cleanT(strat);
-  if (strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
+  if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));

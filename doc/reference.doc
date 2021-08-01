@@ -9521,6 +9521,10 @@ See
 @node noether, printlevel, multBound, System variables
 @subsection noether
 @cindex noether
+@cindex highest corner
+@cindex highest edge
+@cindex edge, highest
+@cindex corner, highest
 @table @code
 @item @strong{Type:}
 poly

@@ -185,7 +185,6 @@ kStrategy kStratCopy(kStrategy o)
   s->tail = pInit();
   copyL(o,s);//s->L=...
   s->B=initL();
-  s->kHEdge=pCopy(o->kHEdge);
   s->kNoether=pCopy(o->kNoether);
   if (o->NotUsedAxis!=NULL)
   {

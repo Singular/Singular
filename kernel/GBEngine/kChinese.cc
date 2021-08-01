@@ -63,7 +63,7 @@ static char * get_number(char *s, number *n)
   s+=SIZEOF_LONG;
   if (((*d)&1)==1) // immidiate number
   {
-    *n=(number)(*d); 
+    *n=(number)(*d);
   }
   else
   {
@@ -100,7 +100,7 @@ static long size_number(number n)
   }
   else
   {
-    if (n->s==3) 
+    if (n->s==3)
     {
       ll+=SIZEOF_LONG*2; /* n->s, mpz size */
       long l=mpz_size1(n->z);
@@ -295,7 +295,7 @@ ideal id_Farey_0(ideal x, number N, const ring r)
 {
   int cnt=IDELEMS(x)*x->nrows;
   int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
-  if (2*cpus>=cnt) /* at least 2 polys for each process, 
+  if (2*cpus>=cnt) /* at least 2 polys for each process,
                      or switch to seriell version */
     return id_Farey(x,N,r);
   ideal result=idInit(cnt,x->rank);

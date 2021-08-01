@@ -1179,15 +1179,14 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec
   // - polynomials used for HECKE: HC, noether -
   if (TEST_OPT_FINDET)
   {
-    if (strat->kHEdge!=NULL)
-      Kstd1_mu=currRing->pFDeg(strat->kHEdge,currRing);
+    if (strat->kNoether!=NULL)
+      Kstd1_mu=currRing->pFDeg(strat->kNoether,currRing);
     else
       Kstd1_mu=-1;
   }
-  if(strat->kHEdge!=NULL) pLmFree(&strat->kHEdge);
+  if(strat->kNoether!=NULL) pLmFree(&strat->kNoether);
   strat->update = TRUE; //???
   strat->lastAxis = 0; //???
-  pDelete(&strat->kNoether);
   omFreeSize((ADDRESS)strat->NotUsedAxis,(rVar(currRing)+1)*sizeof(BOOLEAN));
   if (TEST_OPT_PROT) messageStat(hilbcount,strat);
 //  if (TEST_OPT_WEIGHTM)
