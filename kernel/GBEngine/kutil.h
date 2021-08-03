@@ -374,7 +374,7 @@ public:
 #ifdef HAVE_PLURAL
   /*BOOLEAN*/ char z2homog; // Z_2 - homogeneous input allows product criterion in commutative and SCA cases!
 #endif
-  /*BOOLEAN*/ char kHEdgeFound;
+  /*BOOLEAN*/ char kAllAxis; // all axis are used -> (re)compute noether
   /*BOOLEAN*/ char honey,sugarCrit;
   /*BOOLEAN*/ char Gebauer,noTailReduction;
   /*BOOLEAN*/ char fromT;

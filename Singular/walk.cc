@@ -277,7 +277,7 @@ static ideal kInterRedCC(ideal F, ideal Q)
   }
   strat->syzComp     = 0;
 */
-  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether=pCopy((currRing->ppNoether));
   strat->ak = id_RankFreeModule(F, currRing);
   initBuchMoraCrit(strat);

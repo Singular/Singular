@@ -219,7 +219,7 @@ kStrategy kStratCopy(kStrategy o)
   s->homog=o->homog;
   s->news=o->news;
   s->newt=o->newt;
-  s->kHEdgeFound=o->kHEdgeFound;
+  s->kAllAxis=o->kAllAxis;
   s->honey=o->honey;
   s->sugarCrit=o->sugarCrit;
   s->Gebauer=o->Gebauer;

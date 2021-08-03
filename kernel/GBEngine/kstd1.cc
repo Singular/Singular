@@ -1029,7 +1029,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         pNormalize(H.p);
         z=0;
       }
-      if ((ei > H.ecart) && (!strat->kHEdgeFound))
+      if ((ei > H.ecart) && (strat->kNoether==NULL))
       {
         /*
         * It is not possible to reduce h with smaller ecart;
@@ -1162,7 +1162,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
                 pNormalize(H.p);
                 z=0;
             }
-            if ((ei > H.ecart) && (!strat->kHEdgeFound))
+            if ((ei > H.ecart) && (strat->kNoether==NULL))
             {
                 /*
                  * It is not possible to reduce h with smaller ecart;
@@ -1533,7 +1533,7 @@ void updateT(kStrategy strat)
 }
 
 /*2
-* arranges red, pos and T if strat->kHEdgeFound (first time)
+* arranges red, pos and T if strat->kAllAxis (first time)
 */
 void firstUpdate(kStrategy strat)
 {
@@ -1613,8 +1613,8 @@ void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
     PrintLn();
   }
   #endif
-  if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
-  if (strat->kHEdgeFound)
+  if ((!strat->kAllAxis)|| (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
+  if (strat->kAllAxis)
   {
     if (newHEdge(strat))
     {
@@ -1628,9 +1628,8 @@ void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
       reorderL(strat);
     }
   }
-  else if (strat->kNoether!=NULL)
-    strat->kHEdgeFound = TRUE;
-  else if (TEST_OPT_FASTHC)
+  else if ((strat->kNoether==NULL)
+  && (TEST_OPT_FASTHC))
   {
     if (strat->posInLOldFlag)
     {
@@ -1659,11 +1658,9 @@ void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
 void enterSMoraNF (LObject &p, int atS,kStrategy strat, int atR = -1)
 {
   enterSBba(p, atS, strat, atR);
-  if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
-  if (strat->kHEdgeFound)
+  if ((!strat->kAllAxis) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
+  if (strat->kAllAxis)
     newHEdge(strat);
-  else if (strat->kNoether!=NULL)
-    strat->kHEdgeFound = TRUE;
 }
 
 void initBba(kStrategy strat)
@@ -1805,14 +1802,14 @@ void initMora(ideal F,kStrategy strat)
   strat->posInLOld = strat->posInL;
   strat->posInLOldFlag = TRUE;
   strat->initEcart = initEcartNormal;
-  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
-  if ( strat->kHEdgeFound )
+  strat->kAllAxis = currRing->ppNoether != NULL;
+  if ( currRing->ppNoether != NULL )
      strat->kNoether = pCopy((currRing->ppNoether));
-  else if (strat->kHEdgeFound || strat->homog)
+  else if (strat->kAllAxis || strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
-  if (strat->kHEdgeFound)
+  if (currRing->ppNoether != NULL)
   {
     strat->HCord = currRing->pFDeg((currRing->ppNoether),currRing)+1;
     strat->posInT = posInT2;
@@ -1884,10 +1881,10 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   * and could have put strat->kHEdgdeFound FALSE*/
   if ((currRing->ppNoether)!=NULL)
   {
-    strat->kHEdgeFound = TRUE;
+    strat->kAllAxis = TRUE;
     strat->kNoether=pCopy(currRing->ppNoether);
   }
-  if (strat->kHEdgeFound && strat->update)
+  if (strat->kAllAxis && strat->update)
   {
     firstUpdate(strat);
     updateLHC(strat);
@@ -2058,14 +2055,14 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.Clear();
 #endif
     }
-    if (strat->kHEdgeFound)
+    if (strat->kAllAxis)
     {
       if ((TEST_OPT_FINDET)
       || ((TEST_OPT_MULTBOUND) && (scMult0Int(strat->Shdl,NULL,strat->tailRing) < Kstd1_mu)))
       {
         // obachman: is this still used ???
         /*
-        * stops computation if strat->kHEdgeFound and
+        * stops computation if strat->kAllAxis and
         * - 27 (finiteDeterminacyTest)
         * or
         * - 23
@@ -2136,21 +2133,21 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   //  return pCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),pMaxComp(q));
   /*- creating temp data structures------------------- -*/
-  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether    = pCopy((currRing->ppNoether));
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   si_opt_1&=~Sy_bit(OPT_INTSTRATEGY);
   if (TEST_OPT_STAIRCASEBOUND
   && (! TEST_V_DEG_STOP)
   && (0<Kstd1_deg)
-  && ((!strat->kHEdgeFound)
+  && ((strat->kNoether==NULL)
     ||(TEST_OPT_DEGBOUND && (pWTotaldegree(strat->kNoether)<Kstd1_deg))))
   {
     pLmDelete(&strat->kNoether);
     strat->kNoether=pOne();
     pSetExp(strat->kNoether,1, Kstd1_deg+1);
     pSetm(strat->kNoether);
-    strat->kHEdgeFound=TRUE;
+    strat->kAllAxis=TRUE;
   }
   initBuchMoraCrit(strat);
   if(rField_is_Ring(currRing))
@@ -2170,7 +2167,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
   if ((strat->ak!=0)
-  && (strat->kHEdgeFound))
+  && (strat->kNoether!=NULL))
   {
     if (strat->ak!=1)
     {
@@ -2281,19 +2278,19 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   //  return idCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
   /*- creating temp data structures------------------- -*/
-  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether=pCopy((currRing->ppNoether));
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   if (TEST_OPT_STAIRCASEBOUND
   && (0<Kstd1_deg)
-  && ((!strat->kHEdgeFound)
+  && ((strat->kNoether==NULL)
     ||(TEST_OPT_DEGBOUND && (pWTotaldegree(strat->kNoether)<Kstd1_deg))))
   {
     pLmDelete(&strat->kNoether);
     strat->kNoether=pOne();
     pSetExp(strat->kNoether,1, Kstd1_deg+1);
     pSetm(strat->kNoether);
-    strat->kHEdgeFound=TRUE;
+    strat->kAllAxis=TRUE;
   }
   initBuchMoraCrit(strat);
   if(rField_is_Ring(currRing))
@@ -2313,7 +2310,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
   if ((strat->ak!=0)
-  && (strat->kHEdgeFound))
+  && (strat->kNoether!=NULL))
   {
     if (strat->ak!=1)
     {
@@ -3421,7 +3418,7 @@ ideal kInterRedOld (ideal F, ideal Q)
 //    mflush();
 //  }
   //strat->syzComp     = 0;
-  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether=pCopy((currRing->ppNoether));
   strat->ak = id_RankFreeModule(tempF,currRing);
   initBuchMoraCrit(strat);

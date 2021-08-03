@@ -253,7 +253,7 @@ VAR int     Kstd1_mu=INT_MAX;
 */
 void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 {
-  if (strat->kHEdgeFound)
+  if (strat->kNoether!=NULL)
   {
     kTest_L(L,strat->tailRing);
     poly p1;
@@ -329,7 +329,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 
 void deleteHCBucket(LObject *L, kStrategy strat)
 {
-  if (strat->kHEdgeFound)
+  if (strat->kNoether!=NULL)
   {
     kTest_L(L,strat->tailRing);
     poly p1;
@@ -486,19 +486,18 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 
 /*2
 *pp is the new element in s
-*returns TRUE (in strat->kHEdgeFound) if
+*returns TRUE (in strat->kAllAxis) if
 *-HEcke is allowed
 *-we are in the last componente of the vector
 *-on all axis are monomials (all elements in NotUsedAxis are FALSE)
 *returns FALSE for pLexOrderings,
 *assumes in module case an ordering of type c* !!
-* HEckeTest is only called with strat->kHEdgeFound==FALSE !
+* HEckeTest is only called with strat->kAllAxis==FALSE !
 */
 void HEckeTest (poly pp,kStrategy strat)
 {
   int   j,/*k,*/p;
 
-  strat->kHEdgeFound=FALSE;
   if (currRing->pLexOrder || rHasMixedOrdering(currRing))
   {
     return;
@@ -523,7 +522,7 @@ void HEckeTest (poly pp,kStrategy strat)
       return;
     }
   }
-  strat->kHEdgeFound=TRUE;
+  strat->kAllAxis=TRUE;
 }
 
 /*2
@@ -7107,8 +7106,8 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
   long op = strat->tailRing->pFDeg(hn, strat->tailRing);
   long e;
   int l;
-  BOOLEAN save_HE=strat->kHEdgeFound;
-  strat->kHEdgeFound |=
+  BOOLEAN save_HE=strat->kAllAxis;
+  strat->kAllAxis |=
     ((Kstd1_deg>0) && (op<=Kstd1_deg)) || TEST_OPT_INFREDTAIL;
 
   while(hn != NULL)
@@ -7120,7 +7119,7 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
     {
       Ln.Set(hn, strat->tailRing);
       Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
-      if (strat->kHEdgeFound)
+      if (strat->kAllAxis)
         With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s);
       else
         With = kFindDivisibleByInS_T(strat, end_pos, &Ln, &With_s, e);
@@ -7133,7 +7132,7 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
         {
-          strat->kHEdgeFound = save_HE;
+          strat->kAllAxis = save_HE;
           return redtail(L, end_pos, strat);
         }
         else
@@ -7154,7 +7153,7 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
   {
     L->pLength = 0;
   }
-  strat->kHEdgeFound = save_HE;
+  strat->kAllAxis = save_HE;
   return p;
 }
 
@@ -8774,7 +8773,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
     do
     {
       if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)
-      && ((e >= strat->ecartS[j]) || strat->kHEdgeFound))
+      && ((e >= strat->ecartS[j]) || (strat->kNoether!=NULL)))
       {
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -8995,11 +8994,11 @@ void updateS(BOOLEAN toT,kStrategy strat)
       else { suc=-1; break; }
       if (h.p!=NULL)
       {
-        if (!strat->kHEdgeFound)
+        if (!strat->kAllAxis)
         {
-          /*strat->kHEdgeFound =*/ HEckeTest(h.p,strat);
+          /*strat->kAllAxis =*/ HEckeTest(h.p,strat);
         }
-        if (strat->kHEdgeFound)
+        if (strat->kAllAxis)
           newHEdge(strat);
       }
     }
@@ -10230,11 +10229,10 @@ void initSbaPos (kStrategy strat)
 void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
 {
   strat->interpt = BTEST1(OPT_INTERRUPT);
-  strat->kNoether=NULL;
-  if (rHasGlobalOrdering(currRing)) strat->kHEdgeFound=FALSE;
+  //strat->kNoether=NULL; // done by skStrategy
   /*- creating temp data structures------------------- -*/
-  strat->cp = 0;
-  strat->c3 = 0;
+  //strat->cp = 0; // done by skStrategy
+  //strat->c3 = 0; // done by skStrategy
   strat->tail = pInit();
   /*- set s -*/
   strat->sl = -1;
@@ -10255,8 +10253,8 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->R = initR();
   strat->sevT = initsevT();
   /*- init local data struct.---------------------------------------- -*/
-  strat->P.ecart=0;
-  strat->P.length=0;
+  //strat->P.ecart=0;  // done by skStrategy
+  //strat->P.length=0;  // done by skStrategy
   if (rHasLocalOrMixedOrdering(currRing))
   {
     if (strat->kNoether!=NULL)
@@ -10293,7 +10291,7 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
       initSLSba(F, Q,strat); /*sets also S, ecartS, fromQ */
     }
   }
-  strat->fromT = FALSE;
+  //strat->fromT = FALSE;  // done by skStrategy
   if (!TEST_OPT_SB_1)
   {
     if(!rField_is_Ring(currRing)) updateS(TRUE,strat);
