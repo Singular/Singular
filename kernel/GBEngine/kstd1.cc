@@ -1805,7 +1805,7 @@ void initMora(ideal F,kStrategy strat)
   strat->kAllAxis = currRing->ppNoether != NULL;
   if ( currRing->ppNoether != NULL )
      strat->kNoether = pCopy((currRing->ppNoether));
-  else if (strat->kAllAxis || strat->homog)
+  else if ((currRing->ppNoether != NULL) || strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
@@ -1879,11 +1879,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_FASTHC) missingAxis(&strat->lastAxis,strat);
   /*updateS in initBuchMora has Hecketest
   * and could have put strat->kHEdgdeFound FALSE*/
-  if ((currRing->ppNoether)!=NULL)
-  {
-    strat->kAllAxis = TRUE;
-    strat->kNoether=pCopy(currRing->ppNoether);
-  }
   if (strat->kAllAxis && strat->update)
   {
     firstUpdate(strat);
@@ -2089,8 +2084,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       Kstd1_mu=-1;
   }
   if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
-  strat->update = TRUE; //???
-  strat->lastAxis = 0; //???
   if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   if ((TEST_OPT_PROT)||(TEST_OPT_DEBUG))  messageStat(hilbcount,strat);
