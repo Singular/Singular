@@ -352,7 +352,6 @@ public:
   int Bl,Bmax;
   int ak,LazyDegree,LazyPass;
   int syzComp;
-  int HCord;
   int lastAxis;
   int newIdeal;
   int minim;

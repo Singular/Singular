@@ -213,7 +213,6 @@ kStrategy kStratCopy(kStrategy o)
   s->syzComp=o->syzComp;
   s->LazyPass=o->LazyPass;
   s->LazyDegree=o->LazyDegree;
-  s->HCord=o->HCord;
   s->lastAxis=o->lastAxis;
   s->interpt=o->interpt;
   s->homog=o->homog;

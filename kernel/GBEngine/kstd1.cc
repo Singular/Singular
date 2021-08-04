@@ -1613,7 +1613,7 @@ void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
     PrintLn();
   }
   #endif
-  if ((!strat->kAllAxis)|| (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
+  HEckeTest(p.p,strat);
   if (strat->kAllAxis)
   {
     if (newHEdge(strat))
@@ -1811,12 +1811,12 @@ void initMora(ideal F,kStrategy strat)
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
   if (currRing->ppNoether != NULL)
   {
-    strat->HCord = currRing->pFDeg((currRing->ppNoether),currRing)+1;
+    HCord = currRing->pFDeg((currRing->ppNoether),currRing)+1;
     strat->posInT = posInT2;
   }
   else
   {
-    strat->HCord = 32000;/*- very large -*/
+    HCord = 32000;/*- very large -*/
   }
 
   if (rField_is_Ring(currRing)) {
@@ -2067,7 +2067,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       }
     }
-    HCord=strat->HCord;
     kTest_TS(strat);
   }
   /*- complete reduction of the standard basis------------------------ -*/

@@ -511,14 +511,17 @@ void HEckeTest (poly pp,kStrategy strat)
     //  return FALSE;
   }
   // k = 0;
+  if (rField_is_Ring(currRing) && (!n_IsUnit(pGetCoeff(pp),currRing->cf)))
+    return;
   p=pIsPurePower(pp);
-  if (rField_is_Ring(currRing) && (!n_IsUnit(pGetCoeff(pp),currRing->cf))) return;
-  if (p!=0) strat->NotUsedAxis[p] = FALSE;
+  if (p!=0)
+    strat->NotUsedAxis[p] = FALSE;
   /*- the leading term of pp is a power of the p-th variable -*/
   for (j=(currRing->N);j>0; j--)
   {
     if (strat->NotUsedAxis[j])
     {
+      strat->kAllAxis=FALSE;
       return;
     }
   }
@@ -10707,14 +10710,14 @@ BOOLEAN newHEdge(kStrategy strat)
     if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
   }
   pSetm(newNoether);
-  if (j < strat->HCord) /*- statistics -*/
+  if (j < HCord) /*- statistics -*/
   {
     if (TEST_OPT_PROT)
     {
       Print("H(%d)",j);
       mflush();
     }
-    strat->HCord=j;
+    HCord=j;
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
