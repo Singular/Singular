@@ -1802,7 +1802,7 @@ void initMora(ideal F,kStrategy strat)
   strat->posInLOld = strat->posInL;
   strat->posInLOldFlag = TRUE;
   strat->initEcart = initEcartNormal;
-  strat->kAllAxis = currRing->ppNoether != NULL;
+  //strat->kAllAxis = FALSE; // done by skStrategy()
   if ( currRing->ppNoether != NULL )
      strat->kNoether = pCopy((currRing->ppNoether));
   else if ((currRing->ppNoether != NULL) || strat->homog)
@@ -1879,7 +1879,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_FASTHC) missingAxis(&strat->lastAxis,strat);
   /*updateS in initBuchMora has Hecketest
   * and could have put strat->kHEdgdeFound FALSE*/
-  if (strat->kAllAxis && strat->update)
+  if ((strat->kNoether!=NULL) && strat->update)
   {
     firstUpdate(strat);
     updateLHC(strat);
@@ -2126,7 +2126,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   //  return pCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),pMaxComp(q));
   /*- creating temp data structures------------------- -*/
-  strat->kAllAxis = (currRing->ppNoether) != NULL;
+  //strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether    = pCopy((currRing->ppNoether));
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   si_opt_1&=~Sy_bit(OPT_INTSTRATEGY);
@@ -2140,7 +2140,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
     strat->kNoether=pOne();
     pSetExp(strat->kNoether,1, Kstd1_deg+1);
     pSetm(strat->kNoether);
-    strat->kAllAxis=TRUE;
+    // strat->kAllAxis=TRUE;
   }
   initBuchMoraCrit(strat);
   if(rField_is_Ring(currRing))
@@ -2271,7 +2271,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   //  return idCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
   /*- creating temp data structures------------------- -*/
-  strat->kAllAxis = (currRing->ppNoether) != NULL;
+  //strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether=pCopy((currRing->ppNoether));
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   if (TEST_OPT_STAIRCASEBOUND
@@ -2283,7 +2283,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     strat->kNoether=pOne();
     pSetExp(strat->kNoether,1, Kstd1_deg+1);
     pSetm(strat->kNoether);
-    strat->kAllAxis=TRUE;
+    //strat->kAllAxis=TRUE;
   }
   initBuchMoraCrit(strat);
   if(rField_is_Ring(currRing))
