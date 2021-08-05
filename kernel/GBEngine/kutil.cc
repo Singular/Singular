@@ -253,7 +253,7 @@ VAR int     Kstd1_mu=INT_MAX;
 */
 void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 {
-  if (strat->kNoether!=NULL)
+  if (strat->kAllAxis)
   {
     kTest_L(L,strat->tailRing);
     poly p1;
@@ -329,7 +329,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 
 void deleteHCBucket(LObject *L, kStrategy strat)
 {
-  if (strat->kNoether!=NULL)
+  if (strat->kAllAxis)
   {
     kTest_L(L,strat->tailRing);
     poly p1;

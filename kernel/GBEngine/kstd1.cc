@@ -1613,7 +1613,7 @@ void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
     PrintLn();
   }
   #endif
-  HEckeTest(p.p,strat);
+  if ((!strat->kAllAxis) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kAllAxis)
   {
     if (newHEdge(strat))
@@ -1802,7 +1802,7 @@ void initMora(ideal F,kStrategy strat)
   strat->posInLOld = strat->posInL;
   strat->posInLOldFlag = TRUE;
   strat->initEcart = initEcartNormal;
-  //strat->kAllAxis = FALSE; // done by skStrategy()
+  strat->kAllAxis = (currRing->ppNoether) != NULL; //!!
   if ( currRing->ppNoether != NULL )
      strat->kNoether = pCopy((currRing->ppNoether));
   else if ((currRing->ppNoether != NULL) || strat->homog)
@@ -2159,7 +2159,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
   if ((strat->ak!=0)
-  && (strat->kNoether!=NULL))
+  && (strat->kAllAxis))
   {
     if (strat->ak!=1)
     {
