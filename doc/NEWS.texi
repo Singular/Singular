@@ -21,6 +21,24 @@
 
 @heading News for version @value{VERSION}
 
+@c New commands:
+@c @itemize
+@c @end itemize
+@c 
+@c New libraries:
+@c 
+@c @itemize
+@c @end itemize
+
+Changes in the kernel/build system:
+@itemize
+@item @code{liftstd} (with 2 arguments) improved (@nref{liftstd})
+@item @code{noether} improved (@nref{noether})
+@item update for using FLINT 2.8.x
+@end itemize
+
+@heading News for version 4-2-1
+
 New commands:
 @itemize
 @item Letterplace: dim, rightStd for qrings (@nref{LETTERPLACE})
