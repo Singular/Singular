@@ -90,7 +90,7 @@ static proc testOptionIsSet()
 proc changechar (list @L, list #)
 "USAGE:   changechar(c[,r]);  c=list, r=ring
 RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
-         ringlist(r)[1] to c.
+         ring_list(r)[1] to c.
 EXAMPLE: example changechar; shows an example
 "
 {
@@ -98,7 +98,7 @@ EXAMPLE: example changechar; shows an example
    if( size(#)==0 ) { def @r=basering; }
    if(( size(#)==1 ) and (typeof(#[1])=="ring")) { def @r=#[1]; }
    setring @r;
-   list rl=ringlist(@r);
+   list rl=ring_list(@r);
    if(defined(@L)!=voice) { def @L=fetch(save_ring,@L); }
    if (size(@L)==1) { rl[1]=@L[1];} else { rl[1]=@L;}
    def Rnew=ring(rl);
