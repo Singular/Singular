@@ -247,33 +247,71 @@ VAR int     HCord;
 VAR int     Kstd1_deg;
 VAR int     Kstd1_mu=INT_MAX;
 
+static void deleteHCBucket(LObject *L, kStrategy strat)
+{
+  if (strat->kNoether!=NULL)
+  {
+    kTest_L(L,strat->tailRing);
+    poly p1;
+    BOOLEAN cut=FALSE;
+    if (L->bucket != NULL)
+    {
+      for (int i=1; i<= (int) L->bucket->buckets_used; i++)
+      {
+        poly p=L->bucket->buckets[i];
+        if(p!=NULL)
+        {
+          if (p_Cmp(p,strat->kNoetherTail(), L->tailRing) == -1)
+          {
+            L->bucket->buckets[i]=NULL;
+            L->bucket->buckets_length[i]=0;
+            cut=TRUE;
+          }
+          else
+          {
+            do
+            {
+              if (p_Cmp(pNext(p),strat->kNoetherTail(), L->tailRing) == -1)
+              {
+                p_Delete(&pNext(p), L->tailRing);
+                cut=TRUE;
+                L->bucket->buckets_length[i]=pLength(L->bucket->buckets[i]);
+                break;
+              }
+              pIter(p);
+            } while(p!=NULL);
+          }
+        }
+      }
+      if (TEST_OPT_PROT && cut) {  PrintS("h"); mflush(); }
+    }
+  }
+}
+
 /*2
 *deletes higher monomial of p, re-compute ecart and length
 *works only for orderings with ecart =pFDeg(end)-pFDeg(start)
 */
 void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 {
-  if (strat->kAllAxis)
+  if (strat->kNoether!=NULL)
   {
     kTest_L(L,strat->tailRing);
     poly p1;
     poly p = L->GetLmTailRing();
     int l = 1;
-    kBucket_pt bucket = NULL;
-    if (L->bucket != NULL)
-    {
-      kBucketClear(L->bucket, &pNext(p), &L->pLength);
-      L->pLength++;
-      bucket = L->bucket;
-      L->bucket = NULL;
-    }
 
     if (!fromNext && p_Cmp(p,strat->kNoetherTail(), L->tailRing) == -1)
     {
+      if (L->bucket != NULL) kBucketDestroy(&L->bucket);
       L->Delete();
       L->Clear();
       L->ecart = -1;
-      if (bucket != NULL) kBucketDestroy(&bucket);
+      return;
+    }
+    if (L->bucket != NULL)
+    {
+      deleteHCBucket(L,strat);
       return;
     }
     p1 = p;
@@ -310,41 +348,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       L->SetpFDeg();
       L->ecart = L->pLDeg(strat->LDegLast) - L->GetpFDeg();
     }
-    if (bucket != NULL)
-    {
-      if (L->pLength > 1)
-      {
-        kBucketInit(bucket, pNext(p), L->pLength - 1);
-        pNext(p) = NULL;
-        if (L->t_p != NULL) pNext(L->t_p) = NULL;
-        L->pLength = 0;
-        L->bucket = bucket;
-      }
-      else
-        kBucketDestroy(&bucket);
-    }
     kTest_L(L,strat->tailRing);
-  }
-}
-
-void deleteHCBucket(LObject *L, kStrategy strat)
-{
-  if (strat->kAllAxis)
-  {
-    kTest_L(L,strat->tailRing);
-    poly p1;
-    if (L->bucket != NULL)
-    {
-      for (int i=1; i<= (int) L->bucket->buckets_used; i++)
-      {
-        poly p=L->bucket->buckets[i];
-        if(p_Cmp(pNext(p),strat->kNoetherTail(), L->tailRing) == -1)
-	{
-          if (TEST_OPT_PROT) {  PrintS("h"); mflush(); }
-          p_Delete(&pNext(p), L->tailRing);
-	}
-      }
-    }
   }
 }
 

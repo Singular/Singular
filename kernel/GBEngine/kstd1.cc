@@ -1613,7 +1613,7 @@ void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
     PrintLn();
   }
   #endif
-  if ((!strat->kAllAxis) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
+  HEckeTest(p.p,strat);
   if (strat->kAllAxis)
   {
     if (newHEdge(strat))
@@ -1667,7 +1667,7 @@ void initBba(kStrategy strat)
 {
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
-    strat->red = redHoney;
+  strat->red = redHoney;
   if (strat->honey)
     strat->red = redHoney;
   else if (currRing->pLexOrder && !strat->homog)
@@ -1727,7 +1727,7 @@ void initSba(ideal F,kStrategy strat)
   //idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSSba;
-    strat->red2 = redHoney;
+  strat->red2 = redHoney;
   if (strat->honey)
     strat->red2 = redHoney;
   else if (currRing->pLexOrder && !strat->homog)
@@ -1804,15 +1804,17 @@ void initMora(ideal F,kStrategy strat)
   strat->initEcart = initEcartNormal;
   strat->kAllAxis = (currRing->ppNoether) != NULL; //!!
   if ( currRing->ppNoether != NULL )
-     strat->kNoether = pCopy((currRing->ppNoether));
-  else if ((currRing->ppNoether != NULL) || strat->homog)
+  {
+    strat->kNoether = pCopy((currRing->ppNoether));
+    strat->red = redEcart;/*take the first possible in under ecart-restriction*/
+  }
+  else if (strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
   if (currRing->ppNoether != NULL)
   {
     HCord = currRing->pFDeg((currRing->ppNoether),currRing)+1;
-    strat->posInT = posInT2;
   }
   else
   {
@@ -1879,12 +1881,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_FASTHC) missingAxis(&strat->lastAxis,strat);
   /*updateS in initBuchMora has Hecketest
   * and could have put strat->kHEdgdeFound FALSE*/
-  if ((strat->kNoether!=NULL) && strat->update)
-  {
-    firstUpdate(strat);
-    updateLHC(strat);
-    reorderL(strat);
-  }
   if (TEST_OPT_FASTHC && (strat->lastAxis) && strat->posInLOldFlag)
   {
     strat->posInLOld = strat->posInL;
@@ -1900,14 +1896,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (strat->homog && strat->red == redFirst)
     if(!idIs0(F) &&(!rField_is_Ring(currRing)))
       kStratInitChangeTailRing(strat);
-  if(strat->kNoether!=NULL)
-  {
-    firstUpdate(strat);
-    /*- cuts elements in L above noether and reorders L -*/
-    updateLHC(strat);
-    /*- reorders L with respect to posInL -*/
-    reorderL(strat);
-  }
 #endif
 
   if (BVERBOSE(23))
