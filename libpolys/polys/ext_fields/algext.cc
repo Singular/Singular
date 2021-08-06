@@ -9,7 +9,7 @@
   *           IMPORTANT ASSUMPTIONS:
   *           1.) So far we assume that cf->extRing is a valid polynomial
   *               ring in exactly one variable, i.e., K[a], where K is allowed
-  *               to be any field (representable in SINGULAR and which may
+  0*               to be any field (representable in SINGULAR and which may
   *               itself be some extension field, thus allowing for extension
   *               towers).
   *           2.) Moreover, this implementation assumes that
@@ -1418,6 +1418,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = naIsOne;
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
+  cf->cfInitMPZ      = naInitMPZ;
   cf->cfFarey        = naFarey;
   cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
