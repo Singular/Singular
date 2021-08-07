@@ -1806,7 +1806,12 @@ void initMora(ideal F,kStrategy strat)
   if ( currRing->ppNoether != NULL )
   {
     strat->kNoether = pCopy((currRing->ppNoether));
-    strat->red = redEcart;/*take the first possible in under ecart-restriction*/
+    strat->red = redFirst;  /*take the first possible in T*/
+    if (TEST_OPT_PROT)
+    {
+      Print("H(%ld)",p_FDeg(currRing->ppNoether,currRing)+1);
+      mflush();
+    }
   }
   else if (strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
