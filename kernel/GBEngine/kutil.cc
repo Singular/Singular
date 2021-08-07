@@ -313,35 +313,41 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       deleteHCBucket(L,strat);
       return;
     }
+    BOOLEAN cut=FALSE;
     p1 = p;
     while (pNext(p1)!=NULL)
     {
       if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
-        p_Delete(&pNext(p1), L->tailRing);
-        if (p1 == p)
+        cut=(pNext(p1)!=NULL);
+        if (cut)
         {
-          if (L->t_p != NULL)
+          p_Delete(&pNext(p1), L->tailRing);
+
+          if (p1 == p)
           {
-            assume(L->p != NULL && p == L->t_p);
-            pNext(L->p) = NULL;
+            if (L->t_p != NULL)
+            {
+              assume(L->p != NULL && p == L->t_p);
+              pNext(L->p) = NULL;
+            }
+            L->max_exp  = NULL;
           }
-          L->max_exp  = NULL;
+          else if (fromNext)
+            L->max_exp  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
+          //if (L->pLength != 0)
+          L->pLength = l;
+          // Hmmm when called from updateT, then only
+          // reset ecart when cut
+          if (fromNext)
+            L->ecart = L->pLDeg() - L->GetpFDeg();
         }
-        else if (fromNext)
-          L->max_exp  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
-        //if (L->pLength != 0)
-        L->pLength = l;
-        // Hmmm when called from updateT, then only
-        // reset ecart when cut
-        if (fromNext)
-          L->ecart = L->pLDeg() - L->GetpFDeg();
         break;
       }
       l++;
       pIter(p1);
     }
-    if (! fromNext)
+    if ((!fromNext) && cut)
     {
       L->SetpFDeg();
       L->ecart = L->pLDeg(strat->LDegLast) - L->GetpFDeg();
