@@ -249,41 +249,40 @@ VAR int     Kstd1_mu=INT_MAX;
 
 static void deleteHCBucket(LObject *L, kStrategy strat)
 {
-  if (strat->kNoether!=NULL)
+  if ((strat->kNoether!=NULL)
+  && (L->bucket != NULL))
   {
-    kTest_L(L,strat->tailRing);
     poly p1;
-    BOOLEAN cut=FALSE;
-    if (L->bucket != NULL)
+    for (int i=1; i<= (int) L->bucket->buckets_used; i++)
     {
-      for (int i=1; i<= (int) L->bucket->buckets_used; i++)
+      poly p=L->bucket->buckets[i];
+      if(p!=NULL)
       {
-        poly p=L->bucket->buckets[i];
-        if(p!=NULL)
+        if (p_Cmp(p,strat->kNoetherTail(), L->tailRing) == -1)
         {
-          if (p_Cmp(p,strat->kNoetherTail(), L->tailRing) == -1)
+          L->bucket->buckets[i]=NULL;
+          L->bucket->buckets_length[i]=0;
+        }
+        else
+        {
+          do
           {
-            L->bucket->buckets[i]=NULL;
-            L->bucket->buckets_length[i]=0;
-            cut=TRUE;
-          }
-          else
-          {
-            do
+            if (p_Cmp(pNext(p),strat->kNoetherTail(), L->tailRing) == -1)
             {
-              if (p_Cmp(pNext(p),strat->kNoetherTail(), L->tailRing) == -1)
-              {
-                p_Delete(&pNext(p), L->tailRing);
-                cut=TRUE;
-                L->bucket->buckets_length[i]=pLength(L->bucket->buckets[i]);
-                break;
-              }
-              pIter(p);
-            } while(p!=NULL);
-          }
+              p_Delete(&pNext(p), L->tailRing);
+              L->bucket->buckets_length[i]=pLength(L->bucket->buckets[i]);
+              break;
+            }
+            pIter(p);
+          } while(p!=NULL);
         }
       }
-      if (TEST_OPT_PROT && cut) {  PrintS("h"); mflush(); }
+    }
+    int i=L->bucket->buckets_used;
+    while ((i>0)&&(L->bucket->buckets[i]==NULL))
+    {
+      i--;
+      L->bucket->buckets_used=i;
     }
   }
 }
@@ -319,7 +318,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     {
       if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
-        if (TEST_OPT_PROT) {  PrintS("h"); mflush(); }
         p_Delete(&pNext(p1), L->tailRing);
         if (p1 == p)
         {
@@ -502,21 +500,13 @@ void HEckeTest (poly pp,kStrategy strat)
 {
   int   j,/*k,*/p;
 
-  if (currRing->pLexOrder || rHasMixedOrdering(currRing))
+  if (currRing->pLexOrder
+  || rHasMixedOrdering(currRing)
+  || (strat->ak >1)
+  || (rField_is_Ring(currRing) && (!n_IsUnit(pGetCoeff(pp),currRing->cf))))
   {
     return;
   }
-  if (strat->ak > 1)           /*we are in the module case*/
-  {
-    return; // until ....
-    //if (!pVectorOut)     /*pVectorOut <=> order = c,* */
-    //  return FALSE;
-    //if (pGetComp(pp) < strat->ak) /* ak is the number of the last component */
-    //  return FALSE;
-  }
-  // k = 0;
-  if (rField_is_Ring(currRing) && (!n_IsUnit(pGetCoeff(pp),currRing->cf)))
-    return;
   p=pIsPurePower(pp);
   if (p!=0)
     strat->NotUsedAxis[p] = FALSE;
@@ -9885,7 +9875,7 @@ void initBuchMoraPos (kStrategy strat)
       strat->posInT = posInT110;
     }
   }
-  else
+  else /* local/mixed ordering */
   {
     if (strat->homog)
     {
