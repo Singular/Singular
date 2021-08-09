@@ -190,6 +190,8 @@ int redEcart (LObject* h,kStrategy strat)
 
     if (ei > h->ecart && ii < strat->tl)
     {
+      unsigned long not_sev=~h->sev;
+      poly h_t= h->GetLmTailRing();
       li = strat->T[j].length;
       if (li<=0) li=strat->T[j].GetpLength();
       // the polynomial to reduce with (up to the moment) is;
@@ -206,7 +208,7 @@ int redEcart (LObject* h,kStrategy strat)
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
-            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing))
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h_t, not_sev, strat->tailRing))
 #else
           j = kFindDivisibleByInT(strat, h, i);
         if (j < 0) break;
@@ -974,7 +976,6 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   H.ecart = currRing->pLDeg(H.p,&H.length,currRing)-o;
   if ((flag & 2) == 0) cancelunit(&H,TRUE);
   H.sev = pGetShortExpVector(H.p);
-  unsigned long not_sev = ~ H.sev;
   loop
   {
     if (j > strat->tl)
@@ -986,6 +987,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       if (kModDeg(H.p)>Kstd1_deg) pLmDelete(&H.p);
       if (H.p==NULL) return NULL;
     }
+    unsigned long not_sev = ~ H.sev;
     if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
         )
     {
@@ -1054,7 +1056,6 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       H.ecart = currRing->pLDeg(H.p,&(H.length),currRing)-o;
       j = 0;
       H.sev = pGetShortExpVector(H.p);
-      not_sev = ~ H.sev;
     }
     else
     {

@@ -934,7 +934,6 @@ int redHomog (LObject* h,kStrategy strat)
 
   poly h_p;
   int i,j,at,pass,cnt,ii;
-  unsigned long not_sev;
   // long reddeg,d;
   int li;
   BOOLEAN test_opt_length=TEST_OPT_LENGTH;
@@ -944,7 +943,6 @@ int redHomog (LObject* h,kStrategy strat)
   // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   h_p = h->GetLmTailRing();
-  not_sev = ~ h->sev;
   h->PrepareRed(strat->use_buckets);
   loop
   {
@@ -963,24 +961,27 @@ int redHomog (LObject* h,kStrategy strat)
     {
       if (li<=0) li=strat->T[j].GetpLength();
       if (li>2)
-      loop
       {
-        /*- search the shortest possible with respect to length -*/
-        i++;
-        if (i > strat->tl)
-          break;
-        if ((strat->T[i].pLength < li)
-           &&
-            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                                 h_p, not_sev, strat->tailRing))
+        unsigned long not_sev = ~ h->sev;
+        loop
         {
-          /*
-           * the polynomial to reduce with is now;
-           */
-          li = strat->T[i].pLength;
-          if (li<=0) li=strat->T[i].GetpLength();
-          ii = i;
-          if (li<3) break;
+          /*- search the shortest possible with respect to length -*/
+          i++;
+          if (i > strat->tl)
+            break;
+          if ((strat->T[i].pLength < li)
+             &&
+              p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                   h_p, not_sev, strat->tailRing))
+          {
+            /*
+             * the polynomial to reduce with is now;
+             */
+            li = strat->T[i].pLength;
+            if (li<=0) li=strat->T[i].GetpLength();
+            ii = i;
+            if (li<3) break;
+          }
         }
       }
     }
@@ -1062,7 +1063,6 @@ int redHomog (LObject* h,kStrategy strat)
     }
     #endif
     h->SetShortExpVector();
-    not_sev = ~ h->sev;
     /*
      * try to reduce the s-polynomial h
      *test first whether h should go to the lazyset L
@@ -1694,12 +1694,10 @@ int redLazy (LObject* h,kStrategy strat)
   assume(h->pFDeg() == h->FDeg);
   long reddeg = h->GetpFDeg();
   long d;
-  unsigned long not_sev;
   BOOLEAN test_opt_length=TEST_OPT_LENGTH;
 
   h->SetShortExpVector();
   poly h_p = h->GetLmTailRing();
-  not_sev = ~ h->sev;
   h->PrepareRed(strat->use_buckets);
   loop
   {
@@ -1719,24 +1717,27 @@ int redLazy (LObject* h,kStrategy strat)
     {
       if (li<=0) li=strat->T[j].GetpLength();
       if(li>2)
-      loop
       {
-        /*- search the shortest possible with respect to length -*/
-        i++;
-        if (i > strat->tl)
-          break;
-        if ((strat->T[i].pLength < li)
-           &&
-            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                                 h_p, not_sev, strat->tailRing))
+        unsigned long not_sev = ~ h->sev;
+        loop
         {
-          /*
-           * the polynomial to reduce with is now;
-           */
-          li = strat->T[i].pLength;
-          if (li<=0) li=strat->T[i].GetpLength();
-          ii = i;
-          if (li<3) break;
+          /*- search the shortest possible with respect to length -*/
+          i++;
+          if (i > strat->tl)
+            break;
+          if ((strat->T[i].pLength < li)
+             &&
+              p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                   h_p, not_sev, strat->tailRing))
+          {
+            /*
+             * the polynomial to reduce with is now;
+             */
+            li = strat->T[i].pLength;
+            if (li<=0) li=strat->T[i].GetpLength();
+            ii = i;
+            if (li<3) break;
+          }
         }
       }
     }
@@ -1820,7 +1821,6 @@ int redLazy (LObject* h,kStrategy strat)
     }
     #endif
     h->SetShortExpVector();
-    not_sev = ~ h->sev;
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     cnt--;
@@ -1896,7 +1896,6 @@ int redHoney (LObject* h, kStrategy strat)
   assume(h->FDeg == h->pFDeg());
   poly h_p;
   int i,j,at,pass,ei, ii, h_d;
-  unsigned long not_sev;
   long reddeg,d;
   int li;
   BOOLEAN test_opt_length=TEST_OPT_LENGTH;
@@ -1905,7 +1904,6 @@ int redHoney (LObject* h, kStrategy strat)
   d = reddeg = h->GetpFDeg() + h->ecart;
   h->SetShortExpVector();
   h_p = h->GetLmTailRing();
-  not_sev = ~ h->sev;
 
   h->PrepareRed(strat->use_buckets);
   loop
@@ -1925,27 +1923,30 @@ int redHoney (LObject* h, kStrategy strat)
     {
       if (li<=0) li=strat->T[j].GetpLength();
       if (li>2)
-      loop
       {
-        /*- takes the first possible with respect to ecart -*/
-        i++;
-        if (i > strat->tl) break;
-        if (ei <= h->ecart) break;
-        if(p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                                 h_p, not_sev, strat->tailRing))
+        unsigned long not_sev = ~ h->sev;
+        loop
         {
-          strat->T[i].GetpLength();
-          if (((strat->T[i].ecart < ei) && (ei> h->ecart))
-           || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
+          /*- takes the first possible with respect to ecart -*/
+          i++;
+          if (i > strat->tl) break;
+          if (ei <= h->ecart) break;
+          if(p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                   h_p, not_sev, strat->tailRing))
           {
-            /*
-            * the polynomial to reduce with is now;
-            */
-            ei = strat->T[i].ecart;
-            li = strat->T[i].pLength;
-            ii = i;
-            if (li==1) break;
-            if (ei<=h->ecart) break;
+            strat->T[i].GetpLength();
+            if (((strat->T[i].ecart < ei) && (ei> h->ecart))
+             || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
+            {
+              /*
+              * the polynomial to reduce with is now;
+              */
+              ei = strat->T[i].ecart;
+              li = strat->T[i].pLength;
+              ii = i;
+              if (li==1) break;
+              if (ei<=h->ecart) break;
+            }
           }
         }
       }
@@ -2047,7 +2048,6 @@ int redHoney (LObject* h, kStrategy strat)
       }
     }
     h->SetShortExpVector();
-    not_sev = ~ h->sev;
     h_d = h->SetpFDeg();
     /* compute the ecart */
     if (ei <= h->ecart)
