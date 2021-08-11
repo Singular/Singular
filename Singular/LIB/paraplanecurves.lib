@@ -312,10 +312,11 @@ EXAMPLE:  example paraPlaneCurve; shows an example
       setring RP1;
       ideal PARA = PARACONIC;
       export(PARA);
-      "// 'paraPlaneCurve' created a ring together with an ideal PARA.";
-      "// Supposing you typed, say,  def RP1 = paraPlaneCurve(f);";
-      "// you may access the ideal by typing";
-      "//      setring RP1; PARA;";
+      int p = printlevel - voice + 3;
+      dbprint(p,"// 'paraPlaneCurve' created a ring together with an ideal PARA.
+// Supposing you typed, say,  def RP1 = paraPlaneCurve(f);
+// you may access the ideal by typing
+//      setring RP1; PARA;");
       return(RP1);
     }
   int k;
@@ -353,10 +354,11 @@ EXAMPLE:  example paraPlaneCurve; shows an example
       setring RP1;
       ideal PARA = fetch(rp1,psi);
       export(PARA);
-      "// 'paraPlaneCurve' created a ring together with an ideal PARA.";
-      "// Supposing you typed, say,  def RP1 = paraPlaneCurve(f);";
-      "// you may access the ideal by typing";
-      "//      setring RP1; PARA;";
+      int p = printlevel - voice + 3;
+      dbprint(p,"// 'paraPlaneCurve' created a ring together with an ideal PARA.
+// Supposing you typed, say,  def RP1 = paraPlaneCurve(f);
+// you may access the ideal by typing
+//      setring RP1; PARA;");
       return(RP1);
     }
   /*the even dimensional case*/
@@ -394,10 +396,11 @@ EXAMPLE:  example paraPlaneCurve; shows an example
   setring RP1;
   ideal PARA = fetch(rp1,psi);
   export(PARA);
-  "// 'paraPlaneCurve' created a ring together with an ideal PARA.";
-  "// Supposing you typed, say,  def RP1 = paraPlaneCurve(f);";
-  "// you may access the ideal by typing";
-  "//      setring RP1; PARA;";
+  int p = printlevel - voice + 3;
+  dbprint(p,"// 'paraPlaneCurve' created a ring together with an ideal PARA.
+// Supposing you typed, say,  def RP1 = paraPlaneCurve(f);
+// you may access the ideal by typing
+//      setring RP1; PARA;");
   return(RP1);
 }
 
@@ -1802,10 +1805,11 @@ EXAMPLE: example paraConic; shows an example
   setring RP1;
   ideal PARACONIC = fetch(rp1,psi);
   export(PARACONIC);
-  "// 'paraConic' created a ring together with an ideal RNC.";
-  "// Supposing you typed, say,  def RP1 = paraConic(q);";
-  "// you may access the ideal by typing";
-  "//      setring RP1; PARACONIC;";
+  int p = printlevel - voice + 3;
+  dbprint(p,"// 'paraConic' created a ring together with an ideal RNC.
+// Supposing you typed, say,  def RP1 = paraConic(q);
+// you may access the ideal by typing
+//      setring RP1; PARACONIC;");
   return(RP1);
 }
 example
