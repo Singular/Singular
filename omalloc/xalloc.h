@@ -138,11 +138,18 @@ static inline long omSizeOfAddr(void *d)
 { long *dd=(long*)d; dd--; return *dd;}
 #endif
 
-static inline void omFree(void *d)
+static inline void omfree(void *d)
 #if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
 { free(d); }
 #else
 { if (d!=NULL) { long *dd=(long*)d; dd--; free(dd);}}
+#endif
+
+static inline void omFree(void *d)
+#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
+{ free(d); }
+#else
+{ long *dd=(long*)d; dd--; free(dd);}
 #endif
 
 static inline void *omRealloc0(void *d, size_t ns)
@@ -276,7 +283,6 @@ enum omError_e
 #define omPrintInfo(F)
 #define omPrintBinStats(F)
 #define omMarkMemoryAsStatic()
-#define omfree(P)                omFree(P)
 #define omFreeBin(P,B)           omFree(P)
 #define omfreeSize(P,S)          omFreeSize(P,S)
 #define omFreeFunc               omFree
