@@ -14,9 +14,9 @@ void MinorKey::reset()
 {
   _numberOfRowBlocks = 0;
   _numberOfColumnBlocks = 0;
-  omFree(_rowKey);
+  omfree(_rowKey);
   _rowKey = NULL;
-  omFree(_columnKey);
+  omfree(_columnKey);
   _columnKey = NULL;
 }
 
