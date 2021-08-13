@@ -579,7 +579,10 @@ int redRiloc_Z (LObject* h,kStrategy strat)
     d = h->GetpFDeg()+ h->ecart;
     reddeg = strat->LazyDegree+d;
     h->SetShortExpVector();
-    if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
+    if ((strat->tl>=0)
+    &&strat->T[0].GetpFDeg() == 0 
+    && strat->T[0].length <= 2)
+    {
         docoeffred  = 1;
     }
     loop
@@ -3822,7 +3825,7 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
   else
   {
     #ifdef HAVE_RINGS
-    assume(strat->red == redEcart || strat->red == redRiloc);
+    assume(strat->red == redEcart || strat->red == redRiloc || strat->red == redRiloc_Z);
     #else
     assume(strat->red == redEcart);
     #endif
