@@ -21,7 +21,7 @@
 
 #ifdef HAVE_SHIFTBBA
 #include <vector>
-#include "Singular/libsingular.h"
+#include "misc/options.h"
 #endif
 
 VAR int  hCo, hMu, hMu2;
