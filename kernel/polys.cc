@@ -173,7 +173,6 @@ poly p_Divide(poly p, poly q, const ring r)
 
 poly pp_Divide(poly p, poly q, const ring r)
 {
-  assume(q!=NULL);
   if (q==NULL)
   {
     WerrorS("div. by 0");

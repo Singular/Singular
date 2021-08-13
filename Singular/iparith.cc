@@ -1276,10 +1276,19 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 {
   poly q=(poly)v->Data();
   poly p=(poly)(u->Data());
-  res->data=(void*)(pp_Divide(p /*(poly)(u->Data())*/ ,
+  if (q!=NULL)
+  {
+    res->data=(void*)(pp_Divide(p /*(poly)(u->Data())*/ ,
                                          q /*(poly)(v->Data())*/ ,currRing));
-  if (res->data!=NULL) pNormalize((poly)res->data);
-  return errorreported; /*there may be errors in p_Divide: div. ny 0, etc.*/
+    if (res->data!=NULL) pNormalize((poly)res->data);
+    return errorreported; /*there may be errors in p_Divide: div. ny 0, etc.*/
+  }
+  else
+  {
+    WerrorS("div. by 0");
+    return TRUE;
+  }
+
 }
 static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
 {
