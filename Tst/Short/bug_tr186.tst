@@ -20,5 +20,5 @@ matrix(sm)-matrix(i)*T;
 module s;
 sm=liftstd(i,T,s);
 print(s);
-
+matrix(i)*matrix(s);
 tst_status(1);$
