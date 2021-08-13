@@ -9486,7 +9486,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   strat->tl++;
   strat->R[strat->tl] = &(strat->T[atT]);
   strat->T[atT].i_r = strat->tl;
-  assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
+  assume((p.sev == 0) || (pGetShortExpVector(p.p) == p.sev));
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
   kTest_T(&(strat->T[atT]),strat);
 }

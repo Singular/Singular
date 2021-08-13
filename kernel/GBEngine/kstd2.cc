@@ -2479,7 +2479,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
-      if (strat->P.p!=NULL) strat->P.sev=pGetShortExpVector(strat->P.p);
     }
     else if (strat->P.p1 == NULL)
     {
@@ -2586,6 +2585,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       &&  ((!TEST_OPT_IDELIM) || (p_Deg(strat->P.p,currRing) > 0)))
       {
+        strat->P.SetShortExpVector();
         enterT(strat->P, strat);
         if (rField_is_Ring(currRing))
           superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
