@@ -3961,10 +3961,12 @@ returns a standard basis of an ideal or module and the transformation
 matrix from the given ideal, resp.@: module, to the standard basis.
 @*That is, if @code{m} is the ideal or module, @code{sm} the standard
 basis returned by @code{liftstd}, and @code{T} the transformation matrix
+(@code{sm=liftstd(m,T)})
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)},
 resp.@: @code{sm=module(matrix(m)*T)}.
 If working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and @code{sm=reduce(ideal(matrix(m)*T),0)}.
 @*If a module name is given as a third argument, the syzygy module will be returned.
+(@code{sm=liftstd(m,T,s)} then additional @code{matrix(m)*matrix(s)=0}).
 @*An optional string argument specifies the Groebner base algorithm to use.
 Possible values are @code{"std"} and @code{"slimgb"}.
 @*Given an optional last argument (say @code{n}), the algorithm computes a standard bases of @code{(m+n)}, syzygies of @code{m} modulo @code{n}, and the transformation matrix only for @code{m}.
@@ -3985,6 +3987,7 @@ syzygy module of @code{n} modulo @code{m}.
   module s;
   sm=liftstd(i,T,s);
   print(s);
+  matrix(i)*matrix(s);
 @c example
 @end smallexample
 @end table
