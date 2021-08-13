@@ -1509,7 +1509,7 @@ BOOLEAN  n2pDBTest(number a, const char *f, const int l, const coeffs r);
 #define n2pCoeffs cf->extRing->cf
 
 #ifdef LDEBUG
-BOOLEAN n2pDBTest(number a, const char *f, const int l, const coeffs cf)
+BOOLEAN n2pDBTest(number a, const char */*f*/, const int /*l*/, const coeffs cf)
 {
   if (a == NULL) return TRUE;
   return p_Test((poly)a, n2pRing);
