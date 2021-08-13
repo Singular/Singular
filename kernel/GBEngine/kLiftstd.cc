@@ -54,6 +54,11 @@ static poly kSplitAt(int k,TObject* h,kStrategy strat)
   poly t=p->next;
   p->next=NULL;
   h->pLength=0; // force re-computation
+  if ((h->p!=NULL) && (h->t_p!=NULL)
+  && (pNext(h->p)!=pNext(h->t_p)))
+  {
+    pNext(h->p)=pNext(h->t_p);
+  }
   return t;
 }
 static poly kSplitAt(int k,LObject* h,kStrategy strat)
@@ -103,6 +108,14 @@ finish:
     l=pLength(pr);
     kBucketInit(h->bucket,pr,l);
   }
+  else
+  {
+    if ((h->p!=NULL) && (h->t_p!=NULL))
+    {
+      pNext(h->p)=pNext(h->t_p);
+    }
+  }
+
   return t;
 }
 static void kAppend(poly t,TObject* h)

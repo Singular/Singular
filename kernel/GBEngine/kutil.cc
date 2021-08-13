@@ -853,7 +853,7 @@ BOOLEAN kTest_T(TObject * T, kStrategy strat, int i, char TN)
       return dReportError("%c[%d].t_p is NULL", TN, i);
     pFalseReturn(p_Test(T->t_p, T->tailRing));
     if (T->p != NULL) pFalseReturn(p_LmTest(T->p, currRing));
-    if (T->p != NULL && T->t_p != NULL)
+    if ((T->p != NULL) && (T->t_p != NULL))
     {
       const char* msg = kTest_LmEqual(T->p, T->t_p, T->tailRing);
       if (msg != NULL)
