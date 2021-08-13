@@ -1969,6 +1969,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       /* create the real one */
       ksCreateSpoly(&(strat->P), strat->kNoetherTail(), strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
+      if (strat->P.p!=NULL) strat->P.sev=pGetShortExpVector(strat->P.p);
       if (!strat->use_buckets)
         strat->P.SetLength(strat->length_pLength);
     }

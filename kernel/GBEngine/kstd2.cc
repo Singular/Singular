@@ -2479,6 +2479,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
+      if (strat->P.p!=NULL) strat->P.sev=pGetShortExpVector(strat->P.p);
     }
     else if (strat->P.p1 == NULL)
     {
