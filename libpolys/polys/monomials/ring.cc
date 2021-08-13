@@ -3044,12 +3044,7 @@ static void rSetOutParams(ring r)
     }
     if (r->CanShortOut)
     {
-      // Hmm... sometimes (e.g., from maGetPreimage) new variables
-      // are introduced, but their names are never set
-      // hence, we do the following awkward trick
-      int N = omSizeOfAddr(r->names)/sizeof(char_ptr);
-      if (r->N < N) N = r->N;
-
+      int N = r->N;
       for (i=(N-1);i>=0;i--)
       {
         if(r->names[i] != NULL && strlen(r->names[i])>1)
@@ -5140,7 +5135,6 @@ BOOLEAN rRing_is_Homog(const ring r)
       int length = r->block1[i] - r->block0[i];
       int* wvhdl = r->wvhdl[i];
       if (r->order[i] == ringorder_M) length *= length;
-      assume(omSizeOfAddr(wvhdl) >= length*sizeof(int));
 
       for (j=0; j< length; j++)
       {

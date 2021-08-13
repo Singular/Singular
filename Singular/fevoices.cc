@@ -459,7 +459,7 @@ static int fePrintEcho(char *anf, char */*b*/)
       do
       {
         c=fgetc(stdin);
-	if (c=='n') traceit_stop=1;
+        if (c=='n') traceit_stop=1;
       }
       while(c!='\n');
     }
@@ -575,7 +575,8 @@ int feReadLine(char* b, int l)
       currentVoice->fptr=0;
       if (currentVoice->buffer==NULL)
       {
-        currentVoice->buffer=(char *)omAlloc(MAX_FILE_BUFFER-sizeof(ADDRESS));
+        currentVoice->buff_size=MAX_FILE_BUFFER-sizeof(ADDRESS);
+        currentVoice->buffer=(char *)omAlloc(currentVoice->buff_size);
         omMarkAsStaticAddr(currentVoice->buffer);
       }
     }
@@ -587,7 +588,7 @@ int feReadLine(char* b, int l)
       feShowPrompt();
       s=fe_fgets_stdin(fe_promptstr,
                        &(currentVoice->buffer[offset]),
-                       omSizeOfAddr(currentVoice->buffer)-1-offset);
+                       currentVoice->buff_size-1-offset);
       //int i=0;
       //if (s!=NULL)
       //  while((s[i]!='\0') /*&& (i<MAX_FILE_BUFFER)*/) {s[i] &= (char)127;i++;}
@@ -624,7 +625,7 @@ int feReadLine(char* b, int l)
     {
       s[rc]='\0';
       offset+=rc;
-      if (offset<(int)omSizeOfAddr(currentVoice->buffer)) goto NewRead;
+      if (offset<currentVoice->buff_size) goto NewRead;
     }
     goto NewBuff;
   }
