@@ -271,17 +271,16 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   if ( currRing->idroot != NULL )
   {
     redefine_from_algext=(currRing->cf->extRing->qideal!=NULL);
-//    return TRUE;
 #ifndef SING_NDEBUG
-    idhdl p = currRing->idroot;
-
-    WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
-
-    while(p != NULL)
-    {
-      PrintS(p->String(TRUE)); Print("(%s)\n",IDID(p));
-      p = p->next;
-    }
+//    idhdl p = currRing->idroot;
+//
+//    WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
+//
+//    while(p != NULL)
+//    {
+//      PrintS(p->String(TRUE)); Print("(%s)\n",IDID(p));
+//      p = p->next;
+//    }
 #endif
   }
 
@@ -308,7 +307,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   while(currRing->idroot!=NULL)
   {
 #ifndef SING_NDEBUG
-    Warn("killing a local object due to minpoly change: %s", IDID(currRing->idroot));
+//    Warn("killing a local object due to minpoly change: %s", IDID(currRing->idroot));
 #endif
     killhdl2(currRing->idroot,&(currRing->idroot),currRing);
   }
