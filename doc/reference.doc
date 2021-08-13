@@ -7956,7 +7956,9 @@ a standard basis is returned, otherwise a generating set.
 @c example
   ring R=0,(x,y),(c,dp);
   ideal i=x,y;
-  syz(i);
+  module s=syz(i);
+  s;
+  matrix(i)*matrix(s);
 @c example
 @end smallexample
 @end table
