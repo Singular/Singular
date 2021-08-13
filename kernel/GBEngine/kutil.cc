@@ -295,7 +295,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 {
   if (strat->kNoether!=NULL)
   {
-    kTest_L(L,strat->tailRing);
+    kTest_L(L,strat);
     poly p1;
     poly p = L->GetLmTailRing();
     int l = 1;
@@ -352,7 +352,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       L->SetpFDeg();
       L->ecart = L->pLDeg(strat->LDegLast) - L->GetpFDeg();
     }
-    kTest_L(L,strat->tailRing);
+    kTest_L(L,strat);
   }
 }
 
@@ -822,9 +822,10 @@ static const char* kTest_LmEqual(poly p, poly t_p, ring tailRing)
 }
 
 STATIC_VAR BOOLEAN sloppy_max = FALSE;
-BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
+BOOLEAN kTest_T(TObject * T, kStrategy strat, int i, char TN)
 {
   ring tailRing = T->tailRing;
+  ring strat_tailRing = strat->tailRing;
   if (strat_tailRing == NULL) strat_tailRing = tailRing;
   r_assume(strat_tailRing == tailRing);
 
@@ -927,7 +928,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   if (i >= 0 && (TN == 'T' || TN == 'L'))
   {
     // FDeg has ir element from T of L set
-    if (T->FDeg  != T->pFDeg())
+    if (strat->homog && (T->FDeg  != T->pFDeg()))
     {
       int d=T->FDeg;
       T->FDeg=T->pFDeg();
@@ -946,9 +947,10 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   return TRUE;
 }
 
-BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
+BOOLEAN kTest_L(LObject *L, kStrategy strat,
                 BOOLEAN testp, int lpos, TSet T, int tlength)
 {
+  ring strat_tailRing=strat->tailRing;
   if (L->p!=NULL)
   {
     if ((L->t_p==NULL)
@@ -983,7 +985,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
         pNext(L->p) = NULL;
       }
     }
-    kFalseReturn(kTest_T(L, strat_tailRing, lpos, 'L'));
+    kFalseReturn(kTest_T(L, strat, lpos, 'L'));
     if (pn != NULL)
       pNext(L->p) = pn;
 
@@ -1035,7 +1037,7 @@ BOOLEAN kTest (kStrategy strat)
 {
   int i;
   // test P
-  kFalseReturn(kTest_L(&(strat->P), strat->tailRing,
+  kFalseReturn(kTest_L(&(strat->P), strat,
                        (strat->P.p != NULL && pNext(strat->P.p)!=strat->tail),
                        -1, strat->T, strat->tl));
 
@@ -1044,7 +1046,7 @@ BOOLEAN kTest (kStrategy strat)
   {
     for (i=0; i<=strat->tl; i++)
     {
-      kFalseReturn(kTest_T(&(strat->T[i]), strat->tailRing, i, 'T'));
+      kFalseReturn(kTest_T(&(strat->T[i]), strat, i, 'T'));
       if (strat->sevT[i] != pGetShortExpVector(strat->T[i].p))
         return dReportError("strat->sevT[%d] out of sync", i);
     }
@@ -1055,7 +1057,7 @@ BOOLEAN kTest (kStrategy strat)
   {
     for (i=0; i<=strat->Ll; i++)
     {
-      kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
+      kFalseReturn(kTest_L(&(strat->L[i]), strat,
                            strat->L[i].Next() != strat->tail, i,
                            strat->T, strat->tl));
       // may be unused
@@ -7275,7 +7277,7 @@ poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEA
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L,strat->tailRing);
+  kTest_L(L,strat);
   return L->GetLmCurrRing();
 }
 
@@ -7390,7 +7392,7 @@ poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLE
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L,strat->tailRing);
+  kTest_L(L,strat);
   return L->GetLmCurrRing();
 }
 
@@ -7520,7 +7522,7 @@ void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
     L->pLength = 0;
   }
 
-  kTest_L(L, strat->tailRing);
+  kTest_L(L, strat);
   return;
 }
 
@@ -7634,7 +7636,7 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L,strat->tailRing);
+  kTest_L(L,strat);
   return L->GetLmCurrRing();
 }
 
@@ -7719,7 +7721,7 @@ poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat )
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L,strat->tailRing);
+  kTest_L(L,strat);
   return L->GetLmCurrRing();
 }
 #endif
@@ -9415,7 +9417,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   // redMoraNF complains about this -- but, we don't really
   // neeed this so far
   assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
-  assume(p.FDeg == p.pFDeg());
+  assume(!strat->homog || (p.FDeg == p.pFDeg()));
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
 #ifdef KDEBUG
@@ -9486,7 +9488,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   strat->T[atT].i_r = strat->tl;
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
-  kTest_T(&(strat->T[atT]));
+  kTest_T(&(strat->T[atT]),strat);
 }
 
 /*2
@@ -9588,7 +9590,7 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   }
   //getchar();*/
   #endif
-  kTest_T(&(strat->T[atT]));
+  kTest_T(&(strat->T[atT]),strat);
 }
 #endif
 
@@ -13462,7 +13464,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
     L->length = 0;
   }
   L->Normalize(); // HANNES: should have a test
-  kTest_L(L,strat->tailRing);
+  kTest_L(L,strat);
   return L->GetLmCurrRing();
 }
 #endif

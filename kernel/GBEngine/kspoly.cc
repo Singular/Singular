@@ -61,9 +61,11 @@ int ksReducePolyZ(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR,tailRing);
-  kTest_T(PW);
-
+  if (strat!=NULL)
+  {
+    kTest_L(PR,strat);
+    kTest_T(PW,strat);
+  }
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
   poly t2 = pNext(p2), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
@@ -203,8 +205,11 @@ int ksReducePoly(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR,tailRing);
-  kTest_T(PW);
+  if (strat!=NULL)
+  {
+    kTest_L(PR,strat);
+    kTest_T(PW,strat);
+  }
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
@@ -333,8 +338,11 @@ int ksReducePolyGCD(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR, tailRing);
-  kTest_T(PW);
+  if (strat!=NULL)
+  {
+    kTest_L(PR,strat);
+    kTest_T(PW,strat);
+  }
 
   poly p1 = PR->GetLmTailRing();
   poly p2 = PW->GetLmTailRing();
@@ -471,8 +479,11 @@ int ksReducePolyLC(LObject* PR,
    * p_Write(PR->p, currRing, PR->tailRing); */
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR,tailRing);
-  kTest_T(PW);
+  if (strat!=NULL)
+  {
+    kTest_L(PR,strat);
+    kTest_T(PW,strat);
+  }
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
@@ -581,8 +592,11 @@ int ksReducePolyBound(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR,tailRing);
-  kTest_T(PW);
+  if (strat!=NULL)
+  {
+    kTest_L(PR,strat);
+    kTest_T(PW,strat);
+  }
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
@@ -723,8 +737,11 @@ int ksReducePolySig(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR,tailRing);
-  kTest_T(PW);
+  if (strat!=NULL)
+  {
+    kTest_L(PR,strat);
+    kTest_T(PW,strat);
+  }
 
   // signature-based stuff:
   // checking for sig-safeness first
@@ -926,8 +943,11 @@ int ksReducePolySigRing(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  kTest_L(PR,tailRing);
-  kTest_T(PW);
+  if (strat!=NULL)
+  {
+    kTest_L(PR,strat);
+    kTest_T(PW,strat);
+  }
 
   // signature-based stuff:
   // checking for sig-safeness first
@@ -1171,7 +1191,6 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 #ifdef KDEBUG
   create_count++;
 #endif
-  kTest_L(Pair,tailRing);
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
   Pair->tailRing = tailRing;
@@ -1319,8 +1338,6 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   poly Lp =     PR->GetLmCurrRing();
   poly Save =   PW->GetLmCurrRing();
 
-  kTest_L(PR,PR->tailRing);
-  kTest_T(PW);
   pAssume(pIsMonomOf(Lp, Current));
 
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
@@ -1361,8 +1378,6 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
   poly Lp =     PR->GetLmCurrRing();
   poly Save =   PW->GetLmCurrRing();
 
-  kTest_L(PR,PR->tailRing);
-  kTest_T(PW);
   pAssume(pIsMonomOf(Lp, Current));
 
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);

@@ -1498,7 +1498,7 @@ void updateLHC(kStrategy strat)
     else
     {
 #ifdef KDEBUG
-      kTest_L(&(strat->L[i]), strat->tailRing, TRUE, i, strat->T, strat->tl);
+      kTest_L(&(strat->L[i]), strat, TRUE, i, strat->T, strat->tl);
 #endif
       i++;
     }
