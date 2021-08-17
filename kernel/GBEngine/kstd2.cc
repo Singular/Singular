@@ -754,7 +754,6 @@ int redRing_Z (LObject* h,kStrategy strat)
         if (!rHasLocalOrMixedOrdering(currRing))
         {
           redtailBbaAlsoLC_Z(&h2, j, strat);
-          h2.pCleardenom();
         }
         /* replace h2 for tj in L (already generated pairs with tj), S and T */
         replaceInLAndSAndT(h2, j, strat);
@@ -2525,7 +2524,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pCleardenom instead of pNorm
       strat->redTailChange=FALSE;
 
       /* if we are computing over Z we always want to try and cut down
@@ -2533,10 +2531,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing))
       {
         redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
-        strat->P.pCleardenom();
       }
 
-      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+      if (TEST_OPT_INTSTRATEGY)
       {
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
@@ -3158,7 +3155,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pCleardenom instead of pNorm
       #ifdef HAVE_RINGS
       poly beforetailred;
       if(rField_is_Ring(currRing))
@@ -4192,10 +4188,9 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       #endif
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pCleardenom instead of pNorm
 #if F5CTAILRED
       BOOLEAN withT = TRUE;
-      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+      if (TEST_OPT_INTSTRATEGY)
       {
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
@@ -4497,7 +4492,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      // therefore we call pCleardenom instead of pNorm
       strat->redTailChange=FALSE;
 
       /* if we are computing over Z we always want to try and cut down
@@ -4505,10 +4499,9 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (rField_is_Z(currRing) && !rHasLocalOrMixedOrdering(currRing))
       {
         redtailBbaAlsoLC_Z(&(strat->P), strat->tl, strat);
-        strat->P.pCleardenom();
       }
 
-      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+      if (TEST_OPT_INTSTRATEGY)
       {
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))

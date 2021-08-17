@@ -1701,7 +1701,6 @@ static BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,k
   h.p = gcd;
   h.tailRing = strat->tailRing;
   int posx;
-  h.pCleardenom();
   strat->initEcart(&h);
   h.sev = pGetShortExpVector(h.p);
   h.i_r1 = -1;h.i_r2 = -1;
@@ -1908,7 +1907,6 @@ static BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /
   h.tailRing = strat->tailRing;
   h.sig = pairsig;
   int posx;
-  h.pCleardenom();
   strat->initEcart(&h);
   h.sev = pGetShortExpVector(h.p);
   h.i_r1 = -1;h.i_r2 = -1;
@@ -9309,7 +9307,7 @@ void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat)
   p.GetP(strat->lmBin);
   if (strat->homog) strat->initEcart(&p);
       strat->redTailChange=FALSE;
-  if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+  if (TEST_OPT_INTSTRATEGY)
   {
     p.pCleardenom();
     if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
@@ -12174,7 +12172,6 @@ static BOOLEAN enterOneStrongPolyShift (poly q, poly p, int /*ecart*/, int /*isF
   h.p = gcd;
   h.tailRing = strat->tailRing;
   int posx;
-  h.pCleardenom();
   strat->initEcart(&h);
   h.sev = pGetShortExpVector(h.p);
   h.i_r1 = -1;h.i_r2 = -1;
