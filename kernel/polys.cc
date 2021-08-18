@@ -384,14 +384,14 @@ poly singclap_gcd ( poly f, poly g, const ring r )
   if (f!=NULL)
   {
     //if (r->cf->has_simple_Inverse) p_Norm(f,r);
-    if (rField_is_Zp(r)) p_Norm(f,r);
-    else                 p_Cleardenom(f, r);
+    if (rField_is_Zp(r))          p_Norm(f,r);
+    else if (!rField_is_Ring(r))  p_Cleardenom(f, r);
   }
   if (g!=NULL)
   {
     //if (r->cf->has_simple_Inverse) p_Norm(g,r);
-    if (rField_is_Zp(r)) p_Norm(g,r);
-    else                 p_Cleardenom(g, r);
+    if (rField_is_Zp(r))          p_Norm(g,r);
+    else if (!rField_is_Ring(r))  p_Cleardenom(g, r);
   }
   else         return f; // g==0 => gcd=f (but do a p_Cleardenom/pNorm)
   if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom/pNorm)

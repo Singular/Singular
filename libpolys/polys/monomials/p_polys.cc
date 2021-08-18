@@ -2282,6 +2282,11 @@ poly p_Power(poly p, int i, const ring r)
 void p_Content(poly ph, const ring r)
 {
   if (ph==NULL) return;
+  if (rField_is_Ring(r)) /*should not be called*/
+  {
+    if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
+    return;
+  }
   const coeffs cf=r->cf;
   if (pNext(ph)==NULL)
   {
@@ -2341,6 +2346,17 @@ void p_Content_n(poly ph, number &c,const ring r)
   if (ph==NULL)
   {
     c=n_Init(1,r->cf);
+    return;
+  }
+  if (rField_is_Ring(r)) /*should not be called*/
+  {
+    if(!n_GreaterZero(pGetCoeff(ph),r->cf))
+    {
+      ph = p_Neg(ph,r);
+      c=n_Init(-1,r->cf);
+    }
+    else
+      c=n_Init(1,r->cf);
     return;
   }
   const coeffs cf=r->cf;
@@ -2620,6 +2636,10 @@ void p_SimpleContent(poly ph, int smax, const ring r)
 {
   if(TEST_OPT_CONTENTSB) return;
   if (ph==NULL) return;
+  if (rField_is_Ring(r)) /*should not be called*/
+  {
+    return;
+  }
   if (pNext(ph)==NULL)
   {
     p_SetCoeff(ph,n_Init(1,r->cf),r);
@@ -2919,16 +2939,10 @@ poly p_Cleardenom(poly p, const ring r)
 
   number d, h;
 
-  if (rField_is_Ring(r))
+  if (rField_is_Ring(r)) /*should not be called*/
   {
-    p_ContentForGB(p,r);
-    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-    return p;
-  }
-
-  if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
-  {
-    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
+    if(!n_GreaterZero(pGetCoeff(p),r->cf)) p = p_Neg(p,r);
+    //p_ContentForGB(p,r);
     return p;
   }
 
@@ -2936,11 +2950,16 @@ poly p_Cleardenom(poly p, const ring r)
 
   if(pNext(p)==NULL)
   {
-    if (!TEST_OPT_CONTENTSB
-    && !rField_is_Ring(r))
+    if (!TEST_OPT_CONTENTSB)
       p_SetCoeff(p,n_Init(1,r->cf),r);
-    else if(!n_GreaterZero(pGetCoeff(p),C))
+    else if(!n_GreaterZero(pGetCoeff(p),r->cf))
       p = p_Neg(p,r);
+    return p;
+  }
+
+  if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
+  {
+    if(!n_GreaterZero(pGetCoeff(p),r->cf)) p = p_Neg(p,r);
     return p;
   }
 
@@ -3001,7 +3020,7 @@ poly p_Cleardenom(poly p, const ring r)
 #endif
   }
 
-  if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
+  if(!n_GreaterZero(pGetCoeff(p),r->cf)) p = p_Neg(p,r);
 
   return start;
 }
@@ -3043,6 +3062,17 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
   }
 #endif
 
+  if (rField_is_Ring(r)) /*should not be called*/
+  {
+    if(!n_GreaterZero(pGetCoeff(ph),C))
+    {
+      ph = p_Neg(ph,r);
+      c=n_Init(-1,C);
+    }
+    else
+      c=n_Init(1,C);
+    return;
+  }
 
   if( pNext(p) == NULL )
   {
@@ -3095,9 +3125,6 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     return;
   }
 #endif
-
-
-
 
   if(1)
   {
@@ -3790,8 +3817,8 @@ void p_Norm(poly p1, const ring r)
 {
   if (rField_is_Ring(r))
   {
-    if (!n_IsUnit(pGetCoeff(p1), r->cf)) return;
-    // Werror("p_Norm not possible in the case of coefficient rings.");
+    if(!n_GreaterZero(pGetCoeff(p1),r->cf)) p1 = p_Neg(p1,r);
+    //p_ContentForGB(p1,r);
   }
   else if (p1!=NULL)
   {
@@ -3800,7 +3827,6 @@ void p_Norm(poly p1, const ring r)
       p_SetCoeff(p1,n_Init(1,r->cf),r);
       return;
     }
-    poly h;
     if (!n_IsOne(pGetCoeff(p1),r->cf))
     {
       number k, c;
@@ -3808,14 +3834,14 @@ void p_Norm(poly p1, const ring r)
       k = pGetCoeff(p1);
       c = n_Init(1,r->cf);
       pSetCoeff0(p1,c);
-      h = pNext(p1);
+      poly h = pNext(p1);
       while (h!=NULL)
       {
         c=n_Div(pGetCoeff(h),k,r->cf);
         // no need to normalize: Z/p, R
         // normalize already in nDiv: Q_a, Z/p_a
         // remains: Q
-        if (rField_is_Q(r) && (!n_IsOne(c,r->cf))) n_Normalize(c,r->cf);
+        if (rField_is_Q(r)) n_Normalize(c,r->cf);
         p_SetCoeff(h,c,r);
         pIter(h);
       }
@@ -3824,8 +3850,9 @@ void p_Norm(poly p1, const ring r)
     else
     {
       //if (r->cf->cfNormalize != nDummy2) //TODO: OPTIMIZE
+      if (rField_is_Q(r))
       {
-        h = pNext(p1);
+        poly h = pNext(p1);
         while (h!=NULL)
         {
           n_Normalize(pGetCoeff(h),r->cf);
