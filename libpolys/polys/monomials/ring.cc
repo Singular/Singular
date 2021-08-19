@@ -3337,6 +3337,7 @@ static void rSetOption(ring r)
   // set intStrategy
   if ( (r->cf->extRing!=NULL)
       || rField_is_Q(r)
+      || rField_is_Ring(r)
   )
     r->options |= Sy_bit(OPT_INTSTRATEGY);
   else
