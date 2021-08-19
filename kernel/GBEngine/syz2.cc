@@ -1030,7 +1030,7 @@ Print("compute %d Paare im Module %d im Grad %d \n",howmuch,index,actdeg+index);
     if (index>0)
     {
       syRedNextPairs_Hilb(nextPairs,syzstr,howmuch,index,actdeg,&toSub,&maxindex,&maxdeg);
-      syzstr->res[index+1]->rank=id_RankFreeModule(syzstr->res[index+1],currRing);
+      syzstr->res[index+1]->rank=idElem(syzstr->res[index]);
       sySetNewHilb(syzstr,toSub,index,actdeg);
       toSub = 0;
       syCompactifyPairSet(syzstr->resPairs[index],(*syzstr->Tl)[index],0);
