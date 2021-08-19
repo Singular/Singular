@@ -590,10 +590,12 @@ int redRiloc_Z (LObject* h,kStrategy strat)
         /* cut down the lead coefficients, only possible if the degree of
          * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
          * we ask for the length of T[0] to be <= 2 */
-        if (docoeffred) {
+        if (docoeffred)
+        {
             j = kTestDivisibleByT0_Z(strat, h);
             if (j == 0 && n_DivBy(pGetCoeff(h->p), pGetCoeff(T0p), currRing->cf) == FALSE
-                    && T0ecart <= h->ecart) {
+                    && T0ecart <= h->ecart)
+            {
                 /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
                  * => we try to cut down the lead coefficient at least */
                 /* first copy T[j] in order to multiply it with a coefficient later on */
@@ -610,6 +612,10 @@ int redRiloc_Z (LObject* h,kStrategy strat)
                 ksReducePolyLC(h, &tj, NULL, &rest, strat);
                 tj.Delete();
                 tj.Clear();
+                if (n_IsZero(pGetCoeff(h->GetP()),currRing->cf))
+                {
+                  h->LmDeleteAndIter();
+                }
             }
         }
         j = kFindDivisibleByInT(strat, h);

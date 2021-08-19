@@ -483,8 +483,7 @@ static inline BOOLEAN rField_is_Ring_2toM(const ring r)
 static inline BOOLEAN rField_is_Ring_PtoM(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return ( nCoeff_is_Ring_PtoM(r->cf) ); }
 
-static inline BOOLEAN rField_is_Ring(const ring r)
-{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Ring(r->cf); }
+#define rField_is_Ring(R) nCoeff_is_Ring((R)->cf)
 
 static inline BOOLEAN rField_is_Domain(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Domain(r->cf); }
