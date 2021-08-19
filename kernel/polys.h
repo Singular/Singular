@@ -360,7 +360,7 @@ inline poly      pTakeOutComp(poly * p, int k, const ring R = currRing)
 void      pSetPolyComp(poly p, int comp);
 #define   pDeleteComp(p,k) p_DeleteComp(p,k,currRing)
 
-inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
+inline void pNorm(poly p){ p_Norm(p, currRing); }
 
 
 #define   pSubst(p,n,e) p_Subst(p,n,e,currRing)

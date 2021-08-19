@@ -491,24 +491,47 @@ KINLINE void  sTObject::pCleardenom()
     }
     nDelete(&n);
   }
+  #ifdef HAVE_RINGS
   else if (is_ring)
   {
+    number c;
+    if (t_p != NULL)
+      c=pGetCoeff(t_p);
+    else
+      c=pGetCoeff(p);
+    const coeffs C=tailRing->cf;
+    number u=n_GetUnit(c,C);
+
     if (t_p != NULL)
     {
+      if (!n_IsOne(u,C))
+      {
+        number uInv = n_Invers(u, C);
+        t_p=p_Mult_nn(t_p,uInv,tailRing);
+        n_Delete(&uInv,C);
+      }
       if(!n_GreaterZero(pGetCoeff(t_p),tailRing->cf))
       {
         t_p = p_Neg(t_p,tailRing);
-        pSetCoeff0(p, pGetCoeff(t_p));
       }
+      pSetCoeff0(p, pGetCoeff(t_p));
     }
     else
     {
+      if (!n_IsOne(u,C))
+      {
+        number uInv = n_Invers(u, C);
+        p=p_Mult_nn(p,uInv,tailRing);
+        n_Delete(&uInv,C);
+      }
       if(!n_GreaterZero(pGetCoeff(p),tailRing->cf))
       {
         p = p_Neg(p,tailRing);
       }
     }
+    n_Delete(&u,C);
   }
+  #endif
   else
   {
     if (t_p != NULL)

@@ -503,13 +503,31 @@ static BOOLEAN nrnGreaterZero(number k, const coeffs cf)
     {
       return TRUE;
     }
+    #if 0
     mpz_t ch2; mpz_init_set(ch2, cf->modBase);
-    mpz_sub_ui(ch2,ch2,1);
+    mpz_sub_ui(ch2,ch2,1); //cf->modBase is odd
     mpz_divexact_ui(ch2,ch2,2);
     if (mpz_cmp(ch2,(mpz_ptr)k)<0)
+    {
+      mpz_clear(ch2);
       return FALSE;
+    }
+    mpz_clear(ch2);
+    #endif
+  }
+  #if 0
+  else
+  {
+    mpz_t ch2; mpz_init_set(ch2, cf->modBase);
+    mpz_tdiv_q_ui(ch2,ch2,2);
+    if (mpz_cmp(ch2,(mpz_ptr)k)<0)
+    {
+      mpz_clear(ch2);
+      return FALSE;
+    }
     mpz_clear(ch2);
   }
+  #endif
   return 0 < mpz_sgn1((mpz_ptr)k);
 }
 
@@ -760,29 +778,8 @@ void nrnWrite (number a, const coeffs cf)
   {
     int l=mpz_sizeinbase((mpz_ptr) a, 10) + 2;
     s=(char*)omAlloc(l);
-    if (cf->is_field)
-    {
-      mpz_t ch2; mpz_init_set(ch2, cf->modBase);
-      mpz_sub_ui(ch2,ch2,1);
-      mpz_divexact_ui(ch2,ch2,2);
-      if ((mpz_cmp_ui(cf->modBase,2)!=0) && (mpz_cmp(ch2,(mpz_ptr)a)<0))
-      {
-        mpz_sub(ch2,(mpz_ptr)a,cf->modBase);
-        z=mpz_get_str(s,10,ch2);
-        StringAppendS(z);
-      }
-      else
-      {
-        z=mpz_get_str(s,10,(mpz_ptr) a);
-        StringAppendS(z);
-      }
-      mpz_clear(ch2);
-    }
-    else
-    {
-      z=mpz_get_str(s,10,(mpz_ptr) a);
-      StringAppendS(z);
-    }
+    z=mpz_get_str(s,10,(mpz_ptr) a);
+    StringAppendS(z);
     omFreeSize((ADDRESS)s,l);
   }
 }
