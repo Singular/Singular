@@ -469,7 +469,8 @@ KINLINE long sTObject::SetDegStuffReturnLDeg()
 KINLINE void  sTObject::pCleardenom()
 {
   assume(p != NULL);
-  if (TEST_OPT_CONTENTSB)
+  BOOLEAN is_ring=rField_is_Ring(currRing);
+  if ((TEST_OPT_CONTENTSB) && (!is_ring))
   {
     number n;
     if (t_p != NULL)
@@ -489,6 +490,24 @@ KINLINE void  sTObject::pCleardenom()
       DENOMINATOR_LIST=denom;
     }
     nDelete(&n);
+  }
+  else if (is_ring)
+  {
+    if (t_p != NULL)
+    {
+      if(!n_GreaterZero(pGetCoeff(t_p),tailRing->cf))
+      {
+        t_p = p_Neg(t_p,tailRing);
+        pSetCoeff0(p, pGetCoeff(t_p));
+      }
+    }
+    else
+    {
+      if(!n_GreaterZero(pGetCoeff(p),tailRing->cf))
+      {
+        p = p_Neg(p,tailRing);
+      }
+    }
   }
   else
   {
