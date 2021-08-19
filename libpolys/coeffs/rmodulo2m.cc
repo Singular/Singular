@@ -25,9 +25,10 @@
 #ifdef LDEBUG
 BOOLEAN nr2mDBTest(number a, const char *f, const int l, const coeffs r)
 {
-  if (((long)a<0L) || ((long)a>(long)r->mod2mMask))
+  if ((((long)a<0L) || ((long)a>(long)r->mod2mMask))
+  && (r->mod2mMask!=-1))
   {
-    Print("wrong mod 2^n number %ld at %s,%d\n",(long)a,f,l);
+    Print("wrong mod 2^n number %ld (m:%ld) at %s,%d\n",(long)a,(long)r->mod2mMask,f,l);
     return FALSE;
   }
   return TRUE;
