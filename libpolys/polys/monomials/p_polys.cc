@@ -2282,7 +2282,7 @@ poly p_Power(poly p, int i, const ring r)
 void p_Content(poly ph, const ring r)
 {
   if (ph==NULL) return;
-  if (nCoeff_is_Ring(r->cf)) /*should not be called*/
+  if (rField_is_Ring(r)) /*should not be called*/
   {
     if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
     return;
@@ -2348,7 +2348,7 @@ void p_Content_n(poly ph, number &c,const ring r)
     c=n_Init(1,r->cf);
     return;
   }
-  if (nCoeff_is_Ring(r->cf)) /*should not be called*/
+  if (rField_is_Ring(r)) /*should not be called*/
   {
     if(!n_GreaterZero(pGetCoeff(ph),r->cf))
     {
@@ -2636,7 +2636,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
 {
   if(TEST_OPT_CONTENTSB) return;
   if (ph==NULL) return;
-  if (nCoeff_is_Ring(r->cf)) /*should not be called*/
+  if (rField_is_Ring(r)) /*should not be called*/
   {
     return;
   }
@@ -2939,7 +2939,7 @@ poly p_Cleardenom(poly p, const ring r)
 
   number d, h;
 
-  if (nCoeff_is_Ring(r->cf)) /*should not be called*/
+  if (rField_is_Ring(r)) /*should not be called*/
   {
     if(!n_GreaterZero(pGetCoeff(p),r->cf)) p = p_Neg(p,r);
     //p_ContentForGB(p,r);
@@ -3062,7 +3062,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
   }
 #endif
 
-  if (nCoeff_is_Ring(r->cf)) /*should not be called*/
+  if (rField_is_Ring(r)) /*should not be called*/
   {
     if(!n_GreaterZero(pGetCoeff(ph),C))
     {
@@ -3815,7 +3815,7 @@ void pEnlargeSet(poly* *p, int l, int increment)
 */
 void p_Norm(poly p1, const ring r)
 {
-  if (nCoeff_is_Ring(r->cf))
+  if (rField_is_Ring(r))
   {
     if(!n_GreaterZero(pGetCoeff(p1),r->cf)) p1 = p_Neg(p1,r);
     //p_ContentForGB(p1,r);
