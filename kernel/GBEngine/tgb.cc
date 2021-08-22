@@ -757,7 +757,7 @@ sorted_pair_node **spn_merge (sorted_pair_node ** p, int pn,
     memmove (p + a[i] + (1 + i), p + a[i], size);
     p[a[i] + i] = q[i];
   }
-  omFree (a);
+  omfree (a);
   return p;
 }
 
@@ -1716,7 +1716,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   //  Print("i:%d,spc_final:%d",i,spc_final);
 
   assume (spc_final <= spc);
-  omFree (nodes);
+  omfree (nodes);
   nodes = NULL;
 
   add_to_reductors (c, h, c->lengths[c->n - 1], ecart, TRUE);
@@ -2136,9 +2136,9 @@ static void mass_add (poly * p, int pn, slimgb_alg * c)
   c->apairs = spn_merge (c->apairs, c->pair_top + 1, big_sbuf, sum, c);
   c->pair_top += sum;
   clean_top_of_pair_list (c);
-  omFree (big_sbuf);
-  omFree (sbuf);
-  omFree (ibuf);
+  omfree (big_sbuf);
+  omfree (sbuf);
+  omfree (ibuf);
   //omfree(buf);
 #ifdef TGB_DEBUG
   int z;
@@ -2983,7 +2983,7 @@ static void go_on (slimgb_alg * c)
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
   mass_add (add_those, num_to_add, c);
-  omFree (add_those);
+  omfree (add_those);
   omFree (buf);
 
   if(TEST_OPT_PROT)
@@ -4685,8 +4685,8 @@ static void sort_region_down (red_object * los, int l, int u, slimgb_alg * /*c*/
       j--;
     }
   }
-  omFree (los_region);
-  omFree (new_indices);
+  omfree (los_region);
+  omfree (new_indices);
 }
 
 //assume that los is ordered ascending by leading term, all non zero
