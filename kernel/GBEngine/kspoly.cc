@@ -407,23 +407,17 @@ int ksReducePolyGCD(LObject* PR,
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     ct = n_ExtGcd(pGetCoeff(p1), pGetCoeff(p2), &an, &bn, tailRing->cf);    // Calculate GCD
-#ifdef HAVE_SHIFTBBA
-    if(rIsLPRing(tailRing)) /* with this test: error at New/stdZtests.tst, infinite : Long/primdecint.tst */
+    if (n_IsZero(an, tailRing->cf) || n_IsZero(bn, tailRing->cf))
     {
-      if (n_IsZero(an, tailRing->cf) || n_IsZero(bn, tailRing->cf))
-      {
-        // NOTE: not sure why this is not checked in the commutative case, this *does* happen and then zero coeff errors are reported
-        // NOTE: we are probably leaking memory of lm=pOne(), but we cannot delete it since it could also be lm=p1
-        n_Delete(&an, tailRing->cf);
-        n_Delete(&bn, tailRing->cf);
-        n_Delete(&ct, tailRing->cf);
-        return ret;
-      }
+      n_Delete(&an, tailRing->cf);
+      n_Delete(&bn, tailRing->cf);
+      n_Delete(&ct, tailRing->cf);
+      return ret;
     }
-#endif
     /* negate bn since we subtract in Tail_Minus_mm_Mult_qq */
     bn  = n_InpNeg(bn, tailRing->cf);
     p_SetCoeff(lm, bn, tailRing);
+    p_Test(lm,tailRing);
     PR->Tail_Mult_nn(an);
   }
   else
