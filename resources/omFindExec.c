@@ -122,6 +122,54 @@ static char * omFindExec_link (const char *name, char* executable)
         }
       }
     }
+    /* try again with LD_LIBRARY_PATH */
+    search = getenv("LD_LIBRARY_PATH");
+    p = search;
+
+    if ((p != NULL)&&(strlen(p)>1))
+    {
+      while (1)
+      {
+        char *next;
+        next = tbuf;
+
+        /* Copy directory name into [tbuf]. */
+        /* This is somewhat tricky: empty names mean cwd, w.r.t. some
+           shell spec */
+        while (*p && *p != ':')
+          *next ++ = *p ++;
+        *next = '\0';
+
+        if (tbuf[strlen(tbuf)-1] != '/') strcat(tbuf, "/");
+        strcat (tbuf, name);
+
+        /* If the named file exists, then return it. */
+        if (! access (tbuf, F_OK))
+        {
+          strcpy(executable, tbuf);
+          return executable;
+        }
+
+        if (*p != '\0')
+        {
+          p ++;
+        }
+        else
+        {
+          break;
+        }
+      }
+    }
+  }
+  /* everything failed, so try the compiled path: */
+  strcpy(tbuf,BIN_DIR);
+  strcat(tbuf,"/");
+  strcat(tbuf,name);
+  /* If the named file exists, then return it. */
+  if (! access (tbuf, F_OK))
+  {
+    strcpy(executable, tbuf);
+    return executable;
   }
   return NULL;
 }
