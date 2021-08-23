@@ -1271,12 +1271,6 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
 
-#ifdef PDEBUG
-/* for counting number of pairs [enterL] in Plural */
-/*   extern int zaehler; */
-/*   Print("Total pairs considered:%d\n",zaehler); zaehler=0; */
-#endif /*PDEBUG*/
-
 #if MYTEST
   PrintS("</gnc_gr_bba>\n");
 #endif
@@ -1288,11 +1282,6 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
 
 ideal k_gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
-#ifndef SING_NDEBUG
-  // Not yet!
-  WarnS("Sorry, non-commutative mora is not yet implemented!");
-#endif
-
   return gnc_gr_bba(F, Q, NULL, NULL, strat, _currRing);
 }
 
