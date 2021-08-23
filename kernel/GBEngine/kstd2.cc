@@ -3895,7 +3895,6 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   res=idInit(IDELEMS(q),si_max(q->rank,F->rank));
-  si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
   for (i=IDELEMS(q)-1; i>=0; i--)
   {
     if (q->m[i]!=NULL)
@@ -3915,6 +3914,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
         }
         else
         {
+          si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
           p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
         }
       }
@@ -3974,7 +3974,6 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   res=idInit(IDELEMS(q),si_max(q->rank,F->rank));
-  si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
   for (i=IDELEMS(q)-1; i>=0; i--)
   {
     if (q->m[i]!=NULL)
@@ -3994,6 +3993,7 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
         }
         else
         {
+          si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
           p = redtailBbaBound(p,max_ind,strat,bound,(lazyReduce & KSTD_NF_NONORM)==0);
         }
       }

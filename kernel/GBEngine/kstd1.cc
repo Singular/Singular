@@ -2132,7 +2132,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   //strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether    = pCopy((currRing->ppNoether));
   si_opt_1|=Sy_bit(OPT_REDTAIL);
-  si_opt_1&=~Sy_bit(OPT_INTSTRATEGY);
+  if (!rField_is_Ring(currRing))
+    si_opt_1&=~Sy_bit(OPT_INTSTRATEGY);
   if (TEST_OPT_STAIRCASEBOUND
   && (! TEST_V_DEG_STOP)
   && (0<Kstd1_deg)
@@ -2177,7 +2178,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
       p_LmDelete(p,currRing);
     }
   }
-  if ((lazyReduce & KSTD_NF_LAZY)==0)
+  if (((lazyReduce & KSTD_NF_LAZY)==0)
+  && (!rField_is_Ring(currRing)))
   {
     for (i=strat->sl; i>=0; i--)
       pNorm(strat->S[i]);
@@ -2320,7 +2322,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
       p_LmDelete(p,currRing);
     }
   }
-  if (TEST_OPT_INTSTRATEGY && ((lazyReduce & KSTD_NF_LAZY)==0))
+  if (((lazyReduce & KSTD_NF_LAZY)==0)
+  && (!rField_is_Ring(currRing)))
   {
     for (i=strat->sl; i>=0; i--)
       pNorm(strat->S[i]);
