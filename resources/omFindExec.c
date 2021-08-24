@@ -171,6 +171,20 @@ static char * omFindExec_link (const char *name, char* executable)
     strcpy(executable, tbuf);
     return executable;
   }
+  strcpy(tbuf,LIB_DIR);
+  strcat(tbuf,"/");
+  strcat(tbuf,name);
+  /* If the named file exists, then return it. */
+  if (! access (tbuf, F_OK))
+  {
+    strcpy(executable, tbuf);
+    /* LIB_DIR is not reliable (may be set out of the Singular tree),
+     * so check also path for standard.lib*/
+    strcpy(tbuf,LIB_DIR);
+    strcat(tbuf,"/../share/singular/LIB/standard.lib");
+    if (! access (tbuf, R_OK))
+      return executable;
+  }
   return NULL;
 }
 
