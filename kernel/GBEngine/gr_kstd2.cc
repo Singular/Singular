@@ -1050,7 +1050,7 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
 #endif
 #endif
 
-  assume(currRing->OrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
+  assume(currRing->OrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)// alternate algebra?
 
   // intvec *w=NULL;
   // intvec *hilb=NULL;
@@ -1282,7 +1282,14 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
 
 ideal k_gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
-  return gnc_gr_bba(F, Q, NULL, NULL, strat, _currRing);
+  if ((ncRingType(_currRing)==nc_skew)
+  || id_HomIdeal(F,Q,_currRing))
+    return gnc_gr_bba(F, Q, NULL, NULL, strat, _currRing);
+  else
+  {
+    WerrorS("not implemented: std for inhomogeneous ideasl in local orderings");
+    return NULL;
+  }
 }
 
 #endif
