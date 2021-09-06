@@ -44,7 +44,7 @@ namespace
       CASE(n_Znm);
       CASE(n_Z2m);
       CASE(n_CF);
-      default: return o << "Unknown type: [" << (const unsigned long) type << "]";
+      default: return o << "Unknown type: [" << (unsigned long) type << "]";
     }
 #undef CASE
     return o;
@@ -106,7 +106,7 @@ class GlobalPrintingFixture : public CxxTest::GlobalFixture
       const int l = 5 + ll;
       char* s = (char *)omAlloc0(l);
       s = strncpy(s, argv0, ll);
-      strncpy(s + ll, ".log", 4);
+      strncpy(s + ll, ".log", 5);
       _ofs.open(s); // , ios_base::out)
       omFreeSize((ADDRESS)s, l);
 

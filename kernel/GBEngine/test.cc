@@ -309,7 +309,6 @@ void TestGBEngine()
   {
     PrintS("\n**********************************\n");
     PrintS("sres: \n");
-    const int maxl = rVar(R)-1; // +2*(1);
 
     syStrategy r = sySchreyer(I, rVar(R));
 

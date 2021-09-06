@@ -354,7 +354,7 @@ class simple_reducer:public reduction_step
   {
     this->p=pp;
     this->reducer_deg=pp_reducer_deg;
-    assume(pp_len==pLength(pp));
+    assume(pp_len==(int)pLength(pp));
     this->p_len=pp_len;
     this->c=pp_c;
   }

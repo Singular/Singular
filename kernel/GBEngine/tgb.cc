@@ -996,7 +996,7 @@ static void move_forward_in_S (int old_pos, int new_pos, kStrategy strat)
   long sev = strat->sevS[old_pos];
   int s_2_r = strat->S_2_R[old_pos];
   int length = strat->lenS[old_pos];
-  assume (length == pLength (strat->S[old_pos]));
+  assume (length == (int)pLength (strat->S[old_pos]));
   wlen_type length_w;
   if(strat->lenSw != NULL)
     length_w = strat->lenSw[old_pos];
@@ -1033,7 +1033,7 @@ static void move_backward_in_S (int old_pos, int new_pos, kStrategy strat)
   long sev = strat->sevS[old_pos];
   int s_2_r = strat->S_2_R[old_pos];
   int length = strat->lenS[old_pos];
-  assume (length == pLength (strat->S[old_pos]));
+  assume (length == (int)pLength (strat->S[old_pos]));
   wlen_type length_w;
   if(strat->lenSw != NULL)
     length_w = strat->lenSw[old_pos];
@@ -1803,7 +1803,7 @@ static poly redNF2 (poly h, slimgb_alg * c, int &len, number & m, int n)
   if(h == NULL)
     return NULL;
 
-  assume (len == pLength (h));
+  assume (len == (int)pLength (h));
   kStrategy strat = c->strat;
   if(0 > strat->sl)
   {
@@ -1874,7 +1874,7 @@ static poly redNF2 (poly h, slimgb_alg * c, int &len, number & m, int n)
       kBucketClear (P.bucket, &(P.p), &len);
       kBucketDestroy (&P.bucket);
       pNormalize (P.p);
-      assume (len == (pLength (P.p)));
+      assume (len == (int)pLength (P.p));
       return P.p;
     }
   }
@@ -3220,7 +3220,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
       poly t = I->m[hzz]->next;
       while(t)
       {
-        if(d != this->pTotaldegree (t))
+        if(d != (int)this->pTotaldegree (t))
         {
           is_homog = FALSE;
           break;
@@ -3782,7 +3782,7 @@ static void shorten_tails (slimgb_alg * c, poly monom)
         }
       assume (old_pos >= 0);
       assume (new_pos <= old_pos);
-      assume (pLength (c->strat->S[old_pos]) == c->lengths[i]);
+      assume ((int)pLength (c->strat->S[old_pos]) == c->lengths[i]);
       c->strat->lenS[old_pos] = c->lengths[i];
       if(c->strat->lenSw)
         c->strat->lenSw[old_pos] = q;
@@ -4409,7 +4409,7 @@ multi_reduction_lls_trick (red_object * los, int /*losl*/, slimgb_alg * c,
     c->strat->S[j] = clear_into;
     c->strat->lenS[j] = new_length;
 
-    assume (pLength (clear_into) == new_length);
+    assume ((int)pLength (clear_into) == new_length);
     if(c->strat->lenSw != NULL)
       c->strat->lenSw[j] = qal;
     if(TEST_OPT_INTSTRATEGY)
@@ -4961,7 +4961,7 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
   {
     red = c->strat->S[rn];
     red_len = c->strat->lenS[rn];
-    assume (red_len == pLength (red));
+    assume (red_len == (int)pLength (red));
   }
   else
   {
@@ -5021,7 +5021,7 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
     // pDelete(&m);
   }
 
-  assume (red_len == pLength (red));
+  assume (red_len == (int)pLength (red));
 
   int reducer_deg = 0;
   if(c->eliminationProblem)
