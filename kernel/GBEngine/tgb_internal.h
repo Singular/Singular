@@ -1449,13 +1449,13 @@ int terms_sort_crit(const void* a, const void* b);
 #ifdef USE_NORO
 
 
-template <class number_type > void write_poly_to_row(number_type* row, poly h, poly*terms, int tn, ring r)
+template <class number_type > void write_poly_to_row(number_type* row, poly h, poly*terms, int tn)
 {
   //poly* base=row;
   while(h!=NULL)
   {
     //Print("h:%i\n",h);
-    number coef=p_GetCoeff(h,r);
+    number coef=pGetCoeff(h);
     poly* ptr_to_h=(poly*) bsearch(&h,terms,tn,sizeof(poly),terms_sort_crit);
     assume(ptr_to_h!=NULL);
     int pos=ptr_to_h-terms;

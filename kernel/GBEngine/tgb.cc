@@ -2069,7 +2069,7 @@ linalg_step_modp (poly * p, poly * p_out, int &pn, poly * terms, int tn,
   {
     poly h = p[i];
     //int base=tn*i;
-    write_poly_to_row (number_array + tn * i, h, terms, tn, c->r);
+    write_poly_to_row (number_array + tn * i, h, terms, tn);
 
   }
 #if 0
