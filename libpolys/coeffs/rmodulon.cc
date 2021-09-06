@@ -767,7 +767,7 @@ static number nrnMapZ(number from, const coeffs src, const coeffs dst)
   return nrnMapQ(from,src,dst);
 }
 #endif
-void nrnWrite (number a, const coeffs cf)
+void nrnWrite (number a, const coeffs /*cf*/)
 {
   char *s,*z;
   if (a==NULL)

@@ -22,7 +22,7 @@ TIMING_DEFINE_PRINT(fac_corrcoeff);
 TIMING_DEFINE_PRINT(fac_extgcd);
 
 static void
-extgcdrest ( const CanonicalForm & a, const CanonicalForm & b, const CanonicalForm & s, const CanonicalForm & t, const CanonicalForm & c, CanonicalForm & S, CanonicalForm & T, const modpk & pk )
+extgcdrest ( const CanonicalForm & a, const CanonicalForm & b, const CanonicalForm & s, const CanonicalForm & t, const CanonicalForm & c, CanonicalForm & S, CanonicalForm & T, const modpk & /*pk*/ )
 {
     CanonicalForm sigma = s * c, tau = t * c;
 //    divremainder( sigma, b, T, S, pk );
@@ -323,7 +323,7 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
 }
 
 bool
-Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & x )
+Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & /*x*/ )
 {
     DEBINCLEVEL( cerr, "Hensel" );
     int k, i, h, t = A.max();

@@ -122,7 +122,7 @@ static BOOLEAN ndIsUnit_Ring(number a, const coeffs r)
 { return r->cfIsOne(a,r)|| r->cfIsMOne(a,r); }
 static BOOLEAN ndIsUnit_Field(number a, const coeffs r)
 { return !r->cfIsZero(a,r); }
-static number ndGetUnit_Ring(number a, const coeffs r)
+static number ndGetUnit_Ring(number, const coeffs r)
 { return r->cfInit(1,r); }
 #ifdef LDEBUG
 // static void   nDBDummy1(number* d,char *, int) { *d=NULL; }
@@ -413,7 +413,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
     n->cfExtGcd = ndExtGcd;
-    //n->cfGetUnit = ndGetUnit;
+    //n->cfGetUnit = ndGetUnit_Ring;// set afterwards
 #endif
 
 #ifdef LDEBUG
@@ -444,7 +444,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
       if (n->is_field) n->cfIsUnit=ndIsUnit_Field;
       else             n->cfIsUnit=ndIsUnit_Ring;
     }
-    #ifdef HAVE_RING
+    #ifdef HAVE_RINGS
     if (n->cfGetUnit==NULL)
     {
       if (n->is_field) n->cfGetUnit=n->cfCopy;
