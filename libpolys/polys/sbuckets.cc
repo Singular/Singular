@@ -148,7 +148,7 @@ void sBucket_Merge_m(sBucket_pt bucket, poly p)
 void sBucket_Merge_p(sBucket_pt bucket, poly p, int length)
 {
   assume(bucket != NULL);
-  assume(length <= 0 || length == pLength(p));
+  assume(length <= 0 || length == (int)pLength(p));
 
   if (p == NULL) return;
   if (length <= 0) length = pLength(p);
@@ -203,11 +203,11 @@ void sBucket_Add_m(sBucket_pt bucket, poly p)
 void sBucket_Add_p(sBucket_pt bucket, poly p, int length)
 {
   assume(bucket != NULL);
-  assume(length <= 0 || length == pLength(p));
+  assume(length <= 0 || length == (int)pLength(p));
 
   if (p == NULL) return;
   p_Test(p,bucket->bucket_ring);
-  if (length <= 0) length = pLength(p);
+  if (length <= 0) length = (int)pLength(p);
 
   int i = SI_LOG2(length);
 
@@ -354,7 +354,7 @@ poly sBucketSortMerge(poly p, const ring r)
   sBucketDestroy(&bucket);
 
   p_Test(pn, r);
-  assume(l_dummy == pLength(pn));
+  assume(l_dummy == (int)pLength(pn));
 #ifndef SING_NDEBUG
   assume(l_in == l_dummy);
 #endif
@@ -392,7 +392,7 @@ poly sBucketSortAdd(poly p, const ring r)
 
   p_Test(pn, r);
 #ifndef SING_NDEBUG
-  assume(l_dummy == pLength(pn));
+  assume(l_dummy == (int)pLength(pn));
   assume(l_in >= l_dummy);
 #endif
   return pn;

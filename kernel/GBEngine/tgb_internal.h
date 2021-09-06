@@ -1395,7 +1395,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
 }
 template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c)
 {
-  assume(len==pLength(p));
+  assume(len==(int)pLength(p));
   if (p==NULL)
   {
     len=0;

@@ -4525,7 +4525,6 @@ ring rAssure_TDeg(ring r, int &pos)
     id_Delete(&res->qideal,r);
   }
 
-  int i=rBlocks(r);
   int j;
 
   res->ExpL_Size=r->ExpL_Size+1; // one word more in each monom

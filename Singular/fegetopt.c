@@ -467,7 +467,7 @@ int _fe_getopt_internal (
            p++, option_index++)
         if (!strncmp (p->name, nextchar, s - nextchar))
           {
-            if (s - nextchar == my_strlen (p->name))
+            if (s - nextchar == (long)my_strlen (p->name))
               {
                 /* Exact match found.  */
                 pfound = p;

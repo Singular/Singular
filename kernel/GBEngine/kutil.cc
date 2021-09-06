@@ -9502,7 +9502,7 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   assume(strat->tailRing == p.tailRing);
   // redMoraNF complains about this -- but, we don't really
   // neeed this so far
-  assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
+  assume(p.pLength == 0 || (int)pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
   assume(p.FDeg == p.pFDeg());
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
@@ -12040,7 +12040,7 @@ poly pCopyL2p(LObject H, kStrategy strat)
 * put the  lcm(q,p)  into the set B, q is the shift of some s[i]
 */
 #ifdef HAVE_SHIFTBBA
-static BOOLEAN enterOneStrongPolyShift (poly q, poly p, int /*ecart*/, int /*isFromQ*/, kStrategy strat, int atR, int /*ecartq*/, int qisFromQ, int shiftcount, int ifromS)
+static BOOLEAN enterOneStrongPolyShift (poly q, poly p, int /*ecart*/, int /*isFromQ*/, kStrategy strat, int atR, int /*ecartq*/, int /*qisFromQ*/, int shiftcount, int ifromS)
 {
   number d, s, t;
   /* assume(atR >= 0); */
@@ -12462,7 +12462,7 @@ static void enterOneStrongPolyAndEnterOnePairRingShift(poly q, poly p, int ecart
 
 #ifdef HAVE_SHIFTBBA
 // creates if possible (q,p), (shifts(q),p)
-static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ecartp, int p_isFromQ, kStrategy strat, int atR, int p_lastVblock, int q_lastVblock)
+static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ecartp, int p_isFromQ, kStrategy strat, int /*atR*/, int p_lastVblock, int q_lastVblock)
 {
   // note: ecart and isFromQ is for p
   assume(q_inS < 0 || strat->S[q_inS] == q); // if q is from S, q_inS should be the index of q in S
@@ -12518,7 +12518,7 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
 
 #ifdef HAVE_SHIFTBBA
 // creates (q,p), use it when q is already shifted
-static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int ecartq, int q_isFromQ, kStrategy strat, int atR, int p_lastVblock, int q_shift)
+static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int ecartq, int q_isFromQ, kStrategy strat, int /*atR*/, int p_lastVblock, int q_shift)
 {
   // note: ecart and isFromQ is for p
   assume(p_inS < 0 || strat->S[p_inS] == p); // if p is from S, p_inS should be the index of p in S

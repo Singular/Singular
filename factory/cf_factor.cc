@@ -752,7 +752,9 @@ end_char0:
     }
   }
 
+#if defined(HAVE_NTL)
 end_charp:
+#endif
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
   return F;
 }

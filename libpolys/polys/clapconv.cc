@@ -104,7 +104,7 @@ static CanonicalForm convSingPFactoryP_intern( poly p, int l, BOOLEAN & setChar,
 {
   CanonicalForm result = 0;
   int e, n = rVar(r);
-  assume(l==pLength(p));
+  assume(l==(int)pLength(p));
 
   if (l>MIN_CONV_LEN)
   {

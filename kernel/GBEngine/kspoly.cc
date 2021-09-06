@@ -567,7 +567,7 @@ int ksReducePolyLC(LObject* PR,
 
 int ksReducePolyBound(LObject* PR,
                  TObject* PW,
-                 int bound,
+                 int /*bound*/,
                  poly spNoether,
                  number *coef,
                  kStrategy strat)
@@ -906,7 +906,7 @@ int ksReducePolySig(LObject* PR,
   {
     PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   }
-  assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
+  assume(PW->GetpLength() == (int)pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
@@ -1160,7 +1160,7 @@ int ksReducePolySigRing(LObject* PR,
   {
     PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   }
-  assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
+  assume(PW->GetpLength() == (int)pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
@@ -1263,7 +1263,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   {
     l2 = -1;
     a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing);
-    assume(l2 == pLength(a2));
+    assume(l2 == (int)pLength(a2));
   }
   else
 #ifdef HAVE_SHIFTBBA

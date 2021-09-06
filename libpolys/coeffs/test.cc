@@ -158,7 +158,7 @@ namespace
       CASE(n_Znm);
       CASE(n_Z2m);
       CASE(n_CF);
-      default: return o << "Unknown type: [" << (const unsigned long) type << "]";
+      default: return o << "Unknown type: [" << (unsigned long) type << "]";
     }
 #undef CASE
     return o;
