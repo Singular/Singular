@@ -985,7 +985,7 @@ ideal idLiftStd (ideal  h1, matrix* T, tHomog hi, ideal * S, GbVariant alg,
   if (S!=NULL) { lift3=TRUE; idDelete(S); }
   if (idIs0(h1))
   {
-    *T=mpNew(1,0);
+    *T=mpNew(1,IDELEMS(h1));
     if (lift3)
     {
       *S=idFreeModule(IDELEMS(h1));
