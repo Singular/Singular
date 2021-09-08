@@ -136,6 +136,7 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
   p_Test(res_p, R);
   return res_p;
 }
+
 /***************************************************************
  *
  * Completing what needs to be set for the monomial
@@ -734,7 +735,7 @@ long p_WDegree(poly p, const ring r)
 long pLDeg0(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  long k= p_GetComp(p, r);
+  long unsigned k= p_GetComp(p, r);
   int ll=1;
 
   if (k > 0)
@@ -781,7 +782,7 @@ long pLDeg0c(poly p,int *l, const ring r)
   }
   else
   {
-    int curr_limit = rGetCurrSyzLimit(r);
+    long unsigned curr_limit = rGetCurrSyzLimit(r);
     poly pp = p;
     while ((p=pNext(p))!=NULL)
     {
@@ -806,7 +807,7 @@ long pLDeg0c(poly p,int *l, const ring r)
 long pLDegb(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  long k= p_GetComp(p, r);
+  long unsigned k= p_GetComp(p, r);
   long o = r->pFDeg(p, r);
   int ll=1;
 
@@ -836,7 +837,7 @@ long pLDegb(poly p,int *l, const ring r)
 long pLDeg1(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  long k= p_GetComp(p, r);
+  long unsigned k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 
@@ -878,7 +879,7 @@ long pLDeg1c(poly p,int *l, const ring r)
   max=r->pFDeg(p, r);
   if (rIsSyzIndexRing(r))
   {
-    long limit = rGetCurrSyzLimit(r);
+    long unsigned limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
       if (__p_GetComp(p, r)<=limit)
@@ -906,7 +907,7 @@ long pLDeg1_Deg(poly p,int *l, const ring r)
 {
   assume(r->pFDeg == p_Deg);
   p_CheckPolyRing(p, r);
-  long k= p_GetComp(p, r);
+  long unsigned k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 
@@ -943,7 +944,7 @@ long pLDeg1c_Deg(poly p,int *l, const ring r)
   max=p_GetOrder(p, r);
   if (rIsSyzIndexRing(r))
   {
-    long limit = rGetCurrSyzLimit(r);
+    long unsigned limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
       if (__p_GetComp(p, r)<=limit)
@@ -970,7 +971,7 @@ long pLDeg1c_Deg(poly p,int *l, const ring r)
 long pLDeg1_Totaldegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  long k= p_GetComp(p, r);
+  long unsigned k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 
@@ -1006,7 +1007,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
   max=p_Totaldegree(p, r);
   if (rIsSyzIndexRing(r))
   {
-    long limit = rGetCurrSyzLimit(r);
+    long unsigned limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
       if (__p_GetComp(p, r)<=limit)
@@ -1033,7 +1034,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
 long pLDeg1_WFirstTotalDegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  long k= p_GetComp(p, r);
+  long unsigned k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 
@@ -1069,7 +1070,7 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, const ring r)
   max=p_WFirstTotalDegree(p, r);
   if (rIsSyzIndexRing(r))
   {
-    long limit = rGetCurrSyzLimit(r);
+    long unsigned limit = rGetCurrSyzLimit(r);
     while ((p=pNext(p))!=NULL)
     {
       if (__p_GetComp(p, r)<=limit)
@@ -2343,23 +2344,23 @@ content_finish:
 
 void p_Content_n(poly ph, number &c,const ring r)
 {
+  const coeffs cf=r->cf;
   if (ph==NULL)
   {
-    c=n_Init(1,r->cf);
+    c=n_Init(1,cf);
     return;
   }
   if (rField_is_Ring(r)) /*should not be called*/
   {
-    if(!n_GreaterZero(pGetCoeff(ph),r->cf))
+    if(!n_GreaterZero(pGetCoeff(ph),cf))
     {
       ph = p_Neg(ph,r);
-      c=n_Init(-1,r->cf);
+      c=n_Init(-1,cf);
     }
     else
-      c=n_Init(1,r->cf);
+      c=n_Init(1,cf);
     return;
   }
-  const coeffs cf=r->cf;
   if (pNext(ph)==NULL)
   {
     c=pGetCoeff(ph);
@@ -2922,7 +2923,10 @@ poly p_Cleardenom(poly p, const ring r)
   if( p == NULL )
     return NULL;
 
-  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+  assume( r != NULL );
+  assume( r->cf != NULL );
+  assume(!rField_is_Ring(r));
+  const coeffs C = r->cf;
 
 #if CLEARENUMERATORS
   if( 0 )
@@ -2941,7 +2945,7 @@ poly p_Cleardenom(poly p, const ring r)
 
   if (rField_is_Ring(r)) /*should not be called*/
   {
-    if(!n_GreaterZero(pGetCoeff(p),r->cf)) p = p_Neg(p,r);
+    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
     //p_ContentForGB(p,r);
     return p;
   }
@@ -2951,15 +2955,15 @@ poly p_Cleardenom(poly p, const ring r)
   if(pNext(p)==NULL)
   {
     if (!TEST_OPT_CONTENTSB)
-      p_SetCoeff(p,n_Init(1,r->cf),r);
-    else if(!n_GreaterZero(pGetCoeff(p),r->cf))
+      p_SetCoeff(p,n_Init(1,C),r);
+    else if(!n_GreaterZero(pGetCoeff(p),C))
       p = p_Neg(p,r);
     return p;
   }
 
   if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
   {
-    if(!n_GreaterZero(pGetCoeff(p),r->cf)) p = p_Neg(p,r);
+    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
     return p;
   }
 
@@ -2984,29 +2988,29 @@ poly p_Cleardenom(poly p, const ring r)
   if(1)
   {
     // get lcm of all denominators ----------------------------------
-    h = n_Init(1,r->cf);
+    h = n_Init(1,C);
     while (p!=NULL)
     {
-      n_Normalize(pGetCoeff(p),r->cf);
-      d=n_NormalizeHelper(h,pGetCoeff(p),r->cf);
-      n_Delete(&h,r->cf);
+      n_Normalize(pGetCoeff(p),C);
+      d=n_NormalizeHelper(h,pGetCoeff(p),C);
+      n_Delete(&h,C);
       h=d;
       pIter(p);
     }
     /* h now contains the 1/lcm of all denominators */
-    if(!n_IsOne(h,r->cf))
+    if(!n_IsOne(h,C))
     {
       // multiply by the lcm of all denominators
       p = start;
       while (p!=NULL)
       {
-        d=n_Mult(h,pGetCoeff(p),r->cf);
-        n_Normalize(d,r->cf);
+        d=n_Mult(h,pGetCoeff(p),C);
+        n_Normalize(d,C);
         p_SetCoeff(p,d,r);
         pIter(p);
       }
     }
-    n_Delete(&h,r->cf);
+    n_Delete(&h,C);
     p=start;
 
     p_ContentForGB(p,r);
@@ -3020,7 +3024,7 @@ poly p_Cleardenom(poly p, const ring r)
 #endif
   }
 
-  if(!n_GreaterZero(pGetCoeff(p),r->cf)) p = p_Neg(p,r);
+  if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
 
   return start;
 }
@@ -3128,18 +3132,18 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
 
   if(1)
   {
-    h = n_Init(1,r->cf);
+    h = n_Init(1,C);
     while (p!=NULL)
     {
-      n_Normalize(pGetCoeff(p),r->cf);
-      d=n_NormalizeHelper(h,pGetCoeff(p),r->cf);
-      n_Delete(&h,r->cf);
+      n_Normalize(pGetCoeff(p),C);
+      d=n_NormalizeHelper(h,pGetCoeff(p),C);
+      n_Delete(&h,C);
       h=d;
       pIter(p);
     }
     c=h;
     /* contains the 1/lcm of all denominators */
-    if(!n_IsOne(h,r->cf))
+    if(!n_IsOne(h,C))
     {
       p = ph;
       while (p!=NULL)
@@ -3155,8 +3159,8 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
         * nDelete(&(p->coef));
         * p->coef =hh;
         */
-        d=n_Mult(h,pGetCoeff(p),r->cf);
-        n_Normalize(d,r->cf);
+        d=n_Mult(h,pGetCoeff(p),C);
+        n_Normalize(d,C);
         p_SetCoeff(p,d,r);
         pIter(p);
       }
@@ -3164,17 +3168,17 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
       {
         loop
         {
-          h = n_Init(1,r->cf);
+          h = n_Init(1,C);
           p=ph;
           while (p!=NULL)
           {
-            d=n_NormalizeHelper(h,pGetCoeff(p),r->cf);
-            n_Delete(&h,r->cf);
+            d=n_NormalizeHelper(h,pGetCoeff(p),C);
+            n_Delete(&h,C);
             h=d;
             pIter(p);
           }
           /* contains the 1/lcm of all denominators */
-          if(!n_IsOne(h,r->cf))
+          if(!n_IsOne(h,C))
           {
             p = ph;
             while (p!=NULL)
@@ -3190,20 +3194,20 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
               * nDelete(&(p->coef));
               * p->coef =hh;
               */
-              d=n_Mult(h,pGetCoeff(p),r->cf);
-              n_Normalize(d,r->cf);
+              d=n_Mult(h,pGetCoeff(p),C);
+              n_Normalize(d,C);
               p_SetCoeff(p,d,r);
               pIter(p);
             }
-            number t=n_Mult(c,h,r->cf);
-            n_Delete(&c,r->cf);
+            number t=n_Mult(c,h,C);
+            n_Delete(&c,C);
             c=t;
           }
           else
           {
             break;
           }
-          n_Delete(&h,r->cf);
+          n_Delete(&h,C);
         }
       }
     }
@@ -3227,7 +3231,6 @@ void p_ProjectiveUnique(poly ph, const ring r)
   if( ph == NULL )
     return;
 
-  assume( r != NULL ); assume( r->cf != NULL );
   const coeffs C = r->cf;
 
   number h;
@@ -3243,7 +3246,6 @@ void p_ProjectiveUnique(poly ph, const ring r)
 
   if (nCoeff_is_Zp(C) && TEST_OPT_INTSTRATEGY)
   {
-    assume( n_GreaterZero(pGetCoeff(ph),C) );
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
     return;
   }
@@ -3425,7 +3427,7 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
 BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r)
 {
   poly q=p,qq;
-  int i;
+  long unsigned i;
 
   while (q!=NULL)
   {
@@ -3448,7 +3450,8 @@ BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r)
 void   p_VectorHasUnit(poly p, int * k, int * len, const ring r)
 {
   poly q=p,qq;
-  int i,j=0;
+  int j=0;
+  long unsigned i;
 
   *len = 0;
   while (q!=NULL)
@@ -3464,7 +3467,7 @@ void   p_VectorHasUnit(poly p, int * k, int * len, const ring r)
        while (qq!=NULL)
        {
          if (__p_GetComp(qq,r)==i) j++;
-        pIter(qq);
+         pIter(qq);
        }
        if ((*len == 0) || (j<*len))
        {
@@ -3484,11 +3487,11 @@ poly p_TakeOutComp1(poly * p, int k, const ring r)
   if (q==NULL) return NULL;
 
   poly qq=NULL,result = NULL;
-
-  if (__p_GetComp(q,r)==k)
+  long unsigned kk=k;
+  if (__p_GetComp(q,r)==kk)
   {
     result = q; /* *p */
-    while ((q!=NULL) && (__p_GetComp(q,r)==k))
+    while ((q!=NULL) && (__p_GetComp(q,r)==kk))
     {
       p_SetComp(q,0,r);
       p_SetmComp(q,r);
@@ -3502,7 +3505,7 @@ poly p_TakeOutComp1(poly * p, int k, const ring r)
 //  if (pGetComp(q) > k) pGetComp(q)--;
   while (pNext(q)!=NULL)
   {
-    if (__p_GetComp(pNext(q),r)==k)
+    if (__p_GetComp(pNext(q),r)==kk)
     {
       if (result==NULL)
       {
@@ -3631,7 +3634,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
   *r_q = pNext(&qq);
   *lq = l;
 #ifndef SING_NDEBUG
-  assume(pLength(*r_p) + pLength(*r_q) == lp);
+  assume(pLength(*r_p) + pLength(*r_q) == (unsigned)lp);
 #endif
   p_Test(*r_p,r);
   p_Test(*r_q,r);
@@ -3640,23 +3643,24 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
 void p_DeleteComp(poly * p,int k, const ring r)
 {
   poly q;
+  long unsigned kk=k;
 
-  while ((*p!=NULL) && (__p_GetComp(*p,r)==k)) p_LmDelete(p,r);
+  while ((*p!=NULL) && (__p_GetComp(*p,r)==kk)) p_LmDelete(p,r);
   if (*p==NULL) return;
   q = *p;
-  if (__p_GetComp(q,r)>k)
+  if (__p_GetComp(q,r)>kk)
   {
     p_SubComp(q,1,r);
     p_SetmComp(q,r);
   }
   while (pNext(q)!=NULL)
   {
-    if (__p_GetComp(pNext(q),r)==k)
+    if (__p_GetComp(pNext(q),r)==kk)
       p_LmDelete(&(pNext(q)),r);
     else
     {
       pIter(q);
-      if (__p_GetComp(q,r)>k)
+      if (__p_GetComp(q,r)>kk)
       {
         p_SubComp(q,1,r);
         p_SetmComp(q,r);
@@ -3669,10 +3673,11 @@ poly p_Vec2Poly(poly v, int k, const ring r)
 {
   poly h;
   poly res=NULL;
+  long unsigned kk=k;
 
   while (v!=NULL)
   {
-    if (__p_GetComp(v,r)==k)
+    if (__p_GetComp(v,r)==kk)
     {
       h=p_Head(v,r);
       p_SetComp(h,0,r);
@@ -3718,9 +3723,6 @@ void  p_Vec2Array(poly v, poly *p, int len, const ring r)
 */
 void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
 {
-  poly h;
-  int k;
-
   *len=p_MaxComp(v,r);
   if (*len==0) *len=1;
   *p=(poly*)omAlloc((*len)*sizeof(poly));
@@ -4694,7 +4696,7 @@ poly p_Last(const poly p, int &l, const ring r)
   }
   else
   {
-    int curr_limit = rGetCurrSyzLimit(r);
+    long unsigned curr_limit = rGetCurrSyzLimit(r);
     poly pp = a;
     while ((a=pNext(a))!=NULL)
     {
@@ -4839,7 +4841,8 @@ unsigned long p_GetShortExpVector(const poly p, const ring r)
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)
-  int i=0,j=1;
+  unsigned int i=0;
+  int j=1;
 
   if (n == 0)
   {
