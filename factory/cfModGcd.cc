@@ -86,8 +86,6 @@ terminationTest (const CanonicalForm& F, const CanonicalForm& G,
 
 #if defined(HAVE_NTL)|| defined(HAVE_FLINT)
 
-static const double log2exp= 1.442695041;
-
 /// compressing two polynomials F and G, M is used for compressing,
 /// N to reverse the compression
 int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
