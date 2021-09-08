@@ -26,7 +26,7 @@
 BOOLEAN nr2mDBTest(number a, const char *f, const int l, const coeffs r)
 {
   if ((((long)a<0L) || ((long)a>(long)r->mod2mMask))
-  && (r->mod2mMask!= ~0L))
+  && (r->mod2mMask!= ~0UL))
   {
     Print("wrong mod 2^n number %ld (m:%ld) at %s,%d\n",(long)a,(long)r->mod2mMask,f,l);
     return FALSE;

@@ -3,10 +3,8 @@
 ****************************************/
 
 /*
-* ABSTRACT:
+* ABSTRACT: float as coeffs
 */
-
-
 
 #include "misc/auxiliary.h"
 #include "misc/mylimits.h"
@@ -22,12 +20,6 @@
 
 //#include <string.h>
 #include <cmath>
-
-// Private interface should be hidden!!!
-
-#ifdef LDEBUG
-static BOOLEAN nrDBTest(number a, const coeffs r, const char *f, const int l);
-#endif
 
 /// Get a mapping function from src into the domain of this type: n_R
 static nMapFunc nrSetMap(const coeffs src, const coeffs dst);
