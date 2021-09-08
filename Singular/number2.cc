@@ -35,10 +35,10 @@ void crPrint(coeffs c)
 BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b)
 {
   coeffs c1=(coeffs)a->Data();
-  long   i2=(long)b->Data();
+  unsigned long i2=(unsigned long)b->Data();
   if (c1->type==n_Z)
   {
-    if (i2==IsPrime(i2))
+    if (i2==(unsigned long)IsPrime(i2))
     {
       #ifndef TEST_ZN_AS_ZP
       res->data=(void *)nInitChar(n_Zp,(void*)i2);
