@@ -821,7 +821,9 @@ diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
     tryDiophantine (recResult, mapinto (F), mapinto (factors), modMipo, fail);
     if (fail)
     {
-//next_prime:
+#ifndef HAVE_NTL
+next_prime:
+#endif
       int i= 0;
       while (cf_getBigPrime (i) <= p)
         i++;
