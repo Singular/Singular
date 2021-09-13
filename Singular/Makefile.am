@@ -220,7 +220,7 @@ TESTS=test
 check_PROGRAMS=$(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD = libSingular.la
+test_LDADD = ${builddir}/../omalloc/libomalloc.la libSingular.la
 
 #########################################################
 # These files are built first

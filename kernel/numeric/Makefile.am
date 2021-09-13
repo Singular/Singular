@@ -18,6 +18,6 @@ TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
 TESTS = test
 check_PROGRAMS = $(TESTS)
 test_SOURCES = test.cc
-test_LDADD   = libnumeric.la ${builddir}/../../Singular/libSingular.la
+test_LDADD   = libnumeric.la ${builddir}/../../omalloc/libomalloc.la ${builddir}/../../Singular/libSingular.la
 
 CLEANFILES = $(TESTS)
