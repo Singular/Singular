@@ -2,6 +2,10 @@
 #include <string.h>
 #include <limits.h>
 
+#include "omConfig.h"
+
+#ifdef HAVE_OMALLOC
+
 #define TRACK_LEVEL   1
 #define CHECK_LEVEL   1
 // keep every ith address: define to 0 if no keeping
@@ -124,4 +128,5 @@ void TestAddrContentEqual(void* s1, void* s2, size_t size);
 #define omtTestDebug(cell)               do {} while (0)
 #define TestAddrContent(a,v,s)          do {} while (0)
 #define TestAddrContentEqual(s1, s2, s) do {} while (0)
+#endif
 #endif

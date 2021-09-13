@@ -2,6 +2,7 @@
 #define OM_CHECK 1
 #include "omalloc.h"
 
+#ifdef HAVE_OMALLOC
 struct LongSpec
 {
   int MaxSize;
@@ -434,3 +435,4 @@ int omtTestErrors()
   return 0;
 #endif
 }
+#endif

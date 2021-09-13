@@ -29,6 +29,7 @@
 #define omSmallSize2AlignedBin omSmallSize2Bin
 #endif
 
+#ifdef HAVE_OMALLOC
 void omtTestAlloc(omMemCell cell, unsigned long spec)
 {
   size_t size = GET_SIZE(spec);
@@ -370,3 +371,4 @@ void omtTestDup(omMemCell cell, unsigned long spec)
     omFree(new_addr);
   }
 }
+#endif

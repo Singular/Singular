@@ -6,6 +6,8 @@
 
 #include "omalloc.h"
 
+#ifdef HAVE_OMALLOC
+
 omMemCell_t cells[MAX_CELLS];
 int errors = 0;
 int missed_errors = 0;
@@ -493,3 +495,10 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
+#else
+
+int main(int argc, char* argv[])
+{
+  return 0;
+}
+#endif
