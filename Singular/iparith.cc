@@ -4606,8 +4606,6 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     res->rtyp = NONE;
   }
   return FALSE;
-  res->data = (char *)0;
-  return FALSE;
 }
 //static BOOLEAN jjMONITOR1(leftv res, leftv v)
 //{
