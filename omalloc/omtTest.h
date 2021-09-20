@@ -19,11 +19,6 @@
 // #define KEEP_ADDR     0
 #define END_CHECK_LEVEL 5
 
-#ifdef OM_TEST_MALLOC
-#define OM_EMULATE_OMALLOC
-#endif
-
-
 #include "omStructs.h"
 
 struct omMemCell_s

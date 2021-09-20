@@ -18,7 +18,7 @@ noinst_HEADERS= omPage.h omDefaultConfig.h omReturn.h omGetPageSize.h \
   omMalloc.h omMallocSystem.h
 
 SOURCES=\
-omBinPage.c       omList.c         omAllocEmulate.c omDebug.c        \
+omBinPage.c       omList.c         omDebug.c        \
 om_Alloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c \
 omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
 omBin.c           omDebugTrack.c   		     \
@@ -68,17 +68,13 @@ DISTCLEANFILES = omConfig.h
 ####################################################
 ## Test program
 
-TESTS = omtTest-m omtTest-r
+TESTS = omtTest-r
 
 check_PROGRAMS = $(TESTS)
 
 # EXTRA_PROGRAMS = omtTest-r
 
 OMTTESTSSOURCES = omtTestReal.c omtTestDebug.c omtTestKeep.c omtTestError.c omtTest.c
-
-omtTest_m_CPPFLAGS = ${AM_CPPFLAGS} -DOM_TEST_MALLOC
-omtTest_m_SOURCES  = $(OMTTESTSSOURCES)
-omtTest_m_LDADD    = libomalloc.la
 
 omtTest_r_SOURCES  = $(OMTTESTSSOURCES)
 omtTest_r_LDADD    = libomalloc.la
