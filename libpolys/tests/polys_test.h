@@ -2481,7 +2481,7 @@ public:
     {
       for (int qi = 0; qi <= 100; qi++)
       {
-        int c = rand() % 1000000;
+        int c = rand() % 1000000+1; /* c must not be 0 */
         poly qterm = p_ISet(c, r); p_SetExp(qterm, 1, qi, r);
         p_Setm(qterm, r);
         number qtermAsN = toFractionNumber(qterm, cf);
