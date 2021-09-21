@@ -46,13 +46,6 @@ void* valloc(size_t size)
   return NULL;
 }
 
-void* memalign(size_t size_1, size_t size_2)
-{
-  fputs("omalloc Warning: memalign not yet implemented\n",stderr);
-  fflush(NULL);
-  return NULL;
-}
-
 void* realloc(void* old_addr, size_t new_size)
 {
   if (old_addr && new_size)

@@ -11,7 +11,6 @@ void* omCallocFunc(size_t nmemb, size_t size);
 void* omMallocFunc(size_t size);
 void omFreeFunc(void* addr);
 void* omVallocFunc(size_t size);
-void* omMemalignFunc(size_t size_1, size_t size_2);
 void* omReallocFunc(void* old_addr, size_t new_size);
 char* omStrdupFunc(const char* addr);
 void* omReallocSizeFunc(void* old_addr, size_t old_size, size_t new_size);

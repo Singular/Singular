@@ -15,7 +15,6 @@
 #define freeSize    omFreeSizeFunc
 #define realloc     omReallocFunc
 #define reallocSize omReallocSizeFunc
-#define memalign    omMemalignFunc
 #define strdup      omStrdupFunc
 #define valloc      omVallocFunc
 
