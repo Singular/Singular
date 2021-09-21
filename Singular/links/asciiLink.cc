@@ -170,6 +170,21 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
         }
         break;
       }
+    #if 1
+    case LIST_CMD:
+      {
+        lists l=(lists)v->Data();
+        for(int i=0;i<l->nr;i++)
+        {
+          char *s=l->m[i].String();
+          fwrite(s,strlen(s),1,outfile);
+          omFree(s);
+          if (i!=l->nr-1) fputc(',',outfile);
+          fputc('\n',outfile);
+        }
+        break;
+      }
+    #endif
     default:
       s = v->String();
       // free v ??
