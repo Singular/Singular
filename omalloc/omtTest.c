@@ -349,6 +349,7 @@ int main(int argc, char* argv[])
   int last_kept_freed = 0;
   om_Opts.MinCheck = CHECK_LEVEL;
   om_Opts.Keep = KEEP_ADDR;
+  om_Opts.HowToReportErrors = 3;
 
   seed = time(NULL);
 
