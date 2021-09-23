@@ -15,6 +15,7 @@
 #include "kernel/oswrapper/vspace.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 BOOLEAN kVerify1(ideal F, ideal Q)

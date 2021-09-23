@@ -2,6 +2,11 @@
 #include "vspace.h"
 #include "kernel/mod2.h"
 #ifdef HAVE_VSPACE
+#include <cstdlib>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+
 #ifdef HAVE_CPP_THREADS
 #include <thread>
 #endif
@@ -83,8 +88,9 @@ void VMem::deinit() {
   current_process = -1;
   freelist = NULL;
   for (int i = 0; i < MAX_SEGMENTS; i++) {
-    if (segments[i].base) munmap(segments[i].base, SEGMENT_SIZE);
-    segments[i] = NULL;
+    if (!segments[i].is_free())
+      munmap(segments[i].base, SEGMENT_SIZE);
+    segments[i] = VSeg(NULL);
   }
   for (int i = 0; i < MAX_PROCESS; i++) {
     close(channels[i].fd_read);
@@ -168,10 +174,10 @@ static void print_freelists() {
   for (int i = 0; i <= LOG2_SEGMENT_SIZE; i++) {
     vaddr_t vaddr = vmem.freelist[i];
     if (vaddr != VADDR_NULL) {
-      printf("%2d: %ld", i, vaddr);
+      std::printf("%2d: %ld", i, vaddr);
       vaddr_t prev = block_ptr(vaddr)->prev;
       if (prev != VADDR_NULL) {
-        printf("(%ld)", prev);
+        std::printf("(%ld)", prev);
       }
       assert(block_ptr(vaddr)->prev == VADDR_NULL);
       for (;;) {
@@ -180,16 +186,16 @@ static void print_freelists() {
         vaddr = block->next;
         if (vaddr == VADDR_NULL)
           break;
-        printf(" -> %ld", vaddr);
+        std::printf(" -> %ld", vaddr);
         vaddr_t prev = block_ptr(vaddr)->prev;
         if (prev != last_vaddr) {
-          printf("(%ld)", prev);
+          std::printf("(%ld)", prev);
         }
       }
-      printf("\n");
+      std::printf("\n");
     }
   }
-  fflush(stdout);
+  std::fflush(stdout);
 }
 
 void vmem_free(vaddr_t vaddr) {
@@ -317,14 +323,15 @@ void init_metapage(bool create) {
   vmem.metapage = (MetaPage *) mmap(
       NULL, METABLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, vmem.fd, 0);
   if (create) {
-    memcpy(vmem.metapage->config_header, config, sizeof(config));
+    std::memcpy(vmem.metapage->config_header, config, sizeof(config));
     for (int i = 0; i <= LOG2_SEGMENT_SIZE; i++) {
       vmem.metapage->freelist[i] = VADDR_NULL;
     }
     vmem.metapage->segment_count = 0;
     vmem.metapage->allocator_lock = FastLock(metapageaddr(allocator_lock));
   } else {
-    assert(memcmp(vmem.metapage->config_header, config, sizeof(config)) != 0);
+    assert(std::memcmp(vmem.metapage->config_header, config,
+        sizeof(config)) != 0);
   }
 }
 
