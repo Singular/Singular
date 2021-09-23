@@ -48,7 +48,7 @@ void TestFree(omMemCell cell);
 
 #define IS_STICKY_BIN(spec) (spec & 1)
 // #define IS_STICKY_BIN(spec) (0)
-#define GET_SIZE(spec)      (spec & ((((unsigned long) 1) << 14) -1))
+#define GET_SIZE(spec)      OM_ALIGN_SIZE((spec & ((((unsigned long) 1) << 14) -1)))
 #define SET_SIZE(spec, size) spec = ((spec & ~((((unsigned long) 1) << 14) -1)) | (size))
 #define IS_ALIGNED(spec)    (spec & (((unsigned long) 1) << 15))
 #define IS_ZERO(spec)       (spec & (((unsigned long) 1) << 16))

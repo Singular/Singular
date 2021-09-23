@@ -70,12 +70,6 @@ void omtTestDebug(omMemCell cell)
   }
 
   is_size = omSizeOfAddr(cell->addr);
-  if (!OM_IS_ALIGNED(is_size))
-  {
-    omReportError(omError_Unknown, omError_NoError, OM_FLR,
-                  "is_size == %u is unaligned", is_size);
-    return;
-  }
   if (is_size < size)
   {
     omReportError(omError_Unknown, omError_NoError, OM_FLR,
