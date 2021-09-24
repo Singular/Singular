@@ -1,0 +1,440 @@
+/////// Procedure to compute Sagbi-Groebner Bases //////
+version="version sagbi.lib 4.2.1.1 Sep_2021 "; // $Id$
+category="Commutative Algebra";
+info="
+LIBRARY: sagbi2.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a subalgebra
+AUTHORS:
+ Nazish Kanwal, Lecturer of Mathematics, School of Mathematics and
+        Computer Science, Institute of Business Administration,
+        Karachi, Pakistan
+ Junaid Alam Khan,  Associate Professor of Mathematics, School of
+        Mathematics and Computer Science, Institute of Business
+        Administration,
+        Karachi, Pakistan
+
+PROCUDURES:
+ SGNFa(f,I,A);       normalform of f wrt. I in subalgebra A.
+ SPOLY(I,A);         S-polynomials of ideal I over subalgebra A.
+ SGB(I,A):           Sagbi basis of ideal I over subalgebra A.
+
+SEE ALSO: sagbi_lib
+";
+
+LIB "algebra.lib";
+LIB "sagbi.lib";
+LIB "grobcov.lib";
+
+////////////////////////////////////////
+
+////////// Procedure to compute normal form ////////
+
+// For a polynomial f of subalgebra A and a finite set of polynomials I , 
+// the following procedure compute a normal form of f with respect to I over subalgebra A.
+
+proc SGNF(poly f,ideal I, ideal A)
+
+"USAGE: SGNF(f,I,A); f polynomial, I ideal of subalgebra 
+                   A, A ideal (which is a finite Sagbi bases).
+RETURN: a polynomial h: the normalform of f wrt. I in A
+"
+{
+   A=sagbi(A);
+   ideal G=I ;
+   poly h=f ;
+   poly h1,j,m,c;
+   list L ;
+   map psi ;
+   int i,k;
+
+   while(h!=0 && h1!=h)
+   { 
+     for(i=1;i<=size(G);i++)
+     {
+       m=lead(h)/lead(G[i]);
+       if(m!=0)
+       {     
+         L= algebra_containment(m,lead(A),1); 
+         if (L[1]==1)
+         { k=1;
+           def s= L[2] ;
+           psi= s,maxideal(1),A ;
+           j= psi(check) ;
+           c=leadcoef(h)/(leadcoef(j)*leadcoef(G[i]));
+           h1=h;
+           h=h-(c*j*G[i]); 
+           kill s;      
+         }
+       }
+     }
+     if(k==0)
+     {
+       return(h);
+     }
+     k=0;
+   }
+   return(h);
+} 
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y),Dp;
+  ideal A=x2,xy;
+  ideal I=x3y+x2,x4+x2y2,-x3y3-x2y2;
+  poly f=x6y6+x2;
+  poly g=x12+x6y6-x8+x5y;
+  SGNF(f,I,A);
+  SGNF(g,I,A);
+}
+
+//////// Leading term generating set for syzygies //////
+
+// This is a procedure for computing generating set for syzygies of
+// leading of ideal I over subalgebra A.
+
+// For this procedure we required two more procedures.
+
+// This procedure compute the elements of lead(I) in the power products
+// of leading elements of subalgebra A.
+
+proc SGGS(ideal I,ideal A)
+"USAGE: SGGS(I,A); I ideal of subalgebra, A subalgebra(which is finite sagbi basis).
+RETURN: a list M."
+{
+  A=sagbi(A);
+  def bsr=R1;
+  ideal B=lead(A);
+  int i;
+  ideal vars = maxideal(1) ;
+  int n=nvars(r) ;
+  int m=size(I) ;
+  ideal Q;
+  list M;
+  for(i=1;i<=m;i++)
+  { 
+     setring bsr;
+     list Li=algebra_containment(lead(I[i]),B,1);
+     if (Li[1]==1)
+     {  
+         def Si=Li[2];
+         setring Si;
+         poly ji=check;
+      
+     }
+     setring bsr;
+     poly ji=imap(Si,ji);
+     M[i]=ji;
+  }
+  return(M);
+}
+
+/////////////////////////////////////
+
+// This procedure provide the syzygies of lead(I) by using
+// Groebner technique.
+
+// Here ideal G=SGGS(I,A);
+proc SYZ(ideal G)
+"USAGE: SYZ(G); G=SGGS(I,A), I ideal of subalgebra A, A is a subalgebra(which is finite sagbi basis).
+RETURN: a list T."
+{
+  int i,j,l;
+  int l=size(G);
+  list T;
+  for(i=1;i<=l-1;i++)
+  {
+    list S;
+    for(j=i+1;j<=l;j++)
+    {
+        poly gij=lcm(G[i],G[j]);
+        vector vij=(gij/G[i])*gen(i)-(gij/G[j])*gen(j);
+        S[j]=vij;
+    }
+    T[i]=S;
+  }
+  return(T);
+}
+//////////////////////////////////////////
+
+// This procedure provide the leading term generating set for syzygies of
+// lead(I) over subalgebra A.
+
+proc LTGS(ideal I,ideal A)
+"USAGE: LTGS(I,A); I ideal of subalgebra A, A subalgebra (which is a finite sagbi basis).
+RETURN: a module M."
+{
+  A=sagbi(A);
+  ideal F=lead(I);
+  ideal B=lead(A);
+  ideal vars = maxideal(1) ;
+  int n=nvars(r) ;
+  int m=ncols(A) ;
+  int k ;
+  ideal Q1 ;
+  if(I==0)
+  {
+    return(Q1) ;
+  }
+  else
+  {
+    execute("ring R1=("+charstr(r)+"),(y(1..m),"+varstr(r)+"),(dp(m),dp(n));");
+    ideal I=imap(r,I);
+    ideal A=imap(r,A);
+    ideal B=lead(A);
+    list P=SGGS(I,A);
+    int a=size(P);
+    ideal G;
+    for(k=1;k<=a;k++)
+    {
+      G[k]=P[k];
+    }
+    ideal H=std(G);
+    list N=SYZ(G);
+    execute("ring R=("+charstr(r)+"),(y(1..m)),(dp(m));");
+    setring r;
+    map phi= R,B;
+    setring R;
+    ideal T=kernel(r,phi);
+    setring R1;
+    ideal T=imap(R,T);
+    ideal J=intersect(H,T);
+    list Q;
+    int b=size(J);
+    int c=size(H);
+    if(b!=0)
+    {
+      int d,e;
+      list D;
+      for(d=1;d<=b;d++)
+      {
+        vector qd; 
+        poly gd=J[d];
+        def td=pdivi(gd,H);
+        for(e=1;e<=c;e++)
+        {
+          vector pde=td[2][e]*gen(e);
+          qd=qd+pde;
+        }
+        D[d]=qd;
+      }
+      Q=N,D;
+    }
+    else
+    {
+      Q=N,0;
+        }
+    setring r;
+    map psi=R1,A,maxideal(1);
+    list W=psi(Q);
+    int n=size(I);
+    int i,j,l,t;
+    module M;
+    t=1;
+    for(i=1;i<=n-1;i++)
+    {
+      module Z;
+      for(j=i+1;j<=n;j++)
+      {
+        vector vij=W[t][i][j];
+        Z[j-i]=vij;
+      }
+      if(M!=0)
+        {
+          M=M,Z;
+        }
+      else
+      {
+        M=Z;
+      }
+    }
+    t=t+1;
+    for(l=1;l<=size(W[2]);l++)
+    {
+      vector vt=W[t][l];
+      if(vt!=0)
+      {
+        M=M,vt;
+      }
+    }
+    return(M);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+// Example 1:
+   ring r=ZZ,(x,y),Dp;
+   ideal A=2x2+xy,2y2,3xy;
+   ideal I=4x2y2+2xy3,18x2y4,36xy5;
+   LTGS(I,A);
+
+// Example 2:
+
+   ring r=QQ,(x,y),Dp;
+   ideal A=x2,xy;
+   ideal I=x3y+x2,x4+x2y2,-x3y3-x2y2;
+   LTGS(I,A);
+}
+
+////////// S-Polynomials of ideal I over subalgebra //////////////
+
+// This procedure compute S-polynomials of ideal I over subalgebra A.
+
+// Here we use LTGS(I,A) for computing S-polynomial.
+
+proc SPOLY(ideal I,ideal A)
+"USAGE: SPOLY(I,A); I ideal of subalgebra A, A subalgebra (which is a finite sagbi basis).
+RETURN: an ideal S: S-polynomials of ideal I
+"
+{
+  int i,j;
+  module P=LTGS(I,A);
+  ideal S;
+  for(j=1;j<=size(P);j++)
+  {
+    vector Vj=P[j];
+    poly hj;
+    for(i=1;i<=size(I);i++)
+    {
+      poly pij = Vj[i]*I[i];
+      hj=hj+pij;
+    }
+    S=S+hj;
+  }
+  return(S);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Example 1:
+  ring r=ZZ,(x,y),Dp;
+  ideal A=2x2+xy,2y2,3xy;
+  ideal I=4x2y2+2xy3,18x2y4;
+  SPOLY(I,A);
+  // Example 2:
+  ring r=QQ,(x,y),Dp;
+  ideal A=x2,xy;
+  ideal I=x3y+x2,x4+x2y2,-x3y3-x2y2;
+  SPOLY(I,A);
+}
+
+//////// SAGBI-GROEBNER Bases Construction ////////// 
+
+// This procedure give Sagbi Groebner bases of 
+// ideal I over subalgebra A.
+
+// We used ideal T=SPOLY(I,A);
+
+proc SGB(ideal I,ideal A)
+"USAGE: SGB(I,A); I ideal of subalgebra A, A subalgebra (which is a finite sagbi basis).
+RETURN: an ideal SB."
+{
+  ideal SB,oldSB;
+  poly Red ;
+  ideal T ;
+  int k,l ;
+  SB=I ;
+  while( size(SB)!=size(oldSB))
+  {
+    A=sagbi(A);
+    T=SPOLY(SB,A);
+    l=size(T);
+    if(l==0)
+    {
+      oldSB=SB;
+    }
+    else
+    {
+      for (k=1; k<=l;k++)
+      {
+        Red=T[k] ;
+        Red=SGNF(Red,SB,A);
+        Red;
+        oldSB=SB ;
+        SB=SB+Red ;
+      }
+    }
+  }
+  return(SB);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Example 1:
+  ring r=ZZ,(x,y),Dp;
+  ideal A=2x2+xy,2y2,3xy;
+  ideal I=4x2y2+2xy3,18x2y4;
+  SGB(I,A);
+
+  // Example 2:
+  ring r=QQ,(w,x,y,z),lp;
+  ideal A=wxy+2z2, y2-4z, x+3y
+  ideal I= wxy-y2+2z2+4z, x+y2+3y-4z, x2+6xy+9y2
+  SGB(I,A);
+}
+/*
+// SINGULAR EXAMPLE #01 for all Procedures:
+
+// ring r=integer,(x,y,z),dp;
+// ideal A=2x2+xz,2y2,3yz;
+// ideal I=4x2y2+2xy2z,6x2yz+3xyz2,4x4-4y4+4x3z+x2z2,27y3z3;
+
+// LTGS(I,A);
+
+_[1]=-2y2*gen(2)+3yz*gen(1)
+_[2]=2x2*gen(1)-2y2*gen(3)+xz*gen(1)
+_[3]=27y3z3*gen(1)-4x2y2*gen(4)-2xy2z*gen(4)
+_[4]=2x2*gen(2)+xz*gen(2)-3yz*gen(3)
+_[5]=9y2z2*gen(2)-2x2*gen(4)-xz*gen(4)
+_[6]=27y3z3*gen(3)-4x4*gen(4)-4x3z*gen(4)-x2z2*gen(4)
+
+// SPOLY(I,A);
+
+_[1]=8y6
+_[2]=12y5z
+_[3]=-108y7z3
+
+// SGB(I,A);
+
+_[1]=4x2y2+2xy2z
+_[2]=6x2yz+3xyz2
+_[3]=4x4-4y4+4x3z+x2z2
+_[4]=27y3z3
+_[5]=8y6
+_[6]=12y5z 
+
+// SINGULAR EXAMPLE #02 for all Procedures:
+
+// ring r=0,(x,y),lp;
+// ideal A=x3y2+y2, x3-y, y2+y;
+// ideal I=x3y2+x3y-y3-y2, x3+y2, x3y2-y;
+
+// LTGS(I,A);
+
+_[1]=-x3y2*gen(2)+x3*gen(1)-y2*gen(2)-y*gen(1)
+_[2]=-gen(3)+gen(1)
+_[3]=x3y2*gen(2)-x3*gen(3)+y2*gen(2)+y*gen(3)
+_[4]=y2*gen(1)+y*gen(1)-gen(2)
+_[5]=2x3y4*gen(1)+3x3y3*gen(1)+x3y2*gen(1)-y6*gen(1)-4y5*gen(1)-4y4*gen(1)-y3*gen(1)
+_[6]=x6y4*gen(1)-x6y2*gen(2)+2x3y4*gen(2)+2x3y4*gen(1)+4x3y3*gen(2)-y6*gen(2)-4y5*gen(2)-4y4*gen(2)+y4*gen(1)
+_[7]=x6y3*gen(2)-2x3y6*gen(2)-6x3y5*gen(2)-6x3y4*gen(2)+y8*gen(2)+5y7*gen(2)+8y6*gen(2)+4y5*gen(2)-y4*gen(2)
+
+// SPOLY(I,A);
+
+_[1]=x6y-x3y4-2x3y3-3x3y2+y3
+_[2]=x3y-y3-y2+y
+_[3]=x3y4+x3y3+x3y2+x3y+y4-y2
+_[4]=x3y4+2x3y3+x3y2-x3-y5-2y4-y3-y2
+_[5]=2x6y6+5x6y5+4x6y4+x6y3-x3y8-7x3y7-13x3y6-9x3y5-2x3y4+y9+5y8+8y7+5y6+y5
+_[6]=x9y6+x9y5-x9y2-x6y7+x6y6+2x6y5+x6y4+4x6y3-2x3y7+x3y5-4x3y4-y8-5y7-5y6
+_[7]=x9y3-2x6y6-5x6y5-6x6y4-x3y8-x3y7+2x3y6+4x3y5-x3y4+y10+5y9+8y8+4y7-y6
+
+// SGB(I,A);
+
+_[1]=x3y2+x3y-y3-y2
+_[2]=x3+y2
+_[3]=x3y2-y
+_[4]=-x3y3-x3y2+y5+2y4-y2
+_[5]=x3y-y3-y2+y
+_[6]=y4+2y3+y2
+
+*/
