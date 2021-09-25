@@ -513,7 +513,7 @@ int ksReducePolyLC(LObject* PR,
 #endif
 
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
-  p_SetCoeff(lm, n_Init(1, tailRing), tailRing);
+  p_SetCoeff(lm, n_Init(1, tailRing->cf), tailRing);
   while (PW->max_exp != NULL && !p_LmExpVectorAddIsOk(lm, PW->max_exp, tailRing))
   {
     // undo changes of lm
@@ -628,7 +628,7 @@ int ksReducePolyBound(LObject* PR,
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term
     PR->LmDeleteAndIter();
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
     return 0;
   }
 
@@ -664,7 +664,7 @@ int ksReducePolyBound(LObject* PR,
 #endif
 
   // take care of coef buisness
-  if (! n_IsOne(pGetCoeff(p2), tailRing))
+  if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
@@ -673,11 +673,11 @@ int ksReducePolyBound(LObject* PR,
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
-    else n_Delete(&an, tailRing);
+    else n_Delete(&an, tailRing->cf);
   }
   else
   {
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing->cf);
   }
 
 
@@ -1385,7 +1385,7 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
 
   if (!ret)
   {
-    if (! n_IsOne(coef, currRing))
+    if (! n_IsOne(coef, currRing->cf))
     {
       pNext(Current) = NULL;
       if (Current == PR->p && PR->t_p != NULL)
@@ -1393,7 +1393,7 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
       PR->Mult_nn(coef);
     }
 
-    n_Delete(&coef, currRing);
+    n_Delete(&coef, currRing->cf);
     pNext(Current) = Red.GetLmTailRing();
     if (Current == PR->p && PR->t_p != NULL)
       pNext(PR->t_p) = pNext(Current);

@@ -158,7 +158,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (p_LmShortDivisibleBy(T0p, sevT0, p, not_sev, r))
         {
             mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
             {
                 return 0;
             }
@@ -167,7 +167,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
             mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
             {
                 return 0;
             }
@@ -185,7 +185,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
                     p, not_sev, r))
         {
             mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
             {
                 return 0;
             }
@@ -194,7 +194,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
             mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
             {
                 return 0;
             }
@@ -228,7 +228,7 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
       {
         mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
         {
           o = j;
           orest = rest;
@@ -238,7 +238,7 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].p, p, r))
       {
         mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
         {
           o = j;
           orest = rest;
@@ -261,7 +261,7 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
             p, not_sev, r))
       {
         mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].t_p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
         {
           o = j;
           orest = rest;
@@ -271,7 +271,7 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
       if (!(sevT[j] & not_sev) && p_LmDivisibleBy(T[j].t_p, p, r))
       {
         mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T[j].t_p), &rest, r->cf);
-        if (!n_IsZero(mult, r) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
         {
           o = j;
           orest = rest;

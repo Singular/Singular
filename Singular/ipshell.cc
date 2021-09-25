@@ -4698,7 +4698,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
     rlist->Init( r[0] );
     for(int i=r[0];i>0;i--)
     {
-      rlist->m[i-1].data=n_Init(r[i],currRing);
+      rlist->m[i-1].data=n_Init(r[i],currRing->cf);
       rlist->m[i-1].rtyp=NUMBER_CMD;
     }
     omFree(r);

@@ -140,9 +140,9 @@ static poly find_reducer(const poly multiplier, const poly t,
         p_ExpVectorDiff(q, q, v[i].lt, r);
         p_SetComp(q, v[i].comp, r);
         p_Setm(q, r);
-        number n = n_Div(p_GetCoeff(multiplier, r), p_GetCoeff(v[i].lt, r), r);
-        n_InpMult(n, p_GetCoeff(t, r), r);
-        p_SetCoeff0(q, n_InpNeg(n, r), r);
+        number n = n_Div(p_GetCoeff(multiplier, r), p_GetCoeff(v[i].lt, r), r->cf);
+        n_InpMult(n, p_GetCoeff(t, r), r->cf);
+        p_SetCoeff0(q, n_InpNeg(n, r->cf), r);
         return q;
     }
     p_LmFree(q, r);
@@ -266,11 +266,11 @@ static poly get_from_cache_term(const cache_term::const_iterator itr,
     }
     const ring r = currRing;
     poly p = p_Copy(itr->second, r);
-    if (LIKELY(!n_Equal(pGetCoeff(multiplier), pGetCoeff(itr->first), r)))
+    if (LIKELY(!n_Equal(pGetCoeff(multiplier), pGetCoeff(itr->first), r->cf)))
     {
-        number n = n_Div(pGetCoeff(multiplier), pGetCoeff(itr->first), r);
+        number n = n_Div(pGetCoeff(multiplier), pGetCoeff(itr->first), r->cf);
         p = p_Mult_nn(p, n, r);
-        n_Delete(&n, r);
+        n_Delete(&n, r->cf);
     }
     return p;
 }

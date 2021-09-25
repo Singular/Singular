@@ -3976,7 +3976,7 @@ static BOOLEAN jjDENOMINATOR(leftv res, leftv v)
 {
   number n = reinterpret_cast<number>(v->CopyD());
   res->data = reinterpret_cast<void*>(n_GetDenom(n, currRing->cf));
-  n_Delete(&n,currRing);
+  n_Delete(&n,currRing->cf);
   return FALSE;
 }
 
@@ -3985,7 +3985,7 @@ static BOOLEAN jjNUMERATOR(leftv res, leftv v)
 {
   number n = reinterpret_cast<number>(v->CopyD());
   res->data = reinterpret_cast<void*>(n_GetNumerator(n, currRing->cf));
-  n_Delete(&n,currRing);
+  n_Delete(&n,currRing->cf);
   return FALSE;
 }
 
