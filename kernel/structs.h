@@ -23,7 +23,6 @@
 /* C++-part */
 #ifdef __cplusplus
 #include "kernel/polys.h"
-#include "polys/coeffrings.h"
 
 class Voice;
 class sleftv;
