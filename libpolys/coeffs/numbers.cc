@@ -39,10 +39,6 @@
 #endif
 
 
-#ifdef HAVE_NUMSTATS
-VAR struct SNumberStatistic number_stats;
-#endif /* HAVE_NUMSTATS */
-
 //static int characteristic = 0;
 //extern int IsPrime(int p);
 
@@ -526,7 +522,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
 void nKillChar(coeffs r)
 {
-  STATISTIC(nKillChar);
   if (r!=NULL)
   {
     r->ref--;
@@ -540,7 +535,7 @@ void nKillChar(coeffs r)
       {
         n->next=n->next->next;
         if (cf_root==r) cf_root=n->next;
-        assume (r->cfKillChar!=NULL); r->cfKillChar(r); // STATISTIC(nKillChar);
+        assume (r->cfKillChar!=NULL); r->cfKillChar(r); 
         omFreeSize((void *)r, sizeof(n_Procs_s));
         r=NULL;
       }
@@ -633,16 +628,6 @@ void n_Print(number& a,  const coeffs r)
    n_Write(a, r);
    { char* s = StringEndS(); Print("%s", s); omFree(s); }
 }
-
-
-number n_convFactoryNSingN( const CanonicalForm n, const coeffs r)
-{ STATISTIC(n_convFactoryNSingN); assume(r != NULL); assume(r->convFactoryNSingN != NULL); return r->convFactoryNSingN(n, r); }
-
-
-
-CanonicalForm n_convSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
-{ STATISTIC(n_convSingNFactoryN); assume(r != NULL); assume(r->convSingNFactoryN != NULL); return r->convSingNFactoryN(n, setChar, r); }
-
 
 char* nEati(char *s, int *i, int m)
 {
