@@ -1,16 +1,18 @@
 #ifndef VSPACE_H
 #define VSPACE_H
-
+#include <fcntl.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <assert.h>
+#include <new> // for placement new
 #include "kernel/mod2.h"
 
 #ifdef HAVE_VSPACE
-
-#include <fcntl.h>
-#include <cstdio>
-#include <cstring>
-#include <assert.h>
-#include <new> // for placement new
-
 
 #if __cplusplus >= 201100
 #define HAVE_CPP_THREADS
@@ -19,7 +21,7 @@
 #undef HAVE_CPP_THREADS
 #endif
 
-// VSpace is a C++ library designed to allow processes in a
+// vspace is a C++ library designed to allow processes in a
 // multi-process environment to interoperate via mmapped shared memory.
 // The library provides facilities for shared memory allocation and
 // deallocation, shared mutexes, semaphores, queues, lists, and hash
@@ -230,9 +232,6 @@ struct Block {
 
 struct VSeg {
   unsigned char *base;
-  inline bool is_free() {
-    return base == NULL;
-  }
   inline Block *block_ptr(segaddr_t addr) {
     return (Block *) (base + addr);
   }
@@ -253,7 +252,7 @@ struct VMem {
   static VMem vmem_global;
   MetaPage *metapage;
   int fd;
-  std::FILE *file_handle;
+  FILE *file_handle;
   int current_process; // index into process table
   vaddr_t *freelist; // reference to metapage information
   VSeg segments[MAX_SEGMENTS];
@@ -279,8 +278,9 @@ struct VMem {
   }
   inline void ensure_is_mapped(vaddr_t vaddr) {
     int seg = vaddr >> LOG2_SEGMENT_SIZE;
-    if (segments[seg].is_free())
-      segments[seg] = mmap_segment(seg);
+    if (segments[seg].base != NULL)
+      return;
+    segments[seg] = mmap_segment(seg);
   }
   inline void *to_ptr(vaddr_t vaddr) {
     if (vaddr == VADDR_NULL)
@@ -733,15 +733,15 @@ private:
 
 public:
   VString(const char *s) {
-    _len = std::strlen(s);
+    _len = strlen(s);
     _buffer = vnew_uninitialized_array<char>(_len + 1);
-    std::strcpy(_buffer.as_ptr(), s);
+    strcpy(_buffer.as_ptr(), s);
   }
   VString(const char *s, size_t len) {
     _len = len;
     _buffer = vnew_uninitialized_array<char>(len + 1);
     char *buffer = _buffer.as_ptr();
-    std::memcpy(buffer, s, len);
+    memcpy(buffer, s, len);
     buffer[len] = '\0';
   }
   VString(size_t len) {

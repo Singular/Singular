@@ -19,7 +19,6 @@ number nlRInit (long i);
 #include "kernel/ideals.h"
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 
 // send a number via a string s
 static char *send_number(char *s, number n)
