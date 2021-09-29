@@ -533,7 +533,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
     return TRUE;
   }
 
-  const int characteristic = n_GetChar(currRing);
+  const int characteristic = n_GetChar(currRing->cf);
   const int varCount = currRing->N;
   const ideal I=(ideal) arg->Data();
   mgb::GroebnerConfiguration conf(characteristic, varCount,I->rank);
