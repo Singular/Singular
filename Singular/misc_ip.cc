@@ -75,10 +75,6 @@ NTL_CLIENT
 #endif
 
 
-static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }
-static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGINT); }
-
-
 void setListEntry(lists L, int index, mpz_t n)
 { /* assumes n > 0 */
   /* try to fit nn into an int: */
@@ -92,7 +88,7 @@ void setListEntry(lists L, int index, mpz_t n)
       return;
     }
   }
-  number nn = mpz2number(n);
+  number nn = mpz2number(n, coeffs_BIGINT);
   L->m[index].rtyp = BIGINT_CMD; L->m[index].data = (void*)nn;
 }
 
@@ -366,7 +362,7 @@ lists primeFactorisation(const number n, const int pBound)
 {
   int i;
   int index=0;
-  mpz_t nn; number2mpz(n, nn);
+  mpz_t nn; number2mpz(n, coeffs_BIGINT, nn);
   lists primes = (lists)omAllocBin(slists_bin); primes->Init(1000);
   int* multiplicities = (int*)omAlloc0(1000*sizeof(int));
   int positive=1;
