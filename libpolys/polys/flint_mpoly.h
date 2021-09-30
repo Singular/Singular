@@ -36,6 +36,7 @@ poly Flint_Divide_MP(poly p,int lp, poly q, int lq, fmpq_mpoly_ctx_t ctx, const 
 poly Flint_Divide_MP(poly p,int lp, poly q, int lq, nmod_mpoly_ctx_t ctx, const ring r);
 poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r);
 poly Flint_GCD_MP(poly p,int lp,poly q,int lq,nmod_mpoly_ctx_t ctx,const ring r);
+poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpz_mpoly_ctx_t ctx,const ring r);
 
 #endif
 #endif

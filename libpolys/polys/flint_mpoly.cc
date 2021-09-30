@@ -388,5 +388,30 @@ poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpq_mpoly_ctx_t ctx,const ring r)
   return pres;
 }
 
+poly Flint_GCD_MP(poly p,int lp,poly q,int lq,fmpz_mpoly_ctx_t ctx,const ring r)
+{
+  fmpz_mpoly_t pp,qq,res;
+  convSingPFlintMP(pp,ctx,p,lp,r);
+  convSingPFlintMP(qq,ctx,q,lq,r);
+  fmpz_mpoly_init(res,ctx);
+  int ok=fmpz_mpoly_gcd(res,pp,qq,ctx);
+  poly pres;
+  if (ok)
+  {
+    // Singular wants a gcd defined over ZZ that is primitive and has a positive leading coeff.
+    pres=convFlintMPSingP(res,ctx,r);
+    p_Test(pres,r);
+  }
+  else
+  {
+    pres=p_One(r);
+  }
+  fmpz_mpoly_clear(res,ctx);
+  fmpz_mpoly_clear(pp,ctx);
+  fmpz_mpoly_clear(qq,ctx);
+  fmpz_mpoly_ctx_clear(ctx);
+  return pres;
+}
+
 #endif
 #endif

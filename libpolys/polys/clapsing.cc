@@ -80,6 +80,17 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
       return res;
     }
   }
+  else
+  if (rField_is_Z(r))
+  {
+    fmpz_mpoly_ctx_t ctx;
+    if (!convSingRFlintR(ctx,r))
+    {
+      // leading coef. positive, all coeffs in Z
+      poly res=Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
+      return res;
+    }
+  }
   #endif
   #endif
   Off(SW_RATIONAL);
