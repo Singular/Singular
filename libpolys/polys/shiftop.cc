@@ -955,7 +955,10 @@ ring freeAlgebra(ring r, int d, int ncGenCount)
     p=0;
   // create R->N
   R->N=r->N*d;
-  R->wanted_maxExp=7; /* Tst/Manual/letterplace_liftstd.tst*/
+  if (ncGenCount>0)
+    R->wanted_maxExp=7; /* Tst/Manual/letterplace_liftstd.tst*/
+  else
+    R->wanted_maxExp=3;
   R->isLPring=r->N;
   R->LPncGenCount=ncGenCount;
   // create R->order
