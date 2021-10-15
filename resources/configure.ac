@@ -1,9 +1,9 @@
-AC_INIT([singular_resources],[4.2.1])
+AC_INIT([singular_resources], [4.2.1])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([omFindExec.h])
-AC_CONFIG_HEADERS([_config.h])
+AC_CONFIG_HEADER([_config.h])
 
 AM_MAINTAINER_MODE([enable])
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
@@ -26,11 +26,7 @@ AM_PROG_CC_C_O
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
-# Autoupdate added the next two lines to ensure that your configure
-# script's behavior did not change.  They are probably safe to remove.
-AC_CHECK_INCLUDES_DEFAULT
-AC_PROG_EGREP
-
+AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h sys/stat.h sys/types.h])
 AC_CHECK_FUNCS(readlink getcwd getwd getpwnam setenv putenv)
 

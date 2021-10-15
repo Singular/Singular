@@ -10,7 +10,7 @@ AC_INIT([omalloc],[0.9.6])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR(om_Alloc.c)
-AC_CONFIG_HEADERS([_config.h])
+AC_CONFIG_HEADER([_config.h])
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -154,6 +154,7 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl header file checks
 dnl
+AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
 
@@ -215,7 +216,7 @@ dnl
 if test "$ac_cv_func_mmap" = yes; then
 AC_MSG_CHECKING(whether mmap works)
 AC_CACHE_VAL(ac_cv_working_mmap,
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_TRY_RUN([
 #include <stdlib.h>
 #include "omMmap.c"
 int main()
@@ -224,7 +225,7 @@ int main()
   if (addr == 0 || ((unsigned long) addr % ${ac_cv_pagesize}))
     exit(1);
   exit(omVfreeMmap(addr, 128*${ac_cv_pagesize}));
-}]])],[ac_cv_working_mmap=yes],[ac_cv_working_mmap=no],[ac_cv_working_mmap=no]))
+}], ac_cv_working_mmap=yes, ac_cv_working_mmap=no, ac_cv_working_mmap=no))
 AC_MSG_RESULT($ac_cv_working_mmap)
 if test "$ac_cv_working_mmap" = yes; then
   AC_DEFINE(HAVE_WORKING_MMAP,1,"Whether we have a working mmap")
@@ -235,7 +236,7 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl for strict alignment
 dnl
 AC_CACHE_CHECK(whether alignment needs to be strict, ac_cv_align_need_strict,
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_TRY_RUN([
 #include <stdlib.h>
 int main()
 {
@@ -247,7 +248,7 @@ int main()
   if (*d_ptr != (double) 1.25) exit(1);
   else exit(0);
 }
-]])],[ac_cv_align_need_strict=no],[ac_cv_align_need_strict=yes],[ac_cv_align_need_strict=yes]))
+], ac_cv_align_need_strict=no, ac_cv_align_need_strict=yes, ac_cv_align_need_strict=yes))
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl external config files
@@ -309,7 +310,7 @@ if test "${ac_cv_working_valloc}" = no; then
 elif test "${ac_cv_working_valloc}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"; then
   AC_MSG_RESULT( (cached) yes)
 else
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_TRY_RUN([
 #include <stdlib.h>
 #include "$OM_MALLOC_HEADER"
 #ifdef OM_HAVE_MALLOC_SOURCE
@@ -324,7 +325,7 @@ int main()
   OM_MALLOC_VFREE(addr, 128*${ac_cv_pagesize});
   exit(0);
 }
-]])],[ac_cv_working_valloc="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"],[ac_cv_working_valloc=no],[ac_cv_working_valloc=no])
+], ac_cv_working_valloc="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}", ac_cv_working_valloc=no, ac_cv_working_valloc=no)
 if test "${ac_cv_working_valloc}" = no; then
 AC_MSG_RESULT(no)
 else
@@ -433,7 +434,7 @@ dnl
 if test "x$with_track" != xno; then
 AC_MSG_CHECKING(whether GET_RET_ADDR works)
 AC_CACHE_VAL(ac_cv_get_return_addr_works,
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_TRY_RUN([
 #include <stdlib.h>
 #define OM_GET_RETURN_ADDR_WORKS 1
 #include "omReturn.h"
@@ -447,7 +448,9 @@ int main()
 {
    exit(! test_return_addr());
 }
-]])],[ac_cv_get_return_addr_works=yes],[ac_cv_get_return_addr_works=no],[ac_cv_get_return_addr_works=no]))
+], ac_cv_get_return_addr_works=yes,
+   ac_cv_get_return_addr_works=no,
+   ac_cv_get_return_addr_works=no))
 AC_MSG_RESULT($ac_cv_get_return_addr_works)
 if test "$ac_cv_get_return_addr_works" = yes; then
 AC_DEFINE(OM_GET_RETURN_ADDR_WORKS,1, "Whether get return address works")
@@ -455,7 +458,7 @@ fi
 
 AC_MSG_CHECKING(whether omGetBackTrace works)
 AC_CACHE_VAL(ac_cv_get_backtrace_works,
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_TRY_RUN([
 #include <stdio.h>
 #include <stdlib.h>
 #include "omGetBackTrace.c"
@@ -479,7 +482,9 @@ int main()
    if (i > 0) exit(0);
    else exit(i+10);
 }
-]])],[ac_cv_get_backtrace_works=yes],[ac_cv_get_backtrace_works=no],[ac_cv_get_backtrace_works=no]))
+], ac_cv_get_backtrace_works=yes,
+   ac_cv_get_backtrace_works=no,
+   ac_cv_get_backtrace_works=no))
 AC_MSG_RESULT($ac_cv_get_backtrace_works)
 if test "$ac_cv_get_backtrace_works" = yes; then
 AC_DEFINE(OM_GET_BACKTRACE_WORKS,1,"Whether omInitGetBackTrace () works")
@@ -495,7 +500,7 @@ fi
 
 AC_MSG_CHECKING(whether addr2line works)
 AC_CACHE_VAL(ac_cv_prog_addr2line_works,
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_TRY_RUN([
 #include <stdlib.h>
 #define OM_GET_RETURN_ADDR_WORKS 1
 #include "omReturn.h"
@@ -523,7 +528,9 @@ int main(int argc, char** argv)
   if (i==1) exit(0);
   else exit (i+10);
 }
-]])],[ac_cv_prog_addr2line_works=yes],[ac_cv_prog_addr2line_works=no],[ac_cv_prog_addr2line_works=no]))
+], ac_cv_prog_addr2line_works=yes,
+   ac_cv_prog_addr2line_works=no,
+   ac_cv_prog_addr2line_works=no))
 AC_MSG_RESULT($ac_cv_prog_addr2line_works)
 
 CFLAGS="$save_cflags"
@@ -575,10 +582,15 @@ dnl figure out the return type of sbrk
 dnl
 
 AC_MSG_CHECKING(return type of sbrk)
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[#define __USE_MISC
+AC_TRY_LINK(
+#define __USE_MISC
 #include <unistd.h>
-]], [[void *sbrk();
-]])],[AC_DEFINE(Void_t,void,"Type of void")],[AC_DEFINE(Void_t,char,"Type of void")])
+,
+void *sbrk();
+,
+AC_DEFINE(Void_t,void,"Type of void"),
+AC_DEFINE(Void_t,char,"Type of void"),
+)
 AC_MSG_RESULT(Void_t)
 
 

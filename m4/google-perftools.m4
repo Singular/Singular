@@ -22,11 +22,13 @@ AC_DEFUN([AC_CONFIG_GOOGLE_PERFTOOLS], [
 
     ac_google_perfdir='no'
     AC_ARG_WITH(google-perftools,
-        AS_HELP_STRING([--with-google-perftools=DIR],[location of a google perftools installation (default none)]),
+        AC_HELP_STRING([--with-google-perftools=DIR],
+            [location of a google perftools installation (default none)]),
         ac_google_perfdir=$withval)
 
     AC_ARG_ENABLE(google-profiling,
-                  AS_HELP_STRING([--enable-google-profiling],[compile with google profiling]),
+                  AC_HELP_STRING([--enable-google-profiling],
+		  [compile with google profiling]),
                   [google_profile=$enableval],
                   [google_profile=no])
 

@@ -34,26 +34,32 @@ fi
 
 if test "$with_readline" != dynamic && test "$with_readline" != no; then
 AC_LANG_SAVE
-AC_LANG([C++])
+AC_LANG_CPLUSPLUS
    AC_CHECK_LIB(readline, readline)
    AC_CHECK_HEADERS(readline/readline.h readline/history.h)
    if test "$ac_cv_lib_readline_readline" = yes && \
       test "$ac_cv_header_readline_readline_h" = yes; then
      AC_MSG_CHECKING(whether readline.h is ok)
      AC_CACHE_VAL(ac_cv_header_readline_readline_h_ok,
-     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include<unistd.h>
+     AC_TRY_LINK(
+#include<unistd.h>
 #include<stdio.h>
 #include<readline/readline.h>
 #ifdef HAVE_READLINE_HISTORY_H
 #include<readline/history.h>
 #endif
-]], [[]])],[ac_cv_header_readline_readline_h_ok="yes"],[ac_cv_header_readline_readline_h_ok="no"]))
+,
+,
+ac_cv_header_readline_readline_h_ok="yes",
+ac_cv_header_readline_readline_h_ok="no",
+))
     AC_MSG_RESULT($ac_cv_header_readline_readline_h_ok)
     if test "$ac_cv_header_readline_readline_h_ok" != yes; then
 #not ok -- try once more with explicitly declaring everything
       AC_MSG_CHECKING(whether or not we nevertheless can use readline)
       AC_CACHE_VAL(ac_cv_have_readline,
-      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+      AC_TRY_LINK(
+#include <stdio.h>
 extern "C"
 {
 extern char * rl_readline_name;
@@ -71,7 +77,8 @@ int read_history();
 #ifndef NULL
 #define NULL 0
 #endif
-]], [[rl_readline_name=NULL;
+,
+rl_readline_name=NULL;
 *rl_line_buffer=1;
 completion_matches(NULL, filename_completion_function);
 rl_attempted_completion_function = (CPPFunction *) NULL;
@@ -80,9 +87,11 @@ readline(NULL);
 add_history(NULL);
 read_history(NULL);
 write_history(NULL);
-]])],[ac_cv_have_readline="yes"
-],[ac_cv_have_readline="no"
-]))
+,
+ac_cv_have_readline="yes"
+,
+ac_cv_have_readline="no"
+))
       AC_MSG_RESULT($ac_cv_have_readline)
     else
       AC_DEFINE([READLINE_READLINE_H_OK], [1], [Use readline.h])

@@ -1,9 +1,9 @@
-AC_INIT([libpolys],[4.2.1])
+AC_INIT([libpolys], [4.2.1])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
-AC_CONFIG_HEADERS([_config.h])
+AC_CONFIG_HEADER([_config.h])
 
 AM_MAINTAINER_MODE([enable])
 
@@ -61,16 +61,8 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1], [Define if vsnprintf exists.])])
 
 # Checks for header files.
-# Autoupdate added the next two lines to ensure that your configure
-# script's behavior did not change.  They are probably safe to remove.
-AC_CHECK_INCLUDES_DEFAULT
-AC_PROG_EGREP
-
-# Autoupdate added the next two lines to ensure that your configure
-# script's behavior did not change.  They are probably safe to remove.
-AC_CHECK_INCLUDES_DEFAULT
-AC_PROG_EGREP
-
+AC_HEADER_STDC
+AC_STDC_HEADERS
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h float.h execinfo.h])
 
 # If the compiler supports GCC C++ ABI name demangling (has header

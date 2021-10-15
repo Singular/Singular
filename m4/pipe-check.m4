@@ -13,7 +13,7 @@ then
   temp_cflags="${CFLAGS}"
   CFLAGS="${CFLAGS} -pipe"
   AC_CACHE_VAL(ac_cv_cxx_have_pipe,
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[ac_cv_cxx_have_pipe=yes],[ac_cv_cxx_have_pipe=no]))
+  AC_TRY_COMPILE(,,ac_cv_cxx_have_pipe=yes,ac_cv_cxx_have_pipe=no))
   AC_MSG_RESULT(${ac_cv_cxx_have_pipe})
   CFLAGS=${temp_cflags}
 else
