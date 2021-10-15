@@ -9,7 +9,7 @@
 #include "singular_resourcesconfig.h"
 
 
-#if defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)
+#if defined(HAVE_UNISTD_H)
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h> /* always defiend */
@@ -316,4 +316,4 @@ char* omFindExec (const char *name, char* exec)
   return name;
 }
 
-#endif /* defined(HAVE_UNISTD_H) && defined(STDC_HEADERS) */
+#endif /* defined(HAVE_UNISTD_H) */

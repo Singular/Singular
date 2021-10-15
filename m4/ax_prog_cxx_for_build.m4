@@ -43,7 +43,7 @@ AC_REQUIRE([AC_CANONICAL_HOST])dnl
 dnl Use the standard macros, but make them use other variable names
 dnl
 pushdef([ac_cv_prog_CXXCPP], ac_cv_build_prog_CXXCPP)dnl
-pushdef([ac_cv_prog_gxx], ac_cv_build_prog_gxx)dnl
+pushdef([ac_cv_cxx_compiler_gnu], ac_cv_build_prog_gxx)dnl
 pushdef([ac_cv_prog_cxx_works], ac_cv_build_prog_cxx_works)dnl
 pushdef([ac_cv_prog_cxx_cross], ac_cv_build_prog_cxx_cross)dnl
 pushdef([ac_cv_prog_cxx_g], ac_cv_build_prog_cxx_g)dnl
@@ -100,7 +100,7 @@ popdef([CXX])dnl
 popdef([ac_cv_prog_cxx_g])dnl
 popdef([ac_cv_prog_cxx_cross])dnl
 popdef([ac_cv_prog_cxx_works])dnl
-popdef([ac_cv_prog_gxx])dnl
+popdef([ac_cv_cxx_compiler_gnu])dnl
 popdef([ac_cv_prog_CXXCPP])dnl
 
 dnl restore global variables (dependant on the current

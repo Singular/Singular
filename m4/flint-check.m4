@@ -52,12 +52,11 @@ do
 		CFLAGS="${FLINT_CFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
 		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-                AC_TRY_LINK([#include <flint/fmpz.h>
-                            ],
-                            [fmpz_t x; fmpz_init(x);], [
+                AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <flint/fmpz.h>
+                            ]], [[fmpz_t x; fmpz_init(x);]])],[
                         flint_found="yes"
                         break
-                ])
+                ],[])
 done
 
 AC_LANG_POP([C])

@@ -1,4 +1,4 @@
-AC_INIT([singular], [4.2.1], [singular@mathematik.uni-kl.de])
+AC_INIT([singular],[4.2.1],[singular@mathematik.uni-kl.de])
 
 AC_SUBST([VERSION_DATE], 2021)
 AC_DEFINE([VERSION_DATE],["May 2021"],[release date])
@@ -10,7 +10,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CONFIG_SRCDIR([Singular/tesths.cc])
 
-AC_CONFIG_HEADER([_config.h])
+AC_CONFIG_HEADERS([_config.h])
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([singularconfig.h],[],[_config.h])
 
@@ -42,7 +42,11 @@ AM_PROG_AR
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
-AC_HEADER_STDC
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h)
 
 AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r)

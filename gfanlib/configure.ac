@@ -1,12 +1,12 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.63])
-AC_INIT([libgfan], [0.6], [ren@mathematik.uni-kl.de])
+AC_PREREQ([2.71])
+AC_INIT([libgfan],[0.6],[ren@mathematik.uni-kl.de])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([gfanlib.h])
-AC_CONFIG_HEADER([_config.h])
+AC_CONFIG_HEADERS([_config.h])
 
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -32,7 +32,11 @@ LT_INIT([win32-dll])
 SING_WIN_FLAGS
 
 # Checks for header files.
-AC_HEADER_STDC
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
