@@ -29,7 +29,7 @@ else
     AC_REQUIRE([SING_CHECK_GMP])
 
     AC_LANG_PUSH(C++)
-    AC_CHECK_LIB([cddgmp], [dd_free_global_constants],
+    AC_SEARCH_LIBS([dd_free_global_constants],[cddgmp],
        [PASSED_ALL_TESTS_FOR_GFANLIB="1"
         CDDGMPLDFLAGS="-lcddgmp $GMP_LIBS"
         CDDGMPCPPFLAGS="-DGMPRATIONAL"],
