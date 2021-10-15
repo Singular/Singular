@@ -141,8 +141,8 @@ if test "x$ntl_found" = "xyes" ; then
 		AC_MSG_RESULT(found)
 	else
 		AC_MSG_RESULT(unknown)
-		echo "WARNING: You appear to be cross compiling, so there is no way to determine"
-		echo "whether your NTL version is new enough. I am assuming it is."
+		AC_MSG_WARN("WARNING: You appear to be cross compiling, so there is no way to determine")
+		AC_MSG_WARN("whether your NTL version is new enough. I am assuming it is.")
 	fi
 	ifelse([$2], , :, [$2])
 elif test -n "$ntl_problem"; then

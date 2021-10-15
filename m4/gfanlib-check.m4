@@ -34,7 +34,7 @@ else
         CDDGMPLDFLAGS="-lcddgmp $GMP_LIBS"
         CDDGMPCPPFLAGS="-DGMPRATIONAL"],
        [if test "x$ENABLE_GFANLIB" = "xyes"; then
-         AC_MSG_ERROR([Error, could not use libcddgmp])
+         AC_MSG_WARN("could not determine if libcddgmp is usable")
         fi
        ],
        [$GMP_LIBS])
