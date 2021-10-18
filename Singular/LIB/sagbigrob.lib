@@ -2,7 +2,7 @@
 version="version sagbi.lib 4.2.1.1 Sep_2021 "; // $Id$
 category="Commutative Algebra";
 info="
-LIBRARY: sagbi2.lib  Compute Sagbi-Groebner basis of an ideal of a subalgebra
+LIBRARY: sagbigrob.lib  Compute Sagbi-Groebner basis of an ideal of a subalgebra
 AUTHORS:
  Nazish Kanwal, Lecturer of Mathematics, School of Mathematics and
         Computer Science, Institute of Business Administration,
@@ -13,6 +13,7 @@ AUTHORS:
         Karachi, Pakistan
 
 PROCUDURES:
+ LTGS(I,A);          leading terms for syzygies of I over subalgebra A
  SGNF(f,I,A);        normalform of f wrt. I in subalgebra A.
  SPOLY(I,A);         S-polynomials of ideal I over subalgebra A.
  SGB(I,A):           Sagbi-Groebner basis of ideal I over subalgebra A.
@@ -28,12 +29,12 @@ LIB "grobcov.lib";
 
 ////////// Procedure to compute normal form ////////
 
-// For a polynomial f of subalgebra A and a finite set of polynomials I , 
+// For a polynomial f of subalgebra A and a finite set of polynomials I ,
 // the following procedure compute a normal form of f with respect to I over subalgebra A.
 
 proc SGNF(poly f,ideal I, ideal A)
 
-"USAGE: SGNF(f,I,A); f polynomial, I ideal of subalgebra 
+"USAGE: SGNF(f,I,A); f polynomial, I ideal of subalgebra
                    A, A ideal (which is a finite Sagbi bases).
 RETURN: a polynomial h: the normalform of f wrt. I in A
 "
@@ -47,13 +48,13 @@ RETURN: a polynomial h: the normalform of f wrt. I in A
    int i,k;
 
    while(h!=0 && h1!=h)
-   { 
+   {
      for(i=1;i<=size(G);i++)
      {
        m=lead(h)/lead(G[i]);
        if(m!=0)
-       {     
-         L= algebra_containment(m,lead(A),1); 
+       {
+         L= algebra_containment(m,lead(A),1);
          if (L[1]==1)
          { k=1;
            def s= L[2] ;
@@ -61,8 +62,8 @@ RETURN: a polynomial h: the normalform of f wrt. I in A
            j= psi(check) ;
            c=leadcoef(h)/(leadcoef(j)*leadcoef(G[i]));
            h1=h;
-           h=h-(c*j*G[i]); 
-           kill s;      
+           h=h-(c*j*G[i]);
+           kill s;
          }
        }
      }
@@ -73,7 +74,7 @@ RETURN: a polynomial h: the normalform of f wrt. I in A
      k=0;
    }
    return(h);
-} 
+}
 example
 {
   "EXAMPLE:"; echo = 2;
@@ -108,20 +109,20 @@ RETURN: a list M."
   int n=nvars(r) ;
   int m=size(I) ;
   ideal Q;
-  list M;
+  list M,Li;
+  poly ji;
   for(i=1;i<=m;i++)
-  { 
-     setring bsr;
-     list Li=algebra_containment(lead(I[i]),B,1);
+  {
+     Li=algebra_containment(lead(I[i]),B,1);
      if (Li[1]==1)
-     {  
-         def Si=Li[2];
-         setring Si;
-         poly ji=check;
-      
+     {
+       if (defined(Si)) { kill Si; }
+       def Si=Li[2];
+       setring Si;
+       poly ji=check;
+       setring bsr;
      }
-     setring bsr;
-     poly ji=imap(Si,ji);
+     ji=imap(Si,ji);
      M[i]=ji;
   }
   return(M);
@@ -137,16 +138,18 @@ proc SYZ(ideal G)
 "USAGE: SYZ(G); G=SGGS(I,A), I ideal of subalgebra A, A is a subalgebra(which is finite sagbi basis).
 RETURN: a list T."
 {
-  int i,j,l;
+  int i,j;
   int l=size(G);
-  list T;
+  list T,S;
+  poly gij;
+  vector vij;
   for(i=1;i<=l-1;i++)
   {
-    list S;
+    S=list();
     for(j=i+1;j<=l;j++)
     {
-        poly gij=lcm(G[i],G[j]);
-        vector vij=(gij/G[i])*gen(i)-(gij/G[j])*gen(j);
+        gij=lcm(G[i],G[j]);
+        vij=(gij/G[i])*gen(i)-(gij/G[j])*gen(j);
         S[j]=vij;
     }
     T[i]=S;
@@ -162,6 +165,7 @@ proc LTGS(ideal I,ideal A)
 "USAGE: LTGS(I,A); I ideal of subalgebra A, A subalgebra (which is a finite sagbi basis).
 RETURN: a module M."
 {
+  def r=basering;
   A=sagbi(A);
   ideal F=lead(I);
   ideal B=lead(A);
@@ -204,14 +208,17 @@ RETURN: a module M."
     {
       int d,e;
       list D;
+      vector qd,pde;
+      poly gd;
+      list td;
       for(d=1;d<=b;d++)
       {
-        vector qd; 
-        poly gd=J[d];
-        def td=pdivi(gd,H);
+        qd=0;
+        gd=J[d];
+        td=pdivi(gd,H);
         for(e=1;e<=c;e++)
         {
-          vector pde=td[2][e]*gen(e);
+          pde=td[2][e]*gen(e);
           qd=qd+pde;
         }
         D[d]=qd;
@@ -221,35 +228,37 @@ RETURN: a module M."
     else
     {
       Q=N,0;
-        }
+    }
     setring r;
     map psi=R1,A,maxideal(1);
     list W=psi(Q);
-    int n=size(I);
+    int nn=size(I);
     int i,j,l,t;
-    module M;
+    module M,Z;
+    vector vij;
     t=1;
-    for(i=1;i<=n-1;i++)
+    for(i=1;i<=nn-1;i++)
     {
-      module Z;
-      for(j=i+1;j<=n;j++)
+      Z=0;
+      for(j=i+1;j<=nn;j++)
       {
-        vector vij=W[t][i][j];
+        vij=W[t][i][j];
         Z[j-i]=vij;
       }
       if(M!=0)
-        {
-          M=M,Z;
-        }
+      {
+        M=M,Z;
+      }
       else
       {
         M=Z;
       }
     }
     t=t+1;
+    vector vt;
     for(l=1;l<=size(W[2]);l++)
     {
-      vector vt=W[t][l];
+      vt=W[t][l];
       if(vt!=0)
       {
         M=M,vt;
@@ -268,8 +277,7 @@ example
    LTGS(I,A);
 
 // Example 2:
-
-   ring r=QQ,(x,y),Dp;
+   ring r2=QQ,(x,y),Dp;
    ideal A=x2,xy;
    ideal I=x3y+x2,x4+x2y2,-x3y3-x2y2;
    LTGS(I,A);
@@ -289,13 +297,15 @@ RETURN: an ideal S: S-polynomials of ideal I
   int i,j;
   module P=LTGS(I,A);
   ideal S;
+  poly pij,hj;
+  vector Vj;
   for(j=1;j<=size(P);j++)
   {
-    vector Vj=P[j];
-    poly hj;
+    Vj=P[j];
+    hj=0;
     for(i=1;i<=size(I);i++)
     {
-      poly pij = Vj[i]*I[i];
+      pij = Vj[i]*I[i];
       hj=hj+pij;
     }
     S=S+hj;
@@ -317,9 +327,9 @@ example
   SPOLY(I,A);
 }
 
-//////// SAGBI-GROEBNER Bases Construction ////////// 
+//////// SAGBI-GROEBNER Bases Construction //////////
 
-// This procedure give Sagbi Groebner bases of 
+// This procedure give Sagbi Groebner bases of
 // ideal I over subalgebra A.
 
 // We used ideal T=SPOLY(I,A);
@@ -366,9 +376,9 @@ example
   SGB(I,A);
 
   // Example 2:
-  ring r=QQ,(w,x,y,z),lp;
-  ideal A=wxy+2z2, y2-4z, x+3y
-  ideal I= wxy-y2+2z2+4z, x+y2+3y-4z, x2+6xy+9y2
+  ring r2=QQ,(w,x,y,z),lp;
+  ideal A=wxy+2z2, y2-4z, x+3y;
+  ideal I= wxy-y2+2z2+4z, x+y2+3y-4z, x2+6xy+9y2;
   SGB(I,A);
 }
 /*
@@ -400,7 +410,7 @@ _[2]=6x2yz+3xyz2
 _[3]=4x4-4y4+4x3z+x2z2
 _[4]=27y3z3
 _[5]=8y6
-_[6]=12y5z 
+_[6]=12y5z
 
 // SINGULAR EXAMPLE #02 for all Procedures:
 
