@@ -2,7 +2,7 @@
 version="version sagbi.lib 4.2.1.1 Sep_2021 "; // $Id$
 category="Commutative Algebra";
 info="
-LIBRARY: sagbi2.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a subalgebra
+LIBRARY: sagbi2.lib  Compute Sagbi-Groebner basis of an ideal of a subalgebra
 AUTHORS:
  Nazish Kanwal, Lecturer of Mathematics, School of Mathematics and
         Computer Science, Institute of Business Administration,
@@ -13,9 +13,9 @@ AUTHORS:
         Karachi, Pakistan
 
 PROCUDURES:
- SGNFa(f,I,A);       normalform of f wrt. I in subalgebra A.
+ SGNF(f,I,A);        normalform of f wrt. I in subalgebra A.
  SPOLY(I,A);         S-polynomials of ideal I over subalgebra A.
- SGB(I,A):           Sagbi basis of ideal I over subalgebra A.
+ SGB(I,A):           Sagbi-Groebner basis of ideal I over subalgebra A.
 
 SEE ALSO: sagbi_lib
 ";
