@@ -11,10 +11,6 @@ poly o = (-q4-5q3-2q2+10q-4)/(q)*ST2+(-q4-6q3-5q2+12q-4)*ST+(q5+5q4+2q3-10q2+4q)
 
 poly O = o;
 
-DetailedPrint(o);
-
-p_Content( O );
-
 O;
 
 simplify(O, 1 + 2 + 4 + 8);
