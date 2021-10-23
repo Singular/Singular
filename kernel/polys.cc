@@ -430,7 +430,7 @@ poly singclap_gcd ( poly f, poly g, const ring r )
     if (r!=save_ring) rChangeCurrRing(save_ring);
     // clean the result
     res=p_Cleardenom(res,r);
-    p_Content(res,r);
+    if (nCoeff_is_Ring(r->cf)) p_Content(res,r);
     return res;
   }
   p_Delete(&f, r);

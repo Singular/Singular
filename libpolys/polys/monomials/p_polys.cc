@@ -2287,6 +2287,7 @@ void p_Content(poly ph, const ring r)
   if (pNext(ph)==NULL)
   {
     p_SetCoeff(ph,n_Init(1,cf),r);
+    return;
   }
   if ((cf->cfSubringGcd==ndGcd)
   || (cf->cfGcd==ndGcd)) /* trivial gcd*/
@@ -2924,7 +2925,6 @@ poly p_Cleardenom(poly p, const ring r)
 
   if (rField_is_Ring(r))
   {
-    p_ContentForGB(p,r);
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
     return p;
   }
@@ -2932,7 +2932,6 @@ poly p_Cleardenom(poly p, const ring r)
   if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
   {
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-    //p_ContentForGB(p,r);
     return p;
   }
 
@@ -2944,12 +2943,6 @@ poly p_Cleardenom(poly p, const ring r)
       p_SetCoeff(p,n_Init(1,C),r);
     else if(!n_GreaterZero(pGetCoeff(p),C))
       p = p_Neg(p,r);
-    return p;
-  }
-
-  if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
-  {
-    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
     return p;
   }
 
