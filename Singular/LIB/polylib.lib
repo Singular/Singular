@@ -905,21 +905,7 @@ EXAMPLE: example content; shows an example
 "
 {
   if (f==0) { return(number(1)); }
-  if (attrib(basering,"ring_cf")
-  && ((typeof(f)=="poly")||(typeof(f)=="vector")))
-  {
-    number c=leadcoef(f);
-    while((c!=1)&&(f!=0))
-    {
-      c=gcd(c,leadcoef(f));
-      f=f-lead(f);
-    }
-    return(c);
-  }
-  else
-  {
-    return(leadcoef(f)/leadcoef(cleardenom(f)));
-  }
+  return(leadcoef(f)/leadcoef(system("content",f)));
 }
 example
 { "EXAMPLE:"; echo = 2;

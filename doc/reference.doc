@@ -7622,6 +7622,11 @@ checks for a small value for floating point numbers
 @cindex system, contributors
 returns names of people who contributed to the @sc{Singular} kernel as string.
 @c ..........................
+@item @code{system("content",p)}
+@cindex content
+@cindex system, content
+returns p/content(p) for poly/vector
+@c ..........................
 @item @code{system("cpu")}
 @cindex cpu
 @cindex system, cpu

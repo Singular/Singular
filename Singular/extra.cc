@@ -223,7 +223,6 @@ poly longCoeffsToSingularPoly(unsigned long *polyCoeffs, const int degree)
   return result;
 }
 
-//void emStart();
 /*2
 *  the "system" command
 */
@@ -290,6 +289,25 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           WerrorS("int expected");
       }
       else
+/*==================== content ==================================*/
+    if(strcmp(sys_cmd,"content")==0)
+    {
+      if ((h!=NULL) && ((h->Typ()==POLY_CMD)||(h->Typ()==VECTOR_CMD)))
+      {
+        int t=h->Typ();
+        poly p=(poly)h->CopyD();
+        if (p!=NULL)
+        {
+           if (!nCoeff_is_Ring(currRing->cf)) p_Cleardenom(p,currRing);
+          p_Content(p,currRing);
+        }
+        res->data=(void *)p;
+        res->rtyp=t;
+        return FALSE;
+      }
+      return TRUE;
+    }
+    else
 /*==================== cpu ==================================*/
     if(strcmp(sys_cmd,"cpu")==0)
     {
