@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1629636237:4210, 64 bit:4.2.1:x86_64-Linux:terra:11666472
-1 >> tst_memory_1 :: 1629636237:4210, 64 bit:4.2.1:x86_64-Linux:terra:14946304
-1 >> tst_memory_2 :: 1629636237:4210, 64 bit:4.2.1:x86_64-Linux:terra:15011840
-1 >> tst_timer_1 :: 1629636237:4210, 64 bit:4.2.1:x86_64-Linux:terra:214
+1 >> tst_memory_0 :: 1635325173:4210, 64 bit:4.2.1:arm64-Darwin:pimpernell:9741864
+1 >> tst_memory_1 :: 1635325173:4210, 64 bit:4.2.1:arm64-Darwin:pimpernell:12738176
+1 >> tst_memory_2 :: 1635325173:4210, 64 bit:4.2.1:arm64-Darwin:pimpernell:12920672
+1 >> tst_timer_1 :: 1635325173:4210, 64 bit:4.2.1:arm64-Darwin:pimpernell:86

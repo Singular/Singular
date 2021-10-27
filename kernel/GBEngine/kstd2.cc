@@ -18,6 +18,8 @@
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
 
+#define STDZ_EXHANGE_DURING_REDUCTION 0
+
 /***********************************************
  * SBA stuff -- start
 ***********************************************/
@@ -686,10 +688,12 @@ int redRing_Z (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat, h);
     if (j < 0)
     {
+#if STDZ_EXCHANGE_DURING_REDUCTION
       /* check if a reducer with the same lead monomial exists */
       j = kFindSameLMInT_Z(strat, h);
       if (j < 0)
       {
+#endif
         /* check if a reducer of the lead monomial exists, by the above
          * check this is a real divisor of the lead monomial */
         j = kFindDivisibleByInT_Z(strat, h);
@@ -741,6 +745,7 @@ int redRing_Z (LObject* h,kStrategy strat)
           tj.Delete();
           tj.Clear();
         }
+#if STDZ_EXCHANGE_DURING_REDUCTION
       }
       else
       {
@@ -758,6 +763,7 @@ int redRing_Z (LObject* h,kStrategy strat)
         /* replace h2 for tj in L (already generated pairs with tj), S and T */
         replaceInLAndSAndT(h2, j, strat);
       }
+#endif
     }
     else
     {

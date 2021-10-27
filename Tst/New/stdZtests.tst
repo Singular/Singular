@@ -648,8 +648,8 @@ kill rng;
 
 ring r =integer,(z,x,y),lp;
 poly f = z7x5 + z2xy9 + zy11 + x3y9;
-ideal i = diff(f,x),diff(f,y),diff(f,z);
-ideal I = std(i);
+ideal ii = diff(f,x),diff(f,y),diff(f,z);
+ideal I = std(ii);
 lead(I);
 kill r;
 
