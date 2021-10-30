@@ -900,6 +900,11 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   int co, mu, l;
   intvec *hseries2;
   intvec *hseries1 = hFirstSeries(S, modulweight, Q);
+  if (hseries1==NULL)
+  {
+    WerrorS("too many variables?");
+    return;
+  }
   l = hseries1->length()-1;
   if (l > 1)
     hseries2 = hSecondSeries(hseries1);
