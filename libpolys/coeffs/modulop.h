@@ -7,13 +7,21 @@
 * ABSTRACT: numbers modulo p (<=32749)
 */
 #include "misc/auxiliary.h"
+#include "factory/factory.h"
+
+#ifdef HAVE_NTL
+  #include <NTL/config.h>
+  #ifdef NTL_AVOID_BRANCHING
+  #undef HAVE_GENERIC_ADD
+  #endif
+#endif
 
 
 // define if a*b is with mod instead of tables
 //#define HAVE_GENERIC_MULT
 // define if 1/b is from  tables
 //#define HAVE_INVTABLE
-// define if an if should be used
+// define if an if should be used(NTL does not define NTL_AVOID_BRANCHING)
 //#define HAVE_GENERIC_ADD
 
 //#undef HAVE_GENERIC_ADD

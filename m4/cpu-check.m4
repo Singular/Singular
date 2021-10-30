@@ -64,7 +64,11 @@ dnl the following settings seems to be better on ppc processors
 dnl testet on: ppc_Linux, 740/750 PowerMac G3, 512k L2 cache
   [powerpc*|ppc*], [AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)],
 dnl the following settings seems to be better on arm processors
-  [arm*], [],
+  [arm*], []
+  [aarch64*], [
+               AC_DEFINE(HAVE_INVTABLE,1,division via a table of logarithms)
+	       AC_DEFINE(HAVE_GENERIC_MULT,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
+	       ]
   []
 )
 

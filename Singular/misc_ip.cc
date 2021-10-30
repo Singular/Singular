@@ -880,6 +880,11 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef __NO_INLINE__
               StringAppendS("CC:NO_INLINE,");
 #endif
+#ifdef HAVE_NTL
+  #ifdef NTL_AVOID_BRANCHING
+  #undef HAVE_GENERIC_ADD
+  #endif
+#endif
 #ifdef HAVE_GENERIC_ADD
               StringAppendS("GenericAdd,");
 #else
