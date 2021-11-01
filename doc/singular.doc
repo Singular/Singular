@@ -1306,7 +1306,7 @@ Todos/Issues:
 @c ---------------------------------------------------------
 @node tateProdCplxNegGrad_lib
 @subsection tateProdCplxNegGrad_lib
-@c lib tateProdCplxNegGrad.lib
+@c lib tateProdCplxNegGrad.lib tag:sing4ti2
 @c ---------------------------------------------------------
 @node VecField_lib
 @subsection VecField_lib
