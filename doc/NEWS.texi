@@ -29,12 +29,17 @@
 @c 
 @c @itemize
 @c @end itemize
+New libraries:
+@itemize
+@item sagbigrob.lib: Sagbi-Groebner basis of an ideal of a subalgebra (@nref{sagbigrob_lib})
+@end itemize
+
 
 Changes in the kernel/build system:
 @itemize
 @item ABI change: all number routines (@code{n_...}) have only @code{coeffs} as last argument,
-     function with @code{ring} as last argument are removed
-@item @code{hilb} avoid int overflow on 64bit cpu
+     functions with @code{ring} as last argument are removed
+@item @code{hilb} avoids int overflow on 64bit cpu
 @item @code{liftstd} (with 2 arguments) improved (@nref{liftstd})
 @item @code{noether} improved (@nref{noether})
 @item update for using FLINT 2.8.x
@@ -53,7 +58,6 @@ New libraries:
 @itemize
 @item decomp.lib: functional decomposition of polynomials (@nref{decomp_lib})
 @item hodge.lib: algorithms for Hodge ideals (@nref{hodge_lib})
-@item sagbigrob.lib: Sagbi-Groebner basis of an ideal of a subalgebra (@nref{sagbigrob_lib})
 @item tateProdCplxNegGrad.lib: sheaf cohomology on product of projective spaces (@nref{tateProdCplxNegGrad_lib})
 @end itemize
 
