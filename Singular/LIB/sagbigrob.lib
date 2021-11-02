@@ -13,10 +13,10 @@ AUTHORS:
         Karachi, Pakistan
 
 PROCUDURES:
- LTGS(I,A);          leading terms for syzygies of I over subalgebra A
- SGNF(f,I,A);        normalform of f wrt. I in subalgebra A.
- SPOLY(I,A);         S-polynomials of ideal I over subalgebra A.
- SGB(I,A):           Sagbi-Groebner basis of ideal I over subalgebra A.
+ LTGS(I,A);                  leading terms for syzygies of I over subalgebra A
+ SGNF(f,I,A);                normalform of f wrt. I in subalgebra A
+ SPOLY(I,A);                 S-polynomials of ideal I over subalgebra A
+ SGB(I,A);                   Sagbi-Groebner basis of ideal I over subalgebra A
 
 SEE ALSO: sagbi_lib
 ";
@@ -33,7 +33,6 @@ LIB "grobcov.lib";
 // the following procedure compute a normal form of f with respect to I over subalgebra A.
 
 proc SGNF(poly f,ideal I, ideal A)
-
 "USAGE: SGNF(f,I,A); f polynomial, I ideal of subalgebra
                    A, A ideal (which is a finite Sagbi bases).
 RETURN: a polynomial h: the normalform of f wrt. I in A
