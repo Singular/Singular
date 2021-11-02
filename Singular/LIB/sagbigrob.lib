@@ -12,7 +12,7 @@ AUTHORS:
         Administration,
         Karachi, Pakistan
 
-PROCUDURES:
+PROCEDURES:
  LTGS(I,A);                  leading terms for syzygies of I over subalgebra A
  SGNF(f,I,A);                normalform of f wrt. I in subalgebra A
  SPOLY(I,A);                 S-polynomials of ideal I over subalgebra A
