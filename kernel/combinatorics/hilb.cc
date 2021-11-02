@@ -41,8 +41,8 @@
 #include <iostream>
 #endif
 
-STATIC_VAR int  **Qpol;
-STATIC_VAR int  *Q0, *Ql;
+STATIC_VAR int64  **Qpol;
+STATIC_VAR int64  *Q0, *Ql;
 STATIC_VAR int  hLength;
 
 
@@ -64,7 +64,7 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
 {
   int  i, j;
   int  x, y, z = 1;
-  int  *p;
+  int64  *p;
   for (i = Nvar; i>0; i--)
   {
     x = 0;
@@ -83,12 +83,12 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
        WerrorS("internal arrays too big");
        return;
       }
-      p = (int *)omAlloc((unsigned long)z * sizeof(int));
+      p = (int64 *)omAlloc((unsigned long)z * sizeof(int64));
       if (Ql[j]!=0)
       {
         if (j==0)
-          memcpy(p, Qpol[j], Ql[j] * sizeof(int));
-        omFreeSize((ADDRESS)Qpol[j], Ql[j] * sizeof(int));
+          memcpy(p, Qpol[j], Ql[j] * sizeof(int64));
+        omFreeSize((ADDRESS)Qpol[j], Ql[j] * sizeof(int64));
       }
       if (j==0)
       {
@@ -101,27 +101,42 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
   }
 }
 
-static int  *hAddHilb(int Nv, int x, int *pol, int *lp)
+static int64 *hAddHilb(int Nv, int x, int64 *pol, int *lp)
 {
   int  l = *lp, ln, i;
-  int  *pon;
+  int64  *pon;
   *lp = ln = l + x;
   pon = Qpol[Nv];
-  memcpy(pon, pol, l * sizeof(int));
+  memcpy(pon, pol, l * sizeof(int64));
   if (l > x)
   {/*pon[i] -= pol[i - x];*/
     for (i = x; i < l; i++)
-    { int64 t=pon[i];
+    {
+      #ifndef __SIZEOF_INT128__
+      int64 t=pon[i];
       int64 t2=pol[i - x];
       t-=t2;
       if ((t>=INT_MIN)&&(t<=INT_MAX)) pon[i]=t;
       else if (!errorreported) WerrorS("int overflow in hilb 1");
+      #else
+      __int128 t=pon[i];
+      __int128 t2=pol[i - x];
+      t-=t2;
+      if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pon[i]=t;
+      else if (!errorreported) WerrorS("long int overflow in hilb 1");
+      #endif
     }
     for (i = l; i < ln; i++)
     { /*pon[i] = -pol[i - x];*/
+      #ifndef __SIZEOF_INT128__
       int64 t= -pol[i - x];
       if ((t>=INT_MIN)&&(t<=INT_MAX)) pon[i]=t;
       else if (!errorreported) WerrorS("int overflow in hilb 2");
+      #else
+      __int128 t= -pol[i - x];
+      if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pon[i]=t;
+      else if (!errorreported) WerrorS("long int overflow in hilb 2");
+      #endif
     }
   }
   else
@@ -134,11 +149,11 @@ static int  *hAddHilb(int Nv, int x, int *pol, int *lp)
   return pon;
 }
 
-static void hLastHilb(scmon pure, int Nv, varset var, int *pol, int lp)
+static void hLastHilb(scmon pure, int Nv, varset var, int64 *pol, int lp)
 {
   int  l = lp, x, i, j;
-  int  *pl;
-  int  *p;
+  int64  *pl;
+  int64  *p;
   p = pol;
   for (i = Nv; i>0; i--)
   {
@@ -150,11 +165,19 @@ static void hLastHilb(scmon pure, int Nv, varset var, int *pol, int lp)
   j = Q0[Nv + 1];
   for (i = 0; i < l; i++)
   { /* pl[i + j] += p[i];*/
+    #ifndef __SIZEOF_INT128__
     int64 t=pl[i+j];
     int64 t2=p[i];
     t+=t2;
     if ((t>=INT_MIN)&&(t<=INT_MAX)) pl[i+j]=t;
     else if (!errorreported) WerrorS("int overflow in hilb 3");
+    #else
+    __int128 t=pl[i+j];
+    __int128 t2=p[i];
+    t+=t2;
+    if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pl[i+j]=t;
+    else if (!errorreported) WerrorS("long int overflow in hilb 3");
+    #endif
   }
   x = pure[var[1]];
   if (x!=0)
@@ -162,11 +185,19 @@ static void hLastHilb(scmon pure, int Nv, varset var, int *pol, int lp)
     j += x;
     for (i = 0; i < l; i++)
     { /* pl[i + j] -= p[i];*/
+      #ifndef __SIZEOF_INT128__
       int64 t=pl[i+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>=INT_MIN)&&(t<=INT_MAX)) pl[i+j]=t;
       else if (!errorreported) WerrorS("int overflow in hilb 4");
+      #else
+      __int128 t=pl[i+j];
+      __int128 t2=p[i];
+      t-=t2;
+      if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pl[i+j]=t;
+      else if (!errorreported) WerrorS("long int overflow in hilb 4");
+      #endif
     }
   }
   j += l;
@@ -175,13 +206,13 @@ static void hLastHilb(scmon pure, int Nv, varset var, int *pol, int lp)
 }
 
 static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
- int Nvar, int *pol, int Lpol)
+ int Nvar, int64 *pol, int Lpol)
 {
   int  iv = Nvar -1, ln, a, a0, a1, b, i;
   int  x, x0;
   scmon pn;
   scfmon sn;
-  int  *pon;
+  int64  *pon;
   if (Nstc==0)
   {
     hLastHilb(pure, iv, var, pol, Lpol);
@@ -1176,7 +1207,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
 
   intvec *work, *hseries1=NULL;
   int  mc;
-  int  p0;
+  int64  p0;
   int  i, j, k, l, ii, mw;
   hexist = hInit(S, Q, &hNexist, tailRing);
   if (hNexist==0)
@@ -1201,9 +1232,9 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   hvar = (varset)omAlloc(((currRing->N) + 1) * sizeof(int));
   hpure = (scmon)omAlloc((1 + ((currRing->N) * (currRing->N))) * sizeof(int));
   stcmem = hCreate((currRing->N) - 1);
-  Qpol = (int **)omAlloc(((currRing->N) + 1) * sizeof(int *));
-  Ql = (int *)omAlloc0(((currRing->N) + 1) * sizeof(int));
-  Q0 = (int *)omAlloc(((currRing->N) + 1) * sizeof(int));
+  Qpol = (int64 **)omAlloc(((currRing->N) + 1) * sizeof(int64 *));
+  Ql = (int64 *)omAlloc0(((currRing->N) + 1) * sizeof(int64));
+  Q0 = (int64 *)omAlloc(((currRing->N) + 1) * sizeof(int64));
   *Qpol = NULL;
   hLength = k = j = 0;
   mc = hisModule;
@@ -1252,7 +1283,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         (**Qpol)++;
       else
       {
-        *Qpol = (int *)omAlloc(sizeof(int));
+        *Qpol = (int64 *)omAlloc(sizeof(int64));
         hLength = *Ql = **Qpol = 1;
       }
     }
@@ -1309,11 +1340,11 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   for (i = 0; i <= (currRing->N); i++)
   {
     if (Ql[i]!=0)
-      omFreeSize((ADDRESS)Qpol[i], Ql[i] * sizeof(int));
+      omFreeSize((ADDRESS)Qpol[i], Ql[i] * sizeof(int64));
   }
-  omFreeSize((ADDRESS)Q0, ((currRing->N) + 1) * sizeof(int));
-  omFreeSize((ADDRESS)Ql, ((currRing->N) + 1) * sizeof(int));
-  omFreeSize((ADDRESS)Qpol, ((currRing->N) + 1) * sizeof(int *));
+  omFreeSize((ADDRESS)Q0, ((currRing->N) + 1) * sizeof(int64));
+  omFreeSize((ADDRESS)Ql, ((currRing->N) + 1) * sizeof(int64));
+  omFreeSize((ADDRESS)Qpol, ((currRing->N) + 1) * sizeof(int64 *));
   hKill(stcmem, (currRing->N) - 1);
   omFreeSize((ADDRESS)hpure, (1 + ((currRing->N) * (currRing->N))) * sizeof(int));
   omFreeSize((ADDRESS)hvar, ((currRing->N) + 1) * sizeof(int));
