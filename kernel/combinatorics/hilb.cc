@@ -18,6 +18,13 @@
 #include "polys/monomials/p_polys.h"
 #include "polys/simpleideals.h"
 
+#if SIZEOF_LONG == 8
+#define OVERFLOW_MAX LONG_MAX
+#define OVERFLOW_MIN LONG_MIN
+#else
+#define OVERFLOW_MAX (((int64)LONG_MAX)<<30)
+#define OVERFLOW_MIN (-OVERFLOW_MAX)
+#endif
 
 // #include "kernel/structs.h"
 // #include "kernel/polys.h"
@@ -116,7 +123,7 @@ static int64 *hAddHilb(int Nv, int x, int64 *pol, int *lp)
       int64 t=pon[i];
       int64 t2=pol[i - x];
       t-=t2;
-      if ((t>=INT_MIN)&&(t<=INT_MAX)) pon[i]=t;
+      if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pon[i]=t;
       else if (!errorreported) WerrorS("int overflow in hilb 1");
       #else
       __int128 t=pon[i];
@@ -130,7 +137,7 @@ static int64 *hAddHilb(int Nv, int x, int64 *pol, int *lp)
     { /*pon[i] = -pol[i - x];*/
       #ifndef __SIZEOF_INT128__
       int64 t= -pol[i - x];
-      if ((t>=INT_MIN)&&(t<=INT_MAX)) pon[i]=t;
+      if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pon[i]=t;
       else if (!errorreported) WerrorS("int overflow in hilb 2");
       #else
       __int128 t= -pol[i - x];
@@ -169,7 +176,7 @@ static void hLastHilb(scmon pure, int Nv, varset var, int64 *pol, int lp)
     int64 t=pl[i+j];
     int64 t2=p[i];
     t+=t2;
-    if ((t>=INT_MIN)&&(t<=INT_MAX)) pl[i+j]=t;
+    if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pl[i+j]=t;
     else if (!errorreported) WerrorS("int overflow in hilb 3");
     #else
     __int128 t=pl[i+j];
@@ -189,7 +196,7 @@ static void hLastHilb(scmon pure, int Nv, varset var, int64 *pol, int lp)
       int64 t=pl[i+j];
       int64 t2=p[i];
       t-=t2;
-      if ((t>=INT_MIN)&&(t<=INT_MAX)) pl[i+j]=t;
+      if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pl[i+j]=t;
       else if (!errorreported) WerrorS("int overflow in hilb 4");
       #else
       __int128 t=pl[i+j];
@@ -1604,7 +1611,7 @@ static int comapreMonoIdBases_IG_Case(ideal J, int JCount, ideal Ob, int ObCount
   return(s);
 }
 
-static int positionInOrbit_IG_Case(ideal I, poly w, std::vector<ideal> idorb, std::vector<poly> polist, int trInd, int trunDegHs)
+static int positionInOrbit_IG_Case(ideal I, poly w, std::vector<ideal> idorb, std::vector<poly> polist, int trInd, int)
 {
   /*
    * It compares the ideal I with ideals in the set 'idorb'
