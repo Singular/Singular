@@ -320,7 +320,7 @@ example
   ideal I=4x2y2+2xy3,18x2y4;
   SPOLY(I,A);
   // Example 2:
-  ring r=QQ,(x,y),Dp;
+  ring r2=QQ,(x,y),Dp;
   ideal A=x2,xy;
   ideal I=x3y+x2,x4+x2y2,-x3y3-x2y2;
   SPOLY(I,A);
