@@ -36,6 +36,9 @@ CFSwitches::CFSwitches ()
 #ifdef HAVE_FLINT
   On(SW_USE_FL_GCD_P);
   On(SW_USE_FL_GCD_0);
+#if (__FLINT_RELEASE >= 20700)  
+  On(SW_USE_FL_FAC_P);
+#endif
 #endif
   On(SW_USE_EZGCD);
   On(SW_USE_EZGCD_P);
