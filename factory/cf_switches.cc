@@ -17,6 +17,10 @@
 #include "cf_defs.h"
 #include "cf_switches.h"
 
+#ifdef HAVE_FLINT
+#include <flint/flint.h>
+#endif
+
 /** CFSwitches::CFSwitches ()
  *
  * CFSwitches::CFSwitches() - default constructor.
