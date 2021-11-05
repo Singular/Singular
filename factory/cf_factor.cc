@@ -583,8 +583,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         convFactoryPFlintMP(f,Flint_f,ctx,f.level());
         nmod_mpoly_factor_t factors;
         nmod_mpoly_factor_init(factors,ctx);
-        if (issqrfree) nmod_mpoly_factor_squarefree(factors,Flint_f,ctx);
-        else           nmod_mpoly_factor(factors,Flint_f,ctx);
+	int okay;
+        if (issqrfree) okay=nmod_mpoly_factor_squarefree(factors,Flint_f,ctx);
+        else           okay=nmod_mpoly_factor(factors,Flint_f,ctx);
         nmod_mpoly_t fac;
         nmod_mpoly_init(fac,ctx);
         CanonicalForm cf_fac;
@@ -601,6 +602,14 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         nmod_mpoly_factor_clear(factors,ctx);
         nmod_mpoly_clear(Flint_f,ctx);
         nmod_mpoly_ctx_clear(ctx);
+	if (okay==0)
+	{
+	  Off(SW_USE_FL_GCD_P);
+	  Off(SW_USE_FL_FAC_P);
+	  F=factorize(f,issqrfree);
+	  On(SW_USE_FL_GCD_P);
+	  On(SW_USE_FL_FAC_P);
+	}
         #endif
         #if !defined(HAVE_FLINT) || (__FLINT_RELEASE < 20700)
         #ifndef HAVE_NTL
