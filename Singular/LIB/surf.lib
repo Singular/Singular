@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version surf.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version surf.lib 4.2.1.0 Nov_2021 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -483,17 +483,17 @@ static proc FindDisplayProgram()
  string s=system("executable","mimeopen");
  if (s!="")
  {
-   return(s);
+   return("mimeopen");
    //return(s+" -d");
  }
  s=system("executable","xdg-open");
- if (s!="") { return(s); }
+ if (s!="") { return("xdg-open"); }
  s=system("executable","cygstart"); // windows
- if (s!="") { return(s); }
+ if (s!="") { return("cygstart"); }
  s=system("executable","open"); // osx
- if (s!="") { return(s); }
+ if (s!="") { return("open"); }
  s=system("executable","display"); // imagemagick
- if (s!="") { return(s); }
+ if (s!="") { return("display"); }
  " No display program for jpg files found";
  return("");
 }

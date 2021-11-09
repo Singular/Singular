@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////
-version="version sing4ti2.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version sing4ti2.lib 4.2.1 Nov_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sing4ti2.lib          Communication Interface to 4ti2
@@ -91,7 +91,16 @@ EXAMPLE: example markov4ti2; shows an example
 //----------------------------------------------------------------------
    // find the name of markov/4ti2-markov
    string s_name=system("executable","markov");
-   if (size(s_name)==0) { s_name=system("executable","4ti2-markov"); /* debian*/ }
+   if (size(s_name)==0)
+   {
+     s_name=system("executable","4ti2-markov"); /* debian*/
+     if (size(s_name)==0)
+     {
+       ERROR("markov not found (part of 4ti2)");
+     }
+     else { s_name="4ti2-markov";}
+   }
+   else { s_name="markov";}
    j=system("sh",s_name+" sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.mar | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g|sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
@@ -216,7 +225,16 @@ EXAMPLE: example graver4ti2; shows an example
 //----------------------------------------------------------------------
    // find the name of graver/4ti2-graver
    string s_name=system("executable","graver");
-   if (size(s_name)==0) { s_name=system("executable","4ti2-graver"); /* debian*/ }
+   if (size(s_name)==0)
+   {
+     s_name=system("executable","4ti2-graver"); /* debian*/
+     if (size(s_name)==0)
+     {
+       ERROR("graver not found (part of 4ti2)");
+     }
+     else { s_name="4ti2-graver"; }
+   }
+   else { s_name="graver"; }
    j=system("sh",s_name+" sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.gra | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
@@ -339,7 +357,16 @@ EXAMPLE: example graver4ti2; shows an example
 //----------------------------------------------------------------------
    // find the name of hilbert/4ti2-hilbert
    string s_name=system("executable","hilbert");
-   if (size(s_name)==0) { s_name=system("executable","4ti2-hilbert"); /* debian*/ }
+   if (size(s_name)==0)
+   {
+     s_name=system("executable","4ti2-hilbert"); /* debian*/
+     if (size(s_name)==0)
+     {
+       ERROR("hilbert not found (part of 4ti2)");
+     }
+     else { s_name="4ti2-hilbert"; }
+   }
+   else { s_name="hilbert"; }
    j=system("sh",s_name+" sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))

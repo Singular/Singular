@@ -1,7 +1,7 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab
 /////////////////////////////////////////////////////////////////
-version="version multigrading.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version multigrading.lib 4.2.1.0 Nov_2021 "; // $Id$
 category="Combinatorial Commutative Algebra";
 info="
 LIBRARY:  multigrading.lib          Multigraded Rings
@@ -3120,12 +3120,17 @@ EXAMPLE: example hilbert4ti2intmat; shows an example
 {
    // find the name of hilbert/4ti2-hilbert
    string s_name=system("executable","hilbert");
-   if (size(s_name)==0) { s_name=system("executable","4ti2-hilbert"); /* debian*/ }
-
-   if( size(s_name)==0 )
+   if (size(s_name)==0)
    {
-     ERROR("Sorry: cannot find 'hilbert' command from 4ti2. Please install 4ti2!");
+     s_name=system("executable","4ti2-hilbert"); /* debian*/
+     if( size(s_name)==0 )
+     {
+       ERROR("Sorry: cannot find 'hilbert' command from 4ti2. Please install 4ti2!");
+     }
+     else { s_name="4ti2-hilbert"; }
    }
+   else { s_name="hilbert"; }
+
 
 //--------------------------------------------------------------------------
 // Initialization and Sanity Checks
