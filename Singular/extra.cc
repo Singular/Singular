@@ -14,6 +14,18 @@
 #include "misc/sirandom.h"
 #include "resources/omFindExec.h"
 
+#ifdef AIX_4
+#ifndef HAVE_PUTENV
+#define HAVE_PUTENV 1
+#endif
+#endif
+
+#if defined(HPUX_10) || defined(HPUX_9)
+#ifndef HAVE_SETENV
+extern "C" int setenv(const char *name, const char *value, int overwrite);
+#endif
+#endif
+
 #ifdef HAVE_CCLUSTER
 #include "ccluster/ccluster.h"
 #endif
@@ -480,12 +492,46 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         WerrorS("shell execution is disallowed in restricted mode");
         return TRUE;
       }
+      #if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
+      char* path = feResource('p');
+      char *oldpath= getenv("PATH");
+      if (oldpath!=NULL) oldpath=omStrDup(oldpath);
+      #ifdef HAVE_PUTENV
+      if (path != NULL)
+      {
+        char *s=(char *)malloc(strlen(path)+6);
+                      sprintf(s,"PATH=%s",path);
+                      putenv(s);
+      }
+      #else
+      if (path != NULL) setenv("PATH", path, 1);
+      #endif
+      #endif
+
       res->rtyp=INT_CMD;
       if (h==NULL) res->data = (void *)(long) system("sh");
       else if (h->Typ()==STRING_CMD)
         res->data = (void*)(long) system((char*)(h->Data()));
       else
         WerrorS("string expected");
+
+      #if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
+      #ifdef HAVE_PUTENV
+      if (oldpath != NULL)
+      {
+        char *s=(char *)malloc(strlen(oldpath)+6);
+                      sprintf(s,"PATH=%s",oldpath);
+                      putenv(s);
+                      omFree(oldpath);
+      }
+      #else
+      if (oldpath != NULL)
+      {
+        setenv("PATH", oldpath, 1);
+        omFree(oldpath);
+      }
+      #endif
+      #endif
       return FALSE;
     }
     else
@@ -3234,7 +3280,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         #if 0
           if (strcmp(s,"FLINT_P")==0) { if (d) On(SW_USE_FL_GCD_P); else Off(SW_USE_FL_GCD_P); } else
           if (strcmp(s,"FLINT_0")==0) { if (d) On(SW_USE_FL_GCD_0); else Off(SW_USE_FL_GCD_0); } else
-        #endif  
+        #endif
           if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
           if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
           if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
@@ -3739,7 +3785,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #ifdef HAVE_CCLUSTER
     if(strcmp(sys_cmd,"ccluster")==0)
     {
-      if ((currRing!=NULL) 
+      if ((currRing!=NULL)
       && (rField_is_Q(currRing) || rField_is_R(currRing) || rField_is_long_R(currRing)))
       {
         const short t[]={5,POLY_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD,NUMBER_CMD};

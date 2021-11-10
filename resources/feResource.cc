@@ -18,19 +18,6 @@
 
 VAR char* feArgv0 = NULL;
 
-#ifdef AIX_4
-#ifndef HAVE_PUTENV
-#define HAVE_PUTENV 1
-#endif
-#endif
-
-#if defined(HPUX_10) || defined(HPUX_9)
-#ifndef HAVE_SETENV
-extern "C" int setenv(const char *name, const char *value, int overwrite);
-#endif
-#endif
-
-
 //char* feResource(const char id, int warn = -1);
 //char* feResource(const char* key, int warn = -1);
 
@@ -193,21 +180,6 @@ void feInitResources(const char* argv0)
   // don't complain about stuff when initializing SingularPath
   feResource('s',0);
   feResource('P');
-
-#if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
-  char* path = feResource('p');
-#ifdef RESOURCE_DEBUG
-  printf("feInitResources(argv0): setting path with '%s'\n", path);
-#endif
-#ifdef HAVE_PUTENV
-  if (path != NULL) { char *s=(char *)malloc(strlen(path)+6);
-                      sprintf(s,"PATH=%s",path);
-                      putenv(s);
-                    }
-#else
-  if (path != NULL) setenv("PATH", path, 1);
-#endif
-#endif
 }
 
 void feReInitResources()
