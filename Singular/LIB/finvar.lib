@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version finvar.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version finvar.lib 4.2.1.0 Nov=2021 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -281,16 +281,11 @@ EXAMPLE: example group_reynolds; shows an example
                                       // matrices
   if (ch<>0)
   { if ((g%ch)==0)
-    { if (voice==2)
-      { "WARNING: The characteristic of the coefficient field divides the group order.";
-        "         Proceed without the Reynolds operator!";
-      }
-      else
-      { if (v)
-        { "  The characteristic of the base field divides the group order.";
-          "  We have to continue without Reynolds operator...";
-          "";
-        }
+    {
+      if (v)
+      { "  The characteristic of the base field divides the group order.";
+        "  We have to continue without Reynolds operator...";
+        "";
       }
       kill REY;
       matrix REY[1][1]=0;
@@ -435,30 +430,20 @@ EXAMPLE: example molien; shows an example
   }
   if (ch<>0)
   { if ((g%ch)==0)
-    { if (voice==2)
-      { "WARNING: The characteristic of the coefficient field divides the group";
-        "         order. Proceed without the Molien series!";
-      }
-      else
-      { if (v)
-        { "  The characteristic of the base field divides the group order.";
-          "  We have to continue without Molien series...";
-          "";
-        }
+    {
+      if (v)
+      { "  The characteristic of the base field divides the group order.";
+        "  We have to continue without Molien series...";
+        "";
       }
     }
     if (minpoly<>0 && mol_flag==0)
-    { if (voice==2)
-      { "WARNING: It is impossible for this program to calculate the Molien series";
-        "         for finite groups over extension fields of prime characteristic.";
-      }
-      else
-      { if (v)
-        { "  Since it is impossible for this program to calculate the Molien series for";
-          "  invariant rings over extension fields of prime characteristic, we have to";
-          "  continue without it.";
-          "";
-        }
+    { 
+      if (v)
+      { "  Since it is impossible for this program to calculate the Molien series for";
+        "  invariant rings over extension fields of prime characteristic, we have to";
+        "  continue without it.";
+        "";
       }
       return();
     }
@@ -925,11 +910,7 @@ EXAMPLE: example reynolds_molien; shows an example
   if (ch<>0 && mol_flag==0)
   { list L=group_reynolds(#[1..gen_num],v);
     if (L[1]==0)
-    { if (voice==2)
-      { "WARNING: The characteristic of the coefficient field divides the group order.";
-        "         Proceed without the Reynolds operator or the Molien series!";
-        return();
-      }
+    {
       if (v)
       { "  The characteristic of the base field divides the group order.";
         "  We have to continue without Reynolds operator or the Molien series...";
@@ -937,18 +918,12 @@ EXAMPLE: example reynolds_molien; shows an example
       }
     }
     if (minpoly<>0)
-    { if (voice==2)
-      { "WARNING: It is impossible for this program to calculate the Molien series";
-        "         for finite groups over extension fields of prime characteristic.";
+    {
+      if (v)
+      { "  Since it is impossible for this program to calculate the Molien series for";
+        "  invariant rings over extension fields of prime characteristic, we have to";
+        "  continue without it.";
         return(L[1]);
-      }
-      else
-      { if (v)
-        { "  Since it is impossible for this program to calculate the Molien series for";
-          "  invariant rings over extension fields of prime characteristic, we have to";
-          "  continue without it.";
-          return(L[1]);
-        }
       }
     }
     if (typeof(L[2])=="int")
@@ -5851,10 +5826,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
     { ERROR("We need to be in the non-modular case"); }
   }
   else
-  { "WARNING: In char 0, secondary_char0 should be faster";
-  }
-  if (v && voice==2)
-  { "";
+  { if (v && voice==2) {"WARNING: In char 0, secondary_char0 should be faster";}
   }
   int j, m, d;
   int max=1;
@@ -6088,7 +6060,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
     { ERROR("We need to be in the non-modular case"); }
   }
   else
-  { "WARNING: In char 0, secondary_char0 should be faster";
+  { if (v && voice==2) {"WARNING: In char 0, secondary_char0 should be faster";}
   }
   if (v && voice==2)
   { "";
