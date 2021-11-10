@@ -7820,6 +7820,11 @@ internal for shift algebra (with i2 variables): shrink the poly
 @cindex system, Singular
 returns the absolute (path) name of the running @sc{Singular} as string.
 @c ..........................
+@item @code{system("SingularBin")}
+@cindex SingularBin
+@cindex system, SingularBin
+returns the absolute path name of directory of the running @sc{Singular} as string
+@c ..........................
 @item @code{system("SingularLib")}
 @cindex SingularLib
 @cindex system, SingularLib

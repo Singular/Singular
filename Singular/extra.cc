@@ -14,18 +14,6 @@
 #include "misc/sirandom.h"
 #include "resources/omFindExec.h"
 
-#ifdef AIX_4
-#ifndef HAVE_PUTENV
-#define HAVE_PUTENV 1
-#endif
-#endif
-
-#if defined(HPUX_10) || defined(HPUX_9)
-#ifndef HAVE_SETENV
-extern "C" int setenv(const char *name, const char *value, int overwrite);
-#endif
-#endif
-
 #ifdef HAVE_CCLUSTER
 #include "ccluster/ccluster.h"
 #endif
@@ -492,46 +480,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         WerrorS("shell execution is disallowed in restricted mode");
         return TRUE;
       }
-      #if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
-      char* path = feResource('p');
-      char *oldpath= getenv("PATH");
-      if (oldpath!=NULL) oldpath=omStrDup(oldpath);
-      #ifdef HAVE_PUTENV
-      if (path != NULL)
-      {
-        char *s=(char *)malloc(strlen(path)+6);
-                      sprintf(s,"PATH=%s",path);
-                      putenv(s);
-      }
-      #else
-      if (path != NULL) setenv("PATH", path, 1);
-      #endif
-      #endif
-
       res->rtyp=INT_CMD;
       if (h==NULL) res->data = (void *)(long) system("sh");
       else if (h->Typ()==STRING_CMD)
         res->data = (void*)(long) system((char*)(h->Data()));
       else
         WerrorS("string expected");
-
-      #if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
-      #ifdef HAVE_PUTENV
-      if (oldpath != NULL)
-      {
-        char *s=(char *)malloc(strlen(oldpath)+6);
-                      sprintf(s,"PATH=%s",oldpath);
-                      putenv(s);
-                      omFree(oldpath);
-      }
-      #else
-      if (oldpath != NULL)
-      {
-        setenv("PATH", oldpath, 1);
-        omFree(oldpath);
-      }
-      #endif
-      #endif
       return FALSE;
     }
     else
@@ -697,6 +651,15 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp=STRING_CMD;
       const char *r=feResource("SearchPath");
+      if (r == NULL) r="";
+      res->data = (void*) omStrDup( r );
+      return FALSE;
+    }
+    else
+    if (strcmp(sys_cmd, "SingularBin") == 0)
+    {
+      res->rtyp=STRING_CMD;
+      const char *r=feResource('b');
       if (r == NULL) r="";
       res->data = (void*) omStrDup( r );
       return FALSE;
