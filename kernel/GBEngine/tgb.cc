@@ -741,10 +741,9 @@ sorted_pair_node **spn_merge (sorted_pair_node ** p, int pn,
   if((pn + qn) > c->max_pairs)
   {
     p =
-      (sorted_pair_node **) omrealloc (p,
-                                       2 * (pn +
-                                            qn) *
-                                       sizeof (sorted_pair_node *));
+      (sorted_pair_node **) omreallocSize (p,
+                                    c->max_pairs *sizeof (sorted_pair_node *),
+                                    2 * (pn + qn) * sizeof (sorted_pair_node *));
     c->max_pairs = 2 * (pn + qn);
   }
   for(i = qn - 1; i >= 0; i--)
