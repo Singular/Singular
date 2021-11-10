@@ -1412,10 +1412,10 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
     p_Delete (&copy, c->r);
   }
 
-#define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->array_lengths*sizeof(type))
+#define ENLARGE(pointer, type) pointer=(type*) omreallocSize(pointer, old*sizeof(type),c->array_lengths*sizeof(type))
 
 #define ENLARGE_ALIGN(pointer, type) {if(pointer)\
-         pointer=(type*)omReallocAligned(pointer, c->array_lengths*sizeof(type));\
+         pointer=(type*)omReallocSize(pointer, old*sizeof(type),c->array_lengths*sizeof(type));\
          else pointer=(type*)omAllocAligned(c->array_lengths*sizeof(type));}
 //  BOOLEAN corr=lenS_correct(c->strat);
   int sugar;
@@ -1427,6 +1427,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   sorted_pair_node **nodes =
     (sorted_pair_node **) omalloc (sizeof (sorted_pair_node *) * i);
   int spc = 0;
+  int old=c->array_lengths;
   if(c->n > c->array_lengths)
   {
     c->array_lengths = c->array_lengths * 2;
@@ -4824,7 +4825,8 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
 #ifdef FIND_DETERMINISTIC
       int i;
       for(i = 0; c->expandS[i]; i++) ;
-      c->expandS = (poly *) omrealloc (c->expandS, (i + 2) * sizeof (poly));
+      c->expandS = (poly *) omreallocSize (c->expandS, (i+1)*sizeof(poly),
+                                                       (i+2)*sizeof(poly));
       c->expandS[i] = erg.expand;
       c->expandS[i + 1] = NULL;
 #else
