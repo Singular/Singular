@@ -863,10 +863,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   GFInfo* p = (GFInfo *)(parameter);
   assume (p->GFChar > 0);
   assume (p->GFDegree > 0);
-  if ((IsPrime(p->GFChar)==p->GFChar)&&(p->GFDegree==1)) /* for oscar-system/Singular.jl/issues/177 */
-  {
-    return npInitChar(r,(void*)(long)p->GFChar);
-  }
   if(p->GFChar > (2<<15))
   {
 #ifndef SING_NDEBUG
