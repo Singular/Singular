@@ -12495,6 +12495,7 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
   {
     poly qq = pLPCopyAndShiftLM(q, j);
     enterPair(qq, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, j, q_inS);
+    // TODO: dekete qq, if not it does not enter the pair set
   }
 
 #ifdef HAVE_RINGS

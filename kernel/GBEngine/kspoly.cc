@@ -1261,6 +1261,16 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   }
 
   // get m2 * a2
+#ifdef HAVE_SHIFTBBA
+  if (tailRing->isLPring)
+  {
+    // m2*a2*m22
+    poly tmp= tailRing->p_Procs->pp_mm_Mult(a2, m2, tailRing);
+    a2 = tailRing->p_Procs->pp_Mult_mm(tmp, m22, tailRing);
+    p_Delete(&tmp,tailRing);
+  }
+  else
+#endif
   if (spNoether != NULL)
   {
     l2 = -1;
@@ -1268,19 +1278,9 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     assume(l2 == (int)pLength(a2));
   }
   else
-#ifdef HAVE_SHIFTBBA
-    if (tailRing->isLPring)
-    {
-      // m2*a2*m22
-      poly tmp= tailRing->p_Procs->pp_mm_Mult(a2, m2, tailRing);
-      a2 = tailRing->p_Procs->pp_Mult_mm(tmp, m22, tailRing);
-      p_Delete(&tmp,tailRing);
-    }
-    else
-#endif
-    {
-      a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
-    }
+  {
+    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
+  }
 #ifdef HAVE_RINGS
   if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
 #endif
