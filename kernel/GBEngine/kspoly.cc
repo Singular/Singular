@@ -273,7 +273,7 @@ int ksReducePoly(LObject* PR,
   }
 
 #ifdef HAVE_SHIFTBBA
-  poly lmRight;
+  poly lmRight=NULL;
   if (tailRing->isLPring)
   {
     assume(PR->shift == 0);
@@ -304,7 +304,11 @@ int ksReducePoly(LObject* PR,
 #ifdef HAVE_SHIFTBBA
   if (tailRing->isLPring)
   {
-    PR->Tail_Minus_mm_Mult_qq(lm, tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing), pLength(t2), spNoether);
+    poly tmp=tailRing->p_Procs->pp_Mult_mm(t2, lmRight, tailRing);
+    PR->Tail_Minus_mm_Mult_qq(lm, tmp, pLength(t2), spNoether);
+    p_Delete(&tmp,tailRing);
+    p_Delete(&lm,tailRing);
+    p_Delete(&lmRight,tailRing);
   }
   else
 #endif
