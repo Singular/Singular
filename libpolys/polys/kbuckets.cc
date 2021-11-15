@@ -1180,7 +1180,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 #ifdef HAVE_SHIFTBBA
   if (r->isLPring)
   {
-    kBucket_Minus_m_Mult_p(bucket, lm, r->p_Procs->pp_Mult_mm(a1, lmRight, r), &l1, spNoether);
+    kBucket_Minus_m_Mult_p(bucket, lm, r->p_Procs->p_Mult_mm(a1, lmRight, r), &l1, spNoether);
   }
   else
 #endif
