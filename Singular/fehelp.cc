@@ -818,7 +818,7 @@ static BOOLEAN heGenInit(int warn, int br)
     {
       case '#': break;
       case ' ': break;
-      case 'i': /* singular.hlp */
+      case 'i': /* singular.info */
       case 'x': /* singular.idx */
       case 'h': /* html dir */
                if (feResource(*p, warn) == NULL)
@@ -957,13 +957,13 @@ static void heGenHelp(heEntry hentry, int br)
                    i=strlen(sys);
                    break;
                  }
-        case 'i': /* singular.hlp */
+        case 'i': /* singular.info */
                  {
                    char *i_res=feResource('i');
                    if (i_res!=NULL) strcat(sys,i_res);
                    else
                    {
-                     WarnS("singular.hlp not found");
+                     WarnS("singular.info not found");
                      return;
                    }
                    i=strlen(sys);

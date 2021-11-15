@@ -14,7 +14,7 @@ EOT
 # default settings of command-line arguments
 #
 $Singular = "../Singular/Singular";
-$hlp = "../doc/singular.hlp";
+$hlp = "../doc/singular.info";
 $cmpl = "cmd";
 $ex_dir= "../examples";
 %symbol = (cmd=>"singular-commands-alist",

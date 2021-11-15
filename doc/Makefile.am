@@ -169,7 +169,7 @@ clean-local:
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
 	/bin/rm -f s-plural.tex s-plulibs.tex s-letterplace.tex
-	/bin/rm -f singular.hlp manual.hlp singular.idx
+	/bin/rm -f singular.info manual.hlp singular.idx
 	/bin/rm -rf html
 	/bin/rm -f cones.tex countedref.tex decodegb.tex
 	/bin/rm -f examples.tex general.tex ti_ip.tex math.tex reference.tex
@@ -179,15 +179,15 @@ clean-local:
 all-local:
 	$(MAKE) -j1 -f Makefile-docbuild all
 
-singular.hlp:
+singular.info:
 	$(MAKE) -j1 -f Makefile-docbuild $@
 
 if ENABLE_DOC_BUILD
 EXTRA_DIST += doc.tbz2
 doc.tbz2:
-	$(MAKE) -j1 -f Makefile-docbuild singular.hlp html
-	chmod -R a+rX singular.hlp html
-	$(AMTAR) jcf $@ singular.hlp html
+	$(MAKE) -j1 -f Makefile-docbuild singular.info html
+	chmod -R a+rX singular.info html
+	$(AMTAR) jcf $@ singular.info html
 dist-hook:
 	@if [ -n "$(DOC2TEX_EXAMPLE_EXCLUSIONS)" ]; then					\
 	  echo >&2 "#######################################################################";	\

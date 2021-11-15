@@ -2457,7 +2457,7 @@ This variable should not be modified by the user.
 
 This variable is buffer-local.")
 
-(defconst singular-help-fall-back-file-name "singular.hlp"
+(defconst singular-help-fall-back-file-name "singular.info"
   "Fall-back file name of the Singular online manual.
 This variable is used if the file name of the Singular online manual cannot
 be determined otherwise.")
@@ -2754,7 +2754,7 @@ been searching for more than 20 seconds."
     (when (string-match singular-scan-header-info-file-regexp output)
       (let ((file-name (substring output (match-beginning 1) (match-end 1))))
 	(singular-debug 'interactive
-			(message "scan header: singular.hlp path found"))
+			(message "scan header: singular.info path found"))
 	;; in any case, remove marker from output
 	(setq output (replace-match "" t t output))
 	(setq changed t)

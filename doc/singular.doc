@@ -5,7 +5,7 @@ x@comment this file contains the main structure of the manual
 @c ------------------------
 @c %**start of header
 @c ------------------------
-@setfilename singular.hlp
+@setfilename singular.info
 @settitle Singular Manual
 @c @setchapternewpage odd
 @paragraphindent 0

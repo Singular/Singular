@@ -19,11 +19,11 @@ install-data-local:
 	  (cat ${top_srcdir}/doc/doc.tbz2| (cd $(DESTDIR)$(datadir)/singular; tar -jx --no-same-owner -f -));\
 	   mkdir $(DESTDIR)$(datadir)/info;\
 	   mkdir $(DESTDIR)$(datadir)/doc;\
-	   mv  $(DESTDIR)$(datadir)/singular/singular.hlp  $(DESTDIR)$(datadir)/info/.;\
+	   mv  $(DESTDIR)$(datadir)/singular/singular.info  $(DESTDIR)$(datadir)/info/.;\
 	fi
 
 uninstall-local:
-	-(cd $(DESTDIR)$(datadir); rm -rf singular info/singular.hlp)
+	-(cd $(DESTDIR)$(datadir); rm -rf singular info/singular.info)
 
 configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = singularconfig.h

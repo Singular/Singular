@@ -5,7 +5,7 @@
 #----------------------------------------------------
 # known requirements:
 #  x- requires singular.idx
-#  i- requires singular.hlp
+#  i- requires singular.info
 #  h- requires html dir
 #  D- requires the environment variable DISPLAY
 #  E:executable:- requires the named executable
@@ -17,7 +17,7 @@
 #  %f: the local html file (in the form /some/dir/sing_123.htm)
 #  %H: the www html  file
 #             (in the form https://www.singular.uni-kl.de/some/dir/sing_123.htm)
-#  %i: the complete path of singular.hlp
+#  %i: the complete path of singular.info
 #  %n: the info node
 #  %v: Singular version (in the form 4-0-0)
 #----------------------------------------------------
