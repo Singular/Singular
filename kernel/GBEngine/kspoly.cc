@@ -1272,7 +1272,9 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     if (tailRing->isLPring)
     {
       // m2*a2*m22
-      a2 = tailRing->p_Procs->pp_Mult_mm(tailRing->p_Procs->pp_mm_Mult(a2, m2, tailRing), m22, tailRing);
+      poly tmp= tailRing->p_Procs->pp_mm_Mult(a2, m2, tailRing);
+      a2 = tailRing->p_Procs->pp_Mult_mm(tmp, m22, tailRing);
+      p_Delete(&tmp,tailRing);
     }
     else
 #endif
@@ -1289,7 +1291,9 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   if (tailRing->isLPring)
   {
     // get m2*a2*m22 - m1*a1*m12
-    Pair->Tail_Minus_mm_Mult_qq(m1, tailRing->p_Procs->pp_Mult_mm(a1, m12, tailRing), l1, spNoether);
+    poly tmp=tailRing->p_Procs->pp_Mult_mm(a1, m12, tailRing);
+    Pair->Tail_Minus_mm_Mult_qq(m1, tmp, l1, spNoether);
+    p_Delete(&tmp,tailRing);
   }
   else
 #endif
