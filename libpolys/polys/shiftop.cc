@@ -12,7 +12,7 @@
  * NEEDED BY
  * - ncHilb.lib
  */
-#define SHIFT_MULT_COMPAT_MODE 
+#define SHIFT_MULT_COMPAT_MODE
 
 #ifdef SHIFT_MULT_DEBUG
 #include "../kernel/polys.h"
@@ -813,7 +813,14 @@ BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
         break;
       }
     }
-    if (divisible) return TRUE;
+    if (divisible)
+    {
+      #ifdef SHIFT_MULT_COMPAT_MODE
+      p_Delete(&a, r);
+      p_Delete(&b, r);
+      #endif
+      return TRUE;
+    }
   }
 #ifdef SHIFT_MULT_COMPAT_MODE
   p_Delete(&a, r);
