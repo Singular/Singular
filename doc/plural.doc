@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
 
 @c ----------------------------------------------------------------------------
-@node  PLURAL, Data types BR_PLURAL_BR, , Non-commutative subsystem
+@node PLURAL, Data types BR_PLURAL_BR, , Non-commutative subsystem
 @section  PLURAL
 @cindex  PLURAL
 
@@ -99,7 +99,7 @@ the two-sided Groebner basis of @code{T}.
  Groebner basis of @code{I}.
 
 @item @code{module} BR_PLURAL_BR
-Unless stated otherwise, a @code{module} as understood by @sc{Plural} 
+Unless stated otherwise, a @code{module} as understood by @sc{Plural}
 is @strong{either} a finitely generated @strong{left} submodule of a free module (of finite rank)
 @* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details). The concrete interpretation left to a function.
 
@@ -1603,7 +1603,7 @@ Computes the Lie bracket @code{[p,q]=pq-qp} of the first polynomial with
 the second. Uses special routines, based on the Leibniz rule.
 If the third argument is @code{N>1}, then the right normed bracket
 @code{[a,[...[a,b]]]]} will be computed.
-@item @strong{Note:} 
+@item @strong{Note:}
 effective both with @sc{Plural} and @sc{Letterplace} rings.
 @item @strong{Example:}
 @smallexample
@@ -1628,7 +1628,7 @@ bracket(x+Q*y+Q^2*z,z);
 kill R; setring r; // Now consider an example for Letterplace
 LIB "freegb.lib";
 ring R = freeAlgebra(r,5); // F<x,y,z> with deg left lex ordering
-bracket(x,y); 
+bracket(x,y);
 bracket(x,y,2);
 bracket(x,y,3);
 bracket(z^2,x+Q*y,2);
@@ -1763,8 +1763,8 @@ ideal (resp.@: a submodule of a free module), by intersecting it
 Moreover, @code{eliminate} does not work in non-commutative quotients.
 @item @strong{Remark:}
  in a non-commutative algebra, not every subset of a set of variables generates
-a proper subalgebra. But if it is so, there may be cases, when no elimination 
-(by means of Groebner bases) is possible; in such situations error messages will be reported. 
+a proper subalgebra. But if it is so, there may be cases, when no elimination
+(by means of Groebner bases) is possible; in such situations error messages will be reported.
 See also @ref{ncpreim_lib} for the advanced algorithm for elimination and preimage.
 
 @item @strong{Example:}
@@ -1804,7 +1804,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node  envelope, fetch BR_PLURAL_BR, eliminate BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node envelope, fetch BR_PLURAL_BR, eliminate BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection envelope
 @cindex envelope
 
@@ -2078,8 +2078,8 @@ See
 matrix
 @item @strong{Purpose:}
 computes the (left) transformation matrix which expresses the (left) generators of a
-submodule in terms of the (left) generators of a module.  
-Uses different algorithms for modules which are (resp.@: are not) represented by 
+submodule in terms of the (left) generators of a module.
+Uses different algorithms for modules which are (resp.@: are not) represented by
 Groebner bases.
 @* More precisely, if  @code{m} is the module, @code{sm} the submodule, and @code{T} the
 transformation matrix returned by lift, then @code{transpose(matrix(sm)) = transpose(T)*transpose(matrix(m))}.
@@ -2167,7 +2167,7 @@ See
 
 
 @c ---------------------------------------
-@node  minres BR_PLURAL_BR, modulo BR_PLURAL_BR, liftstd BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node minres BR_PLURAL_BR, modulo BR_PLURAL_BR, liftstd BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection minres BR_PLURAL_BR
 @cindex minres BR_PLURAL_BR
 
@@ -2324,7 +2324,7 @@ See also
 
 
 @c ---------------------------------------
-@node  mres BR_PLURAL_BR, nc_algebra, modulo BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node mres BR_PLURAL_BR, nc_algebra, modulo BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection mres BR_PLURAL_BR
 @cindex mres BR_PLURAL_BR
 @table @code
@@ -2566,7 +2566,7 @@ See also
 @c ref
 
 @c ---------------------------------------
-@node  nres BR_PLURAL_BR, oppose, ncalgebra, Functions BR_PLURAL_BR
+@node nres BR_PLURAL_BR, oppose, ncalgebra, Functions BR_PLURAL_BR
 @subsection nres BR_PLURAL_BR
 @cindex nres BR_PLURAL_BR
 @table @code
@@ -2610,7 +2610,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node  oppose, opposite, nres BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node oppose, opposite, nres BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection oppose
 @cindex oppose
 
@@ -2633,30 +2633,30 @@ for any object
 @smallexample
 @c example
 LIB "ncalg.lib";
-def r = makeUsl2();
-setring r;
+def R = makeUsl2();
+setring R;
 matrix m[3][4];
 poly   p  = (h^2-1)*f*e;
 vector v  = [1,e*h,0,p];
 ideal  i  = h*e, f^2*e,h*f*e;
 m         = e,f,h,1,0,h^2, p,0,0,1,e^2,e*f*h+1;
 module mm = module(m);
-def b     = opposite(r);
+def b     = opposite(R);
 setring b; b;
 // we will oppose these objects: p,v,i,m,mm
-poly P    = oppose(r,p);
-vector V  = oppose(r,v);
-ideal  I  = oppose(r,i);
-matrix M  = oppose(r,m);
-module MM = oppose(r,mm);
+poly P    = oppose(R,p);
+vector V  = oppose(R,v);
+ideal  I  = oppose(R,i);
+matrix M  = oppose(R,m);
+module MM = oppose(R,mm);
 def c = opposite(b);
 setring c;   // now let's check the correctness:
 // print compact presentations of objects
-print(oppose(b,P)-imap(r,p));
-print(oppose(b,V)-imap(r,v));
-print(matrix(oppose(b,I))-imap(r,i));
-print(matrix(oppose(b,M))-imap(r,m));
-print(matrix(oppose(b,MM))-imap(r,mm));
+print(oppose(b,P)-imap(R,p));
+print(oppose(b,V)-imap(R,v));
+print(matrix(oppose(b,I))-imap(R,i));
+print(matrix(oppose(b,M))-imap(R,m));
+print(matrix(oppose(b,MM))-imap(R,mm));
 @c example
 @end smallexample
 @end table
@@ -2747,7 +2747,7 @@ To compute the kernel of a map, the preimage of zero has to be determined.
 Hence there is no special command for computing the kernel of a map in
 @sc{Plural}.
 @item @strong{Remark:}
-In the non-commutative case, the command @code{preimage} is implemented only for maps @math{A} -> @math{B}, 
+In the non-commutative case, the command @code{preimage} is implemented only for maps @math{A} -> @math{B},
 where @math{A} is  a commutative ring.
 See @ref{ncpreim_lib} for the most general available implementation.
 @item @strong{Example:}
@@ -3229,9 +3229,9 @@ See also
 ideal
 @item @strong{Purpose:}
 returns a two-sided Groebner basis of an input
-@item @strong{Note:} Treating the input as a set of 
-two-sided generators of a two-sided ideal @code{T}, 
-two-sided Groebner basis is a left (and a right) Groebner basis 
+@item @strong{Note:} Treating the input as a set of
+two-sided generators of a two-sided ideal @code{T},
+two-sided Groebner basis is a left (and a right) Groebner basis
 of @code{T}.
 @ifset singularmanual
 (see @ref{std}).
@@ -3499,7 +3499,7 @@ $R= K[x_1, \ldots, x_n]$,
  @{x_i@}
 @end ifinfo
 and an ordering <.
-@* From the sequence of variables we will build a G-algebra with the 
+@* From the sequence of variables we will build a G-algebra with the
 @tex
 Poincar\'e
 @end tex
@@ -3925,8 +3925,8 @@ Other sources to check are the following books and articles:
 @c Kr  Book
  [Kr] Kredel, H.
      Solvable polynomial rings.
-	Shaker, 1993
-	@url{http://krum.rz.uni-mannheim.de/kredel/kredel_solvable_polynomial_rings.pdf}
+     Shaker, 1993
+     @url{http://krum.rz.uni-mannheim.de/kredel/kredel_solvable_polynomial_rings.pdf}
 
 @item
 @c HLi  Book
@@ -4046,7 +4046,7 @@ A. Kandri-Rody and V. Weispfenning.
 T. N@"u@ss{}ler and H. Sch@"onemann.
   Gr@"obner bases in algebras with zero-divisors.
      Preprint 244, Universit@"at Kaiserslautern, 1993.
-	 @url{https://www.mathematik.uni-kl.de/organisation/zca/reports-on-ca/}.
+      @url{https://www.mathematik.uni-kl.de/organisation/zca/reports-on-ca/}.
 
 @item
 @c S:03  InColl
