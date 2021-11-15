@@ -274,7 +274,9 @@ poly shift_p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly s
 
   Shorter = pLength(p) + pLength(q);
 
-  poly qq = p_Add_q(p, shift_pp_mm_Mult(q, p_Neg(p_Copy(m, ri), ri), ri), ri);
+  poly tmp = p_Neg(p_Copy(m, ri), ri);
+  poly qq = p_Add_q(p, shift_pp_mm_Mult(q, tmp, ri), ri);
+  p_Delete(&tmp,ri);
 
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("shift_p_Minus_mm_Mult_qq result: "); p_wrp(qq, ri, ri); PrintLn();
