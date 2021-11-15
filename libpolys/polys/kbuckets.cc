@@ -1152,7 +1152,8 @@ number kBucketPolyRed(kBucket_pt bucket,
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;
-  if (r->isLPring) {
+  if (r->isLPring)
+  {
     int firstBlock = p_mFirstVblock(p1, r);
     k_SplitFrame(lm, lmRight, si_max(firstBlock, 1), r);
   }
@@ -1181,6 +1182,7 @@ number kBucketPolyRed(kBucket_pt bucket,
   if (r->isLPring)
   {
     kBucket_Minus_m_Mult_p(bucket, lm, r->p_Procs->p_Mult_mm(a1, lmRight, r), &l1, spNoether);
+    p_LmDelete(&lmRight, r);
   }
   else
 #endif
@@ -1194,12 +1196,6 @@ number kBucketPolyRed(kBucket_pt bucket,
 #endif
 
   p_LmDelete(&lm, r);
-#ifdef HAVE_SHIFTBBA
-  if (r->isLPring)
-  {
-    p_LmDelete(&lmRight, r);
-  }
-#endif
   if (reset_vec) p_SetCompP(a1, 0, r);
   kbTest(bucket);
   return rn;
