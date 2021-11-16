@@ -21,14 +21,16 @@
 #include <strstream>
 #include <string>
 #else
-#include <iostream.h>
-#include <fstream.h>
-#include <strstream.h>
-#include <string.h>
+#include <iostream>
+#include <fstream>
+#include <strstream>
+#include <string>
 #endif
 
 
 #include <stdlib.h>
+
+#define FACTORY_PUBLIC
 
 #include "cf_assert.h"
 #include "gf_tabutil.h"
@@ -37,6 +39,7 @@
 
 using namespace std;
 
+int gf_tab_numdigits62 ( int q );
 /**
  *
  * constants.
@@ -365,7 +368,7 @@ main()
                 while ( q < maxtable ) {
                         CanonicalForm f = findGenNew( n, q );
                         ASSERT( f != 0, "no generator found" );
-                        printTable( n, q, f );
+                        if (n==1) printTable( n, q, f );
                         n++; q *= p;
                 }
     }

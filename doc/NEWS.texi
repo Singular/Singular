@@ -43,6 +43,8 @@ Changes in the kernel/build system:
 @item @code{hilb} avoids int overflow (also in @code{degree, stdhilb})
 @item @code{liftstd} (with 2 arguments) improved (@nref{liftstd})
 @item @code{noether} improved (@nref{noether})
+@item letterplace routines improved (@nref{LETTERPLACE})
+@item info file is now @code{singular.info} instead of @code{singular.hlp}
 @item update for using FLINT 2.8.x
 @end itemize
 
