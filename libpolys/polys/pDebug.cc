@@ -49,7 +49,9 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
   fprintf(stderr, "\n// ***dPolyReportError: ");
   vfprintf(stderr, fmt, ap);
   fprintf(stderr, "\n occurred at\n");
+  #ifdef HAVE_OMALLOC
   omPrintCurrentBackTraceMax(stderr, 8);
+  #endif
   if (p != NULL)
   {
     fprintf(stderr, " occurred for poly: ");
