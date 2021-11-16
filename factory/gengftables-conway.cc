@@ -30,8 +30,6 @@
 
 #include <stdlib.h>
 
-#define FACTORY_PUBLIC
-
 #include "cf_assert.h"
 #include "gf_tabutil.h"
 #include "cf_algorithm.h"
@@ -368,7 +366,7 @@ main()
                 while ( q < maxtable ) {
                         CanonicalForm f = findGenNew( n, q );
                         ASSERT( f != 0, "no generator found" );
-                        if (n==1) printTable( n, q, f );
+                        printTable( n, q, f );
                         n++; q *= p;
                 }
     }
