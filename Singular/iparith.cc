@@ -1016,7 +1016,8 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     {
       a=(poly)u->Data(); // works also for VECTOR_CMD
       b=(poly)v->Data(); // works also for VECTOR_CMD
-      if ((a!=NULL) && (b!=NULL)
+      if (!rIsLPRing(currRing)
+      && (a!=NULL) && (b!=NULL)
       && ((long)pTotaldegree(a)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)-(long)pTotaldegree(b)))
       {
         Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
@@ -1028,7 +1029,8 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     // u->next exists: copy v
     a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
     b=pCopy((poly)v->Data());
-    if ((a!=NULL) && (b!=NULL)
+    if (!rIsLPRing(currRing)
+    && (a!=NULL) && (b!=NULL)
     && (pTotaldegree(a)+pTotaldegree(b)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)))
     {
       Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
@@ -6610,7 +6612,8 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   if (ringvar>0)
   {
     int mm=p_MaxExpPerVar(p,ringvar,currRing);
-    if ((monomexpr!=NULL) && (p!=NULL) && (mm!=0) &&
+    if (!rIsLPRing(currRing) &&
+    (monomexpr!=NULL) && (p!=NULL) && (mm!=0) &&
     ((unsigned long)pTotaldegree(monomexpr) > (currRing->bitmask / (unsigned long)mm/2)))
     {
       Warn("possible OVERFLOW in subst, max exponent is %ld, substituting deg %d by deg %d",currRing->bitmask/2, pTotaldegree(monomexpr), mm);
@@ -6642,7 +6645,7 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   if (ringvar>0)
   {
     BOOLEAN overflow=FALSE;
-    if (monomexpr!=NULL)
+    if (!rIsLPRing(currRing) && (monomexpr!=NULL))
     {
       long deg_monexp=pTotaldegree(monomexpr);
       for(int i=IDELEMS(id)-1;i>=0;i--)
