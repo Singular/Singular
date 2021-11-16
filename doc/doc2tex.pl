@@ -186,7 +186,7 @@ while (<DOC>)
   if (/^\@c\s*include\s+/)  {&HandleInclude; next;}
   if (/^\@c\s*ref\s*$/)     {&HandleRef; next;}
   if (/^\@c\s*lib\s+/)      {&HandleLib; next;}
-  if (/^\@setfilename/)     {print TEX "\@setfilename $doc.hlp\n"; next;}
+  if (/^\@setfilename/)     {print TEX "\@setfilename $doc.info\n"; next;}
 
   if (/^\@\w*section\s*/ || /^\@\w*chapter\s*/ || /^\@\w*heading\s*/)
   {
