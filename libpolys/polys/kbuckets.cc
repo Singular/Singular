@@ -1181,8 +1181,9 @@ number kBucketPolyRed(kBucket_pt bucket,
 #ifdef HAVE_SHIFTBBA
   if (r->isLPring)
   {
-    kBucket_Minus_m_Mult_p(bucket, lm, r->p_Procs->p_Mult_mm(a1, lmRight, r), &l1, spNoether);
-    p_LmDelete(&lmRight, r);
+    poly tmp=r->p_Procs->pp_Mult_mm(a1, lmRight, r);
+    kBucket_Minus_m_Mult_p(bucket, lm,tmp, &l1, spNoether);
+    p_Delete(&tmp,r);
   }
   else
 #endif
