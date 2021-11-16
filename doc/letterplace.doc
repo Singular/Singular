@@ -10,7 +10,7 @@
 %**start
 @end ignore
 
-@node LETTERPLACE, , ,Non-commutative subsystem
+@node LETTERPLACE
 @section LETTERPLACE
 @cindex LETTERPLACE
 @cindex Letterplace
@@ -73,6 +73,9 @@ Note, that the elements of the coefficient field (or a ring) mutually commute wi
 * Examples of use of Letterplace over Z::
 * Functionality and release notes of Letterplace::
 * References and history of Letterplace::
+* Functions BR_LETTERPLACE_BR::
+* LETTERPLACE libraries::
+* Release Notes BR_LETTERPLACE_BR::
 @end menu
 
 @c ---------------------------------------------------------------------------
@@ -511,7 +514,9 @@ dim(I); // 3, as expected for R/I = K[x,y,z]
 @end smallexample
 @end table
 @c ref
-See @ref{fpaprops_lib, fpadim_lib}.
+See
+@ref{fpaprops_lib},
+@ref{fpadim_lib}.
 @c ref
 
 @c ---------------------------------------
