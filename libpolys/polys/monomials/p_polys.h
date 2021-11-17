@@ -822,8 +822,8 @@ static inline poly p_Copy(poly p, const ring r)
     return NULL;
 }
 
-/// copy the i(leading) term of p
-static inline poly p_Head(poly p, const ring r)
+/// copy the (leading) term of p
+static inline poly p_Head(const poly p, const ring r)
 {
   if (p == NULL) return NULL;
   p_LmCheckPolyRing1(p, r);
@@ -836,8 +836,14 @@ static inline poly p_Head(poly p, const ring r)
   return np;
 }
 
+/// like p_Head, but allow NULL coeff
+poly p_Head0(const poly p, const ring r);
+
 /// like p_Head, but with coefficient 1
-poly p_CopyPowerProduct(poly p, const ring r);
+poly p_CopyPowerProduct(const poly p, const ring r);
+
+/// like p_Head, but with coefficient n
+poly p_CopyPowerProduct0(const poly p, const number n, const ring r);
 
 /// returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
 static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
@@ -1971,7 +1977,6 @@ static inline BOOLEAN p_IsConstantComp(const poly p, const ring r)
 static inline BOOLEAN p_IsConstant(const poly p, const ring r)
 {
   if (p == NULL) return TRUE;
-  p_Test(p, r);
   return (pNext(p)==NULL) && p_LmIsConstant(p, r);
 }
 

@@ -5005,19 +5005,30 @@ poly p_GcdMon(poly f, poly g, const ring r)
   return G;
 }
 
-poly p_CopyPowerProduct(poly p, const ring r)
+poly p_CopyPowerProduct0(const poly p, number n, const ring r)
 {
-  if (p == NULL) return NULL;
   p_LmCheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
   memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
   pNext(np) = NULL;
-  pSetCoeff0(np, n_Init(1, r->cf));
+  pSetCoeff0(np, n);
   return np;
 }
 
+poly p_CopyPowerProduct(const poly p, const ring r)
+{
+  if (p == NULL) return NULL;
+  return p_CopyPowerProduct0(p,n_Init(1,r->cf),r);
+}
+
+poly p_Head0(const poly p, const ring r)
+{
+  if (p==NULL) return NULL;
+  if (pGetCoeff(p)==NULL) return p_CopyPowerProduct0(p,NULL,r);
+  return p_Head(p,r);
+}
 int p_MaxExpPerVar(poly p, int i, const ring r)
 {
   int m=0;
