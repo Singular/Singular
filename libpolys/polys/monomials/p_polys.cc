@@ -1446,8 +1446,11 @@ poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
       errorreported=TRUE;
     }
     ok=FALSE;
-    if (pGetCoeff(p)==NULL) p_LmFree(p,r);
-    else                    p_LmDelete(p,r);
+    if (p!=NULL)
+    {
+      if (pGetCoeff(p)==NULL) p_LmFree(p,r);
+      else                    p_LmDelete(p,r);
+    }
     return NULL;
   }
   p_Test(p,r);
