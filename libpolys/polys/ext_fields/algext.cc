@@ -296,7 +296,6 @@ BOOLEAN naEqual(number a, number b, const coeffs cf)
 number naCopy(number a, const coeffs cf)
 {
   naTest(a);
-  if (a == NULL) return NULL;
   if (((poly)a)==naMinpoly) return a;
   return (number)p_Copy((poly)a, naRing);
 }
