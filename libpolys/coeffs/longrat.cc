@@ -1628,7 +1628,7 @@ void nlGMP(number &i, mpz_t n, const coeffs r)
   }
   if (i->s!=3)
   {
-     WarnS("Omitted denominator during coefficient mapping !");
+    WarnS("Omitted denominator during coefficient mapping !");
   }
   mpz_set(n, i->z);
 }
@@ -1637,7 +1637,7 @@ void nlGMP(number &i, mpz_t n, const coeffs r)
 /*2
 * acces to denominator, other 1 for integers
 */
-number   nlGetDenom(number &n, const coeffs r)
+number nlGetDenom(number &n, const coeffs r)
 {
   if (!(SR_HDL(n) & SR_INT))
   {
@@ -1666,7 +1666,7 @@ number   nlGetDenom(number &n, const coeffs r)
 /*2
 * acces to Nominator, nlCopy(n) for integers
 */
-number   nlGetNumerator(number &n, const coeffs r)
+number nlGetNumerator(number &n, const coeffs r)
 {
   if (!(SR_HDL(n) & SR_INT))
   {
@@ -1746,7 +1746,7 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
 // copy not immediate number a
 number _nlCopy_NoImm(number a)
 {
-  assume(!((SR_HDL(a) & SR_INT)||(a==NULL)));
+  assume(!(SR_HDL(a) & SR_INT));
   //nlTest(a, r);
   number b=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -1775,9 +1775,6 @@ void _nlDelete_NoImm(number *a)
         mpz_clear((*a)->n);
       case 3:
         mpz_clear((*a)->z);
-#ifdef LDEBUG
-        (*a)->s=2;
-#endif
     }
     #ifdef LDEBUG
     memset(*a,0,sizeof(**a));
@@ -1788,12 +1785,10 @@ void _nlDelete_NoImm(number *a)
 
 number _nlNeg_NoImm(number a)
 {
+  mpz_neg(a->z,a->z);
+  if (a->s==3)
   {
-    mpz_neg(a->z,a->z);
-    if (a->s==3)
-    {
-      a=nlShort3(a);
-    }
+    a=nlShort3(a);
   }
   return a;
 }
@@ -2657,7 +2652,7 @@ LINLINE BOOLEAN nlIsZero (number a, const coeffs)
 */
 LINLINE number nlCopy(number a, const coeffs)
 {
-  if ((SR_HDL(a) & SR_INT)||(a==NULL))
+  if (SR_HDL(a) & SR_INT)
   {
     return a;
   }
