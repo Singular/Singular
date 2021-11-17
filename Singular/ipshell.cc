@@ -5068,7 +5068,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
 
   delete ures;
   delete arranger;
-  nDelete( &smv );
+  if (smv!=NULL) nDelete( &smv );
 
   res->data= (void *)listofroots;
 

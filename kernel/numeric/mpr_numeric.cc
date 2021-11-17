@@ -173,12 +173,12 @@ number * vandermonde::interpolateDense( const number * q )
     c[cn-1]= nInpNeg(c[cn-1]);              // c[cn]= -x[1]
 
     for ( i= 1; i < cn; i++ ) {              // i=2; i <= cn
-      nDelete( &xx );
+      if (xx!=NULL) nDelete( &xx );
       xx= nCopy(x[i]);
       xx= nInpNeg(xx);               // xx= -x[i]
 
       for ( j= (cn-i-1); j <= (cn-2); j++) { // j=(cn+1-i); j <= (cn-1)
-        nDelete( &tmp1 );
+        if (tmp1!=NULL) nDelete( &tmp1 );
         tmp1= nMult( xx, c[j+1] );           // c[j]= c[j] + (xx * c[j+1])
         newnum= nAdd( c[j], tmp1 );
         nDelete( &c[j] );
@@ -194,11 +194,11 @@ number * vandermonde::interpolateDense( const number * q )
       nDelete( &xx );
       xx= nCopy(x[i]);                     // xx= x[i]
 
-      nDelete( &t );
-      t= nInit( 1 );                         // t= b= 1
-      nDelete( &b );
+      if (t!=NULL) nDelete( &t );
+      t= nInit( 1 );                        // t= b= 1
+      if (b!=NULL) nDelete( &b );
       b= nInit( 1 );
-      nDelete( &s );                         // s= q[cn-1]
+      if (s!=NULL) nDelete( &s );           // s= q[cn-1]
       s= nCopy( q[cn-1] );
 
       for ( k= cn-1; k >= 1; k-- ) {         // k=cn; k >= 2
@@ -284,7 +284,8 @@ rootContainer::~rootContainer()
     omFreeSize( (void *)ievpoint, (anz+2) * sizeof( number ) );
   }
 
-  for ( i=0; i <= tdg; i++ ) nDelete( coeffs + i );
+  for ( i=0; i <= tdg; i++ ) 
+    if (coeffs[i]!=NULL) nDelete( coeffs + i );
   omFreeSize( (void *)coeffs, (tdg+1) * sizeof( number ) );
 
   // theroots löschen
