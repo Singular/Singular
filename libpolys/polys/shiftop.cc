@@ -608,7 +608,7 @@ void k_SplitFrame(poly &m1, poly &m2, int at, const ring r)
   p_Setm(m2, r); // p_mLPunshift also implicitly calls p_Setm(), but just for the case this changes in future.
   p_mLPunshift(m2, r);
 
-  m1 = p_Head(m1, r);
+  m1 = p_Head0(m1, r);
   for(int i = split + 1; i <= r->N; i++)
   {
     p_SetExp(m1, i, 0, r);
@@ -795,9 +795,9 @@ BOOLEAN p_LPLmDivisibleBy(poly a, poly b, const ring r)
 BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
 {
 #ifdef SHIFT_MULT_COMPAT_MODE
-  a = p_Head(a, r);
+  a = p_Head0(a, r);
   p_mLPunshift(a, r);
-  b = p_Head(b, r);
+  b = p_Head0(b, r);
   p_mLPunshift(b, r);
 #endif
   int aLastVblock = p_mLastVblock(a, r);
