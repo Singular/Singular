@@ -5,7 +5,7 @@
 
 set -e
 
-TARVERSION=4.2.1p1
+TARVERSION=4.2.1p2
 VERSION=4.2.1
 BUILD_DIR=/tmp/tst2
 export VERSION TARVERSION BUILD_DIR
@@ -16,13 +16,10 @@ then
 
 rm -rf singular-$VERSION
 git archive --prefix=singular-$VERSION/ HEAD |tar xf -
-mkdir singular-$VERSION/doc
-cp doc/*.* singular-$VERSION/doc/.
-mkdir singular-$VERSION/doc/images
-cp doc/images/* singular-$VERSION/doc/images/.
 
 command rm singular-$VERSION/.gdbinit singular-$VERSION/*/.gdbinit singular-$VERSION/*/*/.gdbinit singular-$VERSION/*/*/*/.gdbinit
 command rm singular-$VERSION/IntegerProgramming/README
+cp doc/doc.tbz2 singular-$VERSION/doc/.
 cd singular-$VERSION
 ./autogen.sh
 cd ..
