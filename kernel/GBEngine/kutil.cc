@@ -10729,11 +10729,7 @@ BOOLEAN newHEdge(kStrategy strat)
   }
   if (pCmp(strat->kNoether,newNoether)!=1)
   {
-    if (strat->kNoether!=NULL)
-    {
-      if (pGetCoeff(strat->kNoether)==NULL) pLmFree(strat->kNoether);
-      else                                  pLmDelete(strat->kNoether);
-    }
+    if (strat->kNoether!=NULL) p_LmDelete0(strat->kNoether,currRing);
     strat->kNoether=newNoether;
     if (strat->t_kNoether != NULL)
     {

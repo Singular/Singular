@@ -714,6 +714,12 @@ static inline void p_LmDelete(poly p, const ring r)
   n_Delete(&pGetCoeff(p), r->cf);
   omFreeBinAddr(p);
 }
+static inline void p_LmDelete0(poly p, const ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  if (pGetCoeff(p)!=NULL) n_Delete(&pGetCoeff(p), r->cf);
+  omFreeBinAddr(p);
+}
 static inline void p_LmDelete(poly *p, const ring r)
 {
   p_LmCheckPolyRing2(*p, r);
