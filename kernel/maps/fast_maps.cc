@@ -85,7 +85,7 @@ static unsigned long maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_
   }
   for (i=0; i<IDELEMS(map_id); i++)
   {
-    p_Delete(&max_map_monomials[i], map_r);
+    p_LmFree(&max_map_monomials[i], map_r);
   }
   omFreeSize(max_map_monomials,IDELEMS(map_id)*sizeof(poly));
 
