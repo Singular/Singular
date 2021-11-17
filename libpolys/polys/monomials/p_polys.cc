@@ -1446,7 +1446,8 @@ poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
       errorreported=TRUE;
     }
     ok=FALSE;
-    p_Delete(&p,r);
+    if (pGetCoeff(p)==NULL) p_LmFree(p,r);
+    else                    p_LmDelete(p,r);
     return NULL;
   }
   p_Test(p,r);
