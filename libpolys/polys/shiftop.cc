@@ -816,15 +816,15 @@ BOOLEAN _p_LPLmDivisibleByNoComp(poly a, poly b, const ring r)
     if (divisible)
     {
       #ifdef SHIFT_MULT_COMPAT_MODE
-      p_Delete(&a, r);
-      p_Delete(&b, r);
+      p_LmDelete0(a, r);
+      p_LmDelete0(b, r);
       #endif
       return TRUE;
     }
   }
 #ifdef SHIFT_MULT_COMPAT_MODE
-  p_Delete(&a, r);
-  p_Delete(&b, r);
+  p_LmDelete0(a, r);
+  p_LmDelete0(b, r);
 #endif
   return FALSE;
 }
