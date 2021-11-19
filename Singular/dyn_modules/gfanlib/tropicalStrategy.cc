@@ -419,10 +419,12 @@ bool tropicalStrategy::reduce(ideal I, const ring r) const
   id_Test(I,r);
 
   nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
-  number p = identity(uniformizingParameter,startingRing->cf,r->cf);
+  number p = NULL;
+  if (uniformizingParameter!=NULL)
+    p = identity(uniformizingParameter,startingRing->cf,r->cf);
   bool b = extraReductionAlgorithm(I,r,p);
   // putUniformizingBinomialInFront(I,r,p);
-  n_Delete(&p,r->cf);
+  if (p!=NULL) n_Delete(&p,r->cf);
 
   return b;
 }

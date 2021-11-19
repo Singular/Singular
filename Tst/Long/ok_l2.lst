@@ -44,5 +44,7 @@ sres_l
 surfacesignature
 std_l
 triang_l
+#requires gfan
+tropical
 zeroset1
 

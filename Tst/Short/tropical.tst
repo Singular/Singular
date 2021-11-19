@@ -170,4 +170,10 @@ tropicalSubst(f,2,x,x+t,y,tx+y+t2);
 randomPolyInT(3,-2,5);
 randomPolyInT(3,-2,5,1);
 //////////////////////////////
+ring trop_r=0,(x,y,z,w),dp;
+ideal I=x-2y+3z,3y-4z+5w;
+tropicalVariety(I);
+tropicalVariety(I,number(2));
+tropicalVariety(I[1],number(3));
+
 tst_status(1);$
