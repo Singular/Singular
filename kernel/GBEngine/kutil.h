@@ -846,6 +846,16 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 /* shiftgb stuff */
 #include "kernel/GBEngine/shiftgb.h"
 
+#ifdef HAVE_SHIFTBBA
+static inline int kFindInL1(const poly p, const kStrategy strat)
+{
+  for(int i=strat->Ll;i>=0;i--)
+  {
+    if (p==strat->L[i].p1) return i;
+  }
+  return -1;
+}
+
 poly pMove2CurrTail(poly p, kStrategy strat);
 
 poly pMoveCurrTail2poly(poly p, kStrategy strat);
@@ -865,6 +875,10 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+
+BOOLEAN is_shifted_p1(const poly p, const kStrategy strat);
+#endif
+
 // test syz strategy: // will be removed soon
 EXTERN_VAR int (*test_PosInT)(const TSet T,const int tl,LObject &h);
 EXTERN_VAR int (*test_PosInL)(const LSet set, const int length,

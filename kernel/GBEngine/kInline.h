@@ -593,7 +593,8 @@ KINLINE void sLObject::Clear()
   sTObject::Clear();
   sev = 0;
 }
-// Initialization
+
+
 KINLINE void sLObject::Delete()
 {
   sTObject::Delete();

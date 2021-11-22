@@ -1264,6 +1264,31 @@ void deleteInSSba (int i,kStrategy strat)
   strat->sl--;
 }
 
+#ifdef HAVE_SHIFTBBA
+BOOLEAN is_shifted_p1(const poly p, const kStrategy strat)
+{
+  if (rIsLPRing(currRing)
+  && (strat->P.p1!=NULL))
+  {
+    // clean up strat->P.p1: may be shifted
+    poly p=strat->P.p1;
+    int lv=currRing->isLPring;
+    BOOLEAN is_shifted=TRUE;
+    for (int i=lv;i>0;i--)
+    {
+      if (pGetExp(p,i)!=0) { is_shifted=FALSE; break;}
+    }
+    if (is_shifted
+    && (kFindInL1(p, strat)<0)
+    && (kFindInT(p, strat->T, strat->tl) < 0)
+    )
+    {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+#endif
 /*2
 *cancels the j-th polynomial in the set
 */
@@ -1305,6 +1330,14 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
       }
     }
   }
+  #ifdef HAVE_SHIFTBBA
+  if (is_shifted_p1(strat->P.p1,strat))
+  {
+    // clean up strat->P.p1: may be shifted
+    pLmDelete(strat->P.p1);
+    strat->P.p1=NULL;
+  }
+  #endif
   if (*length > 0 && j < *length)
   {
 #ifdef ENTER_USE_MEMMOVE
@@ -3415,7 +3448,12 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
   {
     for (j=strat->Ll; j>=0; j--)
     {
+      #ifdef HAVE_SHIFTBBA
+      if ((strat->L[j].p1!=NULL) &&
+      pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
+      #else
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
+      #endif
       {
         if ((pNext(strat->L[j].p) == strat->tail)||(rHasGlobalOrdering(currRing)))
         {

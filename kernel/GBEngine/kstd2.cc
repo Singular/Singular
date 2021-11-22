@@ -4452,6 +4452,12 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
+      // clean up strat->P.p1: may be shifted
+      if (is_shifted_p1(strat->P.p1,strat))
+      {
+        pLmDelete(strat->P.p1);
+	strat->P.p1=NULL;
+      }
     }
     else if (strat->P.p1 == NULL)
     {
