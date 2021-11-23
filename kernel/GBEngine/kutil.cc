@@ -1265,7 +1265,7 @@ void deleteInSSba (int i,kStrategy strat)
 }
 
 #ifdef HAVE_SHIFTBBA
-BOOLEAN is_shifted_p1(const poly p, const kStrategy strat)
+static BOOLEAN is_shifted_p1(const poly p, const kStrategy strat)
 {
   if (rIsLPRing(currRing)
   && (strat->P.p1!=NULL))
@@ -1289,6 +1289,7 @@ BOOLEAN is_shifted_p1(const poly p, const kStrategy strat)
   return FALSE;
 }
 #endif
+
 /*2
 *cancels the j-th polynomial in the set
 */
@@ -12491,10 +12492,11 @@ static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, k
 
 #ifdef HAVE_SHIFTBBA
 // adds the strong pair and the normal pair for rings (aka gpoly and spoly)
-static void enterOneStrongPolyAndEnterOnePairRingShift(poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
+static BOOLEAN enterOneStrongPolyAndEnterOnePairRingShift(poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
 {
   enterOneStrongPolyShift(q, p, ecart, isFromQ, strat, atR, ecartq, qisFromQ, shiftcount, ifromS); // "gpoly"
   enterOnePairRingShift(q, p, ecart, isFromQ, strat, atR, ecartq, qisFromQ, shiftcount, ifromS); // "spoly"
+  return FALSE; // TODO: delete q?
 }
 #endif
 
@@ -12516,7 +12518,7 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
   if (strat->fromQ != NULL && q_inS >= 0)
     q_isFromQ = strat->fromQ[q_inS];
 
-  void (*enterPair)(poly, poly, int, int, kStrategy, int, int, int, int, int);
+  BOOLEAN (*enterPair)(poly, poly, int, int, kStrategy, int, int, int, int, int);
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
     enterPair = enterOneStrongPolyAndEnterOnePairRingShift;
@@ -12532,8 +12534,11 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
   for (int j = firstShift; j <= maxShift; j++)
   {
     poly qq = pLPCopyAndShiftLM(q, j);
-    enterPair(qq, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, j, q_inS);
-    // TODO: dekete qq, if not it does not enter the pair set
+    if (enterPair(qq, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, j, q_inS))
+    {
+      if (j>0) pLmDelete(qq);
+      // delete qq, if not it does not enter the pair set
+    }
   }
 
 #ifdef HAVE_RINGS
@@ -12557,7 +12562,8 @@ static void enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int ec
 
 #ifdef HAVE_SHIFTBBA
 // creates (q,p), use it when q is already shifted
-static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int ecartq, int q_isFromQ, kStrategy strat, int /*atR*/, int p_lastVblock, int q_shift)
+// return TRUE, if (q,p) is discarded
+static BOOLEAN enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int ecartq, int q_isFromQ, kStrategy strat, int /*atR*/, int p_lastVblock, int q_shift)
 {
   // note: ecart and isFromQ is for p
   assume(p_inS < 0 || strat->S[p_inS] == p); // if p is from S, p_inS should be the index of p in S
@@ -12576,13 +12582,13 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
   if (rField_is_Ring(currRing))
   {
     assume(q_shift <= p_lastVblock); // we allow the special case where there is no overlap
-    enterOneStrongPolyAndEnterOnePairRingShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
+    return enterOneStrongPolyAndEnterOnePairRingShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
   }
   else
 #endif
   {
     assume(q_shift <= p_lastVblock - ((pGetComp(q) > 0 || pGetComp(p) > 0) ? 0 : 1)); // there should be an overlap (in the module case epsilon overlap is also allowed)
-    enterOnePairShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
+    return enterOnePairShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
   }
 }
 #endif
@@ -12594,9 +12600,10 @@ static void enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, int
 #endif
 /*2
 * put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i]
+* return TRUE, if (q,p) does not enter B
 */
 #ifdef HAVE_SHIFTBBA
-void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
+BOOLEAN enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS)
 {
 #ifdef CRITERION_DEBUG
   if (TEST_OPT_DEBUG)
@@ -12646,7 +12653,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #ifdef CRITERION_DEBUG
     if (TEST_OPT_DEBUG) PrintS("--- V crit\n");
 #endif
-    return;
+    return TRUE;
   }
 
   if (strat->sugarCrit && ALLOW_PROD_CRIT(strat))
@@ -12673,7 +12680,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #ifdef CRITERION_DEBUG
       if (TEST_OPT_DEBUG) PrintS("--- prod crit\n");
 #endif
-      return;
+      return TRUE;
     }
     else
       Lp.ecart = si_max(ecart,ecartq);
@@ -12683,7 +12690,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #ifdef CRITERION_DEBUG
       if (TEST_OPT_DEBUG) PrintS("--- ecartq > ecart\n");
 #endif
-      return;
+      return TRUE;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
     }
     /*
@@ -12711,7 +12718,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
               Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
             }
 #endif
-            return;
+            return TRUE;
           }
           break;
         }
@@ -12758,7 +12765,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #ifdef CRITERION_DEBUG
           if (TEST_OPT_DEBUG) PrintS("--- prod crit\n");
 #endif
-          return;
+          return TRUE;
       }
       if (strat->fromT && (ecartq>ecart))
       {
@@ -12766,7 +12773,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #ifdef CRITERION_DEBUG
         if (TEST_OPT_DEBUG) PrintS("--- ecartq > ecart\n");
 #endif
-        return;
+        return TRUE;
         /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
       }
       /*
@@ -12790,7 +12797,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
               Print("--- chain crit using B[%d].lcm=%s\n", j, pString(strat->B[j].lcm));
             }
 #endif
-            return;
+            return TRUE;
           }
           break;
         }
@@ -12820,7 +12827,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #ifdef CRITERION_DEBUG
     if (TEST_OPT_DEBUG) PrintS("--- q == NULL || p == NULL\n");
 #endif
-    return;
+    return FALSE;
   }
   if ((strat->fromQ!=NULL) && (isFromQ!=0) && (qfromQ!=0))
   {
@@ -12928,6 +12935,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     if (TEST_OPT_DEBUG) PrintS("+++ Entered pair\n");
 #endif
   }
+  return FALSE;
 }
 #endif
 
@@ -12965,15 +12973,18 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
           for (i=0; i<=maxShift; i++)
           {
             poly hh = pLPCopyAndShiftLM(h, i);
+            BOOLEAN delete_hh=TRUE;
             for (j=0; j<=k; j++)
             {
               if (strat->fromQ == NULL || !strat->fromQ[j])
               {
                 new_pair=TRUE;
                 poly s = strat->S[j];
-                enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, pmLastVblock(s), i);
+                if (!enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, pmLastVblock(s), i))
+                  delete_hh=FALSE;
               }
             }
+            if (delete_hh) pLmDelete(hh);
           }
         }
         else
@@ -13132,6 +13143,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         for (i=1; i<=maxShift; i++)
         {
           poly hh = pLPCopyAndShiftLM(h, i);
+          BOOLEAN delete_hh=TRUE;
           for (j=0; j<=k; j++)
           {
             if ((pGetComp(h)==pGetComp(strat->S[j]))
@@ -13140,7 +13152,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
               poly s = strat->S[j];
               int s_lastVblock = pmLastVblock(s);
               if (i <= s_lastVblock) // in the module case, product criterion does not hold
-                enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
+                if (!enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i))
+                  delete_hh=FALSE;
 #ifdef HAVE_RINGS
               else if (rField_is_Ring(currRing))
               {
@@ -13157,7 +13170,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             }
           }
           if (i <= h_lastVblock) // in the module case, product criterion does not hold
-            enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
+            if(!enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i))
+              delete_hh=FALSE;
 #ifdef HAVE_RINGS
           else if (rField_is_Ring(currRing))
           {
@@ -13171,6 +13185,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             idDelete(&fillers);
           }
 #endif
+          if (delete_hh) pLmDelete(hh);
         }
       }
     }

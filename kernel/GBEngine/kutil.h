@@ -864,7 +864,7 @@ poly pCopyL2p(LObject h, kStrategy strat);
 
 void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
-void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);
+BOOLEAN enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR);
 
@@ -875,8 +875,6 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
-
-BOOLEAN is_shifted_p1(const poly p, const kStrategy strat);
 #endif
 
 // test syz strategy: // will be removed soon
