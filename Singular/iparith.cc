@@ -1955,14 +1955,9 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
 {
-  if (rHasGlobalOrdering(currRing))
-  {
-    res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
-    return v->next!=NULL; //do not allow next like in eliminate(I,a(1..4))
-  }
-  /*else*/
-  WerrorS("glovbal ring order required");
-  return TRUE;
+  res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
+  //setFlag(res,FLAG_STD);
+  return v->next!=NULL; //do not allow next like in eliminate(I,a(1..4))
 }
 static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
 {
