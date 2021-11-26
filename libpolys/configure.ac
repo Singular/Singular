@@ -49,7 +49,8 @@ AC_SEARCH_LIBS(sem_wait,[rt pthreads pthread],[],[
 # Check whether --with-gmp was given.
 SING_CHECK_GMP
 
-dnl ntl check in factory
+LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+
 LB_CHECK_FLINT(2.4,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 SING_CHECK_JULIA
