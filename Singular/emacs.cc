@@ -260,7 +260,7 @@ int main(int argc, char** argv)
   if (emacs_dir == NULL) emacs_dir = feResource("EmacsDir", 0);
   if (emacs_dir == NULL)
   {
-    error( "Error: Can't find emacs directory for Singular lisp files. \n Expected it at %s\n Specify with --emacs_dir option,\n or set ESINGULAR_EMACS_DIR environment variable.\n",
+    error( "Error: Can't find emacs directory for Singular lisp files. \n Expected it at %s\n Specify with --emacs-dir option,\n or set ESINGULAR_EMACS_DIR environment variable.\n",
             feResourceDefault("EmacsDir"));
     mainUsage();
     exit(1);
@@ -289,7 +289,7 @@ int main(int argc, char** argv)
         emacs_load = feResource("EmacsLoad", 0);
         if (emacs_load == NULL)
         {
-          error( "Error: Can't find emacs load file for Singular mode. \n Expected it at %s\n Specify with --emacs_load option,\n or set ESINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n",
+          error( "Error: Can't find emacs load file for Singular mode. \n Expected it at %s\n Specify with --emacs-load option,\n or set ESINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n",
                   feResourceDefault("EmacsLoad"));
           mainUsage();
           exit(1);
