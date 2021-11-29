@@ -182,7 +182,7 @@
 #include "Singular/utils.h"
 #include "Singular/walk.h"
 
-#include "Singular/fegetopt.h"
+#include "resources/fegetopt.h"
 
 void siInit(char *);
 
