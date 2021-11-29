@@ -3,8 +3,8 @@ tst_init();
 /*
 *  Probleme:
 *   1. "minor" verwendet "det" mit Matrizen,
-*      das sollte wegen sparse über Moduln laufen.
-*   2. Rechenzeit von "bareiss" >> "det", Brüche und Normalisierung?
+*      das sollte wegen sparse ueber Moduln laufen.
+*   2. Rechenzeit von "bareiss" >> "det", Brueche und Normalisierung?
 *      genaue Zeitmessung erforderlich.
 *   3. Sparse Matrizen ohne Symbole sollten nicht nach factory.
 */
