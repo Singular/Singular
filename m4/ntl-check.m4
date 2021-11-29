@@ -138,6 +138,7 @@ done
 
 if test "x$ntl_found" = "xyes" ; then
 	AC_SUBST(NTL_CPPFLAGS)
+	AC_SUBST(NTL_CXXFLAGS)
 	AC_SUBST(NTL_LIBS)
 	AC_DEFINE(HAVE_NTL,1,[Define if NTL is installed])
 	HAVE_NTL=yes
