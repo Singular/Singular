@@ -1516,6 +1516,12 @@ x2:
           pSetCoeff0(m2, t1);
       }
 #endif
+#ifdef HAVE_SHIFTBBA
+      if (tailRing->isLPring && (shift2!=0)) /*a1==NULL*/
+      {
+        p_LmDelete(a2, tailRing);
+      }
+#endif
       return m2;
     }
     else
@@ -1564,6 +1570,12 @@ x1:
       nDelete(&lc1);
       nDelete(&lc2);
       nDelete(&t1);
+    }
+#endif
+#ifdef HAVE_SHIFTBBA
+    if (tailRing->isLPring && (shift1!=0)) /*a2==NULL*/
+    {
+      p_LmDelete(a1, tailRing);
     }
 #endif
     return m1;
@@ -1621,6 +1633,13 @@ x1:
           nDelete(&t1);
         }
 #endif
+#ifdef HAVE_SHIFTBBA
+       if (tailRing->isLPring)
+       {
+         if (shift1!=0) p_LmDelete(a1, tailRing);
+         if (shift2!=0) p_LmDelete(a2, tailRing);
+       }
+#endif
         return m1;
       }
       else
@@ -1634,6 +1653,13 @@ x1:
           nDelete(&lc2);
           nDelete(&t2);
         }
+#endif
+#ifdef HAVE_SHIFTBBA
+       if (tailRing->isLPring)
+       {
+         if (shift1!=0) p_LmDelete(a1, tailRing);
+         if (shift2!=0) p_LmDelete(a2, tailRing);
+       }
 #endif
         return m2;
       }
@@ -1663,6 +1689,13 @@ x1:
           nDelete(&lc2);
           nDelete(&t1);
           nDelete(&t2);
+      }
+#endif
+#ifdef HAVE_SHIFTBBA
+      if (tailRing->isLPring)
+      {
+        if (shift1!=0) p_LmDelete(a1, tailRing);
+        if (shift2!=0) p_LmDelete(a2, tailRing);
       }
 #endif
       return m1;
