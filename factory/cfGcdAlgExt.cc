@@ -369,6 +369,20 @@ tryNewtonInterp (const CanonicalForm & alpha, const CanonicalForm & u,
   return interPoly;
 }
 
+static void leadDeg(const CanonicalForm & f, int degs[])
+{ // leading degree vector w.r.t. lex. monomial order x(i+1) > x(i)
+  // 'a' should point to an array of sufficient size level(f)+1
+  if(f.inCoeffDomain())
+    return;
+  CanonicalForm tmp = f;
+  do
+  {
+    degs[tmp.level()] = tmp.degree();
+    tmp = LC(tmp);
+  }
+  while(!tmp.inCoeffDomain());
+}
+
 void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail, bool topLevel )
 { // assume F,G are multivariate polys over Z/p(a) for big prime p, M "univariate" polynomial in an algebraic variable
   // M is assumed to be monic
@@ -529,12 +543,12 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     result = NN(c);
     return;
   }
-  int *L = new int[mv+1]; // L is addressed by i from 2 to mv
-  int *N = new int[mv+1];
+  int L[mv+1];
+  int N[mv+1];
   for(int i=2; i<=mv; i++)
     L[i] = N[i] = 0;
-  L = leadDeg(f, L);
-  N = leadDeg(g, N);
+  leadDeg(f, L);
+  leadDeg(g, N);
   CanonicalForm gamma;
   TIMING_START (alg_euclid_p)
 #ifdef HAVE_NTL
@@ -586,7 +600,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     }
     for(int i=2; i<=mv; i++)
       dg_im[i] = 0; // reset (this is necessary, because some entries may not be updated by call to leadDeg)
-    dg_im = leadDeg(g_image, dg_im); // dg_im cannot be NIL-pointer
+    leadDeg(g_image, dg_im);
     if(isEqual(dg_im, L, 2, mv))
     {
       CanonicalForm inv;
@@ -785,8 +799,8 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   other = new int[mv+1];
   for(int i=1; i<=mv; i++) // initialize 'bound', 'other' with zeros
     bound[i] = other[i] = 0;
-  bound = leadDeg(f,bound); // 'bound' is set the leading degree vector of f
-  other = leadDeg(g,other);
+  leadDeg(f,bound); // 'bound' is set the leading degree vector of f
+  leadDeg(g,other);
   for(int i=1; i<=mv; i++) // entry at i=0 not visited
     if(other[i] < bound[i])
       bound[i] = other[i];
@@ -830,7 +844,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     // here: Dp NOT inCoeffDomain
     for(int i=1; i<=mv; i++)
       other[i] = 0; // reset (this is necessary, because some entries may not be updated by call to leadDeg)
-    other = leadDeg(Dp,other);
+    leadDeg(Dp,other);
 
     if(isEqual(bound, other, 1, mv)) // equal
     {
@@ -916,22 +930,6 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   return D;
 }
 
-
-int * leadDeg(const CanonicalForm & f, int *degs)
-{ // leading degree vector w.r.t. lex. monomial order x(i+1) > x(i)
-  // if f is in a coeff domain, the zero pointer is returned
-  // 'a' should point to an array of sufficient size level(f)+1
-  if(f.inCoeffDomain())
-    return 0;
-  CanonicalForm tmp = f;
-  do
-  {
-    degs[tmp.level()] = tmp.degree();
-    tmp = LC(tmp);
-  }
-  while(!tmp.inCoeffDomain());
-  return degs;
-}
 
 
 bool isLess(int *a, int *b, int lower, int upper)

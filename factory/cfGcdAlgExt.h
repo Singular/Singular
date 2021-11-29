@@ -34,7 +34,6 @@ void tryInvert( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, b
 /// If a zero divisor is encountered fail is set to true.
 void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail, bool topLevel= true );
 
-int * leadDeg(const CanonicalForm & f, int *degs);
 bool isLess(int *a, int *b, int lower, int upper);
 bool isEqual(int *a, int *b, int lower, int upper);
 CanonicalForm firstLC(const CanonicalForm & f);
