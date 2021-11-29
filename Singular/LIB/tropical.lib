@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version tropical.lib 4.2.1.1 Jul_2021 ";
+version="version tropical.lib 4.2.1.2 Nov_2021 ";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -588,10 +588,10 @@ EXAMPLE: example tropicalLifting;   shows an example"
         // we need a ring where the parameters X_1,...,X_k
         // from LIFTRING are present,
         // and where also the variables of CUTDOWNRING live
-	list RL=ring_list(LIFTRING);
-	list RL2=ring_list(CUTDOWNRING);
-	RL[2]=RL2[2];
-	RL[3]=list(list("dp",1:nvars(CUTDOWNRING)));
+        list RL=ring_list(LIFTRING);
+        list RL2=ring_list(CUTDOWNRING);
+        RL[2]=RL2[2];
+        RL[3]=list(list("dp",1:nvars(CUTDOWNRING)));
         ring REPLACEMENTRING = ring(RL);
         list repl=imap(CUTDOWNRING,repl); // get the replacement rules
                                           // from CUTDOWNRING
@@ -4126,7 +4126,7 @@ NOTE:        needs the libraries random.lib and primdec.lib;
         wvecp=wvec;
         variablen=0;
         j2=0;
-	VARIABLEN=list();
+        VARIABLEN=list();
         for(j1=1;j1<=nvars(basering)-1;j1++)
         {
           if(setvec[j1]==1)//if j belongs to the biggest variables
@@ -4140,13 +4140,13 @@ NOTE:        needs the libraries random.lib and primdec.lib;
           {
             variablen=variablen+var(j1); // read the set of remaining variables
                                          // (needed to make quotring later)
-	    VARIABLEN=VARIABLEN+list(RL[2][j1]);
+            VARIABLEN=VARIABLEN+list(RL[2][j1]);
           }
         }
         // return pideal, the initial and the list ergl which tells us
         // which variables we replaced by which form
-	RL=ring_list(BASERING);
-	RL[2]=VARIABLEN+list("t");
+        RL=ring_list(BASERING);
+        RL[2]=VARIABLEN+list("t");
         RL[3]=list(list("dp",1:size(VARIABLEN)),list("lp",1:1));
         ring BASERINGLESS1 = ring(RL);
         ideal i=imap(BASERING,pideal);
@@ -4622,15 +4622,19 @@ NOTE:    - the procedure is also called recursively by itself, and
       {
         if (charstr(basering)!="0")
         {
-          system("sh","gfan_tropicalbasis --mod "+charstr(basering)+" < /tmp/gfaninput > /tmp/gfanbasis");
-          system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput");
+          if (system("sh","gfan_tropicalbasis --mod "+charstr(basering)+" < /tmp/gfaninput > /tmp/gfanbasis"))
+          { ERROR("error in gfan_tropicalbasis");
+          if (system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput"))
+          { ERROR("error in gfan_tropicalintersection");
         }
         else
         {
 //          system("sh","gfan_tropicalstartingcone < /tmp/gfaninput > /tmp/gfantropstcone");
 //          system("sh","gfan_tropicaltraverse < /tmp/gfantropstcone > /tmp/gfanoutput");
-          system("sh","gfan_tropicalbasis < /tmp/gfaninput > /tmp/gfanbasis");
-          system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput");
+          if (system("sh","gfan_tropicalbasis < /tmp/gfaninput > /tmp/gfanbasis"))
+          { ERROR("error in gfan_tropicalbasis");
+          if (system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput"))
+          { ERROR("error in gfan_tropicalintersection");
         }
         string trop=read("/tmp/gfanoutput");
         setring PREGFANRING;
@@ -4665,7 +4669,8 @@ NOTE:    - the procedure is also called recursively by itself, and
       }
       else
       {
-        system("sh","gfan_tropicallifting -n "+string(anzahlvariablen)+" --noMult -c < /tmp/gfaninput > /tmp/gfanoutput");
+        if(system("sh","gfan_tropicallifting -n "+string(anzahlvariablen)+" --noMult -c < /tmp/gfaninput > /tmp/gfanoutput"))
+        { ERROR("error in gfan_tropicallifting"); }
         // read the result from gfan and store it to a string,
         // which in a later version
         // should be interpreded by Singular
@@ -4755,7 +4760,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     // displays the lowest term in t first
     if (anzahlvariablen+numberdeletedvariables<nvars(basering))
     {
-      list l2; 
+      list l2;
       for (int zz = 1; zz <= (nvars(basering)-anzahlvariablen-numberdeletedvariables); zz++)
       {
        l2[zz] = "X("+string(zz)+")";
@@ -4953,7 +4958,7 @@ NOTE:    the procedure is called from inside the recursive procedure
     {
       variablen=variablen+var(j);
     }
-    list l3; 
+    list l3;
     for (int zz = string(nvars(BASERING)-anzahlvariablen+1); zz <= string(nvars(BASERING)-anzahlvariablen+neuvar); zz++)
     {
      l3[zz] = "X("+string(zz)+")";
@@ -5692,15 +5697,19 @@ NOTE:    - the procedure is also called recursively by itself, and
           {
             if (charstr(basering)!="0")
             {
-              system("sh","gfan_tropicalbasis --mod "+charstr(basering)+" < /tmp/gfaninput > /tmp/gfanbasis");
-              system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput");
+              if(system("sh","gfan_tropicalbasis --mod "+charstr(basering)+" < /tmp/gfaninput > /tmp/gfanbasis"))
+              { ERROR("error in gfan_tropicalbasis"); }
+              if(system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput"))
+              { ERROR("error in gfan_tropicalintersection"); }
             }
             else
             {
 //      system("sh","gfan_tropicalstartingcone < /tmp/gfaninput > /tmp/gfantropstcone");
 //      system("sh","gfan_tropicaltraverse < /tmp/gfantropstcone > /tmp/gfanoutput");
-              system("sh","gfan_tropicalbasis < /tmp/gfaninput > /tmp/gfanbasis");
-              system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput");
+              if(system("sh","gfan_tropicalbasis < /tmp/gfaninput > /tmp/gfanbasis"))
+              { ERROR("error in gfan_tropicalbasis"); }
+              if(system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput"))
+              { ERROR("error in gfan_tropicalintersection"); }
             }
             string trop=read("/tmp/gfanoutput");
             setring PREGFANRING;
@@ -5735,7 +5744,8 @@ NOTE:    - the procedure is also called recursively by itself, and
           }
           else
           {
-            system("sh","gfan_tropicallifting -n "+string(anzahlvariablen)+" --noMult -c < /tmp/gfaninput > /tmp/gfanoutput");
+            if(system("sh","gfan_tropicallifting -n "+string(anzahlvariablen)+" --noMult -c < /tmp/gfaninput > /tmp/gfanoutput"))
+            { ERROR("error in gfan_tropicallifting"); }
             // read the result from gfan and store it to a string,
             // which in a later version
             // should be interpreded by Singular
