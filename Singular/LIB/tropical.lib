@@ -4623,18 +4623,18 @@ NOTE:    - the procedure is also called recursively by itself, and
         if (charstr(basering)!="0")
         {
           if (system("sh","gfan_tropicalbasis --mod "+charstr(basering)+" < /tmp/gfaninput > /tmp/gfanbasis"))
-          { ERROR("error in gfan_tropicalbasis");
+          { ERROR("error in gfan_tropicalbasis");}
           if (system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput"))
-          { ERROR("error in gfan_tropicalintersection");
+          { ERROR("error in gfan_tropicalintersection");}
         }
         else
         {
 //          system("sh","gfan_tropicalstartingcone < /tmp/gfaninput > /tmp/gfantropstcone");
 //          system("sh","gfan_tropicaltraverse < /tmp/gfantropstcone > /tmp/gfanoutput");
           if (system("sh","gfan_tropicalbasis < /tmp/gfaninput > /tmp/gfanbasis"))
-          { ERROR("error in gfan_tropicalbasis");
+          { ERROR("error in gfan_tropicalbasis");}
           if (system("sh","gfan_tropicalintersection < /tmp/gfanbasis > /tmp/gfanoutput"))
-          { ERROR("error in gfan_tropicalintersection");
+          { ERROR("error in gfan_tropicalintersection");}
         }
         string trop=read("/tmp/gfanoutput");
         setring PREGFANRING;
