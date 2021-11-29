@@ -12,10 +12,6 @@
 /* for omBin */
 #include "omalloc/omalloc.h"
 
-#ifdef HAVE_RINGS
-#include "coeffs/si_gmp.h"
-#endif
-
 /* standard types */
 #define BITSET  unsigned int
 

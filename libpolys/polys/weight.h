@@ -25,7 +25,7 @@ int * iv2array(intvec * iv, const ring R);
 // internal:
 extern "C" THREAD_VAR double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
-extern "C" double wFunctionalBuch(int *degw, int *lpol, int npol,
+double wFunctionalBuch(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
 void wCall(poly* s, int sl, int *x, double wNsqr, const ring R);
 
