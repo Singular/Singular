@@ -150,13 +150,13 @@ EXTRA_PROGRAMS =  libparse Singulard
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
-Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singular_SOURCES = tesths.cc utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS}
 
 Singular_LDFLAGS = ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
-Singulard_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singulard_SOURCES = tesths.cc utils.cc  utils.h
 
 Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
@@ -172,7 +172,7 @@ ${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
 ${top_builddir}/resources/libsingular_resources.la
 
 
-ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
+ESingular_SOURCES = emacs.cc feOptES.inc feOpt.cc
 
 #### same for TSingular
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
@@ -180,7 +180,7 @@ TSingular_LDADD = ${top_builddir}/libpolys/reporter/libreporter.la \
 ${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
 ${top_builddir}/resources/libsingular_resources.la
 
-TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
+TSingular_SOURCES = emacs.cc feOptTS.inc feOpt.cc
 # utils.cc utils.h
 
 

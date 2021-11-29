@@ -7,7 +7,7 @@
 * ABSTRACT: Declarations for working with Options
 */
 
-#include "Singular/fegetopt.h"
+#include "resources/fegetopt.h"
 
 #include "Singular/feOptTab.h"
 

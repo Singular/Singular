@@ -24,7 +24,7 @@
 #include "distrib.h"
 #include "mmalloc.h"
 #include "tok.h"
-#include "fegetopt.h"
+#include "resources/fegetopt.h"
 
 #include "Singular/countedref.h"
 #include "Singular/pyobject_setup.h"
