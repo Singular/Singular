@@ -17,7 +17,7 @@ pyobject_la_SOURCES = pyobject.cc
 
 
 ##########################################################################
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CPPFLAGS) $(NTL_CPPFLAGS) $(FLINT_CFLAGS)
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CPPFLAGS) $(NTL_CXXFLAGS) $(NTL_CPPFLAGS) $(FLINT_CFLAGS)
 
 
 ### if HAVE_PYTHON???

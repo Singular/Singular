@@ -12,7 +12,7 @@ SOURCES =  python_module.cc poly_wrap.cc vector_wrap.cc CF_wrap.cc\
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 ${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
-${FLINT_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS} ${PTHREAD_CFLAGS}
+${FLINT_CFLAGS} $(NTL_CXXFLAGS) ${NTL_CPPFLAGS} ${GMP_CPPFLAGS} ${PTHREAD_CFLAGS}
 
 if SI_BUILTIN_PYTHON_MODULE
   noinst_LTLIBRARIES=python_module.la

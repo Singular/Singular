@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS=-I ../../m4
 AM_CPPFLAGS=-I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 ${FACTORY_INCLUDES} $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
-${FLINT_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}
+${FLINT_CFLAGS} $(NTL_CXXFLAGS) ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}
 
 noinst_LTLIBRARIES=libGBEngine.la
 libGBEngine_la_SOURCES=khstd.cc kstdfac.cc kstd1.cc kstd2.cc kutil.cc nc.cc sca.cc gr_kstd2.cc kspoly.cc\

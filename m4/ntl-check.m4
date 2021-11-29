@@ -51,9 +51,11 @@ for NTL_HOME in ${NTL_HOME_PATH}
  do
 	if test "$NTL_HOME" != "DEFAULTS"; then
 		NTL_CPPFLAGS="-I${NTL_HOME}/include"
+		NTL_CXXFLAGS=""
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
 		NTL_CPPFLAGS=""
+		NTL_CXXFLAGS=""
 		NTL_LIBS="-lntl"
 	fi
 	CXXFLAGS="${NTL_CPPFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CXXFLAGS}"
@@ -91,13 +93,15 @@ for NTL_HOME in ${NTL_HOME_PATH}
 	])
 dnl try again with -std=c++11 (for NTL >=10 with threads)
 	if test "$NTL_HOME" != "DEFAULTS"; then
-		NTL_CPPFLAGS="-std=c++11 -I${NTL_HOME}/include"
+		NTL_CPPFLAGS="-I${NTL_HOME}/include"
+		NTL_CXXFLAGS="-std=c++11"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
-		NTL_CPPFLAGS="-std=c++11"
+		NTL_CPPFLAGS=""
+		NTL_CXXFLAGS="-std=c++11"
 		NTL_LIBS="-lntl"
 	fi
-	CXXFLAGS="${NTL_CPPFLAGS} ${BACKUP_CXXFLAGS} ${GMP_CPPFLAGS}"
+	CXXFLAGS="${NTL_CXXFLAGS} ${NTL_CPPFLAGS} ${BACKUP_CXXFLAGS} ${GMP_CPPFLAGS}"
 	LIBS="${NTL_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
 	AC_TRY_LINK(

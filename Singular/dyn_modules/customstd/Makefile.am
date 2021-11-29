@@ -5,7 +5,7 @@ SOURCES = customstd.cc
 MY_CPPFLAGS = -I${srcdir} -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 ${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
-${FLINT_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}
+${FLINT_CFLAGS} $(NTL_CXXFLAGS) ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}
 
 if SI_BUILTIN_CUSTOMSTD
   noinst_LTLIBRARIES=customstd.la

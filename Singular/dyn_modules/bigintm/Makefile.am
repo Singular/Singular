@@ -16,7 +16,7 @@ endif
 MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 $(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
-$(FLINT_CFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS)
+$(FLINT_CFLAGS) $(NTL_CXXFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS)
 
 bigintm_la_SOURCES  = mod_main.cc bigintm.cc bigintm.h
 bigintm_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}

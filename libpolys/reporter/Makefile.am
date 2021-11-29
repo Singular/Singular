@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..  $(FACTORY_INCLUDES)  ${FLINT_CFLAGS}  ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..  $(FACTORY_INCLUDES)  ${FLINT_CFLAGS} $(NTL_CXXFLAGS) ${NTL_CPPFLAGS} ${GMP_CPPFLAGS}
 
 noinst_LTLIBRARIES = libreporter.la
 #### libreporterdir = $(libdir)/singular

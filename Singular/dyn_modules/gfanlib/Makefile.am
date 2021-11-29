@@ -5,7 +5,7 @@ SOURCES = singularWishlist.cc singularWishlist.h gfanlib_exceptions.h callgfanli
 MY_CPPFLAGS = -I${srcdir} -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 ${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
-${FLINT_CFLAGS} ${NTL_CPPFLAGS} ${GMP_CPPFLAGS} ${PTHREAD_CFLAGS}
+${FLINT_CFLAGS} $(NTL_CXXFLAGS) ${NTL_CPPFLAGS} ${GMP_CPPFLAGS} ${PTHREAD_CFLAGS}
 
 if SI_BUILTIN_GFANLIB
 if HAVE_GFANLIB

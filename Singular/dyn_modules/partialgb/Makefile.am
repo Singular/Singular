@@ -14,7 +14,7 @@ endif
 MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
       -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
       $(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
-      $(FLINT_CFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS) $(GOOGLE_PERFTOOLS_CFLAGS)
+      $(FLINT_CFLAGS) $(NTL_CXXFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS) $(GOOGLE_PERFTOOLS_CFLAGS)
 
 
 partialgb_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}

@@ -15,7 +15,7 @@ endif
 MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 $(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
-$(FLINT_CFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS) $(CPPFLAGS)
+$(FLINT_CFLAGS) $(NTL_CXXFLAGS) $(NTL_CPPFLAGS) $(GMP_CPPFLAGS) $(CPPFLAGS)
 
 singmathic_la_SOURCES  = singmathic.cc
 singmathic_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}

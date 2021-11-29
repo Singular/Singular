@@ -568,7 +568,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     if(N[i] < L[i])
       L[i] = N[i];
   // L is now upper bound for degrees of gcd
-  int *dg_im = new int[mv+1]; // for the degree vector of the image we don't need any entry at i=1
+  int dg_im[mv+1]; // for the degree vector of the image we don't need any entry at i=1
   for(int i=2; i<=mv; i++)
     dg_im[i] = 0; // initialize
   CanonicalForm gamma_image, m=1;
