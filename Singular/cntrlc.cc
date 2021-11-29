@@ -25,10 +25,6 @@
 
 #ifdef HAVE_NTL
 #include <NTL/version.h>
-#include <NTL/tools.h>
-#ifdef NTL_CLIENT
-NTL_CLIENT
-#endif
 #endif
 
 /* undef, if you don't want GDB to come up on error */
@@ -537,6 +533,8 @@ void init_signals()
 // NTL error handling (>= 9.3.0) ----------------------------------------
 #ifdef HAVE_NTL
 #if (((NTL_MAJOR_VERSION==9)&&(NTL_MINOR_VERSION>=3))||(NTL_MAJOR_VERSION>=10))
+  extern void (*ErrorCallback)();
+  extern void (*ErrorMsgCallback)(const char *);
   ErrorMsgCallback=WerrorS;
   ErrorCallback=HALT;
 #endif
