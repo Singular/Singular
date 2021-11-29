@@ -19,17 +19,17 @@
 /*0 implementation*/
 extern "C" THREAD_VAR double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
-extern "C" double wFunctionalMora(int *degw, int *lpol, int npol,
+double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
-extern "C" double wFunctionalBuch(int *degw, int *lpol, int npol,
+double wFunctionalBuch(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
-extern "C" void wAdd(int *A, int mons, int kn, int xx, int rvar);
-extern "C" void wNorm(int *degw, int *lpol, int npol, double *rel);
-extern "C" void wFirstSearch(int *A, int *x, int mons,
+void wAdd(int *A, int mons, int kn, int xx, int rvar);
+void wNorm(int *degw, int *lpol, int npol, double *rel);
+void wFirstSearch(int *A, int *x, int mons,
         int *lpol, int npol, double *rel, double *fopt, double wNsqr, int rvar);
-extern "C" void wSecondSearch(int *A, int *x, int *lpol,
+void wSecondSearch(int *A, int *x, int *lpol,
         int npol, int mons, double *rel, double *fk, double wNsqr, int rvar);
-extern "C" void wGcd(int *x, int n);
+void wGcd(int *x, int n);
 
 static void wDimensions(poly* s, int sl, int *lpol, int *npol, int *mons)
 {

@@ -32,7 +32,7 @@ SOURCES = \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
 	pDebug.cc polys0.cc prCopy.cc prCopyMacros.h \
-	kbuckets.cc sbuckets.cc weight.cc weight0.c simpleideals.cc matpol.cc \
+	kbuckets.cc sbuckets.cc weight.cc weight0.cc simpleideals.cc matpol.cc \
 	sparsmat.cc \
 	shiftop.cc \
         ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} mod_raw.cc \

@@ -165,7 +165,7 @@ void wFirstSearch(int *A, int *x, int mons,
   a = n * sizeof(int);
   y = (int * )omAlloc((long)a);
   adr = (void * )omAllocAligned((long)a0);
-  pr = adr;
+  pr = (double*)adr;
   *pr = (double)1.0;
   *y = 0;
   degw = A + (n * mons);
