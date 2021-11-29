@@ -23,10 +23,6 @@
 #include "Singular/links/silink.h"
 #include "Singular/links/ssiLink.h"
 
-#ifdef HAVE_NTL
-#include <NTL/version.h>
-#endif
-
 /* undef, if you don't want GDB to come up on error */
 
 #define CALL_GDB
@@ -530,16 +526,6 @@ static void stack_trace (char *const*args)
 /// init signal handlers and error handling for libraries: NTL, factory
 void init_signals()
 {
-// NTL error handling (>= 9.3.0) ----------------------------------------
-#ifdef HAVE_NTL
-#if (((NTL_MAJOR_VERSION==9)&&(NTL_MINOR_VERSION>=3))||(NTL_MAJOR_VERSION>=10))
-  extern void (*ErrorCallback)();
-  extern void (*ErrorMsgCallback)(const char *);
-  ErrorMsgCallback=WerrorS;
-  ErrorCallback=HALT;
-#endif
-#endif
-
 // signal handler -------------------------------------------------------
   #ifdef SIGSEGV
   si_set_signal(SIGSEGV,(si_hdl_typ)sigsegv_handler);
