@@ -13064,12 +13064,14 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         for (i=1; i<=maxShift; i++)
         {
           poly hh = pLPCopyAndShiftLM(h, i);
+          BOOLEAN discard=TRUE;
           for (j=0; j<=k; j++)
           {
             poly s = strat->S[j];
             int s_lastVblock = pmLastVblock(s);
             if (i < s_lastVblock || (pGetComp(s) > 0 && i == s_lastVblock)) // in the module case, product criterion does not hold (note: comp h is always zero here)
-              enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
+              discard=enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i)
+                && discard;
 #ifdef HAVE_RINGS
             else if (rField_is_Ring(currRing))
             {
@@ -13085,7 +13087,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 #endif
           }
           if (i < h_lastVblock) // in the module case, product criterion does not hold (note: comp h is always zero here)
-            enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
+            discard=enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i)
+              && discard;
 #ifdef HAVE_RINGS
           else if (rField_is_Ring(currRing))
           {
@@ -13099,6 +13102,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             idDelete(&fillers);
           }
 #endif
+          if (discard) pLmDelete(hh);
         }
       }
     }
