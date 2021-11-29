@@ -201,75 +201,75 @@ CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 **/
 CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 {
-    int is_rat=isOn(SW_RATIONAL);
-    Off(SW_RATIONAL);
-    Variable x = f.mvar();
-    CanonicalForm result = 0;
-    CanonicalForm c;
-    CFIterator i;
+  int is_rat=isOn(SW_RATIONAL);
+  Off(SW_RATIONAL);
+  Variable x = f.mvar();
+  CanonicalForm result = 0;
+  CanonicalForm c;
+  CFIterator i;
 #ifdef HAVE_FLINT
-   fmpz_t FLINTq;
-   fmpz_init(FLINTq);
-   convertCF2initFmpz(FLINTq,q);
-   fmpz_t FLINTc;
-   fmpz_init(FLINTc);
-   fmpq_t FLINTres;
-   fmpq_init(FLINTres);
+  fmpz_t FLINTq;
+  fmpz_init(FLINTq);
+  convertCF2initFmpz(FLINTq,q);
+  fmpz_t FLINTc;
+  fmpz_init(FLINTc);
+  fmpq_t FLINTres;
+  fmpq_init(FLINTres);
 #elif defined(HAVE_NTL)
-    ZZ NTLq= convertFacCF2NTLZZ (q);
-    ZZ bound;
-    SqrRoot (bound, NTLq/2);
+  ZZ NTLq= convertFacCF2NTLZZ (q);
+  ZZ bound;
+  SqrRoot (bound, NTLq/2);
 #else
-   factoryError("NTL/FLINT missing:Farey");
+  factoryError("NTL/FLINT missing:Farey");
 #endif
-    for ( i = f; i.hasTerms(); i++ )
+  for ( i = f; i.hasTerms(); i++ )
+  {
+    c = i.coeff();
+    if ( c.inCoeffDomain())
     {
-        c = i.coeff();
-        if ( c.inCoeffDomain())
-        {
 #ifdef HAVE_FLINT
-          if (c.inZ())
-          {
-             convertCF2initFmpz(FLINTc,c);
-             fmpq_reconstruct_fmpz(FLINTres,FLINTc,FLINTq);
-             result += power (x, i.exp())*(convertFmpq2CF(FLINTres));
-          }
+      if (c.inZ())
+      {
+        convertCF2initFmpz(FLINTc,c);
+        fmpq_reconstruct_fmpz(FLINTres,FLINTc,FLINTq);
+        result += power (x, i.exp())*(convertFmpq2CF(FLINTres));
+      }
 #elif defined(HAVE_NTL)
-          if (c.inZ())
-          {
-            ZZ NTLc= convertFacCF2NTLZZ (c);
-            bool lessZero= (sign (NTLc) == -1);
-            if (lessZero)
-              NTL::negate (NTLc, NTLc);
-            ZZ NTLnum, NTLden;
-            if (ReconstructRational (NTLnum, NTLden, NTLc, NTLq, bound, bound))
-            {
-              if (lessZero)
-                NTL::negate (NTLnum, NTLnum);
-              CanonicalForm num= convertNTLZZX2CF (to_ZZX (NTLnum), Variable (1));
-              CanonicalForm den= convertNTLZZX2CF (to_ZZX (NTLden), Variable (1));
-              On (SW_RATIONAL);
-              result += power (x, i.exp())*(num/den);
-              Off (SW_RATIONAL);
-            }
-          }
-#else
-          if (c.inZ())
-            result += power (x, i.exp()) * Farey_n(c,q);
-#endif
-          else
-            result += power( x, i.exp() ) * Farey(c,q);
+      if (c.inZ())
+      {
+        ZZ NTLc= convertFacCF2NTLZZ (c);
+        bool lessZero= (sign (NTLc) == -1);
+        if (lessZero)
+          NTL::negate (NTLc, NTLc);
+        ZZ NTLnum, NTLden;
+        if (ReconstructRational (NTLnum, NTLden, NTLc, NTLq, bound, bound))
+        {
+          if (lessZero)
+            NTL::negate (NTLnum, NTLnum);
+          CanonicalForm num= convertNTLZZX2CF (to_ZZX (NTLnum), Variable (1));
+          CanonicalForm den= convertNTLZZX2CF (to_ZZX (NTLden), Variable (1));
+          On (SW_RATIONAL);
+          result += power (x, i.exp())*(num/den);
+          Off (SW_RATIONAL);
         }
-        else
-          result += power( x, i.exp() ) * Farey(c,q);
-    }
-    if (is_rat) On(SW_RATIONAL);
-#ifdef HAVE_FLINT
-    fmpq_clear(FLINTres);
-    fmpz_clear(FLINTc);
-    fmpz_clear(FLINTq);
+      }
+#else
+      if (c.inZ())
+        result += power (x, i.exp()) * Farey_n(c,q);
 #endif
-    return result;
+      else
+        result += power( x, i.exp() ) * Farey(c,q);
+    }
+    else
+      result += power( x, i.exp() ) * Farey(c,q);
+  }
+  if (is_rat) On(SW_RATIONAL);
+#ifdef HAVE_FLINT
+  fmpq_clear(FLINTres);
+  fmpz_clear(FLINTc);
+  fmpz_clear(FLINTq);
+#endif
+  return result;
 }
 
 // returns x where (a * x) % b == 1, inv is a cache
