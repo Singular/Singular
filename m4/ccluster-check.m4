@@ -43,5 +43,8 @@ CFLAGS=${BACKUP_CFLAGS}
 LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH
 
+if test "x$HAVE_CCLUSTER" != "xyes"; then
+  AC_MSG_RESULT(not found)
+fi  
 AM_CONDITIONAL(SING_HAVE_CCLUSTER, test "x$HAVE_CCLUSTER" = "xyes")
 ])

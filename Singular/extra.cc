@@ -659,9 +659,38 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "SingularBin") == 0)
     {
       res->rtyp=STRING_CMD;
-      const char *r=feResource('b');
-      if (r == NULL) r="";
-      res->data = (void*) omStrDup( r );
+      const char *r=feResource('r');
+      if (r == NULL) r="/usr/local";
+      int l=strlen(r);
+      if ((strstr(r,".libs/..")==NULL)   /*not installed Singular (libtool)*/
+      &&(strstr(r,"Singular/..")==NULL)) /*not installed Singular (static)*/
+      {
+        /* where to find Singular's programs: */
+        #define SINGULAR_PROCS_DIR "/libexec/singular/MOD"
+        char *s=(char*)omAlloc(l+strlen(SINGULAR_PROCS_DIR)+1);
+        strcpy(s,r);
+        strcat(s,SINGULAR_PROCS_DIR);
+        if (access(s,X_OK)==0)
+          res->data = (void*)s;
+        else
+        {
+          /*second try: LIBEXEC_DIR*/
+          omFree(s); s=omStrDup(LIBEXEC_DIR);
+          if (access(s,X_OK)==0)
+            res->data = (void*)s;
+          else
+          {
+            s[0]='\0';
+            res->data = (void*)s;
+          }
+        }
+      }
+      else
+      {
+        const char *r=feResource('b');
+        if (r == NULL) r="";
+        res->data = (void*) omStrDup( r );
+      }
       return FALSE;
     }
     else
