@@ -3917,6 +3917,40 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
+/* ====== fq_nmod_mat_rref ============================*/
+    #ifdef HAVE_FLINT
+    if(strcmp(sys_cmd,"fq_nmod_mat_rref")==0)
+    {
+      const short t1[]={1,MATRIX_CMD};
+      if (iiCheckTypes(h,t1,1))
+      {
+        matrix M=(matrix)h->Data();
+	fq_nmod_ctx_t ctx;
+        fmpz_t p;
+	convSingIFlintI(p,rChar(currRing));
+        fq_nmod_ctx_init(ctx,p,1,"t");
+	fq_nmod_mat_t FLINTM;
+	// convert matrix
+	convSingMFlintFq_nmod_mat(M,FLINTM,ctx,currRing);
+	// rank
+        long rk= fq_nmod_mat_rref (FLINTM,ctx);
+	res->data=(void*)convFlintFq_nmod_matSingM(FLINTM,ctx,currRing);
+	// clean up
+	fq_nmod_mat_clear (FLINTM,ctx);
+        fq_nmod_ctx_clear(ctx);
+	fmpz_clear(p);
+        res->rtyp=MATRIX_CMD;
+        Print("rank:%ld\n",rk);
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("expected system(\"fq_nmod_mat_rref\",<matrix>)");
+        return TRUE;
+      }
+    }
+    else
+    #endif
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

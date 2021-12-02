@@ -36,6 +36,11 @@
 #include <flint/fmpz_poly_mat.h>
 #if __FLINT_RELEASE >= 20500
 #include <flint/fmpz_lll.h>
+#include <flint/fq.h>
+#include <flint/fq_poly.h>
+#include <flint/fq_nmod.h>
+#include <flint/fq_nmod_poly.h>
+#include <flint/fq_nmod_mat.h>
 #endif
 
 int convFlintISingI (fmpz_t f);
@@ -56,6 +61,13 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r);
 
 bigintmat*  singflint_LLL(bigintmat* A, bigintmat* T);
 intvec* singflint_LLL(intvec* A, intvec* T);
+
+#if __FLINT_RELEASE >= 20500
+void convSingPFlintnmod_poly_t(nmod_poly_t result, const poly p, const ring r);
+void convSingMFlintFq_nmod_mat(matrix m, fq_nmod_mat_t M, const fq_nmod_ctx_t fq_con, const ring r);
+poly convFlintFq_nmodSingP(const fq_nmod_t Fp, const fq_nmod_ctx_t ctx, const ring r);
+matrix convFlintFq_nmod_matSingM(fq_nmod_mat_t m, const fq_nmod_ctx_t fq_con, const ring r);
+#endif
 #endif
 #endif
 // LIBPOLYS_POLYS_FLINTCONV_H

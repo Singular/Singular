@@ -13,6 +13,7 @@
 
 #ifdef HAVE_FLINT
 #if __FLINT_RELEASE >= 20500
+
 #include "coeffs/coeffs.h"
 #include "coeffs/longrat.h"
 #include "polys/monomials/p_polys.h"
@@ -278,6 +279,62 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
   fmpq_clear(c);
   p_Test(p,r);
   return p;
+}
+
+void convSingPFlintnmod_poly_t(nmod_poly_t result, const poly p, const ring r)
+{
+  // assume univariate
+  nmod_poly_init2 (result,rChar(r),p_Deg(p,r)); 
+  poly h=p;
+  while(h!=NULL)
+  {
+    nmod_poly_set_coeff_ui(result,p_GetExp(h,1,r),n_Int(pGetCoeff(h),r->cf));
+    pIter(h);
+  }
+}
+
+void convSingMFlintFq_nmod_mat(matrix m, fq_nmod_mat_t M, const fq_nmod_ctx_t fq_con, const ring r)
+{
+  fq_nmod_mat_init (M, (long)MATROWS(m), (long) MATCOLS(m), fq_con);
+  int i,j;
+  for(i=MATROWS(m);i>0;i--)
+  {
+    for(j=MATCOLS(m);j>0;j--)
+    {
+      convSingPFlintnmod_poly_t (M->rows[i-1]+j-1, MATELEM(m,i,j),r);
+    }
+  }
+}
+
+poly convFlintFq_nmodSingP(const fq_nmod_t Fp, const fq_nmod_ctx_t ctx, const ring r)
+{
+  poly p=NULL;
+  poly h;
+  for (int i= 0; i < nmod_poly_length (Fp); i++)
+  {
+    ulong coeff= nmod_poly_get_coeff_ui (Fp, i);
+    if (coeff != 0)
+    h=p_NSet(n_Init(coeff,r->cf),r);
+    p_SetExp(h,1,i,r);
+    p_Setm(h,r);
+    p=p_Add_q(p,h,r);
+  }
+  return p;
+}
+
+matrix convFlintFq_nmod_matSingM(fq_nmod_mat_t m, const fq_nmod_ctx_t fq_con, const ring r)
+{
+  matrix M=mpNew(fq_nmod_mat_nrows (m, fq_con),fq_nmod_mat_ncols (m, fq_con));
+   int i,j;
+  for(i=MATROWS(M);i>0;i--)
+  {
+    for(j=MATCOLS(M);j>0;j--)
+    {
+      MATELEM(M,i,j)=convFlintFq_nmodSingP(fq_nmod_mat_entry (m, i-1, j-1),
+                                          fq_con, r);
+    }
+  }
+  return M;
 }
 
 bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
