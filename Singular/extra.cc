@@ -662,35 +662,47 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       const char *r=feResource('r');
       if (r == NULL) r="/usr/local";
       int l=strlen(r);
+      /* where to find Singular's programs: */
+      #define SINGULAR_PROCS_DIR "/libexec/singular/MOD"
+      int ll=si_max(strlen(SINGULAR_PROCS_DIR),strlen(LIBEXEC_DIR));
+      char *s=(char*)omAlloc(l+ll+2);
       if ((strstr(r,".libs/..")==NULL)   /*not installed Singular (libtool)*/
       &&(strstr(r,"Singular/..")==NULL)) /*not installed Singular (static)*/
       {
-        /* where to find Singular's programs: */
-        #define SINGULAR_PROCS_DIR "/libexec/singular/MOD"
-        char *s=(char*)omAlloc(l+strlen(SINGULAR_PROCS_DIR)+1);
         strcpy(s,r);
         strcat(s,SINGULAR_PROCS_DIR);
         if (access(s,X_OK)==0)
-          res->data = (void*)s;
+        {
+          strcat(s,"/");
+        }
         else
         {
           /*second try: LIBEXEC_DIR*/
-          omFree(s); s=omStrDup(LIBEXEC_DIR);
+          strcpy(s,LIBEXEC_DIR);
           if (access(s,X_OK)==0)
-            res->data = (void*)s;
+          {
+            strcat(s,"/");
+          }
           else
           {
             s[0]='\0';
-            res->data = (void*)s;
           }
         }
       }
       else
       {
         const char *r=feResource('b');
-        if (r == NULL) r="";
-        res->data = (void*) omStrDup( r );
+        if (r == NULL)
+        {
+          s[0]='\0';
+        }
+        else
+        {
+          strcpy(s,r);
+          strcat(s,"/");
+        }
       }
+      res->data = (void*)s;
       return FALSE;
     }
     else

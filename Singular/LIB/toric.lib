@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version toric.lib 4.2.1.0 Nov_2021 "; // $Id$
+version="version toric.lib 4.2.1.2 Nov_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: toric.lib   Standard Basis of Toric Ideals
@@ -273,7 +273,7 @@ static proc toric_ideal_1(intmat A, string alg)
 
 
   // call external program
-  dummy=system("sh",system("SingularBin")+"/toric_ideal -alg "+alg+" "+matrixfile);
+  dummy=system("sh",system("SingularBin")+"toric_ideal -alg "+alg+" "+matrixfile);
   if (dummy!=0) { ERROR("toric_ideal failed with error code "+string(dummy)); }
 
   // read toric ideal from created file
@@ -586,7 +586,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
   close(MATRIX);
 
   // call external program
-  dummy=system("sh",system("SingularBin")+"/toric_ideal -alg "+alg+" "+matrixfile);
+  dummy=system("sh",system("SingularBin")+"toric_ideal -alg "+alg+" "+matrixfile);
   if (dummy!=0) { ERROR("toric_ideal failed with error code "+string(dummy)); }
 
   // read toric ideal from created file
@@ -999,7 +999,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
   }
 
   // call external program
-  dummy=system("sh",system("SingularBin")+"/change_cost "+groebnerfile+" "+newcostfile);
+  dummy=system("sh",system("SingularBin")+"change_cost "+groebnerfile+" "+newcostfile);
   if (dummy!=0) { ERROR("change_cost failed with error code "+string(dummy)); }
 
   // read toric standard basis from created file

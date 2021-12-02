@@ -7823,7 +7823,7 @@ returns the absolute (path) name of the running @sc{Singular} as string.
 @item @code{system("SingularBin")}
 @cindex SingularBin
 @cindex system, SingularBin
-returns the absolute path name of directory of the running @sc{Singular} as string
+returns the absolute path name of directory of the running @sc{Singular} as string (ending in /)
 @c ..........................
 @item @code{system("SingularLib")}
 @cindex SingularLib
