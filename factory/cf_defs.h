@@ -12,12 +12,6 @@
 #include "globaldefs.h"
 // #include "config.h"
 
-/*BEGINPUBLIC*/
-
-#define LEVELBASE -1000000
-#define LEVELTRANS -500000
-#define LEVELQUOT 1000000
-#define LEVELEXPR 1000001
 
 #define UndefinedDomain 32000
 #define PrimePowerDomain 5
@@ -25,6 +19,13 @@
 #define FiniteFieldDomain 3
 #define RationalDomain 2
 #define IntegerDomain 1
+
+/*BEGINPUBLIC*/
+
+#define LEVELBASE -1000000
+#define LEVELTRANS -500000
+#define LEVELQUOT 1000000
+#define LEVELEXPR 1000001
 
 /// set to 1 for computations over Q
 static const int SW_RATIONAL = 0;
