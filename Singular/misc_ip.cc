@@ -829,7 +829,11 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppendS("Plural,");
 #endif
 #ifdef HAVE_VSPACE
-              StringAppendS("vspace,");
+  #if defined(__GNUC__) && (__GNUC__<9)
+              StringAppendS("vspace(1),");
+  #else
+              StringAppendS("vspace(2),");
+  #endif
 #endif
 #ifdef HAVE_DBM
               StringAppendS("DBM,\n\t");
