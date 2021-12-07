@@ -4,7 +4,7 @@
 
 #ifdef HAVE_VSPACE
 
-#if defined(__GNUC__) && (__GNUC__<9)
+#if defined(__GNUC__) && (__GNUC__<9) && !defined(__clang__)
 #include <fcntl.h>
 #include <stddef.h>
 #include <stdio.h>

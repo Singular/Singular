@@ -829,7 +829,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppendS("Plural,");
 #endif
 #ifdef HAVE_VSPACE
-  #if defined(__GNUC__) && (__GNUC__<9)
+  #if defined(__GNUC__) && (__GNUC__<9) &&!defined(__clang__)
               StringAppendS("vspace(1),");
   #else
               StringAppendS("vspace(2),");

@@ -6,7 +6,7 @@
 #include <thread>
 #endif
 
-#if defined(__GNUC__) && (__GNUC__<9)
+#if defined(__GNUC__) && (__GNUC__<9) &&!defined(__clang__)
 
 namespace vspace {
 namespace internals {
