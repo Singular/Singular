@@ -1152,9 +1152,11 @@ number kBucketPolyRed(kBucket_pt bucket,
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;
+  poly lm_org;
   if (r->isLPring)
   {
     int firstBlock = p_mFirstVblock(p1, r);
+    lm_org=lm;
     k_SplitFrame(lm, lmRight, si_max(firstBlock, 1), r);
   }
 #endif
@@ -1184,6 +1186,8 @@ number kBucketPolyRed(kBucket_pt bucket,
     poly tmp=r->p_Procs->pp_Mult_mm(a1, lmRight, r);
     kBucket_Minus_m_Mult_p(bucket, lm,tmp, &l1, spNoether);
     p_Delete(&tmp,r);
+    p_LmDelete(&lmRight,r);
+    p_LmDelete(lm_org,r);
   }
   else
 #endif

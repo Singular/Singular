@@ -308,14 +308,16 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
       {
         if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-        if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
+        if ((T[j].p!=NULL)
+        && p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
             return j;
         }
 #else
-        if (!(sevT[j] & not_sev) &&
-          p_LmDivisibleBy(T[j].p, p, r))
+        if (!(sevT[j] & not_sev)
+        && (T[j].p!=NULL)
+        && p_LmDivisibleBy(T[j].p, p, r))
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
             return j;
@@ -330,13 +332,15 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
       {
         if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-        if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
+        if ((T[j].p!=NULL)
+        && p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
         {
           return j;
         }
 #else
-        if (!(sevT[j] & not_sev) &&
-          p_LmDivisibleBy(T[j].p, p, r))
+        if (!(sevT[j] & not_sev)
+        && (T[j].p!=NULL)
+        && p_LmDivisibleBy(T[j].p, p, r))
         {
           return j;
         }
@@ -4616,16 +4620,19 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         if ((strat->fromQ!=NULL) && (strat->fromQ[k])) continue; // do not reduce Q_k
         for (int j = 0; j<=strat->tl; ++j)
         {
-          // this is like clearS in bba, but we reduce with elements from T, because it contains the shifts too
-          assume(strat->sevT[j] == pGetShortExpVector(strat->T[j].p));
-          assume(strat->sevS[k] == pGetShortExpVector(strat->S[k]));
-          if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], strat->S[k], ~strat->sevS[k]))
+          if (strat->T[j].p!=NULL)
           {
-            if (pLmCmp(strat->T[j].p, strat->S[k]) != 0)
-            { // check whether LM is different
-              deleteInS(k, strat);
-              --k;
-              break;
+            // this is like clearS in bba, but we reduce with elements from T, because it contains the shifts too
+            assume(strat->sevT[j] == pGetShortExpVector(strat->T[j].p));
+            assume(strat->sevS[k] == pGetShortExpVector(strat->S[k]));
+            if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], strat->S[k], ~strat->sevS[k]))
+            {
+              if (pLmCmp(strat->T[j].p, strat->S[k]) != 0)
+              { // check whether LM is different
+                deleteInS(k, strat);
+                --k;
+                break;
+              }
             }
           }
         }
