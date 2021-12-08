@@ -24,7 +24,7 @@
 // define if you want to use special src_ring
 #define HAVE_SRC_R 1
 // define if you want to use optimization step
-#define HAVE_MAP_OPTIMIZE 1
+#define HAVE_MAP_OPTIMIZE 0
 
 /*******************************************************************************
 **
@@ -396,7 +396,7 @@ ideal fast_map_common_subexp(const ideal map_id,const ring map_r,const ideal ima
   maPoly_Eval(mp, src_r, dest_id, dest_r, length);
   if (TEST_OPT_PROT) PrintS(".");
 
-  // collect the results back into an ideal
+  // collect the results back into an ideal, clean up mideal
   ideal res_dest_id = maIdeal_2_Ideal(mideal, dest_r);
   if (TEST_OPT_PROT) PrintS(".");
 
