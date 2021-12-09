@@ -283,12 +283,15 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
 
 void convSingPFlintnmod_poly_t(nmod_poly_t result, const poly p, const ring r)
 {
-  // assume univariate
+  // assume univariate, r->cf=Z/p
   nmod_poly_init2 (result,rChar(r),p_Deg(p,r)); 
   poly h=p;
   while(h!=NULL)
   {
-    nmod_poly_set_coeff_ui(result,p_GetExp(h,1,r),n_Int(pGetCoeff(h),r->cf));
+    if (h==NULL)
+      nmod_poly_set_coeff_ui(result,0,0);
+    else
+      nmod_poly_set_coeff_ui(result,p_GetExp(h,1,r),n_Int(pGetCoeff(h),r->cf)+rChar(r));
     pIter(h);
   }
 }
@@ -315,9 +318,12 @@ poly convFlintFq_nmodSingP(const fq_nmod_t Fp, const fq_nmod_ctx_t ctx, const ri
     ulong coeff= nmod_poly_get_coeff_ui (Fp, i);
     if (coeff != 0)
     h=p_NSet(n_Init(coeff,r->cf),r);
-    p_SetExp(h,1,i,r);
-    p_Setm(h,r);
-    p=p_Add_q(p,h,r);
+    if (h!=NULL)
+    {
+      p_SetExp(h,1,i,r);
+      p_Setm(h,r);
+      p=p_Add_q(p,h,r);
+    }
   }
   return p;
 }
@@ -332,6 +338,37 @@ matrix convFlintFq_nmod_matSingM(fq_nmod_mat_t m, const fq_nmod_ctx_t fq_con, co
     {
       MATELEM(M,i,j)=convFlintFq_nmodSingP(fq_nmod_mat_entry (m, i-1, j-1),
                                           fq_con, r);
+    }
+  }
+  return M;
+}
+
+void convSingMFlintNmod_mat(matrix m, nmod_mat_t M, const ring r)
+{
+  nmod_mat_init (M, (long)MATROWS(m), (long) MATCOLS(m), rChar(r));
+  int i,j;
+  for(i=MATROWS(m);i>0;i--)
+  {
+    for(j=MATCOLS(m);j>0;j--)
+    {
+      poly h=MATELEM(m,i,j);
+      if (h==NULL)
+        nmod_mat_entry(M,i-1,j-1)=0;
+      else
+        nmod_mat_entry(M,i-1,j-1)=(long)pGetCoeff(h);
+    }
+  }
+}
+
+matrix convFlintNmod_matSingM(nmod_mat_t m, const ring r)
+{
+  matrix M=mpNew(nmod_mat_nrows (m),nmod_mat_ncols (m));
+   int i,j;
+  for(i=MATROWS(M);i>0;i--)
+  {
+    for(j=MATCOLS(M);j>0;j--)
+    {
+      MATELEM(M,i,j)=p_ISet(nmod_mat_entry (m, i-1, j-1),r);
     }
   }
   return M;

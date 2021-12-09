@@ -3917,14 +3917,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-/* ====== fq_nmod_mat_rref ============================*/
+/* ====== rref ============================*/
     #ifdef HAVE_FLINT
-    if(strcmp(sys_cmd,"fq_nmod_mat_rref")==0)
+    if(strcmp(sys_cmd,"rref")==0)
     {
       const short t1[]={1,MATRIX_CMD};
       if (iiCheckTypes(h,t1,1))
       {
         matrix M=(matrix)h->Data();
+	#if 0
 	fq_nmod_ctx_t ctx;
         fmpz_t p;
 	convSingIFlintI(p,rChar(currRing));
@@ -3939,6 +3940,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	fq_nmod_mat_clear (FLINTM,ctx);
         fq_nmod_ctx_clear(ctx);
 	fmpz_clear(p);
+	#else
+	nmod_mat_t FLINTM;
+	// convert matrix
+	convSingMFlintNmod_mat(M,FLINTM,currRing);
+	// rank
+        long rk= nmod_mat_rref (FLINTM);
+	res->data=(void*)convFlintNmod_matSingM(FLINTM,currRing);
+	// clean up
+	nmod_mat_clear(FLINTM);
+	#endif
         res->rtyp=MATRIX_CMD;
         Print("rank:%ld\n",rk);
         return FALSE;

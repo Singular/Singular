@@ -61,6 +61,8 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r);
 
 bigintmat*  singflint_LLL(bigintmat* A, bigintmat* T);
 intvec* singflint_LLL(intvec* A, intvec* T);
+void convSingMFlintNmod_mat(matrix m, nmod_mat_t M, const ring r);
+matrix convFlintNmod_matSingM(nmod_mat_t m, const ring r);
 
 #if __FLINT_RELEASE >= 20500
 void convSingPFlintnmod_poly_t(nmod_poly_t result, const poly p, const ring r);
