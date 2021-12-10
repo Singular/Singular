@@ -284,7 +284,7 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
 void convSingPFlintnmod_poly_t(nmod_poly_t result, const poly p, const ring r)
 {
   // assume univariate, r->cf=Z/p
-  nmod_poly_init2 (result,rChar(r),p_Deg(p,r)); 
+  nmod_poly_init2 (result,rChar(r),p_Deg(p,r));
   poly h=p;
   while(h!=NULL)
   {
@@ -370,6 +370,73 @@ matrix convFlintNmod_matSingM(nmod_mat_t m, const ring r)
     {
       MATELEM(M,i,j)=p_ISet(nmod_mat_entry (m, i-1, j-1),r);
     }
+  }
+  return M;
+}
+
+matrix singflint_rref(matrix  m, const ring R)
+{
+  int r=m->rows();
+  int c=m->cols();
+  int i,j;
+  matrix M=mpNew(r,c);
+  if (rField_is_Q(R))
+  {
+    fmpq_mat_t FLINTM;
+    fmpq_mat_init(FLINTM,r,c);
+    number n=n_Init(0,R->cf);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        poly h=MATELEM(m,i,j);
+        if (h==NULL)
+          convSingNFlintN(fmpq_mat_entry(FLINTM,i-1,j-1),n,R->cf);
+        else
+          convSingNFlintN(fmpq_mat_entry(FLINTM,i-1,j-1),pGetCoeff(h),R->cf);
+      }
+    }
+    n_Delete(&n,R->cf);
+    fmpq_mat_rref(FLINTM,FLINTM);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        n=convFlintNSingN(fmpq_mat_entry(FLINTM,i-1,j-1),R->cf);
+        MATELEM(M,i,j)=p_NSet(n,R);
+      }
+    }
+    fmpq_mat_clear(FLINTM);
+  }
+  else if (rField_is_Zp(R))
+  {
+    nmod_mat_t FLINTM;
+    // convert matrix
+    convSingMFlintNmod_mat(M,FLINTM,R);
+    // rank
+    long rk= nmod_mat_rref (FLINTM);
+    M=convFlintNmod_matSingM(FLINTM,R);
+    // clean up
+    nmod_mat_clear(FLINTM);
+  }
+  else
+  {
+    #if 0
+    fmpz_t p;
+    convSingIFlintI(p,rChar(currRing));
+    fq_nmod_ctx_init(ctx,p,1,"t");
+    fq_nmod_mat_t FLINTM;
+    // convert matrix
+    convSingMFlintFq_nmod_mat(M,FLINTM,ctx,currRing);
+    // rank
+    long rk= fq_nmod_mat_rref (FLINTM,ctx);
+    res->data=(void*)convFlintFq_nmod_matSingM(FLINTM,ctx,currRing);
+    // clean up
+    fq_nmod_mat_clear (FLINTM,ctx);
+    fq_nmod_ctx_clear(ctx);
+    fmpz_clear(p);
+    #endif
+    WerrorS("not implmented for these coefficients");
   }
   return M;
 }

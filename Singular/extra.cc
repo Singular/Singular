@@ -3925,33 +3925,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (iiCheckTypes(h,t1,1))
       {
         matrix M=(matrix)h->Data();
-	#if 0
-	fq_nmod_ctx_t ctx;
-        fmpz_t p;
-	convSingIFlintI(p,rChar(currRing));
-        fq_nmod_ctx_init(ctx,p,1,"t");
-	fq_nmod_mat_t FLINTM;
-	// convert matrix
-	convSingMFlintFq_nmod_mat(M,FLINTM,ctx,currRing);
-	// rank
-        long rk= fq_nmod_mat_rref (FLINTM,ctx);
-	res->data=(void*)convFlintFq_nmod_matSingM(FLINTM,ctx,currRing);
-	// clean up
-	fq_nmod_mat_clear (FLINTM,ctx);
-        fq_nmod_ctx_clear(ctx);
-	fmpz_clear(p);
-	#else
-	nmod_mat_t FLINTM;
-	// convert matrix
-	convSingMFlintNmod_mat(M,FLINTM,currRing);
-	// rank
-        long rk= nmod_mat_rref (FLINTM);
-	res->data=(void*)convFlintNmod_matSingM(FLINTM,currRing);
-	// clean up
-	nmod_mat_clear(FLINTM);
-	#endif
+        res->data=(void*)singflint_rref(M,currRing);
         res->rtyp=MATRIX_CMD;
-        Print("rank:%ld\n",rk);
         return FALSE;
       }
       else

@@ -31,6 +31,7 @@
 #include "coeffs/bigintmat.h"
 #include <flint/fmpz.h>
 #include <flint/fmpq.h>
+#include <flint/fmpq_mat.h>
 #include <flint/fmpz_poly.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpz_poly_mat.h>
@@ -64,6 +65,7 @@ intvec* singflint_LLL(intvec* A, intvec* T);
 void convSingMFlintNmod_mat(matrix m, nmod_mat_t M, const ring r);
 matrix convFlintNmod_matSingM(nmod_mat_t m, const ring r);
 
+matrix singflint_rref(matrix  m, const ring R);
 #if __FLINT_RELEASE >= 20500
 void convSingPFlintnmod_poly_t(nmod_poly_t result, const poly p, const ring r);
 void convSingMFlintFq_nmod_mat(matrix m, fq_nmod_mat_t M, const fq_nmod_ctx_t fq_con, const ring r);
