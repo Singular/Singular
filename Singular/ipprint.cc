@@ -81,7 +81,7 @@ void ipPrint_MA0(matrix m, const char *name)
       pString0(m->m[i]);
       StringAppendS(",");
       ss=StringEndS();
-      if ((int)strlen(ss)>colmax) s[i]=NULL;
+      if ((int)strlen(ss)>colmax) { s[i]=NULL; omFree(ss); }
       else                        s[i]=ss;
     }
     /* look up the width of all columns, put it in l[col_nr] */
