@@ -197,7 +197,6 @@ poly shift_pp_mm_Mult(poly p, const poly m, const ring ri)
   while (p != NULL);
   omFreeSize((ADDRESS) pExpV, (ri->N+1)*sizeof(int));
   omFreeSize((ADDRESS) mExpV, (ri->N+1)*sizeof(int));
-  pNext(q) = NULL;
 #ifdef SHIFT_MULT_COMPAT_MODE
   p_Delete(&_m, ri); // in this case we copied _m before
   p_Delete(&pCopyHead, ri); // in this case we copied p before
