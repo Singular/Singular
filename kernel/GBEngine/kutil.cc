@@ -9514,7 +9514,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   strat->T[atT] = (TObject) p;
   //printf("\nenterT: add new: length = %i, ecart = %i\n",p.length,p.ecart);
 
-  if (pNext(p.p) != NULL)
+  if ((pNext(p.p) != NULL) && (!rIsLPRing(currRing)))
     strat->T[atT].max_exp = p_GetMaxExpP(pNext(p.p), strat->tailRing);
   else
     strat->T[atT].max_exp = NULL;
@@ -13179,8 +13179,11 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             ideal fillers = id_MaxIdeal(i - h_lastVblock, currRing);
             for (int k = 0; k < IDELEMS(fillers); k++)
             {
+              BOOLEAN delete_hhh=TRUE;
               poly hhh = pLPCopyAndShiftLM(pp_mm_Mult(h, fillers->m[k], currRing), h_lastVblock);
-              enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock);
+              if(!enterOnePairWithoutShifts(-1, hhh, h, ecart, isFromQ, strat, atR, h_lastVblock, h_lastVblock))
+                delete_hhh=FALSE;
+              if (delete_hhh) p_LmDelete(hhh,currRing);
             }
             idDelete(&fillers);
           }
