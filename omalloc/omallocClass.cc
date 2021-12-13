@@ -9,6 +9,8 @@
 
 #include <new>
 #include <stdlib.h>
+#include "omalloc/omConfig.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omallocClass.h"
 // The C++ standard has ratified a change to the new operator.
 //
@@ -43,4 +45,5 @@ void *  omallocClass::operator new[](size_t size, const std::nothrow_t &) throw(
   omTypeAlloc(void*, addr, size);
   return addr;
 }
+#endif
 #endif

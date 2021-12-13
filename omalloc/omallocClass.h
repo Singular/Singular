@@ -12,6 +12,8 @@
 
 #include <new>
 #include <stdlib.h>
+#include "omalloc/omConfig.h"
+#ifdef HAVE_OMALLOC
 #include "omalloc/omalloc.h"
 
 class omallocClass
@@ -81,5 +83,6 @@ void * operator new(size_t size, const std::nothrow_t &) throw();
 
 void * operator new[](size_t size, const std::nothrow_t &) throw();
 };
+#endif
 #endif
 #endif
