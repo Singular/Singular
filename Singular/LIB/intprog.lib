@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version intprog.lib 4.2.1.2 Nov_2021 "; // $Id$
+version="version intprog.lib 4.2.1.3 Dec_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: intprog.lib      Integer Programming with Groebner Basis Methods
@@ -95,7 +95,14 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
   close(PROBLEM);
 
   // call external program
-  int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  {
+    int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
+  else
+  {
+    int dummy=system("sh","solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
 
   // read solution from created file
   link SOLUTION=":r "+matrixfile+".sol."+alg;
@@ -258,7 +265,14 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
   close(PROBLEM);
 
   // call external program
-  int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  {
+    int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
+  else
+  {
+    int dummy=system("sh","solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
 
   // read solution from created file
   link SOLUTION=":r "+matrixfile+".sol."+alg;
@@ -405,7 +419,14 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
   close(PROBLEM);
 
   // call external program
-  int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  {
+    int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
+  else
+  {
+    int dummy=system("sh","solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
 
   // read solution from created file
   link SOLUTION=":r "+matrixfile+".sol."+alg;
@@ -551,7 +572,14 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
   close(PROBLEM);
 
   // call external program
-  int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  {
+    int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
+  else
+  {
+    int dummy=system("sh","solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
+  }
 
   // read solution from created file
   link SOLUTION=":r "+matrixfile+".sol."+alg;
