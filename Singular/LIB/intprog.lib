@@ -95,7 +95,7 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
   close(PROBLEM);
 
   // call external program
-  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes")
   {
     int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
   }
@@ -265,7 +265,7 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
   close(PROBLEM);
 
   // call external program
-  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes")
   {
     int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
   }
@@ -419,7 +419,7 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
   close(PROBLEM);
 
   // call external program
-  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes")
   {
     int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
   }
@@ -572,7 +572,7 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
   close(PROBLEM);
 
   // call external program
-  if (status(system("SingularBin")+"solve_IP","exists")=="yes)
+  if (status(system("SingularBin")+"solve_IP","exists")=="yes")
   {
     int dummy=system("sh",system("SingularBin")+"solve_IP -alg "+alg+" "+matrixfile+" "+problemfile);
   }
