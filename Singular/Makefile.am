@@ -187,9 +187,9 @@ TSingular_SOURCES = emacs.cc feOptTS.inc feOpt.cc
 #### libparse
 libparse_CPPFLAGS = ${AM_CPPFLAGS} -DSTANDALONE_PARSER
 
-libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
+libparse_SOURCES = libparse.cc utils.cc utils.h
 
-libparse_LDADD =
+libparse_LDADD = ${top_builddir}/resources/libsingular_resources.la
 libparse_LDFLAGS = ${AM_LDFLAGS}
 
 #########################################################

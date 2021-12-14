@@ -2,7 +2,7 @@
 
 #ifdef STANDALONE_PARSER
 
-#include "Singular/fegetopt.h"
+#include "resources/fegetopt.h"
 #include "Singular/utils.h"
 #include "Singular/libparse.h"
 
