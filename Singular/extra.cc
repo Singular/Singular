@@ -1237,6 +1237,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   #endif
+/* ====== rref ============================*/
+  #ifdef HAVE_FLINT
+  if(strcmp(sys_cmd,"rref")==0)
+  {
+    const short t1[]={1,MATRIX_CMD};
+    if (iiCheckTypes(h,t1,1))
+    {
+      matrix M=(matrix)h->Data();
+      res->data=(void*)singflint_rref(M,currRing);
+      res->rtyp=MATRIX_CMD;
+      return FALSE;
+    }
+    else
+    {
+      WerrorS("expected system(\"rref\",<matrix>)");
+      return TRUE;
+    }
+  }
+  else
+  #endif
   /*==================== pcv ==================================*/
   #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)
@@ -3917,26 +3937,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-/* ====== rref ============================*/
-    #ifdef HAVE_FLINT
-    if(strcmp(sys_cmd,"rref")==0)
-    {
-      const short t1[]={1,MATRIX_CMD};
-      if (iiCheckTypes(h,t1,1))
-      {
-        matrix M=(matrix)h->Data();
-        res->data=(void*)singflint_rref(M,currRing);
-        res->rtyp=MATRIX_CMD;
-        return FALSE;
-      }
-      else
-      {
-        WerrorS("expected system(\"fq_nmod_mat_rref\",<matrix>)");
-        return TRUE;
-      }
-    }
-    else
-    #endif
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

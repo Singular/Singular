@@ -4183,10 +4183,12 @@ P, L, and U.
 @c example
 @end smallexample
 @end table
+See @code{system("rref",A);}.
 @c ref
 See
 @ref{luinverse};
-@ref{lusolve}.
+@ref{lusolve};
+@ref{system}.
 @c ref
 @c ---------------------------------------
 @node luinverse, lusolve, ludecomp, Functions
@@ -4257,10 +4259,12 @@ The method will give a warning for any non-quadratic matrix A.
 @c example
 @end smallexample
 @end table
+See @code{system("rref",A);}.
 @c ref
 See
 @ref{ludecomp};
-@ref{lusolve}.
+@ref{lusolve};
+@ref{system}.
 @c ref
 @c ---------------------------------------
 @node lusolve, max, luinverse, Functions
@@ -4327,10 +4331,12 @@ the given polynomial ring, only.
 @c example
 @end smallexample
 @end table
+See @code{system("rref",A);}.
 @c ref
 See
 @ref{ludecomp};
-@ref{luinverse}.
+@ref{luinverse};
+@ref{system}.
 @c ref
 @c ---------------------------------------
 @node max, maxideal, lusolve, Functions
@@ -7565,7 +7571,7 @@ See
 @ref{substitute}.
 @c ref
 @c ---------------------------------------
-@node  system, syz, subst, Functions
+@node system, syz, subst, Functions
 @subsection system
 @cindex system
 @table @code
@@ -7778,6 +7784,11 @@ reserve a port and listen with the given backlog.
 @cindex system, reservedLink
 accept a connect at the reserved port and return a (write-only) link to it.
 (see @code{system("reserve")}).
+@c ..........................
+@item @code{system("rref",) matrix @code{ )}
+@cindex system, rref
+return a reduced row echelon form of the constant matrix M
+(see @code{system("rref")}).
 @c ..........................
 @item @code{system("semaphore",} string, int @code{)}
 @cindex semaphore
