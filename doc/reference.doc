@@ -7785,7 +7785,7 @@ reserve a port and listen with the given backlog.
 accept a connect at the reserved port and return a (write-only) link to it.
 (see @code{system("reserve")}).
 @c ..........................
-@item @code{system("rref",) matrix @code{ )}
+@item @code{system("rref",} matrix @code{ )}
 @cindex system, rref
 return a reduced row echelon form of the constant matrix M
 (see @code{system("rref")}).
