@@ -664,7 +664,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       int l=strlen(r);
       /* where to find Singular's programs: */
       #define SINGULAR_PROCS_DIR "/libexec/singular/MOD"
-      int ll=si_max(strlen(SINGULAR_PROCS_DIR),strlen(LIBEXEC_DIR));
+      int ll=si_max((int)strlen(SINGULAR_PROCS_DIR),(int)strlen(LIBEXEC_DIR));
       char *s=(char*)omAlloc(l+ll+2);
       if ((strstr(r,".libs/..")==NULL)   /*not installed Singular (libtool)*/
       &&(strstr(r,"Singular/..")==NULL)) /*not installed Singular (static)*/
