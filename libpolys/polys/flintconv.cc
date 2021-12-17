@@ -441,7 +441,7 @@ matrix singflint_rref(matrix  m, const ring R)
     fq_nmod_ctx_clear(ctx);
     fmpz_clear(p);
     #endif
-    WerrorS("not implmented for these coefficients");
+    WerrorS("not implemented for these coefficients");
   }
   return M;
 }
