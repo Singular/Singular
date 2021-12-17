@@ -78,7 +78,8 @@ idhdl idrec::get(const char * s, int level)
   int l;
   const char *id_;
   unsigned long i=iiS2I(s);
-  int less4=(i < (1L<<((SIZEOF_LONG-1)*8)));
+  char *dummy=(char*)&i;
+  BOOLEAN less4=(dummy[SIZEOF_LONG-1]=='\0');
   while (h!=NULL)
   {
     omCheckAddr((ADDRESS)IDID(h));
