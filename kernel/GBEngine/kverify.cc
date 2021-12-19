@@ -19,6 +19,7 @@
 #endif
 
 BOOLEAN kVerify1(ideal F, ideal Q)
+/* sequential version */
 {
   assume (!rIsNCRing(currRing));
   kStrategy strat=new skStrategy;
@@ -135,6 +136,7 @@ BOOLEAN kVerify1(ideal F, ideal Q)
 }
 
 BOOLEAN kVerify2(ideal F, ideal Q)
+/* parallel version */
 {
 #ifdef HAVE_VSPACE
   assume (!rIsNCRing(currRing));
@@ -207,6 +209,8 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   /*---------------------------------------------------------------------*/
   BOOLEAN all_okay=TRUE;
   int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
+  if (cpus>=MAX_PROCESS) cpus=MAX_PROCESS-1;
+  /* start no more than MAX_PROCESS-1 children */
   int parent_pid=getpid();
   using namespace vspace;
   vmem_init();
@@ -279,7 +283,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       {
         if (TEST_OPT_PROT) printf("fail: result: %d\n",red_result);
         rqueue->enqueue(1);
-        exit(0); // found fail, no neeed to test further
+        exit(0); // found fail, no need to test further
       }
     }
     exit(0); // all done, quit child
@@ -309,7 +313,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
         int dummy;
         do
         {
-          dummy=queue->dequeue();
+          dummy=queue->dequeue(); // remove remaining tasks
         } while (dummy==0);
       }
     }

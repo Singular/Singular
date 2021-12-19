@@ -296,6 +296,8 @@ ideal id_Farey_0(ideal x, number N, const ring r)
 {
   int cnt=IDELEMS(x)*x->nrows;
   int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
+  if (cpus>=MAX_PROCESS) cpus=MAX_PROCESS-1;
+  /* start no more than MAX_PROCESS-1 children */
   if (2*cpus>=cnt) /* at least 2 polys for each process,
                      or switch to seriell version */
     return id_Farey(x,N,r);
