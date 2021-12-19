@@ -209,7 +209,8 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   /*---------------------------------------------------------------------*/
   BOOLEAN all_okay=TRUE;
   int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
-  if (cpus>=MAX_PROCESS) cpus=MAX_PROCESS-1;
+  if (cpus>=vspace::internals::MAX_PROCESS)
+    cpus=vspace::internals::MAX_PROCESS-1;
   /* start no more than MAX_PROCESS-1 children */
   int parent_pid=getpid();
   using namespace vspace;
