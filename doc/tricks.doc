@@ -91,7 +91,11 @@ All input to @sc{Singular} must be 7-bit clean, i.e. special characters like the
 the German Umlaute (@"a, @"o, etc.), or the French accent characters may
 neither appear as input to @sc{Singular}, nor in libraries or procedure
 definitions.
-@cindex @code{vspace}, used in @code("verifyGB",I)} and @code{farey} can not
+@cindex vspace
+@cindex verifyGB
+@cindex farey
+@item
+@code{vspace}, used in @code("verifyGB",I)} and @code{farey} can not
 use more than MAX_PROCESS (64) cpus. This limit can be changed in the source file @code{kernel/oswrapper/vspace.h}.
 @end itemize
 
