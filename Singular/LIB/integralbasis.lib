@@ -1,12 +1,14 @@
-//////////////////////////////////////////////////////////////////////////////
-version="version integralbasis.lib 4.1.2.0 Feb_2019 "; // $Id$
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+version="version integralbasis.lib 4.2.1.3 Dec_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  integralbasis.lib  Integral basis in algebraic function fields
-AUTHORS:  J. Boehm, j.boehm at mx.uni-saarland.de @*
-          W. Decker, decker at mathematik.uni-kl.de> @*
-          S. Laplagne, slaplagn at dm.uba.ar @*
-          F. Seelisch, seelisch at mathematik.uni-kl.de
+AUTHORS:  J. Boehm, boehm at mathematik.uni-kl.de
+          W. Decker, decker at mathematik.uni-kl.de
+          S. Laplagne, slaplagn at dm.uba.ar
+          G. Pfister, pfister at mathematik.uni-kl.de
 
 OVERVIEW:
 Given an irreducible polynomial f in two variables defining a plane curve,
@@ -18,10 +20,18 @@ or (this is the default) compute in the localization at each component of
 the singular locus and put everything together.
 
 PROCEDURES:
- integralBasis(f, intVar);     Integral basis of an algebraic function field
+ integralBasis(f, intVar, list #); Integral basis of an algebraic function field
+ polyDK(int d, int k, list #);     Polynomial with an ordinary multiple point at the origin
+ monic(poly f);                    Makes a polynomial monic
+ henselGlobal(poly f, poly g, poly h, int order);  Splits a polynomial using Hensel lifting
 ";
 
 LIB "normal.lib";
+LIB "locnormal.lib";
+LIB "assprimeszerodim.lib";
+LIB "puiseuxexpansions.lib";
+LIB "classify.lib";  // For init_debug() and debug_log() procedures
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -32,25 +42,48 @@ proc integralBasis(poly f, int intVar, list #)
         The base ring must be a ring in two variables, and the polynomial f
         must be monic as polynomial in the intVar-th variable.@*
         Optional parameters in list choose (can be entered in any order):@*
-        Parameters for selecting the algorithm:@*
-        - \"global\" -> computes the integral basis by computing the
-        normalization of R/<f>, where R is the base ring.@*
+        Strategy:@*
+        - \"global\" -> computes the integral basis by global algorithms. This
+        forces \"normal\" option. @*
         - \"local\" -> computes the integral basis by computing the
-        normalization of R/<f> localized at each component of the singular
-        locus of R/<f>, and then putting everything together.
-        This is the default option.@*
-        Other parameters:@*
+        local contribution at each component of the singular
+        locus of R/<f>, and then putting everything together. (Default option.)
+        @*Algorithm:@*
+        - \"normal\" -> the integral bases are computed using the normalization
+        algorithm.@*
+        - \"hensel\" -> the integral bases are computed using a special
+        algorithm, based on Hensel lifting. (Default option.)
+        - \"modular\" -> uses modular algorithms for computing Groebner bases,
+        radicals and decompositions whenever possible. Can be used together
+        with any of the other options. The ground field must have
+        characteristic 0. (Default option for ground fields of characteristic
+        0.)@*
+        - \"nonModular\" -> do not uses modular algorithms. (Default option for
+        ground fields of positive charecteristic.)@*
+        - \"rotation\" -> apply a rotation when there are singularities
+        with the same X-coordinate @*
+        - \"noRotation\" -> does not apply a rotation when there are singularities
+        with the same X-coordinate (Default option.)@*
+        Other options:@*
+        - \"atOrigin\" -> will compute the local contribution at the origin
+        to the integral basis, assuming that the curve has a singularity at
+        the origin.@*
         - \"isIrred\" -> assumes that the input polynomial f is irreducible,
         and therefore will not check this. If this option is given but f is not
         irreducible, the output might be wrong.@*
         - list(\"inputJ\", ideal inputJ) -> takes as initial test ideal the
-        ideal inputJ. This option is only for use in other procedures. Using
-        this option, the result might not be the integral basis.@*
+        ideal inputJ. This option is only for use in other procedures.
+        Using this option, the result might not be the integral basis.
         (When this option is given, the global option will be used.)@*
         - list(\"inputC\", ideal inputC) -> takes as initial conductor the
         ideal inputC. This option is only for use in other procedures. Using
-        this option, the result might not be the integral basis.@*
-        (When this option is given, the global option will be used.)@*
+        this option, the result might not be the integral basis. (When this
+        option is given, the global option will be used.)@*
+        - \"locBasis\" -> when computing the integral basis at a prime or
+        primary component, it computes a local basis, that is, a basis that is
+        integral only over the ring localized at the component. This option
+        is only valid when \"atOrigin\" is chosen or an initial test ideal or
+        conductor is given.@*
 RETURN: a list, say l, of size 2.
         l[1] is an ideal I and l[2] is a polynomial D such that the integral
         basis is b_0 = I[1] / D, b_1 = I[2] / D, ..., b_{n-1} = I[n] / D.@*
@@ -60,7 +93,6 @@ RETURN: a list, say l, of size 2.
         where we assume that x is the transcendental variable, y is the integral
         element (indicated by intVar), f gives the integral equation and n is
         the degree of f as a polynomial in y.@*
-
 THEORY:  We compute the integral basis of the integral closure of k[x] in k(x,y)
          by computing the normalization of the affine ring k[x,y]/<f> and
          converting the k[x,y]-module generators into a k[x]-basis.@*
@@ -70,10 +102,37 @@ EXAMPLE: example integralBasis; shows an example
 "
 {
   int i;
-  ideal inputJ = 0;
-  ideal inputC = 0;
-  string algorithm = "local";     // The default option is "local"
-  int checkIrred = 1;
+
+  ideal inputJ = 0;               // Initial test ideal (local approach)
+  ideal inputC = 0;               // Initial conductor ideal (local approach)
+
+  string strategy = "local";      // The default strategy is "local"
+  string algorithm = "hensel";    // The default algorithm is "hensel"
+  string compType = "";
+  ideal compo = 0;
+
+
+  // Modular algorithms
+  // The default is not using modular algorithms
+  int modular;
+  if(char(basering) > 0)
+  {
+    modular = 0;
+  } else
+  {
+    modular = 0;
+  }
+
+  int useRotation = 0;
+
+  int checkIrred = 1;   // Checks if the input polynomial is irreducible
+
+  int locBasis = 0;     // The default is to compute a non-local basis
+
+  int dbg = printlevel - voice + 2;
+
+  int check0 = 0;
+  //int check0 = 1;
 
 //--------------------------- read the input options---------------------------
   for ( i=1; i <= size(#); i++ )
@@ -81,29 +140,90 @@ EXAMPLE: example integralBasis; shows an example
     if ( typeof(#[i]) == "string" )
     {
       if (#[i]=="local"){
-        algorithm = "local";
+        strategy = "local";
       }
       if (#[i]=="global"){
-        algorithm = "global";
+        strategy = "global";
+      }
+      if (#[i]=="modular"){
+        modular = 1;
+      }
+      if (#[i]=="nonModular"){
+        modular = 0;
+      }
+      if (#[i]=="rotation"){
+        useRotation = 1;
+      }
+      if (#[i]=="noRotation"){
+        useRotation = 0;
+      }
+      if (#[i]=="normal"){
+        algorithm = "normal";
+      }
+      if (#[i]=="hensel"){
+        algorithm = "hensel";
+      }
+      if (#[i]=="atOrigin"){
+        compType = "inputJ";
+        check0 = 0;            // Do not check at the origin
+        compo = maxideal(1);
+        strategy = "atCompo";  // Computes only the local contribution at compo
+      }
+      if (#[i]=="check0"){
+        check0 = 1;
+      }
+      if (#[i]=="noCheck0"){
+        check0 = 0;
+      }
+      if (#[i]=="locBasis"){
+        locBasis = 1;
       }
       if (#[i]=="isIrred"){
         checkIrred = 0;
       }
     }
-    if(typeof(#[i]) == "list"){
-      if(size(#[i]) == 2){
-        if (#[i][1]=="inputJ"){
-          if((typeof(#[i][2]) == "ideal") or (typeof(#[i][2]) == "poly")){
-            inputJ = #[i][2];
-            algorithm = "global";
+
+    if(typeof(#[i]) == "list")
+    {
+      if(size(#[i]) == 2)
+      {
+        if (#[i][1]=="inputJ")
+        {
+          if((typeof(#[i][2]) == "ideal") or (typeof(#[i][2]) == "poly"))
+          {
+            if(!isZeroIdeal(#[i][2]))
+            {
+              // Computes only the local contribution at inputJ
+              compType = "inputJ";
+              compo = #[i][2];
+              strategy = "atCompo";
+              dbprint(dbg, "// Ideal J read from the input parameters.");
+            }
           }
         }
       }
-      if (#[i][1]=="inputC"){
-        if(size(#[i]) == 2){
-          if((typeof(#[i][2]) == "ideal") or (typeof(#[i][2]) == "poly")){
-            inputC = #[i][2];
-            algorithm = "global";
+      if (#[i][1]=="inputC")
+      {
+        if(size(#[i]) == 2)
+        {
+          if((typeof(#[i][2]) == "ideal") or (typeof(#[i][2]) == "poly"))
+          {
+            if(!isZeroIdeal(#[i][2]))
+            {
+              // Computes only the local contribution at inputC
+              strategy = "atCompo";
+              if(algorithm != "normal")
+              {
+                compType = "inputJ";
+                compo = radical(#[i][2]);
+                dbprint(dbg, "Ideal J read from the input parameters. (The radical of the conductor is used.)");
+              } else
+              {
+                compType = "inputC";
+                compo = #[i][2];
+                dbprint(dbg, "Ideal C read from the input parameters.");
+              }
+            }
           }
         }
       }
@@ -135,14 +255,64 @@ EXAMPLE: example integralBasis; shows an example
   }
 
   // The polynomial f must be irreducible.
-  if(checkIrred == 1){
-    if(factorize(f)[2] != [1,1]){
+  if(checkIrred == 1)
+  {
+    if(factorize(f)[2] != [1,1])
+    {
         ERROR("The input polynomial must be irreducible.");
     }
   }
 
+  // If the integral variable is the first one, we change the order of the
+  // variables.
+  if(intVar == 1)
+  {
+    def R = basering;
+    list rl = ringlist(R);
+    def temp = rl[2][1];
+    rl[2][1] = rl[2][2];
+    rl[2][2] = temp;
+    def S = ring(rl);
+    setring S;
+    poly f = imap(R, f);
+    ideal compo = imap(R, compo);
+  }
+
+
+  // We chech if the only singularity is at the origin.
+  //check0 = 0;
+  if(check0 == 1)
+  {
+    "Check at origin";
+    int c0 = checkAt0(f, modular);
+
+    if(c0 == 1)
+    {
+      compType = "inputJ";
+      compo = maxideal(1);
+      strategy = "atCompo";  // Computes only the local contribution at compo
+    } else {
+    }
+  }
+
 //--------------------- computing the integral basis --------------------------
-  return(cancelCF(integralBasisMain(f, algorithm, inputJ, inputC, intVar)));
+  dbprint(dbg, "Computing the integral basis...");
+  list ib = integralBasisMain(f, strategy, algorithm, modular, compType, compo, locBasis, useRotation);
+
+  ideal num = ib[1];
+  poly den = ib[2];
+  dbprint(dbg, "Integral basis computation finished.");
+//--------------------- computation finished ----------------------------------
+
+  // We reverse the change in the order of the variables.
+  if(intVar == 1)
+  {
+    setring R;
+    ideal num = imap(S, num);
+    poly den = imap(S, den);
+    list ib = num, den;
+  }
+  return(cancelCF(ib));
 }
 example
 { "EXAMPLE:";
@@ -160,153 +330,173 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inputC, int intVar)
-// Computes the integral basis of R/<f>, from the normalizaiton of R/<f>.
-// inputC is the conductor ideal to be used in proc normal.
-// If inputC = < 0 >, then the default conductor ideal is used (the full
-// jacobian ideal).
-// inputJ is the test ideal to be used in proc normal.
-// If inputJ = < 0 >, then the default test ideal is used (the radical of the
-// conductor).
+static proc integralBasisMain(poly f, string strategy, string algorithm, int modular, string compType, ideal compo, int locBasis, int useRotation)
+// Computes the integral basis of R/<f>.
+// The integral variable is always the second variable.
 {
-  int dbg = printlevel - voice + 2;
+
+  int dbg = printlevel - voice + 3;
   int i, j;
-  int newRing = 0;    // If = 1, a new ring with dp ordering was used.
+
+  int norToInt = 1;   // Indicates if a conversion from normalization to
+                      // integral basis is needed.
+
+  int newRing = 0;    // If newRing = 1, a new ring with dp ordering was used.
+  list ib;
   def origR = basering;
+  ideal normalGen;
+  poly D;
 
 //--------------------- moving to a ring with dp ordering ---------------------
-  if(ordstr(origR) != "dp(2),C"){
+  string s = ordstr(origR);
+  if(s[1,2] != "dp")
+  {
     // We change to dp ordering.
     list rl = ringlist(origR);
     list origOrd = rl[3];
-    list newOrd = list("dp", intvec(1:nvars(origR))), list("C", 0);
+    int jj = attrib(origR,"maxExp");
+
+    list newOrd = list("dp", intvec(1:nvars(origR))), list("C", 0), list("L", jj);
     rl[3] = newOrd;
     def R = ring(rl);
     setring R;
     poly f = fetch(origR, f);
-    ideal inputJ = fetch(origR, inputJ);
-    ideal inputC = fetch(origR, inputC);
+    ideal compo = fetch(origR, compo);
+    ideal normalGen;
+    poly D;
     newRing = 1;
-  } else {
+  } else
+  {
     def R = basering;
   }
 
 //-------------------------------- basic data ---------------------------------
   // The degree of f with respect to the variable intVar
-  ideal I = f;
-  int n = size(coeffs(f, var(intVar))) - 1;
+  int n = size(coeffs(f, var(2))) - 1;
 
   // If the integral variable is the first, then the universal denominator
   // must be a polynomial in the second variable (and viceversa).
-  string conduStr;
-  if(intVar == 1){
-    conduStr = "var2";
-  } else {
-    conduStr = "var1";
-  }
+  // In this proc, the integral variables is always the second one.
+  string conduStr = "var1";
   list opts = conduStr;
 
-//-------------------------- computes the normalization -----------------------
-  if(algorithm == "local"){
-    list nor = integralLocal(I, opts);
-  } else {
-    if(inputJ != 0){
-      opts = insert(opts, list("inputJ", inputJ));
+//------------------------- computes the integral basis -----------------------
+  ideal I = f;
+  int needRed = 1;
+  if(strategy == "atCompo")
+  {
+    norToInt = 0;
+    if(algorithm == "normal")
+    {
+      // Computes the integral basis at the component via normalization
+      opts = insert(opts, list(compType, compo));
+      if(locBasis == 1)
+      {
+        "Warning: local basis are not implemented for the normalization algorithm. The output will be a global basis.
+        Use Hensel algorithm instead for computing local basis.";
+      }
+      ib = normal(I, opts)[2];
+      if(size(ib) > 1){
+        ERROR("The input polynomial is not irreducible.");
+      }
+      normalGen = ib[1];
+      D = normalGen[size(normalGen)];
+    } else
+    {
+      // Computes the integral basis at the component via puiseux expansions
+      ib = ibLocal(f, compo, locBasis, useRotation);
+      normalGen = ib[1];
+      D = ib[2];
     }
-    if(inputC != 0){
-      opts = insert(opts, list("inputC", inputC));
+  } else
+  {
+    if(strategy == "local")
+    {
+      // Computes the integral basis my glueing together the local
+      // contrubutions
+      //"_DEBUG_ integralLocal";
+      ib = integralLocal(I, modular, algorithm, useRotation, opts);
+      normalGen = ib[1];
+      D = ib[2];  // The universal denominator
+      norToInt = ib[3];
+      needRed = ib[4];
+    } else
+    {
+      // Computes the global integral basis from the global normalization
+      // This can be changed to locNormal if "var1" is implemented in locNormal
+      ib = normal(I, opts)[2];
+      normalGen = ib[1];
+      D = normalGen[size(normalGen)];
     }
-    list nor = normal(I, opts);
   }
-  ideal normalGen = nor[2][1];
-  poly D = normalGen[size(normalGen)];  // The universal denominator
 
   //Debug information
-  if(dbg >= 2){
-    "The universal denominator is: ", D;
+  if(dbg >= 10)
+  {
+    "--Generators of the normalization.";
+    "----Numerator:"; normalGen;
+    "----Denominator: ", D;
   }
 
 //--------------- computes the integral basis from the normalization ----------
-  // We define a new ring where the integral variable is the first (needed for
-  // reduction) and has the appropriate ordering.
-  list rl = ringlist(R);
-  rl[2] = list(var(intVar), var(3-intVar));
-  rl[3] = list(list("C", 0), list("lp", intvec(1,1)));
-  def S = ring(rl);
-  setring S;
 
-  // We map the elements in the previous ring to the new one
-  poly f = imap(R, f);
-  ideal normalGen = imap(R, normalGen);
+  int ttt = timer;
 
-  // We create the system of generatos y^i*f_j.
-  list l;
-  ideal red = groebner(f);
-  for(j = 1; j <= size(normalGen); j++){
-    l[j] = reduce(normalGen[j], red);
+  // Merging the components
+  debug_log_intbas(5, "norToInt: ", norToInt);
+  if(norToInt == 1)
+  {
+    // We define a new ring where the integral variable is the first (needed for
+    // reduction) and has the appropiate ordering.
+    dbprint(dbg, "--Computing the integral basis from the normalization...");
+    int needGroeb = 0;  // When all the components are already integral basis, no full groebner basis is needed.
+
+    list outp = normToInt(f, normalGen, D, needGroeb);
+  } else
+  {
+    list outp = normalGen, normalGen[1];
   }
-  for(i = 1; i <= n-1; i++){
-    for(j = 1; j <= size(normalGen); j++){
-      l[size(l)+1] = reduce(var(1)^i*normalGen[j], red);
-    }
+  debug_log_intbas(2, "----Time for merging: ", timer-ttt);
+
+  // Back to the original ring if needed
+
+  if(newRing == 1)
+  {
+    setring origR;
+    list outp;
+    outp[1] = fetch(R, normalGen);
+    outp[2] = outp[1][1];
   }
-
-  // To eliminate the redundant elements, we look at the polynomials as
-  // elements of a free module where the coordinates are the coefficients
-  // of the polynomials regarded as polynomials in y.
-  // The groebner basis of the module generated by these elements
-  // gives the desired basis.
-  matrix vecs[n + 1][size(l)];
-  matrix coeffi[n + 1][2];
-
-  for(i = 1; i<= size(l); i++){
-    coeffi = coeffs(l[i], var(1));
-    vecs[1..nrows(coeffi), i] = coeffi[1..nrows(coeffi), 1];
-  }
-  module M = vecs;
-  M = std(M);
-
-  // We go back to the original ring.
-  setring origR;
-  module M = imap(S, M);
-  if(newRing == 1){
-    poly D = fetch(R, D);
-  }
-
-  // We go back from the module to the ring in two variables
-  ideal G;
-  poly g;
-  for(i = 1; i <= size(M); i++){
-    g = 0;
-    for(j = 0; j <= n; j++){
-      g = g + M[i][j+1] * var(intVar)^j;
-    }
-    G[i] = g;
-  }
-
-  // The first element in the output is the ideal of numerators.
-  // The second element is the denominator.
-  list outp = G, D;
-
   return(outp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc integralLocal(ideal I, list #){
 // Computes the integral basis  by localizing at the different components of
 // the singular locus.
-  int i;
+// The main procedure for the computation of the local approach is ibLocal
+
+static proc integralLocal(ideal I, int modular, string algorithm, int useRotation, list #)
+{
+  int i, ii;
   int dbg = printlevel - voice + 4;
+  int locBasis = 0;   // This is a global procedure.
   def R = basering;
 
-  list n;         // Output of proc normal
+  poly f = I[1];
+
+  list norOut;    // Output of proc normal
   ideal norT;     // Temporary data.
+  ideal norT0;
   poly denomT;    // Temporary data.
+  poly condu;
+  poly conduT;    // Temporary data
 
   ideal nor;      // Output of normal with the denominator changed to the
                   // common denominator.
   ideal res;      // The full integral basis
+
+  int good;
 
 //--------------------------- read the input options---------------------------
   int denomOption = 0;
@@ -322,59 +512,45 @@ static proc integralLocal(ideal I, list #){
   }
 
 //------------------------ singular locus computation -------------------------
-  // We use a general method that works for any ideal.
-  // For I defined by a single polynomial a simpler method could be used.
-  list IM = mstd(I);
-  I = IM[1];
-  int d = dim(I);
-  ideal IMin = IM[2];
-  qring Q = I;  // We work in the quotient by the Groebner basis of the ideal I
-  option("redSB");
-  option("returnSB");
-  ideal I = fetch(R, I);
-  attrib(I, "isSB", 1);
-  ideal IMin = fetch(R, IMin);
-  if(dbg >= 2){
-    int t = timer;
-  }
-  ideal J = minor(jacob(IMin), nvars(basering) - d, I);
-  if(dbg >= 2){
-    "singular locus time: ", timer - t;
-    t = timer;
-  }
-  setring R;
-  ideal J = fetch(Q, J);
-  J = J, I;
-  J = groebner(J);
+  ideal J = f, diff(f, var(1)), diff(f, var(2));
 
-  if(dbg >= 2){
-    "groebner of the singular locus time: ", timer - t;
-    t = timer;
-  }
-
-  if(dbg >= 2){
+  if(dbg >= 4){
     "The original singular locus is";
     J;
   }
 
-//------------------------ universal denominator ------------------------------
-  // We could use the LCD of the denominators of each component, but we need
-  // a denominator in the required variable.
-  if(denomOption == 0){
-    poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
-                                   // of J as universal denominator.
-  } else {
-    poly condu = getOneVar(J, denomOption);
+  if(isOneIdeal(J))
+  {
+    list out = trivialBasis(f);
+    "out";
+    out;
+    return(list(out[1], out[2], 0, 0));
   }
 
 //------------------- components of the singular locus------------------------
-  list pd = primdecGTZ(J);
-  if(dbg >= 2){
-    "primary decomposition time:", timer - t;
-  }
-  if(dbg >= 1){
-    "The number of components of the Singular Locus is ", size(pd);
-  }
+  int t = timer;
+  //if(algorithm == "normal")
+  //{
+  //  dbprint(dbg, "--Computing the primary decomposition of the singular locus...");
+  //  list pd = primdecGTZ(J);
+  //} else {
+    dbprint(dbg, "--Computing the associated primes of the singular locus...");
+    if(modular == 1)
+    {
+      dbprint(dbg, "  (Using modular algorithm.)");
+      list pd = assPrimes(J);
+    } else
+    {
+      dbprint(dbg, "  (Using non-modular algorithm.)");
+      list pd = minAssGTZ(J);
+    }
+  //}
+  //"Time assoc primes: ", timer - t;
+  debug_log_intbas(2, "----Decomposition time:", timer - t);
+
+  dbprint(dbg-2, "----The number of components of the Singular Locus is ", size(pd));
+  dbprint(dbg-4, "--Components of the Singular Locus:", pd);
+
 
   // The following commented lines are not needed for integral basis, since
   // all components are maximal.
@@ -384,50 +560,209 @@ static proc integralLocal(ideal I, list #){
   //list locs = intersectList(comps);
 
 //------------------- normalization of each component--------------------------
-  list opts;
+  ideal compo;
+  poly cofactD, cofactC;
+  string compType;
+  dbprint(dbg, "--Computing the integral basis at each component...");
   for(i = 1; i <= size(pd); i++){
-    //opts = #;
-    // We use the prime components as test ideals in the normalization.
-    //opts = list(list("inputJ", pd[i][2]));
-    // We use the primary components as conductor in the normalization.
-    opts = list(list("inputC", pd[i][1]));
-
+    if(debug_lvl() >= 2){
+      t = timer;
+    }
     if(dbg >= 2){
       t = timer;
     }
-    n = normal(I, opts);
-    if(dbg >= 2){
-      "normalization of component ", i, " time: ", timer - t;
+    good = 0;
+    // If algorithm == "new", we try to use the new algorithm.
+    //if((algorithm == "hensel") or (algorithm == "hoeij"))
+    //{
+      // We localize at the prime components.
+      compType = "inputJ";
+      compo = pd[i];
+    //} else
+    //{
+      // We use the primary components given by primdecGTZ as conductor in the
+      // normalization.
+      // We need to have the denominator in the transcendental variable. This
+      // is indicated in #.
+    //  compType = "inputC";
+    //  compo = pd[i][1];
+    //}
+    dbprint(dbg, "----Computing the integral basis of component ", i);
+    dbprint(dbg, "----Component: ");
+    if(dbg>=1){compo;}
+
+    norOut = intBasisComp(f, compType, compo, algorithm, locBasis, useRotation, #);
+    norT = norOut[1];
+    denomT = norOut[2];
+    // If the denominator is not a polynomial in x we change it.
+    if(deg(denomT, intvec(0,1)) > 0)
+    {
+      ideal PLex = yInTermOfx(compo);
+      poly px = PLex[1];
+      poly newCondu = xCondu(px, norOut, I);
+      //"Old conductor: ", denomT;
+      //"New conductor: ", newCondu;
+      ideal norOutF = changeDenominatorFast(norOut[1], norOut[2], newCondu, I);
+      norOut[1] = norOutF;
+      norOut[2] = newCondu;
+
+      norT = norOut[1];
+      denomT = norOut[2];
     }
-    if(size(n[2]) > 1){
-      ERROR("The input polynomial is not irreducible.");
+    if(size(pd)>1)
+    {
+      // We can remove redudant elements considering the generators as an ideal
+      // because the powers of Y will be added again later for merging
+      // the bases for the different components.
+      for(ii = 2; ii <= ncols(norT); ii++)
+      {
+        norT[ii] = reduce(norT[ii], groebner(denomT));
+      }
+      //norT = groebner(norT);
+      norT = norT + 0; // Eliminate 0's in the ideal
     }
+    //dbprint(dbg - 3, "------Normalization of component ", i, " output: ", norOut[1]);
+    dbprint(dbg - 3, "------Normalization of component ", i, " output: ", norT);
+    dbprint(dbg - 3, "------Denominator: ", denomT);
+
+    debug_log_intbas(2, "----Normalization of component ", i, " time: ", timer - t);
+
 
     // We add up the normalizations at each localization, to construct the
     // normalization of the whole ideal.
-    norT = n[2][1];
-    denomT = norT[size(norT)];
 
     // We change the denominator of the normalization of the localized ring,
     // to have the same denominator for all the normalizations.
-    nor = changeDenominator(norT, denomT, condu, I);
+    //"The denominator is ", denomT;
+    //"The denominator is changed to ", condu;
+
+    // We compute the denominator as the lcm of the denominators.
+    conduT = condu;
+    if(condu != 0)
+    {
+      condu = lcm(condu, denomT);
+      cofactD = condu / denomT;
+      cofactC = condu / conduT;
+
+      if(dbg >= 2)
+      {
+        "----Changing the denominator...";
+        if(dbg >= 4)
+        {
+          "    from ", denomT, " to ", condu;
+        }
+      }
+      nor = norT * cofactD;
+      res = res * cofactC;
+//    We can also use changeDenominator, but it is slower.
+//      nor = changeDenominator(norT, denomT, condu, I);
+//      res = changeDenominator(res, conduT, condu, I);
+    } else
+    {
+      condu = denomT;
+      nor = norT;
+    }
 
     // We sum the result to the previous results.
-    res = res, nor;
+    if(size(res)>0)
+    {
+      res = res, nor;
+    } else
+    {
+      res = nor;
+    }
   }
-  res = groebner(res);
-  res[size(res)+1] = condu;
 
+  // needRed indicates if reduction is needed to compute the full integral basis.
+  // When the local basis are already local integral basis, no reduction is needed.
+  int needRed;
+  if(algorithm == "normal")
+  {
+    needRed = 1;
+  } else
+  {
+    needRed = 0;
+  }
+
+  if((size(pd) == 1) and (algorithm != "normal"))
+  {
+    // Only one prime component in the singular locus, no need to
+    // merge the compontens together.
+    int norToInt = 0;
+    ideal num = norT;
+    poly den = denomT;
+  } else
+  {
+    dbprint(dbg, "--Putting all the components together...");
+    ideal num = res;
+    poly den = condu;
+    int norToInt = 1;
+  }
   // The output follows the output of proc normal, but we don't return the
   // ring structure, only the generators. (We return 0 instead of the ring.)
-  return(list(0,list(res)));
+
+  return(list(num, den, norToInt, needRed));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Integral basis localized at a component.
+static proc intBasisComp(poly f, string compType, ideal compo, string algorithm, int locBasis, int useRotation, list #)
+{
+  int dbg = printlevel - voice + 4;
+  int good = 0;
+  list nor;
+  ideal norT;
+  poly denomT;
+
+  // If algorithm == "hensel", we use the new algorithm.
+  if(algorithm == "hensel"){
+    nor = ibLocal(f, compo, locBasis, useRotation);
+    if(size(nor) != 0){
+      norT = nor[1];
+      denomT = nor[2];
+      good = 1;
+    } else {
+      dbprint(dbg, "Using the normalization algorithm.");
+    }
+  }
+  // If not, or if the new algorithm did not succeed, we use normal.
+  if(good == 0){
+    // # indicate which is the transcendental variable.
+    list opts = insert(#, list(compType, compo));
+    ideal I = f;
+    nor = normal(I, opts)[2];
+    if(size(nor) > 1){
+      ERROR("The input polynomial is not irreducible.");
+    }
+    norT = nor[1];
+    denomT = norT[size(norT)];
+  }
+  return(list(norT, denomT));
+}
+
+//////////////////////////////////////////////////////////////////////
+
+// Converts generators for the normalization into integral basis shape
+// The third parameter indicates the variable for the integral basis
+// It computes an element in the conductor in that variable.
+static proc normToIntJacob(ideal U, poly den, poly v, poly f)
+{
+  ideal jac = jacob(f);
+  ideal elimJ = elim(jac, v);
+  poly dJ = elimJ[1];
+  option("redSB");
+
+  ideal PP = changeDenominatorFast(U, den, dJ, f);
+  list l = normToInt(f, PP, dJ, 1);
+  return(l);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc cancelCF(list IB)
 "USAGE:  cancelCF(IB); IB list of type returned by integralBasis
-RETURN:  list of same type with  common factor cancelled.
+RETURN:  list of same type with common factor cancelled.
 KEYWORDS: greatest common divisor.
 "
 {
@@ -449,6 +784,4397 @@ KEYWORDS: greatest common divisor.
     }
   return(IB);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Converts generators for the normalization into integral basis shape
+static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
+{
+  int dbg = printlevel - voice + 4;
+  option("redSB");
+  f = reduce(f, groebner(D));
+
+  dbprint(dbg, "--Computing the integral basis from the normalization...");
+  int needRed = 1;
+  int i, j;
+  intvec vy = (0, 1);
+  int n = deg(f, vy);
+  int t;
+
+  // We define a new ring where the integral variable is the first (needed for
+  // reduction) and has the appropiate ordering.
+  def R = basering;
+  list rl = ringlist(R);
+  rl[2] = list(var(2), var(1));
+  rl[3] = list(list("C", 0), list("lp", intvec(1,1)));
+  def S = ring(rl);
+  setring S;
+  intvec vyS = (1, 0);
+
+  // We map the elements in the previous ring to the new one
+  poly f = imap(R, f);
+  poly D = imap(R, D);
+
+  ideal normalGen = imap(R, normalGen);
+
+  //needGroeb = 1;
+
+  if(needGroeb == 1)
+  {
+    t = timer;
+    ideal ID2 = normalGen, f, D;
+    normalGen= groebner(ID2);
+    debug_log_intbas(3, "----Time for groebner base of generators: ", timer - t);
+  }
+
+  t = timer;
+
+  // We create the system of generatos y^i*f_j.
+  list l;
+  poly p;
+
+  if(needRed == 1)
+  {
+    dbprint(dbg - 1, "----Reduction...");
+    ideal red = groebner(f);
+    poly pRed;
+    for(j = 1; j <= ncols(normalGen); j++)
+    {
+      l[j] = reduce(normalGen[j], red);
+      // REDUCTION NEEDED?
+      if(size(D) == 1)
+      {
+        pRed = reduce(l[j], groebner(D));
+        if(deg(l[j], vyS) == deg(pRed, vyS))
+        {
+          l[j] = pRed;
+        }
+      }
+    }
+    int sl = size(l);
+    poly pc;
+
+    for(j = 1; j <= sl; j++)
+    {
+      p = l[j];
+      if(p != 0)
+      {
+        for(i = 1; i < n-deg(l[j], vyS); i++)
+        {
+          p = p * var(1);
+
+          // REDUCTION NEEDED?
+          if(size(D) == 1)
+          {
+            pRed = reduce(p, groebner(D));
+            if(deg(p, vyS) == deg(pRed, vyS))
+            {
+              p = pRed;
+            }
+
+          }
+          l[size(l)+1] = p;
+        }
+      }
+    }
+  } else
+  {
+    dbprint(dbg - 1, "----No reduction needed.");
+    ideal red = groebner(f);
+    for(j = 1; j <= ncols(normalGen); j++)
+    {
+      l[j] = reduce(normalGen[j], red);
+    }
+  }
+
+  debug_log_intbas(2, "------Time for reduction: ", timer - t);
+
+  // To eliminate the redundant elements, we look at the polynomials as
+  // elements of a free module where the coordinates are the coefficients
+  // of the polynomials regarded as polynomials in y.
+  // The groebner basis of the module generated by these elements
+  // gives the desired basis.
+  matrix vecs[n + 1][size(l)];
+  matrix coeffi[n + 1][2];
+
+  for(i = 1; i<= size(l); i++)
+  {
+    coeffi = coeffs(l[i], var(1));
+    vecs[1..nrows(coeffi), i] = coeffi[1..nrows(coeffi), 1];
+  }
+  module M = vecs;
+  dbprint(dbg - 1, "----Triangulating...");
+
+  int tt = timer;
+  M = std(M);
+
+  debug_log_intbas(2, "------Time for std(M): ", timer - tt);
+
+  // We go back to the original ring.
+  setring R;
+  module M = imap(S, M);
+
+  tt = timer;
+  // We go back from the module to the ring in two variables
+  matrix YY[1][n+1];
+  for(j = 0; j <= n; j++)
+  {
+    YY[1, j+1] = var(2)^j;
+  }
+  ideal G = YY * M;
+
+  tt = timer;
+  // Clear common x factor
+  poly ggcd = D;
+  for(i = 1; i <= size(M); i++)
+  {
+    ggcd = gcd(ggcd, G[i]);
+  }
+  G = G / ggcd;
+  D = D / ggcd;
+
+  // The first element in the output is the ideal of numerators.
+  // The second element is the denominator.
+  list outp = G, D;
+
+  debug_log_intbas(2, "------Time for triangulation: ", timer - tt);
+
+  return(outp);
+}
+
+
+///////////////////////////////////////////////////////////////////////
+//
+//                             The new algorithm
+//
+///////////////////////////////////////////////////////////////////////
+
+// Computes the integral basis of R[y]/f, with R = k[x] localized at
+// the x coordinates of the points in P.
+// It uses the algorithm by Boehm, Decker, Laplagne, Pfister.
+// If locBasis = 1, it doesnt take into account the the unit from f
+// after localization
+
+static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
+  int dbg = printlevel - voice + 2;
+  P  = groebner(P);
+  if(dbg - 1 > 0)
+  {
+    "Computing the integral basis at P = "; P;
+  }
+
+  int i,j;
+  int li;
+  int moved;
+  poly fT;
+  def R = basering;
+  poly x = var(1);
+  poly y = var(2);
+  intvec vy = (0,1);
+  intvec vx = (1,0);
+
+  ideal PLex = yInTermOfx(P);
+  poly px = PLex[1];
+  poly py = PLex[size(PLex)];
+  py = monic(py);
+
+  // This special case implements the Remark on the paper
+  // on an alternative approach without coordinate change
+
+  useRotation = 0;
+  //"useRotation: ", useRotation;
+
+  if(useRotation == 0)
+  {
+    // Case: rational x-coordinate and non-rational y-coordinate.
+    // We treat this as a special case, so that no coordinate change is used.
+    if((deg(py, vy) > 1) and (deg(px) <= 1))
+    {
+      dbprint(dbg, "Case: non-rational y-coordinate.");
+
+      // We move the singularities to x = 0.
+      fT = moveToVar(f, px, x);
+
+      // We compute the integral basis.
+      list ib = ibNonRatY(fT, py, locBasis);
+
+      //"ib: ", ib;
+
+      // If the integral basis was not computed, we return an empty list.
+      // Else, we map back the output to the original x coordinate.
+      if(size(ib) == 0)
+      {
+        return(list());
+      } else
+      {
+        for(i = 1; i <= size(ib[1]); i++)
+        {
+          ib[1][i] = moveFromVar(ib[1][i], px, x);
+        }
+        ib[2] = moveFromVar(ib[2], px, x);
+        return(ib);
+      }
+    }
+  }
+
+  // This is the general case of non-rational coordinates.
+  if((deg(px) > 1) or (deg(py, vy) > 1))
+  {
+    dbprint(dbg, "Case: non-rational xy-coordinates.");
+    // If needed, we make a coord change so that y in terms of x has
+    // degree 1.
+
+    poly fCh = f;
+
+    if(deg(py,vy) > 1)
+    {
+      // The degree in y is > 1, hence there are singularities with
+      // the same x-coordinate.
+      dbprint(dbg, "Conjugated singularities with same x-coordinate.");
+      dbprint(dbg, "Linear coordinate change needed.");
+
+      li = 1;
+      poly linCh = x;
+      poly invCh = x;
+      ideal PCh = P;
+      while(((li < 20) and (deg(py,vy) > 1)) or (isXMonic(f)==0)){
+        linCh = linCh + y;
+        invCh = invCh - y;
+        fCh = subst(f, x, x + y);
+        PCh = subst(PCh, x, x + y);
+        PLex = yInTermOfx(PCh);
+        px = PLex[1];
+        py = PLex[size(PLex)];
+        li++;
+      }
+
+      if(li == 20){
+        // No appropiate coordinate change was found. We return an empty
+        // list.
+        "No appropiate coordinate change found. Procedure failed.";
+        return(list());
+      } else
+      {
+        dbprint(dbg, "Coordinate change applied: x ->", linCh);
+      }
+      fCh = monic(fCh);
+      py = monic(py);
+    } else
+    {
+      dbprint(dbg, "No conjugated singularities with same x-coordinate.");
+      dbprint(dbg, "No coordinate change needed.");
+    }
+    dbprint(dbg, "");
+
+    // We compute the integral basis.
+    list ib = ibNonRatXY(fCh, px, py, locBasis);
+
+    if(li > 0)
+    {
+      dbprint(dbg, "Integral basis for the transformed polynomial: ");
+      dbprint(dbg, ib);
+      dbprint(dbg, "px: ", px);
+      dbprint(dbg, "py: ", py);
+      dbprint(dbg, "invch: ", invCh);
+    }
+
+    // If we applied a linar coordinate change, we apply the inverse
+    // transformation
+    if(li > 0)
+    {
+      for(i = 1; i <= size(ib); i++){
+        ib[i][1] = subst(ib[i][1], x, invCh);
+      }
+      px = subst(px, x, invCh);
+
+    }
+
+    dbprint(dbg, "ibLocal - Convert to integral basis shape: ", ib, px);
+
+    ib = convertIB(ib, px);
+
+
+    if(li > 0)
+    {
+      ib = normToIntJacob(ib[1], ib[2], y, f);
+    }
+
+    dbprint(dbg, "ibLocal - Output of convertIB: ", ib, px);
+
+    return(ib);
+  }
+
+  // Case of rational coordinates.
+  if(deg(py)*deg(px) == 1){
+    dbprint(dbg, "Case: rational coordinates.");
+
+    // Hensel algorithm is used in this case.
+    moved = 0;
+    if((px != x) || (py != y))
+    {
+      fT = moveTo(f, px, py);
+      moved = 1;
+    } else
+    {
+      fT = f;
+    }
+
+    ideal ibN = ibAt0(fT, locBasis);
+
+    if(size(ibN) == 0){
+      return(list());
+    } else {
+      if(moved == 1)
+      {
+        for(i = 1; i <= size(ibN); i++){
+          ibN[i] = moveFrom(ibN[i], px, py);
+        }
+      }
+      list ib = list(ibN, ibN[1]);
+      return(ib);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//     Procs for handling different kind of singularities
+//
+////////////////////////////////////////////////////////////////////////
+
+// Computes the integral basis of R[y]/f, with R = k[x] localized at x=0.
+// It uses the algorithm by Boehm, Decker, Laplagne, Pfister.
+// If locBasis = 1, it doesnt take into account the the unit from f
+// after localization
+static proc ibAt0(poly f, int locBasis)
+{
+  int t;
+  int dbg = printlevel - voice + 4;
+
+  int tt = timer;
+
+  poly outComp;     // The component outside the origin.
+  list b;
+
+  def R = basering;
+  int slN, slD, bestSl;
+  int i, j, k;
+
+  intvec vy = (0,1);
+  intvec vx = (1,0);
+  poly x = var(1);
+  poly y = var(2);
+  int n = deg(f, vy);
+
+  // Degree of the component outside the origin
+  poly f0 = subst(f, var(1), 0);
+  int d0 = divideBy(f0, var(2))[2];
+  int d1 = n - d0;
+
+  debug_log_intbas(3, "------Time preliminars: ", timer - tt);
+  tt = timer;
+
+  // Starting exponents and minimal polynomials of the Puiseux expansions
+
+  // Puiseux expansions at the origin
+  dbprint(dbg, "--Computing Puiseux expansions at the origin...");
+
+
+
+  // puiseux(poly f, int maxDeg, int atOrigin)
+  list l = puiseux(f, -1, 1);
+  //"puiseux expansion: ", l;
+  //~;
+
+  debug_log_intbas(3, "------Time puiseux expansions: ", timer - tt);
+  tt = timer;
+
+  int totDeg = getTotalDeg(l);
+  list classes = getClasses(l);
+
+  //if(dbg > 5)
+  //{
+  //  "Puiseux branches: "; classes;
+  //}
+
+  // We compute the building blocks of the basis elements
+  dbprint(dbg, "--Building factors of different degrees...");
+  list bF = buildFactors(classes);
+  //"Factors: "; bF;
+
+  debug_log_intbas(3, "------Time for the factors: ", timer - tt);
+  tt = timer;
+
+  list slopes = getSlopes(classes);
+  intvec md = getDegs(classes);
+
+  // Tables of vanishing order of diferences of puiseux expansions
+  dbprint(dbg, "--Computing vanishing orders...");
+  matrix M = valIK(classes);
+  list vS = valIKSelf(bF, md);
+  list MSelf = vS[1];
+
+  list bestElem = vS[2];
+
+  // The highest exponent of the denominator
+  if(size(classes) > 1)
+  {
+    b = ibElement(M, MSelf, d0 - 1, md);
+    number maxExp = b[1];
+    intvec elem = b[2];
+  } else
+  {
+    if(d0 > 1)
+    {
+      number maxExp = MSelf[1][size(MSelf[1])];
+      intvec elem = d0-1;
+    } else {
+      // This should never happen, unless we have a non-singular point?
+      number maxExp = 0;
+      intvec elem = 0;
+    }
+  }
+
+  debug_log_intbas(3, "------Time for factors info: ", timer - tt);
+  tt = timer;
+
+  dbprint(dbg, "--Building HenselBlocks...");
+  int degExpand = int(maxExp);
+  dbprint(dbg, "---- Degree of expansions: ", degExpand);
+
+
+  // Computing hensel blocks...
+  list I2Lifted = henselBlocks(f, degExpand, 1);
+  debug_log_intbas(3, "------Time Hensel Blocks: ", timer - tt);
+  tt = timer;
+
+
+////////////////////////////////////////////////////////////////////////
+// RECOMPUTE CLASSES USING HENSEL BLOCKS
+// SO THAT THEY ARE COMPUTED IN THE SAME ORDER
+
+// FIX THIS SO THAT THEY ARE ALWAYS COMPUTED IN THE SAME ORDER AS
+// THE HENSEL BLOCKS
+
+//  if((size(classes) > 1) && (1==0))
+  if((size(classes) > 1))
+  {
+    list classesNew;
+    list classesTemp;
+    for(i = 1; i <= size(I2Lifted)-1; i++)
+    {
+      //l = puiseux(I2Lifted[i+1], -1, 1);
+      // This is slower, many unneeded terms, we should develop only
+      // until they become different. FIX!
+      // (or even better, dont recompute but correct blocks in the correct order!)
+      //l = puiseux(I2Lifted[i+1], degExpand, 1);
+      l = puiseux(I2Lifted[i+1], -1, 1);
+      classesTemp = getClasses(l);
+      classesNew = classesNew + classesTemp;
+    }
+
+    classes = classesNew;
+
+    dbprint(dbg, "Building factors of different degrees...");
+    bF = buildFactors(classes);
+
+    slopes = getSlopes(classes);
+    md = getDegs(classes);
+
+    // Tables of vanishing order of diferences of puiseux expansions
+    dbprint(dbg, "Computing vanishing orders...");
+    M = valIK(classes);
+
+    vS = valIKSelf(bF, md);
+    MSelf = vS[1];
+
+    bestElem = vS[2];
+
+    debug_log_intbas(3, "------Time for recomputation: ", timer - tt);
+    tt = timer;
+  }
+
+// RECOMPUTATION FINISHED
+///////////////////////////////////////////////////////////////////////
+
+  //dbprint(dbg, "Output of Hensel Blocks: ");
+  //dbprint(dbg, I2Lifted);
+
+  int cl;
+
+  int nClasses;
+  nClasses = size(classes);
+
+  // ordsFull gives the order of each polynomial in I2Lifted at the other conjugacy classes.
+  matrix ordsFull[size(I2Lifted) -1][nClasses];
+
+  for(i = 1; i <= size(I2Lifted) - 1; i++)
+  {
+    for(cl = 1; cl <= nClasses; cl++)
+    {
+      if(i != cl)
+      {
+        ordsFull[i, cl] = ordAtPol(I2Lifted[i+1], classes[cl][1]);
+      }
+    }
+  }
+
+  debug_log_intbas(3, "------Time for ordFull: ", timer - tt);
+  tt = timer;
+
+  list ordsBest;
+  list ordsTemp;
+  for(cl = 1; cl <= nClasses; cl++)
+  {
+    ordsBest[cl] = list();
+    for(i = 1; i <= size(bestElem); i++)
+    {
+      ordsTemp = list();
+      for(j = 1; j <= size(bestElem[i]); j++)
+      {
+        ordsTemp[j] = ordAtPol(bestElem[i][j], classes[cl][1]);
+      }
+      ordsBest[cl][i] = ordsTemp;
+    }
+  }
+
+  debug_log_intbas(3, "------Time for ordsBest: ", timer - tt);
+
+  tt = timer;
+
+  int mdm = 0;
+  int mdmTemp;
+
+  for(i = 1; i <= nClasses; i++)
+  {
+    mdmTemp = maxDegMerge(n, i, locBasis, d0, M, MSelf, md, classes, I2Lifted, bestElem, ordsFull, ordsBest);
+    //"mdmTemp = ", mdmTemp;
+    mdm = maxInt(mdm, mdmTemp);
+  }
+  tt = timer;
+
+  if(printlevel - voice > 0)
+  {
+    "Maximum degree required for merging: ", mdm;
+  }
+
+  list ifOut = irreducibleFactors(f, classes, mdm);
+  list I2LiftedFull = ifOut[1];
+
+  if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
+  {
+    kill ordsFull;
+    kill ordsBest;
+    kill ordsTemp;
+
+    matrix ordsFull[size(I2LiftedFull) -1][nClasses];
+
+    for(i = 1; i <= size(I2LiftedFull) - 1; i++)
+    {
+      for(cl = 1; cl <= nClasses; cl++)
+      {
+        if(i != cl)
+        {
+          ordsFull[i, cl] = ordAtPol(I2LiftedFull[i+1], classes[cl][1]);
+        }
+      }
+    }
+
+    debug_log_intbas(3, "------Time for ordFull: ", timer - tt);
+    tt = timer;
+
+    list ordsBest;
+    list ordsTemp;
+    for(cl = 1; cl <= nClasses; cl++)
+    {
+      ordsBest[cl] = list();
+      for(i = 1; i <= size(bestElem); i++)
+      {
+        ordsTemp = list();
+        for(j = 1; j <= size(bestElem[i]); j++)
+        {
+          ordsTemp[j] = ordAtPol(bestElem[i][j], classes[cl][1]);
+        }
+        ordsBest[cl][i] = ordsTemp;
+      }
+    }
+  }
+
+  if(ifOut[3] == 0)
+  {
+    "Classes are wrongly computed. We need to recompute!";
+
+    list mergeCl = mergeClassesIF(f, classes, ifOut, mdm);
+    classes = mergeCl[1];
+    ifOut = mergeCl[2];
+
+    slopes = getSlopes(classes);
+    md = getDegs(classes);
+
+    ifOut = irreducibleFactors(f, classes, mdm);
+    if(ifOut[3] == 0)
+    {
+      "Recomputation unsuccesfull. Output may be wrong.";
+    } else
+    {
+      "Recomputation succesfull. ";
+    }
+    I2LiftedFull = ifOut[1];
+
+    // Check if needed or can be obtained from I2LiftedFull
+    bF = buildFactors(classes);
+
+    // Recomputation of classes info
+    // Code should be reused
+
+    // Tables of vanishing order of diferences of puiseux expansions
+    dbprint(dbg, "Computing vanishing orders...");
+    M = valIK(classes);
+    vS = valIKSelf(bF, md);
+    MSelf = vS[1];
+
+    bestElem = vS[2];
+
+    nClasses = size(classes);
+
+    kill ordsFull, ordsBest, ordsTemp;
+
+    matrix ordsFull[size(I2Lifted) -1][nClasses];
+    list ordsBest;
+    list ordsTemp;
+
+    for(i = 1; i <= size(I2LiftedFull) - 1; i++)
+    {
+      for(cl = 1; cl <= nClasses; cl++)
+      {
+        if(i != cl)
+        {
+          ordsFull[i, cl] = ordAtPol(I2LiftedFull[i+1], classes[cl][1]);
+        }
+      }
+    }
+
+    for(cl = 1; cl <= nClasses; cl++)
+    {
+      ordsBest[cl] = list();
+      for(i = 1; i <= size(bestElem); i++)
+      {
+        ordsTemp = list();
+        for(j = 1; j <= size(bestElem[i]); j++)
+        {
+          ordsTemp[j] = ordAtPol(bestElem[i][j], classes[cl][1]);
+        }
+        ordsBest[cl][i] = ordsTemp;
+      }
+    }
+
+    //debug_log_intbas(3, "------Time for recomputation: ", timer - tt);
+  }
+
+  for(i = 1; i <= size(I2LiftedFull); i++)
+  {
+    I2LiftedFull[i] = reduce(I2LiftedFull[i], groebner(var(1)^mdm));
+  }
+
+  ideal IOut;
+  list outNormal;
+  list bases;
+
+  list IdOut;
+
+  list l1, l2;
+
+  tt = timer;
+
+  for(i = 1; i <= nClasses; i++)
+  {
+    // Computing ~A(i)_new... (using modified chinese remainder)
+    IdOut[i] = locLocAlgorithm(n, i, locBasis, d0, M, MSelf, md, classes, I2LiftedFull, mdm, bestElem, ordsFull, ordsBest);
+    bases = bases + list(IdOut[i]);
+  }
+  debug_log_intbas(3, "------Time integral basis for all branches: ", timer - tt);
+
+  if(nClasses > 1)
+  {
+    // We add some extra polynomials to the integral basis
+    // which will simplify the computations
+    list enzNum;
+    list enzDen;
+    poly elemNum;
+    number euNum;
+    int eu;
+    intvec classesInd = 1:nClasses;
+    number ordY = ordAtClassesPol(var(2), classes, classesInd);
+    for(k = 0; k < n - deg(I2Lifted[1], vy); k++)
+    {
+      elemNum = var(2)^k;
+      euNum = ordY * k;
+      eu = int(euNum);
+      enzNum = enzNum + list(elemNum);
+      enzDen = enzDen + list(var(1)^(eu));
+    }
+    list enzOut = comDen(enzNum, enzDen);
+    ideal enzId = enzOut[2];
+    for(k=1; k <=size(enzOut[1]); k++)
+    {
+      enzId[k+1] = enzOut[1][k];
+    }
+    list enzOutList = enzId, enzId[1];
+    bases = bases + list(enzOutList);
+  }
+
+
+  tt = timer;
+  if(size(bases) > 1)
+  {
+    // We compute the local integral basis at the origin
+    dbprint(dbg, "--Merging the integral bases for the branches...");
+    outNormal = mergeBases(bases);
+
+    // Check the correct degree for reduction
+    //outNormal[1] = reduce(outNormal[1], groebner(x^mdm));
+
+
+    //dbprint(dbg, "----Computing the groebner basis...", outNormal[1]);
+    //dbprint(dbg, "----Denominator:", outNormal[2]);
+    outNormal[1] = groebner(outNormal[1]);
+    dbprint(dbg, "----Merging finished");
+    poly fLoc = 1;
+    for(k = 2; k <= size(I2LiftedFull); k++)
+    {
+      fLoc = reduce(fLoc * reduce(I2LiftedFull[k], groebner(x^mdm)), groebner(x^mdm));
+    }
+    int needGroeb = 1;
+    list intBas = normToInt(fLoc, outNormal[1], outNormal[2], needGroeb);
+  } else
+  {
+    list intBas;
+    intBas[1] = bases[1][1];
+    intBas[2] = bases[1][2];
+  }
+  debug_log_intbas(3, "------Time for merging bases: ", timer - tt);
+
+
+  // We add the unit outside the origin
+  for(k = 0; k < deg(I2LiftedFull[1], vy); k++)
+  {
+    IOut[k+1] = intBas[2]*var(2)^(k);
+  }
+  for(k = 1; k <= size(intBas[1]); k++)
+  {
+    IOut[size(IOut)+1] = intBas[1][k]  * I2Lifted[1];
+  }
+
+  return(IOut);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Computation of the local integral basis at a point with non-rational
+// coordinates. We assume that the singularities have no repeated x-coordinate.
+// px is a polynomial in the first variable. The roots of px are the
+// x-coordinates of the singularities.
+// py is a polynomial of degree 1 in y, giving the y-coordinate of the
+// singularities.
+// locBasis indicates if a local basis is needed.
+static proc ibNonRatXY(poly f, poly px, poly py, int locBasis)
+{
+  int i;
+  def R = basering;
+
+  // We add a root of px to the basering.
+  // It will be the x-coordinate of the singularity.
+
+  def S = splitRingAt(px);
+  setring S;
+  poly x = var(1);
+  poly y = var(2);
+  poly f = imap(R, f);
+  poly px = imap(R, px);
+  poly py = imap(R, py);
+
+  // We compute the y-coordinate of the singularity
+  poly pya = subst(py,x,par(1));
+
+  // We move the singularity to the origin and compute the integral basis
+  poly fT = moveTo(f, var(1) - par(1), pya);
+
+  //ideal IOut = ibOrigin(fT, locBasis);
+  ideal IOut = ibAt0(fT, locBasis);
+
+  list ib = intBasIdealToList(IOut);
+
+  dbprint(dbg, "ibNonRatXY - Integral basis at the origin: ", ib);
+
+
+  // The output might contain the root added, and we have to remove it.
+  for(i = 1; i <= size(ib); i++){
+    // We move back the singularity to original position.
+    ib[i][1] = moveFrom(ib[i][1], var(1) - par(1), pya);
+
+    // We remove the parameter from the denominator.
+    // To achieve this, we reduce the polynomial modulo the generators
+    // of smaller degree.
+    // Note that the simple version ib[i][1] = subst(ib[i][1], par(1), x)
+    // does not work in general.
+    if(ib[i][2] > 0)
+    {
+//      "Call to elimPar";
+//      ib;
+//      ~;
+      ib[i][1] = elimPar(ib, i);
+    } else
+    {
+      // When there is no denominator we can simply replace the parameter by 0.
+      ib[i][1] = subst(ib[i][1], par(1), 0);
+    }
+  }
+
+  dbprint(dbg, "ibNonRatXY - Integral basis after moving back to the original singularity: ", ib);
+
+  // We map back the output to the original ring.
+  setring R;
+  list ib = imap(S, ib);
+  return(ib);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  a list of different normalization bases, where the first
+//         element of each basis is the denominator
+// Output: it computes a common denominator for all the bases, and
+//         returns a Groebner basis of the ideal generated by all the
+//         numerators with this common denominator.
+static proc mergeBases(list bases)
+{
+  int i;
+  poly den = 1;
+  ideal I;
+  ideal IT;
+  for(i = 1; i <= size(bases); i++)
+  {
+    den = lcm(den, bases[i][2]);
+  }
+  for(i = 1; i <= size(bases); i++)
+  {
+    IT = bases[i][1] * (den / bases[i][2]);
+    I = I + IT;
+  }
+  list out = I, den;
+  return(out);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+//
+//    MAIN PROCEDURE OF THE NEW APPROACH AS EXPLAINED IN THE
+//    PAPER by Boehm, Decker, Laplagne & Pfister
+//
+////////////////////////////////////////////////////////////////////////
+
+// Input:  n is the degree of f
+//         cl is the index of the class for which the loc basis is computed.
+// Output: integral basis for the branches at the origin
+// Algorithm: combines the integral basis of each conjugacy class of expansions.
+static proc locLocAlgorithm(int n, int cl, int locBasis, int d0, matrix M, list MSelf, intvec md, list classes, list I2Lifted, int mdm, list bestElem, matrix ordsFull, list ordsBest);
+{
+  if(printlevel - voice > 0)
+  {
+    "";
+    "-- Starting computation of lifted integral basis for class ", cl;
+  }
+
+  int tim = timer;
+  def R = basering;
+
+  int i, j, k;
+  list ibNum, ibDen;
+  number expUnit;  // The integrality exponent of the local unit
+  poly polyUnit;
+
+  intvec vy = (0,1);
+  intvec vx = (1,0);
+
+  // The elements containing the expansions that vanish outside the origin,
+  // but not the locloc unit
+  for(k = 0; k < (n - md[cl] - deg(I2Lifted[1], vy)); k++)
+  {
+    ibNum = ibNum + list(var(2)^k);
+    ibDen = ibDen + list(1);
+  }
+
+  poly baseFactor;
+  number expBaseFactor;
+  poly locLocFactor = 1;
+  expUnit = 0;
+
+  def SS = classes[cl][1];
+
+  // This corrects for some wrongly computed number of classes
+  int nClasses;
+//  if(size(classes) > size(I2Lifted) - 1)
+//  {
+//    nClasses = size(I2Lifted) - 1;
+//  } else
+//  {
+//    nClasses = size(classes);
+//  }
+  nClasses = size(classes);
+
+  // We add factors to merge the integral bases for the branches
+  // applying Algorithm "Merge Coefficients"
+  if(nClasses > 1)
+  {
+    for(j = 1; j <= size(I2Lifted)-1; j++)
+    {
+      if(j != cl)
+      {
+        expUnit = expUnit + number(ordsFull[j, cl]);
+        locLocFactor = prodMod(locLocFactor, I2Lifted[1 + j], mdm+1);
+      }
+    }
+    // The first term containing the locloc unit
+    expBaseFactor = expUnit;
+
+    // If the order of hi is not integer, we add a factor.
+    // The order of hi is expBaseFactor
+    // The order of y is MSelf[cl][1]
+    if(int(denominator(expBaseFactor)) > 1)
+    {
+      // We add the factor corresponding to the full expansions
+      list fullPoly;
+      for(j = 1; j <= nClasses; j++)
+      {
+        fullPoly[j] = I2Lifted[j+1];
+      }
+
+      int whichElem = 0;
+      int den1;
+      int den2;
+
+      intvec degsCl;
+      for(i = 1; i <= size(MSelf); i++)
+      {
+        degsCl[i] = size(MSelf[i]) + 1;
+      }
+      intvec chVec = 0:size(MSelf);
+
+      den1 = 1;
+      den2 = int(denominator(expBaseFactor));
+
+      number ordNewFactor;
+
+      number oAP;
+      number oAPTemp;
+
+      while(den1 mod den2 != 0)
+      {
+        chVec = nextSummand(degsCl, chVec, cl);
+
+        ordNewFactor = 0;
+        for(i = 1; i <= nClasses; i++)
+        {
+          if(i != cl)
+          {
+            k = chVec[i];
+            if(k > 0)
+            {
+              if(k <= size(bestElem[i]))
+              {
+                oAP = number(ordsBest[cl][i][k]);
+                ordNewFactor = ordNewFactor + oAP;
+              } else
+              {
+                oAP = number(ordsFull[i, cl]);
+                ordNewFactor = ordNewFactor + oAP;
+              }
+            }
+          }
+        }
+        den1 = int(denominator(ordNewFactor));
+      }
+
+      poly newFactor = 1;
+      int denNewFactor = den1;
+      int powFactor = 0;
+
+      for(i = 1; i <= size(MSelf); i++)
+      {
+        k = chVec[i];
+        if(k > 0)
+        {
+          if(k <= size(bestElem[i]))
+          {
+            newFactor = prodMod(newFactor, bestElem[i][k], mdm);
+          } else
+          {
+            newFactor = prodMod(newFactor, fullPoly[i], mdm);
+          }
+        }
+      }
+
+      int nnE = int(numerator(expBaseFactor));
+      int ddE = int(denominator(expBaseFactor));
+      int nnY = int(numerator(ordNewFactor));
+
+      while(ddE > 1)
+      {
+        powFactor = powFactor + 1;
+        expBaseFactor = expUnit + powFactor * ordNewFactor;
+        ddE = int(denominator(expBaseFactor));
+      }
+      baseFactor = prodMod(locLocFactor, newFactor^powFactor, mdm);
+
+      if(printlevel - voice >= 0)
+      {
+        "----Coefficient for merging for class i = ", cl, " (as in Algorithm 7) developed up to order X^" , mdm;
+        "------beta_i = ", newFactor, "^", powFactor;
+        "------h_i = ", locLocFactor;
+        "------c_i = ", expBaseFactor;
+      }
+    } else
+    {
+      baseFactor = locLocFactor;
+      if(printlevel - voice >= 0)
+      {
+        "----Coefficient for merging for class i = ", cl, " (as in Algorithm 7) developed up to order X^" , mdm;
+        "------beta_i = ", 1;
+        "------h_i = ", locLocFactor;
+        "------c_i = ", expBaseFactor;
+      }
+
+    }
+  } else
+  {
+    baseFactor = 1;
+    expBaseFactor = 0;
+  }
+  // The initial element
+  ibNum = ibNum + list(baseFactor);
+  ibDen = ibDen + list(var(1)^int(expBaseFactor));
+
+  // We put everything together in integral basis shape
+  poly elemNum;
+  int eu;
+  number euNum;
+  for(k = (n - md[cl] + 2); k <= n; k++)
+  {
+    euNum = expBaseFactor + MSelf[cl][k - (n-md[cl]+1)];
+    eu = int(euNum);
+    elemNum = prodMod(baseFactor, bestElem[cl][k - (n-md[cl]+1)], mdm);
+    ibNum = ibNum + list(elemNum);
+    ibDen = ibDen + list(var(1)^(eu));
+  }
+
+  ideal IOut;
+  for(i = 1; i<=size(ibNum); i++)
+  {
+    IOut[i] = (ibNum[i] * ibDen[size(ibDen)]) / ibDen[i];
+  }
+
+  list outp = IOut, ibDen[size(ibDen)];
+
+  // We can reduce modulo the denominator
+  //outp[1] = reduce(outp[1], groebner(outp[2]));
+
+//  if(printlevel - voice >= 0)
+//  {
+//    "---- Output: "; outp;
+//    //~;
+//    "";
+//  }
+
+
+  return(outp);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Computes the smallest slope of the list of slopes.
+static proc getSlope(list slopes)
+{
+  int i;
+  int slN = 1;
+  int slD = 0;
+  int bestI;
+  for(i = 1; i <= size(slopes); i++)
+  {
+    if(slopes[i][1]*slD < slN * slopes[i][2])
+    {
+      slN = slopes[i][1];
+      slD = slopes[i][2];
+      bestI = i;
+    }
+  }
+  return(list(slN, slD, bestI));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+// Local factors at the origin of the original polynomial f.
+// Input:  a list whose elements are classes of conjugate Puiseux
+//         expansions, as returned by proc getClasses.
+// Output: a list of lists of three elements.
+//         The first element in the i-th list is a list of the factors
+//         corresponding to the i-th conjugacy class developed up to the
+//         different degrees corresponding to the different possible
+//         truncations of the puiseux expansions.
+//         The second element is a list of the orders of the corresponding
+//         factors.
+//         The third element is a list of the degrees of the corresponding
+//         factors.
+static proc buildFactors(list classes)
+{
+  int i, j;
+  int d = -1;
+  int ind;
+  int first;
+  int k;
+  int stop1;
+
+  int dbg = printlevel - voice + 4;
+
+  intvec exps;
+  intvec expsT;
+
+  int t;    // Timings
+
+  intvec vx = (1,0);
+  intvec vy = (0,1);
+
+  def R = basering;
+  list facs;
+  list ords;
+  list degs;
+  list gfChecks;
+  int den;
+  list fFrac;
+  poly fGround;
+  def S;
+
+  list polyGround;
+
+  int isGround = 1;
+
+  for(i = 1; i <= size(classes); i++)
+  {
+    facs[i] = list();
+    ords[i] = list();
+    degs[i] = list();
+    gfChecks[i] = list();
+
+    ind = 1;
+    first = 1;
+    stop1 = 0;
+
+    // If there is only one expansion in the class, there is nothing to do
+    if((typeof(classes[i][1]) == "ring") or (size(classes[i]) > 1))
+    {
+      for(j = 1; j <= size(classes[i]); j++)
+      {
+        if(typeof(classes[i][j]) == "ring")
+        {
+          S = classes[i][j];
+          setring S;
+          if(typeof(PE[1][7])!= "none")
+          {
+
+            debug_log_intbas(6, "Computation of the characterisitic exponents from the integral basis. Check if correct or characteristic orders are needed.");
+
+            //expsT = poly2intvec(PE[1][1]);
+            //"Check expsT 1: ", expsT;
+            expsT = list2intvec(PE[1][7]);
+            //"Check expsT 2: ", expsT;
+            //"Compare exps: ";
+            //poly2intvec(PE[1][1]);
+            //charExp(poly2intvec(PE[1][1]), PE[1][2]);
+            //expsT;
+          } else
+          {
+            expsT = deg(PE[1][1]);
+          }
+          if(j == 1)
+          {
+            den = PE[1][2];
+          }
+          setring R;
+        } else
+        {
+          if(typeof(classes[i][j][7]) != "none")
+          {
+            expsT = list2intvec(classes[i][j][7]);
+          } else
+          {
+            expsT = deg(classes[i][j][1]);
+          }
+          if(j == 1)
+          {
+            den = classes[i][1][2];
+          }
+        }
+        if(j > 1)
+        {
+          exps = appendIntvecs(exps, expsT);
+        } else
+        {
+          exps = expsT;
+        }
+      }
+
+      for(k = 1; k <= size(exps); k++)
+      {
+        d = exps[k];
+        if(dbg >= 2)
+        {
+          "----Building factor of degree < d = ", d;
+        }
+        t = timer;
+        for(j = 1; j <= size(classes[i]); j++)
+        {
+          if(typeof(classes[i][j]) == "ring")
+          {
+            if(!defined(dMP))
+            {
+              int dMP;
+            }
+            dMP = pardeg(minpoly);
+            S = classes[i][j];
+
+            setring S;
+            // d = -1 for computing polynomial of full degree
+            if(d >= 0){
+              poly fF = jet(PE[1][1], d-1, vx);
+            } else
+            {
+              poly fF = PE[1][1];
+            }
+            if(dMP > 1)
+            {
+              poly mp = composePolys(minPolys);
+              poly mpX = subst(mp, var(2), var(1));
+              poly fFB = buildPolyFracNew(fF, mpX);
+              ideal rel = extendBack(fFB, erg[1], dMP);
+              matrix CC = coef(fFB, var(1)*var(2));
+            } else
+            {
+              poly fFB = buildPolyFrac(fF);
+            }
+            setring R;
+
+            if(dMP > 1)
+            {
+              ideal rel = imap(S, rel);
+              matrix CC = imap(S, CC);
+              int kk;
+              fFrac[j] = 0;
+              for(kk = 1; kk <= ncols(CC); kk++)
+              {
+                fFrac[j] = fFrac[j] + subst(rel[kk], var(1), par(1)) * CC[1, kk];
+              }
+            } else
+            {
+              fFrac[j] = imap(S, fFB);
+            }
+
+            // Cleaning
+            setring S;
+            kill fF;
+            kill fFB;
+            setring R;
+          } else
+          {
+            if(d>=0){
+              fFrac[j] = var(2) - jet(classes[i][j][1], d-1, vx);
+            } else
+            {
+              fFrac[j] = var(2) - classes[i][j][1];
+            }
+
+          }
+        }
+
+        polyGround = buildPolyGround(fFrac, den);
+
+        fGround = squarefree(polyGround[1]);
+        if (polyGround[2] == 0)
+        {
+          // "Error. Conjugation classes are wrongly computed. The polynomial obtained is not over the ground field. ";
+          ind++;
+          isGround = 0;
+        } else {
+
+          debug_log_intbas(4, "------Time for this factor: ", timer - t);
+          if(dbg - 1 > 0)
+          {
+            "------Factor: ", fGround;
+          }
+
+          fFrac = list();
+
+          // If the degree has not increased, we replaced the previous one.
+          // Else, we add it to the list.
+          if(first != 1)
+          {
+            if(deg(fGround, vy) > degs[i][ind])
+            {
+            ind++;
+            } else
+            {
+            dbprint(dbg - 1, "Factor discarded");
+            }
+          } else
+          {
+            first = 0;
+          }
+        }
+        facs[i][ind] = fGround;
+        if(d>=0){
+          ords[i][ind] = number(d) / number(den);
+        } else {
+          ords[i][ind] = number(deg(facs[i][ind],vx)) / number(den);
+        }
+        degs[i][ind] = deg(fGround, vy);
+        gfChecks[i][ind] = polyGround[2];
+
+      }
+    }
+  }
+  return(list(facs, ords, degs, gfChecks, isGround));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Product of conjugate factors
+// Input:  a polynomial f over an algebraic extension of the base ring.
+//         the minimal polynomial mp as a polynomial in the first variable
+//         (it can be different from the minpoly of the ring, since we can be
+//         working on an extension of an extension)
+// Output: polynomial = the product of (y-f_i) for all conjugate polynomials
+//         f_i of f.
+static proc buildPolyFracNew(poly f, poly mp)
+{
+  int i;
+  def R = basering;
+  int d = deg(mp, intvec(1,0));
+  def Q = ring(0, (var(1), var(2), @a, T(1..d)), lp);
+  ring S = 0, (var(1), @a), dp;
+  poly f = imap(R, f);
+  intvec da = (0,1);
+  if(deg(f, da) > 0)
+  {
+    //poly mp = imap(R, mp);
+    //mp = subst(mp,var(1),@a);
+    setring Q;
+    poly f = imap(R, f);
+    poly mp = imap(R, mp);
+    mp = mp / leadcoef(mp);
+    poly fNew;
+    poly fNewTemp = 1;
+    poly rels = 1;
+    ideal I;
+    for(i = 1; i <= d; i++)
+    {
+      rels = rels * (var(1) - T(i));
+    }
+    matrix c1 = coeffs(rels, var(1));
+    matrix c2 = coeffs(mp, var(1));
+    for(i = 1; i<=d; i++)
+    {
+      I[i] = c1[i,1] - c2[i,1];
+    }
+    I = groebner(I);
+
+    int t = timer;
+    poly fTemp;
+    for(i = 1; i<=d; i++)
+    {
+      fTemp = subst(f, var(3), T(i));
+      fNewTemp = fNewTemp * (var(2) - fTemp);
+      fNew = reduce(fNewTemp, I);
+    }
+    setring R;
+    poly fNew = imap(Q, fNew);
+  } else
+  {
+    setring R;
+    poly fNew = (var(2) - f)^d;
+  }
+  return(fNew);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Product of conjugate factors
+// Input:  a polynomial f over an algebraic extension of the base ring.
+// Output: polynomial = the product of (y-f_i) for all conjugate polynomials
+//         f_i of f.
+static proc buildPolyFrac(poly f)
+{
+  int i;
+  def R = basering;
+
+  intvec dx = (1,0);
+  int degX = deg(f, dx);
+
+  poly mp = minpoly;
+
+
+  mp = subst(minpoly, @a, var(1));
+  int d = pardeg(minpoly);
+  def Q = ring(0, (var(1), var(2), @a, T(1..d)), lp);
+  ring S = 0, (var(1), @a), dp;
+  poly f = imap(R, f);
+  intvec da = (0,1);
+
+  if(deg(f, da) > 0)
+  {
+    poly mp = imap(R, mp);
+    mp = subst(mp,var(1),@a);
+    setring Q;
+    poly f = imap(S, f);
+    poly mp = imap(S, mp);
+    mp = mp / leadcoef(mp);
+    poly fNew = 1;
+    poly rels = 1;
+    //ideal I = var(1)^(degX + 1);  // We use this to reduce modulo x^maxDeg
+    ideal I;  // We use this to reduce modulo x^maxDeg
+    for(i = 1; i <= d; i++)
+    {
+      rels = rels * (var(1) - T(i));
+    }
+    matrix c1 = coeffs(rels, var(1));
+    matrix c2 = coeffs(mp, @a);
+    for(i = 1; i<=d; i++)
+    {
+      I[i] = c1[i,1] - c2[i,1];
+    }
+    I = groebner(I);
+
+    int t = timer;
+    poly fTemp;
+    for(i = 1; i<=d; i++)
+    {
+      fTemp = subst(f, @a, T(i));
+      fNew = fNew * (var(2) - fTemp);
+      fNew = reduce(fNew, I);
+    }
+    debug_log_intbas(4,"--------Time for product reduction: ", timer - t);
+
+    setring R;
+    poly fNew = imap(Q, fNew);
+
+  } else
+  {
+    setring R;
+    poly fNew = (var(2) - f)^d;
+  }
+  return(fNew);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Polynomail over the ground field.
+// Input:  a list of polynomials representing Puiseux expansions and
+//         an integer sD representing the denominator of the exponents in
+//         all the expansions.
+// Output: polynomial = the product of all the expansions in the input list.
+//         The common denominator is now cancelled with the numerators.
+static proc buildPolyGround(list fFrac, int sD)
+{
+  int i;
+  int gfCheck = 1;  // The polynomial computed is over the ground field.
+                    // This means the conjugacy  is computed correctly.
+  def R = basering;
+  poly f = 1;
+  intvec vx = (1, 0);
+  for(i = 1; i <= size(fFrac); i++)
+  {
+    f = f * fFrac[i];
+  }
+  ring P = (0, @a), (@x, @y, @X), dp;
+  poly fNew = fetch(R, f);
+  poly f2 = reduce(fNew, groebner(@X-@x^sD));
+  if(deg(f2, (1,0,0)) > 0)
+  {
+    "f2", f2;
+    "Polynomial is not over the ground field";
+    ~;
+    gfCheck = 0;
+  }
+  f2 = subst(f2, @X, @x);
+  setring R;
+  poly fNew = fetch(P, f2);
+  return(list(fNew, gfCheck));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Valuations of products of expansions with respect to expansions of the
+// same class.
+// Input:  a list bF of lists of polynomials, as given by proc buildFactors.
+//         an intvec md representing the degrees of the minimal polynomials
+//         of the extension used for each expansion.
+// Output: two lists. The i-th element of the first list is a list of
+//         numbers, representing the valutations of taking 1 to d-1 expansions
+//         in the i-th conjugacy class given in bF, with respect to an
+//         expansion of that same class
+// [Example 1]
+static proc valIKSelf(list bF, intvec md)
+{
+  int i, k;
+  list facs = bF[1];
+  list ords = bF[2];    // The order of the factors
+  list degs = bF[3];    // The degree of the factors in y
+  int b = size(ords);    // Number of blocks
+  list MSelf;
+  list bestElem;
+  number o;
+  int d, dT;
+  poly p;
+  for(i = 1; i <= b; i++)
+  {
+    MSelf[i] = list();
+    bestElem[i] = list();
+    for(d = 1; d < md[i]; d++)
+    {
+      o = d * number(ords[i][1]);
+      for(k = 2; k <= size(degs[i]); k++)
+      {
+        o = o + number(int(d div degs[i][k])) * (number(ords[i][k]) - number(ords[i][k-1]));
+      }
+      MSelf[i][d] = o;
+
+      p = 1;
+      // fa[3] are the degrees of the polynomials
+      dT = d;
+      for(k = size(degs[i]); k >= 1; k--)
+      {
+        p = p * facs[i][k]^(int(dT div degs[i][k]));
+        dT = dT mod degs[i][k];
+      }
+      bestElem[i][d] = p;
+    }
+  }
+
+  return(list(MSelf, bestElem));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Valuations of differences of non-conjugate expansions.
+// Input:  a list classes of classes of conjugate expansions, as given by
+//         proc getClasses
+// Output: a matrix M of number, where M[i, j] is the valuation
+//         of gamma_i - gamma_j, expansions of the i-th and j-th conjugacy
+//         class respectively.
+static proc valIK(list classes)
+{
+  int i, j;
+  def R = basering;
+  matrix M[size(classes)][size(classes)];
+  for(i = 1; i <= size(classes); i++)
+  {
+    if(typeof(classes[i][1]) == "ring")
+    {
+      def S = classes[i][1];
+      setring S;
+      poly f = subst(PE[1][1], @a, 0);
+      int den(i) = PE[1][2];
+      number o = number(ratDeg(PE[1][1])) / number(den(i));
+      setring R;
+      poly f(i) = imap(S, f);
+      number o(i) = number(imap(S, o));
+      int nonRat(i) = 1;
+      setring S;
+      kill f;
+      kill o;
+      setring R;
+      kill S;
+    } else
+    {
+      poly f(i) = classes[i][1][1];
+      int den(i) =  classes[i][1][2];
+      number o(i) = number(orderExp(f(i))) / number(den(i));
+      int nonRat(i) = 0;
+    }
+  }
+
+  int k;
+  poly differ;
+  number ordDiff;
+  for(i = 1; i <= size(classes); i++)
+  {
+    M[i, i] = o(i);
+    for(j = 1; j < i; j++)
+    {
+      differ = subst(f(i), var(1), var(1)^den(j)) - subst(f(j), var(1), var(1)^den(i));
+      if(differ != 0){
+        k = orderExp(differ);
+        ordDiff = number(k) / number(den(i)*den(j));
+        // The order of the difference cannot be greater than the o(i) when
+        // the i-th expansion is non-rational when all the expansions in the
+        // block are in the same class.
+        if((nonRat(i) == 1) and (ordDiff > o(i)))
+        {
+          ordDiff = o(i);
+        }
+        if((nonRat(j) == 1) and (ordDiff > o(j)))
+        {
+          ordDiff = o(j);
+        }
+        M[i, j] = ordDiff;
+        M[j, i] = ordDiff;
+      } else
+      {
+        M[i, j] = o(i);
+        if(o(j) < o(i))
+        {
+          M[i, j] = o(j);
+        }
+        M[j, i] = M[i, j];
+      }
+    }
+  }
+  return(M);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  a polynomial f.
+// Output: an integer k = the order of f (that is, the smallest exponent of f
+//         as poly in the first variable).
+static proc orderExp(poly f){
+  if(f == 0)
+  {
+    return(-1);
+  } else
+  {
+    matrix co = coeffs(f, var(1));
+    int k = 1;
+    while(co[k, 1] == 0){
+      k++;
+    }
+    k--;
+  }
+  return(k);
+}
+
+// Input:  a list l of puiseux expansions
+// Output: a set of polynomials = the rational part of each expansion in l
+//static proc truncPoly(list l)
+//{
+//  int i, j;
+//  def R = basering;
+//  ring P = 0, (x,y,X), dp;
+//  poly fNew;
+//  poly f2;
+//  setring R;
+//
+//  for(i = 1; i <= size(l); i++)
+//  {
+//    if(typeof(l[i]) == "ring")
+//    {
+//      def S = l[i];
+//      setring S;
+//      poly f = subst(PE[1][1], @a, 0);
+//      int den(i) = PE[1][2];
+//      setring R;
+//      poly f(i) = imap(S, f);
+//      setring S;
+//      kill f;
+//      setring R;
+//      kill S;
+//    } else {
+//      poly f(i) = l[i][1];
+//      int den(i) =  l[i][2];
+//    }
+//    setring P;
+//    fNew = fetch(R, f(i));
+//    f2 = reduce(fNew, groebner(X - x^den(i)));
+//    f2 = subst(f2, X, x);
+//    setring R;
+//    f(i) = var(2) - fetch(P, f2);
+//  }
+//  return(f(1..size(l)));
+//}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  matrix M of valuations of differences of expansions of different
+//         classes, list MSelf of valuations of an expansions with respect
+//         to valuations of the same class, integer d the degree of the
+//         required element, intvec md = the number of expansions in each
+//         class.
+// Output: the maximal valuation of an element of degree d, and the
+//         corresponding element.
+static proc ibElement(matrix M, list MSelf, int d, intvec md)
+{
+  // Best i
+  int i, j, k;
+  int top = d;
+  int s = ncols(M);
+
+  intvec vy = (0,1);
+  intvec vx = (1,0);
+  number order(1..s);
+  number minOrd;
+  number maxExp = 0;
+  int maxExpi;    // The value of i for the max exp.
+
+  list sums = summands(d, s, md);
+
+  for(i = 1; i <= size(sums); i++)
+  {
+    minOrd = 0;
+    for(j = 1; j <= s; j++)
+    {
+      order(j) = 0;
+      for(k = 1; k <= s; k++)
+      {
+        if(order(j) > -1)
+        {
+          if(k != j)
+          {
+            order(j) = order(j) + number(sums[i][k]) * number(M[k, j]);
+          } else
+          {
+            if (sums[i][k] < md[j])
+            {
+              if(sums[i][k] > 0)
+              {
+                order(j) = order(j) + MSelf[j][sums[i][k]];
+              }
+            } else
+            {
+              order(j) = -1;
+            }
+          }
+        }
+      }
+      if(((order(j) < minOrd) or (minOrd == 0)) and (order(j) > -1))
+      {
+        minOrd = order(j);
+      }
+    }
+    if(minOrd > maxExp)
+    {
+      maxExp = minOrd;
+      maxExpi = i;
+    }
+  }
+  intvec elem = sums[maxExpi];
+  return(list(maxExp, elem));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  int n, int k, intvec md of size k
+// Output: matrix such that it each row is a way of expressing n
+//         as a sum of k non-negative integers, where the i-th integer is
+//         smaller or equal than md[i].
+static proc summands(int n, int k, intvec md)
+{
+  list l;
+  list lT;
+  intvec v;
+  int i, j;
+  int m;
+  intvec mdT;
+  if(k > 1){
+    m = md[1];
+    if(m > n)
+    {
+      m = n;
+    }
+    for(i = m; i>= 0; i = i-1)
+    {
+      mdT = md[2..k];
+      lT = summands(n-i, k-1, mdT);
+      for(j = 1; j <= size(lT); j++)
+      {
+        v = i, lT[j];
+        l = insert(l, v);
+      }
+    }
+  } else {
+    if(n <= md[1])
+    {
+      l = insert(l, n);
+    }
+  }
+  return(l);
+}
+
+// Input:  int n, int k, intvec md of size k
+// Output: matrix such that it each row is a way of expressing n
+//         as a sum of k non-negative integers, where the i-th integer is
+//         smaller or equal than md[i].
+static proc summandAll(intvec md)
+{
+  int k = size(md);
+  list l;
+  list lT;
+  intvec v;
+  int i, j;
+  int m;
+  intvec mdT;
+  if(k > 1){
+    m = md[1];
+    for(i = 0; i <= m; i = i + 1)
+    {
+      mdT = md[2..k];
+      lT = summandAll(mdT);
+      for(j = 1; j <= size(lT); j++)
+      {
+        v = i, lT[j];
+        l = l + list(v);
+      }
+    }
+  } else {
+    for(i = 0; i <= md[1]; i = i+1)
+    {
+      l = l + list(i);
+    }
+  }
+  return(l);
+}
+
+
+// Next element in a list of integers
+static proc nextSummand(intvec md, intvec ch, int cl)
+{
+  int k = nrows(md);
+  int pos = 1;
+  if(cl == pos){pos = pos + 1;}
+  ch[pos] = ch[pos] + 1;
+
+//  "md: ", md;
+//  "ch: ", ch;
+//  "cl: ", cl;
+  while(ch[pos] > md[pos])
+  {
+    ch[pos] = 0;
+    pos = pos + 1;
+    ch[pos] = ch[pos] + 1;
+  }
+//  "output: ", ch;
+  return(ch);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  poly f in L[x], with L an algebraic extension of K.
+// Output: int k = the degree of the first term whose coefficient is in L - K
+static proc ratDeg(poly f)
+{
+  matrix c = coeffs(f, var(1));
+  int k = 1;
+  while((pardeg(number(c[k,1])) <= 0) and (k < size(c)))
+  {
+    k++;
+  }
+  if(pardeg(number(c[k,1])) > 0)
+  {
+    k--;
+  }
+  return(k);
+}
+
+// Input:  a list classes, whose elements are classes of conjugate Puiseux
+//         expansions, as returned by proc getClasses.
+// Output: a list of intvec, where the first element of each vector is the
+//         numerator and the second one the denominator of the (rational)
+//         order of the Puiseux expansions in each class.
+static proc getSlopes(list classes)
+{
+  int i;
+  list slopes;
+
+  def R = basering;
+
+  for(i = 1; i <= size(classes); i++)
+  {
+    if(typeof(classes[i][1]) == "ring")
+    {
+      def S = classes[i][1];
+      setring S;
+      slopes[i] = intvec(orderExp(PE[1][1]), PE[1][2]);
+      setring R;
+      kill S;
+    } else
+    {
+      slopes[i] = intvec(orderExp(classes[i][1][1]), classes[i][1][2]);
+    }
+  }
+  return(slopes);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  a list l of rings, each of these rings containing a list PE of
+//         Puiseux expansions.
+// Output: a list of rings, with one ring for each of the Puiseux expansions
+//         in the original rings.
+static proc explodeRings(list l)
+{
+  def R = basering;
+
+  int i, j;
+  int numb;
+  list rings;
+
+  for(i = 1; i <= size(l); i++){
+    if(typeof(l[i]) == "ring"){
+      def S = l[i];
+      setring S;
+      list rl;
+      numb = size(PE);
+      for(j = 1; j <= numb; j++){
+        rl = ringlist(S);
+        def SS = ring(rl);
+        setring SS;
+        list PET = fetch(S, PE);
+        list PE = list(PET[j]);
+        list erg = fetch(S, erg);
+        list minPolys = fetch(S, minPolys);
+        export(PE);
+        export(erg);
+        export(minPolys);
+        kill PET;
+        setring R;
+        rings = rings + list(SS);
+        setring S;
+        kill SS;
+      }
+    }
+  }
+  setring R;
+  return(rings);
+}
+
+// Input:  a list l, whose elements are either Puiseux expansions over the
+//         base ring or rings containing a list PE of Puiseux expansions.
+// Output: a list classes, where each element is a list of conjugate
+//         Puiseux expansions (given also either as expansions over the base
+//         rings or defined in extension rings).
+static proc getClasses(list l)
+{
+  int i;
+  int j;
+  int cc;
+  int prevI;
+  list code;
+  list classCode;
+  list classes;
+
+  list l2;
+  for(i = 1; i <= size(l); i++)
+  {
+    if(typeof(l[i]) == "ring"){
+      l2 = l2 + explodeRings(l[i]);
+    } else
+    {
+      l2 = l2 + list(l[i]);
+    }
+  }
+  l = l2;
+
+  int k = 1;
+  classes[k] = list();
+  classes[k][1] = l[1];
+  classCode[1] = 1;
+
+  def R = basering;
+
+  for(i = 1; i <= size(l); i++){
+    if(typeof(l[i]) == "ring"){
+      def S = l[i];
+      setring S;
+      code[i] = PE[1][6];
+      setring R;
+      kill S;
+    } else {
+      code[i] = l[i][6];
+    }
+    if(i>1)
+    {
+      prevI = 0;
+      for(j = 1; j < i; j++)
+      {
+        if(equalLists(code[i], code[j]))
+        {
+          prevI = j;
+        }
+      }
+      if(prevI == 0)
+      {
+        k++;
+        classes[k] = list();
+        classes[k][1] = l[i];
+        classCode[i] = k;
+      } else
+      {
+        cc = classCode[prevI];
+        classes[cc][size(classes[cc])+1] = l[i];
+        classCode[i] = classCode[prevI];
+      }
+    }
+  }
+  return(classes);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  a list classes, whose elements are classes of conjugate Puiseux
+//         expansions, as returned by proc getClasses.
+// Output: an intvec degs, where the i-th element is the number of Puiseux
+//         expansions in the i-th class (which is equal to the degree in y
+//         of the factor corresponding to that conjugacy class).
+static proc getDegs(list classes)
+{
+  int i, j;
+  intvec degs;
+
+  def R = basering;
+  int degBase = 1;
+  if(pardeg(minpoly) != -1)
+  {
+    degBase = pardeg(minpoly);
+  }
+
+  for(i = 1; i <= size(classes); i++)
+  {
+    degs[i] = 0;
+    for(j = 1; j <= size(classes[i]); j++)
+    {
+      if(typeof(classes[i][j]) == "ring")
+      {
+        def S = classes[i][j];
+        setring S;
+        degs[i] = degs[i] + (pardeg(minpoly) div degBase)*size(PE);
+        setring R;
+        kill S;
+      } else
+      {
+        degs[i] = degs[i] + 1;
+      }
+    }
+  }
+  return(degs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  a list l, whose elements are either Puiseux expansions over the
+//         base ring or rings containing a list PE of Puiseux expansions.
+// Output: an integer d = sum of the degrees of the singular part of all the
+//         Puiseux expansions in the input.
+static proc getTotalDeg(list l)
+{
+  int i, j;
+  number d = 0;
+  number d2;
+  int dT, nT;
+  int mT;
+  def R = basering;
+  for(i = 1; i <= size(l); i++)
+  {
+    if(typeof(l[i]) == "ring")
+    {
+      def SS = l[i];
+      setring SS;
+      number dTemp;
+      dTemp = 0;
+      mT = pardeg(minpoly);
+      for(j = 1; j <= size(PE); j++)
+      {
+        nT = deg(PE[j][1]);
+        dT = PE[j][2];
+        dTemp = dTemp + (number(nT) / dT) * mT;
+      }
+      setring R;
+      d2 = number(imap(SS, dTemp));
+      d = d + d2;
+      kill SS;
+    } else
+    {
+      d = d + number(deg(l[i][1])) / l[i][2];
+    }
+  }
+  if(d == int(d))
+  {
+    return(int(d));
+  } else
+  {
+    //"Computing Puiseux expansions over an algebraic extension! Please check correct output...";
+    //"Input: list l";
+    //l;
+    //"Output: int d";
+    //int(d) + 1;
+    return(int(d) + 1);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Product modulo x^e.
+// Input:  poly p, q in k[x][y], int expo
+// Output: p * q reduced mod x^e.
+// Remarks: it is assumed that x is the first variable in the ring.
+static proc prodMod(poly p, poly q, int expo)
+{
+  def R = basering;
+  qring Q = var(1)^expo;
+  poly p = imap(R, p);
+  poly q = imap(R, q);
+  poly pq = p*q;
+  setring R;
+  poly pq = imap(Q, pq);
+  pq = reduce(pq, groebner(var(1)^expo));
+  return(pq);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Computed the order of poly h at the expansion defined by S,
+// which may be a ring or a Puiseux expansion
+static proc ordAtPol(poly h, def S)
+{
+  def R = basering;
+
+  if(typeof(S) == "ring")
+  {
+    setring S;
+    poly h = imap(R, h);
+    poly g = PE[1][1];
+    int den = PE[1][2];
+
+    //"here";
+    //"h, g", h, g;
+
+    //"b debug overflow <-";
+
+    if(size(h) > 1)
+    {
+      h = subst(h, var(1), var(1)^den);
+      poly hs = subst(h, var(2), g);
+      //"b debug overflow <-";
+
+      matrix MM;
+      MM = coef(hs, var(1));
+      int oo = deg(MM[1, ncols(MM)]);
+      kill hs;
+    } else
+    {
+      matrix MM;
+      MM = coef(g, var(1));
+      int oo = deg(MM[1, ncols(MM)])*deg(h, intvec(0,1)) + deg(h, intvec(1,0))*den;
+    }
+    //~;
+
+    number oro = oo/number(den);
+
+    //"h, oro", h, oro;
+    kill h;
+    kill g;
+    kill MM;
+    setring R;
+    number oro2 = number(imap(S, oro));
+    setring S;
+    kill oro;
+    setring R;
+  } else
+  {
+    int den = S[2];
+    poly g = S[1];
+    h = subst(h, var(1), var(1)^den);
+    poly hs = subst(h, var(2), g);
+
+    matrix MM;
+    MM = coef(hs, var(1));
+    int oo = deg(MM[1, ncols(MM)]);
+
+    number oro2 = oo/number(den);
+  }
+  return(oro2);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Computes the factors of f corresponding to each conjugacy class,
+// up to degree degExpand
+static proc irreducibleFactors(poly f, list classes, int degExpand)
+{
+  list I2Lifted = henselBlocks(f, degExpand, 1);
+
+  int nClasses;
+  nClasses = size(classes);
+
+  int gfCheck = 1;  // For checking if the polynomial is over
+                    // the ground field.
+  list gfCheckList;
+
+  //"nClasses: ", nClasses;
+  //"size(I2Lifted): ", size(I2Lifted);
+  //"I2Lifted: ", I2Lifted;
+  //"degExpand: ", degExpand;
+
+  int wrongNumber = 0; // If some hensel block contains different classes
+
+  // CHECK THIS. How to count factor outside the origin?
+  if(nClasses != (size(I2Lifted) - 1))
+  {
+
+    list newL;
+    list I2LiftedNew;
+    I2LiftedNew[1] = I2Lifted[1];
+    int ind = 2;
+    list classes2;
+    poly fu, fuProd;
+    list fuPols;
+    int PEPE;
+    int cl;
+    int i, j;
+
+    list bPG;
+
+    def R = basering;
+
+    for(i = 2; i <= size(I2Lifted); i++)
+    {
+      //"Computing singular part of Puiseux expansions of factor ", i, ": ", I2Lifted[i];
+      newL = puiseux(I2Lifted[i], -1, 1);
+      classes2 = getClasses(newL);
+
+
+      if(size(classes2) > 1)
+      {
+        // We recompute up to the appropiate order for merging
+        poly I2Red = reduce(I2Lifted[i], var(1)^(degExpand+1));
+
+        //"Computing Puiseux expansions up to degree degExpand of factor ", i, ": ", I2Red;
+
+        newL = puiseux(I2Red, degExpand, 1);
+        classes2 = getClasses(newL);
+
+        for(j = 1; j <= size(classes2); j++)
+        {
+          fuProd = 1;
+          fuPols = list();
+          // FIX THIS FOR PUISEUX EXPANSIONS THAT ARE NOT GIVEN AS RINGS
+          // Check example
+          // ring R = 0, (X,Y), dp;
+          // poly f = (Y^6-6*X^3*Y^4-2*X^7*Y^3+12*X^6*Y^2-12*X^10*Y-8*X^9)*(Y^2-2*Y*X^3-2*X^3)*(Y^2+X^7)+X^30;
+          // list l = integralBasis(f,2,"atOrigin");
+
+
+          for(cl = 1; cl <= size(classes2[j]); cl++)
+          {
+
+            if(typeof(classes2[j][cl]) == "ring")
+            {
+              def S = classes2[j][cl];
+              setring S;
+
+              poly fu = buildPolyFrac(PE[1][1]);
+
+              PEPE = PE[1][2];
+
+              setring R;
+              fu = imap(S, fu);
+              kill S;
+              fuProd = fuProd * fu;
+            } else
+            {
+              "RING EXPECTED! Please contact the developers.";
+              ~;
+            }
+          }
+
+          bPG = buildPolyGround(fuProd, PEPE);
+
+          if(bPG[2] == 0)
+          {
+            // The polynomial computed is not over the ground field.
+            // The classes computed are wrong, we need to recompute.
+            "Polynomial not over the ground field.";
+            gfCheck = 0;
+          }
+
+          fu = reduce(bPG[1], groebner(var(1)^degExpand));
+
+          I2LiftedNew[ind] = fu;
+          gfCheckList[ind] = bPG[2];
+
+          ind = ind + 1;
+        }
+      } else {
+        I2LiftedNew[ind] = I2Lifted[i];
+        ind = ind + 1;
+      }
+    }
+    I2Lifted = I2LiftedNew;
+    wrongNumber = 1;
+  }
+  list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber);
+
+  return(ll);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Computes the maximum degree needed of the factors
+
+// Input:  n is the degree of f
+//         cl is the index of the class for which the loc basis is computed.
+// Output: maximal degree needed for computing the basis
+// [Example 4]
+
+static proc maxDegMerge(int n, int cl, int locBasis, int d0, matrix M, list MSelf, intvec md, list classes, list I2Lifted, list bestElem, matrix ordsFull, list ordsBest);
+{
+  //"START - newib.lib - maxDegMerge - 4";
+  int tt = timer;
+  def R = basering;
+
+  int i, j, k;
+  list ibNum, ibDen;
+  number expUnit;  // The integrality exponent of the local unit
+  poly polyUnit;
+
+  intvec vy = (0,1);
+  intvec vx = (1,0);
+
+  poly baseFactor;
+  number expBaseFactor;
+  poly locLocFactor = 1;
+  expUnit = 0;
+
+  def SS = classes[cl][1];
+
+  // This corrects for some wrongly computed number of classes
+  int nClasses;
+//  if(size(classes) > size(I2Lifted) - 1)
+//  {
+//    nClasses = size(I2Lifted) - 1;
+//  } else
+//  {
+//    nClasses = size(classes);
+//  }
+  nClasses = size(classes);
+
+
+  if(nClasses > 1)
+  {
+    for(j = 1; j <= size(I2Lifted)-1; j++)
+    {
+      if(j != cl)
+      {
+        expUnit = expUnit + number(ordsFull[j, cl]);
+      }
+    }
+    // The first term containing the locloc unit
+    expBaseFactor = expUnit;
+
+    // If the order of hi is not integer, we add a factor.
+    if(int(denominator(expBaseFactor)) > 1)
+    {
+
+      // We add the factor corresponding to the full expansions
+      list fullPoly;
+      for(j = 1; j <= nClasses; j++)
+      {
+        fullPoly[j] = I2Lifted[j+1];
+      }
+
+      int whichElem = 0;
+      int den1;
+      int den2;
+
+      intvec degsCl;
+      for(i = 1; i <= size(MSelf); i++)
+      {
+        degsCl[i] = size(MSelf[i]) + 1;
+      }
+      intvec chVec = 0:size(MSelf);
+
+      den1 = 1;
+      den2 = int(denominator(expBaseFactor));
+
+      number ordNewFactor;
+
+      number oAP;
+      number oAPT;
+
+      while(den1 mod den2 != 0)
+      {
+        chVec = nextSummand(degsCl, chVec, cl);
+        ordNewFactor = 0;
+        for(i = 1; i <= nClasses; i++)
+        {
+          if(i != cl)
+          {
+            k = chVec[i];
+            //"i, k", i, k;
+            if(k > 0)
+            {
+              if(k <= size(bestElem[i]))
+              {
+                oAP = ordsBest[cl][i][k];
+                ordNewFactor = ordNewFactor + oAP;
+              } else
+              {
+                oAP = number(ordsFull[i, cl]);
+                ordNewFactor = ordNewFactor + oAP;
+              }
+            }
+          }
+        }
+        den1 = int(denominator(ordNewFactor));
+      }
+
+      poly newFactor = 1;
+      int denNewFactor = den1;
+      int powFactor = 0;
+
+      int nnE = int(numerator(expBaseFactor));
+      int ddE = int(denominator(expBaseFactor));
+      int nnY = int(numerator(ordNewFactor));
+
+      while(ddE > 1)
+      {
+        powFactor = powFactor + 1;
+        expBaseFactor = expUnit + powFactor * ordNewFactor;
+        ddE = int(denominator(expBaseFactor));
+      }
+    }
+  } else
+  {
+    expBaseFactor = 0;
+  }
+
+  int eu;
+  number euNum;
+
+  euNum = expBaseFactor;
+  if(size(MSelf[cl]) > 0)
+  {
+    euNum = expBaseFactor + MSelf[cl][md[cl]-1];
+  }
+  eu = int(euNum);
+  debug_log_intbas(3, "------Time maxDegMerge: ", timer - tt);
+
+  return(eu);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Computes the order of a polynomial h at the classes from list classes
+// indicated by an entry 1 in the vector classesInd
+static proc ordAtClassesPol(poly h, list classes, intvec classesInd)
+{
+  int i, j;
+  number expUnit = 0;
+  number expUnitTemp;
+
+  for(i = 1; i <= size(classes); i++)
+  {
+    if(classesInd[i] == 1)
+    {
+      expUnitTemp = ordAtPol(h, classes[i][1]);
+      if((expUnit == 0) || (expUnitTemp < expUnit))
+      {
+        expUnit = expUnitTemp;
+      }
+    }
+  }
+  return(expUnit);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Computes the order of a product of polynomials at a list of classes
+static proc ordAtClasses(list classes, list fullPoly, intvec classes1Ind, intvec classes2Ind)
+{
+  int i, j;
+  number expUnit = 0;
+  number expUnitTemp;
+
+  for(i = 1; i <= size(classes); i++)
+  {
+    if(classes1Ind[i] == 1)
+    {
+      expUnitTemp = 0;
+      for(j = 1; j <= size(classes); j++)
+      {
+        if(classes2Ind[j] == 1)
+        {
+          expUnitTemp = expUnitTemp + ordAtPol(fullPoly[j], classes[i][1]);
+        }
+      }
+      if((expUnit == 0) || (expUnitTemp < expUnit))
+      {
+        expUnit = expUnitTemp;
+      }
+    }
+  }
+  return(expUnit);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Takes the common denominator in a list of polynomial fractions
+static proc comDen(list ibNum, list ibDen)
+{
+  int i;
+  ideal IOut;
+  poly ibComDen = 1;
+
+  for(i = 1; i <= size(ibNum); i++)
+  {
+    ibComDen = lcm(ibComDen, ibDen[i]);
+  }
+
+  // Common denominator
+  for(i = 1; i <= size(ibNum); i++)
+  {
+    IOut[i] = (ibNum[i] * ibComDen) / ibDen[i];
+  }
+
+  list out = IOut, ibComDen;
+  return(out);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+//          Auxiliar tools
+//
+/////////////////////////////////////////////////////////////////////////////
+
+// The maximum between a and b
+static proc maxInt(int a, int b)
+{
+  if(a > b)
+  {
+    return(a);
+  } else {
+    return(b);
+  }
+}
+
+// Computes a polynomial over the ground field that together with the
+// elements of slower degree in the IB, generates the same ring as the
+// polynomial in the extension field.
+// Remark: it is assumed that x is the first variable.
+static proc elimPar(list ib, int i)
+{
+  // Trivial case
+  if(i == 1)
+  {
+    //"Trivial case";
+    return(ib[1][1]);
+  }
+
+  int t = timer;
+  int j;
+  def BR = basering;
+  poly pa = subst(minpoly, @a, var(1));
+
+  // We use a lexicographical ordering so that the parameter is eliminated.
+  ring ER = 0, (@a,var(1),var(2)), lp;
+  intvec va = (1,0,0);
+
+  // pa will be a polynomial in a.
+  poly pa = fetch(BR, pa);
+
+  // remi will be the ideal of the generators of smaller degree, after taking
+  // common denominator.
+  ideal remi;
+  list ib = imap(BR, ib);
+
+  int mExp = ib[i][2];
+  if(mExp > ib[i][2])
+  {
+    "WRONG EXPONENT. CHECK!!";
+    ~;
+    setring BR;
+    return(var(2) * ib[i-1][1]);
+  }
+
+  for(j = 1; j < i; j++)
+  {
+    // var(2) is now x
+    remi[j] = ib[j][1] * (var(2)-@a)^(mExp - ib[j][2]);
+  }
+
+  // Module reduction - NOT WORKING!! TO DO!!
+  //"Module reduction";
+  //"remi: "; remi;
+  //"pa: ", pa;
+  //"ib[i][1]: ", ib[i][1];
+  //poly redT = moduleReduction(remi, pa, ib[i][1]);
+
+  remi[i] = pa;
+  remi = groebner(remi);
+
+  // We reduce the last element by the rest of the elements
+  poly red = reduce(ib[i][1], remi);
+
+  if(deg(red, va) > 0)
+  {
+    "Wrong degree! Check!";
+    ~;
+  }
+  setring BR;
+  poly red = imap(ER, red);
+  return(red);
+}
+
+// The number of different initial coefficients must be equal to the
+// order b of the singular points.
+static proc newtonInfo(poly f, int b){
+  //"START - ibasis.lib - newtonInfo";
+  int i;
+  int slN, slD;
+  int g;
+  int dbg = printlevel - voice + 4;
+
+  list l = newtonpoly(f);
+  if(size(l) > 2){
+    dbprint(dbg, "The Puiseux Expansions have different initial exponents. New algorithm not implemented for this case.");
+    return(list());
+  } else {
+    slN = l[2][1] - l[1][1];
+    slD = l[1][2] - l[2][2];
+    g = gcd(slD, slN);
+    slD = slD div g;
+    slN = slN div g;
+    poly pp = Puiseuxexpansions::puiseuxStep(f, slN, slD);
+    if(deg(pp) < b){
+      dbprint(dbg, "The Puiseux Expansions have repeated initial coefficients. New algorithm not implemented for this case.");
+      return(list());
+    }
+    poly sqpp = squarefree(pp);
+    // CHECK! Case deg sqpp = 1 might not be fully implemented.
+    if((deg(sqpp) > 1) and (deg(sqpp) < deg(pp))){
+      dbprint(dbg, "The Puiseux Expansions have repeated initial coefficients. New algorithm not implemented for this case.");
+      return(list());
+    }
+    if((deg(sqpp) == 1) and (deg(pp) > 1))
+    {
+      if((slN mod slD) == 0)
+      {
+        return(list("changeCoord", subst(sqpp, y, 0)*x^(slN div slD)));
+      } else
+      {
+        "Not implemented.";
+        return(list());
+      }
+    }
+
+    if(slD*slN == 1){
+      dbprint(dbg, "Ordinary multiple point.");
+    }
+    return(list("OK", slN, slD));
+  }
+}
+
+// Gives the integral basis in the desired shape.
+// It replaces the exponents alpha by the corresponding px^alpha
+static proc convertIB(list ib, poly px)
+{
+  //"START - ibasis.lib - convertIB - 10";
+  int i;
+  int expDen = ib[size(ib)][2];
+  poly den = px^expDen;
+  ideal ibCom;
+  for(i = 1; i<= size(ib); i++)
+  {
+    ibCom[i] = ib[i][1]*(px^(expDen-int(ib[i][2])));
+  }
+  list new = list(ibCom, den);
+  return(new);
+}
+
+// Procedures to traslate polynomials
+static proc moveToVar(poly f, poly p, poly vari)
+{
+  ////"START - ibasis.lib - moveToVar - 8";
+  matrix c = coeffs(p, vari);
+  poly rootP = (-1)*c[1,1] / c[2,1];
+  poly fT = subst(f,vari,vari+rootP);
+  return(fT);
+}
+
+static proc moveFromVar(poly f, poly p, poly vari)
+{
+  //"START - ibasis.lib - moveFromVar - 8";
+  matrix c = coeffs(p, vari);
+  poly rootP = (-1)*c[1,1] / c[2,1];
+  poly fT = subst(f,vari,vari-rootP);
+  return(fT);
+}
+
+static proc moveTo(poly f, poly px, poly py)
+{
+  //"START - ibasis.lib - moveTo - 8";
+  poly fT = moveToVar(f, px, var(1));
+  fT = moveToVar(fT, py, var(2));
+  return(fT);
+}
+
+static proc moveFrom(poly f, poly px, poly py)
+{
+  //"START - ibasis.lib - moveFrom - 8";
+  poly fT = moveFromVar(f, px, var(1));
+  fT = moveFromVar(fT, py, var(2));
+  return(fT);
+}
+
+// Converts an integral basis in the shape {p0, p1, ..., pn-1} to the
+// shape (p0, d0), ..., (pn-1, dn-1)
+static proc intBasIdealToList(ideal I)
+{
+  list ib;
+  int d = deg(I[1], intvec(1,0));
+  list out;
+  for(int i = 1; i <= ncols(I); i++)
+  {
+    out = divideBy(I[i], var(1));
+    ib[i] = list(out[1], d - out[2]);
+  }
+  return(ib);
+}
+
+
+// Divides f by the maximum possible power of g.
+// Returns the quotient and the exponent used of g.
+static proc divideBy(poly f, poly g)
+"USAGE:  divideBy(f,g); f, g multivariate polynomials
+RETURN:  a list of two elements. The first element is the polynomial f
+divided by the maximum possible power of g and the second element is an
+integer indicating the power of g used.
+KEYWORDS: division multivariate polynomials
+"
+
+{
+  int i = 1;
+  ideal G = groebner(g);
+  while(reduce(f, G) == 0)
+  {
+    f = f / g;
+    i = i + 1;
+  }
+  list out = f, i-1;
+  return(out);
+}
+
+// Compares two polynomials in two variables.
+// This is used so that the puiseux expansions are always given in the same
+// order.
+static proc isBigger(poly f, poly g)
+{
+  //"START - integralbasis.lib - isBigger - 1";
+  int i;
+  intvec vy = (0,1);
+  if(deg(f, vy) > deg(g, vy))
+  {
+    // f is bigger
+    return(1);
+  }
+  if(deg(f, vy) < deg(g, vy))
+  {
+    // g is bigger
+    return(-1);
+  }
+  matrix cf = coeffs(f, var(2));
+  matrix cg = coeffs(g, var(2));
+  for(i = size(cf); i >= 1; i = i-1)
+  {
+    if(cf[i,1] > cg[i,1])
+    {
+      return(1);
+    }
+    if(cf[i,1] < cg[i,1])
+    {
+      return(-1);
+    }
+  }
+  // f is equal to g.
+  return(0);
+}
+
+// This is used so that the puiseux expansions are always given in
+// the same order. This procedure is also used in Puiseux library.
+static proc sortFactors(list facts)
+{
+  //"START - integralbasis.lib - sortFactors - 1";
+  int i, j;
+  int n = size(facts[1]);
+  poly pTemp;
+  int eTemp;
+  for (i = n; i >= 1; i--)
+  {
+    for (j = 1; j <= i-1; j++)
+    {
+      if(isBigger(facts[1][j], facts[1][j+1]) == 1)
+      {
+        pTemp = facts[1][j];
+        eTemp = facts[2][j];
+        facts[1][j] = facts[1][j+1];
+        facts[2][j] = facts[2][j+1];
+        facts[1][j+1] = pTemp;
+        facts[2][j+1] = eTemp;
+      }
+    }
+  }
+  return(facts);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Convert a list of numbers into an intvec
+static proc poly2intvec(poly p)
+{
+  intvec c;
+  matrix M = coef(p, var(1));
+  int n = ncols(M);
+  for(int i = 1; i <= n; i++)
+  {
+    c[i] = int(deg(M[1,n+1-i]));
+  }
+  return(c);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Convert a list of numbers into an intvec
+static proc list2intvec(list l)
+{
+  intvec c;
+  for(int i = 1; i <= size(l); i++)
+  {
+    c[i] = int(l[i]);
+  }
+  return(c);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Given two intvecs, both ordered for lowest to highest, it return
+// a new intvec containing the union of both intvecs, ordered from lowest
+// to highest.
+static proc appendIntvecs(intvec a, intvec b)
+{
+  intvec c;
+  int indA = 1;
+  int indB = 1;
+  int indC = 1;
+  int last = -1;
+  while((indA <= size(a)) and (indB <= size(b)))
+  {
+    if(a[indA] < b[indB]){
+      if(a[indA] > last)
+      {
+        c[indC] = a[indA];
+        last = c[indC];
+        indC++;
+      }
+      indA++;
+    } else {
+      if(b[indB] > last)
+      {
+        c[indC] = b[indB];
+        last = c[indC];
+        indC++;
+      }
+      indB++;
+    }
+  }
+  while(indA <= size(a))
+  {
+    if(a[indA] > last)
+    {
+      c[indC] = a[indA];
+      last = c[indC];
+      indC++;
+    }
+    indA++;
+  }
+  while(indB <= size(b))
+  {
+    if(b[indB] > last)
+    {
+      c[indC] = b[indB];
+      last = c[indC];
+      indC++;
+    }
+    indB++;
+  }
+  return(c);
+}
+
+
+// Computes a Groebner basis of P with lex order and y > x.
+static proc yInTermOfx(ideal P)
+{
+  //"START - integralbasis.lib - yInTermOfx - 1";
+  def R = basering;
+  ring S = 0, (var(2), var(1)), lp;
+  ideal P = imap(R, P);
+  P = groebner(P);
+  setring R;
+  P = imap(S, P);
+  return(P);
+}
+
+// Divides a polynomial by a - x.
+static proc divXA(poly f)
+{
+  //"START - integralbasis.lib - divXA";
+  def R = basering;
+
+  ring W = 0, (@a,var(1),var(2)), lp;
+  poly f = imap(R, f);
+  //list l = division(f, @a-x);
+  list l = division(f, @a-var(2));
+  setring R;
+  list l = imap(W, l);
+  list l2 = l[1][1,1], l[2][1];
+  return(l2);
+}
+
+static proc swapXYIdeal(ideal I)
+{
+  //"START - integralbasis.lib - swapXYIdeal";
+  def R = basering;
+  def R2 = ring(0, (y,x), dp);
+  setring R2;
+  ideal I = fetch(R, I);
+  setring R;
+  I = imap(R2, I);
+  return(I);
+}
+
+static proc swapXYPoly(poly f)
+{
+  //"START - integralbasis.lib - swapXYPoly";
+  def R = basering;
+  def R2 = ring(0, (y,x), dp);
+  setring R2;
+  poly f = fetch(R, f);
+  setring R;
+  f = imap(R2, f);
+  return(f);
+}
+
+// f monic as poly in the second variable (assuming that the coefficient of
+// the max degree is a constant)
+proc monic(poly f)
+"USAGE:  monic(f); f polynomial in two variables whose leadi.
+RETURN:  a multiple of f monic as polynomial in the second variables,
+polynomial of degree d in the second variable of the ring with
+an ordinary  multiple point at the origin of order k.
+ASSUME:  f is a bivariate polynomial whose leading coefficients as
+polynomial in the second variable is a unit.
+EXAMPLE: example monic; shows an example
+"
+{
+  //"START - integralbasis.lib - monic - 1";
+  matrix c = coeffs(f,var(2));
+  f = f/c[size(c), 1];
+  return(f);
+}
+example
+{ "EXAMPLE:";
+  echo = 2;
+  ring R = 0, (x,y), dp;
+  poly f = -3y3 + 3x2y + y2 + 1;
+  monic(f);
+}
+
+
+
+// Generates a polynomial of degree d in y with a ordinary multiple point at
+// the origin of order k.
+proc polyDK(int d, int k, list #)
+"USAGE:  polyDK(d,k,#); d integer, k<=d integer.
+RETURN:  polynomial of degree d in the second variable of the ring with
+an ordinary  multiple point at the origin of order k.
+KEYWORDS: singularities ordinary multiple point.
+EXAMPLE: example polyDK; shows an example
+"
+
+{
+  //"START - integralbasis.lib - polyDK";
+  if(size(#) > 0){
+    if(typeof(#[1]) == "int"){
+      int sd = #[1];
+      //"Setting the seed to ", sd;
+      system("--random", sd);
+    }
+  }
+
+  int i;
+  def r = basering;
+  ring s = 0, (x,y,z), dp;
+  ideal m2 = maxideal(d);
+  ideal m1 = ideal(x,y);
+  m1 = m1^k;
+  ideal J = intersect(m1, m2);
+
+  int good = 0;
+  while(good == 0){
+    setring s;
+    matrix M = randommat(1,1,J,5);
+    poly p = M[1,1];
+    p = p+y^(d);
+    p = subst(p,z,1);
+
+    setring r;
+    poly p = fetch(s, p);
+    matrix c = coeffs(p,y);
+    poly f = p / c[size(c), 1];
+
+    // We check if f satisfies the desired properties.
+    list fc = divideBy(subst(f,x,0), y);
+    if(fc[2] == k){
+      good = 1;
+    }
+  }
+  return(f);
+}
+example
+{ "EXAMPLE:";
+  echo = 2;
+  ring R = 0, (x,y), dp;
+  int k = 3;
+  int d = 6;
+
+  // Polynomial of degree 6 in y with an ordinary multiple point
+  // at the origin of order k.
+  poly f = polyDK(d, k, 1231);
+  f;
+
+  // The integral basis of R / <f>
+  list l = integralBasis(f, 2, "atOrigin");
+  l;
+  echo = 0;
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+//          Hensel Lifting
+//
+/////////////////////////////////////////////////////////////////////////////
+
+proc henselGlobal(poly f, poly g, poly h, int order)
+"USAGE:  henselGlobal(f,g,h,order); h is polynomial in x and y.
+f and g are polynomials in y such that f(y)*g(y) = h(0,y) and <f, g> = 1.
+RETURN:  polynomials f1 and g1 such that
+1) h = f1*g1 up to the required order in x.
+2) f1(0,y) = f, g1(0,y) = g
+KEYWORDS: hensel lifting.
+"
+{
+  //"START - hensel.lib - henselGlobal - 1";
+  intvec vx = (1,0);
+
+  int dbg = printlevel - voice + 2;
+  //if(dbg > 2)
+  //{
+  //  "Hensel lifting input:";
+  //  "f: ", f; "g: ", g; "h: ", h;
+  //  "order: ", order;
+  //}
+
+  // Trivial cases
+  //if(f == 1)
+  if(deg(f,intvec(0,1)) == 0)
+  {
+    //if(f != 1)
+    //{
+    //  "Non monic at henselGlobal, please check.";
+    //}
+    if(subst(h, var(1), 0) == f * g)
+    {
+      list L = f, jet(h, order, vx);
+      //dbprint(dbg - 2, "Output: ", L);
+      //"DBG - henselGlobal easy ends";
+      return(L);
+    } else
+    {
+    "ERROR";
+    ~;
+      ERROR("f(y)*g(y) != h(0,y)");
+    }
+  }
+  //if(g == 1)
+  if(deg(g, intvec(0,1)) == 0)
+  {
+    //if(g != 1)
+    //{
+    //  "Non monic at henselGlobal, please check.";
+    //}
+    if(subst(h, var(1), 0) == f * g)
+    {
+      list L = jet(h, order, vx), poly(1);
+      //"DBG - henselGlobal easy ends";
+      //dbprint(dbg - 2, "Output: ", L);
+      return(L);
+    } else
+    {
+      "ERROR";
+      ~;
+      ERROR("f(y)*g(y) != h(0,y)");
+    }
+  }
+
+  int t = timer;
+  // Kernel version
+  dbprint(dbg, "--------Calling Hensel lifting (kernel)...");
+  //"DBG - Calling hensel lifting (kernel)..."; "h: ", h; "f: ", f; "g:", g;
+
+  // DEBUG!!
+  // REMOVE!!!
+  //order = order * 10;
+
+  //"h, order, f, g", h, order, f, g;
+  list L = factmodd(h, order, f, g, 1, 2);
+
+  //list L = system("henselfactors", 1, 2, h, f, g, order);
+  debug_log_intbas(3, "--------Time hensel lifting (kernel): ", timer-t);
+  //"DBG - Time hensel lifting (kernel): ", timer-t;
+
+  dbprint(dbg - 2, "--------Output of Hensel lifting: ", L);
+  //"DBG - henselGlobal ends";
+  //"Check: "; jet(L[1]*L[2] - h, order, vx);
+  return(L);
+}
+example
+{ "EXAMPLE:";
+  echo = 2;
+  ring R = 0, (x,y), dp;
+
+  // Polynomial of degree 6 in y with an ordinary multiple point
+  // at the origin of order k.
+  poly h = (y2 + 3xy + x3 + x4)*(y3 + 2x + 1);
+  poly f = y2;
+  poly g = y3 + 1;
+  henselGlobal(f, g, h, 3);
+  echo = 0;
+}
+
+
+
+
+// This procedure separates the segment with slope slN / slD (assuming that
+// it is the smallest slope) from the rest.
+// It returns a list containing the factor correspoding to the slope slN / slD, and
+// the polynomial corresponding to all the factors with larger slope.
+// This procedure tranforms the polynomials so that the Hensel Lifting Lemma
+// can be applied, and uses it to lift the factorization up to the desired
+// order.
+static proc henselLocal(poly f, int slN, int slD, int order)
+{
+  int dbg = printlevel - voice + 5;
+  int i;
+  intvec vy = 0, 1;
+  poly x = var(1);
+  poly y = var(2);
+  int d = deg(f, vy);
+
+  //"Transformation...", slN, slD;
+
+  // We transform y by x^(slN / slD)y in f.
+  // and factor out the powers of x.
+  // (In fact, to avoid fractional exponents,
+  // we map x to x^slD and y to x^slN*y.)
+  poly f1 = mapTo(f, slN, slD);
+  int fD = slN * d;
+  f1 = f1 / (x^fD);
+  poly f0 = subst(f1, x, 0);
+  list l1 = divideBy(f0, y);
+  poly g0 = l1[1];
+  int gD = deg(g0, vy);
+  int hD = l1[2];
+  poly h0 = y^hD;
+
+  // We set up to which order we have to compute the expansions
+  int ordCommon;
+  if(hD < gD)
+  {
+    ordCommon = slN * hD;
+  } else
+  {
+    ordCommon = slN * gD;
+  }
+
+  //dbprint(dbg, "henselGlobal inside henselLocal");
+  //dbprint(dbg - 1, "Order: ", order * slD - ordCommon);
+
+  // DEBUG!!!
+  //order = order * 10;
+
+  list l2 = henselGlobal(g0, h0, f1, order * slD - ordCommon);
+  //dbprint(dbg, "henselGlobal inside henselLocal finished");
+
+  // We transform everything back to the original setting
+  // The case of several blocks with the same slope is not implemented.
+  //list comps = henselFacs(g, order * slD - ordCommon);
+  poly g = l2[1] * (x^(gD * slN));
+
+  g = mapFrom(g, slN, slD);
+
+  poly h = l2[2] * (x^(hD*slN));
+  h = mapFrom(h, slN, slD);
+  return(list(g, h));
+}
+
+// Maps x to x^slD and y to x^slN*y.
+static proc mapTo(poly f, int slN, int slD)
+{
+  f = subst(f, var(1), var(1)^slD);
+  f = subst(f, var(2), var(1)^slN*var(2));
+  return(f);
+}
+
+// We map back x^slN*y to y and x^slD to x.
+static proc mapFrom(poly f, int slN, int slD)
+{
+  //"START - hensel.lib - mapFrom - 1";
+  def R = basering;
+  int jj = attrib(basering, "maxExp");
+  ring S = (0, @a), (x, y, T), (dp, L(jj));
+  poly f = fetch(R, f);
+  ideal I1 = x^slN*y-T;
+  poly g = reduce(f, groebner(I1));
+  g = subst(g, T, y);
+  ideal I2 = x^slD - T;
+  g = reduce(g, groebner(I2));
+  g = subst(g, T, x);
+  setring R;
+  poly g = fetch(S, g);
+  //"ENDS - hensel.lib - mapFrom - 1";
+  return(g);
+}
+
+//------------------------------------------------------------------
+// General procedure for computing factors via hensel lifting
+//------------------------------------------------------------------
+// Computes the factors of f corresponding to the Puiseux blocks up to a given
+// order in the power series ring.
+static proc henselBlocks(poly f, int globOrder, int loc)
+{
+  int dbg = printlevel - voice + 5;
+
+  // If loc = 1, the factors outside the origin will be taken all together.
+  // The first poly in the ouput will be the factor corresponding to the component
+  // outside the origin.
+
+  //if(dbg > 5)
+  //{
+  //  "---- henselBlock begins";
+  //}
+
+  poly x = var(1);
+  poly y = var(2);
+
+  int comp = 1;
+  list comps;
+  list compsT;
+  int i, j, k;
+  int first;
+  int stop, last;
+
+  list fSegment;
+
+  intvec vx = (1,0);
+  intvec vy = (0,1);
+  int maxOrder = deg(f, vx);
+  if(globOrder > maxOrder)
+  {
+    maxOrder = globOrder;
+  }
+  int locOrder = maxOrder;
+
+  if(loc == 1)
+  {
+    poly f0 = subst(f, x, 0);
+
+    list fl = divideBy(f0, y);
+
+    list fGlob = henselGlobal(y^fl[2], fl[1], f, maxOrder);
+
+    poly fLoc = fGlob[1];
+
+    if(fLoc == 1)
+    {
+      "Warning! No local component. This may indicate you are computing the basis at a value of X where there is no singularity.";
+    }
+    comps[1] = fGlob[2];    // comp[1] is the component outside the origin.
+    comp = 2;
+    dbprint(dbg, "----Computing Puiseux Segments...");
+    fSegment = henselSegments(fLoc, maxOrder);
+
+    for(i = 1; i <= size(fSegment); i++)
+    {
+      compsT = henselInSegment(fSegment[i], maxOrder);
+
+      for(k = 1; k <= size(compsT); k++){
+        comps[comp] = compsT[k];
+        comp++;
+      }
+    }
+  } else
+  {
+    comps = henselTotal(f, maxOrder);
+    comp = size(comps) + 1;
+  }
+
+  return(comps);
+}
+
+// Given a poly without components outside the origin, computes the factors
+// corresponding to each slope in the power series rings.
+static proc henselSegments(poly f, int order)
+{
+  //if(printlevel - voice > 5)
+  //{
+  //  "START - hensel.lib - henselSegments - 1";
+  //}
+
+  int dbg = printlevel - voice + 5;
+  int i;
+  int slN, slD;
+  poly fLoc = f;
+  list lLoc;
+
+  list l = newtonpoly(f);
+  list hSegment;
+
+  for(i = 1; i < size(l) - 1; i++)
+  {
+    slN = l[i+1][1] - l[i][1];
+    slD = l[i][2] - l[i+1][2];
+
+    // The polynomial corresponding to the segment.
+    if(dbg > 0)
+    {
+      "------Computing the polynomial corresponding to segment", i;
+    }
+    lLoc = henselLocal(fLoc, slN, slD, order);
+
+    //dbprint(dbg, "Done.");
+    hSegment[i] = lLoc[1];
+    fLoc = lLoc[2];
+  }
+  hSegment[size(l) - 1] = fLoc;
+
+  return(hSegment);
+}
+
+// Computes the different blocks in a segment up to the given order.
+static proc henselInSegment(poly f, int globOrder)
+{
+  //if(printlevel - voice > 5)
+  //{
+  //  "START - hensel.lib - henselSegments - 1";
+  //}
+  int i, j;
+  int loc;
+  list comps;
+
+  poly x = var(1);
+  poly y = var(2);
+  intvec vx = (1,0);
+  intvec vy = (0,1);
+  int d = deg(f, vy);
+
+  list l = newtonpoly(f);
+
+  int slN = l[2][1] - l[1][1];
+  int slD = l[1][2] - l[2][2];
+  int g = gcd(slD, slN);
+  slD = slD div g;
+  slN = slN div g;
+
+  poly je = Puiseuxexpansions::minEqNewton(f, slN, slD);
+  list fJe = factorize(je);
+  fJe = sortFactors(fJe);
+
+  // We transform y by x^(slN / slD)y in f.
+  // and factor out the powers of x.
+  // (In fact, to avoid fractional exponents,
+  // we map x to x^slD and y to x^slN*y.)
+  poly f1 = mapTo(f, slN, slD);
+  f1 = f1 / (x^(d*slN));
+
+  poly je1 = mapTo(je, slN, slD);
+  je1 = je1 / (x^(d*slN));
+
+  // For each factor of the equation, compute the corresponding lifted factor
+  list lLoc;
+  poly fLoc = f1;
+  list hFactor;
+  poly fJe1;
+  int sFac = size(fJe[1]) - 1;
+
+  for(i = 1; i < sFac; i++)
+  {
+    fJe1 = mapTo(fJe[1][i+1]^(fJe[2][i+1]), slN, slD);
+    fJe1 = fJe1 / (x^(deg(fJe1, vy) * slN));
+    je1 = je1 / fJe1;
+    lLoc = henselGlobal(fJe1, je1, fLoc, globOrder);
+    hFactor[i] = lLoc[1];
+    fLoc = lLoc[2];
+  }
+  hFactor[sFac] = fLoc;
+
+  int degFac;
+  int comp = 1;
+  poly ratPart;
+  list compsT;
+  for(i = 1; i <= sFac; i++)
+  {
+    degFac = deg(fJe[1][i+1], vy) * fJe[2][i+1];
+    hFactor[i] = hFactor[i] * (x^(degFac * slN));
+    hFactor[i] = mapFrom(hFactor[i], slN, slD);
+    compsT = splitFact(hFactor[i], fJe[1][i+1], fJe[2][i+1], globOrder);
+    for(j = 1; j <= size(compsT); j++)
+    {
+      comps[comp] = compsT[j];
+      comp++;
+    }
+  }
+  return(comps);
+}
+
+// Computes the Puiseux block at the origin an outside the origin.
+// It lifts all the factors of h(0,y) and splits them.
+static proc henselTotal(poly h, int order)
+{
+  if(printlevel - voice > 5)
+  {
+    "START - hensel.lib - henselTotal";
+  }
+
+  poly f, g;
+  int i, j;
+  list facs;
+  list comps;
+  list hFacts;
+  int comp = 1;
+
+  poly x = var(1);
+  poly y = var(2);
+  intvec vy = (0,1);
+
+  poly h0 = subst(h, x, 0);
+  list fc = factorize(h0);
+  fc = sortFactors(fc);
+
+  g = h;
+
+  // Computes the lifting of the factors
+  list compsT;
+  for(i = 2; i < size(fc[1]); i++)
+  {
+    f = fc[1][i]^(fc[2][i]);
+    g = g / f;
+    facs = henselGlobal(f, g, h, order);
+    h = facs[2];
+    hFacts[i-1] = facs[1];
+  }
+  hFacts[size(fc[1]) - 1] = h;
+
+  // Splits the factors
+  for(i = 1; i <= size(hFacts); i++)
+  {
+    compsT = splitFact(hFacts[i], fc[1][i+1], fc[2][i+1], order);
+    for(j = 1; j <= size(compsT); j++)
+    {
+      comps[comp] = compsT[j];
+      comp++;
+    }
+  }
+  return(comps);
+}
+
+// Split poly f assuming that it corresponds to a factor factor^exp
+static proc splitFact(poly f, poly fact, int exp, int order)
+{
+  poly x = var(1);
+  poly y = var(2);
+
+  fact = monic(fact);
+  int i, j;
+  list comps;
+
+  intvec vy = (0,1);
+  int comp = 1;
+
+  // If the degree of the minimal polynomial is greater than 1,
+  // the splitting is not implemented.
+
+  // If the degree is 1, and the exponent is 1, there is nothing to do.
+  if((deg(fact, vy) == 1) and (exp > 1))
+  {
+    // The rational part.
+    fact = monic(fact);
+    poly ratPart = subst(fact, y, 0);
+    poly fNew = subst(f, y, y - ratPart);
+
+    int loc;
+    int start;
+    if(fact == y)
+    {
+      loc = 1;    // Separate only the factors at the origin.
+      start = 2;
+    } else
+    {
+      loc = 0;    // Separate also the factors outside the origin.
+      start = 1;
+    }
+    list compsT = henselBlocks(fNew, order, loc);
+    for(j = start; j <= size(compsT); j++)
+    {
+      comps[comp] = subst(compsT[j], y, y + ratPart);
+      comp++;
+    }
+  } else
+  {
+    comps[1] = f;
+  }
+  return(comps);
+}
+
+///////////////////////////////////////////////////////////////////////
+//
+//                             Auxiliary tools
+//
+///////////////////////////////////////////////////////////////////////
+
+// Checks if the term of highest degree in y of f contains x.
+static proc isXMonic(poly f){
+  //"START - integralbasis.lib - isXMonic";
+  matrix c = coeffs(f,var(2));
+  return(deg(c[size(c), 1]) == 0);
+}
+
+// Check if the only singularity is at the origin
+static proc checkAt0(poly f, int modular)
+{
+  def R = basering;
+
+  int vdDS, vd32003;
+  int vdx, vdy;
+
+  // vdim at origin (using ds ordering)
+  //"checking at 0";
+  list rlDS = ringlist(R);
+  rlDS[3] = list(list("C", 0), list("ds", intvec(1,1)));
+  def S1 = ring(rlDS);
+  setring S1;
+  poly f = imap(R, f);
+  ideal SL = f, diff(f, var(1)), diff(f, var(2));
+
+  if(modular == 0)
+  {
+    SL = groebner(SL);
+  } else {
+    SL = modStd(SL);
+  }
+  vdDS = vdim(SL);
+  setring R;
+
+  // vdim at affine ring (using char 32003)
+  list rl32003 = ringlist(R);
+  rl32003[1] = 32003;
+  def S2 = ring(rl32003);
+  setring S2;
+  poly f = imap(R, f);
+  ideal SL = f, diff(f, var(1)), diff(f, var(2));
+  SL = groebner(SL);
+  vd32003 = vdim(SL);
+  setring R;
+  if(vdDS == vd32003)
+  {
+
+    // vdim at charts (using char 32003)
+    ring S = 0, (x,y,z), dp;
+    poly f = fetch(R, f);
+    f = homog(f, z);
+
+    poly fy = subst(f, y, 1);
+    poly fx = subst(f, x, 1);
+
+    ring Sx = 32003, (y, z), dp;
+    poly fx5 = imap(S, fx);
+    ideal J = fx5, diff(fx5, y), diff(fx5, z);
+    J = groebner(J);
+    vdx = vdim(J);
+
+    ring Sy = 32003, (x, z), dp;
+    poly fy5 = imap(S, fy);
+    ideal J = fy5, diff(fy5, x), diff(fy5, z);
+    J = groebner(J);
+    vdy = vdim(J);
+
+    if((vdx == 0) && (vdy == 0))
+    {
+      // No singularities at infinity
+      return(1);
+    } else
+    {
+      // Singularities at infinity
+      "Singularities at infinity";
+      return(0);
+    }
+  } else
+  {
+    "Check at origin: FALSE";
+    return(0);
+  }
+  kill vdDS, vd32003;
+  kill S1, S2;
+  kill rlDS, rl32003;
+}
+
+static proc xCondu(poly px, list norOut, ideal I)
+{
+  ideal XC = quotient(norOut[2]+I, norOut[1]);
+  ideal XCX = eliminate(XC, var(2));
+  //"The x-conductor is ", XCX[1];
+  return(XCX[1]);
+}
+
+// Compose the tower of minimimal polynomials.
+// We assume that the polynomials are given in the second variable.
+// The first polynomial in the list is not used.
+static proc composePolys(list minPolys)
+{
+  int i;
+  poly mp = minPolys[size(minPolys)];
+  for(i = size(minPolys)-1; i > 1; i--)
+  {
+    mp = subst(mp, var(2), minPolys[i]);
+  }
+  return(mp);
+}
+
+// We work in a ring extension from a ring extension, and we compute the
+// coefficients of f in the original ring (we assume they are elements of the
+// original ring).
+// poly alpha is the primitive element of the first extension mapped into the
+// extended ring
+// d is the degree of the original extension
+static proc extendBack(poly f, poly alpha, int d)
+{
+  def R = basering;
+  ideal I;
+  for(int i = 1; i <= d; i++)
+  {
+    I[i] = alpha^(i-1);
+  }
+
+  ring S = 0, (var(1), var(2), @a), dp;
+  poly f = imap(R, f);
+  ideal I = imap(R, I);
+  module M = coeffs(I, @a);
+  matrix CC = coef(f, var(1)*var(2));
+  module P;
+  matrix L;
+  int j;
+  ideal rel;
+  for(i = 1; i <= ncols(CC); i++)
+  {
+    P = coeffs(CC[2, i], @a);
+    L = lift(M, P);
+    rel[i] = 0;
+    for(j = 1; j <= nrows(L); j++)
+    {
+      rel[i] = rel[i] + L[j, 1] * var(1)^(j-1);
+    }
+
+  }
+  setring R;
+  ideal rel = imap(S, rel);
+  return(rel);
+}
+
+static proc changeDenominatorFast(ideal U1, poly c1, poly c2, ideal I)
+{
+  //"changeDenominatorFast";
+  ideal U2 = quotient(c2*U1+I, c1);
+  return(U2);
+}
+
+static proc trivialBasis(poly f)
+{
+  int j;
+
+  intvec vy = (0, 1);
+  int n = deg(f, vy);
+  ideal l;
+
+  for(j = 0; j < n; j++)
+  {
+    l[j+1] = var(2)^j;
+  }
+  return(list(l, poly(1)));
+}
+
+static proc isOneIdeal(ideal I)
+{
+  I = groebner(I);
+  int i;
+  int out = 0;
+
+  for (i = 1; i <= ncols(I); i++)
+  {
+    if(I[i] == 1){out = 1;}
+  }
+  return(out);
+}
+
+static proc isZeroIdeal(ideal I)
+{
+  int i;
+  int out = 1;
+  for (i = 1; i <= ncols(I); i++)
+  {
+    if(I[i] != 0){out = 0;}
+  }
+  return(out);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// SPECIAL ALGORITHM FOR SINGULARITIES WITH SAME X-COORDINATE
+////////////////////////////////////////////////////////////////////////////////
+
+// Case: singularity with non-rational Y coordinate, and X = 0.
+// py is a polynomial in Y, whose roots are the Y-coordinate of the
+// singuarities.
+static proc ibNonRatY(poly f, poly py, int locBasis){
+  // We have singularities at <x, roots of(py)>.
+  int i;
+  int b;    // Multiplicity of the singularity.
+  int dbg = printlevel - voice + 5;
+
+  poly x = var(1);
+  poly y = var(2);
+  intvec vY = (0,1);
+  intvec vX = (1,0);
+
+  def R = basering;
+  int d = deg(f,vY);
+
+  // We add one of the roots of py to the basering.
+  def S = splitRingAt(py);
+  setring S;
+  poly f = fetch(R, f);
+  poly py = fetch(R, py);
+
+  // Initial terms of the Puiseux expansion of f at the singularity, y = PE.
+  poly PE = par(1);
+
+  // We move the singularity to the origin
+  poly fT = subst(f, var(2), var(2) + par(1));
+
+  // We compute the integral basis with the singularity at the origin.
+  list ib = ibNonRatYSplit(fT, f, py, PE, locBasis);
+
+  // We do not need to move back the integral basis, because it is already
+  // computed using the original f.
+
+  // Back to the original ring
+  setring R;
+  list ib = imap(S, ib);
+  return(ib);
+}
+
+// fOrig and py are the original polynomials, they will not be changed.
+// f and PE are changed so as to compute the puiseux expansions
+static proc ibNonRatYSplit(poly f, poly fOrig, poly py, poly PE, int locBasis)
+{
+  debug_log_intbas(4, "--------START - integralbasis.lib - ibLocalNonRatYSplit");
+//  "f", f;
+//  "fOrig", fOrig;
+//  "py", py;
+//  "PE", PE;
+//  "locBasis", locBasis;
+//  "basering", basering;
+
+  int i;
+  int dbg = printlevel - voice + 5;
+
+  poly x = var(1);
+  poly y = var(2);
+
+  intvec vY = (0,1);
+  intvec vX = (1,0);
+  int d = deg(fOrig,vY);
+
+  // We compute the multiplicity of the singularity.
+  poly f0 = subst(fOrig,x,0);
+  list fc = divideBy(f0, py);
+  int b = fc[2];
+
+  list dat = newtonInfo(f, b);
+
+  list ib;    // Integral basis
+  if(size(dat) == 0){
+    // The simple algorithm cannot be used.
+    return(list());
+  }
+  if(dat[1] == "changeCoord")
+  {
+    // The first term of the Puiseux expansions is repeated.
+    // We remove it and compute the integral basis recursively.
+    //"DBG - Change coord (linear term in PE)";
+    f = subst(f, y, y - dat[2]);
+
+    // We add the new terms of the Puiseux expansion
+    PE = PE - dat[2];
+
+    // We compute the integral basis
+    ib = ibNonRatYSplit(f, fOrig, py, PE, locBasis);
+
+    if(size(ib) > 0)
+    {
+      return(ib);
+    } else
+    {
+      // The integral basis could not be computed.
+      return(list());
+    }
+  }
+
+  // We run the algorithm
+  dbprint(dbg, "Simple algorithm is used for this component.");
+
+  poly f1, f2;    // fOrig(0,y) = f1*f2
+  f1 = py^b;
+  f2 = fc[1];
+
+  // Slope of the Newton polygon (giving the initial exponent)
+  int slN = dat[2];
+  int slD = dat[3];
+
+  // Degrees of the polynomials
+  int dU = deg(f2,vY);
+  int dPY = deg(py, vY);
+
+  // Maximum integrality exponent
+  int maxExpDen = (slN * (((d-1)-dU) div dPY)) div slD;
+  if(dbg >= 1)
+  {
+    "Hensel lifting - order = ", maxExpDen;
+  }
+  // We compute the lifiting of the factor outside the origin up to the
+  // maximum integrality exponent
+  list hen = henselGlobal(f1, f2, fOrig, maxExpDen);
+  poly p = hen[1];
+  poly u = hen[2];
+
+  // We multiply the conjugates of (y - PE) to get a polynomial over
+  // the ground field
+  poly PEGround = buildPolyFrac(PE);
+  //"PE: "; PE;
+  //"PEground: "; PEGround;
+
+  // We compute the integral basis from the data obtained.
+  // It will be a product of u (the factor outside the singularity) and
+  // powers of y and PEGround.
+  int expDen;
+  int expPY, expY;  // The exponent of py and y in the numerator.
+  int ordU;
+  if(locBasis == 0)
+  {
+    for(i = 0; i < d; i++){
+      if(i >= dU + dPY){
+        expDen = (slN * ((i-dU) div dPY)) div slD;
+        ordU = expDen - 1;
+        if (ordU < 0){ordU = 0;}
+        expPY = (int(i-dU) div dPY);
+        expY = i-dU-(expPY * dPY);
+        ib[i+1] = list(PEGround^expPY * y^expY, x^(expDen));
+        if(dU > 0){
+          ib[i+1][1] = ib[i+1][1] * jet(u, ordU, vX);
+        }
+      } else {
+        ib[i+1] = list(y^i, 1);
+      }
+    }
+  } else
+  {
+    for(i = 0; i < d - dU; i++)
+    {
+      if(i > 0)
+      {
+        expDen = (slN* (i div dPY)) div slD;
+        expPY = (i/dPY);
+        expY = i-(expPY * dPY);
+        ib[i+1] = list(py^expPY * y^expY, x^(expDen));
+      } else
+      {
+        ib[1] = list(1, 0);
+      }
+    }
+  }
+
+  // We put the integral basis in the usual form, with a common denominator.
+  poly den = ib[size(ib)][2];
+  ideal ibCom;
+  for(i = 1; i<= size(ib); i++){
+    ibCom[i] = ib[i][1]*den/ib[i][2];
+  }
+  list new = list(ibCom, den);
+  //"time for generating the base: "; timer - t;
+  return(new);
+}
+
+// Checks if two lists are equal
+static proc equalLists(list l1, list l2)
+{
+  int i;
+  if(size(l1) != size(l2))
+  {
+    return(0);
+  }
+  for(i = 1; i <= size(l1); i++)
+  {
+    if(l1[i] != l2[i])
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+
+
+// Merge classes if the corresponding factors are not over the ground field
+// Takes as input the output of proc irreducibleFactors
+
+static proc mergeClassesIF(poly f, list classes, list ifOut, int mdm)
+{
+  int h, i, j;
+
+  list cl;
+
+  int rep = 0;
+
+  for(i = 1; i <= size(classes); i++)
+  {
+    if(ifOut[2][i+1] == 0)
+    {
+      "Recombination of conjugation classes is not fully implemented. ";
+      "Please check output.";
+
+      rep = 1;
+
+      cl = getClassVector(classes[i]);
+      for(h = 1; h <= size(classes); h++)
+      {
+        if(i != h)
+        {
+          if(sameClass(cl, getClassVector(classes[h]), 1))
+          {
+            classes[h] = setClassVector(classes[h], cl);
+          }
+        }
+      }
+      break;
+    }
+  }
+
+  // Regroup classes
+  list classesNew;
+  for(i = 1; i <= size(classes); i++)
+  {
+    classesNew = classesNew + classes[i];
+  }
+  classes = getClasses(classesNew);
+
+  if(rep == 1)
+  {
+    ifOut = irreducibleFactors(f, classes, mdm);
+    if(ifOut[3] == 0)
+    {
+      classes = mergeClassesIF(f, classes, ifOut, mdm);
+    }
+  }
+  return(list(classes, ifOut));
+}
+
+static proc mergeTwoClasses(list classes, int a1, int a2)
+{
+  classes[a1] = classes[a1] + classes[a2];
+  classes = delete(classes,a2);
+  return(classes);
+}
+
+
+/////////////////////////////////////////////////////////////////////
+
+// splitring from primitiv.lib changed so that the variables
+// are named @a and not a
+
+static proc splitRingAt(poly f,list #)
+"USAGE:   splitringAt(f[,L]); f poly, L list of polys and/or ideals
+         (optional)
+ASSUME:  f is univariate and irreducible over the active ring. @*
+         The active ring must allow an algebraic extension (e.g., it cannot
+         be a transcendent ring extension of Q or Z/p).
+RETURN:  ring; @*
+           if called with a nonempty second parameter L, then in the output
+           ring there is defined a list erg ( =L mapped to the new ring);
+           if the minpoly of the active ring is non-zero, then the image of
+           the primitive root of f in the output ring is appended as last
+           entry of the list erg.
+NOTE:    If the old ring has no parameter, the name @code{a} is chosen for the
+         parameter of R (if @code{a} is no ring variable; if it is, @code{b} is
+         chosen, etc.; if @code{a,b,c,o} are ring variables,
+         @code{splitring(f[,L])} produces an error message), otherwise the
+         name of the parameter is kept and only the minimal polynomial is
+         changed. @*
+         The names of the ring variables and the orderings are not affected. @*
+KEYWORDS: algebraic field extension; extension of rings
+EXAMPLE: example splitring;  shows an example
+"
+{
+ //----------------- split ist bereits eine proc in 'inout.lib' ! -------------
+ if (size(#)>=1) {
+    list L=#;
+    int L_groesse=size(L);
+ }
+ else { int L_groesse=-1; }
+ //-------------- ermittle das Minimalpolynom des aktuellen Rings: ------------
+ string minp=string(minpoly);
+
+ def altring=basering;
+ string charakt=string(char(altring));
+ string varnames=varstr(altring);
+ string algname;
+ int i;
+ int anzvar=size(maxideal(1));
+ //--------------- Fall 1: Bisheriger Ring hatte kein Minimalpolynom ----------
+ if (minp=="0") { // only possible without parameters (by assumption)
+  if (find(varnames,"@a")==0)        { algname="@a";}
+  else { if (find(varnames,"@b")==0) { algname="@b";}
+         else { if (find(varnames,"@c")==0)
+                                    { algname="@c";}
+         else { if (find(varnames,"@o")==0)
+                                    { algname="@o";}
+         else {
+           "** Sorry -- could not find a free name for the primitive element.";
+           "** Try e.g. a ring without '@a' or '@b' as variable.";
+           return();
+         }}
+       }
+  }
+  //-- erzeuge einen String, der das Minimalpolynom des neuen Rings enthaelt: -
+  execute("ring splt1="+charakt+","+algname+",dp;");
+  ideal abbnach=var(1);
+  for (i=1; i<anzvar; i++) { abbnach=abbnach,var(1); }
+  map nach_splt1=altring,abbnach;
+  execute("poly mipol="+string(nach_splt1(f))+";");
+  string Rminp=string(mipol);
+  //~;
+
+  //--------------------- definiere den neuen Ring: ---------------------------
+  list ordStrNew = ordstr(altring);
+  int jj = attrib(altring,"maxExp");
+
+  ordStrNew = ordStrNew + list("L", jj);
+
+  execute("ring neuring = ("+charakt+","+algname+"),("+varnames+"),("
+           +ordstr(altring)+");");
+  execute("minpoly="+Rminp+";");
+
+  //---------------------- Berechne die zurueckzugebende Liste: ---------------
+  if (L_groesse>0) {
+   list erg;
+   map take=altring,maxideal(1);
+   erg=take(L);
+  }
+ }
+ else {
+
+  //------------- Fall 2: Bisheriger Ring hatte ein Minimalpolynom: -----------
+  algname=parstr(altring);           // Name des algebraischen Elements
+  if (npars(altring)>1) {"only one Parameter is allowed!!"; return(altring);}
+
+  //---------------- Minimalpolynom in ein Polynom umwandeln: -----------------
+  execute("ring splt2="+charakt+","+algname+",dp;");
+  execute("poly mipol="+minp+";");
+  // f ist Polynom in algname und einer weiteren Variablen -> mache f bivariat:
+  execute("ring splt3="+charakt+",("+algname+","+varnames+"),dp;");
+  poly f=imap(altring,f);
+
+  //-------------- Vorbereitung des Aufrufes von primitive: -------------------
+  execute("ring splt1="+charakt+",(x,y),dp;");
+  ideal abbnach=x;
+  for (i=1; i<=anzvar; i++) { abbnach=abbnach,y; }
+  map nach_splt1_3=splt3,abbnach;
+  map nach_splt1_2=splt2,x;
+  ideal maxid=nach_splt1_2(mipol),nach_splt1_3(f);
+  ideal primit=primitive(maxid);
+  if (size(primit)==0) {             // Suche mit 1. Proc erfolglos
+    primit=primitive_extra(maxid);
+  }
+  //-- erzeuge einen String, der das Minimalpolynom des neuen Rings enthaelt: -
+  setring splt2;
+  map nach_splt2=splt1,0,var(1);     // x->0, y->a
+  minp=string(nach_splt2(primit)[1]);
+  if (printlevel > -1) { "// new minimal polynomial:",minp; }
+  //--------------------- definiere den neuen Ring: ---------------------------
+  execute("ring neuring = ("+charakt+","+algname+"),("+varnames+"),("
+          +ordstr(altring)+");");
+  execute("minpoly="+minp+";");
+
+  if (L_groesse>0) {
+    //---------------------- Berechne die zurueckzugebende Liste: -------------
+    list erg;
+    setring splt3;
+    list zwi=imap(altring,L);
+    map nach_splt3_1=splt1,0,var(1);  // x->0, y->a
+    //----- rechne das primitive Element von altring in das von neuring um: ---
+    ideal convid=maxideal(1);
+    convid[1]=nach_splt3_1(primit)[2];
+    poly new_b=nach_splt3_1(primit)[3];
+    map convert=splt3,convid;
+    zwi=convert(zwi);
+    setring neuring;
+    erg=imap(splt3,zwi);
+    erg[size(erg)+1]=imap(splt3,new_b);
+  }
+ }
+ if (defined(erg)){export erg;}
+ return(neuring);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0,(x,y),dp;
+ def r1=splitring(x2-2);
+ setring r1; basering;    // change to Q(sqrt(2))
+ // change to Q(sqrt(2),sqrt(sqrt(2)))=Q(a) and return the transformed
+ // old parameter:
+ def r2=splitring(x2-a,a);
+ setring r2; basering; erg;
+ // the result is (a)^2 = (sqrt(sqrt(2)))^2
+ kill r1; kill r2;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+static proc getClassVector(list cl);
+{
+  if(typeof(cl[1]) == "ring")
+  {
+    def S = cl[1];
+    setring S;
+    list clVec = PE[1][6];
+  } else
+  {
+    list clVec = cl[1][6];
+  }
+  return(clVec);
+}
+
+static proc setClassVector(list cl, list clVec);
+{
+  def R = basering;
+  int i, j;
+  for(i = 1; i <=size(cl); i++)
+  {
+    if(typeof(cl[i]) == "ring")
+    {
+      def S = cl[i];
+      setring S;
+      for(j = 1; j <= size(PE); j++)
+      {
+        PE[j][6] = clVec;
+      }
+      setring R;
+      kill S;
+    } else
+    {
+      for(j = 1; j <= size(cl); j++)
+      {
+        cl[j][6] = clVec;
+      }
+
+    }
+  }
+  return(cl);
+}
+
+static proc sameClass(list l1, list l2, int offset)
+{
+  int i;
+  int same = 1;
+  for(i = 1; i <= size(l1) - offset; i++)
+  {
+    if(l1[i] != l2[i])
+    {
+      same = 0;
+    }
+  }
+  return(same);
+}
+
+
+// proc checkClass(list expClass)
+// {
+//     // If there is only one expansion in the class, there is nothing to do
+//     if(typeof(expClass[1]) == "ring")
+//     {
+//       for(j = 1; j <= size(classes[i]); j++)
+//       {
+//         if(typeof(classes[i][j]) == "ring")
+//         {
+//           S = classes[i][j];
+//           setring S;
+//           if(typeof(PE[1][7])!= "none")
+//           {
+//
+
+///////////////////////////////////////////////////////////////////////////////
+// Copied from classify.lib
+static proc init_debug_intbas(list #)
+"USAGE:    init_debug([level]);  level=int
+COMPUTE:  Set the global variable @DeBug to level. The variable @DeBug is
+          used by the function debug_log_intbas(level, list of strings) to know
+          when to print the list of strings. init_debug() reports only
+          changes of @DeBug.
+NOTE:     The procedure init_debug(n); is usefull as trace-mode. n may
+          range from 0 to 10, higher values of n give more information.
+EXAMPLE:  example init_debug; shows an example"
+{
+  int newDebug=0;
+  if( defined(@DeBug) != 0 ) { newDebug = @DeBug; }
+
+  if( size(#) > 0 )
+  {
+    newDebug=#[1];
+  }
+  else
+  {
+    string s=system("getenv", "SG_DEBUG");
+    if( s != "" && defined(@DeBug)==0)
+    {
+      s="newDebug="+s;
+      execute(s);
+    }
+  }
+  if( defined(@DeBug) == 0)
+  {
+    int @DeBug = newDebug;
+    export @DeBug;
+    if(@DeBug>0) { "Debugging level is set to ", @DeBug; }
+  }
+  else
+  {
+    if( (size(#) == 0) && (newDebug < @DeBug) ) { return(); }
+    if( @DeBug != newDebug)
+    {
+      int oldDebug = @DeBug;
+      @DeBug = newDebug;
+      if(@DeBug>0) { "Debugging level change from ", oldDebug, " to ",@DeBug; }
+      else
+      {
+        if( @DeBug==0 && oldDebug>0 ) { "Debugging switched off."; }
+      }
+    }
+  }
+  //printlevel = @DeBug;
+}
+example
+{ "EXAMPLE:"; echo=2;
+  init_debug();
+  debug_log_intbas(1,"no trace information printed");
+  init_debug(1);
+  debug_log_intbas(1,"some trace information");
+  init_debug(2);
+  debug_log_intbas(2,"nice for debugging scripts");
+  init_debug(0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc debug_log_intbas (int level, list #)
+"USAGE:    debug_log_intbas(level,li); level=int, li=comma separated \"message\" list
+COMPUTE:  print \"messages\" if level>=@DeBug.
+          useful for user-defined trace messages.
+EXAMPLE:  example debug_log_intbas; shows an example
+SEE ALSO: init_debug
+"
+{
+   int len = size(#);
+//   int printresult = printlevel - level +1;
+//   if(level>1)
+//   {
+//     dbprint(printresult, "Debug:("+ string(level)+ "): ", #[2..len]);
+//   }
+//   else { dbprint(printresult, #[1..len]); }
+   if( defined(@DeBug) == 0 ) { init_debug_intbas(); }
+   if(@DeBug>=level)
+   {
+      if(level>1) { "Debug:("+ string(level)+ "): ", #[1..len]; }
+      else { #[1..len]; }
+   }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  example init_debug;
+}
+
+static proc debug_lvl()
+{
+  int j = @DeBug;
+  return(j);
+}
+
+// Alternative procedure for computing characteristic exponents
+// from the exponentes of the series.
+// Not used beacuse we need to use characteristic orders, it is
+// not enough to compute the characteristic exponents.
+static proc charExp(intvec v, int k)
+{
+  intvec vNew;
+  int i = 1;
+  int ind = 1;
+  while ((v[i] mod k) == 0)
+  {
+    i++;
+  }
+  vNew[1] = v[i];
+  ind++;
+  int g = gcd(k, vNew[1]);
+  while(i <= size(v))
+  {
+    while((v[i] mod g) == 0)
+    {
+      i++;
+      if(i > size(v)){break;}
+    }
+    if(i <= size(v))
+    {
+      vNew[ind] = v[i];
+      g = gcd(g, vNew[ind]);
+      ind++;
+    }
+  }
+  return(vNew);
+}
+
+
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -486,8 +5212,8 @@ f = f+30y2x4+10yx5+3x6+33y5+37y4x-8y3x2-33y2x3-20yx4-3x5-11y4-15y3x;
 f = f+13y2x2+10yx3+x4; // 3 OMPs of mult 3, 1 OMP of mult 4
 integralBasis(f, 2);
 f =1/11*f;
-integralBasis(f, 2, "global");  // time 2
 integralBasis(f, 2);  // local by default, time 0
+integralBasis(f, 2, "global");  // time 2
 kill RR;
 // -------------------------------------------------------
 // Example 4
@@ -506,8 +5232,8 @@ f = f+12*u*v^3*z^2+6*v^4*z^2+36*u^2*z^4+36*u*v*z^4+9*v^2*z^4;
 f = subst(f,z,1);
 ring RR = 0, (x,y), dp;
 poly f = fetch(SS,f);
-integralBasis(f, 2);  integralBasis(f, 2, "global");  // time 1
 integralBasis(f, 2);  // local by default, time 0
+integralBasis(f, 2, "global");  // time 1
 kill RR, SS;
 // -------------------------------------------------------
 // Example 6
@@ -566,5 +5292,3 @@ poly f = fetch(SS,f);
 integralBasis(f, 2);  //  local by default, time 2
 kill RR, SS;
 */
-
-
