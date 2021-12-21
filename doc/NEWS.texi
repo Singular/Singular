@@ -32,7 +32,7 @@
 New libraries:
 @itemize
 @item sagbigrob.lib: Sagbi-Groebner basis of an ideal of a subalgebra (@nref{sagbigrob_lib})
-@item puiseuxexpansion.lib: Puiseux expansions over algebraic extensions (@nref{puiseuxexpansioni_lib})
+@item puiseuxexpansion.lib: Puiseux expansions over algebraic extensions (@nref{puiseuxexpansions_lib})
 @item integralbasis_lib: Integral basis in algebraic function fields: new version (@nref{integralbasis_lib})
 @end itemize
 
