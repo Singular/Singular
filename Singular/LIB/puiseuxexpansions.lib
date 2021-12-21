@@ -1,8 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version puiseux.lib 4.2.1.2 Nov_2021 "; // $Id$
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+version="version puiseuxexpansion.lib 4.2.1.3 Dec_2021 "; // $Id$
 category="Commutative Algebra";
 info="
-LIBRARY:  puiseux.lib  Puiseux expansions over algebraic extensions
+LIBRARY:  puiseuxexpansion.lib  Puiseux expansions over algebraic extensions
 AUTHORS:  J. Boehm, j.boehm at mx.uni-saarland.de
           W. Decker, decker at mathematik.uni-kl.de
           S. Laplagne, slaplagn at dm.uba.ar
@@ -16,6 +18,10 @@ or an algebraic extension of Q.
 
 PROCEDURES:
  puiseuxList(PP, maxDeg, iVarX, iVarY);     Computes the Puiseux expansion of PP at X = 0
+ makePuiseux(f, denom, fr);       Creates a Puiseux element
+ makePuiseuxFromPoly(poly f);     Converts a polynomail to Puiseux data type
+ printPuiseux(f);                 Prints information for Puiseux elements
+ puiseux(f, maxDeg, atOrigin);    Computes the Puiseux expansions of f
 ";
 
 LIB "normal.lib";
@@ -109,12 +115,22 @@ static proc substPuiseux(Puiseux f, int idx, Puiseux g)
 }
 
 proc makePuiseuxFromPoly(poly f)
+"USAGE: makePuiseuxFromPoly(f); f polynomial in two variables
+RETURN: make a ring independent polynomial over Puiseux series
+EXAMPLE: example makePuiseuxFromPoly, shows an example"
 {
   return(makePuiseux(f,1,1));
 }
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),dp;
+ poly f=3*x^2+x+1;
+ makePuiseuxFromPoly(f);
+}
 
-proc makePuiseux(poly f, poly d, int fr)
-"USAGE: makePuiseux(f); f polynomial in two variables, d polynomial in
+proc makePuiseux(poly f, poly denom, int fr)
+"USAGE: makePuiseux(f, denom, fr); f polynomial in two variables, denom polynomial in
         the first variable of the ring, int fr
 RETURN: make a ring independent polynomial over Puiseux series
 EXAMPLE: example makePuiseux, shows an example"
@@ -122,7 +138,7 @@ EXAMPLE: example makePuiseux, shows an example"
   Puiseux F;
   F.in=basering;
   F.numer=f;
-  F.denom =d;
+  F.denom =denom;
   F.fraction = fr;
   return(F);
 }
@@ -136,6 +152,9 @@ example
 
 // Print information for Puiseux elements
 proc printPuiseux(Puiseux f)
+"USAGE: printPuiseux(f); f Puiseux expansion
+RETURN: prints information for Puiseux elements
+EXAMPLE: example printPuiseux, shows an example"
 {
   def R = basering;
   def S = f.in;
@@ -144,6 +163,15 @@ proc printPuiseux(Puiseux f)
   "Denominator of exponent : ",  f.fraction;
   if(minpoly <> 0) {"Minimal polynomial: ", minpoly;}
   setring R;
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),dp;
+ poly f=3*x^2+x*y+1;
+ Puiseux F = makePuiseux(f,x^2,3);
+ printPuiseux(F);
+
 }
 
 // Sum of two Puiseux elements
@@ -237,6 +265,9 @@ static proc expPuiseux(Puiseux f, int n)
 // Main call por computing Puiseux expansions
 // It returns a list containing information about the expansions
 proc puiseux(poly f, int maxDeg, int atOrigin)
+"USAGE: puiseux(f, maxDeg, atOrigin); f polynomial in two variables, int maxDeg, int atOrigin
+RETURN: the Puiseux expansions of f developed up to degree maxDeg. If atOrigin = 1, only the expansions passing through the origin will be returned.
+EXAMPLE: example puiseux, shows an example"
 {
   if(atOrigin == 1)
   {
@@ -248,12 +279,19 @@ proc puiseux(poly f, int maxDeg, int atOrigin)
 
   return(p);
 }
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),dp;
+ poly f=y^3 + x^2 + x^8;
+ puiseux(f,3,0);
+}
 
 
 // Finds the coefficient of y^slope in the Puiseux expansion
 // slN is the numerator of the slope
 // slD is the denominator
-proc puiseuxStep(poly f, int slN, int slD){
+static proc puiseuxStep(poly f, int slN, int slD){
   def R = basering;
   poly x = var(1);
   poly y = var(2);
@@ -402,7 +440,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
       je = minEqNewton(f, slN, slD);
 
       fJe = factorize(je);
-      fJe = sortFactors(fJe);
+      fJe = Integralbasis::sortFactors(fJe);
 
       fNew1 = subst(f, var(1), var(1)^slD);
       for(ii = 2; ii <= size(fJe[1]); ii++)
@@ -565,7 +603,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                   minPolys[1] = 1;
                 }
 
-                def S = splitRingAt(minP, erg);
+                def S = Integralbasis::splitRingAt(minP, erg);
                 setring S;
                 sizeErg = size(erg);
                 poly newA = erg[size(erg)];  // The root founded. That is, newA is the root of minP in S.
@@ -585,7 +623,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                 fNew1 = subst(fNew1, par(1), erg[size(erg)-1]);
 
               } else {
-                def S = splitRingAt(minP);
+                def S = Integralbasis::splitRingAt(minP);
                 setring S;
                 list minPolys;
                 minPolys[1] = 1;
@@ -728,7 +766,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc newtonpoly2(poly f, int #)
+static proc newtonpoly2(poly f, int #)
 "USAGE:   newtonpoly2(f);   f poly
 ASSUME:  basering has exactly two variables; @*
          f is convenient, that is, f(x,0) != 0 != f(0,y).
@@ -790,7 +828,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc negExp(poly fNew1, poly c1, int slN)
+static proc negExp(poly fNew1, poly c1, int slN)
 {
   // All this is a workaround to work with negative exponents,
   // which are not allowed in Singular.
@@ -849,6 +887,18 @@ proc negExp(poly fNew1, poly c1, int slN)
 //        - int iVarX, the index of the X variable for the ring C{X}[Y].
 //        - int iVarY, the index of the Y variable for the ring C{X}[Y].
 proc puiseuxList(Puiseux PP, int maxDeg, int iVarX, int iVarY)
+"USAGE:  puiseuxList(PP, maxDeg, iVarX, iVarY);   Puiseux expansion PP, int maxDeg
+         is the integer up to which the Puiseux expansions will be computed
+         (if maxDeg = -1 computes the singular part),
+         int iVarX is the index of the X variable for the ring C{X}[Y],
+         int iVarY, the index of the Y variable for the ring C{X}[Y].
+ASSUME:  basering has exactly two variables; @*
+         f is convenient, that is, f(x,0) != 0 != f(0,y).
+RETURN:  a list with the Puiseux expansions of PP.
+KEYWORDS: Puiseux expansions
+EXAMPLE: example puiseuxList;  shows an example
+"
+
 {
   def R = basering;
   def R_PP = PP.in;
@@ -872,7 +922,7 @@ proc puiseuxList(Puiseux PP, int maxDeg, int iVarX, int iVarY)
   // We compute the Puiseux expansions in this new ring
   poly f = imap(R_PP, PP_numer);
   list fFacs = factorize(f);
-  fFacs = sortFactors(fFacs);
+  fFacs = Integralbasis::sortFactors(fFacs);
   list p;
   list pTemp;
   for(i = 1; i <= size(fFacs[1]); i++)
@@ -981,12 +1031,18 @@ proc puiseuxList(Puiseux PP, int maxDeg, int iVarX, int iVarY)
   setring R;
   return(out);
 }
-
+example
+{
+ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y),dp;
+  Puiseux PP = x5+2x3y-x2y2+3xy5+y6+y7;
+  puiseuxList(PP, 5, 1, 2);
+}
 
 // The equation corresponding to a segment of the Newton polygon.
 // Factors of this equation correspong to different groups of
 // conjugate expansions
-proc minEqNewton(poly f, int slN, int slD)
+static proc minEqNewton(poly f, int slN, int slD)
 {
   intvec v = slD, slN;
   int d = 0;
@@ -995,8 +1051,8 @@ proc minEqNewton(poly f, int slN, int slD)
     d++;
     je = jet(f, d, v);
   }
-  je = divideBy(je, var(1))[1];
-  je = divideBy(je, var(2))[1];
+  je = Integralbasis::divideBy(je, var(1))[1];
+  je = Integralbasis::divideBy(je, var(2))[1];
   return(je);
 }
 
@@ -1005,10 +1061,10 @@ proc minEqNewton(poly f, int slN, int slD)
 // Same as splitring, but it allows for a name of the parameter to add
 // (it will call splitring and replace the parameter, so if a,b,c,o
 // are in use, it will give an error as in splitring)
-proc splitringParname(poly f, string varName, list #)
+static proc splitringParname(poly f, string varName, list #)
 {
   def R = basering;
-  def S = splitRingAt(f, #);
+  def S = Integralbasis::splitRingAt(f, #);
   //def S = splitring(f, #);
   setring S;
   int isErg = defined(erg);
@@ -1031,7 +1087,7 @@ proc splitringParname(poly f, string varName, list #)
 ///////////////////////////////////////////////////////////////////////////////
 
 // Sum a same number to all elements in the list of integers
-proc sum2All(list l, int k)
+static proc sum2All(list l, int k)
 {
   for(int i = 1; i <= size(l); i++)
   {

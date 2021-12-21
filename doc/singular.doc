@@ -1208,7 +1208,7 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * pfd_lib:: Multivartiate partial fraction decomposition
 * polyclass_lib:: class of polynomials
-* puiseux_lib:: Puiseux expansions over algebraic extensions
+* puiseuxexpansion_lib:: Puiseux expansions over algebraic extensions
 * ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
 * sagbigrob_lib:: Sagbi-Groebner basis of an ideal of a subalgebra
@@ -1286,9 +1286,9 @@ Todos/Issues:
 @subsection polyclass_lib
 @c lib polyclass.lib
 @c ----------------------------------------------------------
-@node puiseux_lib
-@subsection puiseux_lib
-@c lib puiseux.lib
+@node puiseuxexpansion_lib
+@subsection puiseuxexpansion_lib
+@c lib puiseuxexpansion.lib
 @c ----------------------------------------------------------
 @node ringgb_lib
 @subsection ringgb_lib
