@@ -50,7 +50,7 @@ SLIB1 = arr.lib arnoldclassify.lib \
 	numerAlg.lib numerDecom.lib \
         olga.lib orbitparam.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \
-	puiseuxexpansion.lib \
+	puiseuxexpansions.lib \
 	realizationMatroids.lib resources.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib sets.lib SingularityDBM.lib symodstd.lib schubert.lib swalk.lib \
