@@ -614,9 +614,10 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
       // We can remove redudant elements considering the generators as an ideal
       // because the powers of Y will be added again later for merging
       // the bases for the different components.
+      ideal tmp_denomT=std(denomT);
       for(ii = 2; ii <= ncols(norT); ii++)
       {
-        norT[ii] = reduce(norT[ii], groebner(denomT));
+        norT[ii] = reduce(norT[ii],tmp_denomT);
       }
       //norT = groebner(norT);
       norT = norT + 0; // Eliminate 0's in the ideal
@@ -792,7 +793,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
 {
   int dbg = printlevel - voice + 4;
   option("redSB");
-  f = reduce(f, groebner(D));
+  f = reduce(f, std(D));
 
   dbprint(dbg, "--Computing the integral basis from the normalization...");
   int needRed = 1;
@@ -836,7 +837,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
   if(needRed == 1)
   {
     dbprint(dbg - 1, "----Reduction...");
-    ideal red = groebner(f);
+    ideal red = std(f);
     poly pRed;
     for(j = 1; j <= ncols(normalGen); j++)
     {
@@ -844,7 +845,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
       // REDUCTION NEEDED?
       if(size(D) == 1)
       {
-        pRed = reduce(l[j], groebner(D));
+        pRed = reduce(l[j], std(D));
         if(deg(l[j], vyS) == deg(pRed, vyS))
         {
           l[j] = pRed;
@@ -866,7 +867,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
           // REDUCTION NEEDED?
           if(size(D) == 1)
           {
-            pRed = reduce(p, groebner(D));
+            pRed = reduce(p, std(D));
             if(deg(p, vyS) == deg(pRed, vyS))
             {
               p = pRed;
@@ -880,7 +881,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
   } else
   {
     dbprint(dbg - 1, "----No reduction needed.");
-    ideal red = groebner(f);
+    ideal red = std(f);
     for(j = 1; j <= ncols(normalGen); j++)
     {
       l[j] = reduce(normalGen[j], red);
@@ -1471,9 +1472,10 @@ static proc ibAt0(poly f, int locBasis)
     //debug_log_intbas(3, "------Time for recomputation: ", timer - tt);
   }
 
+  ideal tmp_var_mdm=std(var(1)^mdm);
   for(i = 1; i <= size(I2LiftedFull); i++)
   {
-    I2LiftedFull[i] = reduce(I2LiftedFull[i], groebner(var(1)^mdm));
+    I2LiftedFull[i] = reduce(I2LiftedFull[i], tmp_var_mdm);
   }
 
   ideal IOut;
@@ -1540,9 +1542,10 @@ static proc ibAt0(poly f, int locBasis)
     outNormal[1] = groebner(outNormal[1]);
     dbprint(dbg, "----Merging finished");
     poly fLoc = 1;
+    tmp_var_mdm=std(x^mdm);
     for(k = 2; k <= size(I2LiftedFull); k++)
     {
-      fLoc = reduce(fLoc * reduce(I2LiftedFull[k], groebner(x^mdm)), groebner(x^mdm));
+      fLoc = reduce(fLoc * reduce(I2LiftedFull[k], tmp_var_mdm), tmp_var_mdm);
     }
     int needGroeb = 1;
     list intBas = normToInt(fLoc, outNormal[1], outNormal[2], needGroeb);
@@ -2295,7 +2298,7 @@ static proc buildPolyGround(list fFrac, int sD)
   }
   ring P = (0, @a), (@x, @y, @X), dp;
   poly fNew = fetch(R, f);
-  poly f2 = reduce(fNew, groebner(@X-@x^sD));
+  poly f2 = reduce(fNew, std(@X-@x^sD));
   if(deg(f2, (1,0,0)) > 0)
   {
     "f2", f2;
@@ -2932,7 +2935,7 @@ static proc prodMod(poly p, poly q, int expo)
   poly pq = p*q;
   setring R;
   poly pq = imap(Q, pq);
-  pq = reduce(pq, groebner(var(1)^expo));
+  pq = reduce(pq, std(var(1)^expo));
   return(pq);
 }
 
@@ -3103,7 +3106,7 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
             gfCheck = 0;
           }
 
-          fu = reduce(bPG[1], groebner(var(1)^degExpand));
+          fu = reduce(bPG[1], std(var(1)^degExpand));
 
           I2LiftedNew[ind] = fu;
           gfCheckList[ind] = bPG[2];
@@ -3560,8 +3563,8 @@ KEYWORDS: division multivariate polynomials
 
 {
   int i = 1;
-  ideal G = groebner(g);
-  while(reduce(f, G) == 0)
+  ideal G = std(g);
+  while(reduce(f, G, 1) == 0)
   {
     f = f / g;
     i = i + 1;
@@ -3784,7 +3787,7 @@ EXAMPLE: example monic; shows an example
 {
   //"START - integralbasis.lib - monic - 1";
   matrix c = coeffs(f,var(2));
-  f = f/c[size(c), 1];
+  f = f/c[nrows(c), 1];
   return(f);
 }
 example
@@ -3806,7 +3809,6 @@ an ordinary  multiple point at the origin of order k.
 KEYWORDS: singularities ordinary multiple point.
 EXAMPLE: example polyDK; shows an example
 "
-
 {
   //"START - integralbasis.lib - polyDK";
   if(size(#) > 0){
@@ -4052,10 +4054,10 @@ static proc mapFrom(poly f, int slN, int slD)
   ring S = (0, @a), (x, y, T), (dp, L(jj));
   poly f = fetch(R, f);
   ideal I1 = x^slN*y-T;
-  poly g = reduce(f, groebner(I1));
+  poly g = reduce(f, std(I1));
   g = subst(g, T, y);
   ideal I2 = x^slD - T;
-  g = reduce(g, groebner(I2));
+  g = reduce(g, std(I2));
   g = subst(g, T, x);
   setring R;
   poly g = fetch(S, g);
@@ -4544,13 +4546,7 @@ static proc isOneIdeal(ideal I)
 
 static proc isZeroIdeal(ideal I)
 {
-  int i;
-  int out = 1;
-  for (i = 1; i <= ncols(I); i++)
-  {
-    if(I[i] != 0){out = 0;}
-  }
-  return(out);
+  return(size(I)==0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
