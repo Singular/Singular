@@ -564,6 +564,7 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
   poly cofactD, cofactC;
   string compType;
   dbprint(dbg, "--Computing the integral basis at each component...");
+  ideal tmp_denomT=std(denomT);
   for(i = 1; i <= size(pd); i++){
     if(debug_lvl() >= 2){
       t = timer;
@@ -614,7 +615,6 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
       // We can remove redudant elements considering the generators as an ideal
       // because the powers of Y will be added again later for merging
       // the bases for the different components.
-      ideal tmp_denomT=std(denomT);
       for(ii = 2; ii <= ncols(norT); ii++)
       {
         norT[ii] = reduce(norT[ii],tmp_denomT);
