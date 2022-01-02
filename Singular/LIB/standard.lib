@@ -821,6 +821,7 @@ PURPOSE: computes a standard basis of the first argument @code{I}
            The actual computation of the Groebner basis can be
            specified by @code{\"std\"} or by @code{\"slimgb\"}
            (not for all orderings implemented). @*
+         - @code{\"HC\"}: using the \"high corner\" from char p in char 0
          A further string @code{\"par2var\"} converts parameters to an extra
          block of variables before a Groebner basis computation (and
          afterwards back).
@@ -897,6 +898,28 @@ EXAMPLE: example groebner;  shows an example"
        method = method + "," + #[k];
      }
   }
+// ------------------check for HC-- ---------------------------------------
+if (attrib(P,"global")==0)
+{
+  if ((method=="HC")&&(typeof(i)=="ideal"))
+  {
+    if (char(P)==0)
+    {
+      list L=ring_list(P);
+      L[1]=ZZ/32003;
+      ring S=ring(L);
+      ideal i=imap(P,i);
+      i=std(i);
+      if (vdim(i)!= -1)
+      {
+        poly HC=system(HC);
+        setring P;
+        noether=imap(S,HC);
+        return(std(i));
+      }
+    }
+  }
+}
 
 //--------------------- save data from basering ---------------------------
   string @Minpoly = string(minpoly);      //minimal polynomial
@@ -2743,7 +2766,7 @@ EXAMPLE: example create_ring; shows an example
   L[4] = l4;
 
   /* return ring */
-  def S = ring(L); 
+  def S = ring(L);
   if (kill_ring)
   {
     kill(R);
