@@ -210,6 +210,9 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
     return NULL;
   }
   int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
+  if (cpus>=vspace::internals::MAX_PROCESS)
+    cpus=vspace::internals::MAX_PROCESS-1;
+  /* start no more than MAX_PROCESS-1 children */
   if ((cpus==1) || (2*cpus>=cnt))
     /* at least 2 polys for each process, or switch to seriell version */
     return id_ChineseRemainder(xx,q,rl,r);
