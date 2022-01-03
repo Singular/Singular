@@ -821,7 +821,7 @@ PURPOSE: computes a standard basis of the first argument @code{I}
            The actual computation of the Groebner basis can be
            specified by @code{\"std\"} or by @code{\"slimgb\"}
            (not for all orderings implemented). @*
-         - @code{\"HC\"}: using the \"high corner\" from char p in char 0
+         - @code{\"HC\"}: using the \"high corner\" from char p in char 0.@*
          A further string @code{\"par2var\"} converts parameters to an extra
          block of variables before a Groebner basis computation (and
          afterwards back).
@@ -912,7 +912,7 @@ EXAMPLE: example groebner;  shows an example"
         { ideal ii=subst(i,par(1),1); }
         else
         { ideal ii=i; }
-        ring S=ring(L);
+        ring S=ring(L); // switch to ring in char. 32003
         ideal ii=imap(P,ii);
         ii=std(ii);
         poly HC=highcorner(ii)*var(nvars(S));
@@ -920,7 +920,7 @@ EXAMPLE: example groebner;  shows an example"
         { "found HC in char 32003:",HC;
           "computing std with HC";
         }
-        setring P;
+        setring P; // back to original ring
         poly save_noether=noether;
         noether=imap(S,HC);
         i=std(i);
