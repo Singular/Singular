@@ -899,27 +899,36 @@ EXAMPLE: example groebner;  shows an example"
      }
   }
 // ------------------check for HC-- ---------------------------------------
-if (attrib(P,"global")==0)
-{
-  if ((method=="HC")&&(typeof(i)=="ideal"))
+  if (attrib(P,"global")==0)
   {
-    if (char(P)==0)
+    if (find(method,"HC")&&(typeof(i)=="ideal"))
     {
-      list L=ring_list(P);
-      L[1]=ZZ/32003;
-      ring S=ring(L);
-      ideal i=imap(P,i);
-      i=std(i);
-      if (vdim(i)!= -1)
+      if (char(P)==0)
       {
-        poly HC=system(HC);
+        list L=ring_list(P);
+        L[1]=ZZ/32003;
+        if (find(method,"prot")) { "computing HC in char 32003"; }
+        if (npars(P)!=0)
+        { ideal ii=subst(i,par(1),1); }
+        else
+        { ideal ii=i; }
+        ring S=ring(L);
+        ideal ii=imap(P,ii);
+        ii=std(ii);
+        poly HC=highcorner(ii)*var(nvars(S));
+        if (find(method,"prot"))
+        { "found HC in char 32003:",HC;
+          "computing std with HC";
+        }
         setring P;
+        poly save_noether=noether;
         noether=imap(S,HC);
-        return(std(i));
+        i=std(i);
+        noether=save_noether;
+        return(i);
       }
     }
   }
-}
 
 //--------------------- save data from basering ---------------------------
   string @Minpoly = string(minpoly);      //minimal polynomial
@@ -1257,6 +1266,11 @@ example
   groebner(i,"fglm");          //computes a reduced standard basis
 
   option(set,opt);
+
+  ring Rt = (0,t),(x,y,z),ds;
+  poly F = y10+(t2)*x7y7+x15+x9y6+(2t)*x6y9+x6y6z3+x5y11+z21;
+  ideal I = jacob(F);
+  I=groebner(I,"HC","prot");
 }
 
 //////////////////////////////////////////////////////////////////////////
