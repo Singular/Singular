@@ -31,6 +31,7 @@
 @c @end itemize
 New libraries:
 @itemize
+@item enumpoints.lib: enumerating rational points (@nref{enumpoints_lib})
 @item sagbigrob.lib: Sagbi-Groebner basis of an ideal of a subalgebra (@nref{sagbigrob_lib})
 @item puiseuxexpansion.lib: Puiseux expansions over algebraic extensions (@nref{puiseuxexpansions_lib})
 @item integralbasis_lib: Integral basis in algebraic function fields: new version (@nref{integralbasis_lib})
