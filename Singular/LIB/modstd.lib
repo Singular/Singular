@@ -58,10 +58,13 @@ EXAMPLE:  example modStd; shows an example"
     /* save options */
     intvec opt = option(get);
     option(redSB);
-    if (noether!=0) { option(infRedTail);}
-    else
-    { def II=I; attrib(II,"isSB",1);
-      if (highcorner(II)!=0) { option(infRedTail);}
+    if (attrib(basering,"global")==0)
+    {
+      if (noether!=0) { option(infRedTail);}
+      else
+      { def II=I; attrib(II,"isSB",1);
+        if (highcorner(II)!=0) { option(infRedTail);}
+      }
     }
 
     /* choose the right command */
