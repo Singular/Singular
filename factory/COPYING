@@ -1,4 +1,4 @@
-                        SINGULAR version 4-2
+                        SINGULAR version 4-3
 			   Singular-Factory
 
                      University of Kaiserslautern
@@ -7,7 +7,7 @@
 
   Authors: G.-M. Greuel, R. Stobbe, J. Schmidt, M. Lee,
                     G. Pfister, H. Schoenemann
-                        Copyright (C) 1991-2021
+                        Copyright (C) 1991-2022
 
   Characteristic sets and factorization over algebraic function fields:
                    Michael Messollen <mmessollen@web.de>

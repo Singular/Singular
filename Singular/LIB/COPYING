@@ -1,4 +1,4 @@
-                        SINGULAR version 4-2
+                        SINGULAR version 4-3
                          Singular-libraries
 
                      University of Kaiserslautern
@@ -7,7 +7,7 @@
 
            Authors: see the header of the libraries or the list below
 
-                        Copyright (C) 1986-2021
+                        Copyright (C) 1986-2022
 
 This directory contains all Singular libraries,
 some came from the Singular team, some were contributed by users.
