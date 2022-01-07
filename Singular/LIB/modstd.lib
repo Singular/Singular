@@ -60,7 +60,9 @@ EXAMPLE:  example modStd; shows an example"
     option(redSB);
     if (noether!=0) { option(infRedTail);}
     else
-    { if (highcorner(I)!=0) { option(infRedTail);} }
+    { def II=I; attrib(II,"isSB",1);
+      if (highcorner(II)!=0) { option(infRedTail);}
+    }
 
     /* choose the right command */
     string command = "groebner";
