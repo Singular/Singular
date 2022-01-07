@@ -45,7 +45,7 @@ Changes in the kernel/build system:
 @item PATH is not changed for @code{system("sh",..)} (use @nref{system, SingularBin})
 @item @code{hilb} avoids int overflow (also in @code{degree, stdhilb})
 @item @code{liftstd} (with 2 arguments) improved (@nref{liftstd})
-@item @code{noether} improved (@nref{noether}, use in @code{groebner(I,"HC")}
+@item @code{noether} improved (@nref{noether}), use in @code{groebner(I,"HC")}
 for faster results for local orderings, 0-dimensional ideals (@nref{groebner}).
 @item letterplace routines improved (@nref{LETTERPLACE})
 @item info file is now @code{singular.info} instead of @code{singular.hlp}
