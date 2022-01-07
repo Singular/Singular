@@ -2801,6 +2801,7 @@ highcorner(std(ideal(1)));
 @c ref
 See
 @ref{dim};
+@ref{groebner};
 @ref{std};
 @ref{vdim}.
 @c ref

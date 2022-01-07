@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.2.1.1 Jul_2021 "; // $Id$
+version="version standard.lib 4.3.0.0 Jan_2022 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -821,7 +821,8 @@ PURPOSE: computes a standard basis of the first argument @code{I}
            The actual computation of the Groebner basis can be
            specified by @code{\"std\"} or by @code{\"slimgb\"}
            (not for all orderings implemented). @*
-         - @code{\"HC\"}: using the \"high corner\" from char p in char 0.@*
+         - @code{\"HC\"}: using the \"high corner\" from char p in char 0,
+	   finding a SB for 0-dimensional ideals in local orderings faster.@*
          A further string @code{\"par2var\"} converts parameters to an extra
          block of variables before a Groebner basis computation (and
          afterwards back).
@@ -833,7 +834,7 @@ HINT:    Since there exists no uniform best method for computing standard
          characteristic 32003 instead of 0 or substitute a subset of
          parameters/variables by integers, etc.). @*
 SEE ALSO: stdhilb, stdfglm, std, slimgb, modstd_lib, ffmodstd_lib, nfmodstd_lib
-KEYWORDS: groebner basis computations
+KEYWORDS: groebner basis computations; high corner method; highcorner
 EXAMPLE: example groebner;  shows an example"
 
 {
