@@ -58,6 +58,9 @@ EXAMPLE:  example modStd; shows an example"
     /* save options */
     intvec opt = option(get);
     option(redSB);
+    if (noether!=0) { option(infRedTail);}
+    else
+    { if (highcorner(I)!=0) { option(infRedTail);} }
 
     /* choose the right command */
     string command = "groebner";
@@ -384,6 +387,7 @@ static proc finalTest_std(string command, alias list args, def result)
         if (reduce(args[1][i], result, 1) != 0) { return(0); }
     }
 
+    option(noredSB,noinfRedTail);
     /* test if result is a GB */
     def G = std(result);
     if (reduce_parallel(G, result)) { return(0); }
