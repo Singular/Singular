@@ -11,6 +11,7 @@
 
 #include "kernel/mod2.h"
 #include "omalloc/omalloc.h"
+#include "kernel/oswrapper/feread.h"
 
 #ifdef HAVE_FEREAD
   #include <unistd.h>
@@ -828,21 +829,21 @@ void fe_reset_input_mode ()
 {
 #if defined(HAVE_DYN_RL)
   char *p = getenv("SINGULARHIST");
-  if ((p != NULL) && (fe_history_total_bytes != NULL))
+  if (p==NULL) p=SINGULARHIST_FILE;
+  if ((strlen(p) != 0) && (fe_history_total_bytes != NULL))
   {
     if((*fe_history_total_bytes)()!=0)
       (*fe_write_history) (p);
   }
-#endif
-#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD) && !defined(HAVE_DYN_RL)
+#elif defined(HAVE_READLINE) && !defined(HAVE_FEREAD) && !defined(HAVE_DYN_RL)
   char *p = getenv("SINGULARHIST");
-  if (p != NULL)
+  if (p==NULL) p=SINGULARHIST_FILE;
+  if (strlen(p) != 0)
   {
     if(history_total_bytes()!=0)
       write_history (p);
   }
-#endif
-#if defined(HAVE_FEREAD)
+#elif defined(HAVE_FEREAD)
   #ifndef HAVE_ATEXIT
   fe_reset_fe(NULL,NULL);
   #else

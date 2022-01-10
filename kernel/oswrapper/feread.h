@@ -9,6 +9,8 @@
 
 EXTERN_VAR char    prompt_char; /*1 either '>' or '.'*/
 
+#define SINGULARHIST_FILE ".singularhist"
+
 #ifdef __cplusplus
 
 /* the interface for reading: */

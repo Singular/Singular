@@ -412,12 +412,12 @@ Library, Command Line Editing, readline, The GNU Readline Library
 Manual}, for more information. If a shared version of this library can
 be found on your machine, then additional command-line editing
 features like  history completion are available.
-In particuliar, if @sc{Singular} is able to load that library and
-if the environment
-variable @code{SINGULARHIST} is set and has a name of a valid file as value,
-then the input history is stored across sessions using this
-file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
-is not set, then the history of the last inputs is only available for
+In particuliar, if @sc{Singular} is able to load that library
+the input history is stored across sessions using the file given in
+the environment variable @code{SINGULARHIST}.
+If @code{SINGULARHIST} is not set @code(.singularhist} is used.
+Otherwise, i.e., if the environment variable @code{SINGULARHIST} is set
+to the empty string, the history of the last inputs is only available for
 previous commands of the current session.
 
 @c --------------------------------------------------------------------------

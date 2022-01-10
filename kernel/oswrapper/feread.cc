@@ -366,7 +366,8 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     /* try to read a history */
     using_history();
     char *p = getenv("SINGULARHIST");
-    if (p != NULL)
+    if (p==NULL) p=SINGULARHIST_FILE;
+    if (strlen(p) != 0)
     {
       read_history (p);
     }

@@ -5,6 +5,7 @@
 #include <readline/history.h>
 #include "Singular/ipid.h"
 #include "Singular/mod_lib.h"
+#include "kernel/oswrapper/feread.h"
 
 #ifdef HAVE_PYTHON
 
@@ -15,7 +16,7 @@ static BOOLEAN predictHelp(leftv result, leftv arg)
         char *buffer[5];
         int lengths[5];
         char *filename = getenv("SINGULARHIST");
-	if (filename==NULL) filename=(char*)"~/.history";
+        if (filename==NULL) filename=SINGULARHIST_FILE;
         int i;
         lists L = (lists)omAllocBin(slists_bin);
 
@@ -39,9 +40,9 @@ static BOOLEAN predictHelp(leftv result, leftv arg)
         }
         #ifdef HAVE_OMALLOC
         ml_make_prediction(filename, buffer, lengths, _omStrDup);
-	#else /*xalloc*/
+        #else /*xalloc*/
         ml_make_prediction(filename, buffer, lengths, omStrDup);
-	#endif
+        #endif
 
         L->Init(5);
 
@@ -65,10 +66,10 @@ static BOOLEAN predictHelp(leftv result, leftv arg)
 extern "C" int SI_MOD_INIT(machinelearning)(SModulFunctions* psModulFunctions)
 {
         char *filename = getenv("SINGULARHIST");
-	if (filename==NULL)
-	{
-	  WarnS("SINGULARHIST is not set - no history available, using ~/.history");
-	}
+        if (filename==NULL)
+        {
+          WarnS("SINGULARHIST is not set - no history available, using ~/.singularhist");
+        }
         // this is the initialization routine of the module
         // adding the routine predictHelp:
         psModulFunctions->iiAddCproc(

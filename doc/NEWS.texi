@@ -24,9 +24,9 @@
 @c New commands:
 @c @itemize
 @c @end itemize
-@c 
+@c
 @c New libraries:
-@c 
+@c
 @c @itemize
 @c @end itemize
 New libraries:
@@ -40,6 +40,7 @@ New libraries:
 
 Changes in the kernel/build system:
 @itemize
+@item input history is stored by default in @code{.singularhist} (@nref{SINGULARHSIT}).
 @item ABI change: all number routines (@code{n_...}) have only @code{coeffs} as last argument,
      functions with @code{ring} as last argument are removed
 @item PATH is not changed for @code{system("sh",..)} (use @nref{system, SingularBin})
@@ -128,8 +129,8 @@ New libraries:
 Changed libraries:
 @itemize
 @item chern.lib:  new version (@nref{chern_lib})
-@item grobcov.lib: new version (@nref{grobcov_lib}), 
-      new functions @nref{ConsLevels}, @nref{Levels}, @nref{Grob1Levels}, 
+@item grobcov.lib: new version (@nref{grobcov_lib}),
+      new functions @nref{ConsLevels}, @nref{Levels}, @nref{Grob1Levels},
       @nref{DifConsLCSets}
 @end itemize
 
