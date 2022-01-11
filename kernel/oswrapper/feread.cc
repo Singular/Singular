@@ -101,6 +101,7 @@ char *command_generator (char *text, int state)
 // #undef READLINE_READLINE_H_OK
 
 extern "C" {
+  VAR BOOLEAN using_history_called=FALSE;
   typedef char * (*RL_PROC)(const char*,int);
   #ifdef READLINE_READLINE_H_OK
     #include <readline/readline.h>
@@ -361,9 +362,11 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     #endif
   }
 
+  using_history_called=FALSE;
   if(isatty(fileno(stdin)))
   {
     /* try to read a history */
+    using_history_called=TRUE;
     using_history();
     char *p = getenv("SINGULARHIST");
     if (p==NULL) p=SINGULARHIST_FILE;
@@ -383,6 +386,7 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
 #ifdef HAVE_DYN_RL
   /* do dynamic loading */
   int res=fe_init_dyn_rl();
+  using_history_called=FALSE;
   if (res!=0)
   {
     //if (res==1)
@@ -406,6 +410,7 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     *fe_rl_attempted_completion_function = (CPPFunction *)singular_completion;
     /* try to read a history */
     (*fe_using_history)();
+    using_history_called=TRUE;
     char *p = getenv("SINGULARHIST");
     if (p != NULL)
     {

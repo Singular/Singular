@@ -8,8 +8,16 @@
  */
 
 EXTERN_VAR char    prompt_char; /*1 either '>' or '.'*/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+EXTERN_VAR BOOLEAN using_history_called; /*1 either '>' or '.'*/
+#ifdef __cplusplus
+}
+#endif
 
-#define SINGULARHIST_FILE ".singularhist"
+#define SINGULARHIST_FILE (char*)".singularhistory"
 
 #ifdef __cplusplus
 

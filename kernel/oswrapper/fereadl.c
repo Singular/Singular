@@ -797,6 +797,7 @@ int fe_init_dyn_rl()
     if (fe_read_history==NULL) { res=14; break; }
     break;
   }
+  using_history_called=FALSE;
   if (res!=0) dynl_close(fe_rl_hdl);
   else
   {
@@ -807,9 +808,11 @@ int fe_init_dyn_rl()
     /* Tell the completer that we want a crack first. */
     (*fe_rl_attempted_completion_function) = (CPPFunction *)singular_completion;
     /* try to read a history */
+    using_history_called=TRUE;
     (*fe_using_history)();
     p = getenv("SINGULARHIST");
-    if (p != NULL)
+    if (p==NULL) p=SINGULARHIST_FILE;
+    if (strlen(p) != 0)
     {
       (*fe_read_history) (p);
     }
@@ -832,7 +835,7 @@ void fe_reset_input_mode ()
   if (p==NULL) p=SINGULARHIST_FILE;
   if ((strlen(p) != 0) && (fe_history_total_bytes != NULL))
   {
-    if((*fe_history_total_bytes)()!=0)
+    if((using_history_called && (*fe_history_total_bytes)()!=0))
       (*fe_write_history) (p);
   }
 #elif defined(HAVE_READLINE) && !defined(HAVE_FEREAD) && !defined(HAVE_DYN_RL)
@@ -840,7 +843,7 @@ void fe_reset_input_mode ()
   if (p==NULL) p=SINGULARHIST_FILE;
   if (strlen(p) != 0)
   {
-    if(history_total_bytes()!=0)
+    if(using_history_called &&(history_total_bytes()!=0))
       write_history (p);
   }
 #elif defined(HAVE_FEREAD)
