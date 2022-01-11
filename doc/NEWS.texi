@@ -40,7 +40,7 @@ New libraries:
 
 Changes in the kernel/build system:
 @itemize
-@item input history is stored by default in @code{.singularhistory} (@nref{SINGULARHSIT}).
+@item input history is stored by default in @code{.singularhistory} (@nref{Editing input}).
 @item ABI change: all number routines (@code{n_...}) have only @code{coeffs} as last argument,
      functions with @code{ring} as last argument are removed
 @item PATH is not changed for @code{system("sh",..)} (use @nref{system, SingularBin})

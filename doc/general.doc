@@ -365,6 +365,8 @@ quits  @sc{Singular}
 @subsection Editing input
 @cindex Editing input
 @cindex SINGULARHIST
+@cindex .singular
+@cindex history
 
 @c This section describes only a subset of the key bindings of
 @c @sc{Singular} binaries built with the GNU Readline library.
