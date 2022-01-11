@@ -415,7 +415,7 @@ features like  history completion are available.
 In particuliar, if @sc{Singular} is able to load that library
 the input history is stored across sessions using the file given in
 the environment variable @code{SINGULARHIST}.
-If @code{SINGULARHIST} is not set @code(.singularhistory} is used.
+If @code{SINGULARHIST} is not set @code{.singularhistory} is used.
 Otherwise, i.e., if the environment variable @code{SINGULARHIST} is set
 to the empty string, the history of the last inputs is only available for
 previous commands of the current session.
