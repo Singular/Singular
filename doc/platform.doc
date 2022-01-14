@@ -89,10 +89,10 @@ at
 @uref{https://www.singular.uni-kl.de/index.php/singular-download.html}.
 @end display
 
-Release versions of @sc{Singular} are also available
+Sources od release versions of @sc{Singular} are also available
 from our FTP site
 @display
-@uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src/4-1-2/}.
+@uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src/}.
 @end display
 
 @c @include README_download.texi
