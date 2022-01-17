@@ -2301,9 +2301,13 @@ static void rO_WDegree64(int &place, int &bitplace, int start, int end,
   ord_struct.data.wp64.start=start;
   ord_struct.data.wp64.end=end;
   ord_struct.data.wp64.place=place;
+  #ifdef HAVE_OMALLOC
+  ord_struct.data.wp64.weights64=weights;
+  #else
   int l=end-start+1;
   ord_struct.data.wp64.weights64=(int64*)omAlloc(l*sizeof(int64));
   for(int i=0;i<l;i++) ord_struct.data.wp64.weights64[i]=weights[i];
+  #endif
   o[place]=1;
   place++;
   o[place]=1;
