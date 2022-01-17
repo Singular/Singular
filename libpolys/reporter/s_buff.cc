@@ -240,8 +240,10 @@ void s_readmpz_base(s_buff F, mpz_ptr a, int base)
     }
     if (str_p>=str_l)
     {
+      int old_str_l=str_l;
       str_l=str_l*2;
-      str=(char*)omRealloc0(str,str_l);
+      str=(char*)omRealloc(str,str_l);
+      memset(str+old_str_l,0,old_str_l);
     }
     c=s_getc(F);
   }

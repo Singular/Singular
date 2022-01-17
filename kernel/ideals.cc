@@ -1733,7 +1733,16 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
       block0[k+1] = origR->block0[k];
       block1[k+1] = origR->block1[k];
       ord[k+1] = origR->order[k];
-      if (origR->wvhdl[k]!=NULL) wv[k+1] = (int*) omMemDup(origR->wvhdl[k]);
+      if (origR->wvhdl[k]!=NULL)
+      #ifdef HAVE_OMALLOC
+        wv[k+1] = (int*) omMemDup(origR->wvhdl[k]);
+      #else
+      {
+        int l=(origR->block1[k]-origR->block0[k]+1)*sizeof(int);
+        wv[k+1]=(int*)omalloc(l);
+        memcpy(wv[k+1],origR->wvhdl[k],l);
+      }
+      #endif
     }
     block0[0] = 1;
     block1[0] = rVar(origR);

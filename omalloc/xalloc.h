@@ -12,13 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "omalloc/omConfig.h"
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-  #ifdef HAVE_MALLOC_H
-  #include <malloc.h>
-  #elif defined(HAVE_MALLOC_MALLOC_H)
-  #include <malloc/malloc.h>
-  #endif
-#endif
 #ifdef __cplusplus
 extern "C" {
   #if __cplusplus >= 201402L
@@ -84,21 +77,9 @@ typedef struct omOpts_s omOpts_t;
 
 extern int om_sing_opt_show_mem;
 
-static inline void * omalloc(size_t s)
-{ if (s!=0)
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-   { return malloc(s); }
-#else
-  {long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
-#endif
-  else return NULL;
-}
-static inline void * omAlloc(size_t s)
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-{ return malloc(s); }
-#else
-{ long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
-#endif
+#define omalloc(s) malloc(s)
+#define omAlloc(s) malloc(s)
+
 static inline void * omAlloc0(size_t s)
 { void *d=omAlloc(s);memset(d,0,s); return d; }
 static inline void * omalloc0(size_t s)
@@ -107,126 +88,34 @@ static inline void * omalloc0(size_t s)
 static inline void *omRealloc(void *d, size_t ns)
 { if (d==NULL) return omAlloc(ns);
   else
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
   return realloc(d,ns);
-#else
-  {
-    long *dd=(long*)d; dd--; dd=(long*)realloc(dd,ns+sizeof(long));
-    *dd=ns+sizeof(long);dd++; return dd;
-  }
-#endif
 }
 #define omReallocAligned(A,B) omRealloc(A,B)
 static inline void *omReallocSize(void *d, __attribute__((unused)) size_t os, size_t ns)
 { if (d==NULL) return omAlloc(ns);
   else
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
   return realloc(d,ns);
-#else
-  {
-    long *dd=(long*)d; dd--; dd=(long*)realloc(dd,ns+sizeof(long));
-    *dd=ns+sizeof(long);dd++; return dd;
-  }
-#endif
 }
-static inline long omSizeOfAddr(void *d)
-#ifdef HAVE_MALLOC_USABLE_SIZE
-{ return malloc_usable_size(d); }
-#elif defined(HAVE_AMLLOC_SIZE)
-{ return malloc_size(d); }
-#else
-{ long *dd=(long*)d; dd--; return *dd;}
-#endif
 
-static inline void omfree(void *d)
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-{ free(d); }
-#else
-{ if (d!=NULL) { long *dd=(long*)d; dd--; free(dd);}}
-#endif
-
-static inline void omFree(void *d)
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-{ free(d); }
-#else
-{ long *dd=(long*)d; dd--; free(dd);}
-#endif
-
-static inline void *omRealloc0(void *d, size_t ns)
-{
-#ifdef HAVE_MALLOC_USABLE_SIZE
-  size_t os=0;
-  if (d!=NULL) os=malloc_usable_size(d);
-  if (os>=ns)
-  {
-    void *n=realloc(d,ns);
-    return n;
-  }
+static inline void *omRealloc0Size(void *d, __attribute__((unused)) size_t os, size_t ns)
+{ if (d==NULL)
+    return omAlloc0(ns);
   else
   {
-    char *n=(char*)realloc(d,ns);
-    memset(n+(ns-os),0,ns-os);
-    return (void*)n;
+    char *p=(char *)realloc(d,ns);
+    if (ns>os) memset(p+os,0,ns-os);
+    return (void*)p;
   }
-#elif defined(HAVE_MALLOC_SIZE)
-  size_t os=0;
-  if (d!=NULL) os=malloc_size(d);
-  if (os>=ns)
-  {
-    void *n=realloc(d,ns);
-    return n;
-  }
-  else
-  {
-    char *n=(char*)realloc(d,ns);
-    memset(n+(ns-os),0,ns-os);
-    return (void*)n;
-  }
-#else
-  void *n=omAlloc0(ns);
-  if (d!=NULL)
-  {
-    size_t c;
-    size_t os=omSizeOfAddr(d);
-    if (ns>os) c=os; else c=ns;
-    memcpy(n,d,c);
-    omFree(d);
-  }
-  return n;
-#endif
 }
-static inline void omFreeSize(void *d, __attribute__((unused)) size_t s)
-#if defined(HAVE_MALLOC_USABLE_SIZE) || defined(HAVE_MALLOC_SIZE)
-{ free(d); }
-#else
-{ if (d!=NULL) { long *dd=(long*)d; dd--; free(dd);}}
-#endif
+
+#define omfree(d) free(d)
+#define omFree(d) free(d)
+#define omFreeSize(d,s) free(d)
 
 static inline char * omStrDup(const char *s)
 { size_t l=strlen(s);char *ns=(char *)omAlloc(l+1);
   return strcpy(ns,s);
 }
-static inline void * omMemDup(void * s)
-#ifdef HAVE_MALLOC_USABLE_SIZE
-{ size_t l=malloc_usable_size(s);
-  void *n=malloc(l);
-  memcpy(n,s,l);
-  return n;
-}
-#elif defined(HAVE_MALLOC_SIZE)
-{ size_t l=malloc_size(s);
-  void *n=malloc(l);
-  memcpy(n,s,l);
-  return n;
-}
-#else
-{ long *n;long *d=(long*)s; d--;
-  n=(long*)malloc(*d+sizeof(long));
-  memcpy(n,d,(*d)+sizeof(long));
-  n++;
-  return n;
-}
-#endif
 
 /* #define omSizeWOfBin(bin_ptr) ((bin_ptr)->sizeW) */
 #define omSizeWOfBin(bin_ptr) (((bin_ptr)+sizeof(long)-1)/sizeof(long))
@@ -289,15 +178,12 @@ enum omError_e
 #define omFreeBinAddr(P)         omFree(P)
 #define omrealloc(A,NS)          omRealloc(A,NS)
 #define omreallocSize(A,OS,NS)   omRealloc(A,NS)
-#define omRealloc0Size(A,OS,NS)  omRealloc0(A,NS)
-#define omrealloc0Size(A,OS,NS)  omRealloc0(A,NS)
+#define omrealloc0Size(A,OS,NS)  omRealloc0Size(A,OS,NS)
 #define omMarkAsStaticAddr(A)
-#define omMemCpyW(A,B,S)         memcpy(A,B,(S)<<2)
-#define omMemcpyW(A,B,S)         memcpy(A,B,(S)<<2)
 #define omGetSpecBin(A)          (A)
 #define omUnGetSpecBin(A)        do {} while (0)
-#define memcpyW(A,B,C)         memcpy(A,B,(C)*sizeof(long))
-#define omGetStickyBinOfBin(B) omGetSpecBin(B)
+#define omMemcpyW(A,B,C)         memcpy(A,B,(C)*sizeof(long))
+#define omGetStickyBinOfBin(B)   omGetSpecBin(B)
 
 
 /* debug dummies: */

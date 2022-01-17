@@ -981,7 +981,15 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       {
         tmpR.order[1]=r2->order[0];
         if (r2->wvhdl[0]!=NULL)
+        #ifdef HAVE_OMALLOC
           tmpR.wvhdl[1]=(int *)omMemDup(r2->wvhdl[0]);
+        #else
+        {
+          int l=(r2->block1[0]-r2->block0[0]+1)*sizeof(int);
+          tmpR.wvhdl[1]=(int*)omalloc(l);
+          memcpy(tmpR.wvhdl[1],r2->wvhdl[0],l);
+        }
+        #endif
       }
       else
         tmpR.order[1]=ringorder_dp;
@@ -1059,7 +1067,15 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           tmpR.block0[i]=r1->block0[i];
           tmpR.block1[i]=r1->block1[i];
           if (r1->wvhdl[i]!=NULL)
+          #ifdef HAVE_OMALLOC
             tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
+          #else
+          {
+            int l=(r1->block1[i]-r1->block0[i]+1)*sizeof(int);
+            tmpR.wvhdl[i]=(int*)omalloc(l);
+            memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l);
+          }
+          #endif
         }
         j=i;
         i--;
@@ -1079,7 +1095,15 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             tmpR.block1[j]=r2->block1[i]+rVar(r1);
             if (r2->wvhdl[i]!=NULL)
             {
+              #ifdef HAVE_OMALLOC
               tmpR.wvhdl[j] = (int*) omMemDup(r2->wvhdl[i]);
+              #else
+              {
+                int l=(r2->block1[i]-r2->block0[i]+1)*sizeof(int);
+                tmpR.wvhdl[j]=(int*)omalloc(l);
+                memcpy(tmpR.wvhdl[j],r2->wvhdl[i],l);
+              }
+              #endif
             }
             j++;
           }
@@ -1106,7 +1130,15 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         tmpR.block1[i]=r1->block1[i];
         if (r1->wvhdl[i]!=NULL)
         {
+          #ifdef HAVE_OMALLOC
           tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
+          #else
+          {
+            int l=(r1->block1[i]-r1->block0[i]+1)*sizeof(int);
+            tmpR.wvhdl[i]=(int*)omalloc(l);
+            memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l);
+          }
+          #endif
         }
       }
       tmpR.OrdSgn=r1->OrdSgn;
@@ -1446,7 +1478,15 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     {
       if (r->wvhdl[j]!=NULL)
       {
+        #ifdef HAVE_OMALLOC
         res->wvhdl[j] = (int*) omMemDup(r->wvhdl[j]);
+        #else
+        {
+          int l=(r->block1[j]-r->block0[j]+1)*sizeof(int);
+          res->wvhdl[j]=(int*)omalloc(l);
+          memcpy(res->wvhdl[j],r->wvhdl[j],l);
+        }
+        #endif
       }
       else
         res->wvhdl[j]=NULL;
@@ -1576,7 +1616,15 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
     {
       if (r->wvhdl[j]!=NULL)
       {
+        #ifdef HAVE_OMALLOC
         res->wvhdl[j+1] = (int*) omMemDup(r->wvhdl[j]); //DIFF
+        #else
+        {
+          int l=(r->block1[j]-r->block0[j]+1)*sizeof(int);
+          res->wvhdl[j+1]=(int*)omalloc(l);
+          memcpy(res->wvhdl[j+1],r->wvhdl[j],l);
+        }
+        #endif
       }
       else
         res->wvhdl[j+1]=NULL; //DIFF
@@ -2238,7 +2286,7 @@ static void rO_WMDegree(int &place, int &bitplace, int start, int end,
 }
 
 static void rO_WDegree64(int &place, int &bitplace, int start, int end,
-    long *o, sro_ord &ord_struct, int64 *weights)
+    long *o, sro_ord &ord_struct, int *weights)
 {
   // weighted degree (aligned) of variables v_start..v_end, ordsgn 1,
   // reserved 2 places
@@ -2247,7 +2295,9 @@ static void rO_WDegree64(int &place, int &bitplace, int start, int end,
   ord_struct.data.wp64.start=start;
   ord_struct.data.wp64.end=end;
   ord_struct.data.wp64.place=place;
-  ord_struct.data.wp64.weights64=weights;
+  int l=end-start+1;
+  ord_struct.data.wp64.weights64=(int64*)omAlloc(l*sizeof(int64));
+  for(int i=0;i<l;i++) ord_struct.data.wp64.weights64[i]=weights[i];
   o[place]=1;
   place++;
   o[place]=1;
@@ -2399,7 +2449,7 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
 #endif /* ifndef SING_NDEBUG */
 
 static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
-    long *o, int /*N*/, int *v, sro_ord &ord_struct)
+    long *o, int N, int *v, sro_ord &ord_struct)
 {
   if ((prev_ord== 1) || (bitplace!=BITS_PER_LONG))
     rO_Align(place,bitplace);
@@ -2407,7 +2457,12 @@ static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
 
   ord_struct.ord_typ = ro_isTemp;
   ord_struct.data.isTemp.start = place;
+  #ifdef HAVE_OMALLOC
   ord_struct.data.isTemp.pVarOffset = (int *)omMemDup(v);
+  #else
+  ord_struct.data.isTemp.pVarOffset = (int *)omAlloc((N+1)*sizeof(int));
+                          memcpy(ord_struct.data.isTemp.pVarOffset,v,(N+1)*sizeof(int));
+  #endif
   ord_struct.data.isTemp.suffixpos = -1;
 
   // We will act as rO_Syz on our own!!!
@@ -3442,7 +3497,7 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_a64:
         rO_WDegree64(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
-                     tmp_typ[typ_i], (int64 *)(r->wvhdl[i]));
+                     tmp_typ[typ_i], r->wvhdl[i]);
         typ_i++;
         break;
 
@@ -4180,7 +4235,7 @@ void rDebugPrint(const ring r)
           PrintS(" w64:");
           int l;
           for(l=r->typ[j].data.wp64.start;l<=r->typ[j].data.wp64.end;l++)
-            Print(" %ld",(long)(((int64*)r->typ[j].data.wp64.weights64)+l-r->typ[j].data.wp64.start));
+            Print(" %ld",(long)(r->typ[j].data.wp64.weights64+l-r->typ[j].data.wp64.start);
           }
         }
     }
@@ -4441,7 +4496,15 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
     res->block1[j]=r->block1[j-1];
     if (r->wvhdl[j-1] != NULL)
     {
+      #ifdef HAVE_OMALLOC
       wvhdl[j] = (int*) omMemDup(r->wvhdl[j-1]);
+      #else
+      {
+        int l=(r->block1[j-1]-r->block0[j-1]+1)*sizeof(int);
+        wvhdl[j]=(int*)omalloc(l);
+        memcpy(wvhdl[j],r->wvhdl[j-1],l);
+      }
+      #endif
     }
   }
   res->order[0]=ringorder_s;
@@ -4619,7 +4682,15 @@ ring rAssure_HasComp(const ring r)
   {
     if (r->wvhdl[j]!=NULL)
     {
+      #ifdef HAVE_OMALLOC
       new_r->wvhdl[j] = (int*) omMemDup(r->wvhdl[j]);
+      #else
+      {
+        int l=(r->block1[j]-r->block0[j]+1)*sizeof(int);
+        new_r->wvhdl[j]=(int*)omalloc(l);
+        memcpy(new_r->wvhdl[j],r->wvhdl[j],l);
+      }
+      #endif
     }
   }
   last_block++;
@@ -4843,7 +4914,15 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete/* = TRUE*/, 
 
     if (r->wvhdl[i] != NULL)
     {
+      #ifdef HAVE_OMALLOC
       wvhdl[j] = (int*) omMemDup(r->wvhdl[i]);
+      #else
+      {
+        int l=(r->block1[i]-r->block0[i]+1)*sizeof(int);
+        wvhdl[j]=(int*)omalloc(l);
+        memcpy(wvhdl[j],r->wvhdl[i],l);
+      }
+      #endif
     } // else wvhdl[j] = NULL;
   }
 
@@ -5187,8 +5266,8 @@ int64 * rGetWeightVec(const ring r)
   assume(r->OrdSize>0);
   int i=0;
   while((r->typ[i].ord_typ!=ro_wp64) && (r->typ[i].ord_typ>0)) i++;
-  assume(r->typ[i].ord_typ==ro_wp64);
-  return (int64*)(r->typ[i].data.wp64.weights64);
+  if (r->typ[i].ord_typ!=ro_wp64) return NULL; /* should not happen*/
+  return r->typ[i].data.wp64.weights64;
 }
 
 void rSetWeightVec(ring r, int64 *wv)
