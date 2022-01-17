@@ -63,6 +63,7 @@ poly prMapR(poly src, nMapFunc nMap, ring src_r, ring dest_r)
     if (n_IsZero(pGetCoeff(dest),dest_r->cf))
     {
       p_LmDelete(&pNext(prev),dest_r);
+      dest=prev;
     }
     pIter(src);
   }
