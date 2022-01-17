@@ -585,35 +585,15 @@ EXTERN_VAR char * yytext;
 EXTERN_VAR int yyleng;
 EXTERN_VAR int inerror;
 
-#ifndef SING_NDEBUG
-// this is to  shadow the malloc/realloc
-// used by yy_flex_malloc/yy_flex_realloc
-// so that we can mark stuff as static
-static void* my_malloc(size_t size)
-{
-  void* addr = omAlloc(size);
-  omMarkAsStaticAddr(addr);
-  return addr;
-}
-
-static void* my_realloc(void* addr, size_t size)
-{
-  void* new_addr = omRealloc(addr, size);
-  omMarkAsStaticAddr(new_addr);
-  return new_addr;
-}
-#undef malloc
-#define malloc my_malloc
-#undef realloc
-#define realloc my_realloc
-#else
+#ifdef HAVE_OMALLOC
 #undef malloc
 #define malloc omAlloc
 #undef realloc
 #define realloc omRealloc
-#endif
 #undef free
 #define free omFree
+#endif
+
 static char * dupyytext()
 {
   char* s;
