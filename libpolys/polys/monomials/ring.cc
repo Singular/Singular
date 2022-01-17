@@ -4235,7 +4235,7 @@ void rDebugPrint(const ring r)
           PrintS(" w64:");
           int l;
           for(l=r->typ[j].data.wp64.start;l<=r->typ[j].data.wp64.end;l++)
-            Print(" %ld",(long)(r->typ[j].data.wp64.weights64+l-r->typ[j].data.wp64.start);
+            Print(" %ld",(long)(r->typ[j].data.wp64.weights64+l-r->typ[j].data.wp64.start));
           }
         }
     }
