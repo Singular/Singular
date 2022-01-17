@@ -1739,6 +1739,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
       #else
       {
         int l=(origR->block1[k]-origR->block0[k]+1)*sizeof(int);
+        if (origR->order[k]==ringorder_a64) l*=2;
         wv[k+1]=(int*)omalloc(l);
         memcpy(wv[k+1],origR->wvhdl[k],l);
       }
