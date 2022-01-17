@@ -385,7 +385,7 @@ long syReorderShiftedComponents(long * sc, int n)
   }
 #endif
 
-  omMemcpyW(sc, tc, n);
+  memcpy(sc, tc, n*sizeof(long));
   omFreeSize(tc, n*sizeof(long));
   return new_space;
 }
