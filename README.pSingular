@@ -4,7 +4,7 @@ unset RUN_PPCC
 cd ppcc
 ./configure && make
 cd ..
-./configure CC="ppcc gcc" CXX="ppcc g++" --disable-omalloc
+./configure CPP="ppcc cpp" CXXCPP="ppcc cpp" --disable-omalloc
 export RUN_PPCC=1
 make
 
