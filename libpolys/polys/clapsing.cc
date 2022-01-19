@@ -23,6 +23,29 @@
 #include "polys/flintconv.h"
 #include "polys/flint_mpoly.h"
 
+#ifdef HAVE_NTL
+#include <NTL/config.h>
+#ifdef NTL_STD_CXX
+#ifdef NOSTREAMIO
+#  ifdef HAVE_IOSTREAM
+#    include <iostream>
+#    define OSTREAM std::ostream
+#    define ISTREAM std::istream
+#  elif defined(HAVE_IOSTREAM_H)
+#    include <iostream.h>
+#    define OSTREAM ostream
+#    define ISTREAM istream
+#  endif
+#endif /* ! NOSTREAMIO */
+#endif
+#include <NTL/mat_ZZ.h>
+#include <NTL/mat_lzz_p.h>
+
+#ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
+NTL_CLIENT
+#endif
+
+#endif
 
 //#include "polys.h"
 #define TRANSEXT_PRIVATES
@@ -1967,6 +1990,111 @@ intvec* singntl_LLL(intvec*  m)
 {
   WerrorS("NTL/FLINT missing");
   return NULL;
+}
+#endif
+
+#ifdef HAVE_NTL
+matrix singntl_rref(matrix  m, const ring R)
+{
+  int r=m->rows();
+  int c=m->cols();
+  int i,j;
+  matrix M=mpNew(r,c);
+  if (rField_is_Zp(R))
+  {
+    zz_p::init(rChar(R));
+    mat_zz_p *NTLM=new mat_zz_p;
+    NTLM->SetDims(r,c);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        poly h=MATELEM(m,i,j);
+        if ((h!=NULL)
+        && (p_Totaldegree(h,R)==0))
+        {
+          (*NTLM)(i,j)=(long)p_GetCoeff(h,R);
+	}
+        else
+        {
+          WerrorS("smatrix for rref is not constant");
+          return M;
+        }
+      }
+    }
+    gauss(*NTLM);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        number n=n_Init(rep((*NTLM)(i,j)),R->cf);
+        if(!n_IsZero(n,R->cf))
+        {
+          poly p=p_NSet(n,R);
+          p_SetComp(p,i,R);
+          M->m[j]=p_Add_q(M->m[j],p,R);
+        }
+      }
+    }
+    delete NTLM;
+  }
+  else
+  {
+    WerrorS("not implemented for these coefficients");
+  }
+  return M;
+}
+#endif
+
+#ifdef HAVE_NTL
+ideal singntl_rref(ideal  m, const ring R) /*assume smatrix m*/
+{
+  int r=m->rank;
+  int c=m->ncols;
+  int i,j;
+  ideal M=idInit(c,r);
+  if (rField_is_Zp(R))
+  {
+    zz_p::init(rChar(R));
+    mat_zz_p *NTLM=new mat_zz_p;
+    NTLM->SetDims(r,c);
+    for(j=c;j>0;j--)
+    {
+      poly h=m->m[j];
+      while(h!=NULL)
+      {
+        i=p_GetComp(h,R);
+        if (p_Totaldegree(h,R)==0)
+          (*NTLM)(i,j)=(long)p_GetCoeff(h,R);
+        else
+        {
+          WerrorS("smatrix for rref is not constant");
+          return M;
+        }
+        pIter(h);
+      }
+    }
+    gauss(*NTLM);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        number n=n_Init(rep((*NTLM)(i,j)),R->cf);
+        if(!n_IsZero(n,R->cf))
+        {
+          poly p=p_NSet(n,R);
+          p_SetComp(p,i,R);
+          M->m[j]=p_Add_q(M->m[j],p,R);
+        }
+      }
+    }
+    delete NTLM;
+  }
+  else
+  {
+    WerrorS("not implemented for these coefficients");
+  }
+  return M;
 }
 #endif
 

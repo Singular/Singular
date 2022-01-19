@@ -1238,20 +1238,36 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #endif
   #endif
 /* ====== rref ============================*/
-  #ifdef HAVE_FLINT
+  #if defined(HAVE_FLINT) || defined(HAVE_NTL)
   if(strcmp(sys_cmd,"rref")==0)
   {
     const short t1[]={1,MATRIX_CMD};
-    if (iiCheckTypes(h,t1,1))
+    const short t2[]={1,SMATRIX_CMD};
+    if (iiCheckTypes(h,t1,0))
     {
       matrix M=(matrix)h->Data();
+      #if defined(HAVE_FLINT)
       res->data=(void*)singflint_rref(M,currRing);
+      #elif defined(HAVE_NTL)
+      res->data=(void*)singntl_rref(M,currRing);
+      #endif
       res->rtyp=MATRIX_CMD;
+      return FALSE;
+    }
+    else if (iiCheckTypes(h,t2,1))
+    {
+      ideal M=(ideal)h->Data();
+      #if defined(HAVE_FLINT)
+      res->data=(void*)singflint_rref(M,currRing);
+      #elif defined(HAVE_NTL)
+      res->data=(void*)singntl_rref(M,currRing);
+      #endif
+      res->rtyp=SMATRIX_CMD;
       return FALSE;
     }
     else
     {
-      WerrorS("expected system(\"rref\",<matrix>)");
+      WerrorS("expected system(\"rref\",<matrix>/<smatrix>)");
       return TRUE;
     }
   }

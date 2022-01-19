@@ -43,6 +43,11 @@ bigintmat* singntl_HNF(bigintmat* A);
 matrix  singntl_LLL(matrix A, const ring r);
 intvec* singntl_LLL(intvec* A);
 
+#ifdef HAVE_NTL
+ideal  singntl_rref(ideal  m, const ring R) /*assume smatrix m*/;
+matrix singntl_rref(matrix  m, const ring R);
+#endif
+
 ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & n, const ring r);
 
 matrix singclap_irrCharSeries ( ideal I, const ring r);

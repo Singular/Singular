@@ -390,15 +390,14 @@ matrix singflint_rref(matrix  m, const ring R)
       for(j=c;j>0;j--)
       {
         poly h=MATELEM(m,i,j);
-        if (h==NULL)
-          convSingNFlintN(fmpq_mat_entry(FLINTM,i-1,j-1),n,R->cf);
-        else if (p_Totaldegree(h,R)==0)
+        if ((h!=NULL)
+        && (p_Totaldegree(h,R)==0))
           convSingNFlintN(fmpq_mat_entry(FLINTM,i-1,j-1),pGetCoeff(h),R->cf);
-	else
-	{
-	  WerrorS("matrix for rref is nor constant");
-	  return M;
-	}
+        else
+        {
+          WerrorS("matrix for rref is not constant");
+          return M;
+        }
       }
     }
     n_Delete(&n,R->cf);
@@ -422,6 +421,106 @@ matrix singflint_rref(matrix  m, const ring R)
     long rk= nmod_mat_rref (FLINTM);
     M=convFlintNmod_matSingM(FLINTM,R);
     // clean up
+    nmod_mat_clear(FLINTM);
+  }
+  else
+  {
+    #if 0
+    fmpz_t p;
+    convSingIFlintI(p,rChar(currRing));
+    fq_nmod_ctx_init(ctx,p,1,"t");
+    fq_nmod_mat_t FLINTM;
+    // convert matrix
+    convSingMFlintFq_nmod_mat(M,FLINTM,ctx,currRing);
+    // rank
+    long rk= fq_nmod_mat_rref (FLINTM,ctx);
+    res->data=(void*)convFlintFq_nmod_matSingM(FLINTM,ctx,currRing);
+    // clean up
+    fq_nmod_mat_clear (FLINTM,ctx);
+    fq_nmod_ctx_clear(ctx);
+    fmpz_clear(p);
+    #endif
+    WerrorS("not implemented for these coefficients");
+  }
+  return M;
+}
+
+ideal singflint_rref(ideal  m, const ring R) /*assume smatrix m*/
+{
+  int r=m->rank;
+  int c=m->ncols;
+  int i,j;
+  ideal M=idInit(c,r);
+  if (rField_is_Q(R))
+  {
+    fmpq_mat_t FLINTM;
+    fmpq_mat_init(FLINTM,r,c);
+    for(j=c;j>0;j--)
+    {
+      poly h=m->m[j];
+      while(h!=NULL)
+      {
+        i=p_GetComp(h,R);
+        if (p_Totaldegree(h,R)==0)
+          convSingNFlintN(fmpq_mat_entry(FLINTM,i-1,j-1),p_GetCoeff(h,R),R->cf);
+        else
+        {
+          WerrorS("smatrix for rref is not constant");
+          return M;
+        }
+        pIter(h);
+      }
+    }
+    fmpq_mat_rref(FLINTM,FLINTM);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        number n=convFlintNSingN(fmpq_mat_entry(FLINTM,i-1,j-1),R->cf);
+        if(!n_IsZero(n,R->cf))
+        {
+          poly p=p_NSet(n,R);
+          p_SetComp(p,i,R);
+          M->m[j]=p_Add_q(M->m[j],p,R);
+        }
+      }
+    }
+    fmpq_mat_clear(FLINTM);
+  }
+  else if (rField_is_Zp(R))
+  {
+    nmod_mat_t FLINTM;
+    nmod_mat_init(FLINTM,r,c,rChar(R));
+    for(j=c;j>0;j--)
+    {
+      poly h=m->m[j];
+      while(h!=NULL)
+      {
+        i=p_GetComp(h,R);
+        if (p_Totaldegree(h,R)==0)
+          nmod_mat_entry(FLINTM,i-1,j-1)=(long)p_GetCoeff(h,R);
+        else
+        {
+          WerrorS("smatrix for rref is not constant");
+          return M;
+        }
+        pIter(h);
+      }
+    }
+    nmod_mat_rref(FLINTM);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        number n=n_Init(nmod_mat_entry(FLINTM,i-1,j-1),R->cf);
+        if(!n_IsZero(n,R->cf))
+        {
+          poly p=p_NSet(n,R);
+          p_SetComp(p,i,R);
+          M->m[j]=p_Add_q(M->m[j],p,R);
+        }
+      }
+    }
     nmod_mat_clear(FLINTM);
   }
   else
