@@ -7,6 +7,7 @@
 
 #include "kernel/mod2.h"
 #include <errno.h>
+#include <stdio.h>
 
 // ----------------------------------------
 // system settings:
@@ -21,6 +22,7 @@
 #include "misc/options.h"
 
 #include "kernel/oswrapper/feread.h"
+#include "reporter/reporter.h"
 
 #if defined(HAVE_DYN_RL)
 #include <unistd.h>
