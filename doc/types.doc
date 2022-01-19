@@ -4142,6 +4142,8 @@ See
 @ref{ring};
 @ref{matrix};
 @ref{module};
+@ref{chinrem};
+@ref{farey};
 @ref{ncols};
 @ref{nrows};
 @ref{std};

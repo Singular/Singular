@@ -21,6 +21,11 @@
 
 @heading News for version @value{VERSION}
 
+New commands:
+@itemize
+@item @code{chinrem}, @code{farey} for @code{smatrix} (@nref{smatrix})
+@end itemize
+
 @c New commands:
 @c @itemize
 @c @end itemize
@@ -29,6 +34,9 @@
 @c
 @c @itemize
 @c @end itemize
+
+@heading News for version 4-3-0
+
 New libraries:
 @itemize
 @item enumpoints.lib: enumerating rational points (@nref{enumpoints_lib})

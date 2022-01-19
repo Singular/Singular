@@ -145,8 +145,8 @@
 // operation: memory (int)  ->  bigint
 // operation: minbase (ideal)  ->  ideal, only commutative rings, field coeffs
 // operation: minbase (module)  ->  module, only commutative rings, field coeffs
-// operation: minres (list)  ->  list
-// operation: minres (resolution)  ->  resolution
+// operation: minres (list)  ->  list, field coeffs
+// operation: minres (resolution)  ->  resolution, field coeffs
 // operation: module (module)  ->  module
 // operation: monitor (link)  ->  nothing
 // operation: monomial (intvec)  ->  poly requires currRing
@@ -176,7 +176,7 @@
 // operation: parstr (ring)  ->  string
 // operation: poly (poly)  ->  poly
 // operation: poly (bigint)  ->  poly requires currRing
-// operation: preimage (map)  ->  ring, only commutative rings
+// operation: preimage (map)  ->  ring, letterplace rings
 // operation: prime (int)  ->  int
 // operation: print (list)  ->  string
 // operation: print (def)  ->  string
@@ -516,6 +516,7 @@
 // operation: farey (ideal, bigint)  ->  ideal, field coeffs
 // operation: farey (module, bigint)  ->  module, field coeffs
 // operation: farey (matrix, bigint)  ->  matrix, field coeffs
+// operation: farey (smatrix, bigint)  ->  smatrix, field coeffs
 // operation: farey (list, bigint)  ->  list, field coeffs
 // operation: fetch (ring, any_type)  ->  any_type
 // operation: fglm (ring, def)  ->  ideal requires currRing, only commutative rings, field coeffs
@@ -568,8 +569,8 @@
 // operation: monitor (link, string)  ->  nothing
 // operation: mpresmat (ideal, int)  ->  module, only commutative rings, field coeffs
 // operation: newstruct (string, string)  ->  nothing
-// operation: mres (ideal, int)  ->  resolution
-// operation: mres (module, int)  ->  resolution
+// operation: mres (ideal, int)  ->  resolution, field coeffs
+// operation: mres (module, int)  ->  resolution, field coeffs
 // operation: primefactors (bigint, int)  ->  list
 // operation: primefactors (number, int)  ->  list
 // operation: ncalgebra (poly, poly)  ->  nothing, only commutative rings, field coeffs
@@ -595,8 +596,8 @@
 // operation: reduce (ideal, ideal)  ->  ideal
 // operation: reduce (module, ideal)  ->  module
 // operation: reduce (module, module)  ->  module
-// operation: nres (ideal, int)  ->  resolution
-// operation: nres (module, int)  ->  resolution
+// operation: nres (ideal, int)  ->  resolution, field coeffs
+// operation: nres (module, int)  ->  resolution, field coeffs
 // operation: sba (ideal, int)  ->  ideal
 // operation: sba (module, int)  ->  module
 // operation: simplify (poly, int)  ->  poly
@@ -1276,9 +1277,9 @@ const struct sValCmdTab dArithTab2[]=
  { 264,174 },
  { 266,0 },
  { 284,217 },
- { 286,267 },
- { 289,287 },
- { 290,304 },
+ { 286,268 },
+ { 289,288 },
+ { 290,305 },
  { 358,214 },
  { 359,216 },
  { 363,221 },
@@ -1297,61 +1298,61 @@ const struct sValCmdTab dArithTab2[]=
  { 398,257 },
  { 399,260 },
  { 400,262 },
- { 401,270 },
+ { 401,271 },
  { 402,261 },
- { 404,271 },
- { 405,273 },
- { 406,268 },
- { 407,269 },
- { 409,274 },
- { 412,278 },
- { 413,280 },
- { 414,286 },
- { 416,288 },
- { 417,289 },
- { 418,290 },
+ { 404,272 },
+ { 405,274 },
+ { 406,269 },
+ { 407,270 },
+ { 409,275 },
+ { 412,279 },
+ { 413,281 },
+ { 414,287 },
+ { 416,289 },
+ { 417,290 },
+ { 418,291 },
  { 420,99 },
- { 421,291 },
- { 423,292 },
- { 427,294 },
- { 428,295 },
- { 429,300 },
- { 430,302 },
- { 431,303 },
- { 432,306 },
- { 438,309 },
- { 439,307 },
- { 442,311 },
- { 443,312 },
- { 451,313 },
- { 452,315 },
- { 453,316 },
- { 454,318 },
- { 459,317 },
- { 460,322 },
- { 461,326 },
- { 468,330 },
- { 475,331 },
- { 476,320 },
- { 478,332 },
- { 483,333 },
- { 484,336 },
- { 485,337 },
- { 486,338 },
- { 487,339 },
- { 490,345 },
- { 499,347 },
- { 501,349 },
- { 504,353 },
- { 505,356 },
- { 506,354 },
- { 507,358 },
- { 511,364 },
- { 512,366 },
- { 523,369 },
- { 525,370 },
- { 526,371 },
- { 527,372 },
+ { 421,292 },
+ { 423,293 },
+ { 427,295 },
+ { 428,296 },
+ { 429,301 },
+ { 430,303 },
+ { 431,304 },
+ { 432,307 },
+ { 438,310 },
+ { 439,308 },
+ { 442,312 },
+ { 443,313 },
+ { 451,314 },
+ { 452,316 },
+ { 453,317 },
+ { 454,319 },
+ { 459,318 },
+ { 460,323 },
+ { 461,327 },
+ { 468,331 },
+ { 475,332 },
+ { 476,321 },
+ { 478,333 },
+ { 483,334 },
+ { 484,337 },
+ { 485,338 },
+ { 486,339 },
+ { 487,340 },
+ { 490,346 },
+ { 499,348 },
+ { 501,350 },
+ { 504,354 },
+ { 505,357 },
+ { 506,355 },
+ { 507,359 },
+ { 511,365 },
+ { 512,367 },
+ { 523,370 },
+ { 525,371 },
+ { 526,372 },
+ { 527,373 },
  { 10000,0 }
 };
 #define JJTAB2LEN 96

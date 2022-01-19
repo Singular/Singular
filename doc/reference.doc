@@ -729,7 +729,7 @@ the same type as the elements of the first argument
 @item @strong{Purpose:}
 applies chinese remainder theorem to the first argument w.r.t. the moduli given in the second.
 The elements in the first list must be of same type which can be @code{bigint}/@code{int},
-@code{poly}, @code{ideal}, @code{module} or @code{matrix}.
+@code{poly}, @code{ideal}, @code{module}, @code{smatrix} or @code{matrix}.
 The moduli, if given by a list, must be of type @code{bigint} or @code{int}.
 @*If data depending on a ring are involved, the coeffcient field must be @code{Q}.
 @item @strong{Example:}
@@ -2051,6 +2051,7 @@ See
 @node farey, fetch, factorize, Functions
 @subsection farey
 @cindex farey
+@cindex ration reconstraction
 
 @table @code
 @item @strong{Syntax:}
@@ -2058,6 +2059,7 @@ See
 @*@code{farey (} ideal_expression @code{,} bigint_expression @code{)}
 @*@code{farey (} module_expression @code{,} bigint_expression @code{)}
 @*@code{farey (} matrix_expression @code{,} bigint_expression @code{)}
+@*@code{farey (} smatrix_expression @code{,} bigint_expression @code{)}
 @*@code{farey (} list_expression @code{,} bigint_expression @code{)}
 @item @strong{Type:}
 type of the first argument (unless it is @code{list})

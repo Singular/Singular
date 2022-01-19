@@ -9932,6 +9932,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   int return_type=c->m[0].Typ();
   if ((return_type!=IDEAL_CMD)
   && (return_type!=MODUL_CMD)
+  && (return_type!=SMATRIX_CMD)
   && (return_type!=MATRIX_CMD)
   && (return_type!=POLY_CMD))
   {
