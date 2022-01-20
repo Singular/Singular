@@ -88,7 +88,7 @@ AC_CANONICAL_HOST
 
 case $host_os in
   *cygwin* ) AX_APPEND_LINK_FLAGS([-Wl,-Bdynamic]);;
-  *) AX_APPEND_LINK_FLAGS([-shared -dynamic -export-dynamic -avoid-version -weak_reference_mismatches weak -undefined dynamic_lookup -flat_namespace],[P_PROCS_MODULE_LDFLAGS]);;
+  *) AX_APPEND_LINK_FLAGS([-shared -dynamic -export-dynamic -avoid-version -flat_namespace],[P_PROCS_MODULE_LDFLAGS]);;
 esac
 
 AC_SUBST(P_PROCS_MODULE_LDFLAGS)
