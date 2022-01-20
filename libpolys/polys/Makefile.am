@@ -69,12 +69,10 @@ p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
 p_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
 p_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
 
-P_PROCS_MODULE_LDFLAGS = -shared -module -dynamic -export-dynamic -avoid-version -weak_reference_mismatches weak -undefined dynamic_lookup -flat_namespace
-
-p_Procs_FieldGeneral_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
-p_Procs_FieldIndep_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
-p_Procs_FieldQ_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
-p_Procs_FieldZp_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldGeneral_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldIndep_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldQ_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldZp_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
 
 P_PROCS = templates/p_Procs_Lib.cc
 
