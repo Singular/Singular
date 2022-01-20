@@ -45,6 +45,7 @@ New/quotient_error.tst
 New/redTail.tst
 New/ring_ring.tst
 New/ringlocal.tst
+New/rref.tst
 New/sat_cleardenom.tst
 New/short_print.tst
 New/sres_bug.tst
