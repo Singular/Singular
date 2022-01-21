@@ -2010,15 +2010,17 @@ matrix singntl_rref(matrix  m, const ring R)
       for(j=c;j>0;j--)
       {
         poly h=MATELEM(m,i,j);
-        if ((h!=NULL)
-        && (p_Totaldegree(h,R)==0))
+        if (h!=NULL)
         {
-          (*NTLM)(i,j)=(long)p_GetCoeff(h,R);
-	}
-        else
-        {
-          WerrorS("smatrix for rref is not constant");
-          return M;
+          if (p_Totaldegree(h,R)==0)
+          {
+            (*NTLM)(i,j)=(long)p_GetCoeff(h,R);
+          }
+          else
+          {
+            WerrorS("smatrix for rref is not constant");
+            return M;
+          }
         }
       }
     }
@@ -2031,8 +2033,7 @@ matrix singntl_rref(matrix  m, const ring R)
         if(!n_IsZero(n,R->cf))
         {
           poly p=p_NSet(n,R);
-          p_SetComp(p,i,R);
-          M->m[j]=p_Add_q(M->m[j],p,R);
+          MATELEM(M,i,j)=p;
         }
       }
     }
@@ -2058,7 +2059,7 @@ ideal singntl_rref(ideal  m, const ring R) /*assume smatrix m*/
     zz_p::init(rChar(R));
     mat_zz_p *NTLM=new mat_zz_p;
     NTLM->SetDims(r,c);
-    for(j=c;j>0;j--)
+    for(j=c-1;j>=0;j--)
     {
       poly h=m->m[j];
       while(h!=NULL)
@@ -2084,7 +2085,7 @@ ideal singntl_rref(ideal  m, const ring R) /*assume smatrix m*/
         {
           poly p=p_NSet(n,R);
           p_SetComp(p,i,R);
-          M->m[j]=p_Add_q(M->m[j],p,R);
+          M->m[j-1]=p_Add_q(M->m[j-1],p,R);
         }
       }
     }

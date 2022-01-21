@@ -388,13 +388,15 @@ matrix singflint_rref(matrix  m, const ring R)
       for(j=c;j>0;j--)
       {
         poly h=MATELEM(m,i,j);
-        if ((h!=NULL)
-        && (p_Totaldegree(h,R)==0))
-          convSingNFlintN(fmpq_mat_entry(FLINTM,i-1,j-1),pGetCoeff(h),R->cf);
-        else
+        if (h!=NULL)
         {
-          WerrorS("matrix for rref is not constant");
-          return M;
+          if (p_Totaldegree(h,R)==0)
+            convSingNFlintN(fmpq_mat_entry(FLINTM,i-1,j-1),pGetCoeff(h),R->cf);
+          else
+          {
+            WerrorS("matrix for rref is not constant");
+            return M;
+          }
         }
       }
     }
