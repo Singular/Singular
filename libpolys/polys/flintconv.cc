@@ -424,21 +424,6 @@ matrix singflint_rref(matrix  m, const ring R)
   }
   else
   {
-    #if 0
-    fmpz_t p;
-    convSingIFlintI(p,rChar(currRing));
-    fq_nmod_ctx_init(ctx,p,1,"t");
-    fq_nmod_mat_t FLINTM;
-    // convert matrix
-    convSingMFlintFq_nmod_mat(M,FLINTM,ctx,currRing);
-    // rank
-    long rk= fq_nmod_mat_rref (FLINTM,ctx);
-    res->data=(void*)convFlintFq_nmod_matSingM(FLINTM,ctx,currRing);
-    // clean up
-    fq_nmod_mat_clear (FLINTM,ctx);
-    fq_nmod_ctx_clear(ctx);
-    fmpz_clear(p);
-    #endif
     WerrorS("not implemented for these coefficients");
   }
   return M;
@@ -524,21 +509,82 @@ ideal singflint_rref(ideal  m, const ring R) /*assume smatrix m*/
   }
   else
   {
-    #if 0
-    fmpz_t p;
-    convSingIFlintI(p,rChar(currRing));
-    fq_nmod_ctx_init(ctx,p,1,"t");
-    fq_nmod_mat_t FLINTM;
+    WerrorS("not implemented for these coefficients");
+  }
+  return M;
+}
+
+matrix singflint_kernel(matrix  m, const ring R)
+{
+  matrix M=NULL;
+  if (rField_is_Zp(R))
+  {
+    nmod_mat_t FLINTM;
+    nmod_mat_t FLINTX;
+    nmod_mat_init (FLINTX, (long)MATROWS(m), (long) MATCOLS(m), rChar(R));
     // convert matrix
-    convSingMFlintFq_nmod_mat(M,FLINTM,ctx,currRing);
+    convSingMFlintNmod_mat(m,FLINTM,R);
     // rank
-    long rk= fq_nmod_mat_rref (FLINTM,ctx);
-    res->data=(void*)convFlintFq_nmod_matSingM(FLINTM,ctx,currRing);
+    long rk= nmod_mat_nullspace(FLINTX,FLINTM);
+    nmod_mat_clear(FLINTM);
+    M=convFlintNmod_matSingM(FLINTX,R);
     // clean up
-    fq_nmod_mat_clear (FLINTM,ctx);
-    fq_nmod_ctx_clear(ctx);
-    fmpz_clear(p);
-    #endif
+    nmod_mat_clear(FLINTX);
+  }
+  else
+  {
+    WerrorS("not implemented for these coefficients");
+  }
+  return M;
+}
+
+ideal singflint_kernel(ideal  m, const ring R) /*assume smatrix m*/
+{
+  int r=m->rank;
+  int c=m->ncols;
+  int i,j;
+  ideal M=idInit(c,r);
+  if (rField_is_Zp(R))
+  {
+    nmod_mat_t FLINTM;
+    nmod_mat_t FLINTX;
+    nmod_mat_init(FLINTM,r,c,rChar(R));
+    nmod_mat_init(FLINTX,r,c,rChar(R));
+    for(j=c-1;j>=0;j--)
+    {
+      poly h=m->m[j];
+      while(h!=NULL)
+      {
+        i=p_GetComp(h,R);
+        if (p_Totaldegree(h,R)==0)
+          nmod_mat_entry(FLINTM,i-1,j)=(long)p_GetCoeff(h,R);
+        else
+        {
+          WerrorS("smatrix for rref is not constant");
+          return M;
+        }
+        pIter(h);
+      }
+    }
+    nmod_mat_nullspace(FLINTX,FLINTM);
+    nmod_mat_clear(FLINTM);
+    for(i=r;i>0;i--)
+    {
+      for(j=c-1;j>=0;j--)
+      {
+        number n=n_Init(nmod_mat_entry(FLINTX,i-1,j),R->cf);
+        if(!n_IsZero(n,R->cf))
+        {
+          poly p=p_NSet(n,R);
+          p_SetComp(p,i,R);
+          M->m[j]=p_Add_q(M->m[j],p,R);
+        }
+      }
+    }
+    nmod_mat_clear(FLINTX);
+  }
+  else
+  {
     WerrorS("not implemented for these coefficients");
   }
   return M;

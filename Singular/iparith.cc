@@ -27,6 +27,7 @@ long farey_cnt=0L;
 #include "polys/weight.h"
 #include "polys/ext_fields/transext.h"
 #include "polys/clapsing.h"
+#include "polys/flintconv.h"
 
 #include "kernel/combinatorics/stairc.h"
 #include "kernel/combinatorics/hilb.h"
@@ -4461,6 +4462,16 @@ static BOOLEAN jjJACOB_M(leftv res, leftv a)
   return FALSE;
 }
 
+static BOOLEAN jjKERNEL_M(leftv res, leftv v)
+{
+  res->data = (char *)singflint_kernel((matrix)(v->Data()),currRing);
+  return res->data==NULL;
+}
+static BOOLEAN jjKERNEL_SM(leftv res, leftv v)
+{
+  res->data = (char *)singflint_kernel((ideal)(v->Data()),currRing);
+  return res->data==NULL;
+}
 static BOOLEAN jjKBASE(leftv res, leftv v)
 {
   assumeStdFlag(v);

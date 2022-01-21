@@ -167,6 +167,8 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjJanetBasis), JANET_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(jjKBASE),      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING|WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjKBASE),      KBASE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING|WARN_RING} /*ring-cf: warning at top level*/
+,{D(jjKERNEL_M),   KERNEL_CMD,      MATRIX_CMD,     MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjKERNEL_SM),  KERNEL_CMD,      SMATRIX_CMD,    SMATRIX_CMD   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLagSolve),   LAGSOLVE_CMD,    LIST_CMD,       POLY_CMD      , NO_NC |NO_RING}
 ,{D(jjLU_DECOMP),  LU_CMD,          LIST_CMD,       MATRIX_CMD    , NO_NC |NO_RING}
 ,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       BIGINT_CMD    , ALLOW_NC |ALLOW_RING}
@@ -682,7 +684,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjJET_ID),    JET_CMD,        MATRIX_CMD,     MATRIX_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjKBASE2),    KBASE_CMD,      IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
 ,{D(jjKBASE2),    KBASE_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING |WARN_RING} /*ring-cf: warning at top level*/
-,{D(jjKERNEL),    KERNEL_CMD,     IDEAL_CMD, RING_CMD,        ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjKERNEL),    KERNEL_CMD,     IDEAL_CMD,      RING_CMD,   ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{D(atKILLATTR2), KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjKoszul),    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD, NO_NC |ALLOW_RING}
 ,{D(jjKoszul_Id), KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD, NO_NC |ALLOW_RING}
@@ -1087,7 +1089,7 @@ VAR cmdnames cmds[] =
   { "jet",         0, JET_CMD ,           CMD_M},
   { "kbase",       0, KBASE_CMD ,         CMD_12},
   { "keepring",    0, KEEPRING_CMD ,      KEEPRING_CMD},
-  { "kernel",      0, KERNEL_CMD ,        CMD_2},
+  { "kernel",      0, KERNEL_CMD ,        CMD_12},
   { "kill",        0, KILL_CMD ,          KILL_CMD},
   { "killattrib",  0, KILLATTR_CMD ,      CMD_12},
   { "koszul",      0, KOSZUL_CMD ,        CMD_23},

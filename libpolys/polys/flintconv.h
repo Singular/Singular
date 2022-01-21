@@ -67,6 +67,8 @@ matrix convFlintNmod_matSingM(nmod_mat_t m, const ring r);
 
 matrix singflint_rref(matrix  m, const ring R);
 ideal  singflint_rref(ideal  m, const ring R);
+matrix singflint_kernel(matrix  m, const ring R);
+ideal  singflint_kernel(ideal  m, const ring R);
 #if __FLINT_RELEASE >= 20500
 void convSingPFlintnmod_poly_t(nmod_poly_t result, const poly p, const ring r);
 void convSingMFlintFq_nmod_mat(matrix m, fq_nmod_mat_t M, const fq_nmod_ctx_t fq_con, const ring r);
