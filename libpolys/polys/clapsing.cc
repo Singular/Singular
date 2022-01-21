@@ -2066,7 +2066,7 @@ ideal singntl_rref(ideal  m, const ring R) /*assume smatrix m*/
       {
         i=p_GetComp(h,R);
         if (p_Totaldegree(h,R)==0)
-          (*NTLM)(i,j)=(long)p_GetCoeff(h,R);
+          (*NTLM)(i,j+1)=(long)p_GetCoeff(h,R);
         else
         {
           WerrorS("smatrix for rref is not constant");
