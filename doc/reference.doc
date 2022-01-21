@@ -3530,7 +3530,6 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{kernel (} ring_name@code{,} map_name @code{)}
-@*@code{preimage (} ring_name@code{,} ideal_expression @code{)}
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
