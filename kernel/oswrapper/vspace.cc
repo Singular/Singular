@@ -5,6 +5,7 @@
 #ifdef HAVE_CPP_THREADS
 #include <thread>
 #endif
+#include <cstddef>
 
 #if defined(__GNUC__) && (__GNUC__<9) &&!defined(__clang__)
 
