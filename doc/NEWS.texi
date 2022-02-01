@@ -26,6 +26,11 @@ New commands:
 @item @code{chinrem}, @code{farey} for @code{smatrix} (@nref{smatrix})
 @end itemize
 
+Changes in the kernel/build system:
+@itemize
+@item changes for gcc 12
+@end itemize
+
 @c New commands:
 @c @itemize
 @c @end itemize
