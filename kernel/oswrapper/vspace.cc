@@ -171,10 +171,10 @@ static void print_freelists() {
   for (int i = 0; i <= LOG2_SEGMENT_SIZE; i++) {
     vaddr_t vaddr = vmem.freelist[i];
     if (vaddr != VADDR_NULL) {
-      printf("%2d: %ld", i, vaddr);
+      printf("%2d: %ld", i, (long)vaddr);
       vaddr_t prev = block_ptr(vaddr)->prev;
       if (prev != VADDR_NULL) {
-        printf("(%ld)", prev);
+        printf("(%ld)", (long)prev);
       }
       assert(block_ptr(vaddr)->prev == VADDR_NULL);
       for (;;) {
@@ -183,10 +183,10 @@ static void print_freelists() {
         vaddr = block->next;
         if (vaddr == VADDR_NULL)
           break;
-        printf(" -> %ld", vaddr);
+        printf(" -> %ld", (long)vaddr);
         vaddr_t prev = block_ptr(vaddr)->prev;
         if (prev != last_vaddr) {
-          printf("(%ld)", prev);
+          printf("(%ld)", (long)prev);
         }
       }
       printf("\n");
@@ -725,10 +725,10 @@ static void print_freelists() {
   for (int i = 0; i <= LOG2_SEGMENT_SIZE; i++) {
     vaddr_t vaddr = vmem.freelist[i];
     if (vaddr != VADDR_NULL) {
-      std::printf("%2d: %ld", i, vaddr);
+      std::printf("%2d: %ld", i, (long)vaddr);
       vaddr_t prev = block_ptr(vaddr)->prev;
       if (prev != VADDR_NULL) {
-        std::printf("(%ld)", prev);
+        std::printf("(%ld)", (long)prev);
       }
       assert(block_ptr(vaddr)->prev == VADDR_NULL);
       for (;;) {
@@ -737,10 +737,10 @@ static void print_freelists() {
         vaddr = block->next;
         if (vaddr == VADDR_NULL)
           break;
-        std::printf(" -> %ld", vaddr);
+        std::printf(" -> %ld", (long)vaddr);
         vaddr_t prev = block_ptr(vaddr)->prev;
         if (prev != last_vaddr) {
-          std::printf("(%ld)", prev);
+          std::printf("(%ld)", (long)prev);
         }
       }
       std::printf("\n");
