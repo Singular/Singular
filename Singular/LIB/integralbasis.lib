@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-version="version integralbasis.lib 4.2.1.3 Dec_2021 "; // $Id$
+version="version integralbasis.lib 4.3.0.1 Feb_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  integralbasis.lib  Integral basis in algebraic function fields
@@ -279,11 +279,11 @@ EXAMPLE: example integralBasis; shows an example
   }
 
 
-  // We chech if the only singularity is at the origin.
+  // We check if the only singularity is at the origin.
   //check0 = 0;
   if(check0 == 1)
   {
-    "Check at origin";
+    dbprint(dbg,"Check at origin");
     int c0 = checkAt0(f, modular);
 
     if(c0 == 1)
@@ -514,7 +514,8 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
 //------------------------ singular locus computation -------------------------
   ideal J = f, diff(f, var(1)), diff(f, var(2));
 
-  if(dbg >= 4){
+  if(dbg >= 4)
+  {
     "The original singular locus is";
     J;
   }
@@ -522,8 +523,6 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
   if(isOneIdeal(J))
   {
     list out = trivialBasis(f);
-    "out";
-    out;
     return(list(out[1], out[2], 0, 0));
   }
 
@@ -752,7 +751,7 @@ static proc normToIntJacob(ideal U, poly den, poly v, poly f)
   ideal jac = jacob(f);
   ideal elimJ = elim(jac, v);
   poly dJ = elimJ[1];
-  option("redSB");
+  option(redSB);
 
   ideal PP = changeDenominatorFast(U, den, dJ, f);
   list l = normToInt(f, PP, dJ, 1);
@@ -792,7 +791,7 @@ KEYWORDS: greatest common divisor.
 static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
 {
   int dbg = printlevel - voice + 4;
-  option("redSB");
+  option(redSB);
   f = reduce(f, std(D));
 
   dbprint(dbg, "--Computing the integral basis from the normalization...");
@@ -2301,9 +2300,8 @@ static proc buildPolyGround(list fFrac, int sD)
   poly f2 = reduce(fNew, std(@X-@x^sD));
   if(deg(f2, (1,0,0)) > 0)
   {
-    "f2", f2;
-    "Polynomial is not over the ground field";
-    ~;
+    //"f2", f2;
+    ERROR("Polynomial is not over the ground field");
     gfCheck = 0;
   }
   f2 = subst(f2, @X, @x);
@@ -2653,16 +2651,12 @@ static proc nextSummand(intvec md, intvec ch, int cl)
   if(cl == pos){pos = pos + 1;}
   ch[pos] = ch[pos] + 1;
 
-//  "md: ", md;
-//  "ch: ", ch;
-//  "cl: ", cl;
   while(ch[pos] > md[pos])
   {
     ch[pos] = 0;
     pos = pos + 1;
     ch[pos] = ch[pos] + 1;
   }
-//  "output: ", ch;
   return(ch);
 }
 
@@ -2954,16 +2948,10 @@ static proc ordAtPol(poly h, def S)
     poly g = PE[1][1];
     int den = PE[1][2];
 
-    //"here";
-    //"h, g", h, g;
-
-    //"b debug overflow <-";
-
     if(size(h) > 1)
     {
       h = subst(h, var(1), var(1)^den);
       poly hs = subst(h, var(2), g);
-      //"b debug overflow <-";
 
       matrix MM;
       MM = coef(hs, var(1));
@@ -2975,11 +2963,9 @@ static proc ordAtPol(poly h, def S)
       MM = coef(g, var(1));
       int oo = deg(MM[1, ncols(MM)])*deg(h, intvec(0,1)) + deg(h, intvec(1,0))*den;
     }
-    //~;
 
     number oro = oo/number(den);
 
-    //"h, oro", h, oro;
     kill h;
     kill g;
     kill MM;
@@ -3018,11 +3004,6 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
   int gfCheck = 1;  // For checking if the polynomial is over
                     // the ground field.
   list gfCheckList;
-
-  //"nClasses: ", nClasses;
-  //"size(I2Lifted): ", size(I2Lifted);
-  //"I2Lifted: ", I2Lifted;
-  //"degExpand: ", degExpand;
 
   int wrongNumber = 0; // If some hensel block contains different classes
 
@@ -3091,8 +3072,7 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
               fuProd = fuProd * fu;
             } else
             {
-              "RING EXPECTED! Please contact the developers.";
-              ~;
+              ERROR("RING EXPECTED! Please contact the developers.");
             }
           }
 
@@ -3102,7 +3082,7 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
           {
             // The polynomial computed is not over the ground field.
             // The classes computed are wrong, we need to recompute.
-            "Polynomial not over the ground field.";
+            ERROR("Polynomial not over the ground field.");
             gfCheck = 0;
           }
 
@@ -3218,7 +3198,6 @@ static proc maxDegMerge(int n, int cl, int locBasis, int d0, matrix M, list MSel
           if(i != cl)
           {
             k = chVec[i];
-            //"i, k", i, k;
             if(k > 0)
             {
               if(k <= size(bestElem[i]))
@@ -3375,7 +3354,6 @@ static proc elimPar(list ib, int i)
   // Trivial case
   if(i == 1)
   {
-    //"Trivial case";
     return(ib[1][1]);
   }
 
@@ -3399,7 +3377,7 @@ static proc elimPar(list ib, int i)
   int mExp = ib[i][2];
   if(mExp > ib[i][2])
   {
-    "WRONG EXPONENT. CHECK!!";
+    ERROR("WRONG EXPONENT. CHECK!!");
     ~;
     setring BR;
     return(var(2) * ib[i-1][1]);
@@ -3426,8 +3404,7 @@ static proc elimPar(list ib, int i)
 
   if(deg(red, va) > 0)
   {
-    "Wrong degree! Check!";
-    ~;
+    ERROR("Wrong degree! Check!");
   }
   setring BR;
   poly red = imap(ER, red);
@@ -3471,7 +3448,7 @@ static proc newtonInfo(poly f, int b){
         return(list("changeCoord", subst(sqpp, y, 0)*x^(slN div slD)));
       } else
       {
-        "Not implemented.";
+        ERROR("Not implemented.");
         return(list());
       }
     }
@@ -3910,8 +3887,6 @@ KEYWORDS: hensel lifting.
       return(L);
     } else
     {
-    "ERROR";
-    ~;
       ERROR("f(y)*g(y) != h(0,y)");
     }
   }
@@ -3930,8 +3905,6 @@ KEYWORDS: hensel lifting.
       return(L);
     } else
     {
-      "ERROR";
-      ~;
       ERROR("f(y)*g(y) != h(0,y)");
     }
   }
@@ -4116,7 +4089,7 @@ static proc henselBlocks(poly f, int globOrder, int loc)
 
     if(fLoc == 1)
     {
-      "Warning! No local component. This may indicate you are computing the basis at a value of X where there is no singularity.";
+      dbprint(dbg,"Warning! No local component. This may indicate you are computing the basis at a value of X where there is no singularity.");
     }
     comps[1] = fGlob[2];    // comp[1] is the component outside the origin.
     comp = 2;
@@ -4434,12 +4407,12 @@ static proc checkAt0(poly f, int modular)
     } else
     {
       // Singularities at infinity
-      "Singularities at infinity";
+      dbprint(dbg,"Singularities at infinity");
       return(0);
     }
   } else
   {
-    "Check at origin: FALSE";
+    dbprint(dbg,"Check at origin: FALSE");
     return(0);
   }
   kill vdDS, vd32003;
@@ -4670,7 +4643,7 @@ static proc ibNonRatYSplit(poly f, poly fOrig, poly py, poly PE, int locBasis)
   int maxExpDen = (slN * (((d-1)-dU) div dPY)) div slD;
   if(dbg >= 1)
   {
-    "Hensel lifting - order = ", maxExpDen;
+    dbprint(dbg,"Hensel lifting - order = ", maxExpDen);
   }
   // We compute the lifiting of the factor outside the origin up to the
   // maximum integrality exponent
@@ -4868,9 +4841,8 @@ EXAMPLE: example splitring;  shows an example
          else { if (find(varnames,"@o")==0)
                                     { algname="@o";}
          else {
-           "** Sorry -- could not find a free name for the primitive element.";
-           "** Try e.g. a ring without '@a' or '@b' as variable.";
-           return();
+           ERROR("** Sorry -- could not find a free name for the primitive element.";
+           "** Try e.g. a ring without '@a' or '@b' as variable.");
          }}
        }
   }
@@ -4904,7 +4876,7 @@ EXAMPLE: example splitring;  shows an example
 
   //------------- Fall 2: Bisheriger Ring hatte ein Minimalpolynom: -----------
   algname=parstr(altring);           // Name des algebraischen Elements
-  if (npars(altring)>1) {"only one Parameter is allowed!!"; return(altring);}
+  if (npars(altring)>1) {ERROR("only one Parameter is allowed!");}
 
   //---------------- Minimalpolynom in ein Polynom umwandeln: -----------------
   execute("ring splt2="+charakt+","+algname+",dp;");
