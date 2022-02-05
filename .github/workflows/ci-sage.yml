@@ -62,7 +62,7 @@ env:
   # Temporarily test with the branch from a sage ticket which enables platforms with GCC 12
   # (this is a no-op after that ticket is merged)
   SAGE_TRAC_GIT: https://github.com/sagemath/sagetrac-mirror.git
-  SAGE_TICKET: 33187
+  SAGE_TICKET: 33160
   REMOVE_PATCHES: "*"
 
 jobs:
