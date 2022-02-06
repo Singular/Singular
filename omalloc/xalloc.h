@@ -81,21 +81,9 @@ extern int om_sing_opt_show_mem;
 #define omAlloc(s) malloc(s)
 
 static inline void * omAlloc0(size_t s)
-{ void *d=omAlloc(s);memset(d,0,s); return d; }
+{ void *d=malloc(s);memset(d,0,s); return d; }
 static inline void * omalloc0(size_t s)
-{ if (s!=0) { void *d=omAlloc(s);memset(d,0,s); return d;} else return NULL; }
-
-static inline void *omRealloc(void *d, size_t ns)
-{ if (d==NULL) return omAlloc(ns);
-  else
-  return realloc(d,ns);
-}
-#define omReallocAligned(A,B) omRealloc(A,B)
-static inline void *omReallocSize(void *d, __attribute__((unused)) size_t os, size_t ns)
-{ if (d==NULL) return omAlloc(ns);
-  else
-  return realloc(d,ns);
-}
+{ if (s!=0) { void *d=malloc(s);memset(d,0,s); return d;} else return NULL; }
 
 static inline void *omRealloc0Size(void *d, __attribute__((unused)) size_t os, size_t ns)
 { if (d==NULL)
@@ -172,13 +160,17 @@ enum omError_e
 #define omPrintInfo(F)
 #define omPrintBinStats(F)
 #define omMarkMemoryAsStatic()
-#define omFreeBin(P,B)           omFree(P)
-#define omfreeSize(P,S)          omFreeSize(P,S)
-#define omFreeFunc               omFree
-#define omFreeBinAddr(P)         omFree(P)
-#define omrealloc(A,NS)          omRealloc(A,NS)
-#define omreallocSize(A,OS,NS)   omRealloc(A,NS)
+#define omFreeBin(P,B)           free(P)
+#define omfreeSize(P,S)          free(P)
+#define omFreeFunc               free
+#define omFreeBinAddr(P)         free(P)
+#define omrealloc(A,NS)          realloc(A,NS)
+#define omreallocSize(A,OS,NS)   realloc(A,NS)
 #define omrealloc0Size(A,OS,NS)  omRealloc0Size(A,OS,NS)
+#define omRealloc(A,B)           realloc(A,B)
+#define omReallocAligned(A,B)    realloc(A,B)
+#define omReallocSize(A,B,C)     realloc(A,C)
+#define omReallocAlignedSize(A,B) realloc(A,B)
 #define omMarkAsStaticAddr(A)
 #define omGetSpecBin(A)          (A)
 #define omUnGetSpecBin(A)        do {} while (0)
@@ -189,7 +181,6 @@ enum omError_e
 /* debug dummies: */
 #define omTypeReallocAlignedSize     omTypeReallocSize
 #define omTypeRealloc0AlignedSize    omTypeRealloc0Size
-#define omReallocAlignedSize         omReallocSize
 #define omRealloc0AlignedSize        omRealloc0Size
 #define omMemDupAligned              omMemDup
 #define omCheckIf(cond, test)                    do {} while (0)
@@ -221,9 +212,9 @@ enum omError_e
 
 #undef OMALLOC_USES_MALLOC
 #define X_OMALLOC
-#define omMallocFunc omAlloc
-#define omReallocSizeFunc omReallocSize
+#define omMallocFunc malloc
 #define omFreeSizeFunc omFreeSize
+#define omReallocSizeFunc realloc
 /* #define OM_NDEBUG */
 #undef OM_SING_KEEP
 
