@@ -274,6 +274,7 @@ void p_Setm_General(poly p, const ring r)
               #endif
             }
           }
+          #if SIZEOF_LONG == 4
           int64 mask=(int64)0x7fffffff;
           long a_0=(long)(ord&mask); //2^31
           long a_1=(long)(ord >>31 ); /*(ord/(mask+1));*/
@@ -284,6 +285,9 @@ void p_Setm_General(poly p, const ring r)
 
           p->exp[o->data.wp64.place]=a_1;
           p->exp[o->data.wp64.place+1]=a_0;
+          #elif SIZEOF_LONG == 8
+          p->exp[o->data.wp64.place]=ord;
+          #endif
 //            if(p_Setm_error) PrintS("***************************\n"
 //                                    "***************************\n"
 //                                    "**WARNING: overflow error**\n"
