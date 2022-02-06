@@ -344,9 +344,9 @@ void Print(const char *fmt, ...)
   {
     va_list ap;
     va_start(ap, fmt);
-    int l;
+    int l=0;
     long ls=strlen(fmt);
-    char *s=(char *)omAlloc(ls+512);
+    char *s=(char *)omAlloc0(ls+512);
 #ifdef HAVE_VSNPRINTF
     l = vsnprintf(s, ls+511, fmt, ap);
     if ((l==-1)||(s[l]!='\0')||(l!=(int)strlen(s)))
