@@ -266,7 +266,7 @@ poly shift_p_mm_Mult(poly p, const poly m, const ring ri)
 }
 
 // p - m*q destroys p
-poly shift_p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring ri) {
+poly shift_p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly /*spNoether*/, const ring ri) {
 #ifdef SHIFT_MULT_DEBUG
   PrintLn(); PrintS("shift_p_Minus_mm_Mult_qq: "); p_wrp(p, ri, ri); PrintS(" - "); p_wrp(m, ri, ri); PrintS(" * "); p_wrp(q, ri, ri);
 #endif
@@ -285,8 +285,9 @@ poly shift_p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly s
 }
 
 // Unsupported Operation STUBs
-poly shift_pp_Mult_mm_Noether_STUB(poly p, const poly m, const poly spNoether, int &ll, const ring ri) {
-  PrintLn(); WarnS("pp_Mult_mm_Noether is not supported yet by Letterplace. Ignoring spNoether and using pp_Mult_mm. This might lead to unexpected behavior.");
+poly shift_pp_Mult_mm_Noether_STUB(poly p, const poly m, const poly /*spNoether*/, int &ll, const ring ri)
+{
+  WarnS("\n** pp_Mult_mm_Noether is not supported yet by Letterplace. Ignoring spNoether and using pp_Mult_mm. This might lead to unexpected behavior.");
 
   int pLen = 0;
   if (ll >= 0)
@@ -309,13 +310,14 @@ poly shift_pp_Mult_mm_Noether_STUB(poly p, const poly m, const poly spNoether, i
 }
 
 
-poly shift_pp_Mult_Coeff_mm_DivSelectMult_STUB(poly p,const poly m, const poly a, const poly b, int &shorter,const ring r) {
-  PrintLn(); WarnS("pp_Mult_Coeff_mm_DivSelectMult is not supported yet by Letterplace. This might lead to unexpected behavior.");
+poly shift_pp_Mult_Coeff_mm_DivSelectMult_STUB(poly,const poly, const poly, const poly, int &,const ring)
+{
+  WarnS("\n** pp_Mult_Coeff_mm_DivSelectMult is not supported yet by Letterplace. This might lead to unexpected behavior.");
   return NULL;
 }
 
-poly shift_pp_Mult_Coeff_mm_DivSelect_STUB(poly p, const poly m, int &shorter, const ring r) {
-  PrintLn(); WarnS("pp_Mult_Coeff_mm_DivSelect is not supported yet by Letterplace. This might lead to unexpected behavior.");
+poly shift_pp_Mult_Coeff_mm_DivSelect_STUB(poly, const poly, int &, const ring) {
+  WarnS("\n** pp_Mult_Coeff_mm_DivSelect is not supported yet by Letterplace. This might lead to unexpected behavior.");
   return NULL;
 }
 
