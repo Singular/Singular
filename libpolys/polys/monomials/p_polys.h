@@ -677,48 +677,38 @@ static inline poly p_New(ring r)
   return p_New(r, r->PolyBin);
 }
 
-#if PDEBUG > 2
 static inline void p_LmFree(poly p, ring r)
-#else
-static inline void p_LmFree(poly p, ring)
-#endif
 {
   p_LmCheckPolyRing2(p, r);
-  omFreeBinAddr(p);
+  omFreeBin(p,r->PolyBin);
 }
-#if PDEBUG > 2
+
 static inline void p_LmFree(poly *p, ring r)
-#else
-static inline void p_LmFree(poly *p, ring)
-#endif
 {
   p_LmCheckPolyRing2(*p, r);
   poly h = *p;
   *p = pNext(h);
-  omFreeBinAddr(h);
+  omFreeBin(h,r->PolyBin);
 }
-#if PDEBUG > 2
+
 static inline poly p_LmFreeAndNext(poly p, ring r)
-#else
-static inline poly p_LmFreeAndNext(poly p, ring)
-#endif
 {
   p_LmCheckPolyRing2(p, r);
   poly pnext = pNext(p);
-  omFreeBinAddr(p);
+  omFreeBin(p,r->PolyBin);
   return pnext;
 }
 static inline void p_LmDelete(poly p, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   n_Delete(&pGetCoeff(p), r->cf);
-  omFreeBinAddr(p);
+  omFreeBin(p,r->PolyBin);
 }
 static inline void p_LmDelete0(poly p, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   if (pGetCoeff(p)!=NULL) n_Delete(&pGetCoeff(p), r->cf);
-  omFreeBinAddr(p);
+  omFreeBin(p,r->PolyBin);
 }
 static inline void p_LmDelete(poly *p, const ring r)
 {
@@ -726,14 +716,14 @@ static inline void p_LmDelete(poly *p, const ring r)
   poly h = *p;
   *p = pNext(h);
   n_Delete(&pGetCoeff(h), r->cf);
-  omFreeBinAddr(h);
+  omFreeBin(h,r->PolyBin);
 }
 static inline poly p_LmDeleteAndNext(poly p, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   poly pnext = pNext(p);
   n_Delete(&pGetCoeff(p), r->cf);
-  omFreeBinAddr(p);
+  omFreeBin(p,r->PolyBin);
   return pnext;
 }
 
@@ -1370,7 +1360,7 @@ static inline poly p_LmShallowCopyDelete(poly p, const ring r)
   memcpy(new_p->exp, p->exp, r->ExpL_Size*sizeof(long));
   pSetCoeff0(new_p, pGetCoeff(p));
   pNext(new_p) = pNext(p);
-  omFreeBinAddr(p);
+  omFreeBin(p,r->PolyBin);
   return new_p;
 }
 
