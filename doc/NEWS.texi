@@ -21,6 +21,11 @@
 
 @heading News for version @value{VERSION}
 
+New libraries:
+@itemize
+@item @code{normal.lib}: new command@code{isNormal}, optioni @code{normalCheck} for @code{normal} (@nref{normal_lib})
+@end itemize
+
 New commands:
 @itemize
 @item @code{chinrem}, @code{farey} for @code{smatrix} (@nref{smatrix})
