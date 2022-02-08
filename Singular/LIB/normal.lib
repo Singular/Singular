@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version normal.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version normal.lib 4.3.0.1 Feb_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
 AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
 @*        S. Laplagne,   slaplagn@dm.uba.ar,
 @*        G. Pfister,    pfister@mathematik.uni-kl.de
-@*        Peter Chini,   chini@rhrk.uni-kl.de (normalConductor)
+@*        P. Chini,   chini@rhrk.uni-kl.de (normalConductor)
 
 
 PROCEDURES:
@@ -18,7 +18,6 @@ PROCEDURES:
  primeClosure(L);    integral closure of R/p, p a prime ideal
  closureFrac(L);     writes a poly in integral closure as element of Quot(R/p)
  iMult(L);           intersection multiplicity of the ideals of the list L
-
  deltaLoc(f,S);      sum of delta invariants at conjugated singular points
  locAtZero(I);       checks whether the zero set of I is located at 0
  norTest(I,nor);     checks the output of normal, normalP, normalC
@@ -81,6 +80,8 @@ proc normal(ideal id, list #)
          (Option only valid for global algorithm.)@*
          Options used for computing integral basis (over rings of two
          variables):@*
+         - \"normalCheck\" -> checks only if the ring is normal. The output
+         is 1 if the ring is normal and 0 if not.
          - \"var1\" -> uses a polynomial in the first variable as
          universal denominator.@*
          - \"var2\" -> uses a polynomial in the second variable as universal
@@ -158,6 +159,7 @@ EXAMPLE: example normal; shows an example
                 // 2 -> equidimensional decomposition
                 // 3 -> minimal associated primes
   int noFac, useRing, withDelta;
+
   int dbg = printlevel - voice + 2;
   int nvar = nvars(basering);
   int chara  = char(basering);
@@ -182,6 +184,13 @@ EXAMPLE: example normal; shows an example
   denomOption = 0;   // The default universal denominator is the smallest
                      // degree polynomial.
 
+  int normalCheck;  // If normalCheck = 1 we dont compute the normalization
+                    // but only check if the ideal is normal.
+                    // This is parameter to pass to normalM, it cannot
+                    // be set to 1 in this procedure.
+  normalCheck = 0;   // The default is to We compute the full normalization.
+
+
 //--------------------------- define the method ---------------------------
   for ( i=1; i <= size(#); i++ )
   {
@@ -193,6 +202,9 @@ EXAMPLE: example normal; shows an example
 
       if ( (#[i]=="nodeco") or (#[i]=="noDeco") )
       {decomp = 1;}
+
+      if (#[i]=="normalCheck")
+      {normalCheck = 1;}
 
       if (#[i]=="prim")
       {decomp = 3;}
@@ -276,29 +288,35 @@ EXAMPLE: example normal; shows an example
   id = groebner(id);
   if((size(id) == 0) or (id[1] == 1))
   {
-    // The original ring R/I was normal. Nothing to do.
-    // We define anyway a new ring, equal to R, to be able to return it.
-    setring origR;
-    list lR = ringlist(origR);
-    def ROut = ring(lR);
-    setring ROut;
-    ideal norid = fetch(origR, id);
-    ideal normap = maxideal(1);
-    export norid;
-    export normap;
-    setring origR;
-    if(withDelta)
+    if(normalCheck)
     {
-      result = list(list(ROut), list(ideal(1)), list(intvec(0), 0));
-    }
-    else
+      return(1)
+    } else
     {
-      result = list(list(ROut), list(ideal(1)));
+      // The original ring R/I was normal. Nothing to do.
+      // We define anyway a new ring, equal to R, to be able to return it.
+      setring origR;
+      list lR = ringlist(origR);
+      def ROut = ring(lR);
+      setring ROut;
+      ideal norid = fetch(origR, id);
+      ideal normap = maxideal(1);
+      export norid;
+      export normap;
+      setring origR;
+      if(withDelta)
+      {
+        result = list(list(ROut), list(ideal(1)), list(intvec(0), 0));
+      }
+      else
+      {
+        result = list(list(ROut), list(ideal(1)));
+      }
+      sp = 1;      // number of rings in the output
+      option(set, opt);
+      normalOutputText(dbg, withDelta, sp);
+      return(result);
     }
-    sp = 1;      // number of rings in the output
-    option(set, opt);
-    normalOutputText(dbg, withDelta, sp);
-    return(result);
   }
 //------------------------ preliminary decomposition-----------------------
   list prim;
@@ -363,6 +381,22 @@ EXAMPLE: example normal; shows an example
   def newR;
   list newRList;
 
+  if(normalCheck)
+  {
+    // We only check if the ring is normal
+    int out;
+    for(i=1; i<=size(prim); i++)
+    {
+      out = normalM(prim[i], decomp, withDelta, denomOption, inputJ, inputC, normalCheck);
+      if(out == 0)
+      {
+        return(0);
+      }
+    }
+    return(1);
+  }
+
+  // We compute the normalization
   for(i=1; i<=size(prim); i++)
   {
     if(dbg>=2){pause();}
@@ -378,7 +412,7 @@ EXAMPLE: example normal; shows an example
         "We compute the normalization in the ring"; basering;
       }
       printlevel = printlevel + 1;
-      norComp = normalM(prim[i], decomp, withDelta, denomOption, inputJ, inputC);
+      norComp = normalM(prim[i], decomp, withDelta, denomOption, inputJ, inputC, normalCheck);
       printlevel = printlevel - 1;
       for(j = 1; j <= size(norComp); j++)
       {
@@ -3520,6 +3554,44 @@ proc closureGenerators(list L);
   return (fetch(R(1),preim));
 }
 
+
+
+// Checks if the given ideal is normal.
+// The ideal I is assumed to be radical.
+proc isNormal(ideal I)
+"USAGE:  isNormal(I); I ideal.
+RETURN:  1 if R/I is normal and 0 if R/I is not normal, where R is the
+basering.
+KEYWORDS: normal integral closure.
+EXAMPLE: example isNormal; shows an example
+"
+{
+  //int decomp = 2;  // Equidimensional decomposition
+  //int withDelta = 0;  // No delta computation
+  //int denomOption = 0; // The smallest degree polynomial;
+  //ideal inputJ = 0;
+  //ideal inputC = 0;
+  //int normalCheck = 1;
+  //int checkN = normalM(I, decomp, withDelta, denomOption, inputJ, inputC, normalCheck);
+  int checkN = normal(I, "normalCheck");
+  return(checkN);
+}
+example
+{ "EXAMPLE:";
+  echo = 2;
+  ring R = 0, (x,y), dp;
+
+  ideal I1 = x2 - y3;
+  isNormal(I1);
+
+  ideal I2 = x - y3;
+  isNormal(I2);
+
+  echo = 0;
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //                From here: procedures for char p with Frobenius
 ///////////////////////////////////////////////////////////////////////////////
@@ -4328,13 +4400,15 @@ static proc computeRing(ideal J, ideal I, list #)
 //                Up to here: procedures for char p with Frobenius
 ///////////////////////////////////////////////////////////////////////////////
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //                From here: subprocedures for normal
 
 // inputJ is used in parametrization of rational curves algorithms, to specify
 // a different test ideal.
 
-static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal inputJ, ideal inputC){
+static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal inputJ, ideal inputC, int normalCheck){
 // Computes the normalization of a ring R / I using the module structure as far
 // as possible.
 // The ring R is the basering.
@@ -4347,6 +4421,8 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
 // - nor[3] = ring say T, containing two ideals norid and normap such that
 // normap gives the normalization map from R / I to T / norid.
 // - nor[4] = the delta invariant, if withDelta = 1.
+
+// Set normalCheck = 1 if you are only interested in checking if the ideal is normal.
 
 // Details:
 // --------
@@ -4451,27 +4527,35 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   //------------------ We check if the singular locus is empty -------------
   if(J[1] == 1)
   {
-    // The original ring R/I was normal. Nothing to do.
-    // We define anyway a new ring, equal to R, to be able to return it.
-    setring R;
-    list lR = ringlist(R);
-    def ROut = ring(lR);
-    setring ROut;
-    ideal norid = fetch(R, I);
-    ideal normap = maxideal(1);
-    export norid;
-    export normap;
-    setring R;
-    if(withDelta)
+    if(normalCheck == 1)
     {
-      list output = ideal(1), poly(1), ROut, 0;
-    }
-    else
+      // If we are only checking if the ideal is normal, and there are no
+      // singular points, return 1.
+      return(1)
+    } else
     {
-      list output = ideal(1), poly(1), ROut;
+      // The original ring R/I was normal. Nothing to do.
+      // We define anyway a new ring, equal to R, to be able to return it.
+      setring R;
+      list lR = ringlist(R);
+      def ROut = ring(lR);
+      setring ROut;
+      ideal norid = fetch(R, I);
+      ideal normap = maxideal(1);
+      export norid;
+      export normap;
+      setring R;
+      if(withDelta)
+      {
+        list output = ideal(1), poly(1), ROut, 0;
+      }
+      else
+      {
+        list output = ideal(1), poly(1), ROut;
+      }
+      option(set,save_opt);
+      return(list(output));
     }
-    option(set,save_opt);
-    return(list(output));
   }
 
 
@@ -4517,12 +4601,28 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
         // I = I1 \cap I2
         printlevel = printlevel + 1;
         ideal JDefault = 0; // Now it uses the default J;
-        list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault);
-        list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault);
-        printlevel = printlevel - 1;
-        option(set,save_opt);
-        list res = nor1 + nor2;
-        return(res);
+        if(normalCheck == 1)
+        {
+          int check1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+          if(check1)
+          {
+            int check2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+            printlevel = printlevel - 1;
+            return(check2);
+          } else
+          {
+            printlevel = printlevel - 1;
+            return(0);
+          }
+        } else
+        {
+          list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+          list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+          printlevel = printlevel - 1;
+          option(set,save_opt);
+          list res = nor1 + nor2;
+          return(res);
+        }
       }
     }
   }
@@ -4641,12 +4741,28 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
       printlevel = printlevel + 1;
 
       ideal JDefault = 0;  // Now it uses the default J;
-      list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault);
-      list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault);
-      printlevel = printlevel - 1;
-      option(set,save_opt);
-      list res = nor1 + nor2;
-      return(res);
+      if(normalCheck == 1)
+      {
+        int check1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+        if(check1)
+        {
+          int check2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+          printlevel = printlevel - 1;
+          return(check2);
+        } else
+        {
+          printlevel = printlevel - 1;
+          return(0);
+        }
+      } else
+      {
+        list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+        list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
+        printlevel = printlevel - 1;
+        option(set,save_opt);
+        list res = nor1 + nor2;
+        return(res);
+      }
     }
   }
 
@@ -4657,15 +4773,25 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   poly condu = fetch(Q, condu);
   J = fetch(Q, J);
   printlevel = printlevel + 1;
-  list result = normalMEqui(I, J, condu, D, withDelta, denomOption);
-  printlevel = printlevel - 1;
-  option(set,save_opt);
-  return(list(result));
+
+  if(normalCheck == 1)
+  {
+    int out = normalMEqui(I, J, condu, D, withDelta, normalCheck);
+    printlevel = printlevel - 1;
+    return(out);
+  } else
+  {
+    list result = normalMEqui(I, J, condu, D, withDelta, normalCheck);
+    printlevel = printlevel - 1;
+    option(set,save_opt);
+    return(list(result));
+  }
+  return();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
+static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta, int normalCheck)
 // Here is where the normalization is actually computed.
 
 // Computes the normalization of R/I. (basering is R)
@@ -4674,6 +4800,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 // D is a non-zerodivisor of R/I.
 // condu is a non-zerodivisor in the conductor or 0 if it was not computed.
 // If withDelta = 1, computes the delta invariant.
+// If normalCheck = 1, it only checks if the ring is normal.
 {
   ASSUME(1, not isQuotientRing(basering) );
   int step = 0;                       // Number of steps. (for debugging)
@@ -4715,35 +4842,47 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
   isNormal = checkInclusions(D*oldU, U);
   if(isNormal == 0)
   {
-    if(dbg >= 1)
+    if(normalCheck == 1)
     {
-      "In this step, we have the ring 1/c * U, with c =", c;
-      "and U = "; U;
+      return(0);
+    } else
+    {
+      if(dbg >= 1)
+      {
+        "In this step, we have the ring 1/c * U, with c =", c;
+        "and U = "; U;
+      }
     }
   }
   else
   {
-    // The original ring R/I was normal. Nothing to do.
-    // We define anyway a new ring, equal to R, to be able to return it.
-    setring R;
-    list lR = ringlist(R);
-    def ROut = ring(lR);
-    setring ROut;
-    ideal norid = fetch(R, I);
-    ideal normap = maxideal(1);
-    export norid;
-    export normap;
-    setring R;
-    if(withDelta)
+    if(normalCheck == 1)
     {
-      list output = ideal(1), poly(1), ROut, 0;
-    }
-    else
+      return(1);
+    } else
     {
-      list output = ideal(1), poly(1), ROut;
+      // The original ring R/I was normal. Nothing to do.
+      // We define anyway a new ring, equal to R, to be able to return it.
+      setring R;
+      list lR = ringlist(R);
+      def ROut = ring(lR);
+      setring ROut;
+      ideal norid = fetch(R, I);
+      ideal normap = maxideal(1);
+      export norid;
+      export normap;
+      setring R;
+      if(withDelta)
+      {
+        list output = ideal(1), poly(1), ROut, 0;
+      }
+      else
+      {
+        list output = ideal(1), poly(1), ROut;
+      }
+      option(set,save_opt);
+      return(output);
     }
-    option(set,save_opt);
-    return(output);
   }
 
   // ----- computation of the chain of ideals A1 c A2 c ... c An ------------
