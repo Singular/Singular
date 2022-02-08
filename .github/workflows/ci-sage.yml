@@ -45,6 +45,11 @@ on:
   workflow_dispatch:
     # Allow to run manually
 
+concurrency:
+  # Cancel previous runs of this workflow for the same branch
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
   DIST_PREREQ: libcdd-dev
@@ -52,15 +57,17 @@ env:
   SPKG:        singular
   # Sage distribution packages to build
   TARGETS_PRE: build/make/Makefile
-  TARGETS:     SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular,pynac singular pynac
+  TARGETS:     SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular singular
   TARGETS_OPTIONAL: SAGE_CHECK=no SAGE_CHECK_pysingular=warn pysingular
+  # Need texinfo for building the Singular documentation
+  EXTRA_SAGE_PACKAGES: info
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:   sagemath/sage
   SAGE_REF:    develop
   # Temporarily test with the branch from a sage ticket which enables platforms with GCC 12
   # (this is a no-op after that ticket is merged)
   SAGE_TRAC_GIT: https://github.com/sagemath/sagetrac-mirror.git
-  SAGE_TICKET: 33187
+  SAGE_TICKET: 33160
   REMOVE_PATCHES: "*"
 
 jobs:
