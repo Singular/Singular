@@ -3817,15 +3817,43 @@ void p_Norm(poly p1, const ring r)
       c = n_Init(1,r->cf);
       pSetCoeff0(p1,c);
       poly h = pNext(p1);
-      while (h!=NULL)
+      if (rField_is_Zp(r))
       {
-        c=n_Div(pGetCoeff(h),k,r->cf);
-        // no need to normalize: Z/p, R
-        // normalize already in nDiv: Q_a, Z/p_a
-        // remains: Q
-        if (rField_is_Q(r) && (!n_IsOne(c,r->cf))) n_Normalize(c,r->cf);
-        p_SetCoeff(h,c,r);
-        pIter(h);
+        if (r->cf->ch>32003)
+        {
+          number inv=n_Invers(k,r->cf);
+          while (h!=NULL)
+          {
+            c=n_Mult(pGetCoeff(h),inv,r->cf);
+            // no need to normalize
+            p_SetCoeff(h,c,r);
+            pIter(h);
+          }
+          n_Delete(&inv,r->cf);
+        }
+        else
+        {
+          while (h!=NULL)
+          {
+            c=n_Div(pGetCoeff(h),k,r->cf);
+            // no need to normalize
+            p_SetCoeff(h,c,r);
+            pIter(h);
+          }
+        }
+      }
+      else
+      {
+        while (h!=NULL)
+        {
+          c=n_Div(pGetCoeff(h),k,r->cf);
+          // no need to normalize: Z/p, R
+          // normalize already in nDiv: Q_a, Z/p_a
+          // remains: Q
+          if (rField_is_Q(r) && (!n_IsOne(c,r->cf))) n_Normalize(c,r->cf);
+          p_SetCoeff(h,c,r);
+          pIter(h);
+        }
       }
       n_Delete(&k,r->cf);
     }

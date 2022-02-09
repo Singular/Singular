@@ -7,7 +7,7 @@
 extern "C"
 {
 #endif
-#define SIPC_MAX_SEMAPHORES 256
+#define SIPC_MAX_SEMAPHORES 512
 
 #define USE_SEM_INIT 0
 
