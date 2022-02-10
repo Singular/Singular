@@ -2333,11 +2333,11 @@ static BOOLEAN jjFRES3(leftv res, leftv u, leftv v, leftv w)
 
 static BOOLEAN jjFRES(leftv res, leftv u, leftv v)
 {
-    leftv w = (leftv)omAlloc0(sizeof(sleftv));
+    leftv w = (leftv)omAlloc0Bin(sleftv_bin);
     w->rtyp = STRING_CMD;
     w->data = (char *)"complete";   // default
     BOOLEAN RES = jjFRES3(res, u, v, w);
-    omFree(w);
+    omFreeBin(w,sleftv_bin);
     return RES;
 }
 
@@ -4341,7 +4341,7 @@ static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
 static BOOLEAN jjIDEAL_Map(leftv res, leftv v)
 {
   map m=(map)v->CopyD(MAP_CMD);
-  omFree((ADDRESS)m->preimage);
+  omFreeBinAddr((ADDRESS)m->preimage);
   m->preimage=NULL;
   ideal I=(ideal)m;
   I->rank=1;
@@ -5505,7 +5505,7 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
         else if (IDTYP(pl)!=PACKAGE_CMD)
         {
           Werror("can not create package `%s`",plib);
-          omFree(plib);
+          omFreeBinAddr(plib);
           return TRUE;
         }
         else /* package */
@@ -5515,11 +5515,11 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
           || (pa->language==LANG_MIX))
           {
             Werror("can not create package `%s` - binaries  exists",plib);
-            omfree(plib);
+            omFreeBinAddr(plib);
             return TRUE;
           }
         }
-        omFree(plib);
+        omFreeBinAddr(plib);
         package savepack=currPack;
         currPack=IDPACKAGE(pl);
         IDPACKAGE(pl)->loaded=TRUE;
@@ -7048,7 +7048,7 @@ static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
   int yes;
   jjSTATUS2(res, u, v);
   yes = (strcmp((char *) res->data, (char *) w->Data()) == 0);
-  omFree((ADDRESS) res->data);
+  omFreeBinAddr((ADDRESS) res->data);
   res->data = (void *)(long)yes;
   return FALSE;
 }
@@ -7424,7 +7424,7 @@ err_fetch:
   char *s1=nCoeffString(r->cf);
   char *s2=nCoeffString(currRing->cf);
   Werror("no identity map from %s (%s -> %s)",u->Fullname(),s1,s2);
-  omFree(s2);omFree(s1);
+  omFreeBinAddr(s2);omFreeBinAddr(s1);
   return TRUE;
 }
 static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
@@ -9806,7 +9806,7 @@ int iiArithRemoveCmd(const char *szName)
     Print("'%s' not found (%d)\n", szName, nIndex);
     return -1;
   }
-  omFree(sArithBase.sCmds[nIndex].name);
+  omFreeBinAddr(sArithBase.sCmds[nIndex].name);
   sArithBase.sCmds[nIndex].name=NULL;
   qsort(sArithBase.sCmds, sArithBase.nCmdUsed, sizeof(cmdnames),
         (&_gentable_sort_cmds));

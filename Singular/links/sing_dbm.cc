@@ -82,7 +82,7 @@ LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv u)
     else
       SI_LINK_SET_R_OPEN_P(l);
     l->data=(void *)(db);
-    omFree(l->mode);
+    omFreeBinAddr(l->mode);
     l->mode=omStrDup(mode);
     return FALSE;
   }
@@ -308,7 +308,7 @@ LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv /*u*/)
     else
       SI_LINK_SET_R_OPEN_P(l);
     l->data=(void *)(db);
-    omFree(l->mode);
+    omFreeBinAddr(l->mode);
     l->mode=omStrDup(mode);
     return FALSE;
   }

@@ -1043,7 +1043,7 @@ static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL)
   {
-    omFree((ADDRESS)((map)res->data)->preimage);
+    omFreeBinAddr((ADDRESS)((map)res->data)->preimage);
     ((map)res->data)->preimage=NULL;
     idDelete((ideal*)&res->data);
   }
@@ -2154,7 +2154,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       // first element in the list sl (r) must be a ring
       if ((rt == RING_CMD)&&(r->e==NULL))
       {
-        omFree((ADDRESS)IDMAP((idhdl)l->data)->preimage);
+        omFreeBinAddr((ADDRESS)IDMAP((idhdl)l->data)->preimage);
         IDMAP((idhdl)l->data)->preimage = omStrDup (r->Fullname());
         /* advance the expressionlist to get the next element after the ring */
         hh = r->next;

@@ -695,7 +695,7 @@ BOOLEAN setOption(leftv res, leftv v)
   okay:
     if (currRing != NULL)
       currRing->options = si_opt_1 & TEST_RINGDEP_OPTS;
-    omFree((ADDRESS)n);
+    omFreeBinAddr((ADDRESS)n);
     v=v->next;
   } while (v!=NULL);
 

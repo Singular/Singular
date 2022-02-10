@@ -516,7 +516,7 @@ ring ssiReadRing(const ssiInfo *d)
     if (cf==NULL)
     {
       Werror("cannot find cf:%s",cf_name);
-      omFree(cf_name);
+      omFreeBinAddr(cf_name);
       return NULL;
     }
   }
@@ -937,7 +937,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
     SI_LINK_SET_OPEN_P(l, flag);
     if(l->data!=NULL) omFreeSize(l->data,sizeof(ssiInfo));
     l->data=d;
-    omFree(l->mode);
+    omFreeBinAddr(l->mode);
     l->mode = omStrDup(mode);
 
     if (l->name[0] == '\0')
@@ -1001,7 +1001,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           //d->r=currRing;
           //if (d->r!=NULL) d->r->ref++;
           l->data=d;
-          omFree(l->mode);
+          omFreeBinAddr(l->mode);
           l->mode = omStrDup(mode);
           singular_in_batchmode=TRUE;
           SI_LINK_SET_RW_OPEN_P(l);

@@ -68,7 +68,7 @@ void ipPrint_MA0(matrix m, const char *name)
     ss=(char *)omAlloc(14+strlen(name));
     sprintf(ss,"%s[%d,%d]",name,MATCOLS(m),MATROWS(m));
     vl=si_max(vl,(int)strlen(ss));
-    omFree(ss);
+    omFreeBinAddr(ss);
 
     /* convert all polys to string */
     i=MATCOLS(m)*MATROWS(m)-1;

@@ -374,7 +374,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
     //Werror("identifier `%s` in use(lev h=%d,typ=%d,t=%d, curr=%d)",s,IDLEV(h),IDTYP(h),t,lev);
     Werror("identifier `%s` in use",s);
     //listall();
-    omFree((ADDRESS)s);
+    omFreeBinAddr((ADDRESS)s);
     return NULL;
 }
 void killid(const char * id, idhdl * ih)
@@ -482,7 +482,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
         hdh = temp;
       }
       killhdl2(*hd,hd,NULL);
-      if (IDPACKAGE(h)->libname!=NULL) omFree((ADDRESS)(IDPACKAGE(h)->libname));
+      if (IDPACKAGE(h)->libname!=NULL) omFreeBinAddr((ADDRESS)(IDPACKAGE(h)->libname));
     }
     paKill(IDPACKAGE(h));
     if (currPackHdl==h) currPackHdl=packFindHdl(currPack);
@@ -495,7 +495,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   //  general  -------------------------------------------------------------
   // now dechain it and delete idrec
   if (IDID(h)!=NULL) // OB: ?????
-    omFree((ADDRESS)IDID(h));
+    omFreeBinAddr((ADDRESS)IDID(h));
   IDID(h)=NULL;
   IDDATA(h)=NULL;
   if (h == (*ih))
@@ -754,9 +754,9 @@ BOOLEAN piKill(procinfov pi)
       }
     }
     if (pi->libname != NULL) // OB: ????
-      omFree((ADDRESS)pi->libname);
+      omFreeBinAddr((ADDRESS)pi->libname);
     if (pi->procname != NULL) // OB: ????
-      omFree((ADDRESS)pi->procname);
+      omFreeBinAddr((ADDRESS)pi->procname);
 
     if( pi->language == LANG_SINGULAR)
     {
@@ -785,7 +785,7 @@ void paCleanUp(package pack)
       dynl_close (pack->handle);
 #endif /* HAVE_DYNAMIC_LOADING */
     }
-    omFree((ADDRESS)pack->libname);
+    omFreeBinAddr((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;
   }
@@ -877,7 +877,7 @@ BOOLEAN iiAlias(leftv p)
       case MAP_CMD:
          {
            map im = IDMAP(pp);
-           omFree((ADDRESS)im->preimage); 
+           omFreeBinAddr((ADDRESS)im->preimage);
 	   im->preimage=NULL;// and continue
          }
          // continue as ideal:

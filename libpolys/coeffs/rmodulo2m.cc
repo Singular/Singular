@@ -238,16 +238,16 @@ static void specialXGCD(unsigned long& s, unsigned long a, const coeffs r)
   }
   s = mpz_get_ui(u1); /* now: 0 <= s <= 2^m - 1 */
 
-  mpz_clear(u);  omFree((ADDRESS)u);
-  mpz_clear(u0); omFree((ADDRESS)u0);
-  mpz_clear(u1); omFree((ADDRESS)u1);
-  mpz_clear(u2); omFree((ADDRESS)u2);
-  mpz_clear(v);  omFree((ADDRESS)v);
-  mpz_clear(v0); omFree((ADDRESS)v0);
-  mpz_clear(v1); omFree((ADDRESS)v1);
-  mpz_clear(v2); omFree((ADDRESS)v2);
-  mpz_clear(q); omFree((ADDRESS)q);
-  mpz_clear(rr); omFree((ADDRESS)rr);
+  mpz_clear(u);  omFreeBinAddr((ADDRESS)u);
+  mpz_clear(u0); omFreeBinAddr((ADDRESS)u0);
+  mpz_clear(u1); omFreeBinAddr((ADDRESS)u1);
+  mpz_clear(u2); omFreeBinAddr((ADDRESS)u2);
+  mpz_clear(v);  omFreeBinAddr((ADDRESS)v);
+  mpz_clear(v0); omFreeBinAddr((ADDRESS)v0);
+  mpz_clear(v1); omFreeBinAddr((ADDRESS)v1);
+  mpz_clear(v2); omFreeBinAddr((ADDRESS)v2);
+  mpz_clear(q); omFreeBinAddr((ADDRESS)q);
+  mpz_clear(rr); omFreeBinAddr((ADDRESS)rr);
 }
 
 static unsigned long InvMod(unsigned long a, const coeffs r)
@@ -585,7 +585,7 @@ static number nr2mAnn(number b, const coeffs r)
     mpz_init_set_ui(cc, r->mod2mMask); mpz_add_ui(cc, cc, 1);
     mpz_div_ui(cc, cc, (unsigned long)(unsigned long)b);
     unsigned long s = mpz_get_ui(cc);
-    mpz_clear(cc); omFree((ADDRESS)cc);
+    mpz_clear(cc); omFreeBinAddr((ADDRESS)cc);
     return (number)(unsigned long)s;
   }
 }
@@ -631,8 +631,8 @@ static number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   mpz_and(erg, (mpz_ptr)from, k);
   number res = (number) mpz_get_ui(erg);
 
-  mpz_clear(erg); omFree((ADDRESS)erg);
-  mpz_clear(k);   omFree((ADDRESS)k);
+  mpz_clear(erg); omFreeBinAddr((ADDRESS)erg);
+  mpz_clear(k);   omFreeBinAddr((ADDRESS)k);
 
   return (number)res;
 }
@@ -642,7 +642,7 @@ static number nr2mMapQ(number from, const coeffs src, const coeffs dst)
   mpz_ptr gmp = (mpz_ptr)omAllocBin(gmp_nrz_bin);
   nlMPZ(gmp, from, src);
   number res=nr2mMapGMP((number)gmp,src,dst);
-  mpz_clear(gmp); omFree((ADDRESS)gmp);
+  mpz_clear(gmp); omFreeBinAddr((ADDRESS)gmp);
   return res;
 }
 

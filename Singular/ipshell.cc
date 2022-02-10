@@ -1298,7 +1298,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
   {
     if (h->Typ()!=STRING_CMD)
     {
-      omFree(t);
+      omFreeBinAddr(t);
       Werror("arg %d is not a string",i);
       return TRUE;
     }
@@ -1307,20 +1307,20 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     if(b) t[i]=tt;
     else
     {
-      omFree(t);
+      omFreeBinAddr(t);
       Werror("arg %d is not a type name",i);
       return TRUE;
     }
   }
   if (h->Typ()!=PROC_CMD)
   {
-    omFree(t);
+    omFreeBinAddr(t);
     Werror("last(%d.) arg.(%s) is not a proc(but %s(%d)), nesting=%d",
            i,h->name,Tok2Cmdname(h->Typ()),h->Typ(),myynest);
     return TRUE;
   }
   b=iiCheckTypes(iiCurrArgs,t,0);
-  omFree(t);
+  omFreeBinAddr(t);
   if (b && (h->rtyp==IDHDL) && (h->e==NULL))
   {
     // get the proc:
@@ -5162,7 +5162,7 @@ void rSetHdl(idhdl h)
           {
             n_Delete(&(dd->n),currRing->cf);
             dd=dd->next;
-            omFree(DENOMINATOR_LIST);
+            omFreeBinAddr(DENOMINATOR_LIST);
             DENOMINATOR_LIST=dd;
           } while(DENOMINATOR_LIST!=NULL);
         }
@@ -5294,7 +5294,7 @@ static leftv rOptimizeOrdAsSleftv(leftv ord)
         else
           (*iv)[2] += (*iv2)[2];
         hh->CleanUp();
-        omFree(hh);
+        omFreeBin(hh,sleftv_bin);
         change=TRUE;
       }
     }
@@ -6243,7 +6243,7 @@ void rKill(idhdl h)
         {
           n_Delete(&(dd->n),currRing->cf);
           dd=dd->next;
-          omFree(DENOMINATOR_LIST);
+          omFreeBinAddr(DENOMINATOR_LIST);
           DENOMINATOR_LIST=dd;
         } while(DENOMINATOR_LIST!=NULL);
       }

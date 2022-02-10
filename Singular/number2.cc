@@ -197,7 +197,7 @@ BOOLEAN jjNUMBER2_OP2(leftv res, leftv a, leftv b)
         case '/': r->n=n_Div(aa,bb,r->cf);break;
         case '%': r->n=n_IntMod(aa,bb,r->cf);break;
         default: Werror("unknown binary operation %s(%d)",Tok2Cmdname(op),op);
-             omFree(r);
+             omFreeBinAddr(r);
              an->CleanUp();
              bn->CleanUp();
              omFreeBin((ADDRESS)an, sleftv_bin);
@@ -234,7 +234,7 @@ BOOLEAN jjNUMBER2_OP1(leftv res, leftv a)
   {
     case '-': r->n=n_Copy(a2->n,a2->cf);r->n=n_InpNeg(r->n,a2->cf);break;
     default: Werror("unknown unary operation %s(%d)",Tok2Cmdname(op),op);
-             omFree(r);
+             omFreeBinAddr(r);
              return TRUE;
   }
   res->data=(void*)r;
@@ -296,7 +296,7 @@ BOOLEAN jjPOLY2_OP2(leftv res, leftv a, leftv b)
         //case '/': r->n=n_Div(aa,bb,r->cf);break;
         //case '%': r->n=n_IntMod(aa,bb,r->cf);break;
         default: Werror("unknown binary operation %s(%d)",Tok2Cmdname(op),op);
-             omFree(r);
+             omFreeBinAddr(r);
              an->CleanUp();
              bn->CleanUp();
              omFreeBin((ADDRESS)an, sleftv_bin);
@@ -333,7 +333,7 @@ BOOLEAN jjPOLY2_OP1(leftv res, leftv a)
   {
     case '-': r->n=p_Copy(a2->n,a2->cf);r->n=p_Neg(r->n,a2->cf);break;
     default: Werror("unknown unary operation %s(%d)",Tok2Cmdname(op),op);
-             omFree(r);
+             omFreeBinAddr(r);
              return TRUE;
   }
   res->data=(void*)r;

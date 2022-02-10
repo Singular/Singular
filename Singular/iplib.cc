@@ -80,7 +80,7 @@ BOOLEAN iiGetLibStatus(const char *lib)
 
   char *plib = iiConvName(lib);
   hl = basePack->idroot->get(plib,0);
-  omFree(plib);
+  omFreeBinAddr(plib);
   if((hl==NULL) ||(IDTYP(hl)!=PACKAGE_CMD))
   {
     return FALSE;
@@ -662,7 +662,7 @@ ideal ii_CallProcId2Id(const char *lib,const char *proc, ideal arg, const ring R
 {
   char *plib = iiConvName(lib);
   idhdl h=ggetid(plib);
-  omFree(plib);
+  omFreeBinAddr(plib);
   if (h==NULL)
   {
     BOOLEAN bo=iiLibCmd(lib,TRUE,TRUE,FALSE);
@@ -681,7 +681,7 @@ int ii_CallProcId2Int(const char *lib,const char *proc, ideal arg, const ring R)
 {
   char *plib = iiConvName(lib);
   idhdl h=ggetid(plib);
-  omFree(plib);
+  omFreeBinAddr(plib);
   if (h==NULL)
   {
     BOOLEAN bo=iiLibCmd(lib,TRUE,TRUE,FALSE);
@@ -907,14 +907,14 @@ BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOO
   {
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
-      omFree(plib);
+      omFreeBinAddr(plib);
       WarnS("not of type package.");
       fclose(fp);
       return TRUE;
     }
     if (!force)
     {
-      omFree(plib);
+      omFreeBinAddr(plib);
       return FALSE;
     }
   }
@@ -1211,20 +1211,20 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
     if(IDPACKAGE(pl)->language==LANG_C)
     {
       if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded as package", newlib);
-      omFree(plib);
+      omFreeBinAddr(plib);
       return FALSE;
     }
     else if(IDPACKAGE(pl)->language==LANG_MIX)
     {
       if (BVERBOSE(V_LOAD_LIB)) Warn( "%s contain binary parts, cannot load", newlib);
-      omFree(plib);
+      omFreeBinAddr(plib);
       return FALSE;
     }
   }
   else
   {
     pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
-    omFree(plib); /* enterid copied plib*/
+    omFreeBinAddr(plib); /* enterid copied plib*/
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
   IDPACKAGE(pl)->language = LANG_C;
@@ -1313,7 +1313,7 @@ BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
     if(IDPACKAGE(pl)->language==LANG_C)
     {
       if (BVERBOSE(V_LOAD_LIB)) Warn( "(builtin) %s already loaded", newlib);
-      omFree(plib);
+      omFreeBinAddr(plib);
       return FALSE;
     }
   }
@@ -1322,7 +1322,7 @@ BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
     pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
     IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
-  omFree(plib);
+  omFreeBinAddr(plib);
   IDPACKAGE(pl)->language = LANG_C;
 
   IDPACKAGE(pl)->handle=(void *)NULL;

@@ -1217,7 +1217,7 @@ ideal id_Homogen(ideal h, int varnum,const ring r)
 ideal id_Vec2Ideal(poly vec, const ring R)
 {
    ideal result=idInit(1,1);
-   omFree((ADDRESS)result->m);
+   omFreeBinAddr((ADDRESS)result->m);
    p_Vec2Polys(vec, &(result->m), &(IDELEMS(result)),R);
    return result;
 }

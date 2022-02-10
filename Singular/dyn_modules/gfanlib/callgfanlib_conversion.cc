@@ -115,7 +115,7 @@ int* ZVectorToIntStar(const gfan::ZVector &v, bool &overflow)
     if (!v[i].fitsInInt())
     {
       omFree(w);
-      WerrorS("intoverflow converting gfan:ZVector to int*");
+      WerrorS("int overflow converting gfan:ZVector to int*");
       overflow = true;
       return NULL;
     }
