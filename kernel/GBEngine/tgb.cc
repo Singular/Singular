@@ -1170,7 +1170,7 @@ static inline poly p_MoveHead (poly p, omBin b)
   poly np;
   omTypeAllocBin (poly, np, b);
   memmove (np, p, omSizeWOfBin(b) * sizeof (long));
-  omFreeBin (p,currRing->PolyBin);
+  omFreeBinAddr (p);
   return np;
 }
 #endif

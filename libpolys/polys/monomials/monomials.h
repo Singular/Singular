@@ -211,13 +211,13 @@ while (0)
 do                                              \
 {                                               \
   omTypeAllocBin(poly, p, bin);                 \
-  p_SetRingOfLm(p, r);                          \
+  p_SetRingOfLm(p, r);                        \
 }                                               \
 while (0)
 #define p_FreeBinAddr(p, r) p_LmFree(p, r)
 #else
 #define p_AllocBin(p, bin, r)   omTypeAllocBin(poly, p, bin)
-#define p_FreeBinAddr(p, r)     omFreeBin(p,r->PolyBin)
+#define p_FreeBinAddr(p, r)     omFreeBinAddr(p)
 #endif
 
 /***************************************************************
@@ -255,7 +255,7 @@ while (0)
 #define p_FreeBinAddr(p, r) p_LmFree(p, r)
 #else
 #define p_AllocBin(p, bin, r)   omTypeAllocBin(poly, p, bin)
-#define p_FreeBinAddr(p, r)     omFreeBin(p,r->PolyBin)
+#define p_FreeBinAddr(p, r)     omFreeBinAddr(p)
 #endif
 
 /***************************************************************
