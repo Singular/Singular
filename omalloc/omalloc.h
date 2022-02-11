@@ -35,6 +35,7 @@ extern int om_sing_opt_show_mem;
 #if defined(OM_NDEBUG) && !defined(OM_ALLOC_INTERNAL)
 #if (SIZEOF_LONG == 8)
 #define OM_T_FREE1
+#define OM_T_FREE2
 #define OM_T_FREE3
 #define OM_T_STR
 #define OM_T_ALLOC
