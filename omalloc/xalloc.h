@@ -100,13 +100,9 @@ static inline void *omRealloc0Size(void *d, __attribute__((unused)) size_t os, s
 #define omFree(d) free(d)
 #define omFreeSize(d,s) free(d)
 
-static inline char * omStrDup(const char *s)
-{ size_t l=strlen(s);char *ns=(char *)omAlloc(l+1);
-  return strcpy(ns,s);
-}
+#define omStrDup(s) strdup(s)
 
-/* #define omSizeWOfBin(bin_ptr) ((bin_ptr)->sizeW) */
-#define omSizeWOfBin(bin_ptr) (((bin_ptr)+sizeof(long)-1)/sizeof(long))
+#define omSizeWOfBin(bin_ptr) (((bin_ptr)+SIZEOF_LONG-1)/SIZEOF_LONG)
 
 /*******************************************************************
  *
@@ -143,7 +139,7 @@ enum omError_e
 };
 // typedef enum omError_e omError_t;
 
-#define omSizeWOfAddr(P)         (omSizeOfAddr(P)/sizeof(long))
+#define omSizeWOfAddr(P)         (omSizeOfAddr(P)/SIZEOF_LONG)
 
 #define omTypeAllocBin(T,P,B)    P=(T)omAlloc(B)
 #define omTypeAlloc(T,P,S)       P=(T)omAlloc(S)
@@ -174,7 +170,7 @@ enum omError_e
 #define omMarkAsStaticAddr(A)
 #define omGetSpecBin(A)          (A)
 #define omUnGetSpecBin(A)        do {} while (0)
-#define omMemcpyW(A,B,C)         memcpy(A,B,(C)*sizeof(long))
+#define omMemcpyW(A,B,C)         memcpy(A,B,(C)*SIZEOF_LONG)
 #define omGetStickyBinOfBin(B)   omGetSpecBin(B)
 
 

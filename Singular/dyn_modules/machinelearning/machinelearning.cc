@@ -41,7 +41,7 @@ static BOOLEAN predictHelp(leftv result, leftv arg)
         #ifdef HAVE_OMALLOC
         ml_make_prediction(filename, buffer, lengths, _omStrDup);
         #else /*xalloc*/
-        ml_make_prediction(filename, buffer, lengths, omStrDup);
+        ml_make_prediction(filename, buffer, lengths, strdup);
         #endif
 
         L->Init(5);
