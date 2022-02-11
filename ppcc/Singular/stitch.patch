@@ -145,7 +145,7 @@ index a4344e18f..8294da86d 100644
 @@ -36,6 +36,9 @@
 
 
- extern int siInit(char *);
+ extern void siInit(char *);
 +#ifdef PSINGULAR
 +GLOBAL_VAR char *global_argv0;
 +#endif

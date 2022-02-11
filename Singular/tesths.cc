@@ -35,7 +35,7 @@
 #endif
 
 
-extern int siInit(char *);
+extern void siInit(char *);
 #ifdef PSINGULAR
 GLOBAL_VAR char *global_argv0;
 #endif
