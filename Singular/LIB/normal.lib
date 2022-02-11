@@ -3586,8 +3586,6 @@ example
 
   ideal I2 = x - y3;
   isNormal(I2);
-
-  echo = 0;
 }
 
 
@@ -5081,7 +5079,6 @@ example
   ideal J = x3-y, y3;
   getOneVar(J, 1);
 
-  echo = 0;
   printlevel = printlevel-1;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -5136,7 +5133,6 @@ example
   ideal J = x3-y, y5, x2-y2+1;
   getSmallest(J);
 
-  echo = 0;
   printlevel = printlevel-1;
 }
 
@@ -5386,7 +5382,6 @@ example
   ideal U2 = changeDenominator(U1, c1, x3, I);
   U2;
   // 1/x3 * U2 is also the normalization of I, but with a different denominator.
-  echo = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -6433,10 +6428,6 @@ example
    def R2 = nor[1][2];  setring R2;
    norid; normap;
 
-   echo = 0;
-   printlevel = printlevel-1;
-   pause("   hit return to continue"); echo=2;
-
    ring r = 2,(x,y,z),dp;
    ideal i = z3-xy4;
    nor = normalC(i);  nor;
@@ -6447,9 +6438,6 @@ example
    // the normalization as affine algebra over the ground field:
    def R = nor[1][1]; setring R;
    norid; normap;
-
-   echo = 0;
-   pause("   hit return to continue");echo = 2;
 
    setring r;
    nor = normalC(i, "withGens", "prim");    // a different algorithm
