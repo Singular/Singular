@@ -3133,7 +3133,7 @@ static void rSetOutParams(ring r)
   assume( !( !r->CanShortOut && r->ShortOut ) );
 }
 
-static void rSetFirstWv(ring r, int i, rRingOrder_t* order, int* block1, int** wvhdl)
+static void rSetFirstWv(ring r, int i, rRingOrder_t* order, int* block0, int* block1, int** wvhdl)
 {
   // cheat for ringorder_aa
   if (order[i] == ringorder_aa)
@@ -3149,7 +3149,7 @@ static void rSetFirstWv(ring r, int i, rRingOrder_t* order, int* block1, int** w
    /*|| (order[i]==ringorder_A)*/)
   {
     int j;
-    for(j=block1[i]-r->block0[i];j>=0;j--)
+    for(j=block1[i]-block0[i];j>=0;j--)
     {
       if (r->firstwv[j]==0) r->LexOrder=TRUE;
     }
@@ -3158,7 +3158,7 @@ static void rSetFirstWv(ring r, int i, rRingOrder_t* order, int* block1, int** w
   {
     int j;
     int64 *w=rGetWeightVec(r);
-    for(j=block1[i]-r->block0[i];j>=0;j--)
+    for(j=block1[i]-block0[i];j>=0;j--)
     {
       if (w[j]==0) r->LexOrder=TRUE;
     }
@@ -3316,10 +3316,10 @@ static void rSetDegStuff(ring r)
   {
     if ((r->VectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s))
     {
-      rSetFirstWv(r, 1, order, block1, wvhdl);
+      rSetFirstWv(r, 1, order, block0, block1, wvhdl);
     }
     else
-      rSetFirstWv(r, 0, order, block1, wvhdl);
+      rSetFirstWv(r, 0, order, block0, block1, wvhdl);
 
     if ((order[0]!=ringorder_c)
         && (order[0]!=ringorder_C)
@@ -4521,7 +4521,7 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
         int l=r->block1[j-1]-r->block0[j-1]+1;
         if (r->order[j-1]==ringorder_a64) l*=2;
         else if (r->order[j-1]==ringorder_M) l=l*l;
-        wvhdl[j]=(int*)omalloc(l*sizeof(int));
+        wvhdl[j]=(int*)omalloc(l*sizeof(int)); /*l+1???*/
         memcpy(wvhdl[j],r->wvhdl[j-1],l*sizeof(int));
       }
       #endif
