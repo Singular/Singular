@@ -53,18 +53,18 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
   {
     assume(perm!=NULL);
     int i=1;
-    while((i<currRing->N)&&(perm[i]==0)) i++;
-    if (i<currRing->N)
+    while((i<preimage_r->N)&&(perm[i]==0)) i++;
+    if (i<preimage_r->N)
     {
       int prev_nonnull=i;
       i++;
-      for(;i<=currRing->N;i++)
+      for(;i<=preimage_r->N;i++)
       {
         if (perm[prev_nonnull] > perm[i])
         {
           if (TEST_V_ALLWARN)
           {
-            Warn("imap not usable for permuting variables, use map (%s <-> %s)",currRing->names[prev_nonnull-1],currRing->names[i-1]);
+            Warn("imap not usable for permuting variables, use map (%s <-> %s)",                 preimage_r->names[prev_nonnull-1],preimage_r->names[i-1]);
           }
           use_mult=TRUE;
           break;
