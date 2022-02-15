@@ -1520,7 +1520,7 @@ void libstack::push(const char */*p*/, char *libn)
 libstackv libstack::pop(const char */*p*/)
 {
   libstackv ls = this;
-  //omFree((ADDRESS)ls->libname);
+  omFree((ADDRESS)ls->libname);
   library_stack = ls->next;
   omFreeBin((ADDRESS)ls,  libstack_bin);
   return(library_stack);
