@@ -4977,7 +4977,7 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete/* = TRUE*/, 
         else if (r->order[i]==ringorder_M) l=l*l;
         else if (r->order[i]==ringorder_am)
         {
-          l+=r->wvhdl[j][r->block1[i]-r->block0[i]+1]+1;
+          l+=r->wvhdl[i][r->block1[i]-r->block0[i]+1]+1;
         }
         wvhdl[j]=(int*)omalloc(l*sizeof(int));
         memcpy(wvhdl[j],r->wvhdl[i],l*sizeof(int));
