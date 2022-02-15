@@ -990,6 +990,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           int l=r2->block1[0]-r2->block0[0]+1;
           if (r2->order[0]==ringorder_a64) l*=2;
           else if (r2->order[0]==ringorder_M) l=l*l;
+          else if (r2->order[0]==ringorder_am)
+          {
+            l+=r2->wvhdl[1][r2->block1[0]-r2->block0[0]+1]+1;
+          }
           tmpR.wvhdl[1]=(int*)omalloc(l*sizeof(int));
           memcpy(tmpR.wvhdl[1],r2->wvhdl[0],l*sizeof(int));
         }
@@ -1078,6 +1082,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             int l=r1->block1[i]-r1->block0[i]+1;
             if (r1->order[i]==ringorder_a64) l*=2;
             else if (r1->order[i]==ringorder_M) l=l*l;
+            else if (r1->order[i]==ringorder_am)
+            {
+              l+=r1->wvhdl[i][r1->block1[i]-r1->block0[i]+1]+1;
+            }
             tmpR.wvhdl[i]=(int*)omalloc(l*sizeof(int));
             memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l*sizeof(int));
           }
@@ -1108,6 +1116,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
                 int l=r2->block1[i]-r2->block0[i]+1;
                 if (r2->order[i]==ringorder_a64) l*=2;
                 else if (r2->order[i]==ringorder_M) l=l*l;
+                else if (r2->order[i]==ringorder_am)
+                {
+                  l+=r2->wvhdl[i][r2->block1[i]-r2->block0[i]+1]+1;
+                }
                 tmpR.wvhdl[j]=(int*)omalloc(l*sizeof(int));
                 memcpy(tmpR.wvhdl[j],r2->wvhdl[i],l*sizeof(int));
               }
@@ -1145,6 +1157,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             int l=r1->block1[i]-r1->block0[i]+1;
             if (r1->order[i]==ringorder_a64) l*=2;
             else if (r1->order[i]==ringorder_M) l=l*l;
+            else if (r1->order[i]==ringorder_am)
+            {
+              l+=r1->wvhdl[i][r1->block1[i]-r1->block0[i]+1]+1;
+            }
             tmpR.wvhdl[i]=(int*)omalloc(l*sizeof(int));
             memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l*sizeof(int));
           }
@@ -1495,6 +1511,10 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
           int l=r->block1[j]-r->block0[j]+1;
           if (r->order[j]==ringorder_a64) l*=2;
           else if (r->order[j]==ringorder_M) l=l*l;
+          else if (r->order[j]==ringorder_am)
+          {
+            l+=r->wvhdl[j][r->block1[j]-r->block0[j]+1]+1;
+          }
           res->wvhdl[j]=(int*)omalloc(l*sizeof(int));
           memcpy(res->wvhdl[j],r->wvhdl[j],l*sizeof(int));
         }
@@ -1635,6 +1655,10 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
           int l=r->block1[j]-r->block0[j]+1;
           if (r->order[j]==ringorder_a64) l*=2;
           else if (r->order[j]==ringorder_M) l=l*l;
+          else if (r->order[j]==ringorder_am)
+          {
+            l+=r->wvhdl[j][r->block1[j]-r->block0[j]+1]+1;
+          }
           res->wvhdl[j+1]=(int*)omalloc(l*sizeof(int));
           memcpy(res->wvhdl[j+1],r->wvhdl[j],l*sizeof(int));
         }
@@ -4521,7 +4545,11 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
         int l=r->block1[j-1]-r->block0[j-1]+1;
         if (r->order[j-1]==ringorder_a64) l*=2;
         else if (r->order[j-1]==ringorder_M) l=l*l;
-        wvhdl[j]=(int*)omalloc(l*sizeof(int)); /*l+1???*/
+        else if (r->order[j-1]==ringorder_am)
+        {
+          l+=r->wvhdl[j-1][r->block1[j-1]-r->block0[j-1]+1]+1;
+        }
+        wvhdl[j]=(int*)omalloc(l*sizeof(int));
         memcpy(wvhdl[j],r->wvhdl[j-1],l*sizeof(int));
       }
       #endif
@@ -4709,6 +4737,10 @@ ring rAssure_HasComp(const ring r)
         int l=r->block1[j]-r->block0[j]+1;
         if (r->order[j]==ringorder_a64) l*=2;
         else if (r->order[j]==ringorder_M) l=l*l;
+        else if (r->order[j]==ringorder_am)
+        {
+          l+=r->wvhdl[j][r->block1[j]-r->block0[j]+1]+1;
+        }
         new_r->wvhdl[j]=(int*)omalloc(l*sizeof(int));
         memcpy(new_r->wvhdl[j],r->wvhdl[j],l*sizeof(int));
       }
@@ -4943,6 +4975,10 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete/* = TRUE*/, 
         int l=(r->block1[i]-r->block0[i]+1);
         if (r->order[i]==ringorder_a64) l*=2;
         else if (r->order[i]==ringorder_M) l=l*l;
+        else if (r->order[i]==ringorder_am)
+        {
+          l+=r->wvhdl[j][r->block1[i]-r->block0[i]+1]+1;
+        }
         wvhdl[j]=(int*)omalloc(l*sizeof(int));
         memcpy(wvhdl[j],r->wvhdl[i],l*sizeof(int));
       }
