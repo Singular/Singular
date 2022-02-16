@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version finvar.lib 4.2.1.0 Nov=2021 "; // $Id$
+version="version finvar.lib 4.3.0.1 Feb_2022 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -1806,9 +1806,9 @@ proc int_number_map (int i)
   while (1)
   { if (i<p^j)                         // finding an upper bound on i
     { for (k=0;k<j-1;k++)
-      { out=out+((i/p^k)%p)*a^k;       // finding how often p^k is contained in
+      { out=out+((i div p^k)%p)*a^k;   // finding how often p^k is contained in
       }                                // i
-      out=out+(i/p^(j-1))*a^(j-1);
+      out=out+(i div p^(j-1))*a^(j-1);
       if (defined(bool)==voice)
       { return((-1)*out);
       }
