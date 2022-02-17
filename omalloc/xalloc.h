@@ -147,7 +147,6 @@ enum omError_e
 #define omAlloc0Aligned(S)       omAlloc0(S)
 #define omAllocAligned(S)        omAlloc(S)
 #define omAllocBin(B)            omAlloc(B)
-#define omAllocBin0(B)           omAlloc0(B)
 #define omAlloc0Bin(B)           omAlloc0(B)
 #define omInitInfo()
 #define omInitGetBackTrace()
