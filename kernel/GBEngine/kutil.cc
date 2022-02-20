@@ -11631,7 +11631,7 @@ skStrategy::skStrategy()
   lmBin = omGetStickyBinOfBin(currRing->PolyBin);
 #endif
 #ifdef HAVE_TAIL_BIN
-  tailBin = omGetStickyBinOfBin(currRing->PolyBin);
+  tailBin = omGetStickyBinOfBin(tailRing->PolyBin);
 #endif
   pOrigFDeg = currRing->pFDeg;
   pOrigLDeg = currRing->pLDeg;
