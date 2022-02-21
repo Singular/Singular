@@ -677,16 +677,20 @@ static inline poly p_New(ring r)
   return p_New(r, r->PolyBin);
 }
 
-#if PDEBUG > 2
+#if (PDEBUG > 2) || defined(XALLOC_BIN)
 static inline void p_LmFree(poly p, ring r)
 #else
 static inline void p_LmFree(poly p, ring)
 #endif
 {
   p_LmCheckPolyRing2(p, r);
+  #ifdef XALLOC_BIN
+  omFreeBin(p,r->PolyBin);
+  #else
   omFreeBinAddr(p);
+  #endif
 }
-#if PDEBUG > 2
+#if (PDEBUG > 2) || defined(XALLOC_BIN)
 static inline void p_LmFree(poly *p, ring r)
 #else
 static inline void p_LmFree(poly *p, ring)
@@ -695,9 +699,13 @@ static inline void p_LmFree(poly *p, ring)
   p_LmCheckPolyRing2(*p, r);
   poly h = *p;
   *p = pNext(h);
+  #ifdef XALLOC_BIN
+  omFreeBin(h,r->PolyBin);
+  #else
   omFreeBinAddr(h);
+  #endif
 }
-#if PDEBUG > 2
+#if (PDEBUG > 2) || defined(XALLOC_BIN)
 static inline poly p_LmFreeAndNext(poly p, ring r)
 #else
 static inline poly p_LmFreeAndNext(poly p, ring)
@@ -705,20 +713,32 @@ static inline poly p_LmFreeAndNext(poly p, ring)
 {
   p_LmCheckPolyRing2(p, r);
   poly pnext = pNext(p);
+  #ifdef XALLOC_BIN
+  omFreeBin(p,r->PolyBin);
+  #else
   omFreeBinAddr(p);
+  #endif
   return pnext;
 }
 static inline void p_LmDelete(poly p, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   n_Delete(&pGetCoeff(p), r->cf);
+  #ifdef XALLOC_BIN
+  omFreeBin(p,r->PolyBin);
+  #else
   omFreeBinAddr(p);
+  #endif
 }
 static inline void p_LmDelete0(poly p, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   if (pGetCoeff(p)!=NULL) n_Delete(&pGetCoeff(p), r->cf);
+  #ifdef XALLOC_BIN
+  omFreeBin(p,r->PolyBin);
+  #else
   omFreeBinAddr(p);
+  #endif
 }
 static inline void p_LmDelete(poly *p, const ring r)
 {
@@ -726,14 +746,22 @@ static inline void p_LmDelete(poly *p, const ring r)
   poly h = *p;
   *p = pNext(h);
   n_Delete(&pGetCoeff(h), r->cf);
+  #ifdef XALLOC_BIN
+  omFreeBin(h,r->PolyBin);
+  #else
   omFreeBinAddr(h);
+  #endif
 }
 static inline poly p_LmDeleteAndNext(poly p, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   poly pnext = pNext(p);
   n_Delete(&pGetCoeff(p), r->cf);
+  #ifdef XALLOC_BIN
+  omFreeBin(p,r->PolyBin);
+  #else
   omFreeBinAddr(p);
+  #endif
   return pnext;
 }
 

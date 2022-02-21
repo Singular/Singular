@@ -8,7 +8,11 @@
 */
 /* debug routines of omalloc are not implemented, but as dummies provided: */
 #define OM_NDEBUG 1
+/* use of Bins: define for optimal performancei(6%), undef for valgrind */
+#define XALLOC_BIN 1
 
+/* performancce of xalloc+XALLOC_BIN: +32.6 %, xalloc w/o XALLOC_BIN: +40.7 %
+ * (omalloc=100 %) */
 #include <stdlib.h>
 #include <string.h>
 #include "omalloc/omConfig.h"
@@ -26,7 +30,7 @@ extern "C" {
   #define REGISTER register
 #endif
 
-typedef size_t            omBin;
+
 
 struct omInfo_s;
 typedef struct omInfo_s omInfo_t;
@@ -102,7 +106,86 @@ static inline void *omRealloc0Size(void *d, __attribute__((unused)) size_t os, s
 
 #define omStrDup(s) strdup(s)
 
+#ifdef XALLOC_BIN
+typedef struct omBin_next_s omBin_next_t;
+typedef omBin_next_t*            omBin_next;
+struct omBin_next_s
+{
+  omBin_next         next;
+};
+
+struct omBin_s
+{
+  omBin_next     curr;          /* current freelist */
+  size_t        size;          /* size in bytes */
+};
+typedef struct omBin_s      omBin_t;
+typedef omBin_t*            omBin;
+#define omSizeWOfBin(bin_ptr) (((bin_ptr->size)+SIZEOF_LONG-1)/SIZEOF_LONG)
+static inline void* omAllocBin(omBin b)
+{
+  if (b->curr!=NULL)
+  {
+    omBin_next p=b->curr;
+    b->curr=p->next;
+    return p;
+  }
+  else return omAlloc(b->size);
+}
+static inline void* omAlloc0Bin(omBin b)
+{
+  if (b->curr!=NULL)
+  {
+    omBin_next p=b->curr;
+    b->curr=p->next;
+    memset(p,0,b->size);
+    return p;
+  }
+  else return omAlloc0(b->size);
+}
+static inline void omFreeBin(void *p, omBin b)
+{
+  *((void**) p) = b->curr;
+  b->curr=(omBin_next)p;
+}
+
+#define omTypeAllocBin(T,P,B)    P=(T)omAllocBin(B)
+#define omTypeAlloc0Bin(T,P,B)   P=(T)omAlloc0Bin(B)
+static inline omBin omGetSpecBin(size_t s)
+{
+  omBin b=(omBin)omAlloc(sizeof(*b));
+  b->size=s;
+  b->curr=NULL;
+  return b;
+}
+static inline void omUnGetSpecBin(omBin *A)
+{
+  omBin_next p=(*A)->curr;
+  omBin_next pp;
+  while(p!=NULL)
+  {
+    pp=p->next;
+    omFree(p);
+    p=pp;
+  }
+  (*A)->curr=NULL;
+  omFree(*A);
+}
+#define omGetStickyBinOfBin(B)   (B)
+
+#else
+
+typedef size_t            omBin;
 #define omSizeWOfBin(bin_ptr) (((bin_ptr)+SIZEOF_LONG-1)/SIZEOF_LONG)
+#define omTypeAllocBin(T,P,B)    P=(T)omAlloc(B)
+#define omTypeAlloc0Bin(T,P,B)   P=(T)omAlloc0(B)
+#define omAllocBin(B)            omAlloc(B)
+#define omAlloc0Bin(B)           omAlloc0(B)
+#define omFreeBin(P,B)           omFree(P)
+#define omGetSpecBin(A)          (A)
+#define omUnGetSpecBin(A)        do {} while (0)
+#define omGetStickyBinOfBin(B)   omGetSpecBin(B)
+#endif
 
 /*******************************************************************
  *
@@ -141,13 +224,9 @@ enum omError_e
 
 #define omSizeWOfAddr(P)         (omSizeOfAddr(P)/SIZEOF_LONG)
 
-#define omTypeAllocBin(T,P,B)    P=(T)omAlloc(B)
 #define omTypeAlloc(T,P,S)       P=(T)omAlloc(S)
-#define omTypeAlloc0Bin(T,P,B)   P=(T)omAlloc0(B)
 #define omAlloc0Aligned(S)       omAlloc0(S)
 #define omAllocAligned(S)        omAlloc(S)
-#define omAllocBin(B)            omAlloc(B)
-#define omAlloc0Bin(B)           omAlloc0(B)
 #define omInitInfo()
 #define omInitGetBackTrace()
 #define omUpdateInfo()
@@ -155,7 +234,6 @@ enum omError_e
 #define omPrintInfo(F)
 #define omPrintBinStats(F)
 #define omMarkMemoryAsStatic()
-#define omFreeBin(P,B)           free(P)
 #define omfreeSize(P,S)          free(P)
 #define omFreeFunc               free
 #define omFreeBinAddr(P)         free(P)
@@ -167,10 +245,8 @@ enum omError_e
 #define omReallocSize(A,B,C)     realloc(A,C)
 #define omReallocAlignedSize(A,B) realloc(A,B)
 #define omMarkAsStaticAddr(A)
-#define omGetSpecBin(A)          (A)
-#define omUnGetSpecBin(A)        do {} while (0)
 #define omMemcpyW(A,B,C)         memcpy(A,B,(C)*SIZEOF_LONG)
-#define omGetStickyBinOfBin(B)   omGetSpecBin(B)
+#define omGetStickyBinOfBin(B)   (B)
 
 
 /* debug dummies: */
