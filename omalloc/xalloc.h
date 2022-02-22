@@ -171,7 +171,6 @@ static inline void omUnGetSpecBin(omBin *A)
   (*A)->curr=NULL;
   omFree(*A);
 }
-#define omGetStickyBinOfBin(B)   (B)
 
 #else
 
@@ -184,7 +183,6 @@ typedef size_t            omBin;
 #define omFreeBin(P,B)           omFree(P)
 #define omGetSpecBin(A)          (A)
 #define omUnGetSpecBin(A)        do {} while (0)
-#define omGetStickyBinOfBin(B)   omGetSpecBin(B)
 #endif
 
 /*******************************************************************
