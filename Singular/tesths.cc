@@ -42,7 +42,7 @@ GLOBAL_VAR char *global_argv0;
 
 int mmInit( void )
 {
-#ifdef HAVE_OMALLOC
+#ifndef X_OMALLOC
 #if defined(OMALLOC_USES_MALLOC)
     /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
     /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
