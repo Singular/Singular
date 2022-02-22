@@ -14,7 +14,6 @@
 //#define TGB_DEBUG
 #define FULLREDUCTIONS
 //#define HALFREDUCTIONS
-//#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
 #define PAR_N 100
@@ -240,9 +239,6 @@ class slimgb_alg
   poly_array_list* F_minus;
 
   //end for F4
-#ifdef HEAD_BIN
-  omBin   HeadBin;
-#endif
   unsigned int reduction_steps;
   int n;
   //! array_lengths should be greater equal n;

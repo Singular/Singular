@@ -1164,17 +1164,6 @@ static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
   return connected;
 }
 
-#ifdef HEAD_BIN
-static inline poly p_MoveHead (poly p, omBin b)
-{
-  poly np;
-  omTypeAllocBin (poly, np, b);
-  memmove (np, p, omSizeWOfBin(b) * sizeof (long));
-  omFreeBinAddr (p);
-  return np;
-}
-#endif
-
 static void replace_pair (int &i, int &j, slimgb_alg * c)
 {
   if(i < 0)
@@ -3282,9 +3271,6 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   tmp_pair_lm = (poly *) omAlloc (n * sizeof (poly));
   tmp_spn = (sorted_pair_node **) omAlloc (n * sizeof (sorted_pair_node *));
   lm_bin = omGetSpecBin (POLYSIZE + (r->ExpL_Size) * sizeof (long));
-#ifdef HEAD_BIN
-  HeadBin = omGetSpecBin (POLYSIZE + (currRing->ExpL_Size) * sizeof (long));
-#endif
   /* omUnGetSpecBin(&(c->HeadBin)); */
 #ifndef HAVE_BOOST
 #ifdef USE_STDVECBOOL
