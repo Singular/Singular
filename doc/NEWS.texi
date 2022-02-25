@@ -23,7 +23,7 @@
 
 New libraries:
 @itemize
-@item @code{normal.lib}: new command@code{isNormal}, optioni @code{normalCheck} for @code{normal} (@nref{normal_lib})
+@item @code{normal.lib}: new command @code{isNormal}, option @code{normalCheck} for @code{normal} (@nref{normal_lib})
 @end itemize
 
 New commands:
