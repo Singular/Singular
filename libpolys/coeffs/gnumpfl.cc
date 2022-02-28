@@ -158,6 +158,13 @@ static number ngfAdd (number a, number b, const coeffs R)
   return (number)r;
 }
 
+static void ngfInpAdd (number &a, number b, const coeffs R)
+{
+  assume( getCoeffType(R) == n_long_R );
+
+  (*(gmp_float*)a) += (*(gmp_float*)b);
+}
+
 /*2
 * u:= a - b
 */
@@ -178,6 +185,13 @@ static number ngfMult (number a, number b, const coeffs R)
 
   gmp_float* r= new gmp_float( (*(gmp_float*)a) * (*(gmp_float*)b) );
   return (number)r;
+}
+
+static void ngfInpMult (number &a, number b, const coeffs R)
+{
+  assume( getCoeffType(R) == n_long_R );
+
+  (*(gmp_float*)a) *= (*(gmp_float*)b);
 }
 
 /*2
@@ -516,13 +530,14 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfInitMPZ = ngfInitMPZ;
   n->cfInt     = ngfInt;
   n->cfAdd     = ngfAdd;
+  n->cfInpAdd  = ngfInpAdd;
   n->cfSub     = ngfSub;
-  n->cfMult    = ngfMult;
+  n->cfInpMult = ngfInpMult;
   n->cfDiv     = ngfDiv;
   n->cfExactDiv= ngfDiv;
-  n->cfInpNeg     = ngfNeg;
+  n->cfInpNeg  = ngfNeg;
   n->cfInvers  = ngfInvers;
-  n->cfCopy   = ngfCopy;
+  n->cfCopy    = ngfCopy;
   n->cfGreater = ngfGreater;
   n->cfEqual   = ngfEqual;
   n->cfIsZero  = ngfIsZero;

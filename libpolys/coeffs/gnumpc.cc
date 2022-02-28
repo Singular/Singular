@@ -161,6 +161,13 @@ static number ngcAdd (number a, number b, const coeffs R)
   return (number)r;
 }
 
+static void ngcInpAdd (number &a, number b, const coeffs R)
+{
+  assume( getCoeffType(R) == n_long_C );
+
+  (*(gmp_complex*)a) += (*(gmp_complex*)b);
+}
+
 /*2
 * u:= a - b
 */
@@ -181,6 +188,13 @@ static number ngcMult (number a, number b, const coeffs R)
 
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) * (*(gmp_complex*)b) );
   return (number)r;
+}
+
+static void ngcInpMult (number &a, number b, const coeffs R)
+{
+  assume( getCoeffType(R) == n_long_C );
+
+  (*(gmp_complex*)a) *= (*(gmp_complex*)b);
 }
 
 /*2
@@ -569,8 +583,10 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfInitMPZ = ngcInitMPZ;
   n->cfInt     = ngcInt;
   n->cfAdd     = ngcAdd;
+  n->cfInpAdd  = ngcInpAdd;
   n->cfSub     = ngcSub;
   n->cfMult    = ngcMult;
+  n->cfInpMult = ngcInpMult;
   n->cfDiv     = ngcDiv;
   n->cfExactDiv= ngcDiv;
   n->cfInpNeg     = ngcNeg;
@@ -645,7 +661,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->cfSetMap = nlSetMap;
   r->cfName = ndName;
   r->cfInpMult=nlInpMult;
-  r->cfInit_bigint=nlCopyMap;
 #ifdef LDEBUG
   // debug stuff
   r->cfDBTest=nlDBTest;
