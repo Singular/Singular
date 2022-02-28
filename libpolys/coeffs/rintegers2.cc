@@ -22,6 +22,11 @@ static number nrzMult (number a, number b, const coeffs)
   return (number) erg;
 }
 
+static void nrzInpMult (number &a, number b, const coeffs)
+{
+  mpz_mul((mpz_ptr) a, (mpz_ptr) a, (mpz_ptr) b);
+}
+
 /*
  * Give the smallest non unit k, such that a * x = k = b * y has a solution
  */
@@ -159,6 +164,11 @@ static number nrzAdd (number a, number b, const coeffs)
   mpz_init(erg);
   mpz_add(erg, (mpz_ptr) a, (mpz_ptr) b);
   return (number) erg;
+}
+
+static void nrzInpAdd (number &a, number b, const coeffs)
+{
+  mpz_add((mpz_ptr) a, (mpz_ptr) a, (mpz_ptr) b);
 }
 
 static number nrzSub (number a, number b, const coeffs)
@@ -656,8 +666,10 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfCoeffName = nrzCoeffName;
   //r->cfKillChar = ndKillChar;
   r->cfMult  = nrzMult;
+  r->cfInpMult  = nrzInpMult;
   r->cfSub   = nrzSub;
   r->cfAdd   = nrzAdd;
+  r->cfInpAdd   = nrzInpAdd;
   r->cfDiv   = nrzDiv;
   r->cfIntMod= nrzIntMod;
   r->cfExactDiv= nrzExactDiv;
