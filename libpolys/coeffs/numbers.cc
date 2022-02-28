@@ -120,6 +120,10 @@ static BOOLEAN ndIsUnit_Field(number a, const coeffs r)
 { return !r->cfIsZero(a,r); }
 static number ndGetUnit_Ring(number, const coeffs r)
 { return r->cfInit(1,r); }
+static number ndRandom(siRandProc p, number p1, number p2, const coeffs cf)
+{ return cf->cfInit(p(),cf); }
+static number ndEucNorm(number a, const coeffs cf)
+{ return cf->cfInit(cf->cfSize(a,cf),cf); }
 #ifdef LDEBUG
 // static void   nDBDummy1(number* d,char *, int) { *d=NULL; }
 static BOOLEAN ndDBTest(number, const char *, const int, const coeffs){ return TRUE; }
@@ -130,10 +134,25 @@ static number ndFarey(number,number,const coeffs r)
   Werror("farey not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return NULL;
 }
+static number ndXExtGcd(number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
+{
+  Werror("XExtGcd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
+  return NULL;
+}
 static number ndChineseRemainder(number *,number *,int,BOOLEAN,CFArray&,const coeffs r)
 {
   Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return r->cfInit(0,r);
+}
+number ndReadFd( const ssiInfo *f, const coeffs r)
+{
+  Warn("ReadFd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
+  return NULL;
+}
+
+static void ndWriteFd(number a, const ssiInfo *f, const coeffs r)
+{
+  Warn("WriteFd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
 }
 
 static int ndParDeg(number n, const coeffs r)
@@ -377,8 +396,8 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfCoeffString = ndCoeffString;
     n->cfCoeffWrite = ndCoeffWrite;
     n->cfCoeffName = ndCoeffName; // should alway be changed!
-    n->cfInpMult=ndInpMult;
     n->cfInpAdd=ndInpAdd;
+    n->cfInpMult=ndInpMult;
     n->cfCopy = ndCopy;
     n->cfIntMod=ndIntMod; /* dummy !! */
     n->cfNormalize=ndNormalize;
@@ -390,25 +409,29 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfPower = ndPower;
     n->cfQuotRem = ndQuotRem;
     n->cfInvers = ndInvers;
+    n->cfRandom = ndRandom;
 
     n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */
     // temp. removed to catch all the coeffs which miss to implement this!
 
-    n->cfChineseRemainder = ndChineseRemainder;
-    n->cfFarey = ndFarey;
-    n->cfParDeg = ndParDeg;
+    n->cfChineseRemainder = ndChineseRemainder; /* not implemented */
+    n->cfFarey = ndFarey; /* not implemented */
+    n->cfParDeg = ndParDeg; /* not implemented */
+    n->cfReadFd = ndReadFd; /* not implemented */
+    n->cfWriteFd = ndWriteFd; /* not implemented */
 
     n->cfParameter = ndParameter;
 
     n->cfClearContent = ndClearContent;
     n->cfClearDenominators = ndClearDenominators;
 
-    //n->cfIsUnit = ndIsUnit;
+    n->cfEucNorm = ndEucNorm;
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
     n->cfExtGcd = ndExtGcd;
+    n->cfXExtGcd = ndXExtGcd;
     //n->cfGetUnit = ndGetUnit_Ring;// set afterwards
 #endif
 
@@ -435,6 +458,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfExactDiv==NULL) n->cfExactDiv=n->cfDiv;
     if (n->cfSubringGcd==NULL) n->cfSubringGcd=n->cfGcd;
+    if (n->cfWriteShort==NULL) n->cfWriteShort = n->cfWriteLong;
     if (n->cfIsUnit==NULL)
     {
       if (n->is_field) n->cfIsUnit=ndIsUnit_Field;
@@ -448,67 +472,39 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     }
     #endif
 
-    if(n->cfWriteShort==NULL)
-      n->cfWriteShort = n->cfWriteLong;
 
-    assume(n->nCoeffIsEqual!=NULL);
-    assume(n->cfSetChar!=NULL);
-    assume(n->cfCoeffName!=ndCoeffName);
-    assume(n->cfMult!=NULL);
-    assume(n->cfSub!=NULL);
-    assume(n->cfAdd!=NULL);
-    assume(n->cfDiv!=NULL);
-    assume(n->cfIntMod!=NULL);
-    assume(n->cfExactDiv!=NULL);
-    assume(n->cfInit!=NULL);
-    assume(n->cfInitMPZ!=NULL);
-    assume(n->cfSize!=NULL);
-    assume(n->cfInt!=NULL);
-    assume(n->cfMPZ!=NULL);
-    //assume(n->n->cfDivComp!=NULL);
-    //assume(n->cfIsUnit!=NULL);
-    //assume(n->cfGetUnit!=NULL);
-    //assume(n->cfExtGcd!=NULL);
-    assume(n->cfInpNeg!=NULL);
-    assume(n->cfCopy!=NULL);
-
-    assume(n->cfWriteLong!=NULL);
-    assume(n->cfWriteShort!=NULL);
+    if(n->cfMult==NULL)  PrintS("cfMult missing\n");
+    if(n->cfSub==NULL)  PrintS("cfSub missing\n");
+    if(n->cfAdd==NULL) PrintS("cfAdd missing\n");
+    if(n->cfDiv==NULL) PrintS("cfDiv missing\n");
+    if(n->cfExactDiv==NULL) PrintS("cfExactDiv missing\n");
+    if(n->cfInit==NULL) PrintS("cfInit missing\n");
+    if(n->cfInt==NULL) PrintS("cfInt missing\n");
+    if(n->cfIsUnit==NULL) PrintS("cfIsUnit missing\n");
+    if(n->cfGetUnit==NULL) PrintS("cfGetUnit missing\n");
+    if(n->cfInpNeg==NULL)  PrintS("cfInpNeg missing\n");
+    if(n->cfXExtGcd==NULL)  PrintS("cfXExtGcd missing\n");
+    if(n->cfAnn==NULL)  PrintS("cfAnn missing\n");
+    if(n->cfWriteLong==NULL) PrintS("cfWriteLong missing\n");
 
     assume(n->iNumberOfParameters>= 0);
 
     assume( (n->iNumberOfParameters == 0 && n->pParameterNames == NULL) ||
             (n->iNumberOfParameters >  0 && n->pParameterNames != NULL) );
 
-    assume(n->cfParameter!=NULL);
-    assume(n->cfParDeg!=NULL);
 
-    assume(n->cfRead!=NULL);
-    assume(n->cfNormalize!=NULL);
-    assume(n->cfGreater!=NULL);
-    //assume(n->cfDivBy!=NULL);
-    assume(n->cfEqual!=NULL);
-    assume(n->cfIsZero!=NULL);
-    assume(n->cfIsOne!=NULL);
-    assume(n->cfIsMOne!=NULL);
-    assume(n->cfGreaterZero!=NULL);
-    assume(n->cfGetDenom!=NULL);
-    assume(n->cfGetNumerator!=NULL);
-    assume(n->cfGcd!=NULL);
-    assume(n->cfNormalizeHelper!=NULL);
-    assume(n->cfDelete!=NULL);
-    assume(n->cfSetMap!=NULL);
-    assume(n->cfInpMult!=NULL);
-//    assume(n->cfInit_bigint!=NULL);
-    assume(n->cfCoeffWrite != NULL);
-
-    assume(n->cfClearContent != NULL);
-    assume(n->cfClearDenominators != NULL);
+    if(n->cfRead==NULL) PrintS("cfRead missing\n");
+    if(n->cfGreater==NULL) PrintS("cfGreater missing\n");
+    if(n->cfEqual==NULL) PrintS("cfEqual missing\n");
+    if(n->cfIsZero==NULL) PrintS("cfIsZero missing\n");
+    if(n->cfIsOne==NULL) PrintS("cfIsOne missing\n");
+    if(n->cfIsMOne==NULL) PrintS("cfIsMOne missing\n");
+    if(n->cfGreaterZero==NULL) PrintS("cfGreaterZero missing\n");
+    if(n->cfSetMap==NULL) PrintS("cfSetMap missing\n");
 
     assume(n->type==t);
 
 #ifndef SING_NDEBUG
-    if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
     if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
     if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
 #endif

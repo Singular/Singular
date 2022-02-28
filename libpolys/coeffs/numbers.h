@@ -78,6 +78,7 @@ number ndGcd(number a, number b, const coeffs);
 // BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter);
 CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs);
 
+number ndReadFd( const ssiInfo *f, const coeffs r);
 /// Test whether a is a zero divisor in r
 /// i.e. not coprime with char. of r
 /// very inefficient implementation:

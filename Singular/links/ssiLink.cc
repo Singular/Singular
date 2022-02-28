@@ -462,7 +462,7 @@ int ssiReadInt(s_buff fich)
 
 number ssiReadNumber_CF(const ssiInfo *d, const coeffs cf)
 {
-  if (cf->cfReadFd!=NULL)
+  if (cf->cfReadFd!=ndReadFd)
   {
      return n_ReadFd(d,cf);
   }

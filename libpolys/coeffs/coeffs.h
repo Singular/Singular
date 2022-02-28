@@ -227,7 +227,7 @@ struct n_Procs_s
            (*cfEqual)(number a,number b, const coeffs r),
            (*cfIsZero)(number a, const coeffs r),
            (*cfIsOne)(number a, const coeffs r),
-       // IsMOne is used for printing os polynomials:
+       // IsMOne is used for printing of polynomials:
        // -1 is only printed for constant monomials
            (*cfIsMOne)(number a, const coeffs r),
        //GreaterZero is used for printing of polynomials:
