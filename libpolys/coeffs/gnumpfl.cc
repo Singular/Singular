@@ -532,6 +532,7 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfAdd     = ngfAdd;
   n->cfInpAdd  = ngfInpAdd;
   n->cfSub     = ngfSub;
+  n->cfMult    = ngfMult;
   n->cfInpMult = ngfInpMult;
   n->cfDiv     = ngfDiv;
   n->cfExactDiv= ngfDiv;
