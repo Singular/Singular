@@ -3878,13 +3878,14 @@ void p_Norm(poly p1, const ring r)
 */
 void p_Normalize(poly p,const ring r)
 {
-  if ((rField_has_simple_inverse(r))  /* Z/p, GF(p,n), R, long R/C */
-  || (r->cf->cfNormalize==ndNormalize)) /* Nemo rings, ...*/
+  const coeffs cf=r->cf;
+  /* Z/p, GF(p,n), R, long R/C, Nemo rings */
+  if (cf->cfNormalize==ndNormalize)
     return;
   while (p!=NULL)
   {
     // no test befor n_Normalize: n_Normalize should fix problems
-    n_Normalize(pGetCoeff(p),r->cf);
+    n_Normalize(pGetCoeff(p),cf);
     pIter(p);
   }
 }
