@@ -52,7 +52,7 @@
 
 #ifdef LDEBUG
 #define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)
-BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
+static BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
 #else
 #define naTest(a) do {} while (0)
 #endif
@@ -70,29 +70,29 @@ BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
 #define naMinpoly naRing->qideal->m[0]
 
 /// forward declarations
-BOOLEAN  naGreaterZero(number a, const coeffs cf);
-BOOLEAN  naGreater(number a, number b, const coeffs cf);
-BOOLEAN  naEqual(number a, number b, const coeffs cf);
-BOOLEAN  naIsOne(number a, const coeffs cf);
-BOOLEAN  naIsMOne(number a, const coeffs cf);
-number   naInit(long i, const coeffs cf);
-number   naNeg(number a, const coeffs cf);
-number   naInvers(number a, const coeffs cf);
-number   naAdd(number a, number b, const coeffs cf);
-number   naSub(number a, number b, const coeffs cf);
-number   naMult(number a, number b, const coeffs cf);
-number   naDiv(number a, number b, const coeffs cf);
-void     naPower(number a, int exp, number *b, const coeffs cf);
-number   naCopy(number a, const coeffs cf);
-void     naWriteLong(number a, const coeffs cf);
-void     naWriteShort(number a, const coeffs cf);
-number   naGetDenom(number &a, const coeffs cf);
-number   naGetNumerator(number &a, const coeffs cf);
-number   naGcd(number a, number b, const coeffs cf);
-void     naDelete(number *a, const coeffs cf);
-void     naCoeffWrite(const coeffs cf, BOOLEAN details);
+static BOOLEAN  naGreaterZero(number a, const coeffs cf);
+static BOOLEAN  naGreater(number a, number b, const coeffs cf);
+static BOOLEAN  naEqual(number a, number b, const coeffs cf);
+static BOOLEAN  naIsOne(number a, const coeffs cf);
+static BOOLEAN  naIsMOne(number a, const coeffs cf);
+static number   naInit(long i, const coeffs cf);
+static number   naNeg(number a, const coeffs cf);
+static number   naInvers(number a, const coeffs cf);
+static number   naAdd(number a, number b, const coeffs cf);
+static number   naSub(number a, number b, const coeffs cf);
+static number   naMult(number a, number b, const coeffs cf);
+static number   naDiv(number a, number b, const coeffs cf);
+static void     naPower(number a, int exp, number *b, const coeffs cf);
+static number   naCopy(number a, const coeffs cf);
+static void     naWriteLong(number a, const coeffs cf);
+static void     naWriteShort(number a, const coeffs cf);
+static number   naGetDenom(number &a, const coeffs cf);
+static number   naGetNumerator(number &a, const coeffs cf);
+static number   naGcd(number a, number b, const coeffs cf);
+static void     naDelete(number *a, const coeffs cf);
+static void     naCoeffWrite(const coeffs cf, BOOLEAN details);
 //number   naIntDiv(number a, number b, const coeffs cf);
-const char * naRead(const char *s, number *a, const coeffs cf);
+static const char * naRead(const char *s, number *a, const coeffs cf);
 
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 
@@ -248,8 +248,8 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
 }
 #endif
 
-void heuristicReduce(poly &p, poly reducer, const coeffs cf);
-void definiteReduce(poly &p, poly reducer, const coeffs cf);
+static void heuristicReduce(poly &p, poly reducer, const coeffs cf);
+static void definiteReduce(poly &p, poly reducer, const coeffs cf);
 
 /* returns the bottom field in this field extension tower; if the tower
    is flat, i.e., if there is no extension, then r itself is returned;
@@ -269,13 +269,13 @@ static coeffs nCoeff_bottom(const coeffs r, int &height)
   return cf;
 }
 
-BOOLEAN naIsZero(number a, const coeffs cf)
+static BOOLEAN naIsZero(number a, const coeffs cf)
 {
   naTest(a);
   return (a == NULL);
 }
 
-void naDelete(number * a, const coeffs cf)
+static void naDelete(number * a, const coeffs cf)
 {
   if (*a == NULL) return;
   if (((poly)*a)==naMinpoly) { *a=NULL;return;}
@@ -284,7 +284,7 @@ void naDelete(number * a, const coeffs cf)
   *a = NULL;
 }
 
-BOOLEAN naEqual(number a, number b, const coeffs cf)
+static BOOLEAN naEqual(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   /// simple tests
@@ -293,25 +293,14 @@ BOOLEAN naEqual(number a, number b, const coeffs cf)
   return p_EqualPolys((poly)a,(poly)b,naRing);
 }
 
-number naCopy(number a, const coeffs cf)
+static number naCopy(number a, const coeffs cf)
 {
   naTest(a);
   if (((poly)a)==naMinpoly) return a;
   return (number)p_Copy((poly)a, naRing);
 }
 
-number naGetNumerator(number &a, const coeffs cf)
-{
-  return naCopy(a, cf);
-}
-
-number naGetDenom(number &a, const coeffs cf)
-{
-  naTest(a);
-  return naInit(1, cf);
-}
-
-BOOLEAN naIsOne(number a, const coeffs cf)
+static BOOLEAN naIsOne(number a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
@@ -319,7 +308,7 @@ BOOLEAN naIsOne(number a, const coeffs cf)
   return n_IsOne(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
-BOOLEAN naIsMOne(number a, const coeffs cf)
+static BOOLEAN naIsMOne(number a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
@@ -328,14 +317,14 @@ BOOLEAN naIsMOne(number a, const coeffs cf)
 }
 
 /// this is in-place, modifies a
-number naNeg(number a, const coeffs cf)
+static number naNeg(number a, const coeffs cf)
 {
   naTest(a);
   if (a != NULL) a = (number)p_Neg((poly)a, naRing);
   return a;
 }
 
-number naInit(long i, const coeffs cf)
+static number naInit(long i, const coeffs cf)
 {
   if (i == 0) return NULL;
   else        return (number)p_ISet(i, naRing);
@@ -347,7 +336,7 @@ static number naInitMPZ(mpz_t m, const coeffs r)
   return (number)p_NSet(n,r->extRing);
 }
 
-long naInt(number &a, const coeffs cf)
+static long naInt(number &a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
@@ -360,7 +349,7 @@ long naInt(number &a, const coeffs cf)
 }
 
 /* TRUE iff (a != 0 and (b == 0 or deg(a) > deg(b) or (deg(a)==deg(b) && lc(a)>lc(b))) */
-BOOLEAN naGreater(number a, number b, const coeffs cf)
+static BOOLEAN naGreater(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if (naIsZero(a, cf))
@@ -380,7 +369,7 @@ BOOLEAN naGreater(number a, number b, const coeffs cf)
 }
 
 /* TRUE iff a != 0 and (LC(a) > 0 or deg(a) > 0) */
-BOOLEAN naGreaterZero(number a, const coeffs cf)
+static BOOLEAN naGreaterZero(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL)                                            return FALSE;
@@ -389,7 +378,7 @@ BOOLEAN naGreaterZero(number a, const coeffs cf)
   return FALSE;
 }
 
-void naCoeffWrite(const coeffs cf, BOOLEAN details)
+static void naCoeffWrite(const coeffs cf, BOOLEAN details)
 {
   assume( cf != NULL );
 
@@ -439,7 +428,7 @@ void naCoeffWrite(const coeffs cf, BOOLEAN details)
 */
 }
 
-number naAdd(number a, number b, const coeffs cf)
+static number naAdd(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if (a == NULL) return naCopy(b, cf);
@@ -450,7 +439,18 @@ number naAdd(number a, number b, const coeffs cf)
   return (number)aPlusB;
 }
 
-number naSub(number a, number b, const coeffs cf)
+static void naInpAdd(number &a, number b, const coeffs cf)
+{
+  naTest(a); naTest(b);
+  if (a == NULL) a=b;
+  else if (b != NULL)
+  {
+    poly aPlusB = p_Add_q((poly)a, p_Copy((poly)b, naRing), naRing);
+    a=(number)aPlusB;
+  }
+}
+
+static number naSub(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if (b == NULL) return naCopy(a, cf);
@@ -461,7 +461,7 @@ number naSub(number a, number b, const coeffs cf)
   return (number)aMinusB;
 }
 
-number naMult(number a, number b, const coeffs cf)
+static number naMult(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if ((a == NULL)||(b == NULL)) return NULL;
@@ -471,7 +471,17 @@ number naMult(number a, number b, const coeffs cf)
   return (number)aTimesB;
 }
 
-number naDiv(number a, number b, const coeffs cf)
+static void naInpMult(number &a, number b, const coeffs cf)
+{
+  naTest(a); naTest(b);
+  if ((a == NULL)||(b == NULL)) { a=NULL; return;}
+  poly aTimesB = p_Mult_q((poly)a, p_Copy((poly)b,naRing), naRing);
+  definiteReduce(aTimesB, naMinpoly, cf);
+  p_Normalize(aTimesB,naRing);
+  a=(number)aTimesB;
+}
+
+static number naDiv(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if (b == NULL) WerrorS(nDivBy0);
@@ -495,7 +505,7 @@ number naDiv(number a, number b, const coeffs cf)
    intermediate reduction modulo the minimal polynomial is controlled by
    the in-place method heuristicReduce(poly, poly, coeffs); see there.
 */
-void naPower(number a, int exp, number *b, const coeffs cf)
+static void naPower(number a, int exp, number *b, const coeffs cf)
 {
   naTest(a);
 
@@ -562,7 +572,7 @@ void naPower(number a, int exp, number *b, const coeffs cf)
    (which should also only be changed here in this method):
       if (deg(p) > 10*deg(reducer) then perform reduction;
    modifies p */
-void heuristicReduce(poly &p, poly reducer, const coeffs cf)
+static void heuristicReduce(poly &p, poly reducer, const coeffs cf)
 {
   #ifdef LDEBUG
   p_Test((poly)p, naRing);
@@ -572,7 +582,7 @@ void heuristicReduce(poly &p, poly reducer, const coeffs cf)
     definiteReduce(p, reducer, cf);
 }
 
-void naWriteLong(number a, const coeffs cf)
+static void naWriteLong(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL)
@@ -590,7 +600,7 @@ void naWriteLong(number a, const coeffs cf)
   }
 }
 
-void naWriteShort(number a, const coeffs cf)
+static void naWriteShort(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL)
@@ -608,7 +618,7 @@ void naWriteShort(number a, const coeffs cf)
   }
 }
 
-const char * naRead(const char *s, number *a, const coeffs cf)
+static const char * naRead(const char *s, number *a, const coeffs cf)
 {
   poly aAsPoly;
   const char * result = p_Read(s, aAsPoly, naRing);
@@ -619,7 +629,7 @@ const char * naRead(const char *s, number *a, const coeffs cf)
 
 #if 0
 /* implemented by the rule lcm(a, b) = a * b / gcd(a, b) */
-number naLcm(number a, number b, const coeffs cf)
+static number naLcm(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if (a == NULL) return NULL;
@@ -631,7 +641,7 @@ number naLcm(number a, number b, const coeffs cf)
   return naDiv(theProduct, theGcd, cf);
 }
 #endif
-number napNormalizeHelper(number b, const coeffs cf)
+static number napNormalizeHelper(number b, const coeffs cf)
 {
   number h=n_Init(1,naRing->cf);
   poly bb=(poly)b;
@@ -645,7 +655,7 @@ number napNormalizeHelper(number b, const coeffs cf)
   }
   return h;
 }
-number naLcmContent(number a, number b, const coeffs cf)
+static number naLcmContent(number a, number b, const coeffs cf)
 {
   if (nCoeff_is_Zp(naRing->cf)) return naCopy(a,cf);
 #if 0
@@ -714,7 +724,7 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 
 }
 
-int naSize(number a, const coeffs cf)
+static int naSize(number a, const coeffs cf)
 {
   if (a == NULL) return 0;
   poly aAsPoly = (poly)a;
@@ -732,7 +742,7 @@ int naSize(number a, const coeffs cf)
 /* performs polynomial division and overrides p by the remainder
    of division of p by the reducer;
    modifies p */
-void definiteReduce(poly &p, poly reducer, const coeffs cf)
+static void definiteReduce(poly &p, poly reducer, const coeffs cf)
 {
   #ifdef LDEBUG
   p_Test((poly)p, naRing);
@@ -744,7 +754,7 @@ void definiteReduce(poly &p, poly reducer, const coeffs cf)
   }
 }
 
-void  naNormalize(number &a, const coeffs cf)
+static void  naNormalize(number &a, const coeffs cf)
 {
   poly aa=(poly)a;
   if (aa!=naMinpoly)
@@ -752,13 +762,13 @@ void  naNormalize(number &a, const coeffs cf)
   a=(number)aa;
 }
 
-number naConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
+static number naConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
 {
   if (n.isZero()) return NULL;
   poly p=convFactoryPSingP(n,naRing);
   return (number)p;
 }
-CanonicalForm naConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs cf )
+static CanonicalForm naConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs cf )
 {
   naTest(n);
   if (n==NULL) return CanonicalForm(0);
@@ -772,7 +782,7 @@ CanonicalForm naConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs c
                    zero element.) Note that the below method does not operate
                    in this strong sense but rather computes the gcd of
                    two given elements in the underlying polynomial ring. */
-number naGcd(number a, number b, const coeffs cf)
+static number naGcd(number a, number b, const coeffs cf)
 {
   if (a==NULL)  return naCopy(b,cf);
   if (b==NULL)  return naCopy(a,cf);
@@ -820,7 +830,7 @@ number naGcd(number a, number b, const coeffs cf)
 //  return (number)p_Gcd((poly)a, (poly)b, naRing);
 }
 
-number naInvers(number a, const coeffs cf)
+static number naInvers(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL) WerrorS(nDivBy0);
@@ -850,7 +860,7 @@ number naInvers(number a, const coeffs cf)
 }
 
 /* assumes that src = Q or Z, dst = Q(a) */
-number naMap00(number a, const coeffs src, const coeffs dst)
+static number naMap00(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   assume(src->rep == dst->extRing->cf->rep);
@@ -860,7 +870,7 @@ number naMap00(number a, const coeffs src, const coeffs dst)
 }
 
 /* assumes that src = Z, dst = K(a) */
-number naMapZ0(number a, const coeffs src, const coeffs dst)
+static number naMapZ0(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   poly result = p_One(dst->extRing);
@@ -872,7 +882,7 @@ number naMapZ0(number a, const coeffs src, const coeffs dst)
 }
 
 /* assumes that src = Z/p, dst = Q(a) */
-number naMapP0(number a, const coeffs src, const coeffs dst)
+static number naMapP0(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   /* mapping via intermediate int: */
@@ -886,13 +896,13 @@ number naMapP0(number a, const coeffs src, const coeffs dst)
 #if 0
 /* assumes that either src = Q(a), dst = Q(a), or
                        src = Z/p(a), dst = Z/p(a)     */
-number naCopyMap(number a, const coeffs src, const coeffs dst)
+static number naCopyMap(number a, const coeffs src, const coeffs dst)
 {
   return naCopy(a, dst);
 }
 #endif
 
-number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
+static number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
 {
   assume (nCoeff_is_transExt (src));
   assume (nCoeff_is_algExt (dst));
@@ -940,7 +950,7 @@ number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
 }
 
 /* assumes that src = Q, dst = Z/p(a) */
-number naMap0P(number a, const coeffs src, const coeffs dst)
+static number naMap0P(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   // int p = rChar(dst->extRing);
@@ -953,7 +963,7 @@ number naMap0P(number a, const coeffs src, const coeffs dst)
 }
 
 /* assumes that src = Z/p, dst = Z/p(a) */
-number naMapPP(number a, const coeffs src, const coeffs dst)
+static number naMapPP(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
@@ -963,7 +973,7 @@ number naMapPP(number a, const coeffs src, const coeffs dst)
 }
 
 /* assumes that src = Z/u, dst = Z/p(a), where u != p */
-number naMapUP(number a, const coeffs src, const coeffs dst)
+static number naMapUP(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   /* mapping via intermediate int: */
@@ -974,7 +984,7 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
   return (number)result;
 }
 
-number naGenMap(number a, const coeffs cf, const coeffs dst)
+static number naGenMap(number a, const coeffs cf, const coeffs dst)
 {
   if (a==NULL) return NULL;
 
@@ -989,7 +999,7 @@ number naGenMap(number a, const coeffs cf, const coeffs dst)
   return (number)g;
 }
 
-number naGenTrans2AlgExt(number a, const coeffs cf, const coeffs dst)
+static number naGenTrans2AlgExt(number a, const coeffs cf, const coeffs dst)
 {
   if (a==NULL) return NULL;
 
@@ -1070,7 +1080,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   return NULL;                                           /// default
 }
 
-int naParDeg(number a, const coeffs cf)
+static int naParDeg(number a, const coeffs cf)
 {
   if (a == NULL) return -1;
   poly aa=(poly)a;
@@ -1078,7 +1088,7 @@ int naParDeg(number a, const coeffs cf)
 }
 
 /// return the specified parameter as a number in the given alg. field
-number naParameter(const int iParameter, const coeffs cf)
+static number naParameter(const int iParameter, const coeffs cf)
 {
   assume(getCoeffType(cf) == n_algExt);
 
@@ -1309,7 +1319,7 @@ static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 }
 
 
-void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
+static void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
   assume((getCoeffType(cf) == n_algExt)||(getCoeffType(cf) == n_polyExt));
@@ -1325,7 +1335,7 @@ void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& 
   c = (number)p_NSet(n, cf->extRing); // over alg. ext. of Q // takes over the input number
 }
 
-void naKillChar(coeffs cf)
+static void naKillChar(coeffs cf)
 {
   rDecRefCnt(cf->extRing);
   if(cf->extRing->ref<0)
@@ -1355,7 +1365,7 @@ char* naCoeffName(const coeffs r) // currently also for tranext.
   return s;
 }
 
-number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray &inv_cache,const coeffs cf)
+static number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray &inv_cache,const coeffs cf)
 {
   poly *P=(poly*)omAlloc(rl*sizeof(poly*));
   number *X=(number *)omAlloc(rl*sizeof(number));
@@ -1367,7 +1377,7 @@ number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN /*sym*/,CFArray 
   return ((number)result);
 }
 
-number  naFarey(number p, number n, const coeffs cf)
+static number  naFarey(number p, number n, const coeffs cf)
 {
   // n is really a bigint
   poly result=p_Farey(p_Copy((poly)p,cf->extRing),n,cf->extRing);
@@ -1425,6 +1435,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfAdd          = naAdd;
   cf->cfSub          = naSub;
   cf->cfMult         = naMult;
+  cf->cfInpMult      = naInpMult;
   cf->cfDiv          = naDiv;
   cf->cfExactDiv     = naDiv;
   cf->cfPower        = naPower;
@@ -1440,8 +1451,6 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfRead         = naRead;
   cf->cfDelete       = naDelete;
   cf->cfSetMap       = naSetMap;
-  cf->cfGetDenom     = naGetDenom;
-  cf->cfGetNumerator = naGetNumerator;
   cf->cfRePart       = naCopy;
   cf->cfCoeffWrite   = naCoeffWrite;
   cf->cfNormalize    = naNormalize;
@@ -1667,6 +1676,7 @@ BOOLEAN n2pInitChar(coeffs cf, void * infoStruct)
   cf->cfInt          = naInt;
   cf->cfInpNeg       = naNeg;
   cf->cfAdd          = naAdd;
+  cf->cfInpAdd       = naInpAdd;
   cf->cfSub          = naSub;
   cf->cfMult         = n2pMult;
   cf->cfDiv          = n2pDiv;
@@ -1683,8 +1693,8 @@ BOOLEAN n2pInitChar(coeffs cf, void * infoStruct)
   cf->cfRead         = n2pRead;
   cf->cfDelete       = naDelete;
   cf->cfSetMap       = naSetMap;
-  cf->cfGetDenom     = naGetDenom;
-  cf->cfGetNumerator = naGetNumerator;
+  //cf->cfGetDenom     = naGetDenom; // use nd*
+  //cf->cfGetNumerator = naGetNumerator; // use nd*
   cf->cfRePart       = naCopy;
   cf->cfCoeffWrite   = n2pCoeffWrite;
   cf->cfNormalize    = n2pNormalize;
