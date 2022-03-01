@@ -992,6 +992,27 @@ static number ntAdd(number a, number b, const coeffs cf)
   return (number)result;
 }
 
+static void ntInpAdd(number &a, number b, const coeffs cf)
+{
+  ntTest(a);
+  ntTest(b);
+  if (IS0(b)) return;
+  if (IS0(a)) { a=ntCopy(b, cf); return;}
+
+  fraction fa = (fraction)a;
+  fraction fb = (fraction)b;
+
+  if (DENIS1(fa) && DENIS1(fb))
+  {
+    poly g = p_Add_q(NUM(fa), p_Copy(NUM(fb),ntRing), ntRing);
+    NUM(fa)=g;
+    if (g==NULL) { omFreeBin((ADDRESS)a, fractionObjectBin); a=NULL; }
+    else heuristicGcdCancellation((number)fa, cf);
+    return;
+  }
+  ndInpAdd(a,b,cf);
+}
+
 static number ntSub(number a, number b, const coeffs cf)
 {
   //check_N(a,cf);
@@ -1097,6 +1118,65 @@ static number ntMult(number a, number b, const coeffs cf)
   //check_N((number)result,cf);
   ntTest((number)result);
   return (number)result;
+}
+
+static void ntInpMult(number &a, number b, const coeffs cf)
+{
+  ntTest(a); // !!!?
+  ntTest(b); // !!!?
+
+  if (IS0(a)) return;
+  if (IS0(b)) { omFreeBin((ADDRESS)a, fractionObjectBin); a=NULL; return; }
+
+  fraction fa = (fraction)a;
+  fraction fb = (fraction)b;
+
+  const poly g = p_Mult_q(NUM(fa), p_Copy(NUM(fb),ntRing), ntRing);
+
+  if (g == NULL) // may happen due to zero divisors???
+  { omFreeBin((ADDRESS)a, fractionObjectBin); a=NULL; return; }
+
+  NUM(fa) = g;
+
+  const poly da = DEN(fa);
+  const poly db = DEN(fb);
+
+
+  //check_N((number)result,cf);
+  if (db == NULL)
+  {
+    // b = ? // NULL
+
+    if(da == NULL)
+    { // both fa && fb are ?? // NULL!
+      DEN(fa) = NULL;
+      COM(fa) = 0;
+      p_Normalize(g,ntRing);
+    }
+    else
+    {
+      //DEN(fa) = da;
+      COM(fa) += MULT_COMPLEXITY;
+      heuristicGcdCancellation((number)fa, cf);
+    }
+  }
+  else
+  { // b = ?? / ??
+    if (da == NULL)
+    { // a == ? // NULL
+      DEN(fa) = p_Copy(db, ntRing);
+      COM(fa) = COM(fb) + MULT_COMPLEXITY;
+      heuristicGcdCancellation((number)fa, cf);
+    }
+    else /* both den's are != 1 */
+    {
+      DEN(fa) = p_Mult_q(da, p_Copy(db,ntRing), ntRing);
+      COM(fa) += COM(fb) + MULT_COMPLEXITY;
+      heuristicGcdCancellation((number)fa, cf);
+    }
+  }
+
+  ntTest((number)fa);
 }
 
 static void ntNormalizeDen(fraction result, const ring R)
@@ -2584,9 +2664,11 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfChineseRemainder = ntChineseRemainder;
   cf->cfInt          = ntInt;
   cf->cfAdd          = ntAdd;
+  cf->cfInpAdd       = ntInpAdd;
   cf->cfInpNeg       = ntNeg;
   cf->cfSub          = ntSub;
   cf->cfMult         = ntMult;
+  cf->cfInpMult      = ntInpMult;
   cf->cfDiv          = ntDiv;
   cf->cfExactDiv     = ntExactDiv;
   cf->cfPower        = ntPower;

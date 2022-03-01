@@ -69,7 +69,7 @@ static void   ndInpMult(number &a, number b, const coeffs r)
   r->cfDelete(&a,r);
   a=n;
 }
-static void ndInpAdd(number &a, number b, const coeffs r)
+void ndInpAdd(number &a, number b, const coeffs r)
 {
   number n=r->cfAdd(a,b,r);
   r->cfDelete(&a,r);
@@ -108,6 +108,14 @@ static void ndPower(number a, int i, number * res, const coeffs r)
 }
 static number ndInvers(number a, const coeffs r)
 {
+  number one=r->cfInit(1,r);
+  number res=r->cfDiv(one,a,r);
+  r->cfDelete(&one,r);
+  return res;
+}
+static number ndInvers_Ring(number a, const coeffs r)
+{
+  Print("ndInvers_Ring used\n");
   number one=r->cfInit(1,r);
   number res=r->cfDiv(one,a,r);
   r->cfDelete(&one,r);
@@ -469,6 +477,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     {
       if (n->is_field) n->cfGetUnit=n->cfCopy;
       else             n->cfGetUnit=ndGetUnit_Ring;
+    }
+    if ((n->cfInvers==ndInvers)&&(n->is_field))
+    {
+      n->cfInvers=ndInvers_Ring;
     }
     #endif
 
