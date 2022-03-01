@@ -2051,7 +2051,7 @@ See
 @node farey, fetch, factorize, Functions
 @subsection farey
 @cindex farey
-@cindex ration reconstraction
+@cindex rational reconstraction
 
 @table @code
 @item @strong{Syntax:}
