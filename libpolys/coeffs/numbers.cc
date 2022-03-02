@@ -115,7 +115,7 @@ static number ndInvers(number a, const coeffs r)
 }
 static number ndInvers_Ring(number a, const coeffs r)
 {
-  Print("ndInvers_Ring used\n");
+  if (!r->cfIsUnit(a,r)) Print("ndInvers_Ring used with non-unit\n");
   number one=r->cfInit(1,r);
   number res=r->cfDiv(one,a,r);
   r->cfDelete(&one,r);
