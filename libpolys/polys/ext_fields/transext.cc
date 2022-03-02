@@ -1338,9 +1338,7 @@ static void ntPower(number a, int exp, number *b, const coeffs cf)
     pow = ntCopy(a, cf);
     for (int i = 2; i <= expAbs; i++)
     {
-      t = ntMult(pow, a, cf);
-      ntDelete(&pow, cf);
-      pow = t;
+      ntInpMult(pow, a, cf);
       heuristicGcdCancellation(pow, cf);
     }
   }
@@ -1352,17 +1350,13 @@ static void ntPower(number a, int exp, number *b, const coeffs cf)
     {
       if (expAbs & 1)
       {
-        t = ntMult(pow, factor, cf);
-        ntDelete(&pow, cf);
-        pow = t;
+        ntInpMult(pow, factor, cf);
         heuristicGcdCancellation(pow, cf);
       }
       expAbs = expAbs / 2;
       if (expAbs != 0)
       {
-        t = ntMult(factor, factor, cf);
-        ntDelete(&factor, cf);
-        factor = t;
+        ntInpMult(factor, factor, cf);
         heuristicGcdCancellation(factor, cf);
       }
     }
