@@ -42,9 +42,21 @@ static inline number nr2mMultM(number a, number b, const coeffs r)
     ((((unsigned long) a) * ((unsigned long) b)) & r->mod2mMask);
 }
 
+static inline void nr2mInpMultM(number &a, number b, const coeffs r)
+{
+  a= (number)
+    ((((unsigned long) a) * ((unsigned long) b)) & r->mod2mMask);
+}
+
 static inline number nr2mAddM(number a, number b, const coeffs r)
 {
   return (number)
+    ((((unsigned long) a) + ((unsigned long) b)) & r->mod2mMask);
+}
+
+static inline void nr2mInpAddM(number &a, number b, const coeffs r)
+{
+  a= (number)
     ((((unsigned long) a) + ((unsigned long) b)) & r->mod2mMask);
 }
 
@@ -139,6 +151,15 @@ static number nr2mMult(number a, number b, const coeffs r)
     n=nr2mMultM(a, b, r);
   n_Test(n,r);
   return n;
+}
+
+static void nr2mInpMult(number &a, number b, const coeffs r)
+{
+  if (((unsigned long)a == 0) || ((unsigned long)b == 0))
+  { a=(number)0;  return; }
+  else
+    nr2mInpMultM(a, b, r);
+  n_Test(a,r);
 }
 
 static number nr2mAnn(number b, const coeffs r);
@@ -327,7 +348,7 @@ static void nr2mPower(number a, int i, number * result, const coeffs r)
  */
 static number nr2mInit(long i, const coeffs r)
 {
-  if (i == 0) return (number)(unsigned long)i;
+  if (i == 0) return (number)(unsigned long)0;
 
   long ii = i;
   unsigned long j = (unsigned long)1;
@@ -335,7 +356,7 @@ static number nr2mInit(long i, const coeffs r)
   unsigned long k = (unsigned long)ii;
   k = k & r->mod2mMask;
   /* now we have: i = j * k mod 2^m */
-  return (number)nr2mMult((number)j, (number)k, r);
+  return nr2mMult((number)j, (number)k, r);
 }
 
 /*
@@ -357,6 +378,12 @@ static number nr2mAdd(number a, number b, const coeffs r)
   number n=nr2mAddM(a, b, r);
   n_Test(n,r);
   return n;
+}
+
+static void nr2mInpAdd(number &a, number b, const coeffs r)
+{
+  nr2mInpAddM(a, b, r);
+  n_Test(a,r);
 }
 
 static number nr2mSub(number a, number b, const coeffs r)
@@ -424,7 +451,7 @@ static number nr2mDiv(number a, number b, const coeffs r)
       return (number) ((unsigned long) a / (unsigned long) b);
     }
   }
-  number n=(number)nr2mMult(a, nr2mInversM(b,r),r);
+  number n=nr2mMult(a, nr2mInversM(b,r),r);
   n_Test(n,r);
   return n;
 }
@@ -618,7 +645,7 @@ number nr2mMapZp(number from, const coeffs /*src*/, const coeffs dst)
   unsigned long i = (unsigned long)ii;
   i = i & dst->mod2mMask;
   /* now we have: from = j * i mod 2^m */
-  return (number)nr2mMult((number)i, (number)j, dst);
+  return nr2mMult((number)i, (number)j, dst);
 }
 
 static number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
@@ -792,8 +819,10 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   //r->cfCopy        = ndCopy;
   r->cfInt         = nr2mInt;
   r->cfAdd         = nr2mAdd;
+  r->cfInpAdd      = nr2mInpAdd;
   r->cfSub         = nr2mSub;
   r->cfMult        = nr2mMult;
+  r->cfInpMult     = nr2mInpMult;
   r->cfDiv         = nr2mDiv;
   r->cfAnn         = nr2mAnn;
   r->cfIntMod      = nr2mMod;
