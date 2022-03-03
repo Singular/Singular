@@ -1995,9 +1995,28 @@ time consuming.
 @item Extra weight vector
 @table @asis
 @item @code{a(} intvec_expression @code{)}
-an extra weight vector @code{a(} intvec_expression @code{)} may precede
-any monomial ordering
+@item @code{aa(} intvec_expression @code{)}
+@item @code{am(} intvec_expression @code{)}
+@item
+an extra weight vector @code{a(} intvec_expression @code{)}, may precede
+any monomial ordering.@*
+@code{aa} allows larger degrees.@*
+@code{am} allows degrees for module generators (see example)
 @end table
+
+Example for ordering @code{am}
+@smallexample
+@c example
+ring r=QQ,(x,y,z),(am(1,1,1,4,1,6),dp);
+r;
+[x,y,z];
+deg([x]);
+deg([0,y]);
+deg([0,0,z]);
+deg([0,0,0,x]);
+@c example
+@end smallexample
+
 
 @item Product ordering
 @table @asis

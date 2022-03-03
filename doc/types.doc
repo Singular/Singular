@@ -3965,7 +3965,7 @@ an expression_list of the name @code{real} and an  int_expression.
 an expression_list of the name @code{complex}, an optional int_expression
 and a name.
 @item
-an expression_list of the name @code{integer}.
+an expression_list of the name @code{ZZ}.
 @item
 an expression_list of the name @code{integer} and following int_expressions.
 @item
@@ -3984,7 +3984,7 @@ For the definition of the 'coefficients', see @ref{Rings and orderings}.
 or @code{rs} optionally followed by a size parameter in parentheses.
 
 @item
-@code{wp}, @code{Wp}, @code{ws}, @code{Ws}, or @code{a} followed by a
+@code{wp}, @code{Wp}, @code{ws}, @code{Ws}, @code{am}, @code{aa}, or @code{a} followed by a
 weight vector given as an intvec_expression in parentheses.
 
 @item
