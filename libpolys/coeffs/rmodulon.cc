@@ -206,6 +206,12 @@ static number nrnMult(number a, number b, const coeffs r)
   return (number) erg;
 }
 
+static void nrnInpMult(number &a, number b, const coeffs r)
+{
+  mpz_mul((mpz_ptr)a, (mpz_ptr)a, (mpz_ptr) b);
+  mpz_mod((mpz_ptr)a, (mpz_ptr)a, r->modNumber);
+}
+
 static void nrnPower(number a, int i, number * result, const coeffs r)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
@@ -221,6 +227,12 @@ static number nrnAdd(number a, number b, const coeffs r)
   mpz_add(erg, (mpz_ptr)a, (mpz_ptr) b);
   mpz_mod(erg, erg, r->modNumber);
   return (number) erg;
+}
+
+static void nrnInpAdd(number &a, number b, const coeffs r)
+{
+  mpz_add((mpz_ptr)a, (mpz_ptr)a, (mpz_ptr) b);
+  mpz_mod((mpz_ptr)a, (mpz_ptr)a, r->modNumber);
 }
 
 static number nrnSub(number a, number b, const coeffs r)
@@ -1005,8 +1017,10 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfSize        = nrnSize;
   r->cfInt         = nrnInt;
   r->cfAdd         = nrnAdd;
+  r->cfInpAdd      = nrnInpAdd;
   r->cfSub         = nrnSub;
   r->cfMult        = nrnMult;
+  r->cfInpMult     = nrnInpMult;
   r->cfDiv         = nrnDiv;
   r->cfAnn         = nrnAnn;
   r->cfIntMod      = nrnMod;
