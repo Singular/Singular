@@ -72,6 +72,20 @@ static number nnMult (number a,number b, const coeffs r)
   }
 }
 
+static void nnInpMult (number &a,number b, const coeffs r)
+{
+  number_array A=(number_array)a;
+  number_array B=(number_array)b;
+  coeffs_array d=(coeffs_array)r->data;
+  int i=0;
+  loop
+  {
+    d[i]->cfInpMult(A[i],B[i],d[i]);
+    i++;
+    if (d[i]==NULL) return;
+  }
+}
+
 /*2
 * create a number from int
 */
@@ -166,6 +180,20 @@ static number nnAdd (number a, number b, const coeffs r)
     C[i]=d[i]->cfAdd(A[i],B[i],d[i]);
     i++;
     if (d[i]==NULL) return (number)C;
+  }
+}
+
+static void nnInpAdd (number &a, number b, const coeffs r)
+{
+  number_array A=(number_array)a;
+  number_array B=(number_array)b;
+  coeffs_array d=(coeffs_array)r->data;
+  int i=0;
+  loop
+  {
+    d[i]->cfInpAdd(A[i],B[i],d[i]);
+    i++;
+    if (d[i]==NULL) return;
   }
 }
 
@@ -600,8 +628,10 @@ BOOLEAN nnInitChar(coeffs n, void* p)
   n->cfDelete = nnDelete;
   n->cfInt  = nnInt;
   n->cfAdd  = nnAdd;
+  n->cfInpAdd  = nnInpAdd;
   n->cfSub  = nnSub;
   n->cfMult = nnMult;
+  n->cfInpMult = nnInpMult;
   n->cfDiv  = nnDiv;
   n->cfExactDiv= nnDiv;
   n->cfInpNeg   = nnInpNeg;
