@@ -1010,7 +1010,25 @@ static void ntInpAdd(number &a, number b, const coeffs cf)
     else heuristicGcdCancellation((number)fa, cf);
     return;
   }
-  ndInpAdd(a,b,cf);
+  poly g = NUM(fa);
+  if (!DENIS1(fb)) g = p_Mult_q(g, p_Copy(DEN(fb), ntRing), ntRing);
+  poly h = p_Copy(NUM(fb), ntRing);
+  if (!DENIS1(fa)) h = p_Mult_q(h, p_Copy(DEN(fa), ntRing), ntRing);
+  g = p_Add_q(g, h, ntRing);
+  if (g==NULL) { omFreeBin((ADDRESS)a, fractionObjectBin); a=NULL; return;}
+  poly f;
+  if (!DENIS1(fa) && DENIS1(fb)) f = DEN(fa);
+  else if (DENIS1(fa) && !DENIS1(fb)) f = p_Copy(DEN(fb), ntRing);
+  else /* both denom's are != 1 */    f = p_Mult_q(DEN(fa),
+                                                   p_Copy(DEN(fb), ntRing),
+                                                   ntRing);
+
+  NUM(fa) = g;
+  DEN(fa) = f;
+  COM(fa) += COM(fb) + ADD_COMPLEXITY;
+  heuristicGcdCancellation(a, cf);
+
+  ntTest(a);
 }
 
 static number ntSub(number a, number b, const coeffs cf)
