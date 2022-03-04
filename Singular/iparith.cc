@@ -7803,7 +7803,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
   {
     if (v->Typ()!=INT_CMD)
     {
-      Werror("`int` expected while building `%s(`",u->name);
+      Werror("`%s` undefined or  `int` expected while building `%s(`",u->name,u->name);
       return TRUE;
     }
     int l=u->listLength();
@@ -7816,7 +7816,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
       v=v->next;
       if (v->Typ()!=INT_CMD)
       {
-        Werror("`int` expected while building `%s`",nn);
+        Werror("`%s` undefined or  `int` expected while building `%s(`",u->name,u->name);
         omFree((ADDRESS)nn);
         return TRUE;
       }
