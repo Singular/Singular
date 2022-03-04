@@ -35,6 +35,7 @@ namespace gfan
   }
   ZCone ZFan::getCone(int dimension, int index, bool orbit, bool maximal)const
   {
+    this->ensureComplex();
     IntVector indices=getConeIndices(dimension,index,orbit,maximal);
     ZCone ret=this->complex->makeZCone(indices);
     if(maximal)ret.setMultiplicity(((orbit)?multiplicitiesOrbits:multiplicities)[dimension][index]);
@@ -216,7 +217,22 @@ namespace gfan
       }
     if(f.complex)
       {
-        complex=new SymmetricComplex(*f.complex);
+        // complex=new SymmetricComplex(*f.complex); // commented out due to bug by Lukas
+        // LIB "gfan.lib";
+        // proc getfirst(fan f)
+        // {
+        //   int dimf = dimension(f);
+        //   cone c = getCone(f, dimf, 1, 1);
+        //   return(c);
+        // }
+        // intmat M[3][3]=
+        //   1,0,0,
+        //   0,1,0,
+        //   0,0,1;
+        // cone c = coneViaPoints(M);
+        // fan f = fanViaCones(c);
+        // f;
+        // getfirst(f);
       }
   }
   ZFan& ZFan::operator=(ZFan const &f)
