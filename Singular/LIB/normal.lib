@@ -25,6 +25,7 @@ PROCEDURES:
  getOneVar(J, vari); computes a polynomial of J in the variable vari
  changeDenominator(U1, c1, c2, I); computes ideal U2 such that 1/c1*U1=1/c2*U2
  normalConductor(ideal); computation of the conductor as ideal in the basering
+ isNormal(ideal)     test if already normal
 
 SEE ALSO: locnormal_lib;modnormal_lib
 ";
