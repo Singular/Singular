@@ -5,17 +5,17 @@ print(mo);
 
 // load dynamic module - at the same time creating package Kstd
 // procedures will be available in the packages Top and Kstd
-LIB("kstd.so");
+LIB("partialgb.so");
 listvar(package);
 
 // set the number of components to be considered to 1
-module mostd=kstd(mo,1);        // calling procedure in Top
+module mostd=partialStd(mo,1);        // calling procedure in Top
                     // obviously computation ignored pairs with leading
                     // term in the second entry
 print(mostd);
 
 // now consider 2 components
-module mostd2=Kstd::kstd(mo,2); // calling procedure in Kstd
+module mostd2=Partialgb::partialStd(mo,2); // calling procedure in partialgb
                     // this time the previously unconsidered pair was
                     // treated too
 print(mostd2);
