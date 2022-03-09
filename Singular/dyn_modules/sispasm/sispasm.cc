@@ -1,15 +1,15 @@
 #include "singularconfig.h"
-#ifdef HAVE_SPASM_H
-extern "C" 
-{
-#include "spasm.h"
-}
 #include "libpolys/polys/monomials/monomials.h"
 #include "kernel/ideals.h"
 #include "Singular/ipid.h"
 #include "Singular/ipshell.h"
 #include "Singular/blackbox.h"
 #include "Singular/mod_lib.h"
+#ifdef HAVE_SPASM_H
+extern "C" 
+{
+#include "spasm.h"
+}
 
 spasm* conv_matrix2spasm(matrix M, const ring R)
 {
