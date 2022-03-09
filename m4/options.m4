@@ -280,7 +280,7 @@ AC_DEFUN([SING_DISABLE_MODULES], [dnl
   m4_foreach([MOD], [subsets, freealgebra, partialgb, syzextra,
                      gfanlib, polymake, customstd, pyobject,
                      singmathic, gitfan, interval, systhreads,
-                     loctriv, cohomo, machinelearning], [dnl
+                     loctriv, cohomo, machinelearning, sispasm], [dnl
     AC_ARG_ENABLE(MOD[-module],
                   AS_HELP_STRING([--disable-]MOD[-module], [Disable building module ]MOD), [dnl
       dnl Nothing to do
@@ -329,6 +329,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_interval=false
   bi_systhreads=false
   bi_loctriv=false
+  bi_sispasm=false
 
 
  if test -z "$with_builtinmodules"; then
@@ -368,6 +369,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        interval ) bi_interval=true ;;
        systhreads ) bi_systhreads=true;;
        loctriv ) bi_loctriv=true;;
+       sispasm ) bi_sispasm=true;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -411,6 +413,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_SYSTHREADS], [test x$bi_systhreads = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_LOCTRIV], [test x$bi_loctriv = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_MACHINELEARNING], [test x$bi_machinelearning = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_SISPASM], [test x$bi_sispasm = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})

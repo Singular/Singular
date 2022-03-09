@@ -277,6 +277,7 @@ AC_CONFIG_FILES([Singular/dyn_modules/cohomo/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/systhreads/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/loctriv/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/machinelearning/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/sispasm/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])
 

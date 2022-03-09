@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-DIST_SUBDIRS=staticdemo bigintm subsets syzextra pyobject customstd gfanlib python gitfan singmathic Order interval cohomo freealgebra partialgb systhreads loctriv machinelearning
+DIST_SUBDIRS=staticdemo bigintm subsets syzextra pyobject customstd gfanlib python gitfan singmathic Order interval cohomo freealgebra partialgb systhreads loctriv machinelearning sispasm
 
 SUBDIRS =
 if ENABLE_STATICDEMO_MODULE
@@ -56,4 +56,7 @@ SUBDIRS += loctriv
 endif
 if ENABLE_MACHINELEARNING_MODULE
 SUBDIRS += machinelearning
+endif
+if ENABLE_SISPASM_MODULE
+SUBDIRS += sispasm
 endif
