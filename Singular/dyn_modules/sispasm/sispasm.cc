@@ -1,3 +1,5 @@
+#include "singularconfig.h"
+#ifdef HAVE_SPASM_H
 extern "C" 
 {
 #include "spasm.h"
@@ -250,4 +252,4 @@ extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* p)
   p->iiAddCproc("spasm.so","to_matrix",FALSE,to_matrix);
   return (MAX_TOK);
 }
-
+#endif

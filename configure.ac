@@ -43,7 +43,7 @@ AC_PROG_LN_S
 AC_PROG_INSTALL
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h)
+AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h spasm.h)
 
 AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r)
 
