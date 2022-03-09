@@ -93,7 +93,7 @@ AC_SUBST(CC)
 AC_CHECK_LIB(rt,clock_gettime)
 
 
-AC_CHECK_LIB(spasm,spasm_csr_free,SPASM_LIB="-lspam",SPASM_LIB="")
+AC_CHECK_LIB(spasm,spasm_csr_free,SPASM_LIB="-lspasm",SPASM_LIB="")
 AC_SUBST(SPASM_LIB)
 
 SING_CHECK_GMP
