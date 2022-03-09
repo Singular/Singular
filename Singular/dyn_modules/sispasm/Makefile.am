@@ -18,7 +18,7 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
 
 
 sispasm_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
-sispasm_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS) -lspasm
+sispasm_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS) $(SPASM_LIB)
 SOURCES = sispasm.cc
 sispasm_la_SOURCES   = $(SOURCES)
 

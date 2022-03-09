@@ -252,4 +252,10 @@ extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* p)
   p->iiAddCproc("spasm.so","to_matrix",FALSE,to_matrix);
   return (MAX_TOK);
 }
+#else
+extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* psModulFunctions)
+{
+  PrintS("no spasm support\n");
+  return MAX_TOK;
+}
 #endif
