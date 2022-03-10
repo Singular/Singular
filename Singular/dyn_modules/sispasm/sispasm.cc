@@ -6,7 +6,7 @@
 #include "Singular/blackbox.h"
 #include "Singular/mod_lib.h"
 #ifdef HAVE_SPASM_H
-extern "C" 
+extern "C"
 {
 #include "spasm.h"
 }
@@ -61,7 +61,7 @@ matrix conv_spasm2matrix(spasm *A, const ring R)
   spasm_GFp *Ax = A->x;
   for (int i = 0; i < n; i++)
   {
-    for (int px = Ap[i]; px < Ap[i + 1]; px++) 
+    for (int px = Ap[i]; px < Ap[i + 1]; px++)
     {
       spasm_GFp x = (Ax != NULL) ? Ax[px] : 1;
       MATELEM(M,i+1,Aj[px] + 1)=p_ISet(x,R);
@@ -79,7 +79,7 @@ ideal conv_spasm2smatrix(spasm *A, const ring R)
   spasm_GFp *Ax = A->x;
   for (int i = 0; i < n; i++)
   {
-    for (int px = Ap[i]; px < Ap[i + 1]; px++) 
+    for (int px = Ap[i]; px < Ap[i + 1]; px++)
     {
       spasm_GFp x = (Ax != NULL) ? Ax[px] : 1;
       poly p=p_ISet(x,R);
@@ -161,7 +161,7 @@ static void* sp_Copy(blackbox* /*b*/, void *d)
    spasm* B=spasm_submatrix(A,0,A->m,0,A->m,1);
    return (void*)B;
  }
- return NULL; 
+ return NULL;
 }
 static BOOLEAN sp_Assign(leftv l, leftv r)
 {
@@ -184,11 +184,11 @@ static BOOLEAN sp_Assign(leftv l, leftv r)
   else if (r->Typ()==SMATRIX_CMD)
   {
     A=conv_smatrix2spasm((ideal)r->Data(),currRing);
-  } 
+  }
   else if (r->Typ()==MATRIX_CMD)
   {
     A=conv_matrix2spasm((matrix)r->Data(),currRing);
-  } 
+  }
   else
     return TRUE;
 
@@ -236,6 +236,17 @@ static BOOLEAN kernel(leftv res, leftv args)
   }
   return TRUE;
 }
+static BOOLEAN rref(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==SPASM_CMD))
+  {
+    res->rtyp=SPASM_CMD;
+    res->data=(void*)sp_rref((spasm*)u->Data(),currRing);
+    return FALSE;
+  }
+  return TRUE;
+}
 /*----------------------------------------------------------------*/
 // initialisation of the module
 extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* p)
@@ -248,6 +259,7 @@ extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* p)
   b->blackbox_Assign=sp_Assign;
   SPASM_CMD=setBlackboxStuff(b,"spasm");
   p->iiAddCproc("spasm.so","spasm_kernel",FALSE,kernel);
+  p->iiAddCproc("spasm.so","spasm_rref",FALSE,rref);
   p->iiAddCproc("spasm.so","to_smatrix",FALSE,to_smatrix);
   p->iiAddCproc("spasm.so","to_matrix",FALSE,to_matrix);
   return (MAX_TOK);
