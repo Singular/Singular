@@ -1,3 +1,13 @@
+/*
+ * provides (after defintion of a ring with coeffs in Z/p)
+ * - type spasm
+ * - assignment smatrix ->spasm, matrix ->spasm
+ * - printing/string(spasm)
+ * - transpose(spasm) -> spasm
+ * - to_matrix(spams) -> matrix
+ * - to_smatrix(spasm) -> smatrix
+ * - spasm_kernel(spasm)->spasm
+*/
 #include "singularconfig.h"
 #include "libpolys/polys/monomials/monomials.h"
 #include "kernel/ideals.h"
@@ -242,10 +252,20 @@ static BOOLEAN rref(leftv res, leftv args)
   if ((u!=NULL) && (u->Typ()==SPASM_CMD))
   {
     res->rtyp=SPASM_CMD;
-    res->data=(void*)sp_rref((spasm*)u->Data(),currRing);
+    res->data=(void*)sp_rref((spasm*)u->Data());
     return FALSE;
   }
   return TRUE;
+}
+static BOOLEAN sp_Op1(int op,leftv l, leftv r)
+{
+  if(op==TRANSPOSE_CMD)
+  {
+    l->rtyp=r->Typ();
+    l->data=(void*)spasm_transpose((spasm*)r->Data(),1);
+    return FALSE;
+  }
+  return  blackboxDefaultOp1(op,l,r);
 }
 /*----------------------------------------------------------------*/
 // initialisation of the module
@@ -257,6 +277,7 @@ extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* p)
   b->blackbox_Init=sp_Init;
   b->blackbox_Copy=sp_Copy;
   b->blackbox_Assign=sp_Assign;
+  b->blackbox_Op1=sp_Op1;
   SPASM_CMD=setBlackboxStuff(b,"spasm");
   p->iiAddCproc("spasm.so","spasm_kernel",FALSE,kernel);
   p->iiAddCproc("spasm.so","spasm_rref",FALSE,rref);
