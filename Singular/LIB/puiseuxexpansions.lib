@@ -367,16 +367,6 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
   int sizeErg;
   int stop;
   int newMaxDeg;
-  list l = newtonpoly2(f);
-
-  //list l = newtonpoly(f);
-
-  //if((l[1][1] == 0) && (l[1][2] == 0))
-  //{
-  //  "ERROR: The polynomial must pass through the origin.";
-  //  list cs = list();
-  //} else
-  //{
 
   poly @c;
   int newExt;
@@ -393,6 +383,32 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
   poly fTemp;
   int cod = 0;
   int mi;
+
+  // Case of Puiseux expansions with finite number of terms
+  list dd = Integralbasis::divideBy(f, var(2));
+  if(dd[2]>0)
+  {
+    for(i = 1; i <= dd[2]; i++)
+    {
+      cs[size(cs) + 1] = list(0, 1);
+      cs[size(cs)][6] = list(cod);
+      cod++;
+    }
+    f = dd[1];
+  }
+
+
+  list l = newtonpoly2(f);
+  
+  //list l = newtonpoly(f);
+  
+  //if((l[1][1] == 0) && (l[1][2] == 0))
+  //{
+  //  "ERROR: The polynomial must pass through the origin.";
+  //  list cs = list();
+  //} else 
+  //{
+
 
   //for(i = 1; i<size(l); i++)
   for(i = size(l)-1; i>=1; i--)
@@ -921,17 +937,30 @@ EXAMPLE: example puiseuxList;  shows an example
 
   // We compute the Puiseux expansions in this new ring
   poly f = imap(R_PP, PP_numer);
-  list fFacs = factorize(f);
-  fFacs = Integralbasis::sortFactors(fFacs);
   list p;
-  list pTemp;
-  for(i = 1; i <= size(fFacs[1]); i++)
-  {
-    if((fFacs[1][i] != 1) and (deg(fFacs[1][i], intvec(0,1)) > 0))
-    {
-      p = p + puiseuxMain(fFacs[1][i], maxDeg, 0, 0, 1);
-    }
-  }
+
+  // NOT WORKING - WE NEED TO CONSIDER ALSO THE MULTIPLICITIES
+  // If we develop to a fix degree we can split the computations.
+  // If we want to compute the singular parts then we cannot split.
+  //if(maxDeg != -1)
+  //{
+  //  // We compute the Puiseux expansions in this new ring
+  //  list fFacs = factorize(f);
+  //  fFacs = Integralbasis::sortFactors(fFacs);
+  //
+  //  for(i = 1; i <= size(fFacs[1]); i++)
+  //  { 
+  //    if((fFacs[1][i] != 1) and (deg(fFacs[1][i], intvec(0,1)) > 0))
+  //    {
+  //      p = p + puiseuxMain(fFacs[1][i], maxDeg, 0, 0, 1);
+  //    }
+  //  }
+  //} else 
+  //{
+  //  p = puiseuxMain(f, maxDeg, 0, 0, 1);
+  //}
+
+  p = puiseuxMain(f, maxDeg, 0, 0, 1);
 
   // We create a list of type Puiseux with one element for each Puiseux
   // expansion
