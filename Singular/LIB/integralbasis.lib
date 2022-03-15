@@ -1257,10 +1257,15 @@ static proc ibAt0(poly f, int locBasis)
 // THE HENSEL BLOCKS
 
 //  if((size(classes) > 1) && (1==0))
+  list blocks;  // Indicates to which block belongs each class of expansions
   if((size(classes) > 1))
   {
     list classesNew;
     list classesTemp;
+    
+    
+    int clInd = 1;
+    
     for(i = 1; i <= size(I2Lifted)-1; i++)
     {
       //l = puiseux(I2Lifted[i+1], -1, 1);
@@ -1270,7 +1275,12 @@ static proc ibAt0(poly f, int locBasis)
       //l = puiseux(I2Lifted[i+1], degExpand, 1);
       l = puiseux(I2Lifted[i+1], -1, 1);
       classesTemp = getClasses(l);
+      for(j = clInd; j <= clInd + size(classesTemp) - 1; j++)
+      {
+        blocks[j] = i;
+      }
       classesNew = classesNew + classesTemp;
+      clInd = clInd + size(classesTemp);
     }
 
     classes = classesNew;
@@ -1292,6 +1302,10 @@ static proc ibAt0(poly f, int locBasis)
 
     debug_log_intbas(3, "------Time for recomputation: ", timer - tt);
     tt = timer;
+  } else
+  {
+    // Only one block with one class of expansions
+    blocks[1] = 1;
   }
 
 // RECOMPUTATION FINISHED
@@ -1357,10 +1371,13 @@ static proc ibAt0(poly f, int locBasis)
   {
     "Maximum degree required for merging: ", mdm;
   }
-
-  list ifOut = irreducibleFactors(f, classes, mdm);
+  
+  list ifOut = irreducibleFactors(f, classes, blocks, mdm);
   list I2LiftedFull = ifOut[1];
-
+  
+  // The classes are reordered in the same order as the irreducible factors
+  classes = ifOut[5];
+  
   if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
   {
     kill ordsFull;
@@ -1411,7 +1428,7 @@ static proc ibAt0(poly f, int locBasis)
     slopes = getSlopes(classes);
     md = getDegs(classes);
 
-    ifOut = irreducibleFactors(f, classes, mdm);
+    ifOut = irreducibleFactors(f, classes, blocks, mdm);
     if(ifOut[3] == 0)
     {
       "Recomputation unsuccesfull. Output may be wrong.";
@@ -2994,10 +3011,12 @@ static proc ordAtPol(poly h, def S)
 
 // Computes the factors of f corresponding to each conjugacy class,
 // up to degree degExpand
-static proc irreducibleFactors(poly f, list classes, int degExpand)
+static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 {
   list I2Lifted = henselBlocks(f, degExpand, 1);
 
+
+  list updatedClasses = classes;
   int nClasses;
   nClasses = size(classes);
 
@@ -3025,14 +3044,29 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
     list bPG;
 
     def R = basering;
-
+    int blInd;
+    
     for(i = 2; i <= size(I2Lifted); i++)
     {
       //"Computing singular part of Puiseux expansions of factor ", i, ": ", I2Lifted[i];
+
+
+      // We replace the classes with the new classes so that they are ordered in the same way as the irreducible factors
+
       newL = puiseux(I2Lifted[i], -1, 1);
       classes2 = getClasses(newL);
+      
+      blInd = 1;
+      for(j =1; j <= size(classes); j++)
+      {
+        if(blocks[j] == i-1)
+        {
+          updatedClasses[j] = classes2[blInd];
+          blInd++;
+        }
+      }
 
-
+      
       if(size(classes2) > 1)
       {
         // We recompute up to the appropiate order for merging
@@ -3072,7 +3106,7 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
               fuProd = fuProd * fu;
             } else
             {
-              ERROR("RING EXPECTED! Please contact the developers.");
+              fuProd = fuProd * (var(2) - classes2[j][cl][1]);
             }
           }
 
@@ -3086,7 +3120,9 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
             gfCheck = 0;
           }
 
+
           fu = reduce(bPG[1], std(var(1)^degExpand));
+
 
           I2LiftedNew[ind] = fu;
           gfCheckList[ind] = bPG[2];
@@ -3101,7 +3137,7 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
     I2Lifted = I2LiftedNew;
     wrongNumber = 1;
   }
-  list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber);
+  list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber, updatedClasses); 
 
   return(ll);
 }
