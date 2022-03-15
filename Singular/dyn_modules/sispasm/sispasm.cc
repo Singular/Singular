@@ -65,7 +65,7 @@ spasm* conv_smatrix2spasm(ideal M, const ring R)
 matrix conv_spasm2matrix(spasm *A, const ring R)
 {
   matrix M=mpNew(A->n,A->m);
-  int n=A->m;
+  int n=A->n;
   int *Aj = A->j;
   int *Ap = A->p;
   spasm_GFp *Ax = A->x;
@@ -83,7 +83,7 @@ matrix conv_spasm2matrix(spasm *A, const ring R)
 ideal conv_spasm2smatrix(spasm *A, const ring R)
 {
   ideal M=idInit(A->m,A->n);
-  int n=A->m;
+  int n=A->n;
   int *Aj = A->j;
   int *Ap = A->p;
   spasm_GFp *Ax = A->x;
@@ -141,15 +141,30 @@ spasm* sp_rref(spasm* A)
   return U;
 }
 
+spasm* sp_Mult_v(spasm* A, int *v)
+{
+  int *y=(int*)omAlloc0(A->n*sizeof(int));
+  spasm *AA=spasm_submatrix(A,0,A->n,0,A->m,1); /*copy A*/
+  spasm_gaxpy(AA,v,y);
+  return AA;
+}
 /*----------------------------------------------------------------*/
 VAR int SPASM_CMD;
 
 static void* sp_Init(blackbox* /*b*/)
 {
-  spasm_triplet *T = spasm_triplet_alloc(0, 0, 1, currRing->cf->ch, 1);
-  spasm* A=spasm_compress(T);
-  spasm_triplet_free(T);
-  return (void*)A;
+  if ((currRing!=NULL)&&(rField_is_Zp(currRing)))
+  {
+    spasm_triplet *T = spasm_triplet_alloc(0, 0, 1, currRing->cf->ch, 1);
+    spasm* A=spasm_compress(T);
+    spasm_triplet_free(T);
+    return (void*)A;
+  }
+  else
+  {
+    WerrorS("ring with Z/p coeffs required");
+    return NULL;
+  }
 }
 static void sp_destroy(blackbox* /*b*/, void *d)
 {
@@ -168,7 +183,7 @@ static void* sp_Copy(blackbox* /*b*/, void *d)
  if (d!=NULL)
  {
    spasm* A=(spasm*)d;
-   spasm* B=spasm_submatrix(A,0,A->m,0,A->m,1);
+   spasm* B=spasm_submatrix(A,0,A->n,0,A->m,1);
    return (void*)B;
  }
  return NULL;
@@ -262,7 +277,7 @@ static BOOLEAN sp_Op1(int op,leftv l, leftv r)
   if(op==TRANSPOSE_CMD)
   {
     l->rtyp=r->Typ();
-    l->data=(void*)spasm_transpose((spasm*)r->Data(),1);
+    l->data=(void*)spasm_transpose((spasm*)r->Data(),SPASM_WITH_NUMERICAL_VALUES);
     return FALSE;
   }
   return  blackboxDefaultOp1(op,l,r);
