@@ -326,6 +326,17 @@ static number ndInitMPZ(mpz_t m, const coeffs r)
   return r->cfInit( mpz_get_si(m), r);
 }
 
+static const char *ndRead(const char * s, number *, const coeffs r)
+{
+  Werror("cfRead is undefined for %s",nCoeffString(r));
+  return s;
+}
+static nMapFunc ndSetMap(const coeffs src, const coeffs dst)
+{
+  if (src==dst) return ndCopyMap;
+  Werror("cfSetMap is undefined for %s",nCoeffString(dst));
+  return NULL;
+}
 
 static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
 {
@@ -443,6 +454,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     //n->cfGetUnit = ndGetUnit_Ring;// set afterwards
 #endif
 
+    // report error, if not redefined
+    n->cfRead=ndRead;
+    n->cfSetMap=ndSetMap;
+
 #ifdef LDEBUG
     n->cfDBTest=ndDBTest;
 #endif
@@ -505,14 +520,16 @@ coeffs nInitChar(n_coeffType t, void * parameter)
             (n->iNumberOfParameters >  0 && n->pParameterNames != NULL) );
 
 
-    if(n->cfRead==NULL) PrintS("cfRead missing\n");
     if(n->cfGreater==NULL) PrintS("cfGreater missing\n");
     if(n->cfEqual==NULL) PrintS("cfEqual missing\n");
     if(n->cfIsZero==NULL) PrintS("cfIsZero missing\n");
     if(n->cfIsOne==NULL) PrintS("cfIsOne missing\n");
     if(n->cfIsMOne==NULL) PrintS("cfIsMOne missing\n");
     if(n->cfGreaterZero==NULL) PrintS("cfGreaterZero missing\n");
-    if(n->cfSetMap==NULL) PrintS("cfSetMap missing\n");
+    /* error reporter:
+    if(n->cfRead==ndRead) PrintS("cfRead missing\n");
+    if(n->cfSetMap==ndSetMap) PrintS("cfSetMap missing\n");
+    */
 
     assume(n->type==t);
 
