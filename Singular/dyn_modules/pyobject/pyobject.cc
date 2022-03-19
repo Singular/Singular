@@ -743,7 +743,7 @@ extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
 #else
 extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
 {
-  printf("no pyobject support\n");
+  PrintS("no pyobject support\n");
   return MAX_TOK;
 }
 
