@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version modstd.lib 4.3.0.0 Jan_2022 "; // $Id$
+version="version modstd.lib 4.3.0.1 Mar_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner bases of ideals/modules using modular methods
@@ -23,6 +23,7 @@ REFERENCES:
 
 PROCEDURES:
   modStd(I);    standard basis of I using modular methods
+  modGB(cmd,I); standard basis of I using modular methods via cmd
   modSyz(I);    syzygy module of I  using modular methods
   modIntersect(I,J); intersection of I and J using modular methods
 ";
@@ -117,6 +118,80 @@ example
     ideal I = cyclic(4);
     ideal J1 = modStd(I, 1);   // default
     ideal J2 = modStd(I, 0);
+    size(reduce(J1, J2));
+    size(reduce(J2, J1));
+}
+
+proc modGB(string command, def I, list #)
+"USAGE:   modGB(method, I[, exactness]); I ideal/module, exactness int
+          method can be: std, slimgb, sba
+RETURN:   a standard basis of I
+NOTE:     The procedure computes a standard basis of I (over the rational
+          numbers) by using modular methods.
+       @* An optional parameter 'exactness' can be provided.
+          If exactness = 1(default), the procedure computes a standard basis
+          of I for sure; if exactness = 0, it computes a standard basis of I
+          with high probability.
+SEE ALSO: modular
+EXAMPLE:  example modGB; shows an example"
+{
+    /* read optional parameter */
+    int exactness = 1;
+    if (size(#) > 0)
+    {
+        if (typeof(#[1]) != "int")
+        {
+            ERROR("wrong optional parameter");
+        }
+        exactness = #[1];
+    }
+
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+    option(redTail);
+
+    /* call modular() */
+    if (exactness)
+    {
+      if(hasCommutativeVars(basering) && (attrib(basering,"global")==1))
+      {
+        I = modular(command, list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std_comm);
+      }
+      else
+      {
+        I = modular(command, list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
+      }
+    }
+    else
+    {
+        I = modular(command, list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std);
+    }
+
+    /* return the result */
+    attrib(I, "isSB", 1);
+    option(set, opt);
+    return(I);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    ideal J = modGB("slimgb",I);
+    J;
+    I = homog(I, t);
+    J = modGB("slimgb",I);
+    J;
+
+    ring R3 = 0, x(1..4), lp;
+    ideal I = cyclic(4);
+    ideal J1 = modGB("slimgb",I, 1);   // default
+    ideal J2 = modGB("slimgb",I, 0);
     size(reduce(J1, J2));
     size(reduce(J2, J1));
 }
