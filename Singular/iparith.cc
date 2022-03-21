@@ -4386,10 +4386,6 @@ static BOOLEAN jjINDEPSET(leftv res, leftv v)
 static BOOLEAN jjINTERRED(leftv res, leftv v)
 {
   ideal result=kInterRed((ideal)(v->Data()), currRing->qideal);
-#ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing))
-    WarnS("interred: this command is experimental over the integers");
-#endif
   if (TEST_OPT_PROT) { PrintLn(); mflush(); }
   res->data = result;
   return FALSE;
