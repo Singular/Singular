@@ -303,6 +303,18 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         }
         else return h;
       }
+      else if((t==PROC_CMD)&&(IDPROC(h)->language==LANG_C))
+      {
+        if (BVERBOSE(V_REDEFINE))
+        {
+          const char *f=VoiceName();
+          if (strcmp(f,"STDIN")==0)
+            Warn("redefining proc %s (%s)",s,my_yylinebuf);
+          else
+            Warn("redefining proc %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
+        }
+        if (s==IDID(h)) IDID(h)=NULL;
+      }
       else
       {
         if (BVERBOSE(V_REDEFINE))
@@ -458,7 +470,8 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
   if (IDTYP(h) == PACKAGE_CMD)
   {
-    if (((IDPACKAGE(h)->language==LANG_C)&&(IDPACKAGE(h)->idroot!=NULL))
+    if ((((IDPACKAGE(h)->language==LANG_C) ||(IDPACKAGE(h)->language==LANG_MIX))
+      &&(IDPACKAGE(h)->idroot!=NULL))
     || (strcmp(IDID(h),"Top")==0))
     {
       Warn("cannot kill `%s`",IDID(h));
@@ -492,6 +505,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     rKill(h);
   else if (IDDATA(h)!=NULL)
     s_internalDelete(IDTYP(h),IDDATA(h),r);
+  IDDATA(h)=NULL;
   //  general  -------------------------------------------------------------
   // now dechain it and delete idrec
   if (IDID(h)!=NULL) // OB: ?????
