@@ -303,18 +303,6 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         }
         else return h;
       }
-      else if((t==PROC_CMD)&&(IDPROC(h)->language==LANG_C))
-      {
-        if (BVERBOSE(V_REDEFINE))
-        {
-          const char *f=VoiceName();
-          if (strcmp(f,"STDIN")==0)
-            Warn("redefining proc %s (%s)",s,my_yylinebuf);
-          else
-            Warn("redefining proc %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
-        }
-        if (s==IDID(h)) IDID(h)=NULL;
-      }
       else
       {
         if (BVERBOSE(V_REDEFINE))
@@ -326,7 +314,10 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
             Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
         }
         if (s==IDID(h)) IDID(h)=NULL;
-        killhdl2(h,root,currRing);
+        if((t!=PROC_CMD)||(IDPROC(h)->language!=LANG_C))
+        {
+          killhdl2(h,root,currRing);
+        }
       }
     }
     else
@@ -348,6 +339,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
             Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
         }
         if (s==IDID(h)) IDID(h)=NULL;
+        //  proc is not ring-dep, no need to check for type "proc":
         killhdl2(h,&currRing->idroot,currRing);
       }
       else
@@ -370,7 +362,10 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
             Warn("redefining %s (%s) %s:%d",s,my_yylinebuf,f, yylineno);
         }
         if (s==IDID(h)) IDID(h)=NULL;
-        killhdl2(h,&IDROOT,NULL);
+        if((t!=PROC_CMD)||(IDPROC(h)->language!=LANG_C))
+        {
+          killhdl2(h,&IDROOT,NULL);
+        }
       }
       else
         goto errlabel;
@@ -892,7 +887,7 @@ BOOLEAN iiAlias(leftv p)
          {
            map im = IDMAP(pp);
            omFreeBinAddr((ADDRESS)im->preimage);
-	   im->preimage=NULL;// and continue
+           im->preimage=NULL;// and continue
          }
          // continue as ideal:
       case IDEAL_CMD:
