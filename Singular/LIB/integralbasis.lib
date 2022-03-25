@@ -1239,7 +1239,7 @@ static proc ibAt0(poly f, int locBasis)
   tt = timer;
 
   dbprint(dbg, "--Building HenselBlocks...");
-  int degExpand = int(maxExp);
+  int degExpand = int(maxExp) + 1;
   dbprint(dbg, "---- Degree of expansions: ", degExpand);
 
 
@@ -2739,13 +2739,16 @@ static proc explodeRings(list l)
   int numb;
   list rings;
 
-  for(i = 1; i <= size(l); i++){
-    if(typeof(l[i]) == "ring"){
+  for(i = 1; i <= size(l); i++)
+  {
+    if(typeof(l[i]) == "ring")
+    {
       def S = l[i];
       setring S;
       list rl;
       numb = size(PE);
-      for(j = 1; j <= numb; j++){
+      for(j = 1; j <= numb; j++)
+      {
         rl = ringlist(S);
         def SS = ring(rl);
         setring SS;
@@ -2786,31 +2789,33 @@ static proc getClasses(list l)
   list l2;
   for(i = 1; i <= size(l); i++)
   {
-    if(typeof(l[i]) == "ring"){
+    if(typeof(l[i]) == "ring")
+    {
       l2 = l2 + explodeRings(l[i]);
     } else
     {
       l2 = l2 + list(l[i]);
     }
   }
-  l = l2;
 
   int k = 1;
   classes[k] = list();
-  classes[k][1] = l[1];
+  classes[k][1] = l2[1];
   classCode[1] = 1;
 
   def R = basering;
 
-  for(i = 1; i <= size(l); i++){
-    if(typeof(l[i]) == "ring"){
-      def S = l[i];
+  for(i = 1; i <= size(l2); i++)
+  {
+    if(typeof(l2[i]) == "ring")
+    {
+      def S = l2[i];
       setring S;
       code[i] = PE[1][6];
       setring R;
       kill S;
     } else {
-      code[i] = l[i][6];
+      code[i] = l2[i][6];
     }
     if(i>1)
     {
@@ -2826,12 +2831,12 @@ static proc getClasses(list l)
       {
         k++;
         classes[k] = list();
-        classes[k][1] = l[i];
+        classes[k][1] = l2[i];
         classCode[i] = k;
       } else
       {
         cc = classCode[prevI];
-        classes[cc][size(classes[cc])+1] = l[i];
+        classes[cc][size(classes[cc])+1] = l2[i];
         classCode[i] = classCode[prevI];
       }
     }

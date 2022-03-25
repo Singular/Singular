@@ -461,7 +461,10 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
       fNew1 = subst(f, var(1), var(1)^slD);
       for(ii = 2; ii <= size(fJe[1]); ii++)
       {
-        cod++;
+        if((ii == 2) || (nonRatCoeff(fJe[1][ii]) == 0))  // If the factor is over the ground field then it is a new conjugacy class.
+        {
+          cod++;
+        }
         fTemp = subst(fJe[1][ii]^(fJe[2][ii]), var(1), var(1)^slD);
         // Checks if a new extension is needed.
         // If so, we have a new cutting point for building the factors.
@@ -664,18 +667,22 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                 if(slN >= 0)
                 {
                   poly fNew2 = subst(fNew1, var(2), (newA + var(2))*var(1)^slN);
-                } else {
+                } else 
+                {
                   poly fNew2 = negExp(fNew1, newA, slN);
                 }
                 fNew2= sat(ideal(fNew2), var(1))[1][1];
-                if(maxDeg > 0){
+                if(maxDeg > 0)
+                {
                   newMaxDeg = maxDeg * slD - slN;
                 } else {
                   newMaxDeg = maxDeg;
                 }
                 list csTS = puiseuxMain(fNew2, newMaxDeg, slN, 1, 0);
-                for(k = 1; k<=size(csTS); k++){
-                  if(typeof(csTS[k]) == "ring"){
+                for(k = 1; k<=size(csTS); k++)
+                {
+                  if(typeof(csTS[k]) == "ring")
+                  {
                     def RT = csTS[k];
                     setring RT;
                     for(h = 1; h<=size(PE); h++)
@@ -1128,3 +1135,17 @@ static proc sum2All(list l, int k)
 
 
 
+// Checks if the coefficents of a polynomial are rational or contain some parameter
+static proc nonRatCoeff(poly p)
+{
+  matrix cc = coef(p, var(1)*var(2));
+  int nonRat = 0;
+  for(int i = 1; i <= ncols(cc); i++)
+  {
+    if(pardeg(number(cc[2,i])) > 0)
+    {
+      nonRat = 1;
+    }
+  }
+  return(nonRat);
+}
