@@ -510,6 +510,7 @@ poly redNF (poly h,int & max_ind,int nonorm,kStrategy strat);
 int redNF0 (LObject *P,kStrategy strat);
 poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
+int redHoneyM (LObject* h, kStrategy strat);
 int redLiftstd (LObject* h, kStrategy strat);
 #ifdef HAVE_RINGS
 int redRing (LObject* h,kStrategy strat);
