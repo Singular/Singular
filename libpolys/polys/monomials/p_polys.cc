@@ -3829,7 +3829,7 @@ void p_Norm(poly p1, const ring r)
             p_SetCoeff(h,c,r);
             pIter(h);
           }
-          n_Delete(&inv,r->cf);
+          // no need for n_Delete for Zp: n_Delete(&inv,r->cf);
         }
         else
         {
@@ -3842,13 +3842,26 @@ void p_Norm(poly p1, const ring r)
           }
         }
       }
+      else if(getCoeffType(r->cf)==n_algExt)
+      {
+        number inv=n_Invers(k,r->cf);
+        while (h!=NULL)
+        {
+          c=n_Mult(pGetCoeff(h),inv,r->cf);
+          // no need to normalize
+          // normalize already in nMult: Zp_a
+          p_SetCoeff(h,c,r);
+          pIter(h);
+        }
+        n_Delete(&inv,r->cf);
+      }
       else
       {
         while (h!=NULL)
         {
           c=n_Div(pGetCoeff(h),k,r->cf);
           // no need to normalize: Z/p, R
-          // normalize already in nDiv: Q_a, Z/p_a
+          // normalize already in nDiv: Q_a
           // remains: Q
           if (rField_is_Q(r) && (!n_IsOne(c,r->cf))) n_Normalize(c,r->cf);
           p_SetCoeff(h,c,r);
