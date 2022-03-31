@@ -3796,35 +3796,32 @@ void pEnlargeSet(poly* *p, int l, int increment)
 */
 void p_Norm(poly p1, const ring r)
 {
-  if (rField_is_Ring(r))
+  if (LIKELY(rField_is_Ring(r)))
   {
     if(!n_GreaterZero(pGetCoeff(p1),r->cf)) p1 = p_Neg(p1,r);
     if (!n_IsUnit(pGetCoeff(p1), r->cf)) return;
     // Werror("p_Norm not possible in the case of coefficient rings.");
   }
-  else if (p1!=NULL)
+  else if (LIKELY(p1!=NULL))
   {
-    if (pNext(p1)==NULL)
+    if (UNLIKELY(pNext(p1)==NULL))
     {
       p_SetCoeff(p1,n_Init(1,r->cf),r);
       return;
     }
     if (!n_IsOne(pGetCoeff(p1),r->cf))
     {
-      number k, c;
-      n_Normalize(pGetCoeff(p1),r->cf);
-      k = pGetCoeff(p1);
-      c = n_Init(1,r->cf);
-      pSetCoeff0(p1,c);
+      number k = pGetCoeff(p1);
+      pSetCoeff0(p1,n_Init(1,r->cf));
       poly h = pNext(p1);
-      if (rField_is_Zp(r))
+      if (LIKELY(rField_is_Zp(r)))
       {
         if (r->cf->ch>32003)
         {
           number inv=n_Invers(k,r->cf);
           while (h!=NULL)
           {
-            c=n_Mult(pGetCoeff(h),inv,r->cf);
+            number c=n_Mult(pGetCoeff(h),inv,r->cf);
             // no need to normalize
             p_SetCoeff(h,c,r);
             pIter(h);
@@ -3835,7 +3832,7 @@ void p_Norm(poly p1, const ring r)
         {
           while (h!=NULL)
           {
-            c=n_Div(pGetCoeff(h),k,r->cf);
+            number c=n_Div(pGetCoeff(h),k,r->cf);
             // no need to normalize
             p_SetCoeff(h,c,r);
             pIter(h);
@@ -3844,31 +3841,33 @@ void p_Norm(poly p1, const ring r)
       }
       else if(getCoeffType(r->cf)==n_algExt)
       {
+        n_Normalize(k,r->cf);
         number inv=n_Invers(k,r->cf);
         while (h!=NULL)
         {
-          c=n_Mult(pGetCoeff(h),inv,r->cf);
+          number c=n_Mult(pGetCoeff(h),inv,r->cf);
           // no need to normalize
-          // normalize already in nMult: Zp_a
+          // normalize already in nMult: Zp_a, Q_a
           p_SetCoeff(h,c,r);
           pIter(h);
         }
         n_Delete(&inv,r->cf);
+        n_Delete(&k,r->cf);
       }
       else
       {
+        n_Normalize(k,r->cf);
         while (h!=NULL)
         {
-          c=n_Div(pGetCoeff(h),k,r->cf);
+          number c=n_Div(pGetCoeff(h),k,r->cf);
           // no need to normalize: Z/p, R
-          // normalize already in nDiv: Q_a
           // remains: Q
-          if (rField_is_Q(r) && (!n_IsOne(c,r->cf))) n_Normalize(c,r->cf);
+          if (rField_is_Q(r)) n_Normalize(c,r->cf);
           p_SetCoeff(h,c,r);
           pIter(h);
         }
+        n_Delete(&k,r->cf);
       }
-      n_Delete(&k,r->cf);
     }
     else
     {
