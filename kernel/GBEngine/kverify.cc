@@ -318,6 +318,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
         } while (dummy==0);
       }
     }
+    sleep(1); // let all the childs finish
     // removes queues
     queue.free();
     rqueue.free();
