@@ -364,6 +364,8 @@ ideal id_Farey_0(ideal x, number N, const ring r)
       msg.free();
       cnt--;
     }
+    // wait for the children to finish
+    sleep(1);
     // removes queues
     queue.free();
     rqueue.free();
