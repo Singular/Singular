@@ -6079,32 +6079,6 @@ int posInL11 (const LSet set, const int length,
   }
 }
 
-int posInL11dp (const LSet set, const int length,
-              LObject* p,const kStrategy)
-{
-  if (length<0) return 0;
-
-  if (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)
-    return length+1;
-  int i;
-  int an = 0;
-  int en= length;
-  loop
-  {
-    if (an >= en-1)
-    {
-      if (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)
-        return en;
-      return an;
-    }
-    i=(an+en) / 2;
-    if (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)
-      an=i;
-    else
-      en=i;
-  }
-}
-
 #ifdef HAVE_RINGS
 /*2
 * looks up the position of polynomial p in set
@@ -9930,10 +9904,7 @@ void initBuchMoraPos (kStrategy strat)
     }
     else if (TEST_OPT_INTSTRATEGY)
     {
-      if (rOrd_is_Totaldegree_Ordering(currRing))
-        strat->posInL = posInL11dp;
-      else
-        strat->posInL = posInL11;
+      strat->posInL = posInL11;
       strat->posInT = posInT11;
     }
     else
@@ -11883,7 +11854,6 @@ void kDebugPrint(kStrategy strat)
     if (strat->posInL==posInL0) PrintS("posInL0\n");
     else if (strat->posInL==posInL10) PrintS("posInL10\n");
     else if (strat->posInL==posInL11) PrintS("posInL11\n");
-    else if (strat->posInL==posInL11dp) PrintS("posInL11dp\n");
     else if (strat->posInL==posInL110) PrintS("posInL110\n");
     else if (strat->posInL==posInL13) PrintS("posInL13\n");
     else if (strat->posInL==posInL15) PrintS("posInL15\n");
