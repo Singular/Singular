@@ -1677,7 +1677,14 @@ static inline int p_LtCmpOrdSgnDiffM(poly p, poly q, const ring r)
 // It is used in posInLRing and posInTRing
 static inline int p_LtCmpOrdSgnDiffP(poly p, poly q, const ring r)
 {
-  return(p_LmCmp(p,q,r) == -r->OrdSgn);
+  if(r->OrdSgn == 1)
+  {
+    return(p_LmCmp(p,q,r) == -1);
+  }
+  else
+  {
+    return(p_LtCmp(p,q,r) != -1);
+  }
 }
 #endif
 
