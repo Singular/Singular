@@ -155,7 +155,7 @@ int main(          /* main entry to Singular */
   {
     int pid=getpid();
     char buf[20];
-    sprintf(buf,"sing_log.%d",pid);
+    sprintf(buf,"/tmp/sing_log.%d",pid);
     File_Log=fopen(buf,"w");
   }
 
