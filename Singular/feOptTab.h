@@ -118,6 +118,8 @@ VAR struct fe_option feOptSpec[] =
   {"emacs",             no_argument,        LONG_OPTION_RETURN,
    0,          "Set defaults for running within emacs",                feOptBool,    0,      0},
 #endif
+  {"log",              no_argument,        LONG_OPTION_RETURN,
+   0,          "Log all input to sing_log.*",                         feOptBool,    0,      0},
 
   {"no-stdlib",         no_argument,        LONG_OPTION_RETURN,
    0,          "Do not load `standard.lib' on start-up",               feOptBool,    0,      0},

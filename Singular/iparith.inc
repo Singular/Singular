@@ -107,8 +107,8 @@
 // operation: int (number)  ->  int
 // operation: int (poly)  ->  int
 // operation: int (string)  ->  int
-// operation: interred (ideal)  ->  ideal, field coeffs
-// operation: interred (module)  ->  module, field coeffs
+// operation: interred (ideal)  ->  ideal
+// operation: interred (module)  ->  module
 // operation: intmat (bigintmat)  ->  intmat
 // operation: intmat (intmat)  ->  intmat
 // operation: intvec (intmat)  ->  intvec
@@ -500,8 +500,8 @@
 // operation: diff (module, poly)  ->  module
 // operation: diff (matrix, poly)  ->  matrix
 // operation: diff (number, number)  ->  number
-// operation: dim (ideal, ideal)  ->  int, field coeffs
-// operation: dim (module, ideal)  ->  int, field coeffs
+// operation: dim (ideal, ideal)  ->  int
+// operation: dim (module, ideal)  ->  int
 // operation: division (ideal, ideal)  ->  list
 // operation: division (module, module)  ->  list
 // operation: eliminate (ideal, poly)  ->  ideal

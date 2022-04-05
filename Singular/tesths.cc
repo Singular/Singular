@@ -39,6 +39,7 @@ extern void siInit(char *);
 #ifdef PSINGULAR
 GLOBAL_VAR char *global_argv0;
 #endif
+EXTERN_VAR FILE* File_Log;
 
 int mmInit( void )
 {
@@ -149,6 +150,13 @@ int main(          /* main entry to Singular */
     /* alternative:
     *    memcpy(stderr,stdout,sizeof(FILE));
     */
+  }
+  if (feOptValue(FE_OPT_LOG))
+  {
+    int pid=getpid();
+    char buf[20];
+    sprintf(buf,"sing_log.%d",pid);
+    File_Log=fopen(buf,"w");
   }
 
 #ifdef SINGULAR_PYOBJECT_SETUP_H

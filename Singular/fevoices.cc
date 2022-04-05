@@ -30,6 +30,7 @@
 
 VAR char fe_promptstr[] ="  ";
 VAR FILE *File_Profiling=NULL;
+VAR FILE *File_Log=NULL;
 
 // line buffer for reading:
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
@@ -615,6 +616,10 @@ int feReadLine(char* b, int l)
     if (feProt&SI_PROT_I)
     {
       fputs(s,feProtFile);
+    }
+    if (File_Log!=NULL)
+    {
+      fputs(s,File_Log);
     }
     int rc=fePrintEcho(s,b)+1;
     //s[strlen(s)+1]='\0'; add an second \0 at the end of the string

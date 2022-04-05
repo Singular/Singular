@@ -1099,7 +1099,9 @@ void m2_end(int i)
   if (!m2_end_called)
   {
     EXTERN_VAR FILE* File_Profiling;
+    EXTERN_VAR FILE* File_Log;
     if (File_Profiling!=NULL) { fclose(File_Profiling); File_Profiling=NULL; }
+    if (File_Log!=NULL)       { fclose(File_Log);       File_Log=NULL; }
     m2_end_called = TRUE;
 #ifdef HAVE_SIMPLEIPC
     for (int j = SIPC_MAX_SEMAPHORES-1; j >= 0; j--)
