@@ -31,6 +31,7 @@
 VAR char fe_promptstr[] ="  ";
 VAR FILE *File_Profiling=NULL;
 VAR FILE *File_Log=NULL;
+VAR BOOLEAN File_Log_written=FALSE;
 
 // line buffer for reading:
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
@@ -619,6 +620,7 @@ int feReadLine(char* b, int l)
     }
     if (File_Log!=NULL)
     {
+      File_Log_written=TRUE;
       fputs(s,File_Log);
     }
     int rc=fePrintEcho(s,b)+1;

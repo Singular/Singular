@@ -1100,8 +1100,20 @@ void m2_end(int i)
   {
     EXTERN_VAR FILE* File_Profiling;
     EXTERN_VAR FILE* File_Log;
+    EXTERN_VAR BOOLEAN File_Log_written;
     if (File_Profiling!=NULL) { fclose(File_Profiling); File_Profiling=NULL; }
-    if (File_Log!=NULL)       { fclose(File_Log);       File_Log=NULL; }
+    if (File_Log!=NULL)
+    {
+      fclose(File_Log);
+      File_Log=NULL;
+      if (File_Log_written==FALSE) // remove empty logs
+      {
+        int pid=getpid();
+        char buf[20];
+        sprintf(buf,"/tmp/sing_log.%d",pid);
+        remove(buf);
+      }
+    }
     m2_end_called = TRUE;
 #ifdef HAVE_SIMPLEIPC
     for (int j = SIPC_MAX_SEMAPHORES-1; j >= 0; j--)
