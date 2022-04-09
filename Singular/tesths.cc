@@ -40,7 +40,7 @@ extern void siInit(char *);
 GLOBAL_VAR char *global_argv0;
 #endif
 EXTERN_VAR FILE* File_Log;
-GLOBAL_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 
 int mmInit( void )
 {
