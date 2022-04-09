@@ -40,6 +40,7 @@ extern void siInit(char *);
 GLOBAL_VAR char *global_argv0;
 #endif
 EXTERN_VAR FILE* File_Log;
+GLOBAL_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 
 int mmInit( void )
 {
@@ -140,11 +141,16 @@ int main(          /* main entry to Singular */
 " by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   %s\n"
 "FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\\n"
 , VERSION, VERSION_DATE);
-  if (feOptValue(FE_OPT_NO_SHELL)) WarnS("running in restricted mode:"
-    " shell invocation and links are disallowed");
+    if (feOptValue(FE_OPT_NO_SHELL))
+    {
+      WarnS("running in restricted mode:"
+      " shell invocation and links are disallowed");
+      FE_OPT_NO_SHELL_FLAG=TRUE;
+    }
   }
   else
   {
+    FE_OPT_NO_SHELL_FLAG=FALSE;
     if (feOptValue(FE_OPT_SORT)) On(SW_USE_NTL_SORT);
     dup2(1,2);
     /* alternative:

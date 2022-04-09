@@ -166,6 +166,7 @@
 #ifndef MAKE_DISTRIBUTION
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 
 /* expects a SINGULAR square matrix with number entries
    where currRing is expected to be over some field F_p;
@@ -475,7 +476,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {
-      if (feOptValue(FE_OPT_NO_SHELL))
+      if (FE_OPT_NO_SHELL_FLAG)
       {
         WerrorS("shell execution is disallowed in restricted mode");
         return TRUE;

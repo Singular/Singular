@@ -39,6 +39,7 @@
 VAR omBin s_si_link_extension_bin = omGetSpecBin(sizeof(s_si_link_extension));
 VAR omBin sip_link_bin = omGetSpecBin(sizeof(sip_link));
 VAR omBin ip_link_bin = omGetSpecBin(sizeof(ip_link));
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 
 /* ====================================================================== */
 static si_link_extension slTypeInit(si_link_extension s, const char* type);
@@ -198,7 +199,7 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
 
     if (l->m == NULL) slInit(l, ((char*)""));
 
-    if (feOptValue(FE_OPT_NO_SHELL)) {WerrorS("no links allowed");return TRUE;}
+    if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
 
     const char *c="_";;
     if (h!=NULL) c=h->Name();
