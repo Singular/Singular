@@ -9,9 +9,7 @@ else !SI_BUILTIN_MACHINELEARNING
   module_LTLIBRARIES = machinelearning.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
-# Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
-  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
-###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace
 endif !SI_BUILTIN_MACHINELEARNING
 
 ##########################################################################
