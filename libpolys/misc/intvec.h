@@ -130,7 +130,7 @@ public:
   }
   intvec* delete_pos(int p);
   // keiner (ausser obachman) darf das folgenden benutzen !!!
-  inline int * ivGetVec() { return v; }
+  inline int * ivGetVec() const { return v; }
 };
 inline intvec * ivCopy(const intvec * o)
 {

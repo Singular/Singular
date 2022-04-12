@@ -3402,6 +3402,25 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
   return TRUE;
 }
 
+/*2
+*tests if p is homogeneous with respect to the given weigths
+*/
+BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const ring r)
+{
+  poly qp=p;
+  long o;
+
+  if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
+  o = totaldegreeWecart_IV(p,r,w->ivGetVec());
+  do
+  {
+    if (totaldegreeWecart_IV(qp,r,w->ivGetVec()) != o) return FALSE;
+    pIter(qp);
+  }
+  while (qp != NULL);
+  return TRUE;
+}
+
 /*----------utilities for syzygies--------------*/
 BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r)
 {
