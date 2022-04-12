@@ -2477,6 +2477,13 @@ static BOOLEAN jjHOMOG1_W(leftv res, leftv v, leftv u)
   if (w!=NULL) delete w;
   return FALSE;
 }
+static BOOLEAN jjHOMOG1_WI(leftv res, leftv v, leftv u)
+{
+  intvec *vw=(intvec*)u->Data();
+  ideal v_id=(ideal)v->Data();
+  res->data=(void *)(long)id_HomIdealW(v_id,currRing->qideal,vw,currRing);
+  return FALSE;
+}
 static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
