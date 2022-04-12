@@ -2887,10 +2887,13 @@ If the current ring has a weighted monomial ordering,
 @code{homog} tests for weighted homogeneity w.r.t. the given weights.
 @item @strong{Syntax:}
 @code{homog (} ideal_expression@code{,} intvec_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
 tests for homogeneity wrt. the given weight vector:
 returns 1 for homogeneous input, 0 otherwise.
 @item @strong{Syntax:}
-@*@code{homog (} polynomial_expression@code{,} ring_variable @code{)}
+@code{homog (} polynomial_expression@code{,} ring_variable @code{)}
 @*@code{homog (} vector_expression@code{,} ring_variable @code{)}
 @*@code{homog (} ideal_expression@code{,} ring_variable @code{)}
 @*@code{homog (} module_expression@code{,} ring_variable @code{)}
