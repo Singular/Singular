@@ -3411,10 +3411,29 @@ BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const ring r)
   long o;
 
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
+  pIter(qp);
   o = totaldegreeWecart_IV(p,r,w->ivGetVec());
   do
   {
     if (totaldegreeWecart_IV(qp,r,w->ivGetVec()) != o) return FALSE;
+    pIter(qp);
+  }
+  while (qp != NULL);
+  return TRUE;
+}
+
+BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const intvec *module_w, const ring r)
+{
+  poly qp=p;
+  long o;
+
+  if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
+  pIter(qp);
+  o = totaldegreeWecart_IV(p,r,w->ivGetVec())+(*module_w)[p_GetComp(p,r)];
+  do
+  {
+    long oo=totaldegreeWecart_IV(qp,r,w->ivGetVec())+(*module_w)[p_GetComp(qp,r)];
+    if (oo != o) return FALSE;
     pIter(qp);
   }
   while (qp != NULL);

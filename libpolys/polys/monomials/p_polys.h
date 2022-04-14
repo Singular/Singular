@@ -229,6 +229,7 @@ poly      p_Homogen (poly p, int varnum, const ring r);
 
 BOOLEAN   p_IsHomogeneous (poly p, const ring r);
 BOOLEAN   p_IsHomogeneousW (poly p, const intvec *w, const ring r);
+BOOLEAN   p_IsHomogeneousW (poly p, const intvec *w, const intvec *module_w,const ring r);
 
 // Setm
 static inline void p_Setm(poly p, const ring r)
