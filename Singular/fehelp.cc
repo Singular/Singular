@@ -86,6 +86,7 @@ STATIC_VAR heBrowser_s *heHelpBrowsers=NULL;
  * Implementation: public function
  *
  *****************************************************************/
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 void feHelp(char *str)
 {
   if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no help available");return;}
