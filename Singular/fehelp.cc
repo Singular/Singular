@@ -88,6 +88,7 @@ STATIC_VAR heBrowser_s *heHelpBrowsers=NULL;
  *****************************************************************/
 void feHelp(char *str)
 {
+  if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no help available");return;}
   str = strclean(str);
   if (str == NULL) {heBrowserHelp(NULL); return;}
 
