@@ -9748,7 +9748,7 @@ show all calls to kernel routines
 @item @code{TRACE=256}
 show all assigns
 @item @code{TRACE=512}
-show all automtic type conversions
+show all automatic type conversions
 @item @code{TRACE=1024}
 profiling: print line numbers to smon.out
 @end table
