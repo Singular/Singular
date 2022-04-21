@@ -858,6 +858,29 @@ BOOLEAN id_HomIdealW (ideal id, ideal Q,  const intvec *w, const ring r)
   return b;
 }
 
+BOOLEAN id_HomModuleW (ideal id, ideal Q,  const intvec *w, const intvec *module_w, const ring r)
+{
+  int i;
+  BOOLEAN b;
+  i = 0;
+  b = TRUE;
+  while ((i < IDELEMS(id)) && b)
+  {
+    b = p_IsHomogeneousW(id->m[i],w,module_w,r);
+    i++;
+  }
+  if ((b) && (Q!=NULL) && (IDELEMS(Q)>0))
+  {
+    i=0;
+    while ((i < IDELEMS(Q)) && b)
+    {
+      b = p_IsHomogeneousW(Q->m[i],w,r);
+      i++;
+    }
+  }
+  return b;
+}
+
 /*2
 *initialized a field with r numbers between beg and end for the
 *procedure idNextChoise
