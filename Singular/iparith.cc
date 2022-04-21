@@ -6179,6 +6179,14 @@ static BOOLEAN jjHOMOG_P_W(leftv res, leftv u, leftv v,leftv /*w*/)
     WerrorS("variable must have weight 1");
   return (d!=1);
 }
+static BOOLEAN jjHOMOG_W_M(leftv res, leftv v1, leftv v2, leftv v3)
+{
+  intvec *w=(intvec *)v3->Data();
+  intvec *vw=(intvec*)v2->Data();
+  ideal v_id=(ideal)v1->Data();
+  res->data=(void *)(long)id_HomModuleW(v_id,currRing->qideal,vw,w,currRing);
+  return FALSE;
+}
 static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 {
   intvec* im= new intvec((int)(long)v->Data(),(int)(long)w->Data(), 0);

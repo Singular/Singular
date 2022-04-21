@@ -2909,6 +2909,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #ifdef HAVE_SDB
       if (strcmp(sys_cmd, "sdb_edit") == 0)
       {
+        if (FE_OPT_NO_SHELL_FLAG)
+        {
+          WerrorS("shell execution is disallowed in restricted mode");
+          return TRUE;
+        }
         if ((h!=NULL) && (h->Typ()==PROC_CMD))
         {
           procinfov p=(procinfov)h->Data();

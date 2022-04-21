@@ -666,6 +666,7 @@
 // operation: homog (vector, poly, intvec)  ->  vector
 // operation: homog (ideal, poly, intvec)  ->  ideal
 // operation: homog (module, poly, intvec)  ->  module
+// operation: homog (module, intvec, intvec)  ->  int
 // operation: insert (list, def, int)  ->  list
 // operation: intersect (ideal, ideal, string)  ->  ideal
 // operation: intersect (module, module, string)  ->  module
