@@ -4530,7 +4530,8 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
     {
       // If we are only checking if the ideal is normal, and there are no
       // singular points, return 1.
-      return(1)
+      option(set,save_opt);
+      return(1);
     } else
     {
       // The original ring R/I was normal. Nothing to do.
@@ -4607,10 +4608,12 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
           {
             int check2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault, normalCheck);
             printlevel = printlevel - 1;
+            option(set,save_opt);
             return(check2);
           } else
           {
             printlevel = printlevel - 1;
+            option(set,save_opt);
             return(0);
           }
         } else
@@ -4620,6 +4623,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
           printlevel = printlevel - 1;
           option(set,save_opt);
           list res = nor1 + nor2;
+          option(set,save_opt);
           return(res);
         }
       }
@@ -4760,6 +4764,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
         printlevel = printlevel - 1;
         option(set,save_opt);
         list res = nor1 + nor2;
+        option(set,save_opt);
         return(res);
       }
     }
@@ -4777,6 +4782,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   {
     int out = normalMEqui(I, J, condu, D, withDelta, normalCheck);
     printlevel = printlevel - 1;
+    option(set,save_opt);
     return(out);
   } else
   {
@@ -4785,6 +4791,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
     option(set,save_opt);
     return(list(result));
   }
+  option(set,save_opt);
   return();
 }
 
