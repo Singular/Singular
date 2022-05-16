@@ -111,7 +111,6 @@ nodist_libfactory_la_SOURCES = factory.h factoryconf.h
 
 # factory header files
 factory_headers = \
-		si_log2.h \
 		cf_assert.h \
 		canonicalform.h \
 		cf_algorithm.h \
