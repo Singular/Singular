@@ -157,11 +157,11 @@ int main(          /* main entry to Singular */
     *    memcpy(stderr,stdout,sizeof(FILE));
     */
   }
-  if (feOptValue(FE_OPT_LOG))
+  if (feOptValue(FE_OPT_LOG)!=NULL)
   {
     int pid=getpid();
-    char buf[20];
-    sprintf(buf,"/tmp/sing_log.%d",pid);
+    char *buf=(char*)malloc(10+strlen((char*) feOptSpec[FE_OPT_LOG].value));
+    sprintf(buf,"%s.%d",(char*) feOptSpec[FE_OPT_LOG].value,pid);
     File_Log=fopen(buf,"w");
   }
 
