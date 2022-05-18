@@ -13,7 +13,7 @@ else
   module_LTLIBRARIES=cohomo.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 endif
 
 SOURCES = cohomo.cc cohomo.h

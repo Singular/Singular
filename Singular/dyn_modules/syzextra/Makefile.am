@@ -13,7 +13,7 @@ else
   module_LTLIBRARIES=syzextra.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 endif
 
 SOURCES = mod_main.cc singularxx_defs.h syzextra.cc syzextra.h

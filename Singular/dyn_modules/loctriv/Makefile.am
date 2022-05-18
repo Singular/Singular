@@ -8,7 +8,7 @@ else
   module_LTLIBRARIES=loctriv.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 endif
 MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
       -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \

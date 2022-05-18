@@ -13,7 +13,7 @@ else
   module_LTLIBRARIES=systhreads.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 endif
 
 SOURCES = shared.cc lintree.cc bytebuf.cc thread.cc bytebuf.h lintree.h channel.h syncvar.h threadconf.h thread.h singthreads.h

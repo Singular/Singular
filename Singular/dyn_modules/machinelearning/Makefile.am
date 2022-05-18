@@ -9,7 +9,7 @@ else !SI_BUILTIN_MACHINELEARNING
   module_LTLIBRARIES = machinelearning.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 endif !SI_BUILTIN_MACHINELEARNING
 
 ##########################################################################

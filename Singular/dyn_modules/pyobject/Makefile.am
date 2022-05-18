@@ -9,7 +9,7 @@ else !SI_BUILTIN_PYOBJECT
   module_LTLIBRARIES = pyobject.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 ###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
 endif !SI_BUILTIN_PYOBJECT
 pyobject_la_SOURCES = pyobject.cc
