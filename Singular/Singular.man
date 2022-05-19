@@ -58,8 +58,8 @@ non-interactive interrupt handling: C is the answer to (a)bort, (c)ontinue, (q)u
 \fB\-\-emacs\fR
 Set defaults for running within emacs
 .TP
-\fB\-\-log\fR
-Log all input to sing_log.*
+\fB\-\-log\fR=\fILOGFILE\fR
+Log all input to LOGFILE.*
 .TP
 \fB\-\-no\-stdlib\fR
 Do not load `standard.lib' on start\-up
