@@ -764,7 +764,7 @@ static void print_freelists() {
 void vmem_free(vaddr_t vaddr) {
   lock_allocator();
   #if defined(__GNUC__) && (__GNUC__>11)
-  vaddr_t vaddr -= (sizeof(vaddr_t)*2);
+  vaddr -= (sizeof(vaddr_t)*2);
   #else
   vaddr -= offsetof(Block, data);
   #endif
