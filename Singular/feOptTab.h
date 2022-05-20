@@ -72,7 +72,7 @@ VAR struct fe_option feOptSpec[] =
 #endif
 
   {"batch",             no_argument,        'b',
-   0,          "Run in batch mode (requires --link/--MPhost/--MPport)",                                    feOptBool,    0,     0},
+   0,          "Run in batch mode (requires --link/--MPhost/--MPport)", feOptBool,    0,     0},
 
   {"execute",           required_argument,  'c',
    "STRING",   "Execute STRING on start-up",                           feOptString, 0,   0},
@@ -161,7 +161,7 @@ VAR struct fe_option feOptSpec[] =
    "TICKS",    "Sets unit of timer to TICKS per second",               feOptInt,    (void*)1,      0},
 
   {"dump-versiontuple",       no_argument,  LONG_OPTION_RETURN,
-   0,          "//Display the version-tuple and exit",  feOptUntyped,    0,      0},
+   0,          "Display the version-tuple and exit",                   feOptUntyped,    0,      0},
 
 // terminator -- do NOT remove
   { 0, 0, 0, 0, 0, feOptInt, 0, 0}
