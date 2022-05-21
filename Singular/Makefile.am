@@ -152,7 +152,7 @@ bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
 Singular_SOURCES = tesths.cc utils.cc  utils.h
 
-Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS}
+Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS} $(FACTORY_LIBS)
 
 Singular_LDFLAGS = ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
