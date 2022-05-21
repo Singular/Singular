@@ -197,11 +197,7 @@ static void print_freelists() {
 
 void vmem_free(vaddr_t vaddr) {
   lock_allocator();
-  #if defined(__GNUC__) && (__GNUC__>11)
-  vaddr -= (sizeof(vaddr_t)*2);
-  #else
   vaddr -= offsetof(Block, data);
-  #endif
   vmem.ensure_is_mapped(vaddr);
   size_t segno = vmem.segment_no(vaddr);
   VSeg seg = vmem.segment(vaddr);
@@ -249,11 +245,7 @@ void vmem_free(vaddr_t vaddr) {
 
 vaddr_t vmem_alloc(size_t size) {
   lock_allocator();
-  #if defined(__GNUC__) && (__GNUC__>11)
-  size_t alloc_size = size + (sizeof(vaddr_t)*2);
-  #else
   size_t alloc_size = size + offsetof(Block, data);
-  #endif
   int level = find_level(alloc_size);
   int flevel = level;
   while (flevel < LOG2_SEGMENT_SIZE && vmem.freelist[flevel] == VADDR_NULL)
@@ -567,7 +559,7 @@ int EventSet::wait() {
 }
 
 } // namespace vspace
-#else
+#else // gcc>9
 #include <cstdlib>
 #include <unistd.h>
 #include <sys/mman.h>
