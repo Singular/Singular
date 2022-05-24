@@ -11,7 +11,7 @@
 #include "kernel/polys.h"
 #include "misc/intvec.h"
 
-intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q=NULL, ring tailRing = currRing);
+intvec * hHstdSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);
 
 intvec * hSecondSeries(intvec *hseries1);

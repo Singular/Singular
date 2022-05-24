@@ -1363,7 +1363,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
 }
 
 
-intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q, ring tailRing)
+intvec * hHstdSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
 {
   id_TestTail(S, currRing, tailRing);
   if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
