@@ -108,10 +108,9 @@ BOOLEAN sdb_set_breakpoint(const char *pp, int given_lineno)
 
 void sdb_edit(procinfo *pi)
 {
-  char * filename = omStrDup("/tmp/sd000000");
-  sprintf(filename+7,"%d",getpid());
-  FILE *fp=fopen(filename,"w");
-  if (fp==NULL)
+  char * filename = omStrDup("/tmp/sdXXXXXX");
+  int f=mkstemp(filename);
+  if (f==-1)
   {
     Print("cannot open %s\n",filename);
     omFree(filename);
@@ -120,8 +119,8 @@ void sdb_edit(procinfo *pi)
   if (pi->language!= LANG_SINGULAR)
   {
     Print("cannot edit type %d\n",pi->language);
-    fclose(fp);
-    fp=NULL;
+    close(f);
+    f=NULL;
   }
   else
   {
@@ -138,15 +137,15 @@ void sdb_edit(procinfo *pi)
       if (pi->data.s.body==NULL)
       {
         PrintS("cannot get the procedure body\n");
-        fclose(fp);
+        close(f);
         si_unlink(filename);
         omFree(filename);
         return;
       }
     }
 
-    fwrite(pi->data.s.body,1,strlen(pi->data.s.body),fp);
-    fclose(fp);
+    write(f,pi->data.s.body,strlen(pi->data.s.body));
+    close(f);
 
     int pid=fork();
     if (pid!=0)
@@ -173,7 +172,7 @@ void sdb_edit(procinfo *pi)
       PrintS("cannot fork\n");
     }
 
-    fp=fopen(filename,"r");
+    FILE* fp=fopen(filename,"r");
     if (fp==NULL)
     {
       Print("cannot read from %s\n",filename);
