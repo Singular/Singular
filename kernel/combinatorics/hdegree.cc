@@ -642,10 +642,22 @@ static int hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
   pn = hGetpure(pure);
   sn = hGetmem(Nstc, stc, stcmem[iv]);
   hStepS(sn, Nstc, var, Nvar, &a, &x);
+  int64 t=hZeroMult(pn, sn, a, var, iv);
   if (a == Nstc)
-    return pure[var[Nvar]] * hZeroMult(pn, sn, a, var, iv);
+  {
+    t *= pure[var[Nvar]];
+    if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
+    else if (!errorreported) WerrorS("int overflow in vdim 3");
+    return sum;
+    /*return pure[var[Nvar]] * hZeroMult(pn, sn, a, var, iv);*/
+  }
   else
-    sum = x * hZeroMult(pn, sn, a, var, iv);
+  {
+    t *= x;
+    if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
+    else if (!errorreported) WerrorS("int overflow in vdim 4");
+    /*sum = x * hZeroMult(pn, sn, a, var, iv);*/
+  }
   b = a;
   loop
   {
@@ -659,11 +671,21 @@ static int hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
     b += (a1 - a0);
     if (a < Nstc)
     {
-      sum += (x - x0) * hZeroMult(pn, sn, b, var, iv);
+      int64 t=hZeroMult(pn, sn, b, var, iv);
+      t *= (x-x0);
+      t += sum;
+      if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
+      else if (!errorreported) WerrorS("int overflow in vdim 1");
+      /*sum += (x - x0) * hZeroMult(pn, sn, b, var, iv);*/
     }
     else
     {
-      sum += (pure[var[Nvar]] - x0) * hZeroMult(pn, sn, b, var, iv);
+      int64 t=hZeroMult(pn, sn, b, var, iv);
+      t *= (pure[var[Nvar]]-x0);
+      t += sum;
+      if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
+      else if (!errorreported) WerrorS("int overflow in vdim 2");
+      /*sum += (pure[var[Nvar]] - x0) * hZeroMult(pn, sn, b, var, iv);*/
       return sum;
     }
   }
