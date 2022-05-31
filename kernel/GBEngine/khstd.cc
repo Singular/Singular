@@ -45,7 +45,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
 * The weights w are needed in the module case, otherwise NULL.
 */
 {
-  intvec *newhilb;
+  intvec *newhilb,*new1;
   int deg,l,ln,mw;
   pFDegProc degp;
 
@@ -77,7 +77,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     // degp = pWDegree;
     l = hilb->length()-1;
     mw = (*hilb)[l];
-    newhilb =hHstdSeries(strat->Shdl,w,Q,strat->kHomW,currRing);
+    newhilb =hFirstSeries(strat->Shdl,w,Q,strat->kHomW,currRing);
     ln = newhilb->length()-1;
     deg = degp(strat->P.p,currRing)-mw;
     loop // compare the series in degree deg, try to increase deg -----------
@@ -143,11 +143,11 @@ so delete all the remaining pairs
 */
 {
   ideal Lm;
-  intvec *newhilb;
+  intvec *newhilb,*new1;
 
   Lm = id_Head(strat->Shdl,currRing);
 
-  newhilb =hHstdSeries(Lm,w,Q,strat->kHomW,currRing);
+  newhilb =hFirstSeries(Lm,w,Q,strat->kHomW,currRing);
 
   if(newhilb->compare(hilb) == 0)
   {

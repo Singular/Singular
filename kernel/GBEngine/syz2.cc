@@ -527,7 +527,7 @@ PrintS("spl1 ist hier: ");spl1->show(0,0);
   kk = (*spl1)[i]-1;
   if (index==1)
   {
-    intvec * temp1_hilb = hHstdSeries(syzstr->res[index],NULL,NULL,NULL);
+    intvec * temp1_hilb = hFirstSeries(syzstr->res[index],NULL,NULL,NULL);
     if (actord<temp1_hilb->length())
     {
       toGo = (*temp1_hilb)[actord];
@@ -782,8 +782,8 @@ void sySetNewHilb(syStrategy syzstr, int toSub,int index,int actord)
 {
   int i;
   actord += index;
-  intvec * temp_hilb = hHstdSeries(syzstr->res[index+1],NULL,NULL,NULL);
-  intvec * cont_hilb = hHstdSeries(syzstr->res[index],NULL,NULL,NULL);
+  intvec * temp_hilb = hFirstSeries(syzstr->res[index+1],NULL,NULL,NULL);
+  intvec * cont_hilb = hFirstSeries(syzstr->res[index],NULL,NULL,NULL);
   if ((index+1<syzstr->length) && (syzstr->hilb_coeffs[index+1]==NULL))
   {
     syzstr->hilb_coeffs[index+1] = new intvec(16*((actord/16)+1));

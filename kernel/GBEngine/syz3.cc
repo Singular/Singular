@@ -54,8 +54,8 @@ VAR int short_pairs;
 */
 static BOOLEAN syIsRegular(ideal old_ideal,ideal new_ideal,int deg)
 {
-  intvec * old_hilbs=hHstdSeries(old_ideal,NULL,NULL,NULL);
-  intvec * new_hilbs=hHstdSeries(new_ideal,NULL,NULL,NULL);
+  intvec * old_hilbs=hFirstSeries(old_ideal,NULL,NULL,NULL);
+  intvec * new_hilbs=hFirstSeries(new_ideal,NULL,NULL,NULL);
   int biggest_length=si_max(old_hilbs->length()+deg,new_hilbs->length());
   intvec * shifted_old_hilbs=new intvec(biggest_length);
   intvec * old_hilb1=new intvec(biggest_length);
