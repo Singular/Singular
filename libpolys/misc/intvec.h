@@ -128,6 +128,16 @@ public:
     }
     return m;
   }
+  inline int max_in()
+  {
+    int m=0;
+    if (row>0)
+    {
+      m=v[0];
+      for (int i=row*col-1; i>0; i--) if (v[i]>m) m=v[i];
+    }
+    return m;
+  }
   intvec* delete_pos(int p);
   // keiner (ausser obachman) darf das folgenden benutzen !!!
   inline int * ivGetVec() const { return v; }
@@ -140,6 +150,7 @@ inline intvec * ivCopy(const intvec * o)
 }
 
 intvec * ivAdd(intvec * a, intvec * b);
+intvec * ivAddShift(intvec * a, intvec * b, int s);
 intvec * ivSub(intvec * a, intvec * b);
 intvec * ivTranp(intvec * o);
 int      ivTrace(intvec * o);
