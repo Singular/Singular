@@ -471,6 +471,60 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, con
 }
 #endif
 
+#ifdef PDEBUG
+/// Internal verification for ideals/modules and dense matrices!
+void id_DBLmTest(ideal h1, int level, const char *f,const int l, const ring r)
+{
+  if (h1 != NULL)
+  {
+    // assume(IDELEMS(h1) > 0); for ideal/module, does not apply to matrix
+    omCheckAddrSize(h1,sizeof(*h1));
+
+    assume( h1->ncols >= 0 );
+    assume( h1->nrows >= 0 ); // matrix case!
+
+    assume( h1->rank >= 0 );
+
+    const long n = ((long)h1->ncols * (long)h1->nrows);
+
+    assume( !( n > 0 && h1->m == NULL) );
+
+    if( h1->m != NULL && n > 0 )
+      omdebugAddrSize(h1->m, n * sizeof(poly));
+
+    long new_rk = 0; // inlining id_RankFreeModule(h1, r, tailRing);
+
+    /* to be able to test matrices: */
+    for (long i=n - 1; i >= 0; i--)
+    {
+      if (h1->m[i]!=NULL)
+      {
+        _p_LmTest(h1->m[i], r, level);
+        const long k = p_GetComp(h1->m[i], r);
+        if (k > new_rk) new_rk = k;
+      }
+    }
+
+    // dense matrices only contain polynomials:
+    // h1->nrows == h1->rank > 1 && new_rk == 0!
+    assume( !( h1->nrows == h1->rank && h1->nrows > 1 && new_rk > 0 ) ); //
+
+    if(new_rk > h1->rank)
+    {
+      dReportError("wrong rank %d (should be %d) in %s:%d\n",
+                   h1->rank, new_rk, f,l);
+      omPrintAddrInfo(stderr, h1, " for ideal");
+      h1->rank = new_rk;
+    }
+  }
+  else
+  {
+    Print("error: ideal==NULL in %s:%d\n",f,l);
+    assume( h1 != NULL );
+  }
+}
+#endif
+
 /// for idSort: compare a and b revlex inclusive module comp.
 static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring R)
 {

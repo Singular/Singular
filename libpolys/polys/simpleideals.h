@@ -74,11 +74,14 @@ int id_MinDegW(ideal M,intvec *w, const ring r);
 
 #ifdef PDEBUG
 void id_DBTest(ideal h1, int level, const char *f,const int l, const ring lR, const ring tR );
+void id_DBLmTest(ideal h1, int level, const char *f,const int l, const ring r);
 #define id_TestTail(A, lR, tR) id_DBTest(A, PDEBUG, __FILE__,__LINE__, lR, tR)
 #define id_Test(A, lR) id_DBTest(A, PDEBUG, __FILE__,__LINE__, lR, lR)
+#define id_LmTest(A, lR) id_DBLmTest(A, PDEBUG, __FILE__,__LINE__, lR)
 #else
 #define id_TestTail(A, lR, tR)  do {} while (0)
 #define id_Test(A, lR) do {} while (0)
+#define id_LmTest(A, lR) do {} while (0)
 #endif
 
 ideal id_Copy (ideal h1,const ring r);
