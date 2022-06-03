@@ -566,7 +566,7 @@ BOOLEAN rComplete(ring r, int force = 0);
 /// set all properties of a new ring - also called by rComplete
 void p_SetGlobals(const ring r, BOOLEAN complete = TRUE);
 
-static inline int rBlocks(ring r)
+static inline int rBlocks(const ring r)
 {
   assume(r != NULL);
   int i=0;

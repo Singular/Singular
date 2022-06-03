@@ -1630,11 +1630,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
 #endif
   hom=(tHomog)idHomModule(h1,NULL,&w); //sets w to weight vector or NULL
   h3=idInit(16,h1->rank);
-  for (k=0;; k++)
-  {
-    if (origR->order[k]!=0) ordersize++;
-    else break;
-  }
+  ordersize=rBlocks(origR)+1;
 #if 0
   if (rIsPluralRing(origR)) // we have too keep the odering: it may be needed
                             // for G-algebra
