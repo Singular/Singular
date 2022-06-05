@@ -278,22 +278,17 @@ intvec * ivAdd(intvec * a, intvec * b)
 
 intvec * ivAddShift(intvec * a, intvec * b, int s)
 {
-  intvec * iv;
-  int mn, ma, i;
   if (a->cols() != b->cols()) return NULL;
-  mn = si_min(a->rows(),b->rows()+s);
-  ma = si_max(a->rows(),b->rows()+s);
   if (a->cols() == 1)
   {
-    iv = new intvec(ma);
-    for (i=0; i<ma; i++)
-    {
-      if ((i<s) && (i<a->rows())) (*iv)[i] = (*a)[i];
-      if ((i>=s) && (i<a->rows()) && (i-s<b->rows()))
-        (*iv)[i] = (*a)[i] + (*b)[i-s];
-      if((i>=s) && (i>=a->rows()) && (i-s<b->rows()))
-        (*iv)[i] = (*b)[i-s];
-    }
+    int i;
+    intvec * iv;
+    int ma = si_max(a->rows(),b->rows()+s);
+    iv=new intvec(ma);
+    for (i=a->rows()-1;i>=0;i--)
+      (*iv)[i] = (*a)[i];
+    for(i=b->rows()+s-1;i>=s;i--)
+      (*iv)[i] += (*b)[i-s];
     return iv;
   }
   return NULL;
