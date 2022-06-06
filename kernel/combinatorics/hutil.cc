@@ -28,24 +28,15 @@ VAR monf stcmem, radmem;
 // global variables, so we might do that here, as well.
 STATIC_VAR scfmon hsecure= NULL;
 
-scfmon hInit(ideal S, ideal Q, int *Nexist, ring src)
+scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
-  id_LmTest(S, src);
-  if (Q!=NULL) id_LmTest(Q, src);
+  id_TestTail(S, currRing, tailRing);
+  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
 
-  hisModule = S->rank;
-  if (hisModule==1)
-  {
-    for(int i=IDELEMS(S)-1;i>=0;i--)
-    {
-      if (S->m[i]!=NULL)
-      {
-        int c=p_GetComp(S->m[i],src);
-	if (c==0) { hisModule=0; break;}
-	else if (c>hisModule) { hisModule=c; }
-      }
-    }
-  }
+//   if (tailRing != currRing)
+    hisModule = id_RankFreeModule(S, currRing, tailRing);
+//  else
+//    hisModule = id_RankFreeModule(S, currRing);
 
   if (hisModule < 0)
     hisModule = 0;
@@ -102,8 +93,8 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring src)
   {
     if (*si!=NULL)
     {
-      *ek = (scmon) omAlloc(((src->N)+1)*sizeof(int));
-      p_GetExpV(*si, *ek, src);
+      *ek = (scmon) omAlloc(((currRing->N)+1)*sizeof(int));
+      p_GetExpV(*si, *ek, currRing);
       ek++;
     }
     si++;
@@ -112,8 +103,8 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring src)
   {
     if (*qi!=NULL)
     {
-      *ek = (scmon) omAlloc(((src->N)+1)*sizeof(int));
-      p_GetExpV(*qi, *ek, src);
+      *ek = (scmon) omAlloc(((currRing->N)+1)*sizeof(int));
+      p_GetExpV(*qi, *ek, currRing);
       ek++;
     }
     qi++;
