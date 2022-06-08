@@ -1944,7 +1944,6 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   if (m==NULL) return TRUE;
   // now make sure that all matrices have the correct size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
-  int i;
   assume (MATCOLS(U) == (int)ul);
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
@@ -8239,7 +8238,7 @@ static BOOLEAN jjRESERVED0(leftv, leftv)
 
 static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 {
-  unsigned i=1;
+  int i=1;
   int l = 0;
   int k = 0;
   lists L = (lists)omAllocBin(slists_bin);

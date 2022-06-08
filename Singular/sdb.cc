@@ -120,7 +120,6 @@ void sdb_edit(procinfo *pi)
   {
     Print("cannot edit type %d\n",pi->language);
     close(f);
-    f=NULL;
   }
   else
   {

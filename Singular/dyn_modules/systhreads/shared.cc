@@ -2387,10 +2387,10 @@ public:
   }
   virtual void execute() {
     vector<leftv> argv;
-    for (int i = 0; i <args.size(); i++) {
+    for (unsigned i = 0; i <args.size(); i++) {
       appendArg(argv, args[i]);
     }
-    for (int i = 0; i < deps.size(); i++) {
+    for (unsigned i = 0; i < deps.size(); i++) {
       appendArg(argv, deps[i]->result);
     }
     sleftv val;
@@ -2409,10 +2409,10 @@ public:
   KernelJob(void (*func)(leftv result, leftv arg)) : cfunc(func) { }
   virtual void execute() {
     vector<leftv> argv;
-    for (int i = 0; i <args.size(); i++) {
+    for (unsigned i = 0; i <args.size(); i++) {
       appendArg(argv, args[i]);
     }
-    for (int i = 0; i < deps.size(); i++) {
+    for (unsigned i = 0; i < deps.size(); i++) {
       appendArg(argv, deps[i]->result);
     }
     sleftv val;
@@ -2856,14 +2856,14 @@ static BOOLEAN scheduleJob(leftv result, leftv arg) {
   if (error) {
     return cmd.abort("illegal dependency");
   }
-  for (int i = 0; i < jobs.size(); i++) {
+  for (unsigned i = 0; i < jobs.size(); i++) {
     Job *job = jobs[i];
     if (job->pool) {
       return cmd.abort("job has already been scheduled");
     }
     job->prio = prio;
   }
-  for (int i = 0; i < deps.size(); i++) {
+  for (unsigned i = 0; i < deps.size(); i++) {
     Job *job = deps[i];
     if (!job->pool) {
       return cmd.abort("dependency has not yet been scheduled");
@@ -2874,14 +2874,14 @@ static BOOLEAN scheduleJob(leftv result, leftv arg) {
   }
   pool->scheduler->lock.lock();
   bool cancelled = false;
-  for (int i = 0; i < jobs.size(); i++) {
+  for (unsigned i = 0; i < jobs.size(); i++) {
     jobs[i]->addDep(deps);
   }
-  for (int i = 0; i < deps.size(); i++) {
+  for (unsigned i = 0; i < deps.size(); i++) {
     deps[i]->addNotify(jobs);
     cancelled |= deps[i]->cancelled;
   }
-  for (int i = 0; i < jobs.size(); i++) {
+  for (unsigned i = 0; i < jobs.size(); i++) {
     if (cancelled) {
       jobs[i]->pool = pool;
       pool->cancelJob(jobs[i]);
@@ -2909,7 +2909,6 @@ BOOLEAN currentJob(leftv result, leftv arg) {
 
 
 BOOLEAN threadID(leftv result, leftv arg) {
-  int i;
   if (wrong_num_args("threadID", arg, 0))
     return TRUE;
   result->rtyp = INT_CMD;
@@ -2918,7 +2917,6 @@ BOOLEAN threadID(leftv result, leftv arg) {
 }
 
 BOOLEAN mainThread(leftv result, leftv arg) {
-  int i;
   if (wrong_num_args("mainThread", arg, 0))
     return TRUE;
   result->rtyp = INT_CMD;

@@ -23,7 +23,6 @@ static BOOLEAN kstd(leftv res, leftv args)
     int k=(int)(long)args->next->Data();
     ideal s_h1;
     ideal s_h3;
-    int j;
     ring orig_ring;
     ring syz_ring;
     intvec *w=NULL;
