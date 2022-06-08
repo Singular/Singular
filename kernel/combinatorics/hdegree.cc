@@ -80,7 +80,7 @@ int  scDimInt(ideal S, ideal Q)
   if( Q!=NULL ) id_Test(Q, currRing);
 
   int  mc;
-  hexist = hInit(S, Q, &hNexist, currRing);
+  hexist = hInit(S, Q, &hNexist);
   if (!hNexist)
     return (currRing->N);
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
@@ -289,7 +289,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
 
   intvec *Set=new intvec((currRing->N));
   int  mc,i;
-  hexist = hInit(S, Q, &hNexist, currRing);
+  hexist = hInit(S, Q, &hNexist);
   if (hNexist==0)
   {
     for(i=0; i<(currRing->N); i++)
@@ -797,7 +797,7 @@ static void hDegree(ideal S, ideal Q)
 
   int  di;
   int  mc;
-  hexist = hInit(S, Q, &hNexist, currRing);
+  hexist = hInit(S, Q, &hNexist);
   if (!hNexist)
   {
     hCo = 0;
@@ -944,7 +944,7 @@ static void hDegree0(ideal S, ideal Q)
   if (Q!=NULL) id_LmTest(Q, currRing);
 
   int  mc;
-  hexist = hInit(S, Q, &hNexist, currRing);
+  hexist = hInit(S, Q, &hNexist);
   if (!hNexist)
   {
     hMu = -1;
@@ -1012,7 +1012,7 @@ static void hDegree0(ideal S, ideal Q)
     omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
 }
 
-int  scMult0Int(ideal S, ideal Q, const ring tailRing)
+int  scMult0Int(ideal S, ideal Q)
 {
   id_LmTest(S, currRing);
   if (Q!=NULL) id_LmTest(Q, currRing);
@@ -1098,7 +1098,7 @@ static void hHedgeStep(scmon pure, scfmon stc,
   }
 }
 
-void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
+void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge)
 {
   id_LmTest(S, currRing);
   if (Q!=NULL) id_LmTest(Q, currRing);
@@ -1134,7 +1134,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   if(idElem(S) == 0)
     return;
   hNvar = (currRing->N);
-  hexist = hInit(S, Q, &hNexist, tailRing); // tailRing?
+  hexist = hInit(S, Q, &hNexist);
   if (k!=0)
     hComp(hexist, hNexist, k, hexist, &hNstc);
   else
@@ -1463,7 +1463,7 @@ ideal scKBase(int deg, ideal s, ideal Q, intvec * mv)
     }
   }
   stcmem = hCreate((currRing->N) - 1);
-  hexist = hInit(s, Q, &hNexist, currRing);
+  hexist = hInit(s, Q, &hNexist);
   p = last = pInit();
   /*pNext(p) = NULL;*/
   act = (scmon)omAlloc(((currRing->N) + 1) * sizeof(int));
@@ -1514,7 +1514,7 @@ ende:
 
 #if 0 //-- alternative implementation of scComputeHC
 /*
-void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
+void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge)
 {
   id_LmTest(ss, currRing);
   if (Q!=NULL) id_LmTest(Q, currRing);
@@ -1532,7 +1532,7 @@ void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
   }
   di = scDimInt(s, Q);
   stcmem = hCreate((currRing->N) - 1);
-  hexist = hInit(s, Q, &hNexist, currRing);
+  hexist = hInit(s, Q, &hNexist);
   p = last = pInit();
   // pNext(p) = NULL;
   act = (scmon)omAlloc(((currRing->N) + 1) * sizeof(int));

@@ -11,9 +11,9 @@
 #include "kernel/polys.h"
 #include "misc/intvec.h"
 
-void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
+void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge);
 #if 0 // - alternative implementation for tests
-void scComputeHCw(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
+void scComputeHCw(ideal s,ideal Q, int  k,poly &hEdge);
 #endif
 
 intvec * scIndIntvec(ideal S, ideal Q=NULL);
@@ -25,7 +25,7 @@ int scDimInt(ideal  s,ideal Q=NULL);
 /// scDimInt for ring-coefficients
 int scDimIntRing(ideal  s,ideal Q=NULL);
 int scMultInt(ideal  s,ideal Q=NULL);
-int scMult0Int(ideal  s,ideal Q=NULL, const ring tailRing = currRing);
+int scMult0Int(ideal  s,ideal Q=NULL);
 void scPrintDegree(int co, int mu);
 void scDegree(ideal  s,intvec *modulweight,ideal Q=NULL);
 

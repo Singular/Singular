@@ -28,15 +28,12 @@ VAR monf stcmem, radmem;
 // global variables, so we might do that here, as well.
 STATIC_VAR scfmon hsecure= NULL;
 
-scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
+scfmon hInit(ideal S, ideal Q, int *Nexist)
 {
   id_LmTest(S, currRing);
   if (Q!=NULL) id_LmTest(Q, currRing);
 
-//   if (tailRing != currRing)
-    hisModule = id_RankFreeModule(S, currRing, tailRing);
-//  else
-//    hisModule = id_RankFreeModule(S, currRing);
+  hisModule = id_RankFreeModule(S, currRing);
 
   if (hisModule < 0)
     hisModule = 0;

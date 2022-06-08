@@ -1107,7 +1107,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   indset save;
   lists res=(lists)omAlloc0Bin(slists_bin);
 
-  hexist = hInit(S, Q, &hNexist, currRing);
+  hexist = hInit(S, Q, &hNexist);
   if (hNexist == 0)
   {
     intvec *iv=new intvec(rVar(currRing));

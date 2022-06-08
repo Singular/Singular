@@ -10741,11 +10741,11 @@ BOOLEAN newHEdge(kStrategy strat)
 
 #if 0
   if (currRing->weight_all_1)
-    scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether, strat->tailRing);
+    scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether);
   else
-    scComputeHCw(strat->Shdl,NULL,strat->ak,strat->kNoether, strat->tailRing);
+    scComputeHCw(strat->Shdl,NULL,strat->ak,strat->kNoether);
 #else
-  scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether, strat->tailRing);
+  scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether);
 #endif
   if (strat->kNoether==NULL) return FALSE;
   if (strat->t_kNoether != NULL)
