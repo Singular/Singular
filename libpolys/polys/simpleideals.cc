@@ -844,8 +844,6 @@ BOOLEAN idIs0 (ideal h)
 /// return the maximal component number found in any polynomial in s
 long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
 {
-  id_TestTail(s, lmRing, tailRing);
-
   long j = 0;
 
   if (rRing_has_Comp(tailRing) && rRing_has_Comp(lmRing))
