@@ -17,6 +17,7 @@
 #include "polys/monomials/ring.h"
 #include "polys/monomials/p_polys.h"
 #include "polys/simpleideals.h"
+#include "polys/weight.h"
 
 #if SIZEOF_LONG == 8
 #define OVERFLOW_MAX LONG_MAX
@@ -48,278 +49,9 @@
 #include <iostream>
 #endif
 
-STATIC_VAR int64  **Qpol;
-STATIC_VAR int64  *Q0, *Ql;
-STATIC_VAR int  hLength;
-
-
-static int hMinModulweight(intvec *modulweight)
-{
-  int i,j,k;
-
-  if(modulweight==NULL) return 0;
-  j=(*modulweight)[0];
-  for(i=modulweight->rows()-1;i!=0;i--)
-  {
-    k=(*modulweight)[i];
-    if(k<j) j=k;
-  }
-  return j;
-}
-
-static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
-{
-  int  i, j;
-  int  x, y, z = 1;
-  int64  *p;
-  for (i = Nvar; i>0; i--)
-  {
-    x = 0;
-    for (j = 0; j < Nstc; j++)
-    {
-      y = stc[j][var[i]];
-      if (y > x)
-        x = y;
-    }
-    z += x;
-    j = i - 1;
-    if (z > Ql[j])
-    {
-      if (z>(MAX_INT_VAL)/2)
-      {
-       WerrorS("internal arrays too big");
-       return;
-      }
-      p = (int64 *)omAlloc((unsigned long)z * sizeof(int64));
-      if (Ql[j]!=0)
-      {
-        if (j==0)
-          memcpy(p, Qpol[j], Ql[j] * sizeof(int64));
-        omFreeSize((ADDRESS)Qpol[j], Ql[j] * sizeof(int64));
-      }
-      if (j==0)
-      {
-        for (x = Ql[j]; x < z; x++)
-          p[x] = 0;
-      }
-      Ql[j] = z;
-      Qpol[j] = p;
-    }
-  }
-}
-
-static int64 *hAddHilb(int Nv, int x, int64 *pol, int *lp)
-{
-  int  l = *lp, ln, i;
-  int64  *pon;
-  *lp = ln = l + x;
-  pon = Qpol[Nv];
-  memcpy(pon, pol, l * sizeof(int64));
-  if (l > x)
-  {/*pon[i] -= pol[i - x];*/
-    for (i = x; i < l; i++)
-    {
-      #ifndef __SIZEOF_INT128__
-      int64 t=pon[i];
-      int64 t2=pol[i - x];
-      t-=t2;
-      if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pon[i]=t;
-      else if (!errorreported) WerrorS("int overflow in hilb 1");
-      #else
-      __int128 t=pon[i];
-      __int128 t2=pol[i - x];
-      t-=t2;
-      if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pon[i]=t;
-      else if (!errorreported) WerrorS("long int overflow in hilb 1");
-      #endif
-    }
-    for (i = l; i < ln; i++)
-    { /*pon[i] = -pol[i - x];*/
-      #ifndef __SIZEOF_INT128__
-      int64 t= -pol[i - x];
-      if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pon[i]=t;
-      else if (!errorreported) WerrorS("int overflow in hilb 2");
-      #else
-      __int128 t= -pol[i - x];
-      if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pon[i]=t;
-      else if (!errorreported) WerrorS("long int overflow in hilb 2");
-      #endif
-    }
-  }
-  else
-  {
-    for (i = l; i < x; i++)
-      pon[i] = 0;
-    for (i = x; i < ln; i++)
-      pon[i] = -pol[i - x];
-  }
-  return pon;
-}
-
-static void hLastHilb(scmon pure, int Nv, varset var, int64 *pol, int lp)
-{
-  int  l = lp, x, i, j;
-  int64  *pl;
-  int64  *p;
-  p = pol;
-  for (i = Nv; i>0; i--)
-  {
-    x = pure[var[i + 1]];
-    if (x!=0)
-      p = hAddHilb(i, x, p, &l);
-  }
-  pl = *Qpol;
-  j = Q0[Nv + 1];
-  for (i = 0; i < l; i++)
-  { /* pl[i + j] += p[i];*/
-    #ifndef __SIZEOF_INT128__
-    int64 t=pl[i+j];
-    int64 t2=p[i];
-    t+=t2;
-    if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pl[i+j]=t;
-    else if (!errorreported) WerrorS("int overflow in hilb 3");
-    #else
-    __int128 t=pl[i+j];
-    __int128 t2=p[i];
-    t+=t2;
-    if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pl[i+j]=t;
-    else if (!errorreported) WerrorS("long int overflow in hilb 3");
-    #endif
-  }
-  x = pure[var[1]];
-  if (x!=0)
-  {
-    j += x;
-    for (i = 0; i < l; i++)
-    { /* pl[i + j] -= p[i];*/
-      #ifndef __SIZEOF_INT128__
-      int64 t=pl[i+j];
-      int64 t2=p[i];
-      t-=t2;
-      if ((t>=OVERFLOW_MIN)&&(t<=OVERFLOW_MAX)) pl[i+j]=t;
-      else if (!errorreported) WerrorS("int overflow in hilb 4");
-      #else
-      __int128 t=pl[i+j];
-      __int128 t2=p[i];
-      t-=t2;
-      if ((t>=LONG_MIN)&&(t<=LONG_MAX)) pl[i+j]=t;
-      else if (!errorreported) WerrorS("long int overflow in hilb 4");
-      #endif
-    }
-  }
-  j += l;
-  if (j > hLength)
-    hLength = j;
-}
-
-static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
- int Nvar, int64 *pol, int Lpol)
-{
-  int  iv = Nvar -1, ln, a, a0, a1, b, i;
-  int  x, x0;
-  scmon pn;
-  scfmon sn;
-  int64  *pon;
-  if (Nstc==0)
-  {
-    hLastHilb(pure, iv, var, pol, Lpol);
-    return;
-  }
-  x = a = 0;
-  pn = hGetpure(pure);
-  sn = hGetmem(Nstc, stc, stcmem[iv]);
-  hStepS(sn, Nstc, var, Nvar, &a, &x);
-  Q0[iv] = Q0[Nvar];
-  ln = Lpol;
-  pon = pol;
-  if (a == Nstc)
-  {
-    x = pure[var[Nvar]];
-    if (x!=0)
-      pon = hAddHilb(iv, x, pon, &ln);
-    hHilbStep(pn, sn, a, var, iv, pon, ln);
-    return;
-  }
-  else
-  {
-    pon = hAddHilb(iv, x, pon, &ln);
-    hHilbStep(pn, sn, a, var, iv, pon, ln);
-  }
-  b = a;
-  x0 = 0;
-  loop
-  {
-    Q0[iv] += (x - x0);
-    a0 = a;
-    x0 = x;
-    hStepS(sn, Nstc, var, Nvar, &a, &x);
-    hElimS(sn, &b, a0, a, var, iv);
-    a1 = a;
-    hPure(sn, a0, &a1, var, iv, pn, &i);
-    hLex2S(sn, b, a0, a1, var, iv, hwork);
-    b += (a1 - a0);
-    ln = Lpol;
-    if (a < Nstc)
-    {
-      pon = hAddHilb(iv, x - x0, pol, &ln);
-      hHilbStep(pn, sn, b, var, iv, pon, ln);
-    }
-    else
-    {
-      x = pure[var[Nvar]];
-      if (x!=0)
-        pon = hAddHilb(iv, x - x0, pol, &ln);
-      else
-        pon = pol;
-      hHilbStep(pn, sn, b, var, iv, pon, ln);
-      return;
-    }
-  }
-}
-
 /*
 *basic routines
 */
-static void hWDegree(intvec *wdegree)
-{
-  int i, k;
-  int x;
-
-  for (i=(currRing->N); i; i--)
-  {
-    x = (*wdegree)[i-1];
-    if (x != 1)
-    {
-      for (k=hNexist-1; k>=0; k--)
-      {
-        hexist[k][i] *= x;
-      }
-    }
-  }
-}
-// ---------------------------------- ADICHANGES ---------------------------------------------
-//!!!!!!!!!!!!!!!!!!!!! Just for Monomial Ideals !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-#if 0 // unused
-//Tests if the ideal is sorted by degree
-static bool idDegSortTest(ideal I)
-{
-    if((I == NULL)||(idIs0(I)))
-    {
-        return(TRUE);
-    }
-    for(int i = 0; i<IDELEMS(I)-1; i++)
-    {
-        if(p_Totaldegree(I->m[i],currRing)>p_Totaldegree(I->m[i+1],currRing))
-        {
-            idPrint(I);
-            WerrorS("Ideal is not deg sorted!!");
-            return(FALSE);
-        }
-    }
-    return(TRUE);
-}
-#endif
 
 //adds the new polynomial at the coresponding position
 //and simplifies the ideal, destroys p
@@ -545,200 +277,6 @@ static poly ChoosePVar (ideal I)
     return(NULL); //i.e. it is the maximal ideal
 }
 
-#if 0 // unused
-//choice XL: last entry divided by x (xy10z15 -> y9z14)
-static poly ChoosePXL(ideal I)
-{
-    int i,j,dummy=0;
-    poly m;
-    for(i = IDELEMS(I)-1; (i>=0) && (dummy == 0); i--)
-    {
-        for(j = 1; (j<=currRing->N) && (dummy == 0); j++)
-        {
-            if(p_GetExp(I->m[i],j, currRing)>1)
-            {
-                dummy = 1;
-            }
-        }
-    }
-    m = p_Copy(I->m[i+1],currRing);
-    for(j = 1; j<=currRing->N; j++)
-    {
-        dummy = p_GetExp(m,j,currRing);
-        if(dummy >= 1)
-        {
-            p_SetExp(m, j, dummy-1, currRing);
-        }
-    }
-    if(!p_IsOne(m, currRing))
-    {
-        p_Setm(m, currRing);
-        return(m);
-    }
-    m = ChoosePVar(I);
-    return(m);
-}
-#endif
-
-#if 0 // unused
-//choice XF: first entry divided by x (xy10z15 -> y9z14)
-static poly ChoosePXF(ideal I)
-{
-    int i,j,dummy=0;
-    poly m;
-    for(i =0 ; (i<=IDELEMS(I)-1) && (dummy == 0); i++)
-    {
-        for(j = 1; (j<=currRing->N) && (dummy == 0); j++)
-        {
-            if(p_GetExp(I->m[i],j, currRing)>1)
-            {
-                dummy = 1;
-            }
-        }
-    }
-    m = p_Copy(I->m[i-1],currRing);
-    for(j = 1; j<=currRing->N; j++)
-    {
-        dummy = p_GetExp(m,j,currRing);
-        if(dummy >= 1)
-        {
-            p_SetExp(m, j, dummy-1, currRing);
-        }
-    }
-    if(!p_IsOne(m, currRing))
-    {
-        p_Setm(m, currRing);
-        return(m);
-    }
-    m = ChoosePVar(I);
-    return(m);
-}
-#endif
-
-#if 0 // unused
-//choice OL: last entry the first power (xy10z15 -> xy9z15)
-static poly ChoosePOL(ideal I)
-{
-    int i,j,dummy;
-    poly m;
-    for(i = IDELEMS(I)-1;i>=0;i--)
-    {
-        m = p_Copy(I->m[i],currRing);
-        for(j=1;j<=currRing->N;j++)
-        {
-            dummy = p_GetExp(m,j,currRing);
-            if(dummy > 0)
-            {
-                p_SetExp(m,j,dummy-1,currRing);
-                p_Setm(m,currRing);
-            }
-        }
-        if(!p_IsOne(m, currRing))
-        {
-            return(m);
-        }
-        else
-        {
-            p_Delete(&m,currRing);
-        }
-    }
-    m = ChoosePVar(I);
-    return(m);
-}
-#endif
-
-#if 0 // unused
-//choice OF: first entry the first power (xy10z15 -> xy9z15)
-static poly ChoosePOF(ideal I)
-{
-    int i,j,dummy;
-    poly m;
-    for(i = 0 ;i<=IDELEMS(I)-1;i++)
-    {
-        m = p_Copy(I->m[i],currRing);
-        for(j=1;j<=currRing->N;j++)
-        {
-            dummy = p_GetExp(m,j,currRing);
-            if(dummy > 0)
-            {
-                p_SetExp(m,j,dummy-1,currRing);
-                p_Setm(m,currRing);
-            }
-        }
-        if(!p_IsOne(m, currRing))
-        {
-            return(m);
-        }
-        else
-        {
-            p_Delete(&m,currRing);
-        }
-    }
-    m = ChoosePVar(I);
-    return(m);
-}
-#endif
-
-#if 0 // unused
-//choice VL: last entry the first variable with power (xy10z15 -> y)
-static poly ChoosePVL(ideal I)
-{
-    int i,j,dummy;
-    bool flag = TRUE;
-    poly m = p_ISet(1,currRing);
-    for(i = IDELEMS(I)-1;(i>=0) && (flag);i--)
-    {
-        flag = TRUE;
-        for(j=1;(j<=currRing->N) && (flag);j++)
-        {
-            dummy = p_GetExp(I->m[i],j,currRing);
-            if(dummy >= 2)
-            {
-                p_SetExp(m,j,1,currRing);
-                p_Setm(m,currRing);
-                flag = FALSE;
-            }
-        }
-        if(!p_IsOne(m, currRing))
-        {
-            return(m);
-        }
-    }
-    m = ChoosePVar(I);
-    return(m);
-}
-#endif
-
-#if 0 // unused
-//choice VF: first entry the first variable with power (xy10z15 -> y)
-static poly ChoosePVF(ideal I)
-{
-    int i,j,dummy;
-    bool flag = TRUE;
-    poly m = p_ISet(1,currRing);
-    for(i = 0;(i<=IDELEMS(I)-1) && (flag);i++)
-    {
-        flag = TRUE;
-        for(j=1;(j<=currRing->N) && (flag);j++)
-        {
-            dummy = p_GetExp(I->m[i],j,currRing);
-            if(dummy >= 2)
-            {
-                p_SetExp(m,j,1,currRing);
-                p_Setm(m,currRing);
-                flag = FALSE;
-            }
-        }
-        if(!p_IsOne(m, currRing))
-        {
-            return(m);
-        }
-    }
-    m = ChoosePVar(I);
-    return(m);
-}
-#endif
-
 //choice JL: last entry just variable with power (xy10z15 -> y10)
 static poly ChoosePJL(ideal I)
 {
@@ -768,49 +306,11 @@ static poly ChoosePJL(ideal I)
   return(m);
 }
 
-#if 0
-//choice JF: last entry just variable with power -1 (xy10z15 -> y9)
-static poly ChoosePJF(ideal I)
-{
-    int i,j,dummy;
-    bool flag = TRUE;
-    poly m = p_ISet(1,currRing);
-    for(i = 0;(i<=IDELEMS(I)-1) && (flag);i++)
-    {
-        flag = TRUE;
-        for(j=1;(j<=currRing->N) && (flag);j++)
-        {
-            dummy = p_GetExp(I->m[i],j,currRing);
-            if(dummy >= 2)
-            {
-                p_SetExp(m,j,dummy-1,currRing);
-                p_Setm(m,currRing);
-                flag = FALSE;
-            }
-        }
-        if(!p_IsOne(m, currRing))
-        {
-            return(m);
-        }
-    }
-    m = ChoosePVar(I);
-    return(m);
-}
-#endif
-
 //chooses 1 \neq p \not\in S. This choice should be made optimal
 static poly ChooseP(ideal I)
 {
   poly m;
-  //  TEST TO SEE WHICH ONE IS BETTER
-  //m = ChoosePXL(I);
-  //m = ChoosePXF(I);
-  //m = ChoosePOL(I);
-  //m = ChoosePOF(I);
-  //m = ChoosePVL(I);
-  //m = ChoosePVF(I);
   m = ChoosePJL(I);
-  //m = ChoosePJF(I);
   return(m);
 }
 
@@ -843,32 +343,11 @@ static poly SearchP(ideal I)
 //test if the ideal is of the form (x1, ..., xr)
 static bool JustVar(ideal I)
 {
-    #if 0
-    int i,j;
-    bool foundone;
-    for(i=0;i<=IDELEMS(I)-1;i++)
-    {
-        foundone = FALSE;
-        for(j = 1;j<=currRing->N;j++)
-        {
-            if(p_GetExp(I->m[i], j, currRing)>0)
-            {
-                if(foundone == TRUE)
-                {
-                    return(FALSE);
-                }
-                foundone = TRUE;
-            }
-        }
-    }
-    return(TRUE);
-    #else
     if(p_Totaldegree(I->m[IDELEMS(I)-1],currRing)>1)
     {
         return(FALSE);
     }
     return(TRUE);
-    #endif
 }
 
 //computes the Euler Characteristic of the ideal
@@ -1009,7 +488,7 @@ static poly LCMmon(ideal I)
 }
 
 //the Roune Slice Algorithm
-void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, int &steps, int &NNN, mpz_ptr &hilbertcoef, int* &hilbpower)
+static void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, int &steps, int &NNN, mpz_ptr &hilbertcoef, int* &hilbpower)
 {
   loop
   {
@@ -1206,180 +685,6 @@ void slicehilb(ideal I)
     //printf("\n-------------------------------------\n");
 }
 
-// -------------------------------- END OF CHANGES -------------------------------------------
-static intvec * hSeries(ideal S, intvec *modulweight,
-                int /*notstc*/, intvec *wdegree, ideal Q, ring tailRing)
-{
-//  id_TestTail(S, currRing, tailRing);
-
-  intvec *work, *hseries1=NULL;
-  int  mc;
-  int64  p0;
-  int  i, j, k, l, ii, mw;
-  hexist = hInit(S, Q, &hNexist, tailRing);
-  if (hNexist==0)
-  {
-    hseries1=new intvec(2);
-    (*hseries1)[0]=1;
-    (*hseries1)[1]=0;
-    return hseries1;
-  }
-
-  #if 0
-  if (wdegree == NULL)
-    hWeight();
-  else
-    hWDegree(wdegree);
-  #else
-  if (wdegree != NULL) hWDegree(wdegree);
-  #endif
-
-  p0 = 1;
-  hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
-  hvar = (varset)omAlloc(((currRing->N) + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + ((currRing->N) * (currRing->N))) * sizeof(int));
-  stcmem = hCreate((currRing->N) - 1);
-  Qpol = (int64 **)omAlloc(((currRing->N) + 1) * sizeof(int64 *));
-  Ql = (int64 *)omAlloc0(((currRing->N) + 1) * sizeof(int64));
-  Q0 = (int64 *)omAlloc(((currRing->N) + 1) * sizeof(int64));
-  *Qpol = NULL;
-  hLength = k = j = 0;
-  mc = hisModule;
-  if (mc!=0)
-  {
-    mw = hMinModulweight(modulweight);
-    hstc = (scfmon)omAlloc(hNexist * sizeof(scmon));
-  }
-  else
-  {
-    mw = 0;
-    hstc = hexist;
-    hNstc = hNexist;
-  }
-  loop
-  {
-    if (mc!=0)
-    {
-      hComp(hexist, hNexist, mc, hstc, &hNstc);
-      if (modulweight != NULL)
-        j = (*modulweight)[mc-1]-mw;
-    }
-    if (hNstc!=0)
-    {
-      hNvar = (currRing->N);
-      for (i = hNvar; i>=0; i--)
-        hvar[i] = i;
-      //if (notstc) // TODO: no mon divides another
-        hStaircase(hstc, &hNstc, hvar, hNvar);
-      hSupp(hstc, hNstc, hvar, &hNvar);
-      if (hNvar!=0)
-      {
-        if ((hNvar > 2) && (hNstc > 10))
-          hOrdSupp(hstc, hNstc, hvar, hNvar);
-        hHilbEst(hstc, hNstc, hvar, hNvar);
-        memset(hpure, 0, ((currRing->N) + 1) * sizeof(int));
-        hPure(hstc, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
-        hLexS(hstc, hNstc, hvar, hNvar);
-        Q0[hNvar] = 0;
-        hHilbStep(hpure, hstc, hNstc, hvar, hNvar, &p0, 1);
-      }
-    }
-    else
-    {
-      if(*Qpol!=NULL)
-        (**Qpol)++;
-      else
-      {
-        *Qpol = (int64 *)omAlloc(sizeof(int64));
-        hLength = *Ql = **Qpol = 1;
-      }
-    }
-    if (*Qpol!=NULL)
-    {
-      i = hLength;
-      while ((i > 0) && ((*Qpol)[i - 1] == 0))
-        i--;
-      if (i > 0)
-      {
-        l = i + j;
-        if (l > k)
-        {
-          work = new intvec(l);
-          for (ii=0; ii<k; ii++)
-            (*work)[ii] = (*hseries1)[ii];
-          if (hseries1 != NULL)
-            delete hseries1;
-          hseries1 = work;
-          k = l;
-        }
-        while (i > 0)
-        {
-          (*hseries1)[i + j - 1] += (*Qpol)[i - 1];
-          (*Qpol)[i - 1] = 0;
-          i--;
-        }
-      }
-    }
-    mc--;
-    if (mc <= 0)
-      break;
-  }
-  if (k==0)
-  {
-    hseries1=new intvec(2);
-    (*hseries1)[0]=0;
-    (*hseries1)[1]=0;
-  }
-  else
-  {
-    l = k+1;
-    while ((*hseries1)[l-2]==0) l--;
-    if (l!=k)
-    {
-      work = new intvec(l);
-      for (ii=l-2; ii>=0; ii--)
-        (*work)[ii] = (*hseries1)[ii];
-      delete hseries1;
-      hseries1 = work;
-    }
-    (*hseries1)[l-1] = mw;
-  }
-  for (i = 0; i <= (currRing->N); i++)
-  {
-    if (Ql[i]!=0)
-      omFreeSize((ADDRESS)Qpol[i], Ql[i] * sizeof(int64));
-  }
-  omFreeSize((ADDRESS)Q0, ((currRing->N) + 1) * sizeof(int64));
-  omFreeSize((ADDRESS)Ql, ((currRing->N) + 1) * sizeof(int64));
-  omFreeSize((ADDRESS)Qpol, ((currRing->N) + 1) * sizeof(int64 *));
-  hKill(stcmem, (currRing->N) - 1);
-  omFreeSize((ADDRESS)hpure, (1 + ((currRing->N) * (currRing->N))) * sizeof(int));
-  omFreeSize((ADDRESS)hvar, ((currRing->N) + 1) * sizeof(int));
-  omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
-  hDelete(hexist, hNexist);
-  if (hisModule!=0)
-    omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
-  return hseries1;
-}
-
-
-intvec * hHstdSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
-{
-  id_TestTail(S, currRing, tailRing);
-  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
-  return hSeries(S, modulweight, 0, wdegree, Q, tailRing);
-}
-
-intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
-{
-  id_TestTail(S, currRing, tailRing);
-  if (Q!= NULL) id_TestTail(Q, currRing, tailRing);
-
-  intvec *hseries1= hSeries(S, modulweight, 1, wdegree, Q, tailRing);
-  if (errorreported) { delete hseries1; hseries1=NULL; }
-  return hseries1;
-}
-
 intvec * hSecondSeries(intvec *hseries1)
 {
   intvec *work, *hseries2;
@@ -1459,11 +764,11 @@ static void hPrintHilb(intvec *hseries,intvec *modul_weight)
 /*
 *caller
 */
-void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
+void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring src)
 {
-  id_TestTail(S, currRing, tailRing);
+  id_LmTest(S, currRing);
 
-  intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree, tailRing);
+  intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree, src);
   if (errorreported) return;
 
   hPrintHilb(hseries1,modulweight);
@@ -1801,7 +1106,7 @@ static int monCompare( const void *m, const void *n)
  return(p_Compare(*(poly*) m, *(poly*)n, currRing));
 }
 
-void sortMonoIdeal_pCompare(ideal I)
+static void sortMonoIdeal_pCompare(ideal I)
 {
   /*
    * sorts monomial ideal in ascending order
@@ -2011,13 +1316,13 @@ static ideal colonIdeal(ideal S, poly w, int lV, ideal Jwi, int trunDegHs)
 
 void HilbertSeries_OrbitData(ideal S, int lV, bool IG_CASE, bool mgrad, bool odp, int trunDegHs)
 {
-	
-	/* new story: 
-	no lV is needed, i.e.  it is to be determined
-	the rest is extracted from the interface input list in extra.cc and makes the input of this proc
-	called from extra.cc
-	*/
-	
+
+        /* new story:
+        no lV is needed, i.e.  it is to be determined
+        the rest is extracted from the interface input list in extra.cc and makes the input of this proc
+        called from extra.cc
+        */
+
   /*
    * This is based on iterative right colon operations on a
    * two-sided monomial ideal of the free associative algebra.
@@ -2369,3 +1674,235 @@ ideal RightColonOperation(ideal S, poly w, int lV)
   return (Iw);
 }
 
+/* ------------------------------------------------------------------------ */
+
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/*
+*  ABSTRACT -  Hilbert series
+*/
+
+#include "kernel/mod2.h"
+
+#include "misc/mylimits.h"
+#include "misc/intvec.h"
+
+#include "polys/monomials/ring.h"
+#include "polys/monomials/p_polys.h"
+#include "polys/simpleideals.h"
+#include "coeffs/coeffs.h"
+
+#include "kernel/ideals.h"
+
+static void p_Div_hi(poly p, const int* exp_q, const ring src)
+{
+  // e=max(0,p-q) for all exps
+  for(int i=1;i<=src->N;i++)
+  {
+    p_SetExp(p,i,si_max(0L,p_GetExp(p,i,src)-exp_q[i]),src);
+  }
+  p_Setm(p,src);
+}
+
+poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
+// accoding to:
+// Algorithm 2.6 of 
+// Dave Bayer, Mike Stillman - Computation of Hilbert Function
+// J.Symbolic Computaion (1992) 14, 31-50
+{
+  int r=id_Elem(A,src);
+  poly h=NULL;
+  if (r==0)
+    return p_One(Qt);
+  else
+  {
+    if (wdegree!=NULL)
+    {
+      int* exp=(int*)omAlloc((src->N+1)*sizeof(int));
+      for(int i=IDELEMS(A)-1; i>=0;i--)
+      {
+        if (A->m[i]!=NULL)
+        {
+          p_GetExpV(A->m[i],exp,src);
+          for(int j=src->N;j>0;j--)
+            exp[j]*=ABS((*wdegree)[j-1]);
+          p_SetExpV(A->m[i],exp,src);
+          p_Setm(A->m[i],src);
+        }
+      }
+      omFreeSize(exp,(src->N+1)*sizeof(int));
+    }
+    //Print("start hilbert_series, r=%d\n",r);
+    h=p_One(Qt);
+    p_SetExp(h,1,p_Totaldegree(A->m[0],src),Qt);
+    p_Setm(h,Qt);
+    h=p_Neg(h,Qt);
+    h=p_Add_q(h,p_One(Qt),Qt);
+  }
+  int i;
+  int *exp_q=(int*)omAlloc((src->N+1)*sizeof(int));
+  for (i=1;i<r;i++)
+  {
+    ideal J=id_Copy(A,src);
+    for (int ii=i;ii<r;ii++) p_Delete(&J->m[ii],src);
+    idSkipZeroes(J);
+    for(int ii=1;ii<=src->N;ii++)
+      exp_q[ii]=p_GetExp(A->m[i],ii,src);
+    for(int ii=0;ii<i;ii++) p_Div_hi(J->m[ii],exp_q,src);
+    id_DelDiv(J,src);
+    // search linear elems:
+    int k=0;
+    for (int ii=0;ii<IDELEMS(J);ii++)
+    {
+      if((J->m[ii]!=NULL) && (p_Totaldegree(J->m[ii],src)==1))
+      {
+        k++;
+        p_Delete(&J->m[ii],src);
+      }
+    }
+    idSkipZeroes(J);
+    poly h_J=hilbert_series(J,src,NULL,Qt);// J_1
+    poly tmp;
+    if (k>0)
+    {
+      // hilbert_series of unmodified J:
+      tmp=p_One(Qt);
+      p_SetExp(tmp,1,1,Qt);
+      tmp=p_Neg(tmp,Qt);
+      tmp=p_Add_q(tmp,p_One(Qt),Qt);
+      if (k>1)
+      {
+        tmp=p_Power(tmp,k,Qt); // (1-t)^k
+      }
+      h_J=p_Mult_q(h_J,tmp,Qt);
+    }
+    // forget about J:
+    id_Delete(&J,src);
+    // t^|A_i|
+    tmp=p_One(Qt);
+    p_SetExp(tmp,1,p_Totaldegree(A->m[i],src),Qt);
+    tmp=p_Neg(tmp,Qt);
+    tmp=p_Mult_q(tmp,h_J,Qt);
+    h=p_Add_q(h,tmp,Qt);
+  }
+  omFreeSize(exp_q,(src->N+1)*sizeof(int));
+  //Print("end hilbert_series, r=%d\n",r);
+  return h;
+}
+
+static ring makeQt()
+{
+  ring Qt=(ring) omAlloc0Bin(sip_sring_bin);
+  Qt->cf = nInitChar(n_Q, NULL);
+  Qt->N=1;
+  Qt->names=(char**)omAlloc(sizeof(char_ptr));
+  Qt->names[0]=omStrDup("t");
+  Qt->wvhdl=(int **)omAlloc0(3 * sizeof(int_ptr));
+  Qt->order = (rRingOrder_t *) omAlloc(3 * sizeof(rRingOrder_t *));
+  Qt->block0 = (int *)omAlloc0(3 * sizeof(int *));
+  Qt->block1 = (int *)omAlloc0(3 * sizeof(int *));
+  /* ringorder lp for the first block: var 1 */
+  Qt->order[0]  = ringorder_lp;
+  Qt->block0[0] = 1;
+  Qt->block1[0] = 1;
+  /* ringorder C for the second block: no vars */
+  Qt->order[1]  = ringorder_C;
+  /* the last block: everything is 0 */
+  Qt->order[2]  = (rRingOrder_t)0;
+  rComplete(Qt);
+  return Qt;
+}
+
+intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
+{
+  A=id_Head(A,src);
+  id_Test(A,src);
+  ideal AA;
+  if (Q!=NULL)
+  {
+    ideal QQ=id_Head(Q,src);
+    AA=id_SimpleAdd(A,QQ,src);
+    id_Delete(&QQ,src);
+    id_Delete(&A,src);
+  }
+  else AA=A;
+  id_DelDiv(AA,src);
+  idSkipZeroes(AA);
+  poly s=hilbert_series(AA,src,wdegree,Qt);
+  id_Delete(&AA,src);
+  intvec *ss;
+  if (s==NULL)
+    ss=new intvec(2);
+  else
+  {
+    ss=new intvec(p_Totaldegree(s,Qt)+2);
+    while(s!=NULL)
+    {
+      int i=p_Totaldegree(s,Qt);
+      (*ss)[i]=n_Int(pGetCoeff(s),Qt->cf);
+      p_LmDelete(&s,Qt);
+    }
+  }
+  return ss;
+}
+
+static ideal getModuleComp(ideal A, int c, const ring src)
+{
+  ideal res=idInit(IDELEMS(A),A->rank);
+  for (int i=0;i<IDELEMS(A);i++)
+  {
+    if ((A->m[i]!=NULL) && (p_GetComp(A->m[i],src)==c))
+      res->m[i]=p_Head(A->m[i],src);
+  }
+  return res;
+}
+
+static BOOLEAN isModule(ideal A, const ring src)
+{
+  for (int i=0;i<IDELEMS(A);i++)
+  {
+    if (A->m[i]!=NULL)
+    {
+      if (p_GetComp(A->m[i],src)>0)
+        return TRUE;
+      else
+        return FALSE;
+    }
+  }
+  return FALSE;
+}
+
+
+intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree, ring src)
+{
+  static ring hilb_Qt=NULL;
+  if (hilb_Qt==NULL) hilb_Qt=makeQt();
+  if (!isModule(A,src))
+    return hFirstSeries0(A,Q,wdegree,src,hilb_Qt);
+  intvec *res=NULL;
+  int w_max=0,w_min=0;
+  if (module_w!=NULL)
+  {
+    w_max=module_w->max_in();
+    w_min=module_w->min_in();
+  }
+  for(int c=1;c<=A->rank;c++)
+  {
+    ideal Ac=getModuleComp(A,c,src);
+    intvec *res_c=hFirstSeries0(Ac,Q,wdegree,src,hilb_Qt);
+    intvec *tmp=NULL;
+    if (res==NULL)
+      res=new intvec(res_c->length()+(w_max-w_min));
+    if ((module_w==NULL) || ((*module_w)[c-1]==0)) tmp=ivAdd(res,res_c);
+    else tmp=ivAddShift(res, res_c,(*module_w)[c-1]-w_min);
+    delete res_c;
+    if (tmp!=NULL)
+    {
+      delete res;
+      res=tmp;
+    }
+  }
+  (*res)[res->length()-1]=w_min;
+  return res;
+}

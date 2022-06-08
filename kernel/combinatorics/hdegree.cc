@@ -938,13 +938,13 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   delete hseries2;
 }
 
-static void hDegree0(ideal S, ideal Q, const ring tailRing)
+static void hDegree0(ideal S, ideal Q)
 {
-  id_TestTail(S, currRing, tailRing);
-  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
+  id_LmTest(S, currRing);
+  if (Q!=NULL) id_LmTest(Q, currRing);
 
   int  mc;
-  hexist = hInit(S, Q, &hNexist, tailRing);
+  hexist = hInit(S, Q, &hNexist, currRing);
   if (!hNexist)
   {
     hMu = -1;
@@ -1014,10 +1014,10 @@ static void hDegree0(ideal S, ideal Q, const ring tailRing)
 
 int  scMult0Int(ideal S, ideal Q, const ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);
-  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
+  id_LmTest(S, currRing);
+  if (Q!=NULL) id_LmTest(Q, currRing);
 
-  hDegree0(S, Q, tailRing);
+  hDegree0(S, Q);
   return hMu;
 }
 
@@ -1100,8 +1100,8 @@ static void hHedgeStep(scmon pure, scfmon stc,
 
 void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);
-  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
+  id_LmTest(S, currRing);
+  if (Q!=NULL) id_LmTest(Q, currRing);
 
   int  i;
   int  k = ak;
@@ -1109,17 +1109,17 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
     //consider just monic generators (over rings with zero-divisors)
-    ideal SS=id_Copy(S,tailRing);
+    ideal SS=id_Head(S,currRing);
     for(i=0;i<=idElem(S);i++)
     {
       if((SS->m[i]!=NULL)
-      && ((p_IsPurePower(SS->m[i],tailRing)==0)
-        ||(!n_IsUnit(pGetCoeff(SS->m[i]), tailRing->cf))))
+      && ((p_IsPurePower(SS->m[i],currRing)==0)
+        ||(!n_IsUnit(pGetCoeff(SS->m[i]), currRing->cf))))
       {
-        p_Delete(&SS->m[i],tailRing);
+        p_Delete(&SS->m[i],currRing);
       }
     }
-    S=id_Copy(SS,tailRing);
+    S=id_Copy(SS,currRing);
     idSkipZeroes(S);
   }
   #if 0
@@ -1516,8 +1516,8 @@ ende:
 /*
 void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
-  id_TestTail(ss, currRing, tailRing);
-  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
+  id_LmTest(ss, currRing);
+  if (Q!=NULL) id_LmTest(Q, currRing);
 
   int  i, di;
   poly p;

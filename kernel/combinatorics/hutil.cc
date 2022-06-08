@@ -30,8 +30,8 @@ STATIC_VAR scfmon hsecure= NULL;
 
 scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);
-  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
+  id_LmTest(S, currRing);
+  if (Q!=NULL) id_LmTest(Q, currRing);
 
 //   if (tailRing != currRing)
     hisModule = id_RankFreeModule(S, currRing, tailRing);
