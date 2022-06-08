@@ -77,7 +77,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     // degp = pWDegree;
     l = hilb->length()-1;
     mw = (*hilb)[l];
-    newhilb =hFirstSeries(strat->Shdl,w,Q,strat->kHomW,currRing);
+    newhilb =hFirstSeries(strat->Shdl,w,Q,strat->kHomW);
     ln = newhilb->length()-1;
     deg = degp(strat->P.p,currRing)-mw;
     loop // compare the series in degree deg, try to increase deg -----------
@@ -147,7 +147,7 @@ so delete all the remaining pairs
 
   Lm = id_Head(strat->Shdl,currRing);
 
-  newhilb =hFirstSeries(Lm,w,Q,strat->kHomW,currRing);
+  newhilb =hFirstSeries(Lm,w,Q,strat->kHomW);
 
   if(newhilb->compare(hilb) == 0)
   {

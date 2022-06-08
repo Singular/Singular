@@ -11,11 +11,11 @@
 #include "kernel/polys.h"
 #include "misc/intvec.h"
 
-intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring src = currRing);
+intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL);
 intvec * hFirstSeries0(ideal S, ideal Q, intvec *wdegree, const ring src, const ring Qt);
 poly hilbert_series(ideal A, const ring src,  const intvec *wdegree, const ring Qt);
 
 intvec * hSecondSeries(intvec *hseries1);
 
-void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring src = currRing);
+void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL);
 #endif

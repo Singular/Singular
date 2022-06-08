@@ -1101,6 +1101,7 @@ void iiDebug()
 }
 
 lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
+// S mjust eb an ideal, not a module
 {
   int i;
   indset save;
@@ -1114,11 +1115,6 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
     res->Init(1);
     res->m[0].rtyp=INTVEC_CMD;
     res->m[0].data=(intvec*)iv;
-    return res;
-  }
-  else if (hisModule!=0)
-  {
-    res->Init(0);
     return res;
   }
   save = ISet = (indset)omAlloc0Bin(indlist_bin);

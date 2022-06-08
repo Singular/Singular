@@ -764,11 +764,11 @@ static void hPrintHilb(intvec *hseries,intvec *modul_weight)
 /*
 *caller
 */
-void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring src)
+void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
 {
   id_LmTest(S, currRing);
 
-  intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree, src);
+  intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree);
   if (errorreported) return;
 
   hPrintHilb(hseries1,modulweight);
@@ -1874,12 +1874,12 @@ static BOOLEAN isModule(ideal A, const ring src)
 }
 
 
-intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree, ring src)
+intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
 {
   static ring hilb_Qt=NULL;
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
-  if (!isModule(A,src))
-    return hFirstSeries0(A,Q,wdegree,src,hilb_Qt);
+  if (!isModule(A,currRing))
+    return hFirstSeries0(A,Q,wdegree,currRing,hilb_Qt);
   intvec *res=NULL;
   int w_max=0,w_min=0;
   if (module_w!=NULL)
@@ -1889,8 +1889,8 @@ intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree, ring src
   }
   for(int c=1;c<=A->rank;c++)
   {
-    ideal Ac=getModuleComp(A,c,src);
-    intvec *res_c=hFirstSeries0(Ac,Q,wdegree,src,hilb_Qt);
+    ideal Ac=getModuleComp(A,c,currRing);
+    intvec *res_c=hFirstSeries0(Ac,Q,wdegree,currRing,hilb_Qt);
     intvec *tmp=NULL;
     if (res==NULL)
       res=new intvec(res_c->length()+(w_max-w_min));
