@@ -354,7 +354,7 @@ void id_DelDiv(ideal id, const ring r)
 
   int i, j;
   int k = IDELEMS(id)-1;
-  for (i=k; i>=0; i--)
+  for (i=k-1; i>=0; i--)
   {
     if (id->m[i] != NULL)
     {
