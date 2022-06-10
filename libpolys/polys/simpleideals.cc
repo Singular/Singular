@@ -391,11 +391,11 @@ void id_DelDiv(ideal id, const ring r)
         {
           if (id->m[j]!=NULL)
           {
-            if (p_DivisibleBy(id->m[i], id->m[j],r))
+            if (p_LmDivisibleByNoComp(id->m[i], id->m[j],r))
             {
               p_Delete(&id->m[j],r);
             }
-            else if (p_DivisibleBy(id->m[j], id->m[i],r))
+            else if (p_LmDivisibleByNoComp(id->m[j], id->m[i],r))
             {
               p_Delete(&id->m[i],r);
               break;
@@ -422,13 +422,13 @@ void id_DelDiv_Sorted(ideal id, const ring r)
       {
         if (id->m[j]!=NULL)
         {
-          if (p_DivisibleBy(id->m[i], id->m[j],r))
+          if (p_LmDivisibleByNoComp(id->m[i], id->m[j],r))
           {
             p_Delete(&id->m[j],r);
             if (j==k) k--;
 	    while(id->m[k]==NULL) k--;
           }
-          else if (p_DivisibleBy(id->m[j], id->m[i],r))
+          else if (p_LmDivisibleByNoComp(id->m[j], id->m[i],r))
           {
             p_Delete(&id->m[i],r);
             break;
