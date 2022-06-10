@@ -1734,33 +1734,29 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
   poly h=NULL;
   if (r==0)
     return p_One(Qt);
-  else
+  if (wdegree!=NULL)
   {
-    if (wdegree!=NULL)
+    int* exp=(int*)omAlloc((src->N+1)*sizeof(int));
+    for(int i=IDELEMS(A)-1; i>=0;i--)
     {
-      int* exp=(int*)omAlloc((src->N+1)*sizeof(int));
-      for(int i=IDELEMS(A)-1; i>=0;i--)
+      if (A->m[i]!=NULL)
       {
-        if (A->m[i]!=NULL)
-        {
-          p_GetExpV(A->m[i],exp,src);
-          for(int j=src->N;j>0;j--)
-            exp[j]*=ABS((*wdegree)[j-1]);
-          p_SetExpV(A->m[i],exp,src);
-          p_Setm(A->m[i],src);
-        }
+        p_GetExpV(A->m[i],exp,src);
+        for(int j=src->N;j>0;j--)
+          exp[j]*=ABS((*wdegree)[j-1]);
+        p_SetExpV(A->m[i],exp,src);
+        p_Setm(A->m[i],src);
       }
-      omFreeSize(exp,(src->N+1)*sizeof(int));
     }
-    h=p_One(Qt);
-    p_SetExp(h,1,p_Totaldegree(A->m[0],src),Qt);
-    p_Setm(h,Qt);
-    h=p_Neg(h,Qt);
-    h=p_Add_q(h,p_One(Qt),Qt);
+    omFreeSize(exp,(src->N+1)*sizeof(int));
   }
-  int i;
+  h=p_One(Qt);
+  p_SetExp(h,1,p_Totaldegree(A->m[0],src),Qt);
+  p_Setm(h,Qt);
+  h=p_Neg(h,Qt);
+  h=p_Add_q(h,p_One(Qt),Qt); // 1-t
   int *exp_q=(int*)omAlloc((src->N+1)*sizeof(int));
-  for (i=1;i<r;i++)
+  for (int i=1;i<r;i++)
   {
     //ideal J=id_Copy(A,src);
     //for (int ii=i;ii<r;ii++) p_Delete(&J->m[ii],src);
@@ -1772,7 +1768,7 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
     id_DelDiv_Sorted(J,src);
     // search linear elems:
     int k=0;
-    for (int ii=0;ii<IDELEMS(J);ii++)
+    for (int ii=IDELEMS(J)-1;ii>=0;ii--)
     {
       if((J->m[ii]!=NULL) && (p_Totaldegree(J->m[ii],src)==1))
       {
