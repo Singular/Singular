@@ -1769,7 +1769,7 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
     for(int ii=1;ii<=src->N;ii++)
       exp_q[ii]=p_GetExp(A->m[i],ii,src);
     for(int ii=0;ii<i;ii++) p_Div_hi(J->m[ii],exp_q,src);
-    id_DelDiv(J,src);
+    id_DelDiv_Sorted(J,src);
     // search linear elems:
     int k=0;
     for (int ii=0;ii<IDELEMS(J);ii++)
@@ -1853,7 +1853,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
     }
   }
   else AA=A;
-  id_DelDiv(AA,src);
+  id_DelDiv_Sorted(AA,src);
   idSkipZeroes(AA);
    /* sort */
   if (IDELEMS(AA)>1) qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare,src);

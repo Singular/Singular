@@ -354,16 +354,16 @@ void id_DelDiv(ideal id, const ring r)
 
   int i, j;
   int k = IDELEMS(id)-1;
-  for (i=k-1; i>=0; i--)
-  {
-    if (id->m[i] != NULL)
-    {
-      for (j=k; j>i; j--)
-      {
-        if (id->m[j]!=NULL)
-        {
 #ifdef HAVE_RINGS
-          if (rField_is_Ring(r))
+  if (rField_is_Ring(r))
+  {
+    for (i=k-1; i>=0; i--)
+    {
+      if (id->m[i] != NULL)
+      {
+        for (j=k; j>i; j--)
+        {
+          if (id->m[j]!=NULL)
           {
             if (p_DivisibleByRingCase(id->m[i], id->m[j],r))
             {
@@ -375,10 +375,22 @@ void id_DelDiv(ideal id, const ring r)
               break;
             }
           }
-          else
+        }
+      }
+    }
+  }
+  else
 #endif
+  {
+    /* the case of a coefficient field: */
+    for (i=k-1; i>=0; i--)
+    {
+      if (id->m[i] != NULL)
+      {
+        for (j=k; j>i; j--)
+        {
+          if (id->m[j]!=NULL)
           {
-            /* the case of a coefficient field: */
             if (p_DivisibleBy(id->m[i], id->m[j],r))
             {
               p_Delete(&id->m[j],r);
@@ -388,6 +400,38 @@ void id_DelDiv(ideal id, const ring r)
               p_Delete(&id->m[i],r);
               break;
             }
+          }
+        }
+      }
+    }
+  }
+}
+
+/// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
+void id_DelDiv_Sorted(ideal id, const ring r)
+{
+  id_Test(id, r);
+
+  int i, j;
+  int k = IDELEMS(id)-1;
+  for (i=0; i<k; i++)
+  {
+    if (id->m[i] != NULL)
+    {
+      for (j=i+1; j<=k; j++)
+      {
+        if (id->m[j]!=NULL)
+        {
+          if (p_DivisibleBy(id->m[i], id->m[j],r))
+          {
+            p_Delete(&id->m[j],r);
+            if (j==k) k--;
+	    while(id->m[k]==NULL) k--;
+          }
+          else if (p_DivisibleBy(id->m[j], id->m[i],r))
+          {
+            p_Delete(&id->m[i],r);
+            break;
           }
         }
       }
