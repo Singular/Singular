@@ -391,11 +391,11 @@ void id_DelDiv(ideal id, const ring r)
         {
           if (id->m[j]!=NULL)
           {
-            if (p_LmDivisibleByNoComp(id->m[i], id->m[j],r))
+            if (p_LmDivisibleBy(id->m[i], id->m[j],r))
             {
               p_Delete(&id->m[j],r);
             }
-            else if (p_LmDivisibleByNoComp(id->m[j], id->m[i],r))
+            else if (p_LmDivisibleBy(id->m[j], id->m[i],r))
             {
               p_Delete(&id->m[i],r);
               break;
