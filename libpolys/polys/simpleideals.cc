@@ -184,9 +184,10 @@ void idSkipZeroes (ideal ide)
 
   int k;
   int j = -1;
+  int idelems=IDELEMS(ide);
   BOOLEAN change=FALSE;
 
-  for (k=0; k<IDELEMS(ide); k++)
+  for (k=0; k<idelems; k++)
   {
     if (ide->m[k] != NULL)
     {
@@ -207,11 +208,12 @@ void idSkipZeroes (ideal ide)
       j = 0;
     else
     {
-      for (k=j+1; k<IDELEMS(ide); k++)
+      for (k=j+1; k<idelems; k++)
         ide->m[k] = NULL;
     }
-    pEnlargeSet(&(ide->m),IDELEMS(ide),j+1-IDELEMS(ide));
-    IDELEMS(ide) = j+1;
+    j++;
+    pEnlargeSet(&(ide->m),idelems,j-idelems);
+    IDELEMS(ide) = j;
   }
 }
 
