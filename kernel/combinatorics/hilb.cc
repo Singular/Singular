@@ -1708,7 +1708,9 @@ static void p_Div_hi(poly p, const int* exp_q, const ring src)
   {
     p_SetExp(p,i,si_max(0L,p_GetExp(p,i,src)-exp_q[i]),src);
   }
+  #ifdef PDEBUG
   p_Setm(p,src);
+  #endif
 }
 
 static int compare(const void *pp1, const void *pp2, void* arg)
@@ -1731,6 +1733,7 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
 // Algorithm 2.6 of
 // Dave Bayer, Mike Stillman - Computation of Hilbert Function
 // J.Symbolic Computation (1992) 14, 31-50
+// assume: except for A==(0), no NULL entries in A
 {
   int r=id_Elem(A,src);
   poly h=NULL;
@@ -1747,7 +1750,9 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
         for(int j=src->N;j>0;j--)
           exp[j]*=ABS((*wdegree)[j-1]);
         p_SetExpV(A->m[i],exp,src);
+	#ifdef PDEBUG
         p_Setm(A->m[i],src);
+	#endif
       }
     }
     omFreeSize(exp,(src->N+1)*sizeof(int));
@@ -1786,6 +1791,7 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
       // hilbert_series of unmodified J:
       tmp=p_One(Qt);
       p_SetExp(tmp,1,1,Qt);
+      p_Setm(tmp,Qt);
       tmp=p_Neg(tmp,Qt);
       tmp=p_Add_q(tmp,p_One(Qt),Qt); // 1-t
       if (k>1)
@@ -1799,6 +1805,7 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
     // t^|A_i|
     tmp=p_One(Qt);
     p_SetExp(tmp,1,p_Totaldegree(A->m[i],src),Qt);
+    p_Setm(tmp,Qt);
     tmp=p_Neg(tmp,Qt);
     tmp=p_Mult_q(tmp,h_J,Qt);
     h=p_Add_q(h,tmp,Qt);
