@@ -318,36 +318,6 @@ static poly lift_ext_LT(const poly a, const ideal previous_module,
 
 /*****************************************************************************/
 
-/*
- * copied from id_DelDiv(), but without testing and without HAVE_RINGS;
- * delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, that is,
- * delete id[i], if LT(i) == coeff*mon*LT(j)
- */
-static void id_DelDiv_no_test(ideal id)
-{
-    const ring r = currRing;
-    int i, j;
-    int k = id->ncols-1;
-    for (i = k; i >= 0; i--)
-    {
-        for (j = k; j > i; j--)
-        {
-            if (id->m[j] != NULL)
-            {
-                if (p_DivisibleBy(id->m[i], id->m[j], r))
-                {
-                    p_Delete(&id->m[j], r);
-                }
-                else if (p_DivisibleBy(id->m[j], id->m[i], r))
-                {
-                    p_Delete(&id->m[i], r);
-                    break;
-                }
-            }
-        }
-    }
-}
-
 typedef poly syzHeadFunction(ideal, int, int);
 
 /*
@@ -434,7 +404,7 @@ static ideal syzM_i_unsorted(const ideal G, const int i,
                 k--;
             }
         }
-        id_DelDiv_no_test(M_i);
+        id_DelDiv(M_i, currRing);
         idSkipZeroes(M_i);
     }
     return M_i;
@@ -462,7 +432,7 @@ static ideal syzM_i_sorted(const ideal G, const int i,
         {
             M_i->m[j] = syzHead(G, i, j+index);
         }
-        id_DelDiv_no_test(M_i);
+        id_DelDiv(M_i, currRing);
         idSkipZeroes(M_i);
     }
     return M_i;
