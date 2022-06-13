@@ -938,7 +938,7 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   delete hseries2;
 }
 
-static void hDegree0(ideal S, ideal Q)
+int  scMult0Int(ideal S, ideal Q)
 {
   id_LmTest(S, currRing);
   if (Q!=NULL) id_LmTest(Q, currRing);
@@ -948,7 +948,7 @@ static void hDegree0(ideal S, ideal Q)
   if (!hNexist)
   {
     hMu = -1;
-    return;
+    return -1;
   }
   else
     hMu = 0;
@@ -1010,17 +1010,8 @@ static void hDegree0(ideal S, ideal Q)
   hDelete(hexist, hNexist);
   if (hisModule)
     omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
-}
-
-int  scMult0Int(ideal S, ideal Q)
-{
-  id_LmTest(S, currRing);
-  if (Q!=NULL) id_LmTest(Q, currRing);
-
-  hDegree0(S, Q);
   return hMu;
 }
-
 
 // HC
 
