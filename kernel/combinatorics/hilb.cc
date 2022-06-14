@@ -1750,9 +1750,9 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
         for(int j=src->N;j>0;j--)
           exp[j]*=ABS((*wdegree)[j-1]);
         p_SetExpV(A->m[i],exp,src);
-	#ifdef PDEBUG
+        #ifdef PDEBUG
         p_Setm(A->m[i],src);
-	#endif
+        #endif
       }
     }
     omFreeSize(exp,(src->N+1)*sizeof(int));

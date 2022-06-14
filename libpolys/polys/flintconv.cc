@@ -276,11 +276,14 @@ poly convFlintPSingP(fmpq_poly_t f, const ring r)
   {
     fmpq_poly_get_coeff_fmpq(c,f,i);
     number n=convFlintNSingN(c,r->cf);
-    poly pp=p_Init(r);
-    pSetCoeff0(pp,n);
-    p_SetExp(pp,1,i,r);
-    p_Setm(pp,r);
-    p=p_Add_q(p,pp,r);
+    if(!n_IsZero(n,r->cf))
+    {
+      poly pp=p_Init(r);
+      pSetCoeff0(pp,n);
+      p_SetExp(pp,1,i,r);
+      p_Setm(pp,r);
+      p=p_Add_q(p,pp,r);
+    }
   }
   fmpq_clear(c);
   p_Test(p,r);
