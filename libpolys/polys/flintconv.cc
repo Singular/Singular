@@ -229,6 +229,11 @@ void convSingNFlintNN(fmpq_t re, fmpq_t im, number n, const coeffs cf)
 
 void convSingPFlintP(fmpq_poly_t res, poly p, const ring r)
 {
+  if (p==NULL)
+  {
+    fmpq_poly_init(res);
+    return;
+  }
   int d=p_GetExp(p,1,r);
   fmpq_poly_init2(res,d+1);
   _fmpq_poly_set_length (res, d + 1);
@@ -262,6 +267,7 @@ void convSingImPFlintP(fmpq_poly_t res, poly p, const ring r)
 
 poly convFlintPSingP(fmpq_poly_t f, const ring r)
 {
+  if (fmpq_poly_is_zero(f)) return NULL;
   int d=fmpq_poly_length(f);
   poly p=NULL;
   fmpq_t c;
