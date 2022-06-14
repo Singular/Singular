@@ -1713,12 +1713,12 @@ static void p_Div_hi(poly p, const int* exp_q, const ring src)
   #endif
 }
 
-static int compare(const void *pp1, const void *pp2, void* arg)
+static int compare_rp(const void *pp1, const void *pp2, void* arg)
 {
   poly p1=*(poly*)pp1;
   poly p2=*(poly*)pp2;
   ring src=(ring)arg;
-  for(int i=currRing->N;i>0;i--)
+  for(int i=src->N;i>0;i--)
   {
     int e1=p_GetExp(p1,i,src);
     int e2=p_GetExp(p2,i,src);
@@ -1861,7 +1861,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   id_DelDiv_Sorted(AA,src);
   idSkipZeroes(AA);
    /* sort */
-  if (IDELEMS(AA)>1) qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare,src);
+  if (IDELEMS(AA)>1) qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare_rp,src);
   poly s=hilbert_series(AA,src,wdegree,Qt);
   id_Delete(&AA,src);
   intvec *ss;
