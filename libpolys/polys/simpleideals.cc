@@ -428,7 +428,7 @@ void id_DelDiv_Sorted(ideal id, const ring r)
           {
             p_Delete(&id->m[j],r);
             if (j==k) k--;
-	    while(id->m[k]==NULL) k--;
+            while(id->m[k]==NULL) k--;
           }
           else if (p_LmDivisibleByNoComp(id->m[j], id->m[i],r))
           {
