@@ -414,23 +414,21 @@ void id_DelDiv_Sorted(ideal id, const ring r)
 {
   id_Test(id, r);
 
-  int i, j;
   int k = IDELEMS(id)-1;
-  for (i=0; i<k; i++)
+  for (int i=0; i<k; i++)
   {
     if (id->m[i] != NULL)
     {
-      for (j=i+1; j<=k; j++)
+      poly m_i=id->m[i];
+      for (int j=i+1; j<=k; j++)
       {
         if (id->m[j]!=NULL)
         {
-          if (p_LmDivisibleByNoComp(id->m[i], id->m[j],r))
+          if (p_LmDivisibleByNoComp(m_i, id->m[j],r))
           {
             p_Delete(&id->m[j],r);
-            if (j==k) k--;
-            while(id->m[k]==NULL) k--;
           }
-          else if (p_LmDivisibleByNoComp(id->m[j], id->m[i],r))
+          else if (p_LmDivisibleByNoComp(id->m[j], m_i,r))
           {
             p_Delete(&id->m[i],r);
             break;
