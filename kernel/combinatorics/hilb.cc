@@ -1713,7 +1713,11 @@ static void p_Div_hi(poly p, const int* exp_q, const ring src)
   #endif
 }
 
+#ifdef __APPLE__
+static int compare_rp(void *arg,const void *pp1, const void *pp2)
+#else
 static int compare_rp(const void *pp1, const void *pp2, void* arg)
+#endif
 {
   poly p1=*(poly*)pp1;
   poly p2=*(poly*)pp2;
@@ -1861,7 +1865,12 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   id_DelDiv_Sorted(AA,src);
   idSkipZeroes(AA);
    /* sort */
-  if (IDELEMS(AA)>1) qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare_rp,src);
+  if (IDELEMS(AA)>1)
+  #ifdef __APPLE__
+    qsort_r(AA->m,IDELEMS(AA),sizeof(poly),src,compare_rp);
+  #else
+    qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare_rp,src);
+  #endif
   poly s=hilbert_series(AA,src,wdegree,Qt);
   id_Delete(&AA,src);
   intvec *ss;
