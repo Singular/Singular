@@ -1713,7 +1713,7 @@ static void p_Div_hi(poly p, const int* exp_q, const ring src)
   #endif
 }
 
-#if defined(__APPLE__) || defined(__FreeBSD__) && defined(__OpenBSD__) && defined(__NetBSD__
+#if defined(__APPLE__) || defined(__FreeBSD__) && defined(__OpenBSD__) && defined(__NetBSD__)
 static int compare_rp(void *arg,const void *pp1, const void *pp2)
 #else
 static int compare_rp(const void *pp1, const void *pp2, void* arg)
