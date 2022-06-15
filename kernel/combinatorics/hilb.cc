@@ -1866,7 +1866,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   idSkipZeroes(AA);
    /* sort */
   if (IDELEMS(AA)>1)
-  #if defined(__APPLE__) || defined(__FreeBSD__) && defined(__OpenBSD__) && defined(__NetBSD__
+  #if defined(__APPLE__) || defined(__FreeBSD__) && defined(__OpenBSD__) && defined(__NetBSD__)
     qsort_r(AA->m,IDELEMS(AA),sizeof(poly),src,compare_rp);
   #else
     qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare_rp,src);
