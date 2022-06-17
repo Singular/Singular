@@ -1713,7 +1713,7 @@ static void p_Div_hi(poly p, const int* exp_q, const ring src)
   #endif
 }
 
-#if defined(__APPLE__) || defined(__FreeBSD__) && defined(__OpenBSD__) && defined(__NetBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 static int compare_rp(void *arg,const void *pp1, const void *pp2)
 #else
 static int compare_rp(const void *pp1, const void *pp2, void* arg)
@@ -1866,7 +1866,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   idSkipZeroes(AA);
    /* sort */
   if (IDELEMS(AA)>1)
-  #if defined(__APPLE__) || defined(__FreeBSD__) && defined(__OpenBSD__) && defined(__NetBSD__)
+  #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
     qsort_r(AA->m,IDELEMS(AA),sizeof(poly),src,compare_rp);
   #else
     qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare_rp,src);
