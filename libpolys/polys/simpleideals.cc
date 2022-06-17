@@ -348,6 +348,41 @@ void id_DelLmEquals(ideal id, const ring r)
   }
 }
 
+/// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
+static void id_DelDiv_SEV(ideal id, int k,const ring r)
+{
+  int kk = k;
+  long *sev=(long*)omAlloc0((k+1)*sizeof(long));
+  for (int i=0; i<=k; i++)
+  {
+    if(id->m[i]!=NULL)
+      sev[i]=p_GetShortExpVector(id->m[i],r);
+  }
+  for (int i=0; i<k; i++)
+  {
+    if (id->m[i] != NULL)
+    {
+      poly m_i=id->m[i];
+      for (int j=i+1; j<=k; j++)
+      {
+        if (id->m[j]!=NULL)
+        {
+          if (p_LmShortDivisibleBy(m_i, sev[i],r, id->m[j],~sev[j],r))
+          {
+            p_Delete(&id->m[j],r);
+          }
+          else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev[i],r))
+          {
+            p_Delete(&id->m[i],r);
+            break;
+          }
+        }
+      }
+    }
+  }
+  omFreeSize(sev,(kk+1)*sizeof(long));
+}
+
 /// delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, i.e.,
 /// delete id[i], if LT(i) == coeff*mon*LT(j)
 void id_DelDiv(ideal id, const ring r)
@@ -385,6 +420,11 @@ void id_DelDiv(ideal id, const ring r)
 #endif
   {
     /* the case of a coefficient field: */
+    if (k>10)
+    {
+      id_DelDiv_SEV(id,k,r);
+      return;
+    }
     for (i=k-1; i>=0; i--)
     {
       if (id->m[i] != NULL)
@@ -412,31 +452,8 @@ void id_DelDiv(ideal id, const ring r)
 /// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
 void id_DelDiv_Sorted(ideal id, const ring r)
 {
-  id_Test(id, r);
-
   int k = IDELEMS(id)-1;
-  for (int i=0; i<k; i++)
-  {
-    if (id->m[i] != NULL)
-    {
-      poly m_i=id->m[i];
-      for (int j=i+1; j<=k; j++)
-      {
-        if (id->m[j]!=NULL)
-        {
-          if (p_LmDivisibleByNoComp(m_i, id->m[j],r))
-          {
-            p_Delete(&id->m[j],r);
-          }
-          else if (p_LmDivisibleByNoComp(id->m[j], m_i,r))
-          {
-            p_Delete(&id->m[i],r);
-            break;
-          }
-        }
-      }
-    }
-  }
+  id_DelDiv_SEV(id,k,r);
 }
 
 /// test if the ideal has only constant polynomials
