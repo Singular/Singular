@@ -374,10 +374,7 @@ static void hIndep(scmon pure)
   Set = ISet->set = new intvec((currRing->N));
   for (iv=(currRing->N); iv!=0 ; iv--)
   {
-    if (pure[iv])
-      (*Set)[iv-1] = 0;
-    else
-      (*Set)[iv-1] = 1;
+    (*Set)[iv-1] = (pure[iv]==0);
   }
   ISet = ISet->nx = (indset)omAlloc0Bin(indlist_bin);
   hMu++;
@@ -557,10 +554,7 @@ static void hCheckIndep(scmon pure)
       Set = res->set;
       for (iv=(currRing->N); iv; iv--)
       {
-        if (pure[iv])
-          (*Set)[iv-1] = 0;
-        else
-          (*Set)[iv-1] = 1;
+        (*Set)[iv-1] = (pure[iv]==0);
       }
     }
   }
