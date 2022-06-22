@@ -1,5 +1,5 @@
 coverage==4.5.4
-numpy==1.21.0
+numpy==1.22.0
 #pandas==0.24.0
 pylint==2.3.0
 pytest==5.0.1
