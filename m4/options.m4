@@ -173,7 +173,7 @@ AC_DEFUN([SING_USE_RESOURCES],
   AC_SUBST(RESOURCES_LIBS)
 
   if test "x$htmldir" = "x\${docdir}"; then 
-    DEFAULT_HTMLDIR="--htmldir=$datarootdir/doc/singular"
+    DEFAULT_HTMLDIR="--htmldir=$datarootdir/singular/html"
   fi
 
   ENABLE_ARG="--with-Singular RESOURCES_LIBS='$RESOURCES_LIBS' RESOURCES_INCLUDES='$RESOURCES_INCLUDES'"
