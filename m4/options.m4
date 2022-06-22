@@ -172,9 +172,15 @@ AC_DEFUN([SING_USE_RESOURCES],
   AC_SUBST(RESOURCES_INCLUDES)
   AC_SUBST(RESOURCES_LIBS)
 
+# If htmldir is the default value, make sure it is passed to resources' configure so that a correct default value is used.
+# if htmldir is set when calling configure, its value is passed by AC_CONFIG_SUBDIRS to resources' configure without manual intervention.
+  if test "x$htmldir" = "x\${docdir}"; then 
+    DEFAULT_HTMLDIR="--htmldir=$datarootdir/doc/singular"
+  fi
+
   ENABLE_ARG="--with-Singular RESOURCES_LIBS='$RESOURCES_LIBS' RESOURCES_INCLUDES='$RESOURCES_INCLUDES'"
 
-  ac_configure_args="$ac_configure_args $ENABLE_ARG"
+  ac_configure_args="$ac_configure_args $DEFAULT_HTMLDIR $ENABLE_ARG"
 
   PKG_REQUIRE="$PKG_REQUIRE singular_resources"
   AC_SUBST(PKG_REQUIRE)
