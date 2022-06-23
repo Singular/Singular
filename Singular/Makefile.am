@@ -143,7 +143,7 @@ nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 ########################### Singular* #########################
 dist_man1_MANS = Singular.man ESingular.man TSingular.man
 
-EXTRA_PROGRAMS =  libparse Singulard
+EXTRA_PROGRAMS =  libparse
 
 # the "optional_Singular_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
@@ -155,12 +155,6 @@ Singular_SOURCES = tesths.cc utils.cc  utils.h
 Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS} $(FACTORY_LIBS)
 
 Singular_LDFLAGS = ${AM_LDFLAGS} ${BUILTIN_FLAGS}
-
-Singulard_SOURCES = tesths.cc utils.cc  utils.h
-
-Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
-
-Singulard_LDFLAGS = -shared ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
 dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win surfex

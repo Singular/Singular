@@ -16,10 +16,13 @@ bin_SCRIPTS = libsingular-config
 
 install-data-local:
 	if test -e $(srcdir)/doc/doc.tbz2; then\
-	  (cat ${top_srcdir}/doc/doc.tbz2| (cd $(DESTDIR)$(datadir)/singular; tar -jx --no-same-owner -f -));\
-	   mkdir $(DESTDIR)$(datadir)/info;\
-	   mkdir $(DESTDIR)$(datadir)/doc;\
-	   mv  $(DESTDIR)$(datadir)/singular/singular.info  $(DESTDIR)$(datadir)/info/.;\
+	   test -e $(DESTDIR)$(datadir) || mkdir -p $(DESTDIR)$(datadir);\
+	   test -e $(DESTDIR)$(datadir)/info || mkdir $(DESTDIR)$(datadir)/info;\
+	   test -e $(DESTDIR)$(datadir)/singular || mkdir $(DESTDIR)$(datadir)/singular;\
+	   test -e $(DESTDIR)$(htmldir) || mkdir -p $(DESTDIR)$(htmldir);\
+	   (cat ${top_srcdir}/doc/doc.tbz2| (cd $(DESTDIR)$(htmldir);tar -jx --no-same-owner -f -));\
+	   mv  $(DESTDIR)$(htmldir)/singular.info  $(DESTDIR)$(datadir)/info/.;\
+	   mv  $(DESTDIR)$(htmldir)/singular.idx  $(DESTDIR)$(datadir)/singular/.;\
 	fi
 
 uninstall-local:

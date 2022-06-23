@@ -187,7 +187,8 @@ EXTRA_DIST += doc.tbz2
 doc.tbz2:
 	$(MAKE) -j1 -f Makefile-docbuild singular.info html
 	chmod -R a+rX singular.info html
-	$(AMTAR) jcf $@ singular.info html
+	cp singular.info singular.idx html
+	(cd html;$(AMTAR) jcf ../$@ *)
 dist-hook:
 	@if [ -n "$(DOC2TEX_EXAMPLE_EXCLUSIONS)" ]; then					\
 	  echo >&2 "#######################################################################";	\
