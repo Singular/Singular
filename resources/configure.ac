@@ -72,5 +72,10 @@ AX_RECURSIVE_EVAL([[$]datadir], [config_datadir])
 AX_NORMALIZE_PATH([config_datadir],['/'])
 AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
 
+AX_RECURSIVE_EVAL([[$]htmldir], [config_htmldir])
+AX_NORMALIZE_PATH([config_htmldir],['/'])
+AX_COMPUTE_RELATIVE_PATHS([config_datadir:config_htmldir:data_to_html])
+AC_DEFINE_UNQUOTED([DATA_TO_HTML_DIR],"%D/$data_to_html",[htmldir])
+
 AC_CONFIG_FILES([singular_resources.pc Makefile])
 AC_OUTPUT

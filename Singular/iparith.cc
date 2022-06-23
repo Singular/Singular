@@ -4466,13 +4466,21 @@ static BOOLEAN jjJACOB_M(leftv res, leftv a)
 
 static BOOLEAN jjKERNEL_M(leftv res, leftv v)
 {
+#ifdef HAVE_FLINT
   res->data = (char *)singflint_kernel((matrix)(v->Data()),currRing);
   return res->data==NULL;
+#else
+  return TRUE;
+#endif
 }
 static BOOLEAN jjKERNEL_SM(leftv res, leftv v)
 {
+#ifdef HAVE_FLINT
   res->data = (char *)singflint_kernel((ideal)(v->Data()),currRing);
   return res->data==NULL;
+#else
+  return TRUE;
+#endif
 }
 static BOOLEAN jjKBASE(leftv res, leftv v)
 {
