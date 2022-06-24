@@ -5435,7 +5435,10 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
     return (kDim == -2);
   }
 #endif
-  res->data = (char *)(long)scMult0Int((ideal)v->Data(),currRing->qideal);
+  long l=scMult0Int((ideal)v->Data(),currRing->qideal);
+  if ((l<INT_MIN)||(l>INT_MAX))
+    WerrorS("int overflow in vdim");
+  res->data = (char *)(long)l;
   return FALSE;
 }
 BOOLEAN jjWAIT1ST1(leftv res, leftv u)

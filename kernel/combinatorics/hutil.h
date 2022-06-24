@@ -44,7 +44,8 @@ EXTERN_VAR monf stcmem, radmem;
 EXTERN_VAR int hisModule;
 EXTERN_VAR monf stcmem, radmem;
 EXTERN_VAR indset ISet, JSet;
-EXTERN_VAR int  hCo, hMu, hMu2;
+EXTERN_VAR int  hCo, hMu2;
+EXTERN_VAR long  hMu;
 
 
 void hDelete(scfmon ev, int ev_length);

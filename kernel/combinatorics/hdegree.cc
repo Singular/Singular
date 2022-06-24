@@ -24,7 +24,8 @@
 #include "misc/options.h"
 #endif
 
-VAR int  hCo, hMu, hMu2;
+VAR int  hCo, hMu2;
+VAR long hMu;
 VAR omBin indlist_bin = omGetSpecBin(sizeof(indlist));
 
 /*0 implementation*/
@@ -617,9 +618,10 @@ void hIndAllMult(scmon pure, int Npure, scfmon rad, int Nrad,
 
 // multiplicity
 
-static int hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
+static long hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
 {
-  int  iv = Nvar -1, sum, a, a0, a1, b, i;
+  int  iv = Nvar -1, a, a0, a1, b, i;
+  long sum;
   int  x, x0;
   scmon pn;
   scfmon sn;
@@ -636,21 +638,28 @@ static int hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
   pn = hGetpure(pure);
   sn = hGetmem(Nstc, stc, stcmem[iv]);
   hStepS(sn, Nstc, var, Nvar, &a, &x);
-  int64 t=hZeroMult(pn, sn, a, var, iv);
   if (a == Nstc)
   {
+    #if  SIZEOF_LONG==8
+    return (long)pure[var[Nvar]] * hZeroMult(pn, sn, a, var, iv);
+    #else
+    int64 t=hZeroMult(pn, sn, a, var, iv);
     t *= pure[var[Nvar]];
     if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
     else if (!errorreported) WerrorS("int overflow in vdim 3");
     return sum;
-    /*return pure[var[Nvar]] * hZeroMult(pn, sn, a, var, iv);*/
+    #endif
   }
   else
   {
+    #if  SIZEOF_LONG==8
+    sum = x * hZeroMult(pn, sn, a, var, iv);
+    #else
+    int64 t=hZeroMult(pn, sn, a, var, iv);
     t *= x;
     if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
     else if (!errorreported) WerrorS("int overflow in vdim 4");
-    /*sum = x * hZeroMult(pn, sn, a, var, iv);*/
+    #endif
   }
   b = a;
   loop
@@ -665,21 +674,27 @@ static int hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
     b += (a1 - a0);
     if (a < Nstc)
     {
+      #if  SIZEOF_LONG==8
+      sum += (long)(x - x0) * hZeroMult(pn, sn, b, var, iv);
+      #else
       int64 t=hZeroMult(pn, sn, b, var, iv);
       t *= (x-x0);
       t += sum;
       if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
       else if (!errorreported) WerrorS("int overflow in vdim 1");
-      /*sum += (x - x0) * hZeroMult(pn, sn, b, var, iv);*/
+      #endif
     }
     else
     {
+      #if  SIZEOF_LONG==8
+      sum += (long)(pure[var[Nvar]] - x0) * hZeroMult(pn, sn, b, var, iv);
+      #else
       int64 t=hZeroMult(pn, sn, b, var, iv);
       t *= (pure[var[Nvar]]-x0);
       t += sum;
       if ((t>=INT_MIN)&&(t<=INT_MAX)) sum=t;
       else if (!errorreported) WerrorS("int overflow in vdim 2");
-      /*sum += (pure[var[Nvar]] - x0) * hZeroMult(pn, sn, b, var, iv);*/
+      #endif
       return sum;
     }
   }
@@ -932,7 +947,7 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   delete hseries2;
 }
 
-int  scMult0Int(ideal S, ideal Q)
+long  scMult0Int(ideal S, ideal Q)
 {
   id_LmTest(S, currRing);
   if (Q!=NULL) id_LmTest(Q, currRing);
