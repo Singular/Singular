@@ -249,7 +249,7 @@ int iiTokType(int op)
 static BOOLEAN jjOP_BIM_I(leftv res, leftv u, leftv v)
 {
   bigintmat* aa= (bigintmat *)u->Data();
-  int bb = (int)(long)(v->Data());
+  long bb = (long)(v->Data());
   if (errorreported) return TRUE;
   bigintmat *cc=NULL;
   switch (iiOp)
