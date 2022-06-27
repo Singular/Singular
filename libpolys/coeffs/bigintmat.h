@@ -318,11 +318,11 @@ bool operator!=(const bigintmat & lhr, const bigintmat & rhr);
 /// Matrix-Add/-Sub/-Mult so oder mit operator+/-/* ?
 /// @Note: NULL as a result means an error (non-compatible matrices?)
 bigintmat * bimAdd(bigintmat * a, bigintmat * b);
-bigintmat * bimAdd(bigintmat * a, int b);
+bigintmat * bimAdd(bigintmat * a, long b);
 bigintmat * bimSub(bigintmat * a, bigintmat * b);
-bigintmat * bimSub(bigintmat * a, int b);
+bigintmat * bimSub(bigintmat * a, long b);
 bigintmat * bimMult(bigintmat * a, bigintmat * b);
-bigintmat * bimMult(bigintmat * a, int b);
+bigintmat * bimMult(bigintmat * a, long b);
 bigintmat * bimMult(bigintmat * a, number b, const coeffs cf);
 
 ///same as copy constructor - apart from it being able to accept NULL as input

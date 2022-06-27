@@ -196,7 +196,7 @@ bigintmat * bimAdd(bigintmat * a, bigintmat * b)
 
   return bim;
 }
-bigintmat * bimAdd(bigintmat * a, int b)
+bigintmat * bimAdd(bigintmat * a, long b)
 {
 
   const int mn = si_min(a->rows(),a->cols());
@@ -233,7 +233,7 @@ bigintmat * bimSub(bigintmat * a, bigintmat * b)
   return bim;
 }
 
-bigintmat * bimSub(bigintmat * a, int b)
+bigintmat * bimSub(bigintmat * a, long b)
 {
   const int mn = si_min(a->rows(),a->cols());
 
@@ -298,7 +298,7 @@ bigintmat * bimMult(bigintmat * a, bigintmat * b)
   return bim;
 }
 
-bigintmat * bimMult(bigintmat * a, int b)
+bigintmat * bimMult(bigintmat * a, long b)
 {
 
   const int mn = a->rows()*a->cols();
