@@ -31,10 +31,19 @@ New commands:
 @item @code{chinrem}, @code{farey} for @code{smatrix} (@nref{smatrix})
 @end itemize
 
+Changed commands:
+@itemize
+@item overflow check for @nref{vdim}
+@item better overflow check/les overflows for Hilbert function (@nref{hilb})
+@end itemize
+
 Changes in the kernel/build system:
 @itemize
 @item changes for gcc 12
 @item new option @code{--log LOGFILE}
+@item configure can change the path to hml documentation (@code{--htmldir=...})
+@item different format for @code{doc.tbz2}
+@item new algorithm for Hilbert function (@nref{hilb})
 @end itemize
 
 @c New commands:
