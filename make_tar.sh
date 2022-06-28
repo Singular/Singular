@@ -5,9 +5,9 @@
 
 set -e
 
-TARVERSION=4.3.0
-VERSION=4.3.0
-BUILD_DIR=/tmp/tst2
+TARVERSION=4.3.1
+VERSION=4.3.1
+BUILD_DIR=/tmp/wawa
 export VERSION TARVERSION BUILD_DIR
 
 # sanity check
