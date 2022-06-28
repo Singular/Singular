@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version recover.lib 4.2.1.0 Jul_2021 "; // $Id$
+version="version recover.lib 4.3.1.0 Jun_2022 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  recover.lib  Hybrid numerical/symbolical algorithms for algebraic geometry
@@ -1917,6 +1917,7 @@ EXAMPLE: example num_prime_decom; shows an example
    bigint C=bigint(10)**Prec;//digits of precision
    list p, mats;
    int i,j;
+   /* div by 0 in LLL
    for(i=1; i<=sP; i++)
    {
       setring Ri;
@@ -1947,7 +1948,7 @@ EXAMPLE: example num_prime_decom; shows an example
 
       Q=Q+list(M);
    }
-
+   */
    return(Q);
 }
 example
