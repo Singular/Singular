@@ -916,6 +916,7 @@ static proc string2intdigit(string ti)
          return(v[i]);
       }
    }
+   return(0);
 }
 
 static proc string2bigint(string s)
@@ -1658,8 +1659,8 @@ static proc get_relations_as_bigintmats(list p, int D, bigint C)
       vd=veronese(d,p);
       len=size(maxideal(d));
       A=getmatrix(vd,C,len);
-      B=use_FLINT_LLL(A);
-      //B=use_NTL_LLL(A);
+      //B=use_FLINT_LLL(A);
+      B=use_NTL_LLL(A);
       //B=use_LLL_bigintmat(A);
 
       mats=mats+list(B);
@@ -1682,7 +1683,8 @@ static proc get_relations_radical_as_bigintmats(list P, int D, bigint C)
       vd=veronese_radical(d,P);
       len=size(maxideal(d));
       A=getmatrix(vd,C,len);
-      B=use_FLINT_LLL(A);
+      //B=use_FLINT_LLL(A);
+      B=mat2bigintmat(A);
       //B=use_NTL_LLL(A);
       //B=use_LLL_bigintmat(A);
 
@@ -2110,7 +2112,9 @@ EXAMPLE: example num_radical_via_randlincom; shows an example
    list mats=get_relations_radical_as_bigintmats(P,D,C);
 
    setring br;
+   /* div by 0 in LLL
    list K=get_relations_lincomradical_over_rationals(D,Prec,mats,posi,endpos);
+   */ list K;
 
    ideal Q;
 
