@@ -64,7 +64,7 @@ number convFlintNSingN (fmpq_t f, const coeffs cf)
 {
 #if __FLINT_RELEASE > 20502
   number z;
-  if (nCoeff_is_Q(cf))
+  if (getCoeffType(cf)==n_Q) /* QQ, bigint */
   {
     z=ALLOC_RNUMBER();
     #if defined(LDEBUG)
