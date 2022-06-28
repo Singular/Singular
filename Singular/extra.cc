@@ -15,6 +15,7 @@
 #include "resources/omFindExec.h"
 
 #ifdef HAVE_CCLUSTER
+#undef CC
 #include "ccluster/ccluster.h"
 #endif
 
