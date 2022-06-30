@@ -811,11 +811,6 @@ static void heBrowserHelp(heEntry hentry)
 #define MAX_SYSCMD_LEN MAXPATHLEN*2
 static BOOLEAN heGenInit(int warn, int br)
 {
-  if (FE_OPT_NO_SHELL_FLAG)
-  {
-    if (warn) WarnS("restricted mod: generic help not available");
-    return FALSE;
-  }
   if (heHelpBrowsers[br].required==NULL) return TRUE;
   const char *p=heHelpBrowsers[br].required;
   while (*p>'\0')
@@ -858,7 +853,7 @@ static BOOLEAN heGenInit(int warn, int br)
 
                  if ((op=='O') && (strcmp(name,S_UNAME)!=0))
                    return FALSE;
-                 if ((op=='E') && (omFindExec(name,exec)==NULL))
+                 if ((op=='E') && ((omFindExec(name,exec)==NULL) || FE_OPT_NO_SHELL_FLAG))
                  {
                    if (warn) Warn("executable `%s` not found",name);
                    return FALSE;
@@ -875,7 +870,6 @@ static BOOLEAN heGenInit(int warn, int br)
 
 static void heGenHelp(heEntry hentry, int br)
 {
-  if (FE_OPT_NO_SHELL_FLAG) return;
   char sys[MAX_SYSCMD_LEN];
   const char *p=heHelpBrowsers[br].action;
   if (p==NULL) {PrintS("no action ?\n"); return;}
@@ -1010,7 +1004,7 @@ static void heGenHelp(heEntry hentry, int br)
     }
   }
   Print("running `%s`\n",sys);
-  (void) system(sys);
+  if (!FE_OPT_NO_SHELL_FLAG) (void) system(sys);
 }
 
 static BOOLEAN heDummyInit(int /*warn*/, int /*br*/)
