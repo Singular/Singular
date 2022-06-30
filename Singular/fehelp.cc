@@ -813,7 +813,7 @@ static BOOLEAN heGenInit(int warn, int br)
 {
   if (FE_OPT_NO_SHELL_FLAG)
   {
-    if (warn) Warn("restricted mod: generic help not available",*p);
+    if (warn) WarnS("restricted mod: generic help not available");
     return FALSE;
   }
   if (heHelpBrowsers[br].required==NULL) return TRUE;
