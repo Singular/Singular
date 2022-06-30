@@ -89,7 +89,6 @@ STATIC_VAR heBrowser_s *heHelpBrowsers=NULL;
 EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 void feHelp(char *str)
 {
-  if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no help available");return;}
   str = strclean(str);
   if (str == NULL) {heBrowserHelp(NULL); return;}
 
@@ -812,6 +811,11 @@ static void heBrowserHelp(heEntry hentry)
 #define MAX_SYSCMD_LEN MAXPATHLEN*2
 static BOOLEAN heGenInit(int warn, int br)
 {
+  if (FE_OPT_NO_SHELL_FLAG)
+  {
+    if (warn) Warn("restricted mod: generic help not available",*p);
+    return FALSE;
+  }
   if (heHelpBrowsers[br].required==NULL) return TRUE;
   const char *p=heHelpBrowsers[br].required;
   while (*p>'\0')
@@ -871,6 +875,7 @@ static BOOLEAN heGenInit(int warn, int br)
 
 static void heGenHelp(heEntry hentry, int br)
 {
+  if (FE_OPT_NO_SHELL_FLAG) return;
   char sys[MAX_SYSCMD_LEN];
   const char *p=heHelpBrowsers[br].action;
   if (p==NULL) {PrintS("no action ?\n"); return;}
