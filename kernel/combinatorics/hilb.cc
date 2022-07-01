@@ -1716,6 +1716,7 @@ static void p_Div_hi(poly p, const int* exp_q, const ring src)
   #endif
 }
 
+#ifdef HAVE_QSORT_R
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__CYGWIN__)
 static int compare_rp(void *arg,const void *pp1, const void *pp2)
 #else
@@ -1734,7 +1735,21 @@ static int compare_rp(const void *pp1, const void *pp2, void* arg)
   }
   return 0;
 }
-
+#else
+static int compare_rp_currRing(const void *pp1, const void *pp2)
+{
+  poly p1=*(poly*)pp1;
+  poly p2=*(poly*)pp2;
+  for(int i=currRing->N;i>0;i--)
+  {
+    int e1=p_GetExp(p1,i,currRing);
+    int e2=p_GetExp(p2,i,currRing);
+    if(e1<e2) return -1;
+    if(e1>e2) return 1;
+  }
+  return 0;
+}
+#endif
 poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
 // accoding to:
 // Algorithm 2.6 of
@@ -1869,10 +1884,19 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   idSkipZeroes(AA);
    /* sort */
   if (IDELEMS(AA)>1)
-  #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__CYGWIN__)
-    qsort_r(AA->m,IDELEMS(AA),sizeof(poly),src,compare_rp);
+  #ifdef HAVE_QSORT_R
+    #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__CYGWIN__)
+      qsort_r(AA->m,IDELEMS(AA),sizeof(poly),src,compare_rp);
+    #else
+      qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare_rp,src);
+    #endif
   #else
-    qsort_r(AA->m,IDELEMS(AA),sizeof(poly),compare_rp,src);
+  {
+    ring r=currRing;
+    currRing=src;
+    qsort(AA->m,IDELEMS(AA),sizeof(poly),compare_rp_currRing);
+    currRing=r;
+  }
   #endif
   poly s=hilbert_series(AA,src,wdegree,Qt);
   id_Delete(&AA,src);
