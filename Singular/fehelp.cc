@@ -914,32 +914,55 @@ static void heGenHelp(heEntry hentry, int br)
                    else
                    {
                      if (*p=='H')
+                     #ifdef SINGULAR_4_2
+                       snprintf(temp,256,"%s/%d-%d/index.htm", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100
+                       );
+                     #else
                        snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10
                        );
+                     #endif
                      else
                        snprintf(temp,256,"%s/index.htm", htmldir);
                    }
                    #else
                    {
                      if (*p=='H')
+                     #ifdef SINGULAR_4_2
+                       sprintf(temp,"%s/%d-%d/%s", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100,
+                       hentry->url);
+                     else
+                       sprintf(temp,"%s/%s", htmldir, hentry->url);
+                     #else
                        sprintf(temp,"%s/%d-%d-%d/%s", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10,
                        hentry->url);
                      else
-                       sprintf(temp,"%s/%d-%d-%d/%s", htmldir, hentry->url);
+                       sprintf(temp,"%s/%s", htmldir, hentry->url);
+                     #endif
                    }
                    else
                      if (*p=='H')
+                     #ifdef SINGULAR_4_2
+                       sprintf(temp,"%s/%d-%d/index.htm", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100
+                       );
+                     #else
                        sprintf(temp,"%s/%d-%d-%d/index.htm", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10
                        );
+                     #endif
                      else
                        sprintf(temp,"%s/index.htm", htmldir);
                    }
@@ -1028,12 +1051,12 @@ static void heEmacsHelp(heEntry hentry, int /*br*/)
   WarnS("to enter the Singular online help. For general");
   WarnS("information on Singular running under Emacs, type C-h m.");
 }
-static int singular_manual(char *str, BOOLEAN isIndexEntry);
+static int singular_manual(char *str, BOOLEAN isIndexEntry, heEntry hentry);
 static void heBuiltinHelp(heEntry hentry, int /*br*/)
 {
   char* node = omStrDup(hentry != NULL && *(hentry->key) != '\0' ?
                        hentry->key : "Top");
-  singular_manual(node,(hentry != NULL) && *(hentry->url)!='\0');
+  singular_manual(node,(hentry != NULL) && *(hentry->url)!='\0',hentry);
   omFree(node);
 }
 
@@ -1096,7 +1119,7 @@ static int show(unsigned long offset, char *close)
 }
 
 /*************************************************/
-static int singular_manual(char *str, BOOLEAN isIndexEntry)
+static int singular_manual(char *str, BOOLEAN isIndexEntry,heEntry hentry)
 { FILE *index=NULL;
   unsigned long offset;
   char *p,close=' ';
@@ -1131,6 +1154,39 @@ static int singular_manual(char *str, BOOLEAN isIndexEntry)
   while(!feof(index)
         && (fgets(buffer, BUF_LEN, index) != (char *)0)
         && (buffer[0] != FIN_INDEX));
+   char temp[256];temp[0]='\0';
+   char *htmldir = feResource('u'); /* always defined */
+   if (hentry != NULL && *(hentry->url) != '\0')
+   #ifdef HAVE_VSNPRINTF
+   {
+     #ifdef SINGULAR_4_2
+     snprintf(temp,256,"%s/%d-%d/%s", htmldir,
+       SINGULAR_VERSION/1000,
+       (SINGULAR_VERSION % 1000)/100,
+     #else
+     snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
+       SINGULAR_VERSION/1000,
+       (SINGULAR_VERSION % 1000)/100,
+       (SINGULAR_VERSION % 100)/10,
+     #endif
+       hentry->url);
+   }
+   #else
+   {
+     #ifdef SINGULAR_4_2
+     sprintf(temp,"%s/%d-%d/%s", htmldir,
+     SINGULAR_VERSION/1000,
+     (SINGULAR_VERSION % 1000)/100,
+     #else
+     sprintf(temp,"%s/%d-%d-%d/%s", htmldir,
+     SINGULAR_VERSION/1000,
+     (SINGULAR_VERSION % 1000)/100,
+     (SINGULAR_VERSION % 100)/10,
+     #endif
+     hentry->url);
+   }
+   #endif
+   Print("url: %s\n",temp);
 
   while(!feof(index))
   {
