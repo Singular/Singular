@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-version="version integralbasis.lib 4.3.0.1 Feb_2022 "; // $Id$
+version="version integralbasis.lib 4.3.1.0 Jul_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  integralbasis.lib  Integral basis in algebraic function fields
@@ -751,10 +751,12 @@ static proc normToIntJacob(ideal U, poly den, poly v, poly f)
   ideal jac = jacob(f);
   ideal elimJ = elim(jac, v);
   poly dJ = elimJ[1];
+  intvec opt = option(get);
   option(redSB);
 
   ideal PP = changeDenominatorFast(U, den, dJ, f);
   list l = normToInt(f, PP, dJ, 1);
+  option(set,opt);
   return(l);
 }
 
@@ -791,6 +793,7 @@ KEYWORDS: greatest common divisor.
 static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
 {
   int dbg = printlevel - voice + 4;
+  intvec opt = option(get);
   option(redSB);
   f = reduce(f, std(D));
 
@@ -938,7 +941,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
   list outp = G, D;
 
   debug_log_intbas(2, "------Time for triangulation: ", timer - tt);
-
+  option(set,opt);
   return(outp);
 }
 
