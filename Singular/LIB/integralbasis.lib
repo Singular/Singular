@@ -12,12 +12,9 @@ AUTHORS:  J. Boehm, boehm at mathematik.uni-kl.de
 
 OVERVIEW:
 Given an irreducible polynomial f in two variables defining a plane curve,
-this library implements an algorithm to compute an integral basis of the
+this library implements algorithms for computing an integral basis of the
 integral closure of the affine coordinate ring in the algebraic function
-field via normalization.@*
-The user can choose whether the algorithm will do the computation globally
-or (this is the default) compute in the localization at each component of
-the singular locus and put everything together.
+field.@*
 
 PROCEDURES:
  integralBasis(f, intVar, list #); Integral basis of an algebraic function field
@@ -42,17 +39,18 @@ proc integralBasis(poly f, int intVar, list #)
         The base ring must be a ring in two variables, and the polynomial f
         must be monic as polynomial in the intVar-th variable.@*
         Optional parameters in list choose (can be entered in any order):@*
-        Strategy:@*
-        - \"global\" -> computes the integral basis by global algorithms. This
-        forces \"normal\" option. @*
-        - \"local\" -> computes the integral basis by computing the
-        local contribution at each component of the singular
-        locus of R/<f>, and then putting everything together. (Default option.)
-        @*Algorithm:@*
-        - \"normal\" -> the integral bases are computed using the normalization
-        algorithm.@*
-        - \"hensel\" -> the integral bases are computed using a special
-        algorithm, based on Hensel lifting. (Default option.)
+        Algorithm:@*
+        - \"normal\" -> the integral basis is computed using the general
+        normalization algorithm.@*
+        - \"hensel\" -> the integral bases is computed using an algorithm 
+        based on Puiseux expansions and Hensel lifting. (Default option.)
+        @*Options for normal algorithm:@*
+        - \"global\" -> computes the normalization of R / <f> and put the
+        results in integral basis shape.@*
+        - \"local\" -> computes the normalization at each component of
+        the singular locus of R/<f> and puts everything together. 
+        (Default option for normal algorithm.)
+        @*Other options:@*
         - \"modular\" -> uses modular algorithms for computing Groebner bases,
         radicals and decompositions whenever possible. Can be used together
         with any of the other options. The ground field must have
@@ -60,11 +58,6 @@ proc integralBasis(poly f, int intVar, list #)
         0.)@*
         - \"nonModular\" -> do not uses modular algorithms. (Default option for
         ground fields of positive charecteristic.)@*
-        - \"rotation\" -> apply a rotation when there are singularities
-        with the same X-coordinate @*
-        - \"noRotation\" -> does not apply a rotation when there are singularities
-        with the same X-coordinate (Default option.)@*
-        Other options:@*
         - \"atOrigin\" -> will compute the local contribution at the origin
         to the integral basis, assuming that the curve has a singularity at
         the origin.@*
@@ -93,9 +86,14 @@ RETURN: a list, say l, of size 2.
         where we assume that x is the transcendental variable, y is the integral
         element (indicated by intVar), f gives the integral equation and n is
         the degree of f as a polynomial in y.@*
-THEORY:  We compute the integral basis of the integral closure of k[x] in k(x,y)
-         by computing the normalization of the affine ring k[x,y]/<f> and
-         converting the k[x,y]-module generators into a k[x]-basis.@*
+THEORY:  We compute the integral basis of the integral closure of k[x] in k(x,y).
+         When option \"normal\" is selected, the normalization of the affine 
+         ring k[x,y]/<f> is computed using procedure normal from normal.lib,
+         which implements a general algorithm for normalization of rings
+         by G. Greuel, S. Laplagne and F. Seelisch, and the k[x,y]-module 
+         generators are converted into a k[x]-basis.
+         When option \"Hensel\" is selected, the algorithm by J. Boehm, W. Decker, 
+         S. Laplagne and G. Pfister is used. @*
 KEYWORDS: integral basis; normalization.
 SEE ALSO: normal.
 EXAMPLE: example integralBasis; shows an example
@@ -139,6 +137,12 @@ EXAMPLE: example integralBasis; shows an example
   {
     if ( typeof(#[i]) == "string" )
     {
+      if (#[i]=="normal"){
+        algorithm = "normal";
+      }
+      if (#[i]=="hensel"){
+        algorithm = "hensel";
+      }
       if (#[i]=="local"){
         strategy = "local";
       }
@@ -151,18 +155,13 @@ EXAMPLE: example integralBasis; shows an example
       if (#[i]=="nonModular"){
         modular = 0;
       }
-      if (#[i]=="rotation"){
-        useRotation = 1;
-      }
-      if (#[i]=="noRotation"){
-        useRotation = 0;
-      }
-      if (#[i]=="normal"){
-        algorithm = "normal";
-      }
-      if (#[i]=="hensel"){
-        algorithm = "hensel";
-      }
+// Not implemented
+//      if (#[i]=="rotation"){
+//        useRotation = 1;
+//      }
+//      if (#[i]=="noRotation"){
+//        useRotation = 0;
+//      }
       if (#[i]=="atOrigin"){
         compType = "inputJ";
         check0 = 0;            // Do not check at the origin
@@ -1242,7 +1241,7 @@ static proc ibAt0(poly f, int locBasis)
   tt = timer;
 
   dbprint(dbg, "--Building HenselBlocks...");
-  int degExpand = int(maxExp);
+  int degExpand = int(maxExp) + 1;
   dbprint(dbg, "---- Degree of expansions: ", degExpand);
 
 
@@ -1260,10 +1259,15 @@ static proc ibAt0(poly f, int locBasis)
 // THE HENSEL BLOCKS
 
 //  if((size(classes) > 1) && (1==0))
+  list blocks;  // Indicates to which block belongs each class of expansions
   if((size(classes) > 1))
   {
     list classesNew;
     list classesTemp;
+    
+    
+    int clInd = 1;
+    
     for(i = 1; i <= size(I2Lifted)-1; i++)
     {
       //l = puiseux(I2Lifted[i+1], -1, 1);
@@ -1273,7 +1277,12 @@ static proc ibAt0(poly f, int locBasis)
       //l = puiseux(I2Lifted[i+1], degExpand, 1);
       l = puiseux(I2Lifted[i+1], -1, 1);
       classesTemp = getClasses(l);
+      for(j = clInd; j <= clInd + size(classesTemp) - 1; j++)
+      {
+        blocks[j] = i;
+      }
       classesNew = classesNew + classesTemp;
+      clInd = clInd + size(classesTemp);
     }
 
     classes = classesNew;
@@ -1295,6 +1304,10 @@ static proc ibAt0(poly f, int locBasis)
 
     debug_log_intbas(3, "------Time for recomputation: ", timer - tt);
     tt = timer;
+  } else
+  {
+    // Only one block with one class of expansions
+    blocks[1] = 1;
   }
 
 // RECOMPUTATION FINISHED
@@ -1360,10 +1373,13 @@ static proc ibAt0(poly f, int locBasis)
   {
     "Maximum degree required for merging: ", mdm;
   }
-
-  list ifOut = irreducibleFactors(f, classes, mdm);
+  
+  list ifOut = irreducibleFactors(f, classes, blocks, mdm);
   list I2LiftedFull = ifOut[1];
-
+  
+  // The classes are reordered in the same order as the irreducible factors
+  classes = ifOut[5];
+  
   if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
   {
     kill ordsFull;
@@ -1414,7 +1430,7 @@ static proc ibAt0(poly f, int locBasis)
     slopes = getSlopes(classes);
     md = getDegs(classes);
 
-    ifOut = irreducibleFactors(f, classes, mdm);
+    ifOut = irreducibleFactors(f, classes, blocks, mdm);
     if(ifOut[3] == 0)
     {
       "Recomputation unsuccesfull. Output may be wrong.";
@@ -2725,13 +2741,16 @@ static proc explodeRings(list l)
   int numb;
   list rings;
 
-  for(i = 1; i <= size(l); i++){
-    if(typeof(l[i]) == "ring"){
+  for(i = 1; i <= size(l); i++)
+  {
+    if(typeof(l[i]) == "ring")
+    {
       def S = l[i];
       setring S;
       list rl;
       numb = size(PE);
-      for(j = 1; j <= numb; j++){
+      for(j = 1; j <= numb; j++)
+      {
         rl = ringlist(S);
         def SS = ring(rl);
         setring SS;
@@ -2772,31 +2791,33 @@ static proc getClasses(list l)
   list l2;
   for(i = 1; i <= size(l); i++)
   {
-    if(typeof(l[i]) == "ring"){
+    if(typeof(l[i]) == "ring")
+    {
       l2 = l2 + explodeRings(l[i]);
     } else
     {
       l2 = l2 + list(l[i]);
     }
   }
-  l = l2;
 
   int k = 1;
   classes[k] = list();
-  classes[k][1] = l[1];
+  classes[k][1] = l2[1];
   classCode[1] = 1;
 
   def R = basering;
 
-  for(i = 1; i <= size(l); i++){
-    if(typeof(l[i]) == "ring"){
-      def S = l[i];
+  for(i = 1; i <= size(l2); i++)
+  {
+    if(typeof(l2[i]) == "ring")
+    {
+      def S = l2[i];
       setring S;
       code[i] = PE[1][6];
       setring R;
       kill S;
     } else {
-      code[i] = l[i][6];
+      code[i] = l2[i][6];
     }
     if(i>1)
     {
@@ -2812,12 +2833,12 @@ static proc getClasses(list l)
       {
         k++;
         classes[k] = list();
-        classes[k][1] = l[i];
+        classes[k][1] = l2[i];
         classCode[i] = k;
       } else
       {
         cc = classCode[prevI];
-        classes[cc][size(classes[cc])+1] = l[i];
+        classes[cc][size(classes[cc])+1] = l2[i];
         classCode[i] = classCode[prevI];
       }
     }
@@ -2997,10 +3018,12 @@ static proc ordAtPol(poly h, def S)
 
 // Computes the factors of f corresponding to each conjugacy class,
 // up to degree degExpand
-static proc irreducibleFactors(poly f, list classes, int degExpand)
+static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 {
   list I2Lifted = henselBlocks(f, degExpand, 1);
 
+
+  list updatedClasses = classes;
   int nClasses;
   nClasses = size(classes);
 
@@ -3028,14 +3051,29 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
     list bPG;
 
     def R = basering;
-
+    int blInd;
+    
     for(i = 2; i <= size(I2Lifted); i++)
     {
       //"Computing singular part of Puiseux expansions of factor ", i, ": ", I2Lifted[i];
+
+
+      // We replace the classes with the new classes so that they are ordered in the same way as the irreducible factors
+
       newL = puiseux(I2Lifted[i], -1, 1);
       classes2 = getClasses(newL);
+      
+      blInd = 1;
+      for(j =1; j <= size(classes); j++)
+      {
+        if(blocks[j] == i-1)
+        {
+          updatedClasses[j] = classes2[blInd];
+          blInd++;
+        }
+      }
 
-
+      
       if(size(classes2) > 1)
       {
         // We recompute up to the appropiate order for merging
@@ -3075,7 +3113,7 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
               fuProd = fuProd * fu;
             } else
             {
-              ERROR("RING EXPECTED! Please contact the developers.");
+              fuProd = fuProd * (var(2) - classes2[j][cl][1]);
             }
           }
 
@@ -3089,7 +3127,9 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
             gfCheck = 0;
           }
 
+
           fu = reduce(bPG[1], std(var(1)^degExpand));
+
 
           I2LiftedNew[ind] = fu;
           gfCheckList[ind] = bPG[2];
@@ -3104,7 +3144,7 @@ static proc irreducibleFactors(poly f, list classes, int degExpand)
     I2Lifted = I2LiftedNew;
     wrongNumber = 1;
   }
-  list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber);
+  list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber, updatedClasses); 
 
   return(ll);
 }
