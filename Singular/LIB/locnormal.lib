@@ -145,9 +145,20 @@ EXAMPLE: example locNormal; shows an example
   if (printTimings==1) {"Time for modStd/std Jacobian "+string(timer-t);}
 
   setring R;
+  ideal U;
+  poly condu;
   ideal J = fetch(Q, J);
+  J = std(J);
+
+  // Already normal
+  if (dim(J) < 0) {
+     U = 1;
+     condu = 1;
+     return(list(U, condu));
+  }
+
   // We compute a universal denominator
-  poly condu = getSmallest(J);
+  condu = getSmallest(J);
   J = J, I;
   if(dbg >= 2){
     "Conductor: ", condu;
@@ -164,7 +175,6 @@ EXAMPLE: example locNormal; shows an example
     "";
   }
 
-  ideal U;
   ideal resT;
   ideal resu;
   poly denomOld;
