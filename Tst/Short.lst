@@ -177,6 +177,7 @@ Short/factorizeQa_s.tst
 Short/factorize_mod7.tst
 Short/factorizep_s.tst
 Short/fetch_s.tst
+Short/ffmodstd_s.tst
 Short/fglm1_s.tst
 Short/fglmquot1_s.tst
 Short/finduni_s.tst
