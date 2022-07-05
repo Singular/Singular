@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-version="version puiseuxexpansion.lib 4.2.1.3 Dec_2021 "; // $Id$
+version="version puiseuxexpansion.lib 4.3.1.0 Jul_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  puiseuxexpansion.lib  Puiseux expansions over algebraic extensions
@@ -399,14 +399,14 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
 
 
   list l = newtonpoly2(f);
-  
+
   //list l = newtonpoly(f);
-  
+
   //if((l[1][1] == 0) && (l[1][2] == 0))
   //{
   //  "ERROR: The polynomial must pass through the origin.";
   //  list cs = list();
-  //} else 
+  //} else
   //{
 
 
@@ -667,7 +667,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                 if(slN >= 0)
                 {
                   poly fNew2 = subst(fNew1, var(2), (newA + var(2))*var(1)^slN);
-                } else 
+                } else
                 {
                   poly fNew2 = negExp(fNew1, newA, slN);
                 }
@@ -956,13 +956,13 @@ EXAMPLE: example puiseuxList;  shows an example
   //  fFacs = Integralbasis::sortFactors(fFacs);
   //
   //  for(i = 1; i <= size(fFacs[1]); i++)
-  //  { 
+  //  {
   //    if((fFacs[1][i] != 1) and (deg(fFacs[1][i], intvec(0,1)) > 0))
   //    {
   //      p = p + puiseuxMain(fFacs[1][i], maxDeg, 0, 0, 1);
   //    }
   //  }
-  //} else 
+  //} else
   //{
   //  p = puiseuxMain(f, maxDeg, 0, 0, 1);
   //}
