@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version locnormal.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version locnormal.lib 4.3.1.0 Jul_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: locnormal.lib   Normalization of affine domains using local methods
@@ -144,17 +144,16 @@ EXAMPLE: example locNormal; shows an example
   if (ch==0) {J = modStd(J);} else {J = std(J);}
   if (printTimings==1) {"Time for modStd/std Jacobian "+string(timer-t);}
 
+  int dim_J=dim(J);
   setring R;
   ideal U;
   poly condu;
   ideal J = fetch(Q, J);
-  J = std(J);
 
   // Already normal
-  if (dim(J) < 0) {
-     U = 1;
-     condu = 1;
-     return(list(U, condu));
+  if (dim_J < 0)
+  {
+     return(list(ideal(1), poly(1)));
   }
 
   // We compute a universal denominator

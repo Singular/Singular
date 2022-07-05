@@ -154,6 +154,7 @@ Short/bug_x_i_j.tst
 Short/charseries.tst
 Short/charseries_p.tst
 Short/classify_s.tst
+Short/cornercase_normal.tst
 Short/countedref_s.tst
 Short/cyc5_lp.tst
 Short/dbm_s.tst
