@@ -224,6 +224,7 @@ Short/ncfactor_koepf_s.tst
 Short/ncfactor_tsai_s.tst
 Short/nfmodstd_s
 Short/normal.tst
+Short/parallel_s.tst
 Short/pAddManyVarsManyL_s.tst
 Short/pAddManyVars_s.tst
 Short/pAdd_s.tst
