@@ -42,13 +42,14 @@ proc integralBasis(poly f, int intVar, list #)
         Algorithm:@*
         - \"normal\" -> the integral basis is computed using the general
         normalization algorithm.@*
-        - \"hensel\" -> the integral bases is computed using an algorithm 
-        based on Puiseux expansions and Hensel lifting. (Default option.)
-        @*Options for normal algorithm:@*
-        - \"global\" -> computes the normalization of R / <f> and put the
+        - \"hensel\" -> the integral bases is computed using an algorithm
+        based on Puiseux expansions and Hensel lifting. (only available for
+        polynomials with rational coefficients; default option in that case)@*
+        Options for normal algorithm:@*
+        - \"global\" -> computes the normalization of R / <f> and puts the
         results in integral basis shape.@*
         - \"local\" -> computes the normalization at each component of
-        the singular locus of R/<f> and puts everything together. 
+        the singular locus of R/<f> and puts everything together.
         (Default option for normal algorithm.)
         @*Other options:@*
         - \"modular\" -> uses modular algorithms for computing Groebner bases,
@@ -58,9 +59,9 @@ proc integralBasis(poly f, int intVar, list #)
         0.)@*
         - \"nonModular\" -> do not uses modular algorithms. (Default option for
         ground fields of positive charecteristic.)@*
-        - \"atOrigin\" -> will compute the local contribution at the origin
-        to the integral basis, assuming that the curve has a singularity at
-        the origin.@*
+        - \"atOrigin\" -> will compute the local contribution to the integral
+        basis at the origin only (naturally, this contribution is only relevant
+        if the curve defined by f has a singularity at the origin).@*
         - \"isIrred\" -> assumes that the input polynomial f is irreducible,
         and therefore will not check this. If this option is given but f is not
         irreducible, the output might be wrong.@*
@@ -87,12 +88,12 @@ RETURN: a list, say l, of size 2.
         element (indicated by intVar), f gives the integral equation and n is
         the degree of f as a polynomial in y.@*
 THEORY:  We compute the integral basis of the integral closure of k[x] in k(x,y).
-         When option \"normal\" is selected, the normalization of the affine 
+         When option \"normal\" is selected, the normalization of the affine
          ring k[x,y]/<f> is computed using procedure normal from normal.lib,
          which implements a general algorithm for normalization of rings
-         by G. Greuel, S. Laplagne and F. Seelisch, and the k[x,y]-module 
+         by G. Greuel, S. Laplagne and F. Seelisch, and the k[x,y]-module
          generators are converted into a k[x]-basis.
-         When option \"Hensel\" is selected, the algorithm by J. Boehm, W. Decker, 
+         When option \"Hensel\" is selected, the algorithm by J. Boehm, W. Decker,
          S. Laplagne and G. Pfister is used. @*
 KEYWORDS: integral basis; normalization.
 SEE ALSO: normal.
@@ -1264,10 +1265,10 @@ static proc ibAt0(poly f, int locBasis)
   {
     list classesNew;
     list classesTemp;
-    
-    
+
+
     int clInd = 1;
-    
+
     for(i = 1; i <= size(I2Lifted)-1; i++)
     {
       //l = puiseux(I2Lifted[i+1], -1, 1);
@@ -1373,13 +1374,13 @@ static proc ibAt0(poly f, int locBasis)
   {
     "Maximum degree required for merging: ", mdm;
   }
-  
+
   list ifOut = irreducibleFactors(f, classes, blocks, mdm);
   list I2LiftedFull = ifOut[1];
-  
+
   // The classes are reordered in the same order as the irreducible factors
   classes = ifOut[5];
-  
+
   if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
   {
     kill ordsFull;
@@ -3052,7 +3053,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 
     def R = basering;
     int blInd;
-    
+
     for(i = 2; i <= size(I2Lifted); i++)
     {
       //"Computing singular part of Puiseux expansions of factor ", i, ": ", I2Lifted[i];
@@ -3062,7 +3063,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 
       newL = puiseux(I2Lifted[i], -1, 1);
       classes2 = getClasses(newL);
-      
+
       blInd = 1;
       for(j =1; j <= size(classes); j++)
       {
@@ -3073,7 +3074,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
         }
       }
 
-      
+
       if(size(classes2) > 1)
       {
         // We recompute up to the appropiate order for merging
@@ -3144,7 +3145,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
     I2Lifted = I2LiftedNew;
     wrongNumber = 1;
   }
-  list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber, updatedClasses); 
+  list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber, updatedClasses);
 
   return(ll);
 }
