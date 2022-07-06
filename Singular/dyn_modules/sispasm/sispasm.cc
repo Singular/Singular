@@ -7,6 +7,7 @@
  * - to_matrix(spams) -> matrix
  * - to_smatrix(spasm) -> smatrix
  * - spasm_kernel(spasm)->spasm
+ * - spasm_rref(spasm) -> spasm
 */
 #include "singularconfig.h"
 #include "libpolys/polys/monomials/monomials.h"
