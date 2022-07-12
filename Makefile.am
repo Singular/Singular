@@ -1,9 +1,13 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = resources omalloc factory \
+SUBDIRS = resources factory \
 libpolys gfanlib IntegerProgramming \
 kernel Singular \
 dox emacs redhat desktop
+
+if ENABLE_OMALLOC
+SUBDIRS += omalloc
+endif
 
 DIST_SUBDIRS = $(SUBDIRS) doc
 if ENABLE_DOC_BUILD

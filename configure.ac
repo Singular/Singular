@@ -121,7 +121,9 @@ SING_WIN_FLAGS
 PKG_REQUIRE="$PKG_REQUIRE"
 AC_SUBST(PKG_REQUIRE)
 
+SING_CHECK_OMALLOC()
 SING_USE_OMALLOC()
+
 SING_USE_RESOURCES()
 SING_USE_FACTORY()
 
@@ -240,7 +242,10 @@ SING_SHOW_FLAGS([Compiler/linker flags: ])
 AC_CONFIG_FILES([dox/Makefile])
 
 AC_CONFIG_SUBDIRS([resources])
-AC_CONFIG_SUBDIRS([omalloc])
+
+if test "x$ENABLE_OMALLOC" = xyes; then
+ AC_CONFIG_SUBDIRS([omalloc])
+fi
 
 if test "x$ENABLE_FACTORY" = xyes; then
  AC_CONFIG_SUBDIRS([factory])
