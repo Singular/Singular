@@ -1,13 +1,15 @@
 Debian (and Debian based Operating Systems)
 ===========================================
 
-The Debian [1] package for Singular is currently maintained by the Debian Science Team [2,3]:
-the git repository for the singular Debian package is at Alioth [4].
+The Debian [1] package for Singular is currently maintained by the Debian Math Team [2,3].
 
 [1] https://www.debian.org/
-[2] https://wiki.debian.org/DebianScience
-[3] https://qa.debian.org/developer.php?login=debian-science-maintainers@lists.alioth.debian.org
-[4] http://anonscm.debian.org/cgit/debian-science/packages/singular.git/
+[2] https://wiki.debian.org/Teams/Math
+[3] https://tracker.debian.org/pkg/singular
+
+Installation (with appropriate privileges):
+
+apt install singular
 
 Fedora (and RPM based Operating Systems)
 =======================================
