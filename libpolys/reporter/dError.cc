@@ -123,7 +123,7 @@ int dReportError(const char* fmt, ...)
   dErrorBreak();
 #else
   fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR.");
-  fprintf(stderr, "// !!! Please, email the input\n// and the following error message to singular@mathematik.uni-kl.de")
+  fprintf(stderr, "// !!! Please, email the input\n// and the following error message to singular@mathematik.uni-kl.de");
   vfprintf(stderr, fmt, ap);
 #endif
   return 0;
