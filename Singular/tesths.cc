@@ -21,7 +21,7 @@
 #include "ipid.h"
 #include "sdb.h"
 #include "feOpt.h"
-#include "distrib.h"
+#include "misc/distrib.h"
 #include "mmalloc.h"
 #include "tok.h"
 #include "resources/fegetopt.h"

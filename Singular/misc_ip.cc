@@ -38,7 +38,7 @@
 #include "feOpt.h"
 #include "links/silink.h"
 #include "mod_lib.h"
-#include "Singular/distrib.h"
+#include "misc/distrib.h"
 
 #include "misc/options.h"
 #include "misc/intvec.h"

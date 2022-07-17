@@ -11,6 +11,7 @@
 #define DERROR_C
 
 #include "misc/auxiliary.h"
+#include "misc/distrib.h"
 
 #include "reporter/reporter.h"
 
