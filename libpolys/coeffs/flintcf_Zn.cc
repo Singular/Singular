@@ -409,16 +409,20 @@ static number Parameter(const int i, const coeffs r)
 }
 // cfClearContent
 // cfClearDenominators
+#if 0
 static number ConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 {
   WerrorS("not yet: ConvFactoryNSingN");
   return NULL;
 }
+#endif
+#if 0
 static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
   WerrorS("not yet: ConvSingNFactoryN");
-  return NULL;
+  return CanonicalForm(0);
 }
+#endif
 static char * CoeffName(const coeffs r)
 {
   STATIC_VAR char CoeffName_flint_Zn[20];
@@ -536,8 +540,8 @@ BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct)
   cf->cfParameter = Parameter;
   //  cf->cfClearContent = ClearContent;
   //  cf->cfClearDenominators = ClearDenominators;
-  cf->convFactoryNSingN=ConvFactoryNSingN;
-  cf->convSingNFactoryN=ConvSingNFactoryN;
+  //cf->convFactoryNSingN=ConvFactoryNSingN;
+  //cf->convSingNFactoryN=ConvSingNFactoryN;
   cf->cfWriteFd = WriteFd;
   cf->cfReadFd  = ReadFd;
 #ifdef LDEBUG
