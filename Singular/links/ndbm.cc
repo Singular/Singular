@@ -280,7 +280,9 @@ datum dbm_nextkey(DBM *db)
         db->dbm_flags |= _DBM_IOERR;
 #endif
     }
-    if (((short *)db->dbm_pagbuf)[0] != 0)
+    short tmp;
+    memcpy(&tmp, db->dbm_pagbuf, sizeof(tmp));
+    if (tmp != 0)
     {
       item = makdatum(db->dbm_pagbuf, db->dbm_keyptr);
       if (item.dptr != NULL)
