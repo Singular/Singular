@@ -88,7 +88,7 @@
 #include "sdb.h"
 #include "feOpt.h"
 #include "fehelp.h"
-#include "distrib.h"
+#include "misc/distrib.h"
 
 #include "misc_ip.h"
 

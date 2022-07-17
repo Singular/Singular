@@ -83,7 +83,6 @@ SingularHEADERS = \
    cntrlc.h \
    countedref.h \
    links/dbm_sl.h \
-   distrib.h \
    eigenval_ip.h \
    feOpt.h feOptTab.h fehelp.h feOpt.inc feOptTS.inc feOptES.inc\
    fglm.h \

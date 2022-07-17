@@ -13,5 +13,5 @@ libmisc_la_LDFLAGS = $(SINGULAR_LDFLAGS)
 
 libmisc_la_includedir = $(includedir)/singular/misc
 libmisc_la_include_HEADERS = mylimits.h options.h intvec.h int64vec.h \
-                             sirandom.h prime.h auxiliary.h
+                             sirandom.h prime.h auxiliary.h distrib.h
 

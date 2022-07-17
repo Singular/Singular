@@ -154,7 +154,7 @@
 #include "Singular/blackbox.h"
 #include "Singular/cntrlc.h"
 #include "Singular/links/dbm_sl.h"
-#include "Singular/distrib.h"
+#include "misc/distrib.h"
 #include "Singular/eigenval_ip.h"
 #include "Singular/gms.h"
 #include "Singular/grammar.h"
