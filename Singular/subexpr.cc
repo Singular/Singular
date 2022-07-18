@@ -210,7 +210,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
        case INT_CMD:
           PrintNSpaces(spaces);
-          ::Print("%d",(int)(long)d);
+          ::Print("%ld",(long)d);
           break;
        case PROC_CMD:
          {

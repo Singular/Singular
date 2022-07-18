@@ -121,6 +121,8 @@ long farey_cnt=0L;
 
 static BOOLEAN check_valid(const int p, const int op);
 
+#define bit31 SIZEOF_LONG*8-1
+
 /*=============== types =====================*/
 struct sValCmdTab
 {
@@ -524,9 +526,9 @@ static BOOLEAN jjOP_REST(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
 {
-  int b=(int)(long)u->Data();
-  int e=(int)(long)v->Data();
-  int rc = 1;
+  long b=(long)u->Data();
+  long e=(long)v->Data();
+  long rc = 1;
   BOOLEAN overflow=FALSE;
   if (e >= 0)
   {
@@ -545,7 +547,7 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
     }
     else
     {
-      int oldrc;
+      long oldrc;
       while ((e--)!=0)
       {
         oldrc=rc;
@@ -558,7 +560,7 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
       if (overflow)
         WarnS("int overflow(^), result may be wrong");
     }
-    res->data = (char *)((long)rc);
+    res->data = (char *)rc;
     if (u!=NULL) return jjOP_REST(res,u,v);
     return FALSE;
   }
@@ -757,11 +759,11 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
 {
-  unsigned int a=(unsigned int)(unsigned long)u->Data();
-  unsigned int b=(unsigned int)(unsigned long)v->Data();
-  unsigned int c=a+b;
+  unsigned long a=(unsigned long)u->Data();
+  unsigned long b=(unsigned long)v->Data();
+  unsigned long c=a+b;
   res->data = (char *)((long)c);
-  if (((Sy_bit(31)&a)==(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
+  if (((Sy_bitL(bit31)&a)==(Sy_bitL(bit31)&b))&&((Sy_bitL(bit31)&a)!=(Sy_bitL(bit31)&c)))
   {
     WarnS("int overflow(+), result may be wrong");
   }
@@ -881,17 +883,17 @@ static BOOLEAN jjPLUS_ID(leftv res, leftv u, leftv v)
 static BOOLEAN jjMINUS_I(leftv res, leftv u, leftv v)
 {
   void *ap=u->Data(); void *bp=v->Data();
-  int aa=(int)(long)ap;
-  int bb=(int)(long)bp;
-  int cc=aa-bb;
-  unsigned int a=(unsigned int)(unsigned long)ap;
-  unsigned int b=(unsigned int)(unsigned long)bp;
-  unsigned int c=a-b;
-  if (((Sy_bit(31)&a)!=(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
+  long aa=(long)ap;
+  long bb=(long)bp;
+  long cc=aa-bb;
+  unsigned long a=(unsigned long)ap;
+  unsigned long b=(unsigned long)bp;
+  unsigned long c=a-b;
+  if (((Sy_bitL(bit31)&a)!=(Sy_bitL(bit31)&b))&&((Sy_bitL(bit31)&a)!=(Sy_bitL(bit31)&c)))
   {
     WarnS("int overflow(-), result may be wrong");
   }
-  res->data = (char *)((long)cc);
+  res->data = (char *)cc;
   return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjMINUS_BI(leftv res, leftv u, leftv v)
@@ -980,12 +982,12 @@ static BOOLEAN jjMINUS_SM(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
 {
-  int a=(int)(long)u->Data();
-  int b=(int)(long)v->Data();
-  int64 c=(int64)a * (int64)b;
-  if ((c>INT_MAX)||(c<INT_MIN))
+  long a=(long)u->Data();
+  long b=(long)v->Data();
+  long c=a * b;
+  if ((a!=0)&&(c/a!=b))
     WarnS("int overflow(*), result may be wrong");
-  res->data = (char *)((long)((int)c));
+  res->data = (char *)c;
   if ((u->Next()!=NULL) || (v->Next()!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
@@ -5436,9 +5438,9 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
   }
 #endif
   long l=scMult0Int((ideal)v->Data(),currRing->qideal);
-  if ((l<INT_MIN)||(l>INT_MAX))
+  if (l<-1L)
     WerrorS("int overflow in vdim");
-  res->data = (char *)(long)l;
+  res->data = (char *)l;
   return FALSE;
 }
 BOOLEAN jjWAIT1ST1(leftv res, leftv u)
