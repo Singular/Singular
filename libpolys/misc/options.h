@@ -29,6 +29,7 @@ EXTERN_VAR BOOLEAN siCntrlc;
 */
 
 #define Sy_bit(x)     ((unsigned)1<<(x))
+#define Sy_bitL(x)     ((unsigned long)1L<<(x))
 #define Sy_inset(x,s) ((Sy_bit(x)&(s))?TRUE:FALSE)
 #define BTEST1(a)     Sy_inset((a), si_opt_1)
 #define BVERBOSE(a)   Sy_inset((a), si_opt_2)
