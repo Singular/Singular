@@ -110,7 +110,6 @@ spasm* sp_kernel(spasm* A, const ring R)
   spasm_find_pivots(A, p, qinv);  /* this does some useless stuff, but
                                    * pushes zero rows to the bottom */
   spasm* A_clean = spasm_permute(A, p, SPASM_IDENTITY_PERMUTATION, SPASM_WITH_NUMERICAL_VALUES);
-  spasm_csr_free(A);
   A = A_clean;
   for (int i = 0; i < n; i++)
   {
