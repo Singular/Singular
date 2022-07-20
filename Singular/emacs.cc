@@ -86,7 +86,7 @@ void fePrintReportBug(char* msg, char* file, int line)
 "Please, email the following output to singular@mathematik.uni-kl.de\n"
 "Bug occurred at %s:%d\n"
 "Message: %s\n"
-"Version: " S_UNAME VERSION,
+"Version: " S_UNAME VERSION VERSION_DATE,
         file, line, msg);
 
 }
