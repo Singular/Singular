@@ -107,10 +107,10 @@ spasm* sp_kernel(spasm* A, const ring R)
   int m = A->m;
   int*  p = (int*)spasm_malloc(n * sizeof(int));
   int * qinv = (int*)spasm_malloc(m * sizeof(int));
-#if 0
-  /*from kernel.c*/
   spasm_find_pivots(A, p, qinv);  /* this does some useless stuff, but
                                    * pushes zero rows to the bottom */
+#if 0
+  /*from kernel.c*/
   spasm* A_clean = spasm_permute(A, p, SPASM_IDENTITY_PERMUTATION, SPASM_WITH_NUMERICAL_VALUES);
   A = A_clean;
   for (int i = 0; i < n; i++)
@@ -130,8 +130,7 @@ spasm* sp_kernel(spasm* A, const ring R)
   spasm* K = spasm_kernel(A_t, qinv);
   spasm_csr_free(A_t);
 #else
-  spasm_find_pivots(A, qinv, p);
-  spasm* K = spasm_kernel(A, qinv);
+  spasm* K = spasm_kernel(A, p);
 #endif
   free(p);
   free(qinv);
