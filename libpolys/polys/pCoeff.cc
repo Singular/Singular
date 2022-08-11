@@ -17,7 +17,8 @@
 
 #include "simpleideals.h"
 
-/// find coeff of (polynomial/vector) m in polynomial/vector p
+/// find coeff of (polynomial) m in polynomial p
+/// find coeff of (vector) m in vector p
 number p_CoeffTerm(poly p, poly m, const ring r)
 {
   while (p!=NULL)
@@ -52,9 +53,10 @@ poly p_CoeffTermV(poly v, poly m, const ring r)
 }
 
 /// find coeffs of (polynomial) m in all polynomials from I
+/// find coeffs of (vector) m in all vectors from I
 ideal id_CoeffTerm(ideal I, poly m, const ring r)
 {
-  ideal res=idInit(IDELEMS(I),1);
+  ideal res=idInit(IDELEMS(I),I->rank);
   for(int i=IDELEMS(I)-1;i>=0;i--)
   {
     number n=p_CoeffTerm(I->m[i],m,r);
@@ -66,7 +68,7 @@ ideal id_CoeffTerm(ideal I, poly m, const ring r)
 /// find coeffs of (polynomial) m in all vectors from I
 ideal id_CoeffTermV(ideal M, poly m, const ring r)
 {
-  ideal res=idInit(IDELEMS(M),1);
+  ideal res=idInit(IDELEMS(M),M->rank);
   for(int i=IDELEMS(M)-1;i>=0;i--)
   {
     res->m[i]=p_CoeffTermV(M->m[i],m,r);

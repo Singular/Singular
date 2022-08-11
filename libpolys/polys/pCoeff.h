@@ -16,13 +16,15 @@
 
 #include "simpleideals.h"
 
-/// find coeff of (polynomial/vector) m in polynomial/vector p
+/// find coeff of (polynomial) m in polynomial p
+/// find coeff of (vector) m in vector p
 number p_CoeffTerm(poly p, poly m, const ring r);
 
 /// find vector of coeffs of (polynomial) m in vector v
 poly p_CoeffTermV(poly v, poly m, const ring r);
 
 /// find coeffs of (polynomial) m in all polynomials from I
+/// find coeffs of (vector) m in all vectors from I
 ideal id_CoeffTerm(ideal I, poly m, const ring r);
 
 /// find coeffs of (polynomial) m in all vectors from I

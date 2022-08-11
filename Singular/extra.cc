@@ -3969,17 +3969,26 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       const short t3[]={2,IDEAL_CMD,POLY_CMD};
       const short t4[]={2,MODUL_CMD,VECTOR_CMD};
       const short t5[]={2,VECTOR_CMD,POLY_CMD};
+      const short t6[]={2,MODUL_CMD,POLY_CMD};
       if (iiCheckTypes(h,t1,0)
       || iiCheckTypes(h,t2,0))
       {
         poly p=(poly)h->Data();
         poly q=(poly)h->next->Data();
         res->data=p_CoeffTerm(p,q,currRing);
-        res->rtyp=h->Typ();
+        res->rtyp=NUMBER_CMD;
         return FALSE;
       }
       else if (iiCheckTypes(h,t3,0)
       || iiCheckTypes(h,t4,0))
+      {
+        ideal p=(ideal)h->Data();
+        poly q=(poly)h->next->Data();
+        res->data=id_CoeffTerm(p,q,currRing);
+        res->rtyp=h->Typ();
+        return FALSE;
+      }
+      else if (iiCheckTypes(h,t5,0))
       {
         poly p=(poly)h->Data();
         poly q=(poly)h->next->Data();
@@ -3987,12 +3996,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         res->rtyp=VECTOR_CMD;
         return FALSE;
       }
-      else if (iiCheckTypes(h,t5,0))
+      else if (iiCheckTypes(h,t6,0))
       {
         ideal p=(ideal)h->Data();
         poly q=(poly)h->next->Data();
-        res->data=id_CoeffTerm(p,q,currRing);
-        res->rtyp=IDEAL_CMD;
+        res->data=id_CoeffTermV(p,q,currRing);
+        res->rtyp=MODUL_CMD;
         return FALSE;
       }
       else
