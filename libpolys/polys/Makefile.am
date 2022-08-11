@@ -31,7 +31,7 @@ SOURCES = \
 	monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
-	pDebug.cc polys0.cc prCopy.cc prCopyMacros.h \
+	pCoeff.cc pDebug.cc polys0.cc prCopy.cc prCopyMacros.h \
 	kbuckets.cc sbuckets.cc weight.cc weight0.cc simpleideals.cc matpol.cc \
 	sparsmat.cc \
 	shiftop.cc \
@@ -47,7 +47,7 @@ LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
 	templates/p_Procs.h templates/p_MemAdd.h templates/p_MemCmp.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
 	sparsmat.h clapsing.h clapconv.h flintconv.h flint_mpoly.h\
-	shiftop.h \
+	pCoeff.h shiftop.h \
 	ext_fields/algext.h ext_fields/transext.h mod_raw.h
 
 EXTRA_DIST = \

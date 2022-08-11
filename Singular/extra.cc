@@ -52,6 +52,7 @@
 
 #include "polys/monomials/maps.h"
 #include "polys/matpol.h"
+#include "polys/pCoeff.h"
 
 #include "polys/weight.h"
 
@@ -3956,6 +3957,47 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
       {
         WerrorS("expected system(\"DivRem\",<poly>,<poly>)");
+        return TRUE;
+      }
+    }
+    else
+/* ====== CoeffTerm ============================*/
+    if(strcmp(sys_cmd,"CoeffTerm")==0)
+    {
+      const short t1[]={2,POLY_CMD,POLY_CMD};
+      const short t2[]={2,VECTOR_CMD,VECTOR_CMD};
+      const short t3[]={2,IDEAL_CMD,POLY_CMD};
+      const short t4[]={2,MODUL_CMD,VECTOR_CMD};
+      const short t5[]={2,VECTOR_CMD,POLY_CMD};
+      if (iiCheckTypes(h,t1,0)
+      || iiCheckTypes(h,t2,0))
+      {
+        poly p=(poly)h->Data();
+        poly q=(poly)h->next->Data();
+        res->data=p_CoeffTerm(p,q,currRing);
+        res->rtyp=h->Typ();
+        return FALSE;
+      }
+      else if (iiCheckTypes(h,t3,0)
+      || iiCheckTypes(h,t4,0))
+      {
+        poly p=(poly)h->Data();
+        poly q=(poly)h->next->Data();
+        res->data=p_CoeffTermV(p,q,currRing);
+        res->rtyp=VECTOR_CMD;
+        return FALSE;
+      }
+      else if (iiCheckTypes(h,t5,0))
+      {
+        ideal p=(ideal)h->Data();
+        poly q=(poly)h->next->Data();
+        res->data=id_CoeffTerm(p,q,currRing);
+        res->rtyp=IDEAL_CMD;
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("expected system(\"CoeffTerm\",<poly>/<vector>,<poly>/<vector>)"        "\n or                          <ideal>/<module>,<poly>/<vector>");
         return TRUE;
       }
     }
