@@ -592,9 +592,8 @@ int * bigintmat::getwid(int maxwid)
       char * tmp = StringEndS();
       const int _nl = strlen(tmp);
       wv[col*i+j] = _nl;
-      if (_nl > cwv[j])
-        cwv[j]=_nl;
-        omFree(tmp);
+      if (_nl > cwv[j]) cwv[j]=_nl;
+      omFree(tmp);
     }
   }
 
