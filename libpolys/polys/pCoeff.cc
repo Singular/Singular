@@ -21,13 +21,16 @@
 /// find coeff of (vector) m in vector p
 number p_CoeffTerm(poly p, poly m, const ring r)
 {
-  while (p!=NULL)
+  if (m!=NULL)
   {
-    if (p_LmCmp(p,m,r)==0)
+    while (p!=NULL)
     {
-      return n_Copy(p_GetCoeff(p,r),r->cf);
+      if (p_LmCmp(p,m,r)==0)
+      {
+        return n_Copy(p_GetCoeff(p,r),r->cf);
+      }
+      pIter(p);
     }
-    pIter(p);
   }
   return n_Init(0,r->cf);
 }
@@ -36,18 +39,21 @@ number p_CoeffTerm(poly p, poly m, const ring r)
 poly p_CoeffTermV(poly v, poly m, const ring r)
 {
   poly res=NULL;
-  while (v!=NULL)
+  if (m!=NULL)
   {
-    p_SetComp(m,p_GetComp(v,r),r);
-    if (p_LmCmp(v,m,r)==0)
+    while (v!=NULL)
     {
-      p_SetComp(m,0,r);
-      poly p=p_Init(r);
-      p_SetCoeff0(p,p_GetCoeff(v,r),r);
-      p_SetComp(p,p_GetComp(v,r),r);
-      res=p_Add_q(res,p,r);
+      p_SetComp(m,p_GetComp(v,r),r);
+      if (p_LmCmp(v,m,r)==0)
+      {
+        p_SetComp(m,0,r);
+        poly p=p_Init(r);
+        p_SetCoeff0(p,p_GetCoeff(v,r),r);
+        p_SetComp(p,p_GetComp(v,r),r);
+        res=p_Add_q(res,p,r);
+      }
+      pIter(v);
     }
-    pIter(v);
   }
   return res;
 }
