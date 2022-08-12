@@ -385,10 +385,12 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
     return _p_Mult_q_Normal(p, q, copy, r);
   else if (pure_polys
+  && ((r->cf->extRing==NULL)||(r->cf->extRing->qideal!=NULL))
+    /* exclude trans. extensions: may contain rat.funct as cf */
   && (((lq >= MIN_LENGTH_FACTORY)
-    && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
-  || ((lq >= MIN_LENGTH_FACTORY_QQ)
-    && rField_is_Q(r))))
+      && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
+    || ((lq >= MIN_LENGTH_FACTORY_QQ)
+      && rField_is_Q(r))))
   {
     poly h=singclap_pmult(p,q,r);
     if (!copy)
