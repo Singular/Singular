@@ -7693,7 +7693,7 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
 }
 
 poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat )
-// normalize=FALSE, withT=FALSE, coeff=Z
+// normalize=FALSE, withT=FALSE, coeff=Ring
 {
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
