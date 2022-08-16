@@ -159,7 +159,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (p_LmShortDivisibleBy(T0p, sevT0, p, not_sev, r))
         {
-          if(n_DivBy(orest, pGetCoeff(T0p), r->cf)
+          if(n_DivBy(orest, pGetCoeff(T0p), r->cf))
           {
             return 0;
           }
@@ -167,7 +167,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 #else
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf)
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf))
           {
             return 0;
           }
@@ -184,7 +184,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (p_LmShortDivisibleBy(T0p, sevT0,
                     p, not_sev, r))
         {
-          if(n_DivBy(orest, pGetCoeff(T0p), r->cf)
+          if(n_DivBy(orest, pGetCoeff(T0p), r->cf))
           {
             return 0;
           }
@@ -192,7 +192,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 #else
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf)
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf))
           {
             return 0;
           }
