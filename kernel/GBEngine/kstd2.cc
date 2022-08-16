@@ -146,7 +146,7 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 
     unsigned long not_sev     = ~L->sev;
     const unsigned long sevT0 = strat->sevT[0];
-    number rest, orest, mult;
+    number orest;
     if (L->p!=NULL)
     {
         const poly T0p  = strat->T[0].p;
@@ -159,20 +159,18 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (p_LmShortDivisibleBy(T0p, sevT0, p, not_sev, r))
         {
-            mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
-            {
-                return 0;
-            }
+          if(n_DivBy(orest, pGetCoeff(T0p), r->cf)
+          {
+            return 0;
+          }
         }
 #else
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
-            mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
-            {
-                return 0;
-            }
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf)
+          {
+            return 0;
+          }
         }
 #endif
     }
@@ -186,20 +184,18 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (p_LmShortDivisibleBy(T0p, sevT0,
                     p, not_sev, r))
         {
-            mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
-            {
-                return 0;
-            }
+          if(n_DivBy(orest, pGetCoeff(T0p), r->cf)
+          {
+            return 0;
+          }
         }
 #else
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
-            mult = n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
-            if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
-            {
-                return 0;
-            }
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf)
+          {
+            return 0;
+          }
         }
 #endif
     }
