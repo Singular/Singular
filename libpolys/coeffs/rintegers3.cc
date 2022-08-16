@@ -488,6 +488,7 @@ static number nrzQuotRem (number a, number b, number * r, const coeffs )
   {
     mpz_clear(rr);
   }
+  qq=nrz_short(qq);
   nrzTest((number)qq);
   return (number) qq;
 }
