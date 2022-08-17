@@ -580,7 +580,7 @@ int redRiloc_Z (LObject* h,kStrategy strat)
     reddeg = strat->LazyDegree+d;
     h->SetShortExpVector();
     if ((strat->tl>=0)
-    &&strat->T[0].GetpFDeg() == 0 
+    &&strat->T[0].GetpFDeg() == 0
     && strat->T[0].length <= 2)
     {
         docoeffred  = 1;
@@ -1079,7 +1079,6 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
     LObject H;
     H.p = h;
     int j0, j = 0;
-    int z = 10;
     int docoeffred  = 0;
     poly T0p    = strat->T[0].p;
     int T0ecart = strat->T[0].ecart;
@@ -1088,18 +1087,26 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
     if ((flag & 2) == 0) cancelunit(&H,TRUE);
     H.sev = pGetShortExpVector(H.p);
     unsigned long not_sev = ~ H.sev;
-    if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2) {
-        docoeffred  = 1;
+    if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2)
+    {
+        docoeffred  = 1; // euclidean ring required: n_QuotRem
+        if (currRing->cf->cfQuotRem==ndQuotRem)
+        {
+          docoeffred = 0;
+        }
     }
     loop
     {
         /* cut down the lead coefficients, only possible if the degree of
          * T[0] is 0 (constant). This is only efficient if T[0] is short, thus
          * we ask for the length of T[0] to be <= 2 */
-        if (docoeffred) {
+        if (docoeffred)
+        {
             j0 = kTestDivisibleByT0_Z(strat, &H);
-            if (j0 == 0 && n_DivBy(pGetCoeff(H.p), pGetCoeff(T0p), currRing->cf) == FALSE
-                    && T0ecart <= H.ecart) {
+            if ((j0 == 0)
+            && (n_DivBy(pGetCoeff(H.p), pGetCoeff(T0p), currRing->cf) == FALSE)
+            && (T0ecart <= H.ecart))
+            {
                 /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
                  * => we try to cut down the lead coefficient at least */
                 /* first copy T[j0] in order to multiply it with a coefficient later on */
@@ -1166,12 +1173,6 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
             /*
              * end of search: have to reduce with pi
              */
-            z++;
-            if (z>10)
-            {
-                pNormalize(H.p);
-                z=0;
-            }
             if ((ei > H.ecart) && (strat->kNoether==NULL))
             {
                 /*
