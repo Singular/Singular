@@ -345,12 +345,23 @@ static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
   return (n==r->type);
 }
 
-static number ndQuotRem (number a, number b, number * r, const coeffs R)
+number ndQuotRem (number a, number b, number * r, const coeffs R)
 {
   // implementation for a field: r: 0, result: n_Div
-  assume(R->is_field);
-  *r=n_Init(0,R);
-  return n_Div(a,b,R);
+  if(R->is_field)
+  {
+    *r=n_Init(0,R);
+    return n_Div(a,b,R);
+  }
+  else
+  // implementation for a non-field:
+  {
+    number d=n_Div(a,b,R);
+    number p=n_mult(b,d,R);
+    *r=n_Sub(a,p,R);
+    n_Delete(p,R);
+    return d;
+  }
 }
 STATIC_VAR n_coeffType nLastCoeffs=n_CF;
 VAR cfInitCharProc nInitCharTableDefault[]=
