@@ -357,9 +357,9 @@ number ndQuotRem (number a, number b, number * r, const coeffs R)
   // implementation for a non-field:
   {
     number d=n_Div(a,b,R);
-    number p=n_mult(b,d,R);
+    number p=n_Mult(b,d,R);
     *r=n_Sub(a,p,R);
-    n_Delete(p,R);
+    n_Delete(&p,R);
     return d;
   }
 }
