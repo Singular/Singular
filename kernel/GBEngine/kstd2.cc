@@ -138,7 +138,8 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
     }
   }
 }
-// return -1 if T[0] does not divide the leading monomial
+// return -1 if T[0] (w/o coeff) does not divide the leading monomial
+// (only for euclidean rings (n_QuotRem)
 int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 {
     if (strat->tl < 1)
@@ -159,10 +160,6 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (p_LmShortDivisibleBy(T0p, sevT0, p, not_sev, r))
         {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf))
-          {
-            return 0;
-          }
           if (n_QuotRem!=ndQuotRem) /*euclidean ring*/
           {
             mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
@@ -179,10 +176,6 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 #else
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf))
-          {
-            return 0;
-          }
           if (n_QuotRem!=ndQuotRem) /*euclidean ring*/
           {
             mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
@@ -208,10 +201,6 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
         if (p_LmShortDivisibleBy(T0p, sevT0,
                     p, not_sev, r))
         {
-          if(n_DivBy(orest, pGetCoeff(T0p), r->cf))
-          {
-            return 0;
-          }
           if (n_QuotRem!=ndQuotRem) /*euclidean ring*/
           {
             mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
@@ -228,10 +217,6 @@ int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
 #else
         if (!(sevT0 & not_sev) && p_LmDivisibleBy(T0p, p, r))
         {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T0p), r->cf))
-          {
-            return 0;
-          }
           if (n_QuotRem!=ndQuotRem) /*euclidean ring*/
           {
             mult= n_QuotRem(pGetCoeff(p), pGetCoeff(T0p), &rest, r->cf);
