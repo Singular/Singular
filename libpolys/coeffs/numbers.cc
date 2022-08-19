@@ -190,7 +190,20 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 void   ndNormalize(number&, const coeffs) { }
 static number ndReturn0(number, const coeffs r)        { return r->cfInit(0,r); }
 number ndGcd(number, number, const coeffs r)    { return r->cfInit(1,r); }
-static number ndIntMod(number, number, const coeffs r) { return r->cfInit(0,r); }
+static number ndIntMod(number, number, const coeffs r)
+{
+  if (r->is_field)
+    return r->cfInit(0,r);
+  else // implementation for a non-field:
+  {
+    number d=n_Div(a,b,R);
+    number p=n_Mult(b,d,R);
+    number r=n_Sub(a,p,R);
+    n_Delete(&p,R);
+    n_Delete(&d,R);
+    return r;
+  }
+}
 static number ndGetDenom(number &, const coeffs r)     { return r->cfInit(1,r); }
 static number ndGetNumerator(number &a,const coeffs r) { return r->cfCopy(a,r); }
 static int    ndSize(number a, const coeffs r)         { return (int)r->cfIsZero(a,r)==FALSE; }
@@ -571,7 +584,7 @@ void nKillChar(coeffs r)
       {
         n->next=n->next->next;
         if (cf_root==r) cf_root=n->next;
-        assume (r->cfKillChar!=NULL); r->cfKillChar(r); 
+        assume (r->cfKillChar!=NULL); r->cfKillChar(r);
         omFreeSize((void *)r, sizeof(n_Procs_s));
         r=NULL;
       }
