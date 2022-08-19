@@ -8931,7 +8931,8 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       blackbox *bb=getBlackboxStuff(at);
       if (bb!=NULL)
       {
-        return bb->blackbox_Op2(op,res,a,b);
+        if(!bb->blackbox_Op2(op,res,a,b)) return FALSE;
+        // if not defined, try generic (attrib, ..)
       }
       else
       return TRUE;
@@ -8942,7 +8943,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       if (bb!=NULL)
       {
         if(!bb->blackbox_Op2(op,res,a,b)) return FALSE;
-        // else: no op defined
+        // if not defined, try generic (attrib, ..)
       }
       else
       return TRUE;
@@ -9117,7 +9118,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       {
         res->rtyp=op;
         res->data=bb->blackbox_Init(bb);
-        if(!bb->blackbox_Assign(res,a)) return FALSE;
+        return bb->blackbox_Assign(res,a);
       }
       else
       return TRUE;
@@ -9127,7 +9128,8 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       blackbox *bb=getBlackboxStuff(at);
       if (bb!=NULL)
       {
-        return bb->blackbox_Op1(op,res,a);
+        if(!bb->blackbox_Op1(op,res,a)) return FALSE;
+        // if not defined, try generic routines (attrib, defined,..)
       }
       else
       return TRUE;
@@ -9329,7 +9331,8 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       blackbox *bb=getBlackboxStuff(at);
       if (bb!=NULL)
       {
-        return bb->blackbox_Op3(op,res,a,b,c);
+        if(!bb->blackbox_Op3(op,res,a,b,c)) return FALSE;
+        // otherwise, try defaul (attrib,..)
       }
       else
       return TRUE;
@@ -9440,7 +9443,8 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       blackbox *bb=getBlackboxStuff(a->Typ());
       if (bb!=NULL)
       {
-        return bb->blackbox_OpM(op,res,a);
+        if(!bb->blackbox_OpM(op,res,a)) return FALSE;
+        // otherwise, try default
       }
       else
       return TRUE;
