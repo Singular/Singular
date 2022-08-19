@@ -8,6 +8,7 @@
  * - to_smatrix(spasm) -> smatrix
  * - spasm_kernel(spasm)->spasm
  * - spasm_rref(spasm) -> spasm
+ * - <spasm>[<int>,<int>] -> number: reading an entry (get_spasm_entry)
 */
 #include "singularconfig.h"
 #include "libpolys/polys/monomials/monomials.h"
@@ -22,7 +23,7 @@ extern "C"
 #include "spasm.h"
 }
 
-spasm* conv_matrix2spasm(matrix M, const ring R)
+static spasm* conv_matrix2spasm(matrix M, const ring R)
 {
   int i=MATROWS(M);
   int j=MATCOLS(M);
@@ -43,7 +44,7 @@ spasm* conv_matrix2spasm(matrix M, const ring R)
   return A;
 }
 
-spasm* conv_smatrix2spasm(ideal M, const ring R)
+static spasm* conv_smatrix2spasm(ideal M, const ring R)
 {
   int i=MATROWS((matrix)M);
   int j=MATCOLS((matrix)M);
@@ -63,7 +64,7 @@ spasm* conv_smatrix2spasm(ideal M, const ring R)
   return A;
 }
 
-matrix conv_spasm2matrix(spasm *A, const ring R)
+static matrix conv_spasm2matrix(spasm *A, const ring R)
 {
   matrix M=mpNew(A->n,A->m);
   int n=A->n;
@@ -81,7 +82,7 @@ matrix conv_spasm2matrix(spasm *A, const ring R)
   return M;
 }
 
-ideal conv_spasm2smatrix(spasm *A, const ring R)
+static ideal conv_spasm2smatrix(spasm *A, const ring R)
 {
   ideal M=idInit(A->m,A->n);
   int n=A->n;
@@ -101,7 +102,27 @@ ideal conv_spasm2smatrix(spasm *A, const ring R)
   return M;
 }
 
-spasm* sp_kernel(spasm* A, const ring R)
+static number get_spasm_entry(spasm *A, int i, int j, const ring R)
+{
+  matrix M=mpNew(A->n,A->m);
+  int n=A->n;
+  int *Aj = A->j;
+  int *Ap = A->p;
+  i--;j--;
+  spasm_GFp *Ax = A->x;
+  if (i<n)
+  {
+    for (int px = Ap[i]; px < Ap[i + 1]; px++)
+    {
+      spasm_GFp x = (Ax != NULL) ? Ax[px] : 1;
+      if (j==Aj[px])
+        return n_Init(x,R->cf);
+    }
+  }
+  return  n_Init(0,R->cf);;
+}
+
+static spasm* sp_kernel(spasm* A, const ring R)
 {
   int n = A->n;
   int m = A->m;
@@ -137,7 +158,7 @@ spasm* sp_kernel(spasm* A, const ring R)
   return K;
 }
 
-spasm* sp_rref(spasm* A)
+static spasm* sp_rref(spasm* A)
 { /* from rref_gplu.c: compute an echelonized form, WITHOUT COLUMN PERMUTATION */
   spasm_lu *LU = spasm_LU(A, SPASM_IDENTITY_PERMUTATION, 1);
   spasm *U = spasm_transpose(LU->L, 1);
@@ -146,7 +167,7 @@ spasm* sp_rref(spasm* A)
   return U;
 }
 
-spasm* sp_Mult_v(spasm* A, int *v)
+static spasm* sp_Mult_v(spasm* A, int *v)
 {
   int *y=(int*)omAlloc0(A->n*sizeof(int));
   spasm *AA=spasm_submatrix(A,0,A->n,0,A->m,1); /*copy A*/
@@ -277,15 +298,28 @@ static BOOLEAN rref(leftv res, leftv args)
   }
   return TRUE;
 }
-static BOOLEAN sp_Op1(int op,leftv l, leftv r)
+static BOOLEAN sp_Op1(int op,leftv res, leftv arg)
 {
   if(op==TRANSPOSE_CMD)
   {
-    l->rtyp=r->Typ();
-    l->data=(void*)spasm_transpose((spasm*)r->Data(),SPASM_WITH_NUMERICAL_VALUES);
+    res->rtyp=arg->Typ();
+    res->data=(void*)spasm_transpose((spasm*)arg->Data(),SPASM_WITH_NUMERICAL_VALUES);
     return FALSE;
   }
-  return  blackboxDefaultOp1(op,l,r);
+  return  blackboxDefaultOp1(op,res,arg);
+}
+static BOOLEAN sp_Op3(int op,leftv res, leftv a1, leftv a2, leftv a3)
+{
+  if ((op=='[')
+  && (a2->Typ()==INT_CMD)
+  && (a3->Typ()==INT_CMD))
+  {
+    res->rtyp=NUMBER_CMD;
+    res->data=(char*)get_spasm_entry((spasm*)a1->Data(),(int)(long)a2->Data(),
+                              (int)(long)a3->Data(),currRing);
+    return FALSE;
+  }
+  return  blackboxDefaultOp3(op,res,a1,a2,a3);
 }
 /*----------------------------------------------------------------*/
 // initialisation of the module
@@ -298,6 +332,7 @@ extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* p)
   b->blackbox_Copy=sp_Copy;
   b->blackbox_Assign=sp_Assign;
   b->blackbox_Op1=sp_Op1;
+  b->blackbox_Op3=sp_Op3;
   SPASM_CMD=setBlackboxStuff(b,"spasm");
   p->iiAddCproc("spasm.so","spasm_kernel",FALSE,kernel);
   p->iiAddCproc("spasm.so","spasm_rref",FALSE,rref);
