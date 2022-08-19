@@ -190,10 +190,10 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 void   ndNormalize(number&, const coeffs) { }
 static number ndReturn0(number, const coeffs r)        { return r->cfInit(0,r); }
 number ndGcd(number, number, const coeffs r)    { return r->cfInit(1,r); }
-static number ndIntMod(number, number, const coeffs r)
+static number ndIntMod(number a, number b, const coeffs R)
 {
-  if (r->is_field)
-    return r->cfInit(0,r);
+  if (R->is_field)
+    return R->cfInit(0,R);
   else // implementation for a non-field:
   {
     number d=n_Div(a,b,R);
