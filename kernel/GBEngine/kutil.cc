@@ -7044,17 +7044,20 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
       {
         if (j > end_pos) return NULL;
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
-        if (strat->S[j]!= NULL && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
-            (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
+        if (strat->S[j]!= NULL
+        && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r)
+        && (ecart== LONG_MAX || ecart>= strat->ecartS[j])
+        && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
         {
-          break;
+          break; // found
         }
   #else
-        if (!(sev[j] & not_sev) &&
-            (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
-            p_LmDivisibleBy(strat->S[j], p, r) && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
+        if (!(sev[j] & not_sev)
+        && (ecart== LONG_MAX || ecart>= strat->ecartS[j])
+        && p_LmDivisibleBy(strat->S[j], p, r)
+        && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
         {
-          break;
+          break; // found
         }
   #endif
         j++;
@@ -7088,14 +7091,15 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         t = strat->S_2_T(j);
         assume(t != NULL && t->t_p != NULL && t->tailRing == r);
-        if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
-            (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+        if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r)
+        && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
         {
           t->pLength=pLength(t->t_p);
           return t;
         }
   #else
-        if (! (sev[j] & not_sev) && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+        if (! (sev[j] & not_sev)
+        && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
         {
           t = strat->S_2_T(j);
           assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
@@ -7119,18 +7123,21 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         t = strat->S_2_T(j);
         assume(t != NULL && t->t_p != NULL && t->tailRing == r);
-        if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
-            (ecart== LONG_MAX || ecart>= strat->ecartS[j]) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
+        if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r)
+        && (ecart== LONG_MAX || ecart>= strat->ecartS[j])
+        && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
         {
           t->pLength=pLength(t->t_p);
           return t;
         }
   #else
-        if (! (sev[j] & not_sev) && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+        if (! (sev[j] & not_sev)
+        && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
         {
           t = strat->S_2_T(j);
           assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
-          if (p_LmDivisibleBy(t->t_p, p, r) && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
+          if (p_LmDivisibleBy(t->t_p, p, r)
+          && n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r->cf))
           {
             t->pLength=pLength(t->t_p);
             return t;
@@ -11832,133 +11839,133 @@ extern char *  showOption();
 
 void kDebugPrint(kStrategy strat)
 {
-  PrintS("red: ");
-    if (strat->red==redFirst) PrintS("redFirst\n");
-    else if (strat->red==redHoney) PrintS("redHoney\n");
-    else if (strat->red==redEcart) PrintS("redEcart\n");
-    else if (strat->red==redHomog) PrintS("redHomog\n");
-    else if (strat->red==redLazy) PrintS("redLazy\n");
-    else if (strat->red==redLiftstd) PrintS("redLiftstd\n");
-    else  Print("%p\n",(void*)strat->red);
-  PrintS("posInT: ");
-    if (strat->posInT==posInT0) PrintS("posInT0\n");
-    else if (strat->posInT==posInT1) PrintS("posInT1\n");
-    else if (strat->posInT==posInT11) PrintS("posInT11\n");
-    else if (strat->posInT==posInT110) PrintS("posInT110\n");
-    else if (strat->posInT==posInT13) PrintS("posInT13\n");
-    else if (strat->posInT==posInT15) PrintS("posInT15\n");
-    else if (strat->posInT==posInT17) PrintS("posInT17\n");
-    else if (strat->posInT==posInT17_c) PrintS("posInT17_c\n");
-    else if (strat->posInT==posInT19) PrintS("posInT19\n");
-    else if (strat->posInT==posInT2) PrintS("posInT2\n");
+  printf("red: ");
+    if (strat->red==redFirst) printf("redFirst\n");
+    else if (strat->red==redHoney) printf("redHoney\n");
+    else if (strat->red==redEcart) printf("redEcart\n");
+    else if (strat->red==redHomog) printf("redHomog\n");
+    else if (strat->red==redLazy) printf("redLazy\n");
+    else if (strat->red==redLiftstd) printf("redLiftstd\n");
+    else  printf("%p\n",(void*)strat->red);
+  printf("posInT: ");
+    if (strat->posInT==posInT0) printf("posInT0\n");
+    else if (strat->posInT==posInT1) printf("posInT1\n");
+    else if (strat->posInT==posInT11) printf("posInT11\n");
+    else if (strat->posInT==posInT110) printf("posInT110\n");
+    else if (strat->posInT==posInT13) printf("posInT13\n");
+    else if (strat->posInT==posInT15) printf("posInT15\n");
+    else if (strat->posInT==posInT17) printf("posInT17\n");
+    else if (strat->posInT==posInT17_c) printf("posInT17_c\n");
+    else if (strat->posInT==posInT19) printf("posInT19\n");
+    else if (strat->posInT==posInT2) printf("posInT2\n");
     #ifdef HAVE_RINGS
-    else if (strat->posInT==posInT11Ring) PrintS("posInT11Ring\n");
-    else if (strat->posInT==posInT110Ring) PrintS("posInT110Ring\n");
-    else if (strat->posInT==posInT15Ring) PrintS("posInT15Ring\n");
-    else if (strat->posInT==posInT17Ring) PrintS("posInT17Ring\n");
-    else if (strat->posInT==posInT17_cRing) PrintS("posInT17_cRing\n");
+    else if (strat->posInT==posInT11Ring) printf("posInT11Ring\n");
+    else if (strat->posInT==posInT110Ring) printf("posInT110Ring\n");
+    else if (strat->posInT==posInT15Ring) printf("posInT15Ring\n");
+    else if (strat->posInT==posInT17Ring) printf("posInT17Ring\n");
+    else if (strat->posInT==posInT17_cRing) printf("posInT17_cRing\n");
     #endif
 #ifdef HAVE_MORE_POS_IN_T
-    else if (strat->posInT==posInT_EcartFDegpLength) PrintS("posInT_EcartFDegpLength\n");
-    else if (strat->posInT==posInT_FDegpLength) PrintS("posInT_FDegpLength\n");
-    else if (strat->posInT==posInT_pLength) PrintS("posInT_pLength\n");
+    else if (strat->posInT==posInT_EcartFDegpLength) printf("posInT_EcartFDegpLength\n");
+    else if (strat->posInT==posInT_FDegpLength) printf("posInT_FDegpLength\n");
+    else if (strat->posInT==posInT_pLength) printf("posInT_pLength\n");
 #endif
-    else if (strat->posInT==posInT_EcartpLength) PrintS("posInT_EcartpLength\n");
-    else if (strat->posInT==posInTrg0) PrintS("posInTrg0\n");
-    else  Print("%p\n",(void*)strat->posInT);
-  PrintS("posInL: ");
-    if (strat->posInL==posInL0) PrintS("posInL0\n");
-    else if (strat->posInL==posInL10) PrintS("posInL10\n");
-    else if (strat->posInL==posInL11) PrintS("posInL11\n");
-    else if (strat->posInL==posInL110) PrintS("posInL110\n");
-    else if (strat->posInL==posInL13) PrintS("posInL13\n");
-    else if (strat->posInL==posInL15) PrintS("posInL15\n");
-    else if (strat->posInL==posInL17) PrintS("posInL17\n");
-    else if (strat->posInL==posInL17_c) PrintS("posInL17_c\n");
+    else if (strat->posInT==posInT_EcartpLength) printf("posInT_EcartpLength\n");
+    else if (strat->posInT==posInTrg0) printf("posInTrg0\n");
+    else  printf("%p\n",(void*)strat->posInT);
+  printf("posInL: ");
+    if (strat->posInL==posInL0) printf("posInL0\n");
+    else if (strat->posInL==posInL10) printf("posInL10\n");
+    else if (strat->posInL==posInL11) printf("posInL11\n");
+    else if (strat->posInL==posInL110) printf("posInL110\n");
+    else if (strat->posInL==posInL13) printf("posInL13\n");
+    else if (strat->posInL==posInL15) printf("posInL15\n");
+    else if (strat->posInL==posInL17) printf("posInL17\n");
+    else if (strat->posInL==posInL17_c) printf("posInL17_c\n");
     #ifdef HAVE_RINGS
-    else if (strat->posInL==posInL0) PrintS("posInL0Ring\n");
-    else if (strat->posInL==posInL11Ring) PrintS("posInL11Ring\n");
-    else if (strat->posInL==posInL11Ringls) PrintS("posInL11Ringls\n");
-    else if (strat->posInL==posInL110Ring) PrintS("posInL110Ring\n");
-    else if (strat->posInL==posInL15Ring) PrintS("posInL15Ring\n");
-    else if (strat->posInL==posInL17Ring) PrintS("posInL17Ring\n");
-    else if (strat->posInL==posInL17_cRing) PrintS("posInL17_cRing\n");
+    else if (strat->posInL==posInL0) printf("posInL0Ring\n");
+    else if (strat->posInL==posInL11Ring) printf("posInL11Ring\n");
+    else if (strat->posInL==posInL11Ringls) printf("posInL11Ringls\n");
+    else if (strat->posInL==posInL110Ring) printf("posInL110Ring\n");
+    else if (strat->posInL==posInL15Ring) printf("posInL15Ring\n");
+    else if (strat->posInL==posInL17Ring) printf("posInL17Ring\n");
+    else if (strat->posInL==posInL17_cRing) printf("posInL17_cRing\n");
     #endif
-    else if (strat->posInL==posInLSpecial) PrintS("posInLSpecial\n");
-    else if (strat->posInL==posInLrg0) PrintS("posInLrg0\n");
-    else  Print("%p\n",(void*)strat->posInL);
-  PrintS("enterS: ");
-    if (strat->enterS==enterSBba) PrintS("enterSBba\n");
-    else if (strat->enterS==enterSMora) PrintS("enterSMora\n");
-    else if (strat->enterS==enterSMoraNF) PrintS("enterSMoraNF\n");
-    else  Print("%p\n",(void*)strat->enterS);
-  PrintS("initEcart: ");
-    if (strat->initEcart==initEcartBBA) PrintS("initEcartBBA\n");
-    else if (strat->initEcart==initEcartNormal) PrintS("initEcartNormal\n");
-    else  Print("%p\n",(void*)strat->initEcart);
-  PrintS("initEcartPair: ");
-    if (strat->initEcartPair==initEcartPairBba) PrintS("initEcartPairBba\n");
-    else if (strat->initEcartPair==initEcartPairMora) PrintS("initEcartPairMora\n");
-    else  Print("%p\n",(void*)strat->initEcartPair);
-  Print("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
+    else if (strat->posInL==posInLSpecial) printf("posInLSpecial\n");
+    else if (strat->posInL==posInLrg0) printf("posInLrg0\n");
+    else  printf("%p\n",(void*)strat->posInL);
+  printf("enterS: ");
+    if (strat->enterS==enterSBba) printf("enterSBba\n");
+    else if (strat->enterS==enterSMora) printf("enterSMora\n");
+    else if (strat->enterS==enterSMoraNF) printf("enterSMoraNF\n");
+    else  printf("%p\n",(void*)strat->enterS);
+  printf("initEcart: ");
+    if (strat->initEcart==initEcartBBA) printf("initEcartBBA\n");
+    else if (strat->initEcart==initEcartNormal) printf("initEcartNormal\n");
+    else  printf("%p\n",(void*)strat->initEcart);
+  printf("initEcartPair: ");
+    if (strat->initEcartPair==initEcartPairBba) printf("initEcartPairBba\n");
+    else if (strat->initEcartPair==initEcartPairMora) printf("initEcartPairMora\n");
+    else  printf("%p\n",(void*)strat->initEcartPair);
+  printf("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
     strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
-  Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets=%d\n",
+  printf("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets=%d\n",
     strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
-  PrintS("chainCrit: ");
-    if (strat->chainCrit==chainCritNormal) PrintS("chainCritNormal\n");
-    else if (strat->chainCrit==chainCritOpt_1) PrintS("chainCritOpt_1\n");
-    else  Print("%p\n",(void*)strat->chainCrit);
-  Print("posInLDependsOnLength=%d\n",
+  printf("chainCrit: ");
+    if (strat->chainCrit==chainCritNormal) printf("chainCritNormal\n");
+    else if (strat->chainCrit==chainCritOpt_1) printf("chainCritOpt_1\n");
+    else  printf("%p\n",(void*)strat->chainCrit);
+  printf("posInLDependsOnLength=%d\n",
          strat->posInLDependsOnLength);
-  PrintS(showOption());PrintLn();
-  PrintS("LDeg: ");
-    if (currRing->pLDeg==pLDeg0) PrintS("pLDeg0");
-    else if (currRing->pLDeg==pLDeg0c) PrintS("pLDeg0c");
-    else if (currRing->pLDeg==pLDegb) PrintS("pLDegb");
-    else if (currRing->pLDeg==pLDeg1) PrintS("pLDeg1");
-    else if (currRing->pLDeg==pLDeg1c) PrintS("pLDeg1c");
-    else if (currRing->pLDeg==pLDeg1_Deg) PrintS("pLDeg1_Deg");
-    else if (currRing->pLDeg==pLDeg1c_Deg) PrintS("pLDeg1c_Deg");
-    else if (currRing->pLDeg==pLDeg1_Totaldegree) PrintS("pLDeg1_Totaldegree");
-    else if (currRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
-    else if (currRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
-    else if (currRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
-    else if (currRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
-    else Print("? (%lx)", (long)currRing->pLDeg);
-    PrintS(" / ");
-    if (strat->tailRing->pLDeg==pLDeg0) PrintS("pLDeg0");
-    else if (strat->tailRing->pLDeg==pLDeg0c) PrintS("pLDeg0c");
-    else if (strat->tailRing->pLDeg==pLDegb) PrintS("pLDegb");
-    else if (strat->tailRing->pLDeg==pLDeg1) PrintS("pLDeg1");
-    else if (strat->tailRing->pLDeg==pLDeg1c) PrintS("pLDeg1c");
-    else if (strat->tailRing->pLDeg==pLDeg1_Deg) PrintS("pLDeg1_Deg");
-    else if (strat->tailRing->pLDeg==pLDeg1c_Deg) PrintS("pLDeg1c_Deg");
-    else if (strat->tailRing->pLDeg==pLDeg1_Totaldegree) PrintS("pLDeg1_Totaldegree");
-    else if (strat->tailRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
-    else if (strat->tailRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
-    else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
-    else if (strat->tailRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
-    else Print("? (%lx)", (long)strat->tailRing->pLDeg);
-    PrintLn();
-  PrintS("currRing->pFDeg: ");
-    if (currRing->pFDeg==p_Totaldegree) PrintS("p_Totaldegree");
-    else if (currRing->pFDeg==p_WFirstTotalDegree) PrintS("pWFirstTotalDegree");
-    else if (currRing->pFDeg==p_Deg) PrintS("p_Deg");
-    else if (currRing->pFDeg==kHomModDeg) PrintS("kHomModDeg");
-    else if (currRing->pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
-    else if (currRing->pFDeg==p_WTotaldegree) PrintS("p_WTotaldegree");
-    else Print("? (%lx)", (long)currRing->pFDeg);
-    PrintLn();
-    Print(" syzring:%d, syzComp(strat):%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
+  printf(showOption());printf("\n");
+  printf("LDeg: ");
+    if (currRing->pLDeg==pLDeg0) printf("pLDeg0");
+    else if (currRing->pLDeg==pLDeg0c) printf("pLDeg0c");
+    else if (currRing->pLDeg==pLDegb) printf("pLDegb");
+    else if (currRing->pLDeg==pLDeg1) printf("pLDeg1");
+    else if (currRing->pLDeg==pLDeg1c) printf("pLDeg1c");
+    else if (currRing->pLDeg==pLDeg1_Deg) printf("pLDeg1_Deg");
+    else if (currRing->pLDeg==pLDeg1c_Deg) printf("pLDeg1c_Deg");
+    else if (currRing->pLDeg==pLDeg1_Totaldegree) printf("pLDeg1_Totaldegree");
+    else if (currRing->pLDeg==pLDeg1c_Totaldegree) printf("pLDeg1c_Totaldegree");
+    else if (currRing->pLDeg==pLDeg1_WFirstTotalDegree) printf("pLDeg1_WFirstTotalDegree");
+    else if (currRing->pLDeg==pLDeg1c_WFirstTotalDegree) printf("pLDeg1c_WFirstTotalDegree");
+    else if (currRing->pLDeg==maxdegreeWecart) printf("maxdegreeWecart");
+    else printf("? (%lx)", (long)currRing->pLDeg);
+    printf(" / ");
+    if (strat->tailRing->pLDeg==pLDeg0) printf("pLDeg0");
+    else if (strat->tailRing->pLDeg==pLDeg0c) printf("pLDeg0c");
+    else if (strat->tailRing->pLDeg==pLDegb) printf("pLDegb");
+    else if (strat->tailRing->pLDeg==pLDeg1) printf("pLDeg1");
+    else if (strat->tailRing->pLDeg==pLDeg1c) printf("pLDeg1c");
+    else if (strat->tailRing->pLDeg==pLDeg1_Deg) printf("pLDeg1_Deg");
+    else if (strat->tailRing->pLDeg==pLDeg1c_Deg) printf("pLDeg1c_Deg");
+    else if (strat->tailRing->pLDeg==pLDeg1_Totaldegree) printf("pLDeg1_Totaldegree");
+    else if (strat->tailRing->pLDeg==pLDeg1c_Totaldegree) printf("pLDeg1c_Totaldegree");
+    else if (strat->tailRing->pLDeg==pLDeg1_WFirstTotalDegree) printf("pLDeg1_WFirstTotalDegree");
+    else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) printf("pLDeg1c_WFirstTotalDegree");
+    else if (strat->tailRing->pLDeg==maxdegreeWecart) printf("maxdegreeWecart");
+    else printf("? (%lx)", (long)strat->tailRing->pLDeg);
+    printf("\n");
+  printf("currRing->pFDeg: ");
+    if (currRing->pFDeg==p_Totaldegree) printf("p_Totaldegree");
+    else if (currRing->pFDeg==p_WFirstTotalDegree) printf("pWFirstTotalDegree");
+    else if (currRing->pFDeg==p_Deg) printf("p_Deg");
+    else if (currRing->pFDeg==kHomModDeg) printf("kHomModDeg");
+    else if (currRing->pFDeg==totaldegreeWecart) printf("totaldegreeWecart");
+    else if (currRing->pFDeg==p_WTotaldegree) printf("p_WTotaldegree");
+    else printf("? (%lx)", (long)currRing->pFDeg);
+    printf("\n");
+    printf(" syzring:%d, syzComp(strat):%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
     if(TEST_OPT_DEGBOUND)
-      Print(" degBound: %d\n", Kstd1_deg);
+      printf(" degBound: %d\n", Kstd1_deg);
 
     if( ecartWeights != NULL )
     {
-       PrintS("ecartWeights: ");
+       printf("ecartWeights: ");
        for (int i = rVar(currRing); i > 0; i--)
-         Print("%hd ", ecartWeights[i]);
-       PrintLn();
+         printf("%hd ", ecartWeights[i]);
+       printf("\n");
        assume( TEST_OPT_WEIGHTM );
     }
 
