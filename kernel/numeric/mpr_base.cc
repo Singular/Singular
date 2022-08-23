@@ -1737,6 +1737,7 @@ ideal resMatrixSparse::getMatrix()
   poly pp,phelp,piter,pgls;
 
   // copy original sparse res matrix
+  if (rmat==NULL) return NULL; //in case of error before
   ideal rmat_out= idCopy(rmat);
 
   // now fill in coeffs of f0
