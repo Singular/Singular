@@ -81,3 +81,31 @@ ideal id_CoeffTermV(ideal M, poly m, const ring r)
   }
   return res;
 }
+
+/// find coeffs of a vector of a list of given monomials, n>=max_comp(v)
+poly p_CoeffTermId(poly v, ideal m, int n, const ring r)
+{
+  if ((n<=0)||(v==NULL)) return NULL;
+  poly q;
+  poly u=NULL;
+  int dummy;
+  const int ncols_m=IDELEMS(m);
+  v=p_Copy(v,r);
+  for(int i=1;i<=n;i++)
+  {
+    p_TakeOutComp(&v,i,&q,&dummy,r);
+    for(int j=0;j<ncols_m;j++)
+    {
+      number n=p_CoeffTerm(q,m->m[j],r);
+      poly uu=p_NSet(n,r);
+      if (uu!=NULL)
+      {
+        p_SetComp(uu,(i-1)*ncols_m+j+1,r);
+        u=p_Add_q(u,uu,r);
+      }
+    }
+    if (v==NULL) break;
+  }
+  return u;
+}
+

@@ -3970,6 +3970,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       const short t4[]={2,MODUL_CMD,VECTOR_CMD};
       const short t5[]={2,VECTOR_CMD,POLY_CMD};
       const short t6[]={2,MODUL_CMD,POLY_CMD};
+      const short t7[]={2,VECTOR_CMD,IDEAL_CMD};
       if (iiCheckTypes(h,t1,0)
       || iiCheckTypes(h,t2,0))
       {
@@ -4002,6 +4003,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         poly q=(poly)h->next->Data();
         res->data=id_CoeffTermV(p,q,currRing);
         res->rtyp=MODUL_CMD;
+        return FALSE;
+      }
+      else if (iiCheckTypes(h,t7,0)) /* vector,ideal*/
+      {
+        poly p=(poly)h->Data();
+        ideal q=(ideal)h->next->Data();
+        res->data=p_CoeffTermId(p,q,p_MaxComp(p,currRing),currRing);
+        res->rtyp=VECTOR_CMD;
         return FALSE;
       }
       else
