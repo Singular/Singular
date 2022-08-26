@@ -5,6 +5,7 @@ New/bigints.tst
 New/bug593_primdecZ.tst
 New/bug_541_interred.tst
 New/bug_dim_mixedorder.tst
+New/bug_long_fact.tst
 New/bug_std.tst
 New/bug_std_qring_559.tst
 New/dim_integers.tst
