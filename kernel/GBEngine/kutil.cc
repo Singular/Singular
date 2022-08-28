@@ -11917,7 +11917,7 @@ void kDebugPrint(kStrategy strat)
     else  printf("%p\n",(void*)strat->chainCrit);
   printf("posInLDependsOnLength=%d\n",
          strat->posInLDependsOnLength);
-  printf(showOption());printf("\n");
+  printf("%s\n",showOption());
   printf("LDeg: ");
     if (currRing->pLDeg==pLDeg0) printf("pLDeg0");
     else if (currRing->pLDeg==pLDeg0c) printf("pLDeg0c");
