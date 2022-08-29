@@ -1080,8 +1080,6 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 // Reduction of Bpoly with a given poly
 //
 
-extern int ksCheckCoeff(number *a, number *b);
-
 number kBucketPolyRed(kBucket_pt bucket,
                       poly p1, int l1,
                       poly spNoether)
@@ -1427,8 +1425,9 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
 *       2  ->  a != 1,  b == 1
 *       3  ->  a == 1,  b == 1
 *   this value is used to control the spolys
+*   reduce is set inside "NF" -> a should be 1
 */
-int ksCheckCoeff(number *a, number *b, const coeffs r)
+int ksCheckCoeff(number *a, number *b, const coeffs r, BOOLEAN reduce)
 {
   int c = 0;
   number an = *a, bn = *b;
@@ -1437,26 +1436,50 @@ int ksCheckCoeff(number *a, number *b, const coeffs r)
 
   number cn;
 
-  if (nCoeff_is_Ring(r)
-  && n_DivBy(an,bn,r))
+  if (nCoeff_is_Ring(r))
   {
-    cn=n_Copy(bn,r);
+    if (n_Equal(an,bn,r))
+    {
+      *a=n_Init(1,r);
+      *b=n_Init(1,r);
+      return 3;
+    }
+    else if(redtail)
+    {
+      an = n_Init(1,r);
+      bn = n_ExactDiv(bn, an, r);
+    }
+    else
+    {
+      cn = n_SubringGcd(an, bn, r);
+      if(n_IsOne(cn, r))
+      {
+        an = n_Copy(an, r);
+        bn = n_Copy(bn, r);
+      }
+      else
+      {
+        an = n_ExactDiv(an, cn, r);
+        bn = n_ExactDiv(bn, cn, r);
+      }
+      n_Delete(&cn, r);
+    }
   }
   else
   {
     cn = n_SubringGcd(an, bn, r);
+    if(n_IsOne(cn, r))
+    {
+      an = n_Copy(an, r);
+      bn = n_Copy(bn, r);
+    }
+    else
+    {
+      an = n_ExactDiv(an, cn, r);
+      bn = n_ExactDiv(bn, cn, r);
+    }
+    n_Delete(&cn, r);
   }
-  if(n_IsOne(cn, r))
-  {
-    an = n_Copy(an, r);
-    bn = n_Copy(bn, r);
-  }
-  else
-  {
-    an = n_ExactDiv(an, cn, r);
-    bn = n_ExactDiv(bn, cn, r);
-  }
-  n_Delete(&cn, r);
   if (n_IsOne(an, r))
   {
     c = 1;

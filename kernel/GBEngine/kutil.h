@@ -699,12 +699,14 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 //            (strat == NULL)
 //         -1 tailRing change could not be performed due to exceeding exp
 //            bound of currRing
+//  reduce should be set inside "kNF" (only relevant for rings)
 int ksReducePoly(LObject* PR,
                  TObject* PW,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  poly *mon =NULL,
-                 kStrategy strat = NULL);
+                 kStrategy strat = NULL,
+                 BOOLEAN redtail = FALSE);
 
 /* like ksReducePoly, but if the reducer has only 1 term we still
  * compute a possible coefficient multiplier for PR. this comes from

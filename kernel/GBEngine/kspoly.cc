@@ -189,7 +189,8 @@ int ksReducePoly(LObject* PR,
                  poly spNoether,
                  number *coef,
                  poly *mon,
-                 kStrategy strat)
+                 kStrategy strat,
+                 BOOLEAN reduce)
 {
 #ifdef KDEBUG
   red_count++;
@@ -287,7 +288,8 @@ int ksReducePoly(LObject* PR,
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
-    int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
+    int ct = ksCheckCoeff(&an, &bn, tailRing->cf, reduce);    // Calculate special LC
+    // in case of reduce, do not multiply PR
     p_SetCoeff(lm, bn, tailRing);
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);

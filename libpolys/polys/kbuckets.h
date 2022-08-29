@@ -243,5 +243,5 @@ inline poly kBucketExtractLm(kBucket_pt bucket)
 poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i);
 void kBucketSimpleContent(kBucket_pt bucket);
 BOOLEAN kBucketIsCleared(kBucket_pt bucket);
-int ksCheckCoeff(number *a, number *b, const coeffs r);
+int ksCheckCoeff(number *a, number *b, const coeffs r, BOOLEAN reduce=FALSE);
 #endif /* KBUCKETS_H */
