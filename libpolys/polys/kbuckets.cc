@@ -1435,29 +1435,26 @@ int ksCheckCoeff(number *a, number *b, const coeffs r)
   n_Test(an,r);
   n_Test(bn,r);
 
-  number cn = n_SubringGcd(an, bn, r);
+  number cn;
 
   if (nCoeff_is_Ring(r)
-  && n_IsOne(cn,r)
   && n_DivBy(an,bn,r))
   {
-    n_Delete(&cn,r);
     cn=n_Copy(bn,r);
-    an=n_ExactDiv(an, cn, r);
-    bn=n_ExactDiv(bn, cn, r);
   }
   else
   {
-    if(n_IsOne(cn, r))
-    {
-      an = n_Copy(an, r);
-      bn = n_Copy(bn, r);
-    }
-    else
-    {
-      an = n_ExactDiv(an, cn, r);
-      bn = n_ExactDiv(bn, cn, r);
-    }
+    cn = n_SubringGcd(an, bn, r);
+  }
+  if(n_IsOne(cn, r))
+  {
+    an = n_Copy(an, r);
+    bn = n_Copy(bn, r);
+  }
+  else
+  {
+    an = n_ExactDiv(an, cn, r);
+    bn = n_ExactDiv(bn, cn, r);
   }
   n_Delete(&cn, r);
   if (n_IsOne(an, r))
