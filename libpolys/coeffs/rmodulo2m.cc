@@ -74,11 +74,11 @@ EXTERN_VAR omBin gmp_nrz_bin; /* init in rintegers*/
 
 static char* nr2mCoeffName(const coeffs cf)
 {
-  STATIC_VAR char n2mCoeffName_buf[30];
+  STATIC_VAR char n2mCoeffName_buf[37];
   if (cf->modExponent>32) /* for 32/64bit arch.*/
-    snprintf(n2mCoeffName_buf,21,"ZZ/(bigint(2)^%lu)",cf->modExponent);
+    snprintf(n2mCoeffName_buf,36,"ZZ/(bigint(2)^%lu)",cf->modExponent);
   else
-    snprintf(n2mCoeffName_buf,21,"ZZ/(2^%lu)",cf->modExponent);
+    snprintf(n2mCoeffName_buf,36,"ZZ/(2^%lu)",cf->modExponent);
   return n2mCoeffName_buf;
 }
 
