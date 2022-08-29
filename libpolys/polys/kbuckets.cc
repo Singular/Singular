@@ -1444,7 +1444,7 @@ int ksCheckCoeff(number *a, number *b, const coeffs r, BOOLEAN reduce)
       *b=n_Init(1,r);
       return 3;
     }
-    else if(redtail)
+    else if(reduce)
     {
       an = n_Init(1,r);
       bn = n_ExactDiv(bn, an, r);
