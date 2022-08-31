@@ -1436,42 +1436,24 @@ int ksCheckCoeff(number *a, number *b, const coeffs r, BOOLEAN reduce)
 
   number cn;
 
-  if (nCoeff_is_Ring(r))
+  if (n_Equal(an,bn,r))
   {
-    if (n_Equal(an,bn,r))
-    {
-      *a=n_Init(1,r);
-      *b=n_Init(1,r);
-      return 3;
-    }
-    else if(reduce)
-    {
-      an = n_Init(1,r);
-      bn = n_ExactDiv(bn, an, r);
-    }
-    else
-    {
-      cn = n_SubringGcd(an, bn, r);
-      if(n_IsOne(cn, r))
-      {
-        an = n_Copy(an, r);
-        bn = n_Copy(bn, r);
-      }
-      else
-      {
-        an = n_ExactDiv(an, cn, r);
-        bn = n_ExactDiv(bn, cn, r);
-      }
-      n_Delete(&cn, r);
-    }
+    *a=n_Init(1,r); // gcd is u*a and a/a is 1 (u a unit)
+    *b=n_Init(1,r); // gcd is u*b and b/b is 1 (u a unit)
+    return 3;
+  }
+  else if(reduce) // especially: a|b
+  {
+    an = n_Init(1,r); // gcd is u*a, a/a is 1
+    bn = n_ExactDiv(bn, an, r);// gcd is u*a, return b/a
   }
   else
   {
     cn = n_SubringGcd(an, bn, r);
     if(n_IsOne(cn, r))
     {
-      an = n_Copy(an, r);
-      bn = n_Copy(bn, r);
+      an = n_Copy(an, r); // a/1
+      bn = n_Copy(bn, r); // b/1
     }
     else
     {
