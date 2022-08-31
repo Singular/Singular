@@ -549,8 +549,8 @@ int feReadLine(char* b, int l)
           else          len=ss-anf;
           show_echo=TRUE;
         }
-        else if (/*(startfptr>0) &&*/
-        (currentVoice->buffer[startfptr-1]=='\n'))
+        else if /*(startfptr>0) &&*/
+        (currentVoice->buffer[startfptr-1]=='\n')
         {
           anf=currentVoice->buffer+startfptr;
           const char *ss=strchr(anf,'\n');

@@ -1153,7 +1153,7 @@ static int singular_manual(char *str, BOOLEAN isIndexEntry,heEntry hentry)
 
   while(!feof(index)
         && (fgets(buffer, BUF_LEN, index) != (char *)0)
-        && (buffer[0] != FIN_INDEX));
+        && (buffer[0] != FIN_INDEX)); // skip to FIN_INDEX
    char temp[256];temp[0]='\0';
    char *htmldir = feResource('u'); /* always defined */
    if (hentry != NULL && *(hentry->url) != '\0')

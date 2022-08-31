@@ -1,6 +1,6 @@
 // emacs edit mode for this file is -*- C++ -*-
 #ifndef PCOEFF_H
-#define PCOEFFH
+#define PCOEFF_H
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
