@@ -1427,29 +1427,21 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
 *   this value is used to control the spolys
 *   reduce is set inside "NF" -> a should be 1
 */
-int ksCheckCoeff(number *a, number *b, const coeffs r, BOOLEAN reduce)
+int ksCheckCoeff(number *a, number *b, const coeffs r, const BOOLEAN reduce)
 {
   int c = 0;
   number an = *a, bn = *b;
   n_Test(an,r);
   n_Test(bn,r);
 
-  number cn;
-
-  if (n_Equal(an,bn,r))
-  {
-    *a=n_Init(1,r); // gcd is u*a and a/a is 1 (u a unit)
-    *b=n_Init(1,r); // gcd is u*b and b/b is 1 (u a unit)
-    return 3;
-  }
-  else if(reduce) // especially: a|b
+  if(reduce) // especially: a|b
   {
     an = n_Init(1,r); // gcd is u*a, a/a is 1
     bn = n_ExactDiv(bn, an, r);// gcd is u*a, return b/a
   }
   else
   {
-    cn = n_SubringGcd(an, bn, r);
+    number cn = n_SubringGcd(an, bn, r);
     if(n_IsOne(cn, r))
     {
       an = n_Copy(an, r); // a/1
