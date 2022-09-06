@@ -109,3 +109,21 @@ poly p_CoeffTermId(poly v, ideal m, int n, const ring r)
   return u;
 }
 
+/// find coeffs of a vector of a matrix(module) of given monomials, n>=max_comp(v)
+poly p_CoeffTermMo(poly v, ideal m, int n, const ring r)
+{
+  poly res=NULL;
+  for(int i=0;i<IDELEMS(m);i++)
+  {
+    ideal mm=id_Vec2Ideal(m->m[i],r);
+    poly tmp=p_CoeffTermId(v,mm,n,r);
+    if (i>0)
+    {
+      p_Shift(&tmp,m->rank,r); // m->rank >= p_MaxComp(m->m[i-1],r)
+      res=p_Add_q(res,tmp,r);
+    }
+    else
+      res=tmp;
+  }
+  return res;
+}

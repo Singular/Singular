@@ -32,4 +32,7 @@ ideal id_CoeffTermV(ideal M, poly m, const ring r);
 
 /// find coeffs of a vector of a list of given monomials, n>=max_comp(v)
 poly p_CoeffTermId(poly v, ideal m, int n, const ring r);
+
+/// find coeffs of a vector of a matrix(as module) of given monomials, n>=max_comp(v)
+poly p_CoeffTermMo(poly v, ideal m, int n, const ring r);
 #endif
