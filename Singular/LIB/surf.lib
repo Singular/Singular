@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version surf.lib 4.2.1.0 Nov_2021 "; // $Id$
+version="version surf.lib 4.3.1.2 Sep_2022 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -165,7 +165,14 @@ EXAMPLE: example plot; shows an example
     {
       surf_call = "surf ";
       surf_call = surf_call + l + ">/dev/null 2>&1";
-      surf_call = surf_call + " && cygstart /tmp/surf.jpg.jpg";
+      if (status("/tmp/surf.jpg","read")=="yes")
+      {
+        surf_call = surf_call + " && cygstart /tmp/surf.jpg";
+      }
+      else
+      {
+        surf_call = surf_call + " && cygstart /tmp/surf.jpg.jpg";
+      }
       i = system("sh", surf_call);
       if (i != 0)
       {
