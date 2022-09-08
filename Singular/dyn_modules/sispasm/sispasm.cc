@@ -4,6 +4,8 @@
  * - assignment smatrix ->spasm, matrix ->spasm
  * - printing/string(spasm)
  * - transpose(spasm) -> spasm
+ * - nrows(spasm) -> int
+ * - ncols(spasm) -> int
  * - to_matrix(spams) -> matrix
  * - to_smatrix(spasm) -> smatrix
  * - spasm_kernel(spasm)->spasm
@@ -304,6 +306,20 @@ static BOOLEAN sp_Op1(int op,leftv res, leftv arg)
   {
     res->rtyp=arg->Typ();
     res->data=(void*)spasm_transpose((spasm*)arg->Data(),SPASM_WITH_NUMERICAL_VALUES);
+    return FALSE;
+  }
+  else if (op==COLS_CMD)
+  {
+    spasm* A=(spasm*)arg->Data();
+    res->rtyp=INT_CMD;
+    res->data=(void*)(long)A->m;
+    return FALSE;
+  }
+  else if (op==ROWS_CMD)
+  {
+    spasm* A=(spasm*)arg->Data();
+    res->rtyp=INT_CMD;
+    res->data=(void*)(long)A->n;
     return FALSE;
   }
   return  blackboxDefaultOp1(op,res,arg);
