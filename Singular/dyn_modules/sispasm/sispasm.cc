@@ -1,7 +1,7 @@
 /*
  * provides (after defintion of a ring with coeffs in Z/p)
  * - type spasm
- * - assignment smatrix ->spasm, matrix ->spasm
+ * - assignment smatrix,module ->spasm, matrix ->spasm
  * - printing/string(spasm)
  * - transpose(spasm) -> spasm
  * - nrows(spasm) -> int
@@ -229,16 +229,17 @@ static BOOLEAN sp_Assign(leftv l, leftv r)
   {
     l->data = (void*)NULL;
   }
+  int rt=r->Typ():
 
-  if (r->Typ()==l->Typ())
+  if (rt==l->Typ())
   {
     A=(spasm*)sp_Copy(NULL,r->Data());
   }
-  else if (r->Typ()==SMATRIX_CMD)
+  else if ((rt==SMATRIX_CMD)||(rt==MODUL_CMD))
   {
     A=conv_smatrix2spasm((ideal)r->Data(),currRing);
   }
-  else if (r->Typ()==MATRIX_CMD)
+  else if (rt==MATRIX_CMD)
   {
     A=conv_matrix2spasm((matrix)r->Data(),currRing);
   }
