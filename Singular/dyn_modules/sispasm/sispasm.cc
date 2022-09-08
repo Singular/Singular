@@ -229,7 +229,7 @@ static BOOLEAN sp_Assign(leftv l, leftv r)
   {
     l->data = (void*)NULL;
   }
-  int rt=r->Typ():
+  int rt=r->Typ();
 
   if (rt==l->Typ())
   {
