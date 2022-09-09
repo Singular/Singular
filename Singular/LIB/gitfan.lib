@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="version gitfan.lib 4.1.2.0 Feb_2019 ";
+version="version gitfan.lib 4.3.1.0 Sep_2022 ";
 category="Algebraic Geometry";
 info="
 LIBRARY:   gitfan.lib       Compute GIT-fans.
@@ -228,7 +228,7 @@ example
 
 
   // 4th ex //
-  ring R = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
+  ring R4 = 0,T(1..10),wp(1,1,1,1,1,1,1,1,1,1);
   ideal J =
     T(5)*T(10)-T(6)*T(9)+T(7)*T(8),
     T(1)*T(9)-T(2)*T(7)+T(4)*T(5),
@@ -345,9 +345,7 @@ EXAMPLE: example isaface; shows an example
   initNewRing = initNewRing + string(var(gam0[size(gam0)])) + ")";
   def R = basering;
 //  execute(initNewRing);
-  initNewRing;
   ring Rgam0 = create_ring(0, initNewRing, "wp("+string(w0)+")");
-  ringlist(Rgam0);
 
   ideal agam0 = imap(R,a);
 
