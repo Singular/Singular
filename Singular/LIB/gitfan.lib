@@ -1007,14 +1007,15 @@ EXAMPLE: example movingCone; shows an example
   {
     // The following code works always but is generally slower:
     list C;
-    for (int i=1; i<=nrows(Qt); i++)
+    int i,j;
+    for (i=1; i<=nrows(Qt); i++)
     {
       intmat Qdash[nrows(Qt)-1][ncols(Qt)];
-      for (int j=1; j<i; j++)
+      for (j=1; j<i; j++)
       {
         Qdash[j,1..ncols(Qt)] = Qt[j,1..ncols(Qt)];
       }
-      for (int j=i+1; j<=nrows(Qt); j++)
+      for (j=i+1; j<=nrows(Qt); j++)
       {
         Qdash[j-1,1..ncols(Qt)] = Qt[j,1..ncols(Qt)];
       }
@@ -1040,13 +1041,13 @@ example
   // moving cone where the image of the positive orthant
   // is the entire space
   // (from bug reported by Donton-Bury and Grab)
-  intmat Q[3][16] =
+  intmat Q2[3][16] =
     7, 7,7,7, 7,7,7, 7,7,7, 7,7,7, -7,0,0,
     0, 0,2,1, 0,2,1, 3,2,1, 3,2,4, 0,-3,0,
     0, 0,1,2, 0,1,2, 3,1,2, 3,4,2, 0,0,-3;
-  cone mov = movingCone(Q);
-  mov;
-  rays(mov);
+  cone mov2 = movingCone(Q2);
+  mov2;
+  rays(mov2);
 }
 
 
