@@ -2437,7 +2437,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   if(idIs0(F))
     return idInit(1,F->rank);
 
-  if(Q!=NULL)&&(idIs0(Q)) Q=NULL;
+  if((Q!=NULL)&&(idIs0(Q))) Q=NULL;
 #ifdef HAVE_SHIFTBBA
   if(rIsLPRing(currRing)) return kStdShift(F, Q, h, w, hilb, syzComp, newIdeal, vw, FALSE);
 #endif
@@ -3184,7 +3184,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
       Q = SCAQuotient(currRing);
   }
 #endif
-  if(Q!=NULL) &&(idIs0(Q)) Q=NULL;
+  if((Q!=NULL) &&(idIs0(Q))) Q=NULL;
 
   if ((idIs0(F))&&(Q==NULL))
   {
@@ -3287,7 +3287,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   }
 #endif
 
-  if (Q!=NULL)&&(idIs0(Q)) Q=NULL;
+  if ((Q!=NULL)&&(idIs0(Q))) Q=NULL;
 
   if ((idIs0(F))&&(Q==NULL))
   {
