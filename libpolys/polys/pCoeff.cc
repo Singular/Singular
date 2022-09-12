@@ -114,10 +114,16 @@ poly p_CoeffTermMo(poly v, ideal m, int n, const ring r)
 {
   poly res=NULL;
   int to_shift=0;
+  poly q;
+  int dummy;
+  v=p_Copy(v,r);
   for(int i=0;i<IDELEMS(m);i++)
   {
+    if (v==NULL) break;
+    p_TakeOutComp(&v,i+1,&q,&dummy,r);
     ideal mm=id_Vec2Ideal(m->m[i],r);
-    poly tmp=p_CoeffTermId(v,mm,n,r);
+    p_SetCompP(q,1,r);
+    poly tmp=p_CoeffTermId(q,mm,1,r);
     if (i>0)
     {
       to_shift+=p_MaxComp(m->m[i-1],r);
