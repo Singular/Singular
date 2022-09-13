@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version polymake.lib 4.2.0.1 Apr_2021 ";
+version="version polymake.lib 4.3.1.1 Sep_2022 ";
 category="Tropical Geometry";
 info="
 LIBRARY:   polymake.lib    Computations with polytopes and fans,
@@ -24,8 +24,8 @@ IMPORTANT NOTE:
    Even though this is a Singular library for computing polytopes and fans
    such as the Newton polytope or the Groebner fan of a polynomial, most of
    the hard computations are NOT done by Singular but by the program
-@* - topcom by Joerg Rambau, Universitaet Bayreuth (see
-     @uref{http://www.rambau.wm.uni-bayreuth.de/TOPCOM/});
+@* - TOPCOM by Joerg Rambau, Universitaet Bayreuth (see
+     @uref{http://www.uni-bayreuth.de/de/team/rambau_joerg/TOPCOM/});
 @* this library should rather be seen as an interface which allows to use a
    (very limited) number of options which topcom offers
    to compute with polytopes and fans and to make the results available in
