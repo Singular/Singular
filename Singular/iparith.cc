@@ -3675,9 +3675,15 @@ static BOOLEAN jjWEDGE(leftv res, leftv u, leftv v)
   res->data = (char *)mp_Wedge((matrix)u->Data(),(int)(long)v->Data(),currRing);
   return FALSE;
 }
-#define jjWRONG2 (proc2)jjWRONG
-#define jjWRONG3 (proc3)jjWRONG
 static BOOLEAN jjWRONG(leftv, leftv)
+{
+  return TRUE;
+}
+static BOOLEAN jjWRONG2(leftv, leftv, leftv)
+{
+  return TRUE;
+}
+static BOOLEAN jjWRONG3(leftv, leftv, leftv, leftv)
 {
   return TRUE;
 }
