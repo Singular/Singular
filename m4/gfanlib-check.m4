@@ -28,17 +28,9 @@ else
     # Check whether --with-gmp was given.
     AC_REQUIRE([SING_CHECK_GMP])
 
-    AC_LANG_PUSH(C++)
-    AC_SEARCH_LIBS([dd_free_global_constants],[cddgmp],
-       [PASSED_ALL_TESTS_FOR_GFANLIB="1"
-        CDDGMPLDFLAGS="-lcddgmp $GMP_LIBS"
-        CDDGMPCPPFLAGS="-DGMPRATIONAL"],
-       [if test "x$ENABLE_GFANLIB" = "xyes"; then
-         AC_MSG_WARN("could not determine if libcddgmp is usable")
-        fi
-       ],
-       [$GMP_LIBS])
-    AC_LANG_POP()
+    PASSED_ALL_TESTS_FOR_GFANLIB="1"
+    CDDGMPLDFLAGS="-lcddgmp $GMP_LIBS"
+    CDDGMPCPPFLAGS="-DGMPRATIONAL"
 
     AC_SUBST(CDDGMPCPPFLAGS)
     AC_SUBST(CDDGMPLDFLAGS)

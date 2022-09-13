@@ -102,8 +102,6 @@ LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recomme
 
 AC_CHECK_HEADERS(mpfr.h)
 
-AC_CHECK_LIB(mpfr,mpfr_add)
-
 AC_CONFIG_GOOGLE_PERFTOOLS()
 
 LB_CHECK_CCLUSTER()
