@@ -1770,7 +1770,15 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
       {
         p_GetExpV(A->m[i],exp,src);
         for(int j=src->N;j>0;j--)
-          exp[j]*=ABS((*wdegree)[j-1]);
+        {
+          int w=(*wdegree)[j-1];
+          if (w<=0)
+          {
+            WerrorS("weights must be positive");
+            return NULL;
+          }
+          exp[j]*=w; /* (*wdegree)[j-1] */
+        }
         p_SetExpV(A->m[i],exp,src);
         #ifdef PDEBUG
         p_Setm(A->m[i],src);
