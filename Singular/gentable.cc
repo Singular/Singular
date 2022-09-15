@@ -537,7 +537,7 @@ void ttGen1()
     {
       if (dArith1[i].cmd==j)
       {
-        fprintf(outfile," { %d,%d },\n",j,i);
+        fprintf(outfile," { %d,%d }, /* %s */\n",j,i,iiTwoOps(j));
         l1++;
         break;
       }
@@ -555,7 +555,7 @@ void ttGen1()
     {
       if (dArith2[i].cmd==j)
       {
-        fprintf(outfile," { %d,%d },\n",j,i);
+        fprintf(outfile," { %d,%d }, /* %s */\n",j,i,iiTwoOps(j));
         l2++;
         break;
       }
