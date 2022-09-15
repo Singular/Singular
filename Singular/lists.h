@@ -55,6 +55,7 @@ BOOLEAN lInsert(leftv res, leftv u, leftv v);
 BOOLEAN lInsert3(leftv res, leftv u, leftv v, leftv w);
 BOOLEAN lAppend(leftv res, leftv u, leftv v);
 BOOLEAN lDelete(leftv res, leftv u, leftv v);
+BOOLEAN lDeleteIV(leftv res, leftv u, leftv v);
 BOOLEAN lAdd(leftv res, leftv u, leftv v);
 BOOLEAN lRingDependend(lists L);
 char* lString(lists l, BOOLEAN typed = FALSE, int dim = 1);

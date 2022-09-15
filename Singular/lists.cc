@@ -33,7 +33,7 @@ lists lCopy(lists L)
 {
   lists N=(lists)omAlloc0Bin(slists_bin);
   int n=L->nr;
-  if (L->nr>=0)
+  if (n>=0)
     N->Init(n+1);
   else
     N->Init();
@@ -171,18 +171,14 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
     lists l=(lists) omAllocBin(slists_bin);
     l->Init(EndIndex+(VIndex>EndIndex));
 
-    for(i=j=0;i<=EndIndex;i++,j++)
+    ul->m[VIndex].CleanUp();
+    for(i=0;i<VIndex;i++)
     {
-      if (i!=VIndex)
-      {
-        l->m[j]=ul->m[i];
-        memset(&ul->m[i],0,sizeof(ul->m[i]));
-      }
-      else
-      {
-        j--;
-        ul->m[i].CleanUp();
-      }
+      l->m[i]=ul->m[i];
+    }
+    for(i=VIndex+1;i<=ul->nr;i++)
+    {
+      l->m[i-1]=ul->m[i];
     }
     omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
     omFreeBin((ADDRESS)ul, slists_bin);
@@ -191,6 +187,33 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
   }
   Werror("wrong index %d in list(%d)",VIndex+1,ul->nr+1);
   return TRUE;
+}
+
+BOOLEAN lDeleteIV(leftv res, leftv u, leftv v)
+{
+  lists ul=(lists)u->CopyD();
+  intvec* vl=(intvec*)v->Data();
+  int i,j,cnt;
+  cnt=0;
+  for(i=vl->length()-1;i>=0;i--)
+  {
+    j=(*vl)[i];
+    if ((j>0)&&(j<=ul->nr))
+    {
+      cnt++;
+      ul->m[j-1].CleanUp();
+      memcpy(&(ul->m[j-1]),&(ul->m[j]),(ul->nr-j+1)*sizeof(sleftv));
+      ul->m[ul->nr].rtyp=DEF_CMD;
+      ul->m[ul->nr].data=NULL;
+    }
+  }
+  if ((cnt*2>=ul->nr)||(cnt*sizeof(sleftv)>=1024))
+  {
+    ul->m=(leftv)omReallocSize(ul->m,(ul->nr+1)*sizeof(sleftv),(ul->nr-cnt+1)*sizeof(sleftv));
+    ul->nr -= cnt;
+  }
+  res->data = (char *)ul;
+  return FALSE;
 }
 
 /*2
