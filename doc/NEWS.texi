@@ -35,6 +35,7 @@ Changed commands:
 @itemize
 @item overflow check for @nref{vdim}
 @item better overflow check/les overflows for Hilbert function (@nref{hilb})
+@item @code{delete} accepts @code{intvec} for the indices to delete (@nref{delete})
 @end itemize
 
 Changes in the kernel/build system:

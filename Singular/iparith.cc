@@ -1877,6 +1877,19 @@ static BOOLEAN jjDelete_ID(leftv res, leftv u, leftv v)
   res->data=(void*)id_Delete_Pos(I,pos-1,currRing);
   return res->data==NULL;
 }
+static BOOLEAN jjDelete_ID_IV(leftv res, leftv u, leftv v)
+{
+  intvec *iv=(intvec*)v->Data();
+  ideal I=(ideal)u->Data();
+  for(int i=iv->length();i>=0;i--)
+  {
+    int pos= (*iv)[i];
+    I=id_Delete_Pos(I,pos-1,currRing);
+    if (I==NULL) break;
+  }
+  res->data=(void*)I;
+  return res->data==NULL;
+}
 static BOOLEAN jjDET2(leftv res, leftv u, leftv v)
 {
   matrix m=(matrix)u->Data();
