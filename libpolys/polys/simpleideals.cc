@@ -351,9 +351,10 @@ void id_DelLmEquals(ideal id, const ring r)
 /// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
 static void id_DelDiv_SEV(ideal id, int k,const ring r)
 {
-  int kk = k;
-  long *sev=(long*)omAlloc0((k+1)*sizeof(long));
-  for (int i=0; i<=k; i++)
+  int kk = k+1;
+  long *sev=(long*)omAlloc0(kk*sizeof(long));
+  while(id->m[k]==NULL) k--;
+  for (int i=k; i>=0; i--)
   {
     if(id->m[i]!=NULL)
       sev[i]=p_GetShortExpVector(id->m[i],r);
@@ -380,7 +381,7 @@ static void id_DelDiv_SEV(ideal id, int k,const ring r)
       }
     }
   }
-  omFreeSize(sev,(kk+1)*sizeof(long));
+  omFreeSize(sev,kk*sizeof(long));
 }
 
 /// delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, i.e.,
