@@ -384,6 +384,44 @@ static void id_DelDiv_SEV(ideal id, int k,const ring r)
   omFreeSize(sev,kk*sizeof(long));
 }
 
+/// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
+/// assume LC(j)==NULL or n_Delete==ndDelete
+static void id_DelDiv_SEV0(ideal id, int k,const ring r)
+{
+  int kk = k+1;
+  long *sev=(long*)omAlloc0(kk*sizeof(long));
+  while(id->m[k]==NULL) k--;
+  for (int i=k; i>=0; i--)
+  {
+    if(id->m[i]!=NULL)
+      sev[i]=p_GetShortExpVector(id->m[i],r);
+  }
+  for (int i=0; i<k; i++)
+  {
+    if (id->m[i] != NULL)
+    {
+      poly m_i=id->m[i];
+      for (int j=i+1; j<=k; j++)
+      {
+        if (id->m[j]!=NULL)
+        {
+          if (p_LmShortDivisibleBy(m_i, sev[i],r, id->m[j],~sev[j],r))
+          {
+            p_LmFree(&id->m[j],r);
+          }
+          else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev[i],r))
+          {
+            p_LmFree(&id->m[i],r);
+            break;
+          }
+        }
+      }
+    }
+  }
+  omFreeSize(sev,kk*sizeof(long));
+}
+
+
 /// delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, i.e.,
 /// delete id[i], if LT(i) == coeff*mon*LT(j)
 void id_DelDiv(ideal id, const ring r)
@@ -455,6 +493,11 @@ void id_DelDiv_Sorted(ideal id, const ring r)
 {
   int k = IDELEMS(id)-1;
   id_DelDiv_SEV(id,k,r);
+}
+void id_DelDiv_Sorted0(ideal id, const ring r)
+{
+  int k = IDELEMS(id)-1;
+  id_DelDiv_SEV0(id,k,r);
 }
 
 /// test if the ideal has only constant polynomials
