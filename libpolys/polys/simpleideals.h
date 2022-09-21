@@ -110,7 +110,6 @@ void id_DelEquals(ideal id, const ring r);
 void id_DelLmEquals(ideal id, const ring r);
 void id_DelDiv(ideal id, const ring r);
 void id_DelDiv_Sorted(ideal id, const ring r);
-void id_DelDiv_Sorted0(ideal id, const ring r);
 BOOLEAN id_IsConstant(ideal id, const ring r);
 
 /// sorts the ideal w.r.t. the actual ringordering

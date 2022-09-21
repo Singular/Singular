@@ -492,12 +492,10 @@ void id_DelDiv(ideal id, const ring r)
 void id_DelDiv_Sorted(ideal id, const ring r)
 {
   int k = IDELEMS(id)-1;
-  id_DelDiv_SEV(id,k,r);
-}
-void id_DelDiv_Sorted0(ideal id, const ring r)
-{
-  int k = IDELEMS(id)-1;
-  id_DelDiv_SEV0(id,k,r);
+  if (r->cf->has_simple_Alloc)
+    id_DelDiv_SEV0(id,k,r);
+  else
+    id_DelDiv_SEV(id,k,r);
 }
 
 /// test if the ideal has only constant polynomials
