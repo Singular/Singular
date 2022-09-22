@@ -355,7 +355,7 @@ static void id_DelDiv_SEV(ideal id, int k,const ring r)
   long *sev=(long*)omAlloc0(kk*sizeof(long));
   while(id->m[k]==NULL) k--;
   BOOLEAN only_lm=r->cf->has_simple_Alloc;
-  if (!only_lm)
+  if (only_lm)
   {
     for (int i=k; i>=0; i--)
     {
