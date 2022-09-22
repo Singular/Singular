@@ -348,71 +348,78 @@ void id_DelLmEquals(ideal id, const ring r)
   }
 }
 
-/// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
+/// delete id[j], if LT(j) == coeff*mon*LT(i)
 static void id_DelDiv_SEV(ideal id, int k,const ring r)
 {
   int kk = k+1;
   long *sev=(long*)omAlloc0(kk*sizeof(long));
   while(id->m[k]==NULL) k--;
+  BOOLEAN only_lm=r->cf->has_simple_Alloc;
+  if (!only_lm)
+  {
+    for (int i=k; i>=0; i--)
+    {
+      if((id->m[i]!=NULL) && (pNext(id->m[i])!=NULL))
+      {
+        only_lm=FALSE;
+        break;
+      }
+    }
+  }
   for (int i=k; i>=0; i--)
   {
     if(id->m[i]!=NULL)
-      sev[i]=p_GetShortExpVector(id->m[i],r);
-  }
-  for (int i=0; i<k; i++)
-  {
-    if (id->m[i] != NULL)
     {
-      poly m_i=id->m[i];
-      for (int j=i+1; j<=k; j++)
+      sev[i]=p_GetShortExpVector(id->m[i],r);
+    }
+  }
+  if (only_lm)
+  {
+    for (int i=0; i<k; i++)
+    {
+      if (id->m[i] != NULL)
       {
-        if (id->m[j]!=NULL)
+        poly m_i=id->m[i];
+        long sev_i=sev[i];
+        for (int j=i+1; j<=k; j++)
         {
-          if (p_LmShortDivisibleBy(m_i, sev[i],r, id->m[j],~sev[j],r))
+          if (id->m[j]!=NULL)
           {
-            p_Delete(&id->m[j],r);
-          }
-          else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev[i],r))
-          {
-            p_Delete(&id->m[i],r);
-            break;
+            if (p_LmShortDivisibleBy(m_i, sev_i,r, id->m[j],~sev[j],r))
+            {
+              p_LmFree(&id->m[j],r);
+            }
+            else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev_i,r))
+            {
+              p_LmFree(&id->m[i],r);
+              break;
+            }
           }
         }
       }
     }
   }
-  omFreeSize(sev,kk*sizeof(long));
-}
-
-/// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
-/// assume LC(j)==NULL or n_Delete==ndDelete
-static void id_DelDiv_SEV0(ideal id, int k,const ring r)
-{
-  int kk = k+1;
-  long *sev=(long*)omAlloc0(kk*sizeof(long));
-  while(id->m[k]==NULL) k--;
-  for (int i=k; i>=0; i--)
+  else
   {
-    if(id->m[i]!=NULL)
-      sev[i]=p_GetShortExpVector(id->m[i],r);
-  }
-  for (int i=0; i<k; i++)
-  {
-    if (id->m[i] != NULL)
+    for (int i=0; i<k; i++)
     {
-      poly m_i=id->m[i];
-      for (int j=i+1; j<=k; j++)
+      if (id->m[i] != NULL)
       {
-        if (id->m[j]!=NULL)
+        poly m_i=id->m[i];
+        long sev_i=sev[i];
+        for (int j=i+1; j<=k; j++)
         {
-          if (p_LmShortDivisibleBy(m_i, sev[i],r, id->m[j],~sev[j],r))
+          if (id->m[j]!=NULL)
           {
-            p_LmFree(&id->m[j],r);
-          }
-          else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev[i],r))
-          {
-            p_LmFree(&id->m[i],r);
-            break;
+            if (p_LmShortDivisibleBy(m_i, sev_i,r, id->m[j],~sev[j],r))
+            {
+              p_Delete(&id->m[j],r);
+            }
+            else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev_i,r))
+            {
+              p_Delete(&id->m[i],r);
+              break;
+            }
           }
         }
       }
@@ -486,16 +493,6 @@ void id_DelDiv(ideal id, const ring r)
       }
     }
   }
-}
-
-/// delete id[j], if LT(j) == coeff*mon*LT(i) (j>i)
-void id_DelDiv_Sorted(ideal id, const ring r)
-{
-  int k = IDELEMS(id)-1;
-  if (r->cf->has_simple_Alloc)
-    id_DelDiv_SEV0(id,k,r);
-  else
-    id_DelDiv_SEV(id,k,r);
 }
 
 /// test if the ideal has only constant polynomials
@@ -1395,9 +1392,18 @@ ideal id_Head(ideal h,const ring r)
 {
   ideal m = idInit(IDELEMS(h),h->rank);
 
-  for (int i=IDELEMS(h)-1;i>=0; i--)
-    if (h->m[i]!=NULL)
-      m->m[i]=p_Head(h->m[i],r);
+  if (r->cf->has_simple_Alloc)
+  {
+    for (int i=IDELEMS(h)-1;i>=0; i--)
+      if (h->m[i]!=NULL)
+        m->m[i]=p_CopyPowerProduct0(h->m[i],pGetCoeff(h->m[i]),r);
+  }
+  else
+  {
+    for (int i=IDELEMS(h)-1;i>=0; i--)
+      if (h->m[i]!=NULL)
+        m->m[i]=p_Head(h->m[i],r);
+  }
 
   return m;
 }

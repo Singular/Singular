@@ -1707,9 +1707,11 @@ ideal RightColonOperation(ideal S, poly w, int lV)
 static void p_Div_hi(poly p, const int* exp_q, const ring src)
 {
   // e=max(0,p-q) for all exps
-  for(int i=1;i<=src->N;i++)
+  for(int i=src->N;i>0;i--)
   {
-    p_SetExp(p,i,si_max(0L,p_GetExp(p,i,src)-exp_q[i]),src);
+    int pi=p_GetExp(p,i,src)-exp_q[i];
+    if (pi<0) pi=0;
+    p_SetExp(p,i,pi,src);
   }
   #ifdef PDEBUG
   p_Setm(p,src);
@@ -1799,10 +1801,10 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
     //for (int ii=i;ii<r;ii++) p_Delete(&J->m[ii],src);
     //idSkipZeroes(J);
     ideal J=id_CopyFirstK(A,i,src);
-    for(int ii=1;ii<=src->N;ii++)
+    for(int ii=src->N;ii>0;ii--)
       exp_q[ii]=p_GetExp(A->m[i],ii,src);
     for(int ii=0;ii<i;ii++) p_Div_hi(J->m[ii],exp_q,src);
-    id_DelDiv_Sorted(J,src);
+    id_DelDiv(J,src);
     // search linear elems:
     int k=0;
     for (int ii=IDELEMS(J)-1;ii>=0;ii--)
@@ -1810,7 +1812,7 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
       if((J->m[ii]!=NULL) && (p_Totaldegree(J->m[ii],src)==1))
       {
         k++;
-        p_Delete(&J->m[ii],src);
+        p_LmDelete(&J->m[ii],src);
       }
     }
     idSkipZeroes(J);
@@ -1888,7 +1890,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
     }
   }
   else AA=A;
-  id_DelDiv_Sorted(AA,src);
+  id_DelDiv(AA,src);
   idSkipZeroes(AA);
    /* sort */
   if (IDELEMS(AA)>1)
