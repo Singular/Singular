@@ -3813,9 +3813,9 @@ void pEnlargeSet(poly* *p, int l, int increment)
 {
   poly* h;
 
+  if (increment==0) return;
   if (*p==NULL)
   {
-    if (increment==0) return;
     h=(poly*)omAlloc0(increment*sizeof(poly));
   }
   else
