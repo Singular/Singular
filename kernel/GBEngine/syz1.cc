@@ -832,7 +832,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
 //Print("Halt");
             pGetCoeff(p) = nInpNeg(pGetCoeff(p));
             number up = kBucketPolyRed(syzstr->bucket,redset[j],elL[bin[j]],
-                                       NULL);
+                                       NULL,FALSE);
             // Thomas: Check whether you need number here
             nDelete(&up);
             q = kBucketGetLm(syzstr->bucket);

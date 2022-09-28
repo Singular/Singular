@@ -79,10 +79,12 @@ void kBucketAdjust(kBucket_pt bucket, int i);
 // Assumes p1 != NULL, Bpoly != NULL
 //         Lm(p1) divides Lm(Bpoly)
 //         pLength(p1) == l1
+// if reduce: do nor multiply q
 // Returns: Lc(p) / gcd(Lc(p), Lc(q))
 number kBucketPolyRed(kBucket_pt bucket,
                       poly p, int l,
-                      poly spNoether);
+                      poly spNoether,
+                      BOOLEAN reduce);
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -243,5 +245,5 @@ inline poly kBucketExtractLm(kBucket_pt bucket)
 poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i);
 void kBucketSimpleContent(kBucket_pt bucket);
 BOOLEAN kBucketIsCleared(kBucket_pt bucket);
-int ksCheckCoeff(number *a, number *b, const coeffs r, const BOOLEAN reduce=FALSE);
+int ksCheckCoeff(number *a, number *b, const coeffs r);
 #endif /* KBUCKETS_H */

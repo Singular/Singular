@@ -496,7 +496,7 @@ static BOOLEAN syRedSyz(kBucket_pt bucket,ideal red,int crit_comp,int* g_l)
     if ((j>=i) || (p==NULL) || (pGetComp(p)<=crit_comp)) break;
     if ((red->m[j]!=NULL) && (pDivisibleBy(red->m[j],p)))
     {
-      n = kBucketPolyRed(bucket,red->m[j], g_l[j], NULL);
+      n = kBucketPolyRed(bucket,red->m[j], g_l[j], NULL, FALSE);
       nDelete(&n);
       p = kBucketGetLm(bucket);
       isChanged = TRUE;
@@ -787,7 +787,8 @@ PrintS("sPoly: ");pWrite(tso.p);
           if (j>=ng_place) break;
           assume (new_repr->m[j]!=NULL);
           sySPRedSyz_Kosz(syzstr,new_generators->m[j],new_repr->m[j],p);
-          n = kBucketPolyRed(syzstr->bucket,new_generators->m[j],pLength(new_generators->m[j]), NULL);
+          n = kBucketPolyRed(syzstr->bucket,new_generators->m[j],
+                             pLength(new_generators->m[j]), NULL, FALSE);
           p = kBucketGetLm(syzstr->bucket);
 #ifdef EXPERIMENT1
           syzp = kBucketGetLm(syzstr->syz_bucket);
@@ -809,7 +810,7 @@ PrintS("sPoly: ");pWrite(tso.p);
 /*--- reduction with general old generators ---------------------*/
           assume (old_repr->m[j]!=NULL);
           sySPRedSyz_Kosz(syzstr,ogm[j],old_repr->m[j],p,orp_l[j]);
-          n = kBucketPolyRed(syzstr->bucket,ogm[j],ogm_l[j], NULL);
+          n = kBucketPolyRed(syzstr->bucket,ogm[j],ogm_l[j], NULL,FALSE);
           p = kBucketGetLm(syzstr->bucket);
 #ifdef EXPERIMENT1
           syzp = kBucketGetLm(syzstr->syz_bucket);
@@ -1036,7 +1037,8 @@ static poly normalize(poly next_p,ideal add_generators, syStrategy syzstr,
     if ((j>=i) || (p==NULL) || (pGetComp(p)<=crit_comp)) break;
     if ((add_generators->m[j]!=NULL) && (pDivisibleBy(add_generators->m[j],p)))
     {
-      n = kBucketPolyRed(syzstr->bucket,add_generators->m[j], g_l[j], NULL);
+      n = kBucketPolyRed(syzstr->bucket,add_generators->m[j], g_l[j],
+                         NULL, FALSE);
       nDelete(&n);
       p = kBucketGetLm(syzstr->bucket);
       j = 0;
@@ -1300,7 +1302,7 @@ PrintS("sPoly: ");pWrite(tso.p);
           assume (add_repr->m[j]!=NULL);
           sySPRedSyz_Kosz(syzstr,add_generators->m[j],add_repr->m[j],p);
           n = kBucketPolyRed(syzstr->bucket,add_generators->m[j],
-                   pLength(add_generators->m[j]), NULL);
+                   pLength(add_generators->m[j]), NULL, FALSE);
           p = kBucketGetLm(syzstr->bucket);
           if ((p==NULL) || (pGetComp(p)<=crit_comp)) break;
           j = 0;
@@ -1574,7 +1576,8 @@ static ideal normalizeOldPart(ideal new_generators,ideal new_repr,
             (pDivisibleBy(old_generators->m[j],p)))
         {
           sySPRedSyz_Kosz(syzstr,old_generators->m[j],old_repr->m[j],p);
-          n = kBucketPolyRed(syzstr->bucket,old_generators->m[j], g_l[j], NULL);
+          n = kBucketPolyRed(syzstr->bucket,old_generators->m[j], g_l[j],
+                             NULL, FALSE);
           nDelete(&n);
           p = kBucketGetLm(syzstr->bucket);
           j = 0;

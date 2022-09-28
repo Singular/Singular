@@ -1833,7 +1833,7 @@ static poly redNF2 (poly h, slimgb_alg * c, int &len, number & m, int n)
 
       number coef = kBucketPolyRed (P.bucket, strat->S[j],
                                     strat->lenS[j] /*pLength(strat->S[j]) */ ,
-                                    strat->kNoether);
+                                    strat->kNoether,FALSE);
       number m2 = nMult (m, coef);
       nDelete (&m);
       m = m2;
@@ -3040,13 +3040,13 @@ static poly redNFTail (poly h, const int sl, kStrategy strat, int len)
 #ifdef HAVE_PLURAL
         if(nc)
         {
-          nc_kBucketPolyRed_Z (P.bucket, strat->S[j], &coef);
+          nc_kBucketPolyRed_Z (P.bucket, strat->S[j], &coef, FALSE);
         }
         else
 #endif
           coef = kBucketPolyRed (P.bucket, strat->S[j],
                                  strat->lenS[j] /*pLength(strat->S[j]) */ ,
-                                 strat->kNoether);
+                                 strat->kNoether,FALSE);
         res=__p_Mult_nn (res, coef, currRing);
         nDelete (&coef);
         h = kBucketGetLm (P.bucket);
@@ -4889,10 +4889,10 @@ void simple_reducer::do_reduce (red_object & ro)
   number coef;
 #ifdef HAVE_PLURAL
   if(c->nc)
-    nc_kBucketPolyRed_Z (ro.bucket, p, &coef);
+    nc_kBucketPolyRed_Z (ro.bucket, p, &coef, FALSE);
   else
 #endif
-    coef = kBucketPolyRed (ro.bucket, p, p_len, c->strat->kNoether);
+    coef = kBucketPolyRed (ro.bucket, p, p_len, c->strat->kNoether,FALSE);
   nDelete (&coef);
 }
 

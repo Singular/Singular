@@ -86,7 +86,7 @@ int ksReducePolyZ(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef,FALSE);// TODO:reduce
     else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
@@ -232,7 +232,7 @@ int ksReducePoly(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef,reduce);
     else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
@@ -288,7 +288,24 @@ int ksReducePoly(LObject* PR,
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
-    int ct = ksCheckCoeff(&an, &bn, tailRing->cf, reduce);    // Calculate special LC
+    int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
+    if (reduce)
+    {
+      if(n_IsMOne(an, tailRing->cf))
+      {
+        an=n_InpNeg(an, tailRing->cf);
+        bn=n_InpNeg(bn, tailRing->cf);
+        ct+=1;
+      }
+#if 1 //ifdef KDEBUG
+      else if(!n_IsOne(an,tailRing->cf))
+      {
+        StringSetS("ksReducePoly: ");n_Write(an,tailRing->cf);
+        StringAppendS("\n");
+        PrintS(StringEndS());
+      }
+#endif
+    }
     // in case of reduce, do not multiply PR
     p_SetCoeff(lm, bn, tailRing);
     if ((ct == 0) || (ct == 2))
@@ -370,7 +387,7 @@ int ksReducePolyGCD(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef,TRUE);
     else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
@@ -505,7 +522,7 @@ int ksReducePolyLC(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef,FALSE);
     else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
@@ -618,7 +635,7 @@ int ksReducePolyBound(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef,FALSE);
     else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
@@ -832,7 +849,7 @@ int ksReducePolySig(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef,FALSE);
     else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
@@ -1079,7 +1096,7 @@ int ksReducePolySigRing(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed_Z(PR->bucket, p2,coef,FALSE);
     else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);

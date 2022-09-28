@@ -1082,7 +1082,8 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 
 number kBucketPolyRed(kBucket_pt bucket,
                       poly p1, int l1,
-                      poly spNoether)
+                      poly spNoether,
+                      BOOLEAN reduce)
 {
   ring r=bucket->bucket_ring;
   assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
@@ -1117,11 +1118,23 @@ number kBucketPolyRed(kBucket_pt bucket,
     p_SetCoeff(lm, bn, r);
     if ((ct == 0) || (ct == 2))
     {
-      /* next line used to be here before but is WRONG:
-      kBucket_Mult_n(bucket, an);
-        its use would result in a wrong sign for the tail of bucket
-        in the reduction */
-
+      if (reduce)
+      {
+        if(n_IsMOne(an,r->cf))
+        {
+          an=n_InpNeg(an,r->cf);
+          bn=n_InpNeg(bn,r->cf);
+        }
+        #if 1 //#ifdef KDEBUG
+        else if (!n_IsOne(an,r->cf))
+        {
+          StringSetS("kBucketPolyRed: ");
+          n_Write(an,r->cf);
+          StringAppendS("\n");
+          PrintS(StringEndS());
+        }
+        #endif
+      }
       /* correct factor for cancelation by changing sign if an=-1 */
       if (rField_is_Ring(r))
         lm = __p_Mult_nn(lm, an, r);
@@ -1427,19 +1440,13 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
 *   this value is used to control the spolys
 *   reduce is set inside "NF" -> a should be 1
 */
-int ksCheckCoeff(number *a, number *b, const coeffs r, const BOOLEAN reduce)
+int ksCheckCoeff(number *a, number *b, const coeffs r)
 {
   int c = 0;
   number an = *a, bn = *b;
   n_Test(an,r);
   n_Test(bn,r);
 
-  if(reduce) // especially: a|b
-  {
-    an = n_Init(1,r); // gcd is u*a, a/a is 1
-    bn = n_ExactDiv(bn, an, r);// gcd is u*a, return b/a
-  }
-  else
   {
     number cn = n_SubringGcd(an, bn, r);
     if(n_IsOne(cn, r))

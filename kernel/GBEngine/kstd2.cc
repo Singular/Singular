@@ -2248,14 +2248,15 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       if (rIsPluralRing(currRing))
       {
         number coef;
-        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef);
+        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef,nonorm==0);
         nDelete(&coef);
       }
       else
 #endif
       {
         number coef;
-        coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
+        coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),
+                            strat->kNoether,nonorm==0);
         nDelete(&coef);
       }
       cnt--;
@@ -2366,14 +2367,14 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
       if (rIsPluralRing(currRing))
       {
         number coef;
-        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef);
+        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef,nonorm==0);
         nDelete(&coef);
       }
       else
 #endif
       {
         number coef;
-        coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
+        coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether,nonorm==0);
         P.p = kBucketClear(P.bucket);
         P.p = pJet(P.p,bound);
         if(!P.IsNull())
@@ -3789,7 +3790,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (BVERBOSE(23)) kDebugPrint(strat);
   int max_ind;
-  p = redNF(pCopy(q),max_ind,lazyReduce & KSTD_NF_NONORM,strat);
+  p = redNF(pCopy(q),max_ind,(lazyReduce & KSTD_NF_NONORM)==KSTD_NF_NONORM,strat);
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
@@ -3946,7 +3947,8 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     if (q->m[i]!=NULL)
     {
       if (TEST_OPT_PROT) { PrintS("r");mflush(); }
-      p = redNF(pCopy(q->m[i]),max_ind,lazyReduce & KSTD_NF_NONORM,strat);
+      p = redNF(pCopy(q->m[i]),max_ind,
+           (lazyReduce & KSTD_NF_NONORM)==KSTD_NF_NONORM,strat);
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
@@ -4025,7 +4027,8 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
     if (q->m[i]!=NULL)
     {
       if (TEST_OPT_PROT) { PrintS("r");mflush(); }
-      p = redNFBound(pCopy(q->m[i]),max_ind,lazyReduce & KSTD_NF_NONORM,strat,bound);
+      p = redNFBound(pCopy(q->m[i]),max_ind,
+                     (lazyReduce & KSTD_NF_NONORM)==KSTD_NF_NONORM,strat,bound);
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }

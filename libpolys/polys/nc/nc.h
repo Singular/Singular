@@ -45,7 +45,7 @@ BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r);
 typedef poly (*SPoly_Proc_Ptr)(const poly p1, const poly p2, const ring r);
 typedef poly (*SPolyReduce_Proc_Ptr)(const poly p1, poly p2, const ring r);
 
-typedef void (*bucket_Proc_Ptr)(kBucket_pt b, poly p, number *c);
+typedef void (*bucket_Proc_Ptr)(kBucket_pt b, poly p, number *c, BOOLEAN reduce);
 
 struct nc_pProcs
 {
@@ -272,26 +272,22 @@ static inline void nc_PolyReduce(poly &b, const poly p, number *c, const ring r)
 }
 */
 
-static inline void nc_kBucketPolyRed_NF(kBucket_pt b, poly p, number *c)
+static inline void nc_kBucketPolyRed_NF(kBucket_pt b, poly p, number *c, BOOLEAN reduce)
 {
   const ring r = b->bucket_ring;
   assume(rIsPluralRing(r));
-
-//   return gnc_kBucketPolyRedNew(b, p, c);
 
   assume(r->GetNC()->p_Procs.BucketPolyRed_NF!=NULL);
-  return r->GetNC()->p_Procs.BucketPolyRed_NF(b, p, c);
+  return r->GetNC()->p_Procs.BucketPolyRed_NF(b, p, c, reduce);
 }
 
-static inline void nc_kBucketPolyRed_Z(kBucket_pt b, poly p, number *c)
+static inline void nc_kBucketPolyRed_Z(kBucket_pt b, poly p, number *c, BOOLEAN reduce)
 {
   const ring r = b->bucket_ring;
   assume(rIsPluralRing(r));
 
-//   return gnc_kBucketPolyRed_ZNew(b, p, c);
-
   assume(r->GetNC()->p_Procs.BucketPolyRed_Z!=NULL);
-  return r->GetNC()->p_Procs.BucketPolyRed_Z(b, p, c);
+  return r->GetNC()->p_Procs.BucketPolyRed_Z(b, p, c, reduce);
 
 }
 

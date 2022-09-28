@@ -121,8 +121,8 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2/*, poly spNoether*/, const ring r
 
 
 
-void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c);
-void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c);
+static void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c, BOOLEAN reduce);
+static void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c, BOOLEAN reduce);
 
 void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c);
 void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c);
@@ -1945,7 +1945,7 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   kBucket_Add_q(b,pp,&l);
 }
 
-void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
+void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c, BOOLEAN reduce)
 {
   const ring r = b->bucket_ring;
 #ifdef PDEBUG
@@ -2025,6 +2025,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 }
 
 
+#if 0
 void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
 {
   const ring r = b->bucket_ring;
@@ -2039,7 +2040,7 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
   if(p_IsConstant(m,r))
   {
     p_Delete(&m, r);
-    ctmp = kBucketPolyRed(b,p,pLength(p),NULL);
+    ctmp = kBucketPolyRed(b,p,pLength(p),NULL,TRUE);
   }
   else
   {
@@ -2047,7 +2048,7 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
     number c2;
     p_Cleardenom_n(pp,r,c2);
     p_Delete(&m, r);
-    ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
+    ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL,TRUE);
     //cc=*c;
     //*c=nMult(*c,c2);
     n_Delete(&c2, r->cf);
@@ -2057,8 +2058,9 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
   if (c!=NULL) *c=ctmp;
   else n_Delete(&ctmp, r->cf);
 }
+#endif
 
-void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
+static void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c, BOOLEAN reduce)
 {
   const ring r = b->bucket_ring;
   // b is multiplied by a constant in this impl.
@@ -2073,7 +2075,7 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
   if(p_IsConstant(m,r))
   {
     p_Delete(&m, r);
-    ctmp = kBucketPolyRed(b,p,pLength(p),NULL);
+    ctmp = kBucketPolyRed(b,p,pLength(p),NULL,reduce);
   }
   else
   {
@@ -2081,7 +2083,7 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
     number c2;
     p_Cleardenom_n(pp,r,c2);
     p_Delete(&m, r);
-    ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
+    ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL,reduce);
     //cc=*c;
     //*c=nMult(*c,c2);
     n_Delete(&c2, r->cf);
