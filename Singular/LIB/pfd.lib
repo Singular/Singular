@@ -8,9 +8,9 @@ AUTHOR: Marcel Wittmann, e-mail: mwittman@mathematik.uni-kl.de
 
 OVERVIEW:
 This Library implements an algorithm based on the work of E. K. Leinartas to
-write rational functions in mutiple variables as a sum of functions with
+write rational functions in multiple variables as a sum of functions with
 \"smaller\" numerators and denominators.
-This can be used to shorten the IBP reduction coeffcients of multi-loop Feynman
+This can be used to shorten the IBP reduction coefficients of multi-loop Feynman
 integrals. For this application,
 we also provide a procedure that applies the algorithm to all entries of a
 matrix of rational functions given as one (possibly very big) txt-file.
@@ -471,7 +471,7 @@ static proc shortNumeratorDecompStep(list l, ideal q, list #)
     return(list(list(),list(l))); // do nothing, return input
   }
 
-  ideal q_denom = q[indices]; // factors occuring in the denominator
+  ideal q_denom = q[indices]; // factors occurring in the denominator
   matrix T;
   ideal q_std = liftstd(q_denom,T);
   list divrem = division(f,q_std);
