@@ -1138,11 +1138,12 @@ KINLINE int ksReducePolyTailLC_Z(LObject* PR, TObject* PW, LObject* Red)
 KINLINE int ksReducePolyTail_Z(LObject* PR, TObject* PW, LObject* Red)
 {
   BOOLEAN ret;
-  number coef;
+  number coef=NULL;
 
   assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
-  ret = ksReducePoly(Red, PW, NULL, &coef);
+  ret = ksReducePoly(Red, PW, NULL, &coef, NULL,NULL,TRUE);
 
+#if 0 // shlould not happen
   if (!ret)
   {
     if (! n_IsOne(coef, currRing->cf))
@@ -1150,8 +1151,9 @@ KINLINE int ksReducePolyTail_Z(LObject* PR, TObject* PW, LObject* Red)
       PR->Mult_nn(coef);
       // HANNES: mark for Normalize
     }
-    n_Delete(&coef, currRing->cf);
   }
+#endif
+  n_Delete(&coef, currRing->cf);
   return ret;
 }
 
