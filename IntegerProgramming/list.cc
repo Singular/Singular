@@ -57,9 +57,9 @@ list::list()
 // The dummy elements have the following functions:
 // - The end_dummy guarantees that the deletion method of the simply linked
 //   list works: Deletion is done by copying the next element to the actual
-//   position and then deleting the original, see below for an explaination.
+//   position and then deleting the original, see below for an explanation.
 //   This would cause problems when deleting the last element; then the
-//   next-pointer of the preceeding element would reference freed memory
+//   next-pointer of the preceding element would reference freed memory
 //   (it cannot be manipulated, is unknown). So the end_dummy as an
 //   artificial last element avoids this problem.
 // - With the described deletion method for a simply linked list, the start
@@ -387,7 +387,7 @@ list& list::ordered_insert(binomial& bin, const term_ordering& w)
 
   // .. and finally inserting bin at the old place
   // Remember that we cannot insert a new element between the referenced
-  // element and its preceeding (we do not know the preceeding element)
+  // element and its preceding (we do not know the preceding element)
   iter->entry=&bin;
   iter->done=FALSE;
   iter->head_reduced=FALSE;
@@ -429,7 +429,7 @@ list& list::_ordered_insert(binomial& bin, const term_ordering& w)
 
   // .. and finally inserting bin at the old place
   // Remember that we cannot insert a new element between the referenced
-  // element and its preceeding (we do not know the preceeding element)
+  // element and its preceding (we do not know the preceding element)
   iter->entry=&bin;
   iter->next=aux;
 
@@ -1093,7 +1093,7 @@ list_iterator& list_iterator::extract_element()
 #ifdef SL_LIST
 
 // When deleting or extracting an element of a simply linked list, the
-// next-pointer of the previous element cannot be manipulated (is unkonwn!).
+// next-pointer of the previous element cannot be manipulated (is unknown!).
 // So deletion must be done by copying the next element to the actual position
 // and then deleting the original. Notice that only pointers are copies, never
 // binomials.

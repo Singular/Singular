@@ -69,7 +69,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 
 /////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; // to verifie file format
+  char format_string[128]; // to verify file format
   int constraints;       // number of equality constraints
   int variables;         // number of variables (without auxiliary variables)
 
@@ -357,7 +357,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 
 /////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; // to verifie file format
+  char format_string[128]; // to verify file format
   int constraints;       // number of equality constraints
   int variables;         // number of variables (without auxiliary variables)
 
@@ -654,7 +654,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 
 /////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; // to verifie file format
+  char format_string[128]; // to verify file format
   int constraints;       // number of equality constraints
   int variables;         // number of variables (without auxiliary variables)
 
@@ -943,7 +943,7 @@ int Pottier(INPUT_FILE MATRIX,
 
 /////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; // to verifie file format
+  char format_string[128]; // to verify file format
   int constraints;       // number of equality constraints
   int variables;         // number of variables (without auxiliary variables)
 
@@ -1231,7 +1231,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 
 /////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128]; // to verifie file format
+  char format_string[128]; // to verify file format
   int constraints;       // number of equality constraints
   int variables;         // number of variables
 
@@ -1404,7 +1404,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   }
 
   // read positive vector in the row space of the matrix
-  // such a vector induces a homogenous grading on the ideal
+  // such a vector induces a homogeneous grading on the ideal
 
   input>>format_string;
 
@@ -1492,7 +1492,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   // prepare time measurement
   clock_t start, end;
 
-  // construct homogenous term ordering
+  // construct homogeneous term ordering
   term_ordering w(variables, hom_grad, W_REV_LEX, HOMOGENEOUS);
 
   delete[] hom_grad;
@@ -2008,7 +2008,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 
 /////////////////////////// input /////////////////////////////////////////
 
-  char format_string[128];     // to verifie file format
+  char format_string[128];     // to verify file format
   int constraints;       // number of equality constraints
   int variables;         // number of variables
 
@@ -2188,7 +2188,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 
   // read positive vector in the row space of the matrix
   // such a vector induces a grading with respect to which the ideal is
-  // homogenous
+  // homogeneous
 
   input>>format_string;
 
@@ -2283,7 +2283,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
   // prepare time measurement
   clock_t start, end;
 
-  // construct homogenous term ordering
+  // construct homogeneous term ordering
   term_ordering w(variables, hom_grad, W_REV_LEX, HOMOGENEOUS);
 
   delete[] hom_grad;
@@ -3063,7 +3063,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
 /////////// computation and output (second part) //////////////////////////
 
-  // distinguish 3 cases to verifie the consistency of the vector dimension
+  // distinguish 3 cases to verify the consistency of the vector dimension
   // and the number of variables
 
   // Conti-Traverso: vectors are read as right hand vectors
@@ -3380,7 +3380,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   ifstream old(GROEBNER);
   ifstream _new(NEW_COST);
 
-  // verifie existence of files
+  // verify existence of files
 
   if(!old)
   {
@@ -3715,7 +3715,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
     return 0;
   }
 
-  // Now we can verifie consistency of both files with respect to the number
+  // Now we can verify consistency of both files with respect to the number
   // of weighted variables:
 
   if(weighted_variables!=new_variables)

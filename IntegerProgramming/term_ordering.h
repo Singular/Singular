@@ -20,7 +20,7 @@
 //   expansion of the program, the nonnegativity check is delegated to a
 //   separate function instead of doing it in the constructors.
 
-// For the same reasons as mentionned in the binomial class, frequently
+// For the same reasons as mentioned in the binomial class, frequently
 // used operations on Integer vectors do not perform range checks. Nor do
 // they check if an error has occurred (i.e. control the "error flag", see
 // below).
@@ -66,7 +66,7 @@ protected:
   // This flag is set to TRUE if the term ordering is thought of as a
   // homogeneous one (i.e. the weighted part), else to FALSE. The standard
   // setting is FALSE.
-  // The routine compare_to_zero is faster if the term ordering is homogenous.
+  // The routine compare_to_zero is faster if the term ordering is homogeneous.
   // It would be safer and more natural to take this flag as a member of
   // the ideal class; this would, however, require many supplementary
   // functions (homogeneous versions of existing functions) in the ideal and
@@ -77,7 +77,7 @@ public:
 
   term_ordering(const BOOLEAN& homogeneous=FALSE);
   // Sets weighted_block_size and elimination_block_size to zero.
-  // With this default contructor, the term ordering can be taken as a member
+  // With this default constructor, the term ordering can be taken as a member
   // of another class (the ideal class in our case).
 
   term_ordering(const short& number_of_weighted_variables,
@@ -174,7 +174,7 @@ public:
   // This function is used to determine a binomials's head with respect to the
   // actual term ordering. The comparison of its two monomials is done
   // according to the binomial data structure:
-  // Instead of comparing explicitely two monomials, the Integer vector
+  // Instead of comparing explicitly two monomials, the Integer vector
   // corresponding to their difference is compared to the zero vector.
   // The function returns
   //          1, if v>0,

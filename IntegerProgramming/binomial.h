@@ -110,7 +110,7 @@ public:
 
   short error_status() const;
   // Returns _number_of_variables iff _number_of_variables<0
-  // (this is the "errror flag").
+  // (this is the "error flag").
 
 
 
@@ -122,7 +122,7 @@ public:
   Integer operator[](const short& i) const;
   // Access operator for reading exponent_vector[i]
   // (cannot be used to overwrite exponent_vector[i]);
-  // no range chack on i!
+  // no range check on i!
 
 
 
