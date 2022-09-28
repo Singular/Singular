@@ -459,21 +459,24 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
   int e;
   poly p=NULL;
   poly pp;
-  BOOLEAN is_const=TRUE; // to check for zero-div in p_Mult_q
+  BOOLEAN is_const=TRUE; // for constant src
   for(i=1;i<=src_r->N;i++)
   {
     e=p_GetExp(src,i,src_r);
     if (e>0)
     {
-      is_const=FALSE;
       pp=dest_id[i-1];
       if (pp==NULL)
       {
         p_Delete(&p,dest_r);
         return NULL;
       }
-      if (/*(*/ p==NULL /*)*/) /* && (e>0)*/
+      if (p==NULL)
       {
+        if (!is_const) // possible only when the coefficient ring is not a field
+        {
+          return NULL;
+        }
         p=p_Copy(pp /*dest_id[i-1]*/,dest_r);
         e--;
       }
@@ -482,6 +485,7 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
         p=p_Mult_q(p,p_Copy(pp /*dest_id[i-1]*/,dest_r),dest_r);
         e--;
       }
+      is_const=FALSE;
     }
   }
   if (is_const)
