@@ -4,7 +4,7 @@
 // This class is designed to handle the input of the integer programming
 // problem. It offers facilities to convert a two-dimensional integer array
 // into a matrix and to read a matrix from an input file.
-// Furhermore, some special routines needed by the IP-algorithms are
+// Furthermore, some special routines needed by the IP-algorithms are
 // implemented:
 // - the computation of a lattice basis for the integer kernel via the LLL
 //   algorithm;
@@ -105,7 +105,7 @@ public:
   // Returns columns iff columns<0 (this is the "error flag"), else 0.
 
   int row_number() const;
-  // Retuns the row number.
+  // Returns the row number.
 
   int column_number() const;
   // Returns the column number.

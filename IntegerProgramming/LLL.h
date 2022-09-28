@@ -2,7 +2,7 @@
 
 // This file contains the implementation of two special variants of the
 // LLL-algorithm.
-// For further explainations see the book of Henri Cohen, A Course in
+// For further explanations see the book of Henri Cohen, A Course in
 // Computational Algebraic Number Theory.
 
 // When performing the LLL-algorithm, some coefficients grow very fast.

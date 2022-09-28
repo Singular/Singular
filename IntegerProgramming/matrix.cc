@@ -346,7 +346,7 @@ int matrix::compute_nonzero_kernel_vector()
   // is positive!
 
   // determine the start vector, i.e. the one with least zero components, but
-  // smallest possible (euclidian) norm
+  // smallest possible (euclidean) norm
   int min_index=-1;
   for(int i=0;i<_kernel_dimension;i++)
     if(M[i]>BigInt(0))
@@ -396,7 +396,7 @@ int matrix::compute_nonzero_kernel_vector()
     // else there are further zero components
 
 
-// STEP 3: Can a furhter zero component be "eliminated"?
+// STEP 3: Can a further zero component be "eliminated"?
 // If this is the case, find a basis vector that can do this.
 
     // determine number of components in each remaining vector that are zero
