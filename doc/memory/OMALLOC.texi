@@ -55,19 +55,19 @@ The major requirements of a memory manager for @sc{Singular} become
 immediately clear from this conclusion:
 
 @table @strong
-@item (1) allocation/deallocation of (small) memory blocks must be extremly fast
+@item (1) allocation/deallocation of (small) memory blocks must be extremely fast
 If the allocation/deallocation of a memory blocks requires more than a
 couple of machine instructions it would become the bottleneck of the
 computations. In particular, even the overhead of a function call
 for a memory operation is already too expensive.
 @item (2) consecutive memory blocks in linked lists must have a high locality of reference
 Compared with the performed operations on list elements, cache misses
-(or, even worse, page misses) of memory blocks are extremly expensive:
+(or, even worse, page misses) of memory blocks are extremely expensive:
 we estimate that one cache miss of a memory block costs at least ten
 or more list element operations. Hence, if the addresses of consecutive
 list elements are not physically closed to each other (i.e., if
 the linked lists have a low locality of reference), then resolving
-chache (or, page) misses would become the bottleneck of computations.
+cache (or, page) misses would become the bottleneck of computations.
 @end table
 
 Furthermore, there a the following more or less obvious requirements on
@@ -102,7 +102,7 @@ requirements.  Therefore, we desigend and implemented @code{omalloc}.
 
 @heading Principles of omalloc
 
-@code{omalloc} is a stand-alone, general-purpose memory managment
+@code{omalloc} is a stand-alone, general-purpose memory management
 library which can be used by any program. Its major design goals were
 derived from the memory management requirements of @sc{Singular} (see above).
 
@@ -111,7 +111,7 @@ is an extension to, and sits on top of, the standard
 @code{malloc/realloc/free} routines provided by most operating systems.
 
 @code{omalloc} is specialized in the management of small memory
-blocks. The managment of large memory blocks, i.e., of memory blocks which
+blocks. The management of large memory blocks, i.e., of memory blocks which
 are larger than "one fourth of the page size of the system" (usually
 appr. 1KByte) are (almost) left entirely to the underlying
 @code{malloc/realloc/free} implementation.
@@ -131,14 +131,14 @@ On @strong{memory allocation}, an appropriate page (i.e. one which has a
 non-empty free list of the appropriate block size) is determined based
 on the  used memory allocation mechanism and its arguments (see
 below). The counter of the page is incremented, and the provided memory
-block is dequed from the free-list of the page.
+block is dequeued from the free-list of the page.
 
 On @strong{memory deallocation}, the address of the memory block is used to
 determine the page (header) which manages the memory block to be
 freed. The counter of the page is decremented, and the memory block is
 enqued into the free-list. If decrementing the counter yields zero,
 i.e., if there are no more used memory blocks in this page, then this
-page is dequed from its Bin and put back into a global pool of unused pages.
+page is dequeued from its Bin and put back into a global pool of unused pages.
 
 
 @code{omalloc}' @strong{API} provides a three-level interface:
@@ -174,7 +174,7 @@ with a non-debugging deallocation routine (and vice versa). In other
 words, the debugging and non-debugging mode of omalloc are not mutually
 exclusive. When in its debugging mode, @code{omalloc} is set out to
 catch more than 20 errors in the usage of its API. And, of course, all
-the common and classical errors are among those which are cought by
+the common and classical errors are among those which are caught by
 @code{omalloc}. Error reporting can either be directe3d to log files or to
 @code{stderr}. On some platforms, the error reporting does not only
 include line number information, but also stack trace (i.e., a
@@ -183,7 +183,7 @@ description of the routines on the function stack), information.
 
 @heading Requirement evaluation of @code{omalloc}
 After explaining its princples of @code{omalloc} let us evaluate
-@code{omalloc} w.r.t. the requirments stated above.
+@code{omalloc} w.r.t. the requirements stated above.
 
 @table @strong
 
@@ -193,7 +193,7 @@ allocation/deallocation of small memory blocks requires (on average)
 only a couple (say, 5-10) assembler instructions. We believe
 that this is optimal, i.e., as fast as one  possibly could implement
 these operations.
-@*The other interface levels incure the additional overhead of the
+@*The other interface levels incur the additional overhead of the
 determination of the appropriate Bin (using a table lookup); and, for the
 function interface level, the additional overhead of function
 calls. Compared with existing memory managers, even these other interface
@@ -201,7 +201,7 @@ levels provide unmatchingly efficient allocation/deallocation routines.
 
 @item (2) locality of reference
 Based on its design principles @code{omalloc} provides  an
-extremly high locality of reference (especially for consecutive elements
+extremely high locality of reference (especially for consecutive elements
 of linked-list like structures). To realize this, recall that
 @itemize
 @item
@@ -209,11 +209,11 @@ consecutively allocated memory blocks are physically almost always from
 the same memory page (the current memory page of a bin is only changed
 when it becomes full or empty).
 @item
-the probabilty that consecutively allocated memory blocks are also
+the probability that consecutively allocated memory blocks are also
 physically consecutive (i.e., that their physical addresses are consecutive)
 is rather high, since memory pages are spooled-back into the
 pool of unused pages as often as possible, and, hence, are reinitialized
-as often as possible (notice that allocationg from a freshly initialized
+as often as possible (notice that allocating from a freshly initialized
 page assures that the physical addresses of consecutively allocated
 memory blocks are also consecutive).
 @end itemize
@@ -224,19 +224,19 @@ can only be achieved by paying for with a slightly higher memory
 consumption, and should therefore only be used temporarily for
 long-lived, often traversed-over data.
 
-@item (3) small maintainance size overhead
+@item (3) small maintenance size overhead
 
 Since @code{omalloc} manages small memory blocks on a per-page basis, there is
-no maintainance-overhead on a per-block basis, but only on a per-page
+no maintenance-overhead on a per-block basis, but only on a per-page
 basis. This overhead amounts to 24 Bytes per memory
-page, i.e., we only need 24 Bytes maintanance overhead per 4096 Bytes,
+page, i.e., we only need 24 Bytes maintenance overhead per 4096 Bytes,
 or 0.6%.
 @*For larger memory blocks, this overhead grows since there might
 be "leftovers" from the division of a memory page into equally-sized
 chunks of memory blocks. Furthermore, there is the additional (but
-rather small) overhead of keeping Bins and other "global" maintance
+rather small) overhead of keeping Bins and other "global" maintenance
 structures.
-@*Nevertheless, on average, we observed a maintanance overhead of
+@*Nevertheless, on average, we observed a maintenance overhead of
 appr. 1% of the total memory usage, which, to the best of our knowldege,
 is unsurpassed by any existing, general-purpose, memory manager.
 
@@ -250,7 +250,7 @@ as our experience has shown, the above outlined layered interface
 designe provides a practical compromise between simplicity and
 efficienc/flexibility.
 
-W.r.t. the debugging mode has our experience shown that it is extremly
+W.r.t. the debugging mode has our experience shown that it is extremely
 useful to be able to fine-tune the granularity of the debugging under both,
 a lexical, per-file base scope, and under a dynamic scope set at
 run-time. It also turned out that it is very convenient that the
@@ -258,7 +258,7 @@ debugging and non-debuggung mode are not mutually exclusive and that the
 same library (and, header file) can be used for both modes -- i.e., that
 no recompilations of @code{omalloc} are required to enable one or the other
 mode. As a summary @code{omalloc} debugging features can at least be
-compared with available memory managment debugging libraries (like
+compared with available memory management debugging libraries (like
 @uref{http://dmalloc.com/,dmalloc}) -- our experience has furthermore
 showh that the features are suitable and appropriate for most practical
 purposes. But then again, fittnes is also a matter of taste and
@@ -270,8 +270,8 @@ expectations and therefore hard to evaluate.
 
 @heading Performance evaluation of @code{omalloc}
 
-We have no (yet) thouroughly  measured the performance of
-@code{omalloc} in comparison to other memory managment
+We have no (yet) thoroughly  measured the performance of
+@code{omalloc} in comparison to other memory management
 systems. Nevertheless, our first experiments yielded the following:
 @itemize
 @item
@@ -281,7 +281,7 @@ memory manager (like the one found in the @code{libc} library on Linux, or
 the one underlying @code{perl}).
 
 @item
-We expect that for programs/computations with similar compuational
+We expect that for programs/computations with similar computational
 characteristics like those of @sc{Singular} (e.g., multivariate
 polynomial computations, sparse matrix computations, etc), the speed
 increase and memory consumption decrease is comparable to those reported
@@ -295,7 +295,7 @@ in the memory consumptions of up to 25%.
 
 @heading Status/Copyright of @code{omalloc}
 
-@code{omalloc} is a fully-functional, mature memory managment
+@code{omalloc} is a fully-functional, mature memory management
 library. It still has a TODO list, with more or less only one major
 point: Create a detailed technical reference manual (in texinfo),
 because there is none so far.
