@@ -217,20 +217,6 @@ void idSkipZeroes (ideal ide)
   }
 }
 
-/// count non-zero elements
-int idElem(const ideal F)
-{
-  assume (F != NULL);
-
-  int i=0;
-
-  for(int j=IDELEMS(F)-1;j>=0;j--)
-  {
-    if ((F->m)[j]!=NULL) i++;
-  }
-  return i;
-}
-
 /// copies the first k (>= 1) entries of the given ideal/module
 /// and returns these as a new ideal/module
 /// (Note that the copied entries may be zero.)
@@ -466,7 +452,7 @@ void id_DelDiv(ideal id, const ring r)
 #endif
   {
     /* the case of a coefficient field: */
-    if (k>10)
+    if (k>9)
     {
       id_DelDiv_SEV(id,k,r);
       return;

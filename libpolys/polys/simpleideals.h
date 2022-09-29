@@ -64,7 +64,16 @@ void idSkipZeroes (ideal ide);
   /*gives an ideal the minimal possible size*/
 
 /// number of non-zero polys in F
-int     idElem(const ideal F);
+static inline int idElem(const ideal F)
+{
+  int i=0;
+  for(int j=IDELEMS(F)-1;j>=0;j--)
+  {
+    if ((F->m)[j]!=NULL) i++;
+  }
+  return i;
+}
+
 #define id_Elem(F,R) idElem(F)
 
 /// normialize all polys in id
