@@ -1704,18 +1704,24 @@ ideal RightColonOperation(ideal S, poly w, int lV)
 
 #include "kernel/ideals.h"
 
-static void p_Div_hi(poly p, const int* exp_q, const ring src)
+static BOOLEAN p_Div_hi(poly p, const int* exp_q, const ring src)
 {
+  BOOLEAN bad=FALSE;
   // e=max(0,p-q) for all exps
   for(int i=src->N;i>0;i--)
   {
     int pi=p_GetExp(p,i,src)-exp_q[i];
-    if (pi<0) pi=0;
+    if (pi<0)
+    {
+      pi=0;
+      bad=TRUE;
+    }
     p_SetExp(p,i,pi,src);
   }
   #ifdef PDEBUG
   p_Setm(p,src);
   #endif
+  return bad;
 }
 
 #ifdef HAVE_QSORT_R
@@ -1752,6 +1758,75 @@ static int compare_rp_currRing(const void *pp1, const void *pp2)
   return 0;
 }
 #endif
+static void id_DelDiv_hi(ideal id, BOOLEAN *bad,const ring r)
+{
+  int k=IDELEMS(id)-1;
+  int kk = k+1;
+  long *sev=(long*)omAlloc0(kk*sizeof(long));
+  while(id->m[k]==NULL) k--;
+  BOOLEAN only_lm=r->cf->has_simple_Alloc;
+  for (int i=k; i>=0; i--)
+  {
+    if(id->m[i]!=NULL)
+    {
+      sev[i]=p_GetShortExpVector(id->m[i],r);
+    }
+  }
+  if (only_lm)
+  {
+    for (int i=0; i<k; i++)
+    {
+      if (bad[i] && (id->m[i] != NULL))
+      {
+        poly m_i=id->m[i];
+        long sev_i=sev[i];
+        for (int j=i+1; j<=k; j++)
+        {
+          if (id->m[j]!=NULL)
+          {
+            if (p_LmShortDivisibleBy(m_i, sev_i, id->m[j],~sev[j],r))
+            {
+              p_LmFree(&id->m[j],r);
+            }
+	    else if (p_LmShortDivisibleBy(id->m[j],sev[j], m_i,~sev_i,r))
+            {
+              p_LmFree(&id->m[i],r);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  else
+  {
+    for (int i=0; i<k; i++)
+    {
+      if (bad[i] && (id->m[i] != NULL))
+      {
+        poly m_i=id->m[i];
+        long sev_i=sev[i];
+        for (int j=i+1; j<=k; j++)
+        {
+          if (id->m[j]!=NULL)
+          {
+            if (p_LmShortDivisibleBy(m_i, sev_i, id->m[j],~sev[j],r))
+            {
+              p_Delete(&id->m[j],r);
+            }
+            else if (p_LmShortDivisibleBy(id->m[j],sev[j], m_i,~sev_i,r))
+            {
+              p_Delete(&id->m[i],r);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  omFreeSize(bad,kk*sizeof(BOOLEAN));
+  omFreeSize(sev,kk*sizeof(long));
+}
 poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
 // accoding to:
 // Algorithm 2.6 of
@@ -1803,8 +1878,12 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
     ideal J=id_CopyFirstK(A,i,src);
     for(int ii=src->N;ii>0;ii--)
       exp_q[ii]=p_GetExp(A->m[i],ii,src);
-    for(int ii=0;ii<i;ii++) p_Div_hi(J->m[ii],exp_q,src);
-    id_DelDiv(J,src);
+    BOOLEAN *bad=(BOOLEAN*)omAlloc0(i*sizeof(BOOLEAN));
+    for(int ii=0;ii<i;ii++)
+    {
+      bad[ii]=p_Div_hi(J->m[ii],exp_q,src);
+    }
+    id_DelDiv_hi(J,bad,src);
     // search linear elems:
     int k=0;
     for (int ii=IDELEMS(J)-1;ii>=0;ii--)
