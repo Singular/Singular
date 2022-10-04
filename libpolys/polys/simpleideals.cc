@@ -371,11 +371,11 @@ static void id_DelDiv_SEV(ideal id, int k,const ring r)
         {
           if (id->m[j]!=NULL)
           {
-            if (p_LmShortDivisibleBy(m_i, sev_i,r, id->m[j],~sev[j],r))
+            if (p_LmShortDivisibleBy(m_i, sev_i,id->m[j],~sev[j],r))
             {
               p_LmFree(&id->m[j],r);
             }
-            else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev_i,r))
+            else if (p_LmShortDivisibleBy(id->m[j],sev[j], m_i,~sev_i,r))
             {
               p_LmFree(&id->m[i],r);
               break;
@@ -397,11 +397,11 @@ static void id_DelDiv_SEV(ideal id, int k,const ring r)
         {
           if (id->m[j]!=NULL)
           {
-            if (p_LmShortDivisibleBy(m_i, sev_i,r, id->m[j],~sev[j],r))
+            if (p_LmShortDivisibleBy(m_i, sev_i, id->m[j],~sev[j],r))
             {
               p_Delete(&id->m[j],r);
             }
-            else if (p_LmShortDivisibleBy(id->m[j],sev[j],r, m_i,~sev_i,r))
+            else if (p_LmShortDivisibleBy(id->m[j],sev[j], m_i,~sev_i,r))
             {
               p_Delete(&id->m[i],r);
               break;
