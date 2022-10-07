@@ -29,7 +29,7 @@
 //  The complexity function should return a measure indicating
 //  how complicated this number is in terms of memory usage
 //  and arithmetic operations. For a rational p/q, one could
-//  return max(|p|,|q|). This fuction is used for pivoting.
+//  return max(|p|,|q|). This function is used for pivoting.
 //
 //  The gcd of two numbers a,b should be a number g such that
 //  the complexities of a/g and b/g are less or equal than those
@@ -43,7 +43,7 @@ template<class K> class KMatrix
 
 private:
 
-    K    *a;                                // the entries ot the matrix
+    K    *a;                                // the entries of the matrix
     int rows;                               // number of rows
     int cols;                               // number of columns
 

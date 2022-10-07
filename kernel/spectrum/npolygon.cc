@@ -290,7 +290,7 @@ int linearForm::positive( void )
 
 
 // ----------------------------------------------------------------------------
-//  Allocate memory for a newton polygon of  k  linear forms
+//  Allocate memory for a Newton polygon of  k  linear forms
 // ----------------------------------------------------------------------------
 
 void    newtonPolygon::copy_new( int k )
@@ -644,7 +644,7 @@ Rational  newtonPolygon::weight_shift1( poly m, const ring r ) const
 
 /*
 // ----------------------------------------------------------------------------
-//  Chcek if the polynomial belonging to the Newton polygon
+//  Check if the polynomial belonging to the Newton polygon
 //  is semiquasihomogeneous (sqh)
 // ----------------------------------------------------------------------------
 
