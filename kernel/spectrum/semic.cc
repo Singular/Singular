@@ -356,7 +356,7 @@ int     spectrum::next_interval( Rational *alpha1,Rational *alpha2 )
 }
 
 // ----------------------------------------------------------------------------
-//  compute the numver of spectrum numbers in the inverval  [*alpha1,*alpha2]
+//  compute the number of spectrum numbers in the interval  [*alpha1,*alpha2]
 // ----------------------------------------------------------------------------
 
 int     spectrum::numbers_in_interval( Rational &alpha1,

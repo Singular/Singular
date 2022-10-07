@@ -47,7 +47,7 @@ void    spectrumPolyNode::copy_zero( void )
 }
 
 // ----------------------------------------------------------------------------
-//  Inizialize a  spectrumPolyNode  shallow from data
+//  Initialize a  spectrumPolyNode  shallow from data
 // ----------------------------------------------------------------------------
 
 void    spectrumPolyNode::copy_shallow(
@@ -61,7 +61,7 @@ void    spectrumPolyNode::copy_shallow(
 }
 
 // ----------------------------------------------------------------------------
-//  Inizialize a  spectrumPolyNode  shallow from another  spectrumPolyNode
+//  Initialize a  spectrumPolyNode  shallow from another  spectrumPolyNode
 // ----------------------------------------------------------------------------
 
 void    spectrumPolyNode::copy_shallow( spectrumPolyNode &node )
@@ -119,7 +119,7 @@ void    spectrumPolyList::copy_zero( void )
 }
 
 // ----------------------------------------------------------------------------
-//  Inizialize a  spectrumPolyList  shallow from data
+//  Initialize a  spectrumPolyList  shallow from data
 // ----------------------------------------------------------------------------
 
 void    spectrumPolyList::copy_shallow(
@@ -131,7 +131,7 @@ void    spectrumPolyList::copy_shallow(
 }
 
 // ----------------------------------------------------------------------------
-//  Inizialize a  spectrumPolyList  shallow from another  spectrumPolyList
+//  Initialize a  spectrumPolyList  shallow from another  spectrumPolyList
 // ----------------------------------------------------------------------------
 
 void    spectrumPolyList::copy_shallow( spectrumPolyList &splist )
@@ -158,7 +158,7 @@ spectrumPolyList::spectrumPolyList( newtonPolygon *npolygon )
 }
 
 // ----------------------------------------------------------------------------
-//  Destuctor for  spectrumPolyList
+//  Destructor for  spectrumPolyList
 // ----------------------------------------------------------------------------
 
 spectrumPolyList::~spectrumPolyList( )
@@ -178,7 +178,7 @@ spectrumPolyList::~spectrumPolyList( )
 // ----------------------------------------------------------------------------
 //  Insert a new node into a  spectrumPolyList  at position k
 //      If the list is sorted, then
-//      the new node ist inserted such that the list remains sorted.
+//      the new node is inserted such that the list remains sorted.
 // ----------------------------------------------------------------------------
 
 void    spectrumPolyList::insert_node( poly m,poly f, const ring R )
