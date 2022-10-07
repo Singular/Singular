@@ -99,7 +99,7 @@ int ReducePolyLead(Poly *x,Poly *y)
   }
   number coef;
   if (y->root_l<=0) y->root_l=pLength(y->root);
-  coef=kBucketPolyRed(x->root_b,y->root,y->root_l,NULL,FALSE);
+  coef=kBucketPolyRed(x->root_b,y->root,y->root_l,NULL);
   nDelete(&coef);
   x->root=kBucketGetLm(x->root_b);
   if (x->root==NULL)

@@ -1082,8 +1082,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 
 number kBucketPolyRed(kBucket_pt bucket,
                       poly p1, int l1,
-                      poly spNoether,
-                      BOOLEAN reduce)
+                      poly spNoether)
 {
   ring r=bucket->bucket_ring;
   assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
@@ -1107,8 +1106,6 @@ number kBucketPolyRed(kBucket_pt bucket,
   if (! n_IsOne(pGetCoeff(p1),r->cf))
   {
     number an = pGetCoeff(p1), bn = pGetCoeff(lm);
-//StringSetS("##### an = "); nWrite(an); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
-//StringSetS("##### bn = "); nWrite(bn); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
     /* ksCheckCoeff: divide out gcd from an and bn: */
     int ct = ksCheckCoeff(&an, &bn,r->cf);
     /* the previous command returns ct=0 or ct=2 iff an!=1
@@ -1118,23 +1115,6 @@ number kBucketPolyRed(kBucket_pt bucket,
     p_SetCoeff(lm, bn, r);
     if ((ct == 0) || (ct == 2))
     {
-      if (reduce)
-      {
-        if(n_IsMOne(an,r->cf))
-        {
-          an=n_InpNeg(an,r->cf);
-          bn=n_InpNeg(bn,r->cf);
-        }
-        #if 1 //#ifdef KDEBUG
-        else if (!n_IsOne(an,r->cf))
-        {
-          StringSetS("kBucketPolyRed: ");
-          n_Write(an,r->cf);
-          StringAppendS("\n");
-          PrintS(StringEndS());
-        }
-        #endif
-      }
       /* correct factor for cancelation by changing sign if an=-1 */
       if (rField_is_Ring(r))
         lm = __p_Mult_nn(lm, an, r);
@@ -1215,6 +1195,100 @@ number kBucketPolyRed(kBucket_pt bucket,
   if (reset_vec) p_SetCompP(a1, 0, r);
   kbTest(bucket);
   return rn;
+}
+
+void kBucketPolyRedNF(kBucket_pt bucket,
+                      poly p1, int l1,
+                      poly spNoether)
+{
+  ring r=bucket->bucket_ring;
+  assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
+  assume(p1 != NULL &&
+         p_DivisibleBy(p1,  kBucketGetLm(bucket), r));
+  assume(pLength(p1) == (unsigned) l1);
+
+  poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
+  BOOLEAN reset_vec=FALSE;
+
+  /* we shall reduce bucket=bn*lm+... by p1=an*t+a1 where t=lm(p1)
+     and an,bn shall be defined further down only if lc(p1)!=1
+     we already know: an|bn and t|lm */
+  if(a1==NULL)
+  {
+    p_LmDelete(&lm, r);
+    return;
+  }
+
+  #ifdef KDEBUG
+  if (n_DivBy(pGetCoeff(lm),pGetCoeff(p1),r->cf))
+  #endif
+  {
+    number c=n_Div(pGetCoeff(lm),pGetCoeff(p1),r->cf);
+    //StringSetS("mult cf:");n_Write(c,r->cf);StringAppendS("\n");
+    //PrintS(StringEndS());
+    #ifdef KDEBUG
+    if (n_IsZero(c,r->cf))
+    {
+      StringSetS("a/b: ");n_Write(pGetCoeff(lm),r->cf);StringAppendS(" / ");
+      n_Write(pGetCoeff(p1),r->cf);StringAppendS("\n");PrintS(StringEndS());
+    }
+    #endif
+    p_SetCoeff(lm,c,r);
+  }
+  #ifdef KDEBUG
+  else
+  {
+    PrintS("bug\n");
+  }
+  #endif
+  if (p_GetComp(p1, r) != p_GetComp(lm, r))
+  {
+    p_SetCompP(a1, p_GetComp(lm, r), r);
+    reset_vec = TRUE;
+    p_SetComp(lm, p_GetComp(p1, r), r);
+    p_Setm(lm, r);
+  }
+
+  p_ExpVectorSub(lm, p1, r);
+  l1--;
+
+  assume((unsigned)l1==pLength(a1));
+
+#ifdef HAVE_SHIFTBBA
+  poly lmRight;
+  poly lm_org;
+  if (r->isLPring)
+  {
+    int firstBlock = p_mFirstVblock(p1, r);
+    lm_org=lm;
+    k_SplitFrame(lm, lmRight, si_max(firstBlock, 1), r);
+  }
+#endif
+
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    poly tmp=r->p_Procs->pp_Mult_mm(a1, lmRight, r);
+    kBucket_Minus_m_Mult_p(bucket, lm,tmp, &l1, spNoether);
+    p_Delete(&tmp,r);
+    p_LmDelete(&lmRight,r);
+    p_LmDelete(lm_org,r);
+  }
+  else
+#endif
+  {
+    kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
+  }
+
+#if 0
+  if (backuped)
+    p_SetCoeff0(a1,coef,r);
+#endif
+
+  p_LmDelete(&lm, r);
+  if (reset_vec) p_SetCompP(a1, 0, r);
+  kbTest(bucket);
+  return;
 }
 
 #ifndef USE_COEF_BUCKETS
@@ -1438,7 +1512,6 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
 *       2  ->  a != 1,  b == 1
 *       3  ->  a == 1,  b == 1
 *   this value is used to control the spolys
-*   reduce is set inside "NF" -> a should be 1
 */
 int ksCheckCoeff(number *a, number *b, const coeffs r)
 {

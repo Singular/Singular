@@ -421,7 +421,7 @@ static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
       if (pLmDivisibleBy(redWith->m[i],q))
       {
         number up = kBucketPolyRed(syzstr->bucket,redWith->m[i],
-                         pLength(redWith->m[i]), NULL, FALSE);
+                         pLength(redWith->m[i]), NULL);
         nDelete(&up);
         q = kBucketGetLm(syzstr->bucket);
         if (toRed==NULL) break;
@@ -623,7 +623,7 @@ kBucketInit(syzstr->syz_bucket,tso.syz,il);
 #endif
             sySPRedSyz(syzstr,redset[j],q);
             number up = kBucketPolyRed(syzstr->bucket,redset[j].p,
-                         redset[j].length, NULL, FALSE);
+                         redset[j].length, NULL);
             nDelete(&up);
             q = kBucketGetLm(syzstr->bucket);
 #ifdef SHOW_RED

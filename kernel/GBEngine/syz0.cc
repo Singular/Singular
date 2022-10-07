@@ -684,7 +684,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
             //lastmonom->coef = nInpNeg(lastmonom->coef);
             pSetComp(lastmonom,l+1);
             //computes the new toRed
-            number up = kBucketPolyRed(sy0buck,F[l],Flength[l],NULL,FALSE);
+            number up = kBucketPolyRed(sy0buck,F[l],Flength[l],NULL);
             if (! nIsOne(up))
             {
               // Thomas: Now do whatever you need to do

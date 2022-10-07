@@ -83,8 +83,11 @@ void kBucketAdjust(kBucket_pt bucket, int i);
 // Returns: Lc(p) / gcd(Lc(p), Lc(q))
 number kBucketPolyRed(kBucket_pt bucket,
                       poly p, int l,
-                      poly spNoether,
-                      BOOLEAN reduce);
+                      poly spNoether);
+void kBucketPolyRedNF(kBucket_pt bucket,
+                      poly p1, int l1,
+                      poly spNoether);
+
 
 
 /////////////////////////////////////////////////////////////////////////////

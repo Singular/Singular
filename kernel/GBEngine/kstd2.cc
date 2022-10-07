@@ -2186,6 +2186,7 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   kbTest(P.bucket);
 #ifdef HAVE_RINGS
   BOOLEAN is_ring = rField_is_Ring(currRing);
+  if(is_ring) nonorm=TRUE;
 #endif
 #ifdef KDEBUG
 //  if (TEST_OPT_DEBUG)
@@ -2202,6 +2203,10 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   loop
   {
     j=kFindDivisibleByInS(strat,&max_ind,&P);
+    while ((j>=0)
+    && (nonorm)
+    && (!n_DivBy(pGetCoeff(P.p),pGetCoeff(strat->S[j]),currRing->cf)))
+      j=kFindNextDivisibleByInS(strat,j+1,max_ind,&P);
     if (j>=0)
     {
 #ifdef HAVE_RINGS
@@ -2215,15 +2220,19 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
           int sll;
           jj=kFindNextDivisibleByInS(strat,jj+1,max_ind,&P);
           if (jj<0) break;
-          sll=pSize(strat->S[jj]);
-          if (sll<sl)
+          if ((!nonorm)
+          || (n_DivBy(pGetCoeff(P.p),pGetCoeff(strat->S[jj]),currRing->cf)))
           {
-            #ifdef KDEBUG
-            if (TEST_OPT_DEBUG) Print("better(S%d:%d -> S%d:%d)\n",j,sl,jj,sll);
-            #endif
-            //else if (TEST_OPT_PROT) { PrintS("b"); mflush(); }
-            j=jj;
-            sl=sll;
+            sll=pSize(strat->S[jj]);
+            if (sll<sl)
+            {
+              #ifdef KDEBUG
+              if (TEST_OPT_DEBUG) Print("better(S%d:%d -> S%d:%d)\n",j,sl,jj,sll);
+              #endif
+              //else if (TEST_OPT_PROT) { PrintS("b"); mflush(); }
+              j=jj;
+              sl=sll;
+            }
           }
         }
         if ((nonorm==0) && (!nIsOne(pGetCoeff(strat->S[j]))))
@@ -2248,16 +2257,14 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       if (rIsPluralRing(currRing))
       {
         number coef;
-        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef,nonorm==0);
+        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef,nonorm);
         nDelete(&coef);
       }
       else
 #endif
       {
-        number coef;
-        coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),
-                            strat->kNoether,nonorm==0);
-        nDelete(&coef);
+        kBucketPolyRedNF(P.bucket,strat->S[j],pLength(strat->S[j]),
+                            strat->kNoether);
       }
       cnt--;
       if (cnt==0)
@@ -2367,14 +2374,13 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
       if (rIsPluralRing(currRing))
       {
         number coef;
-        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef,nonorm==0);
+        nc_kBucketPolyRed_NF(P.bucket,strat->S[j],&coef,nonorm);
         nDelete(&coef);
       }
       else
 #endif
       {
-        number coef;
-        coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether,nonorm==0);
+        kBucketPolyRedNF(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
         P.p = kBucketClear(P.bucket);
         P.p = pJet(P.p,bound);
         if(!P.IsNull())
@@ -2384,7 +2390,6 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
           P.bucket = kBucketCreate(currRing);
           kBucketInit(P.bucket,P.p,pLength(P.p));
         }
-        nDelete(&coef);
       }
       h = kBucketGetLm(P.bucket);   // FRAGE OLIVER
       if (h==NULL)

@@ -2075,7 +2075,7 @@ static void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c, BOOLEAN red
   if(p_IsConstant(m,r))
   {
     p_Delete(&m, r);
-    ctmp = kBucketPolyRed(b,p,pLength(p),NULL,reduce);
+    ctmp = kBucketPolyRed(b,p,pLength(p),NULL);
   }
   else
   {
@@ -2083,7 +2083,13 @@ static void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c, BOOLEAN red
     number c2;
     p_Cleardenom_n(pp,r,c2);
     p_Delete(&m, r);
-    ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL,reduce);
+    if (reduce)
+    {
+      kBucketPolyRedNF(b,pp,pLength(pp),NULL);
+      ctmp=n_Init(1,r->cf);
+    }
+    else
+      ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
     //cc=*c;
     //*c=nMult(*c,c2);
     n_Delete(&c2, r->cf);
