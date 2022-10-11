@@ -1046,22 +1046,28 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         * It is not possible to reduce h with smaller ecart;
         * we have to reduce with bad ecart: H has to enter in T
         */
-        doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
-        if (H.p == NULL)
-          return NULL;
+        LObject L= H;
+        L.Copy();
+        H.GetP();
+        H.length=H.pLength=pLength(H.p);
+        ksReducePoly(&L, &(strat->T[ii]), strat->kNoetherTail(), NULL, NULL, strat,
+                            (flag & KSTD_NF_NONORM)==0);
+        enterT(H,strat);
+        H = L;
       }
       else
       {
         /*
         * we reduce with good ecart, h need not to be put to T
         */
-        doRed(&H,&(strat->T[ii]),FALSE,strat,TRUE);
-        if (H.p == NULL)
-          return NULL;
+        ksReducePoly(&H, &(strat->T[ii]), strat->kNoetherTail(), NULL, NULL, strat,
+                            (flag & KSTD_NF_NONORM)==0);
       }
+      if (H.p == NULL)
+        return NULL;
       /*- try to reduce the s-polynomial -*/
       o = H.SetpFDeg();
-      if ((flag &2 ) == 0) cancelunit(&H,TRUE);
+      if ((flag & KSTD_NF_ECART) == 0) cancelunit(&H,TRUE);
       H.ecart = currRing->pLDeg(H.p,&(H.length),currRing)-o;
       j = 0;
       H.sev = pGetShortExpVector(H.p);
@@ -1084,7 +1090,7 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
     int T0ecart = strat->T[0].ecart;
     int o = H.SetpFDeg();
     H.ecart = currRing->pLDeg(H.p,&H.length,currRing)-o;
-    if ((flag & 2) == 0) cancelunit(&H,TRUE);
+    if ((flag & KSTD_NF_ECART) == 0) cancelunit(&H,TRUE);
     H.sev = pGetShortExpVector(H.p);
     unsigned long not_sev = ~ H.sev;
     if (strat->T[0].GetpFDeg() == 0 && strat->T[0].length <= 2)
@@ -1179,19 +1185,25 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
                  * It is not possible to reduce h with smaller ecart;
                  * we have to reduce with bad ecart: H has to enter in T
                  */
-                doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
-                if (H.p == NULL)
-                    return NULL;
+              LObject L= H;
+              L.Copy();
+              H.GetP();
+              H.length=H.pLength=pLength(H.p);
+              ksReducePoly(&L, &(strat->T[ii]), strat->kNoetherTail(), NULL, NULL, strat,
+                            (flag & KSTD_NF_NONORM)==0);
+              enterT_strong(H,strat);
+              H = L;
             }
             else
             {
                 /*
                  * we reduce with good ecart, h need not to be put to T
                  */
-                doRed(&H,&(strat->T[ii]),FALSE,strat,TRUE);
-                if (H.p == NULL)
-                    return NULL;
+                ksReducePoly(&H, &(strat->T[ii]), strat->kNoetherTail(), NULL, NULL, strat,
+                            (flag & KSTD_NF_NONORM)==0);
             }
+            if (H.p == NULL)
+              return NULL;
             /*- try to reduce the s-polynomial -*/
             o = H.SetpFDeg();
             if ((flag &2 ) == 0) cancelunit(&H,TRUE);
@@ -2357,10 +2369,10 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
         if(rField_is_Ring(currRing))
         {
-          p = redMoraNFRing(p,strat, lazyReduce & KSTD_NF_ECART);
+          p = redMoraNFRing(p,strat, lazyReduce);
         }
         else
-          p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
+          p = redMoraNF(p,strat, lazyReduce);
         if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
         {
           if (TEST_OPT_PROT) { PrintS("t"); mflush(); }

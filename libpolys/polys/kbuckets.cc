@@ -1520,6 +1520,12 @@ int ksCheckCoeff(number *a, number *b, const coeffs r)
   n_Test(an,r);
   n_Test(bn,r);
 
+  if (UNLIKELY(nCoeff_is_Ring(r) && n_DivBy(bn,an,r))) // in NF
+  {
+      bn = n_ExactDiv(bn, an, r);
+      an = n_Init(1, r);
+  }
+  else
   {
     number cn = n_SubringGcd(an, bn, r);
     if(n_IsOne(cn, r))
