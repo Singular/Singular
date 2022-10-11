@@ -297,7 +297,7 @@ int ksReducePoly(LObject* PR,
         bn=n_InpNeg(bn, tailRing->cf);
         ct+=1;
       }
-#if 1 //ifdef KDEBUG
+#ifdef KDEBUG
       else if(!n_IsOne(an,tailRing->cf))
       {
         StringSetS("ksReducePoly: ");n_Write(an,tailRing->cf);
