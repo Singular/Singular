@@ -4864,14 +4864,13 @@ void p_Shift (poly * p,int i, const ring r)
 static inline unsigned long GetBitFields(const long e,
                                          const unsigned int s, const unsigned int n)
 {
-#define Sy_bit_L(x)     (((unsigned long)1L)<<(x))
   unsigned int i = 0;
   unsigned long  ev = 0L;
   assume(n > 0 && s < BIT_SIZEOF_LONG);
   do
   {
     assume(s+i < BIT_SIZEOF_LONG);
-    if (e > (long) i) ev |= Sy_bit_L(s+i);
+    if (e > (long) i) ev |= Sy_bitL(s+i);
     else break;
     i++;
   }
