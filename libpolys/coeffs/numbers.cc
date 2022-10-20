@@ -128,7 +128,7 @@ static BOOLEAN ndIsUnit_Field(number a, const coeffs r)
 { return !r->cfIsZero(a,r); }
 static number ndGetUnit_Ring(number, const coeffs r)
 { return r->cfInit(1,r); }
-static number ndRandom(siRandProc p, number p1, number p2, const coeffs cf)
+static number ndRandom(siRandProc p, number, number, const coeffs cf)
 { return cf->cfInit(p(),cf); }
 static number ndEucNorm(number a, const coeffs cf)
 { return cf->cfInit(cf->cfSize(a,cf),cf); }
@@ -142,7 +142,7 @@ static number ndFarey(number,number,const coeffs r)
   Werror("farey not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return NULL;
 }
-static number ndXExtGcd(number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
+static number ndXExtGcd(number, number, number *, number *, number *, number *, const coeffs r)
 {
   Werror("XExtGcd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return NULL;
@@ -152,13 +152,13 @@ static number ndChineseRemainder(number *,number *,int,BOOLEAN,CFArray&,const co
   Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return r->cfInit(0,r);
 }
-number ndReadFd( const ssiInfo *f, const coeffs r)
+number ndReadFd( const ssiInfo *, const coeffs r)
 {
   Warn("ReadFd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
   return NULL;
 }
 
-static void ndWriteFd(number a, const ssiInfo *f, const coeffs r)
+static void ndWriteFd(number, const ssiInfo *, const coeffs r)
 {
   Warn("WriteFd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
 }
@@ -291,7 +291,6 @@ static void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*
   d = n_Init(1, r);
 }
 
-static number ndCopy(number a, const coeffs) { return a; }
 number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
   // aRing and r need not be the same, but must be the same representation
@@ -305,6 +304,7 @@ number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 static void ndKillChar(coeffs) {}
 static void ndSetChar(const coeffs) {}
 
+static number ndCopy(number a, const coeffs) { return a; }
 number nd_Copy(number a, const coeffs r) { return r->cfCopy(a, r); }
 
 #ifdef HAVE_RINGS
