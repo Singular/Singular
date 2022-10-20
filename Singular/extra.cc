@@ -2667,16 +2667,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
 #endif
-  /*==================== pDivStat =============================*/
-  #if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if(strcmp(sys_cmd,"pDivStat")==0)
-      {
-        extern void pPrintDivisbleByStat();
-        pPrintDivisbleByStat();
-        return FALSE;
-      }
-      else
-  #endif
   /*==================== red =============================*/
   #if 0
       if(strcmp(sys_cmd,"red")==0)
