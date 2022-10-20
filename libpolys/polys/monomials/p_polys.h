@@ -1821,7 +1821,9 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, const ring r_a, poly b, con
   do
   {
     if (p_GetExp(a,i,r_a) > p_GetExp(b,i,r_b))
+    {
       return FALSE;
+    }
     i--;
   }
   while (i);
@@ -1874,12 +1876,6 @@ static inline BOOLEAN _p_LmDivisibleBy(poly a, poly b, const ring r)
     return _p_LmDivisibleByNoComp(a, b, r);
   return FALSE;
 }
-static inline BOOLEAN _p_LmDivisibleBy(poly a, const ring r_a, poly b, const ring r_b)
-{
-  if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
-    return _p_LmDivisibleByNoComp(a, r_a, b, r_b);
-  return FALSE;
-}
 static inline BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, const ring r)
 {
   p_LmCheckPolyRing1(a, r);
@@ -1911,21 +1907,6 @@ static inline BOOLEAN p_DivisibleBy(poly a, poly b, const ring r)
   if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
       return _p_LmDivisibleByNoComp(a,b,r);
   return FALSE;
-}
-static inline BOOLEAN p_DivisibleBy(poly a, const ring r_a, poly b, const ring r_b)
-{
-  pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r_b));
-  pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r_a));
-  if (a != NULL) {
-      return _p_LmDivisibleBy(a, r_a, b, r_b);
-  }
-  return FALSE;
-}
-static inline BOOLEAN p_LmDivisibleBy(poly a, const ring r_a, poly b, const ring r_b)
-{
-  p_LmCheckPolyRing(a, r_a);
-  p_LmCheckPolyRing(b, r_b);
-  return _p_LmDivisibleBy(a, r_a, b, r_b);
 }
 
 static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
@@ -1965,26 +1946,6 @@ static inline BOOLEAN p_LmShortDivisibleByNoComp(poly a, unsigned long sev_a,
   return p_LmDivisibleByNoComp(a, b, r);
 #else
   return pDebugLmShortDivisibleByNoComp(a, sev_a, r, b, not_sev_b, r);
-#endif
-}
-
-static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, const ring r_a,
-                                      poly b, unsigned long not_sev_b, const ring r_b)
-{
-  p_LmCheckPolyRing1(a, r_a);
-  p_LmCheckPolyRing1(b, r_b);
-#ifndef PDIV_DEBUG
-  _pPolyAssume2(p_GetShortExpVector(a, r_a) == sev_a, a, r_a);
-  _pPolyAssume2(p_GetShortExpVector(b, r_b) == ~ not_sev_b, b, r_b);
-
-  if (sev_a & not_sev_b)
-  {
-    pAssume1(_p_LmDivisibleByNoComp(a, r_a, b, r_b) == FALSE);
-    return FALSE;
-  }
-  return _p_LmDivisibleBy(a, r_a, b, r_b);
-#else
-  return pDebugLmShortDivisibleBy(a, sev_a, r_a, b, not_sev_b, r_b);
 #endif
 }
 
