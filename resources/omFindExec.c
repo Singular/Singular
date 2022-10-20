@@ -56,17 +56,18 @@ static char * omFindExec_link (const char *name, char* executable)
         ((name[0] == '.') && (name[1] == '.') && (name[2] == '/')) ||
         strchr(name, '/') != NULL)
     {
+      short ok=1;
 
 #ifdef HAVE_GETCWD
-      getcwd (tbuf, MAXPATHLEN);
+      if (getcwd (tbuf, MAXPATHLEN)==NULL) ok=0;
 #else
 # ifdef HAVE_GETWD
-      getwd (tbuf);
+      if (getwd (tbuf)==NULL) ok=0;
 # endif
 #endif
       strcat (tbuf, "/");
       strcat (tbuf, name);
-      if (! access(tbuf, F_OK))
+      if (ok && ! access(tbuf, F_OK))
       {
         strcpy(executable, tbuf);
         return executable;
