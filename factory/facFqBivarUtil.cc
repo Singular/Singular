@@ -229,7 +229,7 @@ void appendTestMapDown (CFList& factors, const CanonicalForm& f,
   CanonicalForm delta= info.getDelta();
   CanonicalForm gamma= info.getGamma();
   CanonicalForm g= f;
-  int degMipoBeta;
+  int degMipoBeta=0;
   if (!k && beta.level() == 1)
     degMipoBeta= 1;
   else if (!k && beta.level() != 1)

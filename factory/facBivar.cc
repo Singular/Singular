@@ -329,7 +329,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   int subCheck1= substituteCheck (A, x);
   int subCheck2= substituteCheck (A, y);
   buf= swapvar (A,x,y);
-  int evaluation, evaluation2, bufEvaluation= 0, bufEvaluation2= 0;
+  int evaluation, evaluation2=0, bufEvaluation= 0, bufEvaluation2= 0;
   for (int i= 0; i < factorNums; i++)
   {
     bufAeval= A;
