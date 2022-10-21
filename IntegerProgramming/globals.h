@@ -20,15 +20,28 @@
 #include <stdio.h>
 #ifndef HAVE_IOSTREAM_H
 #include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <limits>
 #else
 #include <iostream.h>
+#endif
+
+#ifndef HAVE_FSTREAM_H
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
+
+#ifndef HAVE_IOMANIP_H
+#include <iomanip>
+#else
 #include <iomanip.h>
+#endif
+
+#ifndef HAVE_LIMITS_H
+#include <limits>
+#else
 #include <limits.h>
 #endif
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
