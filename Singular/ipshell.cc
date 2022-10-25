@@ -2892,7 +2892,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
         {
           TransExtInfo extParam;
           extParam.r = extRing;
-          assume( extRing->qideal == NULL );
 
           R->cf = nInitChar(n_transExt, &extParam);
         }
@@ -5889,18 +5888,27 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   // ring NEW = OLD, (), (); where OLD is a polynomial ring...
   else if ((pn->Typ()==RING_CMD) && (P == 1))
   {
-    TransExtInfo extParam;
-    extParam.r = (ring)pn->Data();
-    extParam.r->ref++;
-    cf = nInitChar(n_transExt, &extParam);
+    ring r=(ring)pn->Data();
+    if (r->qideal==NULL)
+    {
+      TransExtInfo extParam;
+      extParam.r = r;
+      extParam.r->ref++;
+      cf = nInitChar(n_transExt, &extParam); // R(a)
+    }
+    else if (IDELEMS(r->qideal)==1)
+    {
+      AlgExtInfo extParam;
+      extParam.r=r;
+      extParam.r->ref++;
+      cf = nInitChar(n_algExt, &extParam);   // R[a]/<minideal>
+    }
+    else
+    {
+      WerrorS("algebraic extension ring must have one minpoly");
+      goto rInitError;
+    }
   }
-  //else if ((pn->Typ()==QRING_CMD) && (P == 1)) // same for qrings - which should be fields!?
-  //{
-  //  AlgExtInfo extParam;
-  //  extParam.r = (ring)pn->Data();
-
-  //  cf = nInitChar(n_algExt, &extParam);   // Q[a]/<minideal>
-  //}
   else
   {
     WerrorS("Wrong or unknown ground field specification");
