@@ -2699,11 +2699,6 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 */
 unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
 {
-#if SIZEOF_LONG == 8
-  if (N<4) N=4;
-#else
-  if (N<2) N=2;
-#endif
   bitmask =rGetExpSize(bitmask, bits);
   int vars_per_long=BIT_SIZEOF_LONG/bits;
   int bits1;
