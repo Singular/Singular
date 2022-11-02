@@ -9,6 +9,8 @@ bug_curvepar
 bug_division_2
 bug_ecart
 bug_heuristic
+bug_heuristic
+bug_hilb
 bug_imap_alg
 bug_liftstd2
 bug_liftstd4
