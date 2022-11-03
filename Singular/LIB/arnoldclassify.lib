@@ -34,6 +34,7 @@ arnoldListAllSeries();   list of all singularity series up to corank 2
 arnoldShowSeries(S);     data defining a singularity series S
 arnoldNormalForm(S,#);   normalform for a singularity series S
 arnoldClassify(f);       singularity class of a power series f
+arnoldClassify_to_string(f); singularity class of a power series f
 arnoldCorank(f);         corank of singularity defined by f
 arnoldDeterminacy(f,#);  upper bound for the determinacy of f
 arnoldMilnorCode(f,#);   Milnor Code of a singularity f
