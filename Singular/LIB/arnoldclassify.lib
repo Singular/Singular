@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version arnoldclassify.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version arnoldclassify.lib 4.3.1.2 Nov_2022 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  arnoldClassify.lib     Arnol'd Classifier of Singularities
@@ -2012,5 +2012,46 @@ static proc read_singularity_db( string typ )
   Tp = read(dbmLink, typ);
     return(Tp);
 
+}
+
+proc arnoldClassify_to_string(poly  fPoly)
+"USAGE:   arnoldClassify_to_string (f); f poly
+ASSUME:  The basering is local of characteristic 0 and f defines an
+         isolated singularity from Arnol'd's list of corank at most 2.
+COMPUTE: singularity class with respect to right equivalence and
+         invariants used in the process of classification
+RETURN:  string: separated by |:
+         @* - name of singularity series as listed by arnoldListAllSeries(),
+         @* - name of singularity class,
+         @* - parameters k,r,s defining the singularity class, -1 if not used,
+         @* - modality, corank, Milnor number, determinacy,
+         @* - Tjurina number, -2 if not computed, -1 if infinite,
+         @* - Milnor code, -1 if not computed,
+         @* - normal form of the singularity series from Arnol'd's list,
+         @* - restrictions on parameters as string in SINGULAR syntax.
+EXAMPLE: example arnoldClassify_to_string; shows an example
+"
+{
+  singclass f=arnoldClassify(fPoly);
+  string s=f.Restrictions+"|"+
+    f.NormalForm+"|"+
+    string(f.MilnorCode)+"|"+
+    string(f.Tjurina)+"|"+
+    string(f.Determinacy)+"|"+
+    string(f.Milnor)+"|"+
+    string(f.Corank)+"|"+
+    string(f.Modality)+"|"+
+    string(f.r)+"|"+
+    string(f.s)+"|"+
+    f.Class+"|"+
+    f.Series;
+  return(s);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 0,(x,y),ds;
+  int k = random(3,10);
+  poly g = x4 + x2*y^(2*k+1)+x*y^(3*k+1)+ y^(4*k +1);
+  arnoldClassify_to_string(g);
 }
 
