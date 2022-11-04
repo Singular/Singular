@@ -1810,7 +1810,7 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   {
     ideal q=idInit(IDELEMS(r->qideal));
     q->m[0]=p_Init(R);
-    pSetCoeff0(q->m[0],(number)(r->qideal->m[0]));
+    pSetCoeff0(q->m[0],n_Copy((number)(r->qideal->m[0]),R->cf));
     L->m[3].data=(void *)q;
 //    I->m[0] = pNSet(R->minpoly);
   }
