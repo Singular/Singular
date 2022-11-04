@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version ring.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version ring.lib 4.3.1.2 Nov_2022 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -916,7 +916,7 @@ EXAMPLE: example rootofUnity; shows examples
 
   setring OldRing;
 
-  list rl = ringlist( OldRing);
+  list rl = ring_list( OldRing);
   while ( j<=@sized )
   {
      ASSUME(0, n%2 ==0);

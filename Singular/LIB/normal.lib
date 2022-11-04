@@ -276,7 +276,7 @@ EXAMPLE: example normal; shows an example
   else
   {
     // We change to dp ordering.
-    list rl = ringlist(origR);
+    list rl = ring_list(origR);
     list origOrd = rl[3];
     list newOrd = list("dp", intvec(1:nvars(origR))), list("C", 0);
     rl[3] = newOrd;
@@ -297,7 +297,7 @@ EXAMPLE: example normal; shows an example
       // The original ring R/I was normal. Nothing to do.
       // We define anyway a new ring, equal to R, to be able to return it.
       setring origR;
-      list lR = ringlist(origR);
+      list lR = ring_list(origR);
       def ROut = ring(lR);
       setring ROut;
       ideal norid = fetch(origR, id);
@@ -421,9 +421,9 @@ EXAMPLE: example normal; shows an example
         if(!defined(savebasering)) { def savebasering;}
         savebasering=basering;
         setring newR; // must be in a compatible ring to newR
-                      // as ringlist may produce ring-dep. stuff
+                      // as ring_list may produce ring-dep. stuff
         if(!defined(newRList)) { list newRList;}
-        newRList = ringlist(newR);
+        newRList = ring_list(newR);
         setring savebasering;
         U = norComp[j][1];
         c = norComp[j][2];
@@ -907,7 +907,7 @@ EXAMPLE: example HomJJ;  shows an example
   }
   else
   {
-    list RL = ringlist(newRing);
+    list RL = ring_list(newRing);
     def lastRing = ring(RL);
     setring lastRing;
     ideal endid = fetch(newRing, endid);
@@ -1175,7 +1175,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    int depth,lauf,prdim,osaz;
    int ti=timer;
 
-   gnirlist = ringlist(BAS);
+   gnirlist = ring_list(BAS);
 
 //----------- the trivial case of a zero ideal as input, RETURN ------------
    if(size(i)==0)
@@ -2323,13 +2323,13 @@ EXAMPLE: example genus; shows an example
    if(size(N) < nvars(R0))
    {
      list newvar=N[1..ncols(N)];
-     list @rl0=ringlist(R0);
+     list @rl0=ring_list(R0);
      @rl0[2]=list(N[1..ncols(N)]);
      @rl0[3]=list(list("dp",1:ncols(N)),list("C",0));
      def R=ring(@rl0); kill @rl0;
      setring R;
      ideal I =imap(R0,I);
-     list @rl0=ringlist(R0);
+     list @rl0=ring_list(R0);
      if((@rl0[3][1][1]=="dp")&&(size(@rl0[3])==2))
      {
        attrib(I,"isSB",1);
@@ -2353,7 +2353,7 @@ EXAMPLE: example genus; shows an example
    }
    else
    {
-     list @rl0=ringlist(R0);
+     list @rl0=ring_list(R0);
      if(dim(I)==0)
      {
        @rl0[2]=list("@s","@t");
@@ -2694,7 +2694,7 @@ EXAMPLE: example deltaLoc;  shows an example
    intvec save_opt=option(get);
    option(redSB);
    def R=basering;
-   list @rl=ringlist(R);
+   list @rl=ring_list(R);
    @rl[2]=list("x","y");
    @rl[3]=list(list("lp",1:2),list("C",0));
    def S=ring(@rl); setring S;
@@ -2986,7 +2986,7 @@ EXAMPLE:  example primeClosure; shows an example
   }
 
   int dblvl = printlevel-voice+2;
-  list gnirlist = ringlist(basering);
+  list gnirlist = ring_list(basering);
 
   //---- Some auxiliary variables:
   int delt;                      //finally the delta invariant
@@ -3011,7 +3011,7 @@ EXAMPLE:  example primeClosure; shows an example
   if (n==1)
   {
       def R = L[1];
-      list Rlist = ringlist(R);
+      list Rlist = ring_list(R);
       def BAS = basering;
       setring R;
       if (!(typeof(ker)=="ideal"))
@@ -3021,7 +3021,7 @@ EXAMPLE:  example primeClosure; shows an example
       }
       ker=simplify(interred(ker),15);
       // Rlist may be not defined in this new ring, so we define it again.
-      list Rlist2 = ringlist(R);
+      list Rlist2 = ring_list(R);
       def R0 = ring(Rlist2);
       setring R0;
       ideal ker=fetch(R,ker);
@@ -3322,7 +3322,7 @@ EXAMPLE:  example closureFrac; shows an example
           if (j==1)
           {
              //### noch abfragen ob Z(i) definiert ist
-             list gnirlist = ringlist(R(k));
+             list gnirlist = ring_list(R(k));
              n2 = size(gnirlist[2]);
              n3 = size(gnirlist[3]);
              for( i=1; i<=ncols(phi); i++)
@@ -3499,7 +3499,7 @@ proc closureGenerators(list L);
                     // ker(k) and construct the ideal J(k).
         {
          //### noch abfragen ob Z(i) definiert ist
-         list gnirlist = ringlist(R(k));
+         list gnirlist = ring_list(R(k));
          n2 = size(gnirlist[2]);
          n3 = size(gnirlist[3]);
          for( i=1; i<=ncols(phi); i++)
@@ -3732,7 +3732,7 @@ EXAMPLE: example normalP; shows an example
        result[3]=result[2]; // pair(delta invariants , total delta invariant)
        result[2]=result[1];
        def BR = basering;
-       list rl = ringlist(basering);
+       list rl = ring_list(basering);
        def rng = ring(rl);
        setring rng;
        ideal norid = 0;
@@ -4044,7 +4044,7 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       return(L);
    }
 
-      list gnirlist = ringlist(basering);
+      list gnirlist = ring_list(basering);
       endid = Le[1];
 //endphi;"";
       for( ii=1; ii<=n; ii++)
@@ -4193,7 +4193,7 @@ static proc computeRing(ideal J, ideal I, list #)
   int y = printlevel-voice+2;
   def R = basering;
   poly c = J[1];                     // the denominator
-  list gnirlist = ringlist(basering);
+  list gnirlist = ring_list(basering);
   string svars = varstr(basering);
   int nva = nvars(basering);
   string svar;
@@ -4537,7 +4537,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
       // The original ring R/I was normal. Nothing to do.
       // We define anyway a new ring, equal to R, to be able to return it.
       setring R;
-      list lR = ringlist(R);
+      list lR = ring_list(R);
       def ROut = ring(lR);
       setring ROut;
       ideal norid = fetch(R, I);
@@ -4668,7 +4668,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
     else
     {
       // We change to global dp ordering.
-      list rl = ringlist(R);
+      list rl = ring_list(R);
       list origOrd = rl[3];
       list newOrd = list("dp", intvec(1:nvars(R))), list("C", 0);
       rl[3] = newOrd;
@@ -4870,7 +4870,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta,
       // The original ring R/I was normal. Nothing to do.
       // We define anyway a new ring, equal to R, to be able to return it.
       setring R;
-      list lR = ringlist(R);
+      list lR = ring_list(R);
       def ROut = ring(lR);
       setring ROut;
       ideal norid = fetch(R, I);
@@ -5064,7 +5064,7 @@ EXAMPLE: example getOneVar; shows an example
   ASSUME(0, (vari==2) || (vari==1) );
 
   def R = basering;
-  list RL = ringlist(R);
+  list RL = ring_list(R);
   // We keep everything from R but we change the ordering to lp, and we
   // order the variables as needed.
   RL[3] = list(list("lp", 1:2), list("C", 0:1));
@@ -5218,7 +5218,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
                                          // global ordering.
   if(isGlobal != 1)
   {
-    list rl = ringlist(origEre);
+    list rl = ring_list(origEre);
     list origOrd = rl[3];
     list newOrd = list("dp", intvec(1:nvars(origEre))), list("C", 0);
     rl[3] = newOrd;
@@ -6782,7 +6782,7 @@ EXAMPLE: example norTest; shows an example
     norid = interred(norid);
 
     //--------- create new ring with one dp block keeping weights ------------
-    list LR = ringlist(R);
+    list LR = ring_list(R);
     list g3 = LR[3];
     int n3 = size(g3);
     list newg3;
@@ -7163,7 +7163,7 @@ timeNormal(I, "normal", "normalC", "normalP", "primCl", "111", "p", "pc");
 //### bottelnecks bei maps beheben
 //### minor verbessern
 //### preimage verbessern (Ist imm Kern map oder imap verwendet?)
-//### Gleich in Ordnung dp wechseln, ringlist verwenden
+//### Gleich in Ordnung dp wechseln, ring_list verwenden
 //### interred ev nur zum Schluss
 //    (z.B. wenn nacher std; wenn nacher minor: testen )
 

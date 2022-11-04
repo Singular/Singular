@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sagbi.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version sagbi.lib 4.3.1.2 Nov_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: sagbi.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a subalgebra
@@ -75,7 +75,7 @@ static proc extendRing(def r, ideal leadTermsAlgebra, int method) {
   //-------- extend current baserring r with new variables @y,
   // one for each new element in ideal algebra  -------------
   setring r;
-  list l = ringlist(r);
+  list l = ring_list(r);
   for (i=nvars(r)-nvars(br)+1; i<=numTotalAdditionalVars;i++)
   {
     l[2][i+nvars(br)]=string(variableName,"(",i,")");
@@ -233,7 +233,7 @@ static proc spolynomialsToric(ideal algebra) {
   dbprint(ppl-2,"//Spoly-1-2- Matrix A",A);
   //Create the preimage ring K[@y(1),...,@y(m)], where m=ncols(algebra).
   string variableName=uniqueVariableName("@y");
-  list l = ringlist(basering);
+  list l = ring_list(basering);
   for (i=1; i<=m;i++)
   {
     l[2][i]=string(variableName,"(",i,")");
@@ -917,7 +917,7 @@ EXAMPLE: example algebraicDependence; shows an example"
   def parameterRing=ring(l);
 
   string extendVarName=uniqueVariableName("@c");
-  list l2 = ringlist(basering);
+  list l2 = ring_list(basering);
   for (i=1; i<=ncols(I);i++)
   {
     l2[2][i+nvars(br)]=string(extendVarName,"(",i,")"); //add @c(i) to the rings as variables

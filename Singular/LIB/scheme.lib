@@ -1,5 +1,5 @@
 //
-version="version scheme.lib 1.0.0.0 Apr_2021 "; // $Id$
+version="version scheme.lib 4.3.1.2 Nov_2022 "; // $Id$
 category="Algebraic geometry";
 info="
 LIBRARY: scheme.lib  Schemes
@@ -752,7 +752,7 @@ EXAMPLE: example makeProjScheme; shows an example"
     chart U;
     for(i=1;i<=n;i=i+1)
     {
-       list rl=ringlist(R);
+       list rl=ring_list(R);
        rl[2]=delete(rl[2],i);
        rl[3]=list(list("dp",1:(n-1)),list("C",0));
        S=ring(rl);
@@ -1701,7 +1701,7 @@ EXAMPLE: example PolyCompratFunc; creates an example"
    if(n!=nvars(S))
    {   ERROR("Wrong number of arguments!!!");}
 
-   list rl=ringlist(S);
+   list rl=ring_list(S);
    list newvars=list();
    for(int k=1; k<=n; k=k+1)
    {
