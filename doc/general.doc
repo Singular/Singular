@@ -1997,12 +1997,11 @@ time consuming.
 @item @code{a(} intvec_expression @code{)}
 @item @code{aa(} intvec_expression @code{)}
 @item @code{am(} intvec_expression @code{)}
-@item
+@end table
 an extra weight vector @code{a(} intvec_expression @code{)}, may precede
 any monomial ordering.@*
 @code{aa} allows larger degrees.@*
 @code{am} allows degrees for module generators (see example)
-@end table
 
 Example for ordering @code{am}
 @smallexample
