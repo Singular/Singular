@@ -1461,14 +1461,14 @@ $
 @end tex
 @ifinfo
 @display
-\bigoplus_{j=1}^m A \epsilon_j A \longrightarrow \bigoplus_{i=1}^r A e_i A,
+\bigoplus_(j=1)^m A \epsilon_j A \longrightarrow \bigoplus_(i=1)^r A e_i A,
 \;
-\epsilon_j  \mapsto \sum_k \ell_{jk} g_j r_{jk},
+\epsilon_j  \mapsto \sum_k \ell_(jk) g_j r_jk,
 @end display
 that is
 @display
-\sum_{j=1}^m \sum_k  \ell_{jk} \epsilon_j r_{jk}
-\mapsto \sum_{j=1}^m \sum_k \ell_{jk} g_j r_{jk}.
+\sum_(j=1)^m \sum_k  \ell_(jk) \epsilon_j r_jk
+\mapsto \sum_(j=1)^m \sum_k \ell_(jk) g_j r_jk.
 @end display
 @end ifinfo
 
@@ -1487,7 +1487,7 @@ $N_i = \sum_{j=1}^m \sum_k \ell_{jk} M_j r_{jk} = \sum_{j=1}^m T_{ij} M_j,$
 @end tex
 @ifinfo
 @display
-N_i = \sum_{j=1}^m \sum_k \ell_{jk} M_j r_{jk} = \sum_{j=1}^m T_{ij} M_j,
+N_i = \sum_(j=1)^m \sum_k \ell_(jk) M_j r_(jk) = \sum_(j=1)^m T_ij M_j,
 @end display
 @end ifinfo
 
