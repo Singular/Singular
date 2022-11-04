@@ -3416,7 +3416,7 @@ c_@{jk@} x_j d_@{ik@} - c_@{ij@} d_@{ik@} x_j + d_@{jk@}x_i
 
 @strong{Note:} Note that non-degeneracy conditions ensure associativity of multiplication,
 defined by the relations. It is also proved, that they are necessary and sufficient to
-guarantee the PBW property of an algebra, defined via @code{C_{ij}} and @code{D_{ij}} as above.
+guarantee the PBW property of an algebra, defined via @code{C_ij} and @code{D_ij} as above.
 
 @c @end table
 
