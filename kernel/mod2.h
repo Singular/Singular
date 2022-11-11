@@ -123,7 +123,7 @@ void  m2_end(int i);
 }
 #endif
 
-static inline void HALT() { m2_end(2);}
+static inline void HALT(void) { m2_end(2);}
 
 /* define OLD_RES for res/sres/mres(i,j,k) */
 #undef OLD_RES
@@ -373,7 +373,7 @@ extern "C" {
 extern int dReportError(const char* fmt, ...);
 /* within a debugger, set a breakpoint on dErrorBreak
 * which is called after the error has been reported */
-extern void dErrorBreak();
+extern void dErrorBreak(void);
 #ifdef __cplusplus
 }
 #endif

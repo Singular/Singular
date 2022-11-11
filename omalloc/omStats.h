@@ -34,14 +34,14 @@ struct omInfo_s
 };
 
 /* returns a copy of omallinfo struct */
-extern struct omInfo_s omGetInfo();
+extern struct omInfo_s omGetInfo(void);
 /* the struct itself which is always up-to-date */
 /* use read-only */
 extern struct omInfo_s om_Info;
 /* update the global info struct */
-extern void omUpdateInfo();
+extern void omUpdateInfo(void);
 /* initialize such that sbrk can be measured */
-extern void omInitInfo();
+extern void omInitInfo(void);
 extern void omPrintStats(FILE* fd);
 extern void omPrintInfo(FILE* fd);
 

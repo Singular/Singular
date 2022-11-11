@@ -18,9 +18,9 @@ struct omOpts_s
   int HowToReportErrors;
   int MarkAsStatic;
   unsigned int PagesPerRegion;
-  void (*OutOfMemoryFunc)();
-  void (*MemoryLowFunc)();
-  void (*ErrorHook)();
+  void (*OutOfMemoryFunc)(void);
+  void (*MemoryLowFunc)(void);
+  void (*ErrorHook)(void);
 };
 extern omOpts_t om_Opts;
 
