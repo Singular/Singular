@@ -10,7 +10,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CONFIG_SRCDIR([Singular/tesths.cc])
 
-AC_CONFIG_HEADER([_config.h])
+AC_CONFIG_HEADERS([_config.h])
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([singularconfig.h],[],[_config.h])
 
@@ -42,7 +42,6 @@ AM_PROG_AR
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
-AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h iostream.h fstream.h iomanip.h limits.h sys/time.h sys/times.h asm/sigcontext.h spasm.h)
 
 AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r)

@@ -6,7 +6,7 @@ AC_INIT([libgfan], [0.6], [ren@mathematik.uni-kl.de])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([gfanlib.h])
-AC_CONFIG_HEADER([_config.h])
+AC_CONFIG_HEADERS([_config.h])
 
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -30,9 +30,6 @@ AC_PROG_LN_S
 LT_INIT([win32-dll])
 
 SING_WIN_FLAGS
-
-# Checks for header files.
-AC_HEADER_STDC
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

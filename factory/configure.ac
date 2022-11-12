@@ -16,7 +16,7 @@ AC_INIT([factory], [4.3.1])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
-AC_CONFIG_HEADER([_config.h])
+AC_CONFIG_HEADERS([_config.h])
 
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -227,9 +227,7 @@ LB_CHECK_FLINT(2.4,,AC_MSG_WARN([Unable to find FLINT (which is strongly recomme
 #AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
 #AC_CACHE_VAL(ac_cv_shift,
 #  [ LDFLAGS="-L$explicit_libdir $LDFLAGS"
-#	AC_TRY_RUN(
-#      [ int main() { if (-2 >> 1 == -1) return(0); else return(1); } ],
-#      ac_cv_shift=yes, ac_cv_shift=no, ac_cv_shift=yes) ])
+#	AC_RUN_IFELSE([AC_LANG_SOURCE([[#       int main() { if (-2 >> 1 == -1) return(0); else return(1); } ]])],[#      ac_cv_shift=yes],[ac_cv_shift=no],[ac_cv_shift=yes]) ])
 #if test "x$ac_cv_shift" = xyes; then
 #  AC_MSG_RESULT(yes)
 #else
@@ -239,7 +237,7 @@ LB_CHECK_FLINT(2.4,,AC_MSG_WARN([Unable to find FLINT (which is strongly recomme
 #
 # - check for header files.
 #
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 AC_LANG_PUSH([C++])
 
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h time.h math.h, ,
@@ -272,10 +270,10 @@ fi
 
 # use C to check compiler characteristics instead of C++.  On
 # nextstep, checking with C++ may fail.
-# AC_LANG_C
+# AC_LANG([C])
 
 # cross-compiling ?!
-#AC_C_CROSS
+#
 #if test "x$cross_compiling" = xyes; then
 #  AC_MSG_WARN([you better specify a cache file to get the values for
 #                    cross-compiling right (e.g., call \`configure
@@ -312,13 +310,13 @@ fi
 #  CXXFLAGS=""
 #
 #AC_LANG_SAVE
-#AC_LANG_CPLUSPLUS
+#AC_LANG([C++])
 # check whether CXX accepts -fno-rtti
 #AC_MSG_CHECKING(whether gcc accepts -fno-rtti)
 #tmp_flags=${CXXFLAGS}
 #CXXFLAGS="${CXXFLAGS}"
 #AC_CACHE_VAL(ac_cv_cxx_have_rtti,
-#AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
+#AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[ac_cv_cxx_have_rtti=yes],[ac_cv_cxx_have_rtti=no])
 #)
 #AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
 #CXXFLAGS=$tmp_flags
@@ -329,7 +327,7 @@ fi
 #tmp_flags=${CXXFLAGS}
 #CXXFLAGS="${CXXFLAGS} -fno-exceptions"
 #AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
-#AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
+#AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[ac_cv_cxx_have_exceptions=yes],[ac_cv_cxx_have_exceptions=no])
 #)
 #AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
 #CXXFLAGS=$tmp_flags
