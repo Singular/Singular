@@ -4324,20 +4324,21 @@ static void initenterstrongPairsSig (poly h,poly hSig, int k,int ecart,int isFro
 
 #ifdef HAVE_RINGS
 /*2
-* Generates spoly(0, h) if applicable. Assumes ring in Z/2^n.
+* Generates spoly(0, h) if applicable. Assumes ring has zero divisors
 */
 void enterExtendedSpoly(poly h,kStrategy strat)
 {
   if (nIsOne(pGetCoeff(h))) return;
   number gcd;
+  number zero=n_Init(0,currRing->cf);
   bool go = false;
-  if (n_DivBy((number) 0, pGetCoeff(h), currRing->cf))
+  if (n_DivBy(zero, pGetCoeff(h), currRing->cf))
   {
     gcd = n_Ann(pGetCoeff(h),currRing->cf);
     go = true;
   }
   else
-    gcd = n_Gcd((number) 0, pGetCoeff(h), strat->tailRing->cf);
+    gcd = n_Gcd(zero, pGetCoeff(h), strat->tailRing->cf);
   if (go || !nIsOne(gcd))
   {
     poly p = h->next;
@@ -4349,7 +4350,6 @@ void enterExtendedSpoly(poly h,kStrategy strat)
     }
     p_Test(p,strat->tailRing);
     p = __pp_Mult_nn(p, gcd, strat->tailRing);
-    nDelete(&gcd);
 
     if (p != NULL)
     {
@@ -4406,6 +4406,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       }
     }
   }
+  nDelete(&zero);
   nDelete(&gcd);
 }
 
@@ -4413,14 +4414,15 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
 {
   if (nIsOne(pGetCoeff(h))) return;
   number gcd;
+  number zero=n_Init(0,currRing->cf);
   bool go = false;
-  if (n_DivBy((number) 0, pGetCoeff(h), currRing->cf))
+  if (n_DivBy(zero, pGetCoeff(h), currRing->cf))
   {
     gcd = n_Ann(pGetCoeff(h),currRing->cf);
     go = true;
   }
   else
-    gcd = n_Gcd((number) 0, pGetCoeff(h), strat->tailRing->cf);
+    gcd = n_Gcd(zero, pGetCoeff(h), strat->tailRing->cf);
   if (go || !nIsOne(gcd))
   {
     poly p = h->next;
@@ -4476,7 +4478,6 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
           // Cancel the sigdrop
           p_Delete(&Lp.sig,currRing);Lp.sig = NULL;
           strat->sigdrop = FALSE;
-          return;
         }
         else
         {
@@ -4484,9 +4485,10 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
           #if 1
           strat->enterS(Lp,0,strat,strat->tl);
           #endif
-          return;
         }
-
+        nDelete(&zero);
+        nDelete(&gcd);
+        return;
       }
       #else
       Lp.sig = pOne();
@@ -4520,9 +4522,9 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
         enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,posx);
       }
     }
-    nDelete(&gcd);
   }
   nDelete(&gcd);
+  nDelete(&zero);
 }
 #endif
 

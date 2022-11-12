@@ -180,12 +180,13 @@ poly plain_spoly(poly f, poly g)
 }
 
 /*2
-* Generates spoly(0, h) if applicable. Assumes ring in Z/2^n.
+* Generates spoly(0, h) if applicable. Assumes ring has zero divisors
 */
 poly plain_zero_spoly(poly h)
 {
   poly p = NULL;
-  number gcd = n_Gcd((number) 0, pGetCoeff(h), currRing->cf);
+  number zero=n_Init(0,currRing->cf);
+  number gcd = n_Gcd(zero, pGetCoeff(h), currRing->cf);
   if (!n_IsOne( gcd,  currRing->cf ))
   {
     number tmp=n_Ann(gcd,currRing->cf);
@@ -193,6 +194,7 @@ poly plain_zero_spoly(poly h)
     p = __p_Mult_nn(p, tmp, currRing);
     n_Delete(&tmp,currRing->cf);
   }
+   n_Delete(&zero,currRing->cf);
   return p;
 }
 
