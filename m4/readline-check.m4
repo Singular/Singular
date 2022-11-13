@@ -34,7 +34,7 @@ fi
 
 if test "$with_readline" != dynamic && test "$with_readline" != no; then
 AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
    AC_CHECK_LIB(readline, readline)
    AC_CHECK_HEADERS(readline/readline.h readline/history.h)
    if test "$ac_cv_lib_readline_readline" = yes && \

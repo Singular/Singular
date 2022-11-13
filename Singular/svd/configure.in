@@ -61,7 +61,7 @@ AC_CHECK_LIB(mpfr, mpfr_add, , [ AC_MSG_ERROR(libmpfr not found) ])
 dnl
 dnl Checks for programs.
 dnl
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 AC_PROG_CXX
 AC_REQUIRE_CPP
 AC_PROG_MAKE_SET
@@ -105,7 +105,7 @@ if test x${GXX} = xyes; then
     fi
 # check whether CXX accepts -fno-rtti
 AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 AC_MSG_CHECKING(whether gcc accepts -fno-rtti)
 tmp_flags=${CXXFLAGS}
 CXXFLAGS="${CXXFLAGS} -fno-rtti"
