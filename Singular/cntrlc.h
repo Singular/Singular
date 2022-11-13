@@ -13,7 +13,7 @@
 EXTERN_VAR jmp_buf si_start_jmpbuf;
 EXTERN_VAR short si_restart;
 EXTERN_VAR int siRandomStart;
-void init_signals();
+void init_signals(void);
 
 EXTERN_VAR BOOLEAN singular_in_batchmode;
 /* TRUE for child of a fork or started with --batch*/

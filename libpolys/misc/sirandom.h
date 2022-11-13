@@ -4,9 +4,9 @@
 extern "C" {
 #endif
 EXTERN_VAR int siSeed;
-int siRand();
+int siRand(void);
 
-typedef int (*siRandProc)();
+typedef int (*siRandProc)(void);
 typedef int (*siRandProc1)(int);
 int siRandNext(int);
 int siRandPlus1(int);

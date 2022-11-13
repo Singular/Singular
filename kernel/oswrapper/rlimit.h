@@ -14,7 +14,7 @@ extern "C"
 {
 #endif
 
-int raise_rlimit_nproc();
+int raise_rlimit_nproc(void);
 
 #ifdef __cplusplus
 }

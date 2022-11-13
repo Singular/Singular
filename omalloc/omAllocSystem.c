@@ -30,15 +30,19 @@
  *
  *******************************************************************/
 /* allocation of large addr */
-#if defined(HAVE_MALLOC_SIZE)
+
+#if defined(HAVE_MALLOC_SIZE) || defined(HAVE_MALLOC_USABLE_SIZE)
+  #include <stdlib.h>
   #ifdef HAVE_MALLOC_H
-  #include <malloc.h>
+    #include <malloc.h>
   #elif defined(HAVE_MALLOC_MALLOC_H)
-  #include <malloc/malloc.h>
+    #include <malloc/malloc.h>
   #endif
+#endif
+
+#if defined(HAVE_MALLOC_SIZE)
   #define _omSizeOfLargeAddr(addr) (malloc_size(addr))
 #elif defined(HAVE_MALLOC_USABLE_SIZE)
-  #include <stdlib.h>
   #define _omSizeOfLargeAddr(addr) (malloc_usable_size(addr))
 #else
 void* omAllocLarge(size_t size)

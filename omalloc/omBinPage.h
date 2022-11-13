@@ -82,7 +82,7 @@ extern unsigned long *om_BinPageIndicies;
  *
  *******************************************************************/
 extern omBinPage omAllocBinPages(int how_many);
-extern omBinPage omAllocBinPage();
+extern omBinPage omAllocBinPage(void);
 
 extern void omFreeBinPages(omBinPage page, int how_many);
 #define omFreeBinPage(addr) omFreeBinPages(addr, 1)

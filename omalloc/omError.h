@@ -55,7 +55,7 @@ extern omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_D
                                const char* fmt, ...);
 
 /* this is a dummy function and used as default for om_Opts.ErrorHook */
-extern void omErrorBreak();
+extern void omErrorBreak(void);
 
 #ifndef OM_NDEBUG
 extern void omPrintAddrInfo(FILE* fd, void* addr, const char* s);
