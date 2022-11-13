@@ -3,7 +3,7 @@ AC_INIT([libpolys], [4.3.1])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
-AC_CONFIG_HEADER([_config.h])
+AC_CONFIG_HEADERS([_config.h])
 
 AM_MAINTAINER_MODE([enable])
 
@@ -61,9 +61,6 @@ AC_CHECK_FUNCS([memmove memset pow sqrt strchr setenv putenv])
 AC_FUNC_VPRINTF
 AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1], [Define if vsnprintf exists.])])
 
-# Checks for header files.
-AC_HEADER_STDC
-AC_STDC_HEADERS
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h float.h execinfo.h])
 
 # If the compiler supports GCC C++ ABI name demangling (has header
