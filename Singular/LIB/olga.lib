@@ -403,11 +403,16 @@ EXAMPLE: example isInS; shows examples"
         if (!override) {
             locData = normalizeRational(locData);
         }
-        ideal I = p;
-        intvec modLocData = intvecComplement(locData, 1..nvars(basering));
-        I = eliminateNC(I, modLocData);
-        if (size(I)) {
-            return(1);
+        int n = nvars(basering);
+        if (size(locData) < n) { // there are variables to eliminate
+            ideal I = p;
+            intvec modLocData = intvecComplement(locData, 1..nvars(basering));
+            I = eliminateNC(I, modLocData);
+            if (size(I)) {
+                return(1);
+            }
+        } else {
+            return(p != 0);
         }
     }
     return(0);
@@ -1469,6 +1474,13 @@ static proc testIsInS()
     }
     if (isInS(x*y, 2, v)) {
         ERROR("Weyl rational isInS negative failed");
+    }
+    intvec w = 4,2,3,4,1;
+    if (!isInS(x*y*Dx*Dy,2,w)) {
+        ERROR("Weyl total rational isInS positive failed");
+    }
+    if (isInS(0, 2, w)) {
+        ERROR("Weyl total rational isInS negative failed");
     }
     print("    isInS OK");
 }
