@@ -1,7 +1,7 @@
 name: Lint
 on:
-  push: { branches: [ "spielweise" ] }
-  pull_request: { branches: [ "spielweise" ] }
+  push: { branches: [ "spielwiese" ] }
+  pull_request: { branches: [ "spielwiese" ] }
 
 jobs:
   codespell:
