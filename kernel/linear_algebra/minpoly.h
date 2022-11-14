@@ -21,7 +21,7 @@
  * To to this, it has an internal n \times (2n + 1) matrix.                        *
  * Every time a new row VA^i is inserted, it is reduced via Gauss' Algorithm,      *
  * using right hand sides. If VA^i is reduced to zero, then the vectors are        *
- * linearly dependend, and the dependency can be read of at the right hand sides.  *
+ * linearly dependent, and the dependency can be read of at the right hand sides.  *
  *                                                                                 *
  * Example: Compute the minimal polynomial of A = [[0,1],[1,1]] with V = [1,0]     *
  * over F_5.                                                                       *
@@ -80,7 +80,7 @@ public:
     ~LinearDependencyMatrix();
 
     // reset the matrix, so that we can use it to find another linear dependence
-    // Note: there is no need to reinitalize the matrix and vectors!
+    // Note: there is no need to reinitialize the matrix and vectors!
     void resetMatrix();
 
 

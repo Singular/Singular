@@ -2963,7 +2963,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   {
     for(int i = 0;i<strat->sbaEnterS;i++)
     {
-      //Update: now the element is at the corect place
+      //Update: now the element is at the correct place
       //i+1 because on the 0 position is the sigdrop element
       enterT(strat->L[strat->Ll-(i)],strat);
       strat->enterS(strat->L[strat->Ll-(i)], strat->sl+1, strat, strat->tl);
@@ -3549,7 +3549,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     //This is used to know how many elements can we directly add to S in the next run
     if(strat->P.sig != NULL)
       strat->sbaEnterS = pGetComp(strat->P.sig)-1;
-    //else we already set it at the beggining of the loop
+    //else we already set it at the beginning of the loop
     #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
     #endif /* KDEBUG */
@@ -3631,7 +3631,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     //  {printf("\nS[%i] = %p\n",k,strat->Shdl->m[k]);pWrite(strat->Shdl->m[k]);}
     k = strat->Ll;
     #if 1
-    // 1 - adds just the unused ones, 0 - adds everthing
+    // 1 - adds just the unused ones, 0 - adds everything
     for(;k>=0 && (strat->L[k].p1 != NULL || strat->L[k].p2 != NULL);k--)
     {
       //printf("\nDeleted k = %i, %p\n",k,strat->L[k].p);pWrite(strat->L[k].p);pWrite(strat->L[k].p1);pWrite(strat->L[k].p2);

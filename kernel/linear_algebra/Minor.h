@@ -58,7 +58,7 @@ class MinorKey
      /**
      * the number of ints (i.e. 32-bit-numbers) we need to encode the set of
      * rows;
-     * If the higest row index is 70, we need 3 blocks of 32 bits to also
+     * If the highest row index is 70, we need 3 blocks of 32 bits to also
      * encode the 70th bit.
      */
      int _numberOfRowBlocks;
@@ -66,7 +66,7 @@ class MinorKey
      /**
      * the number of ints (i.e. 32-bit-numbers) we need to encode the set of
      * columns;
-     * If the higest column index is 70, we need 3 blocks of 32 bits to also
+     * If the highest column index is 70, we need 3 blocks of 32 bits to also
      * encode the 70th bit.
      */
      int _numberOfColumnBlocks;

@@ -110,7 +110,7 @@ class MinorProcessor
     * A method for iterating through all possible subsets of \c k rows and
     * \c k columns inside a pre-defined submatrix of a pre-defined matrix.<br>
     * The method will set \c _rowKey and \c columnKey to represent the
-    * next possbile subsets of \c k rows and columns inside the submatrix
+    * next possible subsets of \c k rows and columns inside the submatrix
     * determined by \c _globalRowKey and \c _globalColumnKey.<br>
     * When first called, this method will just shift \c _rowKey and
     * \c _columnKey to point to the first sensible choices. Every subsequent
@@ -128,7 +128,7 @@ class MinorProcessor
     * private store for the rows and columns of the container minor within
     * the underlying matrix;
     * \c _container will be used to fix a submatrix (e.g. 40 x 50) of a
-    * larger matrix (e.g. 70 x 100). This is usefull when we would like to
+    * larger matrix (e.g. 70 x 100). This is useful when we would like to
     * compute all minors of a given size (e.g. 4 x 4) inside such a
     * pre-defined submatrix.
     */
@@ -322,9 +322,9 @@ class IntMinorProcessor : public MinorProcessor
     * all results will be reduced w.r.t. to this basis. Moreover, if the given
     * characteristic is non-zero, all results will be computed modulo this
     * characteristic.
-    * @param k the number of rows and columns in the minor to be comuted
+    * @param k the number of rows and columns in the minor to be computed
     * @param mk the representation of rows and columns of the minor to be
-    *        comuted
+    *        computed
     * @param multipleMinors decides whether we compute just one or all minors
     *        of a specified size
     * @param c a cache to be used for caching reusable sub-minors
@@ -354,9 +354,9 @@ class IntMinorProcessor : public MinorProcessor
     * all results will be reduced w.r.t. to this basis. Moreover, if the given
     * characteristic is non-zero, all results will be computed modulo this
     * characteristic.
-    * @param k the number of rows and columns in the minor to be comuted
+    * @param k the number of rows and columns in the minor to be computed
     * @param mk the representation of rows and columns of the minor to be
-    *        comuted
+    *        computed
     * @param characteristic 0 or the characteristic of the underlying
     *        coefficient ring/field
     * @param iSB NULL or a standard basis
@@ -382,7 +382,7 @@ class IntMinorProcessor : public MinorProcessor
     * case, all results will be reduced w.r.t. to this basis. Moreover, if the
     * given characteristic is non-zero, all results will be computed modulo
     * this characteristic.
-    * @param k the number of rows and columns in the minor to be comuted
+    * @param k the number of rows and columns in the minor to be computed
     * @param mk the representation of rows and columns of the minor to be
     *        computed
     * @param characteristic 0 or the characteristic of the underlying
@@ -581,9 +581,9 @@ class PolyMinorProcessor : public MinorProcessor
     * MinorProcessor::getBestLine (const int k, const MinorKey& mk).
     * If an ideal is given, it is assumed to be a standard basis. In this case,
     * all results will be reduced w.r.t. to this basis.
-    * @param k the number of rows and columns in the minor to be comuted
+    * @param k the number of rows and columns in the minor to be computed
     * @param mk the representation of rows and columns of the minor to be
-    *        comuted
+    *        computed
     * @param multipleMinors decides whether we compute just one or all minors
     *        of a specified size
     * @param c a cache to be used for caching reusable sub-minors
@@ -607,9 +607,9 @@ class PolyMinorProcessor : public MinorProcessor
     * MinorProcessor::getBestLine (const int k, const MinorKey& mk).
     * If an ideal is given, it is assumed to be a standard basis. In this case,
     * all results will be reduced w.r.t. to this basis.
-    * @param k the number of rows and columns in the minor to be comuted
+    * @param k the number of rows and columns in the minor to be computed
     * @param mk the representation of rows and columns of the minor to be
-    *        comuted
+    *        computed
     * @param iSB NULL or a standard basis
     * @return an instance of MinorValue representing the value of the
     *         corresponding minor
@@ -626,9 +626,9 @@ class PolyMinorProcessor : public MinorProcessor
     * using Bareiss's algorithm.
     * If an ideal is given, it is assumed to be a standard basis. In this case,
     * all results will be reduced w.r.t. to this basis.
-    * @param k the number of rows and columns in the minor to be comuted
+    * @param k the number of rows and columns in the minor to be computed
     * @param mk the representation of rows and columns of the minor to be
-    *        comuted
+    *        computed
     * @param iSB NULL or a standard basis
     * @return an instance of MinorValue representing the value of the
     *         corresponding minor

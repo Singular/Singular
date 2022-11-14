@@ -1078,7 +1078,7 @@ GroebnerViaFunctionals( const idealFunctionals & l,
             // v is the vector-representation of candidate.monom
             // some elements of v are zeroed in data.gaussreduce(). Which
             // ones and how this was done is stored in p.
-            // originalV containes the unchanged v, which is later inserted
+            // originalV contains the unchanged v, which is later inserted
             // into the working list (via data.updateCandidates().
             fglmVector v = l.multiply( candidate.v, candidate.var );
             fglmVector originalV = v;

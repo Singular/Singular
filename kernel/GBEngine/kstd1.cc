@@ -3552,7 +3552,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     strat->use_buckets = 1;
 #endif
 
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
 
