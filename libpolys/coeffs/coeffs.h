@@ -377,7 +377,8 @@ struct n_Procs_s
    int     (*cfDivComp)(number a,number b,const coeffs r);
    BOOLEAN (*cfIsUnit)(number a,const coeffs r);
    number  (*cfGetUnit)(number a,const coeffs r);
-   //CF: test if b divides a
+   /// test if b divides a
+   /// cfDivBy(zero,b,r) is true, if b is a zero divisor
    BOOLEAN (*cfDivBy)(number a, number b, const coeffs r);
   /* The following members are for representing the ring Z/n,
      where n is not a prime. We distinguish four cases:
