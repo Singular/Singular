@@ -300,7 +300,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         return 0;
       }
     }
-    // first try usal division
+    // first try usual division
     if (p_LmDivisibleBy(strat->S[j],(*h).p,currRing))
     {
 #ifdef KDEBUG

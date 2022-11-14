@@ -114,7 +114,7 @@ inline ideal idFreeModule (int i)
 }
 
 
-// GB algorithm for syz computaions:
+// GB algorithm for syz computations:
 enum GbVariant
 {
   GbDefault=0,

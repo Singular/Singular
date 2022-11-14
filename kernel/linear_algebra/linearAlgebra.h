@@ -12,7 +12,7 @@
  * 'currentRing' represents some polynomial ring K[x_1, x_2, ..., x_n], then
  * the entries of the matrices are 'numbers' representing elements of K (and
  * NOT 'polys' in K[x_1, x_2, ..., x_n]).
- * This restriction may become obselete in the future.
+ * This restriction may become obsolete in the future.
  *
  * @author Frank Seelisch
  *

@@ -571,7 +571,7 @@ fglmSdata::getVectorRep( const poly p )
     return temp;
 }
 
-//     Searches through the border for a monomoial bm which devides m and returns
+//     Searches through the border for a monomial bm which divides m and returns
 //      its normalform in vector representation.
 //     var contains the number of the variable v, s.t. bm = m * v
 fglmVector
@@ -661,7 +661,7 @@ internalCalculateFunctionals( const ideal /*& theIdeal*/, idealFunctionals & l,
 //     Calculates the defining Functionals for the ideal "theIdeal" and
 //     returns them in "l".
 //     The ideal has to be zero-dimensional and reduced and has to be a
-//     real subset of the polynomal ring.
+//     real subset of the polynomial ring.
 //     In any case it has to be zero-dimensional and minimal (check this
 //      via fglmIdealcheck). Any minimal but not reduced ideal is detected.
 //      In this case it returns FglmNotReduced.
@@ -1078,7 +1078,7 @@ GroebnerViaFunctionals( const idealFunctionals & l,
             // v is the vector-representation of candidate.monom
             // some elements of v are zeroed in data.gaussreduce(). Which
             // ones and how this was done is stored in p.
-            // originalV containes the unchanged v, which is later inserted
+            // originalV contains the unchanged v, which is later inserted
             // into the working list (via data.updateCandidates().
             fglmVector v = l.multiply( candidate.v, candidate.var );
             fglmVector originalV = v;
@@ -1086,8 +1086,8 @@ GroebnerViaFunctionals( const idealFunctionals & l,
             number pdenom = NULL;
             data.gaussreduce( v, p, pdenom );
             if ( v.isZero() ) {
-                // Now v is linear dependend to the already found basis elements.
-                // This means that v (rsp. candidate.monom) is the leading
+                // Now v is linear dependent to the already found basis elements.
+                // This means that v (resp. candidate.monom) is the leading
                 // monomial of the next groebner-basis polynomial.
                 data.newGroebnerPoly( p, candidate.monom );
                 nDelete( & pdenom );
@@ -1188,7 +1188,7 @@ FindUnivariatePolys( const idealFunctionals & l )
   return destIdeal;
 }
 
-// for a descritption of the parameters see fglm.h
+// for a description of the parameters see fglm.h
 BOOLEAN
 fglmzero( ring sourceRing, ideal & sourceIdeal, ring destRing, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
 {

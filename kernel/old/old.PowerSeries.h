@@ -140,7 +140,7 @@ template<class traits> class PowerSeriesBase{
   }
   PowerSeriesBase(const numerator_type &a, const denominator_type & b):numerator(a),denominator(b){
     assume(a.getRing()==b.getRing());
-    //asume b!=NULL
+    //assume b!=NULL
   }
   typedef PowerSeriesInputIterator<traits> iterator;
   iterator begin(){

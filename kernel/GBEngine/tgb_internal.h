@@ -331,7 +331,7 @@ int kFindDivisibleByInS_easy(kStrategy strat,poly p, long sev);
 class reduction_step
 {
  public:
-  /// we assume hat all occuring red_objects have same lm, and all
+  /// we assume that all occurring red_objects have same lm, and all
   /// occ. lm's in r[l...u] are the same, only reductor does not occur
   virtual void reduce(red_object* r, int l, int u);
   //int reduction_id;

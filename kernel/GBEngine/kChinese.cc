@@ -62,7 +62,7 @@ static char * get_number(char *s, number *n)
   //                    14: size(long) -mpz
   long *d=(long*)s;
   s+=SIZEOF_LONG;
-  if (((*d)&1)==1) // immidiate number
+  if (((*d)&1)==1) // immediate number
   {
     *n=(number)(*d);
   }

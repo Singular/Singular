@@ -38,7 +38,7 @@
  * The returned score is based on the implementation of 'nSize' for
  * numbers (, see numbers.h): nSize(n) provides a measure for the
  * complexity of n. Thus, less complex pivot elements will be
- * prefered, and get therefore a smaller pivot score. Consequently,
+ * preferred, and get therefore a smaller pivot score. Consequently,
  * we simply return the value of nSize.
  * An exception to this rule are the ground fields R, long R, and
  * long C: In these, the result of nSize relates to |n|. And since

@@ -21,7 +21,7 @@ struct sSObject{
                  poly  p1,p2; /*- the pair p comes from -*/
                  poly  lcm;   /*- the lcm of p1,p2 -*/
                  poly  syz;   /*- the syzygy associated to p1,p2 -*/
-                 int   ind1,ind2; /*- the indeces of p1,p2 -*/
+                 int   ind1,ind2; /*- the indices of p1,p2 -*/
                  poly  isNotMinimal;
                  int   syzind;
                  int   order;

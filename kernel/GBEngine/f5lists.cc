@@ -98,7 +98,7 @@ bool PList::check(poly p) {
   while(NULL != temp) {
     //pWrite(temp->getPoly());
     //pWrite(p);
-    //Print("COMAPRE: %d\n",pLmEqual(p,temp->getPoly()));
+    //Print("COMPARE: %d\n",pLmEqual(p,temp->getPoly()));
     if(1 == pLmEqual(p,temp->getPoly())) {
       //Print("YES!\n");
       //pWrite(pHead(temp->getPoly()));
@@ -216,7 +216,7 @@ inline LNode* LNode::insertSP(poly t, int i, poly p, RuleOld* r) {
   //pWrite(t);
 return newElement;
 }
-// insert new elemets to the list w.r.t. increasing labels
+// insert new elements to the list w.r.t. increasing labels
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
 inline LNode* LNode::insertByLabel(poly t, int i, poly p, RuleOld* r) {
     //Print("ADDING SOLYS TO THE LIST\n");
@@ -915,7 +915,7 @@ void CNode::print()
 functions working on the class CListOld
 ====================================
 */
-// for initialization of CListOlds, last element alwas has data=NULL and next=NULL
+// for initialization of CListOlds, last element always has data=NULL and next=NULL
 CListOld::CListOld() {
     first   =   NULL;
 }

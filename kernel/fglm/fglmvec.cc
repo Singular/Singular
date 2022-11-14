@@ -221,7 +221,7 @@ void
   int i;
   int vsize = v.size ();
   number term1, term2;
-  fglmASSERT (vsize <= rep->size (), "v has to be smaller oder equal");
+  fglmASSERT (vsize <= rep->size (), "v has to be smaller or equal");
   if(rep->isUnique ())
   {
     for(i = vsize; i > 0; i--)

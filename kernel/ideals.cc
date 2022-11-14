@@ -558,7 +558,7 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
 
-  /* interprete result ----------------------------------------*/
+  /* interpret result ----------------------------------------*/
   result = idInit(IDELEMS(tempstd),maxrk);
   k = 0;
   for (j=0;j<IDELEMS(tempstd);j++)
@@ -2163,7 +2163,7 @@ matrix idDiffOp(ideal I, ideal J,BOOLEAN multiply)
 }
 
 /*3
-*handles for some ideal operations the ring/syzcomp managment
+*handles for some ideal operations the ring/syzcomp management
 *returns all syzygies (componentwise-)shifted by -syzcomp
 *or -syzcomp-1 (in case of ideals as input)
 static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
@@ -2582,7 +2582,7 @@ int idIndexOfKBase(poly monom, ideal kbase)
 
 /*2
 *decomposes the monom in a part of coefficients described by the
-*complement of how and a monom in variables occuring in how, the
+*complement of how and a monom in variables occurring in how, the
 *index of which in kbase is returned as integer pos (-1 if it don't
 *exists)
 */

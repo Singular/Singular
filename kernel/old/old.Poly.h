@@ -339,7 +339,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   void print() const {
     ptr->print();
   }
-  //* ressource managed by Singular
+  //* resource managed by Singular
   char* c_string() const{
 
     return p_String(ptr->p,ptr->getRing(),ptr->getRing());

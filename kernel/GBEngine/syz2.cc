@@ -897,7 +897,7 @@ PrintLn();
 
 /*3
 * reorders the result (stored in orderedRes) according
-* to the seqence given by res
+* to the sequence given by res
 */
 static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
 {

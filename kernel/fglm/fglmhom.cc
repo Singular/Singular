@@ -35,7 +35,7 @@
 #include "kernel/combinatorics/stairc.h"
 #include "factory/templates/ftmpl_list.h"
 
-// obachman: Got rid off those "redefiende messages by includeing fglm.h
+// obachman: Got rid of those "redefined" messages by including fglm.h
 #include "fglm.h"
 #if 0
 #define PROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
@@ -222,7 +222,7 @@ mapMonoms( ring oldRing, homogData & dat )
     int s;
     for ( s= dat.numMonoms - 1; s >= 0; s-- ) {
 //        dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, currRing->N, NULL, 0 );
-      // obachman: changed the folowing to reflect the new calling interface of
+      // obachman: changed the following to reflect the new calling interface of
       // pPermPoly -- Tim please check whether this is correct!
         dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, oldRing, NULL, 0 );
     }

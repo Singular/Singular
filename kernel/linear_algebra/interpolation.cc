@@ -128,7 +128,7 @@ STATIC_VAR int bad_primes; // modp_number of bad primes so far;
 STATIC_VAR mpz_t common_denom; // common denominator used to force points coordinates to Z (not used for modp)
 STATIC_VAR bool denom_divisible; // common denominator is divisible by p (not used for modp)
 
-STATIC_VAR poly comparizon_p1;  //polynomials used to do comparizons by Singular
+STATIC_VAR poly comparizon_p1;  //polynomials used to do comparisons by Singular
 STATIC_VAR poly comparizon_p2;
 
 STATIC_VAR modp_number *modp_Reverse; // reverses in mod p
@@ -973,7 +973,7 @@ static void FreeResultEntry (modp_result_entry *e) // destroys the result entry,
 }
 
 
-static void NewGenerator (mono_type mon)  // new generator in modp comp found, shoul be stored on the list
+static void NewGenerator (mono_type mon)  // new generator in modp comp found, should be stored on the list
 {
      generator_entry *cur_ptr;
      generator_entry *prev_ptr;
@@ -1013,7 +1013,7 @@ static void MultGenerators () // before reconstructing, all denominators must be
 #endif
 }
 #if 0 /* only debbuging */
-void PresentGenerator (int i)  // only for debuging, writes a generator in its form in program
+void PresentGenerator (int i)  // only for debugging, writes a generator in its form in program
 {
      int j;
      modp_result_entry *cur_ptr;
@@ -1163,7 +1163,7 @@ static void ReconstructGenerator (int ngen,int n) // recostruction of generator 
      mpz_clear(nsol);
 }
 
-static void Discard ()  // some unlucky prime occures
+static void Discard ()  // some unlucky prime occurs
 {
      modp_result_entry *temp;
 #ifdef writemsg

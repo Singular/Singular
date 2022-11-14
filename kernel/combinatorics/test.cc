@@ -315,7 +315,7 @@ void TestSimpleRingArithmetcs()
   // create the polynomial 1
   poly p1=pISet(1);
 
-  // create tthe polynomial 2*x^3*z^2
+  // create the polynomial 2*x^3*z^2
   poly p2=p_ISet(2,R);
   pSetExp(p2,1,3);
   pSetExp(p2,3,2);
@@ -351,7 +351,7 @@ int main( int, char *argv[] )
 
   feInitResources(argv[0]);
 
-  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+  StringSetS("resources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
 
   PrintLn();

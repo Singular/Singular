@@ -615,7 +615,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
         rowPermutation[i] = rowPermutation[r];
         rowPermutation[r] = j;
         /* Now we know that tempMatrix[rowPermutation[r] * k + r] is not zero.
-           But carefull; we have to negate the sign, as there is always an odd
+           But careful; we have to negate the sign, as there is always an odd
            number of row transpositions to swap two given rows of a matrix. */
         sign = -sign;
       }
@@ -1470,7 +1470,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
         rowPermutation[bestRow] = rowPermutation[r];
         rowPermutation[r] = j;
         /* Now we know that tempMatrix[rowPermutation[r] * k + r] is not zero.
-           But carefull; we have to negate the sign, as there is always an odd
+           But careful; we have to negate the sign, as there is always an odd
            number of row transpositions to swap two given rows of a matrix. */
         sign = -sign;
       }

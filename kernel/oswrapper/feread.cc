@@ -123,7 +123,7 @@ extern "C" {
     #define rl_completion_matches           completion_matches
   #endif
   #ifndef READLINE_READLINE_H_OK
-    /* declare everything we need explicitely and do not rely on includes */
+    /* declare everything we need explicitly and do not rely on includes */
     EXTERN_VAR char * rl_readline_name;
     EXTERN_VAR char *rl_line_buffer;
     char *rl_filename_completion_function(const char*, int);

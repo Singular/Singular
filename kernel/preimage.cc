@@ -18,7 +18,7 @@
 /*2
 *shifts the variables between minvar and maxvar of p  \in p_ring to the
 *first maxvar-minvar+1 variables in the actual ring
-*be carefull: there is no range check for the variables of p
+*be careful: there is no range check for the variables of p
 */
 static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar, const ring dst_r)
 {
@@ -131,7 +131,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
                               pChangeSizeOfPoly(theImageRing, theImageRing->qideal->m[i-sourcering->N-j0], 1, imagepvariables, tmpR),
                               tmpR);
   }
-  // we ignore here homogenity - may be changed later:
+  // we ignore here homogeneity - may be changed later:
 
   temp2 = kStd(temp1,NULL,isNotHomog,NULL);
 

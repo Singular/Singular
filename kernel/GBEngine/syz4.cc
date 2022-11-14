@@ -780,7 +780,7 @@ static void insert_ext_induced_LTs(const resolvente res, const int length,
  * _every_ term in the current step of the resolution. This corresponds to the
  * subtree attached to the node which represents this term, see reference.
  *
- * If use_tensor_trick == true, the current module is modfied after each
+ * If use_tensor_trick == true, the current module is modified after each
  * lifting step in the resolution: any term which contains a variable which
  * does not appear among the (induced) leading terms is deleted. Note that the
  * resulting object is not necessarily a complex anymore. However, constant

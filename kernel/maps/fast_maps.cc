@@ -431,7 +431,7 @@ ideal fast_map_common_subexp(const ideal map_id,const ring map_r,const ideal ima
 * Evaluation stuff                                                    *
 **********************************************************************/
 
-// substitute p everywhere the monomial occours,
+// substitute p everywhere the monomial occurs,
 // return the number of substitutions
 static int maPoly_Substitute(macoeff c, poly p, ring dest_r)
 {

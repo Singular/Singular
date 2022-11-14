@@ -42,7 +42,7 @@ ${builddir}/GBEngine/libGBEngine.la \
 ${builddir}/oswrapper/liboswrapper.la \
 ${builddir}/libkernelCommon.la
 
-### TODO: the following has to be addapted...
+### TODO: the following has to be adapted...
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
 

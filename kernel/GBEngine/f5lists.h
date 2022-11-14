@@ -270,7 +270,7 @@ class CListOld {
     private:
         CNode*  first;
     public:
-                // for initialization of CListOlds, last element alwas has data=NULL and next=NULL
+                // for initialization of CListOlds, last element always has data=NULL and next=NULL
                 CListOld();
                 CListOld(CPairOld* c);
                 ~CListOld();
@@ -313,7 +313,7 @@ class RList (lists of RuleOlds)
 class RList {
     private:
         RNode*  first;
-        // last alway has data=NULL and next=NULL, for initialization purposes used
+        // last always has data=NULL and next=NULL, for initialization purposes used
         RNode*  last;
     public:
                 RList();

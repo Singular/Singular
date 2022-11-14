@@ -496,8 +496,8 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   poly HH = NULL;
   poly H  = NULL;
   HH = p_HeadRat(p1,is,r); //p_Copy(p_HeadRat(p1,is,r),r); // lm_D(g)
-//  H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^aplha lm_D(g)
-  H  = nc_mm_Mult_p(m, HH, r); // d^aplha lm_D(g) == h_g in the paper
+//  H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^alpha lm_D(g)
+  H  = nc_mm_Mult_p(m, HH, r); // d^alpha lm_D(g) == h_g in the paper
 
   poly K  = p_GetCoeffRat(H,  is, r); //p_Copy( p_GetCoeffRat(H,  is, r), r); // k in the paper
   poly P  = p_GetCoeffRat(p2, is, r); //p_Copy( p_GetCoeffRat(p2, is, r), r); // lc_D(p_2) == lc_D(f)
@@ -537,8 +537,8 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   PrintS(" k' t_f: "); p_wrp(p2,r);
 #endif
 
-//  out = r->nc->p_Procs.mm_Mult_p(m, out, r); // d^aplha t_g
-  out = nc_mm_Mult_p(m, out, r); // d^aplha t_g
+//  out = r->nc->p_Procs.mm_Mult_p(m, out, r); // d^alpha t_g
+  out = nc_mm_Mult_p(m, out, r); // d^alpha t_g
   p_Delete(&m,r);
 
 #ifdef PDEBUG

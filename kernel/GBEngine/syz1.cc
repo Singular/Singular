@@ -513,7 +513,7 @@ static BOOLEAN syOrder(poly p,syStrategy syzstr,int index,
     if (same_comp == 0)
       same_comp = SYZ_SHIFT_BASE;
 
-    // test wheter we have enough space for new shifted component
+    // test whether we have enough space for new shifted component
     if ((LONG_MAX - same_comp) <= shind[ie-1])
     {
       long new_space = syReorderShiftedComponents(shind, ie);
@@ -1806,7 +1806,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift,
 
   return result; /// Don't change the syzstr???
 
-  // TODO: cleanup thses!
+  // TODO: cleanup these!
   if( fullres != NULL && syzstr->fullres == NULL )
     syzstr->fullres = fullres;
   if( minres != NULL && syzstr->minres == NULL )
@@ -2269,7 +2269,7 @@ static intvec * syToStrip(syStrategy syzstr, int index)
 
 /*2
 * re-computes the order of pairs during the algorithm
-* this ensures to procede with a triangular matrix
+* this ensures to proceed with a triangular matrix
 */
 static intvec * syOrdPairs(SSet sPairs, int length)
 {
@@ -2379,7 +2379,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   {
     rChangeCurrRing(origR);
     // Thomas: now make sure that all data which you need is pFetchCopied
-    // maybe incoporate it into syReorder ??
+    // maybe incorporate it into syReorder ??
   }
   tres = syReorder(tres,syzstr->length,syzstr,FALSE,syzstr->res);
   syKillEmptyEntres(tres,syzstr->length);

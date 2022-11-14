@@ -62,7 +62,7 @@ STATIC_VAR int  hLength;
 *basic routines
 */
 
-//adds the new polynomial at the coresponding position
+//adds the new polynomial at the corresponding position
 //and simplifies the ideal, destroys p
 static void SortByDeg_p(ideal I, poly p)
 {
@@ -1163,7 +1163,7 @@ static ideal  minimalMonomialGenSet(ideal I)
 static poly shiftInMon(poly p, int i, int lV, const ring r)
 {
   /*
-   * shifts the varibles of monomial p in the  i^th layer,
+   * shifts the variables of monomial p in the  i^th layer,
    * p remains unchanged,
    * creates new poly and returns it for the colon ideal
    */
@@ -1196,7 +1196,7 @@ static poly shiftInMon(poly p, int i, int lV, const ring r)
 static poly deleteInMon(poly w, int i, int lV, const ring r)
 {
   /*
-   * deletes the variables upto i^th layer of monomial w
+   * deletes the variables up to i^th layer of monomial w
    * w remains unchanged
    * creates new poly and returns it for the colon ideal
    */
@@ -1828,7 +1828,7 @@ static void id_DelDiv_hi(ideal id, BOOLEAN *bad,const ring r)
   omFreeSize(sev,kk*sizeof(long));
 }
 poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
-// accoding to:
+// according to:
 // Algorithm 2.6 of
 // Dave Bayer, Mike Stillman - Computation of Hilbert Function
 // J.Symbolic Computation (1992) 14, 31-50

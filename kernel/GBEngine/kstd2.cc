@@ -659,7 +659,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   }
 /*  unsigned long alpha_k = twoPow(leadRing->ch - k_ind2);
   if (1 == 0 && alpha_k <= a)
-  {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
+  {  // Temporarily disabled, reducing coefficients not compatible with std TODO Oliver
     zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
@@ -701,7 +701,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 */
 int redRing_Z (LObject* h,kStrategy strat)
 {
-  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
+  if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
   if (strat->tl<0) return 1;
 
   int at;
@@ -860,7 +860,7 @@ int redRing_Z (LObject* h,kStrategy strat)
 int redRing (LObject* h,kStrategy strat)
 {
   if (strat->tl<0) return 1;
-  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
+  if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
 
   int at/*,i*/;
   long d;
@@ -2447,7 +2447,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
 #endif
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
 
@@ -2941,7 +2941,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->use_buckets = 1;
 #endif
 
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   // if (!TEST_OPT_OLDSTD)
   //   withT = ! strat->homog;
 
@@ -2963,7 +2963,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   {
     for(int i = 0;i<strat->sbaEnterS;i++)
     {
-      //Update: now the element is at the corect place
+      //Update: now the element is at the correct place
       //i+1 because on the 0 position is the sigdrop element
       enterT(strat->L[strat->Ll-(i)],strat);
       strat->enterS(strat->L[strat->Ll-(i)], strat->sl+1, strat, strat->tl);
@@ -3549,7 +3549,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     //This is used to know how many elements can we directly add to S in the next run
     if(strat->P.sig != NULL)
       strat->sbaEnterS = pGetComp(strat->P.sig)-1;
-    //else we already set it at the beggining of the loop
+    //else we already set it at the beginning of the loop
     #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
     #endif /* KDEBUG */
@@ -3631,7 +3631,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     //  {printf("\nS[%i] = %p\n",k,strat->Shdl->m[k]);pWrite(strat->Shdl->m[k]);}
     k = strat->Ll;
     #if 1
-    // 1 - adds just the unused ones, 0 - adds everthing
+    // 1 - adds just the unused ones, 0 - adds everything
     for(;k>=0 && (strat->L[k].p1 != NULL || strat->L[k].p2 != NULL);k--)
     {
       //printf("\nDeleted k = %i, %p\n",k,strat->L[k].p);pWrite(strat->L[k].p);pWrite(strat->L[k].p1);pWrite(strat->L[k].p2);
@@ -4417,7 +4417,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
 #endif
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   //  if (!TEST_OPT_OLDSTD)
   //    withT = ! strat->homog;
 

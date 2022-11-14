@@ -1,4 +1,4 @@
-/*! \page kernel_linear_algebra_page Linar algebra related algorithms
+/*! \page kernel_linear_algebra_page Linear algebra related algorithms
 
  This sub-package of kernel (\ref kernel_page) contains
  Linear algebra related algorithms.

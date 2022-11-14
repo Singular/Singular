@@ -294,7 +294,7 @@ static void syMinStep1(resolvente res, int length)
 
   while ((index<length) && (res[index]!=NULL))
   {
-/*---we take out dependend elements from syz---------------------*/
+/*---we take out dependent elements from syz---------------------*/
     if (res[index+1]!=NULL)
     {
       ideal deg0 = id_Jet(res[index+1],0,currRing);

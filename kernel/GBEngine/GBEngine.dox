@@ -24,7 +24,7 @@
  - \ref kernel/GBEngine/units.h
 
 
- Some importat data structures and classes:
+ Some important data structures and classes:
  - \ref skStrategy
  - \ref sLObject
  - \ref sTObject

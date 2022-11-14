@@ -94,7 +94,7 @@ private:
   int RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] );
 
   /* Remaps a result of LP to the according point set Qi.
-   * Returns false iff remaping was not possible, otherwise true.
+   * Returns false iff remapping was not possible, otherwise true.
    */
   bool remapXiToPoint( const int indx, pointSet **pQ, int *set, int *vtx );
 
@@ -175,19 +175,19 @@ public:
   // pointSet.points[i] equals pointSet[i]
   inline onePointP operator[] ( const int index );
 
-  /** Adds a point to pointSet, copy vert[0,...,dim] ot point[num+1][0,...,dim].
+  /** Adds a point to pointSet, copy vert[0,...,dim] to point[num+1][0,...,dim].
    * Returns false, iff additional memory was allocated ( i.e. num >= max )
    * else returns true
    */
   bool addPoint( const onePointP vert );
 
-  /** Adds a point to pointSet, copy vert[0,...,dim] ot point[num+1][0,...,dim].
+  /** Adds a point to pointSet, copy vert[0,...,dim] to point[num+1][0,...,dim].
    * Returns false, iff additional memory was allocated ( i.e. num >= max )
    * else returns true
    */
   bool addPoint( const int * vert );
 
-  /** Adds a point to pointSet, copy vert[0,...,dim] ot point[num+1][0,...,dim].
+  /** Adds a point to pointSet, copy vert[0,...,dim] to point[num+1][0,...,dim].
    * Returns false, iff additional memory was allocated ( i.e. num >= max )
    * else returns true
    */
@@ -294,7 +294,7 @@ private:
    */
   void runMayanPyramid( int dim );
 
-  /**  Compute v-distance via Linear Programing
+  /**  Compute v-distance via Linear Programming
    * Linear Program finds the v-distance of the point in accords[].
    * The v-distance is the distance along the direction v to boundary of
    * Minkowski Sum of Qi (here vector v is represented by shift[]).
@@ -1196,7 +1196,7 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
     if ( (acoords[dim] > minR) && (acoords[dim] <= maxR) )
     {     // acoords[dim] >= minR  ??
       mprSTICKYPROT(ST_SPARSE_MREC1);
-      runMayanPyramid( dim + 1 );         // recurse with higer dimension
+      runMayanPyramid( dim + 1 );         // recurse with higher dimension
     }
     else
     {
@@ -1206,7 +1206,7 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
       if( dist >= SIMPLEX_EPS )
       {
         mprSTICKYPROT(ST_SPARSE_MREC2);
-        runMayanPyramid( dim + 1 );       // recurse with higer dimension
+        runMayanPyramid( dim + 1 );       // recurse with higher dimension
       }
     }
     acoords[dim]++;
@@ -1255,7 +1255,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
     {
       LP->n++;
 
-      // objective funtion, minimize
+      // objective function, minimize
       LP->LiPM[1][LP->n] = - ( (mprfloat) (*pQ[i])[k]->point[pQ[i]->dim] / SCALEDOWN );
 
       // lambdas sum up to 1
@@ -1453,7 +1453,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
       epos= E->getExpPos( iterp );
       if ( epos == 0 )
       {
-        // this can happen, if the shift vektor or the lift funktions
+        // this can happen, if the shift vector or the lift functions
         // are not generically chosen.
         Werror("resMatrixSparse::createMatrix: Found exponent not in E, id %d, set [%d, %d]!",
                i,(*E)[i]->rc.set,(*E)[i]->rc.pnt);
