@@ -48,7 +48,7 @@
 //print vector of integers.
 void listprint(std::vector<int> vec)
 {
-  int i;
+  unsigned i;
   for(i=0;i<vec.size();i++)
   {
     Print("   _[%d]=%d\n",i+1,vec[i]);
@@ -64,7 +64,7 @@ void listprint(std::vector<int> vec)
 //print vector of vectors of integers.
 void listsprint(std::vector<std::vector<int> > posMat)
 {
-  int i,j;
+  unsigned i;
   for(i=0;i<posMat.size();i++)
   {
     Print("[%d]:\n",i+1);
@@ -96,7 +96,7 @@ void id_print(ideal h)
 //print vector of polynomials.
 void lpprint( std::vector<poly> pv)
 {
-  for(int i=0;i<pv.size();i++)
+  for(unsigned i=0;i<pv.size();i++)
   {
     Print("   _[%d]=",i+1);
     pWrite(pv[i]);
@@ -113,7 +113,7 @@ void lpprint( std::vector<poly> pv)
 //print vector of vectors of polynomials.
 void lpsprint(std::vector<std::vector<poly> > pvs)
 {
-  for(int i=0;i<pvs.size();i++)
+  for(unsigned i=0;i<pvs.size();i++)
   {
     Print("[%d]:\n",i+1);
     lpprint(pvs[i]);
@@ -142,7 +142,7 @@ void lpsprint(std::vector<std::vector<poly> > pvs)
 //otherwise, returns false
 bool IsinL(int a, std::vector<int> vec)
 {
-  int i;
+  unsigned i;
   for(i=0;i<vec.size();i++)
   {
     if(a==vec[i])
@@ -161,7 +161,7 @@ bool IsinL(int a, std::vector<int> vec)
 //returns empty if they are disjoint
 std::vector<int> vecIntersection(std::vector<int> p, std::vector<int> q)
 {
-  int i;
+  unsigned i;
   std::vector<int> inte;
   for(i=0;i<p.size();i++)
   {
@@ -183,7 +183,7 @@ std::vector<int> vecIntersection(std::vector<int> p, std::vector<int> q)
 //is not used
 bool vEv(std::vector<int> vec1,std::vector<int> vec2)
 {
-  int i,j, lg1=vec1.size(),lg2=vec2.size();
+  unsigned j, lg1=vec1.size(),lg2=vec2.size();
   if(lg1!=lg2)
   {
     return false;
@@ -454,7 +454,7 @@ poly pMake(std::vector<int> vbase)
 //convert the vectors to a ideal(for T^1)
 ideal idMake(std::vector<std::vector<int> > vecs)
 {
-  int lv=vecs.size(), i, j;
+  int lv=vecs.size(), i;
   poly p;
   ideal id_re=idInit(1,1);
   for(i=0;i<lv;i++)
@@ -473,7 +473,6 @@ ideal idMake(std::vector<std::vector<int> > vecs)
 //the quotient ring of h1 respect to h2
 ideal idmodulo(ideal h1,ideal h2)
 {
-  int i;
   ideal gb=kStd(h2,NULL,testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(gb);
   ideal idq=kNF(gb,NULL,h1);
@@ -485,7 +484,7 @@ ideal idmodulo(ideal h1,ideal h2)
 //assume the polynomial p has form of y1+y2+...
 int pcoef(poly p, int m)
 {
-  int i,j,co; poly q=pCopy(p);
+  int i,co; poly q=pCopy(p);
   for(i=1;i<=currRing->N;i++)
   {
     if(p_GetExp(q,m,currRing)!=0)
@@ -504,7 +503,6 @@ int pcoef(poly p, int m)
 //returns true if p involves the mth variable of the current ring
 bool vInp(int m,poly p)
 {
-  int i;
   poly q=pCopy(p);
   while (q!=NULL)
   {
@@ -522,7 +520,7 @@ bool vInp(int m,poly p)
 //returns the vector w.r.t. polynomial p
 std::vector<int> vMake(poly p)
 {
-  int i; poly q=pCopy(p);
+  int i;
   std::vector<int> vbase;
   for(i=1;i<=currRing->N;i++)
   {
@@ -558,7 +556,6 @@ std::vector<std::vector<int> > vsMake(ideal h)
 //the result is also represented by vector.
 std::vector<std::vector<int> > vecqring(std::vector<std::vector<int> > vec1, std::vector<std::vector<int> > vec2)
 {
-  int i,j;
   ideal h1=idMake(vec1), h2=idMake(vec2);
   ideal h=idmodulo(h1,h2);
   std::vector<std::vector<int> > vecs= vsMake(h);
@@ -3115,7 +3112,7 @@ std::vector<int> bv,av;
         PrintS("This is b:");
         pWrite(b);
         intvec *solve=gradedpiece2n(h, a, b);
-	delete solve;
+        delete solve;
         gp++;
       }
     }

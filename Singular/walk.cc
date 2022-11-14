@@ -1631,7 +1631,7 @@ intvec* Mfpertvector(ideal G, intvec* ivtarget)
     (* result)[i] = mpz_get_si(pert_vector[i]);
   }
 
-  CHECK_OVERFLOW:
+  //CHECK_OVERFLOW:
 
   for(i=0; i<niv; i++)
   {
@@ -2400,7 +2400,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     goto FINISH;
   }
 
-  SIMPLIFY_GCD:
+  //SIMPLIFY_GCD:
 
   // simplify the vectors curr_weight and diff_weight (C-int)
   gcd_tmp = (*curr_weight)[0];
@@ -2508,7 +2508,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     (*diff_weight)[j] = mpz_get_si(vec[j]);
   }
 
- TEST_OVERFLOW:
+ //TEST_OVERFLOW:
 
   for (j=0; j<nRing; j++)
   {
@@ -7243,7 +7243,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
         goto NEXT_VECTOR_FRACTAL;
 #endif
 
-      FRACTAL_MSTDCC:
+      //FRACTAL_MSTDCC:
         if(printout > 0)
         {
           Print("\n//** rec_fractal_call: Wrong cone. Applying Buchberger's algorithm in ring = %s.\n",
@@ -7816,7 +7816,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         goto NEXT_VECTOR_FRACTAL;
 #endif
 
-      FRACTAL_MSTDCC:
+      //FRACTAL_MSTDCC:
         if(printout > 0)
         {
           Print("\n//** rec_r_fractal_call: apply Buchberger's algorithm in ring = %s.\n",
