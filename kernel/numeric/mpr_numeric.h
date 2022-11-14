@@ -199,7 +199,7 @@ public:
   int n;         // # of independent variables
   int m1,m2,m3;  // constraints <=, >= and ==
   int icase;     // == 0: finite solution found;
-                 // == +1 objective funtion unbound; == -1: no solution
+                 // == +1 objective function unbound; == -1: no solution
   int *izrov,*iposv;
 
   mprfloat **LiPM; // the matrix (of size [m+2, n+1])
