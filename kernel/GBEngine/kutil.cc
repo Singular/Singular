@@ -8307,7 +8307,7 @@ void initSyzRules (kStrategy strat)
         diff      = comp - comp_old - 1;
         // diff should be zero, but sometimes also the initial generating
         // elements of the input ideal reduce to zero. then there is an
-        // index-gap between the signatures. for these inbetween signatures we
+        // index-gap between the signatures. for these in-between signatures we
         // can safely set syzIdx[j] = 0 as no such element will be ever computed
         // in the following.
         // doing this, we keep the relation "j = comp - 2" alive, which makes
@@ -8352,7 +8352,7 @@ void initSyzRules (kStrategy strat)
     diff      = comp - comp_old - 1;
     // diff should be zero, but sometimes also the initial generating
     // elements of the input ideal reduce to zero. then there is an
-    // index-gap between the signatures. for these inbetween signatures we
+    // index-gap between the signatures. for these in-between signatures we
     // can safely set syzIdx[j] = 0 as no such element will be ever computed
     // in the following.
     // doing this, we keep the relation "j = comp - 2" alive, which makes
@@ -9333,7 +9333,7 @@ void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
 
   /*- save result -*/
   strat->S[atS] = p.p;
-  strat->sig[atS] = p.sig; // TODO: get ths correct signature in here!
+  strat->sig[atS] = p.sig; // TODO: get the correct signature in here!
   if (strat->honey) strat->ecartS[atS] = p.ecart;
   if (p.sev == 0)
     p.sev = pGetShortExpVector(p.p);
@@ -9476,7 +9476,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
 #endif
   assume(strat->tailRing == p.tailRing);
   // redMoraNF complains about this -- but, we don't really
-  // neeed this so far
+  // need this so far
   assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
   assume(!strat->homog || (p.FDeg == p.pFDeg()));
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
@@ -9564,7 +9564,7 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   pp_Test(p.p, currRing, p.tailRing);
   assume(strat->tailRing == p.tailRing);
   // redMoraNF complains about this -- but, we don't really
-  // neeed this so far
+  // need this so far
   assume(p.pLength == 0 || (int)pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
   assume(p.FDeg == p.pFDeg());
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));

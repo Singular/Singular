@@ -56,7 +56,7 @@ VAR BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
                 |Sy_bit(OPT_WEIGHTM);      /* 31 */
 
 /* the list of all options which may be used by option and test */
-/* defintion of ALL options: libpolys/misc/options.h */
+/* definition of ALL options: libpolys/misc/options.h */
 VAR BITSET validOpts=Sy_bit(0)
                 |Sy_bit(1)
                 |Sy_bit(2) // obachman 10/00: replaced by notBucket
@@ -134,7 +134,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat, bool 
 #endif
   if (intoT)
   {
-    // need to do it exacly like this: otherwise
+    // need to do it exactly like this: otherwise
     // we might get errors
     LObject L= *h;
     L.Copy();
@@ -2129,7 +2129,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 //#define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
 //#define KSTD_NF_ECART  2
-  // only local: recude even with bad ecart
+  // only local: reduce even with bad ecart
   poly   p;
   int   i;
   int   j;
@@ -2233,7 +2233,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   }
   /*- release temp data------------------------------- -*/
   cleanT(strat);
-  assume(strat->L==NULL); /*strat->L unsed */
+  assume(strat->L==NULL); /*strat->L unused */
   assume(strat->B==NULL); /*strat->B unused */
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
@@ -2274,7 +2274,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
 //#define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
 //#define KSTD_NF_ECART  2
-  // only local: recude even with bad ecart
+  // only local: reduce even with bad ecart
   poly   p;
   int   i;
   int   j;
@@ -2386,7 +2386,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
-  assume(strat->L==NULL); /*strat->L unsed */
+  assume(strat->L==NULL); /*strat->L unused */
   assume(strat->B==NULL); /*strat->B unused */
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));

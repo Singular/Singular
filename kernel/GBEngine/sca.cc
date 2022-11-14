@@ -483,7 +483,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec
 
   //  due to std( SB, p).
   // Note that after initBuchMora :: initSSpecial all these additional
-  // elements are in S and T (and some pairs are in L, which also has no initiall
+  // elements are in S and T (and some pairs are in L, which also has no initial
   // elements!!!)
   if(TEST_OPT_SB_1)
   {

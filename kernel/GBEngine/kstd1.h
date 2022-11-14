@@ -17,7 +17,7 @@ typedef BOOLEAN (*s_poly_proc_t)(kStrategy strat);
 #define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
 #define KSTD_NF_ECART  2
-  // only local: recude even with bad ecart
+  // only local: reduce even with bad ecart
 #define KSTD_NF_NONORM 4
   // only global: avoid normalization, return a multiply of NF
 

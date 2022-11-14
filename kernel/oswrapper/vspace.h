@@ -115,7 +115,7 @@ public:
   }
 #endif
 #ifdef HAVE_CPP_THREADS
-  // We only need to define the copy constructur for the
+  // We only need to define the copy constructor for the
   // atomic version, as the std::atomic_flag constructor
   // is deleted.
   FastLock(const FastLock &other) {

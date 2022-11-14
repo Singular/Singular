@@ -767,7 +767,7 @@ int ksReducePolySigRing(LObject* PR,
 
 // Reduces PR at Current->next with PW
 // Assumes PR != NULL, Current contained in PR
-//         Current->next != NULL, LM(PW) devides LM(Current->next)
+//         Current->next != NULL, LM(PW) divides LM(Current->next)
 // Changes: PR
 // Const:   PW
 // Return: see ksReducePoly

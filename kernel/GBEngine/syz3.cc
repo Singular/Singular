@@ -1051,7 +1051,7 @@ static poly normalize(poly next_p,ideal add_generators, syStrategy syzstr,
 }
 
 /*3
-* updates the pairs inthe higher modules
+* updates the pairs in the higher modules
 */
 static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy /*syzstr*/,
        int index,ideal add_generators,ideal /*add_repr*/,ideal /*new_generators*/,

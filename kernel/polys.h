@@ -1,10 +1,10 @@
-/*! \file kernel/polys.h Compatiblity layer for legacy polynomial operations (over @ref currRing)
+/*! \file kernel/polys.h Compatibility layer for legacy polynomial operations (over @ref currRing)
 
  Macro defines for legacy polynomial operations used in @ref kernel_page and @ref singular_page.
  They take no ring argument since they work with @ref currRing by default.
  Notice that they have different prefix: `p` instead of `p_`.
 
- See also related global ring variable and the correct ring changeing routine:
+ See also related global ring variable and the correct ring changing routine:
  - \ref currRing
  - \ref rChangeCurrRing
 */
@@ -51,7 +51,7 @@ void rChangeCurrRing(ring r);
 
 /***************************************************************
  *
- * Allocation/Initalization/Deletion
+ * Allocation/Initialization/Deletion
  * except for pHead, all polys must be != NULL
  *
  ***************************************************************/
@@ -161,7 +161,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 
 /// polynomial division a/b, ignoring the rest
 /// via singclap_pdivide resp. idLift
-/// destroyes a,b
+/// destroys a,b
 poly p_Divide(poly a, poly b, const ring r);
 /// polynomial division a/b, ignoring the rest
 /// via singclap_pdivide resp. idLift
@@ -221,7 +221,7 @@ poly singclap_gcd ( poly f, poly g, const ring r );
 #define pSortAdd(p)             p_SortAdd(p, currRing)
 
 
-/// Assume: If considerd only as poly in any component of p
+/// Assume: If considered only as poly in any component of p
 /// (say, monomials of other components of p are set to 0),
 /// then p is already sorted correctly
 #define pSortCompCorrect(p) pSort(p)
@@ -274,7 +274,7 @@ typedef poly*   polyset;
 
 /***************************************************************
  *
- * Degree stuff -- see p_polys.cc for explainations
+ * Degree stuff -- see p_polys.cc for explanations
  *
  ***************************************************************/
 #define pWeight(i)       p_Weight(i,currRing)
@@ -370,7 +370,7 @@ inline void pNorm(poly p){ p_Norm(p, currRing); }
 #define   pJetW(p,m,iv) p_JetW(p,m,iv,currRing)
 #define   pMinDeg(p,w) p_MinDeg(p,w,currRing)
 #define   pSeries(n,p,u,w) p_Series(n,p,u,w,currRing)
-// maximum weigthed degree of all monomials of p, w is indexed from
+// maximum weighted degree of all monomials of p, w is indexed from
 // 1..pVariables
 
 /// Deprecated: only for compatibility with older code!

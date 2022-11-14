@@ -1006,7 +1006,7 @@ int ksReducePolySigRing(LObject* PR,
     printf("--------------\n");
 #endif
     p_ExpVectorAddSub(sigMult,PR->GetLmCurrRing(),PW->GetLmCurrRing(),currRing);
-    //I have also to set the leading coeficient for sigMult (in the case of rings)
+    //I have also to set the leading coefficient for sigMult (in the case of rings)
     if(rField_is_Ring(currRing))
     {
       pSetCoeff(sigMult,nMult(nDiv(pGetCoeff(PR->p),pGetCoeff(PW->p)), pGetCoeff(sigMult)));
@@ -1040,7 +1040,7 @@ int ksReducePolySigRing(LObject* PR,
       poly origsig = pCopy(PR->sig);
       if(sigMult != NULL)
         PR->sig = pHead(pSub(PR->sig, sigMult));
-      //The sigs have the same lm, have to substract
+      //The sigs have the same lm, have to subtract
       //It may happen that now the signature is 0 (drop)
       if(PR->sig == NULL)
       {
@@ -1432,7 +1432,7 @@ int ksReducePolyTailBound(LObject* PR, TObject* PW, int bound, poly Current, pol
 
 /***************************************************************
  *
- * Auxillary Routines
+ * Auxiliary Routines
  *
  *
  ***************************************************************/

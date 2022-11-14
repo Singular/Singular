@@ -1806,7 +1806,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift,
 
   return result; /// Don't change the syzstr???
 
-  // TODO: cleanup thses!
+  // TODO: cleanup these!
   if( fullres != NULL && syzstr->fullres == NULL )
     syzstr->fullres = fullres;
   if( minres != NULL && syzstr->minres == NULL )

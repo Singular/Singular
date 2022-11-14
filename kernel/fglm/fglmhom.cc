@@ -222,7 +222,7 @@ mapMonoms( ring oldRing, homogData & dat )
     int s;
     for ( s= dat.numMonoms - 1; s >= 0; s-- ) {
 //        dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, currRing->N, NULL, 0 );
-      // obachman: changed the folowing to reflect the new calling interface of
+      // obachman: changed the following to reflect the new calling interface of
       // pPermPoly -- Tim please check whether this is correct!
         dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, oldRing, NULL, 0 );
     }

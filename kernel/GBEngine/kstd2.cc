@@ -659,7 +659,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   }
 /*  unsigned long alpha_k = twoPow(leadRing->ch - k_ind2);
   if (1 == 0 && alpha_k <= a)
-  {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
+  {  // Temporarily disabled, reducing coefficients not compatible with std TODO Oliver
     zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
@@ -701,7 +701,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 */
 int redRing_Z (LObject* h,kStrategy strat)
 {
-  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
+  if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
   if (strat->tl<0) return 1;
 
   int at;
@@ -860,7 +860,7 @@ int redRing_Z (LObject* h,kStrategy strat)
 int redRing (LObject* h,kStrategy strat)
 {
   if (strat->tl<0) return 1;
-  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
+  if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
 
   int at/*,i*/;
   long d;
@@ -2447,7 +2447,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
 #endif
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
 
@@ -2941,7 +2941,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->use_buckets = 1;
 #endif
 
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   // if (!TEST_OPT_OLDSTD)
   //   withT = ! strat->homog;
 
@@ -4417,7 +4417,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
 #endif
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   //  if (!TEST_OPT_OLDSTD)
   //    withT = ! strat->homog;
 
