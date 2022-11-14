@@ -149,7 +149,7 @@ int ksReducePolyZ(LObject* PR,
   }
 #endif
 
-  // take care of coef buisness
+  // take care of coef business
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
@@ -283,7 +283,7 @@ int ksReducePoly(LObject* PR,
   }
 #endif
 
-  // take care of coef buisness
+  // take care of coef business
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
@@ -426,7 +426,7 @@ int ksReducePolyGCD(LObject* PR,
 #endif
 
   number ct, an, bn;
-  // take care of coef buisness
+  // take care of coef business
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     ct = n_ExtGcd(pGetCoeff(p1), pGetCoeff(p2), &an, &bn, tailRing->cf);    // Calculate GCD
@@ -686,7 +686,7 @@ int ksReducePolyBound(LObject* PR,
   }
 #endif
 
-  // take care of coef buisness
+  // take care of coef business
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
@@ -900,7 +900,7 @@ int ksReducePolySig(LObject* PR,
   }
 #endif
 
-  // take care of coef buisness
+  // take care of coef business
   if (! n_IsOne(pGetCoeff(p2), tailRing->cf))
   {
     number bn = pGetCoeff(lm);
@@ -1147,7 +1147,7 @@ int ksReducePolySigRing(LObject* PR,
   }
 #endif
 
-  // take care of coef buisness
+  // take care of coef business
   if(rField_is_Ring(currRing))
   {
     p_SetCoeff(lm, nDiv(pGetCoeff(lm),pGetCoeff(p2)), tailRing);

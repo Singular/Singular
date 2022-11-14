@@ -50,7 +50,7 @@ VAR int short_pairs;
 
 /*3
 * assumes the ideals old_ideal and new_ideal to be homogeneous
-* tests wether the new_ideal is a regular extension of the old_ideal
+* tests whether the new_ideal is a regular extension of the old_ideal
 */
 static BOOLEAN syIsRegular(ideal old_ideal,ideal new_ideal,int deg)
 {
@@ -683,14 +683,14 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       PrintS(".");
     if (index==0)
     {
-/*--- tests wether a generator must be replaced (lt(f1)|lt(f2)!)--*/
+/*--- tests whether a generator must be replaced (lt(f1)|lt(f2)!)--*/
       if (p_FDeg(tso.p1,currRing)==p_FDeg(tso.lcm,currRing))
         toReplace = tso.ind1+1;
       else if (p_FDeg(tso.p2,currRing)==p_FDeg(tso.lcm,currRing))
         toReplace = tso.ind2+1;
     }
 #ifdef EXPERIMENT3
-/*--- tests wether the product criterion applies --------------*/
+/*--- tests whether the product criterion applies --------------*/
     if ((index==0) && (old_generators->rank==1) &&
         (p_FDeg(tso.p1,currRing)+p_FDeg(tso.p2,currRing)==tso.order))
     {
@@ -851,7 +851,7 @@ PrintLn();
 #endif
   if (toReplace)
   {
-/*-- replaces the generator if neccesary ------------------*/
+/*-- replaces the generator if necessary ------------------*/
     pDelete(&old_generators->m[toReplace-1]);
     pDelete(&old_repr->m[toReplace-1]);
     for (i=toReplace-1;i<og_idel-1;i++)
@@ -1407,7 +1407,7 @@ static BOOLEAN reducePairsHIndex(SSet resPairs,int l_pairs,syStrategy syzstr,
 /*3
 * we proceed the generators of the next module;
 * they are stored in add_generators and add_repr;
-* if the normal form of a new genrators w.r.t. add_generators has
+* if the normal form of a new generators w.r.t. add_generators has
 * pGetComp<crit_comp it is skipped from the reduction;
 * new_generators and new_repr (which are empty) stores the result of the
 * reduction which is normalized afterwards
@@ -1522,7 +1522,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal /*temp_repr*/,
       next_deg = -1;
     if ((next_place_add>next_new_el) || (next_deg<0))  //there are new generators or pairs
     {
-/*-reducing and generating pairs untill the degree of the next generators-*/
+/*-reducing and generating pairs until the degree of the next generators-*/
       pairs_left = TRUE;
       while (pairs_left && ((next_deg<0) || (red_deg<= next_deg)))
       {
@@ -1745,7 +1745,7 @@ static ideal syAppendSyz(ideal new_generators, syStrategy syzstr,int index,int c
 #ifdef SHOW_PROT
 PrintS("Add new generators:\n");
 idPrint(new_generators);
-PrintS("with representaions:\n");
+PrintS("with representations:\n");
 idPrint(new_repr);
 #endif
     result = kosz_std(new_generators,new_repr,syzstr,index,crit_comp);

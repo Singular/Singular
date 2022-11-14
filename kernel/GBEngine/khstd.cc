@@ -134,9 +134,9 @@ void khCheckLocInhom(ideal Q, intvec *w, intvec *hilb, int &count,
              kStrategy strat)
 
 /*
-This will be used for the local orderings in the case of the inhomogenous ideals.
+This will be used for the local orderings in the case of the inhomogeneous ideals.
 Assume f1,...,fs are already in the standard basis. Test if hilb(LM(f1),...,LM(fs),1)
-is equal to the inputed one.
+is equal to the inputted one.
 If no, do nothing.
 If Yes, we know that all polys that we need are already in the standard basis
 so delete all the remaining pairs

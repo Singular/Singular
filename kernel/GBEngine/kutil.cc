@@ -2247,7 +2247,7 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     *term of p divides the lcm(s,r)
     *(this canceling should be done here because
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
-    *the first case is handeled in chainCrit
+    *the first case is handled in chainCrit
     */
     if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
   }
@@ -2478,7 +2478,7 @@ static void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy stra
     *term of p divides the lcm(s,r)
     *(this canceling should be done here because
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
-    *the first case is handeled in chainCrit
+    *the first case is handled in chainCrit
     */
     if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
   }
@@ -2932,7 +2932,7 @@ static void enterOnePairSigRing (int i, poly p, poly pSig, int, int ecart, int i
     }
     if(pSigMult != NULL && sSigMult != NULL && p_LmCmp(pSigMult,sSigMult,currRing) == 0)
     {
-      //Same lm, have to substract
+      //Same lm, have to subtract
       Lp.sig = p_Sub(pCopy(pSigMult),pCopy(sSigMult),currRing);
     }
     else
@@ -4691,7 +4691,7 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
   }
   else
 */
-//   #endif // ??? Why was the following cancelation disabled for non-commutative rings?
+//   #endif // ??? Why was the following cancellation disabled for non-commutative rings?
   {
     j=pos;
     loop
@@ -6099,7 +6099,7 @@ int posInL11 (const LSet set, const int length,
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure pLmCmp,totaldegree,coefficient
 * For the same totaldegree, original pairs (from F) will
-* be put at the end and smalles coefficents
+* be put at the end and smallest coefficients
 */
 int posInL11Ring (const LSet set, const int length,
               LObject* p,const kStrategy)
@@ -9740,7 +9740,7 @@ void initHilbCrit(ideal/*F*/, ideal /*Q*/, intvec **hilb,kStrategy strat)
 {
 
   //if the ordering is local, then hilb criterion
-  //can be used also if the ideal is not homogenous
+  //can be used also if the ideal is not homogeneous
   if((rHasLocalOrMixedOrdering(currRing)) && (rHasMixedOrdering(currRing)==FALSE))
   {
     if(rField_is_Ring(currRing))
@@ -9784,7 +9784,7 @@ void initBuchMoraCrit(kStrategy strat)
   strat->honey =            !strat->homog || strat->sugarCrit || TEST_OPT_WEIGHTM;
   if (TEST_OPT_NOT_SUGAR) strat->honey = FALSE;
   strat->pairtest = NULL;
-  /* alway use tailreduction, except:
+  /* always use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   //if(rHasMixedOrdering(currRing)==2)
@@ -9858,7 +9858,7 @@ void initSbaCrit(kStrategy strat)
   strat->honey =            !strat->homog || strat->sugarCrit || TEST_OPT_WEIGHTM;
   if (TEST_OPT_NOT_SUGAR) strat->honey = FALSE;
   strat->pairtest = NULL;
-  /* alway use tailreduction, except:
+  /* always use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   if(rHasMixedOrdering(currRing)) strat->noTailReduction =TRUE;
@@ -12917,7 +12917,7 @@ BOOLEAN enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy str
     *term of p divides the lcm(s,r)
     *(this canceling should be done here because
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
-    *the first case is handeled in chainCrit
+    *the first case is handled in chainCrit
     */
     if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
 #ifdef CRITERION_DEBUG
@@ -13367,7 +13367,7 @@ void initenterstrongPairsShift (poly h,int k,int ecart,int isFromQ, kStrategy st
           if ((pGetComp(h)==pGetComp(strat->S[j]))
               || (pGetComp(strat->S[j])==0))
           {
-            assume(isFromQ == 0); // this case is not handeled here and should also never happen
+            assume(isFromQ == 0); // this case is not handled here and should also never happen
             poly s = strat->S[j];
             if (strat->fromQ != NULL && strat->fromQ[j])
             {

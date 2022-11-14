@@ -457,7 +457,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec
     strat->use_buckets = 1;
 #endif
 
-  // redtailBBa against T for inhomogenous input
+  // redtailBBa against T for inhomogeneous input
   if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
 

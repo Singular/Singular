@@ -1235,7 +1235,7 @@ static void replace_pair (int &i, int &j, slimgb_alg * c)
       j = j_con[m];
   }
 
-  //can also try dependend search
+  //can also try dependent search
   omFree (i_con);
   omFree (j_con);
   return;
@@ -1715,7 +1715,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
     if(c->lengths[c->n - 1] == 1)
       shorten_tails (c, c->S->m[c->n - 1]);
   }
-  //you should really update c->lengths, c->strat->lenS, and the oder of polys in strat if you sort after lengths
+  //you should really update c->lengths, c->strat->lenS, and the order of polys in strat if you sort after lengths
 
   //for(i=c->strat->sl; i>0;i--)
   //  if(c->strat->lenS[i]<c->strat->lenS[i-1]) printf("fehler bei %d\n",i);
