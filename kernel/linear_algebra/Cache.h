@@ -254,7 +254,7 @@ template<class KeyClass, class ValueClass> class Cache
      * k equals the given key.
      * If so, the method returns true; false otherwise.
      * In order to make Cache::getValue (const KeyClass&) const
-     * work properly, the user is strongly adviced to always check key
+     * work properly, the user is strongly advised to always check key
      * containment by means of Cache::hasKey (const KeyClass&) const.
      * (The implementation at hand ensures that invoking hasKey and
      * getValue does not result in extra computational efforts.)
@@ -291,7 +291,7 @@ template<class KeyClass, class ValueClass> class Cache
      * re-establish both bounds. Note that this may even result in deleting the
      * newly inserted pair (key --> value).<br>
      * Because of that undesirable but possible effect, the method returns
-     * whether the pair is actually contained in the cache after invokation of
+     * whether the pair is actually contained in the cache after invocation of
      * Cache::put (const KeyClass&, const ValueClass&).
      * @param key an instance of KeyClass
      * @param value an instance of ValueClass

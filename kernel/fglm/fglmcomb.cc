@@ -163,7 +163,7 @@ poly fglmNewLinearCombination( ideal source, poly monset )
     int basisMax = basisBS;
 
     int * weights = NULL;
-    int * lengthes = NULL;
+    int * lengths = NULL;
     int * order = NULL;
 
     int numMonoms = 0;
@@ -173,7 +173,7 @@ poly fglmNewLinearCombination( ideal source, poly monset )
     numMonoms= pLength( monset );
     STICKYPROT2( "%i monoms\n", numMonoms );
 
-    // Allcoate Memory and initialize sets
+    // Allocate Memory and initialize sets
     m= (polyset)omAlloc( numMonoms * sizeof( poly ) );
     poly temp= monset;
     for ( k= 0; k < numMonoms; k++ ) {
@@ -215,7 +215,7 @@ poly fglmNewLinearCombination( ideal source, poly monset )
         STICKYPROT2( "%i ", w );
     }
     STICKYPROT( "\n" );
-    lengthes= (int *)omAlloc( numMonoms * sizeof( int ) );
+    lengths= (int *)omAlloc( numMonoms * sizeof( int ) );
     order= (int *)omAlloc( numMonoms * sizeof( int ) );
 
     // calculate the NormalForm in a special way
@@ -306,8 +306,8 @@ poly fglmNewLinearCombination( ideal source, poly monset )
 
     STICKYPROT( "sizes: " );
     for ( k= 0; k < numMonoms; k++ ) {
-        lengthes[k]= v[k].numNonZeroElems();
-        STICKYPROT2( "%i ", lengthes[k] );
+        lengths[k]= v[k].numNonZeroElems();
+        STICKYPROT2( "%i ", lengths[k] );
     }
     STICKYPROT( "\n" );
 
@@ -315,18 +315,18 @@ poly fglmNewLinearCombination( ideal source, poly monset )
     while ( (isZero == FALSE) && (act < numMonoms) ) {
         int best = 0;
         for ( k= numMonoms - 1; k >= 0; k-- ) {
-            if ( lengthes[k] > 0 ) {
+            if ( lengths[k] > 0 ) {
                 if ( best == 0 ) {
                     best= k+1;
                 }
                 else {
-                    if ( lengthes[k] < lengthes[best-1] ) {
+                    if ( lengths[k] < lengths[best-1] ) {
                         best= k+1;
                     }
                 }
             }
         }
-        lengthes[best-1]= 0;
+        lengths[best-1]= 0;
         order[act]= best-1;
         STICKYPROT2( " (%i) ", best );
         if ( ( isZero= gauss.reduce( v[best-1] )) == TRUE ) {
@@ -381,7 +381,7 @@ poly fglmNewLinearCombination( ideal source, poly monset )
         p_Cleardenom( result, currRing );
     }
     // Free Memory
-    omFreeSize( (ADDRESS)lengthes, numMonoms * sizeof( int ) );
+    omFreeSize( (ADDRESS)lengths, numMonoms * sizeof( int ) );
     omFreeSize( (ADDRESS)order, numMonoms * sizeof( int ) );
 //     for ( k= 0; k < numMonoms; k++ )
 //         v[k].~fglmVector();

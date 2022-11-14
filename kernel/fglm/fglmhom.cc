@@ -35,7 +35,7 @@
 #include "kernel/combinatorics/stairc.h"
 #include "factory/templates/ftmpl_list.h"
 
-// obachman: Got rid off those "redefiende messages by includeing fglm.h
+// obachman: Got rid of those "redefined" messages by including fglm.h
 #include "fglm.h"
 #if 0
 #define PROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

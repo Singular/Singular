@@ -756,7 +756,7 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
         deleteBit = deleteBit >> 1;
       };
       _columnKey[newBitBlockIndex] = anInt;
-      /* ...and we delete all entries in _columnKey[i] fo
+      /* ...and we delete all entries in _columnKey[i] for
          0 <= i < newBitBlockIndex */
       for (int i = 0; i < newBitBlockIndex; i++)
         _columnKey[i] = 0;

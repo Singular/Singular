@@ -108,7 +108,7 @@ ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id,
       }
     }
     // ----------------------------------------------------------
-    // long polys in the image ?: possiblity of many common subexpressions
+    // long polys in the image ?: possibility of many common subexpressions
     if ((nMap==ndCopyMap) /* and !rIsPluralRing(image_r) */
     && (map_id->nrows==1) /* i.e. only for ideal/map */
     && (map_id->rank==1))

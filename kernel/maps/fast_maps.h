@@ -74,7 +74,7 @@ inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r = NULL)
 
 // inserts ("adds") monomial what into poly into
 // returns the maMonomial which was inserted, or, if an equal one was found,
-// the monomial which "swalloed" the monomial
+// the monomial which "swallowed" the monomial
 // It furthermore might reset into
 mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r);
 mapoly maPoly_InsertMonomial(mapoly &into, poly p, ring src_r, sBucket_pt bucket = NULL);
@@ -95,7 +95,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
                        ideal image_id, ring image_r,
                        ring &src_r, ring &dest_r, BOOLEAN &no_sort);
 
-// collects tthe results into an ideal and destroys maideal
+// collects the results into an ideal and destroys maideal
 ideal maIdeal_2_Ideal(maideal ideal, ring dest_r);
 
 // main routine: map_id: the ideal to map

@@ -306,7 +306,7 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
 ///////////////////////////////////////////////////////////////////
 
 
-//unperturbedStartVectorStrategy IS NOW NOT ALLWAYS AS DEFAULT SET
+//unperturbedStartVectorStrategy IS NOW NOT ALWAYS AS DEFAULT SET
 //TO TRUE BUT IS INPUT FROM fractalWalk64
 WalkState firstFractalWalkStep64(ideal & G,int64vec* & currw64,
 intvec* currMat, ring destRing,
@@ -315,7 +315,7 @@ BOOLEAN unperturbedStartVectorStrategy){
     //This strategy Uses the ordinary walk for the first step
     if(unperturbedStartVectorStrategy){
       return(unperturbedFirstStep64(G,currw64,destRing));
-    //here G is updated since its adress is given as argument
+    //here G is updated since its address is given as argument
     }
 
     //This strategy makes sure that the start vector lies inside the start cone
@@ -547,7 +547,7 @@ while(1){
 
       state=fractalRec64(Gw,sigma,destMat,level+1,step);
 
-      //The resulting GB is Gw since its adress is given as argument.
+      //The resulting GB is Gw since its address is given as argument.
       ideal recG=Gw;
       ring temp=currRing;
 

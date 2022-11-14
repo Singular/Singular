@@ -5,7 +5,7 @@
 ****************************************/
 /*
 * ABSTRACT - class gaussReducer. Used in fglmzero.cc and fglmhom.cc
-*  to find linear dependecies of fglmVectors.
+*  to find linear dependencies of fglmVectors.
 */
 
 

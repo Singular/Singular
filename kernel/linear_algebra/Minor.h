@@ -455,7 +455,7 @@ class MinorValue
     * induced ordering
     * on MinorValues has an impact on the caching behaviour in a given cache:
     * Greater MinorValues will be cached longer than lower ones.<br>
-    * More explicitely, this means: Make the return value of this method
+    * More explicitly, this means: Make the return value of this method
     * greater, and the given MinorValue will be cached longer when caching
     * strategy 1 is deployed.<br>
     * Rank measure 1 is equal to the number of actually performed
@@ -471,7 +471,7 @@ class MinorValue
     * induced ordering on MinorValues has an impact on the caching behaviour
     * in a given cache: Greater MinorValues will be cached longer than lower
     * ones.<br>
-    * More explicitely, this means: Make the return value of this method
+    * More explicitly, this means: Make the return value of this method
     * greater, and the given MinorValue will be cached longer when caching
     * strategy 1 is deployed.<br>
     * Rank measure 2 is equal to the number of accumulated multiplications to
@@ -489,7 +489,7 @@ class MinorValue
     * induced ordering on MinorValues has an impact on the caching behaviour
     * in a given cache: Greater MinorValues will be cached longer than lower
     * ones.<br>
-    * More explicitely, this means: Make the return value of this method
+    * More explicitly, this means: Make the return value of this method
     * greater, and the given MinorValue will be cached longer when caching
     * strategy 1 is deployed.<br>
     * Rank measure 3 is equal to the number of actually performed
@@ -506,7 +506,7 @@ class MinorValue
     * induced ordering on MinorValues has an impact on the caching behaviour
     * in a given cache: Greater MinorValues will be cached longer than lower
     * ones.<br>
-    * More explicitely, this means: Make the return value of this method
+    * More explicitly, this means: Make the return value of this method
     * greater, and the given MinorValue will be cached longer when caching
     * strategy 1 is deployed.<br>
     * Rank measure 4 is equal to the number of actually performed
@@ -523,7 +523,7 @@ class MinorValue
     * induced ordering on MinorValues has an impact on the caching behaviour
     * in a given cache: Greater MinorValues will be cached longer than lower
     * ones.<br>
-    * More explicitely, this means: Make the return value of this method
+    * More explicitly, this means: Make the return value of this method
     * greater, and the given MinorValue will be cached longer when caching
     * strategy 1 is deployed.<br>
     * Rank measure 5 is equal to the number of not yet performed retrievals.
@@ -662,7 +662,7 @@ class MinorValue
     * induced ordering on MinorValues has an impact on the caching behaviour
     * of the underlying cache: Greater MinorValues will be cached longer than
     * lower ones.<br>
-    * More explicitely, this means: Make the return value of this method
+    * More explicitly, this means: Make the return value of this method
     * greater, and the given MinorValue will be cached longer.<br>
     * Internally, this method will call one of several implementations,
     * depending on the pre-defined caching strategy; see
