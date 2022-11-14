@@ -56,7 +56,7 @@ class Number{
     return n_Copy(n,r.get());
   }
   Number& operator=(const Number& n2){
-    //durch Reihenfolge Selbstzuweisungen berücksichtigt
+    //durch Reihenfolge Selbstzuweisungen beruecksichtigt
     number nc=n_Copy(n2.n,n2.r.get());
     n_Delete(&n,r.get());
     r=n2.r;

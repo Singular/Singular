@@ -284,11 +284,11 @@ rootContainer::~rootContainer()
     omFreeSize( (void *)ievpoint, (anz+2) * sizeof( number ) );
   }
 
-  for ( i=0; i <= tdg; i++ ) 
+  for ( i=0; i <= tdg; i++ )
     if (coeffs[i]!=NULL) nDelete( coeffs + i );
   omFreeSize( (void *)coeffs, (tdg+1) * sizeof( number ) );
 
-  // theroots löschen
+  // theroots loeschen
   for ( i=0; i < tdg; i++ ) delete theroots[i];
   omFreeSize( (void *) theroots, (tdg)*sizeof(gmp_complex*) );
 
@@ -889,9 +889,9 @@ void rootArranger::arrange()
   bool found;
   //gmp_complex mprec(1.0/pow(10,gmp_output_digits-5),1.0/pow(10,gmp_output_digits-5));
 
-  for ( xkoord= 0; xkoord < anzm; xkoord++ ) {    // für x1,x2, x1,x2,x3, x1,x2,...,xn
+  for ( xkoord= 0; xkoord < anzm; xkoord++ ) {    // fuer x1,x2, x1,x2,x3, x1,x2,...,xn
     gmp_float mprec(1.0/pow(10.0,(int)(gmp_output_digits/3)));
-    for ( r= 0; r < anzr; r++ ) {                 // für jede Nullstelle
+    for ( r= 0; r < anzr; r++ ) {                 // fuer jede Nullstelle
       // (x1-koordinate) * evp[1] + (x2-koordinate) * evp[2] +
       //                                  ... + (xkoord-koordinate) * evp[xkoord]
       tmp= gmp_complex();
@@ -901,7 +901,7 @@ void rootArranger::arrange()
       }
       found= false;
       do { // while not found
-        for ( rtest= r; rtest < anzr; rtest++ ) {   // für jede Nullstelle
+        for ( rtest= r; rtest < anzr; rtest++ ) {   // fuer jede Nullstelle
            zwerg = tmp - (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xk+1, xkoord+2
           for ( mtest= 0; mtest < anzr; mtest++ )
           {

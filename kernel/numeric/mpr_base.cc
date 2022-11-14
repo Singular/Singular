@@ -793,7 +793,7 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
     m = pLength( (gls->m)[i] );
 
     poly p= (gls->m)[i];
-    for( j= 1; j <= m; j++) {  // für jeden Exponentvektor
+    for( j= 1; j <= m; j++) {  // fuer jeden Exponentvektor
       if( !inHull( (gls->m)[i], p, m, j ) )
       {
         p_GetExpV( p, vert, currRing );
@@ -849,7 +849,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
     m = pLength( (gls->m)[i] );
 
     p= (gls->m)[i];
-    for( j= 1; j <= m; j++) {  // für jeden Exponentvektor
+    for( j= 1; j <= m; j++) {  // fuer jeden Exponentvektor
       if( !inHull( (gls->m)[i], p, m, j ) )
       {
         if ( (id->m)[i] == NULL )

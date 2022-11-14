@@ -72,7 +72,7 @@ class PolyImpl{
     return Number(p->coef,r.get());
   }
   PolyImpl& operator=(const PolyImpl& p2){
-    //durch Reihenfolge Selbstzuweisungen berücksichtigt
+    //durch Reihenfolge Selbstzuweisungen beruecksichtigt
     if (this==&p2) return *this;
     poly pc=p_Copy(p2.p,p2.r.get());
     if(r!=NULL)
