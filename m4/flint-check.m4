@@ -22,13 +22,13 @@ AC_ARG_WITH(flint,
                             library even if it could be found on your machine.
                             Otherwise you can give the <path> to the directory
                             which contains the library.
-	     ],
-	     [if test "x$withval" = xyes ; then
-			FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"
-	      elif test "x$withval" != xno ; then
-			FLINT_HOME_PATH="$withval"
-	     fi],
-	     [FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"])
+             ],
+             [if test "x$withval" = xyes ; then
+                        FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"
+              elif test "x$withval" != xno ; then
+                        FLINT_HOME_PATH="$withval"
+             fi],
+             [FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"])
 
 dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}
@@ -44,20 +44,19 @@ do
                 FLINT_CFLAGS=""
                 FLINT_LIBS="-lflint -lmpfr -lgmp"
         else
-		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
-		FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
+                FLINT_CFLAGS="-I${FLINT_HOME}/include/"
+                FLINT_LIBS="-L${FLINT_HOME}/lib -Wl,-rpath,${FLINT_HOME}/lib -lflint -lmpfr -lgmp"
         fi
 
-	# we suppose that mpfr and mpir to be in the same place or available by default
-		CFLAGS="${FLINT_CFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
-		LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
+        # we suppose that mpfr and mpir to be in the same place or available by default
+                CFLAGS="${FLINT_CFLAGS} ${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
+                LIBS="${FLINT_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-                AC_TRY_LINK([#include <flint/fmpz.h>
-                            ],
-                            [fmpz_t x; fmpz_init(x);], [
-                        flint_found="yes"
-                        break
-                ])
+                AC_LINK_IFELSE(
+                [AC_LANG_PROGRAM([[#include <flint/fmpz.h>]],
+                            [[fmpz_t x; fmpz_init(x);]])],
+                        [flint_found="yes"],
+                        [break])
 done
 
 AC_LANG_POP([C])
@@ -69,14 +68,14 @@ LIBS=${BACKUP_LIBS}
 AC_MSG_CHECKING(for FLINT)
 
 if test "x$flint_found" = "xyes" ; then
-	AC_DEFINE(HAVE_FLINT,1,[Define if FLINT is installed])
-	HAVE_FLINT=yes
-	AC_MSG_RESULT(found)
+        AC_DEFINE(HAVE_FLINT,1,[Define if FLINT is installed])
+        HAVE_FLINT=yes
+        AC_MSG_RESULT(found)
 else
-	AC_MSG_RESULT(not found)
-	FLINT_CFLAGS=""
-	FLINT_LIBS=""
-	FLINT_HOME=""
+        AC_MSG_RESULT(not found)
+        FLINT_CFLAGS=""
+        FLINT_LIBS=""
+        FLINT_HOME=""
 fi
 AC_SUBST(FLINT_CFLAGS)
 AC_SUBST(FLINT_LIBS)
