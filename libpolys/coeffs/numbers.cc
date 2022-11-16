@@ -46,9 +46,8 @@ VAR n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
 
-
 static void   ndDelete(number* d, const coeffs) { *d=NULL; }
-static number ndAnn(number, const coeffs) { return NULL;}
+static number ndAnn(number, const coeffs cf) { WarnS("cfAnn undefined"); return n_Init(0,cf); }
 static char* ndCoeffString(const coeffs r)
 {
   return omStrDup(r->cfCoeffName(r));

@@ -1849,7 +1849,8 @@ void initMora(ideal F,kStrategy strat)
     HCord = 32000;/*- very large -*/
   }
 
-  if (rField_is_Ring(currRing)) {
+  if (rField_is_Ring(currRing))
+  {
     if (rField_is_Z(currRing))
       strat->red = redRiloc_Z;
     else
