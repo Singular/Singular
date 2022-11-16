@@ -15,7 +15,7 @@ jobs:
         configflags: ["", "--with-ntl --with-flint", "--without-ntl --with-flint"]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: "Install dependencies"
         run: |
                FLINT_JLL="https://github.com/JuliaBinaryWrappers/FLINT_jll.jl/releases/download/FLINT-v200.700.0%2B0/FLINT.v200.700.0"

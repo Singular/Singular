@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out ${{ env.SPKG }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: build/pkgs/${{ env.SPKG }}/src
       - name: Install prerequisites
@@ -91,7 +91,7 @@ jobs:
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
           && echo 'echo ntl flint readline mpfr cddlib 4ti2 > ../build/pkgs/singular/dependencies' >> upstream/update-pkgs.sh \
           && ls -l upstream/
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: upstream
           name: upstream
@@ -116,14 +116,14 @@ jobs:
       DOCKER_TARGETS: configured with-targets with-targets-optional
     steps:
       - name: Check out SageMath
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ env.SAGE_REPO }}
           ref: ${{ env.SAGE_REF }}
           fetch-depth: 2000
         if: env.SAGE_REPO != ''
       - name: Check out git-trac-command
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: sagemath/git-trac-command
           path: git-trac-command
@@ -135,7 +135,7 @@ jobs:
           git config --global user.name "ci-sage workflow"
           if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac fetch $SAGE_TICKET; then git merge FETCH_HEAD || echo "(ignored)"; exit 0; fi; sleep 40; done; exit 1
         if: env.SAGE_TRAC_GIT != ''
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: upstream
           name: upstream
@@ -156,7 +156,7 @@ jobs:
           if [ -f .tox/$TOX_ENV/Dockertags ]; then CONTAINERS=$(docker create $(tail -1 .tox/$TOX_ENV/Dockertags) /bin/bash || true); fi
           if [ -n "$CONTAINERS" ]; then for CONTAINER in $CONTAINERS; do for ARTIFACT in /sage/logs; do docker cp $CONTAINER:$ARTIFACT artifacts/$LOGS_ARTIFACT_NAME && HAVE_LOG=1; done; if [ -n "$HAVE_LOG" ]; then break; fi; done; fi
         if: always()
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: artifacts
           name: ${{ env.LOGS_ARTIFACT_NAME }}
@@ -215,14 +215,14 @@ jobs:
         choco --version
         choco install git python3 --source cygwin
     - name: Check out SageMath
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: ${{ env.SAGE_REPO }}
         ref: ${{ env.SAGE_REF }}
         fetch-depth: 2000
       if: env.SAGE_REPO != ''
     - name: Check out git-trac-command
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: sagemath/git-trac-command
         path: git-trac-command
@@ -235,7 +235,7 @@ jobs:
         git config --global user.name "ci-sage workflow"
         if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac fetch $SAGE_TICKET; then git merge FETCH_HEAD || echo "(ignored)"; exit 0; fi; sleep 40; done; exit 1
       if: env.SAGE_TRAC_GIT != ''
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         path: upstream
         name: upstream
@@ -257,7 +257,7 @@ jobs:
       run: |
         mkdir -p "artifacts/$LOGS_ARTIFACT_NAME"; for a in local/var/tmp/sage/build/*; do if [ -d $a ]; then tar -c --remove-files -f "artifacts/$LOGS_ARTIFACT_NAME/$(basename $a).tar" $a || tar -c --ignore-failed-read -f "artifacts/$LOGS_ARTIFACT_NAME/$(basename $a)-save.tar" $a ; fi; done; cp -r logs/*  "artifacts/$LOGS_ARTIFACT_NAME"
       if: always()
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         path: artifacts
         name: ${{ env.LOGS_ARTIFACT_NAME }}
@@ -275,7 +275,7 @@ jobs:
       run: |
         C:\\tools\\cygwin\\bin\\bash -l -c 'cd $(cygpath -u "$GITHUB_WORKSPACE") && rm -f "${{ env.SAGE_LOCAL }}"/lib64; tar -cf /tmp/sage-local-${{ env.STAGE }}.tar --remove-files "${{ env.SAGE_LOCAL }}"'
       if: always()
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       # upload-artifact@v2 does not support whitespace in file names.
       # so we tar up the directory ourselves
       with:
@@ -298,14 +298,14 @@ jobs:
       DOCKER_TARGETS: configured with-targets with-targets-optional
     steps:
       - name: Check out SageMath
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ env.SAGE_REPO }}
           ref: ${{ env.SAGE_REF }}
           fetch-depth: 2000
         if: env.SAGE_REPO != ''
       - name: Check out git-trac-command
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: sagemath/git-trac-command
           path: git-trac-command
@@ -390,14 +390,14 @@ jobs:
         run: |
           if [ ${{ matrix.xcode_version_factor }} != default ]; then sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode_version_factor }}.app; fi
       - name: Check out SageMath
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ env.SAGE_REPO }}
           ref: ${{ env.SAGE_REF }}
           fetch-depth: 2000
         if: env.SAGE_REPO != ''
       - name: Check out git-trac-command
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: sagemath/git-trac-command
           path: git-trac-command
@@ -409,7 +409,7 @@ jobs:
           git config --global user.name "ci-sage workflow"
           if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac fetch $SAGE_TICKET; then git merge FETCH_HEAD || echo "(ignored)"; exit 0; fi; sleep 40; done; exit 1
         if: env.SAGE_TRAC_GIT != ''
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: upstream
           name: upstream
@@ -429,7 +429,7 @@ jobs:
         run: |
           mkdir -p "artifacts/$LOGS_ARTIFACT_NAME"; cp -r .tox/*/log "artifacts/$LOGS_ARTIFACT_NAME"
         if: always()
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v3
         with:
           path: artifacts
           name: ${{ env.LOGS_ARTIFACT_NAME }}
