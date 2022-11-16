@@ -229,7 +229,6 @@ static void ngcPower ( number x, int exp, number * u, const coeffs r)
   }
   else if ( exp == 1 )
   {
-    n_New(u, r);
     gmp_complex* n = new gmp_complex();
     *n= *(gmp_complex*)x;
     *u=(number)n;
@@ -237,7 +236,6 @@ static void ngcPower ( number x, int exp, number * u, const coeffs r)
   }
   else if (exp == 2)
   {
-    n_New(u, r);
     gmp_complex* n = new gmp_complex();
     *n= *(gmp_complex*)x;
     *u=(number)n;
@@ -254,8 +252,7 @@ static void ngcPower ( number x, int exp, number * u, const coeffs r)
   }
   else
   {
-    number w;
-    n_New(&w, r);
+    number w=NULL;
     ngcPower(x,exp/2,&w, r);
     ngcPower(w,2,u, r);
     n_Delete(&w, r);

@@ -130,7 +130,7 @@ struct n_Procs_s
    int     factoryVarOffset;
 
    // general properties:
-   /// TRUE, if nNew/nDelete/nCopy are dummies
+   /// TRUE, if nDelete/nCopy are dummies
    BOOLEAN has_simple_Alloc;
    /// TRUE, if std should make polynomials monic (if nInvers is cheap)
    /// if false, then a gcd routine is used for a content computation
@@ -436,10 +436,6 @@ void nKillChar(coeffs r);
 /// initialisations after each ring change
 static FORCE_INLINE void nSetChar(const coeffs r)
 { assume(r!=NULL); assume(r->cfSetChar != NULL); r->cfSetChar(r); }
-
-void           nNew(number * a);
-#define n_New(n, r)           nNew(n)
-
 
 /// Return the characteristic of the coeff. domain.
 static FORCE_INLINE int n_GetChar(const coeffs r)
@@ -903,7 +899,7 @@ static FORCE_INLINE BOOLEAN nCoeff_is_CF(const coeffs r)
 static FORCE_INLINE BOOLEAN nCoeff_has_simple_inverse(const coeffs r)
 { assume(r != NULL); return r->has_simple_Inverse; }
 
-/// TRUE if n_Delete/n_New are empty operations
+/// TRUE if n_Delete is empty operation
 static FORCE_INLINE BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
 { assume(r != NULL); return r->has_simple_Alloc; }
 

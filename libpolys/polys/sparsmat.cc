@@ -2852,7 +2852,7 @@ static smnumber sm_Poly2Smnumber(poly q, const ring R)
   a = res = (smnumber)omAllocBin(smnrec_bin);
   a->pos = p_GetComp(p,R);
   a->m = pGetCoeff(p);
-  n_New(&pGetCoeff(p),R->cf);
+  pGetCoeff(p)=NULL;
   loop
   {
     pIter(p);
@@ -2865,7 +2865,7 @@ static smnumber sm_Poly2Smnumber(poly q, const ring R)
     a = a->n = (smnumber)omAllocBin(smnrec_bin);
     a->pos = p_GetComp(p,R);
     a->m = pGetCoeff(p);
-    n_New(&pGetCoeff(p),R->cf);
+    pGetCoeff(p)=NULL;
   }
 }
 
