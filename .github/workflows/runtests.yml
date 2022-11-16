@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: "Install dependencies"
         run: |
-               FLINT_JLL="https://github.com/JuliaBinaryWrappers/FLINT_jll.jl/releases/download/FLINT-v200.700.0%2B0/FLINT.v200.700.0"
+               FLINT_JLL="https://github.com/JuliaBinaryWrappers/FLINT_jll.jl/releases/download/FLINT-v200.900.1%2B0/FLINT.v200.900.1"
                if [ "$RUNNER_OS" == "Linux" ]; then
                     # sharutils is for uudecode
                     sudo apt install sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev 4ti2 normaliz
