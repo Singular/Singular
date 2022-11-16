@@ -1688,7 +1688,7 @@ poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r)
 
   p_SetComp (m, lCompM, r);
   p_Setm(m,r);
-  n_New(&(p_GetCoeff(m, r)), r);
+  p_GetCoeff(m, r)=NULL;
 
   return(m);
 };
