@@ -34,8 +34,9 @@ do
     AC_LINK_IFELSE(
       [AC_LANG_PROGRAM([[#include <gmp.h>]],
                 [[mpz_t a; mpz_init (a);]])],
-         [gmp_found=yes],
-         [break])
+         [gmp_found=yes
+	 break],
+         )
 done
 if test "$gmp_found" != yes; then
     AC_MSG_ERROR([GNU MP not found])
