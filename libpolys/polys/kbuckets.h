@@ -79,7 +79,6 @@ void kBucketAdjust(kBucket_pt bucket, int i);
 // Assumes p1 != NULL, Bpoly != NULL
 //         Lm(p1) divides Lm(Bpoly)
 //         pLength(p1) == l1
-// if reduce: do nor multiply q
 // Returns: Lc(p) / gcd(Lc(p), Lc(q))
 number kBucketPolyRed(kBucket_pt bucket,
                       poly p, int l,

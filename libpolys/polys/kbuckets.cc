@@ -742,18 +742,6 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   kbTest(bucket);
   i = pLogLength(l1);
 
-#if defined(HAVE_PLURAL)
-  if ((rField_is_Ring(r) && !(rField_is_Domain(r)))
-  ||(rIsPluralRing(r)))
-  {
-    pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
-    p1=r->p_Procs->pp_mm_Mult(p,m,r);
-    pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
-    l1=pLength(p1);
-    i = pLogLength(l1);
-  }
-  else
-#endif
   {
     if ((i <= bucket->buckets_used) && (bucket->buckets[i] != NULL))
     {
