@@ -261,13 +261,11 @@ int vInvs(std::vector<int> vec, std::vector<std::vector<int> > vecs)
   return -1;
 }
 
-
-
 //returns the union of two vectors(as the union of sets)
 std::vector<int> vecUnion(std::vector<int> vec1, std::vector<int> vec2)
 {
   std::vector<int> vec=vec1;
-  int i;
+  unsigned i;
   for(i=0;i<vec2.size();i++)
   {
     if(!IsinL(vec2[i],vec))
@@ -276,12 +274,10 @@ std::vector<int> vecUnion(std::vector<int> vec1, std::vector<int> vec2)
   return vec;
 }
 
-
-
 std::vector<int> vecMinus(std::vector<int> vec1,std::vector<int> vec2)
 {
   std::vector<int> vec;
-  for(int i=0;i<vec1.size();i++)
+  for(unsigned i=0;i<vec1.size();i++)
   {
     if(!IsinL(vec1[i],vec2))
     {
@@ -290,11 +286,6 @@ std::vector<int> vecMinus(std::vector<int> vec1,std::vector<int> vec2)
   }
   return vec;
 }
-
-
-
-
-
 
 std::vector<std::vector<int> > vsMinusv(std::vector<std::vector<int> > vecs, std::vector<int> vec)
 {
@@ -1152,7 +1143,7 @@ std::vector<std::vector<int> > Mabv(ideal h,poly a,poly b)
   std::vector<int> av=support1(a), bv=support1(b), pv, vec;
   ideal h2=id_complement(h);
   std::vector<std::vector<int> > hvs=supports(h), h2v=supports(h2), vecs;
-  for(int i=0;i<h2v.size();i++)
+  for(unsigned i=0;i<h2v.size();i++)
   {
     pv=h2v[i];
     if(mabconditionv(hvs,pv,av,bv))
@@ -1163,21 +1154,9 @@ std::vector<std::vector<int> > Mabv(ideal h,poly a,poly b)
   return vecs;
 }
 
-
-
-
-
-
-
-
-
-
-
 /***************************************************************************/
 //For solving the equations which has form of x_i-x_j.(equations got from T_1)
 /***************************************************************************/
-
-
 
 //subroutine for soleli1
 std::vector<int> eli1(std::vector<int> eq1,std::vector<int> eq2)
@@ -1239,7 +1218,7 @@ std::vector<int> keeporder(  std::vector<int> vec)
 
 std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
 {
-  int i,j;
+  int i;
   std::vector<int> yaya;
   std::vector<std::vector<int> >  pre=eqs, ppre, re;
   if(eqs.size()>0)
@@ -2251,23 +2230,13 @@ std::vector<std::vector<int> > getvector(ideal h,int n)
   return vecs;
 }
 
-
-
 /**************************************************************************/
-
-
-
-
-
-
-
-
 
 //subspace of T2(find all the possible values of alpha)
 std::vector<int> findalpha(std::vector<std::vector<int> > mv, std::vector<int> bv)
 {
   std::vector<int> alset;
-  for(int i=0;i<mv.size();i++)
+  for(unsigned i=0;i<mv.size();i++)
   {
     if(vsubset(bv,mv[i]))
     {
@@ -2278,13 +2247,6 @@ std::vector<int> findalpha(std::vector<std::vector<int> > mv, std::vector<int> b
   //listprint(alset);
   return alset;
 }
-
-
-
-
-
-
-
 
 std::vector<int> subspacet1(int num, std::vector<std::vector<int> > ntvs)
 {
@@ -2338,9 +2300,9 @@ std::vector<std::vector<int> > mabtv(std::vector<std::vector<int> > hvs,  std::v
 {
   std::vector<int> v1,var;
   std::vector<std::vector<int> > vars;
-  for(int i=0;i<Mv.size();i++)
+  for(unsigned i=0;i<Mv.size();i++)
   {
-    for(int j=i+1;j<Mv.size();j++)
+    for(unsigned j=i+1;j<Mv.size();j++)
     {
       var.clear();
       v1=vecUnion(Mv[i],Mv[j]);
@@ -2532,9 +2494,9 @@ std::vector<std::vector<int> > nabtv(std::vector<std::vector<int> > hvs,    std:
 {
   std::vector<int> v1,var;
   std::vector<std::vector<int> > vars;
-  for(int i=0;i<Nv.size();i++)
+  for(unsigned i=0;i<Nv.size();i++)
   {
-    for(int j=i+1;j<Nv.size();j++)
+    for(unsigned j=i+1;j<Nv.size();j++)
     {
       var.clear();
       if(nabtconditionv(hvs, Nv[i], Nv[j]))
@@ -2563,7 +2525,7 @@ bool tNab(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<s
 {
   std::vector<int> sv;
   if(bvs.size()<=1) return false;
-  for(int i=0;i<bvs.size();i++)
+  for(unsigned i=0;i<bvs.size();i++)
   {
     sv=vecUnion(pv,bvs[i]);
     if(!vInvsl(sv,hvs))
@@ -2574,16 +2536,10 @@ bool tNab(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<s
   return false;
 }
 
-
-
-
-
-
-
 std::vector<int>  tnab(std::vector<std::vector<int> > hvs,std::vector<std::vector<int> > nvs,std::vector<std::vector<int> > bvs)
 {
   std::vector<int> pv, vec;
-  for(int j=0;j<nvs.size();j++)
+  for(unsigned j=0;j<nvs.size();j++)
   {
     pv=nvs[j];
     if(tNab(hvs, pv, bvs))
@@ -2618,9 +2574,9 @@ std::vector<std::vector<int> > value1(std::vector<std::vector<int> > mvs, std::v
   int j;
   std::vector<int> pv, base;
   std::vector<std::vector<int> > bases;
-  for(int t=0;t<vecs.size();t++)
+  for(unsigned t=0;t<vecs.size();t++)
   {
-    for(int i=0;i<mvs.size();i++)
+    for(unsigned i=0;i<mvs.size();i++)
     {
       pv=phimage(mvs[i],av,bv);
       for( j=0;j<nvs.size();j++)
@@ -2901,7 +2857,7 @@ std::vector<int> findalphan(std::vector<std::vector<int> >  N, std::vector<int> 
 //subspace of T^2 (nab method)
 std::vector<std::vector<int> > subspacetn(std::vector<std::vector<int> >  N, std::vector<int>   tN, std::vector<std::vector<int> > ntvs)
 {
-  int i,j;
+  int i;
   std::vector<int> alset=findalphan(N,tN), subase;
   std::vector<std::vector<int> > subases;
   for(i=0;i<alset.size();i++)
@@ -2931,9 +2887,9 @@ std::vector<std::vector<int> > value2(std::vector<std::vector<int> > mvs, std::v
   //PrintS("This is the mabt:\n");
   //listsprint(mts);
   //PrintS("mabt ends:\n");
-  for(int t=0;t<vecs.size();t++)
+  for(unsigned t=0;t<vecs.size();t++)
   {
-    for(int i=0;i<mts.size();i++)
+    for(unsigned i=0;i<mts.size();i++)
     {
       row=mts[i][0];
       col=mts[i][1];
@@ -3147,9 +3103,9 @@ std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs, std::
   std::vector<int> pv;
   std::vector<int> base;
   std::vector<std::vector<int> > bases;
-  for(int t=0;t<vecs.size();t++)
+  for(unsigned t=0;t<vecs.size();t++)
   {
-    for(int i=0;i<mvs.size();i++)
+    for(unsigned i=0;i<mvs.size();i++)
     {
       pv=phimagel(mvs[i], av, bv);
       for(j=0;j<lks.size();j++)
@@ -3292,9 +3248,9 @@ std::vector<std::vector<int> > value2l(std::vector<std::vector<int> > mvs, std::
   {
 
   }
-  for(int t=0;t<vecs.size();t++)
+  for(unsigned t=0;t<vecs.size();t++)
   {
-    for(int i=0;i<mts.size();i++)
+    for(unsigned i=0;i<mts.size();i++)
     {
       row=mts[i][0];
       col=mts[i][1];
@@ -3885,7 +3841,7 @@ static std::vector<std::vector<int> > phi2(poly a, ideal Xo, ideal Sigma)
 
   std::vector<std::vector<int> > ss=p_new(Sigma, Xo), fvs;
   std::vector<int> av=support1(a), intvec, vv;
-  for(int i=0;i<ss.size();i++)
+  for(unsigned i=0;i<ss.size();i++)
   {
     intvec=vecIntersection(ss[i], av);
     if(intvec.size()==av.size())
@@ -4106,7 +4062,7 @@ std::vector<std::vector<int> > bsubsets_1(poly b)
 {
   std::vector<int>  bvs=support1(b), vs;
   std::vector<std::vector<int> > bset;
-  for(int i=0;i<bvs.size();i++)
+  for(unsigned i=0;i<bvs.size();i++)
   {
     for(int j=0;j!=i; j++)
     {
@@ -4750,7 +4706,7 @@ BOOLEAN tnabvl(leftv res, leftv args)
          ideal sub=psubset(q);
          sbv=supports(sub);
          std::vector<int> tnv =tnab(vecs,nvs,sbv);
-         for(int i=0;i<tnv.size();i++)
+         for(unsigned i=0;i<tnv.size();i++)
          {
            tnbr.push_back(nvs[tnv[i]]);
          }
@@ -4825,7 +4781,7 @@ BOOLEAN nabtvl(leftv res, leftv args)
          ntvs=nabtv( hvs, nv, av, bv);
          std::vector<std::vector<poly> > pvs=idMakei(nv,ntvs);
          ideal gens=idInit(1,1);
-         for(int i=0;i<pvs.size();i++)
+         for(unsigned i=0;i<pvs.size();i++)
          {
            idInsertPoly(gens,pvs[i][0]);
            idInsertPoly(gens,pvs[i][1]);

@@ -760,7 +760,7 @@ static BOOLEAN executeProc(sleftv &result,
   }
   memset(&result, 0, sizeof(result));
   leftv *tail = &procnode->next;
-  for (int i = 0; i < argv.size(); i++) {
+  for (unsigned i = 0; i < argv.size(); i++) {
     *tail = argv[i];
     tail = &(*tail)->next;
   }
@@ -1687,14 +1687,14 @@ public:
   }
   int threadpool_size(ThreadPool *pool) {
     int n;
-    for (int i = 0; i <thread_owners.size(); i++) {
+    for (unsigned i = 0; i <thread_owners.size(); i++) {
       if (thread_owners[i] == pool)
         n++;
     }
     return n;
   }
   virtual ~Scheduler() {
-    for (int i = 0; i < thread_queues.size(); i++) {
+    for (unsigned i = 0; i < thread_queues.size(); i++) {
       JobQueue *q = thread_queues[i];
       while (!q->empty()) {
         Job *job = q->front();
@@ -1728,7 +1728,7 @@ public:
       response.wait();
     }
     lock.unlock();
-    for (int i = 0; i <threads.size(); i++) {
+    for (unsigned i = 0; i <threads.size(); i++) {
       joinThread(threads[i]);
     }
   }
@@ -1775,7 +1775,7 @@ public:
   }
   void broadcastJob(ThreadPool *pool, Job *job) {
     lock.lock();
-    for (int i = 0; i <thread_queues.size(); i++) {
+    for (unsigned i = 0; i <thread_queues.size(); i++) {
       if (thread_owners[i] == pool) {
 	acquireShared(job);
 	thread_queues[i]->push(job);
@@ -1785,7 +1785,7 @@ public:
   }
   void cancelDeps(Job * job) {
     vector<Job *> &notify = job->notify;
-    for (int i = 0; i <notify.size(); i++) {
+    for (unsigned i = 0; i <notify.size(); i++) {
       Job *next = notify[i];
       if (!next->cancelled) {
         cancelJob(next);
@@ -1829,7 +1829,7 @@ public:
   static void notifyDeps(Scheduler *scheduler, Job *job) {
     vector<Job *> &notify = job->notify;
     job->incref(notify.size());
-    for (int i = 0; i <notify.size(); i++) {
+    for (unsigned i = 0; i <notify.size(); i++) {
       Job *next = notify[i];
       if (!next->queued && next->ready() && !next->cancelled) {
         next->queued = true;
@@ -1840,7 +1840,7 @@ public:
     leftv arg = NULL;
     if (triggers.size() > 0 && job->result.size() > 0)
       arg = LinTree::from_string(job->result);
-    for (int i = 0; i < triggers.size(); i++) {
+    for (unsigned i = 0; i < triggers.size(); i++) {
       Trigger *trigger = triggers[i];
       if (trigger->accept(arg)) {
         trigger->activate(arg);
@@ -2017,7 +2017,7 @@ public:
   virtual void execute() {
     lists l = (lists) omAlloc0Bin(slists_bin);
     l->Init(args.size());
-    for (int i = 0; i < args.size(); i++) {
+    for (unsigned i = 0; i < args.size(); i++) {
       leftv val = LinTree::from_string(args[i]);
       memcpy(&l->m[i], val, sizeof(*val));
       omFreeBin(val, sleftv_bin);
@@ -2102,7 +2102,7 @@ public:
     if (!ready()) {
       pool->scheduler->lock.unlock();
       vector<leftv> argv;
-      for (int i = 0; i < args.size(); i++) {
+      for (unsigned i = 0; i < args.size(); i++) {
         appendArg(argv, args[i]);
       }
       int error = false;
@@ -2419,7 +2419,7 @@ public:
     memset(&val, 0, sizeof(val));
     if (argv.size() > 0) {
       leftv *tail = &argv[0]->next;
-      for (int i = 1; i < argv.size(); i++) {
+      for (unsigned i = 1; i < argv.size(); i++) {
 	*tail = argv[i];
 	tail = &(*tail)->next;
       }
