@@ -7025,17 +7025,14 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (strat->S[j]!= NULL && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
             (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
-        {
-            break;
-        }
   #else
         if (!(sev[j] & not_sev) &&
             (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
             p_LmDivisibleBy(strat->S[j], p, r))
-        {
-          break;
-        }
   #endif
+        {
+            break;
+        }
         j++;
       }
     }
@@ -7050,18 +7047,15 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
         && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r)
         && (ecart== LONG_MAX || ecart>= strat->ecartS[j])
         && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
-        {
-          break; // found
-        }
   #else
         if (!(sev[j] & not_sev)
         && (ecart== LONG_MAX || ecart>= strat->ecartS[j])
         && p_LmDivisibleBy(strat->S[j], p, r)
         && n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r->cf))
+  #endif
         {
           break; // found
         }
-  #endif
         j++;
       }
     }

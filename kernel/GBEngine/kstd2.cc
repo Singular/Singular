@@ -295,19 +295,15 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if ((T[j].p!=NULL)
         && p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
-        {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
-            return j;
-        }
 #else
         if (!(sevT[j] & not_sev)
         && (T[j].p!=NULL)
         && p_LmDivisibleBy(T[j].p, p, r))
+#endif
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r->cf))
             return j;
         }
-#endif
         j++;
       }
     }
@@ -319,17 +315,14 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if ((T[j].p!=NULL)
         && p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
-        {
-          return j;
-        }
 #else
         if (!(sevT[j] & not_sev)
         && (T[j].p!=NULL)
         && p_LmDivisibleBy(T[j].p, p, r))
+#endif
         {
           return j;
         }
-#endif
         j++;
       }
     }
@@ -346,18 +339,14 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
-        {
-          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r->cf))
-            return j;
-        }
 #else
         if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
+#endif
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r->cf))
             return j;
         }
-#endif
         j++;
       }
     }
@@ -369,16 +358,13 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
         if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
-        {
-          return j;
-        }
 #else
         if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
+#endif
         {
           return j;
         }
-#endif
         j++;
       }
     }
@@ -417,18 +403,14 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-      {
-        if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing->cf))
-          return j;
-      }
 #else
       if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
+#endif
       {
         if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing->cf))
           return j;
       }
-#endif
       j++;
     }
   }
@@ -440,16 +422,13 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-      {
-        return j;
-      }
 #else
       if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
+#endif
       {
         return j;
       }
-#endif
       j++;
     }
   }
@@ -475,18 +454,14 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-      {
-        if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing->cf))
-          return j;
-      }
 #else
       if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
+#endif
       {
         if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing->cf))
           return j;
       }
-#endif
       j++;
     }
   }
@@ -498,16 +473,13 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-      {
-        return j;
-      }
 #else
       if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
+#endif
       {
         return j;
       }
-#endif
       j++;
     }
   }
