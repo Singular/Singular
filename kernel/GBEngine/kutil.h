@@ -416,7 +416,6 @@ public:
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
 void deleteHC(LObject* L, kStrategy strat, BOOLEAN fromNext = FALSE);
 void deleteInS (int i,kStrategy strat);
-void deleteInSSba (int i,kStrategy strat);
 void cleanT (kStrategy strat);
 static inline LSet initL (int nr=setmaxL)
 { return (LSet)omAlloc(nr*sizeof(LObject)); }

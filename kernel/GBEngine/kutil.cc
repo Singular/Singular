@@ -1208,62 +1208,6 @@ void deleteInS (int i,kStrategy strat)
   strat->sl--;
 }
 
-
-/*2
-*cancels the i-th polynomial in the standardbase s
-*/
-void deleteInSSba (int i,kStrategy strat)
-{
-#ifdef ENTER_USE_MEMMOVE
-  memmove(&(strat->S[i]), &(strat->S[i+1]), (strat->sl - i)*sizeof(poly));
-  memmove(&(strat->sig[i]), &(strat->sig[i+1]), (strat->sl - i)*sizeof(poly));
-  memmove(&(strat->ecartS[i]),&(strat->ecartS[i+1]),(strat->sl - i)*sizeof(int));
-  memmove(&(strat->sevS[i]),&(strat->sevS[i+1]),(strat->sl - i)*sizeof(unsigned long));
-  memmove(&(strat->sevSig[i]),&(strat->sevSig[i+1]),(strat->sl - i)*sizeof(unsigned long));
-  memmove(&(strat->S_2_R[i]),&(strat->S_2_R[i+1]),(strat->sl - i)*sizeof(int));
-#else
-  int j;
-  for (j=i; j<strat->sl; j++)
-  {
-    strat->S[j] = strat->S[j+1];
-    strat->sig[j] = strat->sig[j+1];
-    strat->ecartS[j] = strat->ecartS[j+1];
-    strat->sevS[j] = strat->sevS[j+1];
-    strat->sevSig[j] = strat->sevSig[j+1];
-    strat->S_2_R[j] = strat->S_2_R[j+1];
-  }
-#endif
-  if (strat->lenS!=NULL)
-  {
-#ifdef ENTER_USE_MEMMOVE
-    memmove(&(strat->lenS[i]),&(strat->lenS[i+1]),(strat->sl - i)*sizeof(int));
-#else
-    for (j=i; j<strat->sl; j++) strat->lenS[j] = strat->lenS[j+1];
-#endif
-  }
-  if (strat->lenSw!=NULL)
-  {
-#ifdef ENTER_USE_MEMMOVE
-    memmove(&(strat->lenSw[i]),&(strat->lenSw[i+1]),(strat->sl - i)*sizeof(wlen_type));
-#else
-    for (j=i; j<strat->sl; j++) strat->lenSw[j] = strat->lenSw[j+1];
-#endif
-  }
-  if (strat->fromQ!=NULL)
-  {
-#ifdef ENTER_USE_MEMMOVE
-    memmove(&(strat->fromQ[i]),&(strat->fromQ[i+1]),(strat->sl - i)*sizeof(int));
-#else
-    for (j=i; j<strat->sl; j++)
-    {
-      strat->fromQ[j] = strat->fromQ[j+1];
-    }
-#endif
-  }
-  strat->S[strat->sl] = NULL;
-  strat->sl--;
-}
-
 #ifdef HAVE_SHIFTBBA
 static BOOLEAN is_shifted_p1(const poly p, const kStrategy strat)
 {
