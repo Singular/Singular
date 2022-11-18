@@ -7147,6 +7147,81 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
   }
 }
 
+TObject* kFindDivisibleByInS_T_noCF(kStrategy strat, int end_pos, LObject* L, TObject *T, long ecart)
+{
+  int j = 0;
+  const unsigned long not_sev = ~L->sev;
+  const unsigned long* sev = strat->sevS;
+  poly p;
+  ring r;
+  L->GetLm(p, r);
+
+  assume(~not_sev == p_GetShortExpVector(p, r));
+
+  if (r == currRing)
+  {
+    loop
+    {
+      if (j > end_pos) return NULL;
+  #if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (strat->S[j]!= NULL && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
+          (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+  #else
+      if (!(sev[j] & not_sev) &&
+          (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
+          p_LmDivisibleBy(strat->S[j], p, r))
+  #endif
+      {
+          break;
+      }
+      j++;
+    }
+    // if called from NF, T objects do not exist:
+    if (strat->tl < 0 || strat->S_2_R[j] == -1)
+    {
+      T->Set(strat->S[j], r, strat->tailRing);
+      assume(T->GetpLength()==pLength(T->p != __null ? T->p : T->t_p));
+      return T;
+    }
+    else
+    {
+      return strat->S_2_T(j);
+    }
+  }
+  else
+  {
+    TObject* t;
+    loop
+    {
+      if (j > end_pos) return NULL;
+      assume(strat->S_2_R[j] != -1);
+  #if defined(PDEBUG) || defined(PDIV_DEBUG)
+      t = strat->S_2_T(j);
+      assume(t != NULL && t->t_p != NULL && t->tailRing == r);
+      if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r)
+      && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+      {
+        t->pLength=pLength(t->t_p);
+        return t;
+      }
+  #else
+      if (! (sev[j] & not_sev)
+      && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+      {
+        t = strat->S_2_T(j);
+        assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
+        if (p_LmDivisibleBy(t->t_p, p, r))
+        {
+          t->pLength=pLength(t->t_p);
+          return t;
+        }
+      }
+  #endif
+      j++;
+    }
+  }
+}
+
 poly redtail (LObject* L, int end_pos, kStrategy strat)
 {
   poly h, hn;
@@ -7623,39 +7698,6 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
       // test divisibility of coefs:
       poly p_Ln=Ln.GetLmCurrRing();
       poly p_With=With->GetLmCurrRing();
-      number z=n_IntMod(pGetCoeff(p_Ln),pGetCoeff(p_With), currRing->cf);
-      if (!nIsZero(z))
-      {
-        // subtract z*Ln, add z.Ln to L
-        poly m=pHead(p_Ln);
-        pSetCoeff(m,z);
-        poly mm=pHead(m);
-        pNext(h) = m;
-        pIter(h);
-        L->pLength++;
-        mm=pNeg(mm);
-        if (Ln.bucket!=NULL)
-        {
-          int dummy=1;
-          kBucket_Add_q(Ln.bucket,mm,&dummy);
-        }
-        else
-        {
-          if ((Ln.t_p!=NULL)&&(Ln.p==NULL))
-            Ln.GetP();
-          if (Ln.p!=NULL)
-          {
-            Ln.p=pAdd(Ln.p,mm);
-            if (Ln.t_p!=NULL)
-            {
-              pNext(Ln.t_p)=NULL;
-              p_LmDelete(Ln.t_p,strat->tailRing);
-            }
-          }
-        }
-      }
-      else
-        nDelete(&z);
 
       if (ksReducePolyTail_Z(L, With, &Ln))
       {
@@ -7693,6 +7735,31 @@ poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat )
   //L->Normalize(); // HANNES: should have a test
   kTest_L(L,strat);
   return L->GetLmCurrRing();
+}
+
+poly redtailBba_NF (poly p, kStrategy strat )
+{
+  strat->redTailChange=FALSE;
+  if (strat->noTailReduction) return p;
+  if ((p==NULL) || (pNext(p)==NULL))
+    return p;
+
+  int max_ind;
+  poly h=p;
+  p=pNext(p);
+  pNext(h)=NULL;
+  while(p!=NULL)
+  {
+    p=redNF(p,max_ind,1,strat);
+    if (p!=NULL)
+    {
+      poly hh=p;
+      p=pNext(p);
+      pNext(hh)=NULL;
+      h=p_Add_q(h,hh,currRing);
+    }
+  }
+  return h;
 }
 
 poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat )
