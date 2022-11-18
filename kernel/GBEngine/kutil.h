@@ -857,8 +857,6 @@ static inline int kFindInL1(const poly p, const kStrategy strat)
   return -1;
 }
 
-poly pCopyL2p(LObject h, kStrategy strat);
-
 void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
 BOOLEAN enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);

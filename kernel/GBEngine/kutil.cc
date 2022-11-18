@@ -6125,45 +6125,6 @@ inline int getIndexRng(long coeff)
   return ind;
 }
 
-int posInLrg0 (const LSet set, const int length,
-              LObject* p,const kStrategy)
-/*          if (nGreater(pGetCoeff(p), pGetCoeff(set[an]))) return en;
-        if (pLmCmp(set[i],p) == cmp_int)         en = i;
-        else if (pLmCmp(set[i],p) == -cmp_int)   an = i;
-        else
-        {
-          if (nGreater(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
-          else en = i;
-        }*/
-{
-  if (length < 0) return 0;
-
-  int o = p->GetpFDeg();
-  int op = set[length].GetpFDeg();
-
-  if ((op > o) || ((op == o) && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))
-    return length + 1;
-  int i;
-  int an = 0;
-  int en = length;
-  loop
-  {
-    if (an >= en - 1)
-    {
-      op = set[an].GetpFDeg();
-      if ((op > o) || ((op == o) && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))
-        return en;
-      return an;
-    }
-    i = (an+en) / 2;
-    op = set[i].GetpFDeg();
-    if ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
-      an = i;
-    else
-      en = i;
-  }
-}
-
 /*{
   if (length < 0) return 0;
 
@@ -11731,7 +11692,6 @@ void kDebugPrint(kStrategy strat)
     else if (strat->posInL==posInL17_cRing) printf("posInL17_cRing\n");
     #endif
     else if (strat->posInL==posInLSpecial) printf("posInLSpecial\n");
-    else if (strat->posInL==posInLrg0) printf("posInLrg0\n");
     else  printf("%p\n",(void*)strat->posInL);
   printf("enterS: ");
     if (strat->enterS==enterSBba) printf("enterSBba\n");
@@ -11813,97 +11773,12 @@ void kDebugPrint(kStrategy strat)
 #endif
 }
 
-#ifdef HAVE_SHIFTBBA
-poly pCopyL2p(LObject H, kStrategy strat)
-{
-  /* restores a poly in currRing from LObject */
-  LObject h = H;
-  h.Copy();
-  poly p;
-  if (h.p == NULL)
-  {
-    if (h.t_p != NULL)
-    {
-      p = prMoveR(h.t_p, /* source ring: */ strat->tailRing, /* dest. ring: */ currRing);
-      return(p);
-    }
-    else
-    {
-      /* h.tp == NULL -> the object is NULL */
-      return(NULL);
-    }
-  }
-  /* we're here if h.p != NULL */
-  if (h.t_p == NULL)
-  {
-    /* then h.p is the whole poly in currRing */
-    p = h.p;
-    return(p);
-  }
-  /* we're here if h.p != NULL and h.t_p != NULL */
-  // clean h.p, get poly from t_p
-  pNext(h.p)=NULL;
-  pLmDelete(&h.p);
-  p = prMoveR(h.t_p, /* source ring: */ strat->tailRing,
-                     /* dest. ring: */ currRing);
-  // no need to clean h: we re-used the polys
-  return(p);
-}
-#endif
-
 //LObject pCopyp2L(poly p, kStrategy strat)
 //{
     /* creates LObject from the poly in currRing */
   /* actually put p into L.p and make L.t_p=NULL : does not work */
 
 //}
-
-// poly pCopyL2p(LObject H, kStrategy strat)
-// {
-//   /* restores a poly in currRing from LObject */
-//   LObject h = H;
-//   h.Copy();
-//   poly p;
-//   if (h.p == NULL)
-//   {
-//     if (h.t_p != NULL)
-//     {
-//       p = p_ShallowCopyDelete(h.t_p, (strat->tailRing != NULL ? strat->tailRing : currRing), strat->tailBin);
-//       return(p);
-//     }
-//     else
-//     {
-//       /* h.tp == NULL -> the object is NULL */
-//       return(NULL);
-//     }
-//   }
-//   /* we're here if h.p != NULL */
-
-//   if (h.t_p == NULL)
-//   {
-//     /* then h.p is the whole poly in tailRing */
-//     if (strat->tailBin != NULL && (pNext(h.p) != NULL))
-//     {
-//       p = p_ShallowCopyDelete(h.p, (strat->tailRing != NULL ? strat->tailRing : currRing), strat->tailBin);
-//     }
-//     return(p);
-//   }
-//   /* we're here if h.p != NULL and h.t_p != NULL */
-//   p = pCopy(pHead(h.p)); // in currRing
-//   if (strat->tailBin != NULL && (pNext(h.p) != NULL))
-//   {
-//     //    pNext(p) = p_ShallowCopyDelete(pNext(h.t_p), (strat->tailRing != NULL ? strat->tailRing : currRing), strat->tailBin);
-//     poly pp = p_Copy(pNext(h.p), strat->tailRing);
-//     //    poly p3 = p_Copy(pNext(h.p), currRing); // error
-//       // p_ShallowCopyDelete(pNext(h.p), currRing, strat->tailBin); // the same as pp
-//     poly p5 = p_ShallowCopyDelete(pNext(h.p), strat->tailRing, strat->tailBin);
-//     pNext(p) = p_ShallowCopyDelete(h.t_p, strat->tailRing, strat->tailBin);
-//     poly p4 = p_Copy(h.t_p, strat->tailRing);
-//     //    if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
-//   }
-//   //  pTest(p);
-//   return(p);
-// }
 
 /*2
 * put the  lcm(q,p)  into the set B, q is the shift of some s[i]
