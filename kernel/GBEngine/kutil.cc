@@ -5944,78 +5944,6 @@ int posInLSigRing (const LSet set, const int length,
   }
 }
 
-int posInLRing (const LSet set, const int length,
-               LObject* p,const kStrategy /*strat*/)
-{
-  if (length < 0) return 0;
-  if (set[length].FDeg > p->FDeg)
-        return length+1;
-  if (set[length].FDeg == p->FDeg)
-    if(set[length].GetpLength() > p->GetpLength())
-          return length+1;
-  int i;
-  int an = 0;
-  int en= length+1;
-  loop
-  {
-    if (an >= en-1)
-    {
-      if(an == en)
-        return en;
-      if (set[an].FDeg > p->FDeg)
-        return en;
-      if(set[an].FDeg == p->FDeg)
-      {
-        if(set[an].GetpLength() > p->GetpLength())
-          return en;
-        else
-        {
-          if(set[an].GetpLength() == p->GetpLength())
-          {
-            if(nGreater(set[an].p->coef, p->p->coef))
-              return en;
-            else
-              return an;
-          }
-          else
-          {
-            return an;
-          }
-        }
-      }
-      else
-        return an;
-    }
-    i=(an+en) / 2;
-    if (set[i].FDeg > p->FDeg)
-      an=i;
-    else
-    {
-      if(set[i].FDeg == p->FDeg)
-      {
-        if(set[i].GetpLength() > p->GetpLength())
-          an=i;
-        else
-        {
-          if(set[i].GetpLength() == p->GetpLength())
-          {
-            if(nGreater(set[i].p->coef, p->p->coef))
-              an = i;
-            else
-              en = i;
-          }
-          else
-          {
-            en=i;
-          }
-        }
-      }
-      else
-        en=i;
-    }
-  }
-}
-
 // for sba, sorting syzygies
 int posInSyz (const kStrategy strat, poly sig)
 {
@@ -9959,7 +9887,6 @@ BOOLEAN kPosInLDependsOnLength(int (*pos_in_l)
   ||  pos_in_l == posInL10
   #ifdef HAVE_RINGS
   ||  pos_in_l == posInL110Ring
-  ||  pos_in_l == posInLRing
   #endif
   )
     return TRUE;

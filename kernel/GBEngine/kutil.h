@@ -461,8 +461,6 @@ int posInLSig (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInLSigRing (const LSet set, const int length,
                LObject* L,const kStrategy strat);
-int posInLRing (const LSet set, const int length,
-               LObject* L,const kStrategy strat);
 int posInSyz (const kStrategy strat, const poly sig);
 int posInL0 (const LSet set, const int length,
              LObject* L,const kStrategy strat);

@@ -1667,7 +1667,7 @@ static inline int p_LtCmpNoAbs(poly p, poly q, const ring r)
 
 #ifdef HAVE_RINGS
 // This is the equivalent of pLmCmp(p,q) != -currRing->OrdSgn for rings
-// It is used in posInLRing and posInTRing
+// It is used in posInTRing
 static inline int p_LtCmpOrdSgnDiffM(poly p, poly q, const ring r)
 {
   return(p_LtCmp(p,q,r) == r->OrdSgn);
@@ -1676,7 +1676,7 @@ static inline int p_LtCmpOrdSgnDiffM(poly p, poly q, const ring r)
 
 #ifdef HAVE_RINGS
 // This is the equivalent of pLmCmp(p,q) != currRing->OrdSgn for rings
-// It is used in posInLRing and posInTRing
+// It is used in posInTRing
 static inline int p_LtCmpOrdSgnDiffP(poly p, poly q, const ring r)
 {
   if(r->OrdSgn == 1)
@@ -1692,7 +1692,7 @@ static inline int p_LtCmpOrdSgnDiffP(poly p, poly q, const ring r)
 
 #ifdef HAVE_RINGS
 // This is the equivalent of pLmCmp(p,q) == -currRing->OrdSgn for rings
-// It is used in posInLRing and posInTRing
+// It is used in posInTRing
 static inline int p_LtCmpOrdSgnEqM(poly p, poly q, const ring r)
 {
   return(p_LtCmp(p,q,r) == -r->OrdSgn);
@@ -1701,7 +1701,7 @@ static inline int p_LtCmpOrdSgnEqM(poly p, poly q, const ring r)
 
 #ifdef HAVE_RINGS
 // This is the equivalent of pLmCmp(p,q) == currRing->OrdSgn for rings
-// It is used in posInLRing and posInTRing
+// It is used in posInTRing
 static inline int p_LtCmpOrdSgnEqP(poly p, poly q, const ring r)
 {
   return(p_LtCmp(p,q,r) == r->OrdSgn);
