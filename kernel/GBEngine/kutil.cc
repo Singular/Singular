@@ -5049,82 +5049,6 @@ int posInT11Ring (const TSet set,const int length,LObject &p)
 }
 #endif
 
-/*2 Pos for rings T: Here I am
-* looks up the position of p in T
-* set[0] is the smallest with respect to the ordering-procedure
-* totaldegree,pComp
-*/
-int posInTrg0 (const TSet set,const int length,LObject &p)
-{
-  if (length==-1) return 0;
-  int o = p.GetpFDeg();
-  int op = set[length].GetpFDeg();
-  int i;
-  int an = 0;
-  int en = length;
-  int cmp_int = currRing->OrdSgn;
-  if ((op < o) || (pLmCmp(set[length].p,p.p)== -cmp_int))
-    return length+1;
-  int cmp;
-  loop
-  {
-    if (an >= en-1)
-    {
-      op = set[an].GetpFDeg();
-      if (op > o) return an;
-      if (op < 0) return en;
-      cmp = pLmCmp(set[an].p,p.p);
-      if (cmp == cmp_int)  return an;
-      if (cmp == -cmp_int) return en;
-      if (nGreater(pGetCoeff(p.p), pGetCoeff(set[an].p))) return en;
-      return an;
-    }
-    i = (an + en) / 2;
-    op = set[i].GetpFDeg();
-    if (op > o)       en = i;
-    else if (op < o)  an = i;
-    else
-    {
-      cmp = pLmCmp(set[i].p,p.p);
-      if (cmp == cmp_int)                                     en = i;
-      else if (cmp == -cmp_int)                               an = i;
-      else if (nGreater(pGetCoeff(p.p), pGetCoeff(set[i].p))) an = i;
-      else                                                    en = i;
-    }
-  }
-}
-/*
-  int o = p.GetpFDeg();
-  int op = set[length].GetpFDeg();
-
-  if ((op < o)
-  || ((op == o) && (pLmCmp(set[length].p,p.p) != currRing->OrdSgn)))
-    return length+1;
-
-  int i;
-  int an = 0;
-  int en= length;
-
-  loop
-  {
-    if (an >= en-1)
-    {
-      op= set[an].GetpFDeg();
-      if ((op > o)
-      || (( op == o) && (pLmCmp(set[an].p,p.p) == currRing->OrdSgn)))
-        return an;
-      return en;
-    }
-    i=(an+en) / 2;
-    op = set[i].GetpFDeg();
-    if (( op > o)
-    || (( op == o) && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
-      en=i;
-    else
-      an=i;
-  }
-}
-  */
 /*2
 * looks up the position of p in T
 * set[0] is the smallest with respect to the ordering-procedure
@@ -11671,7 +11595,6 @@ void kDebugPrint(kStrategy strat)
     else if (strat->posInT==posInT_pLength) printf("posInT_pLength\n");
 #endif
     else if (strat->posInT==posInT_EcartpLength) printf("posInT_EcartpLength\n");
-    else if (strat->posInT==posInTrg0) printf("posInTrg0\n");
     else  printf("%p\n",(void*)strat->posInT);
   printf("posInL: ");
     if (strat->posInL==posInL0) printf("posInL0\n");
