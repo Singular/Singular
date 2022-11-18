@@ -857,10 +857,6 @@ static inline int kFindInL1(const poly p, const kStrategy strat)
   return -1;
 }
 
-poly pMove2CurrTail(poly p, kStrategy strat);
-
-poly pMoveCurrTail2poly(poly p, kStrategy strat);
-
 poly pCopyL2p(LObject h, kStrategy strat);
 
 void enterTShift(LObject p, kStrategy strat, int atT = -1);

@@ -11889,37 +11889,6 @@ void kDebugPrint(kStrategy strat)
 }
 
 #ifdef HAVE_SHIFTBBA
-poly pMove2CurrTail(poly p, kStrategy strat)
-{
-  /* assume: p is completely in currRing */
-  /* produces an object with LM in curring
-     and TAIL in tailring */
-  if (pNext(p)!=NULL)
-  {
-    pNext(p) = prMoveR(pNext(p), /* src */ currRing, /* dest */ strat->tailRing);
-  }
-  return(p);
-}
-#endif
-
-#ifdef HAVE_SHIFTBBA
-poly pMoveCurrTail2poly(poly p, kStrategy strat)
-{
-  /* assume: p has  LM in curring and TAIL in tailring */
-  /* convert it to complete currRing */
-
-  /* check that LM is in currRing */
-  assume(p_LmCheckIsFromRing(p, currRing));
-
-  if (pNext(p)!=NULL)
-  {
-    pNext(p) = prMoveR(pNext(p), /* src */ strat->tailRing, /* dest */currRing);
-  }
-  return(p);
-}
-#endif
-
-#ifdef HAVE_SHIFTBBA
 poly pCopyL2p(LObject H, kStrategy strat)
 {
   /* restores a poly in currRing from LObject */
@@ -12805,7 +12774,6 @@ BOOLEAN enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy str
 
     /* ksCreateShortSpoly needs two Lobject-kind presentations */
     /* p is already in this form, so convert q */
-    //    q = pMove2CurrTail(q, strat);
     Lp.p = ksCreateShortSpoly(q, p, strat->tailRing);
       //  }
   }
