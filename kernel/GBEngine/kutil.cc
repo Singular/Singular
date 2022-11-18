@@ -719,26 +719,6 @@ BOOLEAN isInPairsetL(int length,poly p1,poly p2,int*  k,kStrategy strat)
   }
 }
 
-/*2
-*in B all pairs have the same element p on the right
-*it tests whether (q,p) is in B and returns TRUE if yes
-*and the position k
-*/
-BOOLEAN isInPairsetB(poly q,int*  k,kStrategy strat)
-{
-  LObject *p=&(strat->B[strat->Bl]);
-
-  *k = strat->Bl;
-  loop
-  {
-    if ((*k) < 0) return FALSE;
-    if (q == (*p).p1)
-      return TRUE;
-    (*k)--;
-    p--;
-  }
-}
-
 int kFindInT(poly p, TSet T, int tlength)
 {
   int i;
