@@ -2178,7 +2178,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
   if ((strat->ak!=0)
-  && (strat->kAllAxis))
+  && (strat->kAllAxis)) /*never true for ring-cf*/
   {
     if (strat->ak!=1)
     {

@@ -52,11 +52,12 @@ static inline number nrz_short(number x)
 #if CF_DEBUG
   StringAppendS(")");
 #endif
+  nrzTest(x);
   return x;
 }
 
 
-static int nrzSize(number a, const coeffs)
+int nrzSize(number a, const coeffs)
 {
   if (a==INT_TO_SR(0)) return 0;
   if (n_Z_IS_SMALL(a)) return 1;
@@ -140,7 +141,6 @@ number nrzMult (number a, number b, const coeffs R)
   }
 }
 
-
 static long int_gcd(long a, long b)
 {
   long r;
@@ -154,7 +154,7 @@ static long int_gcd(long a, long b)
     a = b;
     b = r;
   } while (b);
-  return ABS(a); // % in c doeas not imply a signn
+  return ABS(a); // % in C does not imply a sign
                  // it would be unlikely to see a negative here
                  // but who knows
 }
@@ -194,6 +194,7 @@ static number nrzLcm (number a, number b, const coeffs R)
       mpz_lcm(erg, (mpz_ptr) a, (mpz_ptr) b);
     }
   }
+  nrzTest((number)erg);
   return (number) erg;
 }
 
@@ -202,6 +203,7 @@ static number nrzCopy(number a, const coeffs)
   if (n_Z_IS_SMALL(a)) return a;
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (mpz_ptr) a);
+  nrzTest((number)erg);
   return (number) erg;
 }
 
@@ -235,6 +237,7 @@ static number nrzGcd (number a,number b,const coeffs R)
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     mpz_init(erg);
     mpz_gcd(erg, (mpz_ptr) a, (mpz_ptr) b);
+    nrzTest((number)erg);
     return (number) erg;
   }
 }
@@ -488,9 +491,9 @@ static number nrzQuotRem (number a, number b, number * r, const coeffs )
   {
     mpz_clear(rr);
   }
-  qq=nrz_short(qq);
-  nrzTest((number)qq);
-  return (number) qq;
+  number res=nrz_short((number)qq);
+  nrzTest(res);
+  return res;
 }
 
 static void nrzPower (number a, int i, number * result, const coeffs)
@@ -525,7 +528,7 @@ static number nrzInitMPZ(mpz_t m, const coeffs)
 }
 
 
-static void nrzDelete(number *a, const coeffs)
+void nrzDelete(number *a, const coeffs)
 {
   if (*a == NULL) return;
   if (n_Z_IS_SMALL(*a)==0)
@@ -741,10 +744,10 @@ static int nrzDivComp(number a, number b, const coeffs r)
   return 0;
 }
 
-static number nrzDiv (number a,number b, const coeffs)
+static number nrzDiv (number a,number b, const coeffs cf)
 {
   assume(SR_TO_INT(b));
-  if (nrzIsZero(b))
+  if (nrzIsZero(b,cf))
   {
     WerrorS(nDivBy0);
     return INT_TO_SR(0);
@@ -811,11 +814,11 @@ static number nrzDiv (number a,number b, const coeffs)
   return nrz_short((number) erg);
 }
 
-static number nrzExactDiv (number a,number b, const coeffs)
+static number nrzExactDiv (number a,number b, const coeffs cf)
 {
   assume(SR_TO_INT(b));
   mpz_t aa, bb;
-  if (nrzIsZero(b))
+  if (nrzIsZero(b,cf))
   {
     WerrorS(nDivBy0);
     return INT_TO_SR(0);
@@ -833,8 +836,7 @@ static number nrzExactDiv (number a,number b, const coeffs)
   mpz_tdiv_q(erg, (mpz_ptr) aa, (mpz_ptr) bb);
   mpz_clear(aa);
   mpz_clear(bb);
-  nrzTest((number)erg);
-  return (number) erg;
+  return nrz_short((number) erg);
 }
 
 static number nrzIntMod (number a,number b, const coeffs)
@@ -949,6 +951,7 @@ static number nrzFarey(number r, number N, const coeffs R)
 
   nrzDelete(&a1, R);
   nrzDelete(&b1, R);
+  nrzTest(ab);
   return ab;
 }
 
@@ -1012,18 +1015,6 @@ static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   return NULL;      // default
 }
 
-
-/*
- * set the exponent (allocate and init tables) (TODO)
- */
-
-void nrzSetExp(int, coeffs)
-{
-}
-
-void nrzInitExp(int, coeffs)
-{
-}
 
 #ifdef LDEBUG
 BOOLEAN nrzDBTest (number x, const char *f, const int l, const coeffs)
@@ -1155,6 +1146,23 @@ static void nrzMPZ(mpz_t res, number &a, const coeffs)
     mpz_init_set(res, (mpz_ptr) a);
 }
 
+static number nrzEucNorm (number a, const coeffs )
+{
+  if (n_Z_IS_SMALL(a))
+  {
+    long aa=ABS(SR_TO_INT(a));
+    return INT_TO_SR(aa);
+  }
+  else
+  {
+    mpz_ptr abs = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+    mpz_init(abs);
+    mpz_abs(abs, (mpz_ptr)a);
+    nrzTest((number)abs);
+    return (number) abs;
+  }
+}
+
 static coeffs nrzQuot1(number c, const coeffs r)
 {
     mpz_t dummy;
@@ -1207,7 +1215,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfExtGcd = nrzExtGcd; // only for ring stuff
   r->cfXExtGcd = nrzXExtGcd; // only for ring stuff
   r->cfEucNorm = nrzEucNorm;
-  r->cfQuotRem = nrzSmallestQuotRem;
+  r->cfQuotRem = nrzQuotRem;
   r->cfDivBy = nrzDivBy; // only for ring stuff
   //#endif
   r->cfInpNeg   = nrzNeg;
