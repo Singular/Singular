@@ -6,6 +6,7 @@
 */
 #ifdef HAVE_RINGS
 #if SI_INTEGER_VARIANT == 3
+#define POW_2_28 (1L<<60)
 
 //make sure that a small number is an immediate integer
 //bascially copied from longrat.cc nlShort3
@@ -93,43 +94,36 @@ number nrzMult (number a, number b, const coeffs R)
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
   //from longrat.cc
-    if (SR_TO_INT(a)==0)
-      return a;
-    if (SR_TO_INT(b)==0)
-      return b;
+    if (a==INT_TO_SR(0)) return INT_TO_SR(0);
+    if (b==INT_TO_SR(0)) return INT_TO_SR(0);
     long r=(long)((unsigned long)(SR_HDL(a)-1L))*((unsigned long)(SR_HDL(b)>>1));
     if ((r/(SR_HDL(b)>>1))==(SR_HDL(a)-1L))
     {
       number u=((number) ((r>>1)+SR_INT));
-    //  if (((((long)SR_HDL(u))<<1)>>1)==SR_HDL(u)) return (u);
+      if (((((long)SR_HDL(u))<<1)>>1)==SR_HDL(u)) return (u);
       return nrzInit(SR_HDL(u)>>2, R);
     }
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
-    mpz_init(erg);
-    mpz_set_si(erg, SR_TO_INT(a));
+    mpz_init_set_si(erg, SR_TO_INT(a));
     mpz_mul_si(erg, erg, SR_TO_INT(b));
     nrzTest((number)erg);
-    return (number) erg;
+    return nrz_short((number) erg);
   }
   else if (n_Z_IS_SMALL(a))
   {
-    if (SR_TO_INT(a)==0)
-      return a;
+    if (a==INT_TO_SR(0)) return INT_TO_SR(0);
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     mpz_init_set(erg, (mpz_ptr) b);
     mpz_mul_si(erg, erg, SR_TO_INT(a));
-    nrzTest((number)erg);
-    return (number) erg;
+    return nrz_short((number) erg);
   }
   else if (n_Z_IS_SMALL(b))
   {
-    if (SR_TO_INT(b)==0)
-      return b;
+    if (b==INT_TO_SR(0)) return INT_TO_SR(0);
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     mpz_init_set(erg, (mpz_ptr) a);
     mpz_mul_si(erg, erg, SR_TO_INT(b));
-    nrzTest((number)erg);
-    return (number) erg;
+    return nrz_short((number) erg);
   }
   else
   {
@@ -137,7 +131,7 @@ number nrzMult (number a, number b, const coeffs R)
     mpz_init(erg);
     mpz_mul(erg, (mpz_ptr) a, (mpz_ptr) b);
     nrzTest((number)erg);
-    return (number) erg;
+    return nrz_short((number) erg);
   }
 }
 
@@ -448,52 +442,59 @@ static number _nrzQuotRem (number a, number b, number * r, const coeffs )
 static number nrzQuotRem (number a, number b, number * r, const coeffs )
 #endif
 {
-  assume(SR_TO_INT(b));
-  if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
-  {
-    if (r)
-      *r = INT_TO_SR(SR_TO_INT(a) % SR_TO_INT(b));
-    return INT_TO_SR(SR_TO_INT(a)/SR_TO_INT(b));
-  }
-  else if (n_Z_IS_SMALL(a))
-  {
-    //a is small, b is not, so q=0, r=a
-    if (r)
-      *r = a;
-    return INT_TO_SR(0);
-  }
-  else if (n_Z_IS_SMALL(b))
-  {
-    unsigned long rr;
-    mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
-    mpz_init(qq);
-    mpz_t rrr;
-    mpz_init(rrr);
-    rr = mpz_divmod_ui(qq, rrr, (mpz_ptr) a, (unsigned long)ABS(SR_TO_INT(b)));
-    mpz_clear(rrr);
-
-    if (r)
-      *r = INT_TO_SR(rr);
-    if (SR_TO_INT(b)<0)
-    {
-      mpz_mul_si(qq, qq, -1);
-    }
-    return nrz_short((number)qq);
-  }
-  mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin),
-             rr = (mpz_ptr) omAllocBin(gmp_nrz_bin);
+  mpz_ptr qq = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(qq);
+  mpz_ptr rr = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(rr);
-  mpz_divmod(qq, rr, (mpz_ptr)a, (mpz_ptr)b);
-  if (r)
-    *r = (number) rr;
+  mpz_t bb;
+  mpz_t aa;
+  int gsign;
+  if (SR_HDL(b) & SR_INT)
+  {
+    if (SR_HDL(b)<0) gsign=-1;
+    else             gsign=1;
+    mpz_init_set_si(bb,SR_TO_INT(b));
+  }
   else
   {
-    mpz_clear(rr);
+    gsign = mpz_sgn((mpz_ptr) b);
+    mpz_init_set(bb,(mpz_ptr) b);
   }
-  number res=nrz_short((number)qq);
-  nrzTest(res);
-  return res;
+  if (SR_HDL(a) & SR_INT)
+  {
+    mpz_init_set_si(aa,SR_TO_INT(a));
+  }
+  else
+  {
+    mpz_init_set(aa,(mpz_ptr) a);
+  }
+  mpz_t gg, ghalf;
+  mpz_init(gg);
+  mpz_init(ghalf);
+  mpz_abs(gg, bb);
+  mpz_fdiv_qr(qq, rr, aa, gg);
+  mpz_tdiv_q_2exp(ghalf, gg, 1);
+  if (mpz_cmp(rr, ghalf) > 0)  // r > ghalf
+    {
+      mpz_sub(rr, rr, gg);
+      mpz_add_ui(qq, qq, 1);
+    }
+  if (gsign < 0) mpz_neg(qq, qq);
+
+  mpz_clear(ghalf);
+  mpz_clear(gg);
+  mpz_clear(aa);
+  mpz_clear(bb);
+  if (r==NULL)
+  {
+    mpz_clear(rr);
+    omFreeBin(rr,gmp_nrz_bin);
+  }
+  else
+  {
+    *r=nrz_short((number)rr);
+  }
+  return nrz_short((number)qq);
 }
 
 static void nrzPower (number a, int i, number * result, const coeffs)
@@ -570,20 +571,22 @@ static number nrzAdd (number a, number b, const coeffs )
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    long c = SR_TO_INT(a) + SR_TO_INT(b);
+    long c = SR_HDL(a)+SR_HDL(b)-1L;
     if (INT_IS_SMALL(c))
-      return INT_TO_SR(c);
+      return (number)c;
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
-    mpz_init_set_si(erg, c);
-
-    nrzTest((number)erg);
-    return (number) erg;
+    mpz_init_set_si(erg,SR_TO_INT(a));
+    if (SR_HDL(b)>0)
+      mpz_add_ui(erg, erg, (unsigned long)SR_TO_INT(b));
+    else
+      mpz_sub_ui(erg, erg, (unsigned long)-(SR_TO_INT(b)));
+    return nrz_short((number)erg);
   }
   else if (n_Z_IS_SMALL(a))
   {
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     mpz_init(erg);
-    if (SR_TO_INT(a)>0)
+    if (SR_HDL(a)>0)
       mpz_add_ui(erg, (mpz_ptr) b, (unsigned long)SR_TO_INT(a));
     else
       mpz_sub_ui(erg, (mpz_ptr) b, (unsigned long)-(SR_TO_INT(a)));
@@ -593,7 +596,7 @@ static number nrzAdd (number a, number b, const coeffs )
   {
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     mpz_init(erg);
-    if (SR_TO_INT(b)>0)
+    if (SR_HDL(b)>0)
       mpz_add_ui(erg, (mpz_ptr) a, (unsigned long)SR_TO_INT(b));
     else
       mpz_sub_ui(erg, (mpz_ptr) a, (unsigned long)-(SR_TO_INT(b)));
@@ -612,33 +615,29 @@ static number nrzSub (number a, number b,  const coeffs )
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    long c = SR_TO_INT(a) - SR_TO_INT(b);
+    long c = SR_HDL(a)-SR_HDL(b)+1;
     if (INT_IS_SMALL(c))
-      return INT_TO_SR(c);
+      return number(c);
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
-    mpz_init_set_si(erg, c);
-    nrzTest((number)erg);
-    return (number) erg;
+    mpz_init_set_si(erg,SR_TO_INT(a));
+    if (SR_HDL(b)>0)
+      mpz_sub_ui(erg, erg, (unsigned long)SR_TO_INT(b));
+    else
+      mpz_add_ui(erg, erg, (unsigned long)-(SR_TO_INT(b)));
+    return nrz_short((number)erg);
   }
   else if (n_Z_IS_SMALL(a))
   {
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
-    mpz_init(erg);
-
-    if (SR_TO_INT(a)>0)
-      mpz_ui_sub(erg, (unsigned long)SR_TO_INT(a), (mpz_ptr) b);
-    else
-    {
-      mpz_add_ui(erg, (mpz_ptr) b, (unsigned long)-SR_TO_INT(a));
-      mpz_neg(erg, erg);
-    }
+    mpz_init_set_si(erg,SR_TO_INT(a));
+    mpz_sub(erg, erg, (mpz_ptr) b);
     return nrz_short((number) erg);
   }
   else if (n_Z_IS_SMALL(b))
   {
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
     mpz_init(erg);
-    if (SR_TO_INT(b)>0)
+    if (SR_HDL(b)>0)
       mpz_sub_ui(erg, (mpz_ptr) a, (unsigned long)SR_TO_INT(b));
     else
       mpz_add_ui(erg, (mpz_ptr) a, (unsigned long)-SR_TO_INT(b));
@@ -746,7 +745,6 @@ static int nrzDivComp(number a, number b, const coeffs r)
 
 static number nrzDiv (number a,number b, const coeffs cf)
 {
-  assume(SR_TO_INT(b));
   if (nrzIsZero(b,cf))
   {
     WerrorS(nDivBy0);
@@ -754,12 +752,19 @@ static number nrzDiv (number a,number b, const coeffs cf)
   }
   else if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
+    long i=SR_TO_INT(a);
+    long j=SR_TO_INT(b);
+    if (j==1L) return a;
+    if ((i==-POW_2_28) && (j== -1L))
+    {
+      return nrzInit(POW_2_28,cf);
+    }
     //if (SR_TO_INT(a) % SR_TO_INT(b))
     //{
     //  WerrorS("1:Division by non divisible element.");
     //  WerrorS("Result is without remainder.");
     //}
-    return INT_TO_SR(SR_TO_INT(a)/SR_TO_INT(b));
+    return INT_TO_SR(i/j);
   }
   else if (n_Z_IS_SMALL(a))
   {
@@ -781,7 +786,7 @@ static number nrzDiv (number a,number b, const coeffs cf)
     //  WerrorS("Result is without remainder.");
     }
     mpz_clear(r);
-    if (SR_TO_INT(b)<0)
+    if (SR_HDL(b)<0)
       mpz_neg(erg, erg);
     return nrz_short((number) erg);
   }
