@@ -69,7 +69,7 @@ VAR libstackv library_stack;
 #endif
 
 //int IsCmd(char *n, int tok);
-char mytolower(char c);
+static char mytolower(char c);
 
 /*2
 * return TRUE if the libray libname is already loaded
@@ -1407,13 +1407,13 @@ void* binary_module_function(const char* newlib, const char* funcname)
 #endif
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-char mytoupper(char c)
+static char mytoupper(char c)
 {
   if(c>=97 && c<=(97+26)) c-=32;
   return(c);
 }
 
-char mytolower(char c)
+static char mytolower(char c)
 {
   if(c>=65 && c<=(65+26)) c+=32;
   return(c);
