@@ -229,10 +229,6 @@ static int iin_Int(number &n,coeffs cf)
   if ((long)i==l) return l;
   return 0;
 }
-poly pHeadProc(poly p)
-{
-  return pHead(p);
-}
 
 int iiTokType(int op)
 {
