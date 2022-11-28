@@ -288,12 +288,18 @@ int main(int argc, char** argv)
   memset(have_doc,0,NUM_PROC);
   memset(have_example,0,NUM_PROC);
   memset(proc_found,0,NUM_PROC);
-  if (argc!=2) { printf("usage: %s lib-file\n",argv[0]); return 1;}
+  if (argc==1)
+  {
+    f=stdin;
+  }
+  else
+  {
+    if (argc!=2) { printf("usage: %s lib-file\n",argv[0]); return 1;}
+    printf("\n          CHECKING LIBRARY %s\n\n",argv[1]);
+    f=fopen(argv[1],"r");
+    if(f==NULL) { printf("cannot read %s\n",argv[1]); return 2; }
+  }
 
-  printf("\n          CHECKING LIBRARY %s\n\n",argv[1]);
-
-  f=fopen(argv[1],"r");
-  if(f==NULL) { printf("cannot read %s\n",argv[1]); return 2; }
   buf[0]='\0';
   get_next(); header++;
   if (strncmp(buf,"//",2)!=0) { printf("error: lib must start with //\n"); }
@@ -314,10 +320,10 @@ int main(int argc, char** argv)
         have_version++;
         pp=p+8;
         while((*pp)==' ') pp++;
-	/* syntax of version string: "version <filename> <version> <date> "
+        /* syntax of version string: "version <filename> <version> <date> "
         if (*pp)!='"')
           printf("error: version string should ....");
-	*/
+        */
       }
     }
     if ((p=strstr(buf,"category="))!=NULL)
@@ -406,8 +412,8 @@ int main(int argc, char** argv)
         p=buf;
         while(*p==' ') p++;
         if (*p == '"') have_doc[i]=1;
-	/* scan proc help*/
-	scan_proc_help(proc[i]);
+        /* scan proc help*/
+        scan_proc_help(proc[i]);
         /* serach for example */
         while(!feof(f))
         {
