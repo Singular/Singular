@@ -83,6 +83,7 @@ VAR long sba_interreduction_operations;
   VAR int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
 
+#ifdef STDZ_EXCHANGE_DURING_REDUCTION
 int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;
@@ -138,6 +139,8 @@ int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start)
     }
   }
 }
+#endif
+
 // return -1 if T[0] (w/o coeff) does not divide the leading monomial
 // (only for euclidean rings (n_QuotRem)
 int kTestDivisibleByT0_Z(const kStrategy strat, const LObject* L)
@@ -487,57 +490,6 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 #else
   int ende=strat->sl;
 #endif
-  if(rField_is_Ring(currRing))
-  {
-    loop
-    {
-      if (j > ende) return -1;
-#if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
-                             p, not_sev, currRing))
-#else
-      if ( !(strat->sevS[j] & not_sev) &&
-         p_LmDivisibleBy(strat->S[j], p, currRing))
-#endif
-      {
-        if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing->cf))
-          return j;
-      }
-      j++;
-    }
-  }
-  else
-  {
-    loop
-    {
-      if (j > ende) return -1;
-#if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
-                             p, not_sev, currRing))
-#else
-      if ( !(strat->sevS[j] & not_sev) &&
-         p_LmDivisibleBy(strat->S[j], p, currRing))
-#endif
-      {
-        return j;
-      }
-      j++;
-    }
-  }
-}
-
-int kFindNextDivisibleByInS_noCF(const kStrategy strat, int start,int max_ind, LObject* L)
-{
-  unsigned long not_sev = ~L->sev;
-  poly p = L->GetLmCurrRing();
-  int j = start;
-
-  pAssume(~not_sev == p_GetShortExpVector(p, currRing));
-#if 1
-  int ende=max_ind;
-#else
-  int ende=strat->sl;
-#endif
   loop
   {
     if (j > ende) return -1;
@@ -556,18 +508,6 @@ int kFindNextDivisibleByInS_noCF(const kStrategy strat, int start,int max_ind, L
 }
 
 #ifdef HAVE_RINGS
-static long ind2(long arg)
-{
-  if (arg <= 0) return 0;
-  long ind = 0;
-  while (arg%2 == 0)
-  {
-    arg = arg / 2;
-    ind++;
-  }
-  return ind;
-}
-
 static long ind_fact_2(long arg)
 {
   if (arg <= 0) return 0;
@@ -575,7 +515,7 @@ static long ind_fact_2(long arg)
   if (arg%2 == 1) { arg--; }
   while (arg > 0)
   {
-    ind += ind2(arg);
+    ind += SI_LOG2_LONG(arg);
     arg = arg - 2;
   }
   return ind;
@@ -594,7 +534,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   unsigned long a = (unsigned long) pGetCoeff(p);
 
   int k_ind2 = 0;
-  int a_ind2 = ind2(a);
+  int a_ind2 = SI_LOG2_LONG(a);
 
   // unsigned long k = 1;
   // of interest is only k_ind2, special routine for improvement ... TODO OLIVER
@@ -620,9 +560,9 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
       {
         s_exp = s_exp - 1;
       }
-      while ( (0 < ind2(s_exp)) && (ind2(s_exp) <= too_much) )
+      while ( (0 < SI_LOG2_LONG(s_exp)) && (SI_LOG2_LONG(s_exp) <= too_much) )
       {
-        too_much = too_much - ind2(s_exp);
+        too_much = too_much - SI_LOG2_LONG(s_exp);
         s_exp = s_exp - 2;
       }
       p_SetExp(lead_mult, i, p_GetExp(p, i,leadRing) - s_exp, tailRing);
@@ -2206,7 +2146,7 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
     while ((j>=0)
     && (nonorm)
     && (!n_DivBy(pGetCoeff(P.p),pGetCoeff(strat->S[j]),currRing->cf)))
-      j=kFindNextDivisibleByInS_noCF(strat,j+1,max_ind,&P);
+      j=kFindNextDivisibleByInS(strat,j+1,max_ind,&P);
     if (j>=0)
     {
       int sl=pSize(strat->S[j]);
@@ -2214,7 +2154,7 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       loop
       {
         int sll;
-        jj=kFindNextDivisibleByInS_noCF(strat,jj+1,max_ind,&P);
+        jj=kFindNextDivisibleByInS(strat,jj+1,max_ind,&P);
         if (jj<0) break;
         if ((!nonorm)
         || (n_DivBy(pGetCoeff(P.p),pGetCoeff(strat->S[jj]),currRing->cf)))

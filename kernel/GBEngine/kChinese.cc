@@ -374,6 +374,8 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   return result;
 }
 
+#if 0
+// debug for send_poly
 void test_n(poly n)
 {
   p_Write(n,currRing);
@@ -393,4 +395,5 @@ void test_n(poly n)
   PrintLn();
   omFree(buf);
 }
+#endif
 #endif

@@ -41,6 +41,7 @@ VAR int create_count = 0;
  *         2: cannot change tailRing: strat==NULL
  *
  ***************************************************************/
+#ifdef STDZ_EXCHANGE_DURING_REDUCTION
 int ksReducePolyZ(LObject* PR,
                  TObject* PW,
                  poly spNoether,
@@ -183,6 +184,7 @@ int ksReducePolyZ(LObject* PR,
 
   return ret;
 }
+#endif
 
 int ksReducePoly(LObject* PR,
                  TObject* PW,
@@ -341,6 +343,7 @@ int ksReducePoly(LObject* PR,
 }
 
 #ifdef HAVE_RINGS
+#ifdef STDZ_EXCHANGE_DURING_REDUCTION
 int ksReducePolyGCD(LObject* PR,
                  TObject* PW,
                  poly spNoether,
@@ -465,6 +468,7 @@ int ksReducePolyGCD(LObject* PR,
 
   return ret;
 }
+#endif
 #endif
 
 /* Computes a reduction of the lead coefficient only. We have already tested
