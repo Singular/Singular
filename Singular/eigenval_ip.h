@@ -12,7 +12,7 @@
 
 BOOLEAN evSwap(leftv res,leftv h);
 BOOLEAN evRowElim(leftv res,leftv h);
-BOOLEAN evColElim(leftv res,leftv h);
+//BOOLEAN evColElim(leftv res,leftv h);
 BOOLEAN evHessenberg(leftv res,leftv h);
 lists evEigenvals(matrix M);
 BOOLEAN evEigenvals(leftv res,leftv h);

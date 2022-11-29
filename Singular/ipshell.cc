@@ -1886,7 +1886,7 @@ static void rDecomposeC(leftv h,const ring R)
 }
 
 #ifdef HAVE_RINGS
-void rDecomposeRing_41(leftv h,const coeffs C)
+static void rDecomposeRing_41(leftv h,const coeffs C)
 /* field is R or C */
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
@@ -3277,6 +3277,7 @@ syStrategy syConvList(lists li)
   return result;
 }
 
+#if 0
 /*3
 * converts a list of modules into a minimal resolution
 */
@@ -3295,6 +3296,7 @@ syStrategy syForceMin(lists li)
   omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
   return result;
 }
+#endif
 // from weight.cc
 BOOLEAN kWeight(leftv res,leftv id)
 {

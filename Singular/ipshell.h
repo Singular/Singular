@@ -103,7 +103,7 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char *newlib,
 // converts a resolution into a list of modules
 lists syConvRes(syStrategy syzstr,BOOLEAN toDel=FALSE,int add_row_shift=0);
 // converts a list of modules into a minimal resolution
-syStrategy syForceMin(lists li);
+//syStrategy syForceMin(lists li);
 // converts a list of modules into a resolution
 syStrategy syConvList(lists li);
 

@@ -72,6 +72,7 @@ BOOLEAN evRowElim(leftv res,leftv h)
   return TRUE;
 }
 
+#if 0
 BOOLEAN evColElim(leftv res,leftv h)
 {
   if(currRing)
@@ -95,6 +96,7 @@ BOOLEAN evColElim(leftv res,leftv h)
   WerrorS("no ring active");
   return TRUE;
 }
+#endif
 
 BOOLEAN evHessenberg(leftv res,leftv h)
 {
