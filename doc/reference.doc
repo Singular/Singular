@@ -3439,7 +3439,11 @@ See
 @*@code{jet (} vector_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @*@code{jet (} ideal_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @*@code{jet (} module_expression@code{,} int_expression@code{,} intvec_expression @code{)}
-@*@code{jet (} poly_expression@code{,} poly_expression@code{,} int_expression @code{)}
+@*@code{jet (} poly_expression@code{,} poly_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{jet (} vector_expression@code{,} poly_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{jet (} ideal_expression@code{,} matrix_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{jet (} module_expression@code{,} matrix_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{jet (} poly_expression@code{,} poly_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @*@code{jet (} vector_expression@code{,} poly_expression@code{,} int_expression @code{)}
 @*@code{jet (} ideal_expression@code{,} matrix_expression@code{,} int_expression @code{)}
 @*@code{jet (} module_expression@code{,} matrix_expression@code{,} int_expression @code{)}
@@ -3447,7 +3451,7 @@ See
 the same as the type of the first argument
 @item @strong{Purpose:}
 deletes from the first argument all terms of degree bigger than the second argument.
-@*If a third argument @code{w} of type intvec is given, the degree is replaced by the weighted degree defined by @code{w}.
+@*If a third/fourth argument @code{w} of type intvec is given, the degree is replaced by the weighted degree defined by @code{w}.
 @*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}. In this case, the coeffcient must be from a field.
 @item @strong{Example:}
 @smallexample
@@ -3685,7 +3689,8 @@ See
 @cindex solve
 @table @code
 @item @strong{Syntax:}
-@code{laguerre (} poly_expression@code{,} int_expression@code{,} int_expression @code{)}
+@code{laguerre (} poly_expression@code @code{)}
+@*@code{laguerre (} poly_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
@@ -3693,8 +3698,8 @@ In characteristic 0:@*
 computes all complex roots of a univariate polynomial using Laguerre's
 algorithm. The second argument defines the precision of the fractional part
 if the ground field is the field of rational numbers, otherwise it will be
-ignored. The third argument (can be 0, 1 or 2) gives the number of extra runs
-for Laguerre's algorithm (with corrupted roots), leading to better results.
+ignored (default: 10).  third argument (can be 0, 1 or 2) gives the number of extra runs
+for Laguerre's algorithm (with corrupted roots), leading to better results (default: 1).
 @*In characteristic p:@*
 computes all roots of a univariate polynomial using factorization
 @item @strong{Note:}
@@ -3705,7 +3710,8 @@ list are of type number, otherwise of type string.
 @c example
 ring rs1=0,(x,y),lp;
 poly f=15x5+x3+x2-10;
-laguerre(f,10,2);
+laguerre(f);
+laguerre(f,30,2);
 @c example
 @end smallexample
 @end table
@@ -4583,6 +4589,9 @@ See
 @item @strong{Syntax:}
 @code{modulo (} ideal_expression@code{,} ideal_expression @code{)}
 @*@code{modulo (} module_expression@code{,} module_expression @code{)}
+@*@code{modulo (} ideal_expression@code{,} ideal_expression{,} string_expression @code{)}
+@*@code{modulo (} module_expression@code{,} module_expression{,} string_expression @code{)}
+@*@code{modulo (} ideal_expression@code{,} ideal_expression{,} matrix_name @code{)}
 @item @strong{Type:}
 module
 @item @strong{Purpose:}
@@ -4661,6 +4670,10 @@ is the induced map.
 @end ifinfo
 @*@code{modulo(h1,h2)} returns generators of
 the kernel of this induced map.
+@*An optional third string argument give the GB algorithm to use.
+(default: "std", else: "groebner", "modstd", "slimgb").
+@*An optional third argument (a name of a matrix) gives the matrix to store
+the transfomation of the input to the GB (see @ref{liftstd}).
 @item @strong{Note:}
 If for at least one of @code{h1} or @code{h2} the attribute @code{"isHomog"} is
 set, @code{modulo(h1,h2)} also sets the attribute @code{"isHomog"}
@@ -6694,11 +6707,12 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{ring_list (} ring_expression @code{)}
+@*@code{ring_list (} cring_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-decomposes a ring/qring into a list of 4 (or 6 in the non-commutative case,
-see @ref{ringlist (plural)}) components.
+decomposes a ring/qring/coeffcient ring into a list of 4 (or 6 in the non-commutative case,
+see @ref{ringlist (plural)}) or 1/4 (for @code{cring}) components.
 It is identical to @code{ringlist} with the exception of the first list entry.
 @enumerate
 @item
@@ -6727,6 +6741,7 @@ These data will be mapped via fetch to the ring to be constructed.
 @c example
  ring r = 0,(x(1..3)),dp;
  list l = ring_list(r);
+ ring_list(l[1]);
  l;
  //  Now change l and create a new ring, by
  //- changing the base field to ZZ/32003
@@ -7996,6 +8011,8 @@ a standard basis is returned, otherwise a generating set.
   module s=syz(i);
   s;
   matrix(i)*matrix(s);
+  s=syz(i,"slimgb");
+  s;
 @c example
 @end smallexample
 @end table
