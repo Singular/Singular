@@ -46,7 +46,7 @@
 
 /***************************print(only for debugging)***********************************************/
 //print vector of integers.
-void listprint(std::vector<int> vec)
+static void listprint(std::vector<int> vec)
 {
   unsigned i;
   for(i=0;i<vec.size();i++)
@@ -62,7 +62,7 @@ void listprint(std::vector<int> vec)
 }
 
 //print vector of vectors of integers.
-void listsprint(std::vector<std::vector<int> > posMat)
+static void listsprint(std::vector<std::vector<int> > posMat)
 {
   unsigned i;
   for(i=0;i<posMat.size();i++)
@@ -81,7 +81,7 @@ void listsprint(std::vector<std::vector<int> > posMat)
 
 
 //print ideal.
-void id_print(ideal h)
+static void id_print(ideal h)
 {
   int i;
   for(i=0;i<IDELEMS(h);i++)
@@ -94,7 +94,7 @@ void id_print(ideal h)
 
 //only for T^2,
 //print vector of polynomials.
-void lpprint( std::vector<poly> pv)
+static void lpprint( std::vector<poly> pv)
 {
   for(unsigned i=0;i<pv.size();i++)
   {
@@ -108,10 +108,8 @@ void lpprint( std::vector<poly> pv)
   }
 }
 
-
-
 //print vector of vectors of polynomials.
-void lpsprint(std::vector<std::vector<poly> > pvs)
+static void lpsprint(std::vector<std::vector<poly> > pvs)
 {
   for(unsigned i=0;i<pvs.size();i++)
   {
@@ -127,20 +125,11 @@ void lpsprint(std::vector<std::vector<poly> > pvs)
   }
 }
 
-
-
-
-
-
-
-
-
-
 /*************operations for vectors (regard vectors as sets)*********/
 
 //returns true if integer n is in vector vec,
 //otherwise, returns false
-bool IsinL(int a, std::vector<int> vec)
+static bool IsinL(int a, std::vector<int> vec)
 {
   unsigned i;
   for(i=0;i<vec.size();i++)
@@ -153,13 +142,9 @@ bool IsinL(int a, std::vector<int> vec)
   return false;
 }
 
-
-
-
-
 //returns intersection of vectors p and q,
 //returns empty if they are disjoint
-std::vector<int> vecIntersection(std::vector<int> p, std::vector<int> q)
+static std::vector<int> vecIntersection(std::vector<int> p, std::vector<int> q)
 {
   unsigned i;
   std::vector<int> inte;
@@ -171,39 +156,8 @@ std::vector<int> vecIntersection(std::vector<int> p, std::vector<int> q)
   return inte;
 }
 
-
-
-
-
-
-
-
-
-//returns true if vec1 is equal to vec2 (strictly equal, including the order)
-//is not used
-bool vEv(std::vector<int> vec1,std::vector<int> vec2)
-{
-  unsigned j, lg1=vec1.size(),lg2=vec2.size();
-  if(lg1!=lg2)
-  {
-    return false;
-  }
-  else
-  {
-    for(j=0;j<vec1.size();j++)
-    {
-      if(vec1[j]!=vec2[j])
-        return false;
-    }
-  }
-  return true;
-}
-
-
-
-
 //returns true if vec1 is contained in vec2
-bool vsubset(std::vector<int> vec1, std::vector<int> vec2)
+static bool vsubset(std::vector<int> vec1, std::vector<int> vec2)
 {
   int i;
   if(vec1.size()>vec2.size())
@@ -217,7 +171,7 @@ bool vsubset(std::vector<int> vec1, std::vector<int> vec2)
 }
 
 //not strictly equal(order doesn't matter)
-bool vEvl(std::vector<int> vec1, std::vector<int> vec2)
+static bool vEvl(std::vector<int> vec1, std::vector<int> vec2)
 {
   if(vec1.size()==0 && vec2.size()==0)
     return true;
@@ -226,11 +180,10 @@ bool vEvl(std::vector<int> vec1, std::vector<int> vec2)
   return false;
 }
 
-
 //the length of vec must be same to it of the elements of vecs
 //returns true if vec is as same as some element of vecs ((not strictly same))
 //returns false if vec is not in vecs
-bool vInvsl(std::vector<int> vec, std::vector<std::vector<int> > vecs)
+static bool vInvsl(std::vector<int> vec, std::vector<std::vector<int> > vecs)
 {
   int i;
   for(i=0;i<vecs.size();i++)
@@ -243,26 +196,8 @@ bool vInvsl(std::vector<int> vec, std::vector<std::vector<int> > vecs)
   return false;
 }
 
-
-//the length of vec must be same to it of the elements of vecs (strictly same)
-//returns the position of vec in vecs,
-//returns -1 if vec is not in vecs
-//actrually is not used.
-int vInvs(std::vector<int> vec, std::vector<std::vector<int> > vecs)
-{
-  int i;
-  for(i=0;i<vecs.size();i++)
-  {
-    if(vEv(vec,vecs[i]))
-    {
-      return i+1;
-    }
-  }
-  return -1;
-}
-
 //returns the union of two vectors(as the union of sets)
-std::vector<int> vecUnion(std::vector<int> vec1, std::vector<int> vec2)
+static std::vector<int> vecUnion(std::vector<int> vec1, std::vector<int> vec2)
 {
   std::vector<int> vec=vec1;
   unsigned i;
@@ -274,7 +209,7 @@ std::vector<int> vecUnion(std::vector<int> vec1, std::vector<int> vec2)
   return vec;
 }
 
-std::vector<int> vecMinus(std::vector<int> vec1,std::vector<int> vec2)
+static std::vector<int> vecMinus(std::vector<int> vec1,std::vector<int> vec2)
 {
   std::vector<int> vec;
   for(unsigned i=0;i<vec1.size();i++)
@@ -287,7 +222,7 @@ std::vector<int> vecMinus(std::vector<int> vec1,std::vector<int> vec2)
   return vec;
 }
 
-std::vector<std::vector<int> > vsMinusv(std::vector<std::vector<int> > vecs, std::vector<int> vec)
+static std::vector<std::vector<int> > vsMinusv(std::vector<std::vector<int> > vecs, std::vector<int> vec)
 {
   int i;
   std::vector<std::vector<int> > rem;
@@ -301,8 +236,7 @@ std::vector<std::vector<int> > vsMinusv(std::vector<std::vector<int> > vecs, std
   return (rem);
 }
 
-
-std::vector<std::vector<int> > vsUnion(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
+static std::vector<std::vector<int> > vsUnion(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
 {
   int i;
   std::vector<std::vector<int> > vs=vs1;
@@ -316,12 +250,7 @@ std::vector<std::vector<int> > vsUnion(std::vector<std::vector<int> > vs1, std::
   return vs;
 }
 
-
-
-
-
-
-std::vector<std::vector<int> > vsIntersection(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
+static std::vector<std::vector<int> > vsIntersection(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
 {
   int i;
   std::vector<std::vector<int> > vs;
@@ -335,15 +264,11 @@ std::vector<std::vector<int> > vsIntersection(std::vector<std::vector<int> > vs1
   return vs;
 }
 
-
-
-
-
 /*************************************for transition between ideal and vectors******************************************/
 
 //P should be monomial,
 // vector version of poly support(poly p)
-std::vector<int> support1(poly p)
+static std::vector<int> support1(poly p)
 {
   int j;
   std::vector<int> supset;
@@ -358,13 +283,8 @@ std::vector<int> support1(poly p)
   return (supset);
 }
 
-
-
-
-
-
 //simplicial complex(the faces set is ideal h)
-std::vector<std::vector<int> >  supports(ideal h)
+static std::vector<std::vector<int> >  supports(ideal h)
 {
   std::vector<std::vector<int> > vecs;
   std::vector<int> vec;
@@ -379,12 +299,9 @@ std::vector<std::vector<int> >  supports(ideal h)
   return vecs;
 }
 
-
-
-
 // only for eqsolve1
 // p could be any polynomial
-std::vector<int> support2(poly p)
+static std::vector<int> support2(poly p)
 {
   int j;
   poly q;
@@ -405,10 +322,8 @@ std::vector<int> support2(poly p)
   return (supset);
 }
 
-
-
 //the supports of ideal
-std::vector<std::vector<int> >  supports2(ideal h)
+static std::vector<std::vector<int> >  supports2(ideal h)
 {
   std::vector<std::vector<int> > vecs;
   std::vector<int> vec;
@@ -422,9 +337,10 @@ std::vector<std::vector<int> >  supports2(ideal h)
   }
   return vecs;
 }
+
 //convert the vector(vbase[i] are the coefficients of x_{i+1}) to a polynomial w.r.t. current ring
 //vector vbase has length of currRing->N.
-poly pMake(std::vector<int> vbase)
+static poly pMake(std::vector<int> vbase)
 {
   int n=vbase.size(); poly p,q=0;
   for(int i=0;i<n;i++)
@@ -434,16 +350,12 @@ poly pMake(std::vector<int> vbase)
       p = pOne();pSetExp(p, i+1, 1);pSetm(p);pSetCoeff(p, nInit(vbase[i]));
       q = pAdd(q, p);
     }
-
   }
   return q;
 }
 
-
-
-
 //convert the vectors to a ideal(for T^1)
-ideal idMake(std::vector<std::vector<int> > vecs)
+static ideal idMake(std::vector<std::vector<int> > vecs)
 {
   int lv=vecs.size(), i;
   poly p;
@@ -457,12 +369,10 @@ ideal idMake(std::vector<std::vector<int> > vecs)
   return id_re;
 }
 
-
-
 /*****************************quotient ring of two ideals*********************/
 
 //the quotient ring of h1 respect to h2
-ideal idmodulo(ideal h1,ideal h2)
+static ideal idmodulo(ideal h1,ideal h2)
 {
   ideal gb=kStd(h2,NULL,testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(gb);
@@ -473,7 +383,7 @@ ideal idmodulo(ideal h1,ideal h2)
 
 //returns the coeff of the monomial of polynomial p which involves the mth varialbe
 //assume the polynomial p has form of y1+y2+...
-int pcoef(poly p, int m)
+static int pcoef(poly p, int m)
 {
   int i,co; poly q=pCopy(p);
   for(i=1;i<=currRing->N;i++)
@@ -492,7 +402,7 @@ int pcoef(poly p, int m)
 }
 
 //returns true if p involves the mth variable of the current ring
-bool vInp(int m,poly p)
+static bool vInp(int m,poly p)
 {
   poly q=pCopy(p);
   while (q!=NULL)
@@ -506,10 +416,8 @@ bool vInp(int m,poly p)
   return false;
 }
 
-
-
 //returns the vector w.r.t. polynomial p
-std::vector<int> vMake(poly p)
+static std::vector<int> vMake(poly p)
 {
   int i;
   std::vector<int> vbase;
@@ -527,9 +435,8 @@ std::vector<int> vMake(poly p)
   return (vbase);
 }
 
-
 //returns the vectors w.r.t. ideal h
-std::vector<std::vector<int> > vsMake(ideal h)
+static std::vector<std::vector<int> > vsMake(ideal h)
 {
   std::vector<int> vec;
   std::vector<std::vector<int> > vecs;
@@ -542,10 +449,9 @@ std::vector<std::vector<int> > vsMake(ideal h)
   return vecs;
 }
 
-
 //the quotient ring of two ideals which are represented by vectors,
 //the result is also represented by vector.
-std::vector<std::vector<int> > vecqring(std::vector<std::vector<int> > vec1, std::vector<std::vector<int> > vec2)
+static std::vector<std::vector<int> > vecqring(std::vector<std::vector<int> > vec1, std::vector<std::vector<int> > vec2)
 {
   ideal h1=idMake(vec1), h2=idMake(vec2);
   ideal h=idmodulo(h1,h2);
@@ -553,12 +459,10 @@ std::vector<std::vector<int> > vecqring(std::vector<std::vector<int> > vec1, std
   return vecs;
 }
 
-
-
 /****************************************************************/
 //construct a monomial based on the support of it
 //returns a squarefree monomial
-poly pMaken(std::vector<int> vbase)
+static poly pMaken(std::vector<int> vbase)
 {
   int n=vbase.size();
   poly p,q=pOne();
@@ -572,7 +476,7 @@ poly pMaken(std::vector<int> vbase)
 }
 
 // returns a ideal according to a set of supports
-ideal idMaken(std::vector<std::vector<int> > vecs)
+static ideal idMaken(std::vector<std::vector<int> > vecs)
 {
   ideal id_re=idInit(1,1);
   poly p;
@@ -587,12 +491,9 @@ ideal idMaken(std::vector<std::vector<int> > vecs)
   return id_re;
 }
 
-
-
 /********************************new version for stanley reisner ideal ***********************************************/
 
-
-std::vector<std::vector<int> > b_subsets(std::vector<int> vec)
+static std::vector<std::vector<int> > b_subsets(std::vector<int> vec)
 {
   int i,j;
   std::vector<int> bv;
@@ -617,9 +518,8 @@ std::vector<std::vector<int> > b_subsets(std::vector<int> vec)
   return(vecs);
 }
 
-
 //the number of the variables
-int idvert(ideal h)
+static int idvert(ideal h)
 {
   int i, j, vert=0;
   if(idIs0(h))
@@ -638,10 +538,7 @@ int idvert(ideal h)
   return vert;
 }
 
-
-
-
-int pvert(poly p)
+static int pvert(poly p)
 {
   int i, vert=0;
   for(i=currRing->N;i>0;i--)
@@ -655,10 +552,9 @@ int pvert(poly p)
   return vert;
 }
 
-
 /*
 //full complex
-std::vector<std::vector<int> > fullcomplex(ideal h)
+static std::vector<std::vector<int> > fullcomplex(ideal h)
 {
   int vert=vertnum(h), i, j;
   //Print("there are %d vertices\n", vert);
@@ -670,13 +566,11 @@ std::vector<std::vector<int> > fullcomplex(ideal h)
   }
   fmons=b_subsets(pre);
   return fmons;
-
 }*/
-
 
 /*
 //all the squarefree monomials whose degree is less or equal to n
-std::vector<std::vector<int> > sfrmons(ideal h, int n)
+static std::vector<std::vector<int> > sfrmons(ideal h, int n)
 {
   int vert=vertnum(h), i, j, time=0;
   std::vector<std::vector<int> > fmons, pres, pres0, pres1;
@@ -698,12 +592,11 @@ std::vector<std::vector<int> > sfrmons(ideal h, int n)
     }
   }
   return fmons;
-
 }
 */
 
 /*
-ideal id_complement(ideal h)
+static ideal id_complement(ideal h)
 {
   int i,j;
   std::vector<std::vector<int> > full=fullcomplex(h), hvs=supports(h), res;
@@ -721,7 +614,7 @@ ideal id_complement(ideal h)
 /*****************About simplicial complex and stanley-reisner ideal and ring **************************/
 
 //h1 minus h2
-ideal idMinus(ideal h1,ideal h2)
+static ideal idMinus(ideal h1,ideal h2)
 {
   ideal h=idInit(1,1);
   int i,j,eq=0;
@@ -745,11 +638,9 @@ ideal idMinus(ideal h1,ideal h2)
   return h;
 }
 
-
-
 //If poly P is squarefree, returns 1
 //returns 0 otherwise,
-bool p_Ifsfree(poly P)
+static bool p_Ifsfree(poly P)
 {
   int i,sf=1;
   for(i=1;i<=rVar(currRing);i++)
@@ -763,10 +654,8 @@ bool p_Ifsfree(poly P)
   return sf;
 }
 
-
-
 //returns the set of all squarefree monomials of degree deg in ideal h
-ideal sfreemon(ideal h,int deg)
+static ideal sfreemon(ideal h,int deg)
 {
   int j;
   ideal temp;
@@ -785,15 +674,9 @@ ideal sfreemon(ideal h,int deg)
   return temp;
 }
 
-
-
-
-
-
-
 //full simplex represented by ideal.
 //(all the squarefree monomials over the polynomial ring)
-ideal id_sfmon(ideal h)
+static ideal id_sfmon(ideal h)
 {
   ideal asfmons,sfmons,mons;
   int j, vert=idvert(h);
@@ -808,16 +691,11 @@ ideal id_sfmon(ideal h)
   return asfmons;
 }
 
-
-
-
-
-
 //if the input ideal is simplicial complex, returns the stanley-reisner ideal,
 //if the input ideal is stanley-reisner ideal, returns the monomial ideal according to simplicial complex.
 //(nonfaces and faces).
 //returns the complement of the ideal h (consisting of only squarefree polynomials)
-ideal id_complement(ideal h)
+static ideal id_complement(ideal h)
 {
   int j, vert=idvert(h);
   ideal i1=id_sfmon(h);
@@ -836,12 +714,9 @@ ideal id_complement(ideal h)
   return (i2);
 }
 
-
-
-
 //Returns true if p is one of the generators of ideal X
 //returns false otherwise
-bool IsInX(poly p,ideal X)
+static bool IsInX(poly p,ideal X)
 {
   int i;
   for(i=0;i<IDELEMS(X);i++)
@@ -856,13 +731,8 @@ bool IsInX(poly p,ideal X)
   return(false);
 }
 
-
-
-
-
-
 //returns the monomials in the quotient ring R/(h1+h2) which have degree deg.
-ideal qringadd(ideal h1, ideal h2, int deg)
+static ideal qringadd(ideal h1, ideal h2, int deg)
 {
   ideal h,qrh;
   h=idAdd(h1,h2);
@@ -870,11 +740,8 @@ ideal qringadd(ideal h1, ideal h2, int deg)
   return qrh;
 }
 
-
-
-
 //returns the maximal degree of the monomials in ideal h
-int id_maxdeg(ideal h)
+static int id_maxdeg(ideal h)
 {
   int i,max;
   max=pTotaldegree(h->m[0]);
@@ -886,15 +753,9 @@ int id_maxdeg(ideal h)
   return (max);
 }
 
-
-
-
-
-
-
 //input ideal h (a squarefree monomial ideal) is the ideal associated to simplicial complex,
 //and returns the Stanley-Reisner ideal(minimal generators)
-ideal idsrRing(ideal h)
+static ideal idsrRing(ideal h)
 {
   int i,n;
   ideal pp,qq,rsr,ppp,hc=idCopy(h);
@@ -922,10 +783,8 @@ ideal idsrRing(ideal h)
   return rsr;
 }
 
-
-
 //returns the set of all the polynomials could divide p
-ideal SimFacset(poly p)
+static ideal SimFacset(poly p)
 {
   int i,j,max=pTotaldegree(p);
   ideal h1,mons,id_re=idInit(1,1);
@@ -941,15 +800,12 @@ ideal SimFacset(poly p)
         idInsertPoly(id_re, h1->m[j]);
       }
     }
-
   }
   idSkipZeroes(id_re);
   return id_re;
 }
 
-
-
-ideal idadda(ideal h1, ideal h2)
+static ideal idadda(ideal h1, ideal h2)
 {
   ideal h=idInit(1,1);
   for(int i=0;i<IDELEMS(h1);i++)
@@ -970,11 +826,10 @@ ideal idadda(ideal h1, ideal h2)
   return h;
 }
 
-
 //complicated version
 //(returns false if it is not a simplicial complex and print the simplex)
 //input h is need to be at least part of faces
-ideal IsSimplex(ideal h)
+static ideal IsSimplex(ideal h)
 {
   int i,max=id_maxdeg(h);
   poly e=pOne();
@@ -992,11 +847,10 @@ ideal IsSimplex(ideal h)
   return (idMinus(id_so,h));
 }
 
-
 //input is the subset of the Stainley-Reisner ideal
 //returns the faces
 //is not used
-ideal complementsimplex(ideal h)
+static ideal complementsimplex(ideal h)
 {
   int i,j;poly p,e=pOne();
   ideal h1=idInit(1,1), pp, h3;
@@ -1019,9 +873,7 @@ ideal complementsimplex(ideal h)
   return (h3);
 }
 
-
-
-int dim_sim(ideal h)
+static int dim_sim(ideal h)
 {
   int dim=pTotaldegree(h->m[0]), i;
   for(i=1; i<IDELEMS(h);i++)
@@ -1034,8 +886,7 @@ int dim_sim(ideal h)
   return dim;
 }
 
-
-int num4dim(ideal h, int n)
+static int num4dim(ideal h, int n)
 {
   int num=0;
   for(int i=0; i<IDELEMS(h); i++)
@@ -1048,19 +899,13 @@ int num4dim(ideal h, int n)
   return num;
 }
 
-
-
 /********************Procedures for T1(M method and N method) ***********/
-
-
-
-
 
 //h is ideal( monomial ideal) associated to simplicial complex
 //returns the all the monomials x^b (x^b must be able to divide
 //at least one monomial in Stanley-Reisner ring)
 //not so efficient
-ideal findb(ideal h)
+static ideal findb(ideal h)
 {
   ideal ib=id_sfmon(h), nonf=id_complement(h), bset=idInit(1,1);
   poly e=pOne();
@@ -1081,15 +926,12 @@ ideal findb(ideal h)
   return bset;
 }
 
-
-
-
 //h is ideal(monomial ideal associated to simplicial complex
 //1.poly S is x^b
 //2.and deg(x^a)=deg(x^b)
 //3.x^a and x^a have disjoint supports
 //returns all the possible x^a according conditions 1. 2. 3.
-ideal finda(ideal h,poly S,int ddeg)
+static ideal finda(ideal h,poly S,int ddeg)
 {
   poly e=pOne();
   ideal h2=id_complement(h), aset=idInit(1,1);
@@ -1115,17 +957,10 @@ ideal finda(ideal h,poly S,int ddeg)
   return(aset);
 }
 
-
-
-
-
-
-
-
 //returns true if support(p) union support(a) minus support(b) is face,
 //otherwise returns false
 //(the vector version of mabcondition)
-bool mabconditionv(std::vector<std::vector<int> > hvs,std::vector<int> pv,std::vector<int> av,std::vector<int> bv)
+static bool mabconditionv(std::vector<std::vector<int> > hvs,std::vector<int> pv,std::vector<int> av,std::vector<int> bv)
 {
   std::vector<int> uv=vecUnion(pv,av);
   uv=vecMinus(uv,bv);
@@ -1136,9 +971,8 @@ bool mabconditionv(std::vector<std::vector<int> > hvs,std::vector<int> pv,std::v
   return(false);
 }
 
-
 // returns the set of nonfaces p where mabconditionv(h, p, a, b) is true
-std::vector<std::vector<int> > Mabv(ideal h,poly a,poly b)
+static std::vector<std::vector<int> > Mabv(ideal h,poly a,poly b)
 {
   std::vector<int> av=support1(a), bv=support1(b), pv, vec;
   ideal h2=id_complement(h);
@@ -1159,7 +993,7 @@ std::vector<std::vector<int> > Mabv(ideal h,poly a,poly b)
 /***************************************************************************/
 
 //subroutine for soleli1
-std::vector<int> eli1(std::vector<int> eq1,std::vector<int> eq2)
+static std::vector<int> eli1(std::vector<int> eq1,std::vector<int> eq2)
 {
   int i,j;
   std::vector<int> eq;
@@ -1178,7 +1012,7 @@ std::vector<int> eli1(std::vector<int> eq1,std::vector<int> eq2)
 
 /*
 //get triangular form(eqs.size()>0)
-std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
+static std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
 {
   int i,j;
   std::vector<int> yaya;
@@ -1202,7 +1036,7 @@ std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
   return re;
 }*/
 //make sure the first element is smaller that the second one
-std::vector<int> keeporder(  std::vector<int> vec)
+static std::vector<int> keeporder(  std::vector<int> vec)
 {
   std::vector<int> yaya;
   int n;
@@ -1215,8 +1049,7 @@ std::vector<int> keeporder(  std::vector<int> vec)
   return vec;
 }
 
-
-std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
+static std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
 {
   int i;
   std::vector<int> yaya;
@@ -1246,12 +1079,10 @@ std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eqs)
   return re;
 }
 
-
-
 // input is a set of equations who is of triangular form(every equations has a form of x_i-x_j)
 // n is the number of variables
 //get the free variables and the dimension
-std::vector<int> freevars(int n,  std::vector<int> bset, std::vector<std::vector<int> > gset)
+static std::vector<int> freevars(int n,  std::vector<int> bset, std::vector<std::vector<int> > gset)
 {
   int ql=gset.size(), bl=bset.size(), i;
   std::vector<int> mvar, fvar;
@@ -1270,12 +1101,11 @@ std::vector<int> freevars(int n,  std::vector<int> bset, std::vector<std::vector
       fvar.push_back(i);
     }
   }
-    return fvar;
+  return fvar;
 }
 
-
 //return the set of free variables except the vnum one
-std::vector<int> fvarsvalue(int vnum, std::vector<int> fvars)
+static std::vector<int> fvarsvalue(int vnum, std::vector<int> fvars)
 {
   int i;
   std::vector<int> fset=fvars;
@@ -1290,12 +1120,9 @@ std::vector<int> fvarsvalue(int vnum, std::vector<int> fvars)
   return fset;
 }
 
-
-
-
 //returns the simplified bset and gset
 //enlarge bset, simplify gset
-std::vector<std::vector<int> > vAbsorb( std::vector<int> bset,std::vector<std::vector<int> > gset)
+static std::vector<std::vector<int> > vAbsorb( std::vector<int> bset,std::vector<std::vector<int> > gset)
 {
   std::vector<int> badset=bset;
   int i,j,m, bl=bset.size(), gl=gset.size();
@@ -1337,14 +1164,9 @@ std::vector<std::vector<int> > vAbsorb( std::vector<int> bset,std::vector<std::v
   return gset;
 }
 
-
-
-
-
-
 //the labels of new variables are started with 1
 //returns a vector of solution space according to index
-std::vector<int> vecbase1(int num, std::vector<int> oset)
+static std::vector<int> vecbase1(int num, std::vector<int> oset)
 {
   int i;
   std::vector<int> base;
@@ -1358,11 +1180,9 @@ std::vector<int> vecbase1(int num, std::vector<int> oset)
   return base;
 }
 
-
-
 //returns a vector which has length of n,
 //and all the entries are 0.
-std::vector<int> make0(int n)
+static std::vector<int> make0(int n)
 {
   int i;
   std::vector<int> vec;
@@ -1373,10 +1193,9 @@ std::vector<int> make0(int n)
   return vec;
 }
 
-
 //returns a vector which has length of n,
 //and all the entries are 1.
-std::vector<int> make1(int n)
+static std::vector<int> make1(int n)
 {
   int i;
   std::vector<int> vec;
@@ -1387,12 +1206,9 @@ std::vector<int> make1(int n)
   return vec;
 }
 
-
-
-
 //input gset must be the triangular form after zero absorbing according to the badset,
 //bset must be the zero set after absorbing.
-std::vector<int> ofindbases1(int num, int vnum, std::vector<int> bset,std::vector<std::vector<int> > gset)
+static std::vector<int> ofindbases1(int num, int vnum, std::vector<int> bset,std::vector<std::vector<int> > gset)
 {
   std::vector<std::vector<int> > goodset;
   std::vector<int> fvars=freevars(num,   bset,  gset), oset, base;
@@ -1406,16 +1222,9 @@ std::vector<int> ofindbases1(int num, int vnum, std::vector<int> bset,std::vecto
   return base;
 }
 
-
-
-
-
-
-
-
 //input gset must be the triangular form after zero absorbing according to the badset
 //bset must be the zero set after absorbing
-std::vector<std::vector<int> > ofindbases(int num,  std::vector<int> bset,std::vector<std::vector<int> > gset)
+static std::vector<std::vector<int> > ofindbases(int num,  std::vector<int> bset,std::vector<std::vector<int> > gset)
 {
   int i,m;
   std::vector<std::vector<int> > bases;
@@ -1439,17 +1248,10 @@ std::vector<std::vector<int> > ofindbases(int num,  std::vector<int> bset,std::v
   return bases;
 }
 
-
-
-
-
-
-
-
 //gset is a set of equations which have forms of x_i-x_j
 //num is the number of varialbes also the length of the set which we need to consider
 //output is trigular form of gset and badset where x_i=0
-std::vector<std::vector<int> > eli2(int num, std::vector<int> bset,std::vector<std::vector<int> > gset)
+static std::vector<std::vector<int> > eli2(int num, std::vector<int> bset,std::vector<std::vector<int> > gset)
 {
   std::vector<int> badset;
   std::vector<std::vector<int> > goodset, solve;
@@ -1484,20 +1286,11 @@ std::vector<std::vector<int> > eli2(int num, std::vector<int> bset,std::vector<s
   return solve;
 }
 
-
 /********************************************************************/
-
-
-
-
-
-
-
 /************************links***********************************/
 
-
 //returns the links of face a in simplicial complex X
-std::vector<std::vector<int> > links(poly a, ideal h)
+static std::vector<std::vector<int> > links(poly a, ideal h)
 {
   int i;
   std::vector<std::vector<int> > lk,X=supports(h);
@@ -1519,9 +1312,7 @@ std::vector<std::vector<int> > links(poly a, ideal h)
   return lk;
 }
 
-
-
-int redefinedeg(poly p, int  num)
+static int redefinedeg(poly p, int  num)
 {
   int deg=0, deg0;
   for(int i=1;i<=currRing->N;i++)
@@ -1540,9 +1331,8 @@ int redefinedeg(poly p, int  num)
   return (deg);
 }
 
-
 // the degree of variables should be same
-ideal p_a(ideal h)
+static ideal p_a(ideal h)
 {
   poly p;
   int i,j,deg=0,deg0;
@@ -1575,7 +1365,6 @@ ideal p_a(ideal h)
   idSkipZeroes(aset);
   return(aset);
 }
-
 
 /*only for the exampels whose variables has degree more than 1*/
 /*ideal p_a(ideal h)
@@ -1612,31 +1401,7 @@ ideal p_a(ideal h)
   return(aset);
 }*/
 
-
-
-
-std::vector<std::vector<int> > id_subsets(std::vector<std::vector<int> > vecs)
-{
-  int i,j;
-  std::vector<std::vector<int> > vvs, res;
-  for(i=0;i<vecs.size();i++)
-  {
-    vvs=b_subsets(vecs[i]);
-    //listsprint(vvs);
-    for(j=0;j<vvs.size();j++)
-    {
-      if(!vInvsl(vvs[j],res))
-        res.push_back(vvs[j]);
-    }
-  }
-  //listsprint(res);
-  return (res);
-}
-
-
-
-
-std::vector<int> vertset(std::vector<std::vector<int> > vecs)
+static std::vector<int> vertset(std::vector<std::vector<int> > vecs)
 {
   int i,j;
   std::vector<int> vert;
@@ -1659,7 +1424,7 @@ std::vector<int> vertset(std::vector<std::vector<int> > vecs)
 }
 
 //smarter way
-ideal p_b(ideal h, poly a)
+static ideal p_b(ideal h, poly a)
 {
   std::vector<std::vector<int> > pbv,lk=links(a,h), res;
   std::vector<int> vert=vertset(lk), bv;
@@ -1684,7 +1449,7 @@ ideal p_b(ideal h, poly a)
 
 /*//dump way to get pb
 // the degree of variables should be same
-ideal p_b(ideal h, poly a)
+static ideal p_b(ideal h, poly a)
 {
   std::vector<std::vector<int> > pbv,lk=links(a,h),res;
 // PrintS("Its links are :\n");id_print(idMaken(lk));
@@ -1732,7 +1497,7 @@ ideal p_b(ideal h, poly a)
   return(deg);
 }
 
-ideal p_b(ideal h, poly a)
+static ideal p_b(ideal h, poly a)
 {
   std::vector<std::vector<int> > pbv,lk=links(a,h),res;
 // PrintS("Its links are :\n");id_print(idMaken(lk));
@@ -1769,12 +1534,9 @@ ideal p_b(ideal h, poly a)
   return(idd);
 }*/
 
-
-
-
 //input is a squarefree monomial p
 //output is all the squarefree monomials which could divid p(including p itself?)
-ideal psubset(poly p)
+static ideal psubset(poly p)
 {
   int i,j,max=pTotaldegree(p);
   ideal h1,mons, id_re=idInit(1,1);
@@ -1794,11 +1556,9 @@ ideal psubset(poly p)
   return id_re;
 }
 
-
-
 //inserts a new vector which has two elements a and b into vector gset (which is a vector of vectors)
 //(especially for gradedpiece1 and gradedpiece1n)
-std::vector<std::vector<int> > listsinsertlist(std::vector<std::vector<int> > gset, int a, int b)
+static std::vector<std::vector<int> > listsinsertlist(std::vector<std::vector<int> > gset, int a, int b)
 {
   std::vector<int> eq;
   eq.push_back(a);
@@ -1807,11 +1567,7 @@ std::vector<std::vector<int> > listsinsertlist(std::vector<std::vector<int> > gs
   return gset;
 }
 
-
-
-
-
-std::vector<int> makeequation(int i,int j, int t)
+static std::vector<int> makeequation(int i,int j, int t)
 {
   std::vector<int> equation;
   equation.push_back(i);
@@ -1821,14 +1577,10 @@ std::vector<int> makeequation(int i,int j, int t)
   return equation;
 }
 
-
-
-
-
 /****************************************************************/
 //only for solving the equations obtained from T^2
 //input should be a vector which has only 3 entries
-poly pMake3(std::vector<int> vbase)
+static poly pMake3(std::vector<int> vbase)
 {
   int co=1;
   poly p,q=0;
@@ -1846,8 +1598,7 @@ poly pMake3(std::vector<int> vbase)
   return q;
 }
 
-
-ideal idMake3(std::vector<std::vector<int> > vecs)
+static ideal idMake3(std::vector<std::vector<int> > vecs)
 {
   ideal id_re=idInit(1,1);
   poly p;
@@ -1864,7 +1615,7 @@ ideal idMake3(std::vector<std::vector<int> > vecs)
 /****************************************************************/
 
 //change the current ring to a new ring which is in num new variables
-void equmab(int num)
+static void equmab(int num)
 {
   int i;
   //Print("There are %d new variables for equations solving.\n",num);
@@ -1884,10 +1635,9 @@ void equmab(int num)
   rSetHdl(h);
 }
 
-
 //returns the trivial case of T^1
 //b must only contain one variable
-std::vector<int> subspace1(std::vector<std::vector<int> > mv, std::vector<int> bv)
+static std::vector<int> subspace1(std::vector<std::vector<int> > mv, std::vector<int> bv)
 {
   int i, num=mv.size();
   std::vector<int> base;
@@ -1901,19 +1651,10 @@ std::vector<int> subspace1(std::vector<std::vector<int> > mv, std::vector<int> b
   return base;
 }
 
-
-
-
-
-
-
-
-
 /***************************only for T^2*************************************/
 //vbase only has two elements which records the position of the monomials in mv
 
-
-std::vector<poly> pMakei(std::vector<std::vector<int> > mv,std::vector<int> vbase)
+static std::vector<poly> pMakei(std::vector<std::vector<int> > mv,std::vector<int> vbase)
 {
   poly p;
   std::vector<poly> h1;
@@ -1926,10 +1667,8 @@ std::vector<poly> pMakei(std::vector<std::vector<int> > mv,std::vector<int> vbas
   return h1;
 }
 
-
-
 // returns a ideal according to a set of supports
- std::vector<std::vector<poly> > idMakei(std::vector<std::vector<int> > mv,std::vector<std::vector<int> > vecs)
+static std::vector<std::vector<poly> > idMakei(std::vector<std::vector<int> > mv,std::vector<std::vector<int> > vecs)
 {
   int i,lv=vecs.size();
   std::vector<std::vector<poly> > re;
@@ -1947,16 +1686,9 @@ std::vector<poly> pMakei(std::vector<std::vector<int> > mv,std::vector<int> vbas
 
 /****************************************************************/
 
-
-
-
-
-
-
-
 //return the graded pieces of cohomology T^1 according to a,b
 //original method (only for debugging)
-void gradedpiece1(ideal h,poly a,poly b)
+static void gradedpiece1(ideal h,poly a,poly b)
 {
   int i,j,m;
   ideal sub=psubset(b);
@@ -2015,24 +1747,8 @@ void gradedpiece1(ideal h,poly a,poly b)
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Returns true if b can divide p*q
-bool condition1for2(std::vector<int > pv,std::vector<int > qv,std::vector<int > bv)
+static bool condition1for2(std::vector<int > pv,std::vector<int > qv,std::vector<int > bv)
 {
   std::vector<int > vec=vecUnion(pv,qv);
   if(vsubset(bv,vec))
@@ -2044,10 +1760,8 @@ bool condition1for2(std::vector<int > pv,std::vector<int > qv,std::vector<int > 
   return false;
 }
 
-
-
 //Returns true if support(p) union support(q) union support(s) union support(a) minus support(b) is face
-bool condition2for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> qv, std::vector<int> sv, std::vector<int> av,  std::vector<int> bv)
+static bool condition2for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> qv, std::vector<int> sv, std::vector<int> av,  std::vector<int> bv)
 {
   std::vector<int> vec=vecUnion(pv,qv);
   vec=vecUnion(vec,sv);
@@ -2060,12 +1774,7 @@ bool condition2for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  st
   return (false);
 }
 
-
-
-
-
-
-bool condition3for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> qv,  std::vector<int> av,  std::vector<int> bv)
+static bool condition3for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> qv,  std::vector<int> av,  std::vector<int> bv)
 {
   std::vector<int> v1,v2,v3;
   v1=vecIntersection(pv,qv);//intersection
@@ -2082,17 +1791,9 @@ bool condition3for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  st
   return(false);
 }
 
-
-
-
-
-
-
-
-
 /****************solve the equations got from T^2*********************/
 
-ideal getpresolve(ideal h)
+static ideal getpresolve(ideal h)
 {
   //ring r=currRing;
   //assume (LIB "presolve.lib");
@@ -2120,9 +1821,7 @@ ideal getpresolve(ideal h)
   return re;
 }
 
-
-
-std::vector<int> numfree(ideal h)
+static std::vector<int> numfree(ideal h)
 {
   int i,j;
   std::vector<int> fvar;
@@ -2141,11 +1840,7 @@ std::vector<int> numfree(ideal h)
   return fvar;
 }
 
-
-
-
-
-std::vector<std::vector<int> > canonicalbase(int n)
+static std::vector<std::vector<int> > canonicalbase(int n)
 {
   std::vector<std::vector<int> > vecs;
   std::vector<int> vec;
@@ -2165,11 +1860,7 @@ std::vector<std::vector<int> > canonicalbase(int n)
   return vecs;
 }
 
-
-
-
-
-std::vector<std::vector<int> > getvector(ideal h,int n)
+static std::vector<std::vector<int> > getvector(ideal h,int n)
 {
   std::vector<int> vec;
   std::vector<std::vector<int> > vecs;
@@ -2233,7 +1924,7 @@ std::vector<std::vector<int> > getvector(ideal h,int n)
 /**************************************************************************/
 
 //subspace of T2(find all the possible values of alpha)
-std::vector<int> findalpha(std::vector<std::vector<int> > mv, std::vector<int> bv)
+static std::vector<int> findalpha(std::vector<std::vector<int> > mv, std::vector<int> bv)
 {
   std::vector<int> alset;
   for(unsigned i=0;i<mv.size();i++)
@@ -2248,7 +1939,7 @@ std::vector<int> findalpha(std::vector<std::vector<int> > mv, std::vector<int> b
   return alset;
 }
 
-std::vector<int> subspacet1(int num, std::vector<std::vector<int> > ntvs)
+static std::vector<int> subspacet1(int num, std::vector<std::vector<int> > ntvs)
 {
   int i, j, t, n=ntvs.size();
   std::vector<int> subase;
@@ -2274,11 +1965,8 @@ std::vector<int> subspacet1(int num, std::vector<std::vector<int> > ntvs)
   return subase;
 }
 
-
-
-
 //subspace for T^2(mab method)
-std::vector<std::vector<int> > subspacet(std::vector<std::vector<int> > mv, std::vector<int> bv,std::vector<std::vector<int> > ntvs)
+static std::vector<std::vector<int> > subspacet(std::vector<std::vector<int> > mv, std::vector<int> bv,std::vector<std::vector<int> > ntvs)
 {
   std::vector<int> alset=findalpha(mv,bv), subase;
   std::vector<std::vector<int> > subases;
@@ -2292,11 +1980,7 @@ std::vector<std::vector<int> > subspacet(std::vector<std::vector<int> > mv, std:
   return subases;
 }
 
-
-
-
-
-std::vector<std::vector<int> > mabtv(std::vector<std::vector<int> > hvs,  std::vector<std::vector<int> > Mv,   std::vector<int> av,  std::vector<int> bv)
+static std::vector<std::vector<int> > mabtv(std::vector<std::vector<int> > hvs,  std::vector<std::vector<int> > Mv,   std::vector<int> av,  std::vector<int> bv)
 {
   std::vector<int> v1,var;
   std::vector<std::vector<int> > vars;
@@ -2317,12 +2001,9 @@ std::vector<std::vector<int> > mabtv(std::vector<std::vector<int> > hvs,  std::v
   return vars;
 }
 
-
-
-
 //fix the problem of the number of the new variables
 //original method for T^2(only for debugging)
-void gradedpiece2(ideal h,poly a,poly b)
+static void gradedpiece2(ideal h,poly a,poly b)
 {
   int t0,t1,t2,i,j,t,m;
   ideal sub=psubset(b);
@@ -2404,39 +2085,11 @@ void gradedpiece2(ideal h,poly a,poly b)
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**********************************************************************/
 //For the method of N_{a-b}
 
-
-
-
 //returns true if pv(support of monomial) satisfies pv union av minus bv is in hvs
-bool nabconditionv(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> av,  std::vector<int> bv)
+static bool nabconditionv(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> av,  std::vector<int> bv)
 {
   std::vector<int> vec1=vecIntersection(pv,bv), vec2=vecUnion(pv,bv);
   int s1=vec1.size();
@@ -2449,13 +2102,8 @@ bool nabconditionv(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std
   return(false);
 }
 
-
-
-
-
-
 //returns N_{a-b}
-std::vector<std::vector<int> > Nabv(std::vector<std::vector<int> > hvs,  std::vector<int> av,  std::vector<int> bv)
+static std::vector<std::vector<int> > Nabv(std::vector<std::vector<int> > hvs,  std::vector<int> av,  std::vector<int> bv)
 {
   std::vector<std::vector<int> > vecs;
   int num=hvs.size();
@@ -2470,11 +2118,6 @@ std::vector<std::vector<int> > Nabv(std::vector<std::vector<int> > hvs,  std::ve
   return vecs;
 }
 
-
-
-
-
-
 //returns true if pv union qv union av minus bv is in hvs
 //hvs is simplicial complex
 static bool nabtconditionv(std::vector<std::vector<int> > hvs,  std::vector<int> pv, std::vector<int> qv)
@@ -2488,9 +2131,8 @@ static bool nabtconditionv(std::vector<std::vector<int> > hvs,  std::vector<int>
   return (false);
 }
 
-
 //returns N_{a-b}^(2)
-std::vector<std::vector<int> > nabtv(std::vector<std::vector<int> > hvs,    std::vector<std::vector<int> > Nv,   std::vector<int> av,  std::vector<int> bv)
+static std::vector<std::vector<int> > nabtv(std::vector<std::vector<int> > hvs,    std::vector<std::vector<int> > Nv,   std::vector<int> av,  std::vector<int> bv)
 {
   std::vector<int> v1,var;
   std::vector<std::vector<int> > vars;
@@ -2510,18 +2152,9 @@ std::vector<std::vector<int> > nabtv(std::vector<std::vector<int> > hvs,    std:
   return vars;
 }
 
-
-
-
-
-
-
-
-
-
 //p must be the monomial which is a face
 //  ideal sub=psubset(b); bvs=supports(sub);
-bool tNab(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<std::vector<int> > bvs)
+static bool tNab(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<std::vector<int> > bvs)
 {
   std::vector<int> sv;
   if(bvs.size()<=1) return false;
@@ -2536,7 +2169,7 @@ bool tNab(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<s
   return false;
 }
 
-std::vector<int>  tnab(std::vector<std::vector<int> > hvs,std::vector<std::vector<int> > nvs,std::vector<std::vector<int> > bvs)
+static std::vector<int>  tnab(std::vector<std::vector<int> > hvs,std::vector<std::vector<int> > nvs,std::vector<std::vector<int> > bvs)
 {
   std::vector<int> pv, vec;
   for(unsigned j=0;j<nvs.size();j++)
@@ -2550,26 +2183,17 @@ std::vector<int>  tnab(std::vector<std::vector<int> > hvs,std::vector<std::vecto
   return vec;
 }
 
-
-
-
-
-
-
-
 //the image phi(pv)=pv union av minus bv
-std::vector<int> phimage(std::vector<int> pv,  std::vector<int> av, std::vector<int> bv)
+static std::vector<int> phimage(std::vector<int> pv,  std::vector<int> av, std::vector<int> bv)
 {
   std::vector<int> qv=vecUnion(pv,av);
   qv=vecMinus(qv,bv);
   return qv;
 }
 
-
-
 //mvs and nvs are the supports of ideal Mab and Nab
 //vecs is the solution of nab
-std::vector<std::vector<int> > value1(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > nvs, std::vector<std::vector<int> > vecs,std::vector<int> av, std::vector<int> bv)
+static std::vector<std::vector<int> > value1(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > nvs, std::vector<std::vector<int> > vecs,std::vector<int> av, std::vector<int> bv)
 {
   int j;
   std::vector<int> pv, base;
@@ -2600,22 +2224,13 @@ std::vector<std::vector<int> > value1(std::vector<std::vector<int> > mvs, std::v
       assert(false);
 
     }
-
     bases.push_back(base);
     base.clear();
   }
   return bases;
 }
 
-
-
-
-
-
-
-
-
-intvec *Tmat(std::vector<std::vector<int> > vecs)
+static intvec *Tmat(std::vector<std::vector<int> > vecs)
 {
     //std::vector<std::vector<int> > solve=gradedpiece1n(h,a,b);
    //Print("the size of solve is: %ld\n",solve.size());
@@ -2638,19 +2253,11 @@ intvec *Tmat(std::vector<std::vector<int> > vecs)
       }
     }
   }
-return (m);
+  return (m);
 }
 
-
-
-
-
-
-
-
-
 //returns the set of position number of minimal gens in M
-std::vector<int> gensindex(ideal M, ideal ids)
+static std::vector<int> gensindex(ideal M, ideal ids)
 {
   int i;
   std::vector<int> vec,index;
@@ -2667,9 +2274,7 @@ std::vector<int> gensindex(ideal M, ideal ids)
   return (index);
 }
 
-
-
-ideal mingens(ideal h, poly a, poly b)
+static ideal mingens(ideal h, poly a, poly b)
 {
   int i;
   std::vector<std::vector<int> > mv=Mabv(h,a,b);
@@ -2683,9 +2288,7 @@ ideal mingens(ideal h, poly a, poly b)
   return (hi);
 }
 
-
-
-std::vector<std::vector<int> >  minisolve(std::vector<std::vector<int> > solve,  std::vector<int> index)
+static std::vector<std::vector<int> >  minisolve(std::vector<std::vector<int> > solve,  std::vector<int> index)
 {
   int i,j;
   std::vector<int> vec,solm;
@@ -2704,12 +2307,10 @@ std::vector<std::vector<int> >  minisolve(std::vector<std::vector<int> > solve, 
   return (solsm);
 }
 
-
 //T_1 graded piece(N method)
 //frame of the most efficient version
 //regardless of links
-
-intvec * gradedpiece1n(ideal h,poly a,poly b)
+static intvec * gradedpiece1n(ideal h,poly a,poly b)
 {
   int i,j,co,n;
   std::vector<std::vector<int> > hvs=supports(h),mv=Mabv(h,a,b),sbv,nv,good,solve;
@@ -2775,13 +2376,8 @@ intvec * gradedpiece1n(ideal h,poly a,poly b)
   return sl;
 }
 
-
-
-
-
-
 //for debugging
-void T1(ideal h)
+static void T1(ideal h)
 {
   ideal bi=findb(h),ai;
   int mm=0;
@@ -2796,29 +2392,22 @@ void T1(ideal h)
     ai=finda(h,b,0);
     if(!idIs0(ai))
     {
-    id_print(ai);
-    for(int j=0;j<IDELEMS(ai);j++)
-    {
-      //PrintS("This is a:");
-      a=pCopy(ai->m[j]);
-      //pWrite(a);
-      intvec * solve=gradedpiece1n(h, a, b);
-      if (IMATELEM(*solve,1,1)!=10)
-         mm++;
+      id_print(ai);
+      for(int j=0;j<IDELEMS(ai);j++)
+      {
+        //PrintS("This is a:");
+        a=pCopy(ai->m[j]);
+        //pWrite(a);
+        intvec * solve=gradedpiece1n(h, a, b);
+        if (IMATELEM(*solve,1,1)!=10)
+           mm++;
+      }
     }
-   }
-
   }
-      Print("Finished %d!\n",mm);
-
+  Print("Finished %d!\n",mm);
 }
 
-
-
-
-
-
-bool condition2for2nv(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<int> qv,  std::vector<int> fv)
+static bool condition2for2nv(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<int> qv,  std::vector<int> fv)
 {
   std::vector<int> vec=vecUnion(pv,qv);
   vec=vecUnion(vec,fv);
@@ -2831,12 +2420,8 @@ bool condition2for2nv(std::vector<std::vector<int> > hvs, std::vector<int> pv, s
   return (false);
 }
 
-
-
-
-
 //for subspace of T2(find all the possible values of alpha)
-std::vector<int> findalphan(std::vector<std::vector<int> >  N, std::vector<int>  tN)
+static std::vector<int> findalphan(std::vector<std::vector<int> >  N, std::vector<int>  tN)
 {
   int i;std::vector<int> alset,vec;
   for(i=0;i<N.size();i++)
@@ -2848,14 +2433,11 @@ std::vector<int> findalphan(std::vector<std::vector<int> >  N, std::vector<int> 
     }
   }
   //listprint(alset);
-    return alset;
+  return alset;
 }
 
-
-
-
 //subspace of T^2 (nab method)
-std::vector<std::vector<int> > subspacetn(std::vector<std::vector<int> >  N, std::vector<int>   tN, std::vector<std::vector<int> > ntvs)
+static std::vector<std::vector<int> > subspacetn(std::vector<std::vector<int> >  N, std::vector<int>   tN, std::vector<std::vector<int> > ntvs)
 {
   int i;
   std::vector<int> alset=findalphan(N,tN), subase;
@@ -2870,13 +2452,11 @@ std::vector<std::vector<int> > subspacetn(std::vector<std::vector<int> >  N, std
   return subases;
 }
 
-
-
 //mts  Mabt
 //nts  Nabt
 //mvs Mab
 //nvs Nab
-std::vector<std::vector<int> > value2(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > nvs, std::vector<std::vector<int> > mts, std::vector<std::vector<int> > nts, std::vector<std::vector<int> > vecs,std::vector<int> av,   std::vector<int> bv)
+static std::vector<std::vector<int> > value2(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > nvs, std::vector<std::vector<int> > mts, std::vector<std::vector<int> > nts, std::vector<std::vector<int> > vecs,std::vector<int> av,   std::vector<int> bv)
 {
   int row,col,j;
   std::vector<int> pv,qv, base;
@@ -2928,10 +2508,7 @@ std::vector<std::vector<int> > value2(std::vector<std::vector<int> > mvs, std::v
   return bases;
 }
 
-
-
-
-ideal genst(ideal h, poly a, poly b)
+static ideal genst(ideal h, poly a, poly b)
 {
   std::vector<std::vector<int> > hvs=supports(h),mv,mts;
   std::vector<int> av=support1(a), bv=support1(b);
@@ -2948,14 +2525,7 @@ ideal genst(ideal h, poly a, poly b)
   return (gens);
 }
 
-
-
-
-
-
-
-
-intvec * gradedpiece2n(ideal h,poly a,poly b)
+static intvec * gradedpiece2n(ideal h,poly a,poly b)
 {
   int i,j,t,n;
   std::vector<std::vector<int> > hvs=supports(h),nv,mv,mts,sbv,vecs,vars,ntvs,solve;
@@ -3033,19 +2603,14 @@ intvec * gradedpiece2n(ideal h,poly a,poly b)
   return sl;
 }
 
-
-
-
-
-
 //for debugging
-void T2(ideal h)
+static void T2(ideal h)
 {
   ideal bi=findb(h),ai;
   id_print(bi);
   poly a,b;
   int mm=0,gp=0;
-std::vector<int> bv,av;
+  std::vector<int> bv,av;
   std::vector<std::vector<int> > solve;
   for(int i=0;i<IDELEMS(bi);i++)
   {
@@ -3079,13 +2644,9 @@ std::vector<int> bv,av;
   Print("There are %d graded pieces in total.\n",gp);
 }
 
-
-
-
-
 /*****************************for links*******************************************/
 //the image phi(pv)=pv minus av minus bv
-std::vector<int> phimagel(std::vector<int> fv,  std::vector<int> av, std::vector<int> bv)
+static std::vector<int> phimagel(std::vector<int> fv,  std::vector<int> av, std::vector<int> bv)
 {
   std::vector<int> nv;
   nv=vecMinus(fv,bv);
@@ -3093,11 +2654,9 @@ std::vector<int> phimagel(std::vector<int> fv,  std::vector<int> av, std::vector
   return nv;
 }
 
-
-
 //mvs and nvs are the supports of ideal Mab and Nab
 //vecs is the solution of nab
-std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > lks, std::vector<std::vector<int> > vecs,std::vector<int> av, std::vector<int> bv)
+static std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > lks, std::vector<std::vector<int> > vecs,std::vector<int> av, std::vector<int> bv)
 {
   int j;
   std::vector<int> pv;
@@ -3122,9 +2681,7 @@ std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs, std::
       WerrorS("Errors in Values Finding(value1l)!");
       usleep(1000000);
       assert(false);
-
     }
-
     bases.push_back(base);
     base.clear();
   }
@@ -3135,7 +2692,6 @@ std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs, std::
 VAR clock_t t_begin, t_mark, t_start, t_construct=0, t_solve=0, t_value=0, t_total=0;
 /**************************************************/
 
-
 static void TimeShow(clock_t t_construct, clock_t t_solve, clock_t t_value ,clock_t t_total)
 {
   Print("The time of value matching for first order deformation:   %.2f sec ;\n", ((double) t_value)/CLOCKS_PER_SEC);
@@ -3145,9 +2701,7 @@ static void TimeShow(clock_t t_construct, clock_t t_solve, clock_t t_value ,cloc
   PrintS("__________________________________________________________\n");
 }
 
-
-
-std::vector<std::vector<int> > gpl(ideal h,poly a,poly b)
+static std::vector<std::vector<int> > gpl(ideal h,poly a,poly b)
 {
   int i,j,co;
   std::vector<std::vector<int> > hvs=supports(h),sbv,nv,mv,good,solve;
@@ -3209,10 +2763,9 @@ std::vector<std::vector<int> > gpl(ideal h,poly a,poly b)
   return solve;
 }
 
-
 //T^1
 //only need to consider the links of a, and reduce a to empty set
-intvec * gradedpiece1nl(ideal h,poly a,poly b, int set)
+static intvec * gradedpiece1nl(ideal h,poly a,poly b, int set)
 {
   t_start=clock();
   poly e=pOne();
@@ -3235,11 +2788,8 @@ intvec * gradedpiece1nl(ideal h,poly a,poly b, int set)
   return sl;
 }
 
-
-
-
 //for finding values of T^2
-std::vector<std::vector<int> > value2l(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > lks, std::vector<std::vector<int> > mts, std::vector<std::vector<int> > lkts, std::vector<std::vector<int> > vecs,std::vector<int> av,   std::vector<int> bv)
+static std::vector<std::vector<int> > value2l(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > lks, std::vector<std::vector<int> > mts, std::vector<std::vector<int> > lkts, std::vector<std::vector<int> > vecs,std::vector<int> av,   std::vector<int> bv)
 {
   std::vector<int> pv,qv,base;
   int row,col,j;
@@ -3292,8 +2842,7 @@ std::vector<std::vector<int> > value2l(std::vector<std::vector<int> > mvs, std::
   return bases;
 }
 
-
-std::vector<std::vector<int> > gpl2(ideal h,poly a,poly b)
+static std::vector<std::vector<int> > gpl2(ideal h,poly a,poly b)
 {
   int i,j,t,n;
   std::vector<std::vector<int> > hvs=supports(h),sbv,nv,mv,mts,vecs,vars,ntvs,solve;
@@ -3361,12 +2910,7 @@ std::vector<std::vector<int> > gpl2(ideal h,poly a,poly b)
   return solve;
 }
 
-
-
-
-
-
-intvec * gradedpiece2nl(ideal h,poly a,poly b)
+static intvec * gradedpiece2nl(ideal h,poly a,poly b)
 {
   poly e=pOne();
   std::vector<int> av=support1(a), bv=support1(b), em;
@@ -3389,8 +2933,6 @@ intvec * gradedpiece2nl(ideal h,poly a,poly b)
   intvec *sl=Tmat(solve);
   return sl;
 }
-
-
 
 //for debugging
 /*
@@ -3421,14 +2963,10 @@ void Tlink(ideal h,poly a,poly b,int n)
 }
 */
 
-
-
 /******************************for triangulation***********************************/
 
-
-
 //returns all the faces which are triangles
-ideal trisets(ideal h)
+static ideal trisets(ideal h)
 {
   int i;
   ideal ids=idInit(1,1);
@@ -3443,11 +2981,8 @@ ideal trisets(ideal h)
   return ids;
 }
 
-
-
-
 // case 1 new faces
-std::vector<std::vector<int> > triface(poly p, int vert)
+static std::vector<std::vector<int> > triface(poly p, int vert)
 {
   std::vector<int> vec, fv=support1(p);
   std::vector<std::vector<int> > fvs0, fvs;
@@ -3466,7 +3001,7 @@ std::vector<std::vector<int> > triface(poly p, int vert)
 
 // the size of p's support must be 3
 //returns the new complex which is a triangulation based on the face p
-ideal triangulations1(ideal h, poly p, int vert)
+static ideal triangulations1(ideal h, poly p, int vert)
 {
   std::vector<int> vec, pv=support1(p);
   std::vector<std::vector<int> > vecs=supports(h),vs,vs0;
@@ -3476,17 +3011,12 @@ ideal triangulations1(ideal h, poly p, int vert)
   //PrintS("This is the new simplicial complex according to the face \n"); pWrite(p);
   //PrintS("is:\n");
   //listsprint(vecs);
-
   ideal re=idMaken(vecs);
-
   return re;
 }
 
-
-
-
 /*
-ideal triangulations1(ideal h)
+static ideal triangulations1(ideal h)
 {
   int i,vert=currRing->N+1;
   std::vector<int> vec;
@@ -3509,8 +3039,7 @@ ideal triangulations1(ideal h)
   return h;
 }*/
 
-
-std::vector<int> commonedge(poly p, poly q)
+static std::vector<int> commonedge(poly p, poly q)
 {
   std::vector<int> ev, fv1= support1(p), fv2= support2(q);
   for(unsigned i=0;i<fv1.size();i++)
@@ -3521,8 +3050,7 @@ std::vector<int> commonedge(poly p, poly q)
   return ev;
 }
 
-
-intvec *edgemat(poly p, poly q)
+static intvec *edgemat(poly p, poly q)
 {
   intvec *m;
   int i;
@@ -3541,7 +3069,7 @@ intvec *edgemat(poly p, poly q)
 }
 
 // case 2 the new face
-std::vector<std::vector<int> > tetraface(poly p, poly q, int vert)
+static std::vector<std::vector<int> > tetraface(poly p, poly q, int vert)
 {
   std::vector<int> ev=commonedge(p, q), vec, fv1=support1(p), fv2=support1(q);
   std::vector<std::vector<int> > fvs1, fvs2, fvs;
@@ -3562,9 +3090,8 @@ std::vector<std::vector<int> > tetraface(poly p, poly q, int vert)
   return (fvs);
 }
 
-
 //if p and q have  a common edge
-ideal triangulations2(ideal h, poly p, poly q, int vert)
+static ideal triangulations2(ideal h, poly p, poly q, int vert)
 {
   std::vector<int> ev, fv1=support1(p), fv2=support1(q);
   std::vector<std::vector<int> > vecs=supports(h), vs1;
@@ -3578,11 +3105,8 @@ ideal triangulations2(ideal h, poly p, poly q, int vert)
   return hh;
 }
 
-
-
-
 // case 2 the new face
-std::vector<std::vector<int> > penface(poly p, poly q, poly g, int vert)
+static std::vector<std::vector<int> > penface(poly p, poly q, poly g, int vert)
 {
   int en=0;
   std::vector<int> ev1=commonedge(p, q), ev2=commonedge(p, g), ev3=commonedge(q, g), ind, vec, fv1=support1(p), fv2=support1(q), fv3=support1(g);
@@ -3626,9 +3150,7 @@ std::vector<std::vector<int> > penface(poly p, poly q, poly g, int vert)
   return (fvs);
 }
 
-
-
-ideal triangulations3(ideal h, poly p, poly q, poly g, int vert)
+static ideal triangulations3(ideal h, poly p, poly q, poly g, int vert)
 {
   std::vector<int> ev1=commonedge(p, q), ev2=commonedge(p, g), ev3=commonedge(q, g), fv1=support1(p), fv2=support1(q), fv3=support1(g);
   std::vector<std::vector<int> > vecs=supports(h), vs1, evec;
@@ -3651,10 +3173,9 @@ ideal triangulations3(ideal h, poly p, poly q, poly g, int vert)
   return hh;
 }
 
-
 //returns p's valency in h
 //p must be a vertex
-int valency(ideal h, poly p)
+static int valency(ideal h, poly p)
 {
   int val=0;
   std::vector<int> ev=support1(pCopy(p));
@@ -3701,10 +3222,8 @@ PrintS("face 2: \n");
   return h;
 }*/
 
-
-
 /*********************************For computation of X_n***********************************/
-std::vector<std::vector<int> > vsMinusvs(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
+static std::vector<std::vector<int> > vsMinusvs(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
 {
   std::vector<std::vector<int> > vs=vs1;
   for(unsigned i=0;i<vs2.size();i++)
@@ -3714,8 +3233,7 @@ std::vector<std::vector<int> > vsMinusvs(std::vector<std::vector<int> > vs1, std
   return vs;
 }
 
-
-std::vector<std::vector<int> > vs_subsets(std::vector<std::vector<int> > vs)
+static std::vector<std::vector<int> > vs_subsets(std::vector<std::vector<int> > vs)
 {
   std::vector<std::vector<int> >  sset, bv;
   for(unsigned i=0;i<vs.size();i++)
@@ -3726,9 +3244,7 @@ std::vector<std::vector<int> > vs_subsets(std::vector<std::vector<int> > vs)
   return sset;
 }
 
-
-
-std::vector<std::vector<int> > p_constant(ideal Xo,  ideal Sigma)
+static std::vector<std::vector<int> > p_constant(ideal Xo,  ideal Sigma)
 {
   std::vector<std::vector<int> > xs=supports(idCopy(Xo)), ss=supports(idCopy(Sigma)), fvs1;
   fvs1=vs_subsets(ss);
@@ -3736,17 +3252,14 @@ std::vector<std::vector<int> > p_constant(ideal Xo,  ideal Sigma)
   return fvs1;
 }
 
-
-std::vector<std::vector<int> > p_change(ideal Sigma)
+static std::vector<std::vector<int> > p_change(ideal Sigma)
 {
   std::vector<std::vector<int> > ss=supports(idCopy(Sigma)), fvs;
   fvs=vs_subsets(ss);
   return (fvs);
 }
 
-
-
-std::vector<std::vector<int> > p_new(ideal Xo, ideal Sigma)
+static std::vector<std::vector<int> > p_new(ideal Xo, ideal Sigma)
 {
   int vert=0;
   std::vector<std::vector<int> > ss=supports(idCopy(Sigma)), fvs;
@@ -3777,10 +3290,7 @@ std::vector<std::vector<int> > p_new(ideal Xo, ideal Sigma)
   return (fvs);
 }
 
-
-
-
-ideal c_New(ideal Io, ideal sig)
+static ideal c_New(ideal Io, ideal sig)
 {
   std::vector<std::vector<int> > vs1=p_constant(Io, sig), vs2=p_change(sig), vs3=p_new(Io, sig), vsig=supports(sig), vs;
   std::vector<int> ev;
@@ -3815,10 +3325,7 @@ ideal c_New(ideal Io, ideal sig)
   return(idMaken(vs));
 }
 
-
-
-
-std::vector<std::vector<int> > phi1(poly a,  ideal Sigma)
+static std::vector<std::vector<int> > phi1(poly a,  ideal Sigma)
 {
   std::vector<std::vector<int> > ss=supports(idCopy(Sigma)), fvs;
   std::vector<int> av=support1(a), intvec, vv;
@@ -3833,8 +3340,6 @@ std::vector<std::vector<int> > phi1(poly a,  ideal Sigma)
   }
   return fvs;
 }
-
-
 
 static std::vector<std::vector<int> > phi2(poly a, ideal Xo, ideal Sigma)
 {
@@ -3853,8 +3358,7 @@ static std::vector<std::vector<int> > phi2(poly a, ideal Xo, ideal Sigma)
   return fvs;
 }
 
-
-std::vector<std::vector<int> > links_new(poly a, ideal Xo, ideal Sigma, int vert, int ord)
+static std::vector<std::vector<int> > links_new(poly a, ideal Xo, ideal Sigma, int vert, int ord)
 {
   std::vector<int> av=support1(a);
   std::vector<std::vector<int> > lko, lkn, lk1, lk2;
@@ -3878,11 +3382,8 @@ std::vector<std::vector<int> > links_new(poly a, ideal Xo, ideal Sigma, int vert
   return lko;
 }
 
-
-
-
 //returns 1 if there is a real divisor of b not in Xs
-int existIn(poly b, ideal Xs)
+static int existIn(poly b, ideal Xs)
 {
   std::vector<int> bv=support1(pCopy(b));
   std::vector<std::vector<int> > xvs=supports(idCopy(Xs)), bs=b_subsets(bv);
@@ -3897,8 +3398,7 @@ int existIn(poly b, ideal Xs)
   return 0;
 }
 
-
-int isoNum(poly p, ideal I, poly a, poly b)
+static int isoNum(poly p, ideal I, poly a, poly b)
 {
   int i;
   std::vector<std::vector<int> > vs=supports(idCopy(I));
@@ -3915,10 +3415,7 @@ int isoNum(poly p, ideal I, poly a, poly b)
   return (0);
 }
 
-
-
-
-int ifIso(poly p, poly q, poly f, poly g, poly a, poly b)
+static int ifIso(poly p, poly q, poly f, poly g, poly a, poly b)
 {
   std::vector<int> va=support1(a), vb=support1(b), vp=support1(p),  vq=support1(q), vf=support1(f), vg=support1(g);
   std::vector<int>   v1=phimagel(vp, va, vb), v2=phimagel(vq, va, vb), v3=phimagel(vf, va, vb), v4=phimagel(vg, va, vb);
@@ -3929,10 +3426,7 @@ int ifIso(poly p, poly q, poly f, poly g, poly a, poly b)
   return (0);
 }
 
-
-
-
-ideal idMinusp(ideal I, poly p)
+static ideal idMinusp(ideal I, poly p)
 {
   ideal h=idInit(1,1);
   int i;
@@ -3947,18 +3441,9 @@ ideal idMinusp(ideal I, poly p)
   return h;
 }
 
-
 /****************************for the interface of .lib*********************************/
 
-ideal makemab(ideal h, poly a, poly b)
-{
-  std::vector<std::vector<int> > mv=Mabv(h,a,b);
-  ideal M=idMaken(mv);
-  return M;
-}
-
-
-std::vector<int> v_minus(std::vector<int> v1, std::vector<int> v2)
+static std::vector<int> v_minus(std::vector<int> v1, std::vector<int> v2)
 {
   std::vector<int> vec;
   for(unsigned i=0;i<v1.size();i++)
@@ -3968,8 +3453,7 @@ std::vector<int> v_minus(std::vector<int> v1, std::vector<int> v2)
   return vec;
 }
 
-
-std::vector<int> gdegree(poly a, poly b)
+static std::vector<int> gdegree(poly a, poly b)
 {
   int i;
   std::vector<int> av,bv;
@@ -3984,15 +3468,9 @@ std::vector<int> gdegree(poly a, poly b)
   return vec;
 }
 
-
-
-
-
-
 /********************************for stellar subdivision******************************/
 
-
-std::vector<std::vector<int> > star(poly a, ideal h)
+static std::vector<std::vector<int> > star(poly a, ideal h)
 {
   int i;
   std::vector<std::vector<int> > st,X=supports(h);
@@ -4008,8 +3486,7 @@ std::vector<std::vector<int> > star(poly a, ideal h)
   return st;
 }
 
-
-std::vector<std::vector<int> > boundary(poly a)
+static std::vector<std::vector<int> > boundary(poly a)
 {
   std::vector<int> av=support1(a), vec;
   std::vector<std::vector<int> > vecs;
@@ -4019,12 +3496,7 @@ std::vector<std::vector<int> > boundary(poly a)
   return vecs;
 }
 
-
-
-
-
-
-std::vector<std::vector<int> > stellarsub(poly a, ideal h)
+static std::vector<std::vector<int> > stellarsub(poly a, ideal h)
 {
   std::vector<std::vector<int> > vecs_minus, vecs_plus, lk=links(a,h), hvs=supports(h), sub, bys=boundary(a);
   std::vector<int> av=support1(a), vec, vec_n;
@@ -4057,8 +3529,7 @@ std::vector<std::vector<int> > stellarsub(poly a, ideal h)
   return(sub);
 }
 
-
-std::vector<std::vector<int> > bsubsets_1(poly b)
+static std::vector<std::vector<int> > bsubsets_1(poly b)
 {
   std::vector<int>  bvs=support1(b), vs;
   std::vector<std::vector<int> > bset;
@@ -4074,10 +3545,8 @@ std::vector<std::vector<int> > bsubsets_1(poly b)
   return bset;
 }
 
-
-
 /***************************for time testing******************************/
-ideal T_1h(ideal h)
+static ideal T_1h(ideal h)
 {
   int i, j;
   //std::vector < intvec > T1;
@@ -4099,11 +3568,11 @@ ideal T_1h(ideal h)
   }
   TimeShow(t_construct, t_solve, t_value, t_total);
   return h;
-
 }
+
 /**************************************interface T1****************************************/
 /*
-BOOLEAN makeqring(leftv res, leftv args)
+static BOOLEAN makeqring(leftv res, leftv args)
 {
   leftv h=args;
   ideal h2= id_complement( hh);
@@ -4128,11 +3597,7 @@ BOOLEAN makeqring(leftv res, leftv args)
   return false;
 }*/
 
-
-
-
-
-BOOLEAN SRideal(leftv res, leftv args)
+static BOOLEAN SRideal(leftv res, leftv args)
 {
   leftv h=args;
    if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4144,12 +3609,7 @@ BOOLEAN SRideal(leftv res, leftv args)
   return false;
 }
 
-
-
-
-
-
-BOOLEAN idcomplement(leftv res, leftv args)
+static BOOLEAN idcomplement(leftv res, leftv args)
 {
   leftv h=args;
    if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4162,11 +3622,7 @@ BOOLEAN idcomplement(leftv res, leftv args)
   return false;
 }
 
-
-
-
-
-BOOLEAN t1h(leftv res, leftv args)
+static BOOLEAN t1h(leftv res, leftv args)
 {
   leftv h=args;
    if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4178,8 +3634,7 @@ BOOLEAN t1h(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN idsr(leftv res, leftv args)
+static BOOLEAN idsr(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4201,7 +3656,7 @@ BOOLEAN idsr(leftv res, leftv args)
   return false;
 }
 
-intvec *dmat(poly a, poly b)
+static intvec *dmat(poly a, poly b)
 {
   intvec *m;
   int i;
@@ -4219,9 +3674,7 @@ intvec *dmat(poly a, poly b)
   return (m);
 }
 
-
-
-BOOLEAN gd(leftv res, leftv args)
+static BOOLEAN gd(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -4238,9 +3691,7 @@ BOOLEAN gd(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN comedg(leftv res, leftv args)
+static BOOLEAN comedg(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -4257,10 +3708,7 @@ BOOLEAN comedg(leftv res, leftv args)
   return false;
 }
 
-
-
-
-BOOLEAN fb(leftv res, leftv args)
+static BOOLEAN fb(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4272,8 +3720,7 @@ BOOLEAN fb(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN pa(leftv res, leftv args)
+static BOOLEAN pa(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4285,9 +3732,7 @@ BOOLEAN pa(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN makeSimplex(leftv res, leftv args)
+static BOOLEAN makeSimplex(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4299,8 +3744,7 @@ BOOLEAN makeSimplex(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN pb(leftv res, leftv args)
+static BOOLEAN pb(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4317,9 +3761,7 @@ BOOLEAN pb(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN fa(leftv res, leftv args)
+static BOOLEAN fa(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4341,8 +3783,7 @@ BOOLEAN fa(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN fgp(leftv res, leftv args)
+static BOOLEAN fgp(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4364,8 +3805,7 @@ BOOLEAN fgp(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN fgpl(leftv res, leftv args)
+static BOOLEAN fgpl(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4392,9 +3832,7 @@ BOOLEAN fgpl(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN genstt(leftv res, leftv args)
+static BOOLEAN genstt(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4416,8 +3854,7 @@ BOOLEAN genstt(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN sgp(leftv res, leftv args)
+static BOOLEAN sgp(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4439,8 +3876,7 @@ BOOLEAN sgp(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN sgpl(leftv res, leftv args)
+static BOOLEAN sgpl(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4462,8 +3898,7 @@ BOOLEAN sgpl(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN Links(leftv res, leftv args)
+static BOOLEAN Links(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -4481,7 +3916,7 @@ BOOLEAN Links(leftv res, leftv args)
   return false;
 }
 
-BOOLEAN isSim(leftv res, leftv args)
+static BOOLEAN isSim(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4492,7 +3927,6 @@ BOOLEAN isSim(leftv res, leftv args)
   }
   return false;
 }
-
 
 BOOLEAN nfaces1(leftv res, leftv args)
 {
@@ -4516,8 +3950,7 @@ BOOLEAN nfaces1(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN nfaces2(leftv res, leftv args)
+static BOOLEAN nfaces2(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4544,8 +3977,7 @@ BOOLEAN nfaces2(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN nfaces3(leftv res, leftv args)
+static BOOLEAN nfaces3(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4577,11 +4009,7 @@ BOOLEAN nfaces3(leftv res, leftv args)
   return false;
 }
 
-
-
-
-
-BOOLEAN eqsolve1(leftv res, leftv args)
+static BOOLEAN eqsolve1(leftv res, leftv args)
 {
   leftv h=args;int i;
   std::vector<int> bset,bs;
@@ -4622,8 +4050,7 @@ BOOLEAN eqsolve1(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN tsets(leftv res, leftv args)
+static BOOLEAN tsets(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4635,11 +4062,7 @@ BOOLEAN tsets(leftv res, leftv args)
   return false;
 }
 
-
-
-
-
-BOOLEAN Valency(leftv res, leftv args)
+static BOOLEAN Valency(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4656,10 +4079,7 @@ BOOLEAN Valency(leftv res, leftv args)
   return false;
 }
 
-
-
-
-BOOLEAN nabvl(leftv res, leftv args)
+static BOOLEAN nabvl(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4683,9 +4103,7 @@ BOOLEAN nabvl(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN tnabvl(leftv res, leftv args)
+static BOOLEAN tnabvl(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4717,8 +4135,7 @@ BOOLEAN tnabvl(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN vsIntersec(leftv res, leftv args)
+static BOOLEAN vsIntersec(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4736,8 +4153,7 @@ BOOLEAN vsIntersec(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN mabvl(leftv res, leftv args)
+static BOOLEAN mabvl(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4759,9 +4175,7 @@ BOOLEAN mabvl(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN nabtvl(leftv res, leftv args)
+static BOOLEAN nabtvl(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4795,8 +4209,7 @@ BOOLEAN nabtvl(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN linkn(leftv res, leftv args)
+static BOOLEAN linkn(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -4828,9 +4241,7 @@ BOOLEAN linkn(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN existsub(leftv res, leftv args)
+static BOOLEAN existsub(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -4847,8 +4258,7 @@ BOOLEAN existsub(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN pConstant(leftv res, leftv args)
+static BOOLEAN pConstant(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4865,7 +4275,7 @@ BOOLEAN pConstant(leftv res, leftv args)
   return false;
 }
 
-BOOLEAN pChange(leftv res, leftv args)
+static BOOLEAN pChange(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4877,9 +4287,7 @@ BOOLEAN pChange(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN p_New(leftv res, leftv args)
+static BOOLEAN p_New(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4896,10 +4304,7 @@ BOOLEAN p_New(leftv res, leftv args)
   return false;
 }
 
-
-
-
-BOOLEAN support(leftv res, leftv args)
+static BOOLEAN support(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -4911,12 +4316,7 @@ BOOLEAN support(leftv res, leftv args)
   return false;
 }
 
-
-
-
-
-
-BOOLEAN bprime(leftv res, leftv args)
+static BOOLEAN bprime(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -4928,9 +4328,7 @@ BOOLEAN bprime(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN psMinusp(leftv res, leftv args)
+static BOOLEAN psMinusp(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4947,9 +4345,7 @@ BOOLEAN psMinusp(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN stellarremain(leftv res, leftv args)
+static BOOLEAN stellarremain(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4969,8 +4365,7 @@ BOOLEAN stellarremain(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN cNew(leftv res, leftv args)
+static BOOLEAN cNew(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -4987,10 +4382,7 @@ BOOLEAN cNew(leftv res, leftv args)
   return false;
 }
 
-
-
-
-BOOLEAN stars(leftv res, leftv args)
+static BOOLEAN stars(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -5007,10 +4399,7 @@ BOOLEAN stars(leftv res, leftv args)
   return false;
 }
 
-
-
-
-BOOLEAN stellarsubdivision(leftv res, leftv args)
+static BOOLEAN stellarsubdivision(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -5027,9 +4416,7 @@ BOOLEAN stellarsubdivision(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN idModulo(leftv res, leftv args)
+static BOOLEAN idModulo(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -5046,8 +4433,7 @@ BOOLEAN idModulo(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN idminus(leftv res, leftv args)
+static BOOLEAN idminus(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -5064,9 +4450,7 @@ BOOLEAN idminus(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN isoNumber(leftv res, leftv args)
+static BOOLEAN isoNumber(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -5093,9 +4477,7 @@ BOOLEAN isoNumber(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN ifIsomorphism(leftv res, leftv args)
+static BOOLEAN ifIsomorphism(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -5132,8 +4514,7 @@ BOOLEAN ifIsomorphism(leftv res, leftv args)
   return false;
 }
 
-
-BOOLEAN newDegree(leftv res, leftv args)
+static BOOLEAN newDegree(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == POLY_CMD))
@@ -5150,9 +4531,7 @@ BOOLEAN newDegree(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN nonf2f(leftv res, leftv args)
+static BOOLEAN nonf2f(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -5164,9 +4543,7 @@ BOOLEAN nonf2f(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN dimsim(leftv res, leftv args)
+static BOOLEAN dimsim(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -5178,9 +4555,7 @@ BOOLEAN dimsim(leftv res, leftv args)
   return false;
 }
 
-
-
-BOOLEAN numdim(leftv res, leftv args)
+static BOOLEAN numdim(leftv res, leftv args)
 {
   leftv h=args;
   if((h != NULL)&&(h->Typ() == IDEAL_CMD))
@@ -5199,9 +4574,7 @@ BOOLEAN numdim(leftv res, leftv args)
 
 /**************************************interface T2****************************************/
 
-
-
-void firstorderdef_setup(SModulFunctions* p)
+static void firstorderdef_setup(SModulFunctions* p)
 {
   p->iiAddCproc("","mg",FALSE,idsr);
   p->iiAddCproc("","gd",FALSE,gd);
@@ -5252,10 +4625,7 @@ void firstorderdef_setup(SModulFunctions* p)
   p->iiAddCproc("","remainpart",FALSE,stellarremain);
   p->iiAddCproc("","idminus",FALSE,idminus);
   p->iiAddCproc("","time1",FALSE,t1h);
-
 }
-
-
 
 extern "C" int SI_MOD_INIT(cohomo)(SModulFunctions* p)
 {
@@ -5264,5 +4634,3 @@ extern "C" int SI_MOD_INIT(cohomo)(SModulFunctions* p)
 }
 #endif
 #endif
-
-
