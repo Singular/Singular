@@ -26,6 +26,11 @@ New libraries:
 @item @code{normal.lib}: new command @code{isNormal}, option @code{normalCheck} for @code{normal} (@nref{normal_lib})
 @end itemize
 
+Changed libraries:
+@itemize
+@item chern.lib: fixed @code{symNsym} (@nref{chern_lib})
+@end itemize
+
 New commands:
 @itemize
 @item @code{chinrem}, @code{farey} for @code{smatrix} (@nref{smatrix})
@@ -36,6 +41,8 @@ Changed commands:
 @item overflow check for @nref{vdim}
 @item better overflow check/les overflows for Hilbert function (@nref{hilb})
 @item @code{delete} accepts @code{intvec} for the indices to delete (@nref{delete})
+@item several GB based commands accept the choice of the algorithm:
+@code{"std","slimgb","sba","modstd","singmatic","groebner","ffmod","nfmod"} (@nref{syz}, @nref{eliminate}, @nref{intersect}, @nref{modulo}, @nref{liftstd}, @nref{lift})
 @end itemize
 
 Changes in the kernel/build system:
