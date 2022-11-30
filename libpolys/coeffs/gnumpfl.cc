@@ -549,6 +549,7 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfRead    = ngfRead;
   n->cfPower   = ngfPower;
   n->cfSetMap = ngfSetMap;
+  n->cfSize   = ngfSize;
 #ifdef LDEBUG
   //n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif

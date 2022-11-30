@@ -595,6 +595,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfIsOne   = ngcIsOne;
   n->cfIsMOne  = ngcIsMOne;
   n->cfGreaterZero = ngcGreaterZero;
+  n->cfSize    = ngcSize;
 
   n->cfWriteLong  = ngcWrite;
   n->cfWriteShort = ngcWrite;

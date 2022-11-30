@@ -208,7 +208,7 @@ static inline number nlMapGMP(number from, const coeffs /*src*/, const coeffs ds
   return nlInitMPZ((mpz_ptr)from,dst);
 }
 
-number nlMapZ(number from, const coeffs src, const coeffs dst)
+number nlMapZ(number from, const coeffs /*src*/, const coeffs dst)
 {
   if (SR_HDL(from) & SR_INT)
   {

@@ -668,6 +668,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   //n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
   n->cfCoeffName = nrCoeffName;
+  n->cfCoeffString = nrCoeffString;
 
   n->cfInit = nrInit;
   n->cfInt  = nrInt;
