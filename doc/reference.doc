@@ -3689,8 +3689,8 @@ See
 @cindex solve
 @table @code
 @item @strong{Syntax:}
-@code{laguerre (} poly_expression@code @code{)}
-@*@code{laguerre (} poly_expression@code{,} int_expression@code{,} int_expression @code{)}
+@code{laguerre (} poly_expression @code{)}
+@*@code{laguerre (} poly_expression @code{,} int_expression @code{,} int_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
