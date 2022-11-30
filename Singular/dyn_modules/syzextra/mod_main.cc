@@ -27,10 +27,7 @@
 
 // extern coeffs coeffs_BIGINT
 
-#include "singularxx_defs.h"
-
 #include "syzextra.h"
-
 
 #include "Singular/mod_lib.h"
 

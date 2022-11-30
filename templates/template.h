@@ -17,11 +17,6 @@
 #ifndef TEMPLATE_H
 #define TEMPLATE_H
 
-// include basic definitions
-#include "singularxx_defs.h"
-
-BEGIN_NAMESPACE_SINGULARXX
-
 /** @class Template template.h <someRootDirectory/template.h>
  *
  * Brief description of class Template.
@@ -86,8 +81,6 @@ protected:
   /// be considered as a detaiiled description.
   bool m_bSomeFlag;
 };
-
-END_NAMESPACE_SINGULARXX
 
 #endif
 /* #ifndef TEMPLATE_H */

@@ -22,7 +22,6 @@
 #include <stack>
 
 // include basic definitions
-#include "singularxx_defs.h"
 #include "kernel/ideals.h"
 
 class idrec; typedef idrec *   idhdl;
