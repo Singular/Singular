@@ -211,45 +211,6 @@ static inline void view(const intvec* v)
 
 
 
-/// wrapper around p_Tail and id_Tail
-static BOOLEAN Tail(leftv res, leftv h)
-{
-  NoReturn(res);
-
-  if( h == NULL )
-  {
-    WarnS("Tail needs a poly/vector/ideal/module argument...");
-    return TRUE;
-  }
-
-  assume( h != NULL );
-
-  const ring r =  currRing;
-
-  if( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD)
-  {
-    res->data = p_Tail( (const poly)h->Data(), r );
-    res->rtyp = h->Typ();
-
-    h = h->Next(); assume (h == NULL);
-
-    return FALSE;
-  }
-
-  if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
-  {
-    res->data = id_Tail( (const ideal)h->Data(), r );
-    res->rtyp = h->Typ();
-
-    h = h->Next(); assume (h == NULL);
-
-    return FALSE;
-  }
-
-  WarnS("Tail needs a single poly/vector/ideal/module argument...");
-  return TRUE;
-}
-
 /// Get leading component
 static BOOLEAN leadcomp(leftv res, leftv h)
 {
@@ -520,8 +481,6 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
 
   ADD("idPrepare", FALSE, idPrepare);
-
-  ADD("Tail", FALSE, Tail);
 
 #undef ADD
   return MAX_TOK;
