@@ -191,12 +191,6 @@ int redLiftstd (LObject* h, kStrategy strat)
   poly h_tail=kSplitAt(strat->syzComp,h,strat);
   // fix h-pLength
   h->pLength=0;
-  // remove content
-  //number cont;
-  //p_Content_n(h_p,cont,strat->tailRing);
-  //if (!n_IsOne(cont,strat->tailRing))
-  //  h_tail=p_Div_nn(h_tail,cont,tailRing);
-
   h->PrepareRed(strat->use_buckets);
   loop
   {

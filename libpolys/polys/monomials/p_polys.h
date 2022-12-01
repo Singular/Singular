@@ -50,9 +50,6 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
  ***************************************************************/
 unsigned long p_GetShortExpVector(const poly a, const ring r);
 
-/// p_GetShortExpVector of p * pp
-unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r);
-
 #ifdef HAVE_RINGS
 /*! divisibility check over ground ring (which may contain zero divisors);
    TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
@@ -211,7 +208,6 @@ void      p_ProjectiveUnique(poly p,const ring r);
 
 void      p_ContentForGB(poly p, const ring r);
 void      p_Content(poly p, const ring r);
-void      p_Content_n(poly p, number &c,const ring r);
 #if 1
 // currently only used by Singular/janet
 void      p_SimpleContent(poly p, int s, const ring r);
@@ -2062,10 +2058,9 @@ poly      p_PolyDiv(poly &p, const poly divisor, const BOOLEAN needResult, const
 /* syszygy stuff */
 BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r);
 void      p_VectorHasUnit(poly p, int * k, int * len, const ring r);
-poly      p_TakeOutComp1(poly * p, int k, const ring r);
-// Splits *p into two polys: *q which consists of all monoms with
-// component == comp and *p of all other monoms *lq == pLength(*q)
-// On return all components pf *q == 0
+/// Splits *p into two polys: *q which consists of all monoms with
+/// component == comp and *p of all other monoms *lq == pLength(*q)
+/// On return all components pf *q == 0
 void p_TakeOutComp(poly *p, long comp, poly *q, int *lq, const ring r);
 
 // This is something weird -- Don't use it, unless you know what you are doing

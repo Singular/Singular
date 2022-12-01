@@ -2346,75 +2346,6 @@ content_finish:
   if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
 }
 
-void p_Content_n(poly ph, number &c,const ring r)
-{
-  const coeffs cf=r->cf;
-  if (ph==NULL)
-  {
-    c=n_Init(1,cf);
-    return;
-  }
-  if (pNext(ph)==NULL)
-  {
-    c=pGetCoeff(ph);
-    p_SetCoeff0(ph,n_Init(1,cf),r);
-  }
-  if ((cf->cfSubringGcd==ndGcd)
-  || (cf->cfGcd==ndGcd)) /* trivial gcd*/
-  {
-    c=n_Init(1,r->cf);
-    return;
-  }
-  number h;
-  if ((rField_is_Q(r))
-  || (rField_is_Q_a(r))
-  || (rField_is_Zp_a)(r)
-  || (rField_is_Z(r))
-  )
-  {
-    h=p_InitContent(ph,r); /* first guess of a gcd of all coeffs */
-  }
-  else
-  {
-    h=n_Copy(pGetCoeff(ph),cf);
-  }
-  poly p;
-  if(n_IsOne(h,cf))
-  {
-    goto content_finish;
-  }
-  p=ph;
-  // take the SubringGcd of all coeffs
-  while (p!=NULL)
-  {
-    n_Normalize(pGetCoeff(p),cf);
-    number d=n_SubringGcd(h,pGetCoeff(p),cf);
-    n_Delete(&h,cf);
-    h = d;
-    if(n_IsOne(h,cf))
-    {
-      goto content_finish;
-    }
-    pIter(p);
-  }
-  // if found<>1, divide by it
-  p = ph;
-  while (p!=NULL)
-  {
-    number d = n_ExactDiv(pGetCoeff(p),h,cf);
-    p_SetCoeff(p,d,r);
-    pIter(p);
-  }
-content_finish:
-  c=h;
-  // and last: check leading sign:
-  if(!n_GreaterZero(pGetCoeff(ph),r->cf))
-  {
-    c = n_InpNeg(c,r->cf);
-    ph = p_Neg(ph,r);
-  }
-}
-
 #define CLEARENUMERATORS 1
 
 void p_ContentForGB(poly ph, const ring r)
@@ -3495,57 +3426,6 @@ void   p_VectorHasUnit(poly p, int * k, int * len, const ring r)
     }
     pIter(q);
   }
-}
-
-poly p_TakeOutComp1(poly * p, int k, const ring r)
-{
-  poly q = *p;
-
-  if (q==NULL) return NULL;
-
-  poly qq=NULL,result = NULL;
-  long unsigned kk=k;
-  if (__p_GetComp(q,r)==kk)
-  {
-    result = q; /* *p */
-    while ((q!=NULL) && (__p_GetComp(q,r)==kk))
-    {
-      p_SetComp(q,0,r);
-      p_SetmComp(q,r);
-      qq = q;
-      pIter(q);
-    }
-    *p = q;
-    pNext(qq) = NULL;
-  }
-  if (q==NULL) return result;
-//  if (pGetComp(q) > k) pGetComp(q)--;
-  while (pNext(q)!=NULL)
-  {
-    if (__p_GetComp(pNext(q),r)==kk)
-    {
-      if (result==NULL)
-      {
-        result = pNext(q);
-        qq = result;
-      }
-      else
-      {
-        pNext(qq) = pNext(q);
-        pIter(qq);
-      }
-      pNext(q) = pNext(pNext(q));
-      pNext(qq) =NULL;
-      p_SetComp(qq,0,r);
-      p_SetmComp(qq,r);
-    }
-    else
-    {
-      pIter(q);
-//      if (pGetComp(q) > k) pGetComp(q)--;
-    }
-  }
-  return result;
 }
 
 poly p_TakeOutComp(poly * p, int k, const ring r)
@@ -4943,63 +4823,6 @@ unsigned long p_GetShortExpVector(const poly p, const ring r)
   }
   return ev;
 }
-
-
-///  p_GetShortExpVector of p * pp
-unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
-{
-  assume(p != NULL);
-  assume(pp != NULL);
-
-  unsigned long ev = 0; // short exponent vector
-  unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
-  unsigned int m1; // highest bit which is filled with (n+1)
-  int j=1;
-  unsigned long i = 0L;
-
-  if (n == 0)
-  {
-    if (r->N <2*BIT_SIZEOF_LONG)
-    {
-      n=1;
-      m1=0;
-    }
-    else
-    {
-      for (; j<=r->N; j++)
-      {
-        if (p_GetExp(p,j,r) > 0 || p_GetExp(pp,j,r) > 0) i++;
-        if (i == BIT_SIZEOF_LONG) break;
-      }
-      if (i>0)
-        ev = ~(0UL) >> (BIT_SIZEOF_LONG - i);
-      return ev;
-    }
-  }
-  else
-  {
-    m1 = (n+1)*(BIT_SIZEOF_LONG - n*r->N);
-  }
-
-  n++;
-  while (i<m1)
-  {
-    ev |= GetBitFields(p_GetExp(p, j,r) + p_GetExp(pp, j,r), i, n);
-    i += n;
-    j++;
-  }
-
-  n--;
-  while (i<BIT_SIZEOF_LONG)
-  {
-    ev |= GetBitFields(p_GetExp(p, j,r) + p_GetExp(pp, j,r), i, n);
-    i += n;
-    j++;
-  }
-  return ev;
-}
-
-
 
 /***************************************************************
  *

@@ -331,7 +331,6 @@ BOOLEAN   pIsHomogeneous (poly p);
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/
 #define   pVectorHasUnitB(p,k) p_VectorHasUnitB(p,k,currRing)
 #define   pVectorHasUnit(p,k,l) p_VectorHasUnit(p,k,l,currRing)
-#define   pTakeOutComp1(p,k)    p_TakeOutComp1(p,k,currRing)
 
 /// Splits *p into two polys: *q which consists of all monoms with
 /// component == comp and *p of all other monoms *lq == pLength(*q)

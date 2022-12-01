@@ -2170,7 +2170,6 @@ static poly syMinimizeP1(int toMin,syStrategy syzstr,intvec * ordn,int index,
       tempStripped =
         syStripOutCopy(syzstr->res[index+1]->m[sPairs[i].syzind],toStrip);
       tc = pGetComp(sPairs[i].isNotMinimal);
-      //p = pTakeOutComp1(&tempStripped,tc);
       int lu;
       pTakeOutComp(&tempStripped,tc,&p,&lu);
       kBucketTakeOutComp(syzstr->bucket,tc,&mp,&lp);
