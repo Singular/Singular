@@ -470,7 +470,6 @@ BOOLEAN rSamePolyRep(ring r1, ring r2);
 
 void   rUnComplete(ring r);
 
-BOOLEAN rRing_is_Homog(const ring r);
 BOOLEAN rRing_has_CompLastBlock(const ring r);
 BOOLEAN rRing_ord_pure_dp(const ring r);
 BOOLEAN rRing_ord_pure_Dp(const ring r);
@@ -770,9 +769,6 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r);
 BOOLEAN rOrd_SetCompRequiresSetm(const ring r);
 rOrderType_t    rGetOrderType(ring r);
 
-/// returns TRUE if var(i) belongs to p-block
-BOOLEAN rIsPolyVar(int i, const ring r);
-
 static inline BOOLEAN rOrd_is_Comp_dp(const ring r)
 {
   assume(r != NULL);
@@ -795,7 +791,6 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
 
 /// construct Wp, C ring
 ring rModifyRing_Wp(ring r, int* weights);
-void rModify_a_to_A(ring r);
 
 void rKillModifiedRing(ring r);
 // also frees weights
@@ -824,7 +819,6 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int 
 
 /// return the position of the p^th IS block order block in r->typ[]...
 int rGetISPos(const int p, const ring r);
-void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
 
 BOOLEAN rCheckIV(const intvec *iv);
 int rTypeOfMatrixOrder(const intvec *order);

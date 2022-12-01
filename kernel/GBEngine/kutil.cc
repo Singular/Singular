@@ -388,10 +388,6 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   // and 2 is not a unit in Z
   //if ( !(n_IsUnit(pGetCoeff(p), r->cf)) ) return;
 
-//    for(i=r->N;i>0;i--)
-//    {
-//      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
-//    }
   poly h = pNext(p);
   int  i;
 

@@ -2033,43 +2033,6 @@ BOOLEAN rOrd_is_WeightedDegree_Ordering(const ring r )
            rOrder_is_WeightedOrdering(( rRingOrder_t)r->order[1])));
 }
 
-BOOLEAN rIsPolyVar(int v,const ring r)
-{
-  int  i=0;
-  while(r->order[i]!=0)
-  {
-    if((r->block0[i]<=v)
-    && (r->block1[i]>=v))
-    {
-      switch(r->order[i])
-      {
-        case ringorder_a:
-          return (r->wvhdl[i][v-r->block0[i]]>0);
-        case ringorder_M:
-          return 2; /*don't know*/
-        case ringorder_a64: /* assume: all weight are non-negative!*/
-        case ringorder_lp:
-        case ringorder_rs:
-        case ringorder_dp:
-        case ringorder_Dp:
-        case ringorder_wp:
-        case ringorder_Wp:
-          return TRUE;
-        case ringorder_ls:
-        case ringorder_ds:
-        case ringorder_Ds:
-        case ringorder_ws:
-        case ringorder_Ws:
-          return FALSE;
-        default:
-          break;
-      }
-    }
-    i++;
-  }
-  return 3; /* could not find var v*/
-}
-
 #ifdef RDEBUG
 // This should eventually become a full-fledge ring check, like pTest
 BOOLEAN rDBTest(ring r, const char* fn, const int l)
@@ -4396,44 +4359,6 @@ static inline void m_DebugPrint(const poly p, const ring R)
 }
 
 
-//    F = system("ISUpdateComponents", F, V, MIN );
-//    // replace gen(i) -> gen(MIN + V[i-MIN]) for all i > MIN in all terms from F!
-void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r )
-{
-  assume( V != NULL );
-  assume( MIN >= 0 );
-
-  if( F == NULL )
-    return;
-
-  for( int j = (F->ncols*F->nrows) - 1; j >= 0; j-- )
-  {
-#ifdef PDEBUG
-    Print("F[%d]:", j);
-    p_wrp(F->m[j], r);
-#endif
-
-    for( poly p = F->m[j]; p != NULL; pIter(p) )
-    {
-      int c = p_GetComp(p, r);
-
-      if( c > MIN )
-      {
-#ifdef PDEBUG
-        Print("gen[%d] -> gen(%d)\n", c, MIN + (*V)[ c - MIN - 1 ]);
-#endif
-
-        p_SetComp( p, MIN + (*V)[ c - MIN - 1 ], r );
-      }
-    }
-#ifdef PDEBUG
-    Print("new F[%d]:", j);
-    p_Test(F->m[j], r);
-    p_wrp(F->m[j], r);
-#endif
-  }
-}
-
 /*2
 * asssume that rComplete was called with r
 * assume that the first block ist ringorder_S
@@ -5257,27 +5182,6 @@ int rGetMaxSyzComp(int i, const ring r)
   }
 }
 
-BOOLEAN rRing_is_Homog(const ring r)
-{
-  if (r == NULL) return FALSE;
-  int i, j, nb = rBlocks(r);
-  for (i=0; i<nb; i++)
-  {
-    if (r->wvhdl[i] != NULL)
-    {
-      int length = r->block1[i] - r->block0[i]+1;
-      int* wvhdl = r->wvhdl[i];
-      if (r->order[i] == ringorder_M) length *= length;
-
-      for (j=0; j< length; j++)
-      {
-        if (wvhdl[j] != 0 && wvhdl[j] != 1) return FALSE;
-      }
-    }
-  }
-  return TRUE;
-}
-
 BOOLEAN rRing_has_CompLastBlock(const ring r)
 {
   assume(r != NULL);
@@ -5855,29 +5759,6 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
   return FALSE;
 }
 #endif
-
-void rModify_a_to_A(ring r)
-// to be called BEFORE rComplete:
-// changes every Block with a(...) to A(...)
-{
-  int i=0;
-  int j;
-  while(r->order[i]!=0)
-  {
-    if (r->order[i]==ringorder_a)
-    {
-      r->order[i]=ringorder_a64;
-      int *w=r->wvhdl[i];
-      int64 *w64=(int64 *)omAlloc((r->block1[i]-r->block0[i]+1)*sizeof(int64));
-      for(j=r->block1[i]-r->block0[i];j>=0;j--)
-              w64[j]=(int64)w[j];
-      r->wvhdl[i]=(int*)w64;
-      omFreeSize(w,(r->block1[i]-r->block0[i]+1)*sizeof(int));
-    }
-    i++;
-  }
-}
-
 
 poly rGetVar(const int varIndex, const ring r)
 {
