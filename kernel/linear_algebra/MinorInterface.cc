@@ -31,7 +31,6 @@ bool arrayIsNumberArray (const poly* polyArray, const ideal iSB,
                          poly* nfPolyArray, int& zeroCounter)
 {
   int n = 0; if (currRing != 0) n = currRing->N;
-  int characteristic = 0; if (currRing != 0) characteristic = rChar(currRing);
   zeroCounter = 0;
   bool result = true;
 
@@ -59,7 +58,6 @@ bool arrayIsNumberArray (const poly* polyArray, const ideal iSB,
       else
       {
         intArray[i] = n_Int(pGetCoeff(nfPolyArray[i]), currRing->cf);
-        if (characteristic != 0) intArray[i] = intArray[i] % characteristic;
         if (intArray[i] == 0) zeroCounter++;
       }
     }

@@ -220,13 +220,16 @@ int MinorProcessor::IOverJ(const int i, const int j)
   /* This is a non-recursive implementation. */
   assume( (i >= 0) && (j >= 0) && (i >= j));
   if (j == 0 || i == j) return 1;
+  #if 0
   int result = 1;
   for (int k = i - j + 1; k <= i; k++) result *= k;
   /* Now, result = (i - j + 1) * ... * i. */
   for (int k = 2; k <= j; k++) result /= k;
   /* Now, result = (i - j + 1) * ... * i / 1 / 2 ...
-     ... / j = i! / j! / (i - j)!. */
+   ... / j = i! / j! / (i - j)!. */
   return result;
+  #endif
+  return binom(i,j);
 }
 
 int MinorProcessor::Faculty(const int i)
