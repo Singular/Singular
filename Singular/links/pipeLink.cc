@@ -30,7 +30,7 @@ typedef struct
 } pipeInfo;
 
 //**************************************************************************/
-BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
+static BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
 {
   pipeInfo *d=(pipeInfo*)omAlloc0(sizeof(pipeInfo));
   if (flag & SI_LINK_OPEN)
@@ -76,7 +76,7 @@ BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
 }
 
 //**************************************************************************/
-LINKAGE BOOLEAN pipeClose(si_link l)
+static BOOLEAN pipeClose(si_link l)
 {
   pipeInfo *d = (pipeInfo *)l->data;
   if (d!=NULL)
@@ -106,7 +106,7 @@ LINKAGE BOOLEAN pipeClose(si_link l)
 }
 
 //**************************************************************************/
-LINKAGE BOOLEAN pipeKill(si_link l)
+static BOOLEAN pipeKill(si_link l)
 {
   if(SI_LINK_OPEN_P(l)) pipeClose(l);
   pipeInfo *d = (pipeInfo *)l->data;
@@ -119,7 +119,7 @@ LINKAGE BOOLEAN pipeKill(si_link l)
 }
 
 //**************************************************************************/
-LINKAGE leftv pipeRead1(si_link l)
+static leftv pipeRead1(si_link l)
 {
   pipeInfo *d = (pipeInfo *)l->data;
   leftv res=(leftv)omAlloc0(sizeof(sleftv));
@@ -134,7 +134,7 @@ LINKAGE leftv pipeRead1(si_link l)
 }
 //**************************************************************************/
 EXTERN_VAR si_link pipeLastLink;
-LINKAGE BOOLEAN pipeWrite(si_link l, leftv data)
+static BOOLEAN pipeWrite(si_link l, leftv data)
 {
   if(!SI_LINK_W_OPEN_P(l)) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL);
   pipeInfo *d = (pipeInfo *)l->data;
@@ -164,7 +164,7 @@ LINKAGE BOOLEAN pipeWrite(si_link l, leftv data)
   return err;
 }
 
-const char* slStatusPipe(si_link l, const char* request)
+static const char* slStatusPipe(si_link l, const char* request)
 {
   pipeInfo *d=(pipeInfo*)l->data;
   if (d==NULL) return "not open";
