@@ -32,7 +32,7 @@ static BOOLEAN CollectLibs(char *name, char ***list_of_libs);
 EXTERN_VAR si_link_extension si_link_root;
 
 /* =============== ASCII ============================================= */
-BOOLEAN slOpenAscii(si_link l, short flag, leftv /*h*/)
+static BOOLEAN slOpenAscii(si_link l, short flag, leftv /*h*/)
 {
   const char *mode;
   if (flag & SI_LINK_OPEN)
@@ -93,7 +93,7 @@ BOOLEAN slOpenAscii(si_link l, short flag, leftv /*h*/)
   return FALSE;
 }
 
-BOOLEAN slCloseAscii(si_link l)
+static BOOLEAN slCloseAscii(si_link l)
 {
   SI_LINK_SET_CLOSE_P(l);
   if (l->name[0] != '\0')
@@ -103,7 +103,7 @@ BOOLEAN slCloseAscii(si_link l)
   return FALSE;
 }
 
-leftv slReadAscii2(si_link l, leftv pr)
+static leftv slReadAscii2(si_link l, leftv pr)
 {
   FILE * fp=(FILE *)l->data;
   char * buf=NULL;
@@ -138,7 +138,7 @@ leftv slReadAscii2(si_link l, leftv pr)
   return v;
 }
 
-leftv slReadAscii(si_link l)
+static leftv slReadAscii(si_link l)
 {
   sleftv tmp;
   memset(&tmp,0,sizeof(sleftv));
@@ -147,7 +147,7 @@ leftv slReadAscii(si_link l)
   return slReadAscii2(l,&tmp);
 }
 
-BOOLEAN slWriteAscii(si_link l, leftv v)
+static BOOLEAN slWriteAscii(si_link l, leftv v)
 {
   FILE *outfile=(FILE *)l->data;
   BOOLEAN err=FALSE;
@@ -223,7 +223,7 @@ const char* slStatusAscii(si_link l, const char* request)
 
 /*------------------ Dumping in Ascii format -----------------------*/
 
-BOOLEAN slDumpAscii(si_link l)
+static BOOLEAN slDumpAscii(si_link l)
 {
   FILE *fd = (FILE *) l->data;
   idhdl h = IDROOT, rh = currRingHdl;
@@ -594,7 +594,7 @@ static int DumpRhs(FILE *fd, idhdl h)
   return 1;
 }
 
-BOOLEAN slGetDumpAscii(si_link l)
+static BOOLEAN slGetDumpAscii(si_link l)
 {
   if (l->name[0] == '\0')
   {
