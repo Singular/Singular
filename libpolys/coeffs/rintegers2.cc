@@ -188,7 +188,7 @@ static BOOLEAN nrzIsUnit (number a, const coeffs)
 
 static BOOLEAN nrzIsZero (number  a, const coeffs)
 {
-  return 0 == mpz_sgn1((mpz_ptr) a, 0);
+  return 0 == mpz_sgn1((mpz_ptr)a);
 }
 
 static BOOLEAN nrzIsOne (number a, const coeffs)
