@@ -188,7 +188,7 @@ static void nrnDelete(number *a, const coeffs)
 }
 static int nrnSize(number a, const coeffs)
 {
-  return mpz_sgn1((mpz_ptr)a);
+  return mpz_size1((mpz_ptr)a);
 }
 #endif
 /*

@@ -143,10 +143,7 @@ number nrzCopyMap(number a, const coeffs /*src*/, const coeffs dst)
 
 int nrzSize(number a, const coeffs)
 {
-  mpz_ptr p=(mpz_ptr)a;
-  int s=p->_mp_alloc;
-  if (s==1) s=(mpz_cmp_ui(p,0)!=0);
-  return s;
+  return mpz_size1((mpz_ptr)a);
 
 }
 
@@ -191,7 +188,7 @@ static BOOLEAN nrzIsUnit (number a, const coeffs)
 
 static BOOLEAN nrzIsZero (number  a, const coeffs)
 {
-  return 0 == mpz_cmpabs_ui((mpz_ptr) a, 0);
+  return 0 == mpz_sgn1((mpz_ptr) a, 0);
 }
 
 static BOOLEAN nrzIsOne (number a, const coeffs)
