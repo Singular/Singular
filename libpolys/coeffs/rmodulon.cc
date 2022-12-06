@@ -188,10 +188,7 @@ static void nrnDelete(number *a, const coeffs)
 }
 static int nrnSize(number a, const coeffs)
 {
-  mpz_ptr p=(mpz_ptr)a;
-  int s=p->_mp_alloc;
-  if (s==1) s=(mpz_cmp_ui(p,0)!=0);
-  return s;
+  return mpz_sgn1((mpz_ptr)a);
 }
 #endif
 /*
@@ -246,7 +243,7 @@ static number nrnSub(number a, number b, const coeffs r)
 
 static BOOLEAN nrnIsZero(number a, const coeffs)
 {
-  return 0 == mpz_cmpabs_ui((mpz_ptr)a, 0);
+  return 0 == mpz_sgn1((mpz_ptr)a);
 }
 
 static number nrnNeg(number c, const coeffs r)
