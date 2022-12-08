@@ -23,13 +23,8 @@
 #include "coeffs/shortfl.h"
 
 #ifdef LDEBUG
-BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
-#endif
-
-
-#ifdef LDEBUG
 // not yet implemented
-BOOLEAN ngcDBTest(number, const char *, const int, const coeffs r)
+static BOOLEAN ngcDBTest(number, const char *, const int, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_C );
 
@@ -707,6 +702,3 @@ void ngcSetChar(const coeffs r)
 {
   setGMPFloatDigits(r->float_len, r->float_len2);
 }
-
-
-

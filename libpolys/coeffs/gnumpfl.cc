@@ -21,8 +21,6 @@
 #include "coeffs/gnumpc.h"
 #include "coeffs/modulop.h"
 
-const char *   ngfRead (const char *s, number *a, const coeffs r);
-
 union nf
 {
   SI_FLOAT _f;

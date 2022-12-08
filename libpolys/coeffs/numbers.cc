@@ -66,7 +66,7 @@ static void   ndInpMult(number &a, number b, const coeffs r)
   r->cfDelete(&a,r);
   a=n;
 }
-void ndInpAdd(number &a, number b, const coeffs r)
+static void ndInpAdd(number &a, number b, const coeffs r)
 {
   number n=r->cfAdd(a,b,r);
   r->cfDelete(&a,r);

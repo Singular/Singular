@@ -21,10 +21,6 @@
 #include <cmath>
 #include <errno.h>
 
-#ifdef LDEBUG
-BOOLEAN nfDBTest      (number a, const char *f, const int l, const coeffs r);
-#endif
-
 //unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
 
 /* the q's from the table 'fftable' */
@@ -108,7 +104,7 @@ const unsigned short fftable[]={
 /*2
 * debugging: is a a valid representation of a number ?
 */
-BOOLEAN nfDBTest (number a, const char *f, const int l, const coeffs r)
+static BOOLEAN nfDBTest (number a, const char *f, const int l, const coeffs r)
 {
   assume( r->m_nfPlus1Table != NULL );
   if (((long)a<0L) || ((long)a>(long)r->m_nfCharQ))

@@ -27,7 +27,7 @@
 
 void nrnWrite (number a, const coeffs);
 #ifdef LDEBUG
-BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
+static BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
 
 EXTERN_VAR omBin gmp_nrz_bin;
@@ -914,7 +914,7 @@ static void nrnInitExp(unsigned long m, coeffs r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nrnDBTest (number a, const char *f, const int l, const coeffs r)
+static BOOLEAN nrnDBTest (number a, const char *f, const int l, const coeffs r)
 {
   if ( (mpz_sgn1((mpz_ptr) a) < 0) || (mpz_cmp((mpz_ptr) a, r->modNumber) > 0) )
   {

@@ -23,7 +23,7 @@
 #ifdef HAVE_RINGS
 
 #ifdef LDEBUG
-BOOLEAN nr2mDBTest(number a, const char *f, const int l, const coeffs r)
+static BOOLEAN nr2mDBTest(number a, const char *f, const int l, const coeffs r)
 {
   if ((((long)a<0L) || ((long)a>(long)r->mod2mMask))
   && (r->mod2mMask!= ~0UL))

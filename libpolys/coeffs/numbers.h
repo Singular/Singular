@@ -69,7 +69,7 @@ number ndGcd(number a, number b, const coeffs);
 // number ndIntMod(number a, number b, const coeffs r);
 
 // void   ndInpMult(number &a, number b, const coeffs r);
-void   ndInpAdd(number &a, number b, const coeffs r);
+// void   ndInpAdd(number &a, number b, const coeffs r);
 number ndQuotRem (number a, number b, number * r, const coeffs R);
 
 // void ndKillChar(coeffs);

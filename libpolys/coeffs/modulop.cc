@@ -23,34 +23,32 @@
 
 #include <string.h>
 
-BOOLEAN npGreaterZero (number k, const coeffs r);
-long    npInt         (number &n, const coeffs r);
-void    npPower       (number a, int i, number * result,const coeffs r);
-BOOLEAN npIsMOne       (number a,const coeffs r);
-number  npDiv         (number a, number b,const coeffs r);
-number  npNeg         (number c,const coeffs r);
-number  npInvers      (number c,const coeffs r);
-BOOLEAN npGreater     (number a, number b,const coeffs r);
-BOOLEAN npEqual       (number a, number b,const coeffs r);
-void    npWrite       (number a, const coeffs r);
-const char *  npRead  (const char *s, number *a,const coeffs r);
-void nvInpMult(number &a, number b, const coeffs r);
+static BOOLEAN npGreaterZero (number k, const coeffs r);
+static BOOLEAN npIsMOne       (number a,const coeffs r);
+static number  npDiv         (number a, number b,const coeffs r);
+static number  npNeg         (number c,const coeffs r);
+static number  npInvers      (number c,const coeffs r);
+static BOOLEAN npGreater     (number a, number b,const coeffs r);
+static BOOLEAN npEqual       (number a, number b,const coeffs r);
+static void    npWrite       (number a, const coeffs r);
+static const char *  npRead  (const char *s, number *a,const coeffs r);
+static void nvInpMult(number &a, number b, const coeffs r);
 
 #ifdef LDEBUG
-BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
+static BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
 
-nMapFunc npSetMap(const coeffs src, const coeffs dst);
+static nMapFunc npSetMap(const coeffs src, const coeffs dst);
 
 #include "coeffs/modulop_inl.h" // npMult, npInit
 
 #ifdef NV_OPS
-number  nvDiv         (number a, number b, const coeffs r);
+static number  nvDiv         (number a, number b, const coeffs r);
 number  nvInvers      (number c, const coeffs r);
 //void    nvPower       (number a, int i, number * result, const coeffs r);
 #endif
 
-BOOLEAN npGreaterZero (number k, const coeffs r)
+static BOOLEAN npGreaterZero (number k, const coeffs r)
 {
   n_Test(k, r);
 
@@ -90,14 +88,14 @@ long npInt(number &n, const coeffs r)
   else                               return ((long)n);
 }
 
-BOOLEAN npIsMOne (number a, const coeffs r)
+static BOOLEAN npIsMOne (number a, const coeffs r)
 {
   n_Test(a, r);
 
   return ((r->npPminus1M == (long)a) &&(1L!=(long)a))/*for char 2*/;
 }
 
-number npDiv (number a,number b, const coeffs r)
+static number npDiv (number a,number b, const coeffs r)
 {
   n_Test(a, r);
   n_Test(b, r);
@@ -132,7 +130,7 @@ number npDiv (number a,number b, const coeffs r)
   return d;
 
 }
-number  npInvers (number c, const coeffs r)
+static number  npInvers (number c, const coeffs r)
 {
   n_Test(c, r);
 
@@ -147,7 +145,7 @@ number  npInvers (number c, const coeffs r)
   return d;
 }
 
-number npNeg (number c, const coeffs r)
+static number npNeg (number c, const coeffs r)
 {
   n_Test(c, r);
 
@@ -164,7 +162,7 @@ number npNeg (number c, const coeffs r)
 #endif
 }
 
-BOOLEAN npGreater (number a,number b, const coeffs r)
+static BOOLEAN npGreater (number a,number b, const coeffs r)
 {
   n_Test(a, r);
   n_Test(b, r);
@@ -173,7 +171,7 @@ BOOLEAN npGreater (number a,number b, const coeffs r)
   return ((long)a) > ((long)b);
 }
 
-BOOLEAN npEqual (number a,number b, const coeffs r)
+static BOOLEAN npEqual (number a,number b, const coeffs r)
 {
   n_Test(a, r);
   n_Test(b, r);
@@ -183,7 +181,7 @@ BOOLEAN npEqual (number a,number b, const coeffs r)
   return npEqualM(a,b,r);
 }
 
-void npWrite (number a, const coeffs r)
+static void npWrite (number a, const coeffs r)
 {
   n_Test(a, r);
 
@@ -192,7 +190,7 @@ void npWrite (number a, const coeffs r)
 }
 
 #if 0
-void npPower (number a, int i, number * result, const coeffs r)
+static void npPower (number a, int i, number * result, const coeffs r)
 {
   n_Test(a, r);
 
@@ -218,7 +216,7 @@ static inline const char* npEati(const char *s, int *i, const coeffs r)
   return nEati((char *)s,i,(int)r->ch);
 }
 
-const char * npRead (const char *s, number *a, const coeffs r)
+static const char * npRead (const char *s, number *a, const coeffs r)
 {
   int z;
   int n=1;
@@ -475,7 +473,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
 }
 
 #ifdef LDEBUG
-BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
+static BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
 {
   if (((long)a<0L) || ((long)a>(long)r->ch))
   {
@@ -606,7 +604,7 @@ static number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs d
   return (number) (f.intval());
 }
 
-nMapFunc npSetMap(const coeffs src, const coeffs)
+static nMapFunc npSetMap(const coeffs src, const coeffs)
 {
 #ifdef HAVE_RINGS
   if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src))
@@ -645,7 +643,7 @@ nMapFunc npSetMap(const coeffs src, const coeffs)
 //  operation for very large primes (32749< p < 2^31-1)
 // ----------------------------------------------------------
 #ifdef NV_OPS
-void nvInpMult(number &a, number b, const coeffs r)
+static void nvInpMult(number &a, number b, const coeffs r)
 {
   number n=nvMult(a,b,r);
   a=n;
@@ -657,7 +655,7 @@ static inline number nvInversM (number c, const coeffs r)
   return (number)inv;
 }
 
-number nvDiv (number a,number b, const coeffs r)
+static number nvDiv (number a,number b, const coeffs r)
 {
   if ((long)a==0L)
     return (number)0L;

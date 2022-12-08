@@ -389,7 +389,7 @@ static void nnWriteLong (number a, const coeffs r)
 }
 
 #if 0
-void nrPower (number a, int i, number * result, const coeffs r)
+static void nrPower (number a, int i, number * result, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );
 
@@ -509,7 +509,7 @@ static const char * nnRead (const char *s, number *a, const coeffs r)
 /*2
 * test valid numbers: not implemented yet
 */
-BOOLEAN  nnDBTest(number a, const char *f, const int l, const coeffs r)
+static BOOLEAN  nnDBTest(number a, const char *f, const int l, const coeffs r)
 {
   BOOLEAN bo=FALSE;
   number_array A=(number_array)a;
@@ -546,7 +546,7 @@ static number nnMap(number from, const coeffs aRing, const coeffs r)
   }
 }
 
-nMapFunc nnSetMap(const coeffs, const coeffs)
+static nMapFunc nnSetMap(const coeffs, const coeffs)
 {
   return nnMap;
 }

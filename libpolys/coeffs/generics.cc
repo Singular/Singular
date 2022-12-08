@@ -38,16 +38,16 @@ static void gCoeffWrite(const coeffs r, BOOLEAN b)
   coeffs1->cfCoeffWrite(coeffs1,b);
 }
 
-char* gCoeffName(const coeffs r)
+static char* gCoeffName(const coeffs r)
 {
   return coeffs1->cfCoeffName(coeffs1);
 }
-void gKillChar(coeffs r)
+static void gKillChar(coeffs r)
 {
   coeffs1->cfKillChar(coeffs1);
   coeffs2->cfKillChar(coeffs2);
 }
-void gSetChar(coeffs r)
+static void gSetChar(coeffs r)
 {
   coeffs1->cfSetChar(coeffs1);
   coeffs2->cfSetChar(coeffs2);
