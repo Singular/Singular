@@ -521,7 +521,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
     // t-initial ideal of the new ideal at the same time
     if(dd!=0)
     {
-      // the procedurce cutdown computes a new ring, in which there lives a
+      // the procedure cutdown computes a new ring, in which there lives a
       // zero-dimensional
       // ideal which has been computed by cutting down the input with
       // generic linear forms

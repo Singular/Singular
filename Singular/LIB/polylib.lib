@@ -632,7 +632,7 @@ EXAMPLE: example mindeg1; shows examples
          int u = i+1;
          int e = -1; i=u;
       }
-      else                        //case: inded is nonnegative
+      else                        //case: mindeg is nonnegative
       {
          while ( jet(c,i,v) == 0 ) { i = 2*(i+1); }
          int o = i-1;

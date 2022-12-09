@@ -1002,7 +1002,7 @@ InternalPoly::comparesame ( InternalCF * acoeff )
             // we test on inequality of coefficients at this
             // point instead of testing on "less than" at the
             // last `else' in the enclosed `if' statement since a
-            // test on inequaltiy in general is cheaper
+            // test on inequality in general is cheaper
             if ( (cursor1->exp != cursor2->exp) || (cursor1->coeff != cursor2->coeff) )
             {
                 if ( cursor1->exp > cursor2->exp )

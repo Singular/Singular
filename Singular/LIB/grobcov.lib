@@ -7381,8 +7381,8 @@ RETURN: The list  [[1,S1],[2,S2],..],
        called is also returned to provide information
        about the values of the variables determined
        for every value of the parameters.
-       If the propsition is false for every values of the
-       parameters, then the emply list is returned.
+       If the proposition is false for every values of the
+       parameters, then the empty list is returned.
 OPTIONS: An option is a pair of arguments: string,
        integer. To modify the default options, pairs
        of arguments -option name, value- of valid options

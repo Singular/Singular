@@ -347,7 +347,7 @@ explicitly fixed during the definition of the current ring.
 @item For monomial orderings, which are not compatible with the length, the following error
 message might appear:
 @code{degree bound of Letterplace ring is 11, but at least 12 is needed for this multiplication}
-In such a situation, activating @code{option(redSB)}, @code{option(redTail)} and increaing the
+In such a situation, activating @code{option(redSB)}, @code{option(redTail)} and increasing the
 length (degree) bound might help. Though there are situations, where nothing leads to a finite
 computation simply while the nature of non-Noetherian rings is so.
 @end itemize

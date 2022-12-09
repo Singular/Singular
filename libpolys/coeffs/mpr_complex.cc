@@ -104,7 +104,7 @@ void gmp_float::setFromStr(const char * in )
   if (neg)  mpf_neg( t, t );
 }
 #else
-// problemns with solve_s.tst
+// problems with solve_s.tst
 void gmp_float::setFromStr(const char * in )
 {
   BOOLEAN neg=false;

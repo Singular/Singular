@@ -2967,7 +2967,7 @@ EXAMPLE:    example arrPoincare;"
 
 example
 {
-"EXAMPLE: The poincare polynomial of the braid arrangement in k dimensions is given as: " +
+"EXAMPLE: The Poincare polynomial of the braid arrangement in k dimensions is given as: " +
 "pi(A,t) = (1 + t)*...*(1 + (k-1)*t)"; echo = 2;
 ring R = 0,(x,y,z,u,v),dp;
 arr A = arrBraid(5);
@@ -2980,7 +2980,7 @@ v;
 // X(A,t) = t^l * pi(A,-t^-1)
 proc arrCharPoly(def input)
 "USAGE:     arrCharPoly(arr A)
-RETURN:     [intvec] coefficients of the characteristic polynomial of A in incresing order
+RETURN:     [intvec] coefficients of the characteristic polynomial of A in increasing order
 REMARKS:    The algorithm only returns the coefficients of the characteristic polynomial since they
             are whole numbers but the basering could be something different.
 SEE ALSO:   arrCharPoly, arrPoincare

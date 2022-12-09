@@ -3709,7 +3709,7 @@ BOOLEAN rComplete(ring r, int force)
 
         if(s == 0) // Prefix IS
           rO_ISPrefix(j, j_bits, prev_ordsgn, tmp_ordsgn, r->N, v, tmp_typ[typ_i++]); // What about prev_ordsgn?
-        else // s = +1 or -1 // Note: typ_i might be incrimented here inside!
+        else // s = +1 or -1 // Note: typ_i might be incremented here inside!
         {
           rO_ISSuffix(j, j_bits, prev_ordsgn, tmp_ordsgn, r->N, v, tmp_typ, typ_i, s); // Suffix.
           need_to_add_comp=FALSE;

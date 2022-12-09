@@ -1384,7 +1384,7 @@ PURPOSE: creates a new ring containing the same variables as R, but without
          'mpoly' = 0.
 RETURN:  ring
 ASSUME:  R = K[x_1,...,x_n] where K = Q or K = Q(a).
-NOTE:    Creates the ring needed for all prodecures with name 'proc-name'Main
+NOTE:    Creates the ring needed for all procedures with name 'proc-name'Main
 "
 {
   def altring=basering;

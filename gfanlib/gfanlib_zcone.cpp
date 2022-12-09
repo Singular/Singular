@@ -550,7 +550,7 @@ _L99:
     m1=poly->m1;
 
     /* this number is same as poly->m, except when
-        poly is given by nonhomogeneous inequalty:
+        poly is given by nonhomogeneous inequality:
         !(poly->homogeneous) && poly->representation==Inequality,
         it is poly->m+1.   See dd_ConeDataLoad.
      */
@@ -1127,9 +1127,9 @@ ZMatrix ZCone::extremeRays(ZMatrix const *generatorsOfLinealitySpace)const
     {
       /* At this point we know lineality space, implied equations and
          also inequalities for the ray. To construct a vector on the
-         ray which is stable under (or indendent of) angle and
-         linarity preserving transformation we find the dimension 1
-         subspace orthorgonal to the implied equations and the
+         ray which is stable under (or independant of) angle and
+         linearity preserving transformation we find the dimension 1
+         subspace orthogonal to the implied equations and the
          lineality space and pick a suitable primitive generator */
 
           /* To be more precise,
