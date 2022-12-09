@@ -1785,6 +1785,7 @@ RETURN:  int,
          maxideal in the basering (which is then assumed to be local)@*
          - if called with 2 arguments: the depth of M'=coker(M) w.r.t. the
          ideal I.
+NOTE:    if I*M==M, depth is infinity, return -1 in this case.
 NOTE:    procedure makes use of KoszulHomology.
 EXAMPLE: example depth; shows an example.
 "
@@ -1795,6 +1796,7 @@ EXAMPLE: example depth; shows an example.
 
   if (size(#)==0)
   {
+    if (size(M)==0) { return(-1); } //+infinity
     // depth(M') over local basering
     while(i<n)
     {
@@ -1805,6 +1807,9 @@ EXAMPLE: example depth; shows an example.
   }
 
   ideal I=simplify(#,2);
+  if (size(M)==0) { return(-1); } //+infinity
+  if (size(reduce(M,std(I*M),5))==0) // M in I*M
+  { return(-1); } //+infinity
   while(i<size(I))
   {
     i++;
