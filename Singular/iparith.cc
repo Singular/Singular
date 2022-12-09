@@ -190,7 +190,7 @@ typedef struct
   struct sValCmdM *psValCmdM;
   unsigned nCmdUsed;      /**< number of commands used */
   unsigned nCmdAllocated; /**< number of commands-slots allocated */
-  unsigned nLastIdentifier; /**< valid indentifieres are slot 1..nLastIdentifier */
+  unsigned nLastIdentifier; /**< valid identifiers are slot 1..nLastIdentifier */
 } SArithBase;
 
 /*---------------------------------------------------------------------*

@@ -204,7 +204,7 @@ example applications for Factory.
 =================================
 Algorithms for manipulation of polynomial ideals via the characteristic set
 methods (e.g., calculating the characteristic set and the irreducible
-characteristic series) are now incorpareted into factory.
+characteristic series) are now incorporated into factory.
 If you want to learn about characteristic sets, the next is a good point
 to start with:
     Dongming Wang:

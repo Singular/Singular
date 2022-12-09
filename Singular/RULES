@@ -44,9 +44,9 @@ Error messages:
   - have a complete test of the input in debug mode (#ifndef SING_NDEBUG)
 - report internal errors via dReportError
 
-Indentiation:
--------------
-- matching  { } should be in the same line (for very short staements)
+Indentation:
+------------
+- matching  { } should be in the same line (for very short statements)
   or in the same column
 
 System dependicies:

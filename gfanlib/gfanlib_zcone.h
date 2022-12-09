@@ -125,8 +125,8 @@ class ZCone
   int getState()const;
 public:
    /**
-    * Constructs a polyhedral cone with specified equations and ineqalities. They are read off as rows
-    * of the matrices. For efficiency it is possible to specifying a PolyhedralConePreassumptions flag
+    * Constructs a polyhedral cone with specified equations and inequalities. They are read off as rows
+    * of the matrices. For efficiency it is possible to specify a PolyhedralConePreassumptions flag
     * which tells what is known about the description already.
     */
      ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, int preassumptions_=PCP_none);

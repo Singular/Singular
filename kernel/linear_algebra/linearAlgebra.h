@@ -177,7 +177,7 @@ bool lowerLeftTriangleInverse(
  *
  * With A denoting the matrix to be inverted, the method expects the
  * LU-decomposition of A, that is, pMat * A = lMat * uMat, where
- * the argument matrices have the appropriate proteries; see method
+ * the argument matrices have the appropriate properties; see method
  * 'luDecomp(const matrix aMat, matrix &pMat, matrix &lMat,
  * matrix &uMat)'.<br>
  * Furthermore, uMat is expected to be an (n x n)-matrix. Then A^(-1)
@@ -230,7 +230,7 @@ int luRank(
  *
  * The method expects the LU-decomposition of A, that is,
  * pMat * A = lMat * uMat, where the argument matrices have the
- * appropriate proteries; see method
+ * appropriate properties; see method
  * 'luDecomp(const matrix aMat, matrix &pMat, matrix &lMat,
  * matrix &uMat)'.<br>
  * Instead of trying to invert A and return x = A^(-1)*b, this
@@ -275,7 +275,7 @@ bool luSolveViaLUDecomp(
  *
  * The method expects the LDU-decomposition of A, that is,
  * pMat * A = lMat * dMat^(-1) * uMat, where the argument matrices have
- * the appropriate proteries; see method
+ * the appropriate properties; see method
  * 'lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat,
  * matrix &dMat, matrix &uMat, poly &l, poly &u, poly &lTimesU)'.<br>
  * Instead of trying to invert A and return x = A^(-1)*b, this

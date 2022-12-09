@@ -663,7 +663,7 @@ Todos/Issues:
 
 Todos/Issues:
 @itemize
-@item formatting is inapprociate
+@item formatting is inappropriate
 @item avoid export
 @item bad names(or should be static):
 identifyvars, elimrep, convertdata, lcmofall, genoutput, salida,

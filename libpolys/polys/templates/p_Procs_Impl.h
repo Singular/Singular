@@ -21,7 +21,7 @@
 /***************************************************************
  Here is how it works:
  At run-time, SetProcs is used to choose the appropriate PolyProcs
-              based on the ring properies.
+              based on the ring properties.
  At generate-time, SetProcs is used to generate all
               possible PolyProcs.
  Which PolyProcs are generated/used can be controled by values of

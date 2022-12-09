@@ -2544,7 +2544,7 @@ example
   // the coefficients of the Chern character of the complex projective plane
   print( chProj(2) );
 
-  // the coefficients of the Chern character of the complex 3-dimentional projectice space
+  // the coefficients of the Chern character of the complex 3-dimensional projective space
   print( chProj(3) );
 }
 //------------------------------------------------------------------------------------------

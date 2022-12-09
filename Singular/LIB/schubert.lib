@@ -2,7 +2,7 @@
 version="version schubert.lib 4.2.0.1 Jan_2021 "; // $Id$
 category="Algebraic Geometry";
 info="
-LIBRARY:    schubert.lib    Proceduces for Intersection Theory
+LIBRARY:    schubert.lib    Procedures for Intersection Theory
 
 AUTHOR:     Hiep Dang,          email: hiep@mathematik.uni-kl.de
 

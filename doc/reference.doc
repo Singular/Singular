@@ -2376,7 +2376,7 @@ See
 @item @strong{Type:}
 cring
 @item @strong{Purpose:}
-returns a coefficient ring of floating point (inexect) real number
+returns a coefficient ring of floating point (inexact) real number
 to be used in ring definitions.
 @item @strong{Example:}
 @smallexample

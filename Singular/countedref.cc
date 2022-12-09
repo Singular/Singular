@@ -287,7 +287,7 @@ public:
   /// Get number of references pointing here, too
   BOOLEAN count(leftv res) { return construct(res, m_data.count() - 1); }
 
-  // Get internal indentifier
+  // Get internal identifier
   BOOLEAN enumerate(leftv res) { return construct(res, (long)(data_type*)m_data); }
 
   /// Check for likewise identifiers

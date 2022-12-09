@@ -410,7 +410,7 @@ $T2H_OPTIONS -> {l2h} =
 # The following options are only relevant if $T2H_L2H is set
 #
 # -l2h_l2h
-# name/location of latex2html progam
+# name/location of latex2html program
 $T2H_L2H_L2H = "latex2html";
 $T2H_OPTIONS -> {l2h_l2h} =
 {
