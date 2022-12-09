@@ -273,6 +273,49 @@ int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int sta
   }
 }
 
+static int kFindDivisibleByInS_Z(const kStrategy strat, LObject* L)
+{
+  unsigned long not_sev = ~L->sev;
+  int j = 0;
+  int o = -1;
+
+  const polyset S=strat->S;
+  const unsigned long* sevS=strat->sevS;
+  number rest, orest, mult;
+  L->GetP();
+  if (L->p!=NULL)
+  {
+    const ring r=currRing;
+    const poly p=L->p;
+    orest = pGetCoeff(p);
+
+    pAssume(~not_sev == p_GetShortExpVector(p, r));
+
+    loop
+    {
+      if (j > strat->sl) return o;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmShortDivisibleBy(S[j], sevS[j],p, not_sev, r))
+#else
+      if (!(sevS[j] & not_sev) && p_LmDivisibleBy(S[j], p, r))
+#endif
+      {
+        mult= n_QuotRem(pGetCoeff(p), pGetCoeff(S[j]), &rest, r->cf);
+        if (!n_IsZero(mult, r->cf) && n_Greater(n_EucNorm(orest, r->cf), n_EucNorm(rest, r->cf), r->cf))
+        {
+          o = j;
+          orest = rest;
+        }
+      }
+      j++;
+    }
+  }
+  else
+  {
+    return -1;
+  }
+}
+
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
 int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start)
@@ -635,7 +678,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 
 #ifdef HAVE_RINGS
 /*2
-*  reduction procedure for the ring Z/2^m
+*  reduction procedure for the ring coeffs
 */
 int redRing_Z (LObject* h,kStrategy strat)
 {
@@ -795,6 +838,119 @@ int redRing_Z (LObject* h,kStrategy strat)
   }
 }
 
+static int redRing_Z_S (LObject* h,kStrategy strat)
+{
+  if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
+  if (strat->sl<0) return 1;
+
+  int at;
+  long d;
+  int j = 0;
+  int pass = 0;
+
+// TODO warum SetpFDeg notwendig?
+  h->SetpFDeg();
+  assume(h->pFDeg() == h->FDeg);
+  long reddeg = h->GetpFDeg();
+  h->SetShortExpVector();
+  int max_ind=strat->sl;
+
+  loop
+  {
+    /* check if a reducer of the lead term exists */
+    max_ind=strat->sl;
+    j = kFindDivisibleByInS(strat,&max_ind, h);
+    if (j < 0)
+    {
+#if STDZ_EXCHANGE_DURING_REDUCTION
+      /* check if a reducer with the same lead monomial exists */
+      j = kFindSameLMInT_Z(strat, h);
+      if (j < 0)
+      {
+#endif
+        /* check if a reducer of the lead monomial exists, by the above
+         * check this is a real divisor of the lead monomial */
+        j = kFindDivisibleByInS_Z(strat, h);
+        if (j < 0)
+        {
+          // over ZZ: cleanup coefficients by complete reduction with monomials
+          if (rHasLocalOrMixedOrdering(currRing))
+            postReduceByMon(h, strat);
+          if(h->p == NULL)
+          {
+            h->Clear();
+            return 0;
+          }
+          if(nIsZero(pGetCoeff(h->p))) return 2;
+          max_ind=strat->sl;
+          j = kFindDivisibleByInS(strat, &max_ind, h);
+          if(j < 0)
+          {
+            if (h->GetLmTailRing() == NULL)
+            {
+              h->Clear();
+              return 0;
+            }
+            return 1;
+          }
+        }
+        else
+        {
+          /* not(lc(reducer) | lc(poly)) && not(lc(poly) | lc(reducer))
+           * => we try to cut down the lead coefficient at least */
+          /* first copy T[j] in order to multiply it with a coefficient later on */
+          number mult, rest;
+          TObject tj(pCopy(strat->S[j]));
+          /* compute division with remainder of lc(h) and lc(S[j]) */
+          mult = n_QuotRem(pGetCoeff(h->p), pGetCoeff(strat->S[j]),
+                  &rest, currRing->cf);
+          /* set corresponding new lead coefficient already. we do not
+           * remove the lead term in ksReducePolyLC, but only apply
+           * a lead coefficient reduction */
+          tj.Mult_nn(mult);
+          ksReducePolyLC(h, &tj, NULL, &rest, strat);
+          tj.Delete();
+          tj.Clear();
+        }
+#if STDZ_EXCHANGE_DURING_REDUCTION
+      }
+      else
+      {
+        /* same lead monomial but lead coefficients do not divide each other:
+         * change the polys to h <- spoly(h,tj) and h2 <- gpoly(h,tj). */
+        LObject h2  = *h;
+        h2.Copy();
+        TObject tj(strat->S[j]);
+
+        ksReducePolyZ(h, &tj, NULL, NULL, strat);
+        ksReducePolyGCD(&h2, &tj, NULL, NULL, strat);
+        if (!rHasLocalOrMixedOrdering(currRing))
+        {
+          redtailBbaAlsoLC_Z_S(&h2, j, strat);
+        }
+        /* replace h2 for tj in L (already generated pairs with tj), S and T */
+        replaceInLAndSAndT(h2, j, strat);
+      }
+#endif
+    }
+    else
+    {
+      TObject tj(strat->S[j]);
+      ksReducePoly(h, &tj, NULL, NULL, NULL, strat);
+    }
+    /* printf("\nAfter small red: ");pWrite(h->p); */
+    if (h->GetLmCurrRing() == NULL)
+    {
+      h->Clear();
+      return 0;
+    }
+    h->SetShortExpVector();
+    d = h->SetpFDeg();
+    /*- try to reduce the s-polynomial -*/
+    pass++;
+  }
+}
+
 int redRing (LObject* h,kStrategy strat)
 {
   if (strat->tl<0) return 1;
@@ -894,6 +1050,66 @@ int redRing (LObject* h,kStrategy strat)
         reddeg = d;
       }
     }
+  }
+}
+
+static int redRing_S (LObject* h,kStrategy strat)
+{
+  if (strat->sl<0) return 1;
+  if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
+
+  int at/*,i*/;
+  long d;
+  int j = 0;
+  int pass = 0;
+  // poly zeroPoly = NULL;
+
+  h->SetpFDeg();
+  assume(h->pFDeg() == h->FDeg);
+  long reddeg = h->GetpFDeg();
+  int max_ind;
+
+  h->SetShortExpVector();
+  loop
+  {
+    max_ind=strat->sl;
+    j = kFindDivisibleByInS(strat, &max_ind, h);
+    if (j < 0)
+    {
+      // over ZZ: cleanup coefficients by complete reduction with monomials
+      postReduceByMon(h, strat);
+      if(h->p == NULL)
+      {
+        h->Clear();
+        return 0;
+      }
+      if(nIsZero(pGetCoeff(h->p))) return 2;
+      max_ind=strat->sl;
+      j = kFindDivisibleByInS(strat, &max_ind,h);
+      if(j < 0)
+      {
+        if (h->GetLmTailRing() == NULL)
+        {
+          h->Clear();
+          return 0;
+        }
+        return 1;
+      }
+    }
+    //printf("\nFound one: ");pWrite(strat->T[j].p);
+    //enterT(*h, strat);
+    TObject tj(strat->S[j]);
+    ksReducePoly(h, &tj, NULL, NULL, NULL, strat); // with debug output
+    //printf("\nAfter small red: ");pWrite(h->p);
+    if (h->GetLmTailRing() == NULL)
+    {
+      h->Clear();
+      return 0;
+    }
+    h->SetShortExpVector();
+    d = h->SetpFDeg();
+    /*- try to reduce the s-polynomial -*/
+    pass++;
   }
 }
 #endif
@@ -2119,10 +2335,6 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   }
   LObject P(h);
   P.SetShortExpVector();
-  P.bucket = kBucketCreate(currRing);
-  kBucketInit(P.bucket,P.p,pLength(P.p));
-  kbTest(P.bucket);
-  P.p=kBucketGetLm(P.bucket);
   P.t_p=NULL;
 #ifdef HAVE_RINGS
   BOOLEAN is_ring = rField_is_Ring(currRing);
@@ -2139,7 +2351,31 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 //    }
 //  };
 #endif
+  if (rField_is_Z(currRing))
+  {
+    redRing_Z_S(&P,strat);
+    if (P.bucket!=NULL)
+    {
+      P.p=kBucketClear(P.bucket);
+      kBucketDestroy(&P.bucket);
+    }
+    return P.p;
+  }
+  else if (rField_is_Ring(currRing))
+  {
+    redRing_S(&P,strat);
+    if (P.bucket!=NULL) 
+    {
+      P.p=kBucketClear(P.bucket);
+      kBucketDestroy(&P.bucket);
+    }
+    return P.p;
+  }
 
+  P.bucket = kBucketCreate(currRing);
+  kBucketInit(P.bucket,P.p,pLength(P.p));
+  kbTest(P.bucket);
+  P.p=kBucketGetLm(P.bucket);
   loop
   {
     j_ring=j=kFindDivisibleByInS_noCF(strat,&max_ind,&P);

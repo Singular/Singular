@@ -119,35 +119,24 @@ KINLINE sTObject::sTObject(ring r)
 }
 KINLINE void sTObject::Set(poly p_in, ring r)
 {
+#ifdef HAVE_SHIFTBBA
+  if (r->isLPring)
+  {
+    shift = si_max(p_mFirstVblock(p_in, r) - 1, 0);
+    if (!shift) p_Test(p_in, r);
+  }
+  else
+#endif
+  {
+    p_Test(p_in, r);
+  }
   if (r != currRing)
   {
     assume(r == tailRing);
-#ifdef HAVE_SHIFTBBA
-    if (r->isLPring)
-    {
-      shift = si_max(p_mFirstVblock(p_in, r) - 1, 0);
-      if (!shift) p_Test(p_in, r);
-    }
-    else
-#endif
-    {
-      p_Test(p_in, r);
-    }
     t_p = p_in;
   }
   else
   {
-#ifdef HAVE_SHIFTBBA
-    if (currRing->isLPring)
-    {
-      shift = si_max(p_mFirstVblock(p_in, currRing) - 1, 0);
-      if (!shift) p_Test(p_in, currRing);
-    }
-    else
-#endif
-    {
-      p_Test(p_in, currRing);
-    }
     p = p_in;
   }
   pLength=::pLength(p_in);
