@@ -1807,9 +1807,9 @@ EXAMPLE: example depth; shows an example.
   }
 
   ideal I=simplify(#,2);
-  if (size(M)==0) { return(-1); } //+infinity
-  if (size(reduce(M,std(I*M),5))==0) // M in I*M
-  { return(-1); } //+infinity
+  //if (size(M)==0) { return(-1); } //+infinity
+  //if (size(reduce(M,std(I*M),5))==0) // M in I*M
+  //{ return(-1); } //+infinity
   while(i<size(I))
   {
     i++;
