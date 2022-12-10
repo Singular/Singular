@@ -18,9 +18,11 @@ endif
 if ENABLE_P_PROCS_DYNAMIC
   USE_P_PROCS_DYNAMIC_CC = templates/p_Procs_Dynamic.cc
   P_PROCS_CPPFLAGS_COMMON = ${AM_CPPFLAGS} -DDYNAMIC_VERSION
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 else
   USE_P_PROCS_DYNAMIC_CC =
   P_PROCS_CPPFLAGS_COMMON = ${AM_CPPFLAGS}
+  P_PROCS_MODULE_LDFLAGS = -module
 endif
 
 
@@ -69,10 +71,10 @@ p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
 p_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
 p_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
 
-p_Procs_FieldGeneral_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
-p_Procs_FieldIndep_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
-p_Procs_FieldQ_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
-p_Procs_FieldZp_la_LDFLAGS = -module ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldGeneral_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldIndep_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldQ_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldZp_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 
 P_PROCS = templates/p_Procs_Lib.cc
 
