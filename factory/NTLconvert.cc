@@ -1223,11 +1223,3 @@ CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(const mat_zz_pE &m, const Variable & a
   return res;
 }
 #endif
-#ifdef HAVE_NTL
-#ifdef NOSTREAMIO
-#if defined(__FreeBSD__)
-// dummy, required on freebsd 13
-std::istream& NTL::operator>>(std::istream& s, NTL::ZZ& x) {return s;}
-#endif
-#endif
-#endif
