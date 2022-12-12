@@ -200,6 +200,7 @@
     ("arnoldClassify" . "arnoldClassify.      (line   6")
     ("arnoldclassify.lib" . "arnoldclassify_lib.  (line   6")
     ("arnoldclassify_lib" . "arnoldclassify_lib.  (line   6")
+    ("arnoldClassify_to_string" . "arnoldClassify_to_string")
     ("arnoldCorank" . "arnoldCorank.        (line   6")
     ("arnoldDeterminacy" . "arnoldDeterminacy.   (line   6")
     ("arnoldListAllSeries" . "arnoldListAllSeries. (line   6")
