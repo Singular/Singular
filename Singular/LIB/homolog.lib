@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version homolog.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version homolog.lib 4.3.1.2 Dez_2022 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -1794,9 +1794,9 @@ EXAMPLE: example depth; shows an example.
   int n=size(m);
   int i;
 
+  if (size(M)==0) { return(-1); } //+infinity
   if (size(#)==0)
   {
-    if (size(M)==0) { return(-1); } //+infinity
     // depth(M') over local basering
     while(i<n)
     {
@@ -1807,9 +1807,8 @@ EXAMPLE: example depth; shows an example.
   }
 
   ideal I=simplify(#,2);
-  //if (size(M)==0) { return(-1); } //+infinity
-  //if (size(reduce(M,std(I*M),5))==0) // M in I*M
-  //{ return(-1); } //+infinity
+  if (size(reduce(M,std(I*M),5))==0) // M in I*M
+  { return(-1); } //+infinity
   while(i<size(I))
   {
     i++;
@@ -1822,7 +1821,7 @@ example
   ring R=0,(x,y,z),dp;
   ideal I=x2,xy,yz;
   module M=0;
-  depth(M,I);   // depth(<x2,xy,yz>,Q[x,y,z])
+  depth(M,I);
   ring r=0,(x,y,z),ds;  // local ring
   matrix M[2][2]=x,xy,1+yz,0;
   print(M);
