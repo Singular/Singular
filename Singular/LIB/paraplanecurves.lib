@@ -964,7 +964,7 @@ EXAMPLE: example mapToRatNormCurve; shows an example
      {
         rl[2][k+3] = "y("+string(k)+")";
      }
-   rl[3]= list(list("dp",1:(3+n)),list("C",0));
+   rl[3]= list(list("wp",intvec(1:3, (n-1):n)),list("C",0));
    def Relim = ring(rl);
    setring Relim;
    ideal IC = fetch(Roriginal,IC);
