@@ -1515,7 +1515,7 @@ EXAMPLE: example flatteningStrat; shows an example
    ideal F;
    while(1)
    {
-      F=interred(fitting(M,w));
+      F=fitting(M,w); // fitting returns a GB
       if(F[1]==1){return(l);}
       if(size(F)!=0){v++;l[v]=F;}
       w++;
@@ -1544,9 +1544,9 @@ EXAMPLE: example isFlat; shows an example.
    while(size(F)==0)
    {
       w++;
-      F=fitting(M,w);
+      F=fitting(M,w); // fitting returns a GB
    }
-   if (deg(std(F)[1])==0) {return(1);}
+   if (deg(F[1])==0) {return(1);}
    return(0);
 }
 example
