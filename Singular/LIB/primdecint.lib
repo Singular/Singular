@@ -14,6 +14,7 @@ OVERVIEW:
   A library for computing the primary decomposition of an ideal in the
   polynomial ring over the integers, Z[x_1,...,x_n].
   The first procedure 'primdecZ' can be used in parallel.
+  The coefficients must always be ZZ.
 
   Reference: Pfister,   Sadiq, Steidel , \"An Algorithm for primary decomposition in polynomial rings over the integers\" , arXiv:1008.2074
 
@@ -38,7 +39,8 @@ LIB "ring.lib";
 proc primdecZ(ideal I, list #)
 "USAGE:  primdecZ(I[, n]); I ideal, n integer (number of processors)
 NOTE:    If size(#) > 0, then #[1] is the number of available processors for
-         the computation.
+         the computation.@*
+         The coefficients must be ZZ.
 RETURN:  a list pr of primary ideals and their associated primes:
 @format
    pr[i][1]   the i-th primary component,
@@ -47,6 +49,7 @@ RETURN:  a list pr of primary ideals and their associated primes:
 EXAMPLE: example primdecZ; shows an example
 "
 {
+   if (coeffs(basering)!=ZZ) { ERROR("coefficoents must be ZZ"); }
    if(size(I)==0){return(list(list(ideal(0),ideal(0))));}
 
 //--------------------  Initialize optional parameters  ------------------------
@@ -399,10 +402,12 @@ example
 
 proc minAssZ(ideal I)
 "USAGE:  minAssZ(I); I ideal
+         The coefficients must be ZZ.
 RETURN:  a list pr of associated primes:
 EXAMPLE: example minAssZ; shows an example
 "
 {
+   if (coeffs(basering)!=ZZ) { ERROR("coefficoents must be ZZ"); }
    if(size(I)==0){return(list(ideal(0)));}
    if(deg(I[1])==0)
    {
@@ -536,10 +541,12 @@ example
 
 proc heightZ(ideal I)
 "USAGE:  heightZ(I); I ideal
+         The coefficients must be ZZ.
 RETURN:  the height of the input ideal
 EXAMPLE: example heightZ; shows an example
 "
 {
+   if (coeffs(basering)!=ZZ) { ERROR("coefficoents must be ZZ"); }
    if(size(I)==0){return(0);}
    if(deg(I[1])==0)
    {
@@ -629,10 +636,12 @@ example
 
 proc radicalZ(ideal I)
 "USAGE:  radicalZ(I); I ideal
+         The coefficients must be ZZ.
 RETURN:  the radcal of the input ideal
 EXAMPLE: example radicalZ; shows an example
 "
 {
+   if (coeffs(basering)!=ZZ) { ERROR("coefficoents must be ZZ"); }
    if(size(I)==0){return(ideal(0));}
    if(deg(I[1])==0)
    {
@@ -732,10 +741,12 @@ example
 
 proc equidimZ(ideal I)
 "USAGE:  equidimZ(I); I ideal
+         The coefficients must be ZZ.
 RETURN:  the part of minimal height
 EXAMPLE: example equidimZ; shows an example
 "
 {
+   if (coeffs(basering)!=ZZ) { ERROR("coefficoents must be ZZ"); }
    if(size(I)==0){return(ideal(0));}
    if(deg(I[1])==0)
    {
@@ -913,11 +924,13 @@ example
 
 proc intersectZ(ideal I, ideal J)
 "USAGE:  intersectZ(I,J); I,J ideals
+         The coefficients must be ZZ.
 RETURN:  the intersection of the input ideals
 NOTE:    this is an alternative to intersect(I,J) over integers,
          is faster for some examples and should be kept for debug purposes.
 EXAMPLE: example intersectZ; shows an example
 {
+   if (coeffs(basering)!=ZZ) { ERROR("coefficoents must be ZZ"); }
    def R = basering;
    ring S=integer,( X(1..nvars(R)) ), ( dp(nvars(R)) );
    ideal I = fetch(R,I);
@@ -1500,6 +1513,7 @@ static proc extractZM(list M, list L)
 
 proc primdecZM(module N)
 "USAGE:  primdecZM(N); N module
+         The coefficients must be ZZ.
 RETURN:  a list pr of primary modules and their associated primes:
 @format
    pr[i][1]   the i-th primary component,
