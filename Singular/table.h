@@ -77,6 +77,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjDUMMY),      CMATRIX_CMD,     CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_NC |ALLOW_RING}
 #endif
 //,{  jjWRONG ,       COLS_CMD,        0,              VECTOR_CMD  , ALLOW_NC |ALLOW_RING}
+,{D(jjCOEFFS1),    COEFFS_CMD,      CRING_CMD,      RING_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_NC |ALLOW_RING|NO_CONVERSION}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        SMATRIX_CMD   , ALLOW_NC |ALLOW_RING|NO_CONVERSION}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_NC |ALLOW_RING|NO_CONVERSION}
@@ -1024,7 +1025,7 @@ VAR cmdnames cmds[] =
   { "Poly",       0, CPOLY_CMD ,         ROOT_DECL_LIST},
 #endif
   { "coef",        0, COEF_CMD ,          CMD_M},
-  { "coeffs",      0, COEFFS_CMD ,        CMD_23},
+  { "coeffs",      0, COEFFS_CMD ,        CMD_123},
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},

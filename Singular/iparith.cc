@@ -3885,6 +3885,13 @@ static BOOLEAN jjCHAR(leftv res, leftv v)
   res->data = (char *)(long)rChar((ring)v->Data());
   return FALSE;
 }
+static BOOLEAN jjCOEFFS1(leftv res, leftv v)
+{
+  ring r=(ring)v->Data();
+  r->cf->ref++;
+  res->data = (char *)r->cf;
+  return FALSE;
+}
 static BOOLEAN jjCOLS(leftv res, leftv v)
 {
   res->data = (char *)(long)MATCOLS((matrix)(v->Data()));

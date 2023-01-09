@@ -891,6 +891,10 @@ See
 @*@code{coeffs (} module_expression@code{,} ring_variable@code{,} matrix_name @code{)}
 @item @strong{Type:}
 matrix
+@item @strong{Syntax:}
+@code{coeffs (} ring_expression @code{)}
+@item @strong{Type:}
+cring
 @item @strong{Purpose:}
 develops each polynomial of the first argument J
 as a univariate polynomial in the given ring_variable
@@ -1120,6 +1124,19 @@ provided by K.
   print(K);
   matrix A = coeffs(M, K, xy);   // leaving z as variable of interest
   print(A);   // attention: only the first row of M is reproduced by K*A
+@c example
+@end smallexample
+@item @strong{Syntax:}
+@code{coeffs (} ring_expression @code{)}
+@item @strong{Type:}
+cring
+@item @strong{Purpose:}
+return the coeffcient ring of the argument
+@item @strong{Example:}
+@smallexample
+@c example
+  ring R=QQ,x,dp;
+  coeffs(R);
 @c example
 @end smallexample
 @end table
