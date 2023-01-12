@@ -67,7 +67,7 @@ rm -rf %{buildroot}
 %{_libexecdir}/*
 
 %files common
-%doc README COPYING ChangeLog
+%doc README COPYING
 %{_datadir}/*
 #%{_mandir}/*
 #%{_infodir}/*
