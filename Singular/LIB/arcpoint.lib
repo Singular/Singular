@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version arcpoint.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version arcpoint.lib 4.3.1.3 Jan_2023 "; // $Id$
 //-*- mode:C++;-*-
 
 category="Singularities";
@@ -496,7 +496,7 @@ EXAMPLE: example equalJinI; shows an example"
   int k;
   for(k=1;k<=col;k++)
   {
-    if(reduce(I[k],J)!=0)
+    if(reduce(I[k],J,5)!=0)
     { return(0);}
   }
   return(1);

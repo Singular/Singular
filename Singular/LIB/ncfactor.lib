@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////
-version="version ncfactor.lib 4.2.0.1 Apr_2021 "; //$Id$
+version="version ncfactor.lib 4.3.1.3 Jan_2023 "; //$Id$
 category="Noncommutative";
 info="
 LIBRARY: ncfactor.lib  Tools for factorization in some noncommutative algebras
@@ -7253,13 +7253,14 @@ ASSUMPTIONS:
   {//Adding the theta_i to solutionSystemforqs to get vdim neq infty
     theThetas = theThetas + theta(i);
   }//Adding the theta_i to solutionSystemforqs to get vdim neq infty
-  if(vdim(slimgb(solutionSystemforqs + theThetas))==0)
+  int v_s_t=vdim(slimgb(solutionSystemforqs + theThetas));
+  if(v_s_t==0)
   {//No solution in this case. Return the empty list
     dbprint(p,dbprintWhitespace+"The Groebner Basis of the solution system was <1>.");
     setring(R);
     return(list());
   }//No solution in this case. Return the empty list
-  if(vdim(slimgb(solutionSystemforqs + theThetas))==-1)
+  if(v_s_t==-1)
   {//My conjecture is that this would never happen
     dbprint(p,dbprintWhitespace+"There are infinitely many solution to this system.
 We will return the empty list.");
@@ -7268,11 +7269,11 @@ We will return the empty list.");
   }//My conjecture is that this would never happen
   else
   {//We have finitely many solutions
-    if(vdim(slimgb(solutionSystemforqs+theThetas))==1)
+    if(v_s_t==1)
     {//exactly one solution
       for (i = 2; i<= size(qs)-1;i++)
       {
-        qs[i][2] = NF(qs[i][2],slimgb(solutionSystemforqs));
+        qs[i][2] = NF(qs[i][2],solutionSystemforqs); //solutionSystemforqs is GB
       }
       setring(R);
       ideal finalMapList;

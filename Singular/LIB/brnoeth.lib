@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version brnoeth.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version brnoeth.lib 4.3.1.3 Jan_2023 "; // $Id$
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -430,7 +430,7 @@ static proc closed_points_ext (poly f,int d,ideal SL)
     for (j=1;j<=m;j=j+1)
     {
       // check if singular i.e. if SL is contained in aux
-      if ( NF(SL[j],aux) != 0 )
+      if ( size(NF(SL[j],aux,5)) != 0 )
       {
         counter=counter+1;
         LP[counter]=list(aux,iv);
@@ -508,12 +508,12 @@ static proc closed_points_deg (poly f,int d,ideal SL)
 static proc idealSubset (ideal I,ideal J)
 {
   // checks whether I is contained in J and returns a boolean
-  // remark : J is assumed to be given by a standard basis
   int s=ncols(I);
   int i;
+  J=std(J);
   for (i=1;i<=s;i=i+1)
   {
-    if ( NF(I[i],std(J)) != 0 )
+    if ( size(NF(I[i],J,5)) != 0 )
     {
       return(0);
     }
