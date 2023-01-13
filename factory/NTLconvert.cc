@@ -43,7 +43,7 @@
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 
-VAR long fac_NTL_char = -1;         // the current characterstic for NTL calls
+VAR long fac_NTL_char = -1;         // the current characteristic for NTL calls
                                 // -1: undefined
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
