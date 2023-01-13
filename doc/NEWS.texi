@@ -110,7 +110,7 @@ New libraries:
 Changes in the kernel/build system:
 @itemize
 @item @code{liftstd} (with 2 arguments) improved (@nref{liftstd})
-@item building on Cygwin with shared libaries
+@item building on Cygwin with shared libraries
 @item building the manual via @code{--enable-doc-build}
 @end itemize
 
@@ -153,7 +153,7 @@ Changes in the kernel/build system:
 @itemize
 @item update for using FLINT 2.6.x and for FLINT 2.7.0
 @item Singular can be build with NTL or FLINT or both
-(if non is availabel, @code{factroize} and @code{gcd} will not work.)
+(if none is available, @code{factorize} and @code{gcd} will not work.)
 @end itemize
 
 @heading News for version 4-1-3

@@ -17,7 +17,7 @@
 #       cut absolute directory names from the loaded messages
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
-#       Processing is aborted if error occures in Singular run,
+#       Processing is aborted if error occurs in Singular run,
 #       unless 'error' is specified
 #       if no_comp is given, then computation is not run
 #       if unix_only is given, then computation is only run
@@ -262,7 +262,7 @@ EOT
 #       cut absolute directory names from the loaded messages
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
-#       Processing is aborted if error occures in Singular run,
+#       Processing is aborted if error occurs in Singular run,
 #       unless 'error' is specified
 #       If [no_comp] is given, actual computation is not run
 #       if [unix_only] is given, then computation is only run
@@ -318,7 +318,7 @@ sub HandleExample
   {
     $line++;
     last if (/^\@c\s*example\s*$/);
-#    s/^\s*//; # remove preceeding white spaces
+#    s/^\s*//; # remove preceding white spaces
     if ($no_ex || $exclude_ex{$tag} || $no_comp || $unix_only)
     {
       &protect_texi;
@@ -405,7 +405,7 @@ sub HandleExample
       else
       {
 	local($to_do, $done);
-	# remove absolute path names from laoded messages
+	# remove absolute path names from loaded messages
 	s/^(\/\/ \*\* loaded )(.*)\/(.+).lib(.*)/$1$3.lib$4/;
 	# shorten error occurred in messages
         s/\? error occurred in [^ ]* line/\? error occurred in line/;
@@ -491,7 +491,7 @@ sub HandleRef
     $header = $_ unless ($header)
   }
   chomp $header;
-  die "$ERRROR no matching \@c ref found for $doc_file:$lline\n"
+  die "$ERROR no matching \@c ref found for $doc_file:$lline\n"
     unless (/^\@c\s*ref\s*$/);
   # sort refs
   @refs = sort(keys(%refs));
@@ -566,7 +566,7 @@ sub HandleLib
   $n_ex = 1 if ($no_ex || /no_ex/ || (/unix_only/ && $Win32));
   $section = $1 if /(\w*)section/;
 
-  # contruct tex file name
+  # construct tex file name
   $tex_file = "$doc_subdir/$lib"."_lib";
   if ($n_fun)
   {
@@ -649,7 +649,7 @@ sub HandleLib
 }
 
 ####################################################################
-# Auxillary routines
+# Auxiliary routines
 #
 
 # protect texi special characters
