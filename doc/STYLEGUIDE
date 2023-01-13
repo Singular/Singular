@@ -247,7 +247,7 @@ i;  // mit Leerzeichen beginnen.
   the general topic first, separated by comma, and followed by
   specialization (like "help, online help system").
 
-+ Use the @anchor{label} construct, to set arbitraty labels, to which
++ Use the @anchor{label} construct, to set arbitrary labels, to which
   you can refer to with @ref{label}. For example:
 @anchor{option(prot);}
   Put the @anchor before the explained topic, otherwise the html

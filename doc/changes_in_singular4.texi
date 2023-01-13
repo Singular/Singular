@@ -152,7 +152,7 @@ The redesign of Singular will allow us to provide new features in the future, fo
 @subsection Notes for developers
 @cindex Notes for developers
 
-There has been an entensive process of refactoring, redesign and modularization
+There has been an intensive process of refactoring, redesign and modularization
 of Singular to facilitate easier maintenance and future development:
 
 @c table @asis
@@ -161,12 +161,12 @@ of Singular to facilitate easier maintenance and future development:
 @item Removed MP (Multi protocol) in favor of SSI links.
 @item Separation/modularization into libraries and packages
 @c add diagram as an image?
-@item For easy integration of new coeffcient rings,
+@item For easy integration of new coefficient rings,
 we defined a generic interface for coefficient
 rings and a supporting framework for making them
 accessible to the user.
 
-In particular we have separated everything related to coeffcient rings into a separate library @code{libcoeffs}.
+In particular we have separated everything related to coefficient rings into a separate library @code{libcoeffs}.
 Dependency tree between restructured packages is show at @uref{https://www.singular.uni-kl.de/dox/singular.png}
 
 In order to use @code{libSingular} as a C++ library, see @ref{libSingular}.
