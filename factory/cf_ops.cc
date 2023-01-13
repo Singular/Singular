@@ -394,7 +394,7 @@ getVars ( const CanonicalForm & f )
       if ( i > 0 ) i--;
    }
 ~~~~~~~~~~~~~~~~~~~~~
- * Then apply( f, diff ) is differentation of f with respect to the
+ * Then apply( f, diff ) is differentiation of f with respect to the
  * main variable of f.
  *
 **/
