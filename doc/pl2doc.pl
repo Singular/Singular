@@ -359,7 +359,7 @@ sub OutInfoItem
   }
   elsif ($item =~ m/example/i)
   {
-    # forget about example, since it comes explicitely
+    # forget about example, since it comes explicitly
     return '';
   }
   elsif ($item =~ m/procedure/i)

@@ -44,7 +44,7 @@ Changed commands:
 @item @code{delete} accepts @code{intvec} for the indices to delete (@nref{delete})
 @item several GB based commands accept the choice of the algorithm:
 @code{"std","slimgb","sba","modstd","singmatic","groebner","ffmod","nfmod"} (@nref{syz}, @nref{eliminate}, @nref{intersect}, @nref{modulo}, @nref{liftstd}, @nref{lift})
-@item @code{reduce} for non-field coefficents: search best reduction
+@item @code{reduce} for non-field coefficients: search best reduction
 @end itemize
 
 Changes in the kernel/build system:
@@ -110,7 +110,7 @@ New libraries:
 Changes in the kernel/build system:
 @itemize
 @item @code{liftstd} (with 2 arguments) improved (@nref{liftstd})
-@item building on Cygwin with shared libaries
+@item building on Cygwin with shared libraries
 @item building the manual via @code{--enable-doc-build}
 @end itemize
 
@@ -153,7 +153,7 @@ Changes in the kernel/build system:
 @itemize
 @item update for using FLINT 2.6.x and for FLINT 2.7.0
 @item Singular can be build with NTL or FLINT or both
-(if non is availabel, @code{factroize} and @code{gcd} will not work.)
+(if none is available, @code{factorize} and @code{gcd} will not work.)
 @end itemize
 
 @heading News for version 4-1-3
@@ -282,7 +282,7 @@ Syntax changes:
 @item new (additional) form of multi-indicies: (for example @code{i(1,2,3,4,5)})
       (@nref{Names})
 @item changed behaviour of @code{charstr} (@nref{charstr})
-@item new data type @code{cring} to describe the coeffient rings, to be used
+@item new data type @code{cring} to describe the coefficient rings, to be used
       for the new definitions for (polynomial) rings (@nref{General syntax of a ring declaration})
 @item new command @code{ring_list} to access the parts used to construct polynomial rings (@nref{ring_list},@nref{ringlist})
 @item extended polynomial ring construction: also from lists produced by @code{ring_list}
