@@ -673,14 +673,14 @@ EXAMPLE: example lift_rel_kb;  shows examples
 "
 {
   poly p = product(maxideal(1));
-       M = std(M);
-  matrix A;
+  M = std(M);
   if (size(#)>0) { p=#[2]; module kbaseM=#[1];}
   else
   { if (vdim(M)<=0) { "// vdim(M) not finite";return(A);}
     module kbaseM = kbase(M);
   }
   N = reduce(N,M);
+  matrix A;
   if (simplify(N,10)[1]==[0]) {return(A);}
   A = coeffs(N,kbaseM,p);
   return(A);

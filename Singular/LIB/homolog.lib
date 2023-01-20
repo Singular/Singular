@@ -1101,8 +1101,8 @@ EXAMPLE: example homology; shows examples
 example
 {"EXAMPLE";    echo=2;
   ring r;
-  ideal id=maxideal(4);
-  qring qr=std(id);
+  ideal id=maxideal(4); // GB
+  qring qr=id;
   module N=maxideal(3)*freemodule(2);
   module M=maxideal(2)*freemodule(2);
   module B=[2x,0],[x,y],[z2,y];
