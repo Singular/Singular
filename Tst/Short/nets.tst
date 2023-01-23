@@ -94,7 +94,7 @@ netRing(r);
 
 kill r;
 ring R = 7,(x,y,z), dp;
-qring r = std(maxideal(2));
+qring r = maxideal(2);
 netRing(r);
 
 

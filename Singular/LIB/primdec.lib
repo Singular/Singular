@@ -6821,6 +6821,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
       ideal zero_rad = zeroRad(@j);
       dbprint(printlevel - voice, "zero_rad passed");
       // SL 2
+      zero_rad = std(zero_rad);
     }
     else
     {
@@ -6834,7 +6835,6 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     // h which is the lcm of the leading coefficients of the fi considered in
     // the quotientring: this is coded in saturn
 
-    zero_rad = std(zero_rad);
 
     ideal hpl;
 

@@ -198,7 +198,8 @@ EXAMPLE: example semiCMcod2; shows an example"
 //---------------------------------------------------------------------------
 // Initialization
 //---------------------------------------------------------------------------
-  module t1erz=kbase(std(t1));
+  t1=std(t1);
+  module t1erz=kbase(t1);
   int tau=vdim(t1);
   int gt=ncols(M);
   int i;
