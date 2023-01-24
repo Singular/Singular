@@ -30,6 +30,7 @@ Changed libraries:
 @itemize
 @item chern.lib: fixed @code{symNsym} (@nref{chern_lib})
 @item homolog.lib: fixed corner cases for @code{depth} (@nref{homolog_lib})
+@item many: call std in many places only if attribute @code{isSB} is not set
 @end itemize
 
 New commands:

@@ -56,7 +56,8 @@ SEE ALSO:   triang_lib
 EXAMPLE:    example closed_points; shows an example
 "
 {
-  ideal II=std(I);
+  ideal II;
+  if (attrib(I,"isSB")) { II=I; } else { II=std(I); }
   if (II[1]==1)
   {
     return(list());
@@ -510,7 +511,7 @@ static proc idealSubset (ideal I,ideal J)
   // checks whether I is contained in J and returns a boolean
   int s=ncols(I);
   int i;
-  J=std(J);
+  if (!attrib(J,"isSB")) { J=std(J);}
   for (i=1;i<=s;i=i+1)
   {
     if ( size(NF(I[i],J,5)) != 0 )

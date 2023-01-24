@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version normal.lib 4.3.0.1 Feb_2022 "; // $Id$
+version="version normal.lib 4.3.1.1 Jan_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -820,17 +820,11 @@ EXAMPLE: example HomJJ;  shows an example
       ring newR1 = char(R),(X(1..nvars(R)),T(1..q)),dp;
    }
 
-   //map psi1 = P,maxideal(1);          //### psi1 durch fetch ersetzt
-   //ideal SBid = psi1(SBid);
    ideal SBid = fetch(P,SBid);
    attrib(SBid,"isSB",1);
 
-   qring newR = std(SBid);
+   qring newR = SBid;
 
-   //map psi = R,ideal(X(1..nvars(R)));  //### psi durch fetch ersetzt
-   //ideal id = psi(id);
-   //ideal f = psi(f);
-   //module syzf = psi(syzf);
    ideal id = fetch(R,id);
    ideal f = fetch(R,f);
    module syzf = fetch(R,syzf);

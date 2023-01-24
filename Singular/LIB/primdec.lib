@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.2.1.1 Jul_2021 "; // $Id$
+version="version primdec.lib 4.3.1.3 Jan_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -78,7 +78,8 @@ NOTE:    result is a std basis in the basering
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
   int @k;
-  ideal inew=std(id);
+  ideal inew=id;
+  if (!attrib(id,"isSB")) { inew=std(id);}
   ideal iold;
   intvec op=option(get);
   option(returnSB);
@@ -384,7 +385,9 @@ example
 
 proc idealsEqual( ideal k, ideal j)
 {
-  return(stdIdealsEqual(std(k),std(j)));
+  if (!attrib(k,"isSB")) { k=std(k);}
+  if (!attrib(j,"isSB")) { j=std(j);}
+  return(stdIdealsEqual(k,j));
 }
 
 static proc specialIdealsEqual( ideal k1, ideal k2)
@@ -6821,7 +6824,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
       ideal zero_rad = zeroRad(@j);
       dbprint(printlevel - voice, "zero_rad passed");
       // SL 2
-      zero_rad = std(zero_rad);
+      if(!attrib(zero_rad,"isSB")) { zero_rad = std(zero_rad);}
     }
     else
     {

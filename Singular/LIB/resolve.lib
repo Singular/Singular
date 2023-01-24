@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version resolve.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version resolve.lib 4.3.1.3 Jan_2023 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -1439,7 +1439,7 @@ EXAMPLE: internal procedure - no example available
     }
   }
   potid=std(potid);
-  potid2=std(potid2);
+  if(!attrib(potid2,"isSB")) { potid2=std(potid2); }
   for(kk=1;(((kk<=count)||(kk<=maxkk+1))&&(kk<=count2));kk++)
   {
 //-------------------------------------------------------------------------

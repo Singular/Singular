@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version elim.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version elim.lib 4.3.1.3 Jan_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -730,7 +730,7 @@ EXAMPLE: example sat; shows an example
 "{
    int ii,kk;
    def i=id;
-   id=std(id);
+   if (!attrib(id,"isSB")) { id=std(id);}
    int p = printlevel-voice+2;  // p=printlevel (default: p=0)
    while( ii<=ncols(i) )
    {
