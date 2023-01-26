@@ -314,13 +314,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== cpu ==================================*/
     if(strcmp(sys_cmd,"cpu")==0)
     {
-      long cpu=1; //feOptValue(FE_OPT_CPUS);
+      #if 0
+      long cpu=1;
       #ifdef _SC_NPROCESSORS_ONLN
       cpu=sysconf(_SC_NPROCESSORS_ONLN);
       #elif defined(_SC_NPROCESSORS_CONF)
       cpu=sysconf(_SC_NPROCESSORS_CONF);
       #endif
       res->data=(void *)cpu;
+      #else
+      res->data=(void *)feOptValue(FE_OPT_CPUS);
+      #endif
       res->rtyp=INT_CMD;
       return FALSE;
     }
