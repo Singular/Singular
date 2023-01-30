@@ -2,7 +2,7 @@
 
 #ifdef STANDALONE_PARSER
 
-#include "resources/fegetopt.h"
+#include <unistd.h>
 #include "Singular/utils.h"
 #include "Singular/libparse.h"
 
@@ -43,16 +43,16 @@ void main_init(int argc, char *argv[])
 {
   int c;
 
-  while((c=fe_getopt(argc, argv, "ihdc:sf:"))>=0)
+  while((c=getopt(argc, argv, "ihdc:sf:"))>=0)
   {
     switch(c)
     {
         case 'd':
           lpverbose = 1;
-          if(isdigit(argv[fe_optind-1][0])) sscanf(optarg, "%d", &lpverbose);
-          else fe_optind--;
+          if(isdigit(argv[optind-1][0])) sscanf(optarg, "%d", &lpverbose);
+          else optind--;
           break;
-        case 'f': lib_file = argv[fe_optind-1];
+        case 'f': lib_file = argv[optind-1];
           break;
         case 's':
           check++;
@@ -67,10 +67,10 @@ void main_init(int argc, char *argv[])
         case 'h' :
           usage(argv[0]);
           break;
-        case -1 : printf("no such option:%s\n", argv[fe_optind]);
+        case -1 : printf("no such option:%s\n", argv[optind]);
           usage(argv[0]);
           break;
-        default: printf("no such option.%x, %c %s\n", c&0xff, c, argv[fe_optind]);
+        default: printf("no such option.%x, %c %s\n", c&0xff, c, argv[optind]);
           usage(argv[0]);
     }
   }
@@ -86,18 +86,18 @@ void main_init(int argc, char *argv[])
   }
   else
   {
-    while(argc>fe_optind && yylpin==NULL)
+    while(argc>optind && yylpin==NULL)
     {
-      yylpin = fopen( argv[fe_optind], "rb" );
+      yylpin = fopen( argv[optind], "rb" );
       if(yylpin!=NULL)
       {
-        lib_file = argv[fe_optind];
+        lib_file = argv[optind];
         if (! (texinfo_out || category_out) )
-          printf("Checking library '%s'\n", argv[fe_optind]);
+          printf("Checking library '%s'\n", argv[optind]);
         else if (! category_out)
           printf("$library = \"%s\";\n", lib_file);
       }
-      else fe_optind++;
+      else optind++;
     }
   }
   if(yylpin == NULL)

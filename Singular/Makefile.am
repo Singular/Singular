@@ -182,7 +182,7 @@ libparse_CPPFLAGS = ${AM_CPPFLAGS} -DSTANDALONE_PARSER
 
 libparse_SOURCES = libparse.cc utils.cc utils.h
 
-libparse_LDADD = ${top_builddir}/resources/libsingular_resources.la
+#libparse_LDADD = ${top_builddir}/resources/libsingular_resources.la
 libparse_LDFLAGS = ${AM_LDFLAGS}
 
 #########################################################
