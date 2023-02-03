@@ -4361,17 +4361,8 @@ static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
 {
   matrix mat=(matrix)v->CopyD(MATRIX_CMD);
   IDELEMS((ideal)mat)=MATCOLS(mat)*MATROWS(mat);
-  if (IDELEMS((ideal)mat)==0)
-  {
-    idDelete((ideal *)&mat);
-    mat=(matrix)idInit(1,1);
-  }
-  else
-  {
-    MATROWS(mat)=1;
-    mat->rank=1;
-    idTest((ideal)mat);
-  }
+  MATROWS(mat)=1;
+  mat->rank=1;
   res->data=(char *)mat;
   return FALSE;
 }

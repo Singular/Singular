@@ -36,13 +36,6 @@ static poly mp_SelectId (ideal I, poly what, const ring R);
 /// create a r x c zero-matrix
 matrix mpNew(int r, int c)
 {
-  int rr=r;
-  if (rr<=0) rr=1;
-  //if ( (((int)(MAX_INT_VAL/sizeof(poly))) / rr) <= c)
-  //{
-  //  Werror("internal error: creating matrix[%d][%d]",r,c);
-  //  return NULL;
-  //}
   matrix rc = (matrix)omAllocBin(sip_sideal_bin);
   rc->nrows = r;
   rc->ncols = c;
