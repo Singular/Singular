@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version bfun.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version bfun.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: bfun.lib     Algorithms for b-functions and Bernstein-Sato polynomial
@@ -1011,12 +1011,12 @@ EXAMPLE: example pIntersectSyz; shows examples
     string str;
     int badprime;
     i=1;
+    number c;
     while (badprime == 0 && i<=size(s)) // detect bad primes
     {
-      str = string(denominator(leadcoef(s[i])));
-      str = "c = " + str + ";";
+      c=denominator(leadcoef(s[i]));
       setring @Rp;
-      execute(str);
+      c=fetch(save,c);
       if (c == 0) { badprime = 1; }
       setring save;
       i++;
@@ -1024,18 +1024,18 @@ EXAMPLE: example pIntersectSyz; shows examples
     str = "poly s = " + string(s) + ";";
     if (size(RL) > 4) // basering is NC-algebra
     {
-      string RL5 = "@C = " + string(RL[5]) + ";";
-      string RL6 = "@D = " + string(RL[6]) + ";";
+      matrix @C=RL[5];
+      matrix @D=RL[6];
       setring @Rp;
-      matrix @C[n][n]; matrix @D[n][n];
-      execute(RL5); execute(RL6);
+      matrix @C[n][n]=fetch(save,@C);
+      matrix @D[n][n]=fetch(save,@D);
       def Rp = nc_algebra(@C,@D);
     }
     else { def Rp = @Rp; }
     setring Rp;
     kill @Rp;
     dbprint(ppl-1,"// solving in ring ", Rp);
-    execute(str);
+    poly s=fetch(save,s);
     vector v;
     number c;
     ideal NI = 1;
@@ -1043,10 +1043,9 @@ EXAMPLE: example pIntersectSyz; shows examples
     i=1;
     while (badprime == 0 && i<=size(I)) // detect bad primes
     {
-      str = string(leadcoef(cleardenom(I[i])));
-      str = "c = " + str + ";";
+      c=leadcoef(cleardenom(I[i]));
       setring Rp;
-      execute(str);
+      c=fetch(save,c);
       if (c == 0) { badprime = 1; }
       setring save;
       i++;
@@ -1084,10 +1083,9 @@ EXAMPLE: example pIntersectSyz; shows examples
     {
       for (j=1; j<=size(newNF); j++)
       {
-        str = string(denominator(leadcoef(s[i])));
-        str = "c = " + str + ";";
+        c=denominator(leadcoef(s[i]));
         setring Rp;
-        execute(str);
+        c=fetch(save,c);
         if (c == 0)
         {
           print("// WARNING: bad prime");
@@ -1099,7 +1097,8 @@ EXAMPLE: example pIntersectSyz; shows examples
       }
       str = "NI[" + string(i) + "+1] = " + string(newNF) + ";";
       setring Rp;
-      execute(str); // NI[i+1] = [newNF]_{solveincharp}
+      NI[i+1]=fetch(save,newNF);
+      // NI[i+1] = [newNF]_{solveincharp}
       v = linSyzSolve(NI,modengine);
       if (v!=0) // there is a modular solution
       {
@@ -1390,10 +1389,9 @@ static proc bfctengine (poly f, int inorann, int whichengine, int addPD, int std
       }
       int short_save = short; // workaround for map Q(a_i) -> Z/q(a_i)
       short = 0;
-      string strLJq = "ideal LJq = " + string(LJ) + ";";
       int nD = nvars(D);
-      string L5 = "matrix @C[nD][nD]; @C = " + string(L[5]) + ";";
-      string L6 = "matrix @D[nD][nD]; @D = " + string(L[6]) + ";";
+      matrix @C[nD][nD] = L[5];
+      matrix @D[nD][nD] = L[6];
       L = L[1..4];
       i = 1;
       while (b == 0)
@@ -1407,10 +1405,11 @@ static proc bfctengine (poly f, int inorann, int whichengine, int addPD, int std
           if (typeof(L[1]) == "int") { L[1] = q; }
           else { L[1][1] = q; } // parameters
           def @Rq = ring(L); setring @Rq;
-          execute(L5); execute(L6);
+          matrix @C=fetch(D,@C);
+          matrix @D=fetch(D,@D);
           def Rq = nc_algebra(@C,@D); // def Rq = nc_algebra(1,@D);
           setring Rq; kill @Rq;
-          execute(strLJq);
+          ideal LJq=fetch(D,LJ);
           sLJq = size(LJq);
           setring D; kill Rq;
           if (sLJq <> sJ ) // detect unlucky prime

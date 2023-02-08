@@ -995,10 +995,10 @@ RETURN: list A  , which gives generators set of the Weierstrass semigroup corres
      {
        d=deg(Param[i][2]);
        TT=Param[i];
-       mpo=string(Param[i][2]);
+       poly mpo=Param[i][2];
        ring S1=(0,a),(t),ds;
        setring S1;
-       execute("minpoly="+mpo+";");
+       minpoly=imap(S,mpo);
        list TT=imap(S,TT);
        list T;
        ideal J1;
