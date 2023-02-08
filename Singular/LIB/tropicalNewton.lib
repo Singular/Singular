@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version tropicalNewton.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version tropicalNewton.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Tropical Geometry";
 info="
 LIBRARY:         tropicalNewton.lib  Computations in Tropical Geometry
@@ -487,29 +487,29 @@ EXAMPLE: example tropicalPointNewton; shows an example
   dbprint("maximal independent set: "+string(u));
 
   int n = nvars(origin);
-  string vars;
-  string subststr = "ideal J = subst(I,";
+  ideal @map_im;
   list VV;
   number c;
+  list vars;
   for (int i=1; i<=n; i++)
   {
     if (u[i]==0)
     {
-      vars = vars+varstr(i)+",";
+      @map_im[i]=var(i);
+      vars=vars+list(string(var(i)));
     }
     else
     {
       c = randomValuedNumber(#);
       VV[i]=number(val(c));
       dbprint("substituting "+string(var(i))+" with number of valuation "+string(VV[i]));
-      subststr = subststr+varstr(i)+","+string(c)+",";
+      @map_im[i]=c;
     }
   }
-  vars = vars[1..size(vars)-1];
-  subststr = string(subststr[1..size(subststr)-1])+");";
-  execute(subststr);
+  map @map=basering,@map_im;
+  ideal J=@map(I);
 
-  ring s = create_ring(ring_list(origin)[1], "("+vars+")", "lp", "no_minpoly");
+  ring s = create_ring(ring_list(origin)[1], vars, "lp", "no_minpoly");
   ideal J = imap(origin,J);
   int tstdlp = timer;
   dbprint("computing triangular decomposition (picking first factor)");
