@@ -5758,7 +5758,7 @@ example
 
 
 
-static proc absPrimdecGTZ_i(int patchPrimaryDecomposition, ideal I, list #)
+static proc absPrimdecGTZ_i(int @patchPrimaryDecomposition, ideal @I, list #)
 {
 // if parameter patchPrimaryDecomposition=1,  drop the unit ideal in the decomposition,
 //           since the unit ideal it is not prime, otherwise take no special action.
@@ -5773,54 +5773,54 @@ static proc absPrimdecGTZ_i(int patchPrimaryDecomposition, ideal I, list #)
 
   if(size(#)>0)
   {
-     int keep_comp=1;
+     int @keep_comp=1;
   }
 
   if(attrib(basering,"global")!=1)
   {
 // algorithm automatically passes to the global case
 // hence prepare to go back to an appropriate new ring
-      def r=basering;
-      ideal max_of_r=maxideal(1);
-      def s=changeord(list(list("dp",1:nvars(basering))));
-      setring s;
-      def I=imap(r,I);
-      def S=absPrimdecGTZ_i(patchPrimaryDecomposition,I);
-      setring S;
-      ring r1=char(basering),var(nvars(r)+1),dp;
-      def rS=r+r1;
+      def @r=basering;
+      ideal @max_of_r=maxideal(1);
+      def @s=changeord(list(list("dp",1:nvars(basering))));
+      setring @s;
+      def @I=imap(@r,@I);
+      def @S=absPrimdecGTZ_i(@patchPrimaryDecomposition,@I);
+      setring @S;
+      ring @r1=char(basering),var(nvars(@r)+1),dp;
+      def @rS=@r+@r1;
 // move objects to appropriate ring and clean up
-      setring rS;
-      def max_of_r=imap(r,max_of_r);
-      attrib(max_of_r,"isSB",1);
-      def absolute_primes=imap(S,absolute_primes);
-      def primary_decomp=imap(S,primary_decomp);
-      if(!defined(keep_comp))
+      setring @rS;
+      def @max_of_r=imap(@r,@max_of_r);
+      attrib(@max_of_r,"isSB",1);
+      def absolute_primes=imap(@S,absolute_primes);
+      def primary_decomp=imap(@S,primary_decomp);
+      if(!defined(@keep_comp))
       {
-         ideal tempid;
-         for(int k=size(absolute_primes);k>=1;k--)
+         ideal @tempid;
+         for(int @k=size(absolute_primes);@k>=1;@k--)
          {
-            tempid=absolute_primes[k][1];
-            tempid[1]=0;                  // ignore minimal polynomial
-            if(size(reduce(lead(tempid),max_of_r,5))!=0)
+            @tempid=absolute_primes[k][1];
+            @tempid[1]=0;                  // ignore minimal polynomial
+            if(size(reduce(lead(@tempid),@max_of_r,5))!=0)
             {
 // 1 contained in ideal, i.e. component does not meet origin in local ordering
-               absolute_primes=delete(absolute_primes,k);
+               absolute_primes=delete(absolute_primes,@k);
             }
          }
-         for(k=size(primary_decomp);k>=1;k--)
+         for(@k=size(primary_decomp);@k>=1;@k--)
          {
-            if(mindeg(std(lead(primary_decomp[k][2]))[1])==0)
+            if(mindeg(std(lead(primary_decomp[@k][2]))[1])==0)
             {
 // 1 contained in ideal, i.e. component does not meet origin in local ordering
-               primary_decomp=delete(primary_decomp,k);
+               primary_decomp=delete(primary_decomp,@k);
             }
          }
-         kill tempid;
+         kill @tempid;
       }
       export(primary_decomp);
       export(absolute_primes);
-      return(rS);
+      return(@rS);
   }
   if(minpoly!=0)
   {
@@ -5829,69 +5829,68 @@ static proc absPrimdecGTZ_i(int patchPrimaryDecomposition, ideal I, list #)
       "Not implemented yet for algebraic extensions.Simulate the ring extension by adding the minpoly to the ideal"
     );
   }
-  def R=basering;
-  int n=nvars(R);
-  list L=decomp_i(patchPrimaryDecomposition,I,3);
-  if (patchPrimaryDecomposition && size(L)==0 )
+  def @R=basering;
+  int @n=nvars(@R);
+  list @L=decomp_i(@patchPrimaryDecomposition,@I,3);
+  if (@patchPrimaryDecomposition && size(@L)==0 )
   {
      "// will not handle case with unit ideal";
   }
-  string newvar=L[1][3];
-  int k=find(newvar,",",find(newvar,",")+1);
-  newvar=newvar[k+1..size(newvar)];
-  list lR=ring_list(R);
-  int i,de,ii;
-  intvec vv=1:n;
-  //for(i=1;i<=n;i++){vv[i]=1;}
+  string @newvar=@L[1][3];
+  int @k=find(@newvar,",",find(@newvar,",")+1);
+  @newvar=@newvar[@k+1..size(@newvar)];
+  list @lR=ring_list(@R);
+  int @i,@de,@ii;
+  intvec @vv=1:@n;
 
-  list orst;
-  orst[1]=list("dp",vv);
-  orst[2]=list("dp",intvec(1));
-  orst[3]=list("C",0);
-  lR[3]=orst;
-  lR[2][n+1] = newvar;
-  def Rz = ring(lR);
-  setring Rz;
-  list L=imap(R,L);
+  list @orst;
+  @orst[1]=list("dp",@vv);
+  @orst[2]=list("dp",intvec(1));
+  @orst[3]=list("C",0);
+  @lR[3]=@orst;
+  @lR[2][@n+1] = @newvar;
+  def @Rz = ring(@lR);
+  setring @Rz;
+  list @L=imap(@R,@L);
   list absolute_primes,primary_decomp;
-  ideal I,M,N,K;
-  M=maxideal(1);
-  N=maxideal(1);
-  poly p,q,f,g;
-  map phi,psi;
-  string tvar;
-  for(i=1;i<=size(L);i++)
+  ideal @I,@M,@N,@K;
+  @M=maxideal(1);
+  @N=maxideal(1);
+  poly @p,@q,@f,@g;
+  map @phi,@psi;
+  string @tvar;
+  for(@i=1;@i<=size(@L);@i++)
   {
-    tvar=L[i][4];
-    ii=find(tvar,"+");
-    while(ii)
+    @tvar=@L[@i][4];
+    @ii=find(@tvar,"+");
+    while(@ii)
     {
-      tvar=tvar[ii+1..size(tvar)];
-      ii=find(tvar,"+");
+      @tvar=@tvar[@ii+1..size(@tvar)];
+      @ii=find(@tvar,"+");
     }
-    for(ii=1;ii<=nvars(basering);ii++)
+    for(@ii=1;@ii<=nvars(basering);@ii++)
     {
-      if(tvar==string(var(ii))) break;
+      if(@tvar==string(var(@ii))) break;
     }
-    I=L[i][2];
-    execute("K="+L[i][3]+";");
-    p=K[1];
-    q=K[2];
-    execute("f="+L[i][4]+";");
-    g=2*var(ii)-f;
-    M[ii]=f;
-    N[ii]=g;
-    de=deg(p);
-    psi=Rz,M;
-    phi=Rz,N;
-    I=phi(I),p,q;
-    I=std(I);
-    absolute_primes[i]=list(psi(I),de);
-    primary_decomp[i]=list(L[i][1],L[i][2]);
+    @I=@L[@i][2];
+    execute("@K="+@L[@i][3]+";");
+    @p=@K[1];
+    @q=@K[2];
+    execute("@f="+@L[@i][4]+";");
+    @g=2*var(@ii)-@f;
+    @M[@ii]=@f;
+    @N[@ii]=@g;
+    @de=deg(@p);
+    @psi=@Rz,@M;
+    @phi=@Rz,@N;
+    @I=@phi(@I),@p,@q;
+    @I=std(@I);
+    absolute_primes[@i]=list(@psi(@I),@de);
+    primary_decomp[@i]=list(@L[@i][1],@L[@i][2]);
   }
   export(primary_decomp);
   export(absolute_primes);
-  setring R;
+  setring @R;
   dbprint( printlevel-voice+4,"
 // 'absPrimdecGTZ' created a ring, in which two lists absolute_primes (the
 // absolute prime components) and primary_decomp (the primary and prime
@@ -5900,7 +5899,7 @@ static proc absPrimdecGTZ_i(int patchPrimaryDecomposition, ideal I, list #)
 // assigned to the return value):
         setring S; absolute_primes; ");
 
-  return(Rz);
+  return(@Rz);
 }
 
 
