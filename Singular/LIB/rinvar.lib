@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version rinvar.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version rinvar.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -108,12 +108,15 @@ EXAMPLE: example ImageGroup; shows an example
   // the matrix is represented as the list 'matrixEntries' where
   // the entries which are always 0 are omittet.
 
-  for(i = 1; i <= ncols(Gaction); i++) {
+  for(i = 1; i <= ncols(Gaction); i++)
+  {
     tVars = tVars * var(i + nvars(basering) - ncols(Gaction));
   }
-  for(i = 1; i <= ncols(Gaction); i++){
+  for(i = 1; i <= ncols(Gaction); i++)
+  {
     coMx = coef(Gaction[i], tVars);
-    for(j = 1; j <= ncols(coMx); j++){
+    for(j = 1; j <= ncols(coMx); j++)
+    {
       k++;
       matrixEntries[k] = coMx[2, j];
     }
@@ -148,7 +151,7 @@ EXAMPLE: example ImageGroup; shows an example
   // s(1..newVars) as the original basering and map the ideal
   // Gn (contains only z(1..newVars)) to this ring
 
-  list l1;  
+  list l1;
   for (int zz = 1; zz <= newVars; zz++)
   {
    l1[size(l1)+1] = "s("+string(zz)+")";
@@ -157,8 +160,7 @@ EXAMPLE: example ImageGroup; shows an example
   {
    l1[size(l1)+1] = "t("+string(yy)+")";
   }
-  ring RIGS = create_ring(ring_list(basering)[1], l1, "lp", "no_minpoly");
-  execute("minpoly = number(" + @mPoly + ");");
+  ring RIGS = create_ring(ring_list(basering)[1], l1, "lp");
   ideal mapIdeal, groupid, actionid;
   int offset;
 
@@ -430,8 +432,7 @@ EXAMPLE: example LinearizeAction; shows an example
         if(defined(RLAB)) { kill RLAB;}
         def RLAB = basering;
         if(defined(RLAR)) { kill RLAR;}
-        ring RLAR = create_ring(ring_list(basering)[1], "(" + varstr(basering)+ ",t(" + string(nrt) + "))", "(" + order + ")", "no_minpoly");
-        execute("minpoly = number(" + @mPoly + ");");
+        ring RLAR = create_ring(ring_list(basering)[1], "(" + varstr(basering)+ ",t(" + string(nrt) + "))", "(" + order + ")");
 
         ideal basis, action, G, reduceIdeal;
         matrix decompMx;
@@ -654,11 +655,13 @@ EXAMPLE: example InvariantRing; shows an example
         ideal action = actionid;
         setring RIRR;
         string parName, minPoly;
-        if(npars(basering) == 0) {
+        if(npars(basering) == 0)
+        {
           parName = "a";
           minPoly = "0";
         }
-        else {
+        else
+        {
           parName = parstr(basering);
           minPoly = string(minpoly);
         }
@@ -679,19 +682,22 @@ EXAMPLE: example InvariantRing; shows an example
       dbprint(dbPrt, " --> " + string(invarsGens[i]));
     }
   }
-  for(i = 1; i <= ncols(invarsGens); i++){
+  for(i = 1; i <= ncols(invarsGens); i++)
+  {
     ok =  InvariantQ(invarsGens[i], groupid, action);
     if(ok) { dbprint(dbPrt, string(i) + ": poly " + string(invarsGens[i])
                                       + " is invariant"); }
     else { print(string(i) + ": Fatal Error with Reynolds ");}
   }
-  if(noReynolds == 0) {
+  if(noReynolds == 0)
+  {
     def RIRS = RORN;
     setring RIRS;
     kill RORN;
     export groupid;
   }
-  else {
+  else
+  {
     def RIRS = RIRR;
     kill RIRR;
     setring RIRS;
@@ -889,9 +895,7 @@ EXAMPLE: example NullCone; shows an example
   {
    l2[size(l2)+1] = "Y("+string(zz)+")";
   }
-  ring RNCR = create_ring(ring_list(basering)[1], l2, order, "no_minpoly");
-  execute("poly aaa = number(" + @minPoly + ");");
-  if (aaa!=0) { minpoly = number(aaa); }
+  ring RNCR = create_ring(ring_list(basering)[1], l2, order);
   ideal action, G, I, J, N, generators;
   map F;
   poly f;

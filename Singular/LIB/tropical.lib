@@ -2147,8 +2147,8 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
       xcomp=graph[loop[i]][1]-graph[loop[i+1]][1];
       ycomp=graph[loop[i]][2]-graph[loop[i+1]][2];
       nenner=denominator(leadcoef(xcomp))*denominator(leadcoef(ycomp));
-      execute("eins="+string(numerator(leadcoef(nenner*xcomp)))+";");
-      execute("zwei="+string(numerator(leadcoef(nenner*ycomp)))+";");
+      eins=int(numerator(leadcoef(nenner*xcomp)));
+      zwei=int(numerator(leadcoef(nenner*ycomp)));
       ggt=gcd(eins,zwei); // the lattice length is the "gcd"
                           // of the x-component and the y-component
       jinvariant=jinvariant+ggt/(nenner*weights[i+1]); // divided by the
@@ -3457,7 +3457,7 @@ EXAMPLE: example tInitialFormPar;   shows an example"
   // the rational constant corresponding to this order in leadkoef(f)
   // (leitkoef[2])
   list leitkoef=simplifyToOrder(f);
-  execute("poly koef="+leitkoef[2]+";");
+  poly koef=leitkoef[2];
   // take in lead(f) only the term of lowest t-order and set t=1
   poly initialf=koef*leadmonom(f);
   // compute the order of lead(f) w.r.t. (1,w)
@@ -3472,7 +3472,7 @@ EXAMPLE: example tInitialFormPar;   shows an example"
     vglgewicht=leitkoef[1]+scalarproduct(w,leadexp(f));
     if (vglgewicht<gewicht)
     {
-      execute("koef="+leitkoef[2]+";");
+      koef=leitkoef[2];
       initialf=koef*leadmonom(f);
       gewicht=vglgewicht;
     }
@@ -3480,7 +3480,7 @@ EXAMPLE: example tInitialFormPar;   shows an example"
     {
       if (vglgewicht==gewicht)
       {
-        execute("koef="+leitkoef[2]+";");
+        koef=leitkoef[2];
         initialf=initialf+koef*leadmonom(f);
       }
     }
@@ -3511,7 +3511,7 @@ EXAMPLE: example tInitialFormParMax;   shows an example"
   // the rational constant corresponding to this order in leadkoef(f)
   // (leitkoef[2])
   list leitkoef=simplifyToOrder(f);
-  execute("poly koef="+leitkoef[2]+";");
+  poly koef=leitkoef[2];
   // take in lead(f) only the term of lowest t-order and set t=1
   poly initialf=koef*leadmonom(f);
   // compute the order of lead(f) w.r.t. (-1,w)
@@ -3526,7 +3526,7 @@ EXAMPLE: example tInitialFormParMax;   shows an example"
     vglgewicht=-leitkoef[1]+scalarproduct(w,leadexp(f));
     if (vglgewicht>gewicht)
     {
-      execute("koef="+leitkoef[2]+";");
+      koef=leitkoef[2];
       initialf=koef*leadmonom(f);
       gewicht=vglgewicht;
     }
@@ -3534,7 +3534,7 @@ EXAMPLE: example tInitialFormParMax;   shows an example"
     {
       if (vglgewicht==gewicht)
       {
-        execute("koef="+leitkoef[2]+";");
+        koef=leitkoef[2];
         initialf=initialf+koef*leadmonom(f);
       }
     }
@@ -5128,17 +5128,17 @@ RETURN:      list, l[1] = t-order of leading term of f
                           in lead(f)
 NOTE:        the procedure is called by tInitialFormPar"
 {
-  string denom=string(denominator(leadcoef(f)));
-  string num=string(numerator(leadcoef(f)));
+  poly denom=denominator(leadcoef(f));
+  poly num=numerator(leadcoef(f));
   string PMet=string(par(1));
   def BASERING=basering;
   ring r = create_ring(0, PMet, "ls");
-  execute("poly denomi="+denom+";");
-  execute("poly numer="+num+";");
+  poly denomi=imap(BASERING,denom);
+  poly numer=imap(BASERING,num);
   int ordnung=ord(numer)-ord(denomi);
-  string koeffizient=string(leadcoef(numer)/leadcoef(denomi));
+  number koeffizient=leadcoef(numer)/leadcoef(denomi);
   setring BASERING;
-  return(list(ordnung,koeffizient));
+  return(list(ordnung,imap(r,koeffizient)));
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -5491,7 +5491,7 @@ NOTE:     the procedure is called from tropicalLifting"
     if (size(#)>0) // noAbs was used
     {
       ring NOQRing = create_ring("("+string(char(LIFTRing))+")", "("+varstr(basering)+","+parstr(LIFTRing)+")", "dp");
-      execute("qring TESTRing=std("+#[1]+");");
+      qring TESTRing=std(#[1]);
       ideal i=imap(BASERING,i);
     }
     else // absolute primary decomposition was used
@@ -7162,7 +7162,7 @@ RETURN:      list, containing strings representing the numbers a and b scaled
 NOTE:        the procedure is called by texDrawTropical"
 {
   ring REALRING=(real,50,100),x,lp;
-  execute("number aa,bb,cc="+AA[1]+","+AA[2]+","+AA[3]+";");
+  number aa,bb,cc=`AA[1]`,`AA[2]`,`AA[3]`;
   number ascale,bscale=1,1;
   if ((aa>cc) or (aa<-cc))
   {
@@ -7195,7 +7195,7 @@ RETURN:      string, the string representing the larger of the two numbers a or 
 NOTE:        the procedure is called by texDrawTropical"
 {
   ring REALRING=(real,50,100),x,lp;
-  execute("poly aa,bb="+a+","+b+";");
+  number aa,bb=`a`,`b`;
   if (aa<bb)
   {
     return(a);
