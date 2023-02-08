@@ -1567,7 +1567,8 @@ void syMake(leftv v,const char * id, package pa)
   * 3) existing identifier, local
   * 4) ringvar, ringpar, local ring
   * 5) existing identifier, global
-  * 6) monom (resp. number), local ring: consisting of:
+  * 6a) int/bigint
+  * 6b) monom (resp. number), local ring: consisting of:
   * 6') ringvar,  ringpar,global ring
   * 6'') monom (resp. number), local ring
   * 7) monom (resp. number), non-local ring
@@ -1679,7 +1680,35 @@ void syMake(leftv v,const char * id, package pa)
       if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);  /*assume strlen(id) <1000 */
       goto id_found;
     }
-    /* 6. local ring: number/poly */
+    /* 6a: int/bigint */
+    if (strlen(id)<=MAX_INT_LEN)
+    {
+      int i;
+      i=0;
+      if (id[0]=='-') { i=1; }
+      while(isdigit(id[i])) i++;
+      if (id[i]=='\0')
+      {
+        int j=atoi(id);
+        char tmp[MAX_INT_LEN+5];
+        sprintf(tmp,"%d",j);
+        if ((j>MAX_INT_LEN) || (strcmp(tmp,id)!=0))
+        {
+          number n;
+          n_Read(id,&n,coeffs_BIGINT);
+          v->rtyp=BIGINT_CMD;
+          v->data = n;
+        }
+        else
+        {
+          v->data=(void*)(long)j;
+          v->rtyp=INT_CMD;
+        }
+        omFreeBinAddr((ADDRESS)id);
+        return;
+      }
+    }
+    /* 6b local ring: number/poly */
     if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
     {
       BOOLEAN ok=FALSE;
