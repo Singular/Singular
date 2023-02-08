@@ -983,7 +983,6 @@ RETURN: list A  , which gives generators set of the Weierstrass semigroup corres
    def R=basering;
 
    list A;
-   string mpo;
    list LL;
    for(k=1;k<=size(H);k++)
    {
@@ -991,14 +990,15 @@ RETURN: list A  , which gives generators set of the Weierstrass semigroup corres
      def S=LL[1];
      setring S;
      list TT;
+     poly mpo;
      for(i=1;i<=size(Param);i++)
      {
        d=deg(Param[i][2]);
        TT=Param[i];
-       poly mpo=Param[i][2];
+       mpo=Param[i][2];
        ring S1=(0,a),(t),ds;
        setring S1;
-       minpoly=imap(S,mpo);
+       minpoly=leadcoef(imap(S,mpo));
        list TT=imap(S,TT);
        list T;
        ideal J1;

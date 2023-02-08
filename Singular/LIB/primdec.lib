@@ -5800,7 +5800,7 @@ static proc absPrimdecGTZ_i(int @patchPrimaryDecomposition, ideal @I, list #)
          ideal @tempid;
          for(int @k=size(absolute_primes);@k>=1;@k--)
          {
-            @tempid=absolute_primes[k][1];
+            @tempid=absolute_primes[@k][1];
             @tempid[1]=0;                  // ignore minimal polynomial
             if(size(reduce(lead(@tempid),@max_of_r,5))!=0)
             {
