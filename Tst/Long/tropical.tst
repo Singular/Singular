@@ -108,7 +108,7 @@ tInitialForm(ff,w);
 ideal ii=t2x-y+t3,t2x-y-2t3x;
 w=-1,2,0;
 // the t-initial forms of the generators are
-tInitialForm(ii[1],w),tInitialForm(i[2],w);
+tInitialForm(ii[1],w),tInitialForm(ii[2],w);
 // and they do not generate the t-initial ideal of i
 tInitialIdeal(ii,w);
 ring r5=0,(x,y),dp;

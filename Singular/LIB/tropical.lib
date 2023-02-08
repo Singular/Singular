@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version tropical.lib 4.2.1.2 Nov_2021 ";
+version="version tropical.lib 4.3.1.3 Feb_2023 ";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -1715,6 +1715,7 @@ NOTE:        - the procedure creates the files /tmp/tropicalcurveNUMBER.tex and
                while lattice points in grey are not marked
 EXAMPLE:     example drawTropicalCurve  shows an example"
 {
+  def save=basering;
   // check if the option "onlytexfile" is set, then only a tex file is produced
   if (size(#)!=0)
   {
@@ -1744,7 +1745,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
       RL[1][1]=0;
       RL[3]=list(list("dp",1:nvars(basering)));
       ring drawring = ring(RL);
-      execute("poly f="+polynomstring+";");
+      poly f=imap(save,f);
     }
     texf=texPolynomial(f); // write the polynomial over Q(t)
     list graph=tropicalCurve(tropicalise(f,#),#); // graph of tropicalis. of f
@@ -1848,6 +1849,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
        "+texDrawNewtonSubdivision(graph,#)+"
    \\end{center}
 \\end{document}";
+  setring save;
   if(defined(onlytexfile)==0)
   {
     int rdnum=random(1000,9999);
