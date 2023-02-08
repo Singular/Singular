@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version toric.lib 4.2.1.3 Dec_2021 "; // $Id$
+version="version toric.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: toric.lib   Standard Basis of Toric Ideals
@@ -128,7 +128,7 @@ static proc toric_ideal_1(intmat A, string alg)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="wp("+string(weightvec)+"),";
     if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
@@ -149,7 +149,7 @@ static proc toric_ideal_1(intmat A, string alg)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="wp("+string(weightvec)+"),";
     if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
@@ -171,7 +171,7 @@ static proc toric_ideal_1(intmat A, string alg)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="Wp("+string(weightvec)+"),";
     if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
@@ -192,7 +192,7 @@ static proc toric_ideal_1(intmat A, string alg)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="Wp("+string(weightvec)+"),";
     if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
@@ -302,7 +302,7 @@ static proc toric_ideal_1(intmat A, string alg)
     number_string=number_string+toric_id[pos];
     pos++;
   }
-  execute("generators="+number_string+";");
+  generators=`number_string`;
 
   intvec v;
   poly head;
@@ -329,7 +329,7 @@ static proc toric_ideal_1(intmat A, string alg)
         number_string=number_string+toric_id[pos];
         pos++;
       }
-      execute("v[j]="+number_string+";");
+      v[j]=`number_string`;
       if(v[j]<0)
       {
         tail=tail*var(j)^(-v[j]);
@@ -472,7 +472,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="wp("+string(weightvec)+"),";
     if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
@@ -493,7 +493,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="wp("+string(weightvec)+"),";
     if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
@@ -515,7 +515,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="Wp("+string(weightvec)+"),";
     if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
@@ -536,7 +536,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="Wp("+string(weightvec)+"),";
     if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
@@ -622,7 +622,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
     number_string=number_string+toric_id[pos];
     pos++;
   }
-  execute("generators="+number_string+";");
+  generators=`number_string`;
 
   intvec v;
   poly head;
@@ -649,7 +649,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
         number_string=number_string+toric_id[pos];
         pos++;
       }
-      execute("v[j]="+number_string+";");
+      v[j]=`number_string`;
       if(v[j]<0)
       {
         tail=tail*var(j)^(-v[j]);
@@ -861,7 +861,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec["+string(i)+"]="+number_string+";");
+      weightvec[i]=`number_string`;
     }
     test_ord="wp("+string(weightvec)+"),";
     if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
@@ -883,7 +883,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="wp("+string(weightvec)+"),";
     if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
@@ -905,7 +905,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="Wp("+string(weightvec)+"),";
     if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
@@ -926,7 +926,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
         number_string=number_string+singular_ord[pos];
         pos++;
       }
-      execute("weightvec[i]="+number_string);
+      weightvec[i]=`number_string`;
     }
     test_ord="Wp("+string(weightvec)+"),";
     if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
@@ -1042,7 +1042,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
     number_string=number_string+toric_id[pos];
     pos++;
   }
-  execute("generators="+number_string+";");
+  generators=`number_string`;
 
   pos=find(toric_id,"basis");
   pos=find(toric_id,":",pos);
@@ -1065,7 +1065,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
         number_string=number_string+toric_id[pos];
         pos++;
       }
-      execute("v[i]="+number_string+";");
+      v[i]=`number_string`;
       if(v[i]<0)
       {
         tail=tail*var(i)^(-v[i]);
