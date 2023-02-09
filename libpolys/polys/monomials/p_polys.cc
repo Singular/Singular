@@ -1442,10 +1442,13 @@ finish:
 poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
 {
   poly p;
-  const char *s=p_Read(st,p,r);
+  char *sst=(char*)st;
+  BOOLEAN neg=FALSE;
+  if (sst[0]=='-') { neg=TRUE; sst=sst+1; }
+  const char *s=p_Read(sst,p,r);
   if (*s!='\0')
   {
-    if ((s!=st)&&isdigit(st[0]))
+    if ((s!=sst)&&isdigit(sst[0]))
     {
       errorreported=TRUE;
     }
@@ -1459,6 +1462,7 @@ poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
   }
   p_Test(p,r);
   ok=!errorreported;
+  if (neg) p=p_Neg(p,r);
   return p;
 }
 
