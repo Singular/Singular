@@ -262,8 +262,7 @@ EXAMPLE: example primRoot; shows an example
       {
          a = modExpo(a, (p-1) div k, p);
 
-         string str = "int xi = "+string(a);
-         execute(str);
+         int xi = int(a);
 
          return(xi);
       }
@@ -612,18 +611,9 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc divPrimeTest(def II, bigint p, int k)
+proc divPrimeTest(ideal I, bigint p, int k)
 {
    if((p - 1) mod k != 0) { return(0); }
-
-   if(typeof(II) == "string")
-   {
-      execute("ideal I = "+II+";");
-   }
-   else
-   {
-      ideal I = II;
-   }
 
    int i,j;
    poly f;

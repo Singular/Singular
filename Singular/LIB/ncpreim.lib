@@ -725,8 +725,7 @@ EXAMPLE:  example preimageNC; shows examples
   setring A;
   dbprint(ppl,"// Writing output to specified ring under the name `"
           + str + "'.");
-  str = "ideal " + str + " = imap(E,J); export(" + str + ");";
-  execute(str);
+  ideal `str` = imap(E,J); export(`str`);
   setring B;
   return();
 }

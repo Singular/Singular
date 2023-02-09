@@ -66,24 +66,15 @@ EXAMPLE: example stdfglm; shows an example"
     os = #[1];
     ideal Qideal = ideal(P);
     int sQ = size(Qideal);
-    int sM = size(minpoly);
-    if ( sM!=0 )
-    {
-      string mpoly = string(minpoly);
-    }
     if (sQ!=0 )
     {
-      ring Rfglm = create_ring(ring_list(P)[1], "("+varstr(P)+")", os, "no_minpoly");
+      ring Rfglm = create_ring(ring_list(P)[1], "("+varstr(P)+")", os);
       ideal Qideal = fetch(P,Qideal);
       qring Pfglm = groebner(Qideal,"std","slimgb");
     }
     else
     {
-      ring Pfglm = create_ring(ring_list(P)[1], "("+varstr(P)+")", os, "no_minpoly");
-    }
-    if ( sM!=0 )
-    {
-      execute("minpoly="+mpoly+";");
+      ring Pfglm = create_ring(ring_list(P)[1], "("+varstr(P)+")", os);
     }
   }
   else
