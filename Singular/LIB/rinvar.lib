@@ -655,6 +655,7 @@ EXAMPLE: example InvariantRing; shows an example
         ideal action = actionid;
         setring RIRR;
         string parName, minPoly;
+        poly minPolyP;
         if(npars(basering) == 0)
         {
           parName = "a";
@@ -664,9 +665,10 @@ EXAMPLE: example InvariantRing; shows an example
         {
           parName = parstr(basering);
           minPoly = string(minpoly);
+          minPolyP=minpoly;
         }
         ring RA1 = create_ring(0, "(" + varstr(basering) + "," + parName + ")", "lp");
-        if (minPoly!="0") { execute("ideal mpoly = std(" + minPoly + ");"); }
+        if (minPoly!="0") { ideal mpoly = std(imap(RIRR, minPolyP)); }
         ideal I = imap(RIRR,invarsGens);
         setring RORN;
         map Phi = RA1, maxideal(1);
@@ -972,6 +974,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   def RORR = zeroSet(G1, primaryDec);
   setring ROBR;
   string parName, minPoly;
+  poly minPolyP;
   if(npars(basering) == 0) {
     parName = "a";
     minPoly = "0";
@@ -979,9 +982,10 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   else {
     parName = parstr(basering);
     minPoly = string(minpoly);
+    minPolyP=minpoly;
   }
   ring RA1 = create_ring(0, "(" + varstr(basering) + "," + parName + ")", "lp");
-  if (minPoly!="0") { execute("ideal mpoly = std(" + minPoly + ");"); }
+  if (minPoly!="0") { ideal mpoly = std(imap(ROBR,minPolyP)); }
   ideal Grp = imap(ROBR,Grp);
   ideal Gaction = imap(ROBR,Gaction);
   setring RORR;

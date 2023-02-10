@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version reszeta.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version reszeta.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  reszeta.lib       topological Zeta-function and
@@ -4840,14 +4840,14 @@ proc fetchInTree(list L,
       if(defined(id1)) { kill id1; }
       if(defined(id2)) { kill id2; }
       if(defined(idlist)) { kill idlist; }
-      execute("int bool2=defined("+idname+");");
+      int bool2=defined(`idname`);
       if(bool2==0)
       {
-        execute("list ttlist=imap(L[2][o1],"+idname+");");
+        list ttlist=imap(L[2][o1],`idname`);
       }
       else
       {
-        execute("list ttlist="+idname+";");
+        list ttlist=`idname`;
       }
       kill bool2;
       def BO=imap(L[2][o1],BO);
