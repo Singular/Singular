@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version elim.lib 4.3.1.3 Jan_2023 "; // $Id$
+version="version elim.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -572,7 +572,6 @@ RETURNS: ideal/module obtained from id by eliminating variables in v
 NOTE:    no special monomial ordering is required, result is a SB with
          respect to ordering dp (resp. ls) if the first var not to be
          eliminated belongs to a -p (resp. -s) blockordering
-         This proc uses 'execute' or calls a procedure using 'execute'.
 SEE ALSO: elim1, eliminate, elim
 EXAMPLE: example elim2; shows examples
 "
@@ -582,11 +581,9 @@ EXAMPLE: example elim2; shows examples
    for( ii=1; ii<=size(va); ii++ ) { vars=vars*var(va[ii]); }
    if(  attrib(basering,"global")) { string ordering = "dp"; }
    else { string ordering = "ls"; }
-   string mpoly=string(minpoly);
 //-------------- create new ring and map objects to new ring ------------------
    def br = basering;
-   ring @newr = create_ring(ring_list(br)[1], "("+varstr(br)+")", ordering, "no_minpoly");
-   if (mpoly!="0") { execute("minpoly="+mpoly+";"); }
+   ring @newr = create_ring(ring_list(br)[1], "("+varstr(br)+")", ordering);
    def i = imap(br,id);
    poly vars = imap(br,vars);
 //---------- now eliminate in new ring and map back to old ring ---------------
@@ -613,7 +610,6 @@ METHOD:  elim1 calls eliminate but in a ring with ordering dp (resp. ls)
          if the first var not to be eliminated belongs to a -p (resp. -s)
          ordering.
 NOTE:    no special monomial ordering is required.
-         This proc uses 'execute' or calls a procedure using 'execute'.
 SEE ALSO: elim, eliminate
 EXAMPLE: example elim1; shows examples
 "
