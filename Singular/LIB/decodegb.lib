@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version decodegb.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version decodegb.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -1840,16 +1840,16 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
      int count=1;
      for (i=s; i>=1; i--)
      {
-          var_ord[count]=string("x("+string(i)+")");
+          var_ord[count]="x("+string(i)+")";
           count++;
      }
      for (i=t; i>=1; i--)
      {
-          var_ord[count]=string("e("+string(i)+")");
+          var_ord[count]="e("+string(i)+")";
           count++;
           for (j=s; j>=1; j--)
           {
-               var_ord[count]=string("x1("+string(s*(i-1)+j)+")");
+               var_ord[count]="x1("+string(s*(i-1)+j)+")";
                count++;
           }
      }
@@ -1862,10 +1862,10 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
           rl[1]=tmp;
           rl[1][1]=p;
           rl[1][2]=tmp;
-          rl[1][2][1]=string("a");
+          rl[1][2][1]="a";
           rl[1][3]=tmp;
           rl[1][3][1]=tmp;
-          rl[1][3][1][1]=string("lp");
+          rl[1][3][1][1]="lp";
           rl[1][3][1][2]=1;
           rl[1][4]=ideal(0);
      } else {
@@ -1876,7 +1876,7 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
 
      rl[3]=tmp;
      rl[3][1]=tmp;
-     rl[3][1][1]=string("lp");
+     rl[3][1][1]="lp";
      intvec v=1;
      for (i=1; i<=size(var_ord)-1; i++)
      {
@@ -1884,7 +1884,7 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
      }
      rl[3][1][2]=v;
      rl[3][2]=tmp;
-     rl[3][2][1]=string("C");
+     rl[3][2][1]="C";
      rl[3][2][2]=intvec(0);
 
      rl[4]=ideal(0);
@@ -1894,7 +1894,7 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
      list l=ringlist(r2);
      if (e>1)
      {
-          execute(string("poly f="+minp));
+          execute("poly f="+minp+";");
           ideal id=f;
           l[1][4]=id;
      }
