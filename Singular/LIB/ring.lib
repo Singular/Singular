@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version ring.lib 4.3.1.2 Nov_2022 "; // $Id$
+version="version ring.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -768,14 +768,11 @@ EXAMPLE: example preimageLoc ; shows an example
     if(size(ideal(S))>0) /*qring*/
     {
       ideal I=ideal(S);
-      minpoly_string=string(minpoly);
       list l8 = ring_list(S)[2];
-      ring S0 = create_ring(ring_list(S)[1], l8, "dp", "no_minpoly");
-      execute("minpoly="+minpoly_string+";");
+      ring S0 = create_ring(ring_list(S)[1], l8, "dp");
       ideal I=imap(S,I);
       list pr=primdecGTZ(I);
-      ring SL = create_ring(ring_list(S)[1], l8, "("+ordstr(S)+")", "no_minpoly");
-      execute("minpoly="+minpoly_string+";");
+      ring SL = create_ring(ring_list(S)[1], l8, "("+ordstr(S)+")");
       list pr=imap(S0,pr);
       ideal I0=std(pr[1][1]);
       for(i=2;i<=size(pr);i++)
@@ -806,14 +803,11 @@ EXAMPLE: example preimageLoc ; shows an example
     {
       ideal J=ideal(@R);
       list l9 = ringlist(@R)[2];
-      minpoly_string=string(minpoly);
-      ring R0 = create_ring(ring_list(@R)[1], l9, "dp", "no_minpoly");
-      execute("minpoly="+minpoly_string+";");
+      ring R0 = create_ring(ring_list(@R)[1], l9, "dp");
       ideal J=imap(@R,J);
       list pr=primdecGTZ(J);
       setring(@R);
-      ring RL = create_ring(ring_list(@R)[1], l9, "("+ordstr(@R)+")", "no_minpoly");
-      execute("minpoly="+minpoly_string+";");
+      ring RL = create_ring(ring_list(@R)[1], l9, "("+ordstr(@R)+")");
       list pr=imap(R0,pr);
       ideal J0=std(pr[1][1]);
       for(i=2;i<=size(pr);i++)

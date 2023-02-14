@@ -57,7 +57,7 @@ EXAMPLE:  example ReesAlgebra; shows an example
   // Kxt is the old ring with additional variable t
   // Here I -> t*I, so the generators of I generate the subalgebra R[It] in Kxt
 
-  execute ("ring Kxt = "+oldchar+",("+oldvar+",t),dp");
+  ring Kxt = create_ring(ring_list(oldring)[1],"("+oldvar+",t)","dp");
   ideal I = fetch(oldring,I);
   ideal m = fetch(oldring,m);
   int k;
