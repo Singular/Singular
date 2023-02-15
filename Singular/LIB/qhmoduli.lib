@@ -145,8 +145,7 @@ EXAMPLE: example ModEqn; shows an example
       {
        l3[zz] = "Y("+string(zz)+")";
       }
-      ring RME5 = create_ring(ring_list(basering)[1], l3, "dp", "no_minpoly");
-      execute("minpoly = number(" + @mPoly + ");");
+      ring RME5 = create_ring(ring_list(basering)[1], l3, "dp");
       ideal modid = imap(RME4, newid);
     }
     else {
