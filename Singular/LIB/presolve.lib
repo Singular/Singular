@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version presolve.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version presolve.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -541,7 +541,7 @@ RETURN:  list of 6 objects:
   @format
             k[x(1..m)]/i -> k[..variables fom [4]..]/[1]
   @end format
-NOTE:    the procedure uses @code{execute} to create a ring with ordering dp
+NOTE:    the procedure creates a ring with ordering dp
          and vars placed correctly and then applies @code{elimpart}.
 EXAMPLE: example elimpartanyr; shows an example
 "
@@ -893,10 +893,8 @@ EXAMPLE: example hilbvec; shows an example
    string @c,@o = "32003", "dp";
    if ( size(#) == 1 ) {  @c = #[1]; }
    if ( size(#) == 2 ) {  @c = #[1]; @o = #[2]; }
-   string @si = typeof(@id)+" @i = "+string(@id)+";";  //** weg
    ring @r = create_ring("("+@c+")", "("+varstr(basering)+")", "("+@o+")");
-   //**def i = imap(P,@id);
-   execute(@si);                   //** weg
+   def @i = imap(@P,@id);
    //show(basering);
    @i = std(@i);
    intvec @hi = hilb(@i,1);         // intvec of 1-st Hilbert-series of id

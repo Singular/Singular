@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version finvar.lib 4.3.0.1 Feb_2022 "; // $Id$
+version="version finvar.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -1387,12 +1387,7 @@ EXAMPLE: example partial_molien; shows an example
       { ERROR("<poly> as third parameter expected"); }
     }
     poly A(1)=M[1,2];                 // denominator of Molien series (for now)
-    string mp=string(minpoly);
-    ring R = create_ring(ring_list(br)[1], "("+varstr(br)+")", "ds", "no_minpoly");
-    if (mp!="0")
-    {
-      execute("minpoly=number("+mp+");");
-    }
+    ring R = create_ring(ring_list(br)[1], "("+varstr(br)+")", "ds");
     poly A(1)=0;                      // A(1) will contain the sum of n terms -
     poly min;                         // min will be our smallest term -
     poly A(2)=fetch(br,A(2));         // fetching A(2) and M[1,2] into R
@@ -7169,15 +7164,12 @@ EXAMPLE: example orbit_variety; shows an example
   { def br=basering;
     int n=nvars(br);
     int m=ncols(F);
-    string mp=string(minpoly);
     list l2 = ringlist(br)[2];
     for (int ii = 1; ii <= m; ii++)
     {
      l2[size(l2)+1] = "y("+string(ii)+")";
     }
-    ring R = create_ring(ring_list(br)[1], l2, "dp", "no_minpoly");
-    if (mp!="0")
-    { execute("minpoly=number("+mp+");"); }
+    ring R = create_ring(ring_list(br)[1], l2, "dp");
     ideal I=ideal(imap(br,F));
     for (int i=1;i<=m;i++)
     { I[i]=I[i]-y(i); }
@@ -7187,9 +7179,7 @@ EXAMPLE: example orbit_variety; shows an example
     {
       l3[zz] = "y("+string(zz)+")";
     }
-    ring newring = create_ring(ring_list(br)[1], l3, "dp("+string(m)+")", "no_minpoly");
-    if (mp!="0")
-    { execute("minpoly=number("+mp+");"); }
+    ring newring = create_ring(ring_list(br)[1], l3, "dp("+string(m)+")");
     ideal vars;
     for (i=2;i<=n;i++)
     { vars[i]=0;
@@ -7399,15 +7389,12 @@ EXAMPLE: example relative_orbit_variety; shows an example
   { def br=basering;
     int n=nvars(br);
     int m=ncols(F);
-    string mp=string(minpoly);
     list l2 = ringlist(br)[2];
     for (int ii = 1; ii <= m; ii++)
     {
      l2[size(l2)+1] = "y("+string(ii)+")";
     }
-    ring R = create_ring(ring_list(br)[1], l2, "lp", "no_minpoly");
-    if (mp!="0")
-    { execute("minpoly=number("+mp+");"); }
+    ring R = create_ring(ring_list(br)[1], l2, "lp");
     ideal J=ideal(imap(br,F));
     ideal I=imap(br,I);
     for (int i=1;i<=m;i++)
@@ -7437,9 +7424,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     {
       l4[zz] = "y("+string(zz)+")";
     }
-    ring newring = create_ring(ring_list(br)[1], l4, "lp", "no_minpoly");
-    if (mp!="0")
-    { execute("minpoly=number("+mp+");"); }
+    ring newring = create_ring(ring_list(br)[1], l4, "lp");
     ideal vars;
     for (i=2;i<=n;i++)
     { vars[i]=0;
