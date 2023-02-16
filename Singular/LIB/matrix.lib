@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version matrix.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version matrix.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -498,7 +498,6 @@ EXAMPLE: example gauss_col; shows an example
 "
 {
    def R=basering; int u;
-   string mp = string(minpoly);
    int n = nrows(A);
    int m = ncols(A);
    module M = A;
@@ -508,7 +507,6 @@ EXAMPLE: example gauss_col; shows an example
    {
      def @R=changeord(list(list("C",0:1),list("dp",1:nvars(R))),R);
      setring @R; u=1;
-     if (mp!="0") { execute("minpoly="+mp+";");}
      matrix A = imap(R,A);
      module M = A;
    }

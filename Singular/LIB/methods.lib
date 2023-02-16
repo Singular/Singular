@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version methods.lib 4.2.0.1 Jan_2021 "; //$Id$
+version="version methods.lib 4.3.1.3 Feb_2023 "; //$Id$
 category="Miscellaneous";
 info="
 LIBRARY:  methods.lib    installing methods in Singular
@@ -162,37 +162,39 @@ EXAMPLE: example installMethod, shows an example
   HashTable H = M.functionClosures;
   //string fname = nameof(M);
   //fname=fname[1..size(fname)-1];
-  string s = "proc "+fname+"() {";
+  string s = "";
   string ff;
   list v = H.values;
   list k = H.keys;
   string ki;
   int i,j,l;
-  for (i=1; i<=size(H); i++){
+  for (i=1; i<=size(H); i++)
+  {
     ff = v[i];
     ki="";
-    for (j=1; j<size(k[i]); j++){
+    for (j=1; j<size(k[i]); j++)
+    {
       ki=ki+"\""+k[i][j]+"\",";
     }
     ki=ki+"\""+k[i][size(k[i])]+"\"";
     s=s+"branchTo("+ki+","+ff+");";
  };
-  s=s+"ERROR(\"No method found\");}";
+  s=s+"ERROR(\"No method found\");";
   //s;
   intvec o=option(get);
   option(noredefine);
-  execute(s);
-  execute("exportto(Top,"+fname+");");
+  proc `fname`=s;
+  exportto(Top,`fname`);
   option(set,o);
 }
 example
 { "EXAMPLE:"; echo=2;
-  proc square(int i){return(i^2);};
+  proc square(int i){return(i^2);}; export(square);
   HashTable H1 = hashTable(list(list("int")),list("square"));
   Method m1 = method(H1);
   installMethod(m1,"tst");
   tst(2);
-  proc kbase2(ideal I,int n){return(kbase(I,n));}
+  proc kbase2(ideal I,int n){return(kbase(I,n));};export(kbase2);
   HashTable H2 = hashTable(list(list("ideal","int")),list("kbase2"));
   Method m2=method(H2);
   Method m=m1+m2;
