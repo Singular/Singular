@@ -23,4 +23,7 @@ example kontrahom;
 example KoszulHomology;
 example tensorMod;
 example Tor;
+ring r;
+ideal i=x,0,z;
+print(KoszulMap(i,2));
 tst_status(1);$
