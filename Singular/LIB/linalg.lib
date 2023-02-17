@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version linalg.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version linalg.lib 4.3.1.3 Feb_2023 "; // $Id$
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -156,13 +156,8 @@ EXAMPLE:  example inverse; shows an example
    if( ordstr(R) != "C,dp(" + string(nvars(R)) + ")" )
    {
      u=1;
-     string mp = string(minpoly);
      def @R=changeord(list(list("C",0:1),list("dp",1:nvars(basering))));
      setring @R;
-     if (mp != string(minpoly))
-     {
-       execute("minpoly = " + mp + ";");
-     }
      module M = fetch(R,M);
    }
 //----------------------------- opt=3: use lift ------------------------------
@@ -369,8 +364,7 @@ EXAMPLE:  example diag_test; shows an example"
   //speichern des aktuellen Rings
   def BR=basering;
   //setze R[t]
-  ring rt = create_ring(ring_list(basering)[1], "(@t,"+varstr(basering)+")", "lp", "no_minpoly");
-  execute("minpoly="+mp+";");
+  ring rt = create_ring(ring_list(basering)[1], "(@t,"+varstr(basering)+")","lp");
   matrix A=imap(BR,A);
 
   intvec z;
