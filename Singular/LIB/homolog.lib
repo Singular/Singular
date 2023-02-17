@@ -1645,7 +1645,6 @@ example
 //  * binom_int  (binomial coeff. as integer, or -1 if too large)
 //  * basisNumber
 //  * basisElement
-//  * KoszulMap
 // for details, see 'A Singular Introduction to Commutative Algebra' (by
 // Greuel/Pfister, Springer 2002), Chapter 7
 
@@ -1691,29 +1690,7 @@ static proc basisElement(int n,int p,int N)
 
 proc KoszulMap(ideal x,int p)
 {
-  int n=ncols(x);
-  int a=binom_int(n,p-1);
-  int b=binom_int(n,p);
-
-  matrix M[a][b];
-
-  if(p==1){M=x;return(M);}
-  int j,k;
-  intvec v,w;
-  for(j=1;j<=b;j++)
-  {
-    v=basisElement(n,p,j);
-    w=v[2..p];
-    M[basisNumber(n,w),j]=x[v[1]];
-    for(k=2;k<p;k++)
-    {
-      w=v[1..k-1],v[k+1..p];
-      M[basisNumber(n,w),j]=(-1)^(k-1)*x[v[k]];
-    }
-    w=v[1..p-1];
-    M[basisNumber(n,w),j]=(-1)^(p-1)*x[v[p]];
-  }
-  return(M);
+  return(koszul(p,x)); // compatibility
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1752,11 +1729,11 @@ EXAMPLE: example KoszulHomology; shows an example.
   if(p!=0)
   {
     module im= tensor(unitmat(a),N);
-    module f = tensor(KoszulMap(x,p),unitmat(nrows(N)));
+    module f = tensor(koszul(p,x),unitmat(nrows(N)));
     ker      = modulo(f,im);
   }
   module im1 = tensor(unitmat(b),N);
-  module im2 = tensor(KoszulMap(x,p+1),unitmat(nrows(N)));
+  module im2 = tensor(koszul(p+1,x),unitmat(nrows(N)));
   module hom = modulo(ker,im1+im2);
   hom        = prune(hom);
   return(hom);
