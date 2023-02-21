@@ -140,13 +140,11 @@ static proc pd2 (poly g1,poly g2)
     ideal facts=factorize(f,1);
     s=size(facts);
     poly g;
-    string sg;
     for (i=1;i<=s;i=i+1)
     {
       g=facts[i];
-      sg=string(g);
       setring raux1;
-      execute("G="+sg+";");
+      G=imap(raux2,g);
       G=subst(G,@a,y);
       setring BR;
       map ppssii=raux1,var(1),var(2),0;
@@ -245,9 +243,9 @@ NOTE:       f must be absolutely irreducible, but this is not checked
     poly CHI=embpol(f);
     export(CHI);
     kill embpol;
-    string s=string(subst(CHI,z,1));
+    poly s=subst(CHI,z,1);
     setring aff_r;
-    execute("poly CHI="+s+";");
+    poly CHI=imap(Proj_R,s);
     export(CHI);
     ideal Aff_SLocus=s_locus(CHI);
     export(Aff_SLocus);
@@ -579,7 +577,6 @@ static proc res_deg ()
 {
   // computes the residual degree of the basering with respect to its prime
   //   field
-  // warning : minpoly must depend on a parameter called "a"
   int ext;
   string s_m=string(minpoly);
   if (s_m=="0")
@@ -588,9 +585,7 @@ static proc res_deg ()
   }
   else
   {
-    ring auxr=char(basering),a,lp;
-    execute("poly minp="+s_m+";");
-    ext=deg(minp);
+    ext=pardeg(minpoly);
   }
   return(ext);
 }
@@ -780,7 +775,7 @@ static proc subfield (def sf)
   }
   else
   {
-    if (old_m<>string(0))
+    if (old_m<>"0")
     {
       ring auxring=char(basering),(a,x),lp;
       execute("poly mpol="+old_m+";");

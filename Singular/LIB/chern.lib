@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 4.1.3.0 Apr_2020 "; // $Id$
+version = "version chern.lib 4.3.1.3 Feb_2023 "; // $Id$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes,
@@ -257,7 +257,7 @@ NOTE:     constants are considered symmetric
   rez1=rez1+f;
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism
-  execute("map FF = r@,"+varstr(br@)+",c[1..nV], V[1..nV];");
+  map FF = r@,maxideal(1),c[1..nV], V[1..nV];
   return( list( FF(rez1), FF(rez2) ) );
 }
 example
@@ -725,8 +725,8 @@ NOTE:     uses the elimination and is extremely inefficient,
      l3[size(l3)+1] = "a@("+string(ii)+")";
     }
     ring r@ = create_ring(ring_list(basering)[1], l3, "lp", "no_minpoly");
-    execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-    list c=F(c); // embed c in the bigger ring
+    // define the corresponding inclusion of rings: imap
+    list c=imap(br@,c); // embed c in the bigger ring
     poly rez;
     list A=a@(1..n);
     list sym=symm(A);
@@ -741,7 +741,7 @@ NOTE:     uses the elimination and is extremely inefficient,
     I=simplify(elim(I, E),1);
     rez = -subst(I[1], c@, 0);
     setring br@; // come back to the initial base ring
-    execute( "map FF= r@,0,"+varstr(br@)+";" ); // define the specialization homomorphism
+    map FF= r@,0,maxideal(1); // define the specialization homomorphism
     poly rez=FF(rez); // bring the result to the base ring
     return( (1/factorial(n))*rez);
   }
@@ -1066,9 +1066,9 @@ NOTE:     makes sense only for (lists of) polynomials;
    l4[size(l4)+1] = "b@("+string(ii)+")";
   }
   ring r@ = create_ring(ring_list(basering)[1], l4, "lp", "no_minpoly");
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-  list c=F(c); // embed c in the bigger ring
-  list C=F(C); // embed C in the bigger ring
+  // define the corresponding inclusion of rings: imap
+  list c=imap(br@,c); // embed c in the bigger ring
+  list C=imap(br@,C); // embed C in the bigger ring
   list A=a@(1..r); // list of Chern roots of the first vector bundle
   list syma = symm(A); // symmetric functions in the Chern roots of the first vector bundles
   list B=b@(1..R); // list of Chern roots of the second vector bundle
@@ -1097,7 +1097,7 @@ NOTE:     makes sense only for (lists of) polynomials;
     rez = rez + list( -subst(J[1], x@, 0) );
   }
   setring br@; // come back to the initial base ring
-  execute( "map FF= r@, 0,"+varstr(br@)+";" ); // define the specialization homomorphism t@=0
+  map FF= r@, 0,maxideal(1); // define the specialization homomorphism t@=0
   list rez=FF(rez); // bring the result to the base ring
   return(rez); // return the corresponding Chern classes
 }
@@ -1160,7 +1160,6 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
    l5[size(l5)+1] = "C@("+string(ii)+")";
   }
   ring r@ = create_ring(ring_list(basering)[1], l5, "dp", "no_minpoly");
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c, C;
   int i;
   for(i=1;i<=r;i++)
@@ -1181,7 +1180,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   }
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism
-  execute("map FF = r@,"+varstr(br@)+",0, c[1..r], C[1..R];");
+  map FF = r@,maxideal(1),0, c[1..r], C[1..R];
   return( FF( rez ) ); // bring the result to the initial ring
 }
 example
@@ -1305,7 +1304,6 @@ NOTE:     Implementation of the formula of Manivel
    l6[size(l6)+1] = "C@("+string(ii)+")";
   }
   ring r@ = create_ring(ring_list(basering)[1], l6, "dp", "no_minpoly");
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c, C;
   int i;
   for(i=1;i<=r;i++)
@@ -1326,7 +1324,7 @@ NOTE:     Implementation of the formula of Manivel
   }
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism
-  execute("map FF = r@,"+varstr(br@)+",0, c[1..r], C[1..R];");
+  map FF = r@,maxideal(1),0, c[1..r], C[1..R];
   return( FF( rez ) ); // bring the result to the initial ring
 }
 example
@@ -1648,8 +1646,8 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
    l7[size(l7)+1] = "a@("+string(ii)+")";
   }
   ring r@ = create_ring(ring_list(basering)[1], l7, "lp", "no_minpoly");
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-  list c=F(c); // embed c into the bigger ring
+  // define the corresponding inclusion of rings: imap
+  list c=imap(br@,c); // embed c into the bigger ring
   list rez; // the Chern classes of the symmetric power are going to be written here
   poly E = product( list( a@(1..r ) )  ); // product of the Chern roots
   list ss=ChernRootsSymm(k, list( a@(1..r) ) ); // list of the Chern roots of the symmetric power
@@ -1724,7 +1722,7 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism,
   // evaluate the formulas for the Chern classes on their given values
-  execute( "map FF = r@,0,"+varstr(br@)+";" );
+  map FF = r@,0,maxideal(1);
   list rez=FF( rez ); // bring the result back to the initial ring
   return( list( N, rez  ) ); // return the result together with the rank of the symmetric power
 }
@@ -1780,7 +1778,6 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
    l8[size(l8)+1] = "c@("+string(ii)+")";
   }
   ring r@ = create_ring(ring_list(basering)[1], l8, "dp", "no_minpoly");
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
   for(i=1;i<=r;i++)
   {
@@ -1795,7 +1792,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
     rez=rez+list(CF[i+1,1]);
   }
   setring br@; // come back to the initial base ring
-  execute("map FF = r@,"+varstr(br@)+",0, c[1..r];"); // define the specialization homomorphism
+  map FF = r@,maxideal(1),0, c[1..r]; // define the specialization homomorphism
   return( list(N, FF( rez )) ); // bring the result to the initial ring
 }
 example
@@ -1952,8 +1949,8 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
    l9[size(l9)+1] = "a@("+string(ii)+")";
   }
   ring r@ = create_ring(ring_list(basering)[1], l9, "lp", "no_minpoly");
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-  list c = F(c); // embed c into the bigger ring
+  // define the corresponding inclusion of rings: imap
+  list c = imap(br@,c); // embed c into the bigger ring
   list rez; // the result should be computed here
   poly E = product( list( a@(1..r ) )  ); // product of the Chern roots to be eliminaned
   list ss=ChernRootsWedge(k,  list( a@(1..r) )); // list of the Chern roots of the exterior product
@@ -2030,7 +2027,7 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism,
   // evaluate the formulas for the Chern classes on their given values
-  execute( "map FF = r@,0,"+varstr(br@)+";" );
+  map FF = r@,0,maxideal(1);
   list rez=FF( rez ); // bring the result back to the initial ring
   return( list( N, rez  ) ); //return the rank and the Chern classes of the exterior product
 }
@@ -2086,7 +2083,6 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
    l10[size(l10)+1] = "c@("+string(ii)+")";
   }
   ring r@ = create_ring(ring_list(basering)[1], l10, "dp", "no_minpoly");
-  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
   for(i=1;i<=r;i++)
   {
@@ -2101,7 +2097,7 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
     rez=rez+list(CF[i+1,1]);
   }
   setring br@; // come back to the initial base ring
-  execute("map FF = r@,"+varstr(br@)+",0, c[1..r];"); // define the specialization homomorphism
+  map FF = r@,maxideal(1),0, c[1..r]; // define the specialization homomorphism
   return( list(N, FF( rez )) ); // bring the result to the initial ring
 }
 example
@@ -2214,8 +2210,8 @@ NOTE:     returns an empty list if l is empty
      l11[size(l11)+1] = "c@("+string(ii)+")";
     }
     ring r@ = create_ring(ring_list(basering)[1], l11, "dp", "no_minpoly");
-    execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-    list c=F(c); // embed c into the bigger ring
+    // define the corresponding inclusion of rings: imap
+    list c=imap(br@,c); // embed c into the bigger ring
     list prev;
     list next;
     next=tdTerms(n, c@(1)); // the Todd class terms of a line budle
@@ -2250,7 +2246,7 @@ NOTE:     returns an empty list if l is empty
     }
     next = delete(next, 1); // throw away the zeroth term which is always equal to 1
     setring br@; // come back to the initial base ring
-    execute("map FF = r@,"+varstr(br@)+",0, c[1..n];"); // define the specialization homomorphism
+    map FF = r@,maxideal(1),0, c[1..n]; // define the specialization homomorphism
     return( FF( next ) ); // bring the result to the initial ring
   }
 }
@@ -2302,8 +2298,8 @@ NOTE:     returns an empty list if l is empty,
      l12[size(l12)+1] = "a@("+string(ii)+")";
     }
     ring r@ = create_ring(ring_list(basering)[1], l12, "lp", "no_minpoly");
-    execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
-    list c=F(c); // embed c into the bigger ring
+    // define the corresponding inclusion of rings: imap
+    list c=imap(br@,c); // embed c into the bigger ring
     int j;
     int k;
     poly E = a@(1); // to be the product of the Chern roots that will be eliminated later
@@ -2331,7 +2327,7 @@ NOTE:     returns an empty list if l is empty,
     poly rez=-subst(I[1],x@, 0); // get the required formula
     setring br@; // come back to the initial base ring
     // define the specialization homomorphism (all added variables are set to zero)
-    execute( "map FF = r@,0, "+varstr(br@)+";" );
+    map FF = r@,0,maxideal(1);
     poly rez=FF( rez ); // bring the result back to the initial base ring
     return(rez);
   }
