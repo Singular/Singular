@@ -4703,10 +4703,10 @@ int p_LowVar (poly p, const ring r)
 /*2
 * verschiebt die Indizees der Modulerzeugenden um i
 */
-void p_Shift (poly * p,long i, const ring r)
+void p_Shift (poly * p,int i, const ring r)
 {
   poly qp1 = *p,qp2 = *p;/*working pointers*/
-  long     j = p_MaxComp(*p,r),k = p_MinComp(*p,r);
+  int     j = p_MaxComp(*p,r),k = p_MinComp(*p,r);
 
   if (j+i < 0) return ;
   BOOLEAN toPoly= ((j == -i) && (j == k));
