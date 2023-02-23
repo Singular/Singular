@@ -52,7 +52,7 @@ matrix mp_Copy(matrix a, const ring r);
 
 matrix mp_InitP(int r, int c, poly p, const ring R);
 matrix mp_InitI(int r, int c, int v, const ring R);
-matrix mp_MultI(matrix a, int f, const ring r);
+matrix mp_MultI(matrix a, long f, const ring r);
 matrix mp_MultP(matrix a, poly p, const ring r);
 matrix pMultMp(poly p, matrix a, const ring r);
 matrix mp_Add(matrix a, matrix b, const ring r);

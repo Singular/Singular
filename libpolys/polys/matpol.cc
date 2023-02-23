@@ -125,7 +125,7 @@ matrix mp_InitI(int r, int c, int v, const ring R)
 }
 
 /// c = f*a
-matrix mp_MultI(matrix a, int f, const ring R)
+matrix mp_MultI(matrix a, long f, const ring R)
 {
   int k, n = a->nrows, m = a->ncols;
   poly p = p_ISet(f, R);
