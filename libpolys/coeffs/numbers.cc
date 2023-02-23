@@ -695,6 +695,26 @@ char* nEati(char *s, int *i, int m)
   return s;
 }
 
+char* nEati(char *s, long *i, int m)
+{
+
+  if (((*s) >= '0') && ((*s) <= '9'))
+  {
+    unsigned long ii=0L;
+    do
+    {
+      ii *= 10;
+      ii += *s++ - '0';
+      if ((m!=0) && (ii > (LONG_MAX / 10))) ii = ii % m;
+    }
+    while (((*s) >= '0') && ((*s) <= '9'));
+    if ((m!=0) && (ii>=(long)m)) ii=ii%m;
+    *i=ii;
+  }
+  else (*i) = 1;
+  return s;
+}
+
 /// extracts a long integer from s, returns the rest
 char * nEatLong(char *s, mpz_ptr i)
 {

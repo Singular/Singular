@@ -110,6 +110,7 @@ coeffs nFindCoeffByName(char *n);
 
 /// helper routine: read an int from a string (mod m), return a pointer to the rest
 char* nEati(char *s, int *i, int m);
+char* nEati(char *s, long *i, int m);
 
 /// extracts a long integer from s, returns the rest
 char * nEatLong(char *s, mpz_ptr i);
