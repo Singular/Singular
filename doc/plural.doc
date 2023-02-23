@@ -2481,6 +2481,8 @@ one can input the polynomial @code{p} instead of matrix @code{D}.
 
 @item @strong{Note:} The returned ring should be activated afterwards, using the command @code{setring}.
 
+@item @strong{Note:} The coefficients must be a field (see @ref{G-algebra}).
+
 @item @strong{Remark:}
 At present, @sc{Plural} does not check the non-degeneracy conditions (@pxref{G-algebras}) while setting an algebra.
 
