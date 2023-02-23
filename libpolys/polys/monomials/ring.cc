@@ -4026,7 +4026,7 @@ void rUnComplete(ring r)
 // set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
 static void rSetVarL(ring r)
 {
-  int  min = MAX_INT_VAL, min_j = -1;
+  int  min = INT_MAX, min_j = -1;
   int* VarL_Number = (int*) omAlloc0(r->ExpL_Size*sizeof(int));
 
   int i,j;
