@@ -784,13 +784,21 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case INT_CMD:
           if (typed)
           {
+	    #if SIZEOF_LONG==8
+            s=(char *)omAlloc(MAX_INT_LEN+17);
+	    #else
             s=(char *)omAlloc(MAX_INT_LEN+7);
-            sprintf(s,"int(%d)",(int)(long)d);
+	    #endif
+            sprintf(s,"int(%ld)",(long)d);
           }
           else
           {
+	    #if SIZEOF_LONG==8
+            s=(char *)omAlloc(MAX_INT_LEN+12);
+	    #else
             s=(char *)omAlloc(MAX_INT_LEN+2);
-            sprintf(s,"%d",(int)(long)d);
+	    #endif
+            sprintf(s,"%ld",(long)d);
           }
           return s;
 
