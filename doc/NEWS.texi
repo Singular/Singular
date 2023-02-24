@@ -31,11 +31,13 @@ Changed libraries:
 @item chern.lib: fixed @code{symNsym} (@nref{chern_lib})
 @item homolog.lib: fixed corner cases for @code{depth} (@nref{homolog_lib})
 @item many: call std in many places only if attribute @code{isSB} is not set
+@item many: change many calls to @code{execute} by better variants
 @end itemize
 
 New commands:
 @itemize
 @item @code{chinrem}, @code{farey} for @code{smatrix} (@nref{smatrix})
+@item @code{coeffs} for @code{ring} (@nref{coeffs})
 @end itemize
 
 Changed commands:
