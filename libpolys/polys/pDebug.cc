@@ -19,6 +19,7 @@
 
 
 #include "misc/auxiliary.h"
+#include "misc/distrib.h"
 
 
 #ifdef PDEBUG
@@ -58,7 +59,9 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
     p_wrp(p, r);
     omPrintAddrInfo(stderr, p, " ");
   }
+  #ifndef MAKE_DISTRIBUTION
   dErrorBreak();
+  #endif
   d_poly_error_reporting = FALSE;
   return FALSE;
 }
