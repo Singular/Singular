@@ -16,6 +16,7 @@ GNU General Public Licence (See [COPYING](@ref copying_page)).
     <https://github.com/Singular/Singular> (git repository)
 
     <ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src> (tar balls)
+    <https://www.singular.uni-kl.de/ftp/pub/Math/Singular/src> (tar balls)
 
 * User Manual:
     <https://www.singular.uni-kl.de/Manual/latest>

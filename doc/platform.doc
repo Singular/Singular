@@ -94,6 +94,10 @@ from our FTP site
 @display
 @uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/src/}.
 @end display
+or
+@display
+@uref{https://wwww.singular.uni-kl.de/ftp/pub/Math/Singular/src/}.
+@end display
 
 @c @include README_download.texi
 

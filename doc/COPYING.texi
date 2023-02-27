@@ -20,8 +20,8 @@
 @cindex normaliz
 
 @center @sc{Singular} version @value{VERSION}
-@center @uref{http://www.uni-kl.de/,,University of Kaiserslautern}
-@center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.singular.uni-kl.de/zca/,,Centre for Computer Algebra}
+@center @uref{https://www.uni-kl.de/,,University of Kaiserslautern}
+@center @uref{https://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{https://www.singular.uni-kl.de/zca/,,Centre for Computer Algebra}
 @center Authors: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann
 
 @center Copyright @copyright{} 1986-@value{VERSION_DATE}
@@ -102,14 +102,14 @@ anonymous ftp through the following addresses:
 @* @uref{https://users-math.au.dk/~jensen/software/gfan/gfan.html}
 @item Singular-Factory
 @copyright{} Gert-Martin Greuel/R@"udiger Stobbe/Martin Lee, University of Kaiserslautern:
-@* @uref{https://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory}
+@* @uref{https://www.singular.uni-kl.de/ftp/pub/Math/Singular/Factory}
 @item Singular-libfac
 @copyright{}  Messollen, University of Saarbr@"ucken:
 @* @uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/Libfac/}
 @item @sc{Singular} binaries and sources
 @uref{ftp://jim.mathematik.uni-kl.de/pub/Math/Singular/} or via a
 WWW brow@-ser from
-@uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}
+@uref{https://www.singular.uni-kl.de/ftp/pub/Math/Singular/}
 @item Cygwin
 @uref{https://www.cygwin.com/}
 @item Xemacs
