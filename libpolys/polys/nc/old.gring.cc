@@ -2715,7 +2715,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
           );
     if(!dummy_ring)
     {
-      WarnS("commutative ring with 1 variable");
+      //WarnS("commutative ring with 1 variable");
       return FALSE;
     }
   }
