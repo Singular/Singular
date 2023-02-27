@@ -18,7 +18,7 @@
  domain as well as polynomials.
 
  For details see:
- <A HREF="ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/factory.ps.gz">Factory Developer's manual</A>
+ <A HREF="https://www.singular.uni-kl.de/ftp/pub/Math/Singular/doc/factory.ps.gz">Factory Developer's manual</A>
 
  \note For more information on how to configure, install and add new code to
  factory, see README:
