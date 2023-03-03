@@ -895,7 +895,7 @@ poly g = x*y*y - y*y*x;
 reduce(g,J); // 0, hence g belongs to J
 poly h = x*y*y*x - y*x*x;
 reduce(h,J); // the rest of two-sided division of h by J
-qring Q = J; // swith to K<x,y>/J
+qring Q = J; // switch to K<x,y>/J
 reduce(x*y*y - y*y*x,twostd(0)); //image of g above
 reduce(x*y*y*x - y*x*x,std(0)); //image of h above
 @c example
