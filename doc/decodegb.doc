@@ -700,7 +700,7 @@ They can be expressed in the unknown syndromes of e w.r.t B:
 since h_i=sum_(j=1)^n a_(ij)b_j and b_j * e=u_j(e).
 @end ifinfo
 
-@subsubheading Contructing the system
+@subsubheading Constructing the system
 
 @tex
   Let $B$ be an MDS matrix with structure constants $\mu^{ij}_l$.

@@ -731,7 +731,7 @@ applies chinese remainder theorem to the first argument w.r.t. the moduli given 
 The elements in the first list must be of same type which can be @code{bigint}/@code{int},
 @code{poly}, @code{ideal}, @code{module}, @code{smatrix} or @code{matrix}.
 The moduli, if given by a list, must be of type @code{bigint} or @code{int}.
-@*If data depending on a ring are involved, the coeffcient field must be @code{Q}.
+@*If data depending on a ring are involved, the coefficient field must be @code{Q}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1131,7 +1131,7 @@ provided by K.
 @item @strong{Type:}
 cring
 @item @strong{Purpose:}
-return the coeffcient ring of the argument
+return the coefficient ring of the argument
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3469,7 +3469,7 @@ the same as the type of the first argument
 @item @strong{Purpose:}
 deletes from the first argument all terms of degree bigger than the second argument.
 @*If a third/fourth argument @code{w} of type intvec is given, the degree is replaced by the weighted degree defined by @code{w}.
-@*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}. In this case, the coeffcient must be from a field.
+@*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}. In this case, the coefficient must be from a field.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4690,7 +4690,7 @@ the kernel of this induced map.
 @*An optional third string argument give the GB algorithm to use.
 (default: "std", else: "groebner", "modstd", "slimgb").
 @*An optional third argument (a name of a matrix) gives the matrix to store
-the transfomation of the input to the GB (see @ref{liftstd}).
+the transformation of the input to the GB (see @ref{liftstd}).
 @item @strong{Note:}
 If for at least one of @code{h1} or @code{h2} the attribute @code{"isHomog"} is
 set, @code{modulo(h1,h2)} also sets the attribute @code{"isHomog"}
@@ -6728,7 +6728,7 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-decomposes a ring/qring/coeffcient ring into a list of 4 (or 6 in the non-commutative case,
+decomposes a ring/qring/coefficient ring into a list of 4 (or 6 in the non-commutative case,
 see @ref{ringlist (plural)}) or 1/4 (for @code{cring}) components.
 It is identical to @code{ringlist} with the exception of the first list entry.
 @enumerate

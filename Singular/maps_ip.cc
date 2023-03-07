@@ -373,7 +373,7 @@ poly pSubstPar(poly p, int par, poly image)
   }
   else
   {
-    WerrorS("cannot apply subst for these coeffcients");
+    WerrorS("cannot apply subst for these coefficients");
   }
   idDelete((ideal *)(&theMap));
   omFreeBin((ADDRESS)v, sleftv_bin);

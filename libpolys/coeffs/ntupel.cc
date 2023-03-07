@@ -3,7 +3,7 @@
 ****************************************/
 
 /*
-* ABSTRACT: n-tupel of coeffcients
+* ABSTRACT: n-tupel of coefficients
 */
 
 

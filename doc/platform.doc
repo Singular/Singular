@@ -206,7 +206,7 @@ Install flint 2.5 (or newer):
 Install Singular
 @code{./configure --with-flint=$HOME/tmp --enable-gfanlib --prefix=$HOME/Singular4}
 @*@code{make && make install}
-@*(@code{$prefix/bin/Singular} is the main execuatble)
+@*(@code{$prefix/bin/Singular} is the main executable)
 @item (optional)
 install 4ti2
 @item (optional)
