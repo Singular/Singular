@@ -944,10 +944,6 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
   const int N = rG->N;
 
-  if(N < 2)
-    return false;
-
-
 //  if( (ncRingType(rG) != nc_skew) || (ncRingType(rG) != nc_comm) )
 //    return false;
 
@@ -1019,9 +1015,11 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 #endif
 
 
-  if( (iAltVarEnd == -1) || (iAltVarStart == (N+1)) )
-    return false; // either no alternating varables, or a single one => we are in commutative case!
-
+  if((iAltVarEnd == -1) || (iAltVarStart == (N+1)))
+  {
+    if (N>1) return false; // no alternating varables
+    iAltVarEnd=iAltVarStart=1;
+  }
 
   for(int i = 1; i < N; i++)
   {
@@ -1058,7 +1056,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 #endif
 
   assume( 1            <= iAltVarStart );
-  assume( iAltVarStart < iAltVarEnd   );
+  assume( iAltVarStart <= iAltVarEnd   );
   assume( iAltVarEnd   <= N            );
 
 

@@ -2507,8 +2507,10 @@ void nc_rKill(ring r)
         id_Delete((ideal *)&(r->GetNC()->MT[UPMATELEM(i,j,rN)]),r);
       }
     }
-    omFreeSize((ADDRESS)r->GetNC()->MT,rN*(rN-1)/2*sizeof(matrix));
-    omFreeSize((ADDRESS)r->GetNC()->MTsize,rN*(rN-1)/2*sizeof(int));
+    int mat_size=rN*(rN-1)/2;
+    mat_size=si_max(1,mat_size);
+    omFreeSize((ADDRESS)r->GetNC()->MT,mat_size*sizeof(matrix));
+    omFreeSize((ADDRESS)r->GetNC()->MTsize,mat_size*sizeof(int));
     id_Delete((ideal *)&(r->GetNC()->COM),r);
   }
   id_Delete((ideal *)&(r->GetNC()->C),r);
@@ -2701,25 +2703,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
   assume( rSamePolyRep(r, curr) || bCopyInput ); // wrong assumption?
 
-
-  if( r->N == 1 ) // clearly commutative!!!
-  {
-    assume(
-           ( (CCC != NULL) && (MATCOLS(CCC) == 1) && (MATROWS(CCC) == 1) && (MATELEM(CCC,1,1) == NULL) ) ||
-           ( (CCN == NULL) )
-          );
-
-    assume(
-           ( (DDD != NULL) && (MATCOLS(DDD) == 1) && (MATROWS(DDD) == 1) && (MATELEM(DDD,1,1) == NULL) ) ||
-           ( (DDN == NULL) )
-          );
-    if(!dummy_ring)
-    {
-      //WarnS("commutative ring with 1 variable");
-      return FALSE;
-    }
-  }
-
   // there must be:
   assume( (CCC != NULL) != (CCN != NULL) ); // exactly one data about coeffs (C).
   assume( !((DDD != NULL) && (DDN != NULL)) ); // at most one data about tails (D).
@@ -2769,11 +2752,6 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
 
   // check C
-  if ((CCC != NULL) && ( (MATCOLS(CCC)==1) || MATROWS(CCC)==1 ) )
-  {
-    CN = MATELEM(CCC,1,1);
-  }
-  else
   {
     if ((CCC != NULL) && ( (MATCOLS(CCC)!=r->N) || (MATROWS(CCC)!=r->N) ))
     {
@@ -3026,12 +3004,6 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
   /* initialize the multiplication: */
   /*  r->GetNC()->MTsize, r->GetNC()->MT, r->GetNC()->COM, */
   /* and r->GetNC()->IsSkewConstant for the skew case */
-  if (rVar(r)==1)
-  {
-    ncRingType(r, nc_comm);
-    r->GetNC()->IsSkewConstant=1;
-    return FALSE;
-  }
 
 //  ring save = currRing;
 //  int WeChangeRing = 0;
@@ -3045,8 +3017,10 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
 //       && (currRing->GetNC()!=NULL) );   // otherwise we cannot work with all these matrices!
 
   int i,j;
-  r->GetNC()->MT = (matrix *)omAlloc0((r->N*(r->N-1))/2*sizeof(matrix));
-  r->GetNC()->MTsize = (int *)omAlloc0((r->N*(r->N-1))/2*sizeof(int));
+  int mat_size=r->N*(r->N-1)/2;
+  mat_size=si_max(1,mat_size);
+  r->GetNC()->MT = (matrix *)omAlloc0(mat_size*sizeof(matrix));
+  r->GetNC()->MTsize = (int *)omAlloc0(mat_size*sizeof(int));
   id_Test((ideal)r->GetNC()->C, r);
   matrix COM = mp_Copy(r->GetNC()->C, r);
   poly p,q;
