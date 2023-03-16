@@ -329,3 +329,164 @@ int redLiftstd (LObject* h, kStrategy strat)
     }
   }
 }
+
+//---------------------------------------------------------------------------
+static void setUnit(int e, ideal *unit)
+{
+  if (unit!=NULL)
+  {
+    *unit=idInit(e,e);
+    for(int i=e-1;i>=0;i--)
+    {
+      poly p=pOne();
+      p_Shift(&p,i+1,currRing);
+      (*unit)->m[i]=p;
+    }
+  }
+}
+ideal idDivRem(ideal A, ideal quot, ideal &factor,ideal *unit,int lazyReduce)
+{
+  /* special cases */
+  if (idIs0(A) || idIs0(quot))
+  {
+    factor=idInit(1,IDELEMS(quot));
+    setUnit(A->rank,unit);
+    return idCopy(A);
+  }
+  /* ideal or module? */
+  ring orig_ring=currRing;
+  int k=id_RankFreeModule(quot,orig_ring);
+  int lsmod=0;
+  if (k==0) { lsmod=1;k=1;}  /*ideal*/
+  /* new ring */
+  ring syz_ring=rAssure_SyzOrder(orig_ring,TRUE);
+  rSetSyzComp(1,syz_ring);
+  rChangeCurrRing(syz_ring);
+  /* move ideals to new ring */
+  ideal s_quot;
+  ideal s_A;
+  if (orig_ring != syz_ring)
+  {
+    s_quot=idrCopyR_NoSort(quot,orig_ring,syz_ring);
+    s_A=idrCopyR_NoSort(A,orig_ring,syz_ring);
+  }
+  else
+  {
+    s_quot=id_Copy(quot,syz_ring);
+    s_A=id_Copy(A,syz_ring);
+  }
+  /* quot[i] -> quot[i]+e(k+i+1) */
+  for(int i=0;i<IDELEMS(s_quot);i++)
+  {
+    p_Shift(&s_quot->m[i],lsmod,syz_ring);
+    poly p=p_One(syz_ring);
+    p_SetComp(p,k+i+2,syz_ring);
+    p_Setm(p,syz_ring);
+    s_quot->m[i]=p_Add_q(s_quot->m[i],p,syz_ring);
+  }
+  s_quot->rank=k+IDELEMS(quot)+1;
+  /* A[i] -> A[i]*e(1) */
+  if (lsmod==1)
+  {
+    for(int i=0;i<IDELEMS(s_A);i++)
+    {
+      p_Shift(&s_A->m[i],1,syz_ring);
+    }
+  }
+  if (unit!=NULL)
+  {
+    int u_k=k+IDELEMS(quot)+2;
+    for(int i=0;i<IDELEMS(s_A);i++)
+    {
+      poly p=p_One(syz_ring);
+      p_SetComp(p,u_k+i,syz_ring);
+      p_Setm(p,syz_ring);
+      s_A->m[i]=p_Add_q(s_A->m[i],p,syz_ring);
+    }
+    s_A->rank=k+IDELEMS(quot)+IDELEMS(A)+1;
+  }
+  /* normalform */
+  ideal rest=kNF(s_quot,syz_ring->qideal,s_A,0,lazyReduce);
+  /* clean s_quot,s_A */
+  id_Delete(&s_quot,syz_ring);
+  id_Delete(&s_A,syz_ring);
+  /* interpret rest: remainder */
+  ideal result=idInit(IDELEMS(rest),1);
+  for(int i=0;i<IDELEMS(rest);i++)
+  {
+    poly p=rest->m[i];
+    poly d=NULL;
+    while(p!=NULL)
+    {
+      poly q=p; pIter(p);
+      pNext(q)=NULL;
+      if (p_GetComp(q,syz_ring)<=k)
+      {
+        result->m[i]=p_Add_q(result->m[i],q,syz_ring);
+      }
+      else
+      {
+        d=p_Add_q(d,q,syz_ring);
+      }
+    }
+    rest->m[i]=d;
+    p_Shift(&result->m[i],-k-lsmod,syz_ring);
+  }
+  /* interpret rest: factors */
+  factor=idInit(IDELEMS(rest),IDELEMS(quot));
+  if (unit==NULL)
+  {
+    for(int i=0;i<IDELEMS(rest);i++)
+    {
+      poly p=rest->m[i];
+      p_Shift(&p,-k-lsmod-1,syz_ring);
+      factor->m[i]=p;
+      factor->m[i]=p_Neg(factor->m[i],syz_ring);
+      rest->m[i]=NULL;
+    }
+  }
+  else
+  {
+    *unit=idInit(IDELEMS(A),IDELEMS(A));
+    /* comp k+1..u_k-1 -> rest, u_k.. -> unit*/
+    int u_k=k+IDELEMS(quot)+2;
+    for(int i=0;i<IDELEMS(rest);i++)
+    {
+      poly p=rest->m[i];
+      rest->m[i]=NULL;
+      poly d=NULL;
+      while(p!=NULL)
+      {
+        poly q=p; pIter(p);
+        pNext(q)=NULL;
+        if(p_GetComp(q,syz_ring)<u_k)
+        {
+          p_Shift(&q,-k-1,syz_ring);
+          factor->m[i]=p_Add_q(factor->m[i],q,syz_ring);
+        }
+        else
+        {
+          d=p_Add_q(d,q,syz_ring);
+        }
+      }
+      (*unit)->m[i]=d;
+      /*fix sign:*/
+      factor->m[i]=p_Neg(factor->m[i],syz_ring);
+      p_Shift(&(*unit)->m[i],-(IDELEMS(quot)+k+1),syz_ring);
+    }
+  }
+  id_Delete(&rest,syz_ring);
+  if (orig_ring != syz_ring)
+  {
+    rChangeCurrRing(orig_ring);
+    result=idrMoveR_NoSort(result, syz_ring, orig_ring);
+    factor=idrMoveR(factor, syz_ring, orig_ring);
+    if (unit!=NULL)
+    {
+      *unit=idrMoveR(*unit, syz_ring, orig_ring);
+    }
+    rDelete(syz_ring);
+  }
+  return result;
+}
+

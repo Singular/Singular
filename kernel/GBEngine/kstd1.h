@@ -29,6 +29,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp=0, int lazyReduce=0);
 
 poly kNFBound (ideal F, ideal Q, poly p,int bound,int syzComp=0, int lazyReduce=0);
 ideal kNFBound (ideal F, ideal Q, ideal p,int bound,int syzComp=0, int lazyReduce=0);
+ideal idDivRem(ideal A, ideal quot, ideal &factor,ideal *unit,int lazyReduce=0);
 
 /// NOTE: this is just a wrapper which sets currRing for the actual kNF call
 poly k_NF (ideal F, ideal Q, poly p,int syzComp, int lazyReduce, const ring _currRing);

@@ -3945,12 +3945,70 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         poly rest;
         res->data=p_DivRem(p,q,rest,currRing);
         res->rtyp=POLY_CMD;
-        Print("rest:");pWrite(rest);
+        PrintS("rest:");pWrite(rest);
         return FALSE;
       }
       else
       {
         WerrorS("expected system(\"DivRem\",<poly>,<poly>)");
+        return TRUE;
+      }
+    }
+    else
+/* ====== DivRemId ============================*/
+    if(strcmp(sys_cmd,"DivRemIdU")==0)
+    {
+      const short t1[]={2,IDEAL_CMD,IDEAL_CMD};
+      const short t2[]={2,MODUL_CMD,MODUL_CMD};
+      if (iiCheckTypes(h,t1,0)
+      || iiCheckTypes(h,t2,0))
+      {
+        ideal p=(ideal)h->CopyD();
+        ideal q=(ideal)h->next->CopyD();
+        ideal rest;
+        ideal unit;
+        ideal quot=idDivRem(p,q,rest,&unit,0);
+        matrix T = id_Module2Matrix(rest,currRing);
+        matrix U = id_Module2Matrix(unit,currRing);
+        lists L=(lists)omAllocBin(slists_bin);
+        L->Init(3);
+        L->m[0].rtyp=IDEAL_CMD;   L->m[0].data=(void *)quot;
+        L->m[1].rtyp=MATRIX_CMD;  L->m[1].data=(void *)T;
+        L->m[2].rtyp=MATRIX_CMD;  L->m[2].data=(void *)U;
+        res->rtyp=LIST_CMD;
+        res->data=L;
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("expected system(\"DivRemId\",<ideal>,<ideal>)");
+        return TRUE;
+      }
+    }
+    else
+    if(strcmp(sys_cmd,"DivRemId")==0)
+    {
+      const short t1[]={2,IDEAL_CMD,IDEAL_CMD};
+      const short t2[]={2,MODUL_CMD,MODUL_CMD};
+      if (iiCheckTypes(h,t1,0)
+      || iiCheckTypes(h,t2,0))
+      {
+        ideal p=(ideal)h->CopyD();
+        ideal q=(ideal)h->next->CopyD();
+        ideal rest;
+        ideal quot=idDivRem(p,q,rest,NULL,0);
+        matrix T = id_Module2Matrix(rest,currRing);
+        lists L=(lists)omAllocBin(slists_bin);
+        L->Init(2);
+        L->m[0].rtyp=IDEAL_CMD;   L->m[0].data=(void *)quot;
+        L->m[1].rtyp=MATRIX_CMD;  L->m[1].data=(void *)T;
+        res->rtyp=LIST_CMD;
+        res->data=L;
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("expected system(\"DivRemId\",<ideal>,<ideal>)");
         return TRUE;
       }
     }
