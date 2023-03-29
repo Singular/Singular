@@ -229,6 +229,11 @@ AX_NORMALIZE_PATH([config_datadir],['/'])
 AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
 AC_SUBST(DATA_DIR, "$config_datadir")
 
+AX_RECURSIVE_EVAL([[$]htmldir], [config_htmldir])
+AX_NORMALIZE_PATH([config_htmldir],['/'])
+AC_DEFINE_UNQUOTED([DATA_DIR],"$config_htmldir",[htmldir])
+AC_SUBST(DATA_DIR, "$config_htmldir")
+
 SING_SHOW_FLAGS([Compiler/linker flags: ])
 
 
