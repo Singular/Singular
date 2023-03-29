@@ -1700,7 +1700,7 @@ void syMake(leftv v,const char * id, package pa)
         int j=atoi(id);
         char tmp[MAX_INT_LEN+5];
         sprintf(tmp,"%d",j);
-        if ((j>MAX_INT_LEN) || (strcmp(tmp,id)!=0))
+        if (strcmp(tmp,id)!=0)
         {
           number n;
           n_Read(id,&n,coeffs_BIGINT);
