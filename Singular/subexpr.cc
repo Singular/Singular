@@ -784,20 +784,20 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case INT_CMD:
           if (typed)
           {
-	    #if SIZEOF_LONG==8
+            #if SIZEOF_LONG==8
             s=(char *)omAlloc(MAX_INT_LEN+17);
-	    #else
+            #else
             s=(char *)omAlloc(MAX_INT_LEN+7);
-	    #endif
+            #endif
             sprintf(s,"int(%ld)",(long)d);
           }
           else
           {
-	    #if SIZEOF_LONG==8
+            #if SIZEOF_LONG==8
             s=(char *)omAlloc(MAX_INT_LEN+12);
-	    #else
+            #else
             s=(char *)omAlloc(MAX_INT_LEN+2);
-	    #endif
+            #endif
             sprintf(s,"%ld",(long)d);
           }
           return s;
@@ -1604,95 +1604,107 @@ void syMake(leftv v,const char * id, package pa)
   if (siq<=0)
 #endif
   {
-    if (strcmp(id,"basering")==0)
+    if (id[0]=='#')
     {
-      if (currRingHdl!=NULL)
+      h=ggetid(id);
+      /* 3) existing identifier, local */
+      if ((h!=NULL) && (IDLEV(h)==myynest))
       {
-        if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
-        h=currRingHdl;
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
         goto id_found;
+      }
+    }
+    else if ((id[0]!='-')&&(id[0]>='@' /* letters, _ */))
+    {
+      if (strcmp(id,"basering")==0)
+      {
+        if (currRingHdl!=NULL)
+        {
+          if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
+          h=currRingHdl;
+          goto id_found;
+        }
+        else
+        {
+          v->name = id;
+          return; /* undefined */
+        }
+      }
+      else if (strcmp(id,"Current")==0)
+      {
+        if (currPackHdl!=NULL)
+        {
+          omFreeBinAddr((ADDRESS)id);
+          h=currPackHdl;
+          goto id_found;
+        }
+        else
+        {
+          v->name = id;
+          return; /* undefined */
+        }
+      }
+      if(v->req_packhdl!=currPack)
+      {
+        h=v->req_packhdl->idroot->get(id,myynest);
       }
       else
       {
-        v->name = id;
-        return; /* undefined */
+        h=ggetid(id);
       }
-    }
-    else if (strcmp(id,"Current")==0)
-    {
-      if (currPackHdl!=NULL)
+      /* 3) existing identifier, local */
+      if ((h!=NULL) && (IDLEV(h)==myynest))
       {
-        omFreeBinAddr((ADDRESS)id);
-        h=currPackHdl;
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
         goto id_found;
       }
-      else
+      if (yyInRingConstruction)
       {
-        v->name = id;
-        return; /* undefined */
+        currRingHdl=NULL;
       }
-    }
-    if(v->req_packhdl!=currPack)
-    {
-      h=v->req_packhdl->idroot->get(id,myynest);
+      /* 4. local ring: ringvar */
+      if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
+      /*&& (!yyInRingConstruction)*/)
+      {
+        int vnr;
+        if ((vnr=r_IsRingVar(id, currRing->names,currRing->N))>=0)
+        {
+          poly p=pOne();
+          pSetExp(p,vnr+1,1);
+          pSetm(p);
+          v->data = (void *)p;
+          v->name = id;
+          v->rtyp = POLY_CMD;
+          return;
+        }
+        if((n_NumberOfParameters(currRing->cf)>0)
+        &&((vnr=r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
+                                n_NumberOfParameters(currRing->cf))>=0)))
+        {
+          BOOLEAN ok=FALSE;
+          poly p = pmInit(id,ok);
+          if (ok && (p!=NULL))
+          {
+            v->data = pGetCoeff(p);
+            pGetCoeff(p)=NULL;
+            pLmFree(p);
+            v->rtyp = NUMBER_CMD;
+            v->name = id;
+            return;
+          }
+        }
+      }
+      /* 5. existing identifier, global */
+      if (h!=NULL)
+      {
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);  /*assume strlen(id) <1000 */
+        goto id_found;
+      }
     }
     else
     {
-      h=ggetid(id);
-    }
-    /* 3) existing identifier, local */
-    if ((h!=NULL) && (IDLEV(h)==myynest))
-    {
-      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
-      goto id_found;
-    }
-    if (yyInRingConstruction)
-    {
-      currRingHdl=NULL;
-    }
-    /* 4. local ring: ringvar */
-    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
-    /*&& (!yyInRingConstruction)*/)
-    {
-      int vnr;
-      if ((vnr=r_IsRingVar(id, currRing->names,currRing->N))>=0)
-      {
-        poly p=pOne();
-        pSetExp(p,vnr+1,1);
-        pSetm(p);
-        v->data = (void *)p;
-        v->name = id;
-        v->rtyp = POLY_CMD;
-        return;
-      }
-      if((n_NumberOfParameters(currRing->cf)>0)
-      &&((vnr=r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
-                              n_NumberOfParameters(currRing->cf))>=0)))
-      {
-        BOOLEAN ok=FALSE;
-        poly p = pmInit(id,ok);
-        if (ok && (p!=NULL))
-        {
-          v->data = pGetCoeff(p);
-          pGetCoeff(p)=NULL;
-          pLmFree(p);
-          v->rtyp = NUMBER_CMD;
-          v->name = id;
-          return;
-        }
-      }
-    }
-    /* 5. existing identifier, global */
-    if (h!=NULL)
-    {
-      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);  /*assume strlen(id) <1000 */
-      goto id_found;
-    }
-    /* 6a: int/bigint */
-    if (strlen(id)<=MAX_INT_LEN)
-    {
-      int i;
-      i=0;
+      /* 6a: int/bigint */
+      int i=0;
       if (id[0]=='-') { i=1; }
       while(isdigit(id[i])) i++;
       if (id[i]=='\0')
