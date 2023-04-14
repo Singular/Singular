@@ -999,21 +999,23 @@ InternalPoly::comparesame ( InternalCF * acoeff )
         termList cursor1 = firstTerm;
         termList cursor2 = apoly->firstTerm;
         for ( ; cursor1 && cursor2; cursor1 = cursor1->next, cursor2 = cursor2->next )
+        {
             // we test on inequality of coefficients at this
             // point instead of testing on "less than" at the
             // last `else' in the enclosed `if' statement since a
             // test on inequality in general is cheaper
-            if ( (cursor1->exp != cursor2->exp) || (cursor1->coeff != cursor2->coeff) )
+            if ( cursor1->exp > cursor2->exp )
+                return 1;
+            else  if ( cursor1->exp < cursor2->exp )
+                return -1;
+            if ( (cursor1->coeff != cursor2->coeff) )
             {
-                if ( cursor1->exp > cursor2->exp )
-                    return 1;
-                else  if ( cursor1->exp < cursor2->exp )
-                    return -1;
-                else  if ( cursor1->coeff > cursor2->coeff )
+                if ( cursor1->coeff > cursor2->coeff )
                     return 1;
                 else
                     return -1;
-             }
+            }
+        }
         // check trailing terms
         if ( cursor1 == cursor2 )
             return 0;
