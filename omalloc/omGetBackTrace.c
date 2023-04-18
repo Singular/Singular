@@ -4,7 +4,9 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
+#ifndef OM_INLINE  /*during configure omConfig.h does not exists yet*/
 #include "omalloc/omConfig.h"
+#endif
 
 #ifdef HAVE_OMALLOC
 #ifndef OM_NDEBUG

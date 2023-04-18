@@ -498,6 +498,7 @@ AC_CACHE_VAL(ac_cv_prog_addr2line_works,
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <stdlib.h>
 #define OM_GET_RETURN_ADDR_WORKS 1
+#undef OM_NDEBUG
 #include "omReturn.h"
 #include "omStructs.h"
 /* #include "omGetBackTrace.h" */
