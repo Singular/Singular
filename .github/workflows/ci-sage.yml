@@ -52,7 +52,7 @@ concurrency:
 
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
-  DIST_PREREQ: libcdd-dev libopenblas-dev
+  DIST_PREREQ: libcdd-dev
   # Name of this project in the Sage distribution
   SPKG:        singular
   # Sage distribution packages to build
