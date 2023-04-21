@@ -21,6 +21,18 @@
 
 @heading News for version @value{VERSION}
 
+New libraries:
+@itemize
+@item @code{sagbiNormaliz.lib}: computation of Sagbi bases via normaliz (@nref{sagbiNormaliz_lib})
+@end itemize
+
+Changed libraries:
+@itemize
+@item @code{normaliz.lib}: update to normaliz 3.10
+@end itemize
+
+@heading News for version 4-3-2
+
 Changed libraries:
 @itemize
 @item many: call std in many places only if attribute @code{isSB} is not set
