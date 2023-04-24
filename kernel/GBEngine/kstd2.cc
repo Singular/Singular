@@ -1216,7 +1216,6 @@ int redHomog (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
-    #if 0 // red is redLiftstd if OPT_IDLIFT
     if (UNLIKELY(TEST_OPT_IDLIFT))
     {
       if (h->p!=NULL)
@@ -1236,7 +1235,6 @@ int redHomog (LObject* h,kStrategy strat)
         }
       }
     }
-    #endif
     #if 0
     else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
     {
@@ -1976,7 +1974,6 @@ int redLazy (LObject* h,kStrategy strat)
       kDeleteLcm(h);
       return 0;
     }
-    #if 0 // red id redLiftstd if OPT_IDLIFT
     if (UNLIKELY(TEST_OPT_IDLIFT))
     {
       if (h->p!=NULL)
@@ -1996,7 +1993,6 @@ int redLazy (LObject* h,kStrategy strat)
         }
       }
     }
-    #endif
     #if 0
     else if ((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ))
     {
@@ -2207,7 +2203,6 @@ int redHoney (LObject* h, kStrategy strat)
       h->Clear();
       return 0;
     }
-    #if 0 // red is redLiftstd if OPT_IDLIFT
     if (UNLIKELY(TEST_OPT_IDLIFT))
     {
       if (h->p!=NULL)
@@ -2228,7 +2223,6 @@ int redHoney (LObject* h, kStrategy strat)
       }
     }
     else
-    #endif
     if (UNLIKELY((strat->syzComp > 0)&&(!TEST_OPT_REDTAIL_SYZ)))
     {
       if (h->p!=NULL)
@@ -2364,7 +2358,7 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   else if (rField_is_Ring(currRing))
   {
     redRing_S(&P,strat);
-    if (P.bucket!=NULL) 
+    if (P.bucket!=NULL)
     {
       P.p=kBucketClear(P.bucket);
       kBucketDestroy(&P.bucket);

@@ -603,6 +603,7 @@ ideal idMultSect(resolvente arg, int length, GbVariant alg)
  * where G: GB of (h1+h11)
  *       T: G/h11=h1*T
  *       S: relative syzygies(h1) modulo h11
+ * if V_IDLIFT is set, ignore/do not return S
  */
 static ideal idPrepare (ideal  h1, ideal h11, tHomog hom, int syzcomp, intvec **w, GbVariant alg)
 {
@@ -610,7 +611,7 @@ static ideal idPrepare (ideal  h1, ideal h11, tHomog hom, int syzcomp, intvec **
   int     j,k;
   poly    p,q;
 
-  if (idIs0(h1)) return NULL;
+  assume(!idIs0(h1));
   k = id_RankFreeModule(h1,currRing);
   if (h11!=NULL)
   {
@@ -1161,8 +1162,18 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     s_mod = mod;
     s_temp = idCopy(submod);
   }
+  BITSET save2;
+  SI_SAVE_OPT2(save2);
+
+  if ((rest==NULL)
+  && (!rField_is_Ring(currRing))
+  && (!rIsNCRing(currRing))
+  && (!TEST_OPT_RETURN_SB))
+    si_opt_2 |=Sy_bit(V_IDLIFT);
+  else
+    si_opt_2 &=~Sy_bit(V_IDLIFT);
   ideal s_h3;
-  if (isSB)
+  if (isSB && !TEST_OPT_IDLIFT)
   {
     s_h3 = idCopy(s_mod);
     idPrepareStd(s_h3, k+comps_to_add);
@@ -1171,6 +1182,8 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   {
     s_h3 = idPrepare(s_mod,NULL,(tHomog)FALSE,k+comps_to_add,NULL,alg);
   }
+  SI_RESTORE_OPT2(save2);
+
   if (!goodShape)
   {
     for (j=0;j<IDELEMS(s_h3);j++)

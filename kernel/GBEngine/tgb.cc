@@ -2786,6 +2786,16 @@ static void go_on (slimgb_alg * c)
       h = s->lcm_of_lm;
       p_Test (h, c->r);
     }
+
+    if(!h)
+      continue;
+
+    if(TEST_OPT_IDLIFT
+    && p_GetComp(h, currRing) > c->syz_comp)
+    {
+      pDelete(&h);
+      continue;
+    }
     // if(s->i>=0)
 //       now_t_rep(s->j,s->i,c);
     number coef;

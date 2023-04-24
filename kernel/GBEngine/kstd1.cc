@@ -1707,7 +1707,9 @@ void initBba(kStrategy strat)
     else
       strat->red = redRing;
   }
-  if (TEST_OPT_IDLIFT)
+  if (TEST_OPT_IDLIFT
+  && (!rIsNCRing(currRing))
+  && (!rField_is_Ring(currRing)))
     strat->red=redLiftstd;
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
