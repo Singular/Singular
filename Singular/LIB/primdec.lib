@@ -3940,7 +3940,11 @@ proc sep(poly f,int i, list #)
    {
       ERROR("FEHLER IN GCD");
    }
-   poly g1=lift(h,f)[1][1];    //  f/h
+   poly g1=f;
+   if (h!=1)
+   {
+     g1=lift(h,f)[1][1];    //  f/h
+   }
    poly h1;
 
    while(h!=h1)
