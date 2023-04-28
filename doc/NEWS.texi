@@ -31,6 +31,12 @@ Changed libraries:
 @item @code{normaliz.lib}: update to normaliz 3.10
 @end itemize
 
+Changes in the kernel/build system:
+@itemize
+@item new algorithm for lift function (@nref{lift})
+@item mstd for local rings (@nref{mstd})
+@end itemize
+
 @heading News for version 4-3-2
 
 Changed libraries:
