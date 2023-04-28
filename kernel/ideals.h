@@ -100,7 +100,7 @@ static inline BOOLEAN idHomModule(ideal m, ideal Q,intvec **w)
 
 BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w);
 
-ideal idMinBase (ideal h1);
+ideal idMinBase (ideal h1, ideal *SB=NULL);
   /*returns a minimized set of generators of h1*/
 void    idInitChoise (int r,int beg,int end,BOOLEAN *endch,int * choise);
 void    idGetNextChoise (int r,int end,BOOLEAN *endch,int * choise);

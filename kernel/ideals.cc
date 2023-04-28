@@ -48,7 +48,7 @@
 /*2
 *returns a minimized set of generators of h1
 */
-ideal idMinBase (ideal h1)
+ideal idMinBase (ideal h1, ideal *SB)
 {
   ideal h2, h3,h4,e;
   int j,k;
@@ -82,9 +82,8 @@ ideal idMinBase (ideal h1)
   {
     return e;
   }
-  pEnlargeSet(&(e->m),IDELEMS(e),15);
-  IDELEMS(e) = 16;
   h2 = kStd(h1,currRing->qideal,isNotHomog,NULL);
+  if (SB!=NULL) *SB=h2;
   h3 = idMaxIdeal(1);
   h4=idMult(h2,h3);
   idDelete(&h3);
@@ -114,7 +113,7 @@ ideal idMinBase (ideal h1)
       }
     }
   }
-  idDelete(&h2);
+  if (SB==NULL) idDelete(&h2);
   idDelete(&h3);
   idDelete(&h4);
   if (currRing->qideal!=NULL)

@@ -3120,12 +3120,12 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     strat->LazyPass*=2;
   }
   strat->homog=h;
+  ideal SB=NULL;
   if (rHasLocalOrMixedOrdering(currRing))
   {
-    if (w!=NULL)
-      r=mora(F,Q,*w,hilb,strat);
-    else
-      r=mora(F,Q,NULL,hilb,strat);
+    r=idMinBase(F,&SB); // SB and M via minbase
+    strat->M=r;
+    r=SB;
   }
   else
   {
@@ -3174,9 +3174,11 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   }
   else
   {
-    if (IDELEMS(M)>IDELEMS(r)) {
-       idDelete(&M);
-       M=idCopy(r); }
+    if (IDELEMS(M)>IDELEMS(r))
+    {
+      idDelete(&M);
+      M=idCopy(r);
+    }
   }
   return r;
 }
