@@ -68,8 +68,7 @@ EXTERN_VAR BOOLEAN siCntrlc;
 #define V_INTERSECT_ELIM 25
 #define V_INTERSECT_SYZ 26
 #define V_ASSIGN_NONE 27
-#define V_IDELIM      28
-/* for tests: 29-30 */
+/* for tests: 28-30 */
 #define V_DEG_STOP   31
 
 
@@ -128,7 +127,6 @@ EXTERN_VAR BOOLEAN siCntrlc;
 #define TEST_OPT_CONTENTSB         BVERBOSE(V_CONTENTSB)
 #define TEST_OPT_CANCELUNIT        BVERBOSE(V_CANCELUNIT)
 #define TEST_OPT_IDLIFT            BVERBOSE(V_IDLIFT)
-#define TEST_OPT_IDELIM            BVERBOSE(V_IDELIM)
 #define TEST_OPT_LENGTH            BVERBOSE(V_LENGTH)
 #define TEST_V_QRING               BVERBOSE(V_QRING)
 #define TEST_V_NSB                 BVERBOSE(V_NSB)

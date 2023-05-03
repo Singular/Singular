@@ -1815,11 +1815,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
     WarnS("wrong algorithm for GB");
     alg=GbDefault;
   }
-  BITSET save2;
-  SI_SAVE_OPT2(save2);
-  if (!TEST_OPT_RETURN_SB) si_opt_2|=V_IDELIM;
   hh=idGroebner(h,0,alg,hilb);
-  SI_RESTORE_OPT2(save2);
   // go back to the original ring
   rChangeCurrRing(origR);
   i = IDELEMS(hh)-1;
