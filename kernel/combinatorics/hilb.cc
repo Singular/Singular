@@ -1761,15 +1761,30 @@ static int compare_rp_currRing(const void *pp1, const void *pp2)
 static void id_DelDiv_hi(ideal id, BOOLEAN *bad,const ring r)
 {
   int k=IDELEMS(id)-1;
+  while(id->m[k]==NULL) k--;
   int kk = k+1;
   long *sev=(long*)omAlloc0(kk*sizeof(long));
-  while(id->m[k]==NULL) k--;
   BOOLEAN only_lm=r->cf->has_simple_Alloc;
-  for (int i=k; i>=0; i--)
+  if (BIT_SIZEOF_LONG / r->N==0) // 1 bit per exp
   {
-    if(id->m[i]!=NULL)
+    for (int i=k; i>=0; i--)
     {
-      sev[i]=p_GetShortExpVector(id->m[i],r);
+        sev[i]=p_GetShortExpVector0(id->m[i],r);
+    }
+  }
+  else
+  if (BIT_SIZEOF_LONG / r->N==1) // 1..2 bit per exp
+  {
+    for (int i=k; i>=0; i--)
+    {
+        sev[i]=p_GetShortExpVector1(id->m[i],r);
+    }
+  }
+  else
+  {
+    for (int i=k; i>=0; i--)
+    {
+        sev[i]=p_GetShortExpVector(id->m[i],r);
     }
   }
   if (only_lm)
@@ -1788,7 +1803,7 @@ static void id_DelDiv_hi(ideal id, BOOLEAN *bad,const ring r)
             {
               p_LmFree(&id->m[j],r);
             }
-	    else if (p_LmShortDivisibleBy(id->m[j],sev[j], m_i,~sev_i,r))
+            else if (p_LmShortDivisibleBy(id->m[j],sev[j], m_i,~sev_i,r))
             {
               p_LmFree(&id->m[i],r);
               break;
@@ -1824,7 +1839,6 @@ static void id_DelDiv_hi(ideal id, BOOLEAN *bad,const ring r)
       }
     }
   }
-  omFreeSize(bad,kk*sizeof(BOOLEAN));
   omFreeSize(sev,kk*sizeof(long));
 }
 poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
@@ -1864,46 +1878,43 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
     }
     omFreeSize(exp,(src->N+1)*sizeof(int));
   }
-  h=p_One(Qt);
+  h=p_Init(Qt); pSetCoeff0(h,n_Init(-1,Qt->cf));
   p_SetExp(h,1,p_Totaldegree(A->m[0],src),Qt);
-  p_Setm(h,Qt);
-  h=p_Neg(h,Qt);
+  //p_Setm(h,Qt);
   h=p_Add_q(h,p_One(Qt),Qt); // 1-t
   int *exp_q=(int*)omAlloc((src->N+1)*sizeof(int));
+  BOOLEAN *bad=(BOOLEAN*)omAlloc0(r*sizeof(BOOLEAN));
   for (int i=1;i<r;i++)
   {
-    //ideal J=id_Copy(A,src);
-    //for (int ii=i;ii<r;ii++) p_Delete(&J->m[ii],src);
-    //idSkipZeroes(J);
     ideal J=id_CopyFirstK(A,i,src);
     for(int ii=src->N;ii>0;ii--)
       exp_q[ii]=p_GetExp(A->m[i],ii,src);
-    BOOLEAN *bad=(BOOLEAN*)omAlloc0(i*sizeof(BOOLEAN));
+    memset(bad,0,i*sizeof(BOOLEAN));
     for(int ii=0;ii<i;ii++)
     {
       bad[ii]=p_Div_hi(J->m[ii],exp_q,src);
     }
     id_DelDiv_hi(J,bad,src);
+    // variant A
     // search linear elems:
     int k=0;
     for (int ii=IDELEMS(J)-1;ii>=0;ii--)
     {
-      if((J->m[ii]!=NULL) && (p_Totaldegree(J->m[ii],src)==1))
+      if((J->m[ii]!=NULL) && (bad[ii]) && (p_Totaldegree(J->m[ii],src)==1))
       {
         k++;
         p_LmDelete(&J->m[ii],src);
       }
     }
-    idSkipZeroes(J);
+    IDELEMS(J)=idSkipZeroes0(J);
     poly h_J=hilbert_series(J,src,NULL,Qt);// J_1
     poly tmp;
     if (k>0)
     {
       // hilbert_series of unmodified J:
-      tmp=p_One(Qt);
+      tmp=p_Init(Qt); pSetCoeff0(tmp,n_Init(-1,Qt->cf));
       p_SetExp(tmp,1,1,Qt);
-      p_Setm(tmp,Qt);
-      tmp=p_Neg(tmp,Qt);
+      //p_Setm(tmp,Qt);
       tmp=p_Add_q(tmp,p_One(Qt),Qt); // 1-t
       if (k>1)
       {
@@ -1912,15 +1923,15 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
       h_J=p_Mult_q(h_J,tmp,Qt);
     }
     // forget about J:
-    id_Delete(&J,src);
+    id_Delete0(&J,src);
     // t^|A_i|
-    tmp=p_One(Qt);
+    tmp=p_Init(Qt); pSetCoeff0(tmp,n_Init(-1,Qt->cf));
     p_SetExp(tmp,1,p_Totaldegree(A->m[i],src),Qt);
-    p_Setm(tmp,Qt);
-    tmp=p_Neg(tmp,Qt);
+    //p_Setm(tmp,Qt);
     tmp=p_Mult_q(tmp,h_J,Qt);
     h=p_Add_q(h,tmp,Qt);
   }
+  omFreeSize(bad,r*sizeof(BOOLEAN));
   omFreeSize(exp_q,(src->N+1)*sizeof(int));
   //Print("end hilbert_series, r=%d\n",r);
   return h;
@@ -1970,7 +1981,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   }
   else AA=A;
   id_DelDiv(AA,src);
-  idSkipZeroes(AA);
+  IDELEMS(AA)=idSkipZeroes0(AA);
    /* sort */
   if (IDELEMS(AA)>1)
   #ifdef HAVE_QSORT_R
@@ -1988,7 +1999,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   }
   #endif
   poly s=hilbert_series(AA,src,wdegree,Qt);
-  id_Delete(&AA,src);
+  id_Delete0(&AA,src);
   intvec *ss;
   if (s==NULL)
     ss=new intvec(2);

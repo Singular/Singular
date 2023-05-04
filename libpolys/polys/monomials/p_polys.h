@@ -49,6 +49,8 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
  *
  ***************************************************************/
 unsigned long p_GetShortExpVector(const poly a, const ring r);
+unsigned long p_GetShortExpVector0(const poly a, const ring r);
+unsigned long p_GetShortExpVector1(const poly a, const ring r);
 
 #ifdef HAVE_RINGS
 /*! divisibility check over ground ring (which may contain zero divisors);

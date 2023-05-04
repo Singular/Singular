@@ -59,8 +59,10 @@ ideal idInit (int size, int rank=1);
 
 /*- deletes an ideal -*/
 void id_Delete (ideal* h, ring r);
+void id_Delete0 (ideal* h, ring r);
 void id_ShallowDelete (ideal* h, ring r);
 void idSkipZeroes (ideal ide);
+int idSkipZeroes0 (ideal ide);
   /*gives an ideal the minimal possible size*/
 
 /// number of non-zero polys in F

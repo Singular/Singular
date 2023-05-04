@@ -4827,6 +4827,53 @@ unsigned long p_GetShortExpVector(const poly p, const ring r)
   }
   return ev;
 }
+// 1 bit per exp
+unsigned long p_GetShortExpVector0(const poly p, const ring r)
+{
+  assume(p != NULL);
+  assume(r->N >=BIT_SIZEOF_LONG);
+  unsigned long ev = 0; // short exponent vector
+
+  for (int j=BIT_SIZEOF_LONG; j>0; j--)
+  {
+    if (p_GetExp(p, j,r)>0)
+    ev |= Sy_bitL(j-1);
+  }
+  return ev;
+}
+
+//1..2 bits per exp
+unsigned long p_GetShortExpVector1(const poly p, const ring r)
+{
+  assume(p != NULL);
+  assume(r->N <BIT_SIZEOF_LONG);
+  assume(2*r->N >=BIT_SIZEOF_LONG);
+  unsigned long ev = 0; // short exponent vector
+  int rest=r->N;
+  int e;
+  // 2 bits per exp
+  int j=r->N;
+  for (; j>BIT_SIZEOF_LONG-r->N; j--)
+  {
+    if ((e=p_GetExp(p, j,r))>0)
+    {
+      ev |= Sy_bitL(j-1);
+      if (e>1)
+      {
+        ev|=Sy_bitL(rest+j-1);
+      }
+    }
+  }
+  // 1 bit per exp
+  for (; j>0; j--)
+  {
+    if (p_GetExp(p, j,r)>0)
+    {
+      ev |= Sy_bitL(j-1);
+    }
+  }
+  return ev;
+}
 
 /***************************************************************
  *

@@ -152,6 +152,26 @@ void id_Delete (ideal * h, ring r)
   *h=NULL;
 }
 
+void id_Delete0 (ideal * h, ring r)
+{
+  const long elems = IDELEMS(*h);
+
+ assume( (*h)->m != NULL );
+
+ long j = elems;
+ do
+ {
+   j--;
+   poly pp=((*h)->m[j]);
+   if (pp!=NULL) p_Delete(&pp, r);
+ }
+ while (j>0);
+
+ omFree((ADDRESS)((*h)->m));
+ omFreeBin((ADDRESS)*h, sip_sideal_bin);
+ *h=NULL;
+}
+
 
 /// Shallowdeletes an ideal/matrix
 void id_ShallowDelete (ideal *h, ring r)
@@ -215,6 +235,32 @@ void idSkipZeroes (ideal ide)
     pEnlargeSet(&(ide->m),idelems,j-idelems);
     IDELEMS(ide) = j;
   }
+}
+
+int idSkipZeroes0 (ideal ide)
+{
+  assume (ide != NULL);
+
+  int k;
+  int j = -1;
+  int idelems=IDELEMS(ide);
+
+  k=0; 
+  while((k<idelems)&&(ide->m[k] != NULL)) k++;
+  if (k==idelems) return idelems;
+  // now: k: pos of first NULL entry
+  j=k; k=k+1;
+  for (; k<idelems; k++)
+  {
+    if (ide->m[k] != NULL)
+    {
+      ide->m[j] = ide->m[k];
+      ide->m[k] = NULL;
+      j++;
+    }
+  }
+  if (j<=1) return 1;
+  return j;
 }
 
 /// copies the first k (>= 1) entries of the given ideal/module

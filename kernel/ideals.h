@@ -129,6 +129,7 @@ enum GbVariant
   GbNfmod,
   GbStdSat,
   GbSingmatic
+  // and test variants
 };
 
 ideal   idSect (ideal h1,ideal h2, GbVariant a=GbDefault);
@@ -199,6 +200,8 @@ ideal id_Farey(ideal x, number N, const ring r);
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
 
 ideal id_Satstd(const ideal I, ideal J, const ring r);
+ideal id_Sat_principal(const ideal I, ideal J, const ring r);
+ideal id_Homogenize(ideal I, int var_num, const ring r);
 
 GbVariant syGetAlgorithm(char *n, const ring r, const ideal M);
 #endif

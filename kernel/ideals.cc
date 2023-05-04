@@ -3159,6 +3159,145 @@ ideal id_Satstd(const ideal I, ideal J, const ring r)
   return res;
 }
 
+ideal id_Sat_principal(ideal I, ideal J, const ring origR)
+{
+  rRingOrder_t    *ord;
+  int    *block0,*block1;
+  int    **wv;
+
+  // construction extension ring
+  ord=(rRingOrder_t*)omAlloc0(4*sizeof(rRingOrder_t));
+  block0=(int*)omAlloc0(4*sizeof(int));
+  block1=(int*)omAlloc0(4*sizeof(int));
+  wv=(int**) omAlloc0(4*sizeof(int**));
+  wv[0]=(int*)omAlloc0((rVar(origR) + 2)*sizeof(int));
+  block0[0] = block0[1] = 1;
+  block1[0] = block1[1] = rVar(origR)+1;
+  // use this special ordering: like ringorder_a, except that pFDeg, pWeights
+  // ignore it
+  ord[0] = ringorder_aa;
+  wv[0][rVar(origR)]=1;
+  BOOLEAN wp=FALSE;
+  for (int j=0;j<rVar(origR);j++)
+    if (p_Weight(j+1,origR)!=1) { wp=TRUE;break; }
+  if (wp)
+  {
+    wv[1]=(int*)omAlloc0((rVar(origR) + 1)*sizeof(int));
+    for (int j=0;j<rVar(origR);j++)
+      wv[1][j]=p_Weight(j+1,origR);
+    ord[1] = ringorder_wp;
+  }
+  else
+    ord[1] = ringorder_dp;
+  ord[2] = ringorder_C;
+  ord[3] = (rRingOrder_t)0;
+  char **names=(char**)omAlloc0((origR->N+1) * sizeof(char *));
+  for (int j=0;j<rVar(origR);j++)
+    names[j]=origR->names[j];
+  names[rVar(origR)]=(char*)"@";
+  ring tmpR=rDefault(nCopyCoeff(origR->cf),rVar(origR)+1,names,4,ord,block0,block1,wv);
+  omFree(names);
+  rComplete(tmpR, 1);
+  rChangeCurrRing(tmpR);
+  // map I
+  ideal II=idrCopyR(I,origR,tmpR);
+  // map J
+  ideal JJ=idrCopyR(J,origR,tmpR);
+  // J[1]*t-1
+  poly t=pOne();
+  p_SetExp(t,rVar(tmpR),1,tmpR);
+  p_Setm(t,tmpR);
+  poly p=JJ->m[0];
+  p=p_Mult_q(p,t,tmpR);
+  p=p_Sub(p,pOne(),tmpR);
+  JJ->m[0]=p;
+  ideal T=id_SimpleAdd(II,JJ,tmpR);
+  idTest(T);
+  id_Delete(&II,tmpR);
+  id_Delete(&JJ,tmpR);
+  // elimination
+  t=pOne();
+  p_SetExp(t,rVar(tmpR),1,tmpR);
+  p_Setm(t,tmpR);
+  BITSET save2;
+  SI_SAVE_OPT2(save2);
+  //if (!TEST_OPT_RETURN_SB) si_opt_2|=Sy_bit(V_IDELIM);
+  //si_opt_1|=Sy_bit(OPT_DEBUG);
+  ideal TT=idGroebner(T,0,GbStd);
+  SI_RESTORE_OPT2(save2);
+  p_Delete(&t,tmpR);
+  for(int j=0;j<IDELEMS(TT);j++)
+  {
+    if ((TT->m[j]!=NULL)
+    && (p_GetExp(TT->m[j],rVar(tmpR),tmpR)>0))
+    {
+      p_Delete(&TT->m[j],tmpR);
+    }
+  }
+  // map back
+  ideal TTT=idrCopyR(TT,tmpR,origR);
+  id_Delete(&TT,tmpR);
+  rChangeCurrRing(origR);
+  rDelete(tmpR);
+  idSkipZeroes(TTT);
+  return TTT;
+}
+
+ideal id_Saturate(ideal I, ideal J, const ring r)
+{
+  if (idElem(J)==1)
+  {
+    idSkipZeroes(J);
+    return id_Sat_principal(I,J,r);
+  }
+  return NULL;
+}
+
+ideal id_Homogenize(ideal I, int var_num, const ring r)
+{
+  ideal II=id_Copy(I,r);
+  if (var_num=rVar(r))
+  {
+    ring tmpR=rAssure_dp_C(r);
+    if (tmpR!=r)
+    {
+      rChangeCurrRing(tmpR);
+      II=idrMoveR(II,r,tmpR);
+    }
+    intvec *ww=NULL;
+    ideal III=kStd(II,currRing->qideal,(tHomog)FALSE,&ww);
+    if (ww!=NULL) delete ww;
+    id_Delete(&II,tmpR);
+    II=id_Homogen(III,var_num,tmpR);
+    id_Delete(&III,tmpR);
+    if (tmpR!=r)
+    {
+      rChangeCurrRing(r);
+      II=idrMoveR(II,tmpR,r);
+    }
+    return II;
+  }
+  ideal III=idInit(IDELEMS(II),1);
+  int *perm=(int*)omAlloc0((rVar(r)+1)*sizeof(int));
+  for(int i=rVar(r)-1; i>0; i--) perm[i]=i;
+  perm[var_num]=rVar(r);
+  perm[rVar(r)]=var_num;
+  for(int i=IDELEMS(II)-1; i>=0;i--)
+  {
+    III->m[i]=p_PermPoly(II->m[i],perm,r,r,ndCopyMap,NULL,0,FALSE);
+  }
+  id_Delete(&II,r);
+  II=id_Homogenize(III,rVar(r),r);
+  id_Delete(&III,r);
+  III=idInit(IDELEMS(II),1);
+  for(int i=IDELEMS(II)-1; i>=0;i--)
+  {
+    III->m[i]=p_PermPoly(II->m[i],perm,r,r,ndCopyMap,NULL,0,FALSE);
+  }
+  id_Delete(&II,r);
+  return III;
+}
+
 GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)
 {
   GbVariant alg=GbDefault;
