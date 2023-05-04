@@ -2043,14 +2043,27 @@ static BOOLEAN isModule(ideal A, const ring src)
   return FALSE;
 }
 
+static void WerrorS_dummy(const char *)
+{
+}
 
 intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
 {
+  void (*WerrorS_save)(const char *s) = WerrorS_callback;
+  WerrorS_callback=WerrorS_dummy;
+  intvec* res=hFirstSeries1(A,module_w,Q,wdegree);
+  WerrorS_callback=WerrorS_save;
+  if (errorreported==0)
+  {
+    return res;
+  }
+  else errorreported=0;// retry with other alg.:
+
   static ring hilb_Qt=NULL;
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   if (!isModule(A,currRing))
     return hFirstSeries0(A,Q,wdegree,currRing,hilb_Qt);
-  intvec *res=NULL;
+  res=NULL;
   int w_max=0,w_min=0;
   if (module_w!=NULL)
   {
