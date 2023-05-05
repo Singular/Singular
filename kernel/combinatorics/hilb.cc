@@ -2049,15 +2049,50 @@ static void WerrorS_dummy(const char *)
 
 intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
 {
-  void (*WerrorS_save)(const char *s) = WerrorS_callback;
-  WerrorS_callback=WerrorS_dummy;
-  intvec* res=hFirstSeries1(A,module_w,Q,wdegree);
-  WerrorS_callback=WerrorS_save;
-  if (errorreported==0)
+  // find degree bound
+  int a,b,prod;
+  a=rVar(currRing);
+  b=1;
+  prod=a;
+  while(prod<(1<<15) && (a>1))
   {
-    return res;
+    a--;b++;
+    prod*=a;
+    prod/=b;
   }
-  else errorreported=0;// retry with other alg.:
+  if (a==1) b=(1<<15);
+  // check degree bound
+  BOOLEAN large_deg=FALSE;
+  int max=0;
+  for(int i=IDELEMS(A)-1;i>=0;i--)
+  {
+    if (A->m[i]!=NULL)
+    {
+      int mm=p_Totaldegree(A->m[i],currRing);
+      if (mm>max)
+      {
+        max=mm;
+        if (max>=b)
+        {
+          large_deg=TRUE;
+          break;
+        }
+      }
+    }
+  }
+  intvec* res;
+  if (!large_deg)
+  {
+    void (*WerrorS_save)(const char *s) = WerrorS_callback;
+    WerrorS_callback=WerrorS_dummy;
+    res=hFirstSeries1(A,module_w,Q,wdegree);
+    WerrorS_callback=WerrorS_save;
+    if (errorreported==0)
+    {
+      return res;
+    }
+    else errorreported=0;// retry with other alg.:
+  }
 
   static ring hilb_Qt=NULL;
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
