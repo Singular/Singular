@@ -3243,14 +3243,32 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
   return TTT;
 }
 
-ideal id_Saturate(ideal I, ideal J, const ring r)
+ideal idSaturate(ideal I, ideal J, int &k)
 {
   if (idElem(J)==1)
   {
     idSkipZeroes(J);
-    return id_Sat_principal(I,J,r);
+    return id_Sat_principal(I,J,currRing);
   }
-  return NULL;
+  BITSET old_test1;
+  SI_SAVE_OPT1(old_test1);
+  si_opt_1 |= Sy_bit(OPT_RETURN_SB);
+  ideal I2,I3;
+  I2=idQuot(I,J,FALSE,TRUE);
+  k=1;
+  loop
+  {
+    k++;
+    I3=idQuot(I2,J,TRUE,TRUE);
+    ideal tmp=kNF(I2,currRing->qideal,I3,1);
+    int  elem=idElem(tmp);
+    id_Delete(&tmp,currRing);
+    id_Delete(&I2,currRing);
+    if (elem==0) break;
+    I2=I3;
+  }
+  SI_RESTORE_OPT1(old_test1);
+  return I3;
 }
 
 ideal id_Homogenize(ideal I, int var_num, const ring r)
