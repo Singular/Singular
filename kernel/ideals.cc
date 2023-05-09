@@ -3208,6 +3208,7 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
   p_SetExp(t,rVar(tmpR),1,tmpR);
   p_Setm(t,tmpR);
   poly p=JJ->m[0];
+  p_Norm(p,currRing);
   p=p_Mult_q(p,t,tmpR);
   p=p_Sub(p,pOne(),tmpR);
   JJ->m[0]=p;
@@ -3220,11 +3221,11 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
   p_SetExp(t,rVar(tmpR),1,tmpR);
   p_Setm(t,tmpR);
   BITSET save2;
-  SI_SAVE_OPT2(save2);
+  SI_SAVE_OPT1(save2);
   //if (!TEST_OPT_RETURN_SB) si_opt_2|=Sy_bit(V_IDELIM);
-  //si_opt_1|=Sy_bit(OPT_DEBUG);
+  //si_opt_1|=Sy_bit(OPT_PROT);
   ideal TT=idGroebner(T,0,GbStd);
-  SI_RESTORE_OPT2(save2);
+  SI_RESTORE_OPT1(save2);
   p_Delete(&t,tmpR);
   for(int j=0;j<IDELEMS(TT);j++)
   {
@@ -3245,11 +3246,11 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
 
 ideal idSaturate(ideal I, ideal J, int &k)
 {
-  if (idElem(J)==1)
-  {
-    idSkipZeroes(J);
-    return id_Sat_principal(I,J,currRing);
-  }
+  //if (idElem(J)==1)
+  //{
+  //  idSkipZeroes(J);
+  //  return id_Sat_principal(I,J,currRing);
+  //}
   BITSET old_test1;
   SI_SAVE_OPT1(old_test1);
   si_opt_1 |= Sy_bit(OPT_RETURN_SB);
