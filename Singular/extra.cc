@@ -4102,6 +4102,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       L->Init(2);
       L->m[0].rtyp = IDEAL_CMD; L->m[0].data=(void*)S;
       L->m[1].rtyp = INT_CMD; L->m[1].data=(void*)k;
+      res->rtyp=LIST_CMD;
+      res->data=(void*)L;
       return FALSE;
     }
     else
