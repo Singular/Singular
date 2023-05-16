@@ -8714,7 +8714,7 @@ static proc minAssSLIteration(ideal I, ideal P);
   list primaryDec = list();
   // Debug
   dbprint (printlevel-voice, "// We search for an element in P - sqrt(I).");
-  while ((k <= size(P)) and (good == 0))
+  while ((k <= ncols(P)) and (good == 0))
   {
     good = 1 - rad_con(P[k], I);
     k++;
@@ -8729,7 +8729,8 @@ static proc minAssSLIteration(ideal I, ideal P);
   // Debug
   dbprint (printlevel - voice, "// We found h = ", P[k]);
   dbprint (printlevel - voice, "// We calculate the saturation of I with respect to the element just founded.");
-  ideal J = sat(I, P[k])[1];
+  ideal J;
+  if (P[k]==1) { J=I; } else { J= sat(I, P[k])[1];}
 
   // Uses decomp from primdec, modified to avoid the recursion.
   // Debug
