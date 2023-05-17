@@ -4097,11 +4097,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ideal I= (ideal)h->Data();
       ideal J=(ideal)h->next->Data();
       int k;
-      ideal S=idSaturate(I,J,k);
+      ideal S=idSaturate(I,J,k,h->Typ()==IDEAL_CMD);
       lists L = (lists)omAllocBin(slists_bin);
       L->Init(2);
-      L->m[0].rtyp = IDEAL_CMD; L->m[0].data=(void*)S;
-      L->m[1].rtyp = INT_CMD; L->m[1].data=(void*)k;
+      L->m[0].rtyp = h->Typ(); L->m[0].data=(void*)S; // ideal or module
+      setFlag(&(L->m[0]),FLAG_STD);
+      L->m[1].rtyp = INT_CMD; L->m[1].data=(void*)(long)k;
       res->rtyp=LIST_CMD;
       res->data=(void*)L;
       return FALSE;

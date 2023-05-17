@@ -724,24 +724,7 @@ KEYWORDS: saturation
 SEE ALSO: modSat
 EXAMPLE: example sat; shows an example
 "{
-   int ii,kk;
-   def i=id;
-   if (!attrib(id,"isSB")) { id=std(id);}
-   int p = printlevel-voice+2;  // p=printlevel (default: p=0)
-   while( ii<=ncols(i) )
-   {
-      dbprint(p,"// compute quotient "+string(kk+1));
-      i=quotient(id,j);
-      for( ii=1; ii<=ncols(i); ii++ )
-      {
-         if( reduce(i[ii],id,5)!=0 ) break;
-      }
-      id=std(i);
-      kk++;
-   }
-   dbprint(p,"// saturation becomes stable after "+string(kk-1)+" iteration(s)","");
-   list L = id,kk-1;
-   return (L);
+   return (system("sat",id,j));
 }
 example
 { "EXAMPLE:"; echo = 2;

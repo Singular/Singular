@@ -201,7 +201,7 @@ ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // imag
 
 ideal id_Satstd(const ideal I, ideal J, const ring r);
 ideal id_Sat_principal(const ideal I, ideal J, const ring r);
-ideal idSaturate(ideal I, ideal J, int &k);
+ideal idSaturate(ideal I, ideal J, int &ki, BOOLEAN isIdeal=TRUE);
 ideal id_Homogenize(ideal I, int var_num, const ring r);
 
 GbVariant syGetAlgorithm(char *n, const ring r, const ideal M);
