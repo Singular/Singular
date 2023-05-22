@@ -4982,6 +4982,11 @@ ring rAssure_dp_C(const ring r)
   return rAssure_Global(ringorder_dp, ringorder_C, r);
 }
 
+ring rAssure_Dp_C(const ring r)
+{
+  return rAssure_Global(ringorder_Dp, ringorder_C, r);
+}
+
 ring rAssure_C_dp(const ring r)
 {
   return rAssure_Global(ringorder_C, ringorder_dp, r);

@@ -3282,19 +3282,19 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
 ideal id_Homogenize(ideal I, int var_num, const ring r)
 {
   ideal II=id_Copy(I,r);
-  if ((var_num=rVar(r))!=0)
+  if ((var_num=1))
   {
-    ring tmpR=rAssure_dp_C(r);
+    ring tmpR=rAssure_Dp_C(r);
     if (tmpR!=r)
     {
       rChangeCurrRing(tmpR);
       II=idrMoveR(II,r,tmpR);
     }
-    intvec *ww=NULL;
-    ideal III=kStd(II,currRing->qideal,(tHomog)FALSE,&ww);
-    if (ww!=NULL) delete ww;
+    ideal III=id_Homogen(II,1,tmpR);
     id_Delete(&II,tmpR);
-    II=id_Homogen(III,var_num,tmpR);
+    intvec *ww=NULL;
+    II=kStd(III,currRing->qideal,(tHomog)TRUE,&ww);
+    if (ww!=NULL) delete ww;
     id_Delete(&III,tmpR);
     if (tmpR!=r)
     {
@@ -3306,14 +3306,14 @@ ideal id_Homogenize(ideal I, int var_num, const ring r)
   ideal III=idInit(IDELEMS(II),1);
   int *perm=(int*)omAlloc0((rVar(r)+1)*sizeof(int));
   for(int i=rVar(r)-1; i>0; i--) perm[i]=i;
-  perm[var_num]=rVar(r);
-  perm[rVar(r)]=var_num;
+  perm[var_num]=1;
+  perm[1]=var_num;
   for(int i=IDELEMS(II)-1; i>=0;i--)
   {
     III->m[i]=p_PermPoly(II->m[i],perm,r,r,ndCopyMap,NULL,0,FALSE);
   }
   id_Delete(&II,r);
-  II=id_Homogenize(III,rVar(r),r);
+  II=id_Homogenize(III,1,r);
   id_Delete(&III,r);
   III=idInit(IDELEMS(II),1);
   for(int i=IDELEMS(II)-1; i>=0;i--)
