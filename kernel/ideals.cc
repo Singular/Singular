@@ -3251,6 +3251,67 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   //  idSkipZeroes(J);
   //  return id_Sat_principal(I,J,currRing);
   //}
+  //---------------------------------------------------
+  BOOLEAN only_vars=TRUE;
+  if (IDELEMS(J)==1)
+  {
+    poly x = J->m[0];
+    if ((x==NULL)||(pNext(x)!=NULL))
+      only_vars=FALSE;
+    else
+    for (int i=1; i<=currRing->N; i++)
+    {
+      int li = p_GetExp(x,i,currRing);
+      if (li>1)
+      {
+        only_vars=FALSE;
+        break;
+      }
+    }
+  }
+  else
+  {
+    for(int j=IDELEMS(J)-1;j>=0;j--)
+    {
+      poly p=J->m[j];
+      if (p!=NULL)
+      {
+        if ((pNext(p)==NULL)
+        || (pVar(p)==0))
+        {
+          only_vars=FALSE;
+          break;
+        }
+      }
+    }
+  }
+  if (only_vars)
+  {
+    BITSET old_test1;
+    SI_SAVE_OPT1(old_test1);
+    si_opt_1 |= Sy_bit(OPT_RETURN_SB);
+    ideal I2,I3,II;
+    II=idCopy(I);
+    idSkipZeroes(II);
+
+    I2=idQuot(II,J,FALSE,TRUE);
+    k=0;
+    loop
+    {
+      k++;
+      I3=idQuot(I2,J,TRUE,TRUE);
+      ideal tmp=kNF(I2,currRing->qideal,I3,1);
+      int  elem=idElem(tmp);
+      id_Delete(&tmp,currRing);
+      id_Delete(&I2,currRing);
+      if (elem==0) break;
+      I2=I3;
+    }
+    idDelete(&II);
+    SI_RESTORE_OPT1(old_test1);
+    return I3;
+  }
+  //--------------------------------------------------
   BITSET old_test1;
   SI_SAVE_OPT1(old_test1);
   si_opt_1 |= Sy_bit(OPT_RETURN_SB);
