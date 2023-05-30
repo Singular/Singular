@@ -2030,6 +2030,7 @@ static ideal getModuleComp(ideal A, int c, const ring src)
 
 static BOOLEAN isModule(ideal A, const ring src)
 {
+  if (src->VarOffset[0]== -1) return FALSE;
   for (int i=0;i<IDELEMS(A);i++)
   {
     if (A->m[i]!=NULL)
@@ -2049,6 +2050,8 @@ static void WerrorS_dummy(const char *)
 
 intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
 {
+  intvec* res;
+  #if 0
   // find degree bound
   int a,b,prod;
   a=rVar(currRing);
@@ -2080,7 +2083,6 @@ intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
       }
     }
   }
-  intvec* res;
   if (!large_deg)
   {
     void (*WerrorS_save)(const char *s) = WerrorS_callback;
@@ -2093,6 +2095,7 @@ intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
     }
     else errorreported=0;// retry with other alg.:
   }
+  #endif
 
   static ring hilb_Qt=NULL;
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
