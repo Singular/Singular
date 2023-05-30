@@ -20,5 +20,5 @@
   read(dbmLink,read(dbmLink));
   // close
   close(dbmLink);
-  system("sh","rm -f example.dir example.pag");
+  int dummy=system("sh","rm -f example.dir example.pag");
 LIB "tst.lib";tst_status(1);$
