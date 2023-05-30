@@ -35,7 +35,7 @@ jobs:
                     sudo mkdir -p /usr/local
                     sudo tar -C /usr/local -xvf FLINT.tar.gz
                     rm -f FLINT.tar.gz
-                    wget -O BLAS.tar.gz https://github.com/JuliaBinaryWrappers/OpenBLAS32_jll.jl/releases/download/OpenBLAS32-v0.3.23%2B0/OpenBLAS32.v0.3.23.x86_64-apple-darwin-libgfortran3.tar.gz
+                    wget -O BLAS.tar.gz https://github.com/JuliaBinaryWrappers/OpenBLAS32_jll.jl/releases/download/OpenBLAS32-v0.3.23%2B0/OpenBLAS32.v0.3.23.x86_64-apple-darwin-libgfortran4.tar.gz
                     sudo tar -C /usr/local -xvf BLAS.tar.gz
                else
                     echo "$RUNNER_OS not supported"
