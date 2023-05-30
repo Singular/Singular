@@ -1,4 +1,5 @@
 #include "Singular/libsingular.h"
+#include "libpolys/polys/prCopy.h"
 //#include <vector>
 //#include <iostream>
 
@@ -115,7 +116,342 @@ static BOOLEAN abort_if_monomial_sp(kStrategy strat)
   return b; // return TRUE if sp was changed, FALSE if not
 }
 
-BOOLEAN monomialabortstd(leftv res, leftv args)
+STATIC_VAR char* si_filename;
+static BOOLEAN print_spoly(kStrategy strat)
+{
+  char *s;
+  if (strat->P.t_p==NULL)
+  {
+    s=pString(strat->P.p);
+  }
+  else
+  {
+    poly p=strat->P.t_p;
+    s=p_String(strat->P.t_p,strat->tailRing);
+  }
+  FILE *f=fopen(si_filename,"a");
+  fwrite(s,strlen(s),1,f);
+  fwrite("\n",1,1,f);
+  fflush(f);
+  fclose(f);
+  return FALSE; // return TRUE if sp was changed, FALSE if not
+}
+
+STATIC_VAR int si_filenr;
+static BOOLEAN print_syz(kStrategy strat)
+{
+  char *s=NULL;
+  if (strat->P.t_p==NULL)
+  {
+    if (pGetComp(strat->P.p)>=strat->syzComp)
+      s=pString(strat->P.p);
+  }
+  else
+  {
+    if (p_GetComp(strat->P.t_p,strat->tailRing)>=strat->syzComp)
+      s=p_String(strat->P.t_p,strat->tailRing);
+  }
+  if (s!=NULL)
+  {
+    char *fn=(char*)malloc(strlen(si_filename)+12);
+    sprintf(fn,"%s.%d",si_filename,si_filenr);
+    si_filenr++;
+    FILE *f=fopen(fn,"w");
+    fwrite(s,strlen(s),1,f);
+    fwrite("\n",1,1,f);
+    fclose(f);
+    free(fn);
+  }
+  return FALSE; // return TRUE if sp was changed, FALSE if not
+}
+
+static BOOLEAN std_print_spoly(leftv res, leftv args)
+{
+  if (args!=NULL)
+  {
+    if ((args->Typ()==IDEAL_CMD) && (args->next!=NULL)
+     && (args->next->Typ()==STRING_CMD))
+    {
+      si_filename=(char*)args->next->Data();
+      ideal I=(ideal)args->Data();
+      I=kStd(I,currRing->qideal,testHomog,NULL,NULL,0,0,NULL,print_spoly);
+      idSkipZeroes(I);
+      res->rtyp=IDEAL_CMD;
+      res->data=(char*)I;
+      return FALSE;
+    }
+  }
+  WerrorS("std_print_spoly: unexpected parameters");
+  return TRUE;
+}
+
+static ideal idGroebner_print(ideal temp,int syzComp, intvec* w=NULL, tHomog hom=testHomog)
+{
+  ideal temp1;
+  if (w==NULL)
+  {
+    if (hom==testHomog)
+      hom=(tHomog)idHomModule(temp,currRing->qideal,&w); //sets w to weight vector or NULL
+  }
+  else
+  {
+    w=ivCopy(w);
+    hom=isHomog;
+  }
+  temp1 = kStd(temp,currRing->qideal,hom,&w,NULL,syzComp,0,NULL,print_syz);
+  idDelete(&temp);
+  if (w!=NULL) delete w;
+  return temp1;
+}
+
+static ideal idPrepare_print (ideal  h1, ideal h11, tHomog hom, int syzcomp, intvec **w)
+{
+  ideal   h2,h22;
+  int     j,k;
+  poly    p,q;
+
+  assume(!idIs0(h1));
+  k = id_RankFreeModule(h1,currRing);
+  if (h11!=NULL)
+  {
+    k = si_max(k,(int)id_RankFreeModule(h11,currRing));
+    h22=idCopy(h11);
+  }
+  h2=idCopy(h1);
+  int i = IDELEMS(h2);
+  if (h11!=NULL) i+=IDELEMS(h22);
+  if (k == 0)
+  {
+    id_Shift(h2,1,currRing);
+    if (h11!=NULL) id_Shift(h22,1,currRing);
+    k = 1;
+  }
+  if (syzcomp<k)
+  {
+    Warn("syzcomp too low, should be %d instead of %d",k,syzcomp);
+    syzcomp = k;
+    rSetSyzComp(k,currRing);
+  }
+  h2->rank = syzcomp+i;
+
+  for (j=0; j<IDELEMS(h2); j++)
+  {
+    p = h2->m[j];
+    q = pOne();
+    pSetComp(q,syzcomp+1+j);
+    pSetmComp(q);
+    if (p!=NULL)
+    {
+      {
+        while (pNext(p)) pIter(p);
+        p->next = q;
+      }
+    }
+    else
+      h2->m[j]=q;
+  }
+  if (h11!=NULL)
+  {
+    ideal h=id_SimpleAdd(h2,h22,currRing);
+    id_Delete(&h2,currRing);
+    id_Delete(&h22,currRing);
+    h2=h;
+  }
+
+  idTest(h2);
+  #if 0
+  matrix TT=id_Module2Matrix(idCopy(h2),currRing);
+  PrintS(" --------------before std------------------------\n");
+  ipPrint_MA0(TT,"T");
+  PrintLn();
+  idDelete((ideal*)&TT);
+  #endif
+
+  ideal h3;
+  if (w!=NULL) h3=idGroebner_print(h2,syzcomp,*w,hom);
+  else         h3=idGroebner_print(h2,syzcomp,NULL,hom);
+  return h3;
+}
+
+static ideal idSyzygies_print (ideal  h1, tHomog h,intvec **w)
+{
+  ideal s_h1;
+  int   j, k, length=0,reg;
+  BOOLEAN isMonomial=TRUE;
+  int ii, idElemens_h1;
+
+  assume(h1 != NULL);
+
+  idElemens_h1=IDELEMS(h1);
+#ifdef PDEBUG
+  for(ii=0;ii<idElemens_h1 /*IDELEMS(h1)*/;ii++) pTest(h1->m[ii]);
+#endif
+  if (idIs0(h1))
+  {
+    ideal result=idFreeModule(idElemens_h1/*IDELEMS(h1)*/);
+    return result;
+  }
+  int slength=(int)id_RankFreeModule(h1,currRing);
+  k=si_max(1,slength /*id_RankFreeModule(h1)*/);
+
+  assume(currRing != NULL);
+  ring orig_ring=currRing;
+  ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);
+  rSetSyzComp(k,syz_ring);
+
+  if (orig_ring != syz_ring)
+  {
+    rChangeCurrRing(syz_ring);
+    s_h1=idrCopyR_NoSort(h1,orig_ring,syz_ring);
+  }
+  else
+  {
+    s_h1 = h1;
+  }
+
+  idTest(s_h1);
+
+  BITSET save_opt;
+  SI_SAVE_OPT1(save_opt);
+  si_opt_1|=Sy_bit(OPT_REDTAIL_SYZ);
+
+  ideal s_h3=idPrepare_print(s_h1,NULL,h,k,w); // main (syz) GB computation
+
+  SI_RESTORE_OPT1(save_opt);
+
+  if (orig_ring != syz_ring)
+  {
+    idDelete(&s_h1);
+    for (j=0; j<IDELEMS(s_h3); j++)
+    {
+      if (s_h3->m[j] != NULL)
+      {
+        if (p_MinComp(s_h3->m[j],syz_ring) > k)
+          p_Shift(&s_h3->m[j], -k,syz_ring);
+        else
+          p_Delete(&s_h3->m[j],syz_ring);
+      }
+    }
+    idSkipZeroes(s_h3);
+    s_h3->rank -= k;
+    rChangeCurrRing(orig_ring);
+    s_h3 = idrMoveR_NoSort(s_h3, syz_ring, orig_ring);
+    rDelete(syz_ring);
+    #ifdef HAVE_PLURAL
+    if (rIsPluralRing(orig_ring))
+    {
+      id_DelMultiples(s_h3,orig_ring);
+      idSkipZeroes(s_h3);
+    }
+    #endif
+    idTest(s_h3);
+    return s_h3;
+  }
+
+  ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
+
+  for (j=IDELEMS(s_h3)-1; j>=0; j--)
+  {
+    if (s_h3->m[j] != NULL)
+    {
+      if (p_MinComp(s_h3->m[j],syz_ring) <= k)
+      {
+        e->m[j] = s_h3->m[j];
+        isMonomial=isMonomial && (pNext(s_h3->m[j])==NULL);
+        p_Delete(&pNext(s_h3->m[j]),syz_ring);
+        s_h3->m[j] = NULL;
+      }
+    }
+  }
+
+  idSkipZeroes(s_h3);
+
+  idDelete(&e);
+  assume(orig_ring==currRing);
+  idTest(s_h3);
+  if (currRing->qideal != NULL)
+  {
+    ideal ts_h3=kStd(s_h3,currRing->qideal,h,w);
+    idDelete(&s_h3);
+    s_h3 = ts_h3;
+  }
+  return s_h3;
+}
+
+static BOOLEAN syz_print_spoly(leftv res, leftv args)
+{
+  if (args!=NULL)
+  {
+    if (((args->Typ()==IDEAL_CMD)||(args->Typ()==MODUL_CMD)) && (args->next!=NULL)
+     && (args->next->Typ()==STRING_CMD))
+    {
+      si_filename=(char*)args->next->Data();
+      si_filenr=0;
+      ideal v_id=(ideal)args->Data();
+      intvec *ww=(intvec *)atGet(args,"isHomog",INTVEC_CMD);
+      intvec *w=NULL;
+      tHomog hom=testHomog;
+      if (ww!=NULL)
+      {
+        if (idTestHomModule(v_id,currRing->qideal,ww))
+        {
+          w=ivCopy(ww);
+          int add_row_shift=w->min_in();
+          (*w)-=add_row_shift;
+          hom=isHomog;
+        }
+        else
+        {
+          //WarnS("wrong weights");
+          delete ww; ww=NULL;
+          hom=testHomog;
+        }
+      }
+      else
+      {
+        if (args->Typ()==IDEAL_CMD)
+          if (idHomIdeal(v_id,currRing->qideal))
+            hom=isHomog;
+      }
+      ideal S=idSyzygies_print(v_id,hom,&w);
+      res->data = (char *)S;
+      res->rtyp=args->Typ();
+      if (hom==isHomog)
+      {
+        int vl=S->rank;
+        intvec *vv=new intvec(vl);
+        if ((args->Typ()==IDEAL_CMD)||(ww==NULL))
+        {
+          for(int i=0;i<vl;i++)
+          {
+            if (v_id->m[i]!=NULL)
+              (*vv)[i]=p_Deg(v_id->m[i],currRing);
+          }
+        }
+        else
+        {
+          p_SetModDeg(ww, currRing);
+          for(int i=0;i<vl;i++)
+          {
+            if (v_id->m[i]!=NULL)
+              (*vv)[i]=currRing->pFDeg(v_id->m[i],currRing);
+          }
+          p_SetModDeg(NULL, currRing);
+       }
+       if (idTestHomModule(S,currRing->qideal,vv))
+         atSet(res,omStrDup("isHomog"),vv,INTVEC_CMD);
+       else
+         delete vv;
+      }
+      if (w!=NULL) delete w;
+      return FALSE;
+    }
+  }
+  WerrorS("syz_print_spoly: unexpected parameters");
+  return TRUE;
+}
+
+static BOOLEAN monomialabortstd(leftv res, leftv args)
 {
   if (args!=NULL)
   {
@@ -320,5 +656,8 @@ extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
   // p->iiAddCproc("std_demo","satstdWithInitialCheck",FALSE,satstdWithInitialCheck);
   p->iiAddCproc("customstd.lib","monomialabortstd",FALSE,monomialabortstd);
   // PrintS("init of std_demo - type `listvar(Std_demo);` to its contents\n");
+  p->iiAddCproc("customstd.lib","std_print_spoly",FALSE,std_print_spoly);
+  p->iiAddCproc("customstd.lib","syz_print_spoly",FALSE,std_print_spoly);
+  
   return (MAX_TOK);
 }
