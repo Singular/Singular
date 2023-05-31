@@ -2030,7 +2030,9 @@ static ideal getModuleComp(ideal A, int c, const ring src)
 
 static BOOLEAN isModule(ideal A, const ring src)
 {
-  if (src->VarOffset[0]== -1) return FALSE;
+  if ((src->VarOffset[0]== -1)
+  || (src->pCompIndex<0))
+    return FALSE; // ring without components
   for (int i=0;i<IDELEMS(A);i++)
   {
     if (A->m[i]!=NULL)
