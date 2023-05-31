@@ -173,7 +173,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     setCharacteristic (getCharacteristic());
     Variable beta= rootOf (mipo.mapinto());
     CanonicalForm buf= GF2FalphaRep (A, beta);
-#ifdef HAVE_NTL    
+#ifdef HAVE_NTL
     if (getCharacteristic() > 2)
 #else
     if (getCharacteristic() > 0)
@@ -222,7 +222,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
                                                          x, beta);
 #endif
     }
-#ifdef HAVE_NTL    
+#ifdef HAVE_NTL
     else
     {
       GF2X NTLMipo= convertFacCF2NTLGF2X (mipo.mapinto());
@@ -234,7 +234,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       factorsA= convertNTLvec_pair_GF2EX_long2FacCFFList (NTLFactorsA, multi,
                                                            x, beta);
     }
-#endif    
+#endif
     setCharacteristic (getCharacteristic(), k, cGFName);
     for (CFFListIterator i= factorsA; i.hasItem(); i++)
     {
@@ -246,7 +246,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   }
   else if (alpha.level() != 1)
   {
-#ifdef HAVE_NTL  
+#ifdef HAVE_NTL
     if (getCharacteristic() > 2)
 #else
     if (getCharacteristic() > 0)
@@ -307,14 +307,14 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       factorsA= convertNTLvec_pair_GF2EX_long2FacCFFList (NTLFactorsA, multi,
                                                            x, alpha);
     }
-#endif    
+#endif
   }
   else
   {
 #ifdef HAVE_FLINT
 #ifdef HAVE_NTL
     if (degree (A) < 300)
-#endif    
+#endif
     {
       nmod_poly_t FLINTA;
       convertFacCF2nmod_poly_t (FLINTA, A);
@@ -1501,7 +1501,7 @@ long isReduced (const nmod_mat_t M)
   return 1;
 }
 #endif
-  
+
 #ifdef HAVE_NTL
 long isReduced (const mat_zz_pE& M)
 {

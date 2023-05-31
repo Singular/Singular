@@ -2544,7 +2544,7 @@ static BOOLEAN startJob(leftv result, leftv arg) {
     pool = currentThreadPoolRef;
   }
   Job *job;
-  if (cmd.argtype(first_arg) == type_job) 
+  if (cmd.argtype(first_arg) == type_job)
     job = *(Job **)(cmd.arg(first_arg));
   else
     job = new ProcJob((char *)(cmd.arg(first_arg)));

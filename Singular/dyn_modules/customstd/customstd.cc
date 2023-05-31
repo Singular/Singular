@@ -658,6 +658,6 @@ extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
   // PrintS("init of std_demo - type `listvar(Std_demo);` to its contents\n");
   p->iiAddCproc("customstd.lib","std_print_spoly",FALSE,std_print_spoly);
   p->iiAddCproc("customstd.lib","syz_print_spoly",FALSE,std_print_spoly);
-  
+
   return (MAX_TOK);
 }

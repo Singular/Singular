@@ -316,7 +316,7 @@ CanonicalForm convFlintMPFactoryP(fmpz_mpoly_t f, fmpz_mpoly_ctx_t ctx, int N);
 #endif // FLINT 2.5.3
 #if __FLINT_RELEASE >= 20700
 CanonicalForm
-convertFq_nmod_mpoly_t2FacCF (const fq_nmod_mpoly_t poly,    ///< [in] 
+convertFq_nmod_mpoly_t2FacCF (const fq_nmod_mpoly_t poly,    ///< [in]
                               const fq_nmod_mpoly_ctx_t& ctx,///< [in] context
                               const int N,                   ///< [in] #vars
                               const fq_nmod_ctx_t& fq_ctx,   ///< [in] fq context

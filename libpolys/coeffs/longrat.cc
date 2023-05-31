@@ -569,7 +569,7 @@ static number nlMapC(number from, const coeffs src, const coeffs dst)
     WarnS("conversion problem in CC -> ZZ mapping");
     return INT_TO_SR(0);
   }
-      
+
   mpf_t *f = ((gmp_complex*)from)->real()._mpfp();
 
   number res;
