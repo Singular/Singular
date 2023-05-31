@@ -320,7 +320,7 @@ CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
 static number ndConvFactoryNSingN( const CanonicalForm, const coeffs r)
 {
   WerrorS("no conversion from factory");
-  return n_Initr(0,r);
+  return n_Init(0,r);
 }
 
 /**< [in, out] a bigint number >= 0  */
