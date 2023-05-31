@@ -1006,7 +1006,7 @@ CanonicalForm gcdFlintMP_QQ(const CanonicalForm& F, const CanonicalForm& G)
 #if __FLINT_RELEASE >= 20700
 CFFList
 convertFLINTFq_nmod_mpoly_factor2FacCFFList (
-                   fq_nmod_mpoly_factor_t fac, 
+                   fq_nmod_mpoly_factor_t fac,
                    const fq_nmod_mpoly_ctx_t& ctx,
                    const int N,
                    const fq_nmod_ctx_t& fq_ctx,

@@ -2864,7 +2864,7 @@ PURPOSE: compute a two-sided division with remainder of p wrt G; two-sided nonco
 ASSUME: G = {g1,...,gN} is a Groebner basis, the original ring of the Letterplace ring has the name 'r' and no variable is called 'tag_i' for i in 1...N
 RETURN: list L
 NOTE: - L[1] is NF(p,I)
-      - L[2] is the list of expressions [i,l_(ij),r_(ij)] with \sum_(i,j) l_(ij) g_i r_(ij) = p - NF(p,I) 
+      - L[2] is the list of expressions [i,l_(ij),r_(ij)] with \sum_(i,j) l_(ij) g_i r_(ij) = p - NF(p,I)
       - procedure lpGBPres2Poly, applied to L, reconstructs p
 EXAMPLE: example lpDivision; shows examples
 "
@@ -2936,7 +2936,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  ring R = freeAlgebra(r, 4); 
+  ring R = freeAlgebra(r, 4);
   ideal I = x*x + y*y - 1; // 2D sphere
   ideal J = twostd(I); // compute a two-sided Groebner basis
   J; // it is finite and nice
@@ -2966,12 +2966,12 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  ring R = freeAlgebra(r, 4); 
+  ring R = freeAlgebra(r, 4);
   ideal I = x*x + y*y - 1; // 2D sphere
   ideal J = twostd(I); // compute a two-sided Groebner basis
   J; // it is finite and nice
   poly h = x*x*y-y*x*x+x*y;
-  list L = lpDivision(h,J); 
+  list L = lpDivision(h,J);
   L[1]; // what means that the normal form (or the remainder) of h wrt J is x*y
   lpGBPres2Poly(L,J); // we see, that it is equal to h from above
 }
@@ -3784,7 +3784,7 @@ example
   lp2ivId(G); // returns the list of intmats for this ideal
 }
 
-proc testLift(ideal M, matrix T) 
+proc testLift(ideal M, matrix T)
 "USAGE: testLift(M,T); module M, matrix T
 RETURN: module
 PURPOSE: assembles the result of the lift procedure

@@ -153,8 +153,9 @@ static BOOLEAN print_syz(kStrategy strat)
   }
   if (s!=NULL)
   {
-    char *fn=(char*)malloc(strlen(si_filename)+12);
-    sprintf(fn,"%s.%d",si_filename,si_filenr);
+    size_t len=strlen(si_filename)+12;
+    char *fn=(char*)malloc(len);
+    snprintf(fn,len, "%s.%d",si_filename,si_filenr);
     si_filenr++;
     FILE *f=fopen(fn,"w");
     fwrite(s,strlen(s),1,f);
@@ -658,6 +659,6 @@ extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
   // PrintS("init of std_demo - type `listvar(Std_demo);` to its contents\n");
   p->iiAddCproc("customstd.lib","std_print_spoly",FALSE,std_print_spoly);
   p->iiAddCproc("customstd.lib","syz_print_spoly",FALSE,std_print_spoly);
-  
+
   return (MAX_TOK);
 }

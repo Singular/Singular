@@ -508,7 +508,7 @@ static proc determine_coef (poly Fm)
       }
       else // no minpoly given
       {
-        list l5;  
+        list l5;
         for (int zz = 1; zz <= npars(basering); zz++)
         {
          l5[size(l5)+1] = "a("+string(zz)+")";
@@ -1275,7 +1275,7 @@ static proc esComputation (int typ, poly p_F, list #)
   if (npars(myRing)<>0)
   {
     ideal qIdeal = ideal(basering);
-    ring ESSring = create_ring("("+ string(char(basering))+ "," + parstr(myRing) +")", "("+ varstr(basering)+")", "("+ ordstr(basering) +")"); 
+    ring ESSring = create_ring("("+ string(char(basering))+ "," + parstr(myRing) +")", "("+ varstr(basering)+")", "("+ ordstr(basering) +")");
     execute(minPolyStr);
     // basering has changed to ESSring
 

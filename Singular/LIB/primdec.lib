@@ -4041,7 +4041,7 @@ EXAMPLE: example zeroRad; shows an example"
    ring @R = create_ring(p, "("+parstr(R)+","+varstr(R)+")", "dp");
    ideal F=imap(R,F);
 
-   list l2;  
+   list l2;
    for (int zz = 1; zz <= m; zz++)
    {
     l2[size(l2)+1] = "@y("+string(zz)+")";

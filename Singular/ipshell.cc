@@ -152,8 +152,8 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
   int l;
   char buf2[128];
 
-  if(fullname) sprintf(buf2, "%s::%s", "", IDID(h));
-  else sprintf(buf2, "%s", IDID(h));
+  if(fullname) snprintf(buf2,128, "%s::%s", "", IDID(h));
+  else snprintf(buf2,128, "%s", IDID(h));
 
   Print("%s%-30.30s [%d]  ",s,buf2,IDLEV(h));
   if (h == currRingHdl) PrintS("*");
@@ -850,11 +850,12 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
   lists L=liMakeResolv(r,length,rlen,typ0,weights);
   int i=0;
   idhdl h;
-  char * s=(char *)omAlloc(strlen(name)+5);
+  size_t len=strlen(name)+5;
+  char * s=(char *)omAlloc(len);
 
   while (i<=L->nr)
   {
-    sprintf(s,"%s(%d)",name,i+1);
+    snprintf(s,len,"%s(%d)",name,i+1);
     if (i==0)
       h=enterid(s,myynest,typ0,&(currRing->idroot), FALSE);
     else
@@ -2418,8 +2419,9 @@ static void rRenameVars(ring R)
           ch=TRUE;
           Warn("name conflict var(%d) and var(%d): `%s`, rename to `@%s`in >>%s<<\nin %s:%d",i+1,j+1,R->names[i],R->names[i],my_yylinebuf,currentVoice->filename,yylineno);
           omFree(R->names[j]);
-          R->names[j]=(char *)omAlloc(2+strlen(R->names[i]));
-          sprintf(R->names[j],"@%s",R->names[i]);
+          size_t len=2+strlen(R->names[i]);
+          R->names[j]=(char *)omAlloc(len);
+          snprintf(R->names[j],len,"@%s",R->names[i]);
         }
       }
     }
@@ -2437,7 +2439,7 @@ static void rRenameVars(ring R)
 //        sprintf(rParameter(R)[i],"@@(%d)",i+1);
         omFree(R->names[j]);
         R->names[j]=(char *)omAlloc(10);
-        sprintf(R->names[j],"@@(%d)",i+1);
+        snprintf(R->names[j],10,"@@(%d)",i+1);
       }
     }
   }
@@ -6479,24 +6481,25 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
 
 BOOLEAN iiARROW(leftv r, char* a, char *s)
 {
-  char *ss=(char*)omAlloc(strlen(a)+strlen(s)+30); /* max. 27 currently */
+  size_t len=strlen(a)+strlen(s)+30; /* max. 27 currently */
+  char *ss=(char*)omAlloc(len);
   // find end of s:
   int end_s=strlen(s);
   while ((end_s>0) && ((s[end_s]<=' ')||(s[end_s]==';'))) end_s--;
   s[end_s+1]='\0';
-  char *name=(char *)omAlloc(strlen(a)+strlen(s)+30);
-  sprintf(name,"%s->%s",a,s);
+  char *name=(char *)omAlloc(len);
+  snprintf(name,len,"%s->%s",a,s);
   // find start of last expression
   int start_s=end_s-1;
   while ((start_s>=0) && (s[start_s]!=';')) start_s--;
   if (start_s<0) // ';' not found
   {
-    sprintf(ss,"parameter def %s;return(%s);\n",a,s);
+    snprintf(ss,len,"parameter def %s;return(%s);\n",a,s);
   }
   else // s[start_s] is ';'
   {
     s[start_s]='\0';
-    sprintf(ss,"parameter def %s;%s;return(%s);\n",a,s,s+start_s+1);
+    snprintf(ss,len,"parameter def %s;%s;return(%s);\n",a,s,s+start_s+1);
   }
   r->Init();
   // now produce procinfo for PROC_CMD:
@@ -6556,9 +6559,9 @@ static void iiReportTypes(int nr,int t,const short *T)
   char buf[250];
   buf[0]='\0';
   if (nr==0)
-    sprintf(buf,"wrong length of parameters(%d), expected ",t);
+    snprintf(buf,250,"wrong length of parameters(%d), expected ",t);
   else
-    sprintf(buf,"par. %d is of type `%s`, expected ",nr,Tok2Cmdname(t));
+    snprintf(buf,250,"par. %d is of type `%s`, expected ",nr,Tok2Cmdname(t));
   for(int i=1;i<=T[0];i++)
   {
     strcat(buf,"`");

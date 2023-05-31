@@ -75,7 +75,7 @@ EXAMPLE: example algebra_containment; shows an example
     }
     //-----------------
     // ---------- create new ring with extra variables --------------------
-    list l3;  
+    list l3;
     for (int zz = 1; zz <= n; zz++)
     {
      l3[size(l3)+1] = "x("+string(zz)+")";
@@ -187,7 +187,7 @@ EXAMPLE: example module_containment; shows an example
   if ( ncols(P)==n )
   { int m=ncols(S);
   // ---------- create new ring with extra variables --------------------
-    list l4;  
+    list l4;
     for (int xx = 1; xx <= n; xx++)
     {
      l4[size(l4)+1] = "x("+string(xx)+")";
@@ -294,7 +294,7 @@ EXAMPLE: example inSubring; shows an example
   // ---------- create new ring with extra variables --------------------
   //the intersection of ideal nett=(p-y(0),I[1]-y(1),...)
   //with the ring k[y(0),...,y(n)] is computed, the result is ker
-  list l5;  
+  list l5;
   for (int xx = 1; xx <= n; xx++)
   {
    l5[size(l5)+1] = "x("+string(xx)+")";
@@ -389,7 +389,7 @@ EXAMPLE: example algDependent; shows an example
  // use internal preimage command (should be equivalent to 2nd variant)
     if ( tt == 1 )
     {
-      list l6;  
+      list l6;
       for (@xx = 1; @xx <= m; @xx++)
       {
        l6[size(l6)+1] = "y("+string(@xx)+")";
@@ -401,7 +401,7 @@ EXAMPLE: example algDependent; shows an example
       ideal ker = preimage(br,phi,B);
     }
  // ---------- create new ring with extra variables --------------------
-    list l7;  
+    list l7;
     for (@xx = n; @xx >= 1; @xx--)
     {
      l7[@xx] = "x("+string(@xx)+")";
@@ -435,7 +435,7 @@ EXAMPLE: example algDependent; shows an example
  // eliminate m variables x(i) from ideal A[i] - y(i) by choosing product
  // order
        {
-        list l8;  
+        list l8;
         for (@xx = n; @xx >=1; @xx--)
         {
          l8[@xx] = "x("+string(@xx)+")";
@@ -541,7 +541,7 @@ EXAMPLE: example alg_kernel; shows an example
     list L = algDependent(A,tt);
     // algDependent is called with "bestoption" if tt = 0
     def S = L[2];
-    list l9;  
+    list l9;
     for (int xx = 1; xx <= n; xx++)
     {
      l9[size(l9)+1] = "@("+string(xx)+")";
@@ -693,7 +693,7 @@ EXAMPLE: example is_surjective; shows an example
     int m = ncols(A);
     int ii,t=1,1;
   // ------------ create new ring with extra variables ---------------------
-    list l10;  
+    list l10;
     for (int yy = 1; yy <= n; yy++)
     {
      l10[size(l10)+1] = "x("+string(yy)+")";
@@ -773,7 +773,7 @@ EXAMPLE: example is_bijective; shows an example
     A=A[1..m];
     int ii,t = 1,1;
   // ------------ create new ring with extra variables ---------------------
-    list l11;  
+    list l11;
     for (int yy = 1; yy <= n; yy++)
     {
      l11[size(l11)+1] = "x("+string(yy)+")";
@@ -1098,7 +1098,7 @@ EXAMPLE: example mapIsFinite; shows an example
   ideal PHI = fetch(bsr,PHI);
 
   // --------------------------- enlarging ring -----------------------------
-  list l12;  
+  list l12;
   for (int yy = 1; yy <= m; yy++)
   {
    l12[size(l12)+1] = "y("+string(yy)+")";

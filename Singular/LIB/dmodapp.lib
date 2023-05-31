@@ -136,7 +136,7 @@ SEE ALSO: bfun_lib, dmod_lib, dmodvar_lib, gmssing_lib
   documentation in deRhamCohom
   - changed charVariety: no homogenization is needed
   - changed inForm: code is much simpler using jet
- 
+
   06.04.20 by VL:
   - engine updated with 2 more modular choices
 
@@ -299,7 +299,7 @@ EXAMPLE: example engine; shows examples
   {
       // modular slimgb with final exactness check
       J = ncmodslimgb(I,1);
-  } 
+  }
   return(J);
 }
 example

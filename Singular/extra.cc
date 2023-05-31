@@ -2553,7 +2553,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           for (int i = 1; i <= varN; i++)
           {
             omFree(currRing->names[i - 1]);
-            sprintf(h, "x%d", i);
+            snprintf(h,10, "x%d", i);
             currRing->names[i - 1] = omStrDup(h);
           }
           rComplete(currRing);

@@ -61,7 +61,7 @@ jobs have been processed. At program startup, this occurs immediately.
 # Creating Jobs
 
 A job is a descriptor for a piece of work that a thread is meant to
-perform. The basic job is 
+perform. The basic job is
 
     job j = createJob(string func[, def arg1, ..., def argn]);
 

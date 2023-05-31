@@ -203,7 +203,7 @@ static char* sp_String(blackbox* /*b*/, void *d)
 {
   char buf[30];
   spasm* A=(spasm*)d;
-  sprintf(buf,"spasm matrix %dx%d",A->n,A->m);
+  snprintf(buf,30, "spasm matrix %dx%d",A->n,A->m);
   return omStrDup(buf);
 }
 static void* sp_Copy(blackbox* /*b*/, void *d)

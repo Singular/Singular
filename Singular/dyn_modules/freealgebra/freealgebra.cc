@@ -40,7 +40,7 @@ static BOOLEAN freeAlgebra(leftv res, leftv args)
       //Werror("only for rings with a global ordering of one block,i=%d, o=%d",i,r->order[i]);
       return TRUE;
     }
-    int ncGenCount = 0; 
+    int ncGenCount = 0;
     if (iiCheckTypes(args,t2,0))
       ncGenCount = (int)(long) args->next->next->Data();
     ring R=freeAlgebra(r,d,ncGenCount);

@@ -601,7 +601,7 @@ EXAMPLE: example findInvoDiag; shows examples
 
   if (Par=="") // if there are no parameters
   {
-    ring @@@KK = create_ring(0, "("+varstr(@B)+","+@ss+")", "dp"); //new ring with new variables 
+    ring @@@KK = create_ring(0, "("+varstr(@B)+","+@ss+")", "dp"); //new ring with new variables
   }
   else //if there exist parameters
   {
@@ -655,11 +655,11 @@ EXAMPLE: example findInvoDiag; shows examples
 
   if ( Par=="" ) //initializes the ring of relations
   {
-    ring @@KK = create_ring(0, "("+@ss+")", "dp"); 
+    ring @@KK = create_ring(0, "("+@ss+")", "dp");
   }
   else
   {
-    ring @@KK = create_ring("(0,"+Par+")", "("+@ss+")", "dp");  
+    ring @@KK = create_ring("(0,"+Par+")", "("+@ss+")", "dp");
   }
 
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
@@ -811,7 +811,7 @@ EXAMPLE: example findAuto; shows examples
   //-------------------------------------------------
   if (( Par=="" ) && (n!=0)) //initializes the ring of relations
   {
-    ring @@KK = create_ring(0, "("+@ss+")", "dp"); 
+    ring @@KK = create_ring(0, "("+@ss+")", "dp");
   }
   if (( Par=="" ) && (n==0)) //initializes the ring of relations
   {
@@ -819,7 +819,7 @@ EXAMPLE: example findAuto; shows examples
   }
   if ( Par!="" )
   {
-    ring @@KK = create_ring("(0,"+Par+")", "("+@ss+")", "dp"); 
+    ring @@KK = create_ring("(0,"+Par+")", "("+@ss+")", "dp");
   }
   //  basering;
   ideal J = imap(@@K,J); // ideal, considered in @@KK now

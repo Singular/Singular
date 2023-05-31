@@ -165,7 +165,7 @@ void convSingNFlintN(fmpz_t f, number n)
 
 void convSingNFlintN(fmpq_t f, number n, const coeffs cf)
 {
-  if (getCoeffType(cf)==n_Q) /* QQ, bigint */ 
+  if (getCoeffType(cf)==n_Q) /* QQ, bigint */
   {
     fmpq_init(f);
     if (SR_HDL(n)&SR_INT)

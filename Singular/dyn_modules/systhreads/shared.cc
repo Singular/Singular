@@ -293,7 +293,7 @@ protected:
       lock->lock();
     else {
       if (!lock->is_locked()) {
-	return 0;
+        return 0;
       }
     }
     return 1;
@@ -530,11 +530,11 @@ BOOLEAN shared_assign(leftv l, leftv r) {
       leftv ll=l->LData();
       if (ll==NULL)
       {
-	return TRUE; // out of array bounds or similiar
+        return TRUE; // out of array bounds or similiar
       }
       if (ll->data) {
-	shared_destroy(NULL, ll->data);
-	omFree(ll->data);
+        shared_destroy(NULL, ll->data);
+        omFree(ll->data);
       }
       ll->data = shared_copy(NULL,r->Data());
     }
@@ -555,7 +555,7 @@ BOOLEAN rlock_assign(leftv l, leftv r) {
       leftv ll=l->LData();
       if (ll==NULL)
       {
-	return TRUE; // out of array bounds or similiar
+        return TRUE; // out of array bounds or similiar
       }
       rlock_destroy(NULL, ll->data);
       omFree(ll->data);
@@ -617,40 +617,40 @@ char *shared_string(blackbox *b, void *d) {
   else if (type == type_regionlock)
     type_name = "regionlock";
   else if (type == type_thread) {
-    sprintf(buf, "<thread #%s>", name.c_str());
+    snprintf(buf,80, "<thread #%s>", name.c_str());
     return omStrDup(buf);
   }
   else if (type == type_threadpool) {
     if (name.size() > 0) {
       name_lock.lock();
-      sprintf(buf, "<threadpool \"%.40s\"@%p>", name.c_str(), obj);
+      snprintf(buf,80, "<threadpool \"%.40s\"@%p>", name.c_str(), obj);
       name_lock.unlock();
     } else
-      sprintf(buf, "<threadpool @%p>", obj);
+      snprintf(buf,80, "<threadpool @%p>", obj);
     return omStrDup(buf);
   }
   else if (type == type_job) {
     if (name.size() > 0) {
       name_lock.lock();
-      sprintf(buf, "<job \"%.40s\"@%p>", name.c_str(), obj);
+      snprintf(buf,80, "<job \"%.40s\"@%p>", name.c_str(), obj);
       name_lock.unlock();
     } else
-      sprintf(buf, "<job @%p>", obj);
+      snprintf(buf,80, "<job @%p>", obj);
     return omStrDup(buf);
   }
   else if (type == type_trigger) {
     if (name.size() > 0) {
       name_lock.lock();
-      sprintf(buf, "<trigger \"%.40s\"@%p>", name.c_str(), obj);
+      snprintf(buf,80, "<trigger \"%.40s\"@%p>", name.c_str(), obj);
       name_lock.unlock();
     } else
-      sprintf(buf, "<trigger @%p>", obj);
+      snprintf(buf,80, "<trigger @%p>", obj);
     return omStrDup(buf);
   } else {
-    sprintf(buf, "<unknown type %d>", type);
+    snprintf(buf,80, "<unknown type %d>", type);
     return omStrDup(buf);
   }
-  sprintf(buf, "<%s \"%.40s\">", type_name, name.c_str());
+  snprintf(buf,80, "<%s \"%.40s\">", type_name, name.c_str());
   return omStrDup(buf);
 }
 
@@ -659,13 +659,13 @@ char *rlock_string(blackbox *b, void *d) {
   SharedObject *obj = *(SharedObject **)d;
   if (!obj)
     return omStrDup("<uninitialized region lock>");
-  sprintf(buf, "<region lock \"%.40s\">", obj->get_name().c_str());
+  snprintf(buf,80, "<region lock \"%.40s\">", obj->get_name().c_str());
   return omStrDup(buf);
 }
 
 void report(const char *fmt, const char *name) {
   char buf[80];
-  sprintf(buf, fmt, name);
+  snprintf(buf,80, fmt, name);
   WerrorS(buf);
 }
 
@@ -1399,13 +1399,13 @@ void *interpreter_thread(ThreadState *ts, void *arg) {
     switch (expr[0]) {
       case '\0': case 'q':
         ts->lock.unlock();
-	return NULL;
+        return NULL;
       case 'x':
         eval = false;
-	break;
+        break;
       case 'e':
         eval = true;
-	break;
+        break;
     }
     ts->to_thread.pop();
     expr = ts->to_thread.front();
@@ -1451,9 +1451,9 @@ static ThreadState *newThread(void *(*thread_func)(ThreadState *, void *),
       ts->arg = arg;
       ts->result = NULL;
       if (pthread_create(&ts->id, NULL, thread_main, ts)<0) {
-	if (error)
-	  *error = "createThread: internal error: failed to create thread";
-	goto fail;
+        if (error)
+          *error = "createThread: internal error: failed to create thread";
+        goto fail;
       }
       goto exit;
     }
@@ -1487,7 +1487,7 @@ static InterpreterThread *createInterpreterThread(const char **error) {
   if (*error) return NULL;
   InterpreterThread *thread = new InterpreterThread(ts);
   char buf[10];
-  sprintf(buf, "%d", ts->index);
+  snprintf(buf,10, "%d", ts->index);
   string name(buf);
   thread->set_name(name);
   thread->set_type(type_thread);
@@ -1698,8 +1698,8 @@ public:
       JobQueue *q = thread_queues[i];
       while (!q->empty()) {
         Job *job = q->front();
-	q->pop();
-	releaseShared(job);
+        q->pop();
+        releaseShared(job);
       }
     }
     thread_queues.clear();
@@ -1777,8 +1777,8 @@ public:
     lock.lock();
     for (unsigned i = 0; i <thread_queues.size(); i++) {
       if (thread_owners[i] == pool) {
-	acquireShared(job);
-	thread_queues[i]->push(job);
+        acquireShared(job);
+        thread_queues[i]->push(job);
       }
     }
     lock.unlock();
@@ -1798,7 +1798,7 @@ public:
       job->cancelled = true;
       if (!job->running && !job->done) {
         job->done = true;
-	cancelDeps(job);
+        cancelDeps(job);
       }
     }
     lock.unlock();
@@ -1814,10 +1814,10 @@ public:
     } else {
       lock.lock();
       for (;;) {
-	if (job->done || job->cancelled) {
-	  break;
-	}
-	response.wait();
+        if (job->done || job->cancelled) {
+          break;
+        }
+        response.wait();
       }
       response.signal(); // forward signal
       lock.unlock();
@@ -1844,8 +1844,8 @@ public:
       Trigger *trigger = triggers[i];
       if (trigger->accept(arg)) {
         trigger->activate(arg);
-	if (trigger->ready())
-	   scheduler->queueJob(trigger);
+        if (trigger->ready())
+           scheduler->queueJob(trigger);
       }
     }
     if (arg) {
@@ -1872,7 +1872,7 @@ public:
       if (scheduler->shutting_down) {
         scheduler->shutdown_counter++;
         scheduler->response.signal();
-	break;
+        break;
       }
       if (!my_queue->empty()) {
        Job *job = my_queue->front();
@@ -2009,7 +2009,7 @@ public:
     while (arg != NULL && !ready()) {
       args.push_back(LinTree::to_string(arg));
       if (ready()) {
-	return;
+        return;
       }
       arg = arg->next;
     }
@@ -2108,17 +2108,17 @@ public:
       int error = false;
       while (arg) {
         appendArgCopy(argv, arg);
-	arg = arg->next;
+        arg = arg->next;
       }
       sleftv val;
       if (!error)
-	error = executeProc(val, procname.c_str(), argv);
+        error = executeProc(val, procname.c_str(), argv);
       if (!error) {
         if (val.Typ() == NONE || (val.Typ() == INT_CMD &&
-	                          (long) val.Data()))
-	{
-	  success = true;
-	}
+                                  (long) val.Data()))
+        {
+          success = true;
+        }
         val.CleanUp();
       }
       pool->scheduler->lock.lock();
@@ -2194,18 +2194,18 @@ static BOOLEAN createThreadPoolSet(leftv result, leftv arg) {
       ThreadPool *pool = new ThreadPool(sched, (int) m);
       pool->set_type(type_threadpool);
       for (int j = 0; j < m; j++) {
-	const char *error;
-	SchedInfo *info = new SchedInfo();
-	info->scheduler = pool->scheduler;
-	acquireShared(pool->scheduler);
-	info->job = NULL;
-	info->num = i;
-	ThreadState *thread = newThread(Scheduler::main, info, &error);
-	if (!thread) {
-	  // TODO: clean up bad pool
-	  return cmd.abort(error);
-	}
-	pool->addThread(thread);
+        const char *error;
+        SchedInfo *info = new SchedInfo();
+        info->scheduler = pool->scheduler;
+        acquireShared(pool->scheduler);
+        info->job = NULL;
+        info->num = i;
+        ThreadState *thread = newThread(Scheduler::main, info, &error);
+        if (!thread) {
+          // TODO: clean up bad pool
+          return cmd.abort(error);
+        }
+        pool->addThread(thread);
       }
       pools->m[i].rtyp = type_threadpool;
       pools->m[i].data = new_shared(pool);
@@ -2420,8 +2420,8 @@ public:
     if (argv.size() > 0) {
       leftv *tail = &argv[0]->next;
       for (unsigned i = 1; i < argv.size(); i++) {
-	*tail = argv[i];
-	tail = &(*tail)->next;
+        *tail = argv[i];
+        tail = &(*tail)->next;
       }
       *tail = NULL;
     }
@@ -2544,7 +2544,7 @@ static BOOLEAN startJob(leftv result, leftv arg) {
     pool = currentThreadPoolRef;
   }
   Job *job;
-  if (cmd.argtype(first_arg) == type_job) 
+  if (cmd.argtype(first_arg) == type_job)
     job = *(Job **)(cmd.arg(first_arg));
   else
     job = new ProcJob((char *)(cmd.arg(first_arg)));
@@ -2746,7 +2746,7 @@ static BOOLEAN updateTrigger(leftv result, leftv arg) {
       trigger->activate(arg->next);
       if (trigger->ready()) {
         trigger->run();
-	Scheduler::notifyDeps(trigger->pool->scheduler, trigger);
+        Scheduler::notifyDeps(trigger->pool->scheduler, trigger);
       }
     }
     trigger->pool->scheduler->lock.unlock();

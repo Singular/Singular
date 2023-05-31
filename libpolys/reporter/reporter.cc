@@ -191,7 +191,11 @@ void Werror(const char *fmt, ...)
   va_list ap;
   va_start(ap, fmt);
   char *s=(char *)omAlloc(256);
+  #ifdef HAVE_VSNPRINTF
+  vsnprintf(s, 256, fmt, ap);
+  #else
   vsprintf(s, fmt, ap);
+  #endif
   WerrorS(s);
   omFreeSize(s,256);
   va_end(ap);
