@@ -160,8 +160,9 @@ void sdb_edit(procinfo *pi)
       }
       else
       {
-        char *p=(char *)omAlloc(strlen(editor)+strlen(filename)+2);
-        sprintf(p,"%s %s",editor,filename);
+        size_t len=strlen(editor)+strlen(filename)+2;
+        char *p=(char *)omAlloc(len);
+        snprintf(p,len,"%s %s",editor,filename);
         system(p);
       }
       exit(0);
@@ -240,7 +241,7 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
           "n - execute current line, break at next line\n"
           "p <var> - display type and value of the variable <var>\n"
           "q <flags> - quit debugger, set debugger flags(0,1,2)\n"
-	  "   0: stop debug, 1:continue, 2: throw an error, return to toplevel\n"
+          "   0: stop debug, 1:continue, 2: throw an error, return to toplevel\n"
           "Q - quit Singular\n");
           int i;
           for(i=0;i<7;i++)
@@ -264,14 +265,14 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         case 'D':
           sdb_show_bp();
           break;
-	#if 0
-	case 'l':
-	{
-	  extern void listall(int showproc);
-	  listall(FALSE);
-	  break;
-	}
-	#endif
+        #if 0
+        case 'l':
+        {
+          extern void listall(int showproc);
+          listall(FALSE);
+          break;
+        }
+        #endif
         case 'n':
           currentVoice->pi->trace_flag|= 1;
           return;
@@ -284,7 +285,7 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         case 'p':
         {
           p=sdb_find_arg(p);
-	  EXTERN_VAR int myynest;
+          EXTERN_VAR int myynest;
           Print("variable `%s`at level %d",p,myynest);
           idhdl h=ggetid(p);
           if (h==NULL)

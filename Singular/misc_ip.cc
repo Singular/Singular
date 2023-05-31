@@ -466,7 +466,7 @@ void singular_example(char *str)
     char *res_m=feResource('m', 0);
     if (res_m!=NULL)
     {
-      sprintf(sing_file, "%s/%s.sing", res_m, s);
+      snprintf(sing_file,MAXPATHLEN, "%s/%s.sing", res_m, s);
       fd = feFopen(sing_file, "r");
     }
     if (fd != NULL)
@@ -1110,7 +1110,7 @@ void m2_end(int i)
       {
         int pid=getpid();
         char buf[20];
-        sprintf(buf,"/tmp/sing_log.%d",pid);
+        snprintf(buf,20,"/tmp/sing_log.%d",pid);
         remove(buf);
       }
     }

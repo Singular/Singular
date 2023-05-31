@@ -60,16 +60,16 @@ int sipc_semaphore_init(int id, int count)
   if (sem == MAP_FAILED)
     return -1;
   sem->count = count;
-  sprintf(buf, "/%d:sem%d:g", getpid(), id);
+  snprintf(buf,100, "/%d:sem%d:g", getpid(), id);
   sem_unlink(buf);
   sem->guard = sem_open(buf, O_CREAT, 0600, count);
   sem_unlink(buf);
-  sprintf(buf, "/%d:sem%d:s", getpid(), id);
+  snprintf(buf,100, "/%d:sem%d:s", getpid(), id);
   sem_unlink(buf);
   sem->sig = sem_open(buf, O_CREAT, 0600, count);
   sem_unlink(buf);
 #else
-  sprintf(buf, "/%d:sem%d", getpid(), id);
+  snprintf(buf,100, "/%d:sem%d", getpid(), id);
   sem_unlink(buf);
   sem = sem_open(buf, O_CREAT, 0600, count);
 #endif

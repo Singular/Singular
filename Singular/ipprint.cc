@@ -65,8 +65,9 @@ void ipPrint_MA0(matrix m, const char *name)
     int vl=si_max(colmax/MATCOLS(m),8);
 
     /* make enough space for the "largest" name*/
-    ss=(char *)omAlloc(14+strlen(name));
-    sprintf(ss,"%s[%d,%d]",name,MATCOLS(m),MATROWS(m));
+    size_t len=14+strlen(name);
+    ss=(char *)omAlloc(len);
+    snprintf(ss,len,"%s[%d,%d]",name,MATCOLS(m),MATROWS(m));
     vl=si_max(vl,(int)strlen(ss));
     omFreeBinAddr(ss);
 
@@ -92,10 +93,10 @@ void ipPrint_MA0(matrix m, const char *name)
       {
         if (s[i*MATCOLS(m)+j]==NULL)
         {
-          ss=(char *)omAlloc(14+strlen(name));
+          ss=(char *)omAlloc(len);
           s[i*MATCOLS(m)+j]=ss;
           ss[0]='\0';
-          sprintf(ss,"%s[%d,%d]",name,i+1,j+1);
+          snprintf(ss,len,"%s[%d,%d]",name,i+1,j+1);
           if ((i!=MATROWS(m)-1) || (j!=MATCOLS(m)-1))
           {
             strcat(ss,",");
@@ -118,6 +119,7 @@ void ipPrint_MA0(matrix m, const char *name)
       /* look up the width of all columns, clear very long entriess */
       /* put length in l[col_nr] */
       /* insert names for cleared entries */
+      size_t len=14+strlen(name);
       for(j=MATCOLS(m)-1;j>=0;j--)
       {
         for(i=MATROWS(m)-1;i>=0;i--)
@@ -126,10 +128,10 @@ void ipPrint_MA0(matrix m, const char *name)
           if (/*strlen(s[i*MATCOLS(m)+j])*/ k > vl)
           {
             omFree((ADDRESS)s[i*MATCOLS(m)+j]);
-            ss=(char *)omAlloc(14+strlen(name));
+            ss=(char *)omAlloc(len);
             s[i*MATCOLS(m)+j]=ss;
             ss[0]='\0';
-            sprintf(ss,"%s[%d,%d]",name,i+1,j+1);
+            snprintf(ss,len,"%s[%d,%d]",name,i+1,j+1);
             if ((i!=MATROWS(m)-1) || (j!=MATCOLS(m)-1))
             {
               strcat(ss,",");

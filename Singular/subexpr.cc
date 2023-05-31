@@ -785,20 +785,22 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             #if SIZEOF_LONG==8
-            s=(char *)omAlloc(MAX_INT_LEN+17);
+            const size_t len=MAX_INT_LEN+17;
             #else
-            s=(char *)omAlloc(MAX_INT_LEN+7);
+            const size_t len=MAX_INT_LEN+7;
             #endif
-            sprintf(s,"int(%ld)",(long)d);
+            s=(char*)omAlloc(len);
+            snprintf(s,len,"int(%ld)",(long)d);
           }
           else
           {
             #if SIZEOF_LONG==8
-            s=(char *)omAlloc(MAX_INT_LEN+12);
+            const size_t len=MAX_INT_LEN+12;
             #else
-            s=(char *)omAlloc(MAX_INT_LEN+2);
+            const size_t len=MAX_INT_LEN+2;
             #endif
-            sprintf(s,"%ld",(long)d);
+            s=(char*)omAlloc(len);
+            snprintf(s,len,"%ld",(long)d);
           }
           return s;
 
@@ -810,8 +812,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           if (typed)
           {
-            s = (char*) omAlloc(strlen((char*) d) + 3);
-            sprintf(s,"\"%s\"", (char*) d);
+            size_t len=strlen((char*) d) + 3;
+            s = (char*) omAlloc(len);
+            snprintf(s,len,"\"%s\"", (char*) d);
             return s;
           }
           else
@@ -824,8 +827,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ps = pString((poly) d);
-            s = (char*) omAlloc(strlen(ps) + 10);
-            sprintf(s,"%s(%s)", (t /*Typ()*/ == POLY_CMD ? "poly" : "vector"), ps);
+            size_t len=strlen(ps) + 10;
+            s = (char*) omAlloc(len);
+            snprintf(s,len,"%s(%s)", (t /*Typ()*/ == POLY_CMD ? "poly" : "vector"), ps);
             omFree(ps);
             return s;
           }
@@ -871,8 +875,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           s= iiStringMatrix((matrix)d,dim, currRing);
           if (typed)
           {
-            char* ns = (char*) omAlloc(strlen(s) + 40);
-            sprintf(ns, "matrix(ideal(%s),%d,%d)", s,
+            size_t len=strlen(s) + 40;
+            char* ns = (char*) omAlloc(len);
+            snprintf(ns,len, "matrix(ideal(%s),%d,%d)", s,
                     ((ideal) d)->nrows, ((ideal) d)->ncols);
             omCheckAddr(ns);
             return ns;
@@ -889,11 +894,12 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           s= iiStringMatrix((matrix)d,dim, currRing);
           if (typed)
           {
-            char* ns = (char*) omAlloc(strlen(s) + 10);
+            size_t len=strlen(s) + 10;
+            char* ns = (char*) omAlloc(len);
             if ((t/*Typ()*/==IDEAL_CMD)||(t==MAP_CMD))
-              sprintf(ns, "ideal(%s)", s);
+              snprintf(ns,len, "ideal(%s)", s);
             else /*MODUL_CMD, SMATRIX_CMD */
-              sprintf(ns, "module(%s)", s);
+              snprintf(ns,len, "module(%s)", s);
             omFree(s);
             omCheckAddr(ns);
             return ns;
@@ -910,13 +916,15 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             char* ns;
             if (t/*Typ()*/ == INTMAT_CMD)
             {
-              ns = (char*) omAlloc(strlen(s) + 40);
-              sprintf(ns, "intmat(intvec(%s),%d,%d)", s, v->rows(), v->cols());
+              size_t len=strlen(s) + 40;
+              ns = (char*) omAlloc(len);
+              snprintf(ns,len, "intmat(intvec(%s),%d,%d)", s, v->rows(), v->cols());
             }
             else
             {
-              ns = (char*) omAlloc(strlen(s) + 10);
-              sprintf(ns, "intvec(%s)", s);
+              size_t len=strlen(s) + 10;
+              ns = (char*) omAlloc(len);
+              snprintf(ns,len, "intvec(%s)", s);
             }
             omCheckAddr(ns);
             omFree(s);
@@ -931,9 +939,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           s = bim->String();
           if (typed)
           {
-            char* ns = (char*) omAlloc0(strlen(s) + 40);
-            sprintf(ns, "bigintmat(bigintvec(%s),%d,%d)", s, bim->rows(), bim->cols());
-            omCheckAddr(ns);
+            size_t len=strlen(s) + 40;
+            char* ns = (char*) omAlloc(len);
+            snprintf(ns,len, "bigintmat(bigintvec(%s),%d,%d)", s, bim->rows(), bim->cols());
             return ns;
           }
           else
@@ -951,13 +959,15 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             {
               char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim,
                               currRing);
-              ns = (char*) omAlloc(strlen(s) + strlen(id) + 20);
-              sprintf(ns, "\"%s\";%sideal(%s)", s,(dim == 2 ? "\n" : " "), id);
+              size_t len=strlen(s) + strlen(id) + 20;
+              ns = (char*) omAlloc(len);
+              snprintf(ns,len, "\"%s\";%sideal(%s)", s,(dim == 2 ? "\n" : " "), id);
             }
             else
             {
-              ns = (char*) omAlloc(strlen(s) + 4);
-              sprintf(ns, "\"%s\"", s);
+              size_t len=strlen(s) + 4;
+              ns = (char*) omAlloc(len);
+              snprintf(ns,len, "\"%s\"", s);
             }
             omFree(s);
             omCheckAddr(ns);
@@ -981,9 +991,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             s = (char *)"";
           if (typed)
           {
-            char* ns = (char*) omAlloc(strlen(s) + 4);
-            sprintf(ns, "\"%s\"", s);
-            omCheckAddr(ns);
+            size_t len=strlen(s) + 4;
+            char* ns = (char*) omAlloc(len);
+            snprintf(ns,len, "\"%s\"", s);
             return ns;
           }
           return omStrDup(s);
@@ -993,8 +1003,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           s = slString((si_link) d);
           if (typed)
           {
-            char* ns = (char*) omAlloc(strlen(s) + 10);
-            sprintf(ns, "link(\"%s\")", s);
+            size_t len=strlen(s) + 10;
+            char* ns = (char*) omAlloc(len);
+            snprintf(ns,len, "link(\"%s\")", s);
             omFreeBinAddr(s);
             omCheckAddr(ns);
             return ns;
@@ -1711,7 +1722,7 @@ void syMake(leftv v,const char * id, package pa)
       {
         int j=atoi(id);
         char tmp[MAX_INT_LEN+5];
-        sprintf(tmp,"%d",j);
+        snprintf(tmp,MAX_INT_LEN+5,"%d",j);
         if (strcmp(tmp,id)!=0)
         {
           number n;

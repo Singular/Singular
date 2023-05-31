@@ -422,10 +422,11 @@ char* lString(lists l, BOOLEAN typed, int dim)
       k++;
     }
   }
-  s = (char*) omAlloc(j+k+2+(typed ? 10 : 0) + (dim == 2 ? k : 0));
+  size_t len=j+k+2+(typed ? 10 : 0) + (dim == 2 ? k : 0);
+  s = (char*) omAlloc(len);
 
   if (typed)
-    sprintf(s, "list(");
+    snprintf(s, len,"list(");
   else
     *s = '\0';
 

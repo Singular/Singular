@@ -2633,7 +2633,7 @@ yyreduce:
             if (l >= MAX_INT_LEN)
             {
               char tmp[MAX_INT_LEN+5];
-              sprintf(tmp,"%d",i);
+              snprintf(tmp,MAX_INT_LEN+5,"%d",i);
               if (strcmp(tmp,(yyvsp[(1) - (1)].name))!=0)
               {
                 n_Read((yyvsp[(1) - (1)].name),&n,coeffs_BIGINT);
@@ -4061,8 +4061,9 @@ yyreduce:
 #line 1498 "grammar.y"
     {
             /* -> if(!$2) break; $3; continue;*/
-            char * s = (char *)omAlloc( strlen((yyvsp[(2) - (3)].name)) + strlen((yyvsp[(3) - (3)].name)) + 36);
-            sprintf(s,"whileif (!(%s)) break;\n%scontinue;\n " ,(yyvsp[(2) - (3)].name),(yyvsp[(3) - (3)].name));
+	    size_t len=strlen((yyvsp[(2) - (3)].name)) + strlen((yyvsp[(3) - (3)].name)) + 36;
+            char * s = (char *)omAlloc(len);
+            snprintf(s,len,"whileif (!(%s)) break;\n%scontinue;\n " ,(yyvsp[(2) - (3)].name),(yyvsp[(3) - (3)].name));
             newBuffer(s,BT_break);
             omFree((ADDRESS)(yyvsp[(2) - (3)].name));
             omFree((ADDRESS)(yyvsp[(3) - (3)].name));
@@ -4076,15 +4077,17 @@ yyreduce:
     {
             /* $2 */
             /* if (!$3) break; $5; $4; continue; */
-            char * s = (char *)omAlloc( strlen((yyvsp[(3) - (5)].name))+strlen((yyvsp[(4) - (5)].name))+strlen((yyvsp[(5) - (5)].name))+36);
-            sprintf(s,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
+            size_t len= strlen((yyvsp[(3) - (5)].name))+strlen((yyvsp[(4) - (5)].name))+strlen((yyvsp[(5) - (5)].name))+36;
+	    char *s=(char*)omAlloc(len);
+            snprintf(s,len,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
                    ,(yyvsp[(3) - (5)].name),(yyvsp[(5) - (5)].name),(yyvsp[(4) - (5)].name));
             omFree((ADDRESS)(yyvsp[(3) - (5)].name));
             omFree((ADDRESS)(yyvsp[(4) - (5)].name));
             omFree((ADDRESS)(yyvsp[(5) - (5)].name));
             newBuffer(s,BT_break);
-            s = (char *)omAlloc( strlen((yyvsp[(2) - (5)].name)) + 3);
-            sprintf(s,"%s;\n",(yyvsp[(2) - (5)].name));
+	    len = strlen((yyvsp[(2) - (5)].name)) + 3;
+            s = (char *)omAlloc(len);
+            snprintf(s,len,"%s;\n",(yyvsp[(2) - (5)].name));
             omFree((ADDRESS)(yyvsp[(2) - (5)].name));
             newBuffer(s,BT_if);
           ;}

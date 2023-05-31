@@ -528,7 +528,7 @@ elemexpr:
             if (l >= MAX_INT_LEN)
             {
               char tmp[MAX_INT_LEN+5];
-              sprintf(tmp,"%d",i);
+              snprintf(tmp,MAX_INT_LEN+5,"%d",i);
               if (strcmp(tmp,$1)!=0)
               {
                 n_Read($1,&n,coeffs_BIGINT);
@@ -1497,8 +1497,9 @@ whilecmd:
         WHILE_CMD STRINGTOK BLOCKTOK
           {
             /* -> if(!$2) break; $3; continue;*/
-            char * s = (char *)omAlloc( strlen($2) + strlen($3) + 36);
-            sprintf(s,"whileif (!(%s)) break;\n%scontinue;\n " ,$2,$3);
+	    size_t len= strlen($2) + strlen($3) + 36;
+            char * s = (char *)omAlloc( len);
+            snprintf(s,len,"whileif (!(%s)) break;\n%scontinue;\n " ,$2,$3);
             newBuffer(s,BT_break);
             omFree((ADDRESS)$2);
             omFree((ADDRESS)$3);
@@ -1510,15 +1511,17 @@ forcmd:
           {
             /* $2 */
             /* if (!$3) break; $5; $4; continue; */
-            char * s = (char *)omAlloc( strlen($3)+strlen($4)+strlen($5)+36);
-            sprintf(s,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
+            size_t len= strlen($3)+strlen($4)+strlen($5)+36;
+	    char *s=(char*)omAlloc(len);
+            snprintf(s,len,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
                    ,$3,$5,$4);
             omFree((ADDRESS)$3);
             omFree((ADDRESS)$4);
             omFree((ADDRESS)$5);
             newBuffer(s,BT_break);
-            s = (char *)omAlloc( strlen($2) + 3);
-            sprintf(s,"%s;\n",$2);
+	    len=strlen($2) + 3;
+            s = (char *)omAlloc( len);
+            snprintf(s,len,"%s;\n",$2);
             omFree((ADDRESS)$2);
             newBuffer(s,BT_if);
           }

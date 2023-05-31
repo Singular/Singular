@@ -824,7 +824,8 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
 {
   BOOLEAN LoadResult = TRUE;
   char libnamebuf[1024];
-  char *libname = (char *)omAlloc(strlen(id)+5);
+  size_t len=strlen(id)+5;
+  char *libname = (char *)omAlloc(len);
   const char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
   int i = 0;
   // FILE *fp;
@@ -833,7 +834,7 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
   lib_types LT;
   for(i=0; suffix[i] != NULL; i++)
   {
-    sprintf(libname, "%s%s", id, suffix[i]);
+    snprintf(libname,len, "%s%s", id, suffix[i]);
     *libname = mytolower(*libname);
     if((LT = type_of_LIB(libname, libnamebuf)) > LT_NOTFOUND)
     {
@@ -1194,7 +1195,7 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
   char *FullName=(char*)omAlloc0(l);
 
   if( *fullname != '/' &&  *fullname != '.' )
-    sprintf(FullName, "./%s", newlib);
+    snprintf(FullName,l, "./%s", newlib);
   else strncpy(FullName, fullname,l);
 
 
@@ -1391,7 +1392,7 @@ void* binary_module_function(const char* newlib, const char* funcname)
   if (!bin_dir)  { return NULL; }
 
   char path_name[MAXPATHLEN];
-  sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, newlib, MODULE_SUFFIX_STRING);
+  snprintf(path_name,MAXPATHLEN, "%s%s%s.%s", bin_dir, DIR_SEPP, newlib, MODULE_SUFFIX_STRING);
 
   void* openlib = dynl_open(path_name);
   if(!openlib)
@@ -1489,8 +1490,8 @@ void piShowProcList()
 //  idhdl pn = ggetid(procname);
 //  procinfo *pi = IDPROC(pn);
 //
-//  sprintf(buf, "%s %3d\0", procname, lineno);
-//  //sprintf(buf, "%s::%s %3d\0", pi->libname, pi->procname,
+//  snprintf(buf,256, "%s %3d\0", procname, lineno);
+//  //snprintf(buf,256, "%s::%s %3d\0", pi->libname, pi->procname,
 //  //  lineno + pi->data.s.body_lineno);
 //  return(buf);
 //}

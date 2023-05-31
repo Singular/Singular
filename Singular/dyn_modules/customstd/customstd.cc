@@ -153,8 +153,9 @@ static BOOLEAN print_syz(kStrategy strat)
   }
   if (s!=NULL)
   {
-    char *fn=(char*)malloc(strlen(si_filename)+12);
-    sprintf(fn,"%s.%d",si_filename,si_filenr);
+    size_t len=strlen(si_filename)+12;
+    char *fn=(char*)malloc(len);
+    snprintf(fn,len, "%s.%d",si_filename,si_filenr);
     si_filenr++;
     FILE *f=fopen(fn,"w");
     fwrite(s,strlen(s),1,f);

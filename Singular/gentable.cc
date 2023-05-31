@@ -175,7 +175,7 @@ const char * Tok2Cmdname(int tok)
   }
   #if 0
   char *s=(char*)malloc(10);
-  sprintf(s,"(%d)",tok);
+  snprintf(s,10,"(%d)",tok);
   return s;
   #else
   return cmds[0].name;
@@ -710,7 +710,7 @@ void ttGen2c()
       "@cindex %s\n",cmds[m].name,cmds[m].name);
       fprintf(outfile,"@include %s.part\n",cmds[m].name);
       char partName[50];
-      sprintf(partName,"%s.part",cmds[m].name);
+      snprintf(partName,50,"%s.part",cmds[m].name);
       struct stat buf;
       if (lstat(partName,&buf)!=0)
       {
