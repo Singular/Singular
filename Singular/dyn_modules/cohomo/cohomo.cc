@@ -1626,7 +1626,8 @@ static void equmab(int num)
   for(i=0; i <num; i++)
   {
     tt[i] = (char*)omalloc(10); //if required enlarge it later
-    snprintf (tt[i],10, "t(%d)", i+1);
+    sprintf (tt[i], "t(%d)", i+1);
+    tt[i]=omStrDup(tt[i]);
   }
   ring R=rDefault(cf,num,tt,ringorder_lp);
   idhdl h=enterid(omStrDup("Re"),0,RING_CMD,&IDROOT,FALSE);

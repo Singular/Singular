@@ -41,7 +41,7 @@ void print_line(int l)
   else
   {
     char b[200];
-    snprintf(b,200,"%s.prof",file_names[l]);
+    sprintf(b,"%s.prof",file_names[l]);
     fo=fopen(b,"w");
   }
   ln=0;
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
         printf("new file:%s\n",buf);
         add_fn(i,buf);
         add_line(i,line_no);
-        fn_cnt++;
+	fn_cnt++;
       }
     }
   }

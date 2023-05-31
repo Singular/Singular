@@ -5,7 +5,7 @@ info="
 LIBRARY:  ncModslimgb.lib A library for computing Groebner bases over G-algebras
                          defined over the rationals using modular techniques.
 
-AUTHORS: Wolfram Decker, Christian Eder, Viktor Levandovskyy, and
+AUTHORS: Wolfram Decker, Christian Eder, Viktor Levandovskyy, and 
 Sharwan K. Tiwari shrawant@gmail.com
 
 REFERENCES:
@@ -44,7 +44,7 @@ PURPOSE: compute a left Groebner basis of I by modular approach
 ASSUME: basering is a G-algebra; base field is prime field Q of rationals.
 NOTE:  - If the given algebra and ideal are graded (it is not checked by this command), then the computed Groebner
 basis will be exact. Otherwise, the result will be correct with a very high probability.
-- The optional parameter `exactness` justifies, whether the final (expensive)
+- The optional parameter `exactness` justifies, whether the final (expensive) 
 verification step will be performed or not (exactness=0, default value is 1).
 - The optional parameter `ncores` (default value is 1) provides an integer to use
 the number of cores (this must not exceed the number of available cores in the computing machine).

@@ -2936,7 +2936,7 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
    else {
     string pa=parstr(altring);
     list rl=ringlist(altring);
-    rl=rl[1]; rl[1]=p;
+    rl=rl[1]; rl[1]=p; 
     ring HNhelpring=ring(rl);
     execute("poly mipo="+mipl+";");  // Minimalpolynom in Polynom umgewandelt
     ring HNEring=(p,a),(x,y),ls;

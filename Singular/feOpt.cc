@@ -393,9 +393,9 @@ void feOptHelp(const char* name)
       if (feOptSpec[i].has_arg > 0)
       {
         if  (feOptSpec[i].has_arg > 1)
-          snprintf(tmp,60, "%s[=%s]", feOptSpec[i].name, feOptSpec[i].arg_name);
+          sprintf(tmp, "%s[=%s]", feOptSpec[i].name, feOptSpec[i].arg_name);
         else
-          snprintf(tmp,60, "%s=%s", feOptSpec[i].name, feOptSpec[i].arg_name);
+          sprintf(tmp, "%s=%s", feOptSpec[i].name, feOptSpec[i].arg_name);
 
         printf(" %c%c --%-20s %s\n",
                (feOptSpec[i].val != LONG_OPTION_RETURN ? '-' : ' '),

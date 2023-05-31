@@ -272,7 +272,7 @@ EXAMPLE:example HilbertClassPoly; shows an example
 
           a1=int(a);
           b1=int(b);
-          t1=int(t);
+          t1=int(t);          
           g1=gcd(gcd(a1,b1),t1 div a1);
           setring C;
           g=g1;

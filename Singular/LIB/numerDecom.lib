@@ -610,7 +610,7 @@ EXAMPLE: example WitSupSet;shows an example
         {
          l2[size(l2)+1] = "z("+string(ii)+")";
         }
-        ring T(qq) = create_ring("(complex,16,I)", l2, "dp");
+        ring T(qq) = create_ring("(complex,16,I)", l2, "dp"); 
         list W(qq-1)=var(1);
        }
       }

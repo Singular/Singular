@@ -738,7 +738,7 @@ const char * piProcinfo(procinfov pi, const char *request)
   else if (strcmp(request, "ref")      == 0)
   {
     char p[8];
-    snprintf(p,8, "%d", pi->ref);
+    sprintf(p, "%d", pi->ref);
     return omStrDup(p);  // MEMORY-LEAK
   }
   return "??";

@@ -198,7 +198,7 @@ static void ngfInpMult (number &a, number b, const coeffs R)
 static number ngfDiv (number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == n_long_R );
-
+  
   gmp_float* f;
   if ( ((gmp_float*)b)->isZero() )
   {

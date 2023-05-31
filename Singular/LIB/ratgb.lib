@@ -296,7 +296,7 @@ EXAMPLE: example ratstd; shows examples
   //  ideal LGG = groebner(LG); // cosmetics
   def LGG = groebner(LG); // cosmetics
   int d = dim(LGG);
-  int Ddim = d;
+  int Ddim = d; 
   dbprint(ppl,"the D-dimension is "+string(d));
   export Ddim;
   int KXdim = -1;

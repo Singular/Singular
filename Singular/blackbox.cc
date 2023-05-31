@@ -124,9 +124,8 @@ BOOLEAN blackboxDefaultOpM(int op,leftv res, leftv args)
       sleftv res2;
       int ret=iiExprArithM(&res2,args,op);
       if (ret) return TRUE;
-      size_t len=strlen((char*)res->data)+strlen((char*)res2.data)+1;
-      char *s2=(char*)omAlloc(len);
-      snprintf(s2,len,"%s%s",(char*)res->data,(char*)res2.data);
+      char *s2=(char*)omAlloc(strlen((char*)res->data)+strlen((char*)res2.data)+1);
+      sprintf(s2,"%s%s",(char*)res->data,(char*)res2.data);
       omFree(res2.data);
       omFree(res->data);
       res->data=s2;

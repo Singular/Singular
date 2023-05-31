@@ -1246,7 +1246,7 @@ static proc createAutMatrix(list BL)
   list l3;
   for (ii = 1; ii <= n0; ii++)
   {
-   l3[ii] = "T("+string(ii)+")";
+   l3[ii] = "T("+string(ii)+")"; 
   }
   for (ii = 1; ii <= n0*n; ii++)
   {
@@ -1804,7 +1804,7 @@ static proc getFullRingS(intmat Q, int n0, int n1){
   list l4;
   for (ii = 1; ii <= n0; ii++)
   {
-   l4[ii] = "T("+string(ii)+")";
+   l4[ii] = "T("+string(ii)+")"; 
   }
   for (ii = 1; ii <= n1; ii++)
   {
@@ -3059,7 +3059,7 @@ EXAMPLE: example autX; shows an example
   list l5;
   for (int ii = 1; ii <= size(V); ii++)
   {
-   l5[ii] = "T("+string(ii)+")";
+   l5[ii] = "T("+string(ii)+")"; 
   }
   ring S = create_ring(ring_list(RR)[1], l5, "dp", "no_minpoly");
   setring S;

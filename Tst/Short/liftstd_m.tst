@@ -50,7 +50,7 @@ matrix G=liftstd(A1,T1,S,"std",A2);
 print(T1);
 print(S);
 reduce(G-A1*T1,A2);
-
+ 
 S=modulo(A1,A2,T2,"std");
 print(T2);
 print(S);

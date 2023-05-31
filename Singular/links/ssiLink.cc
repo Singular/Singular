@@ -88,7 +88,7 @@ BOOLEAN ssiSetCurrRing(const ring r) /* returned: not accepted */
     idhdl h=NULL;
     loop
     {
-      snprintf(name,20,"ssiRing%d",nr); nr++;
+      sprintf(name,"ssiRing%d",nr); nr++;
       h=IDROOT->get(name, 0);
       if (h==NULL)
       {
@@ -125,7 +125,7 @@ void ssiCheckCurrRing(const ring r)
     idhdl h=NULL;
     loop
     {
-      snprintf(name,20,"ssiRing%d",nr); nr++;
+      sprintf(name,"ssiRing%d",nr); nr++;
       h=IDROOT->get(name, 0);
       if (h==NULL)
       {
@@ -624,7 +624,7 @@ ring ssiReadRing(const ssiInfo *d)
     idhdl h=NULL;
     loop
     {
-      snprintf(name,20,"ssiRing%d",nr); nr++;
+      sprintf(name,"ssiRing%d",nr); nr++;
       h=IDROOT->get(name, 0);
       if (h==NULL)
       {
@@ -634,7 +634,7 @@ ring ssiReadRing(const ssiInfo *d)
       && (r!=IDRING(h))
       && (rEqual(r,IDRING(h),1)))
       {
-        rDelete(r);
+	rDelete(r);
         r=rIncRefCnt(IDRING(h));
         break;
       }
@@ -1170,9 +1170,9 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         char* ser_host = (char*)omAlloc(64);
         gethostname(ser_host,64);
         if (strcmp(cli_host,"localhost")==0) /*avoid "ssh localhost" as key may change*/
-          snprintf(ssh_command,256,"%s -q --batch --link=ssi --MPhost=%s --MPport=%d &",path,ser_host,portno);
+          sprintf(ssh_command,"%s -q --batch --link=ssi --MPhost=%s --MPport=%d &",path,ser_host,portno);
         else
-          snprintf(ssh_command,256,"ssh %s %s -q --batch --link=ssi --MPhost=%s --MPport=%d &",cli_host,path,ser_host,portno);
+          sprintf(ssh_command,"ssh %s %s -q --batch --link=ssi --MPhost=%s --MPport=%d &",cli_host,path,ser_host,portno);
         //Print("client on %s started:%s\n",cli_host,path);
         omFree(path);
         omFree(cli_host);
@@ -2000,7 +2000,7 @@ int ssiBatch(const char *host, const char * port)
 {
   si_link l=(si_link) omAlloc0Bin(sip_link_bin);
   char *buf=(char*)omAlloc(256);
-  snprintf(buf,256,"ssi:connect %s:%s",host,port);
+  sprintf(buf,"ssi:connect %s:%s",host,port);
   slInit(l, buf);
   omFreeSize(buf,256);
   if (slOpen(l,SI_LINK_OPEN,NULL)) return 1;

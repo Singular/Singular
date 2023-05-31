@@ -1,20 +1,20 @@
 /* A Bison parser, made by GNU Bison 2.4.3.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-
+   
       Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
    2009, 2010 Free Software Foundation, Inc.
-
+   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -27,7 +27,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -2633,7 +2633,7 @@ yyreduce:
             if (l >= MAX_INT_LEN)
             {
               char tmp[MAX_INT_LEN+5];
-              snprintf(tmp,MAX_INT_LEN+5,"%d",i);
+              sprintf(tmp,"%d",i);
               if (strcmp(tmp,(yyvsp[(1) - (1)].name))!=0)
               {
                 n_Read((yyvsp[(1) - (1)].name),&n,coeffs_BIGINT);
@@ -4061,9 +4061,8 @@ yyreduce:
 #line 1498 "grammar.y"
     {
             /* -> if(!$2) break; $3; continue;*/
-	    size_t len=strlen((yyvsp[(2) - (3)].name)) + strlen((yyvsp[(3) - (3)].name)) + 36;
-            char * s = (char *)omAlloc(len);
-            snprintf(s,len,"whileif (!(%s)) break;\n%scontinue;\n " ,(yyvsp[(2) - (3)].name),(yyvsp[(3) - (3)].name));
+            char * s = (char *)omAlloc( strlen((yyvsp[(2) - (3)].name)) + strlen((yyvsp[(3) - (3)].name)) + 36);
+            sprintf(s,"whileif (!(%s)) break;\n%scontinue;\n " ,(yyvsp[(2) - (3)].name),(yyvsp[(3) - (3)].name));
             newBuffer(s,BT_break);
             omFree((ADDRESS)(yyvsp[(2) - (3)].name));
             omFree((ADDRESS)(yyvsp[(3) - (3)].name));
@@ -4077,17 +4076,15 @@ yyreduce:
     {
             /* $2 */
             /* if (!$3) break; $5; $4; continue; */
-            size_t len= strlen((yyvsp[(3) - (5)].name))+strlen((yyvsp[(4) - (5)].name))+strlen((yyvsp[(5) - (5)].name))+36;
-	    char *s=(char*)omAlloc(len);
-            snprintf(s,len,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
+            char * s = (char *)omAlloc( strlen((yyvsp[(3) - (5)].name))+strlen((yyvsp[(4) - (5)].name))+strlen((yyvsp[(5) - (5)].name))+36);
+            sprintf(s,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
                    ,(yyvsp[(3) - (5)].name),(yyvsp[(5) - (5)].name),(yyvsp[(4) - (5)].name));
             omFree((ADDRESS)(yyvsp[(3) - (5)].name));
             omFree((ADDRESS)(yyvsp[(4) - (5)].name));
             omFree((ADDRESS)(yyvsp[(5) - (5)].name));
             newBuffer(s,BT_break);
-	    len = strlen((yyvsp[(2) - (5)].name)) + 3;
-            s = (char *)omAlloc(len);
-            snprintf(s,len,"%s;\n",(yyvsp[(2) - (5)].name));
+            s = (char *)omAlloc( strlen((yyvsp[(2) - (5)].name)) + 3);
+            sprintf(s,"%s;\n",(yyvsp[(2) - (5)].name));
             omFree((ADDRESS)(yyvsp[(2) - (5)].name));
             newBuffer(s,BT_if);
           ;}

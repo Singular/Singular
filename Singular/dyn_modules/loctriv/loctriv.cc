@@ -26,13 +26,13 @@ static BOOLEAN kstd(leftv res, leftv args)
     ring orig_ring;
     ring syz_ring;
     intvec *w=NULL;
-
+  
     assume(currRing != NULL);
     orig_ring=currRing;
     syz_ring=rAssure_SyzComp(orig_ring);
     rSetSyzComp(k,syz_ring);
     rChangeCurrRing(syz_ring);
-
+  
     if (orig_ring != syz_ring)
     {
       s_h1=idrCopyR_NoSort(h1,orig_ring,syz_ring);
@@ -41,9 +41,9 @@ static BOOLEAN kstd(leftv res, leftv args)
     {
       s_h1 = h1;
     }
-
+  
     s_h3=kStd(s_h1,NULL,testHomog,&w,NULL,k);
-
+  
     if (orig_ring != syz_ring)
     {
       idDelete(&s_h1);

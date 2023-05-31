@@ -1562,7 +1562,7 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
   if(u->name==NULL) return TRUE;
   long slen = strlen(u->name) + 14;
   char *nn = (char*) omAlloc(slen);
-  snprintf(nn,slen,"%s(%d)",u->name,(int)(long)v->Data());
+  sprintf(nn,"%s(%d)",u->name,(int)(long)v->Data());
   char *n=omStrDup(nn);
   omFreeSize((ADDRESS)nn,slen);
   syMake(res,n);
@@ -1589,7 +1589,7 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
       p->next=(leftv)omAlloc0Bin(sleftv_bin);
       p=p->next;
     }
-    snprintf(n,slen,"%s(%d)",u->name,(*iv)[i]);
+    sprintf(n,"%s(%d)",u->name,(*iv)[i]);
     syMake(p,omStrDup(n));
   }
   omFreeSize(n, slen);
@@ -3798,7 +3798,7 @@ static BOOLEAN jjSetRing(leftv, leftv u)
       char name_buffer[100];
       STATIC_VAR int ending=1000000;
       ending++;
-      snprintf(name_buffer,100, "PYTHON_RING_VAR%d",ending);
+      sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
       h=enterid(name_buffer,0,RING_CMD,&IDROOT);
       IDRING(h)=rIncRefCnt(r);
     }
@@ -5728,7 +5728,7 @@ static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
     return TRUE;
   }
   res->data = (char *)omAlloc((long)(c+1));
-  snprintf((char *)res->data,c+1,"%-*.*s",c,c,s+r-1);
+  sprintf((char *)res->data,"%-*.*s",c,c,s+r-1);
   return FALSE;
 }
 static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
@@ -7850,9 +7850,8 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
       return TRUE;
     }
     int l=u->listLength();
-    size_t len=strlen(u->name) + 12*l;
-    char * nn = (char *)omAlloc(len);
-    snprintf(nn,len,"%s(%d",u->name,(int)(long)v->Data());
+    char * nn = (char *)omAlloc(strlen(u->name) + 12*l);
+    sprintf(nn,"%s(%d",u->name,(int)(long)v->Data());
     char *s=nn;
     do
     {
@@ -7864,7 +7863,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
         omFree((ADDRESS)nn);
         return TRUE;
       }
-      snprintf(s,len-(nn-s),",%d",(int)(long)v->Data());
+      sprintf(s,",%d",(int)(long)v->Data());
     } while (v->next!=NULL);
     while (*s!='\0') s++;
     nn=strcat(nn,")");

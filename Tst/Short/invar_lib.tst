@@ -17,9 +17,9 @@ matrix m=dsum(SLrep,SLrep,SLrep,SLrep);
 invar(m);                       // empirical evidence for FFT
 setring Invar::polyring;
 // The reynolds operator is computed using the Omega process.
-Invar::reynolds(x(1)*x(4));
+Invar::reynolds(x(1)*x(4)); 
 
-setring Invar::group;
+setring Invar::group;                  
 
 "EXAMPLE 2:";
 SL(3);                          // Take the group SL_3
@@ -54,7 +54,7 @@ invar(m);                       // compute the invariant ring
 
 "EXAMPLE 2:";
 
-setring Invar::group;
+setring Invar::group;                  
 weights=-4,-3,-2,1,1,2,3,4;     // a harder example
 matrix m=torusrep(weights);
 invar(m);
@@ -95,7 +95,7 @@ invar(rep);                             // compute the invariant ring
 
 "EXAMPLE 2:";
 finite(4);                              // Cyclic group of order 4
-matrix id=unitmat(4);
+matrix id=unitmat(4);                   
 matrix m4[4][4]=0,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0;
                                         // matrix of (1 2 3 4)
 list a=id,m4,m4*m4,m4*m4*m4;            // all elements of the cyclic group

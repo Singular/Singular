@@ -65,9 +65,9 @@ void error(const char* fmt, ...)
    int j =0;
    va_list args;
    va_start(args, fmt);
-   j =   snprintf(buf,4096,    "");
-   j += vsnprintf(buf + j,4096-j,fmt,args);
-   j +=  snprintf(buf + j,4096-j,"\n");
+   j =   sprintf(buf,    "");
+   j += vsprintf(buf + j,fmt,args);
+   j +=  sprintf(buf + j,"\n");
    va_end(args);
    MessageBox(NULL, buf, "ESingular.exe", MB_ICONSTOP);
    exit(1);
@@ -223,9 +223,10 @@ int main(int argc, char** argv)
 #define EXTRA_XTERM_ARGS ""
 #endif
 
-  size_t len=strlen(emacs) + strlen(singular) + length + 300;
-  syscall = (char*) omAlloc(len);
-  snprintf(syscall,len, "%s %s -e %s ", emacs, EXTRA_XTERM_ARGS, singular);
+  syscall = (char*) omAlloc(strlen(emacs) +
+                                 strlen(singular) +
+                                 length + 300);
+  sprintf(syscall, "%s %s -e %s ", emacs, EXTRA_XTERM_ARGS, singular);
 
   for (i=1; i<argc; i++)
   {
@@ -277,7 +278,7 @@ int main(int argc, char** argv)
       if ((emacs_load==NULL)||(!access(emacs_load,X_OK)))
         emacs_load = getenv("SINGHOME");
 #endif
-      snprintf(cwd,MAXPATHLEN, "%s/.emacs-singular", emacs_load);
+      sprintf(cwd, "%s/.emacs-singular", emacs_load);
       if (! access(cwd, R_OK))
       {
         emacs_load = omStrDup(cwd);
@@ -297,8 +298,11 @@ int main(int argc, char** argv)
     }
   }
 
-  size_t len=strlen(emacs) + strlen(singular) + strlen(emacs_dir) + strlen(emacs_load) + length +300;
-  syscall = (char*) omAlloc(len);
+  syscall = (char*) omAlloc(strlen(emacs) +
+                           strlen(singular) +
+                           strlen(emacs_dir) +
+                           strlen(emacs_load) +
+                           length + 300);
   const char* prefix = "--";
   if (strstr(emacs, "xemacs") || strstr(emacs, "Xemacs") || strstr(emacs, "XEMACS"))
     prefix = "-";
@@ -308,7 +312,7 @@ int main(int argc, char** argv)
 
   // Note: option -no-init-file should be equivalent to -q. Anyhow,
   // xemacs-20.4 sometimes crashed on startup when using -q. Don´t know why.
-  snprintf(syscall,len, "%s %sno-init-file %seval '(progn (setq singular-emacs-home-directory \"%s\") (load-file \"%s\") (singular-other \"%s\" \"%s\" (list ",
+  sprintf(syscall, "%s %sno-init-file %seval '(progn (setq singular-emacs-home-directory \"%s\") (load-file \"%s\") (singular-other \"%s\" \"%s\" (list ",
           emacs, prefix, prefix, emacs_dir, emacs_load,
           singular, cwd);
 

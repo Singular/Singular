@@ -92,7 +92,7 @@ static void gf_get_table ( int p, int n )
     FILE * inputfile;
     if (gftable_dir)
     {
-      snprintf( buffer, gf_maxbuffer, "gftables/%d", q);
+      sprintf( buffer, "gftables/%d", q);
       gffilename = (char *)malloc(strlen(gftable_dir) + strlen(buffer) + 1);
       STICKYASSERT(gffilename,"out of memory");
       strcpy(gffilename,gftable_dir);
@@ -101,7 +101,7 @@ static void gf_get_table ( int p, int n )
     }
     else
     {
-      snprintf( buffer, gf_maxbuffer, "gftables/%d", q );
+      sprintf( buffer, "gftables/%d", q );
       gffilename = buffer;
 #ifndef SINGULAR
       inputfile = fopen( buffer, "r" );

@@ -386,7 +386,7 @@ There are ways to workaround this:
   if (fe_is_raw_tty) fe_temp_reset();
   #endif /* HAVE_FEREAD */
 
-  snprintf (buf, 16, "%d", getpid ());
+  sprintf (buf, "%d", getpid ());
 
   args[2] = buf;
 

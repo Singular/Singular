@@ -21,7 +21,7 @@ typedef struct
 {
   char **names;
   int N;
-  #ifdef QA_DEBUG
+  #ifdef QA_DEBUG  
   coeffs C;
   #endif
 } QaInfo;

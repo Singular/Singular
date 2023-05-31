@@ -853,7 +853,7 @@ static proc linearReduce(ideal I, list mons)
   }
 
   def ring_for_var_change = addNvarsTo(original_ring, number_of_monomials, "@y", 2);
-
+ 
   setring ring_for_var_change;
   if( prime_field == 0)
   {

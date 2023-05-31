@@ -245,7 +245,7 @@ int idSkipZeroes0 (ideal ide)
   int j = -1;
   int idelems=IDELEMS(ide);
 
-  k=0;
+  k=0; 
   while((k<idelems)&&(ide->m[k] != NULL)) k++;
   if (k==idelems) return idelems;
   // now: k: pos of first NULL entry

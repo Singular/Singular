@@ -696,7 +696,7 @@ EXAMPLE: example ALTannfsBM; shows examples
   export LD;
   return(@R2);
   string  strr1 = "Printing from ALTannfsBM";     // comment by sachin
-  strr1;    // comment by sachin
+  strr1;    // comment by sachin  
 }
 example
 {
@@ -4303,8 +4303,8 @@ EXAMPLE: example SannfsLOT; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1] = "dp";  // string
-  iv=1:Nnew;
-  kill s;
+  iv=1:Nnew; 
+  kill s; 
   kill NName;
   tmp[2]      = iv;
   Lord[2]     = tmp;
@@ -4604,17 +4604,17 @@ RETURN:  ring
 PURPOSE: compute the annihilator ideal of F^n in the Weyl Algebra
 @*           for the given rational number n
 ASSUME: basering is commutative, the number n is rational.
-NOTE: Activate the output ring by @code{setring} command.
+NOTE: Activate the output ring by @code{setring} command. 
 In the ring the ideal called @code{annfalpha} is exported.
 @* We compute the real annihilator for any rational value of n (both
-@*    generic and exceptional). The implementation fixes a bug in
+@*    generic and exceptional). The implementation fixes a bug in 
 @*    the Algorithm 5.3.15 from Saito-Sturmfels-Takayama.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfspecial; shows examples
 "
 {
-   // using dmodideal.lib
+   // using dmodideal.lib 
   ideal f = F;
   ideal alpha = n;
   def @A = annfalphaI(f,alpha);
@@ -4624,10 +4624,10 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  poly F = x3-y2;
-  bernsteinBM(F); // the roots of Bernstein-Sato poly: -7/6, -1, -5/6
+  poly F = x3-y2;  
+  bernsteinBM(F); // the roots of Bernstein-Sato poly: -7/6, -1, -5/6 
   // *** first example: generic root
-  def A = annfspecial(F,-5/6);
+  def A = annfspecial(F,-5/6); 
   setring A; print(annfalpha); kill A; setring r;
   // *** second example:  exceptional root since its distance to -1 is integer 2
   def A = annfspecial(F,1);

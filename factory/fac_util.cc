@@ -177,7 +177,7 @@ CanonicalForm
 prod ( const CFArray & a )
 {
     return prod( a, a.min(), a.max() );
-}
+}   
 
 void
 extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, CanonicalForm & T, const modpk & pk )
