@@ -137,12 +137,12 @@ static BOOLEAN ndDBTest(number, const char *, const int, const coeffs){ return T
 static number ndFarey(number,number,const coeffs r)
 {
   Werror("farey not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
-  return NULL;
+  return n_Init(0,r);
 }
 static number ndXExtGcd(number, number, number *, number *, number *, number *, const coeffs r)
 {
   Werror("XExtGcd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
-  return NULL;
+  return n_Init(0,r);
 }
 static number ndChineseRemainder(number *,number *,int,BOOLEAN,CFArray&,const coeffs r)
 {
@@ -152,7 +152,7 @@ static number ndChineseRemainder(number *,number *,int,BOOLEAN,CFArray&,const co
 number ndReadFd( const ssiInfo *, const coeffs r)
 {
   Warn("ReadFd not implemented for %s (c=%d)",r->cfCoeffName(r),getCoeffType(r));
-  return NULL;
+  return n_Init(0,r);
 }
 
 static void ndWriteFd(number, const ssiInfo *, const coeffs r)
@@ -317,10 +317,10 @@ CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
   return term;
 }
 
-static number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
+static number ndConvFactoryNSingN( const CanonicalForm, const coeffs r)
 {
   WerrorS("no conversion from factory");
-  return NULL;
+  return n_Initr(0,r);
 }
 
 /**< [in, out] a bigint number >= 0  */
@@ -336,16 +336,17 @@ static number ndInitMPZ(mpz_t m, const coeffs r)
   return r->cfInit( mpz_get_si(m), r);
 }
 
-static const char *ndRead(const char * s, number *, const coeffs r)
+static const char *ndRead(const char * s, number *n, const coeffs r)
 {
   Werror("cfRead is undefined for %s",nCoeffString(r));
+  *n=n_Init(0,r);
   return s;
 }
 static nMapFunc ndSetMap(const coeffs src, const coeffs dst)
 {
   if (src==dst) return ndCopyMap;
   Werror("cfSetMap is undefined for %s",nCoeffString(dst));
-  return NULL;
+  return ndCopyMap;
 }
 
 static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
