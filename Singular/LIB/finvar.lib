@@ -438,7 +438,7 @@ EXAMPLE: example molien; shows an example
       }
     }
     if (minpoly<>0 && mol_flag==0)
-    { 
+    {
       if (v)
       { "  Since it is impossible for this program to calculate the Molien series for";
         "  invariant rings over extension fields of prime characteristic, we have to";
@@ -709,10 +709,10 @@ EXAMPLE: example molien; shows an example
         else
         {
           rl[1][1]=0;
-        }  
+        }
         def newring=ring(rl);
         setring newring;
-        
+
       }
     }
     else
@@ -727,7 +727,7 @@ EXAMPLE: example molien; shows an example
       else
       {
         rl[1][1]=0;
-      }  
+      }
       def newring=ring(rl);
       setring newring;
       execute("minpoly="+minp);
@@ -1105,7 +1105,7 @@ EXAMPLE: example reynolds_molien; shows an example
     }
     if (minpoly==0)
     { if (i>size(chst))
-      { 
+      {
          ring newring = create_ring(0, "("+varstr(br)+")", "("+ordstr(br)+")");
       }
       else
@@ -1118,9 +1118,9 @@ EXAMPLE: example reynolds_molien; shows an example
         else
         {
           rl[1][1]=0;
-        }  
+        }
         def newring=ring(rl);
-        setring newring; 
+        setring newring;
       }
     }
     else
@@ -1135,9 +1135,9 @@ EXAMPLE: example reynolds_molien; shows an example
       else
       {
         rl[1][1]=0;
-      }  
+      }
       def newring=ring(rl);
-      setring newring;  
+      setring newring;
       execute("minpoly="+minp);
     }
     poly v1=var(1);                    // the Molien series will be in terms of

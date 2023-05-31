@@ -15,7 +15,7 @@ integrals. For this application,
 we also provide a procedure that applies the algorithm to all entries of a
 matrix of rational functions given as one (possibly very big) txt-file.
 If you use the library pfd.lib, please cite the corresponding paper
-[J. Boehm, M. Wittmann, Z. Wu, Y. Xu, Y. Zhang: 'IBP reduction coefficients 
+[J. Boehm, M. Wittmann, Z. Wu, Y. Xu, Y. Zhang: 'IBP reduction coefficients
 made simple'] (preprint 2020).
 
 KEYWORDS: partial fraction; decomposition; Leinartas

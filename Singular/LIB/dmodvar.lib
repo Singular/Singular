@@ -140,7 +140,7 @@ static proc ORDstr2list (string ORD, int NN)
   {
    l1[size(l1)+1] = "z("+string(zz)+")";
   }
-  ring @Z = create_ring(0, l1, ORD);   
+  ring @Z = create_ring(0, l1, ORD);
   list L = ringlist(@Z)[3];
   kill @Z;
   return(L);

@@ -727,7 +727,7 @@ static proc ncRingDefine()
       s = s + ", " + NCVARIABLES[i];
     }
   }
-  s = s + ")"; 
+  s = s + ")";
   ring NCRING = create_ring("(0, I)", s, "dp");
   minpoly = I^2+1;
   short = 0;

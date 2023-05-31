@@ -11,8 +11,8 @@ OVERVIEW:
   over the rational numbers using modular methods.
 
 REFERENCES:
-  M. Noro, K. Yokoyama: Usage of Modular Techniques for Efficient Computation of Ideal Operations. 
-  Math.Comput.Sci. 12: 1, 1-32. (2017). 
+  M. Noro, K. Yokoyama: Usage of Modular Techniques for Efficient Computation of Ideal Operations.
+  Math.Comput.Sci. 12: 1, 1-32. (2017).
 
 PROCEDURES:
   modQuotient(I,J); standard basis of (I:J) using modular methods
@@ -48,13 +48,13 @@ example
     echo=2;
     ring r=0,x(1..6),dp;
     ideal i=cyclic(6);
-    ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6); 
+    ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6);
     modQuotient(i,modQuotient(i,j));
     ideal id2=x(1)^2+x(1)*x(2)*x(3),x(2)^2-x(3)^3*x(2),x(3)^3+x(2)^5*x(1)*x(3);
     quotient(id2,maxideal(3));
 }
 
-/* test if a prime number p is permissible for an ideal I 
+/* test if a prime number p is permissible for an ideal I
  * i.e. it does not divide the denominator of any of the coefficients
  * or numerator of any of the leading coefficients */
 static proc isPermissible(int p,ideal I)
@@ -129,7 +129,7 @@ static proc pTest_quotient(string command, alias list args, alias def result,
             return(0);
         }
     }
-    
+
     /* test if Gp is in (Ip:Jp) */
     ideal GpJp=Gp*Jp;
     for (i = ncols(GpJp); i > 0; i--)
@@ -174,7 +174,7 @@ example
     echo=2;
     ring r=0,x(1..6),dp;
     ideal i=cyclic(6);
-    ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6); 
+    ideal j=-15*var(5)+16*var(6)^3-60*var(6)^2+225*var(6)-4,2*var(5)^2-7*var(5)+2*var(6)^2-7*var(6)+28,(4*var(6)-1)*var(5)-var(6)+4,4*var(1)+var(5)+var(6),4*var(2)+var(5)+var(6),4*var(3)+var(5)+var(6),4*var(4)+var(5)+var(6);
     modSat(i,modSat(i,j)[1])[1];
     poly F     = x(1)^5+x(2)^5+(x(1)-x(2))^2*x(1)*x(2)*x(3);
     ideal J    = jacob(F);
@@ -189,7 +189,7 @@ static proc primeTest_sat(int p, alias list args)
 
 /* find entries in modresults which come from unlucky primes.
  * For this, sort the entries into categories depending on their leading
- * ideal and return the indices in all but the biggest category. 
+ * ideal and return the indices in all but the biggest category.
  * Referring to Modstd::deleteUnlickyPrimes_std. */
 static proc deleteUnluckyPrimes_sat(alias list modresults)
 {
@@ -289,7 +289,7 @@ static proc pTest_sat(string command, alias list args, alias def result,
             return(0);
         }
     }
-    
+
     /* test if Gp is in (Ip:Jp^\infty) */
     for (i = ncols(Gp); i > 0; i--)
     {

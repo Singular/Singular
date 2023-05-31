@@ -285,7 +285,7 @@ The basering is of characteristic zero and without parameters.
                                     "str:",str_tmp_l;
                                     string str_num_mp = "number "+parstr(1)+"="+
                                         decstr2ratstr(rootminpoly())+";";
-                                    ring Iring = create_ring(0, "("+string(coords)+")", "dp"); 
+                                    ring Iring = create_ring(0, "("+string(coords)+")", "dp");
                                     basering;
                                     execute(str_num_mp);
                                     execute(str_tmp_l);
@@ -305,7 +305,7 @@ The basering is of characteristic zero and without parameters.
                             short=0;
                             string str_tmp_l = "ideal eqd_tmp = "+string(tmp_l)+";";
                             def cur_ring = basering;
-                            ring Iring = create_ring("(real,30)", "("+string(coords)+")", "("+ordstr(oring)+")"); 
+                            ring Iring = create_ring("(real,30)", "("+string(coords)+")", "("+ordstr(oring)+")");
 //                            basering;
                             execute(str_I);
                             execute(str_tmp_l);

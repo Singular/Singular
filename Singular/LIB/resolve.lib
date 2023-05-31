@@ -733,7 +733,7 @@ EXAMPLE: example blowUpBO;  shows an example
    {
     l3[size(l3)+1] = "y("+string(ii)+")";
    }
-   ring S = create_ring(ring_list(R)[1], l3, "dp", "no_minpoly"); 
+   ring S = create_ring(ring_list(R)[1], l3, "dp", "no_minpoly");
    list resu;
    list B;
    list l4 = ringlist(R)[2];
