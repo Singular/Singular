@@ -4847,6 +4847,53 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
   return res;
 }
 
+ring rAssure_Wp_C(const ring r, intvec *w)
+{
+  int r_blocks = rBlocks(r);
+
+  if ((r_blocks == 3) &&
+      (r->order[0] == ringorder_Wp) &&
+      (r->order[1] == ringorder_C) &&
+      (r->order[2] == 0))
+  {
+    BOOLEAN ok=TRUE;
+    for(int i=0;i<r->N;i++)
+    {
+      if ((*w)[i]!=r->wvhdl[0][i]) { ok=FALSE;break;}
+    }
+    if (ok) return r;
+  }
+  ring res = rCopy0(r, FALSE, FALSE);
+  res->order = (rRingOrder_t*)omAlloc0(3*sizeof(rRingOrder_t));
+  res->block0 = (int*)omAlloc0(3*sizeof(int));
+  res->block1 = (int*)omAlloc0(3*sizeof(int));
+  res->wvhdl = (int**)omAlloc0(3*sizeof(int*));
+  res->order[0] = ringorder_Wp;
+  res->order[1] = ringorder_C;
+  res->block0[1] = 1;
+  res->block1[1] = r->N;
+  res->wvhdl[0]=(int*)omAlloc(r->N*sizeof(int));
+  for(int i=0;i<r->N;i++)
+  {
+    r->wvhdl[0][i]=(*w)[i];
+  }
+  rComplete(res, 1);
+  if (r->qideal!=NULL) res->qideal= idrCopyR_NoSort(r->qideal, r, res);
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    if ( nc_rComplete(r, res, false) ) // no qideal!
+    {
+#ifndef SING_NDEBUG
+      WarnS("error in nc_rComplete");
+#endif
+    }
+  }
+#endif
+//  rChangeCurrRing(res);
+  return res;
+}
+
 ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete/* = TRUE*/, int sgn/* = 1*/)
 { // TODO: ???? Add leading Syz-comp ordering here...????
 

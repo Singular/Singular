@@ -3343,7 +3343,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
 ideal id_Homogenize(ideal I, int var_num, const ring r)
 {
   ideal II=id_Copy(I,r);
-  if ((var_num=1))
+  if (var_num=1)
   {
     ring tmpR=rAssure_Dp_C(r);
     if (tmpR!=r)
@@ -3383,6 +3383,52 @@ ideal id_Homogenize(ideal I, int var_num, const ring r)
   }
   id_Delete(&II,r);
   return III;
+}
+
+ideal id_HomogenizeW(ideal I, int var_num, intvec *w,const ring r)
+{
+  ideal II=id_Copy(I,r);
+  if (var_num=1)
+  {
+    ring tmpR=rAssure_Wp_C(r,w);
+    if (tmpR!=r)
+    {
+      rChangeCurrRing(tmpR);
+      II=idrMoveR(II,r,tmpR);
+    }
+    ideal III=id_Homogen(II,1,tmpR);
+    id_Delete(&II,tmpR);
+    intvec *ww=NULL;
+    II=kStd(III,currRing->qideal,(tHomog)TRUE,&ww);
+    if (ww!=NULL) delete ww;
+    id_Delete(&III,tmpR);
+    if (tmpR!=r)
+    {
+      rChangeCurrRing(r);
+      II=idrMoveR(II,tmpR,r);
+    }
+    return II;
+  }
+  ideal III=idInit(IDELEMS(II),1);
+  int *perm=(int*)omAlloc0((rVar(r)+1)*sizeof(int));
+  for(int i=rVar(r)-1; i>0; i--) perm[i]=i;
+  perm[var_num]=1;
+  perm[1]=var_num;
+  for(int i=IDELEMS(II)-1; i>=0;i--)
+  {
+    III->m[i]=p_PermPoly(II->m[i],perm,r,r,ndCopyMap,NULL,0,FALSE);
+  }
+  id_Delete(&II,r);
+  II=id_HomogenizeW(III,1,w,r);
+  id_Delete(&III,r);
+  III=idInit(IDELEMS(II),1);
+  for(int i=IDELEMS(II)-1; i>=0;i--)
+  {
+    III->m[i]=p_PermPoly(II->m[i],perm,r,r,ndCopyMap,NULL,0,FALSE);
+  }
+  id_Delete(&II,r);
+  return III;
+  return NULL;
 }
 
 GbVariant syGetAlgorithm(char *n, const ring r, const ideal /*M*/)

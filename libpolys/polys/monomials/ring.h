@@ -734,6 +734,7 @@ ring   rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, in
 ring   rAssure_dp_S(const ring r);
 ring   rAssure_dp_C(const ring r);
 ring   rAssure_Dp_C(const ring r);
+ring   rAssure_Wp_C(const ring r, intvec *w);
 ring   rAssure_C_dp(const ring r);
 ring   rAssure_c_dp(const ring r);
 
