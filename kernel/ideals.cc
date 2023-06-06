@@ -3014,7 +3014,7 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
     int *m0=(int*)omAlloc0((1+rVar(currRing))*sizeof(int));
     p_GetExpV(p,mm,currRing);
     bool nonTrivialSaturationToBeDone=true;
-    for (p=pNext(p); p!=NULL; pIter(p))
+    for (; p!=NULL; pIter(p))
     {
       nonTrivialSaturationToBeDone=false;
       p_GetExpV(p,m0,currRing);
