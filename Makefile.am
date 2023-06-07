@@ -26,7 +26,8 @@ install-data-local:
 	fi
 
 uninstall-local:
-	-(cd $(prefix); rm -rf singular info/singular.info)
+	-(cd $(datadir); rm -rf singular info/singular.info)
+	-rm -rf $(htmldir)
 
 configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = singularconfig.h
