@@ -3220,12 +3220,7 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
   t=pOne();
   p_SetExp(t,rVar(tmpR),1,tmpR);
   p_Setm(t,tmpR);
-  BITSET save2;
-  SI_SAVE_OPT1(save2);
-  //if (!TEST_OPT_RETURN_SB) si_opt_2|=Sy_bit(V_IDELIM);
-  //si_opt_1|=Sy_bit(OPT_PROT);
   ideal TT=idGroebner(T,0,GbStd);
-  SI_RESTORE_OPT1(save2);
   p_Delete(&t,tmpR);
   for(int j=0;j<IDELEMS(TT);j++)
   {
@@ -3246,6 +3241,12 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
 
 ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
 {
+  if(idIs0(I))
+  {
+     I=idCopy(I);
+     idSkipZeroes(I);
+     return(I);
+  }
   //if (idElem(J)==1)
   //{
   //  idSkipZeroes(J);
@@ -3253,23 +3254,6 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   //}
   //---------------------------------------------------
   BOOLEAN only_vars=TRUE;
-  if (IDELEMS(J)==1)
-  {
-    poly x = J->m[0];
-    if ((x==NULL)||(pNext(x)!=NULL))
-      only_vars=FALSE;
-    else
-    for (int i=1; i<=currRing->N; i++)
-    {
-      int li = p_GetExp(x,i,currRing);
-      if (li>1)
-      {
-        only_vars=FALSE;
-        break;
-      }
-    }
-  }
-  else
   {
     for(int j=IDELEMS(J)-1;j>=0;j--)
     {
@@ -3285,47 +3269,41 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
       }
     }
   }
-  if (only_vars)
+  if (only_vars && isIdeal)
   {
-    BITSET old_test1;
-    SI_SAVE_OPT1(old_test1);
-    si_opt_1 |= Sy_bit(OPT_RETURN_SB);
-    ideal I2,I3,II;
-    II=idCopy(I);
-    idSkipZeroes(II);
-
-    I2=idQuot(II,J,FALSE,TRUE);
+    ideal Iquot,Istd;
+    intvec *w=NULL;
+    Istd=id_Satstd(I,J,currRing);
     k=0;
     loop
     {
       k++;
-      I3=idQuot(I2,J,TRUE,TRUE);
-      ideal tmp=kNF(I2,currRing->qideal,I3,1);
+      Iquot=idQuot(Istd,J,TRUE,isIdeal);
+      ideal tmp=kNF(Istd,currRing->qideal,Iquot,5);
       int  elem=idElem(tmp);
       id_Delete(&tmp,currRing);
-      id_Delete(&I2,currRing);
+      id_Delete(&Istd,currRing);
+      w=NULL;
+      Istd=kStd(Iquot,currRing->qideal,testHomog,&w);
+      if (w!=NULL) delete w;
+      id_Delete(&Iquot,currRing);
       if (elem==0) break;
-      I2=I3;
     }
-    idDelete(&II);
-    SI_RESTORE_OPT1(old_test1);
-    return I3;
+    k--;
+    idSkipZeroes(Istd);
+    return Istd;
   }
   //--------------------------------------------------
-  BITSET old_test1;
-  SI_SAVE_OPT1(old_test1);
-  si_opt_1 |= Sy_bit(OPT_RETURN_SB);
   ideal Iquot,Istd;
-  Iquot=idQuot(I,J,FALSE,isIdeal);
   intvec *w=NULL;
-  Istd=kStd(Iquot,currRing->qideal,testHomog,&w);
+  Istd=kStd(I,currRing->qideal,testHomog,&w);
   if (w!=NULL) delete w;
   k=0;
   loop
   {
     k++;
     Iquot=idQuot(Istd,J,TRUE,isIdeal);
-    ideal tmp=kNF(Istd,currRing->qideal,Iquot,1);
+    ideal tmp=kNF(Istd,currRing->qideal,Iquot,5);
     int  elem=idElem(tmp);
     id_Delete(&tmp,currRing);
     id_Delete(&Istd,currRing);
@@ -3335,7 +3313,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
     id_Delete(&Iquot,currRing);
     if (elem==0) break;
   }
-  SI_RESTORE_OPT1(old_test1);
+  k--;
   idSkipZeroes(Istd);
   return Istd;
 }
