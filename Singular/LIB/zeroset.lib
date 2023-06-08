@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version zeroset.lib 4.3.1.3 Jan_2023 "; // $Id$
+version="version zeroset.lib 4.3.2.3 Jun_2023 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures for roots and factorization
@@ -76,9 +76,9 @@ LIB "primdec.lib";
 
 proc roots(poly f)
 "USAGE:   roots(f); where f is a polynomial
-PURPOSE: compute all roots of f in a finite extension of the ground field
+PURPOSE: compute all roots of f in a finite extension of QQ
          without multiplicities.
-RETURN:  ring, a polynomial ring over an extension field of the ground field,
+RETURN:  ring, a polynomial ring over an extension field of QQ,
          containing a list 'theRoots' and polynomials 'newA' and 'f':
   @format
   - 'theRoots' is the list of roots of the polynomial f (no multiplicities)
@@ -93,6 +93,7 @@ ASSUME:  ground field to be Q or a simple extension of Q given by a minpoly
 EXAMPLE: example roots; shows an example
 "
 {
+  ASSUME(char(basering)==0);
   int dbPrt = printlevel-voice+3;
 
   // create a new ring where par(1) is replaced by the variable
@@ -155,8 +156,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc rootsMain(poly f)
-"USAGE:   rootsMain(f); where f is a polynomial
-PURPOSE: compute all roots of f in a finite extension of the ground field
+"USAGE:   rootsMain(f); where f is a polynomial in Q[a,x]
+PURPOSE: compute all roots of f in a finite extension of the QQ
          without multiplicities.
 RETURN:  list, all entries are polynomials
   @format
@@ -303,8 +304,8 @@ EXAMPLE: example rootsMain; shows an example
 proc zeroSet(ideal I, list #)
 "USAGE:   zeroSet(I [,opt] ); I=ideal, opt=integer
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
-         of the ground field.
-RETURN:  ring, a polynomial ring over an extension field of the ground field,
+         of QQ.
+RETURN:  ring, a polynomial ring over an extension field of QQ,
          containing a list 'theZeroset', a polynomial 'newA', and an
          ideal 'id':
   @format
@@ -408,7 +409,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc invertNumberMain(poly f)
-"USAGE:   invertNumberMain(f); where f is a polynomial
+"USAGE:   invertNumberMain(f); where f is a polynomial in Q[a]
 PURPOSE: compute 1/f if f is a number in Q(a), i.e., f is represented by a
          polynomial in Q[a].
 RETURN:  poly 1/f
@@ -438,7 +439,7 @@ NOTE:    outdated, use / instead
 ///////////////////////////////////////////////////////////////////////////////
 
 proc MultPolys(poly f, poly g)
-"USAGE:   MultPolys(f, g); poly f,g
+"USAGE:   MultPolys(f, g); poly f,g in Q[a,x]
 PURPOSE: multiply the polynomials f and g and reduce them w.r.t. mpoly
 RETURN:  poly f*g
 ASSUME:  basering = Q[x,a], ideal mpoly must be defined, it might be 0 !
@@ -471,7 +472,7 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Quotient(poly f, poly g)
-"USAGE:   Quotient(f, g); where f,g are polynomials;
+"USAGE:   Quotient(f, g); where f,g are polynomials
 PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
   @format
@@ -509,7 +510,7 @@ example
 }
 
 proc quotientMain(poly f, poly g)
-"USAGE:   quotientMain(f, g); where f,g are polynomials
+"USAGE:   quotientMain(f, g); where f,g are polynomials in Q(a)[x]
 PURPOSE: compute the quotient q and remainder r s.th. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
   @format
@@ -566,7 +567,7 @@ example
 }
 
 proc remainderMain(poly f, poly g)
-"USAGE:   remainderMain(f, g); where f,g are polynomials
+"USAGE:   remainderMain(f, g); where f,g are polynomials in Q[a,x]
 PURPOSE: compute the remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
@@ -589,7 +590,7 @@ NOTE: outdated, use mod/reduce instead
 ///////////////////////////////////////////////////////////////////////////////
 
 proc egcdMain(poly f, poly g)
-"USAGE:   egcdMain(f, g); where f,g are polynomials
+"USAGE:   egcdMain(f, g); where f,g are polynomials in Q[a,x]
 PURPOSE: compute the polynomial gcd of f and g over Q(a)[x]
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
@@ -650,7 +651,7 @@ EXAMPLE: example MEGCD; shows an example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sqfrNorm(poly f)
-"USAGE:   sqfrNorm(f); where f is a polynomial
+"USAGE:   sqfrNorm(f); where f is a polynomial in Q(a)[x]
 PURPOSE: compute the norm of the squarefree polynomial f in Q(a)[x].
 RETURN:  list with 3 entries
   @format
@@ -684,7 +685,7 @@ example
 }
 
 proc sqfrNormMain(poly f)
-"USAGE:   sqfrNorm(f); where f is a polynomial
+"USAGE:   sqfrNorm(f); where f is a polynomial in Q(a)[x]
 PURPOSE: compute the norm of the squarefree polynomial f in Q(a)[x].
 RETURN:  list with 3 entries
   @format
