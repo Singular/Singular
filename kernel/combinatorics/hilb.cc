@@ -2009,8 +2009,10 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
     while(s!=NULL)
     {
       int i=p_Totaldegree(s,Qt);
+      long l=n_Int(pGetCoeff(s),Qt->cf);
       (*ss)[i]=n_Int(pGetCoeff(s),Qt->cf);
-      if((*ss)[i]==0) Print("overflow at t^%d\n",i);
+      if((l==0)||(l<=-INT_MAX)||(l>INT_MAX)) Print("overflow at t^%d\n",i);
+      else (*ss)[i]=(int)l;
       p_LmDelete(&s,Qt);
     }
   }
