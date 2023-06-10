@@ -93,7 +93,7 @@ ASSUME:  ground field to be Q or a simple extension of Q given by a minpoly
 EXAMPLE: example roots; shows an example
 "
 {
-  ASSUME(char(basering)==0);
+  ASSUME(0,char(basering)==0);
   int dbPrt = printlevel-voice+3;
 
   // create a new ring where par(1) is replaced by the variable
