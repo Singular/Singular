@@ -594,6 +594,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     if ((res[i]!=NULL) && ! idIs0(res[i]))
     {
       id_Shift(res[i],-rGetMaxSyzComp(i, currRing),currRing);
+      res[i]->rank=idElem(res[i-1]);
     }
   }
 /*--- going back to the original ring -------------------------*/
