@@ -3259,7 +3259,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   //  return id_Sat_principal(I,J,currRing);
   //}
   //---------------------------------------------------
-  BOOLEAN only_vars=TRUE;
+  BOOLEAN only_vars=FALSE; //disabled
   {
     for(int j=IDELEMS(J)-1;j>=0;j--)
     {
