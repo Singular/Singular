@@ -3039,9 +3039,9 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       //  for (int i=rVar(currRing); i>0; i--)
       //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
       //PrintLn();
-      strat->P.Init(currRing);
+      strat->P.Init(strat->tailRing);
       //memset(&strat->P,0,sizeof(strat->P));
-      strat->P.tailRing = strat->tailRing;
+      //strat->P.tailRing = strat->tailRing; // done by Init
       strat->P.p=p;
       while(p!=NULL)
       {
@@ -3091,9 +3091,9 @@ static BOOLEAN id_sat_vars_sp(kStrategy strat)
       //  for (int i=rVar(currRing); i>0; i--)
       //    if (mm[i]!=0) Print("x_%d:%d ",i,mm[i]);
       //PrintLn();
-      strat->P.Init(currRing);
+      strat->P.Init(strat->tailRing);
       //memset(&strat->P,0,sizeof(strat->P));
-      strat->P.tailRing = strat->tailRing;
+      //strat->P.tailRing = strat->tailRing;// done by Init
       strat->P.t_p=p;
       while(p!=NULL)
       {
@@ -3139,6 +3139,12 @@ ideal id_Satstd(const ideal I, ideal J, const ring r)
   else
   {
     poly x = J->m[0];
+    if (pNext(x)!=NULL)
+    {
+      Werror("generator must be a monomial");
+      if (currRing!=save) rChangeCurrRing(save);
+      return NULL;
+    }
     for (int i=1; i<=r->N; i++)
     {
       int li = p_GetExp(x,i,r);
@@ -3260,8 +3266,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
       poly p=J->m[j];
       if (p!=NULL)
       {
-        if ((pNext(p)==NULL)
-        || (pVar(p)==0))
+        if (pVar(p)==0)
         {
           only_vars=FALSE;
           break;
@@ -3269,7 +3274,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
       }
     }
   }
-  if (only_vars && isIdeal)
+  if (only_vars && isIdeal && rOrd_is_Totaldegree_Ordering(currRing))
   {
     ideal Iquot,Istd;
     intvec *w=NULL;
@@ -3283,6 +3288,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
       int  elem=idElem(tmp);
       id_Delete(&tmp,currRing);
       id_Delete(&Istd,currRing);
+      Istd=Iquot;
       w=NULL;
       Istd=kStd(Iquot,currRing->qideal,testHomog,&w);
       if (w!=NULL) delete w;
@@ -3291,30 +3297,35 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
     }
     k--;
     idSkipZeroes(Istd);
+  //PrintS("\nSatstd:\n");
+  //iiWriteMatrix((matrix)I,"I",1,currRing,0); PrintLn();
+  //iiWriteMatrix((matrix)J,"J",1,currRing,0); PrintLn();
+  //iiWriteMatrix((matrix)Istd,"res",1,currRing,0);PrintLn();
+  //id_Delete(&Istd,currRing);
     return Istd;
   }
   //--------------------------------------------------
   ideal Iquot,Istd;
   intvec *w=NULL;
-  Istd=kStd(I,currRing->qideal,testHomog,&w);
-  if (w!=NULL) delete w;
+  Istd=idCopy(I);
   k=0;
   loop
   {
     k++;
-    Iquot=idQuot(Istd,J,TRUE,isIdeal);
+    Iquot=idQuot(Istd,J,FALSE,isIdeal);
     ideal tmp=kNF(Istd,currRing->qideal,Iquot,5);
     int  elem=idElem(tmp);
     id_Delete(&tmp,currRing);
     id_Delete(&Istd,currRing);
-    w=NULL;
-    Istd=kStd(Iquot,currRing->qideal,testHomog,&w);
-    if (w!=NULL) delete w;
-    id_Delete(&Iquot,currRing);
+    Istd=Iquot;
     if (elem==0) break;
   }
   k--;
   idSkipZeroes(Istd);
+  //if (only_vars)
+  //{
+  //  iiWriteMatrix((matrix)Istd,"org",1,currRing,0);
+  //}
   return Istd;
 }
 
