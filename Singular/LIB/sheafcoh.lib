@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sheafcoh.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version sheafcoh.lib 4.3.2.3 Jun_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -13,6 +13,8 @@ PROCEDURES:
  truncateFast(phi,d);    truncation of coker(phi) at d (fast+ experimental)
  CM_regularity(M);       Castelnuovo-Mumford regularity of coker(M)
  sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
+ sheafCohBGGregul(M,l,h,r); cohomology of sheaf associated to coker(M)
+                          with given regularity
  sheafCohBGG2(M,l,h);    cohomology of sheaf associated to coker(M), experimental version
  sheafCoh(M,l,h);        cohomology of sheaf associated to coker(M)
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
@@ -605,6 +607,114 @@ example
   intvec v=2,2,2,2,2,2;
   attrib(M,"isHomog",v);
   def B=sheafCohBGG(M,-8,4);
+}
+
+proc sheafCohBGGregul(module M,int l,int h, int reg)
+"USAGE:   sheafCohBGGregul(M,l,h);    M module, l,h int, reg int
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute, @code{h>=l}, and the basering has @code{n+1}
+         variables.
+RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
+         associated to coker(M). The range of twists is determined by @code{l},
+         @code{h}.
+NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
+         correspondence and on Tate resolution ( see [Eisenbud, Floystad,
+         Schreyer: Sheaf cohomology and free resolutions over exterior
+         algebras, Trans AMS 355 (2003)] ).@*
+         @code{sheafCohBGG(M,l,h)} does not compute all values in the above
+         table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
+         use @code{sheafCohBGG(M,l-n,h+n)}.
+SEE ALSO: sheafCoh, dimH
+EXAMPLE: example sheafCohBGGregul; shows an example
+"
+{
+  int i,j,k,row,col;
+  if( typeof(attrib(M,"isHomog"))!="intvec" )
+  {
+     if (size(M)==0) { attrib(M,"isHomog",0); }
+     else { ERROR("No admissible degree vector assigned"); }
+  }
+  int n=nvars(basering)-1;
+  int ell=l+n;
+  def R=basering;
+  int bound=max(reg+1,h-1);
+  module MT=truncate(M,bound);
+  int m=nrows(MT);
+  MT=transpose(jacobM(MT));
+  MT=syz(MT);
+  matrix ML[n+1][1]=maxideal(1);
+  matrix S=transpose(outer(ML,unitmat(m)));
+  matrix SS=transpose(S*MT);
+  //--- to the exterior algebra
+  def AR = Exterior();
+  setring AR;
+  intvec saveopt=option(get);
+  option(redSB);
+  option(redTail);
+  module EM=imap(R,SS);
+  intvec w;
+  //--- here we are with our matrix
+  int bound1=max(1,bound-ell+1);
+  for (i=1; i<=nrows(EM); i++)
+  {
+     w[i]=-bound-1;
+  }
+  attrib(EM,"isHomog",w);
+  resolution RE=mres(EM,bound1);
+  intmat Betti=betti(RE);
+  k=ncols(Betti);
+  row=nrows(Betti);
+  int shift=attrib(Betti,"rowShift")+(k+ell-1);
+  intmat newBetti[n+1][h-l+1];
+  for (j=1; j<=row; j++)
+  {
+    for (i=l; i<=h; i++)
+    {
+      if ((k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1))
+      {
+        newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
+      }
+      else { newBetti[n+2-shift-j,i-l+1]=-1; }
+    }
+  }
+  for (j=2; j<=n+1; j++)
+  {
+    for (i=1; i<j; i++)
+    {
+      newBetti[j,i]=-1;
+    }
+  }
+  int d=k-h+ell-1;
+  for (j=1; j<=n; j++)
+  {
+    for (i=h-l+1; i>=k+j; i--)
+    {
+      newBetti[j,i]=-1;
+    }
+  }
+  //displayCohom(newBetti,l,h,n);
+  option(set,saveopt);
+  setring R;
+  return(newBetti);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  // cohomology of structure sheaf on P^4:
+  //-------------------------------------------
+  ring r=0,x(1..5),dp;
+  module M=0;
+  def A=sheafCohBGGregul(M,-9,4,CM_regularity(M));
+  A;
+  // cohomology of cotangential bundle on P^3:
+  //-------------------------------------------
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  attrib(M,"isHomog",v);
+  def B=sheafCohBGGregul(M,-8,4,CM_regularity(M));
+  B;
 }
 
 
