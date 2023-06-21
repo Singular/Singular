@@ -28,7 +28,7 @@ New libraries:
 
 Changed libraries:
 @itemize
-@item @code{normaliz.lib}: update to normaliz 3.10
+@item @code{normaliz.lib}: update to normaliz 3.10 (nref{normaliz_lib})
 @end itemize
 
 Changes in the kernel/build system:
