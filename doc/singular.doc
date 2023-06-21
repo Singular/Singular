@@ -1213,6 +1213,7 @@ Comments should be send to the author of the library directly.
 * ringgb_lib:: Functions for coefficient rings
 * rwalk_lib:: Groebner Walk Conversion
 * sagbigrob_lib:: Sagbi-Groebner basis of an ideal of a subalgebra
+* sagbiNormaliz_lib:: computation of Sagbi bases via normaliz
 * stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * swalk_lib:: Sagbi Walk Conversion Algorithm
 * systhreads_lib:: multi-threaded objects
@@ -1306,6 +1307,10 @@ Todos/Issues:
 @node sagbigrob_lib
 @subsection sagbigrob_lib
 @c lib sagbigrob.lib
+@c ----------------------------------------------------------
+@node sagbiNormaliz_lib
+@subsection sagbiNormaliz_lib
+@c lib sagbiNormaliz.lib
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
