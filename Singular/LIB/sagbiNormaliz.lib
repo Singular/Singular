@@ -1,5 +1,5 @@
 //// Singular library normaliz.lib
-version="version sagbiNormaliz.lib 4.3.1.0 June 2022 "; // $Id$
+version="version sagbiNormaliz.lib 4.3.2.0 June 2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: sagbiNormaliz.lib  Provides an interface for the computation of Sagbi bases.
@@ -20,7 +20,7 @@ Use of this library requires the program Normaliz to be installed and the
 availability of normaliz.lib. You can download both from
 @uref{https://github.com/Normaliz/Normaliz/releases}.
 Please make sure that the executable is in the search path or use setNmzExecPath (defined
-in normaliz.lib.
+in normaliz.lib).
 
 The computations of this library require reading Normaliz output files and therefore a file name
 must be set. The standard file name chosen by the library is NmzSagbiExchange in the current
@@ -687,7 +687,8 @@ static proc dosagbiHilbControlled(ideal Q, intvec HS_num_algebra, intvec HS_deno
     }
 }
 
-static proc doSagbiGeneral(ideal Q, int Sagbi_degree_bound, int Sagbi_max_rounds, int sorting){
+static proc doSagbiGeneral(ideal Q, int Sagbi_degree_bound, int Sagbi_max_rounds, int sorting)
+{
 
     string output;
 
