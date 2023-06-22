@@ -3259,7 +3259,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   //  return id_Sat_principal(I,J,currRing);
   //}
   //---------------------------------------------------
-  BOOLEAN only_vars=FALSE; //disabled
+  BOOLEAN only_vars=TRUE; // enabled for I:x_i
   {
     for(int j=IDELEMS(J)-1;j>=0;j--)
     {
@@ -3274,7 +3274,8 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
       }
     }
   }
-  if (only_vars && isIdeal && rOrd_is_Totaldegree_Ordering(currRing))
+  if (only_vars && isIdeal && rOrd_is_Totaldegree_Ordering(currRing)
+  && (idElem(J)==1))
   {
     ideal Iquot,Istd;
     intvec *w=NULL;
@@ -3321,6 +3322,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
     if (elem==0) break;
   }
   k--;
+  Istd=kStd(Iquot,currRing->qideal,testHomog,&w);
   idSkipZeroes(Istd);
   //if (only_vars)
   //{
