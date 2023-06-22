@@ -3348,6 +3348,18 @@ ideal id_Homogenize(ideal I, int var_num, const ring r)
     II=kStd(III,currRing->qideal,(tHomog)TRUE,&ww);
     if (ww!=NULL) delete ww;
     id_Delete(&III,tmpR);
+    // saturate wrt. x_1
+    poly m=pOne();
+    for(int i=0;i<IDELEMS(II);i++)
+    {
+      if (II->m[i]!=NULL)
+      {
+        pSetExp(m,1,pGetExp(II->m[i],1));
+        pSetm(m);
+        II->m[i]=p_Div_mm(II->m[i],m,currRing);
+      }
+    }
+    pDelete(&m);
     if (tmpR!=r)
     {
       rChangeCurrRing(r);
@@ -3393,6 +3405,18 @@ ideal id_HomogenizeW(ideal I, int var_num, intvec *w,const ring r)
     II=kStd(III,currRing->qideal,(tHomog)TRUE,&ww);
     if (ww!=NULL) delete ww;
     id_Delete(&III,tmpR);
+    // saturate wrt. x_1
+    poly m=pOne();
+    for(int i=0;i<IDELEMS(II);i++)
+    {
+      if (II->m[i]!=NULL)
+      {
+        pSetExp(m,1,pGetExp(II->m[i],1));
+        pSetm(m);
+        II->m[i]=p_Div_mm(II->m[i],m,currRing);
+      }
+    }
+    pDelete(&m);
     if (tmpR!=r)
     {
       rChangeCurrRing(r);
