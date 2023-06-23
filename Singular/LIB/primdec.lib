@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.3.1.3 Jan_2023 "; // $Id$
+version="version primdec.lib 4.3.2.3 Jun_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -3080,7 +3080,8 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     if(size(fried)>0)
     {
       string newva;
-      string newma;
+      ideal newma_i;
+      int newma_x=0;
       poly f;
       for(@k=1;@k<=nvars(basering);@k++)
       {
@@ -3096,20 +3097,21 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         if(@n1==0)
         {
           newva=newva+string(var(@k))+",";
-          newma=newma+string(var(@k))+",";
+          newma_x++;
+          newma_i[newma_x]=var(@k);
         }
         else
         {
-          newma=newma+string(0)+",";
+          newma_x++;
+          newma_i[newma_x]=0;
           fried[@n]=fried[@n]/leadcoef(fried[@n]);
           f=fried[@n]-lead(fried[@n]);
           @j=subst(@j,var(@k),-f);
         }
       }
       newva[size(newva)]=")";
-      newma[size(newma)]=";";
       ring @deirf = create_ring(ring_list(gnir)[1],"("+newva,"lp","no_minpoly");
-      execute("map @kappa=gnir,"+newma);
+      map @kappa=gnir,imap(gnir,newma_i);
       ideal @j= @kappa(@j);
       @j=std(@j);
 
@@ -3328,13 +3330,13 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     }
     else
     {
-      @va=string(maxideal(1));
+      ideal maxi=maxideal(1);
       if(@m==1)
       {
         @j=fetch(@P,i);
       }
       ring gnir1 = create_ring(ring_list(basering)[1],"("+indep[@m][1]+")","("+indep[@m][2]+")","no_minpoly");
-      execute("map phi=gnir,"+@va+";");
+      map phi=gnir,imap(gnir,maxi);
       op=option(get);
       option(redSB);
       ideal @j=groebner(phi(@j));
@@ -3620,6 +3622,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       setring gnir;
       ser=imap(@Phelp,ser);
     }
+    ideal maxi=maxideal(1);
     if(size(reduce(ser,peek,5))!=0)
     {
       for(@m=1;@m<=size(restindep);@m++)
@@ -3640,9 +3643,8 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         }
         else
         {
-          @va=string(maxideal(1));
           ring gnir1 = create_ring(ring_list(basering)[1],"("+restindep[@m][1]+")","("+restindep[@m][2]+")","no_minpoly");
-          execute("map phi=gnir,"+@va+";");
+          map phi=gnir,imap(gnir,maxi);
           op=option(get);
           option(redSB);
           if(homo==1)
@@ -4082,18 +4084,19 @@ static proc algeRad(ideal i)
 //reduces radical computation over algebraic extensions to the other cases
    def R=basering;
    int n=nvars(R);
-
-   string mp="poly @p="+string(minpoly)+";";
-   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
-                +"),dp;";
-   execute(gnir);
-   execute(mp);
+   list lll=ringlist(R);
+   list lll_n=lll;
+   lll_n[1]=lll[1][1]; //char.
+   lll_n[2]=lll[2]+lll[1][2][1];
+   lll_n[3]=list(list("dp",nvars(R)+1),list("C",1));
+   ring RH=ring(lll_n);
+   list lll=imap(R,lll);
+   poly @p=lll[1][4][1];//minpoly
+   kill lll;
    ideal i=imap(R,i);
    i=i,@p;
    ideal ra=radical(i);
-   gnir="ring RS="+string(char(R))+",("+varstr(RH)
-                +"),(dp("+string(n)+"),lp);";
-   execute(gnir);
+   def RS=changeord(list(list("dp",1:n),list("lp",1)), RH);
    ideal K=imap(RH,ra);
    K=std(K);
    if (ncols(K)>1) { K=K[2..size(K)];}
@@ -6761,10 +6764,10 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     }
     else
     {
-      @va = string(maxideal(1));
+      ideal @va_i = maxideal(1);
 
       ring gnir1 = create_ring(ring_list(basering)[1],"(" + indep[@m][1] + ")","(" + indep[@m][2] + ")","no_minpoly");
-      execute("map phi = @P," + @va + ";");
+      map phi = @P,imap(@P,@va_i);
       ideal @j = groebner(phi(I));
     }
     if((deg(@j[1]) == 0) || (dim(@j) < jdim))
