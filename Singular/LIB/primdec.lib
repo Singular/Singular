@@ -3314,6 +3314,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
   keepdi=di;
 
   setring gnir;
+  ideal maxi=maxideal(1);
   for(@m=1;@m<=size(indep);@m++)
   {
     isat=0;
@@ -3330,7 +3331,6 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     }
     else
     {
-      ideal maxi=maxideal(1);
       if(@m==1)
       {
         @j=fetch(@P,i);
@@ -3622,7 +3622,6 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       setring gnir;
       ser=imap(@Phelp,ser);
     }
-    ideal maxi=maxideal(1);
     if(size(reduce(ser,peek,5))!=0)
     {
       for(@m=1;@m<=size(restindep);@m++)
@@ -4087,7 +4086,7 @@ static proc algeRad(ideal i)
    list lll=ringlist(R);
    list lll_n=lll;
    lll_n[1]=lll[1][1]; //char.
-   lll_n[2]=lll[2]+lll[1][2][1];
+   lll_n[2]=lll[2]+list(lll[1][2][1]);
    lll_n[3]=list(list("dp",nvars(R)+1),list("C",1));
    ring RH=ring(lll_n);
    list lll=imap(R,lll);
@@ -4096,7 +4095,7 @@ static proc algeRad(ideal i)
    ideal i=imap(R,i);
    i=i,@p;
    ideal ra=radical(i);
-   def RS=changeord(list(list("dp",1:n),list("lp",1)), RH);
+   ring RS=changeord(list(list("dp",1:n),list("lp",1)), RH);
    ideal K=imap(RH,ra);
    K=std(K);
    if (ncols(K)>1) { K=K[2..size(K)];}
@@ -6751,6 +6750,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
   indep = newMaxIndependSetDp(I, parameters);
   // SL 2006-04-24 2
 
+  ideal @va_i = maxideal(1);
   for(@m = 1; @m <= size(indep); @m++)
   {
     if((indep[@m][1] == varstr(basering)) && (@m == 1))
@@ -6764,8 +6764,6 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     }
     else
     {
-      ideal @va_i = maxideal(1);
-
       ring gnir1 = create_ring(ring_list(basering)[1],"(" + indep[@m][1] + ")","(" + indep[@m][2] + ")","no_minpoly");
       map phi = @P,imap(@P,@va_i);
       ideal @j = groebner(phi(I));
