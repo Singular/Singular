@@ -37,6 +37,8 @@
 
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
+#include "flint/fq_nmod_vec.h"
+#include "flint/fmpz_mod.h"
 #endif
 
 // univariate polys

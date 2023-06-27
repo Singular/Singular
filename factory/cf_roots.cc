@@ -18,6 +18,7 @@
 
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
+#include "flint/nmod_poly_factor.h"
 #endif
 
 #include "cf_roots.h"

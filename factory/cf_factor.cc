@@ -47,6 +47,10 @@
 #include <flint/nmod_mpoly_factor.h>
 #include <flint/fmpq_mpoly_factor.h>
 #include <flint/fq_nmod_mpoly_factor.h>
+#include <flint/nmod_poly_factor.h>
+#include <flint/fmpz_poly_factor.h>
+#include <flint/fmpz_mpoly_factor.h>
+#include <flint/fq_nmod_poly_factor.h>
 #endif
 #endif
 

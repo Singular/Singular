@@ -53,6 +53,7 @@ extern "C"
 #include <flint/fmpq_poly.h>
 #include <flint/nmod_mat.h>
 #include <flint/fmpz_mat.h>
+#include <flint/fmpz_mod.h>
 #if ( __FLINT_RELEASE >= 20400)
 #include <flint/fq.h>
 #include <flint/fq_poly.h>

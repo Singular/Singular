@@ -42,6 +42,9 @@
 #include <flint/fq_nmod.h>
 #include <flint/fq_nmod_poly.h>
 #include <flint/fq_nmod_mat.h>
+#include <flint/nmod_poly.h>
+#include <flint/nmod_mat.h>
+#include <flint/fmpz_mat.h>
 #endif
 
 int convFlintISingI (fmpz_t f);

@@ -23,6 +23,7 @@
 #include "cf_algorithm.h"
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
+#include "flint/nmod_poly_factor.h"
 #include <flint/fmpz_poly_factor.h>
 #endif
 #ifdef HAVE_NTL
