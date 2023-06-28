@@ -7817,7 +7817,6 @@ EXAMPLE: example newDecompStep; shows an example
   }
 
   poly @gs,@gh,@p;
-  string @va;
   list quprimary,htprimary,collectprimary,lsau,lnew,allindep,restindep;
   ideal @h;
   int jdim=dim(@j);
@@ -8024,6 +8023,7 @@ EXAMPLE: example newDecompStep; shows an example
      }
      if(size(reduce(ser,peek,5))!=0)
      {
+       ideal @va_i;
        for(@m=1;@m<=size(restindep);@m++)
        {
         // if(restindep[@m][3]>=keepdi)
@@ -8042,9 +8042,9 @@ EXAMPLE: example newDecompStep; shows an example
           }
           else
           {
-             @va=string(maxideal(1));
+             @va_i=maxideal(1);
              ring gnir1 = create_ring(ring_list(basering)[1],"(" +restindep[@m][1]+")","(" +restindep[@m][2]+")","no_minpoly");
-             execute("map phi=gnir,"+@va+";");
+             map phi=gnir,imap(gnir,@va_i);
              op=option(get);
              option(redSB);
              if(homo==1)
@@ -8335,7 +8335,7 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
    ASSUME(1, hasGlobalOrdering(basering) ) ;
 
 
-   string @va;
+   ideal @va_i;
    def quotring;
    intvec op;
    intvec @vv;
@@ -8379,7 +8379,7 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
    }
    else
    {
-     @va=string(maxideal(1));
+     @va_i=maxideal(1);
 //Aenderung==============
      //if(@m==1)
      //{
@@ -8387,7 +8387,7 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
      //}
 //=======================
      ring gnir1 = create_ring(ring_list(basering)[1],"("+indepInfo[1]+")","(" +indepInfo[2]+")","no_minpoly");
-     execute("map phi=gnir,"+@va+";");
+     map phi=gnir,imap(gnir,@va_i);
      op=option(get);
      option(redSB);
      if(homo==1)
