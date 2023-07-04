@@ -16,6 +16,7 @@
 #include <flint/fmpq.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpq_mpoly.h>
+#include <flint/nmod_mpoly.h>
 
 BOOLEAN convSingRFlintR(fmpq_mpoly_ctx_t ctx, const ring r);
 void convSingPFlintMP(fmpq_mpoly_t res, fmpq_mpoly_ctx_t ctx, poly p, int lp,const ring r);

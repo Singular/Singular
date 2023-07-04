@@ -30,6 +30,7 @@
 
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
+#include <flint/fq_nmod_poly_factor.h>
 #endif
 
 // cyclotomoic polys:

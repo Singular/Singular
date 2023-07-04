@@ -43,6 +43,8 @@
 
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
+#include "flint/nmod_poly_factor.h"
+#include "flint/fq_nmod_poly_factor.h"
 #endif
 
 TIMING_DEFINE_PRINT(fac_fq_uni_factorizer)
