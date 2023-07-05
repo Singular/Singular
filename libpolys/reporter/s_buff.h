@@ -27,7 +27,8 @@ typedef struct
   char level;
   char send_quit_at_exit;
   char quit_sent;
-
+  #define SI_RING_CACHE 20
+  ring rings[SI_RING_CACHE];
 } ssiInfo;
 
 s_buff s_open(int fd);

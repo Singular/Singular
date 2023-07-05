@@ -49,7 +49,7 @@
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
 
-#define SSI_VERSION 13
+#define SSI_VERSION 14
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
@@ -58,6 +58,7 @@
 // 10->11: extended ring descr. for named coeffs (not in used until 4.1)
 // 11->12: add rank to ideal/module, add smatrix
 // 12->13: NC rings
+// 13->14: ring references
 
 VAR link_list ssiToBeClosed=NULL;
 VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
@@ -201,8 +202,18 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
   /* ch=-3: cf name follows */
+  /* ch=-4: NULL*/
+  /* ch=-5: reference <int> */
   if (r!=NULL)
   {
+    for(int i=0;i<SI_RING_CACHE;i++)
+    {
+      if (d->rings[i]==r)
+      {
+        fprintf(d->f_write,"-5 %d ",i);
+	return;
+      }
+    }
     if (rField_is_Q(r) || rField_is_Zp(r))
       fprintf(d->f_write,"%d %d ",n_GetChar(r->cf),r->N);
     else if (rFieldType(r)==n_transExt)
@@ -504,6 +515,29 @@ ring ssiReadRing(const ssiInfo *d)
 /* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
   int ch;
   ch=s_readint(d->f_read);
+  if (ch==-5)
+  {
+    int index=s_readint(d->f_read);
+    char name[20];
+    idhdl h=NULL;
+    snprintf(name,20,"ssiRing%d",index);
+    h=IDROOT->get(name, 0);
+    if (h==NULL)
+    {
+      Werror("missing `%s`",name);
+      return NULL;
+    }
+    else if (IDTYP(h)==RING_CMD)
+    {
+      ring r=rIncRefCnt(IDRING(h));
+      return r;
+    }
+    else
+    {
+      Werror("wrong type of `%s`",name);
+      return NULL;
+    }
+  }
   if (ch==-4)
     return NULL;
   int N=s_readint(d->f_read);
@@ -1344,6 +1378,11 @@ BOOLEAN ssiClose(si_link l)
       }
       // clean ring
       if (d->r!=NULL) rKill(d->r);
+      for(int i=0;i<SI_RING_CACHE;i++)
+      {
+        if (d->rings[i]!=NULL)  rKill(d->rings[i]);
+	d->rings[i]=NULL;
+      }
       // did the child to stop ?
       si_waitpid(d->pid,NULL,WNOHANG);
       if ((d->pid!=0)
