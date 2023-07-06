@@ -1027,7 +1027,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== reserved port =================*/
     if (strcmp(sys_cmd,"reserve")==0)
     {
-      int ssiReservePort(int clients);
       const short t[]={1,INT_CMD};
       if (iiCheckTypes(h,t,1))
       {

@@ -21,4 +21,5 @@ si_link_extension slInitSsiExtension(si_link_extension s);
 si_link ssiCommandLink();
 
 void sig_chld_hdl(int sig);
+int ssiReservePort(int clients);
 #endif
