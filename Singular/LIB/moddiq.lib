@@ -313,9 +313,10 @@ static proc finalTest_sat(string command, alias list args, def result)
       JGm = JGm + args[2]^m;
     }
     def K=H*JGm;
+    def I=std(args[1]);
     for (i = ncols(K); i > 0; i--)
     {
-        if (reduce(K[i], args[1], 1) != 0) {print("fail") return(0); }
+        if (reduce(K[i], I, 5) != 0) {print("fail") return(0); }
     }
     return(1);
 }
