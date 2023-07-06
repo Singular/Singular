@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version moddiq.lib 4.1.2.0 Feb_2020 "; // $Id$
+version="version moddiq.lib 4.3.2.2 Jun_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  moddiq.lib       Double ideal quotient using modular methods
@@ -283,7 +283,7 @@ static proc pTest_sat(string command, alias list args, alias def result,
     int i;
     for (i = ncols(IJp); i > 0; i--)
     {
-        if (reduce(IJp[i], Gp, 1) != 0)
+        if (reduce(IJp[i], Gp, 5) != 0)
         {
             setring(br);
             return(0);
@@ -293,7 +293,7 @@ static proc pTest_sat(string command, alias list args, alias def result,
     /* test if Gp is in (Ip:Jp^\infty) */
     for (i = ncols(Gp); i > 0; i--)
     {
-        if (reduce(Gp[i], IJp, 1) != 0) { setring(br); return(0); }
+        if (reduce(Gp[i], IJp, 5) != 0) { setring(br); return(0); }
     }
     setring(br);
     return(1);
@@ -313,10 +313,9 @@ static proc finalTest_sat(string command, alias list args, def result)
       JGm = JGm + args[2]^m;
     }
     def K=H*JGm;
-    def I=std(args[1]);
     for (i = ncols(K); i > 0; i--)
     {
-        if (reduce(K[i], I, 5) != 0) {print("fail") return(0); }
+        if (reduce(K[i], args[1], 5) != 0) {print("fail") return(0); }
     }
     return(1);
 }
