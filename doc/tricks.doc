@@ -40,6 +40,12 @@ the characteristic of a prime field must be less than or equal to 2147483647 (2^
 @* (the characteristic of a prime field in the NTL routines must be less than NTL_SP_BOUND (2^30) on 32bit
 machines - This is always the case since currently, only factory uses NTL.)
 @item
+if only NTL is used, extgcd has a limit on the coefficients:
+NTL_MAX_FFTPRIMES
+// At the current setting of 20000, on 64-bit machines with 50-bit
+// FFT primes, this allows for polynomials with 20*50/2 = 500K-bit
+// coefficients, while the table itself takes 160KB.
+@item
 the number of elements in GF(p,n) must be less than 65536
 @item
 the (weighted) degree of a monomial must be less or equal  than 2147483647
