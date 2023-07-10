@@ -146,7 +146,7 @@ VAR struct fe_option feOptSpec[] =
    "#threads", "maximal number of CPUs to use for threads",            feOptInt,    (void*)2,      0},
 
   {"flint-threads",   required_argument,    LONG_OPTION_RETURN,
-   "#flintthreads", "maximal number of threads to use in flint library", feOptInt,    (void*)1,      0},
+   "#flintthreads", "maximal number of threads to use in flint/ntl library", feOptInt,    (void*)1,      0},
 
   {"MPport",           required_argument,   LONG_OPTION_RETURN,
    "PORT",     "Use PORT number for connections",                       feOptString,    0,      0},

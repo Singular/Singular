@@ -311,11 +311,11 @@ static const char* feOptAction(feOptIndex opt)
         return NULL;
       }
 
-      #ifdef HAVE_FLINT
-      #if __FLINT_RELEASE >= 20503
       case FE_OPT_FLINT_THREADS:
       {
         slong nthreads = (slong)feOptSpec[FE_OPT_FLINT_THREADS].value;
+        #ifdef HAVE_FLINT
+        #if __FLINT_RELEASE >= 20503
         nthreads = FLINT_MAX(nthreads, WORD(1));
         flint_set_num_threads(nthreads);
         int * cpu_affinities = new int[nthreads];
@@ -324,9 +324,16 @@ static const char* feOptAction(feOptIndex opt)
         flint_set_thread_affinity(cpu_affinities, nthreads);
         delete[] cpu_affinities;
         return NULL;
+        #endif
+        #endif
+        #ifdef HAVE_NTL
+        #if NTL_MAJOR_VERSION>=10
+        #ifdef NTL_THREAD_BOOST
+        SetNumThreads(nthreads);
+        #endif
+        #endif
+        #endif
       }
-      #endif
-      #endif
 
       default:
         return NULL;

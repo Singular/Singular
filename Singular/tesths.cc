@@ -72,13 +72,6 @@ int main(          /* main entry to Singular */
 #endif
   siInit(argv[0]);
   init_signals();
-  #ifdef HAVE_NTL
-  #if NTL_MAJOR_VERSION>=10
-  #ifdef NTL_THREAD_BOOST
-  SetNumThreads(feOptValue(FE_OPT_CPUS));
-  #endif
-  #endif
-  #endif
 
   // parse command line options
   int optc, option_index;
