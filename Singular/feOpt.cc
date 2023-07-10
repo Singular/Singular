@@ -313,7 +313,7 @@ static const char* feOptAction(feOptIndex opt)
 
       case FE_OPT_FLINT_THREADS:
       {
-        slong nthreads = (slong)feOptSpec[FE_OPT_FLINT_THREADS].value;
+        long nthreads = (long)feOptSpec[FE_OPT_FLINT_THREADS].value;
         #ifdef HAVE_FLINT
         #if __FLINT_RELEASE >= 20503
         nthreads = FLINT_MAX(nthreads, WORD(1));
