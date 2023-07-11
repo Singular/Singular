@@ -604,7 +604,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
   l.rtyp=INT_CMD;
   l.data=(void*)(long)Ll;
   f->m->Write(f, &l);
-  // set all entries corresponding to "real" mebers to 1 in rings
+  // set all entries corresponding to "real" members to 1 in rings
   char *rings=(char*)omAlloc0(Ll+1);
   newstruct_member elem=dd->member;
   while (elem!=NULL)
