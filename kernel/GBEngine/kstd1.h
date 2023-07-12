@@ -42,7 +42,7 @@ ideal kStd(ideal F, ideal Q, tHomog h, intvec ** mw,intvec *hilb=NULL,
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** mw, intvec *hilb=NULL,
     int syzComp=0, int newIdeal=0, intvec *vw=NULL, BOOLEAN rightGB=FALSE);
 
-ideal rightgb(ideal F, ideal Q);
+ideal rightgb(ideal F,const ideal Q);
 
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;
@@ -55,10 +55,10 @@ EXTERN_VAR BITSET validOpts;
 
 void initMora(ideal F,kStrategy strat);
 
-ideal kInterRed (ideal F, ideal Q=NULL);
-ideal kInterRedOld (ideal F, ideal Q=NULL);
-long   kModDeg(poly p, ring r = currRing);
-long  kHomModDeg(poly p, ring r = currRing);
+ideal kInterRed (ideal F, const ideal Q=NULL);
+ideal kInterRedOld (ideal F, const ideal Q=NULL);
+long   kModDeg(poly p, const ring r = currRing);
+long  kHomModDeg(poly p, const ring r = currRing);
 
 ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w);
 

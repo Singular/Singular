@@ -4962,7 +4962,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
 
 #ifdef HAVE_SHIFTBBA
-ideal rightgb(ideal F, ideal Q)
+ideal rightgb(ideal F, const ideal Q)
 {
   assume(rIsLPRing(currRing));
   assume(idIsInV(F));

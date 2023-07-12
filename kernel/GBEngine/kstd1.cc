@@ -2423,7 +2423,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
 
 VAR intvec * kModW, * kHomW;
 
-long kModDeg(poly p, ring r)
+long kModDeg(poly p,const ring r)
 {
   long o=p_WDegree(p, r);
   long i=__p_GetComp(p, r);
@@ -2433,7 +2433,7 @@ long kModDeg(poly p, ring r)
     return o+(*kModW)[i-1];
   return o;
 }
-long kHomModDeg(poly p, ring r)
+long kHomModDeg(poly p,const ring r)
 {
   int i;
   long j=0;
@@ -3410,7 +3410,7 @@ poly k_NF (ideal F, ideal Q, poly p,int syzComp, int lazyReduce, const ring _cur
 *interreduces F
 */
 // old version
-ideal kInterRedOld (ideal F, ideal Q)
+ideal kInterRedOld (ideal F,const ideal Q)
 {
   int j;
   kStrategy strat = new skStrategy;
@@ -3762,7 +3762,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   delete strat;
   return res;
 }
-ideal kInterRed (ideal F, ideal Q)
+ideal kInterRed (ideal F,const ideal Q)
 {
 #ifdef HAVE_PLURAL
   if(rIsPluralRing(currRing)) return kInterRedOld(F,Q);
