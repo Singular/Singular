@@ -28,7 +28,8 @@ New libraries:
 
 Changed libraries:
 @itemize
-@item @code{normaliz.lib}: update to normaliz 3.10 (nref{normaliz_lib})
+@item @code{normaliz.lib}: update to normaliz 3.10 (@nref{normaliz_lib})
+@item @code{hess.lib}: fixes (@nref{hess_lib})
 @end itemize
 
 Changes in the kernel/build system:
