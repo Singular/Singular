@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////
-version="version hess.lib 4.1.2.0 Feb_2019 "; //$Id$
+version="version hess.lib 4.3.2.2 Jul_2023 "; //$Id$
 category="Hess";
 info="
 LIBRARY:  hess.lib  Riemann-Roch space of divisors
@@ -1720,10 +1720,10 @@ static proc infPlaces (poly f)
   intvec iv;
   def base_r=basering;
   ring r_auxz=char(basering),(x,y,z),lp;
-  poly F=imap(base_r,f);
+  poly F=fetch(base_r,f);
   poly f_inf=subst(F,z,0);
   setring base_r;
-  poly f_inf=imap(r_auxz,f_inf);
+  poly f_inf=fetch(r_auxz,f_inf);
   ideal I=factorize(f_inf,1);  // points at infinity as homogeneous
   // polynomials
   int s=size(I);
@@ -1736,7 +1736,7 @@ static proc infPlaces (poly f)
 
   for (i=1;i<=s;i=i+1)
   {
-    aux=subst(I[i],y,1);
+    aux=subst(I[i],var(2),1);
     if (aux==1)
     {
       // the point is (1:0:0)
@@ -1768,7 +1768,7 @@ static proc infPlaces (poly f)
       // the point is rational and no field extension is needed
         setring r_auxz;
         poly f_xz=subst(F,y,1);
-        poly aux=imap(base_r,aux);
+        poly aux=fetch(base_r,aux);
         number A=-number(subst(aux,x,0));
         map phi=r_auxz,x+A,0,z;
         poly f_origin=phi(f_xz);
@@ -1798,9 +1798,9 @@ static proc infPlaces (poly f)
       // minpoly=aux is needed
 
         ring r_ext=(char(basering),@a),(x,y,z),lp;
-        poly aux=imap(base_r,aux);
+        poly aux=fetch(base_r,aux);
         minpoly=number(subst(aux,x,@a));
-        poly F=imap(r_auxz,F);
+        poly F=fetch(r_auxz,F);
         poly f_xz=subst(F,y,1);
         map phi=r_ext,x+@a,0,z;
         poly f_origin=phi(f_xz);
