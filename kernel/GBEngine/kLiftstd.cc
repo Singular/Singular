@@ -344,7 +344,7 @@ static void setUnit(int e, ideal *unit)
     }
   }
 }
-ideal idDivRem(ideal A, ideal quot, ideal &factor,ideal *unit,int lazyReduce)
+ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduce)
 {
   /* special cases */
   if (idIs0(A) || idIs0(quot))
