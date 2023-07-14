@@ -160,6 +160,7 @@ static void MPZ(mpz_t result, number &n, const coeffs)
   mpz_init(result);
   if (fmpq_poly_degree((fmpq_poly_ptr)n)==0)
   {
+#if __FLINT_RELEASE >= 20503
     fmpq_t m;
     fmpq_init(m);
     fmpq_poly_get_coeff_fmpq(m,(fmpq_poly_ptr)n,0);
@@ -170,6 +171,19 @@ static void MPZ(mpz_t result, number &n, const coeffs)
     if ((dl!=1)||(mpz_cmp_si(den,(long)dl)!=0)) mpz_set_ui(result,0);
     mpz_clear(den);
     fmpq_clear(m);
+#else
+    mpq_t m;
+    mpq_init(m);
+    fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)n,0);
+    mpz_t den;
+    mpz_init(den);
+    mpq_get_num(result,m);
+    mpq_get_den(den,m);
+    int dl=(int)mpz_get_si(den);
+    if ((dl!=1)||(mpz_cmp_si(den,(long)dl)!=0)) mpz_set_ui(result,0);
+    mpz_clear(den);
+    mpq_clear(m);
+#endif
   }
 }
 static number Neg(number a, const coeffs)
@@ -223,6 +237,7 @@ static void WriteShort(number a, const coeffs r)
   else
   {
   StringAppendS("(");
+#if __FLINT_RELEASE >= 20503
   fmpq_t m;
   fmpq_init(m);
   BOOLEAN need_plus=FALSE;
@@ -259,6 +274,51 @@ static void WriteShort(number a, const coeffs r)
     }
   }
   fmpq_clear(m);
+#else
+  mpq_t m;
+  mpq_init(m);
+  mpz_t num,den;
+  mpz_init(num);
+  mpz_init(den);
+  BOOLEAN need_plus=FALSE;
+  for(int i=fmpq_poly_length((fmpq_poly_ptr)a);i>=0;i--)
+  {
+    fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)a,i);
+    mpq_get_num(num,m);
+    mpq_get_den(den,m);
+    if (mpz_sgn1(num)!=0)
+    {
+      if (need_plus && (mpz_sgn1(num)>0))
+        StringAppendS("+");
+      need_plus=TRUE;
+      int l=mpz_sizeinbase(num,10);
+      l=si_max(l,(int)mpz_sizeinbase(den,10));
+      l+=2;
+      char *s=(char*)omAlloc(l);
+      char *z=mpz_get_str(s,10,num);
+      if ((i==0)
+      ||(mpz_cmp_si(num,1)!=0)
+      ||(mpz_cmp_si(den,1)!=0))
+      {
+        StringAppendS(z);
+        if (mpz_cmp_si(den,1)!=0)
+        {
+          StringAppendS("/");
+          z=mpz_get_str(s,10,den);
+          StringAppendS(z);
+        }
+        if (i!=0) StringAppendS("*");
+      }
+      if (i>1)
+        StringAppend("%s^%d",r->pParameterNames[0],i);
+      else if (i==1)
+        StringAppend("%s",r->pParameterNames[0]);
+    }
+  }
+  mpz_clear(den);
+  mpz_clear(num);
+  mpq_clear(m);
+#endif
   StringAppendS(")");
   }
 }
@@ -458,6 +518,7 @@ static void WriteFd(number a, const ssiInfo *d, const coeffs)
   fmpq_poly_ptr aa=(fmpq_poly_ptr)a;
   int l=fmpq_poly_length(aa);
   fprintf(d->f_write,"%d ",l);
+#if __FLINT_RELEASE >= 20503
   fmpq_t m;
   fmpq_init(m);
   mpz_t num,den;
@@ -475,6 +536,26 @@ static void WriteFd(number a, const ssiInfo *d, const coeffs)
   mpz_clear(den);
   mpz_clear(num);
   fmpq_clear(m);
+#else
+  mpq_t m;
+  mpq_init(m);
+  mpz_t num,den;
+  mpz_init(num);
+  mpz_init(den);
+  for(int i=l; i>=0; i--)
+  {
+    fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)a,i);
+    mpq_get_num(num,m);
+    mpq_get_den(den,m);
+    mpz_out_str (d->f_write,SSI_BASE, num);
+    fputc(' ',d->f_write);
+    mpz_out_str (d->f_write,SSI_BASE, den);
+    fputc(' ',d->f_write);
+  }
+  mpz_clear(den);
+  mpz_clear(num);
+  mpq_clear(m);
+#endif
 }
 static number ReadFd(const ssiInfo *d, const coeffs)
 {
