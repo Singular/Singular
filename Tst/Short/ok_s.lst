@@ -31,6 +31,7 @@ bug_normalize
 bug_opposite
 bug_OrdSgn
 bug_printres
+bug_paraplanecurve
 bug_qring2
 bug_ring
 bug_ring_red
