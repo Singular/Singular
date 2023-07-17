@@ -2491,6 +2491,7 @@ EXAMPLE: example rationalPointConic; shows an example
 "
 {
   list L = isQuadratic(p);
+  if (L[1] != 1) { Error("p is not quadratic."); }
   bigint a = bigint(L[2]); bigint b = bigint(L[3]); bigint c = bigint(L[4]);
   bigint d = bigint(L[5]); bigint e = bigint(L[6]); bigint f = bigint(L[7]);
   bigint x; bigint y; bigint z; bigint nn;
