@@ -608,7 +608,6 @@ example
   attrib(M,"isHomog",v);
   def B=sheafCohBGG(M,-8,4);
 }
-
 proc sheafCohBGGregul(module M,int l,int h, int reg)
 "USAGE:   sheafCohBGGregul(M,l,h);    M module, l,h int, reg int
 ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
@@ -717,6 +716,11 @@ example
   B;
 }
 
+proc sheafCohBGGregul_w(module M,int l,int h,int regul, intvec w)
+{
+  attrib(M,"isHomog",w);
+  return sheafCohBGGregul(M,l,h,regul);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc showResult( def R, int l, int h )
