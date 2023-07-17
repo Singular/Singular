@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version paraplanecurves.lib 4.3.2.2 Nov_2022 "; // $Id$
+version="version paraplanecurves.lib 4.3.2.3 Jul_2023 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
@@ -1902,6 +1902,7 @@ RETURN:  checks whether p is a homogeneous, quadratic polynomial in the
          otherwise, a list with the single entry [0] is returned
 "
 {
+  p=system("content",p); // clear denominator, remove content
   bigint a = bigint(leadcoef(subst(p, var(2), 0, var(3), 0)));
   bigint c = bigint(leadcoef(subst(p, var(1), 0, var(3), 0)));
   bigint f = bigint(leadcoef(subst(p, var(1), 0, var(2), 0)));
