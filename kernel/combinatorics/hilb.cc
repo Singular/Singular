@@ -1846,7 +1846,6 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
 // Algorithm 2.6 of
 // Dave Bayer, Mike Stillman - Computation of Hilbert Function
 // J.Symbolic Computation (1992) 14, 31-50
-// assume: except for A==(0), no NULL entries in A
 {
   int r=id_Elem(A,src);
   poly h=NULL;
