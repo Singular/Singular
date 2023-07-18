@@ -3281,7 +3281,6 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
     intvec *w=NULL;
     Istd=id_Satstd(I,J,currRing);
     k=0;
-    /*
     loop
     {
       k++;
@@ -3298,7 +3297,6 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
       if (elem==0) break;
     }
     k--;
-    */
     idSkipZeroes(Istd);
   //PrintS("\nSatstd:\n");
   //iiWriteMatrix((matrix)I,"I",1,currRing,0); PrintLn();
