@@ -7,10 +7,11 @@
 */
 
 #include "misc/auxiliary.h"
+
+#ifdef HAVE_FLINT
 #include "flintconv.h"
 #include "flint_mpoly.h"
 
-#ifdef HAVE_FLINT
 #if __FLINT_RELEASE >= 20503
 #include "coeffs/coeffs.h"
 #include "coeffs/longrat.h"
