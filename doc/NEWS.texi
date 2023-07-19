@@ -30,6 +30,7 @@ Changed libraries:
 @itemize
 @item @code{normaliz.lib}: update to normaliz 3.10 (@nref{normaliz_lib})
 @item @code{hess.lib}: fixes (@nref{hess_lib})
+@item @code{sheafcoh.lib}: new routines @nref{sheafCohBGGregul}, @nref{sheafCohBGGregul_w} (@nref{sheafcoh_lib})
 @end itemize
 
 Changes in the kernel/build system:

@@ -737,7 +737,7 @@ EXAMPLE: example sheafCohBGGregul_w; shows an example
 "
 {
   attrib(M,"isHomog",w);
-  return sheafCohBGGregul(M,l,h,regul);
+  return(sheafCohBGGregul(M,l,h,regul));
 }
 example
 {"EXAMPLE:";
