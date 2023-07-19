@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sheafcoh.lib 4.3.2.3 Jun_2023 "; // $Id$
+version="version sheafcoh.lib 4.3.2.3 Jul_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -15,6 +15,7 @@ PROCEDURES:
  sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
  sheafCohBGGregul(M,l,h,r); cohomology of sheaf associated to coker(M)
                           with given regularity
+ sheafCohBGGregul_w(M,l,h,r,w); cohomology with given module weights
  sheafCohBGG2(M,l,h);    cohomology of sheaf associated to coker(M), experimental version
  sheafCoh(M,l,h);        cohomology of sheaf associated to coker(M)
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
@@ -717,10 +718,40 @@ example
 }
 
 proc sheafCohBGGregul_w(module M,int l,int h,int regul, intvec w)
+"USAGE:   sheafCohBGGregul_w(M,l,h,w);    M module, l,h int, reg int, w intvec
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector w, @code{h>=l}, and the basering has @code{n+1}
+         variables.
+RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
+         associated to coker(M). The range of twists is determined by @code{l},
+         @code{h}.
+NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
+         correspondence and on Tate resolution ( see [Eisenbud, Floystad,
+         Schreyer: Sheaf cohomology and free resolutions over exterior
+         algebras, Trans AMS 355 (2003)] ).@*
+         @code{sheafCohBGG(M,l,h)} does not compute all values in the above
+         table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
+         use @code{sheafCohBGG(M,l-n,h+n)}.
+SEE ALSO: sheafCoh, dimH
+EXAMPLE: example sheafCohBGGregul_w; shows an example
+"
 {
   attrib(M,"isHomog",w);
   return sheafCohBGGregul(M,l,h,regul);
 }
+example
+{"EXAMPLE:";
+  echo = 2;
+  // cohomology of cotangential bundle on P^3:
+  //-------------------------------------------
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  def B=sheafCohBGGregul_w(M,-8,4,CM_regularity(M),v);
+  B;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc showResult( def R, int l, int h )
