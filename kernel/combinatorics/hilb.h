@@ -14,7 +14,7 @@
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL);
 intvec * hFirstSeries1(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL);
 intvec * hFirstSeries0(ideal S, ideal Q, intvec *wdegree, const ring src, const ring Qt);
-poly hilbert_series(ideal A, const ring src,  const intvec *wdegree, const ring Qt);
+poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt);
 
 intvec * hSecondSeries(intvec *hseries1);
 

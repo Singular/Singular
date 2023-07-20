@@ -1037,7 +1037,6 @@ static void hHedge(poly hEdge)
   }
 }
 
-
 static void hHedgeStep(scmon pure, scfmon stc,
                        int Nstc, varset var, int Nvar,poly hEdge)
 {

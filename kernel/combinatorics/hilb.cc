@@ -24,6 +24,14 @@
 #include "polys/simpleideals.h"
 #include "polys/weight.h"
 
+#ifdef HAVE_FLINT
+#include "polys/flintconv.h"
+#include "polys/flint_mpoly.h"
+#if __FLINT_RELEASE >= 20503
+#include <flint/fmpq_mpoly.h>
+#endif
+#endif
+
 #if SIZEOF_LONG == 8
 #define OVERFLOW_MAX LONG_MAX
 #define OVERFLOW_MIN LONG_MIN
@@ -747,57 +755,181 @@ void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
   *co = i - j;
 }
 
-static void hPrintHilb(intvec *hseries,intvec *modul_weight)
+static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
 {
-  int  i, j, l, k;
-  if (hseries == NULL)
-    return;
-  l = hseries->length()-1;
-  k = (*hseries)[l];
   if ((modul_weight!=NULL)&&(modul_weight->compare(0)!=0))
   {
     char *s=modul_weight->ivString(1,0,1);
     Print("module weights:%s\n",s);
     omFree(s);
   }
-  for (i = 0; i < l; i++)
+  p_Write(hseries,Qt);
+  PrintLn();
+  poly o_t=p_One(Qt);p_SetExp(o_t,1,1,Qt);p_Setm(o_t,Qt);
+  o_t=p_Neg(o_t,Qt);
+  o_t=p_Add_q(p_One(Qt),o_t,Qt);
+  poly di1=p_Copy(hseries,Qt);
+#ifdef HAVE_FLINT
+  poly di2;
+  fmpq_mpoly_ctx_t ctx;
+  convSingRFlintR(ctx,Qt);
+  int co=0;
+  loop
   {
-    j = (*hseries)[i];
-    if (j != 0)
-    {
-      Print("//  %8d t^%d\n", j, i+k);
-    }
+    di2=Flint_Divide_MP(di1,0,o_t,0,ctx,Qt);
+    if (di2==NULL) break;
+    co++;
+    p_Delete(&di1,Qt);
+    di1=di2;
   }
+#else
+  CanonicalForm  Di1=convSingPFactoryP(di1,Qt);
+  CanonicalForm  O_t=convSingPFactoryP(o_t,Qt);
+  int co=0;
+  loop
+  {
+    if (is_zero(Di1.mod(O_t))) break;
+    Di1/=O_t;
+    co++;
+  }
+  p_Delete(di1,Qt);
+  di1=convFactoryPSingP(Di1,Qt);
+#endif
+  p_Write(di1,Qt);
+  int mu=0;
+  poly p=di1;
+  while(p!=NULL)
+  {
+    mu+=n_Int(pGetCoeff(p),Qt->cf);
+    p_LmDelete(&p,Qt);
+  }
+  int di = (currRing->N)-co;
+  if (hseries==NULL) di=0;
+  if (currRing->OrdSgn == 1)
+  {
+    if (di>0)
+      Print("// dimension (proj.)  = %d\n// degree (proj.)   = %d\n", di-1, mu);
+    else
+      Print("// dimension (affine) = 0\n// degree (affine)  = %d\n",       mu);
+  }
+  else
+    Print("// dimension (local)   = %d\n// multiplicity = %d\n", di, mu);
 }
 
-/*
-*caller
-*/
+static ring makeQt()
+{
+  ring Qt=(ring) omAlloc0Bin(sip_sring_bin);
+  Qt->cf = nInitChar(n_Q, NULL);
+  Qt->N=1;
+  Qt->names=(char**)omAlloc(sizeof(char_ptr));
+  Qt->names[0]=omStrDup("t");
+  Qt->wvhdl=(int **)omAlloc0(3 * sizeof(int_ptr));
+  Qt->order = (rRingOrder_t *) omAlloc(3 * sizeof(rRingOrder_t *));
+  Qt->block0 = (int *)omAlloc0(3 * sizeof(int *));
+  Qt->block1 = (int *)omAlloc0(3 * sizeof(int *));
+  /* ringorder lp for the first block: var 1 */
+  Qt->order[0]  = ringorder_lp;
+  Qt->block0[0] = 1;
+  Qt->block1[0] = 1;
+  /* ringorder C for the second block: no vars */
+  Qt->order[1]  = ringorder_C;
+  /* the last block: everything is 0 */
+  Qt->order[2]  = (rRingOrder_t)0;
+  rComplete(Qt);
+  return Qt;
+}
+
+static ring hilb_Qt=NULL;
+static BOOLEAN isModule(ideal A, const ring src)
+{
+  if ((src->VarOffset[0]== -1)
+  || (src->pCompIndex<0))
+    return FALSE; // ring without components
+  for (int i=0;i<IDELEMS(A);i++)
+  {
+    if (A->m[i]!=NULL)
+    {
+      if (p_GetComp(A->m[i],src)>0)
+        return TRUE;
+      else
+        return FALSE;
+    }
+  }
+  return FALSE;
+}
+
 void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
 {
   id_LmTest(S, currRing);
 
-  intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree);
-  if (errorreported) return;
+  if (!isModule(S,currRing))
+  {
+    if (hilb_Qt==NULL) hilb_Qt=makeQt();
+    poly hseries=hFirstSeries0p(S,Q,wdegree,currRing,hilb_Qt);
 
-  hPrintHilb(hseries1,modulweight);
-
-  const int l = hseries1->length()-1;
-
-  intvec *hseries2 = (l > 1) ? hSecondSeries(hseries1) : hseries1;
-
-  int co, mu;
-  hDegreeSeries(hseries1, hseries2, &co, &mu);
-
-  PrintLn();
-  hPrintHilb(hseries2,modulweight);
-  if ((l == 1) &&(mu == 0))
-    scPrintDegree(rVar(currRing)+1, 0);
+    hPrintHilb(hseries,hilb_Qt,wdegree);
+    p_Delete(&hseries,hilb_Qt);
+  }
   else
-    scPrintDegree(co, mu);
-  if (l>1)
-    delete hseries1;
-  delete hseries2;
+  {
+    intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree);
+    if (errorreported) return;
+
+    {
+      int  i, j, l, k;
+      l = hseries1->length()-1;
+      k = (*hseries1)[l];
+      if ((modulweight!=NULL)&&(modulweight->compare(0)!=0))
+      {
+        char *s=modulweight->ivString(1,0,1);
+        Print("module weights:%s\n",s);
+        omFree(s);
+      }
+      for (i = 0; i < l; i++)
+      {
+        j = (*hseries1)[i];
+        if (j != 0)
+        {
+          Print("//  %8d t^%d\n", j, i+k);
+        }
+      }
+    }
+
+    const int l = hseries1->length()-1;
+
+    intvec *hseries2 = (l > 1) ? hSecondSeries(hseries1) : hseries1;
+
+    int co, mu;
+    hDegreeSeries(hseries1, hseries2, &co, &mu);
+
+    PrintLn();
+    {
+      int  i, j, l, k;
+      l = hseries2->length()-1;
+      k = (*hseries2)[l];
+      if ((modulweight!=NULL)&&(modulweight->compare(0)!=0))
+      {
+        char *s=modulweight->ivString(1,0,1);
+        Print("module weights:%s\n",s);
+        omFree(s);
+      }
+      for (i = 0; i < l; i++)
+      {
+        j = (*hseries2)[i];
+        if (j != 0)
+        {
+          Print("//  %8d t^%d\n", j, i+k);
+        }
+      }
+      if ((l == 1) &&(mu == 0))
+        scPrintDegree(rVar(currRing)+1, 0);
+      else
+        scPrintDegree(co, mu);
+      if (l>1)
+        delete hseries1;
+      delete hseries2;
+    }
+  }
 }
 
 /***********************************************************************
@@ -1841,7 +1973,8 @@ static void id_DelDiv_hi(ideal id, BOOLEAN *bad,const ring r)
   }
   omFreeSize(sev,kk*sizeof(long));
 }
-poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
+
+static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
 // according to:
 // Algorithm 2.6 of
 // Dave Bayer, Mike Stillman - Computation of Hilbert Function
@@ -1936,30 +2069,7 @@ poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Q
   return h;
 }
 
-static ring makeQt()
-{
-  ring Qt=(ring) omAlloc0Bin(sip_sring_bin);
-  Qt->cf = nInitChar(n_Q, NULL);
-  Qt->N=1;
-  Qt->names=(char**)omAlloc(sizeof(char_ptr));
-  Qt->names[0]=omStrDup("t");
-  Qt->wvhdl=(int **)omAlloc0(3 * sizeof(int_ptr));
-  Qt->order = (rRingOrder_t *) omAlloc(3 * sizeof(rRingOrder_t *));
-  Qt->block0 = (int *)omAlloc0(3 * sizeof(int *));
-  Qt->block1 = (int *)omAlloc0(3 * sizeof(int *));
-  /* ringorder lp for the first block: var 1 */
-  Qt->order[0]  = ringorder_lp;
-  Qt->block0[0] = 1;
-  Qt->block1[0] = 1;
-  /* ringorder C for the second block: no vars */
-  Qt->order[1]  = ringorder_C;
-  /* the last block: everything is 0 */
-  Qt->order[2]  = (rRingOrder_t)0;
-  rComplete(Qt);
-  return Qt;
-}
-
-intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
+poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
 {
   A=id_Head(A,src);
   id_Test(A,src);
@@ -1999,6 +2109,12 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   #endif
   poly s=hilbert_series(AA,src,wdegree,Qt);
   id_Delete0(&AA,src);
+  return s;
+}
+
+intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
+{
+  poly s=hFirstSeries0p(A,Q,wdegree,src,Qt);
   intvec *ss;
   if (s==NULL)
     ss=new intvec(2);
@@ -2010,7 +2126,10 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
       int i=p_Totaldegree(s,Qt);
       long l=n_Int(pGetCoeff(s),Qt->cf);
       (*ss)[i]=n_Int(pGetCoeff(s),Qt->cf);
-      if((l==0)||(l<=-INT_MAX)||(l>INT_MAX)) Print("overflow at t^%d\n",i);
+      if((l==0)||(l<=-INT_MAX)||(l>INT_MAX))
+      {
+        if(!errorreported) Werror("overflow at t^%d\n",i);
+      }
       else (*ss)[i]=(int)l;
       p_LmDelete(&s,Qt);
     }
@@ -2027,28 +2146,6 @@ static ideal getModuleComp(ideal A, int c, const ring src)
       res->m[i]=p_Head(A->m[i],src);
   }
   return res;
-}
-
-static BOOLEAN isModule(ideal A, const ring src)
-{
-  if ((src->VarOffset[0]== -1)
-  || (src->pCompIndex<0))
-    return FALSE; // ring without components
-  for (int i=0;i<IDELEMS(A);i++)
-  {
-    if (A->m[i]!=NULL)
-    {
-      if (p_GetComp(A->m[i],src)>0)
-        return TRUE;
-      else
-        return FALSE;
-    }
-  }
-  return FALSE;
-}
-
-static void WerrorS_dummy(const char *)
-{
 }
 
 intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
@@ -2100,7 +2197,6 @@ intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
   }
   #endif
 
-  static ring hilb_Qt=NULL;
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   if (!isModule(A,currRing))
     return hFirstSeries0(A,Q,wdegree,currRing,hilb_Qt);

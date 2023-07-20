@@ -12,9 +12,6 @@
 #include "misc/intvec.h"
 
 void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge);
-#if 0 // - alternative implementation for tests
-void scComputeHCw(ideal s,ideal Q, int  k,poly &hEdge);
-#endif
 
 intvec * scIndIntvec(ideal S, ideal Q=NULL);
 
@@ -26,8 +23,8 @@ int scDimInt(ideal  s,ideal Q=NULL); // dim (cf: field)
 int scDimIntRing(ideal  s,ideal Q=NULL); // dim (general)
 int scMultInt(ideal  s,ideal Q=NULL); // mult
 long scMult0Int(ideal  s,ideal Q=NULL); // vdim
-void scPrintDegree(int co, int mu);
 void scDegree(ideal  s,intvec *modulweight,ideal Q=NULL);
+void scPrintDegree(int co, int mu);
 
 ideal scKBase(int deg, ideal  s, ideal Q=NULL, intvec * mv=NULL);
 
