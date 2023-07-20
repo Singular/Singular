@@ -25,12 +25,13 @@
 #include "polys/weight.h"
 
 #ifdef HAVE_FLINT
-#include "polys/flintconv.h"
-#include "polys/flint_mpoly.h"
-#if __FLINT_RELEASE >= 20503
-#include <flint/fmpq_mpoly.h>
+  #include "polys/flintconv.h"
+  #include "polys/flint_mpoly.h"
+  #if __FLINT_RELEASE >= 20503
+  #include <flint/fmpq_mpoly.h>
+  #endif
 #endif
-#endif
+#include "polys/clapconv.h"
 
 #if SIZEOF_LONG == 8
 #define OVERFLOW_MAX LONG_MAX
@@ -788,11 +789,11 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
   int co=0;
   loop
   {
-    if (is_zero(Di1.mod(O_t))) break;
+    if (Di1.mod(O_t)==CanonicalForm(0)) break;
     Di1/=O_t;
     co++;
   }
-  p_Delete(di1,Qt);
+  p_Delete(&di1,Qt);
   di1=convFactoryPSingP(Di1,Qt);
 #endif
   p_Write(di1,Qt);
