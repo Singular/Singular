@@ -37,6 +37,8 @@ Changes in the kernel/build system:
 @itemize
 @item new algorithm for lift function (@nref{lift})
 @item mstd for local rings (@nref{mstd})
+@item use the new Hilbert function algorith for @nref{hilb}.
+@item overflow in @code{hilb} is an error (on request of a single user)
 @end itemize
 
 @heading News for version 4-3-2
