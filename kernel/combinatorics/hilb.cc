@@ -787,10 +787,13 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
   CanonicalForm  Di1=convSingPFactoryP(di1,Qt);
   CanonicalForm  O_t=convSingPFactoryP(o_t,Qt);
   int co=0;
+  CanonicalForm Di2,dummy;
   loop
   {
-    if (Di1.mod(O_t)==CanonicalForm(0)) break;
-    Di1/=O_t;
+    Di2=Di1/O_t;
+    dummy=Di2*O_t;
+    if (dummy!=Di1) break;
+    else Di1=Di2;
     co++;
   }
   p_Delete(&di1,Qt);
