@@ -770,11 +770,12 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
   o_t=p_Neg(o_t,Qt);
   o_t=p_Add_q(p_One(Qt),o_t,Qt);
   poly di1=p_Copy(hseries,Qt);
+  int co;
 #ifdef HAVE_FLINT
   poly di2;
   fmpq_mpoly_ctx_t ctx;
   convSingRFlintR(ctx,Qt);
-  int co=0;
+  co=0;
   loop
   {
     di2=Flint_Divide_MP(di1,0,o_t,0,ctx,Qt);
@@ -784,20 +785,23 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
     di1=di2;
   }
 #else
-  CanonicalForm  Di1=convSingPFactoryP(di1,Qt);
-  CanonicalForm  O_t=convSingPFactoryP(o_t,Qt);
-  int co=0;
-  CanonicalForm Di2,dummy;
-  loop
+  if (di1!=NULL)
   {
-    Di2=Di1/O_t;
-    dummy=Di2*O_t;
-    if (dummy!=Di1) break;
-    else Di1=Di2;
-    co++;
+    CanonicalForm  Di1=convSingPFactoryP(di1,Qt);
+    CanonicalForm  O_t=convSingPFactoryP(o_t,Qt);
+    CanonicalForm Di2,dummy;
+    co=0;
+    loop
+    {
+      Di2=Di1/O_t;
+      dummy=Di2*O_t;
+      if (dummy!=Di1) break;
+      else Di1=Di2;
+      co++;
+    }
+    p_Delete(&di1,Qt);
+    di1=convFactoryPSingP(Di1,Qt);
   }
-  p_Delete(&di1,Qt);
-  di1=convFactoryPSingP(Di1,Qt);
 #endif
   p_Write(di1,Qt);
   int mu=0;
