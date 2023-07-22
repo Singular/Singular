@@ -145,8 +145,8 @@ static proc partSum(scheme X, int i, int lower, int upper, ideal S)
     {
           I=X.maps[i][l].dom;
           def L=sat(S,I);
-          result=result+vdim(L[1]);
-          result=result-partSum(X,i,l+1,upper,L[1]);
+          result=result+vdim(L);
+          result=result-partSum(X,i,l+1,upper,L);
           l=l+1;
           kill L;
     }
@@ -211,8 +211,8 @@ EXAMPLE: example IntersectionNumber; shows an example"
                 ideal K=X.maps[l][k].dom;
                 def L=sat(Z.cover[l].value+X.cover[l].value,K);
                 kill K;
-                d=d-vdim(L[1]);
-                d=d+partSum(X,l,l+1,k-1,L[1]);
+                d=d-vdim(L);
+                d=d+partSum(X,l,l+1,k-1,L);
                 k=k+1;
                 kill L;
             }
@@ -513,7 +513,7 @@ static proc equalChartmap(chartmap phi, chartmap psi)
       for(j=1; j<=size(phi.ratFuncs[i]); j=j+1)
       {
          poly f=phi.ratFuncs[i][j].num*psi.ratFuncs[i][j].den-psi.ratFuncs[i][j].num*phi.ratFuncs[i][j].den;
-         if(std(reduce(f,sat(phi.preim.value,ideal(phi.dom[i]))[1]))!=0)
+         if(std(reduce(f,sat(phi.preim.value,ideal(phi.dom[i]))))!=0)
          {
             setring R;
             return(0);
@@ -1831,7 +1831,7 @@ EXAMPLE: example ChartmapCompIdeal; creates an example"
       poly tmp=phi.dom[i];
       setring S;
       if (S!=domR) { poly tmp=fetch(domR,tmp);}
-      II=sat(II.value,tmp)[1];
+      II=sat(II.value,tmp);
       kill tmp;
       L[i]=II;
       if (S!=domR) { setring domR;kill tmp;setring S;}
@@ -2526,7 +2526,7 @@ EXAMPLE: example blowUp;  shows an example
                I=I+ideal(J[j]*y(k)-J[k]);
             }
          }
-         U.value=sat(I,ideal(J[j]))[1];
+         U.value=sat(I,ideal(J[j]));
          phi.preim=U;
          Bcover=Bcover+list(U);
          maps=maps+list(list(phi,i,j));
@@ -2582,7 +2582,7 @@ EXAMPLE: example blowUp;  shows an example
             {
                facts=list();
                f=psi.dom[k];
-               e=sat(C.cover[r].value,ideal(f))[2];
+               e=sat_with_exp(C.cover[r].value,ideal(f))[2];
                setring SS;
                for(l=1; l<=size(C.cover[s].value); l=l+1)
                {
@@ -2793,7 +2793,7 @@ EXAMPLE: example strictTransform, shows an example"
 
          ideal E=pi.exDiv.cover[k].value;
 
-         J=sat(J,E)[1];
+         J=sat(J,E);
          chart U=J;
          result.cover=result.cover+list(U);
 

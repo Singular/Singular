@@ -169,7 +169,7 @@ EXAMPLE: example PrimdecA; shows an example
   ////////////////////////////////////////////////////////////////
   for(@i=1;@i<=sizeSp;@i++)
   {
-    pprimary=pprimary+list(sat(@N,sp[@i]));
+    pprimary=pprimary+list(sat_with_exp(@N,sp[@i]));
     rest=rest+sp[@i]^pprimary[@i][2];
   }
   list result;           // a primary decomposition of @N
@@ -229,7 +229,7 @@ EXAMPLE: example PrimdecB; shows an example
 
     setring BAS;
     poly @q=imap(Rloc, @q);
-    list satu=sat(@N,@q);
+    list satu=sat_with_exp(@N,@q);
     if(satu[2]==0)
     {
       return(list(list(@N,ideal(0))));
@@ -325,7 +325,7 @@ EXAMPLE: example PrimdecB; shows an example
   {
     list satu = minSatMod(@N,@f);
     return(list(list(satu[1],isoPrim))+ PrimdecA(@N+satu[2]*@M));
-    //    list satu = sat(@N,@f);
+    //    list satu = sat_with_exp(@N,@f);
     //return(list(list(satu[1],isoPrim))+ PrimdecA(@N+@f^satu[2]*@M));
   }
   else
@@ -405,13 +405,13 @@ EXAMPLE: example modDec; shows an example
   tempList=list();
   for(@i=1;@i<=sizePrim;@i++)     // compute sat(N,f), for all separators f
   {
-    tempList=tempList+list(sat(@N,sepPrimes[@i])[1]);
+    tempList=tempList+list(sat(@N,sepPrimes[@i]));
   }
   module testMod;
   @k=0;
   for(@i=1;@i<=sizePrim;@i++)
   {
-    testMod=sat(tempList[@i],prim[@i-@k][2])[1];  // computes sat(sat(N,f),p)
+    testMod=sat(tempList[@i],prim[@i-@k][2]);  // computes sat(sat(N,f),p)
     if (size(NF(testMod,std(tempList[@i]),1))==0) // tests if equal to sat(N,f)
     {
       prim=delete(prim,@i-@k);                    // if yes: the component
@@ -639,7 +639,7 @@ EXAMPLE: example GTZmod; shows an example
 
     setring BAS;
     poly @q=imap(Rloc, @q);
-    list satu=sat(@N,@q);
+    list satu=sat_with_exp(@N,@q);
     if(satu[2]==0)
     {
       return(list(list(@N,ideal(0))));
@@ -690,7 +690,7 @@ EXAMPLE: example GTZmod; shows an example
     setring BAS;
     poly @q=imap(Rloc,@q);
     kill Rloc;
-    @q=@q^sat(@N,@q)[2];
+    @q=@q^sat_with_exp(@N,@q)[2];
     if (deg(@q)>0)
     {
       return(GTZmod(@N+@q*@M,check));
@@ -718,11 +718,11 @@ EXAMPLE: example GTZmod; shows an example
   kill Rloc;
   for(@k=1;@k<=size(qprim);@k++)
   {
-    qprim[@k]=list(sat(qprim[@k][1],@p[@k][1])[1],
-                   sat(qprim[@k][2],@p[@k][2])[1]);
+    qprim[@k]=list(sat(qprim[@k][1],@p[@k][1]),
+                   sat(qprim[@k][2],@p[@k][2]));
     check=intersect(check,qprim[@k][1]);
   }
-  @q=@q^sat(@N,@q)[2];
+  @q=@q^sat_with_exp(@N,@q)[2];
   if (deg(@q)>0)
   {
     qprim=qprim+GTZmod(@N+@q*@M,check);
@@ -1058,7 +1058,7 @@ static proc sp2(module @N,  poly p, list #)
   {
     ideal splitPrime=ann;
   }
-  list fact=sat(@N, p);
+  list fact=sat_with_exp(@N, p);
   list splitList;
   ideal splitAnn, prim, tempPrime;
   if (fact[2]>0)
@@ -1430,7 +1430,7 @@ EXAMPLE: example GTZmod; shows an example
 
    setring BAS;
    poly @q=imap(Rloc, @q);
-   list satu=sat(@N,@q);
+   list satu=sat_with_exp(@N,@q);
 
    if(satu[2]==0)
    {
@@ -1597,7 +1597,7 @@ EXAMPLE: example GTZmod; shows an example
         check=imap(Rloc,check);
         @h=imap(Rloc,@h2);
         @q=minSatMod(imap(BAS,@N),@h)[2];
-        // @q=imap(Rloc,pp)^sat(imap(BAS,@N),imap(Rloc,pp))[2];
+        // @q=imap(Rloc,pp)^sat_with_exp(imap(BAS,@N),imap(Rloc,pp))[2];
         kill Rloc;
         if (deg(@q)>0)
         {
@@ -1629,8 +1629,8 @@ EXAMPLE: example GTZmod; shows an example
         kill Rloc;
         for(@k3=1;@k3<=size(primary);@k3++)
         {
-          primary[@k3]=list(sat(primary[@k3][1],@p[@k3][1])[1],
-                            sat(primary[@k3][2],@p[@k3][2])[1]);
+          primary[@k3]=list(sat(primary[@k3][1],@p[@k3][1]),
+                            sat(primary[@k3][2],@p[@k3][2]));
           check=intersect(check,primary[@k3][1]);
         }
         @q=minSatMod(imap(BAS,@N),@h)[2];
@@ -1972,7 +1972,7 @@ example
 static proc minSatMod(module Nnew, ideal @h)
 "USAGE:   minSatMod(N, I); module N, ideal I
 RETURN:  list with 2 elements:
-         [1]=sat(N,product(I))[1],
+         [1]=sat(N,product(I)),
          [2]=p, the polynomial of minimal degree s.th. [1]=quotient(N,p)
 EXAMPLE: example minSatMod; shows an example
 "

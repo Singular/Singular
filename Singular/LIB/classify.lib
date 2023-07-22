@@ -784,14 +784,14 @@ static proc Funktion58 (poly fin, list cstn)
     kz   = 3;     // Koordinate z
     B    = maxideal(1);     // ideal fuer Abbildungen
     Jf3  = jacob(f3);
-    S    = sat(Jf3, maxideal(1))[1];
+    S    = sat(Jf3, maxideal(1));
     J1   = diff(S[1], x(kx)), diff(S[1], x(ky)), diff(S[1], x(kz)),
            diff(S[2], x(kx)), diff(S[2], x(ky)), diff(S[2], x(kz));
     M    = J1;
     J2   = minor(M, 2), S;
 
     //------------------ determine coordinate named 'x' -----------------------
-    S  = sat(J2, maxideal(1))[1];
+    S  = sat(J2, maxideal(1));
     J1 = Coeff(S[1], x(1), x(1)), Coeff(S[1], x(2), x(2)),
           Coeff(S[1], x(3), x(3)), Coeff(S[2], x(1), x(1)),
           Coeff(S[2], x(2), x(2)), Coeff(S[2], x(3), x(3));

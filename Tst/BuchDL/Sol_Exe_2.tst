@@ -38,7 +38,7 @@ ideal J = homog(I,w);            // generators are homogenized
 size(reduce(J,groebner(Ih),1));  // J is contained in Ih
 size(reduce(Ih,groebner(J),1));  // Ih is not contained in J
 if (not(defined(sat))){ LIB "elim.lib"; }
-ideal Iinf = sat(J,Ih)[1];
+ideal Iinf = sat(J,Ih);
 Iinf;
 
 

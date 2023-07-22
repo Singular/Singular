@@ -1546,6 +1546,19 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
+/*==================== sat =================*/
+    if(strcmp(sys_cmd,"sat")==0)
+    {
+      ideal I= (ideal)h->Data();
+      ideal J=(ideal)h->next->Data();
+      int k;
+      ideal S=idSaturate(I,J,k,h->Typ()==IDEAL_CMD);
+      res->rtyp=h->Typ();
+      res->data=(void*)S;
+      setFlag(res,FLAG_STD);
+      return FALSE;
+    }
+    else
   /*==================== walk stuff =================*/
   /*==================== walkNextWeight =================*/
   #ifdef HAVE_WALK
@@ -4091,7 +4104,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== sat =================*/
-    if(strcmp(sys_cmd,"sat")==0)
+#if 0
+    if(strcmp(sys_cmd,"sat_with_exp")==0)
     {
       ideal I= (ideal)h->Data();
       ideal J=(ideal)h->next->Data();
@@ -4107,6 +4121,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif    
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

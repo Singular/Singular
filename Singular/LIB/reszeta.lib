@@ -551,7 +551,7 @@ static proc countEijk(list re,list iden,intvec iv,list #)
       }
       otherId=std(otherId);
 //--- do not count each point more than once
-      interId=sat(interId,otherId)[1];
+      interId=sat(interId,otherId);
       export(interId);
       if(dim(interId)>0)
       {
@@ -658,7 +658,7 @@ static proc chiEij(list re, list iden, intvec iv)
         kill tempId;
      }
 //--- only consider new components in interId
-     interId=sat(interId,doneId)[1];
+     interId=sat(interId,doneId);
      if(dim(interId)>1)
      {
        ERROR("genus_Eij: higher dimensional intersection");
@@ -804,7 +804,7 @@ static proc chiEij_local(list re, list iden, intvec iv)
         kill tempId;
      }
 //--- only consider new components in interId
-     interId=sat(interId,doneId)[1];
+     interId=sat(interId,doneId);
      if(dim(interId)>1)
      {
        ERROR("genus_Eij: higher dimensional intersection");
@@ -1339,7 +1339,7 @@ static proc computeChiE_local(list re, list iden)
             kill tempId;
          }
 //--- drop components which have already been dealt with
-         interId=sat(interId,doneId)[1];
+         interId=sat(interId,doneId);
          list pr=minAssGTZ(interId);
          myPts=std(interId+doneId);
          for(k=1;k<=size(pr);k++)
@@ -1353,7 +1353,7 @@ static proc computeChiE_local(list re, list iden)
               chi_E[i][1]=chi_E[i][1]+(2-2*genus(pr[k]));
            }
          }
-         myPts=sat(myPts,donePts)[1];
+         myPts=sat(myPts,donePts);
          chi_E[i][1]=chi_E[i][1]-vdim(myPts);
       }
    }
@@ -2344,7 +2344,7 @@ static proc decompEinX(list BO)
       I=BO[4][i]+BO[2];
       for(j=i+1;j<=size(BO[4]);j++)
       {
-         sa=sat(I,BO[4][j]+BO[2]);
+         sa=sat_with_exp(I,BO[4][j]+BO[2]);
          if(sa[2])
          {
            I=sa[1];
@@ -2979,7 +2979,7 @@ static proc abstractNC(list BO)
             flag=1;break;
          }
 //--- drop previously considered exceptional divisors from the current one
-         J=sat(J,L[k])[1];
+         J=sat(J,L[k]);
          if(deg(std(J)[1])==0)
          {
 //--- nothing remaining
@@ -3640,10 +3640,10 @@ static proc addSelfInter(list re,intmat Inters,list iden,list iden0,intvec endiv
         {
            for(b=1;b<=size(dcE[a]);b++)
            {
-              Ftemp=sat(Ftemp,dcE[a][b][1])[1];
+              Ftemp=sat(Ftemp,dcE[a][b][1]);
            }
         }
-        F=sat(F,Ftemp)[1];
+        F=sat(F,Ftemp);
         Flist[1]=Ftemp;
         Ftemp=1;
         list pr=primdecGTZ(F);
@@ -3765,7 +3765,7 @@ static proc addSelfInter(list re,intmat Inters,list iden,list iden0,intvec endiv
            doneId=intersect(doneId,tempId);
            str="interId="+interList[1]+";";
            execute(str);
-           interId=sat(interId,doneId)[1];
+           interId=sat(interId,doneId);
            interList[1]=string(interId);
         }
         interId=std(interId);
@@ -4243,7 +4243,7 @@ EXAMPLE:  example collectDiv;   shows an example
 //--- there were saved centers
                    while((k<=size(transBO[10])) & (savedCent==0))
                    {
-                      tempsat=sat(transBO[10][k][1],BO[4][size(BO[4])]);
+                      tempsat=sat_with_exp(transBO[10][k][1],BO[4][size(BO[4])]);
                       if(deg(tempsat[1][1])!=0)
                       {
 //--- saved center can be seen in this affine chart
@@ -5335,8 +5335,8 @@ proc fetchInTree(list L,
       for(m=1;m<=size(idlist);m++)
       {
 //--- get rid of new exceptional divisor
-         idlist[m][1]=sat(idlist[m][1]+BO[1],BO[4][size(BO[4])])[1];
-         idlist[m][2]=sat(idlist[m][2],BO[4][size(BO[4])])[1];
+         idlist[m][1]=sat(idlist[m][1]+BO[1],BO[4][size(BO[4])]);
+         idlist[m][2]=sat(idlist[m][2],BO[4][size(BO[4])]);
       }
       if(defined(debug_fetchInTree)>0)
       {

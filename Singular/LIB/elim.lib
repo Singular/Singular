@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version elim.lib 4.3.2.3 Jun_2023 "; // $Id$
+version="version elim.lib 4.3.2.5 Jul_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -12,6 +12,7 @@ PROCEDURES:
  elim2(id,..)         variables .. eliminated from id (different algorithm)
  nselect(id,v)        select generators not containing variables given by v
  sat(id,j)            saturated quotient of ideal/module id by ideal j
+ sat_with_exp(id,j)   saturated quotient of ideal/module id by ideal j with exponent
  select(id,v)         select generators containing all variables given by v
  select1(id,v)        select generators containing one variable given by v
            (parameters in square brackets [] are optional)
@@ -715,17 +716,33 @@ example
 
 proc sat (def id, ideal j)
 "USAGE:   sat(id,j);  id=ideal/module, j=ideal
+RETURN:  ideal/module
+         saturation of id with respect to j (= union_(k=1...) of id:j^k)
+NOTE:    result is a standard basis in the basering
+KEYWORDS: saturation
+SEE ALSO: modSat; sat_with_exp
+EXAMPLE: example sat; shows an example
+"{
+   return(system("sat",id,j));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r     = 2,(x,y,z),dp;
+   poly F     = x5+y5+(x-y)^2*xyz;
+   ideal j    = jacob(F);
+   sat(j,maxideal(1));
+   sat(j,maxideal(2));
+}
+proc sat_with_exp (def id, ideal j)
+"USAGE:   sat(id,j);  id=ideal/module, j=ideal
 RETURN:  list of an ideal/module [1] and an integer [2]:
          [1] = saturation of id with respect to j (= union_(k=1...) of id:j^k)
          [2] = saturation exponent (= min( k | id:j^k = id:j^(k+1) ))
 NOTE:    [1] is a standard basis in the basering
-DISPLAY: saturation exponent during computation if printlevel >=1
 KEYWORDS: saturation
-SEE ALSO: modSat
-EXAMPLE: example sat; shows an example
+SEE ALSO: modSat; sat
+EXAMPLE: example sat_with_exp; shows an example
 "{
-   return(system("sat",id,j));
-   /*
    int ii,kk;
    def i=id;
    if (!attrib(id,"isSB")) { id=std(id);}
@@ -744,18 +761,14 @@ EXAMPLE: example sat; shows an example
    dbprint(p,"// saturation becomes stable after "+string(kk-1)+" iteration(s)","");
    list L = id,kk-1;
    return (L);
-   */
 }
 example
 { "EXAMPLE:"; echo = 2;
-   int p      = printlevel;
    ring r     = 2,(x,y,z),dp;
    poly F     = x5+y5+(x-y)^2*xyz;
    ideal j    = jacob(F);
    sat(j,maxideal(1));
-   printlevel = 2;
    sat(j,maxideal(2));
-   printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -253,8 +253,8 @@ if (not(defined(randomid))){ LIB "random.lib"; }
 def f(1),f(2) = randomid(Adj_LS_3,2,10);
 ideal I(1) = f(1),C;
 ideal I(2) = f(2),C;
-ideal B(1) = sat(I(1),I)[1];
-ideal B(2) = sat(I(2),I)[1];
+ideal B(1) = sat(I(1),I);
+ideal B(2) = sat(I(2),I);
 
 Adj_S = intersect(Adj_S,B(1),B(2));
 option(redSB);
@@ -262,7 +262,7 @@ ideal L' = jet(std(Adj_S),4);
 L' = simplify(L',6);
 poly f' =  randomid(L',1,10)[1];
 ideal I' = f',C;
-ideal B(3) = sat(I',L')[1];
+ideal B(3) = sat(I',L');
 
 ideal L'' = jet(std(intersect(Adj_LS_3,B(3))),3);
 L'' = simplify(L'',6);  L'';
@@ -273,7 +273,7 @@ poly f'' = imap(R,f''(1)) + t*imap(R,f''(2));
 ideal I_t = f'', imap(R,C);
 I_t = std(I_t);
 ideal L'' = imap(R,L'');
-I_t = sat(I_t,L'')[1];
+I_t = sat(I_t,L'');
 I_t = std(subst(I_t,z,1));
 def phi_x = reduce(x,I_t);  phi_x;
 def phi_y = reduce(y,I_t);  phi_y;

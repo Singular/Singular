@@ -1886,7 +1886,7 @@ static proc exHom1()
   option(redSB);
   option(redTail);
   ideal L = groebner(J); //(K);
-  ideal LL = sat(L,ideal(h))[1];
+  ideal LL = sat(L,ideal(h));
   ideal M = subst(LL,h,1);
   M = simplify(M,2);
   setring U;

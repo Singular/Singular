@@ -1118,7 +1118,7 @@ EXAMPLE:  example DsingularLocus; shows examples
     IDD[i] = var(i+n);
   }
   dbprint(ppl  ,"// Computing saturation...");
-  ideal S = sat(charVar,IDD)[1];
+  ideal S = sat(charVar,IDD);
   dbprint(ppl  ,"// ...done");
   dbprint(ppl-1,"// " + string(S));
   dbprint(ppl  ,"// Computing elimination...");

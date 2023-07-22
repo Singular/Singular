@@ -81,8 +81,8 @@ EXAMPLE: example RiemannRochBN; shows an example
   I = D.num;
   J = D.den;
   // compute a set of minimal generators
-  //I = minbase(sat(I,maxideal(1))[1]);
-  //J = minbase(sat(J,maxideal(1))[1]);
+  //I = minbase(sat(I,maxideal(1)));
+  //J = minbase(sat(J,maxideal(1)));
 
   list degI;
 
@@ -105,7 +105,7 @@ EXAMPLE: example RiemannRochBN; shows an example
   int n = deg(F[1]);
 
   // compute the residual divisor
-  ideal Iresidual = quotient((sat(ideal(F),maxideal(1)))[1],I);
+  ideal Iresidual = quotient((sat(ideal(F),maxideal(1))),I);
   ideal IH = intersect(Iresidual,J);
   IH = minbase(truncate1(IH,n));
 

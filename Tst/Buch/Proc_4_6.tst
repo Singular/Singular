@@ -230,10 +230,10 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
 //---compute the intersection of ra with BAS
    for(k=1;k<=size(ra);k++)
    {
-     ra[k]=list(sat(ra[k][1],p[k][1])[1],
-                sat(ra[k][2],p[k][2])[1]);
+     ra[k]=list(sat(ra[k][1],p[k][1]),
+                sat(ra[k][2],p[k][2]));
    }
-   q=q^sat(i,q)[2];
+   q=q^sat_with_exp(i,q)[2];
 
 //---i=intersection((i:q),(i,q)) and ra is the primary
 //   decomposition of i:q
@@ -292,7 +292,7 @@ RETURN:  list l of two ideals such that intersetion(l[1],
    ideal eq=imap(quring,eq);
    kill quring;
 //-----compute the intersection of eq with BAS
-   eq=sat(eq,p)[1];
+   eq=sat(eq,p);
 
    SBi=std(quotient(i,eq));
 
@@ -380,7 +380,7 @@ NOTE:    algorithm of Krick/Logar
    ideal ra=imap(quring,ra);
    kill quring;
 //-----compute the intersection of ra with BAS
-   ra=sat(ra,p)[1];
+   ra=sat(ra,p);
 //----now we have radical(i)=intersection(ra,radical((i,q)))
    return(intersect(ra,radical(i+q)));
 }

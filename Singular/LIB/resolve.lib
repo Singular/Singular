@@ -765,7 +765,7 @@ EXAMPLE: example blowUpBO;  shows an example
    if(haveCenters){list kN=imap(R,knownCenters);}
 
 //---  the strict transform of the exceptional divisors
-   for(j=1;j<size(E1);j++){E1[j]=sat(E1[j]+W,E)[1];}
+   for(j=1;j<size(E1);j++){E1[j]=sat(E1[j]+W,E);}
 //---  the intersection matrix of the exceptional divisors
    matrix intEold=imap(R,intE);
    matrix intE[size(E1)][size(E1)];
@@ -858,7 +858,7 @@ EXAMPLE: example blowUpBO;  shows an example
         laM=psi(laM);
      }
      Jsub=B[2];
-     B[2]=sat(Jsub,std(psi(E)))[1];
+     B[2]=sat(Jsub,std(psi(E)));
      if(!defined(MAtmp)){ideal MAtmp=MA;}
      MAtmp[i+1]=0;
      JJ=std(B[2]+MAtmp);
@@ -1173,7 +1173,7 @@ EXAMPLE: example blowUpBO;  shows an example
               tt=std(BO[10][j][1]);
               if(deg(tt[1])>0)
               {
-                tt=sat(tt,BO[4][size(BO[4])])[1];
+                tt=sat(tt,BO[4][size(BO[4])]);
               }
               if((deg(tt[1])>0)&&(deg(std(tt+BO[2]+BO[1])[1])>0))
               {
@@ -1767,7 +1767,7 @@ EXAMPLE: example Delta;  shows an example
 //--- everything should live in W, not just in the intersection of
 //--- D(m) with W
       C=C+W;
-      C=sat(C,m)[1];
+      C=sat(C,m);
 //--- intersect ideal with previously computed ones to make sure that no
 //--- components are lost
       D=intersect(D,C);
@@ -2239,7 +2239,7 @@ proc CenterTail(list BM, ideal C)
   list satList;
   for(i=1;i<=size(BM[4]);i++)
   {
-     satList=sat(M,BM[4][i]);
+     satList=sat_with_exp(M,BM[4][i]);
      satex[i]=satList[2];
      M=satList[1];
   }
@@ -2720,12 +2720,12 @@ EXAMPLE: example CenterBO;  shows an example
                                       // is unnecessary
    }
 //--- to switch off DropCoeff, set Idropped=1;
-   BO1[2]=sat(BO1[2],Idropped)[1];
+   BO1[2]=sat(BO1[2],Idropped);
    if(deg(BO1[2][1])==0)
    {
 //--- Coeff ideal is trivial
      C1=radical(C1);
-     ideal C2=sat(C1,Idropped)[1];
+     ideal C2=sat(C1,Idropped);
      if(deg(std(C2)[1])!=0)
      {
         C1=C2;
@@ -2737,7 +2737,7 @@ EXAMPLE: example CenterBO;  shows an example
        int bo17save=BO1[7][1];
        BOtemp[7]=0;
        BO1=Coeff(BOtemp,b,int(0));
-       BO1[2]=sat(BO1[2],Idropped)[1];
+       BO1[2]=sat(BO1[2],Idropped);
        if(deg(std(BO1[2])[1])==0)
        {
 //--- there is really nothing left to do for the Coeff ideal
@@ -2780,7 +2780,7 @@ EXAMPLE: example CenterBO;  shows an example
        {
          if(deg(std(BO1[4][aa])[1])==0){aa++;continue;}
          if(defined(satlist)){kill satlist;}
-         list satlist=sat(BO1[2],BO1[4][aa]+BO1[1]);
+         list satlist=sat_with_exp(BO1[2],BO1[4][aa]+BO1[1]);
          if(deg(std(satlist[1])[1])==0)
          {
             coeff_invar++;
@@ -3168,7 +3168,7 @@ static proc SpecialCoeff(list BO,int b,poly f)
    {
       BO[6][i]=0;             // reset intersection indicator
       BO[4][i]=BO[4][i]+Z;    // intersect the E_i
-      BO[2]=sat(BO[2],BO[4][i]+BO[1])[1];
+      BO[2]=sat(BO[2],BO[4][i]+BO[1]);
                               // "strict transform" of J w.r.t E, not "total"
    }
    return(BO);
@@ -3199,7 +3199,7 @@ static proc DropCoeff(list BO)
         i++;
         continue;
      }
-     Itemp=sat(I,pr[i])[1];
+     Itemp=sat(I,pr[i]);
      if(deg(std(Itemp+pr[i])[1])!=0)
      {
 //--- this component is not disjoint from the other ones ===> we still need it
@@ -3745,7 +3745,7 @@ EXAMPLE: example Coeff;    shows an example
       BO[4][i]=BO[4][i]+Z;    // intersect the E_i
       if(i<=ma)
       {
-        BO[2]=sat(BO[2],BO[4][i]+BO[1])[1];
+        BO[2]=sat(BO[2],BO[4][i]+BO[1]);
                        // "strict transform" of J w.r.t E, not "total"
       }
    }
@@ -4758,11 +4758,11 @@ static proc testRes(ideal J,list L,int loca)
       {
          if(deg(E[j][1])>0)
          {
-            stTK=sat(stTK,E[j])[1];
+            stTK=sat(stTK,E[j]);
          }
          if(loca)
          {
-            stTM=sat(stTM,E[j])[1];
+            stTM=sat(stTM,E[j]);
          }
       }
       ideal sL=slocusE(J);

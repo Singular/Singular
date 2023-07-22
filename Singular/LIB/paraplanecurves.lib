@@ -149,8 +149,8 @@ EXAMPLE: example invertBirMap; shows an example
    ideal xv = mi[1..n];
    ideal yv  = mi[n+1..n+m];
    matrix HM[2][m] = concat(transpose(yv),transpose(phi));
-   ideal graph = sat(I+minor(HM,2),phi)[1];
-   graph = sat(graph,xv)[1];
+   ideal graph = sat(I+minor(HM,2),phi);
+   graph = sat(graph,xv);
    intvec Hgraph = hilb(graph,1);
    setring Roriginal;
    rl[3]= list(list("dp",1:n),list("dp",1:m),list("C",0));
@@ -644,7 +644,7 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
     else
     { AI = adjointIdealIQ(f,insert(choices,ideal(0),size(choices))); }
     AI = homog(std(AI),var(3));
-    AI = sat(AI, maxideal(1))[1];
+    AI = sat(AI, maxideal(1));
     AI = minbase(AI);
     setring Roriginal;
     return(imap(RP2,AI));
@@ -714,7 +714,7 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
       {
         if(deg(A[j]>(n-2)))
         {
-          A = sat(A, maxideal(1))[1];
+          A = sat(A, maxideal(1));
           break;
         }
         j = j+1;
@@ -726,7 +726,7 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   B = intersect(B,homog(std(LL4),var(3)));  // add nodes and cusps
   if(sizeLL2==0)  // ordinary multiple points plus cusps only
   {
-    ideal AI = sat(B, maxideal(1))[1];
+    ideal AI = sat(B, maxideal(1));
     AI = minbase(AI);
     setring Roriginal;
     return(imap(RP2,AI));
@@ -734,12 +734,12 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   setring Rdummy;
   poly f = imap(RP2,dhf);
   ideal SL = jacob(f),f;
-  SL = sat(SL, fetch(RP2,LL4))[1];
+  SL = sat(SL, fetch(RP2,LL4));
   if(sizeLL3!=0)
   {
     for(k=lb;k<=ub;k++)
     {
-      SL = sat(SL, A(k))[1];
+      SL = sat(SL, A(k));
     }
   }
   list PD = primdecGTZ(SL);  // could be made faster -- see minAssGTZ
@@ -763,7 +763,7 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   }
   AI = homog(std(AI),var(3));
   AI = intersect(AI,B);
-  AI = sat(AI, maxideal(1))[1];
+  AI = sat(AI, maxideal(1));
   AI = minbase(AI);
   setring Roriginal;
   return(imap(RP2,AI));
@@ -1420,7 +1420,7 @@ SEE ALSO: genus
    }
    cusps=vdim(radID)-iglob;
 
-   ideal NodesPlusCusps  = radical(sat(I+I1, radIDsing)[1]);
+   ideal NodesPlusCusps  = radical(sat(I+I1, radIDsing));
 
    nsing=nsing+cusps;
 

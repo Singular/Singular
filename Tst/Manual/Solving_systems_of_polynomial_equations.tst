@@ -20,7 +20,7 @@ vdim(si);
 // to compute equations for the non-zero solutions:
 option(redSB);
 ideal maxI=maxideal(1);
-ideal j=sat(si,maxI)[1];  // output is Groebner basis
+ideal j=sat(si,maxI);  // output is Groebner basis
 vdim(j);                  // number of non-zero solutions (with mult's)
 //
 // We compute a triangular decomposition for the ideal I. This requires first

@@ -21,5 +21,5 @@ J;
 ideal H=std(I);
 H;
 LIB "elim.lib";
-sat(H,xyz);
+sat_with_exp(H,xyz);
 tst_status(1);$

@@ -515,7 +515,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                   // Negative exponent case
                   fNew2 = negExp(fNew1, c1, slN);
                 }
-                fNew2= sat(ideal(fNew2), var(1))[1][1];
+                fNew2= sat(ideal(fNew2), var(1))[1];
 
                 if(maxDeg > 0)
                 {
@@ -671,7 +671,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                 {
                   poly fNew2 = negExp(fNew1, newA, slN);
                 }
-                fNew2= sat(ideal(fNew2), var(1))[1][1];
+                fNew2= sat(ideal(fNew2), var(1))[1];
                 if(maxDeg > 0)
                 {
                   newMaxDeg = maxDeg * slD - slN;
@@ -898,7 +898,7 @@ static proc negExp(poly fNew1, poly c1, int slN)
     f4 = f4 + f4T;
     f3Temp = f3Temp - leadP;
   }
-  f4 = sat(ideal(f4), var(1))[1][1];
+  f4 = sat(ideal(f4), var(1))[1];
   return(f4);
 }
 

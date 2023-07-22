@@ -929,7 +929,7 @@ EXAMPLE: example triangMH; shows an example
         if (lcr <> 0)             // d.h. (H):lcr <> (1)
         {
               dbprint(string(timer)+" S"+s+"L"+string(m-l-k)+": Berechnung Saturation.");
-            G2 = sat(H,lcr)[1];     // Saturation statt Idealquotient.
+            G2 = sat(H,lcr);     // Saturation statt Idealquotient.
             attrib(G2,"isSB",1);
 
             if (G2[1] <> 1)

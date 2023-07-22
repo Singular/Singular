@@ -4541,7 +4541,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   i=i+m; // if a field extension was necessary, then i has to be extended by m
   for (jj=anzahlvariablen-1;jj>=1;jj--)  // the variable t is the last one !!!
   {
-    I=sat(ideal(var(jj)+i),t)[1];
+    I=sat(ideal(var(jj)+i),t);
     LI=subst(I,var(nvars(basering)),0);
     //size(deletedvariables)=anzahlvariablen(before elim.)
     for (kk=1;kk<=size(deletedvariables)-1;kk++)
@@ -6045,7 +6045,7 @@ NOTE:    - the procedure is called from inside the recursive
 */
     if (size(i)-size(m)!=1)
     {
-      I=reduce(sat(std(ideal(var(lastvar)+i)),t)[1],std(m)); // get rid of the minimal
+      I=reduce(sat(std(ideal(var(lastvar)+i)),t),std(m)); // get rid of the minimal
                                                              // polynomial for the test
     }
     else
@@ -6120,7 +6120,7 @@ NOTE:    - the procedure is called from inside the recursive
     }
     else
     {
-      i=std(sat(i,var(lastvar))[1]);
+      i=std(sat(i,var(lastvar)));
     }
     I=reduce(i,std(m)); // "remove" m from i
     // test first, if i still is in the ideal <t,x_1,...,x_n> -- if not, then
@@ -6176,7 +6176,7 @@ NOTE:    - the procedure is called from inside the recursive
     ideal variablen; // will contain the variables which are not eliminated
     for (j=anzahlvariablen-1;j>=1;j--)  // the variable t is the last one !!!
     {
-      I=sat(ideal(std(var(j)+i)),t)[1];
+      I=sat(ideal(std(var(j)+i)),t);
       LI=subst(I,var(nvars(basering)),0);
       //size(deletedvariables)=anzahlvariablen-1(before elimination)
       for (k=1;k<=size(deletedvariables);k++)

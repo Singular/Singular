@@ -1021,7 +1021,7 @@ ASSUME:  i is a homogeneous ideal of the basering S=K[x(0)..x(n)].
                and -1 is returned.
 THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
-         ideals i and isat=sat(i,maxideal(1))[1] coincide.
+         ideals i and isat=sat(i,maxideal(1)) coincide.
 NOTE:    If printlevel > 0 (default = 0), dim(S/i) is also displayed.
 EXAMPLE: example satiety; shows some examples
 "

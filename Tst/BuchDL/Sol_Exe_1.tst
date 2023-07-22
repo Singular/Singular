@@ -143,7 +143,7 @@ nvars(P4) - dim(groebner(slocus(VP4)));
 
 if(not(defined(sat))){ LIB "elim.lib"; // loads random.lib, too }
 ideal CI1 = randomid(VP4,2,100);
-ideal QES = sat(CI1,VP4)[1];
+ideal QES = sat(CI1,VP4);
 resolution FQES = mres(QES,0);
 print(betti(FQES),"betti");
 // ---------- Check Smoothness ------------
@@ -162,7 +162,7 @@ nvars(P5) - dim(groebner(slocus(CS)));
 //-> 6
 // ----------------------------------------
 ideal CI2 = matrix(CS)*randommat(3,2,maxideal(1),100);
-ideal B = sat(CI2,CS)[1];
+ideal B = sat(CI2,CS);
 print(betti(list(B)),"betti");
 
 setring P5;

@@ -14,7 +14,7 @@
   // just the ideal quotient, the second the iterated ideal quotient
   // or saturation. In our case both is the same.
   ideal q = quotient(j,ideal(f));     // ideal quotient
-  ideal qsat = sat(j,f)[1];           // saturation, proc from elim.lib
+  ideal qsat = sat(j,f);              // saturation, proc from elim.lib
   ideal sq = std(q);
   dim(sq);
   // 1-dimensional, hence
@@ -49,7 +49,7 @@
   dim(std(j));                        // V(j), projective 1-dimensional
   dim(std(j+ideal(f)));               // V(j,f) also projective 1-dimensional
   ideal q = quotient(j,ideal(f));
-  ideal qsat = sat(j,f)[1];           // saturation, proc from elim.lib
+  ideal qsat = sat(j,f);              // saturation, proc from elim.lib
   dim(std(qsat));
   // projective 1-dimensional, hence q and/or qsat define the projective
   // polar curve. In this case, q and qsat are not the same, we needed

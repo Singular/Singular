@@ -1388,7 +1388,7 @@ static proc pseudo_primdecZM(module N)
    }
    for(i=1;i<=size(B);i++)
    {
-      L=sat(N,S[i]);
+      L=sat_with_exp(N,S[i]);
       K[i]=S[i]^L[2];
       R[i]=list(L[1],B[i]);
    }
@@ -1501,7 +1501,7 @@ static proc extractZM(list M, list L)
       ASSUME(1, size(fac)==ncols(fac) || size(fac)==0);
       for(i=1;i<=size(fac);i++)
       {
-         II=sat(I,fac[i]);
+         II=sat_with_exp(I,fac[i]);
           I=II[1];
           h=h*fac[i]^II[2];
       }

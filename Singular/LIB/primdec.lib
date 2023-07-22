@@ -4198,7 +4198,7 @@ EXAMPLE: example radicalEHV; shows an example
       return(I);
     }
 
-    I2=sat(I,radI1)[1];
+    I2=sat(I,radI1);
 
     if(deg(I2[1])<=0)
     {
@@ -6973,7 +6973,7 @@ static proc radicalSLIteration (ideal I, ideal P);
   {
     intvec oo=option(get);
     option(redSB);
-    ideal J = sat(I, P[k])[1];
+    ideal J = sat(I, P[k]);
     option(set,oo);
 
   }
@@ -8731,7 +8731,7 @@ static proc minAssSLIteration(ideal I, ideal P);
   dbprint (printlevel - voice, "// We found h = ", P[k]);
   dbprint (printlevel - voice, "// We calculate the saturation of I with respect to the element just founded.");
   ideal J;
-  if (P[k]==1) { J=I; } else { J= sat(I, P[k])[1];}
+  if (P[k]==1) { J=I; } else { J= sat(I, P[k]);}
 
   // Uses decomp from primdec, modified to avoid the recursion.
   // Debug

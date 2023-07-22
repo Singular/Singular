@@ -390,7 +390,7 @@ RETURN:  an integer, the satiety of i.
 ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
 THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
-         ideals i and isat=sat(i,maxideal(1))[1] coincide.
+         ideals i and isat=sat(i,maxideal(1)) coincide.
 KEYWORDS: saturation
 "
 {
@@ -478,7 +478,7 @@ RETURN:  an integer, the satiety of i.
 ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
 THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
-         ideals i and isat=sat(i,maxideal(1))[1] coincide.
+         ideals i and isat=sat(i,maxideal(1)) coincide.
 NOTE:    This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
 KEYWORDS: saturation
 "

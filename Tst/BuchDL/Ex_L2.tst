@@ -34,7 +34,7 @@ print(betti(singI,0),"betti");
 //->    ------------------
 //->    total:     1    24
 
-ideal singI_sat = sat(singI,maxideal(1))[1]; // from elim.lib
+ideal singI_sat = sat(singI,maxideal(1)); // from elim.lib
 print(betti(singI_sat,0),"betti");
 //->               0     1
 //->    ------------------
@@ -55,7 +55,7 @@ reduce(I,groebner(IL),1);
 //->   _[3]=0
 //->   _[4]=0
 
-ideal I' = sat(I,IL)[1];   // result is Groebner basis
+ideal I' = sat(I,IL);   // result is Groebner basis
 
 degree(GI);
 //->   // dimension (proj.)  = 1

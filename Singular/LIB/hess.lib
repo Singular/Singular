@@ -1625,8 +1625,8 @@ THEORY: We compute first the places corresponding to affine
     ideal I1,J1;
 
     // ideals corresponding to affine points on the curve (z=1)
-    I1 = sat(I,var(3))[1];
-    J1 = sat(J,var(3))[1];
+    I1 = sat(I,var(3));
+    J1 = sat(J,var(3));
     ideal Ifin = std(subst(I1,var(3),1));
     ideal Jfin = std(subst(J1,var(3),1));
 
@@ -1637,8 +1637,8 @@ THEORY: We compute first the places corresponding to affine
     list InfTmp;
     int d;
     ideal Iinf, Jinf;
-    Iinf = sat(I,I1)[1];
-    Jinf = sat(J,J1)[1];
+    Iinf = sat(I,I1);
+    Jinf = sat(J,J1);
 
     if (size(InfPlaces) == 0)
     {
@@ -1648,14 +1648,14 @@ THEORY: We compute first the places corresponding to affine
     {
       if(isIncluded(Iinf,InfPlaces[i][1]))
       {
-        d = sat(Iinf,InfPlaces[i][1])[2];
+        d = sat_with_exp(Iinf,InfPlaces[i][1])[2];
         InfTmp = powerFracIdeal(InfPlaces[i][2],d);
         InfPos = multiplyFracIdeals(InfPos,InfTmp);
 
       }
       if (isIncluded(Jinf,InfPlaces[i][1]))
       {
-        d = sat(Jinf,InfPlaces[i][1])[2];
+        d = sat_with_exp(Jinf,InfPlaces[i][1])[2];
         InfTmp = powerFracIdeal(InfPlaces[i][2],d);
         InfNeg = multiplyFracIdeals(InfNeg,InfTmp);
       }

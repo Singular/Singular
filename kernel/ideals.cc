@@ -3260,6 +3260,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   //}
   //---------------------------------------------------
   BOOLEAN only_vars=TRUE; // enabled for I:x_i
+  if (idElem(J)==1)
   {
     for(int j=IDELEMS(J)-1;j>=0;j--)
     {

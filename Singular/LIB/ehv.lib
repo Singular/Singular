@@ -549,7 +549,7 @@ EXAMPLE: example radEHV; shows an example"
 
   //...else remove the maximal dimensional components and
   //compute the radical K of the lower dimensional components ...
-  ideal K = radEHV(sat(I,J)[1],#);
+  ideal K = radEHV(sat(I,J),#);
 
   //..and intersect it with J.
   K = intersect(J,K);
@@ -1207,7 +1207,7 @@ EXAMPLE: example localize; shows an example"
     }
 
   //...and saturate I w.r.t. f.
-  I = sat(I,f)[1];
+  I = sat(I,f);
   return(I);
 }
 
@@ -1243,7 +1243,7 @@ EXAMPLE: example componentEHV; shows an example"
   ideal IP = groebner(localize(I,P,L));
 
   //...and compute the saturation of the localization w.r.t. P.
-  ideal IP2 = sat(IP,P)[1];
+  ideal IP2 = sat(IP,P);
 
   //As long as we have not found a primary component...
   int isPrimaryComponent = 0;

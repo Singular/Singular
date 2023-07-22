@@ -6,7 +6,7 @@ ideal I1=x5z3,xyz,yz4;
 ideal I2=z;
 
 LIB"elim.lib";
-sat(I1,I2)[1]; // 'rounds' may be undef.
+sat(I1,I2);
 
 int k;
 ideal J=quotient(I1,I2);

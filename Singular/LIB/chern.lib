@@ -3198,7 +3198,7 @@ NOTE:
   for(i=1;i<=n;i++)// for all i=1, ... n define J(j) as in 3.6 of the Aluffi's paper
   {
     // add a random general linear form in variables t@(1), ... , t@(n) to J(i-1)
-    J(i)=sat( random_hypersurf(J(i-1), T)   , T)[1]; // and saturate with respect to T
+    J(i)=sat( random_hypersurf(J(i-1), T)   , T); // and saturate with respect to T
   }
   poly prd=product(T); // compute the product of t@(i)
   poly cl;
@@ -3297,7 +3297,7 @@ NOTE:
   for(i=1;i<=n;i++)// for all i=1, ... n define J(j) as in 3.6 of the Aluffi's paper
   {
     // add a random general linear form in variables t@(1), ... , t@(n) to J(i-1)
-    J(i)=sat(   random_hypersurf(J(i-1), T)  , T)[1]; // and saturate with respect to T
+    J(i)=sat(   random_hypersurf(J(i-1), T)  , T); // and saturate with respect to T
   }
   poly prd=product(T); // compute the product of t@(i)
   poly cl;
@@ -3963,9 +3963,9 @@ example
   // notice that both ideals have the same saturation
   // with respect to the irrelevant ideal (x, y, z)
   // the saturation of the initial ideal coincides with the ideal itself
-  sat(I, maxideal(1))[1];
+  sat(I, maxideal(1));
   // the saturation of the modified ideal
-  sat(J, maxideal(1))[1];
+  sat(J, maxideal(1));
 }
 //-------------------------------------------------------------------------------------------
 
@@ -4012,7 +4012,7 @@ NOTE:
   ideal T=t@(1..sz);
   for(i=1;i<=n;i++)
   {
-    J(i) = sat( random_hypersurf(J(i-1), T), T )[1];
+    J(i) = sat( random_hypersurf(J(i-1), T), T );
   }
   poly prd=product(T);
   poly cl;
