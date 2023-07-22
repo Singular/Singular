@@ -771,7 +771,7 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
   o_t=p_Add_q(p_One(Qt),o_t,Qt);
   poly di1=p_Copy(hseries,Qt);
   int co;
-#ifdef HAVE_FLINT
+#if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
   poly di2;
   fmpq_mpoly_ctx_t ctx;
   convSingRFlintR(ctx,Qt);
