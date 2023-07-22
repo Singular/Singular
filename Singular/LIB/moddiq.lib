@@ -160,11 +160,11 @@ RETURN:   a standard basis of (I:J^\infty)
 NOTE:     The procedure computes a standard basis of (I:J^\infty) (over the rational
           numbers) by using modular methods.
 KEYWORDS: saturation
-SEE ALSO: modular; sat
+SEE ALSO: modular; sat_with_exp
 EXAMPLE:  example modSat; shows an example"
 {
     I = modStd(I);
-    def IJ=modular("sat",list(I,J),primeTest_sat,
+    def IJ=modular("sat_with_exp",list(I,J),primeTest_sat,
       deleteUnluckyPrimes_sat,pTest_sat,finalTest_sat);
     return(IJ);
 }
@@ -319,5 +319,3 @@ static proc finalTest_sat(string command, alias list args, def result)
     }
     return(1);
 }
-
-
