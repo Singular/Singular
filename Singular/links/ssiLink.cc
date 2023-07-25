@@ -213,7 +213,7 @@ static void ssiWriteRing_R(ssiInfo *d,const ring r)
       if (d->rings[i]==r)
       {
         fprintf(d->f_write,"-5 %d ",i);
-	return;
+        return;
       }
     }
     for(int i=0;i<SI_RING_CACHE;i++)
@@ -261,14 +261,22 @@ static void ssiWriteRing_R(ssiInfo *d,const ring r)
         case ringorder_Ws:
         case ringorder_aa:
         {
-          int ii;
-          for(ii=r->block0[i];ii<=r->block1[i];ii++)
-            fprintf(d->f_write,"%d ",r->wvhdl[i][ii-r->block0[i]]);
+          int s=r->block1[i]-r->block0[i]+1; // #vars
+          for(int ii=0;ii<s;ii++)
+            fprintf(d->f_write,"%d ",r->wvhdl[i][ii]);
+        }
+        break;
+        case ringorder_M:
+        {
+          int s=r->block1[i]-r->block0[i]+1; // #vars
+          for(int ii=0;ii<s*s;ii++)
+          {
+            fprintf(d->f_write,"%d ",r->wvhdl[i][ii]);
+          }
         }
         break;
 
         case ringorder_a64:
-        case ringorder_M:
         case ringorder_L:
         case ringorder_IS:
           Werror("ring oder not implemented for ssi:%d",r->order[i]);
@@ -585,18 +593,27 @@ static ring ssiReadRing(ssiInfo *d)
       case ringorder_Ws:
       case ringorder_aa:
       {
-        wvhdl[i]=(int*)omAlloc((block1[i]-block0[i]+1)*sizeof(int));
+        int s=block1[i]-block0[i]+1; // #vars
+        wvhdl[i]=(int*)omAlloc(s*sizeof(int));
         int ii;
-        for(ii=block0[i];ii<=block1[i];ii++)
-          wvhdl[i][ii-block0[i]]=s_readint(d->f_read);
+        for(ii=0;i<s;ii++)
+          wvhdl[i][ii]=s_readint(d->f_read);
       }
       break;
-
-      case ringorder_a64:
       case ringorder_M:
+      {
+        int s=block1[i]-block0[i]+1; // #vars
+        wvhdl[i]=(int*)omAlloc(s*s*sizeof(int));
+        for(int ii=0;ii<s*s;ii++)
+        {
+          wvhdl[i][ii]=s_readint(d->f_read);
+        }
+      }
+      break;
+      case ringorder_a64:
       case ringorder_L:
       case ringorder_IS:
-        Werror("ring oder not implemented for ssi:%d",ord[i]);
+        Werror("ring order not implemented for ssi:%d",ord[i]);
         break;
 
       default: break;
@@ -1388,7 +1405,7 @@ BOOLEAN ssiClose(si_link l)
       for(int i=0;i<SI_RING_CACHE;i++)
       {
         if (d->rings[i]!=NULL)  rKill(d->rings[i]);
-	d->rings[i]=NULL;
+        d->rings[i]=NULL;
       }
       // did the child to stop ?
       si_waitpid(d->pid,NULL,WNOHANG);
