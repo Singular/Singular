@@ -5675,11 +5675,8 @@ static proc primdecGTZ_i(int patchPrimaryDecomposition,ideal i, list #)
    if(minpoly!=0)
    {
       return(algeDeco_i(patchPrimaryDecomposition,i,0));
-      ERROR(
-      "// Not implemented yet for algebraic extensions.Simulate the ring extension by adding the minpoly to the ideal"
-      );
    }
-  return(convList(decomp_i(patchPrimaryDecomposition,i,#)));
+   return(convList(decomp_i(patchPrimaryDecomposition,i,#)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
