@@ -880,63 +880,16 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
   }
   else
   {
-    intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree);
-    if (errorreported) return;
-
+    if (hilb_Qt==NULL) hilb_Qt=makeQt();
+    poly hseries=hFirstSeries0m(S,Q,wdegree,modulweight,currRing,hilb_Qt);
+    if ((modulweight!=NULL)&&(modulweight->compare(0)!=0))
     {
-      int  i, j, l, k;
-      l = hseries1->length()-1;
-      k = (*hseries1)[l];
-      if ((modulweight!=NULL)&&(modulweight->compare(0)!=0))
-      {
-        char *s=modulweight->ivString(1,0,1);
-        Print("module weights:%s\n",s);
-        omFree(s);
-      }
-      for (i = 0; i < l; i++)
-      {
-        j = (*hseries1)[i];
-        if (j != 0)
-        {
-          Print("//  %8d t^%d\n", j, i+k);
-        }
-      }
+      char *s=modulweight->ivString(1,0,1);
+      Print("module weights:%s\n",s);
+      omFree(s);
     }
-
-    const int l = hseries1->length()-1;
-
-    intvec *hseries2 = (l > 1) ? hSecondSeries(hseries1) : hseries1;
-
-    int co, mu;
-    hDegreeSeries(hseries1, hseries2, &co, &mu);
-
-    PrintLn();
-    {
-      int  i, j, l, k;
-      l = hseries2->length()-1;
-      k = (*hseries2)[l];
-      if ((modulweight!=NULL)&&(modulweight->compare(0)!=0))
-      {
-        char *s=modulweight->ivString(1,0,1);
-        Print("module weights:%s\n",s);
-        omFree(s);
-      }
-      for (i = 0; i < l; i++)
-      {
-        j = (*hseries2)[i];
-        if (j != 0)
-        {
-          Print("//  %8d t^%d\n", j, i+k);
-        }
-      }
-      if ((l == 1) &&(mu == 0))
-        scPrintDegree(rVar(currRing)+1, 0);
-      else
-        scPrintDegree(co, mu);
-      if (l>1)
-        delete hseries1;
-      delete hseries2;
-    }
+    hPrintHilb(hseries,hilb_Qt,wdegree);
+    p_Delete(&hseries,hilb_Qt);
   }
 }
 
@@ -2118,6 +2071,49 @@ poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring
   poly s=hilbert_series(AA,src,wdegree,Qt);
   id_Delete0(&AA,src);
   return s;
+}
+
+poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring src, const ring Qt)
+{
+  int rk=A->rank;
+  poly h=NULL;
+  for(int i=1;i<=rk;i++)
+  {
+    ideal AA=id_Head(A,src);
+    BOOLEAN have_terms=FALSE;
+    for(int ii=0;ii<IDELEMS(AA);ii++)
+    {
+      if (AA->m[ii]!=NULL)
+      {
+        if(p_GetComp(AA->m[ii],src)!=i)
+          p_Delete(&AA->m[ii],src);
+	else
+	  have_terms=TRUE;
+      }
+    }
+    poly h_i;
+    //int sh=0;
+    if (have_terms)
+    {
+      idSkipZeroes(AA);
+      h_i=hFirstSeries0p(AA,Q,wdegree,src,Qt);
+    }
+    else
+    {
+      h_i=p_One(Qt);
+    } 
+    poly s=p_One(Qt);
+    if (shifts!=NULL)
+    {
+      //sh=(*shifts)[i-1];
+      p_SetExp(s,1,(*shifts)[i-1],Qt);
+      p_Setm(s,Qt);
+    }
+    h_i=p_Mult_q(h_i,s,Qt);
+    //Print("comp %d (sh:%d):",i,sh); p_Write(h_i,Qt);
+    h=p_Add_q(h,h_i,Qt);
+  }
+  return h;
 }
 
 intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
