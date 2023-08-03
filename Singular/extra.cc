@@ -438,23 +438,20 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         WerrorS("system(\"verifyGB\",<ideal>,..) expects a commutative ring");
         return TRUE;
       }
-      if (h->Typ()!=IDEAL_CMD)
+      if (((h->Typ()!=IDEAL_CMD)&&(h->Typ()!=MODUL_CMD))
+      || (h->next!=NULL))
       {
-        WerrorS("expected system(\"verifyGB\",<ideal>,..)");
+        Werror("expected system(\"verifyGB\",<ideal/module>), found <%s>",Tok2Cmdname(h->Typ()));
         return TRUE;
       }
       ideal F=(ideal)h->Data();
-      if (h->next==NULL)
-      {
-        #ifdef HAVE_VSPACE
-        int cpus = (long) feOptValue(FE_OPT_CPUS);
-        if (cpus>1)
-          res->data=(char*)(long) kVerify2(F,currRing->qideal);
-        else
-        #endif
-          res->data=(char*)(long) kVerify1(F,currRing->qideal);
-      }
-      else return TRUE;
+      #ifdef HAVE_VSPACE
+      int cpus = (long) feOptValue(FE_OPT_CPUS);
+      if (cpus>1)
+        res->data=(char*)(long) kVerify2(F,currRing->qideal);
+      else
+      #endif
+        res->data=(char*)(long) kVerify1(F,currRing->qideal);
       res->rtyp=INT_CMD;
       return FALSE;
     }
