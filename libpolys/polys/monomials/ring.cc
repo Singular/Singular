@@ -2023,6 +2023,15 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
              rOrder_is_DegOrdering((rRingOrder_t)r->order[2]))))));
 }
 
+BOOLEAN rOrd_is_dp(const ring r)
+{
+  // Hmm.... what about Syz orderings?
+  return (rVar(r) > 1 &&
+         (rHasSimpleOrder(r) &&
+           (r->order[0]==ringorder_dp) ||
+            (r->order[1]==ringorder_dp)));
+}
+
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
 BOOLEAN rOrd_is_WeightedDegree_Ordering(const ring r )
 {
