@@ -139,4 +139,7 @@ resolvente syReorder(resolvente res,int length,
 resolvente syReorder(resolvente res,int length,
         syStrategy syzstr,BOOLEAN toCopy/*=TRUE*/,resolvente totake/*=NULL*/);
 
+
+syStrategy syMres_with_map(ideal arg, int maxlength,intvec * w, ideal &trans);
+void syMinimize_with_map(syStrategy res, ideal &trans);
 #endif

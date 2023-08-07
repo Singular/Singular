@@ -4681,7 +4681,7 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 {
   intvec *weights=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
 
-  syStrategy tmp=(syStrategy)v->Data();
+  syStrategy tmp=syCopy((syStrategy)v->Data());
   tmp = syMinimize(tmp); // enrich itself!
 
   res->data=(char *)tmp;

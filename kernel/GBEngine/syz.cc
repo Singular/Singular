@@ -1161,3 +1161,22 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
 }
 #endif
 
+syStrategy syMres_with_map(ideal arg, int maxlength,intvec * w, ideal &trans)
+{
+  syStrategy res=syResolution(arg,maxlength,w,1);
+  ideal *r=res->minres;
+  if (r==NULL) r=res->fullres;
+  trans=idLift(arg,r[0],NULL,TRUE,FALSE,FALSE,NULL);
+  return res;
+}
+
+void syMinimize_with_map(syStrategy res, ideal &trans)
+{
+  ideal *r=res->minres;
+  if (r==NULL) r=res->fullres;
+  ideal org=idCopy(r[0]);
+  res=syMinimize(res);
+  r=res->minres;
+  if (r==NULL) r=res->fullres;
+  trans=idLift(org,r[0],NULL,TRUE,FALSE,FALSE,NULL);
+}

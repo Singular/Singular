@@ -4100,6 +4100,34 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+/*==================== mres_with_map =================*/
+    if(strcmp(sys_cmd,"mres_with_map")==0)
+    {
+      ideal I= (ideal)h->Data();
+      int l=(int)(long)h->next->Data();
+      ideal trans;
+      res->rtyp=RESOLUTION_CMD;
+      res->data=(void*)syMres_with_map(I,l,NULL,trans);
+      res->next=(leftv)omAlloc0Bin(sleftv_bin);
+      res->next->data=(void*)trans;
+      res->next->rtyp=MODUL_CMD;
+      return FALSE;
+    }
+    else
+/*==================== minres_with_map =================*/
+    if(strcmp(sys_cmd,"minres_with_map")==0)
+    {
+      syStrategy r= syCopy((syStrategy)h->Data());
+      ideal trans;
+      res->rtyp=RESOLUTION_CMD;
+      syMinimize_with_map(r,trans);
+      res->data=(void*)r;
+      res->next=(leftv)omAlloc0Bin(sleftv_bin);
+      res->next->data=(void*)trans;
+      res->next->rtyp=MODUL_CMD;
+      return FALSE;
+    }
+    else
 /*==================== sat =================*/
 #if 0
     if(strcmp(sys_cmd,"sat_with_exp")==0)
