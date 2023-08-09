@@ -4605,7 +4605,7 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
         - U is in upper row echelon form
      Then, we also have P * M = L * U.
      A list [P, L, U] is returned. */
-  matrix mat = (const matrix)v->Data();
+  matrix mat = (matrix)v->Data();
   if (!idIsConstant((ideal)mat))
   {
     WerrorS("matrix must be constant");
@@ -6322,7 +6322,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   int v_typ=v->Typ();
   if (v_typ==MATRIX_CMD)
   {
-     m = (const matrix)v->Data();
+     m = (matrix)v->Data();
   }
   else
   {
@@ -6344,7 +6344,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     }
     m=(matrix)tmp.data;
   }
-  const int mk = (const int)(long)u->Data();
+  const int mk = (int)(long)u->Data();
   bool noIdeal = true; bool noK = true; bool noAlgorithm = true;
   bool noCacheMinors = true; bool noCacheMonomials = true;
   ideal IasSB; int k; char* algorithm; int cacheMinors; int cacheMonomials;
@@ -8272,7 +8272,6 @@ static BOOLEAN jjRESERVED0(leftv, leftv)
 
 static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
 {
-  int i=1;
   int l = 0;
   int k = 0;
   lists L = (lists)omAllocBin(slists_bin);
@@ -8285,7 +8284,7 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
   }
   bb_list = getBlackboxTypes();
   // count the  number of entries;
-  for (i=0; i<nCount; i++)
+  for (unsigned i=0; i<nCount; i++)
   {
     l++;
     if (i + 1 + nCount < sArithBase.nCmdUsed)
@@ -8297,7 +8296,7 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
       l++;
     }
   }
-  for (i = 0; i < bb_list->count; i++)
+  for (int i = 0; i < bb_list->count; i++)
   {
     if (bb_list->list[i] != NULL)
     {
@@ -8307,7 +8306,7 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
   // initiate list
   L->Init(l);
   k = 0;
-  for (i=0; i<nCount; i++)
+  for (unsigned i=0; i<nCount; i++)
   {
     L->m[k].rtyp = STRING_CMD;
     L->m[k].data = omStrDup(sArithBase.sCmds[i+1].name);
@@ -8331,7 +8330,7 @@ static BOOLEAN jjRESERVEDLIST0(leftv res, leftv)
   }
 
   // assign blackbox types
-  for (i = 0; i < bb_list->count; i++)
+  for (int i = 0; i < bb_list->count; i++)
   {
     if (bb_list->list[i] != NULL)
     {
