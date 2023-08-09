@@ -6175,6 +6175,30 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   WerrorS(feNotImplemented);
   return TRUE;
 }
+static BOOLEAN jjHILBERT3Qt(leftv res, leftv u, leftv v, leftv w)
+{
+#ifdef HAVE_RINGS
+  if (rField_is_Z(currRing))
+  {
+    PrintS("// NOTE: computation of Hilbert series etc. is being\n");
+    PrintS("//       performed for generic fibre, that is, over Q\n");
+  }
+#endif
+  assumeStdFlag(u);
+  ring Qt =(ring)v->Data();
+  char *name=(char*)w->Data();
+  poly h;
+  if (u->Typ()==IDEAL_CMD)
+    h=hFirstSeries0p((ideal)u->Data(),currRing->qideal,NULL,currRing,Qt);
+  else
+  {
+    intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+    h=hFirstSeries0m((ideal)u->Data(),currRing->qideal,NULL,module_w,currRing,Qt);
+  }
+  idhdl hh=enterid(name,myynest,POLY_CMD,&(Qt->idroot),FALSE,FALSE);
+  IDPOLY(hh)=h;
+  return FALSE;
+}
 static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv /*w*/)
 {
   PrintS("TODO\n");

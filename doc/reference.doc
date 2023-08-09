@@ -2863,12 +2863,22 @@ intvec
 computes the second Hilbert series from the first, i.e.
 if @code{intvec v=hilb(I,1);} then @code{hilb(v)} yields the same result
 as @code{hilb(I,2)}.
+@item @strong{Syntax:}
+@code{hilb (} ideal_expression@code{,} ring@code{,} string_expression @code{)}
+@*@code{hilb (} module_expression@code{,} ring@code{,} string_expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+computes the (weighted) Hilbert series of the base ring R modulo the ideal, resp.@: R^k modulo the module,
+defined by the leading terms of the generators of the given ideal, resp.@: module.@*
+The series is stored as @code{poly} under the name give as string in the given ring.
 @item @strong{Note:}
 If the input is homogeneous w.r.t.@: the weights and a standard basis, the result is
 the (weighted) Hilbert series of the original ideal, resp.@: module.@*
 @item @strong{Example:}
 @smallexample
 @c example
+  ring Qt=QQ,t,dp;
   ring R=32003,(x,y,z),dp;
   ideal i=x2,y2,z2;
   ideal s=std(i);
@@ -2877,6 +2887,8 @@ the (weighted) Hilbert series of the original ideal, resp.@: module.@*
   hilb(s,2);
   intvec w=2,2,2;
   hilb(s,1,w);
+  hilb(s,Qt,"h");
+  setring Qt;h;
 @c example
 @end smallexample
 @end table
