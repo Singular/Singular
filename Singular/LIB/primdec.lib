@@ -3217,15 +3217,23 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         }
         else
         {
-          invsigma=basering,maxideal(1);
-          jmap=randomLast(50);
-          sigma=basering,jmap;
-          jmap[nn]=2*var(nn)-jmap[nn];
-          invsigma=basering,jmap;
-          II=groebner(sigma(II));
-          absotto = absFactorize(II[1],77);
-          II=var(nn);
-          tempo= primary[2*ab-1],primary[2*ab],absotto,string(invsigma(II));
+           invsigma=basering,maxideal(1);
+           while(1) 
+           {
+             jmap=randomLast(50);
+             sigma=basering,jmap;
+             jmap[nn]=2*var(nn)-jmap[nn];
+             invsigma=basering,jmap;
+             ideal JJ=groebner(sigma(II));
+             if (deg(JJ[1]) == vdim(JJ))
+             {
+               II = JJ;
+               break;
+             }
+           }
+           absotto = absFactorize(II[1],77);
+           II=var(nn);
+           tempo= primary[2*ab-1],primary[2*ab],absotto,string(invsigma(II));
         }
         resu[ab]=tempo;
       }
