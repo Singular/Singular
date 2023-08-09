@@ -3203,7 +3203,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       list resu,tempo;
       string absotto;
       map sigma,invsigma;
-      ideal II,jmap;
+      ideal II,jmap,JJ;
       nn=nvars(basering);
       for(ab=1;ab<=size(primary) div 2;ab++)
       {
@@ -3224,7 +3224,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
              sigma=basering,jmap;
              jmap[nn]=2*var(nn)-jmap[nn];
              invsigma=basering,jmap;
-             ideal JJ=groebner(sigma(II));
+             JJ=groebner(sigma(II));
              if (deg(JJ[1]) == vdim(JJ))
              {
                II = JJ;
