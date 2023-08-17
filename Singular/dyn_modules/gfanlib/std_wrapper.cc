@@ -55,7 +55,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
     {
       // std::cout << "simplifying!" << std::endl;
       p=p_Copy(strat->P.p,currRing);
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Init();
       strat->P.tailRing = strat->tailRing;
       strat->P.p=p;
       while(p!=NULL)
@@ -99,7 +99,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
     if (nonTrivialSaturationToBeDone)
     {
       p=p_Copy(strat->P.t_p,strat->tailRing);
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Init();
       strat->P.tailRing = strat->tailRing;
       strat->P.t_p=p;
       while(p!=NULL)

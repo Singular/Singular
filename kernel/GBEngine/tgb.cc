@@ -481,7 +481,7 @@ wlen_type kEBucketLength (kBucket * b, poly lm, slimgb_alg * ca)
   {
     return bucket_guess (b);
   }
-  int d = ca->pTotaldegree (lm);
+  long unsigned d = ca->pTotaldegree (lm);
 #if 0
   assume (sugar >= d);
   s = 1 + (bucket_guess (b) - 1) * (sugar - d + 1);
@@ -940,7 +940,7 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
 
   if (TEST_OPT_IDLIFT &&(pGetComp(h) > c->syz_comp)) return;
   LObject P;
-  memset (&P, 0, sizeof (P));
+  P.Init();
   P.tailRing = c->r;
   P.p = h;                      /*p_Copy(h,c->r); */
   P.ecart = ecart;

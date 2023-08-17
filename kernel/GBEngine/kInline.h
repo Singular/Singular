@@ -623,7 +623,7 @@ KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
     if (use_bucket && (l > 1))
     {
       poly tp = GetLmTailRing();
-      assume(l == ::pLength(tp));
+      assume((int)l == ::pLength(tp));
       bucket = kBucketCreate(tailRing);
       kBucketInit(bucket, pNext(tp), l-1);
       pNext(tp) = NULL;
@@ -903,7 +903,6 @@ KINLINE long sLObject::Comp()
 
 KINLINE sLObject& sLObject::operator=(const sTObject& t)
 {
-  memset(this, 0, sizeof(*this));
   memcpy(this, &t, sizeof(sTObject));
   return *this;
 }

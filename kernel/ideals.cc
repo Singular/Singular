@@ -3335,7 +3335,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
 ideal id_Homogenize(ideal I, int var_num, const ring r)
 {
   ideal II=id_Copy(I,r);
-  if (var_num=1)
+  if (var_num==1)
   {
     ring tmpR=rAssure_Dp_C(r);
     if (tmpR!=r)
@@ -3380,7 +3380,7 @@ ideal id_Homogenize(ideal I, int var_num, const ring r)
 ideal id_HomogenizeW(ideal I, int var_num, intvec *w,const ring r)
 {
   ideal II=id_Copy(I,r);
-  if (var_num=1)
+  if (var_num==1)
   {
     ring tmpR=rAssure_Wp_C(r,w);
     if (tmpR!=r)

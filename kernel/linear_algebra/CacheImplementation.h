@@ -354,7 +354,7 @@ bool Cache<KeyClass, ValueClass>::put (const KeyClass& key,
 template<class KeyClass, class ValueClass>
 std::string Cache<KeyClass, ValueClass>::toString() const
 {
-  char h[11]; /*max.int length +1 for \0 */
+  char h[12]; /*max.int length +1 for \0 */
   std::string s = "Cache:";
   s += "\n   entries: ";
   sprintf(h, "%d", getNumberOfEntries()); s += h;

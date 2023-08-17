@@ -127,7 +127,7 @@ static BOOLEAN print_spoly(kStrategy strat)
   else
   {
     poly p=strat->P.t_p;
-    s=p_String(strat->P.t_p,strat->tailRing);
+    s=p_String(p,strat->tailRing);
   }
   FILE *f=fopen(si_filename,"a");
   fwrite(s,strlen(s),1,f);
@@ -274,10 +274,11 @@ static ideal idPrepare_print (ideal  h1, ideal h11, tHomog hom, int syzcomp, int
   return h3;
 }
 
+#if 0
 static ideal idSyzygies_print (ideal  h1, tHomog h,intvec **w)
 {
   ideal s_h1;
-  int   j, k, length=0,reg;
+  int   j, k;
   BOOLEAN isMonomial=TRUE;
   int ii, idElemens_h1;
 
@@ -378,7 +379,9 @@ static ideal idSyzygies_print (ideal  h1, tHomog h,intvec **w)
   }
   return s_h3;
 }
+#endif
 
+#if 0
 static BOOLEAN syz_print_spoly(leftv res, leftv args)
 {
   if (args!=NULL)
@@ -451,6 +454,7 @@ static BOOLEAN syz_print_spoly(leftv res, leftv args)
   WerrorS("syz_print_spoly: unexpected parameters");
   return TRUE;
 }
+#endif
 
 static BOOLEAN monomialabortstd(leftv res, leftv args)
 {

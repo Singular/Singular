@@ -843,15 +843,12 @@ static int redRing_Z_S (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
   if (strat->sl<0) return 1;
 
-  int at;
-  long d;
   int j = 0;
   int pass = 0;
 
 // TODO warum SetpFDeg notwendig?
   h->SetpFDeg();
   assume(h->pFDeg() == h->FDeg);
-  long reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   int max_ind=strat->sl;
 
@@ -945,7 +942,7 @@ static int redRing_Z_S (LObject* h,kStrategy strat)
       return 0;
     }
     h->SetShortExpVector();
-    d = h->SetpFDeg();
+    h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
   }
@@ -1058,15 +1055,12 @@ static int redRing_S (LObject* h,kStrategy strat)
   if (strat->sl<0) return 1;
   if (h->IsNull()) return 0; // spoly is zero (can only occur with zero divisors)
 
-  int at/*,i*/;
-  long d;
   int j = 0;
   int pass = 0;
   // poly zeroPoly = NULL;
 
   h->SetpFDeg();
   assume(h->pFDeg() == h->FDeg);
-  long reddeg = h->GetpFDeg();
   int max_ind;
 
   h->SetShortExpVector();
@@ -1107,7 +1101,6 @@ static int redRing_S (LObject* h,kStrategy strat)
       return 0;
     }
     h->SetShortExpVector();
-    d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
   }
@@ -1132,7 +1125,6 @@ int redHomog (LObject* h,kStrategy strat)
 
   pass = j = 0;
   cnt = RED_CANONICALIZE;
-  // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   h_p = h->GetLmTailRing();
   h->PrepareRed(strat->use_buckets);
@@ -1365,7 +1357,6 @@ int redSig (LObject* h,kStrategy strat)
   int li;
 
   pass = j = 0;
-  // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
@@ -1546,7 +1537,6 @@ int redSigRing (LObject* h,kStrategy strat)
   BOOLEAN test_opt_length=TEST_OPT_LENGTH;
 
   pass = j = 0;
-  // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
@@ -2895,7 +2885,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
 
 #ifdef KDEBUG
-    memset(&(strat->P), 0, sizeof(strat->P));
+    strat->P.Init();
 #endif /* KDEBUG */
     kTest_TS(strat);
   }
@@ -3743,7 +3733,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
 
 #ifdef KDEBUG
-    memset(&(strat->P), 0, sizeof(strat->P));
+    strat->P.Init();
 #endif /* KDEBUG */
     kTest_TS(strat);
   }
@@ -3761,7 +3751,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->sbaEnterS = pGetComp(strat->P.sig)-1;
     //else we already set it at the beginning of the loop
     #ifdef KDEBUG
-    memset(&(strat->P), 0, sizeof(strat->P));
+    strat->P.Init();
     #endif /* KDEBUG */
   }
 #ifdef KDEBUG
@@ -4524,7 +4514,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     }
 
 #ifdef KDEBUG
-    memset(&(strat->P), 0, sizeof(strat->P));
+    strat->P.Init();
 #endif /* KDEBUG */
   }
   int cc = 0;
@@ -4853,7 +4843,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       p_Delete(&strat->P.p2, currRing, strat->tailRing);
     }
 #ifdef KDEBUG
-    memset(&(strat->P), 0, sizeof(strat->P));
+    strat->P.Init();
 #endif /* KDEBUG */
     kTest_TS(strat);
   }

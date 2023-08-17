@@ -1150,7 +1150,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec
 
 #ifdef KDEBUG
       // make sure kTest_TS does not complain about strat->P
-      memset(&strat->P,0,sizeof(strat->P));
+      strat->P.Init();
 #endif
     }
 #if 0

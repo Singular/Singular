@@ -252,7 +252,6 @@ static void deleteHCBucket(LObject *L, kStrategy strat)
   if ((strat->kNoether!=NULL)
   && (L->bucket != NULL))
   {
-    poly p1;
     for (int i=1; i<= (int) L->bucket->buckets_used; i++)
     {
       poly p=L->bucket->buckets[i];
@@ -1269,7 +1268,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 #endif
   }
 #ifdef KDEBUG
-  memset(&(set[*length]),0,sizeof(LObject));
+  set[*length].Init();
 #endif
   (*length)--;
 }
@@ -6458,7 +6457,7 @@ int posInL17_cRing (const LSet set, const int length,
 
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
-  unsigned long c = pGetComp(p->p)*cc;
+  long c = pGetComp(p->p)*cc;
   int o = p->GetpFDeg() + p->ecart;
 
   if (pGetComp(set[length].p)*cc > c)
@@ -6562,7 +6561,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
   PrintS("--- syzygy criterion checks:  ");
   pWrite(sig);
 #endif
-  int comp = __p_GetComp(sig, currRing);
+  int comp = (int)__p_GetComp(sig, currRing);
   int min, max;
   if (comp<=1)
     return FALSE;
@@ -6991,11 +6990,11 @@ poly redtailBba (LObject* L, int end_pos, kStrategy strat, BOOLEAN withT, BOOLEA
       {
         if (Ln.p!=NULL)
         {
-          if (__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+          if ((int)__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
         }
         else
         {
-          if (__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+          if ((int)__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
         }
       }
       Ln.SetShortExpVector();
@@ -7100,11 +7099,11 @@ poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLE
       {
         if (Ln.p!=NULL)
         {
-          if (__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+          if ((int)__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
         }
         else
         {
-          if (__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+          if ((int)__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
         }
       }
       Ln.SetShortExpVector();
@@ -7219,11 +7218,11 @@ void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
       {
         if (Ln.p!=NULL)
         {
-          if (__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+          if ((int)__p_GetComp(Ln.p,currRing)> strat->syzComp) break;
         }
         else
         {
-          if (__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+          if ((int)__p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
         }
       }
       Ln.SetShortExpVector();
