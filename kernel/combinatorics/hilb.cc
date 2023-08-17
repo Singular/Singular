@@ -764,8 +764,7 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
     Print("module weights:%s\n",s);
     omFree(s);
   }
-  p_Write(hseries,Qt);
-  PrintLn();
+  PrintS("(");p_Write0(hseries,Qt);Print(") / (1-%s)^%d\n",Qt->names[0],currRing->N);
   poly o_t=p_One(Qt);p_SetExp(o_t,1,1,Qt);p_Setm(o_t,Qt);
   o_t=p_Neg(o_t,Qt);
   o_t=p_Add_q(p_One(Qt),o_t,Qt);
@@ -803,7 +802,9 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
     di1=convFactoryPSingP(Di1,Qt);
   }
 #endif
-  p_Write(di1,Qt);
+  int di = (currRing->N)-co;
+  if (hseries==NULL) di=0;
+  PrintS("("); p_Write0(di1,Qt); Print(") / (1-%s)^%d\n",Qt->names[0],di);
   int mu=0;
   poly p=di1;
   while(p!=NULL)
@@ -811,8 +812,6 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
     mu+=n_Int(pGetCoeff(p),Qt->cf);
     p_LmDelete(&p,Qt);
   }
-  int di = (currRing->N)-co;
-  if (hseries==NULL) di=0;
   if (currRing->OrdSgn == 1)
   {
     if (di>0)

@@ -2,6 +2,7 @@ allres_l
 assprimeszerodim_l
 bardet_probl_l
 bug_4
+bug_39
 bug_45
 bug_tr164
 bug_res
@@ -29,6 +30,7 @@ fres_l
 gcd0_l
 gcdp_l
 gcd_univar_p_create
+gmssin_l
 groebner_l
 hnoether_l
 homtest

@@ -3413,6 +3413,7 @@
     ("Sannfslog" . "Sannfslog.           (line   6")
     ("SannfsVar" . "SannfsVar.           (line   6")
     ("sat" . "sat.                 (line   6")
+    ("sat_with_exp" . "sat_with_exp.        (line   6")
     ("satiety" . "satiety.             (line   6")
     ("satstd" . "satstd.              (line   6")
     ("saturation" . "modsatiety.          (line  28")

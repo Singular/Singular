@@ -45,7 +45,7 @@ bug_subst
 bug_zp
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
-; bug_tr276
+bug_tr276
 bug_tr339
 bug_tr393
 bug_tr488
@@ -130,6 +130,7 @@ gcd5primtest
 gcd5test
 gcd_univar_p_s
 gcd_univar_p_alpha_s
+gmssin_s
 homalg
 invar_lib
 liftstd_m
