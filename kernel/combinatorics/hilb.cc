@@ -756,25 +756,17 @@ void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
   *co = i - j;
 }
 
-static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
+poly hFirst2Second(poly h, const ring Qt, int &co)
 {
-  if ((modul_weight!=NULL)&&(modul_weight->compare(0)!=0))
-  {
-    char *s=modul_weight->ivString(1,0,1);
-    Print("module weights:%s\n",s);
-    omFree(s);
-  }
-  PrintS("(");p_Write0(hseries,Qt);Print(") / (1-%s)^%d\n",Qt->names[0],currRing->N);
   poly o_t=p_One(Qt);p_SetExp(o_t,1,1,Qt);p_Setm(o_t,Qt);
   o_t=p_Neg(o_t,Qt);
   o_t=p_Add_q(p_One(Qt),o_t,Qt);
-  poly di1=p_Copy(hseries,Qt);
-  int co;
+  poly di1=p_Copy(h,Qt);
+  co=0;
 #if defined(HAVE_FLINT) && (__FLINT_RELEASE >= 20503)
   poly di2;
   fmpq_mpoly_ctx_t ctx;
   convSingRFlintR(ctx,Qt);
-  co=0;
   loop
   {
     di2=Flint_Divide_MP(di1,0,o_t,0,ctx,Qt);
@@ -789,7 +781,6 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
     CanonicalForm  Di1=convSingPFactoryP(di1,Qt);
     CanonicalForm  O_t=convSingPFactoryP(o_t,Qt);
     CanonicalForm Di2,dummy;
-    co=0;
     loop
     {
       Di2=Di1/O_t;
@@ -802,11 +793,25 @@ static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
     di1=convFactoryPSingP(Di1,Qt);
   }
 #endif
+  return di1;
+}
+
+static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
+{
+  if ((modul_weight!=NULL)&&(modul_weight->compare(0)!=0))
+  {
+    char *s=modul_weight->ivString(1,0,1);
+    Print("module weights:%s\n",s);
+    omFree(s);
+  }
+  PrintS("(");p_Write0(hseries,Qt);Print(") / (1-%s)^%d\n",Qt->names[0],currRing->N);
+  int co;
+  poly h2=hFirst2Second(hseries,Qt,co);
   int di = (currRing->N)-co;
   if (hseries==NULL) di=0;
-  PrintS("("); p_Write0(di1,Qt); Print(") / (1-%s)^%d\n",Qt->names[0],di);
+  PrintS("("); p_Write0(h2,Qt); Print(") / (1-%s)^%d\n",Qt->names[0],di);
   int mu=0;
-  poly p=di1;
+  poly p=h2;
   while(p!=NULL)
   {
     mu+=n_Int(pGetCoeff(p),Qt->cf);
@@ -846,7 +851,7 @@ static ring makeQt()
   return Qt;
 }
 
-static ring hilb_Qt=NULL;
+STATIC_VAR ring hilb_Qt=NULL;
 static BOOLEAN isModule(ideal A, const ring src)
 {
   if ((src->VarOffset[0]== -1)
@@ -2086,8 +2091,8 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
       {
         if(p_GetComp(AA->m[ii],src)!=i)
           p_Delete(&AA->m[ii],src);
-	else
-	  have_terms=TRUE;
+        else
+          have_terms=TRUE;
       }
     }
     poly h_i;
@@ -2621,3 +2626,38 @@ intvec * hFirstSeries1(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
   return hseries1;
 }
 
+bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf)
+{
+  int td=p_Totaldegree(h,Qt);
+  bigintmat* biv=new bigintmat(1,td+2,biv_cf);
+  h=p_Copy(h,Qt);
+  nMapFunc f=n_SetMap(Qt->cf,biv_cf);
+  while(h!=NULL)
+  {
+    int d=p_Totaldegree(h,Qt);
+    biv->rawset(td-d,f(pGetCoeff(h),Qt->cf,biv_cf),biv_cf);
+    p_LmDelete(&h,Qt);
+  }
+  return biv;
+}
+
+bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
+{
+  if (hilb_Qt==NULL) hilb_Qt=makeQt();
+  poly h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
+  bigintmat *biv=biv=hPoly2BIV(h,hilb_Qt,biv_cf);
+  p_Delete(&h,hilb_Qt);
+  return biv;
+}
+
+bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
+{
+  if (hilb_Qt==NULL) hilb_Qt=makeQt();
+  poly h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
+  int co;
+  poly h2=hFirst2Second(h,hilb_Qt,co);
+  p_Delete(&h,hilb_Qt);
+  bigintmat *biv=biv=hPoly2BIV(h2,hilb_Qt,biv_cf);
+  p_Delete(&h2,hilb_Qt);
+  return biv;
+}
