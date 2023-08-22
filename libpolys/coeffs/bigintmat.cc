@@ -414,23 +414,19 @@ void bigintmat::Write()
 {
   int n = cols(), m=rows();
 
-  StringAppendS("[ ");
   for(int i=1; i<= m; i++)
   {
-    StringAppendS("[ ");
     for(int j=1; j< n; j++)
     {
       n_Write(v[(i-1)*n+j-1], basecoeffs());
       StringAppendS(", ");
     }
     if (n) n_Write(v[i*n-1], basecoeffs());
-    StringAppendS(" ]");
     if (i<m)
     {
       StringAppendS(", ");
     }
   }
-  StringAppendS(" ] ");
 }
 
 char* bigintmat::String()
