@@ -2092,10 +2092,14 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
         if(p_GetComp(AA->m[ii],src)!=i)
           p_Delete(&AA->m[ii],src);
         else
+        {
+          p_SetComp(AA->m[ii],0,src);
+          p_Setm(AA->m[ii],src);
           have_terms=TRUE;
+        }
       }
     }
-    poly h_i;
+    poly h_i=NULL;
     //int sh=0;
     if (have_terms)
     {
@@ -2106,15 +2110,19 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
     {
       h_i=p_One(Qt);
     } 
+    id_Delete(&AA,src);
     poly s=p_One(Qt);
     if (shifts!=NULL)
     {
-      //sh=(*shifts)[i-1];
-      p_SetExp(s,1,(*shifts)[i-1],Qt);
-      p_Setm(s,Qt);
+      int m=shifts->min_in();
+      int sh=(*shifts)[i-1]-m;
+      if (sh!=0)
+      {
+        p_SetExp(s,1,sh,Qt);
+        p_Setm(s,Qt);
+      }
     }
     h_i=p_Mult_q(h_i,s,Qt);
-    //Print("comp %d (sh:%d):",i,sh); p_Write(h_i,Qt);
     h=p_Add_q(h,h_i,Qt);
   }
   return h;
@@ -2635,7 +2643,8 @@ bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf)
   while(h!=NULL)
   {
     int d=p_Totaldegree(h,Qt);
-    biv->rawset(td-d,f(pGetCoeff(h),Qt->cf,biv_cf),biv_cf);
+    n_Delete(&BIMATELEM(*biv,1,d+1),biv_cf);
+    BIMATELEM(*biv,1,d+1)=f(pGetCoeff(h),Qt->cf,biv_cf);
     p_LmDelete(&h,Qt);
   }
   return biv;
@@ -2644,8 +2653,21 @@ bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf)
 bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
 {
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
-  poly h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
-  bigintmat *biv=biv=hPoly2BIV(h,hilb_Qt,biv_cf);
+  poly h;
+  int m=0;
+  if (isModule(I,src))
+  {
+    h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
+    if (shifts!=NULL) m=shifts->min_in();
+  }
+  else
+    h=hFirstSeries0p(I,Q,wdegree,src,hilb_Qt);
+  bigintmat *biv=hPoly2BIV(h,hilb_Qt,biv_cf);
+  if (m!=0)
+  {
+    n_Delete(&BIMATELEM(*biv,1,biv->cols()),biv_cf);
+    BIMATELEM(*biv,1,biv->cols())=n_Init(m,biv_cf);
+  }
   p_Delete(&h,hilb_Qt);
   return biv;
 }
@@ -2653,11 +2675,15 @@ bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, con
 bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
 {
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
-  poly h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
+  poly h;
+  if (isModule(I,src))
+    h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
+  else
+    h=hFirstSeries0p(I,Q,wdegree,src,hilb_Qt);
   int co;
   poly h2=hFirst2Second(h,hilb_Qt,co);
   p_Delete(&h,hilb_Qt);
-  bigintmat *biv=biv=hPoly2BIV(h2,hilb_Qt,biv_cf);
+  bigintmat *biv=hPoly2BIV(h2,hilb_Qt,biv_cf);
   p_Delete(&h2,hilb_Qt);
   return biv;
 }

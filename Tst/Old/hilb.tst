@@ -70,4 +70,5 @@ mult(m);
 degree(m);
 vdim(m);
 hilb(m);
+hilb(m,1);
 LIB "tst.lib";tst_status(1);$
