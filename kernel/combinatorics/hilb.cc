@@ -2109,7 +2109,7 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
     else
     {
       h_i=p_One(Qt);
-    } 
+    }
     id_Delete(&AA,src);
     poly s=p_One(Qt);
     if (shifts!=NULL)
@@ -2636,10 +2636,15 @@ intvec * hFirstSeries1(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
 
 bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf)
 {
-  int td=p_Totaldegree(h,Qt);
+  int td=0;
+  nMapFunc f;
+  if (h!=NULL)
+  {
+    td=p_Totaldegree(h,Qt);
+    h=p_Copy(h,Qt);
+    f=n_SetMap(Qt->cf,biv_cf);
+  }
   bigintmat* biv=new bigintmat(1,td+2,biv_cf);
-  h=p_Copy(h,Qt);
-  nMapFunc f=n_SetMap(Qt->cf,biv_cf);
   while(h!=NULL)
   {
     int d=p_Totaldegree(h,Qt);
