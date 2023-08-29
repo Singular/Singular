@@ -2655,6 +2655,20 @@ bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf)
   return biv;
 }
 
+poly hBIV2Poly(bigintmat* b, const ring Qt, const coeffs biv_cf)
+{
+  poly p=NULL;
+  nMapFunc f=n_SetMap(biv_cf,Qt->cf);
+  for(int d=0;d<b->rows()-1;d++)
+  {
+    poly h=p_New(Qt);
+    p_SetExp(h,1,d,Qt);p_Setm(h,Qt);
+    pSetCoeff0(h,f(BIMATELEM(*b,1,d+1),biv_cf,Qt->cf));
+    p=p_Add_q(p,h,Qt);
+  }
+  return p;
+}
+
 bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
 {
   if (hilb_Qt==NULL) hilb_Qt=makeQt();

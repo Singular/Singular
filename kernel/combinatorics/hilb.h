@@ -17,6 +17,7 @@ intvec * hFirstSeries1(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegr
 intvec * hFirstSeries0(ideal S, ideal Q, intvec *wdegree, const ring src, const ring Qt);
 poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt);
 bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf);
+poly hBIV2Poly(bigintmat* b, const ring Qt, const coeffs biv_cf);
 bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts,const ring src, const coeffs biv_cf);
 bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts,const ring src, const coeffs biv_cf);
 poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring src, const ring Qt);
