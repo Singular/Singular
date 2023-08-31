@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version matrix.lib 4.3.1.3 Feb_2023 "; // $Id$
+version="version matrix.lib 4.3.2.3 Aug_2023 "; // $Id$
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -262,6 +262,11 @@ EXAMPLE: example outer; shows an example
 {
    int i,j; list L;
    int triv = nrows(B)*ncols(B);
+   if ((triv==0)||(nrows(A)==0))
+   {
+     matrix C[0][0];
+     return(C);
+   }
    if( triv==1 )
    {
      return(B[1,1]*A);
