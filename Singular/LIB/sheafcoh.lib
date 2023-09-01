@@ -565,11 +565,18 @@ EXAMPLE: example sheafCohBGG; shows an example
   {
     for (i=l; i<=h; i++)
     {
-      if ((k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1))
+      if (((n+2-shift-j)>0)&&((n+2-shift-j)<=(n+1))
+      && ((i-l+1)>0)&&((i-l+1)<=(h-l+1)))
       {
-        newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
+        if ((k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1))
+        {
+          newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
+        }
+        else
+        { 
+          newBetti[n+2-shift-j,i-l+1]=-1;
+        }
       }
-      else { newBetti[n+2-shift-j,i-l+1]=-1; }
     }
   }
   for (j=2; j<=n+1; j++)
