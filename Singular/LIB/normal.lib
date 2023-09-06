@@ -7537,20 +7537,6 @@ static proc outComp(ideal Out1, ideal Out2, poly den1, poly den2, ideal I)
   return((size(reduce(Out1, Out2, 5)) == 0) * (size(reduce(Out2, Out1, 5)) == 0));
 }
 
-
-// Make p homogeneous of degree d taking h as the aux variable of deg 1.
-static proc polyHomogenize(poly p, int d, intvec degs, poly h)
-{
-  int i;
-  poly q;
-  for(i = 1; i <= size(p); i++)
-  {
-    q = q + p[i]*h^(d-deg(p[i], degs));
-  }
-  return(q);
-}
-
-
 // verification procedure
 static proc normalCheck(ideal U, ideal I,int printTimings)
 // U / U[1] = output of the normalization
