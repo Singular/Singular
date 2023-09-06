@@ -47,6 +47,8 @@ LIB "hnoether.lib";
 LIB "reesclos.lib";
 LIB "algebra.lib";
 LIB "curveInv.lib";
+LIB "parallel.lib";
+LIB "modstd.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -196,10 +198,11 @@ EXAMPLE: example normal; shows an example
 
   int normalCheck;  // If normalCheck = 1 we dont compute the normalization
                     // but only check if the ideal is normal.
-                    // This is parameter to pass to normalM, it cannot
+                    // This is a parameter to pass to normalM, it cannot
                     // be set to 1 in this procedure.
-  normalCheck = 0;   // The default is to We compute the full normalization.
+  normalCheck = 0;  // The default is to compute the full normalization.
 
+  list options;     // Options to try different strategies
 
 //--------------------------- define the method ---------------------------
   for ( i=1; i <= size(#); i++ )
@@ -228,7 +231,6 @@ EXAMPLE: example normal; shows an example
       if ( ((#[i]=="useRing") or (#[i]=="usering")) and (ordstr(basering) != "dp("+string(nvars(basering))+"),C"))
       {useRing = 1;}
 
-      list options;
       if (#[i]=="GBRadical")
       {options = insert(options, "GBRadical");}
       if (#[i]=="noGBRadical")
