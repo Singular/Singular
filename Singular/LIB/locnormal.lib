@@ -263,7 +263,7 @@ proc locNormal_parallelTask(ideal pdi, ideal I, poly condu, int i, int locmod,
     "Output of normalization of component ", i, ": "; norT;
     "";
   }
-  ideal nor = changeDenom(norT, denomT, condu, I);
+  ideal nor = normal::changeDenominator(norT, denomT, condu, I);
   return(list(nor, t));
 }
 
