@@ -1,4 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 version="version normal.lib 4.3.1.1 Jan_2023 "; // $Id$
 category="Commutative Algebra";
 info="
@@ -75,7 +76,8 @@ proc normal(ideal id, list #)
          or equidimensional decompositions.@*
          If this option is not set, normal changes to dp ordering and performs
          all computations with respect to this ordering.@*
-         - \"withDelta\" (or \"wd\") -> returns also the delta invariants.@*
+         - \"withDelta\" (or \"wd\") -> returns also the delta invariants. 
+         Not valid for options \"locNormal\" and \"modNormal\".@*
          If the optional parameter choose is not given or empty, only
          \"equidim\" but no other option is used.@*
          - list(\"inputJ\", ideal inputJ) -> takes as initial test ideal the
@@ -98,14 +100,33 @@ proc normal(ideal id, list #)
          ideal computed for the test ideal.@*
          - \"noGBRadical\" -> it does not compute a Groebner basis of 
          the radical ideal computed for the test ideal.@*
+         - \"locNormal\" -> uses locNormal procedure to compute the 
+         normalization, which implements a local-to-global algorithm
+         (for this option it is required that the ideal I is prime).@*
+         - \"modular\" -> combined with \"locNormal\" option, it will
+         use modNormal algorithm for the local computations.@*
+         - \"modNormal\" -> uses modNormal procedure to compute the
+         normalization, which implements a modular algorithm (for this 
+         option it is required that the ideal I is prime).@*
+         - list(\"nPrimes\", int n) -> parameter for modNormal. We consider
+         n primes at a time until the result lifted to the rationals is 
+         correct modulo one additional prime. (default: n = 10)@*
+         - \"noVerification\" -> if the modular approach is used (using 
+         modNormal option or modular option in locNormal), the 
+         result will not be verified.@*
          If the optional parameter choose is not given or empty, only
          \"equidim\" but no other option is used.@*
+         - \"withRing\" -> the ring structure of the normalization is
+         computed. The number of variables in the new ring is reduced as much
+         as possible. This is the default option, except when using 
+         modNormal or locNormal options.@*
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (id=radical(id); makes id radical). However, when using the
          \"prim\" option the minimal associated primes of id are computed first
          and hence normal computes the normalization of the radical of id.@*
 NOTE:    \"isPrim\" should only be used if id is known to be prime.
-RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
+RETURN:  If \"withRing\" option is set, a list, say nor, of size 2 
+         (resp. 3 with option \"withDelta\").
          Let R denote the basering and id the input ideal.
          * nor[1] is a list of r rings, where r is the number of associated
          primes P_i with option \"prim\" (resp. >= no of equidimenensional
@@ -126,7 +147,9 @@ RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
          * nor[3] (if option \"withDelta\" is set) is a list of an intvec
          of size r, the delta invariants of the r components, and an integer,
          the total delta invariant of basering/id (-1 means infinite, and 0
-         that R/P_i resp. R/id is normal).
+         that R/P_i resp. R/id is normal).@*
+         If \"withRing\" option is not set, a list of an ideal U and 
+         a polynomial d such that U/d is the normalization
 THEORY:  We use here a general algorithm described in [G.-M.Greuel, S.Laplagne,
          F.Seelisch: Normalization of Rings (2009)].@*
          The procedure computes the R-module structure, the algebra structure
@@ -159,6 +182,39 @@ SEE ALSO: normalC, normalP.
 EXAMPLE: example normal; shows an example
 "
 {
+  // We quickly choose the main procedure to be used
+  if((in_array(#, "locNormal")) or (in_array(#, "modNormal"))) {
+    if(in_array(#, "modNormal")) {
+      int nPrimes = getParameterValue(#, "nPrimes");
+      if(nPrimes == 0){nPrimes = 10;}
+      "Callign modNormal with nPrimes = ", nPrimes;
+      list opt = remove_from_list(#, "modNormal");
+      opt = remove_from_list(opt, "locNormal");
+      list out = modNormal(id, nPrimes, #);
+    }
+    if(in_array(#, "locNormal")) {
+      "Calling locNormal...";
+      list opt = remove_from_list(#, "modNormal");
+      opt = remove_from_list(opt, "locNormal");
+      list out = locNormal(id, opt);
+    }  
+    if(in_array(#, "withRing")) {
+      // We compute the ring structure
+      def outRing = computeRing(out[1], id);  
+      
+      // We put the conductor as the last element of the ideal.
+      ideal OO = reduce(out[1], groebner(out[2]));
+      OO = interred(OO);
+      OO[ncols(OO)+1]=out[2];
+      
+      list outWR = list(list(outRing), list(OO));
+      return(outWR);
+    } else {
+      return(out);
+    }
+  }
+  
+  
   ASSUME(0, not isQuotientRing(basering) );
 
   intvec opt = option(get);     // Save current options
@@ -5205,10 +5261,43 @@ proc in_array(list l, string s)
   int n = size(l);
   int found = 0;
   for(i = 1; i <= n; i++) {
-    if(l[i] == s) {found = 1;}
+    if(typeof(l[i]) == "string") {
+      if(l[i] == s) {found = 1;}
+    }
   }
   return(found);
 }
+
+// Removes all appearances of string s in list l
+proc remove_from_list(list l, string s)
+{
+  int i;
+  int n = size(l);
+  int found = 0;
+  for(i = 1; i <= n; i++) {
+    if(typeof(l[i]) == "string") {
+      if(l[i] == s) {
+        l = delete(l, i);
+        return(remove_from_list(l,s));
+      }
+    }
+  }
+  return(l);
+}
+
+// Searches for list(s, n) inside list l and returns the value of n
+proc getParameterValue(list l, string s);
+{
+  int i;
+  int n = size(l);
+  for(i = 1; i <= n; i++) {
+    if(typeof(l[i]) == "list") {
+      if(l[i][1] == s) {return(l[i][2]);}
+    }
+  }
+  return(0);
+}
+  
 
 static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list options)
 {
@@ -5278,9 +5367,9 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list option
   if(in_array(options, "GBRadical")) {
     t = timer;
     J = groebnerDP(J);
-    "DEBUG - time for GB of radical using dp ordering in all variables:", timer - t;
+    //"DEBUG - time for GB of radical using dp ordering in all variables:", timer - t;
   } else {
-    "DEBUG - we do not compute the GB of radical output";
+    //"DEBUG - we do not compute the GB of radical output";
   }
  
   if(dbg > 1)
@@ -5356,7 +5445,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list option
   // ---------------------- step 4 of the mapping ---------------------------
   t = timer;
   qring Q = groebner(I);
-  "DEBUG - time for qring GB computation:", timer - t;
+  //"DEBUG - time for qring GB computation:", timer - t;
 
   ideal J = imap(R, J);
   poly c = imap(R, c);
@@ -5373,7 +5462,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list option
       if(degs[i]==0) { J[i] = c*J[i]; }
     }
   }
-  "DEBUG - time for liftings:", timer - t;
+  //"DEBUG - time for liftings:", timer - t;
 
 
   if(dbg > 1)
@@ -5386,10 +5475,9 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list option
   // --------------------------- prepare output ----------------------------
   // Groebner basis in the ring with only the original variables
   
-  "time up to here: ", timer - t;
   t = timer;
   J = groebner(J);
-  "DEBUG - time for final GB computation:", timer - t;
+  //"DEBUG - time for final GB computation:", timer - t;
 
   setring R;
   J = imap(Q, J);
@@ -7236,7 +7324,7 @@ static proc modpNormal(ideal I, int p, poly condu,int printTimings,list #)
 proc modNormal(ideal I, int nPrimes, list #)
 "USAGE:  modNormal(I, n [,options]); I = prime ideal, n = positive integer, options = list of options. @*
          Optional parameters in list options (can be entered in any order):@*
-         noVerificication: do not verify the result.@*
+         noVerification: do not verify the result.@*
          printTimings: print timings.@*
          int ncores: number of cores to be used (default = 1).
 ASSUME:  I is a prime ideal (the algorithm will also work for radical ideals as long as the
@@ -7245,13 +7333,13 @@ RETURN:  a list of an ideal U and a universal denominator d such that U/d is the
 REMARKS: We use the algorithm given in [1] to compute the normalization of A = R/I where R is the
          basering. We apply the algorithm for n primes at a time until the result lifted to the
          rationals is correct modulo one additional prime. Depending on whether the option
-         noVerificication is used or not, the result is returned as a probabilistic result
+         noVerification is used or not, the result is returned as a probabilistic result
          or verified over the rationals.@*
          The normalization of A is represented as an R-module by returning a list of U and d,
          where U is an ideal of A and d is an element of A such that U/d is the normalization of A.
          In fact, U and d are returned as an ideal and a polynomial of the base ring R.
 KEYWORDS: normalization; modular techniques.
-SEE ALSO: normal_lib, locnormal_lib.
+SEE ALSO: integralbasis_lib.
 EXAMPLE: example modNormal; shows an example
 "
 {
@@ -7549,7 +7637,7 @@ static proc normalCheck(ideal U, ideal I,int printTimings)
   poly D = U[1];  // universal denominator
 
   if (printTimings==1) {"Computing the new ring structure";}
-  list ele = Normal::computeRing(U, I, "noRed");
+  list ele = computeRing(U, I, "noRed");
 
   def origEre = ele[1];
   setring origEre;
@@ -7575,7 +7663,7 @@ static proc normalCheck(ideal U, ideal I,int printTimings)
 
   // ----------------- Grauer-Remmert criterion check -----------------------
   // We check if the equality in Grauert - Remmert criterion is satisfied.
-  int isNormal = Normal::checkInclusions(D*oldU, U);
+  int isNormal = checkInclusions(D*oldU, U);
   setring R;
   return(isNormal);
 }
@@ -7622,8 +7710,8 @@ proc locNormal(ideal I, list #)
 "USAGE:  locNormal(I [,options]); I = prime ideal, options = list of options. @*
          Optional parameters in list options (can be entered in any order):@*
          modular: use a modular approach for the local computations. The number of primes is
-                  increased one at a time, starting with 2 primes, until the result stabelizes.@*
-         noVerificication: if the modular approach is used, the result will not be verified.
+                  increased one at a time, starting with 2 primes, until the result stabilizes.@*
+         noVerification: if the modular approach is used, the result will not be verified.
 ASSUME:  I is a prime ideal (the algorithm will also work for radical ideals as long as the
          normal command does not detect that the ideal under consideration is not prime).
 RETURN:  a list of an ideal U and a universal denominator d such that U/d is the normalization.
@@ -7632,7 +7720,7 @@ REMARKS: We use the local-to-global algorithm given in [1] to compute the normal
          The idea is to stratify the singular locus of A, apply the normalization algorithm
          given in [2] locally at each stratum, and put the local results together.@*
          If the option modular is given, the result is returned as a probabilistic result
-         or verified, depending on whether the option noVerificication is used or not.@*
+         or verified, depending on whether the option noVerification is used or not.@*
          The normalization of A is represented as an R-module by returning a list of U and d,
          where U is an ideal of A and d is an element of A such that U/d is the normalization of A.
          In fact, U and d are returned as an ideal and a polynomial of the base ring R.
@@ -7805,7 +7893,7 @@ proc locNormal_parallelTask(ideal pdi, ideal I, poly condu, int i, int locmod,
     "Output of normalization of component ", i, ": "; norT;
     "";
   }
-  ideal nor = normal::changeDenominator(norT, denomT, condu, I);
+  ideal nor = changeDenominator(norT, denomT, condu, I);
   return(list(nor, t));
 }
 
