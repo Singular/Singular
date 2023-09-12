@@ -285,7 +285,7 @@ EXAMPLE: example integralBasis; shows an example
 
 
   // We check if the only singularity is at the origin.
-  //check0 = 0;
+  check0 = 0;
   if(check0 == 1)
   {
     dbprint(dbg,"Check at origin");
@@ -302,7 +302,7 @@ EXAMPLE: example integralBasis; shows an example
 
 //--------------------- computing the integral basis --------------------------
   dbprint(dbg, "Computing the integral basis...");
-  list ib = integralBasisMain(f, strategy, algorithm, modular, compType, compo, locBasis, useRotation);
+  list ib = integralBasisMain(f, strategy, algorithm, modular, compType, compo, locBasis, useRotation, optimize);
 
   ideal num = ib[1];
   poly den = ib[2];
@@ -525,6 +525,8 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
     J;
   }
 
+~;
+
   if(isOneIdeal(J))
   {
     list out = trivialBasis(f);
@@ -533,6 +535,9 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
 
 //------------------- components of the singular locus------------------------
   int t = timer;
+
+"HHH";
+
   //if(algorithm == "normal")
   //{
   //  dbprint(dbg, "--Computing the primary decomposition of the singular locus...");
@@ -1200,15 +1205,9 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   int totDeg = getTotalDeg(l);
   list classes = getClasses(l);
 
-  //if(dbg > 5)
-  //{
-  //  "Puiseux branches: "; classes;
-  //}
-
   // We compute the building blocks of the basis elements
   dbprint(dbg, "--Building factors of different degrees...");
   list bF = buildFactors(classes);
-  //"Factors: "; bF;
 
   debug_log_intbas(3, "------Time for the factors: ", timer - tt);
   tt = timer;
@@ -1427,7 +1426,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   if(ifOut[3] == 0)
   {
-    "Classes are wrongly computed. We need to recompute!";
+    dbprint(dbg, "// Classes are wrongly computed. We need to recompute!");
 
     list mergeCl = mergeClassesIF(f, classes, ifOut, mdm);
     classes = mergeCl[1];
@@ -1439,10 +1438,10 @@ static proc ibAt0(poly f, int locBasis, int optimize)
     ifOut = irreducibleFactors(f, classes, blocks, mdm);
     if(ifOut[3] == 0)
     {
-      "Recomputation unsuccesfull. Output may be wrong.";
+      dbprint(dbg, "// Recomputation unsuccesfull. Output may be wrong.");
     } else
     {
-      "Recomputation succesfull. ";
+      dbprint(dbg, "// Recomputation succesfull. ");
     }
     I2LiftedFull = ifOut[1];
 
@@ -4890,13 +4889,6 @@ proc optimAlgorithm(int n, int locBasis, int d0, int d1, intvec vxy, matrix M, l
 
   dbprint(dbg, "Computing all the elements of the integral basis...");
   
-  "d0 = ", d0;
-  "Classes";
-  classes;
-  
-  //~;
-  
-  
   list bestElems;
   if(optimize == 1){
     bestElems = optiBest(M, MSelf, md, n);
@@ -4914,10 +4906,6 @@ proc optimAlgorithm(int n, int locBasis, int d0, int d1, intvec vxy, matrix M, l
     }
   }
   
-  
-  "bestElems";
-  bestElems;
-
   if(locBasis == 0)
   {
     for(k = 1; k <= d1+1; k++)
@@ -4931,10 +4919,6 @@ proc optimAlgorithm(int n, int locBasis, int d0, int d1, intvec vxy, matrix M, l
     ibDen[1] = 1;
   }
 
-  "MSelf";
-  MSelf;
-
-  
   poly pTemp;
   for(k = 1; k < d0; k++)
   {
