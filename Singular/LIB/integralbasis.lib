@@ -50,8 +50,17 @@ proc integralBasis(poly f, int intVar, list #)
         results in integral basis shape.@*
         - \"local\" -> computes the normalization at each component of
         the singular locus of R/<f> and puts everything together.
+        (Default option for normal algorithm.)@*
+        Options for hensel algorithm:@*
+        - \"opti\" -> The integral basis for the branches are merged 
+        using a combinatorial approach. (Default option.)@*
+        - \"noOpti\" -> the integral basis for the different branches
+        are merged using the Chinese remainder theorem. This is usually
+        slower when the number of branches is large.@*
+        - \"local\" -> computes the normalization at each component of
+        the singular locus of R/<f> and puts everything together.
         (Default option for normal algorithm.)
-        @*Other options:@*
+        Other options:@*
         - \"modular\" -> uses modular algorithms for computing Groebner bases,
         radicals and decompositions whenever possible. Can be used together
         with any of the other options. The ground field must have
@@ -185,6 +194,9 @@ EXAMPLE: example integralBasis; shows an example
       }
       if (#[i]=="noOpti"){
         optimize = 0;
+      }
+      if (#[i]=="opti"){
+        optimize = 1;
       }
     }
 
@@ -4846,7 +4858,7 @@ static proc mergeTwoClasses(list classes, int a1, int a2)
 
 proc optimAlgorithm(int n, int locBasis, int d0, int d1, intvec vxy, matrix M, list MSelf, intvec md, list classes, list I2Lifted, list bestElem, int optimize)
 {
-  "START - intbasoptim.lib - optimAlgorithm - 1";  
+  dbprint(dbg, "START - intbasoptim.lib - optimAlgorithm - 1");  
   int i, j, k;
   int t = timer;
   list b;
