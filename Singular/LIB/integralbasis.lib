@@ -525,7 +525,13 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
     J;
   }
 
-~;
+  if(modular == 1)
+  {
+    J = modStd(J);
+  } else
+  {
+    J = std(J);
+  }
 
   if(isOneIdeal(J))
   {
@@ -535,8 +541,6 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
 
 //------------------- components of the singular locus------------------------
   int t = timer;
-
-"HHH";
 
   //if(algorithm == "normal")
   //{
@@ -554,7 +558,6 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
       list pd = minAssGTZ(J);
     }
   //}
-  //"Time assoc primes: ", timer - t;
   debug_log_intbas(2, "----Decomposition time:", timer - t);
 
   dbprint(dbg-2, "----The number of components of the Singular Locus is ", size(pd));
@@ -4563,9 +4566,9 @@ static proc trivialBasis(poly f)
   return(list(l, poly(1)));
 }
 
+// We assumes we are given a Groebner basis of I
 static proc isOneIdeal(ideal I)
 {
-  I = groebner(I);
   int i;
   int out = 0;
 
