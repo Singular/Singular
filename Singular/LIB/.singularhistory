@@ -1,0 +1,393 @@
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+var(2)
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+den
+f
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+ff
+den
+pols
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+maxExpi
+d
+s
+md
+summands(d, s, md);
+M
+MSelf
+s
+d
+s
+md
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+md
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+I2Lifted
+classes
+l
+getClasses(l)
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+f
+classes
+blocks
+mdm
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+degExpand
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+maxDeg
+sN
+sD
+f
+je
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+newL
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+[200~LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+~
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+l1;
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+I2LiftedFull
+ifOut
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+l1;
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+I2LiftedFull
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+classes2
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+I2LiftedFull
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y5 + x2) * (y5 + y4x + x2)+y11;
+list l1 = integralBasis(f,2, "atOrigin");
+l1;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y3+x2)*(y2-x3)+y6;
+integralBasis(f,2);
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+classes
+typeof(classes[i][1])
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+classes
+i
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+classes
+size(classes);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+;
+;
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+1<>0;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+maxExpi
+minOrd
+M
+MSelf
+d
+md
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+classes
+def S = classes[2];
+setring S;
+PE;
+printlevel = 10;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+classes
+def SS = classes[2][1];
+setring SS;
+PE;
+basering;
+M
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+M
+bestElem
+bF
+md
+classes
+def SS = classes[2][1];
+setring SS;
+PE;
+minpoly
+pardeg(minpoly)
+degBase
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+md
+basering
+def SS = classes[1][1];
+setring SS;
+PE;
+basering;
+lcm(5,5)
+lcm(5,10)
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)+y12;
+list l1 = integralBasis(f,2);
+l;
+l1;
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y4+3x3y + x4)*(y5+7x3)*(y3-4x2)*(y3+x2)*(y2-x3)+y30;
+list l1 = integralBasis(f,2,"modular");
+
