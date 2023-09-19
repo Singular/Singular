@@ -2335,10 +2335,8 @@ proc buildPolyGroundXRoot(poly f, int den)
     //~;
     
     list pols;
-    poly ff;
     for(i = 1; i <= den; i++)
     {
-      
       ff = subst(ffRed, var(1), var(1) * var(2+i));
       pols[i] = ff;
     }
@@ -2361,13 +2359,14 @@ proc buildPolyGroundXRoot(poly f, int den)
     }
     I = groebner(I);
 
-    poly fNewTemp = 1;
+    poly fNew = 1;
     for(i = 1; i<=den; i++)
     {
-      fNewTemp = fNewTemp * (var(2) - pols[i]);
-      fNewTemp = reduce(fNewTemp, I);
+      fNewTemp = fNew * (var(2) - pols[i]);
+      fNew = reduce(fNewTemp, I);
     }
-    poly fNew = reduce(fNewTemp, I);
+    //poly fNew = reduce(fNewTemp, I);
+    //poly fNew = fNewTemp;
 
     //"fNewTemp", pols, den;
     //~; 
