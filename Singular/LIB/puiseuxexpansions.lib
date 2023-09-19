@@ -849,6 +849,9 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
   int cod = 0;
   int mi;
 
+  poly minPBefore;
+  list minPFacs;
+
   // Case of Puiseux expansions with finite number of terms
   list dd = Integralbasis::divideBy(f, var(2));
   if(dd[2]>0)
@@ -864,7 +867,6 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
 
 
   list l = newtonpoly2(f);
-  "newton poly", l;
 
   //list l = newtonpoly(f);
 
@@ -926,11 +928,6 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
 
       fNew1 = subst(f, var(1), var(1)^slD);
       
-      "size(fJe[1])";
-      size(fJe[1]);
-      
-      "fJe", fJe;
-      
       for(ii = 2; ii <= size(fJe[1]); ii++)
       {
         if((ii == 2) || (nonRatCoeff(fJe[1][ii]) == 0))  // If the factor is over the ground field then it is a new conjugacy class.
@@ -951,317 +948,312 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
         @c = puiseuxStep(fTemp, slN, 1);
         fc = factorize(@c);
         
-        "here";
-        fJe;
-
-          // Stopping criterium
-          stop = 0;
-          if(maxDeg <= 0)
+        // Stopping criterium
+        stop = 0;
+        if(maxDeg <= 0)
+        {
+          if(fJe[2][ii] == 1)
           {
-            if(fJe[2][ii] == 1)
-            {
-              stop = 1;
-            }
-          } else 
-          {
-            if(slN >= slD * maxDeg)
-            {
-              stop = 1;
-            }
+            stop = 1;
           }
-
-          if(fJe[1][ii] != var(2))
+        } else 
+        {
+          if(slN >= slD * maxDeg)
           {
-            //minP = fc[1][j];
-            // The minpoly of Y^5-1 is Y-1 and the minpoly of Y^5-2 is Y-2.
-            poly minPBefore = subst(fJe[1][ii],var(1),1);
-            list minPFacs = factorize(minPBefore);
-            minP = minPFacs[1][2];   // Check if this always the smallest degree
-            "minPFacs", minPFacs;
-            "minP = ", minP;
-            if(deg(minP)==1)
+            stop = 1;
+          }
+        }
+
+        if(fJe[1][ii] != var(2))
+        {
+          //minP = fc[1][j];
+          
+          // The minpoly of Y^5-1 is Y-1 and the minpoly of Y^5-2 is Y^5-2.
+          minPBefore = subst(fJe[1][ii],var(1),1);
+          minPFacs = factorize(minPBefore);
+          minP = minPFacs[1][2];   // Check if this always the smallest degree
+
+          if(deg(minP)==1)
+          {
+            cofs = coeffs(minP, var(2));
+            c1 = number(-cofs[1,1]/cofs[2,1]);
+            if(defined(erg))
             {
-              cofs = coeffs(minP, var(2));
-              c1 = number(-cofs[1,1]/cofs[2,1]);
-              if(defined(erg))
+              sizeErg = size(erg);
+            } else 
+            {
+              sizeErg = 1;
+            }
+            if(stop == 0)
+            {
+              if(slN >= 0)
               {
-                sizeErg = size(erg);
-              } else 
+                fNew2 = subst(fNew1, var(2), (c1+var(2))*(var(1)^slN));
+              } else
               {
-                sizeErg = 1;
+                // Negative exponent case
+                fNew2 = negExp(fNew1, c1, slN);
               }
-              if(stop == 0)
+              fNew2= sat(ideal(fNew2), var(1))[1];
+
+              if(maxDeg > 0)
               {
-                if(slN >= 0)
-                {
-                  "check this";
-                  fNew2 = subst(fNew1, var(2), (c1+var(2))*(var(1)^slN));
-                } else
-                {
-                  // Negative exponent case
-                  fNew2 = negExp(fNew1, c1, slN);
-                }
-                fNew2= sat(ideal(fNew2), var(1))[1];
+                newMaxDeg = maxDeg * slD - slN;
+              } else {
+                newMaxDeg = maxDeg;
+              }
 
-                if(maxDeg > 0)
-                {
-                  newMaxDeg = maxDeg * slD - slN;
-                } else {
-                  newMaxDeg = maxDeg;
-                }
+              csT = puiseuxMainOneExpansion(fNew2, newMaxDeg, slN, 1, 0);
 
-                csT = puiseuxMainOneExpansion(fNew2, newMaxDeg, slN, 1, 0);
-
-                for(k = 1; k<=size(csT); k++)
+              for(k = 1; k<=size(csT); k++)
+              {
+                if(typeof(csT[k]) != "ring")
                 {
-                  if(typeof(csT[k]) != "ring")
+                  // Case of a polynomial with the corresponding denominator;
+                  if(slN >= 0)
                   {
-                    // Case of a polynomial with the corresponding denominator;
-                    if(slN >= 0)
-                    {
-                      cs[size(cs) + 1] = list((csT[k][1] + c1)*(var(1)^(csT[k][2]*slN)), csT[k][2]*slD);
-                    } else 
-                    {
-                      cs[size(cs) + 1] = list(csT[k][1] + c1, csT[k][2]*slD);
-                      cs[size(cs)][8] = list("Denominator", var(1) ^ (-slN*csT[k][2]));
-                    }
-
-
-                    // NEW CODING FOR CONJUGATED EXPANSIONS
-                    cs[size(cs)][6] = insert(csT[k][6], cod);
-                    
-                    if(newExt == 1)
-                    {
-                      if(typeof(csT[k][7])=="none"){
-                        cs[size(cs)][7] = list(0);
-                      } else
-                      {
-                        cs[size(cs)][7] = insert(csT[k][7], 0);
-                      }
-                      cs[size(cs)][7] = sum2All(cs[size(cs)][7], slN * csT[k][2]);
-                    } else
-                    {
-                      if(typeof(csT[k][7]) != "none"){
-                        cs[size(cs)][7] = sum2All(csT[k][7], slN * csT[k][2]);
-                      }
-                    }
+                    cs[size(cs) + 1] = list((csT[k][1] + c1)*(var(1)^(csT[k][2]*slN)), csT[k][2]*slD);
                   } else 
                   {
-                    def RT = csT[k];
-                    setring RT;
-                    number c1 = fetch(R, c1);
-                    // Change @a by par(1)?
-                    c1 = number(subst(c1, @a, number(erg[sizeErg])));
-
-                    for(h = 1; h <= size(PE); h++)
-                    {
-                      if(slN >= 0)
-                      {
-                        PE[h][1] = (PE[h][1] + c1) * (var(1)^(slN*PE[h][2]));
-                        if(newExt == 1)
-                        {
-                          PE[h][7] = insert(PE[h][7], 0);
-                        }
-                        PE[h][7] = sum2All(PE[h][7], slN * PE[h][2]);
-                        PE[h][2] = PE[h][2] * slD;
-
-                        // NEW CODING FOR CONJUGATED EXPANSIONS
-                        PE[h][6] = insert(PE[h][6], cod);
-                      } else {
-                        PE[h][1] = PE[h][1] + c1;
-                        if(newExt == 1)
-                        {
-                          PE[h][7] = insert(PE[h][7], 0);
-                        }
-
-                        // Check if this is correct
-                        // (before PE[h][8] was defined after PE[h][2] was modified)
-                        PE[h][8] = list("Denominator", var(1) ^ (-slN*PE[h][2]));
-                        PE[h][2] = PE[h][2] * slD;
-
-                        // NEW CODING FOR CONJUGATED EXPANSIONS
-                        PE[h][6] = insert(PE[h][6], cod);
-                      }
-                    }
-                    setring R;
-                    cs[size(cs) + 1] = RT;
-                    kill RT;
+                    cs[size(cs) + 1] = list(csT[k][1] + c1, csT[k][2]*slD);
+                    cs[size(cs)][8] = list("Denominator", var(1) ^ (-slN*csT[k][2]));
                   }
-                }
-              } else {
-                cs[size(cs) + 1] = list(c1 * var(1)^slN, slD);
-                cs[size(cs)][6] = list(cod);
-                if(newExt == 1)
+
+
+                  // NEW CODING FOR CONJUGATED EXPANSIONS
+                  cs[size(cs)][6] = insert(csT[k][6], cod);
+                  
+                  if(newExt == 1)
+                  {
+                    if(typeof(csT[k][7])=="none"){
+                      cs[size(cs)][7] = list(0);
+                    } else
+                    {
+                      cs[size(cs)][7] = insert(csT[k][7], 0);
+                    }
+                    cs[size(cs)][7] = sum2All(cs[size(cs)][7], slN * csT[k][2]);
+                  } else
+                  {
+                    if(typeof(csT[k][7]) != "none"){
+                      cs[size(cs)][7] = sum2All(csT[k][7], slN * csT[k][2]);
+                    }
+                  }
+                } else 
                 {
-                  cs[size(cs)][7] = list(slN);
+                  def RT = csT[k];
+                  setring RT;
+                  number c1 = fetch(R, c1);
+                  // Change @a by par(1)?
+                  c1 = number(subst(c1, @a, number(erg[sizeErg])));
+
+                  for(h = 1; h <= size(PE); h++)
+                  {
+                    if(slN >= 0)
+                    {
+                      PE[h][1] = (PE[h][1] + c1) * (var(1)^(slN*PE[h][2]));
+                      if(newExt == 1)
+                      {
+                        PE[h][7] = insert(PE[h][7], 0);
+                      }
+                      PE[h][7] = sum2All(PE[h][7], slN * PE[h][2]);
+                      PE[h][2] = PE[h][2] * slD;
+
+                      // NEW CODING FOR CONJUGATED EXPANSIONS
+                      PE[h][6] = insert(PE[h][6], cod);
+                    } else {
+                      PE[h][1] = PE[h][1] + c1;
+                      if(newExt == 1)
+                      {
+                        PE[h][7] = insert(PE[h][7], 0);
+                      }
+
+                      // Check if this is correct
+                      // (before PE[h][8] was defined after PE[h][2] was modified)
+                      PE[h][8] = list("Denominator", var(1) ^ (-slN*PE[h][2]));
+                      PE[h][2] = PE[h][2] * slD;
+
+                      // NEW CODING FOR CONJUGATED EXPANSIONS
+                      PE[h][6] = insert(PE[h][6], cod);
+                    }
+                  }
+                  setring R;
+                  cs[size(cs) + 1] = RT;
+                  kill RT;
                 }
               }
             } else {
-              if(npars(R) == 1)
+              cs[size(cs) + 1] = list(c1 * var(1)^slN, slD);
+              cs[size(cs)][6] = list(cod);
+              if(newExt == 1)
               {
-                if(!defined(erg))
-                {
-                  list erg;
-                  erg[1] = par(1);
-                }
-                if(!defined(minPolys))
-                {
-                  list minPolys;
-                  minPolys[1] = 1;
-                }
-
-                def S = Integralbasis::splitRingAt(minP, erg);
-                setring S;
-                sizeErg = size(erg);
-                poly newA = erg[size(erg)];  // The root founded. That is, newA is the root of minP in S.
-                poly fNew1 = fetch(R, fNew1);
-
-                if(!defined(minPolys))
-                {
-                  list minPolys = fetch(R, minPolys);
-                }
-
-                // We replace the old a by its image in the new ring.
-                minPolys[size(minPolys)+1] = fetch(R, minP);
-                for(mi = 1; mi <= size(minPolys); mi++)
-                {
-                  minPolys[mi] = subst(minPolys[mi], par(1), erg[size(erg)-1]);
-                }
-                fNew1 = subst(fNew1, par(1), erg[size(erg)-1]);
-
-              } else {
-                def S = Integralbasis::splitRingAt(minP);
-                setring S;
+                cs[size(cs)][7] = list(slN);
+              }
+            }
+          } else {
+            if(npars(R) == 1)
+            {
+              if(!defined(erg))
+              {
+                list erg;
+                erg[1] = par(1);
+              }
+              if(!defined(minPolys))
+              {
                 list minPolys;
                 minPolys[1] = 1;
-                minPolys[size(minPolys)+1] = fetch(R, minP);
-                poly fNew1 = fetch(R, fNew1);
-                poly newA = par(1);      // In this case, it is the new variable.
-                list erg = par(1);
-                export erg;
-                sizeErg = 1;
               }
-              export(minPolys);
 
-              if(defined(PES))
+              def S = Integralbasis::splitRingAt(minP, erg);
+              setring S;
+              sizeErg = size(erg);
+              poly newA = erg[size(erg)];  // The root founded. That is, newA is the root of minP in S.
+              poly fNew1 = fetch(R, fNew1);
+
+              if(!defined(minPolys))
               {
-                PES = list();
+                list minPolys = fetch(R, minPolys);
+              }
+
+              // We replace the old a by its image in the new ring.
+              minPolys[size(minPolys)+1] = fetch(R, minP);
+              for(mi = 1; mi <= size(minPolys); mi++)
+              {
+                minPolys[mi] = subst(minPolys[mi], par(1), erg[size(erg)-1]);
+              }
+              fNew1 = subst(fNew1, par(1), erg[size(erg)-1]);
+
+            } else {
+              def S = Integralbasis::splitRingAt(minP);
+              setring S;
+              list minPolys;
+              minPolys[1] = 1;
+              minPolys[size(minPolys)+1] = fetch(R, minP);
+              poly fNew1 = fetch(R, fNew1);
+              poly newA = par(1);      // In this case, it is the new variable.
+              list erg = par(1);
+              export erg;
+              sizeErg = 1;
+            }
+            export(minPolys);
+
+            if(defined(PES))
+            {
+              PES = list();
+            } else
+            {
+              list PES;
+            }
+            if(stop == 0){
+              // We use the image of the root of minP in the new ring.
+              if(slN >= 0)
+              {
+                poly fNew2 = subst(fNew1, var(2), (newA + var(2))*var(1)^slN);
               } else
               {
-                list PES;
+                poly fNew2 = negExp(fNew1, newA, slN);
               }
-              if(stop == 0){
-                // We use the image of the root of minP in the new ring.
-                if(slN >= 0)
+              fNew2= sat(ideal(fNew2), var(1))[1];
+              if(maxDeg > 0)
+              {
+                newMaxDeg = maxDeg * slD - slN;
+              } else {
+                newMaxDeg = maxDeg;
+              }
+              list csTS = puiseuxMainOneExpansion(fNew2, newMaxDeg, slN, 1, 0);
+              for(k = 1; k<=size(csTS); k++)
+              {
+                if(typeof(csTS[k]) == "ring")
                 {
-                  poly fNew2 = subst(fNew1, var(2), (newA + var(2))*var(1)^slN);
-                } else
-                {
-                  poly fNew2 = negExp(fNew1, newA, slN);
-                }
-                fNew2= sat(ideal(fNew2), var(1))[1];
-                if(maxDeg > 0)
-                {
-                  newMaxDeg = maxDeg * slD - slN;
-                } else {
-                  newMaxDeg = maxDeg;
-                }
-                list csTS = puiseuxMainOneExpansion(fNew2, newMaxDeg, slN, 1, 0);
-                for(k = 1; k<=size(csTS); k++)
-                {
-                  if(typeof(csTS[k]) == "ring")
+                  def RT = csTS[k];
+                  setring RT;
+                  for(h = 1; h<=size(PE); h++)
                   {
-                    def RT = csTS[k];
-                    setring RT;
-                    for(h = 1; h<=size(PE); h++)
-                    {
-                      // The new coefficient is the image of a in the new ring.
-                      if(slN >= 0)
-                      {
-                        PE[h][1] = (PE[h][1] + erg[sizeErg]) * var(1)^(PE[h][2]*slN);
-                        if(newExt == 1)
-                        {
-                          PE[h][7] = insert(PE[h][7], 0);
-                        }
-                        PE[h][7] = sum2All(PE[h][7], slN * PE[h][2]);
-                        PE[h][2] = PE[h][2] * slD;
-
-                        // NEW CODING FOR CONJUGATED EXPANSIONS
-                        PE[h][6] = insert(PE[h][6], cod);
-                      } else
-                      {
-                        PE[h][1] = (PE[h][1] + erg[sizeErg]);
-                        if(newExt == 1)
-                        {
-                          PE[h][7] = insert(PE[h][7], 0);
-                        }
-                        PE[h][7] = sum2All(PE[h][7], slN * PE[h][2]);
-                        PE[h][2] = PE[h][2] * slD;
-
-                        // NEW CODING FOR CONJUGATED EXPANSIONS
-                        PE[h][6] = insert(PE[h][6], cod);
-
-                        PE[h][8] = list("Denominator", var(1) ^ (-slN*PE[h][2]));
-                      }
-                    }
-                    setring R;
-                    cs[size(cs) + 1] = RT;
-                    kill RT;
-                    setring S;
-                  } else {
+                    // The new coefficient is the image of a in the new ring.
                     if(slN >= 0)
                     {
-                      PES[size(PES) + 1] = list((csTS[k][1] + newA)*var(1)^(csTS[k][2]*slN), csTS[k][2]*slD);
-                    } else {
-                      PES[size(PES) + 1] = list(csTS[k][1] + newA, csTS[k][2]*slD);
-                      PES[size(PES)][8] = list("Denominator", var(1) ^ (-slN*csTS[k][2]));
-                    }
-
-                    // NEW CODING FOR CONJUGATED EXPANSIONS
-                    PES[size(PES)][6] = insert(csTS[k][6], cod);
-
-                    if(newExt == 1)
-                    {
-                      if(typeof(csTS[k][7]) == "none")
+                      PE[h][1] = (PE[h][1] + erg[sizeErg]) * var(1)^(PE[h][2]*slN);
+                      if(newExt == 1)
                       {
-                        PES[size(PES)][7] = list(0);
-
-                      } else
-                      {
-                        PES[size(PES)][7] = insert(csTS[k][7], 0);
+                        PE[h][7] = insert(PE[h][7], 0);
                       }
-                      PES[size(PES)][7] = sum2All(PES[size(PES)][7], slN * csTS[k][2]);
+                      PE[h][7] = sum2All(PE[h][7], slN * PE[h][2]);
+                      PE[h][2] = PE[h][2] * slD;
+
+                      // NEW CODING FOR CONJUGATED EXPANSIONS
+                      PE[h][6] = insert(PE[h][6], cod);
                     } else
                     {
-                      PES[size(PES)][7] = csTS[k][7];
+                      PE[h][1] = (PE[h][1] + erg[sizeErg]);
+                      if(newExt == 1)
+                      {
+                        PE[h][7] = insert(PE[h][7], 0);
+                      }
+                      PE[h][7] = sum2All(PE[h][7], slN * PE[h][2]);
+                      PE[h][2] = PE[h][2] * slD;
+
+                      // NEW CODING FOR CONJUGATED EXPANSIONS
+                      PE[h][6] = insert(PE[h][6], cod);
+
+                      PE[h][8] = list("Denominator", var(1) ^ (-slN*PE[h][2]));
                     }
-
                   }
-                }
-                if(size(PES) > 0){
-                  list PE = PES;
-                  export PE;
                   setring R;
-                  cs[size(cs) + 1] = S;
-                }
-              } else {
-                poly PE1 = newA*var(1)^slN;
-                list PE = list(list(PE1, slD));
-                PE[1][6] = list(cod);
-                if(newExt == 1)
-                {
-                  PE[1][7] = list(slN);
-                }
-                export PE;
+                  cs[size(cs) + 1] = RT;
+                  kill RT;
+                  setring S;
+                } else {
+                  if(slN >= 0)
+                  {
+                    PES[size(PES) + 1] = list((csTS[k][1] + newA)*var(1)^(csTS[k][2]*slN), csTS[k][2]*slD);
+                  } else {
+                    PES[size(PES) + 1] = list(csTS[k][1] + newA, csTS[k][2]*slD);
+                    PES[size(PES)][8] = list("Denominator", var(1) ^ (-slN*csTS[k][2]));
+                  }
 
+                  // NEW CODING FOR CONJUGATED EXPANSIONS
+                  PES[size(PES)][6] = insert(csTS[k][6], cod);
+
+                  if(newExt == 1)
+                  {
+                    if(typeof(csTS[k][7]) == "none")
+                    {
+                      PES[size(PES)][7] = list(0);
+
+                    } else
+                    {
+                      PES[size(PES)][7] = insert(csTS[k][7], 0);
+                    }
+                    PES[size(PES)][7] = sum2All(PES[size(PES)][7], slN * csTS[k][2]);
+                  } else
+                  {
+                    PES[size(PES)][7] = csTS[k][7];
+                  }
+
+                }
+              }
+              if(size(PES) > 0){
+                list PE = PES;
+                export PE;
                 setring R;
                 cs[size(cs) + 1] = S;
               }
-              kill S;
+            } else {
+              poly PE1 = newA*var(1)^slN;
+              list PE = list(list(PE1, slD));
+              PE[1][6] = list(cod);
+              if(newExt == 1)
+              {
+                PE[1][7] = list(slN);
+              }
+              export PE;
+
+              setring R;
+              cs[size(cs) + 1] = S;
             }
+            kill S;
           }
-          setring R;
-        
+        }
+        setring R;
       }
     }
   }
@@ -1273,28 +1265,6 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
 
   return(cs);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
