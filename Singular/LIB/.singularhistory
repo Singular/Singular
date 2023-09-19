@@ -1068,5 +1068,27 @@ ring r = 0,(x,y),dp;
 poly f = x^15-21*x^14+8*x^13*y-6*x^13-16*x^12*y+20*x^11*y^2-x^12+8*x^11*y-36*x^10*y^2+24*x^9*y^3+4*x^9*y^2-16*x^8*y^3+26*x^7*y^4-6*x^6*y^4+8*x^5*y^5+4*x^3*y^6-y^8;
 f = f *(-1);
 list l = integralBasis(f, 2, "nonModular");
-
 l;
+LIB"integralbasis.lib";
+ring r = 0,(x,y),dp;
+poly f = (y^4 + 2*x^3*y^2 + x^6 + x^5*y)^3 + x^11*y^11;
+list l = integralBasis(f, 2, "nonModular");
+l;
+LIB"integralbasis.lib";
+ring r = 0,(x,y),dp;
+poly f = (y^4 + 2*x^3*y^2 + x^6 + x^5*y)^3 + x^11*y^11;
+list l = integralBasis(f, 2, "nonModular");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y3+x2)*(y2-x3)+y6;
+integralBasis(f,2);
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y6x + x4)*(y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+list l2 = integralBasis(f,2, "atOrigin", "noOpti");
+
