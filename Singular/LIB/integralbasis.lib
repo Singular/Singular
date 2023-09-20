@@ -1398,7 +1398,6 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
   {
-    "ifOut4 = 1";
     kill ordsFull;
     kill ordsBest;
     kill ordsTemp;
@@ -2385,6 +2384,7 @@ proc buildPolyGroundXRoot(poly f, int den)
     I = groebner(I);
 
     poly fNew = 1;
+    poly fNewTemp;
     for(i = 1; i<=den; i++)
     {
       fNewTemp = fNew * (var(2) - pols[i]);
@@ -3194,6 +3194,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
     int ind = 2;
     list classes2;
     poly fu, fuProd;
+    list bP;
     list fuPols;
     int PEPE;
     int cl;
@@ -3255,7 +3256,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
             
             list bP = buildPolyGroundXRoot(PE[1][1], PE[1][2]);
             
-            "bP ring", bP;
+            //"bP ring", bP;
 
 
             poly fuProd = bP[1];
@@ -3264,15 +3265,15 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
             //PEPE = PE[1][2];
 
             setring R;
-            poly fuProd = imap(S, fuProd);
+            fuProd = imap(S, fuProd);
             kill S;
           } else
           {
-            list bP = buildPolyGroundXRoot(classes2[j][1][1], classes2[j][1][2]);
-            poly fuProd = bP[1];
-            int gfCheck = bP[2];
+            bP = buildPolyGroundXRoot(classes2[j][1][1], classes2[j][1][2]);
+            fuProd = bP[1];
+            gfCheck = bP[2];
             
-            "bP poly", bP;
+            //"bP poly", bP;
             
           }
 
