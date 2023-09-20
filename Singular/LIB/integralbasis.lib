@@ -429,7 +429,7 @@ static proc integralBasisMain(poly f, string strategy, string algorithm, int mod
   {
     if(strategy == "local")
     {
-      // Computes the integral basis my glueing together the local
+      // Computes the integral basis by glueing together the local
       // contrubutions
       //"_DEBUG_ integralLocal";
       ib = integralLocal(I, modular, algorithm, useRotation, optimize, opts);
@@ -3051,6 +3051,8 @@ static proc ordAtPol(poly h, def S)
 // up to degree degExpand
 static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 {
+  dbprint(dbg, "START - irreducibleFactors");
+  
   list I2Lifted = henselBlocks(f, degExpand, 1);
 
 
@@ -3110,10 +3112,14 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
         // We recompute up to the appropiate order for merging
         poly I2Red = reduce(I2Lifted[i], var(1)^(degExpand+1));
 
-        //"Computing Puiseux expansions up to degree degExpand of factor ", i, ": ", I2Red;
+        dbprint(dbg, "Computing Puiseux expansions up to degree ", degExpand, " of factor ", i, ": ", I2Red);
 
         newL = puiseux(I2Red, degExpand, 1);
+        dbprint(dbg, "Puiseux expansions finished");
+
+        
         classes2 = getClasses(newL);
+        dbprint(dbg, "getClasses finished");
 
         for(j = 1; j <= size(classes2); j++)
         {
@@ -3149,6 +3155,8 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
           }
 
           bPG = buildPolyGround(fuProd, PEPE);
+          dbprint(dbg, "buildPolyGround finished");
+
 
           if(bPG[2] == 0)
           {
@@ -3176,6 +3184,8 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
     wrongNumber = 1;
   }
   list ll = list(I2Lifted, gfCheckList, gfCheck, wrongNumber, updatedClasses);
+
+  dbprint(dbg, "END - irreducibleFactors");
 
   return(ll);
 }
@@ -4169,10 +4179,12 @@ static proc henselBlocks(poly f, int globOrder, int loc)
     comp = 2;
     dbprint(dbg, "----Computing Puiseux Segments...");
     fSegment = henselSegments(fLoc, maxOrder);
-
+    
     for(i = 1; i <= size(fSegment); i++)
     {
+      "i, fSegment", i, fSegment, maxOrder;
       compsT = henselInSegment(fSegment[i], maxOrder);
+      dbprint(dbg, "----henselInSegment finished");
 
       for(k = 1; k <= size(compsT); k++){
         comps[comp] = compsT[k];
@@ -4230,10 +4242,9 @@ static proc henselSegments(poly f, int order)
 // Computes the different blocks in a segment up to the given order.
 static proc henselInSegment(poly f, int globOrder)
 {
-  //if(printlevel - voice > 5)
-  //{
-  //  "START - hensel.lib - henselSegments - 1";
-  //}
+  int dbg = printlevel - voice - 5;
+  dbprint(dbg, "START - henselInSegment");
+
   int i, j;
   int loc;
   list comps;
@@ -4244,6 +4255,7 @@ static proc henselInSegment(poly f, int globOrder)
   intvec vy = (0,1);
   int d = deg(f, vy);
 
+  dbprint(dbg, "henselInSegment - newtonpoly");
   list l = newtonpoly(f);
 
   int slN = l[2][1] - l[1][1];
@@ -4252,6 +4264,7 @@ static proc henselInSegment(poly f, int globOrder)
   slD = slD div g;
   slN = slN div g;
 
+  dbprint(dbg, "henselInSegment - minEqNewton");
   poly je = Puiseuxexpansions::minEqNewton(f, slN, slD);
   list fJe = factorize(je);
   fJe = sortFactors(fJe);
@@ -4288,12 +4301,18 @@ static proc henselInSegment(poly f, int globOrder)
   int comp = 1;
   poly ratPart;
   list compsT;
+  
+  dbprint(dbg, "sFac = ", sFac);
   for(i = 1; i <= sFac; i++)
   {
     degFac = deg(fJe[1][i+1], vy) * fJe[2][i+1];
     hFactor[i] = hFactor[i] * (x^(degFac * slN));
     hFactor[i] = mapFrom(hFactor[i], slN, slD);
+  
+    dbprint(dbg, "henselInSegment - splitFact - i = ", i);
     compsT = splitFact(hFactor[i], fJe[1][i+1], fJe[2][i+1], globOrder);
+    dbprint(dbg, "henselInSegment - splitFact - finished");
+    
     for(j = 1; j <= size(compsT); j++)
     {
       comps[comp] = compsT[j];
