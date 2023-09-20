@@ -3045,6 +3045,7 @@ static proc ordAtPol(poly h, def S)
 // up to degree degExpand
 static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 {
+  int dbg = printlevel - voice - 2;
   dbprint(dbg, "START - irreducibleFactors");
   
   list I2Lifted = henselBlocks(f, degExpand, 1);
