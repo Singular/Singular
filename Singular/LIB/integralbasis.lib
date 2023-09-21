@@ -1185,6 +1185,12 @@ proc in_array(list l, def elem)
   return(found);
 }
 
+// We compute the Puiseux segments using Hensel lifting.
+// The segments are order according to the initial exponent from
+// smaller to larger.
+// The classes of Puiseux expansions are grouped matching the
+// Puiseux segments.
+
 proc getSegments(poly f, list classes, list slopes, int globOrder)
 {
   int i, j;
@@ -1207,6 +1213,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
   }
   int locOrder = maxOrder;
 
+  // If loc == 1, we remove the component outside the origin.
   if(loc == 1)
   {
     list comps;
@@ -1228,13 +1235,13 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
     fSegment;
     for(i = 1; i <= size(fSegment); i++)
     {
+      // We compute the newton poly of each polynomial to find out the
+      // corresponding slope
       list l = newtonpoly(fSegment[i]);
-      "l(", i , ") = ", l;
-      
       slopeSegment = number(l[2][1]) / number(l[1][2]);
+
+      // We look for all classes with same slope as each segment
       classesNew = list();
-        
-      // We look for all classes with same slope as this segment
       for(j = 1; j <= size(classes); j++)
       {
         if(slopes[j][1] * l[1][2] == slopes[j][2] * l[2][1])  // same slope
@@ -1243,6 +1250,8 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
           classesNew[size(classesNew) + 1] = classes[j];  
         }
       }  
+      
+      // We put everything together
       out[i] = list(fSegment[i], slopeSegment, classesNew);
     }
   }
@@ -1250,9 +1259,6 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
   // We reorder according to the slope
   out = sortSegments(out);
   
-  
-  "output of getSegments: "; out;
-  //~;
   return(out);
 }
 
@@ -1260,7 +1266,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
 // the same order. This procedure is also used in Puiseux library.
 proc sortSegments(list segment);
 {
-  //"START - integralbasis.lib - sortFactors - 1";
+  //"START - integralbasis.lib - sortSegments - 1";
   int i, j;
   int n = size(segment);
   list segTemp;
@@ -1280,8 +1286,8 @@ proc sortSegments(list segment);
 }
 
 
-// We compute the local integral at f by exhaustive search
-// See "Direct approach in the combinatorial paper
+// We compute the local integral basis at f by exhaustive search
+// See "Direct approach in the combinatorial paper.
 proc ibSegment(poly f, list classes, int degExpand)
 {
   "ibSegment begins";
@@ -1290,7 +1296,8 @@ proc ibSegment(poly f, list classes, int degExpand)
   list polySet;
   intvec degPolySet;
   intvec vy = (0,1);
-  // We get all the possible polynomials, includign the full polys
+  
+  // We get all the possible polynomials, including the full polys
   list bF = buildFactors(classes);
   
   int degF = deg(f, vy);
@@ -1299,6 +1306,7 @@ proc ibSegment(poly f, list classes, int degExpand)
   poly pGround;
   for(i = 1; i <= size(classes); i++)
   {
+    // We put everything in a list, with no repeated elements
     for(j = 1; j <= size(bF[1][i]); j++)
     {
       if(in_array(polySet, bF[1][i][j]) == 0)
@@ -1306,6 +1314,7 @@ proc ibSegment(poly f, list classes, int degExpand)
         polySet[size(polySet)+1] = bF[1][i][j];
       }
     }
+    // We compute the full polynomial up to the integrality exponent
     pGround = buildPolyGroundXRootClass(classes[i], degExpand);
     if(in_array(polySet, pGround) == 0)
     {
@@ -1329,10 +1338,10 @@ proc ibSegment(poly f, list classes, int degExpand)
       ordExpAtPoly[i][j] = ordAtPol(polySet[i], classes[j][1]);
     }
   }
-  "polySet = "; polySet;
-  "degPolySet = "; degPolySet;
-  "ordExpAtPoly = "; ordExpAtPoly;
-  ~;
+  //"polySet = "; polySet;
+  //"degPolySet = "; degPolySet;
+  //"ordExpAtPoly = "; ordExpAtPoly;
+  //~;
   
   // We compute the integral basis by exhaustive search
   list ib = ibExhaustive(polySet, degPolySet, ordExpAtPoly, degF);
@@ -1340,6 +1349,9 @@ proc ibSegment(poly f, list classes, int degExpand)
   return(ib);
 }
   
+// For each degree up to the degree of f, with compute the best 
+// possible product of factors by checking exhaustively all possible
+// combinations such that the product has the correct degree.
 proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
 {
   int i;
@@ -1354,7 +1366,12 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
   {
     // The best element of degree d;
     oMax  = 0;
+    
+    // We generate the list of all possible combinations
     c = summandsFac(degPolySet, d);
+    
+    // We compute the valuation of each combination,
+    // and we keep the largest one.
     for(i = 1; i <= size(c); i++)
     {
       o = getValuation(c[i], ordExpAtPoly);
@@ -1374,8 +1391,8 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
     ib[d];
     "---";
   }
-  "ib computation finished!";
-  ib;
+  //"ib computation finished!";
+  //ib;
   return(ib);
 }
 
@@ -1405,7 +1422,10 @@ proc getValuation(c, ordExpAtPoly)
   return(oBest);
 }
 
-
+// List of intvecs suchs that the sum of each coordinate times the degree
+// given in degPolySet equals degTotal
+// This is used to compute a product of factors such that the total
+// degree is equal to degTotal
 proc summandsFac(intvec degPolySet, int degTotal)
 {
   intvec degsT;
@@ -1434,7 +1454,7 @@ proc summandsFac(intvec degPolySet, int degTotal)
   return(l);
 }
   
-
+//We implement the optimization approach from scratch
 proc optiBase(list ibSeg, list segmentSlope)
 {
   if(size(ibSeg) == 1) {return(ibSeg[1]);}
@@ -1551,6 +1571,8 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   int degExpand = int(maxExp) + 1;
   dbprint(dbg, "---- Degree of expansions: ", degExpand);
 
+
+  // Optimization algorithm from scratch
   if(optimize == 1)
   {
     // 1) Compute Puiseux sets (we use segments for easier implementation)
@@ -1574,7 +1596,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
     int intExp = int(ib[size(ib)][1]);
     IOut[1] = var(1)^intExp;
 
-    // We convery to ib shape
+    // We convert to ib shape
     for(i = 1; i <= size(ib); i++)
     {
       IOut[i + 1] = ib[i][3] * var(1)^(intExp - int(ib[i][1]));
