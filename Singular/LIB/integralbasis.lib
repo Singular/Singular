@@ -314,6 +314,8 @@ EXAMPLE: example integralBasis; shows an example
 
 //--------------------- computing the integral basis --------------------------
   dbprint(dbg, "Computing the integral basis...");
+  if(optimize == 1) {"DBG - optimize = 1";}
+  else {"DBG - optimize = 0";}
   list ib = integralBasisMain(f, strategy, algorithm, modular, compType, compo, locBasis, useRotation, optimize);
 
   ideal num = ib[1];
@@ -1228,22 +1230,29 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   // Tables of vanishing order of diferences of puiseux expansions
   dbprint(dbg, "--Computing vanishing orders...");
   matrix M = valIK(classes);
+  matrix MClass = valIKClass(classes);
   list vS = valIKSelf(bF, md);
   list MSelf = vS[1];
 
   list bestElem = vS[2];
 
-  //"classes";
-  //classes;
-  //~;
-  
+  "MClass"; 
+  MClass;
+  ~;
+
 
   // The highest exponent of the denominator
   if(size(classes) > 1)
   {
-    b = ibElement(M, MSelf, d0 - 1, md);
+    //b = ibElement(M, MSelf, d0 - 1, md);
+    
+    // We use a specific proc for degree n-1
+    // MClass is the degree of an expansion at the poly corresponding to a class
+    b = ibElementMax(MClass, MSelf, md);
     number maxExp = b[1];
-    intvec elem = b[2];
+    
+    // Not needed?
+    //intvec elem = b[2];
   } else
   {
     if(d0 > 1)
@@ -1256,6 +1265,9 @@ static proc ibAt0(poly f, int locBasis, int optimize)
       intvec elem = 0;
     }
   }
+  
+  "maxExp = ", maxExp;
+  ~;
 
   debug_log_intbas(3, "------Time for factors info: ", timer - tt);
   tt = timer;
@@ -1347,14 +1359,18 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   {
     for(cl = 1; cl <= nClasses; cl++)
     {
-      if(i != cl)
-      {
-        ordsFull[i, cl] = ordAtPol(I2Lifted[i+1], classes[cl][1]);
-      }
+      // Polys maybe do not coincide with classes
+      //if(i != cl)
+      //{
+      ordsFull[i, cl] = ordAtPol(I2Lifted[i+1], classes[cl][1]);
+      //}
     }
   }
 
   debug_log_intbas(3, "------Time for ordFull: ", timer - tt);
+  "ordFull is wrong for us...";
+  //~;
+  
   tt = timer;
 
   list ordsBest;
@@ -1382,7 +1398,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   for(i = 1; i <= nClasses; i++)
   {
-    mdmTemp = maxDegMerge(n, i, locBasis, d0, M, MSelf, md, classes, I2Lifted, bestElem, ordsFull, ordsBest);
+    mdmTemp = maxDegMerge(n, i, locBasis, d0, M, MSelf, md, classes, I2Lifted, bestElem, ordsFull, ordsBest, optimize);
     //"mdmTemp = ", mdmTemp;
     mdm = maxInt(mdm, mdmTemp);
   }
@@ -1398,6 +1414,10 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   // The classes are reordered in the same order as the irreducible factors
   classes = ifOut[5];
+  
+  "Here we should start...";
+  //~;
+  
 
   if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
   {
@@ -2136,7 +2156,8 @@ proc buildFactors(list classes)
             //fFr = var(2) - classes[i][1][1];
             fFr = classes[i][1][1];
           }
-          polyGround = buildPolyGroundXRoot(fFr, den);
+          // Factors up to degree d
+          polyGround = buildPolyGroundXRoot(fFr, den, d);
         }
         fGround = squarefree(polyGround[1]);
 
@@ -2245,6 +2266,8 @@ static proc buildPolyFrac(poly f)
 
     int t = timer;
     poly fTemp;
+    "DBG - reduction";
+    //~;
     for(i = 1; i<=d; i++)
     {
       fTemp = subst(f, @a, T(i));
@@ -2330,7 +2353,7 @@ static proc buildPolyFracNew(poly f, poly mp)
 // Product of conjugate factors
 // Input:  a polynomial f representing a Puiseux expansions, where the denominator in the exponent is den.
 // Output: polynomial = the product of (y-f_i) for all conjugate polynomials, taking the conjugates of x^(1/den).
-proc buildPolyGroundXRoot(poly f, int den)
+proc buildPolyGroundXRoot(poly f, int den, int d)
 {
   int i;
   int gfCheck = 1;
@@ -2338,14 +2361,15 @@ proc buildPolyGroundXRoot(poly f, int den)
 
   intvec dx = (1,0);
   int degX = deg(f, dx);
+  
+  if(d == -1) {d = degX + 1;}
+  
 
   if(degX > 0)
   {
     list l = ringlist(basering);
-    for(i = 1; i<=den; i++)
-    {
-      l[2][size(l[2])+1]="T(" + string(i) + ")";
-    }
+    // We only add powers of T(1), a primitive root
+    l[2][size(l[2])+1]="T(1)";
     def S = ring(l);
     setring S;
     
@@ -2358,22 +2382,19 @@ proc buildPolyGroundXRoot(poly f, int den)
     list ffList = buildPolyGround(list(ff), g2);
     poly ffRed = ffList[1];
     
-    //"ff = ", ff;
-    //"ffRed = ", ffRed;
-    //~;
-    
     list pols;
-    for(i = 1; i <= den; i++)
+    pols[1] = ffRed;
+    for(i = 1; i < den; i++)
     {
-      ff = subst(ffRed, var(1), var(1) * var(2+i));
-      pols[i] = ff;
+      ff = subst(ffRed, var(1), var(1) * (var(3)^i));
+      pols[i+1] = ff;
     }
     
-    // Newton relations between the variables
-    poly rels = 1;
-    for(i = 1; i <= den; i++)
+        // Newton relations between the variables
+    poly rels = (var(1) - 1);
+    for(i = 1; i < den; i++)
     {
-      rels = rels * (var(1) - T(i));
+      rels = rels * (var(1) - T(1)^i);
     }
     
     poly pExt = var(1)^den - 1; // A root of unity
@@ -2381,24 +2402,26 @@ proc buildPolyGroundXRoot(poly f, int den)
     matrix c2 = coeffs(pExt, var(1));
     
     ideal I;
-    for(i = 1; i<=den; i++)
+    for(i = 1; i < den; i++)
     {
       I[i] = c1[i,1] - c2[i,1];
     }
     I = groebner(I);
-
+        
     poly fNew = 1;
-    poly fNewTemp;
+    poly fNewTemp = 1;
+    
+    
     for(i = 1; i<=den; i++)
     {
-      fNewTemp = fNew * (var(2) - pols[i]);
-      fNew = reduce(fNewTemp, I);
-    }
-    //poly fNew = reduce(fNewTemp, I);
-    //poly fNew = fNewTemp;
+      fNewTemp = fNewTemp * (var(2) - pols[i]);
 
-    //"fNewTemp", pols, den;
-    //~; 
+      // We compute factors up to degree d, so we can truncate
+      fNewTemp = reduce(fNewTemp, groebner(var(1)^(d*den+1)));
+
+      fNewTemp = reduce(fNewTemp, I);
+    }
+    fNew = reduce(fNewTemp, I);
     
     // We replace x^den by x
     ring P = (0, @a), (@x, @y, @X), dp;
@@ -2416,7 +2439,7 @@ proc buildPolyGroundXRoot(poly f, int den)
     return(list(fNew,gfCheck));
   } else
   {
-    return(list((var(2) - f), 1));
+    return(list((var(2) - f)^den, 1));
   }
 }
 
@@ -2531,6 +2554,7 @@ static proc valIKSelf(list bF, intvec md)
   return(list(MSelf, bestElem));
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
 // Valuations of differences of non-conjugate expansions.
@@ -2612,6 +2636,88 @@ static proc valIK(list classes)
 
 ////////////////////////////////////////////////////////////////////////
 
+// Valuations of expansions from one class at the product of all
+// conjugated factors (Y - gamma) corresponing to another class.
+// This is required to compute the maximum integrality exponent.
+// Input:  a list classes of classes of conjugate expansions, as given by
+//         proc getClasses
+// Output: a matrix M of number, where M[i, j] is the valuation
+//         of gamma_i at the product of the conjugated factors (Y - gamma_j), 
+//         expansions of the i-th and j-th conjugacy class respectively.
+static proc valIKClass(list classes)
+{
+  int i, j;
+  def R = basering;
+  matrix M[size(classes)][size(classes)];
+  for(i = 1; i <= size(classes); i++)
+  {
+    if(typeof(classes[i][1]) == "ring")
+    {
+      def S = classes[i][1];
+      setring S;
+      // Check... why are we removing @a?
+      poly f = subst(PE[1][1], @a, 0);
+      int den(i) = PE[1][2];
+      number o = number(ratDeg(PE[1][1])) / number(den(i));
+      setring R;
+      poly f(i) = imap(S, f);
+      number o(i) = number(imap(S, o));
+      int nonRat(i) = 1;
+      setring S;
+      kill f;
+      kill o;
+      setring R;
+      kill S;
+    } else
+    {
+      poly f(i) = classes[i][1][1];
+      int den(i) =  classes[i][1][2];
+      number o(i) = number(orderExp(f(i))) / number(den(i));
+      int nonRat(i) = 0;
+    }
+  }
+
+  int k;
+  poly differ;
+  number ordDiff;
+  for(i = 1; i <= size(classes); i++)
+  {
+    M[i, i] = o(i);
+    for(j = 1; j <= size(classes); j++)
+    {
+      if(i <> j)
+      {
+        // If the initial exponent of class i is smaller than initial exp
+        // of class j, then take den times o(i).
+        if(o(i) < o(j))
+        {
+          M[i, j] = den(j) * o(i);
+        } else
+        {
+          if(o(j) < o(i))
+          {
+            // If the initial exponent of class j is smaller than initial exp
+            // of class i, then take n times o(j).
+            M[i, j] = den(j) * o(j);
+          } else
+          {
+            // Finally, if they have the same order we use ordAtPol.
+            "Build fac";
+            //~;
+            list l = buildPolyGroundXRoot(f(j), den(j), -1);
+            M[i, j] = ordAtPol(l[1], list(f(i), den(i)));
+            "ord of class i at poly corresponding to class j:", M[i,j];
+            //~;
+          }
+        }
+      }
+    }
+  }
+  return(M);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 // Input:  a polynomial f.
 // Output: an integer k = the order of f (that is, the smallest exponent of f
 //         as poly in the first variable).
@@ -2669,6 +2775,63 @@ static proc orderExp(poly f){
 //  }
 //  return(f(1..size(l)));
 //}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+// Input:  matrix M of valuations of differences of expansions of different
+//         classes, list MSelf of valuations of an expansions with respect
+//         to valuations of the same class, integer d the degree of the
+//         required element, intvec md = the number of expansions in each
+//         class.
+// Output: the maximal valuation of an element of degree d, and the
+//         corresponding element.
+
+// It computed the element of maximal integrality exponent (as in Van Hoeij)
+static proc ibElementMax(matrix M, list MSelf, intvec md)
+{
+  // Best i
+  int i, j;
+  int s = ncols(M);
+
+  intvec vy = (0,1);
+  intvec vx = (1,0);
+  number minOrd;
+  number maxExp = 0;
+  int maxExpi;    // The value of i for the max exp.
+
+  // We remove an expansion from the ith class of expansions
+  for(i = 1; i <= s; i++)
+  {
+    minOrd = 0;
+    for(j = 1; j <= s; j++)
+    {
+      if(i == j) 
+      {
+        minOrd = minOrd + number(MSelf[i][md[i]-1]);
+      } else 
+      {
+        minOrd = minOrd + number(M[i][j]);
+      }
+    }
+    if(minOrd > maxExp)
+    {
+      maxExp = minOrd;
+      maxExpi = i;
+    }
+  }
+  return(list(maxExp, i));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -3259,7 +3422,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
             def S = classes2[j][1];
             setring S;
             
-            list bP = buildPolyGroundXRoot(PE[1][1], PE[1][2]);
+            list bP = buildPolyGroundXRoot(PE[1][1], PE[1][2], degExpand);
             
             //"bP ring", bP;
 
@@ -3274,7 +3437,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
             kill S;
           } else
           {
-            bP = buildPolyGroundXRoot(classes2[j][1][1], classes2[j][1][2]);
+            bP = buildPolyGroundXRoot(classes2[j][1][1], classes2[j][1][2], degExpand);
             fuProd = bP[1];
             gfCheck = bP[2];
             
@@ -3327,7 +3490,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 // Output: maximal degree needed for computing the basis
 // [Example 4]
 
-static proc maxDegMerge(int n, int cl, int locBasis, int d0, matrix M, list MSelf, intvec md, list classes, list I2Lifted, list bestElem, matrix ordsFull, list ordsBest);
+static proc maxDegMerge(int n, int cl, int locBasis, int d0, matrix M, list MSelf, intvec md, list classes, list I2Lifted, list bestElem, matrix ordsFull, list ordsBest, int optimize);
 {
   //"START - newib.lib - maxDegMerge - 4";
   int tt = timer;
@@ -3372,75 +3535,81 @@ static proc maxDegMerge(int n, int cl, int locBasis, int d0, matrix M, list MSel
     // The first term containing the locloc unit
     expBaseFactor = expUnit;
 
-    // If the order of hi is not integer, we add a factor.
-    if(int(denominator(expBaseFactor)) > 1)
+    "Check here";
+    //~;
+        
+    if(optimize == 0)
     {
-
-      // We add the factor corresponding to the full expansions
-      list fullPoly;
-      for(j = 1; j <= nClasses; j++)
+      // If the order of hi is not integer, we add a factor.
+      // This is used in the Chinese remainder strategy
+      if(int(denominator(expBaseFactor)) > 1)
       {
-        fullPoly[j] = I2Lifted[j+1];
-      }
-
-      int whichElem = 0;
-      int den1;
-      int den2;
-
-      intvec degsCl;
-      for(i = 1; i <= size(MSelf); i++)
-      {
-        degsCl[i] = size(MSelf[i]) + 1;
-      }
-      intvec chVec = 0:size(MSelf);
-
-      den1 = 1;
-      den2 = int(denominator(expBaseFactor));
-
-      number ordNewFactor;
-
-      number oAP;
-      number oAPT;
-
-      while(den1 mod den2 != 0)
-      {
-        chVec = nextSummand(degsCl, chVec, cl);
-        ordNewFactor = 0;
-        for(i = 1; i <= nClasses; i++)
+        // We add the factor corresponding to the full expansions
+        list fullPoly;
+        for(j = 1; j <= nClasses; j++)
         {
-          if(i != cl)
+          fullPoly[j] = I2Lifted[j+1];
+        }
+
+        int whichElem = 0;
+        int den1;
+        int den2;
+
+        intvec degsCl;
+        for(i = 1; i <= size(MSelf); i++)
+        {
+          degsCl[i] = size(MSelf[i]) + 1;
+        }
+        intvec chVec = 0:size(MSelf);
+
+        den1 = 1;
+        den2 = int(denominator(expBaseFactor));
+
+        number ordNewFactor;
+
+        number oAP;
+        number oAPT;
+
+        while(den1 mod den2 != 0)
+        {
+          chVec = nextSummand(degsCl, chVec, cl);
+          ordNewFactor = 0;
+          for(i = 1; i <= nClasses; i++)
           {
-            k = chVec[i];
-            if(k > 0)
+            if(i != cl)
             {
-              if(k <= size(bestElem[i]))
+              k = chVec[i];
+              if(k > 0)
               {
-                oAP = ordsBest[cl][i][k];
-                ordNewFactor = ordNewFactor + oAP;
-              } else
-              {
-                oAP = number(ordsFull[i, cl]);
-                ordNewFactor = ordNewFactor + oAP;
+                if(k <= size(bestElem[i]))
+                {
+                  oAP = ordsBest[cl][i][k];
+                  ordNewFactor = ordNewFactor + oAP;
+                } else
+                {
+                  oAP = number(ordsFull[i, cl]);
+                  ordNewFactor = ordNewFactor + oAP;
+                }
               }
             }
           }
+          den1 = int(denominator(ordNewFactor));
         }
-        den1 = int(denominator(ordNewFactor));
-      }
 
-      poly newFactor = 1;
-      int denNewFactor = den1;
-      int powFactor = 0;
+        poly newFactor = 1;
+        int denNewFactor = den1;
+        int powFactor = 0;
 
-      int nnE = int(numerator(expBaseFactor));
-      int ddE = int(denominator(expBaseFactor));
-      int nnY = int(numerator(ordNewFactor));
+        int nnE = int(numerator(expBaseFactor));
+        int ddE = int(denominator(expBaseFactor));
+        int nnY = int(numerator(ordNewFactor));
 
-      while(ddE > 1)
-      {
-        powFactor = powFactor + 1;
-        expBaseFactor = expUnit + powFactor * ordNewFactor;
-        ddE = int(denominator(expBaseFactor));
+        while(ddE > 1)
+        {
+          powFactor = powFactor + 1;
+          expBaseFactor = expUnit + powFactor * ordNewFactor;
+          ddE = int(denominator(expBaseFactor));
+        }
       }
     }
   } else
@@ -5068,6 +5237,9 @@ proc optimAlgorithm(int n, int locBasis, int d0, int d1, intvec vxy, matrix M, l
       //"elem: ", bestElems[k+1][2], " - ", bestElems[k+1][1];
     }
   }
+  
+  "optiBest";
+  //~;
   
   if(locBasis == 0)
   {
