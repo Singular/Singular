@@ -1290,9 +1290,6 @@ proc sortSegments(list segment);
 // See "Direct approach in the combinatorial paper.
 proc ibSegment(poly f, list classes, int degExpand)
 {
-  "ibSegment begins";
-  ~;
-  
   int i, j;
   list polySet;
   intvec degPolySet;
@@ -1339,9 +1336,9 @@ proc ibSegment(poly f, list classes, int degExpand)
       ordExpAtPoly[i][j] = ordAtPol(polySet[i], classes[j][1]);
     }
   }
- "ordAtPoly wrong?";
- "It should be infinite when evaluating an expansion at the product of the expansions..."
-  ~;
+ //"ordAtPoly wrong?";
+ //"It should be infinite when evaluating an expansion at the product of the expansions..."
+ // ~;
 
   //"polySet = "; polySet;
   //"degPolySet = "; degPolySet;
@@ -1387,16 +1384,18 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
     {
       o = getValuation(c[i], ordExpAtPoly);
       "Valuation at ", c[i], " = ", o;
-      if(o > oMax)
+      if((o > oMax) or (o == -1))
       {
         oMax = o;
         cBest = c[i];
       }
     }
     pBest = 1;
-    for(i = 1; i <= size(c); i++)
+    "polySet = ", polySet;
+    "cBest = ", cBest;
+    for(i = 1; i <= size(cBest); i++)
     {
-      if(c[i] > 0){pBest = pBest * polySet[i]^cBest[i];}
+      if(cBest[i] > 0){pBest = pBest * polySet[i]^cBest[i];}
     }
     ib[d+1] = list(oMax, cBest, pBest);
     ib[d+1];
@@ -1412,6 +1411,9 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
 // take to construct the ib element).
 proc getValuation(c, ordExpAtPoly)
 {
+  "c, ordExpAtPoly";
+  c, ordExpAtPoly;
+  
   number o;
   number oBest;
   int i, j;
@@ -1422,10 +1424,18 @@ proc getValuation(c, ordExpAtPoly)
     o = 0;
     for (i = 1; i <= nPolys; i++)
     {
-      o = o + c[i] * ordExpAtPoly[i][j];   // We consider c[i] equal factors, each one with valuation 
-                                           // ordExpAtPoly[i][j] at the jth Puiseux expansion
+      if(c[i] > 0)
+      {
+        if(ordExpAtPoly[i][j] >= 0)
+        {
+          o = o + c[i] * ordExpAtPoly[i][j];   // We consider c[i] equal factors, each one with valuation 
+                                               // ordExpAtPoly[i][j] at the jth Puiseux expansion
+        } else {
+          o = -1;  // Infinite valuation
+        }
+      }
     }
-    if((j == 1) or (o < oBest))
+    if((j == 1) or (oBest == -1) or ((o >= 0) and (o < oBest)))
     {
       oBest = o;
     }
@@ -1468,8 +1478,6 @@ proc summandsFac(intvec degPolySet, int degTotal)
 //We implement the optimization approach from scratch
 proc optiBase(list ibSeg, list segmentSlope)
 {
-  "segmentSlope"; segmentSlope;
-  ~;
   int i;
   int s = size(ibSeg);
   
@@ -1679,23 +1687,20 @@ static proc ibAt0(poly f, int locBasis, int optimize)
       // pSegment[2] are the corresponding classes of expansions
       ibSeg[i] = ibSegment(pSegment[i][1], pSegment[i][3], degExpand);
     }
-    "ibSeg"; 
-    ibSeg;
-    ;
-    
+        
     // 3) Call optimAlgorithm(n, locBasis, d0, d1, vxy, M, MSelf, md, classes, I2Lifted, bestElem, optimize);
     list ib = optiBase(ibSeg, pSegment);
     "ib opti"; ib;
     ~;
     
     ideal IOut;
-    int intExp = int(ib[size(ib)][1]);
-    IOut[1] = var(1)^intExp;
+    int intExp = int(ib[size(ib)-1][1]);
+    IOut[1] = var(1)^intExp;   // The first element is 1
 
     // We convert to ib shape
-    for(i = 1; i <= size(ib); i++)
+    for(i = 1; i <= size(ib)-2; i++)  // We dont use the first element (1) and the last one (with degree f).
     {
-      IOut[i + 1] = ib[i][3] * var(1)^(intExp - int(ib[i][1]));
+      IOut[i + 1] = ib[i+1][3] * var(1)^(intExp - int(ib[i][1]));
     }
   } else
   {
@@ -2058,8 +2063,6 @@ static proc ibAt0(poly f, int locBasis, int optimize)
       IOut = optimAlgorithm(n, locBasis, d0, d1, vxy, M, MSelf, md, classes, I2Lifted, bestElem, optimize);
     }
   }
-  "IOut"; IOut;
-  ~;
   return(IOut);
 }
 
@@ -2779,8 +2782,6 @@ static proc buildPolyFracNew(poly f, poly mp)
 // developed up to degree degExpand
 proc buildPolyGroundXRootClass(list classPE, int degExpand)
 {
-  "classPE", classPE;
-  ~;
   if(typeof(classPE[1]) == "ring")
   {
     def R = basering;
@@ -3768,12 +3769,16 @@ static proc ordAtPol(poly h, def S)
     poly g = S[1];
     h = subst(h, var(1), var(1)^den);
     poly hs = subst(h, var(2), g);
+    if(hs <> 0)
+    {
+      matrix MM;
+      MM = coef(hs, var(1));
+      int oo = deg(MM[1, ncols(MM)]);
 
-    matrix MM;
-    MM = coef(hs, var(1));
-    int oo = deg(MM[1, ncols(MM)]);
-
-    number oro2 = oo/number(den);
+      number oro2 = oo/number(den);
+    } else {
+      number oro2 = -1;
+    }
   }
   return(oro2);
 }
@@ -4917,7 +4922,6 @@ static proc henselBlocks(poly f, int globOrder, int loc)
     
     "Check output of henselSegments";
     fSegment;
-    ~;
     
     for(i = 1; i <= size(fSegment); i++)
     {

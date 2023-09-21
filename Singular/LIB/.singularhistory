@@ -2297,9 +2297,102 @@ ring r = 0, (x,y), dp;
 poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
 int t = timer;
 list l1 = integralBasis(f,2, "atOrigin");
-
 ordExpAtPoly
 polySet
 classes
 ordAtPol(polySet[2], classes[1][1]);
 deg(0, vy)
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+i
+j
+polySet[i]
+classes[j]
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+hs
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+MM[1, ncols(MM)]
+MM[1, ncols(MM)]
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x2) * (y5 + y4x + x2)+y13;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+classes
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4)+y30;
+int t = timer;
+list l1 = integralBasis(f,2, "atOrigin");
+
