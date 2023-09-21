@@ -1293,6 +1293,7 @@ proc sortSegments(list segment);
 proc ibSegment(poly f, list classes, int degExpand)
 {
   "ibSegment begins";
+  ~;
   
   int i, j;
   list polySet;
@@ -1340,6 +1341,10 @@ proc ibSegment(poly f, list classes, int degExpand)
       ordExpAtPoly[i][j] = ordAtPol(polySet[i], classes[j][1]);
     }
   }
+ "ordAtPoly wrong?";
+ "It should be infinite when evaluating an expansion at the product of the expansions..."
+  ~;
+
   //"polySet = "; polySet;
   //"degPolySet = "; degPolySet;
   //"ordExpAtPoly = "; ordExpAtPoly;
@@ -1358,13 +1363,19 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
 {
   int i;
   int d;
+  int s = size(degPolySet);
+  list c;
   list ib;
   number o;
   number oMax;
   intvec cBest;
   poly pBest;
-  list c;
-  for (d = 1; d < degF; d++)
+  
+  // The first element is polynomial 1
+  intvec zero = 0 * (1..s);
+  ib[1] = list(0, zero, 1);
+  
+  for (d = 1; d <= degF; d++)
   {
     // The best element of degree d;
     oMax  = 0;
@@ -1389,8 +1400,8 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
     {
       if(c[i] > 0){pBest = pBest * polySet[i]^cBest[i];}
     }
-    ib[d] = list(oMax, cBest, pBest);
-    ib[d];
+    ib[d+1] = list(oMax, cBest, pBest);
+    ib[d+1];
     "---";
   }
   //"ib computation finished!";
@@ -1459,10 +1470,90 @@ proc summandsFac(intvec degPolySet, int degTotal)
 //We implement the optimization approach from scratch
 proc optiBase(list ibSeg, list segmentSlope)
 {
-  if(size(ibSeg) == 1) {return(ibSeg[1]);}
+  "segmentSlope"; segmentSlope;
+  ~;
+  int i;
+  int s = size(ibSeg);
+  
+  if(s == 1) {return(ibSeg[1]);}
   // Implement the optimization algorithm...
   // Use the code already implemented??
+  
+  //for(i = s-1; i >= 1; i++)
+  //{
+  if(s == 2)
+  {
+    return(optiTwoSets(ibSeg[1], segmentSlope[1][2], ibSeg[2], segmentSlope[2][2]));
+  } 
 }
+
+// We combine two sets of expansions
+proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
+{
+  "optiTwoSets begin...";
+  
+  int s1 = size(ib1)-1;  // max degree
+  int s2 = size(ib2)-1;  // max degree
+  int c1, c2;
+  intvec cBest;
+  int d;
+  
+  number o, o1, o2;
+  number oBest;
+  poly polyBest;
+  
+  list out;
+  out[1] = list(0, intvec(0,0), 1);
+  // Best element of degree d
+  for(d = 1; d < s1 + s2; d++)
+  {
+    oBest = 0;
+    for(c1 = 0; c1 <= s1; c1++)
+    {
+      if(c1 <= d)
+      {
+        c2 = d - c1;
+        if(c2 <= s2)
+        {
+          // The first component of ib1 contains the orders of the best polynomial of each degree
+          if(c1 < s1)
+          {
+            o1 = c2 * slope1 + ib1[c1+1][1];  // The valuation of an expansion from the first group
+          }
+          if(c2 < s2)
+          {
+            o2 = c1 * slope1 + ib2[c2+1][1];  // The valuation of an expansion from the second group
+          }
+          if(c1 == s1)
+          {
+            o = o2;
+          } else 
+          {
+            if(c2 == s2) 
+            {
+              o = o1;
+            } else 
+            {
+              if(o1 < o2) {o = o1;}
+              else {o = o2;}
+            }
+          }
+          "c1 = ", c1, "c2 = ", c2, "s1 = ", s1, "s2 = ", s2, "o = ", o;
+          
+          if(o > oBest)
+          {
+            oBest = o;
+            cBest = intvec(c1, c2);
+            polyBest = ib1[c1+1][3] * ib2[c2+1][3];
+          }
+        }
+      }
+    }
+    out[size(out) + 1] = list(oBest, cBest, polyBest);
+  }
+  return(out);
+}
+    
   
 
 
@@ -1542,6 +1633,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   "MClass"; 
   MClass;
+  classes;
   ~;
 
 
@@ -1590,10 +1682,14 @@ static proc ibAt0(poly f, int locBasis, int optimize)
       // pSegment[2] are the corresponding classes of expansions
       ibSeg[i] = ibSegment(pSegment[i][1], pSegment[i][3], degExpand);
     }
+    "ibSeg"; 
+    ibSeg;
+    ;
     
     // 3) Call optimAlgorithm(n, locBasis, d0, d1, vxy, M, MSelf, md, classes, I2Lifted, bestElem, optimize);
     list ib = optiBase(ibSeg, pSegment);
     "ib opti"; ib;
+    ~;
     
     ideal IOut;
     int intExp = int(ib[size(ib)][1]);
@@ -2688,10 +2784,12 @@ static proc buildPolyFracNew(poly f, poly mp)
 // developed up to degree degExpand
 proc buildPolyGroundXRootClass(list classPE, int degExpand)
 {
-  if(typeof(classPE) == "ring")
+  "classPE", classPE;
+  ~;
+  if(typeof(classPE[1]) == "ring")
   {
     def R = basering;
-    def S = classesPE;
+    def S = classPE[1];
     setring S;
     list out = buildPolyGroundXRoot(PE[1][1], PE[1][2], degExpand);
     poly pOut = out[1];
