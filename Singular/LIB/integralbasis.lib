@@ -1222,6 +1222,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
     list fl = divideBy(f0, y);
     list fGlob = henselGlobal(y^fl[2], fl[1], f, maxOrder);
     poly fLoc = fGlob[1];
+    
     if(fLoc == 1)
     {
       dbprint(dbg,"Warning! No local component. This may indicate you are computing the basis at a value of X where there is no singularity.");
@@ -1231,8 +1232,8 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
     dbprint(dbg, "----Computing Puiseux Segments...");
     fSegment = henselSegments(fLoc, maxOrder);
     
-    "Check output of henselSegments";
-    fSegment;
+    //"Check output of henselSegments";
+    //fSegment;
     for(i = 1; i <= size(fSegment); i++)
     {
       // We compute the newton poly of each polynomial to find out the
@@ -1259,7 +1260,9 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
   // We reorder according to the slope
   out = sortSegments(out);
   
-  return(out);
+  // We also return the unit outside the origin
+  list outFull = list(out, fGlob[2]);
+  return(outFull);
 }
 
 // This is used so that the puiseux expansions are always given in
@@ -1336,6 +1339,7 @@ proc ibSegment(poly f, list classes, int degExpand)
       ordExpAtPoly[i][j] = ordAtPol(polySet[i], classes[j][1]);
     }
   }
+
  //"ordAtPoly wrong?";
  //"It should be infinite when evaluating an expansion at the product of the expansions..."
  // ~;
@@ -1383,7 +1387,7 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
     for(i = 1; i <= size(c); i++)
     {
       o = getValuation(c[i], ordExpAtPoly);
-      "Valuation at ", c[i], " = ", o;
+      //"Valuation at ", c[i], " = ", o;
       if((o > oMax) or (o == -1))
       {
         oMax = o;
@@ -1391,18 +1395,19 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
       }
     }
     pBest = 1;
-    "polySet = ", polySet;
-    "cBest = ", cBest;
+    //"polySet = ", polySet;
+    //"cBest = ", cBest;
     for(i = 1; i <= size(cBest); i++)
     {
       if(cBest[i] > 0){pBest = pBest * polySet[i]^cBest[i];}
     }
     ib[d+1] = list(oMax, cBest, pBest);
-    ib[d+1];
-    "---";
+    //ib[d+1];
+    //"---";
   }
   //"ib computation finished!";
   //ib;
+  //~;
   return(ib);
 }
 
@@ -1411,8 +1416,8 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
 // take to construct the ib element).
 proc getValuation(c, ordExpAtPoly)
 {
-  "c, ordExpAtPoly";
-  c, ordExpAtPoly;
+  //"c, ordExpAtPoly";
+  //c, ordExpAtPoly;
   
   number o;
   number oBest;
@@ -1511,7 +1516,7 @@ proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
   list out;
   out[1] = list(0, intvec(0,0), 1);
   // Best element of degree d
-  for(d = 1; d < s1 + s2; d++)
+  for(d = 1; d <= s1 + s2; d++)
   {
     oBest = 0;
     for(c1 = 0; c1 <= s1; c1++)
@@ -1544,7 +1549,7 @@ proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
               else {o = o2;}
             }
           }
-          "c1 = ", c1, "c2 = ", c2, "s1 = ", s1, "s2 = ", s2, "o = ", o;
+          //"c1 = ", c1, "c2 = ", c2, "s1 = ", s1, "s2 = ", s2, "o = ", o;
           
           if(o > oBest)
           {
@@ -1638,8 +1643,8 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   "MClass"; 
   MClass;
-  classes;
-  ~;
+
+  //classes;
 
 
   // The highest exponent of the denominator
@@ -1662,7 +1667,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
     }
   }
   
-  dbprint("The maximum integrality exponent is ", maxExp);
+  "The maximum integrality exponent is ", maxExp;
 
   debug_log_intbas(3, "------Time for factors info: ", timer - tt);
   tt = timer;
@@ -1676,8 +1681,12 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   if(optimize == 1)
   {
     // 1) Compute Puiseux sets (we use segments for easier implementation)
-    list pSegment = getSegments(f, classes, slopes, degExpand);
-    "puiseux segments: "; pSegment;
+    list pSegmentFull = getSegments(f, classes, slopes, degExpand);
+    "step 1 finished";
+    //"puiseux segments: "; pSegmentFull;
+    
+    list pSegment = pSegmentFull[1]; // The segments corresponding to expansions at the origin
+    poly unitPoly = pSegmentFull[2]; // The unit outside the origin
     
     // 2) Compute IB in each set
     list ibSeg;
@@ -1687,21 +1696,40 @@ static proc ibAt0(poly f, int locBasis, int optimize)
       // pSegment[2] are the corresponding classes of expansions
       ibSeg[i] = ibSegment(pSegment[i][1], pSegment[i][3], degExpand);
     }
+    "step 2 finished";
         
     // 3) Call optimAlgorithm(n, locBasis, d0, d1, vxy, M, MSelf, md, classes, I2Lifted, bestElem, optimize);
     list ib = optiBase(ibSeg, pSegment);
-    "ib opti"; ib;
-    ~;
+    //"ib opti"; ib;
     
     ideal IOut;
     int intExp = int(ib[size(ib)-1][1]);
-    IOut[1] = var(1)^intExp;   // The first element is 1
+    poly condu = var(1)^intExp;  // The denominator of the integral basis.
+    
+    "step 3 finished";
+    
+    //IOut[1] =    // The first element is 1
 
     // We convert to ib shape
-    for(i = 1; i <= size(ib)-2; i++)  // We dont use the first element (1) and the last one (with degree f).
+    //for(i = 1; i <= size(ib)-2; i++)  // We dont use the first element (1) and the last one (with degree f).
+    //{
+    //  IOut[i + 1] = ib[i+1][3] * var(1)^(intExp - int(ib[i+1][1]));
+    //}
+    
+    // 4) We add the unit outside the origin
+    for(k = 0; k < deg(unitPoly, vy); k++)
     {
-      IOut[i + 1] = ib[i+1][3] * var(1)^(intExp - int(ib[i][1]));
+      IOut[k+1] = condu * var(2)^(k);
     }
+    for(k = 1; k <= size(ib) - 2; k++)
+    {
+      IOut[size(IOut)+1] = ib[k+1][3] * var(1)^(intExp - int(ib[k+1][1])) * unitPoly;
+    }
+    "step 4 finished";
+    //"IOut = "; IOut;
+    //~;
+    
+    
   } else
   {
 
@@ -3741,23 +3769,32 @@ static proc ordAtPol(poly h, def S)
     {
       h = subst(h, var(1), var(1)^den);
       poly hs = subst(h, var(2), g);
-
-      matrix MM;
-      MM = coef(hs, var(1));
-      int oo = deg(MM[1, ncols(MM)]);
+      if(hs <> 0)
+      {
+        matrix MM;
+        MM = coef(hs, var(1));
+        int oo = deg(MM[1, ncols(MM)]);
+        number oro = oo/number(den);
+        kill MM;
+      } else {  // The valuation is infinity
+        number oro = -1;
+      }
       kill hs;
     } else
     {
       matrix MM;
       MM = coef(g, var(1));
       int oo = deg(MM[1, ncols(MM)])*deg(h, intvec(0,1)) + deg(h, intvec(1,0))*den;
+      number oro = oo/number(den);
+      kill MM;
     }
-
-    number oro = oo/number(den);
-
+    if(oro == 0)
+    {
+      "oro = 0";
+      ~;
+    }
     kill h;
     kill g;
-    kill MM;
     setring R;
     number oro2 = number(imap(S, oro));
     setring S;
@@ -4920,12 +4957,12 @@ static proc henselBlocks(poly f, int globOrder, int loc)
     dbprint(dbg, "----Computing Puiseux Segments...");
     fSegment = henselSegments(fLoc, maxOrder);
     
-    "Check output of henselSegments";
-    fSegment;
+    //"Check output of henselSegments";
+    //fSegment;
     
     for(i = 1; i <= size(fSegment); i++)
     {
-      "i, fSegment", i, fSegment, maxOrder;
+      //"i, fSegment", i, fSegment, maxOrder;
       compsT = henselInSegment(fSegment[i], maxOrder);
       dbprint(dbg, "----henselInSegment finished");
 
