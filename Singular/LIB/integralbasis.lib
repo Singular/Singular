@@ -1187,6 +1187,66 @@ static proc in_array(list l, def elem)
   return(found);
 }
 
+// The main procedure for the combinatorial approach
+static proc optimizationSteps(f, classes, slopes, degExpand)
+{
+  int i, k;
+  intvec vy = (0,1);
+  
+  "Using optimization algorithm";
+  // 1) Compute Puiseux sets (we use segments for easier implementation)
+  list pSegmentFull = getSegments(f, classes, slopes, degExpand);
+  "step 1 finished";
+  //"puiseux segments: "; pSegmentFull;
+  
+  list pSegment = pSegmentFull[1]; // The segments corresponding to expansions at the origin
+  poly unitPoly = pSegmentFull[2]; // The unit outside the origin
+  
+  // 2) Compute IB in each set
+  list ibSeg;
+  for(i = 1; i <= size(pSegment); i++)
+  {
+    // pSegment[1] is the list of polynomial factors
+    // pSegment[2] are the corresponding classes of expansions
+    ibSeg[i] = ibSegment(pSegment[i][1], pSegment[i][3], degExpand);
+  }
+  "step 2 finished";
+      
+  // 3) Call optimAlgorithm(n, locBasis, d0, d1, vxy, M, MSelf, md, classes, I2Lifted, bestElem, optimize);
+  list ib = optiBase(ibSeg, pSegment);
+  //"ib opti"; ib;
+  
+  ideal IOut;
+  int intExp = int(ib[size(ib)-1][1]);
+  poly condu = var(1)^intExp;  // The denominator of the integral basis.
+  
+  "step 3 finished";
+  
+  //IOut[1] =    // The first element is 1
+
+  // We convert to ib shape
+  //for(i = 1; i <= size(ib)-2; i++)  // We dont use the first element (1) and the last one (with degree f).
+  //{
+  //  IOut[i + 1] = ib[i+1][3] * var(1)^(intExp - int(ib[i+1][1]));
+  //}
+  
+  // 4) We add the unit outside the origin
+  for(k = 0; k < deg(unitPoly, vy); k++)
+  {
+    IOut[k+1] = condu * var(2)^(k);
+  }
+  //~;
+  for(k = 1; k <= size(ib) - 1; k++)
+  {
+    IOut[size(IOut)+1] = ib[k][3] * var(1)^(intExp - int(ib[k][1])) * unitPoly;
+  }
+  "step 4 finished";
+  //"IOut = "; IOut;
+  //~;
+  return(IOut);
+}
+  
+
 ///////////////////////////////////////////////////////////////////////
 // Computation of Puiseux segments and classes in each segment
 //
@@ -1199,7 +1259,6 @@ static proc in_array(list l, def elem)
 // Returns a list of two lists
 // In the first list, the polynomials of each segment
 // In the second list, the classes of expansions corresponding to each segment
-
 
 proc getSegments(poly f, list classes, list slopes, int globOrder)
 {
@@ -1516,6 +1575,7 @@ proc summandsFac(intvec degPolySet, int degTotal)
   }
   return(l);
 }
+
   
 //We implement the optimization approach from scratch
 proc optiBase(list ibSeg, list segmentSlope)
@@ -1730,61 +1790,9 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   if(optimize == 1)
   {
-    "Using optimization algorithm";
-    // 1) Compute Puiseux sets (we use segments for easier implementation)
-    list pSegmentFull = getSegments(f, classes, slopes, degExpand);
-    "step 1 finished";
-    //"puiseux segments: "; pSegmentFull;
-    
-    list pSegment = pSegmentFull[1]; // The segments corresponding to expansions at the origin
-    poly unitPoly = pSegmentFull[2]; // The unit outside the origin
-    
-    // 2) Compute IB in each set
-    list ibSeg;
-    for(i = 1; i <= size(pSegment); i++)
-    {
-      // pSegment[1] is the list of polynomial factors
-      // pSegment[2] are the corresponding classes of expansions
-      ibSeg[i] = ibSegment(pSegment[i][1], pSegment[i][3], degExpand);
-    }
-    "step 2 finished";
-        
-    // 3) Call optimAlgorithm(n, locBasis, d0, d1, vxy, M, MSelf, md, classes, I2Lifted, bestElem, optimize);
-    list ib = optiBase(ibSeg, pSegment);
-    //"ib opti"; ib;
-    
-    ideal IOut;
-    int intExp = int(ib[size(ib)-1][1]);
-    poly condu = var(1)^intExp;  // The denominator of the integral basis.
-    
-    "step 3 finished";
-    
-    //IOut[1] =    // The first element is 1
-
-    // We convert to ib shape
-    //for(i = 1; i <= size(ib)-2; i++)  // We dont use the first element (1) and the last one (with degree f).
-    //{
-    //  IOut[i + 1] = ib[i+1][3] * var(1)^(intExp - int(ib[i+1][1]));
-    //}
-    
-    // 4) We add the unit outside the origin
-    for(k = 0; k < deg(unitPoly, vy); k++)
-    {
-      IOut[k+1] = condu * var(2)^(k);
-    }
-    //~;
-    for(k = 1; k <= size(ib) - 1; k++)
-    {
-      IOut[size(IOut)+1] = ib[k][3] * var(1)^(intExp - int(ib[k][1])) * unitPoly;
-    }
-    "step 4 finished";
-    //"IOut = "; IOut;
-    //~;
-    
-    
+    ideal IOut = optimizationSteps(f, classes, slopes, degExpand);
   } else
   {
-
     dbprint(dbg, "--Building HenselBlocks...");
     // Computing hensel blocks...
     list I2Lifted = henselBlocks(f, degExpand, 1);
