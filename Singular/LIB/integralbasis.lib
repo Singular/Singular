@@ -1200,6 +1200,7 @@ static proc optimizationSteps(f, classes, slopes, degExpand)
   list pSegmentFull = getSegments(f, classes, slopes, degExpand);
   "step 1 finished";
   //"puiseux segments: "; pSegmentFull;
+  //~;
   
   list pSegment = pSegmentFull[1]; // The segments corresponding to expansions at the origin
   poly unitPoly = pSegmentFull[2]; // The unit outside the origin
@@ -1214,7 +1215,7 @@ static proc optimizationSteps(f, classes, slopes, degExpand)
   }
   "step 2 finished";
       
-  // 3) Call optimAlgorithm(n, locBasis, d0, d1, vxy, M, MSelf, md, classes, I2Lifted, bestElem, optimize);
+  // 3) Merge all the integral basis for the segments using the combinatorial approach
   list ib = optiBase(ibSeg, pSegment);
   //"ib opti"; ib;
   
@@ -1413,6 +1414,9 @@ proc ibSegment(poly f, list classes, int degExpand)
     } else
     {
       pGround = buildPolyGroundXRootClass(classes[i], degExpand);
+      //"Check pGround... :((";
+      //pGround;
+      //~;
       if(in_array(polySet, pGround) == 0)
       {
         polySet[size(polySet)+1] = pGround;
@@ -1448,6 +1452,10 @@ proc ibSegment(poly f, list classes, int degExpand)
   
   // We compute the integral basis by exhaustive search
   list ib = ibExhaustive(polySet, degPolySet, ordExpAtPoly, degF);
+  //"f = ", f;
+  //"ib = ", ib;
+  //"check ib output";
+  //~;
 
   return(ib);
 }
@@ -1486,7 +1494,7 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
     {
       o = getValuation(c[i], ordExpAtPoly);
       //"Valuation at ", c[i], " = ", o;
-      if((o > oMax) or (o == -1))
+      if(((o > oMax) and (oMax <> -1)) or (o == -1))
       {
         oMax = o;
         cBest = c[i];
@@ -1527,14 +1535,17 @@ proc getValuation(c, ordExpAtPoly)
     o = 0;
     for (i = 1; i <= nPolys; i++)
     {
-      if(c[i] > 0)
+      if(o >= 0)  // We could also break when o = -1
       {
-        if(ordExpAtPoly[i][j] >= 0)
+        if(c[i] > 0)
         {
-          o = o + c[i] * ordExpAtPoly[i][j];   // We consider c[i] equal factors, each one with valuation 
-                                               // ordExpAtPoly[i][j] at the jth Puiseux expansion
-        } else {
-          o = -1;  // Infinite valuation
+          if(ordExpAtPoly[i][j] >= 0)
+          {
+            o = o + c[i] * ordExpAtPoly[i][j];   // We consider c[i] equal factors, each one with valuation 
+                                                 // ordExpAtPoly[i][j] at the jth Puiseux expansion
+          } else {
+            o = -1;  // Infinite valuation
+          }
         }
       }
     }
@@ -1743,13 +1754,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   list vS = valIKSelf(bF, md);
   list MSelf = vS[1];
   list bestElem = vS[2];
-
-  //"MClass"; 
-  //MClass;
-
-  //classes;
-  //~;
-
+  
 
   // The highest exponent of the denominator
   if(size(classes) > 1)
@@ -1773,6 +1778,12 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   
   "The maximum integrality exponent is ", maxExp;
 
+  //"MClass"; 
+  //MClass;
+  
+  //classes;
+  //~;
+  
   debug_log_intbas(3, "------Time for factors info: ", timer - tt);
   tt = timer;
 
@@ -1948,8 +1959,6 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
   // The classes are reordered in the same order as the irreducible factors
   classes = ifOut[5];
   
-  
-
   if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
   {
     kill ordsFull;
@@ -2602,7 +2611,8 @@ proc buildFactors(list classes)
         den = classes[i][1][2];
       }
       exps = expsT;      
-
+      //"exponents for class ", i, " = ", expsT;
+      
       for(k = 1; k <= size(exps); k++)
       {
         d = exps[k];
@@ -2725,6 +2735,13 @@ proc buildFactors(list classes)
         degs[i][ind] = deg(fGround, vy);
         gfChecks[i][ind] = polyGround[2];
       }
+    } else {
+      // Non-singular branch
+      // Check if we need to do something here...
+      //facs[i][ind] = y - ;
+      //ords[i][ind] = number(d) / number(den);
+      //degs[i][ind] = 1;
+      //gfChecks[i][ind] = 1;
     }
   }
   
@@ -2753,8 +2770,7 @@ static proc buildPolyFrac(poly f)
   int degX = deg(f, dx);
 
   poly mp = minpoly;
-
-
+  
   mp = subst(minpoly, @a, var(1));
   int d = pardeg(minpoly);
   def Q = ring(0, (var(1), var(2), @a, T(1..d)), lp);
@@ -2788,7 +2804,7 @@ static proc buildPolyFrac(poly f)
 
     int t = timer;
     poly fTemp;
-    "DBG - reduction";
+    //"DBG - reduction";
     //~;
     for(i = 1; i<=d; i++)
     {
@@ -2805,6 +2821,76 @@ static proc buildPolyFrac(poly f)
   {
     setring R;
     poly fNew = (var(2) - f)^d;
+  }
+  return(fNew);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// Product of conjugate factors
+// Input:  a polynomial f over an algebraic extension of the base ring.
+// Output: polynomial = the product of (f_i) for all conjugate polynomials
+//         f_i of f.
+static proc multiplicateConjugates(poly f)
+{
+  int i;
+  def R = basering;
+
+  intvec dx = (1,0);
+  int degX = deg(f, dx);
+
+  poly mp = minpoly;
+  
+  mp = subst(minpoly, @a, var(1));
+  int d = pardeg(minpoly);
+  def Q = ring(0, (var(1), var(2), @a, T(1..d)), lp);
+  ring S = 0, (var(1), var(2), @a), dp;
+  poly f = imap(R, f);
+  intvec da = (0,1);
+
+  if(deg(f, da) > 0)
+  {
+    poly mp = imap(R, mp);
+    mp = subst(mp,var(1),@a);
+    setring Q;
+    poly f = imap(S, f);
+    poly mp = imap(S, mp);
+    mp = mp / leadcoef(mp);
+    poly fNew = 1;
+    poly rels = 1;
+    //ideal I = var(1)^(degX + 1);  // We use this to reduce modulo x^maxDeg
+    ideal I;  // We use this to reduce modulo x^maxDeg
+    for(i = 1; i <= d; i++)
+    {
+      rels = rels * (var(1) - T(i));
+    }
+    matrix c1 = coeffs(rels, var(1));
+    matrix c2 = coeffs(mp, @a);
+    for(i = 1; i<=d; i++)
+    {
+      I[i] = c1[i,1] - c2[i,1];
+    }
+    I = groebner(I);
+
+    int t = timer;
+    poly fTemp;
+    //"DBG - reduction";
+    //~;
+    for(i = 1; i<=d; i++)
+    {
+      fTemp = subst(f, @a, T(i));
+      fNew = fNew * (fTemp);
+      fNew = reduce(fNew, I);
+    }
+    debug_log_intbas(4,"--------Time for product reduction: ", timer - t);
+
+    setring R;
+    poly fNew = imap(Q, fNew);
+
+  } else
+  {
+    setring R;
+    poly fNew = (f)^d;
   }
   return(fNew);
 }
@@ -2907,6 +2993,8 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
   
   if(d == -1) {d = degX + 1;}
   
+  //"Check buildPG";
+  //f;
 
   if(degX > 0)
   {
@@ -2923,6 +3011,8 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
     int g2 = gcd(g1, den);
     den = den div g2;
     list ffList = buildPolyGround(list(ff), g2);
+    //"After buildPolyGround";
+    //~;
     poly ffRed = ffList[1];
     
     list pols;
@@ -2933,7 +3023,7 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
       pols[i+1] = ff;
     }
     
-        // Newton relations between the variables
+    // Newton relations between the variables
     poly rels = (var(1) - 1);
     for(i = 1; i < den; i++)
     {
@@ -2979,8 +3069,19 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
       gfCheck = 0;
     }
     f2 = subst(f2, @X, @x);
+        
     setring R;
     poly fNew = fetch(P, f2);
+    // If there is still an algebraic extension, we compute the poly over the ground field
+    if(isNonRat(fNew) == 1)
+    {
+      //"old f2 = ", fNew;
+      fNew = multiplicateConjugates(fNew);
+      //"new f2 = ", fNew;
+      //~;
+    }
+
+    
     return(list(fNew,gfCheck));
   } else
   {
@@ -3194,7 +3295,9 @@ static proc valIKClass(list classes)
 {
   int i, j;
   def R = basering;
-  matrix M[size(classes)][size(classes)];
+  matrix MC[size(classes)][size(classes)];
+  
+  // Order for each class of expansions
   for(i = 1; i <= size(classes); i++)
   {
     if(typeof(classes[i][1]) == "ring")
@@ -3204,6 +3307,7 @@ static proc valIKClass(list classes)
       // Check... why are we removing @a?
       poly f = subst(PE[1][1], @a, 0);
       int den(i) = PE[1][2];
+      int mmult(i) = lcm(pardeg(minpoly), den(i)) div den(i);  // mult(i) * den(i) should be the number of elements in the conjugacy class
       number o = number(ratDeg(PE[1][1])) / number(den(i));
       setring R;
       poly f(i) = imap(S, f);
@@ -3218,6 +3322,7 @@ static proc valIKClass(list classes)
     {
       poly f(i) = classes[i][1][1];
       int den(i) =  classes[i][1][2];
+      int mmult(i) = 1;
       number o(i) = number(orderExp(f(i))) / number(den(i));
       int nonRat(i) = 0;
     }
@@ -3231,7 +3336,7 @@ static proc valIKClass(list classes)
   
   for(i = 1; i <= size(classes); i++)
   {
-    M[i, i] = o(i);
+    MC[i, i] = o(i);
     for(j = 1; j <= size(classes); j++)
     {
       if(i <> j)
@@ -3240,21 +3345,21 @@ static proc valIKClass(list classes)
         // of class j, then take den times o(i).
         if(o(i) < o(j))
         {
-          M[i, j] = den(j) * o(i);
+          MC[i, j] = den(j) * mmult(j) * o(i);
         } else
         {
           if(o(j) < o(i))
           {
             // If the initial exponent of class j is smaller than initial exp
             // of class i, then take n times o(j).
-            M[i, j] = den(j) * o(j);
+            MC[i, j] = den(j) * mmult(j)  * o(j);
           } else
           {
             // Finally, if they have the same order we use ordAtPol.
             //"Build fac";
             //~;
             l = buildPolyGroundXRoot(f(j), den(j), -1);
-            M[i, j] = ordAtPol(l[1], list(f(i), den(i)));
+            MC[i, j] = ordAtPol(l[1], list(f(i), den(i)));
             //"ord of class i at poly corresponding to class j:", M[i,j];
             //~;
           }
@@ -3262,7 +3367,8 @@ static proc valIKClass(list classes)
       }
     }
   }
-  return(M);
+  //"DBG - vanihshing finished...";
+  return(MC);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3358,10 +3464,16 @@ static proc ibElementMax(matrix M, list MSelf, intvec md)
     {
       if(i == j) 
       {
-        minOrd = minOrd + number(MSelf[i][md[i]-1]);
+        //"md = ", md;
+        //"i = ", i;
+        if(md[i] > 1) 
+        {
+          minOrd = minOrd + number(MSelf[i][md[i]-1]);
+        }
+        //"it worked";
       } else 
       {
-        minOrd = minOrd + number(M[i][j]);
+        minOrd = minOrd + number(M[i,j]);
       }
     }
     if(minOrd > maxExp)
@@ -3370,7 +3482,8 @@ static proc ibElementMax(matrix M, list MSelf, intvec md)
       maxExpi = i;
     }
   }
-  return(list(maxExp, i));
+  //"maxExp, maxExpi: ", maxExp, maxExpi;
+  return(list(maxExp, maxExpi));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3559,6 +3672,23 @@ static proc ratDeg(poly f)
     k--;
   }
   return(k);
+}
+
+// Input:  poly f in L[x], with L an algebraic extension of K.
+// Output: int out = 0 if the coefficients are in K and out = 1 if the coefficients are in L - K
+static proc isNonRat(poly f)
+{
+  matrix c = coeffs(f, var(1));
+  int i;
+  int out = 0;
+  for(i = 1; i <= size(c); i++)
+  {
+    if(pardeg(number(c[i,1])) > 0)
+    {
+      out = 1;
+    }
+  }
+  return(out);
 }
 
 // Input:  a list classes, whose elements are classes of conjugate Puiseux
