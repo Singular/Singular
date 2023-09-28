@@ -315,8 +315,8 @@ EXAMPLE: example integralBasis; shows an example
 
 //--------------------- computing the integral basis --------------------------
   dbprint(dbg, "Computing the integral basis...");
-  if(optimize == 1) {"DBG - optimize = 1";}
-  else {"DBG - optimize = 0";}
+  if(optimize == 1) {dbprint(dbg, "DBG - optimize = 1");}
+  else {dbprint(dbg, "DBG - optimize = 0");}
   list ib = integralBasisMain(f, strategy, algorithm, modular, compType, compo, locBasis, useRotation, optimize);
 
   ideal num = ib[1];
@@ -1192,16 +1192,13 @@ static proc optimizationSteps(f, classes, slopes, degExpand)
 {
   int i, k;
   intvec vy = (0,1);
+  int dbg = printlevel - voice;
   
-  "Using optimization algorithm";
   // 1) Compute Puiseux sets (we use segments for easier implementation)
   list pSegmentFull = getSegments(f, classes, slopes, degExpand);
-  "step 1 finished";
-  //"puiseux segments: "; pSegmentFull;
-  //~;
-  
   list pSegment = pSegmentFull[1]; // The segments corresponding to expansions at the origin
   poly unitPoly = pSegmentFull[2]; // The unit outside the origin
+  dbprint(dbg, "Step 1 finished");  
   
   // 2) Compute IB in each set
   list ibSeg;
@@ -1211,39 +1208,26 @@ static proc optimizationSteps(f, classes, slopes, degExpand)
     // pSegment[2] are the corresponding classes of expansions
     ibSeg[i] = ibSegment(pSegment[i][1], pSegment[i][3], degExpand);
   }
-  "step 2 finished";
+  dbprint(dbg, "Step 2 finished");
       
   // 3) Merge all the integral basis for the segments using the combinatorial approach
   list ib = optiBase(ibSeg, pSegment);
-  //"ib opti"; ib;
-  
+  dbprint(dbg, "Step 3 finished");
+    
+  // 4) We add the unit outside the origin and convert to ib shape.
   ideal IOut;
   int intExp = int(ib[size(ib)-1][1]);
   poly condu = var(1)^intExp;  // The denominator of the integral basis.
   
-  "step 3 finished";
-  
-  //IOut[1] =    // The first element is 1
-
-  // We convert to ib shape
-  //for(i = 1; i <= size(ib)-2; i++)  // We dont use the first element (1) and the last one (with degree f).
-  //{
-  //  IOut[i + 1] = ib[i+1][3] * var(1)^(intExp - int(ib[i+1][1]));
-  //}
-  
-  // 4) We add the unit outside the origin
   for(k = 0; k < deg(unitPoly, vy); k++)
   {
     IOut[k+1] = condu * var(2)^(k);
   }
-  //~;
   for(k = 1; k <= size(ib) - 1; k++)
   {
     IOut[size(IOut)+1] = ib[k][3] * var(1)^(intExp - int(ib[k][1])) * unitPoly;
   }
-  "step 4 finished";
-  //"IOut = "; IOut;
-  //~;
+  dbprint(dbg, "Step 4 finished");
   return(IOut);
 }
   
@@ -1301,7 +1285,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
     comp = 2;
     dbprint(dbg, "----Computing Puiseux Segments...");
     fSegment = henselSegments(fLoc, maxOrder);
-    "Number of segments: ", size(fSegment);
+    dbprint(dbg, "Number of segments: ", size(fSegment));
     
     list pExpRecomputed;
     list nPoly;
@@ -1773,7 +1757,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
     }
   }
   
-  "The maximum integrality exponent is ", maxExp;
+  dbprint(dbg, "The maximum integrality exponent is ", maxExp);
 
   //"MClass"; 
   //MClass;
@@ -2841,7 +2825,7 @@ static proc multiplicateConjugates(poly f)
   def Q = ring(0, (var(1), var(2), @a, T(1..d)), lp);
   ring S = 0, (var(1), var(2), @a), dp;
   poly f = imap(R, f);
-  intvec da = (0,1);
+  intvec da = (0,0,1);
 
   if(deg(f, da) > 0)
   {
@@ -2881,9 +2865,9 @@ static proc multiplicateConjugates(poly f)
 
     setring R;
     poly fNew = imap(Q, fNew);
-
   } else
   {
+    // Check, usually we would need only the square free polynomial.
     setring R;
     poly fNew = (f)^d;
   }
@@ -3025,31 +3009,28 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
       rels = rels * (var(1) - T(1)^i);
     }
     
-    poly pExt = var(1)^den - 1; // A root of unity
-    matrix c1 = coeffs(rels, var(1));
-    matrix c2 = coeffs(pExt, var(1));
-    
-    ideal I;
+    // T(1) is a den-th root of unity, the only relation is 
+    // 0 = 1 + T(1) + ... + T(1)^(den-1)
+    poly pExt = 1; // A root of unity
     for(i = 1; i < den; i++)
     {
-      I[i] = c1[i,1] - c2[i,1];
+      pExt = pExt + T(1)^i;
     }
+    ideal I = pExt;
     I = groebner(I);
         
     poly fNew = 1;
     poly fNewTemp = 1;
-    
-    
     for(i = 1; i<=den; i++)
     {
       fNewTemp = fNewTemp * (var(2) - pols[i]);
 
       // We compute factors up to degree d, so we can truncate
       fNewTemp = reduce(fNewTemp, groebner(var(1)^(d*den+1)));
-
+      // We reduce modulo the algebraic relations
       fNewTemp = reduce(fNewTemp, I);
     }
-    fNew = reduce(fNewTemp, I);
+    fNew = fNewTemp;
     
     // We replace x^den by x
     ring P = (0, @a), (@x, @y, @X), dp;
@@ -3070,10 +3051,11 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
     // If there is still an algebraic extension, we compute the poly over the ground field
     if(isNonRat(fNew) == 1)
     {
-      //"old f2 = ", fNew;
+      // We look for a polynomial over Q.
+      // This algorithm is not implemented for complex singularities.
+      // In that case we would need to distinguish the extension in the basering 
+      // from the extension in the Puiseux expansion, as in buildPolyFracNew.
       fNew = multiplicateConjugates(fNew);
-      //"new f2 = ", fNew;
-      //~;
     }
 
     
