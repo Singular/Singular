@@ -1305,7 +1305,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
     fSegment = henselSegments(fLoc, maxOrder);
     "Number of segments: ", size(fSegment);
     
-    list pRecomputed;
+    list pExpRecomputed;
     list nPoly;
     
     //"Check output of henselSegments";
@@ -1334,9 +1334,9 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
       if(size(classesNew) > 1) 
       {
         // puiseux(poly f, int maxDeg, int atOrigin)
-        list lRecomputed = puiseux(fSegment[i], globOrder, 1);
+        pExpRecomputed = puiseux(fSegment[i], globOrder, 1);
         debug_log_intbas(3, "------Puiseux expansions recomputed: ");
-        classesNew = getClasses(lRecomputed);
+        classesNew = getClasses(pExpRecomputed);
       }
       
       // We put everything together
