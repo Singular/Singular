@@ -5646,4 +5646,101 @@ ring r = 0,(x,y),(dp, L(100000));
 poly f = (y^15 + 2*x^38)*(y^19 + 7*x^52) + y^100;
 int t = timer;
 list l1 = integralBasis(f, 2, "atOrigin");
+LIB"integralbasis.lib";
+ring r = 0, (x,y), dp;
+poly f = (y7 + x4) * (y7 + y5x3 + x4) + y30;
+list l = puiseux(f,1,-1);
+l;
+printlevel = 3;
+LIB"integralbasis.lib";
+ring R = 0,(x,y),dp;
+poly f = x^(30)+x^2*y^2+y^(11);
+map phi = R,x+2*y+x^2+x*y+y^2+x^3,3*x+5*y+x^2*y+y^2;
+poly g =phi(f);
+int t = timer;
+list l1 = integralBasis(g, 2, "atOrigin");
+timer - t;
+t = timer;
+list l2 = integralBasis(f, 2, "atOrigin", "noOpti");
+timer - t;
+printlevel = 3;
+LIB"integralbasis.lib";
+ring R = 0,(x,y),dp;
+poly f = x^(30)+x^2*y^2+y^(11);
+map phi = R,x+2*y+x^2+x*y+y^2+x^3,3*x+5*y+x^2*y+y^2;
+poly g =phi(f);
+int t = timer;
+list l1 = integralBasis(g, 2, "atOrigin");
+printlevel = 3;
+LIB"integralbasis.lib";
+ring R = 0,(x,y),dp;
+poly f = x^(30)+x^2*y^2+y^(11);
+map phi = R,x+2*y+x^2+x*y+y^2+x^3,3*x+5*y+x^2*y+y^2;
+poly g =phi(f);
+int t = timer;
+list l1 = integralBasis(g, 2, "atOrigin");
+classes
+basering;
+bF
+printlevel = 3;
+LIB"integralbasis.lib";
+ring R = 0,(x,y),dp;
+poly f = x^(30)+x^2*y^2+y^(11);
+map phi = R,x+2*y+x^2+x*y+y^2+x^3,3*x+5*y+x^2*y+y^2;
+poly g =phi(f);
+int t = timer;
+list l1 = integralBasis(g, 2, "atOrigin");
+bF
+printlevel = 3;
+LIB"integralbasis.lib";
+ring R = 0,(x,y),dp;
+poly f = x^(30)+x^2*y^2+y^(11);
+map phi = R,x+2*y+x^2+x*y+y^2+x^3,3*x+5*y+x^2*y+y^2;
+poly g =phi(f);
+int t = timer;
+list l1 = integralBasis(g, 2, "atOrigin");
+fNew
+fetch(P, f2);
+f
+d
+den
+degX
+setring S
+ff
+ffRed
+pols
+fNewTemp
+I
+basering
+den
+printlevel = 3;
+LIB"integralbasis.lib";
+ring R = 0,(x,y),dp;
+poly f = x^(30)+x^2*y^2+y^(11);
+map phi = R,x+2*y+x^2+x*y+y^2+x^3,3*x+5*y+x^2*y+y^2;
+poly g =phi(f);
+int t = timer;
+list l1 = integralBasis(g, 2, "atOrigin");
+printlevel = 3;
+LIB"integralbasis.lib";
+ring R = 0,(x,y),dp;
+poly f = x^(30)+x^2*y^2+y^(11);
+map phi = R,x+2*y+x^2+x*y+y^2+x^3,3*x+5*y+x^2*y+y^2;
+poly g =phi(f);
+int t = timer;
+list l1 = integralBasis(g, 2, "atOrigin");
+
+l1;
+timer - t;
+t = timer;
+list l2 = integralBasis(f, 2, "atOrigin", "noOpti");
+timer - t;
+
+list l2 = integralBasis(g, 2, "atOrigin", "noOpti");
+timer - t;
+
+l2;
+"Verification...";
+size(reduce(l1[1], groebner(l2[1])));
+size(reduce(l2[1], groebner(l1[1])));
 
