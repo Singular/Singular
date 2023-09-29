@@ -3139,7 +3139,7 @@ static proc valIK(list classes)
       setring S;
       poly f = subst(PE[1][1], @a, 0);
       int den(i) = PE[1][2];
-      number o = number(ratDeg(PE[1][1])) / number(den(i));
+      number o = number(ratDeg(PE[1][1])) / number(den(i));  // Check if we should have orderExp here...
       setring R;
       poly f(i) = imap(S, f);
       number o(i) = number(imap(S, o));
@@ -3224,7 +3224,7 @@ static proc valIKClass(list classes)
       poly f = subst(PE[1][1], @a, 0);
       int den(i) = PE[1][2];
       int mmult(i) = lcm(pardeg(minpoly), den(i)) div den(i);  // mult(i) * den(i) should be the number of elements in the conjugacy class
-      number o = number(ratDeg(PE[1][1])) / number(den(i));
+      number o = number(orderExp(PE[1][1])) / number(den(i));  // The degree of the smallest term
       setring R;
       poly f(i) = imap(S, f);
       number o(i) = number(imap(S, o));
@@ -3272,7 +3272,7 @@ static proc valIKClass(list classes)
           } else
           {
             // Finally, if they have the same order we use ordAtPol.
-            l = buildPolyGroundXRoot(f(j), den(j), -1);
+            l = buildPolyGroundXRootClass(classes[j], -1);
             MC[i, j] = ordAtPol(l[1], list(f(i), den(i)));
           }
         }
