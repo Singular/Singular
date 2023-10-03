@@ -27,7 +27,7 @@ like the second input file with extensions replaced by
 
 where GB stands for GROEBNER and <alg> is the abbreviation of the
 algorithm used for computing the input GROEBNER file (see the help for
-solve_IP or toric_ideal for an explaination).
+solve_IP or toric_ideal for an explanation).
 
 A GROEBNER file looks as follows:
 
@@ -119,7 +119,7 @@ OPTIONS:
                           -p 12.0
 
  -S [RP] [M] [B] [M] [2]  criteria to use in Buchberger´s algorithm
-                          for discarding unneccessary S-pairs
+                          for discarding unnecessary S-pairs
              RP           relatively prime leading terms
              M            Gebauer-Moeller criterion M
              F            Gebauer-Moeller criterion F
