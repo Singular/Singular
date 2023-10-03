@@ -162,7 +162,7 @@ public:
   void print() const;
   void ordered_print(const term_ordering&) const;
   // Writes the list to the standard output medium.
-  // The first routine writes the list elements as they are oredred in
+  // The first routine writes the list elements as they are ordered in
   // the list.
   // The second one writes them in increasing order with respect to the
   // argument term ordering; the list has not to be ordered before and
@@ -257,7 +257,7 @@ public:
 
   int operator==(const list_iterator& iter) const;
   int operator!=(const list_iterator& iter) const;
-  // These operators verifie if actual references the same element
+  // These operators verify if actual references the same element
   // as iter.actual.
 
   int next_is(const list_iterator& iter) const;

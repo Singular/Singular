@@ -25,7 +25,7 @@ typedef char* OUTPUT_FILE;
 // with respect to a term ordering refining the cost function c. This can
 // be done by the following procedures. They check the format of their input
 // file (which should be a MATRIX file as described below) and return 1 if
-// they were successfull, 0 else.
+// they were successful, 0 else.
 //  They take as arguments:
 // - their input file
 // - the arguments for Buchberger´s algorithm (see the comments in ideal.h)
@@ -105,7 +105,7 @@ extern int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
                                     const BOOLEAN& verbose=FALSE);
 // A modified version of the algorithm called EATI using "pseudo-elimination".
 // This algorithm is quite similar to Pottier's algorithm, but deals with
-// homogenous binomials.
+// homogeneous binomials.
 
 // The second step of the IP-solution is to reduce one or more given
 // initial solutions (which also define right-hand vectors b) with respect
