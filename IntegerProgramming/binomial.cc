@@ -877,7 +877,7 @@ int binomial::reduce_head_by(const binomial& b, const term_ordering& w)
   for(short i=0;i<_number_of_variables;i++)
   {
     Integer& actual_entry=exponent_vector[_number_of_variables-1-i];
-    // to avoid unneccessary pointer arithmetic
+    // to avoid unnecessary pointer arithmetic
 
     actual_entry*=sign;
 
@@ -950,7 +950,7 @@ int binomial::reduce_tail_by(const binomial& b, const term_ordering& w)
   for(short i=0;i<_number_of_variables;i++)
   {
     Integer& actual_entry=exponent_vector[_number_of_variables-1-i];
-    // to avoid unneccessary pointer arithmetic
+    // to avoid unnecessary pointer arithmetic
 
     if(i<size_of_support_vectors)
     {
@@ -1048,7 +1048,7 @@ binomial& S_binomial(const binomial& a, const binomial& b,
   {
     Integer& actual_entry=result.exponent_vector
       [result._number_of_variables-1-i];
-    // to avoid unneccessary pointer arithmetic
+    // to avoid unnecessary pointer arithmetic
 
     actual_entry*=sign;
 

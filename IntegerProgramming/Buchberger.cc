@@ -383,14 +383,14 @@ ideal& ideal::compute_actual_S_pairs_1()
 // already considered in a previous S-pair computation; pairs of such
 // "old" binomials do not have to be computed anymore (but pairs of an old
 // and a new one have to be computed, of course). As the generator list are
-// ordered with respect to the "done"-flag (all undone elements preceed all
+// ordered with respect to the "done"-flag (all undone elements precede all
 // done elements), we can avoid unnecessary iteration steps by breaking
 // the iteration at the right point.
 
 // The computed S-pairs are stored in the aux_list for further computations.
 
 // For a better overview, the code for NO_SUPPORT_DRIVEN_METHODS_EXTENDED
-// and SUPPORT_DRIVEN_METHODS_EXTENDED is completetly separated in this
+// and SUPPORT_DRIVEN_METHODS_EXTENDED is completely separated in this
 // function.
 
 // Note that the "next()"-operations in the following routine do not reach a
@@ -636,7 +636,7 @@ ideal& ideal::compute_actual_S_pairs_2()
 // In the previous S-pair routines, the computed S-bionomials are not reduced
 // at all. This is done in the appropriate Groebner basis routine
 // (reduced_Groebner_basis_1 or ..._1a) when moving them from the aux_list
-// to the generator lists. This meens that S-binomials cannot only be reduced
+// to the generator lists. This means that S-binomials cannot only be reduced
 // by the generators known at the time of their computation, but also by
 // the S-pairs that where already treated.
 
@@ -645,7 +645,7 @@ ideal& ideal::compute_actual_S_pairs_2()
 // the ideal almost reduced, so the minimalization will be faster.
 // Furthermore, the computation of S-pairs with unreduced generators is
 // avoided.
-// To provide a possibility to compensate the mentionned disadvantage,
+// To provide a possibility to compensate the mentioned disadvantage,
 // I have written the routine minimalize_S_pairs() that interreduces the
 // binomials stored in aux_list.
 
@@ -901,7 +901,7 @@ ideal& ideal::compute_actual_S_pairs_2()
 
 ideal& ideal::compute_actual_S_pairs_3()
 {
-// This routine is quite similar to the preceeding.
+// This routine is quite similar to the preceding one.
 // The main difference is that the computed S-binomials are not stored in the
 // aux_list, but in new_generators. This makes a difference when minimalizing
 // the S-binomials in the appropriate Groebner basis routine
@@ -2020,7 +2020,7 @@ ideal& ideal::minimalize_new_generators()
 ideal& ideal::minimalize()
 {
 // For a better overview, the code for NO_SUPPORT_DRIVEN_METHODS_EXTENDED
-// and SUPPORT_DRIVEN_METHODS_EXTENDED is completetly separated in this
+// and SUPPORT_DRIVEN_METHODS_EXTENDED is completely separated in this
 // function. Note that th iteration methods are quite different for those
 // two possibilities.
 
@@ -2508,7 +2508,7 @@ ideal& ideal::final_reduce()
 // This method leads to a minimal, but in general not to the reduced Groebner
 // basis. The actual procedure reduces such a minimal basis at the end of
 // Buchberger´s algorithm. It will probably cause problems when called
-// in the course of the algorithm. For an explaination of this fact, see
+// in the course of the algorithm. For an explanation of this fact, see
 // the following comment.
 
   minimalize();
@@ -2862,7 +2862,7 @@ ideal& ideal::reduced_Groebner_basis_1(const int& S_pair_criteria,
                                        const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
-  // for an explaination see in globals.h
+  // for an explanation see in globals.h
   rel_primeness=(S_pair_criteria & 1);
   M_criterion=(S_pair_criteria & 2);
   F_criterion=(S_pair_criteria & 4);
@@ -2943,7 +2943,7 @@ ideal& ideal::reduced_Groebner_basis_1a(const int& S_pair_criteria,
                                         const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
-  // for an explaination see in globals.h
+  // for an explanation see in globals.h
   rel_primeness=(S_pair_criteria & 1);
   M_criterion=(S_pair_criteria & 2);
   F_criterion=(S_pair_criteria & 4);
@@ -3024,7 +3024,7 @@ ideal& ideal::reduced_Groebner_basis_2(const int& S_pair_criteria,
                                        const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
-  // for an explaination see in globals.h
+  // for an explanation see in globals.h
   rel_primeness=(S_pair_criteria & 1);
   M_criterion=(S_pair_criteria & 2);
   F_criterion=(S_pair_criteria & 4);
@@ -3105,7 +3105,7 @@ ideal& ideal::reduced_Groebner_basis_3(const int& S_pair_criteria,
                                        const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
-  // for an explaination see in globals.h
+  // for an explanation see in globals.h
   rel_primeness=(S_pair_criteria & 1);
   M_criterion=(S_pair_criteria & 2);
   F_criterion=(S_pair_criteria & 4);
