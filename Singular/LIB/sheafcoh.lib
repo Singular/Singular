@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sheafcoh.lib 4.3.2.3 Jul_2023 "; // $Id$
+version="version sheafcoh.lib 4.3.2.8 Okt_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -497,7 +497,8 @@ ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
 RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
          associated to coker(M). The range of twists is determined by @code{l},
          @code{h}.
-DISPLAY: The intmat is displayed in a diagram of the following form: @*
+DISPLAY: The intmat is displayed in a diagram of the following form:
+         with @code{displayCohom(A,l,h,nvars(r)-1);}@*
   @format
                 l            l+1                      h
   ----------------------------------------------------------
@@ -573,7 +574,7 @@ EXAMPLE: example sheafCohBGG; shows an example
           newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
         }
         else
-        { 
+        {
           newBetti[n+2-shift-j,i-l+1]=-1;
         }
       }
@@ -594,7 +595,6 @@ EXAMPLE: example sheafCohBGG; shows an example
       newBetti[j,i]=-1;
     }
   }
-  displayCohom(newBetti,l,h,n);
   option(set,saveopt);
   setring R;
   return(newBetti);
@@ -606,7 +606,9 @@ example
   //-------------------------------------------
   ring r=0,x(1..5),dp;
   module M=0;
-  def A=sheafCohBGG(M,-9,4);
+  intmat A=sheafCohBGG(M,-9,4);
+  A;
+  displayCohom(A,-9,4,nvars(r)-1);
   // cohomology of cotangential bundle on P^3:
   //-------------------------------------------
   ring R=0,(x,y,z,u),dp;
@@ -614,7 +616,9 @@ example
   module M=T1[3];
   intvec v=2,2,2,2,2,2;
   attrib(M,"isHomog",v);
-  def B=sheafCohBGG(M,-8,4);
+  intmat B=sheafCohBGG(M,-8,4);
+  B;
+  displayCohom(B,-8,4,nvars(R)-1);
 }
 proc sheafCohBGGregul(module M,int l,int h, int reg)
 "USAGE:   sheafCohBGGregul(M,l,h);    M module, l,h int, reg int
@@ -699,7 +703,6 @@ EXAMPLE: example sheafCohBGGregul; shows an example
       newBetti[j,i]=-1;
     }
   }
-  //displayCohom(newBetti,l,h,n);
   option(set,saveopt);
   setring R;
   return(newBetti);
@@ -859,7 +862,8 @@ ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
 RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
          associated to coker(M). The range of twists is determined by @code{l},
          @code{h}.
-DISPLAY: The intmat is displayed in a diagram of the following form: @*
+DISPLAY: The intmat is displayed in a diagram of the following form:
+         with @code{displayCohom(A,l,h,nvars(r)-1);}@*
   @format
                 l            l+1                      h
   ----------------------------------------------------------
@@ -1220,7 +1224,8 @@ ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
 RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
          associated to coker(M). The range of twists is determined by @code{l},
          @code{h}.
-DISPLAY: The intmat is displayed in a diagram of the following form: @*
+DISPLAY: The intmat can be displayed in a diagram of the following form:
+         with @code{displayCohom(A,l,h,nvars(r)-1);}@*
   @format
                 l            l+1                      h
   ----------------------------------------------------------
@@ -1279,7 +1284,6 @@ EXAMPLE: example sheafCoh; shows an example
        }
      }
   }
-  displayCohom(newBetti,l,h,n);
   return(newBetti);
 }
 example
@@ -1290,7 +1294,9 @@ example
   //-------------------------------------------
   ring r=0,x(1..5),dp;
   module M=0;
-  def A=sheafCoh(0,-7,2);
+  intmat A=sheafCoh(0,-7,2);
+  A;
+  displayCohom(A,-7,2,nvars(r)-1);
   //
   // cohomology of cotangential bundle on P^3:
   //-------------------------------------------
@@ -1299,7 +1305,8 @@ example
   module M=T1[3];
   intvec v=2,2,2,2,2,2;
   attrib(M,"isHomog",v);
-  def B=sheafCoh(M,-6,2);
+  intmat B=sheafCoh(M,-6,2);
+  displayCohom(B,-6,2,nvars(R)-1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
