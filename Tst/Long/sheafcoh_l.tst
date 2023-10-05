@@ -35,7 +35,9 @@ kill r;
  print(betti(FI),"betti");
  module F=FI[2];
  A=sheafCoh(F,-6,6);
+ displayCohom(A,-6,6,nvars(basering)-1);
  B=sheafCohBGG(F,-6,6);
+ displayCohom(B,-6,6,nvars(basering)-1);
 
  dimH(3,F,-4);
  dimH(1,F,1);
@@ -76,8 +78,11 @@ kill r;
 
  module F=FI[2];
  def A1=sheafCoh(F,-4,6);
+ displayCohom(A1,-4,6,nvars(basering)-1);
  A1=sheafCoh(F,-3,6,"sres");
+ displayCohom(A1,-3,6,nvars(basering)-1);
  def A2=sheafCohBGG(F,-4,6);
+ displayCohom(A2,-4,6,nvars(basering)-1);
 
 kill S;
 
@@ -186,7 +191,9 @@ x(0)*x(2), 0,      0,     x(1)^2, 0,      x(0)*x(1),  0,       x(0)^2;
 def M=module(FHM);
 attrib(M,"isHomog",intvec(4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3,3,3));
 A1=sheafCohBGG(M,-10,7);
+displayCohom(A1,-10,7,nvars(basering)-1);
 A2=sheafCoh(M,-4,3);
+displayCohom(A2,-4,3,nvars(basering)-1);
 
 tst_status(1);$
 
