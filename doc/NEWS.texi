@@ -31,6 +31,7 @@ Changed libraries:
 @item @code{normaliz.lib}: update to normaliz 3.10 (@nref{normaliz_lib})
 @item @code{hess.lib}: fixes (@nref{hess_lib})
 @item @code{sheafcoh.lib}: new routines @nref{sheafCohBGGregul}, @nref{sheafCohBGGregul_w} (@nref{sheafcoh_lib})
+@item @code{sheafcoh.lib}: display of the tables is moved to @nref{displayCohom} (@nref{sheafcoh_lib})
 @item @code{elim.lib}: rename @code{sat} to @code{sat_with_exp}, @code{sat} now return the saturation i9deal (only).
 @end itemize
 
