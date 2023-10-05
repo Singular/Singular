@@ -1128,7 +1128,7 @@ static BOOLEAN jjTIMES_MA_N2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA_I1(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)mp_MultI((matrix)u->CopyD(MATRIX_CMD),(int)(long)v->Data(),currRing);
+  res->data = (char *)mp_MultI((matrix)u->CopyD(MATRIX_CMD),(long)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjTIMES_MA_I2(leftv res, leftv u, leftv v)
@@ -1227,15 +1227,15 @@ static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
 static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
 {
   if (iiOp=='/') Warn("int division with `/`: use `div` instead in line >>%s<<",my_yylinebuf);
-  int a= (int)(long)u->Data();
-  int b= (int)(long)v->Data();
+  long a= (long)u->Data();
+  long b= (long)v->Data();
   if (b==0)
   {
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  int c=a%b;
-  int r=0;
+  long c=a%b;
+  long r=0;
   switch (iiOp)
   {
     case '%':
@@ -1244,7 +1244,7 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
     case INTDIV_CMD:
         r=((a-c) /b);   break;
   }
-  res->data=(void *)((long)r);
+  res->data=(void *)r;
   return FALSE;
 }
 static BOOLEAN jjDIV_BI(leftv res, leftv u, leftv v)
@@ -1448,8 +1448,8 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjINDEX_P(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->Data();
-  int i=(int)(long)v->Data();
-  int j=0;
+  long i=(long)v->Data();
+  long j=0;
   while (p!=NULL)
   {
     j++;
@@ -1468,8 +1468,8 @@ static BOOLEAN jjINDEX_PBu(leftv res, leftv u, leftv v)
   sBucketCanonicalize(b);
   int l; poly p,pp;
   sBucketDestroyAdd(b, &pp, &l);
-  int i=(int)(long)v->Data();
-  int j=0;
+  long i=(long)v->Data();
+  long j=0;
   p=pp;
   while (p!=NULL)
   {
@@ -1769,7 +1769,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjALIGN_V(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->CopyD();
-  int s=(int)(long)v->Data();
+  long s=(long)v->Data();
   if (s+p_MinComp(p,currRing)<=0)
   { p_Delete(&p,currRing);return TRUE;}
   p_Shift(&p,s,currRing);
