@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sheafcoh.lib 4.3.2.8 Sep_2023 "; // $Id$
+version="version sheafcoh.lib 4.3.2.3 Jul_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -18,7 +18,6 @@ PROCEDURES:
  sheafCohBGGregul_w(M,l,h,r,w); cohomology with given module weights
  sheafCohBGG2(M,l,h);    cohomology of sheaf associated to coker(M), experimental version
  sheafCoh(M,l,h);        cohomology of sheaf associated to coker(M)
- sheafCohN(M,l,h);       cohomology of sheaf associated to coker(M), no printout
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
  dimGradedPart()
 
@@ -632,7 +631,7 @@ NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
          @code{sheafCohBGG(M,l,h)} does not compute all values in the above
          table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
          use @code{sheafCohBGG(M,l-n,h+n)}.
-SEE ALSO: sheafCoh, dimH, sheafCohBGG
+SEE ALSO: sheafCoh, dimH
 EXAMPLE: example sheafCohBGGregul; shows an example
 "
 {
@@ -1301,85 +1300,6 @@ example
   intvec v=2,2,2,2,2,2;
   attrib(M,"isHomog",v);
   def B=sheafCoh(M,-6,2);
-}
-
-proc sheafCohN(module M,int l,int h,list #)
-"USAGE:   sheafCohN(M,l,h);    M module, l,h int
-ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
-         vector as an attribute, @code{h>=l}. The basering @code{S} has
-         @code{n+1} variables.
-RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
-         associated to coker(M). The range of twists is determined by @code{l},
-         @code{h}.
-NOTE:    The procedure is based on local duality as described in [Eisenbud:
-         Computing cohomology. In Vasconcelos: Computational methods in
-         commutative algebra and algebraic geometry. Springer (1998)].@*
-         By default, the procedure uses @code{mres} to compute the Ext
-         modules. If called with the additional parameter @code{\"sres\"},
-         the @code{sres} command is used instead.
-SEE ALSO: dimH, sheafCohBGG, sheafCoh
-EXAMPLE: example sheafCohN; shows an example
-"
-{
-  int use_sres;
-  if( typeof(attrib(M,"isHomog"))!="intvec" )
-  {
-     if (size(M)==0) { attrib(M,"isHomog",0); }
-     else { ERROR("No admissible degree vector assigned"); }
-  }
-  if (size(#)>0)
-  {
-    if (#[1]=="sres") { use_sres=1; }
-  }
-  int i,j;
-  module N,N0,N1;
-  int n=nvars(basering)-1;
-  intvec v=0..n+1;
-  int col=h-l+1;
-  intmat newBetti[n+1][col];
-  if (use_sres) { list L=Ext_R(v,M,1,"sres")[2]; }
-  else          { list L=Ext_R(v,M,1)[2]; }
-  for (i=l; i<=h; i++)
-  {
-    N0=L[n+2];
-    N1=L[n+1];
-    newBetti[n+1,i-l+1]=dimGradedPart(M,i) - dimGradedPart(N0,-n-1-i)
-                             - dimGradedPart(N0,-n-1-i);
-  }
-  for (j=1; j<=n; j++)
-  {
-     N=L[j];
-     attrib(N,"isSB",1);
-     if (dim(N)>=0)
-     {
-       for (i=l; i<=h; i++)
-       {
-         newBetti[j,i-l+1]=dimGradedPart(N,-n-1-i);
-       }
-     }
-  }
-  return(newBetti);
-}
-example
-{"EXAMPLE:";
-  echo = 2;
-  //
-  // cohomology of structure sheaf on P^4:
-  //-------------------------------------------
-  ring r=0,x(1..5),dp;
-  module M=0;
-  def A=sheafCohN(0,-7,2);
-  A;
-  //
-  // cohomology of cotangential bundle on P^3:
-  //-------------------------------------------
-  ring R=0,(x,y,z,u),dp;
-  resolution T1=mres(maxideal(1),0);
-  module M=T1[3];
-  intvec v=2,2,2,2,2,2;
-  attrib(M,"isHomog",v);
-  def B=sheafCohN(M,-6,2);
-  B;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
