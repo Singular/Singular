@@ -519,7 +519,7 @@ NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
          @code{sheafCohBGG(M,l,h)} does not compute all values in the above
          table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
          use @code{sheafCohBGG(M,l-n,h+n)}.
-SEE ALSO: sheafCoh, dimH
+SEE ALSO: sheafCoh, dimH, displayCohom
 EXAMPLE: example sheafCohBGG; shows an example
 "
 {
@@ -635,7 +635,7 @@ NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
          @code{sheafCohBGG(M,l,h)} does not compute all values in the above
          table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
          use @code{sheafCohBGG(M,l-n,h+n)}.
-SEE ALSO: sheafCoh, dimH
+SEE ALSO: sheafCoh, dimH, displayCohom
 EXAMPLE: example sheafCohBGGregul; shows an example
 "
 {
@@ -742,7 +742,7 @@ NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
          @code{sheafCohBGG(M,l,h)} does not compute all values in the above
          table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
          use @code{sheafCohBGG(M,l-n,h+n)}.
-SEE ALSO: sheafCoh, dimH
+SEE ALSO: sheafCoh, dimH, displayCohom
 EXAMPLE: example sheafCohBGGregul_w; shows an example
 "
 {
@@ -888,7 +888,7 @@ NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
          table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
          use @code{sheafCohBGG(M,l-n,h+n)}.
          Experimental version. Should require less memory.
-SEE ALSO: sheafCohBGG
+SEE ALSO: sheafCohBGG, displayCohom
 EXAMPLE: example sheafCohBGG2; shows an example
 "
 {
@@ -1092,18 +1092,21 @@ example
   t = timer;
 
   def A = sheafCoh(M, l, h); // global Ext method:
+  displayCohom(A,l,h,nvars(basering)-1);
 
   "Time: ", timer - t;
   //////////////////////////////////////////////
   t = timer;
 
   A = sheafCohBGG(M, l, h);  // BGG method (without optimization):
+  displayCohom(A,l,h,nvars(basering)-1);
 
   "Time: ", timer - t;
   //////////////////////////////////////////////
   t = timer;
 
   A = sheafCohBGG2(M, l, h); // BGG method (with optimization)
+  displayCohom(A,l,h,nvars(basering)-1);
 
   "Time: ", timer - t;
   //////////////////////////////////////////////
@@ -1125,18 +1128,21 @@ example
   t = timer;
 
   def B = sheafCoh(M, l, h); // global Ext method:
+  displayCohom(B,l,h,nvars(basering)-1);
 
   "Time: ", timer - t;
   //////////////////////////////////////////////
   t = timer;
 
   B = sheafCohBGG(M, l, h);  // BGG method (without optimization):
+  displayCohom(B,l,h,nvars(basering)-1);
 
   "Time: ", timer - t;
   //////////////////////////////////////////////
   t = timer;
 
   B = sheafCohBGG2(M, l, h); // BGG method (with optimization)
+  displayCohom(B,l,h,nvars(basering)-1);
 
   "Time: ", timer - t;
   //////////////////////////////////////////////
