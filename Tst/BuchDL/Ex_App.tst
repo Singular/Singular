@@ -21,7 +21,8 @@ resolution FI = mres(I,0);
 
 LIB "sheafcoh.lib";
 module F = FI[2];
-def B = sheafCoh(F,-2,6);
+intmat B = sheafCoh(F,-2,6);
+displayCohom(B,-2,6,nvars(S)-1);
 //->          -2   -1    0    1    2    3    4    5    6
 //->   -------------------------------------------------
 //->     4:    -    -    -    -    -    -    -    -    -
@@ -70,7 +71,8 @@ resolution FI = mres(I,0);
 
 if (not(defined(sheafCoh))){ LIB "sheafcoh.lib"; }
 module F = FI[2];
-def B = sheafCoh(F,0,8);
+intmat B = sheafCoh(F,0,8);
+displayCohom(B,0,8,nvars(basering)-1);
 //->           0    1    2    3    4    5    6    7    8
 //->   -------------------------------------------------
 //->     4:    -    -    -    -    -    -    -    -    -
@@ -103,7 +105,8 @@ resolution FI = mres(I,0);
 
 if (not(defined(sheafCohBGG))){ LIB "sheafcoh.lib"; }
 module F = FI[2];
-def B = sheafCohBGG(F,-2,6);
+intmat B = sheafCohBGG(F,-2,6);
+displayCohom(B,-2,6,nvars(basering)-1);
 //->          -2   -1    0    1    2    3    4    5    6
 //->    -------------------------------------------------
 //->     4:    -    -    -    -    -    *    *    *    *
