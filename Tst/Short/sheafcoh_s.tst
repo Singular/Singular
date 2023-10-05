@@ -8,7 +8,9 @@ tst_init();
 ring r=0,x(1..6),dp;
 module M=0;
 def A=sheafCoh(M,-10,5);
+displayCohom(A,-10,5,5);
 A=sheafCoh(M,-10,5,"sres");
+displayCohom(A,-10,5,5);
 def B=sheafCohBGG(M,-10,5);
 displayCohom(A,-10,5,5);
 displayCohom(B,-10,5,5);
@@ -16,24 +18,33 @@ displayCohom(B,-10,5,5);
 //----------------------------------------------------
 attrib(M,"isHomog",intvec(-2));
 A=sheafCoh(M,-10,3);
+displayCohom(A,-10,3,5);
 A=sheafCoh(M,-10,3,"sres");
+displayCohom(A,-10,3,5);
 B=sheafCohBGG(M,-10,3);
+displayCohom(B,-10,3,5);
 // Kohomologie direkter Summen getwisteter Strukturgarben von P^5:
 //----------------------------------------------------------------
 matrix MM[3][1];
 M=MM;
 attrib(M,"isHomog",intvec(-1,0,2));
 A=sheafCoh(M,-9,5);
+displayCohom(A,-9,5,5);
 A=sheafCoh(M,-9,4,"sres");
+displayCohom(A,-9,4,5);
 B=sheafCohBGG(M,-8,3);
+displayCohom(B,-8,3,5);
 // Kohomologie von O(-2)+O(-1)+(O/x(1))(1) = O_5(-2)+o_5(-1)+O_4(1):
 //-------------------------------------------------------------------
 MM=0,x(1),0;
 M=MM;
 attrib(M,"isHomog",intvec(-2,1,-1));
 A=sheafCoh(M,-8,4);
+displayCohom(A,-8,4,5);
 A=sheafCoh(M,-8,4,"sres");
+displayCohom(A,-8,4,5);
 B=sheafCohBGG(M,-8,3);
+displayCohom(B,-8,3,5);
 kill r;
 
 // Kohomologie der Idealgarbe der Veronese Flaeche in $\P^3$:
@@ -58,13 +69,17 @@ kill r;
  print(betti(FI),"betti");
  module F=FI[2];
  A=sheafCoh(F,-4,4);
+ displayCohom(A,-4,4,4);
  A=sheafCoh(F,-4,4,"sres");
+ displayCohom(A,-4,4,4);
  B=sheafCohBGG(F,-4,2);
+ displayCohom(B,-4,2,4);
 
  dimH(3,F,-4);
  dimH(1,F,1);
 
  A=sheafCoh(F,-1,1);
+ displayCohom(A,-1,1,4);
  kill S;
 
 // --------------------------------------------------

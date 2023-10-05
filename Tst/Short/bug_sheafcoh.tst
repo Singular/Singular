@@ -9,6 +9,8 @@ vector s2 = [y];
 module m = s1, s2;
 intvec w = 1;
 attrib(m, "isHomog", w);
-sheafCohBGG(m, -3, 10);
+intmat B=sheafCohBGG(m, -3, 10);
+displayCohom(B,-3,10,1);
+B;
 
 tst_status(1);$
