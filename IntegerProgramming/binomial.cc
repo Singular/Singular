@@ -472,7 +472,7 @@ BOOLEAN binomial::operator>=(const Integer comp_value) const
 
 
 Integer binomial::head_reductions_by(const binomial& b) const
-// Returns the number of possible reductions of the actual binomial´s head
+// Returns the number of possible reductions of the actual binomialÂ´s head
 // by the binomial b. This is the minimum of the quotients
 // exponent_vector[i]/b.exponent_vector[i]
 // where exponent_vector[i]>0 and b.exponent_vector[i]>0
@@ -642,7 +642,7 @@ Integer binomial::head_reductions_by(const binomial& b) const
 
 
 Integer binomial::tail_reductions_by(const binomial& b) const
-// Returns the number of possible reductions of the actual binomial´s tail
+// Returns the number of possible reductions of the actual binomialÂ´s tail
 // by the binomial b. This is the minimum of the quotients
 // - exponent_vector[i]/b.exponent_vector[i]
 // where exponent_vector[i]<0 and b.exponent_vector[i]>0
@@ -1247,7 +1247,7 @@ BOOLEAN B(const binomial& a, const binomial& b, const binomial& c)
 
   if(a_or_b != b_or_c)
     // Then the first inequality conditions is guaranteed...
-    // Verifie only the second.
+    // Verify only the second.
   {
     BOOLEAN not_equal=FALSE;
 
@@ -1270,7 +1270,7 @@ BOOLEAN B(const binomial& a, const binomial& b, const binomial& c)
 
   if( a_or_c != b_or_c )
     // Then the second inequality conditions is guaranteed...
-    // Verifie only the first.
+    // Verify only the first.
   {
     BOOLEAN not_equal=FALSE;
 
@@ -1359,7 +1359,7 @@ BOOLEAN binomial::involves_elimination_variables(const term_ordering& w)
 // cases here (relation between the number of variables to eliminate
 // and the number of support variables) and be quite difficult.
 // It is doubtful if this would improve performance.
-// As this function is not used in Buchberger´s algorithm (and therefore
+// As this function is not used in BuchbergerÂ´s algorithm (and therefore
 // rather rarely), I renounce to implement this.
 
   for(short i=0;i<w.number_of_elimination_variables();i++)
@@ -1400,7 +1400,7 @@ BOOLEAN binomial::drop_elimination_variables(const term_ordering& w)
   // Normally, this routine is only called for binomials that do not involve
   // the variables to eliminate. But if SUPPORT_VARIABLES_LAST is enabled,
   // the support changes in spite of this. Therefore, the support is
-  // recomputed... For the same reasons as mentionned in the preceeding
+  // recomputed... For the same reasons as mentioned in the preceding
   // routine, the existing support information is not used.
 
   head_support=0;
@@ -1485,7 +1485,7 @@ BOOLEAN binomial::drop_last_weighted_variable(const term_ordering& w)
   // Normally, this routine is only called for binomials that do not involve
   // the variable to be dropped. But if SUPPORT_VARIABLES_LAST is enabled,
   // the support changes in spite of this. Therefore, the support is
-  // recomputed... For the same reasons as mentionned in the preceeding
+  // recomputed... For the same reasons as mentioned in the preceding
   // routines, the existing support information is not used.
 
   head_support=0;

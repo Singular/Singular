@@ -4,7 +4,7 @@
 // - some facilities as the g++ input/output routines are included,
 // - the general data type can be chosen (the people of Singular do not like
 //   templates),
-// - some makros are defined for an easier handling of the program,
+// - some macros are defined for an easier handling of the program,
 // - some flags and constants can be set to observe the behaviour of the
 //   algorithms when using different strategies.
 
@@ -109,7 +109,7 @@ typedef char BOOLEAN;
 
 
 // Enumerate the criteria to discard unnecessary S-pairs:
-// The constants are defined to allow an easier call of Buchberger´s algorithm
+// The constants are defined to allow an easier call of BuchbergerÂ´s algorithm
 // with different criteria. This algorithm takes as an argument a short int
 // which represents the combination of criteria to be used (with a default
 // combination if no argument is given).
@@ -119,7 +119,7 @@ typedef char BOOLEAN;
 // range of 0 to 31) gives a unique combination (cf. the read-write-execute
 // rights for files in UNIX systems).
 // EXAMPLE:
-// If you want to call Buchberger´s algorithm with the criterion "relatively
+// If you want to call BuchbergerÂ´s algorithm with the criterion "relatively
 // prime leading terms" and the second criterion for the ideal I, write:
 //
 //      I.reduced_Groebner_basis_1(REL_PRIMENESS + SECOND_CRITERION);
