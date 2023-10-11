@@ -2,12 +2,12 @@
 /                         Integral Kernel using LLL Algorithm               |
 /                                                                           |
 /                           Implemented by                                  |
-/            Alfredo Sánchez-Navarro and Alberto Vigneron-Tenorio           |
+/            Alfredo SÃ¡nchez-Navarro and Alberto Vigneron-Tenorio           |
 /            alfredo.sanchez@uca.es  alberto.vigneron@uca.es,               |
 /                 E.U.E.Empresariales de Jerez.                             |
-/                   Universidad de Cádiz                                    |
+/                   Universidad de CÃ¡diz                                    |
 /                   Porvera 54.                                             |
-/                 Jerez de la Frontera (Cádiz, Spain)                       |
+/                 Jerez de la Frontera (CÃ¡diz, Spain)                       |
 /                                                                           |
 /                                                                           |
 / This application computes the LLL-reduced basis of the Z-kernel of a      |

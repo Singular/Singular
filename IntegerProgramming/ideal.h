@@ -61,7 +61,7 @@ private:
   list generators[Number_of_Lists];
 
   list new_generators[Number_of_Lists];
-  // Only needed in some special versions of Buchberger´s algorithm to
+  // Only needed in some special versions of BuchbergerÂ´s algorithm to
   // store newly found generators.
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -72,7 +72,7 @@ private:
   list generators;
 
   list new_generators;
-  // Only needed in some special versions of Buchberger´s algorithm to
+  // Only needed in some special versions of BuchbergerÂ´s algorithm to
   // store newly found generators.
 
 #endif  // NO_SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -84,7 +84,7 @@ private:
   int F_criterion;
   int B_criterion;
   int second_criterion;
-  // When Buchberger´s algorithm is called, we only use one argument which
+  // When BuchbergerÂ´s algorithm is called, we only use one argument which
   // describes the combination of the criteria to be used (see in globals.h).
   // But we use five flags instead of one here because this is a little more
   // efficient.
@@ -137,10 +137,10 @@ private:
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
-// subroutines for Buchberger´s algorithm (implemented in Buchberger.cc except
-// from the first two implemeted in ideal.cc)
+// subroutines for BuchbergerÂ´s algorithm (implemented in Buchberger.cc except
+// from the first two implemented in ideal.cc)
 
-// Some of these procedures do not interact with all versions of Buchberger´s
+// Some of these procedures do not interact with all versions of BuchbergerÂ´s
 // algorithm. Generally, they cannot be combined as one likes. This header
 // file only gives a brief overview of their features. For more detailed
 // comments see the implementation.
@@ -170,7 +170,7 @@ private:
   //   generators, others reduce it later (after having computed more
   //   S-binomials, hence more possible reducers).
   // - Some reduce the ideal generators immediately by a newly computed
-  //   S-binomial, others don´t.
+  //   S-binomial, others donÂ´t.
   // In each case, the use of the list flag "done" guarantees that we perform
   // the S-pair computation only once for each binomial pair.
 
@@ -227,9 +227,9 @@ public:
   // The term ordering is needed to determine the leading terms of the
   // binomials in the resulting generating set. Neither is the generated ideal
   // saturated nor is it given in form of a Groebner basis.
-  // Such computations must be explicitely demanded.
+  // Such computations must be explicitly demanded.
   // The argument matrix cannot be declared as const because the constructor
-  // may call the LLL-algorithm to compute the matrix kernel (if this hasn´t
+  // may call the LLL-algorithm to compute the matrix kernel (if this hasnÂ´t
   // been done yet). This algorithm changes some matrix members. But the
   // real matrix remains, of course, unchanged.
 
@@ -267,7 +267,7 @@ public:
                                   const float& interred_percentage=12.0);
   ideal& reduced_Groebner_basis_3(const int& S_pair_criteria=11,
                                   const float& interred_percentage=12.0);
-  // Several different versions of Buchberger´s algorithm for computing
+  // Several different versions of BuchbergerÂ´s algorithm for computing
   // the reduced Groebner basis of the actual ideal. They differ in the
   // steering of the algorithm (i.e. in the way in which the S-pair
   // computation and reduction is organized). Further variants can be
@@ -277,7 +277,7 @@ public:
   // and which showed to be quite slow), the efficiency of these algorithms
   // does not differ too much.
   // The first argument indicates which criteria will be used to discard
-  // unnecessary S-pairs. For an explaination of how this works, see in
+  // unnecessary S-pairs. For an explanation of how this works, see in
   // globals.h. The default value 11 means that we use the criterion of
   // relatively prime leading terms as well as the M- and the B-criterion.
   // The second argument specifies the interreduction frequency; see the
@@ -296,13 +296,13 @@ public:
   ideal& reduced_Groebner_basis(const int& version=1,
                                 const int& S_pair_criteria=11,
                                 const float& interred_percentage=12.0);
-  // Takes the version of Buchberger´s algorithm as above as an argument
+  // Takes the version of BuchbergerÂ´s algorithm as above as an argument
   // (to allow a call of different versions of our IP-algorithms from the
   // command line). To call version 1a, the first argument has to be zero.
 
   binomial& reduce(binomial& bin, BOOLEAN complete=TRUE) const;
   // Reduces a binomial by the actual generators.
-  // To reduce a binomial by the ideal (outside of Buchberger´s algorithm),
+  // To reduce a binomial by the ideal (outside of BuchbergerÂ´s algorithm),
   // be sure to have computed the reduced Groebner basis before.
   // The flag "complete" indicates if the binomial is reduced completely
   // (head and tail); if it is set to FALSE, only the tail will be reduced.

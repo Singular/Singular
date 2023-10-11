@@ -16,7 +16,7 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
 {
 // This function checks several criteria to discard th S-pair of the
 // binomials referenced by the iterators. The criteria depend on the
-// settings of the ideal´s S-pair flags.
+// settings of the idealÂ´s S-pair flags.
 
 // The arguments are iterators instead of the referenced binomials
 // because we have to do some equality tests. These are more efficient on
@@ -253,7 +253,7 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
   }
 
-////////////////////// Buchberger´s second criterion ////////////////////////
+////////////////////// BuchbergerÂ´s second criterion ////////////////////////
 
   if(second_criterion)
   {
@@ -261,7 +261,7 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
     binomial& bin1=first_iter.get_element();
     binomial& bin2=second_iter.get_element();
 
-    // The Buchberger´s second criterion checks binomial triples as
+    // The BuchbergerÂ´s second criterion checks binomial triples as
     // explained in binomial.h; these are built of the elements referenced
     // by the argument iterators and a third element appearing anywhere
     // in the generator lists.
@@ -343,7 +343,7 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
       // different lists.
     {
 
-      // Test first_iter´s list.
+      // Test first_iterÂ´s list.
       iter.set_to_list(generators[supp1]);
       while(iter.is_at_end()==FALSE)
       {
@@ -355,7 +355,7 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
         iter.next();
       }
 
-      // Test second_iter´s list.
+      // Test second_iterÂ´s list.
       iter.set_to_list(generators[supp2]);
       while(iter.is_at_end()==FALSE)
       {
@@ -509,7 +509,7 @@ ideal& ideal::compute_actual_S_pairs_1()
 ideal& ideal::compute_actual_S_pairs_1a()
 {
 // The only difference to the previous routine is that the aux_list is kept
-// ordered with respect to the ideal´s term ordering, i.e. the inserts are
+// ordered with respect to the idealÂ´s term ordering, i.e. the inserts are
 // replaced by ordered inserts.
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -626,7 +626,7 @@ ideal& ideal::compute_actual_S_pairs_1a()
 
 ideal& ideal::compute_actual_S_pairs_2()
 {
-// This routine implements are mor dynamic S-pair-computation. As in the
+// This routine implements more dynamic S-pair-computation. As in the
 // previous routines, we iterate over the generator list(s) with two
 // iterators, forming pairs under the consideration of the "done"-flags.
 
@@ -2029,7 +2029,7 @@ ideal& ideal::minimalize()
 
 // For technical simplicity, the interreduction is done as follows:
 // We iterate over the generators with two iterators.
-// For each binomial pair, we examine if one binomial´s head can be
+// For each binomial pair, we examine if one binomialÂ´s head can be
 // reduced by the other. If this is the case, the reducible binomial is
 // reduced and moved to the aux_list if it is not 0, else deleted.
 // After one iteration, the elements of the aux_list are reinserted;
@@ -2502,12 +2502,12 @@ ideal& ideal::minimalize()
 
 ideal& ideal::final_reduce()
 {
-// During Buchberger´s algorithm, we perform only head reductions
+// During BuchbergerÂ´s algorithm, we perform only head reductions
 // (minimalizations). This strategy showed to be a little more efficient
 // than the strategy to do reduce the ideal always completely.
 // This method leads to a minimal, but in general not to the reduced Groebner
 // basis. The actual procedure reduces such a minimal basis at the end of
-// Buchberger´s algorithm. It will probably cause problems when called
+// BuchbergerÂ´s algorithm. It will probably cause problems when called
 // in the course of the algorithm. For an explanation of this fact, see
 // the following comment.
 
@@ -2851,7 +2851,7 @@ binomial& ideal::reduce(binomial& bin, BOOLEAN complete) const
 
 
 //////////////////////////////////////////////////////////////////////////////
-/////////// variants of Buchberger´s algorithm ///////////////////////////////
+/////////// variants of BuchbergerÂ´s algorithm ///////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -2967,7 +2967,7 @@ ideal& ideal::reduced_Groebner_basis_1a(const int& S_pair_criteria,
     compute_actual_S_pairs_1a();
     // compute the S-pairs of the actual generators
     // These are stored in a unreduced form in aux_list.
-    // aux_list is ordered according to the ideal´s term ordering.
+    // aux_list is ordered according to the idealÂ´s term ordering.
 
     list_iterator S_pair_iter(aux_list);
     // now reduce and insert the computed S-pairs

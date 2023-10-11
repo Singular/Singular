@@ -28,9 +28,9 @@ typedef char* OUTPUT_FILE;
 // they were successful, 0 else.
 //  They take as arguments:
 // - their input file
-// - the arguments for Buchberger´s algorithm (see the comments in ideal.h)
+// - the arguments for BuchbergerÂ´s algorithm (see the comments in ideal.h)
 // - the output mode (verbose or not, default: not verbose; verbose mode
-//   prints compiler settings and options for Buchberger´s algorithm)
+//   prints compiler settings and options for BuchbergerÂ´s algorithm)
 // The last four arguments have default values and do not have to be
 // specified.
 

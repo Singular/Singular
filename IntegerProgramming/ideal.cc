@@ -66,7 +66,7 @@ void ideal::destroy_subset_tree()
 }
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
-/////////// subroutines for Buchberger´s algorithm //////////////////////////
+/////////// subroutines for BuchbergerÂ´s algorithm //////////////////////////
 
 ideal& ideal::add_new_generator(binomial& bin)
 {
@@ -244,7 +244,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
     for(int k=0;k<A.columns;k++)
     {
 
-      // We should first verifie if the components of the LLL-reduced lattice
+      // We should first verify if the components of the LLL-reduced lattice
       // basis fit into the basic data type (Integer as defined in globals.h).
       // This overflow control does of course not detect overflows in the
       // course of the LLL-algorithm!
@@ -378,7 +378,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
     for(int k=0;k<A.columns;k++)
     {
 
-      // We should first verifie if the components of the LLL-reduced lattice
+      // We should first verify if the components of the LLL-reduced lattice
       // basis fit into the basic data type (Integer as defined in globals.h).
       // This overflow control does of course not detect overflows in the
       // course of the LLL-algorithm!
@@ -428,7 +428,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
       generator[k]=(A.H)[j][k];
     }
 
-    // verifie term ordering
+    // verify term ordering
     if(w.weight(generator)!=0)
       cerr<<"\nWARNING: ideal& ideal::Hosten_Sturmfels_ideal(matrix&, "
         "const term_ordering&):\nInvalid row space vector does not induce "
@@ -504,7 +504,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
     for(int k=0;k<A.columns;k++)
     {
 
-      // We should first verifie if the components of the LLL-reduced lattice
+      // We should first verify if the components of the LLL-reduced lattice
       // basis fit into the basic data type (Integer as defined in globals.h).
       // This overflow control does of course not detect overflows in the
       // course of the LLL-algorithm!
@@ -629,7 +629,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
   {
     for(int k=0;k<A.columns;k++)
     {
-      // We should first verifie if the components of the LLL-reduced lattice
+      // We should first verify if the components of the LLL-reduced lattice
       // basis fit into the basic data type (Integer as defined in globals.h).
       // This overflow control does of course not detect overflows in the
       // course of the LLL-algorithm!
