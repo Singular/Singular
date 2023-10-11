@@ -19,7 +19,6 @@
 #include "misc/intvec.h"
 
 #include "polys/weight.h"
-#include "polys/prCopy.h"
 #include "kernel/polys.h"
 
 #include "kernel/GBEngine/kutil.h"
@@ -2447,6 +2446,17 @@ long kHomModDeg(poly p,const ring r)
   return j+(*kModW)[i-1];
 }
 
+ideal idPermIdeal(ideal I,const int *perm, const ring oldRing, const ring dst,
+       nMapFunc nMap, const int *par_perm, int OldPar, BOOLEAN use_mult)
+{
+  ideal II=idInit(IDELEMS(I),I->rank);
+  for(int i=IDELEMS(I)-1; i>=0; i--)
+  {
+    II->m[i]=p_PermPoly(I->m[i],perm,oldRing,dst,nMap,par_perm,OldPar,use_mult);
+  }
+  return II;
+}
+
 poly kTryHC(ideal F, ideal Q)
 {
   if (TEST_OPT_PROT) PrintS("try HC in Zp ring\n");
@@ -2455,11 +2465,13 @@ poly kTryHC(ideal F, ideal Q)
   ring Zp_ring=rCopy0(save_ring);
   nKillChar(Zp_ring->cf);
   Zp_ring->cf=nInitChar(n_Zp, (void*)(long)32003);
+  rComplete(Zp_ring);
   // map data
   rChangeCurrRing(Zp_ring);
-  ideal FF=idrCopyR_NoSort(F,save_ring,Zp_ring);
+  nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
+  ideal FF=idPermIdeal(F,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   ideal QQ=NULL;
-  if (Q!=NULL) QQ=idrCopyR_NoSort(Q,save_ring,Zp_ring);
+  if (Q!=NULL) QQ=idPermIdeal(Q,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   // call std
   ideal res=kStd(FF,QQ,testHomog,NULL,NULL);
   // clean
@@ -2471,7 +2483,7 @@ poly kTryHC(ideal F, ideal Q)
   poly p=NULL;
   if (Zp_ring->ppNoether!=NULL)
   {
-    p=prMoveR(Zp_ring->ppNoether,Zp_ring,save_ring);
+    p=p_PermPoly(Zp_ring->ppNoether,NULL,Zp_ring,save_ring,nMap,NULL,0,0);
     Zp_ring->ppNoether=NULL;
     if (TEST_OPT_PROT) PrintS("HC found in Zp ring\n");
   }
