@@ -59,9 +59,9 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @c @center C. Lossen, B. Martin, M. Me@ss{}ollen, W. Neumann, T. N@"u@ss{}ler, W. Pohl, T. Siebert,
 @c @center J. Schmidt, M. Schulze, R. Stobbe, M. Wenk, T. Wichmann, D. Yanovich
 @sp 2
-@author Fachbereich Mathematik
-@author Zentrum f@"ur Computeralgebra
-@author Universit@"at Kaiserslautern
+@author Department of Mathematics
+@author Centre of computer algebra
+@author University Kaiserslautern-Landau
 @author D-67653 Kaiserslautern
 @end titlepage
 
@@ -94,8 +94,8 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @html
 </h4>
 </center>
-<CENTER><A HREF="https://www.uni-kl.de/"><I>University of Kaiserslautern</I></A></CENTER>
-<CENTER><A HREF="https://www.mathematik.uni-kl.de/"><I>Department of Mathematics</I></A></CENTER>
+<CENTER><A HREF="https://rptu.de/"><I>University of Kaiserslautern-Landau</I></A></CENTER>
+<CENTER><A HREF="https://math.rptu.de/"><I>Department of Mathematics</I></A></CENTER>
 <CENTER><I>Centre for Computer Algebra</I></CENTER><p></p>
 @end html
 @end ifhtml
