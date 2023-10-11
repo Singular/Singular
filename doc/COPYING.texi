@@ -20,8 +20,8 @@
 @cindex normaliz
 
 @center @sc{Singular} version @value{VERSION}
-@center @uref{https://www.uni-kl.de/,,University of Kaiserslautern}
-@center @uref{https://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{https://www.singular.uni-kl.de/zca/,,Centre for Computer Algebra}
+@center @uref{https://rptu.de/,,University of Kaiserslautern-Landau}
+@center @uref{https://mathrptu.de/,,Department of Mathematics} and  @uref{https://www.singular.uni-kl.de/zca/,,Centre for Computer Algebra}
 @center Authors: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann
 
 @center Copyright @copyright{} 1986-@value{VERSION_DATE}
