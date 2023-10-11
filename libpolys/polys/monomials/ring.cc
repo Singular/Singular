@@ -2025,11 +2025,16 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
 
 BOOLEAN rOrd_is_dp(const ring r)
 {
-  // Hmm.... what about Syz orderings?
   return (rVar(r) > 1 &&
-         (rHasSimpleOrder(r) &&
-           (r->order[0]==ringorder_dp) ||
-            (r->order[1]==ringorder_dp)));
+           ((r->order[0]==ringorder_dp)&&(r->block1[0]==r->N)) ||
+           ((r->order[1]==ringorder_dp)&&(r->block1[1]==r->N)&&((r->block0[1]==1))));
+}
+
+BOOLEAN rOrd_is_ds(const ring r)
+{
+  return (rVar(r) > 1 &&
+           ((r->order[0]==ringorder_ds)&&(r->block1[0]==r->N)) ||
+           ((r->order[1]==ringorder_ds)&&(r->block1[1]==r->N)&&((r->block0[1]==1))));
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */

@@ -767,6 +767,7 @@ inline BOOLEAN rHasMixedOrdering(const ring r) { return (r->MixedOrder); }
 
 BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r);
 BOOLEAN rOrd_is_dp(const ring r);
+BOOLEAN rOrd_is_ds(const ring r);
 
 /// return TRUE if p_SetComp requires p_Setm
 BOOLEAN rOrd_SetCompRequiresSetm(const ring r);
