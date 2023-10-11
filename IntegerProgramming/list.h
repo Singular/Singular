@@ -167,7 +167,7 @@ public:
   // The second one writes them in increasing order with respect to the
   // argument term ordering; the list has not to be ordered before and
   // will not be ordered after. This routine is essentially written to
-  // compare Gröbner bases.
+  // compare GrÃ¶bner bases.
 
   void print(FILE* output) const;
   void ordered_print(FILE* output, const term_ordering&) const;
