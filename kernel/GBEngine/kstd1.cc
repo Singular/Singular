@@ -19,6 +19,7 @@
 #include "misc/intvec.h"
 
 #include "polys/weight.h"
+#include "polys/prCopy.h"
 #include "kernel/polys.h"
 
 #include "kernel/GBEngine/kutil.h"
@@ -2446,6 +2447,38 @@ long kHomModDeg(poly p,const ring r)
   return j+(*kModW)[i-1];
 }
 
+poly kTryHC(ideal F, ideal Q)
+{
+  if (TEST_OPT_PROT) PrintS("try HC in Zp ring\n");
+  // create Zp_ring
+  ring save_ring=currRing;
+  ring Zp_ring=rCopy0(save_ring);
+  nKillChar(Zp_ring->cf);
+  Zp_ring->cf=nInitChar(n_Zp, (void*)(long)32003);
+  // map data
+  rChangeCurrRing(Zp_ring);
+  ideal FF=idrCopyR_NoSort(F,save_ring,Zp_ring);
+  ideal QQ=NULL;
+  if (Q!=NULL) QQ=idrCopyR_NoSort(Q,save_ring,Zp_ring);
+  // call std
+  ideal res=kStd(FF,QQ,testHomog,NULL,NULL);
+  // clean
+  idDelete(&FF);
+  if (QQ!=NULL) idDelete(&QQ);
+  idDelete(&res);
+  // map back
+  rChangeCurrRing(save_ring);
+  poly p=NULL;
+  if (Zp_ring->ppNoether!=NULL)
+  {
+    p=prMoveR(Zp_ring->ppNoether,Zp_ring,save_ring);
+    Zp_ring->ppNoether=NULL;
+    if (TEST_OPT_PROT) PrintS("HC found in Zp ring\n");
+  }
+  rDelete(Zp_ring);
+  return p;
+}
+
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
           int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
@@ -2456,6 +2489,21 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef HAVE_SHIFTBBA
   if(rIsLPRing(currRing)) return kStdShift(F, Q, h, w, hilb, syzComp, newIdeal, vw, FALSE);
 #endif
+
+  /* test HC precomputation*/
+  poly save_noether=currRing->ppNoether;
+  int ak = id_RankFreeModule(F,currRing);
+  if((ak==0)
+  && (h!=isHomog)
+  && (w==NULL)
+  && (hilb==NULL)
+  && (vw==NULL)
+  && (newIdeal==0)
+  && (sp==NULL)
+  && rOrd_is_ds(currRing)
+  && rField_is_Q (currRing)
+  && !rIsPluralRing(currRing))
+    currRing->ppNoether=kTryHC(F,Q);
 
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
@@ -2474,7 +2522,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else
     strat->LazyPass=2;
   strat->LazyDegree = 1;
-  strat->ak = id_RankFreeModule(F,currRing);
+  strat->ak = ak;
   strat->kModW=kModW=NULL;
   strat->kHomW=kHomW=NULL;
   if (vw != NULL)
@@ -2628,6 +2676,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 //Print("%d reductions canceled \n",strat->cel);
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  if (currRing->ppNoether=save_noether);
   return r;
 }
 
