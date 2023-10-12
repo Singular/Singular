@@ -2446,7 +2446,7 @@ long kHomModDeg(poly p,const ring r)
   return j+(*kModW)[i-1];
 }
 
-poly kTryHC(ideal F, ideal Q)
+static poly kTryHC(ideal F, ideal Q)
 {
   if (TEST_OPT_PROT) PrintS("try HC in Zp ring\n");
   // create Zp_ring
