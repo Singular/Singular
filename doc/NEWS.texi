@@ -33,6 +33,7 @@ Changed libraries:
 @item @code{sheafcoh.lib}: new routines @nref{sheafCohBGGregul}, @nref{sheafCohBGGregul_w} (@nref{sheafcoh_lib})
 @item @code{sheafcoh.lib}: display of the tables is moved to @nref{displayCohom} (@nref{sheafcoh_lib})
 @item @code{elim.lib}: rename @code{sat} to @code{sat_with_exp}, @code{sat} now return the saturation i9deal (only).
+@item @code{primdec.lib}: fixed a bug in absolute primary decomposition (@nref{primdec_lib})
 @end itemize
 
 Changes in the kernel/build system:
