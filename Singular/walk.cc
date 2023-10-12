@@ -1990,7 +1990,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   if(mpz_cmp(t_nenner, t_null) == 0)
   {
 #ifndef SING_NDEBUG
-    PrintS("\n//MwalkNextWeightCC: t_nenner=0\n");
+    //PrintS("\n//MwalkNextWeightCC: t_nenner=0\n");
 #endif
     delete diff_weight;
     diff_weight = ivCopy(curr_weight);//take memory
@@ -2385,7 +2385,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   if(mpz_cmp(t_nenner, t_null) == 0)
   {
 #ifndef SING_NDEBUG
-    PrintS("\n//MwalkNextWeightCC: t_nenner=0\n");
+    //PrintS("\n//MwalkNextWeightCC: t_nenner=0\n");
 #endif
     delete diff_weight;
     diff_weight = ivCopy(curr_weight);//take memory
