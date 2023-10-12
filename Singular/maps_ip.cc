@@ -195,7 +195,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       else if ((what==IMAP_CMD) || (what==FETCH_CMD))
       {
         m=(matrix)id_PermIdeal((ideal)data,R,C,perm,preimage_r,currRing,
-	                            nMap,par_perm,P,use_mult);
+                                    nMap,par_perm,P,use_mult);
       }
       else /* (what==MAP_CMD) */
       {
