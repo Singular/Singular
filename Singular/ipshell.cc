@@ -3219,6 +3219,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
     {
       if (tr[i]!=NULL)
       {
+        tr[i]->rank = id_RankFreeModule(tr[i],currRing);
         trueres[i] = idCopy(tr[i]);
       }
     }
