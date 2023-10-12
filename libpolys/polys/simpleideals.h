@@ -184,4 +184,8 @@ ideal id_Delete_Pos(const ideal I, const int pos, const ring r);
 
 /// for julia: convert an array of poly to vector
 poly id_Array2Vector(poly *m, unsigned n, const ring R);
+
+/// mapping ideals/matrices to other rings
+ideal id_PermIdeal(ideal I,int R, int C,const int *perm, const ring src,
+   const ring dst, nMapFunc nMap, const int *par_perm, int P, BOOLEAN use_mult);
 #endif

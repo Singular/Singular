@@ -169,9 +169,9 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     {
       int C=((matrix)data)->cols();
       int R;
+      matrix m=NULL;
       if (w->rtyp==MAP_CMD) R=1;
       else R=((matrix)data)->rows();
-      matrix m=mpNew(R,C);
       char *tmpR=NULL;
       if(w->rtyp==MAP_CMD)
       {
@@ -185,6 +185,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 #endif
          )
       {
+        m=mpNew(R,C);
         for (i=R*C-1;i>=0;i--)
         {
           m->m[i]=prCopyR(((ideal)data)->m[i], preimage_r, currRing);
@@ -193,16 +194,13 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       }
       else if ((what==IMAP_CMD) || (what==FETCH_CMD))
       {
-        for (i=R*C-1;i>=0;i--)
-        {
-          m->m[i]=p_PermPoly(((ideal)data)->m[i],perm,preimage_r,currRing,
-                          nMap,par_perm,P,use_mult);
-          pTest(m->m[i]);
-        }
+        m=(matrix)id_PermIdeal((ideal)data,R,C,perm,preimage_r,currRing,
+	                            nMap,par_perm,P,use_mult);
       }
       else /* (what==MAP_CMD) */
       {
         assume(what==MAP_CMD);
+        m=mpNew(R,C);
         matrix s=mpNew(N,maMaxDeg_Ma((ideal)data,preimage_r));
         for (i=R*C-1;i>=0;i--)
         {
