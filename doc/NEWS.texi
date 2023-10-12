@@ -37,6 +37,8 @@ Changed libraries:
 
 Changes in the kernel/build system:
 @itemize
+@item new algorithm for @code{std} in the case of ordering @code{ds}
+      and zero dimensional ideal over @code{QQ} (@nrewf{std})
 @item new algorithm for lift function (@nref{lift})
 @item mstd for local rings (@nref{mstd})
 @item use the new Hilbert function algorith for @nref{hilb}. (Different output format)
