@@ -2446,17 +2446,6 @@ long kHomModDeg(poly p,const ring r)
   return j+(*kModW)[i-1];
 }
 
-ideal idPermIdeal(ideal I,const int *perm, const ring oldRing, const ring dst,
-       nMapFunc nMap, const int *par_perm, int OldPar, BOOLEAN use_mult)
-{
-  ideal II=idInit(IDELEMS(I),I->rank);
-  for(int i=IDELEMS(I)-1; i>=0; i--)
-  {
-    II->m[i]=p_PermPoly(I->m[i],perm,oldRing,dst,nMap,par_perm,OldPar,use_mult);
-  }
-  return II;
-}
-
 poly kTryHC(ideal F, ideal Q)
 {
   if (TEST_OPT_PROT) PrintS("try HC in Zp ring\n");
@@ -2469,9 +2458,9 @@ poly kTryHC(ideal F, ideal Q)
   // map data
   rChangeCurrRing(Zp_ring);
   nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
-  ideal FF=idPermIdeal(F,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
+  ideal FF=id_PermIdeal(F,IDELEMS(F),1,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   ideal QQ=NULL;
-  if (Q!=NULL) QQ=idPermIdeal(Q,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
+  if (Q!=NULL) QQ=id_PermIdeal(Q,IDELEMS(Q),1,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   // call std
   ideal res=kStd(FF,QQ,testHomog,NULL,NULL);
   // clean

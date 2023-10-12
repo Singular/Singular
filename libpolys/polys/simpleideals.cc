@@ -2186,3 +2186,15 @@ ideal id_Delete_Pos(const ideal I, const int p, const ring r)
   for(int i=p+1;i<IDELEMS(I);i++) ret->m[i-1]=p_Copy(I->m[i],r);
   return ret;
 }
+
+ideal id_PermIdeal(ideal I,int R, int C,const int *perm, const ring src, const ring dst,
+       nMapFunc nMap, const int *par_perm, int P, BOOLEAN use_mult)
+{
+  ideal II=(ideal)mpNew(R,C);
+  II->rank=I->rank;
+  for(int i=R*C-1; i>=0; i--)
+  {
+    II->m[i]=p_PermPoly(I->m[i],perm,src,dst,nMap,par_perm,P,use_mult);
+  }
+  return II;
+}
