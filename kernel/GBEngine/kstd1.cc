@@ -2677,7 +2677,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 //Print("%d reductions canceled \n",strat->cel);
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  if (currRing->ppNoether=save_noether);
+  currRing->ppNoether=save_noether;
   return r;
 }
 
