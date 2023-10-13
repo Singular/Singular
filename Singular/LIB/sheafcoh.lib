@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sheafcoh.lib 4.3.2.8 Okt_2023 "; // $Id$
+version="version sheafcoh.lib 4.3.2.9 Oct_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -18,6 +18,7 @@ PROCEDURES:
  sheafCohBGGregul_w(M,l,h,r,w); cohomology with given module weights
  sheafCohBGG2(M,l,h);    cohomology of sheaf associated to coker(M), experimental version
  sheafCoh(M,l,h);        cohomology of sheaf associated to coker(M)
+ sheafCoh_w(M,l,h);      cohomology of coker(M) with given module weights
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
  dimGradedPart()
 
@@ -1249,7 +1250,7 @@ NOTE:    The procedure is based on local duality as described in [Eisenbud:
          By default, the procedure uses @code{mres} to compute the Ext
          modules. If called with the additional parameter @code{\"sres\"},
          the @code{sres} command is used instead.
-SEE ALSO: dimH, sheafCohBGG
+SEE ALSO: dimH, sheafCohBGG, sheafCoh_w
 EXAMPLE: example sheafCoh; shows an example
 "
 {
@@ -1312,6 +1313,61 @@ example
   intvec v=2,2,2,2,2,2;
   attrib(M,"isHomog",v);
   intmat B=sheafCoh(M,-6,2);
+  displayCohom(B,-6,2,nvars(R)-1);
+}
+
+proc sheafCoh_w(module M,int l,int h,intvec w, list #)
+"USAGE:   sheafCoh(M,l,h);    M module, l,h int, w intvec
+ASSUME:  @code{M} is graded by w, @code{h>=l}. The basering @code{S} has
+         @code{n+1} variables.
+RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
+         associated to coker(M). The range of twists is determined by @code{l},
+         @code{h}.
+DISPLAY: The intmat can be displayed in a diagram of the following form:
+         with @code{displayCohom(A,l,h,nvars(r)-1);}@*
+  @format
+                l            l+1                      h
+  ----------------------------------------------------------
+      n:     h^n(F(l))    h^n(F(l+1))   ......    h^n(F(h))
+           ...............................................
+      1:     h^1(F(l))    h^1(F(l+1))   ......    h^1(F(h))
+      0:     h^0(F(l))    h^0(F(l+1))   ......    h^0(F(h))
+  ----------------------------------------------------------
+    chi:     chi(F(l))    chi(F(l+1))   ......    chi(F(h))
+  @end format
+         A @code{'-'} in the diagram refers to a zero entry.
+NOTE:    The procedure is based on local duality as described in [Eisenbud:
+         Computing cohomology. In Vasconcelos: Computational methods in
+         commutative algebra and algebraic geometry. Springer (1998)].@*
+         By default, the procedure uses @code{mres} to compute the Ext
+         modules. If called with the additional parameter @code{\"sres\"},
+         the @code{sres} command is used instead.
+SEE ALSO: dimH, sheafCohBGG, sheafCoh
+EXAMPLE: example sheafCoh; shows an example
+"
+{
+  attrib(M,"isHomog",w);
+  return(sheafCoh(M,l,h,#));
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  //
+  // cohomology of structure sheaf on P^4:
+  //-------------------------------------------
+  ring r=0,x(1..5),dp;
+  module M=0;
+  intmat A=sheafCoh_w(0,-7,2,intvec(0));
+  A;
+  displayCohom(A,-7,2,nvars(r)-1);
+  //
+  // cohomology of cotangential bundle on P^3:
+  //-------------------------------------------
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  intmat B=sheafCoh_w(M,-6,2,v);
   displayCohom(B,-6,2,nvars(R)-1);
 }
 
