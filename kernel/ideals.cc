@@ -2692,17 +2692,16 @@ static void idDeleteComps(ideal arg,int* red_comp,int del)
 * returns the presentation of an isomorphic, minimally
 * embedded  module (arg represents the quotient!)
 */
-ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
+static ideal idMinEmbedding1(ideal arg,BOOLEAN inPlace, intvec **w,
+  int* red_comp, int &del)
 {
   if (idIs0(arg)) return idInit(1,arg->rank);
   int i,next_gen,next_comp;
   ideal res=arg;
   if (!inPlace) res = idCopy(arg);
   res->rank=si_max(res->rank,id_RankFreeModule(res,currRing));
-  int *red_comp=(int*)omAlloc((res->rank+1)*sizeof(int));
   for (i=res->rank;i>=0;i--) red_comp[i]=i;
 
-  int del=0;
   loop
   {
     next_gen = id_ReadOutPivot(res, &next_comp, currRing);
@@ -2716,21 +2715,39 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
     }
   }
 
-  idDeleteComps(res,red_comp,del);
   idSkipZeroes(res);
-  omFree(red_comp);
 
   if ((w !=NULL)&&(*w!=NULL) &&(del>0))
   {
     int nl=si_max((*w)->length()-del,1);
     intvec *wtmp=new intvec(nl);
-    for(i=0;i<res->rank;i++) (*wtmp)[i]=(**w)[i];
+    for(i=0;i<nl;i++) (*wtmp)[i]=(**w)[i];
     delete *w;
     *w=wtmp;
   }
   return res;
 }
 
+ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
+{
+  int *red_comp=(int*)omAlloc((arg->rank+1)*sizeof(int));
+  int del=0;
+  ideal res=idMinEmbedding1(arg,inPlace,w,red_comp,del);
+  idDeleteComps(res,red_comp,del);
+  omFree(red_comp);
+  return res;
+}
+
+ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
+{
+  int *red_comp=(int*)omAlloc((arg->rank+1)*sizeof(int));
+  int del=0;
+  ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
+  trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
+  idDeleteComps(res,red_comp,del);
+  omFree(red_comp);
+  return res;
+}
 #include "polys/clapsing.h"
 
 #if 0
