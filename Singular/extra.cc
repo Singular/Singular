@@ -4114,6 +4114,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+/*==================== prune_with_map =================*/
+    if(strcmp(sys_cmd,"prune_with_map")==0)
+    {
+      ideal I= (ideal)h->Data();
+      ideal trans;
+      res->rtyp=MODUL_CMD;
+      res->data=(void*)idMinEmbedding_with_map(I,NULL,trans);
+      res->next=(leftv)omAlloc0Bin(sleftv_bin);
+      res->next->data=(void*)trans;
+      res->next->rtyp=MODUL_CMD;
+      return FALSE;
+    }
+    else
 /*==================== minres_with_map =================*/
     if(strcmp(sys_cmd,"minres_with_map")==0)
     {
