@@ -19,6 +19,7 @@
 
 #include "config.h"
 
+#include <math.h>
 
 #include "cf_assert.h"
 #include "cf_util.h"
