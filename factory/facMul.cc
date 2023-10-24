@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include <math.h>
 
 #include "canonicalform.h"
 #include "facMul.h"

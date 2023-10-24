@@ -45,6 +45,7 @@ extern "C"
 #endif
 #if ( __FLINT_RELEASE >= 20700)
 #include <flint/fq_nmod_mpoly_factor.h>
+#include <flint/fmpz_mod.h>
 #endif
 #endif
 
