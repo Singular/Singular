@@ -7657,7 +7657,7 @@ abort the Singular process after computing for that many seconds (system+user cp
 absolute factorization of the polynomial
 (from a polynomial ring over a transzedental extension)
 Returns a list of the ideal of the factors, intvec of multiplicities,
-ideal of minimal polynomials and the bumber of factors.
+ideal of minimal polynomials and the number of factors.
 @c ..........................
 @item @code{system("blackbox")}
 @cindex system, blackbox

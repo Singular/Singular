@@ -797,7 +797,7 @@ a type cast to module
 
 @table @asis
 @item @code{+}
-addition (concatenation of the generators and simplification) Note that ''-'' implicitely converts a module into a matrix; see
+addition (concatenation of the generators and simplification) Note that ''-'' implicitly converts a module into a matrix; see
 below example.
 
 @item @code{*}

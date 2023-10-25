@@ -42,7 +42,7 @@ Changes in the kernel/build system:
       and zero dimensional ideal over @code{QQ}
 @item new algorithm for lift function (@nref{lift})
 @item mstd for local rings (@nref{mstd})
-@item use the new Hilbert function algorith for @nref{hilb}. (Different output format)
+@item use the new Hilbert function algorithm for @nref{hilb}. (Different output format)
 @item overflow in @code{hilb} is an error (on request of a single user)
 @end itemize
 
