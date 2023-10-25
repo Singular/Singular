@@ -9,7 +9,7 @@
 #  $indexentry\t$nodename\t$url\t$chksum
 #
 #  where $indexentry: entries of index (all lower case)
-#        $nodename  : name of node where index entry occured
+#        $nodename  : name of node where index entry occurred
 #        $url       : url of node
 #        $chksum    : checksum of help text, if library proc node
 # lines are sorted alphabetically w.r.t. $indexentry

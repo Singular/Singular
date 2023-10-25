@@ -4765,7 +4765,7 @@ For kernel_command having a variable number of arguments (internal @code{CMD_M})
 use 4 independent of the number of really supplied arguments.
 
 List of available kernel commands and the required number_of_args,
-some accept several variants and appear therefor at several places:
+some accept several variants and appear therefore at several places:
 @itemize
 @item inplace binary operands: @code{+,-,*,/,div,%,&,|, [}, number_of_args:2
 @item unary functions:
