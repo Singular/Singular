@@ -377,7 +377,7 @@ sub HandleExample
       if (system("echo '\$' | $Singular $Singular_opts > $res_file"))
       {
 	$Singular .= '.exe' if ($Win32 && $Singular !~ /\.exe$/);
-	Error("Can´t run '$Singular $Singular_opts': $@")
+	Error("Can't run '$Singular $Singular_opts': $@")
 	  if (system("echo '\$' | $Singular $Singular_opts > $res_file"));
       }
       $Singular_OK = 1

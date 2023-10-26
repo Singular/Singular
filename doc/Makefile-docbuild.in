@@ -72,7 +72,7 @@ HTML_TUTOR_PREFIX  = tut
 HTML_MANUAL_TOP    = index.htm
 HTML_TUTOR_TOP     = tutor.htm
 ##
-## End configuration dependend stuff
+## End configuration dependent stuff
 #################################################################
 
 ###########################################################

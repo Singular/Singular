@@ -414,7 +414,7 @@ Library, Command Line Editing, readline, The GNU Readline Library
 Manual}, for more information. If a shared version of this library can
 be found on your machine, then additional command-line editing
 features like  history completion are available.
-In particuliar, if @sc{Singular} is able to load that library
+In particular, if @sc{Singular} is able to load that library
 the input history is stored across sessions using the file given in
 the environment variable @code{SINGULARHIST}.
 If @code{SINGULARHIST} is not set @code{.singularhistory} is used.

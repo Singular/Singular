@@ -49,7 +49,7 @@
 + Email Adressen in @email{...} notieren, URL's in @uref{...}
 
 + Multicolumn tables: Rows of multicolumn tables need to go in one
-  line, otherwise texi2html chockes. Space beween rows with "empty"
+  line, otherwise texi2html chockes. Space between rows with "empty"
   rows (c.f. texi2html), i.e., with @item @tab @tab ....
 
 
@@ -219,20 +219,20 @@ i;  // mit Leerzeichen beginnen.
 
 + mit der neuen Version von doc2tex kann (soll) man Listen von
   Cross-Referenzen wie folgt schreiben:
-    @c ref
-    See
-    @ref{std};
-    @ref{stdfac};
-    @ref{stdhilbert}.
-    @c ref
-  Daraus wird dann automatisch ein Menue fuer die info-Files erzeugt.
-  (Man kann sich also das "@menu * std:: ...  @end menu" sparen.)
-  Bitte pro Zeile nur *eine* Referenz notieren und das `See'
-  in eine eigene Zeile packen.  Das macht die Sache
-  uebersichtlicher.  Ausserdem kann man die Referenzen dann
-  leichter im Editor handhaben (loeschen, alphabetisch
-  sortieren).
-  Die Referenzen bitte alphabetisch sortieren und mit einem Semikolon
+    @c ref
+    See
+    @ref{std};
+Â    @ref{stdfac};
+    @ref{stdhilbert}.
+    @c ref
+  Daraus wird dann automatisch ein Menue fuer die info-Files erzeugt.
+  (Man kann sich also das "@menu * std:: ...  @end menu" sparen.)
+  Bitte pro Zeile nur *eine* Referenz notieren und das `See'
+  in eine eigene Zeile packen. Das macht die Sache
+  uebersichtlicher. Ausserdem kann man die Referenzen dann
+  leichter im Editor handhaben (loeschen, alphabetisch
+  sortieren).
+  Die Referenzen bitte alphabetisch sortieren und mit einem Semikolon
   trennen.
 
 * Index, Anchors*

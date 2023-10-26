@@ -1394,7 +1394,7 @@ We say that a subset @math{G} of @math{I} is a @strong{(two-sided) Groebner basi
 @end ifinfo
 
 Suppose, that the weights of the ring variables are strictly positive.
-We can interprete these weights as defining a non-standard grading on the ring.
+We can interpret these weights as defining a non-standard grading on the ring.
 If the set of input polynomials is weighted homogeneous with respect to the given
 weights of the ring variables, then computing up to a weighted degree (and thus, also length) bound @math{d}
 results in the @strong{truncated Groebner basis} @math{G(d)}. In other words, by trimming elements
