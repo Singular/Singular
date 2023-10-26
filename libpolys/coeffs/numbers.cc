@@ -338,8 +338,7 @@ static number ndInitMPZ(mpz_t m, const coeffs r)
 
 static const char *ndRead(const char * s, number *n, const coeffs r)
 {
-  Werror("cfRead is undefined for %s",nCoeffString(r));
-  *n=n_Init(0,r);
+  *n=n_Init(1,r);
   return s;
 }
 static nMapFunc ndSetMap(const coeffs src, const coeffs dst)
