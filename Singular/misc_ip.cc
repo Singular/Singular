@@ -870,6 +870,9 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef KDEBUG
               StringAppendS("KDEBUG,");
 #endif
+#ifdef HAVE_SDB
+              StringAppendS("sdb,");
+#endif
               StringAppendS("\n\t");
 #ifdef __OPTIMIZE__
               StringAppendS("CC:OPTIMIZE,");
