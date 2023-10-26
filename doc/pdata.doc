@@ -507,9 +507,9 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 \beta_i$.
 @end tex
 @item rp:
-reverse lexicographical ordering:
+inverse lexicographical ordering:
 @cindex rp, global ordering
-@cindex reverse lexicographical ordering
+@cindex inverse lexicographical ordering
 @*
 @ifinfo
 x^a < x^b  <==> there is an i,  1 <= i <= n :

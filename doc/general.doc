@@ -1926,7 +1926,7 @@ In a ring declaration, @sc{Singular} offers the following orderings
 lexicographical ordering
 
 @item @code{rp}
-reverse lexicographical ordering, i.e. a lexicographical ordering from the right
+inverse lexicographical ordering, i.e. a lexicographical ordering from the right
 with 1 < x_1 < ... <x_n
 (should not be used as it reverses the "natural" x_1 > ... > x_n,
 reorder the variables instead)
