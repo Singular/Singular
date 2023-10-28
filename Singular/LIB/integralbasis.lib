@@ -2075,7 +2075,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
     outNormal = mergeBases(bases);
 
     // Check the correct degree for reduction
-    //outNormal[1] = reduce(outNormal[1], groebner(x^mdm));
+    //outNormal[1] = reduce(outNormal[1], groebner(var(1)^mdm));
 
 
     //dbprint(dbg, "----Computing the groebner basis...", outNormal[1]);
@@ -2083,7 +2083,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
     outNormal[1] = groebner(outNormal[1]);
     dbprint(dbg, "----Merging finished");
     poly fLoc = 1;
-    tmp_var_mdm=std(x^mdm);
+    tmp_var_mdm=std(var(1)^mdm);
     for(k = 2; k <= size(I2LiftedFull); k++)
     {
       fLoc = reduce(fLoc * reduce(I2LiftedFull[k], tmp_var_mdm), tmp_var_mdm);
