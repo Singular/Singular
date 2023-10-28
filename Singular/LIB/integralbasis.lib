@@ -971,8 +971,6 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
   int moved;
   poly fT;
   def R = basering;
-  poly x = var(1);
-  poly y = var(2);
   intvec vy = (0,1);
   intvec vx = (1,0);
 
@@ -996,7 +994,7 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
       dbprint(dbg, "Case: non-rational y-coordinate.");
 
       // We move the singularities to x = 0.
-      fT = moveToVar(f, px, x);
+      fT = moveToVar(f, px, var(1));
 
       // We compute the integral basis.
       list ib = ibNonRatY(fT, py, locBasis);
@@ -1012,9 +1010,9 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
       {
         for(i = 1; i <= size(ib[1]); i++)
         {
-          ib[1][i] = moveFromVar(ib[1][i], px, x);
+          ib[1][i] = moveFromVar(ib[1][i], px, var(1));
         }
-        ib[2] = moveFromVar(ib[2], px, x);
+        ib[2] = moveFromVar(ib[2], px, var(1));
         return(ib);
       }
     }
@@ -1037,14 +1035,14 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
       dbprint(dbg, "Linear coordinate change needed.");
 
       li = 1;
-      poly linCh = x;
-      poly invCh = x;
+      poly linCh = var(1);
+      poly invCh = var(1);
       ideal PCh = P;
       while(((li < 20) and (deg(py,vy) > 1)) or (isXMonic(f)==0)){
-        linCh = linCh + y;
-        invCh = invCh - y;
-        fCh = subst(f, x, x + y);
-        PCh = subst(PCh, x, x + y);
+        linCh = linCh + var(2);
+        invCh = invCh - var(2);
+        fCh = subst(f, var(1), var(1) + var(2));
+        PCh = subst(PCh, var(1), var(1) + var(2));
         PLex = yInTermOfx(PCh);
         px = PLex[1];
         py = PLex[size(PLex)];
@@ -1086,9 +1084,9 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
     if(li > 0)
     {
       for(i = 1; i <= size(ib); i++){
-        ib[i][1] = subst(ib[i][1], x, invCh);
+        ib[i][1] = subst(ib[i][1], var(1), invCh);
       }
-      px = subst(px, x, invCh);
+      px = subst(px, var(1), invCh);
 
     }
 
@@ -1099,7 +1097,7 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
 
     if(li > 0)
     {
-      ib = normToIntJacob(ib[1], ib[2], y, f);
+      ib = normToIntJacob(ib[1], ib[2], var(2), f);
     }
 
     dbprint(dbg, "ibLocal - Output of convertIB: ", ib, px);
@@ -1113,7 +1111,7 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation){
 
     // Hensel algorithm is used in this case.
     moved = 0;
-    if((px != x) || (py != y))
+    if((px != var(1)) || (py != var(2)))
     {
       fT = moveTo(f, px, py);
       moved = 1;
@@ -1165,8 +1163,6 @@ static proc ibAt0(poly f, int locBasis)
 
   intvec vy = (0,1);
   intvec vx = (1,0);
-  poly x = var(1);
-  poly y = var(2);
   int n = deg(f, vy);
 
   // Degree of the component outside the origin
@@ -1553,7 +1549,7 @@ static proc ibAt0(poly f, int locBasis)
     outNormal = mergeBases(bases);
 
     // Check the correct degree for reduction
-    //outNormal[1] = reduce(outNormal[1], groebner(x^mdm));
+    //outNormal[1] = reduce(outNormal[1], groebner(var(1)^mdm));
 
 
     //dbprint(dbg, "----Computing the groebner basis...", outNormal[1]);
@@ -1561,7 +1557,7 @@ static proc ibAt0(poly f, int locBasis)
     outNormal[1] = groebner(outNormal[1]);
     dbprint(dbg, "----Merging finished");
     poly fLoc = 1;
-    tmp_var_mdm=std(x^mdm);
+    tmp_var_mdm=std(var(1)^mdm);
     for(k = 2; k <= size(I2LiftedFull); k++)
     {
       fLoc = reduce(fLoc * reduce(I2LiftedFull[k], tmp_var_mdm), tmp_var_mdm);
@@ -1609,14 +1605,12 @@ static proc ibNonRatXY(poly f, poly px, poly py, int locBasis)
 
   def S = splitRingAt(px);
   setring S;
-  poly x = var(1);
-  poly y = var(2);
   poly f = imap(R, f);
   poly px = imap(R, px);
   poly py = imap(R, py);
 
   // We compute the y-coordinate of the singularity
-  poly pya = subst(py,x,par(1));
+  poly pya = subst(py,var(1),par(1));
 
   // We move the singularity to the origin and compute the integral basis
   poly fT = moveTo(f, var(1) - par(1), pya);
@@ -1637,7 +1631,7 @@ static proc ibNonRatXY(poly f, poly px, poly py, int locBasis)
     // We remove the parameter from the denominator.
     // To achieve this, we reduce the polynomial modulo the generators
     // of smaller degree.
-    // Note that the simple version ib[i][1] = subst(ib[i][1], par(1), x)
+    // Note that the simple version ib[i][1] = subst(ib[i][1], par(1), var(1))
     // does not work in general.
     if(ib[i][2] > 0)
     {
@@ -4003,8 +3997,6 @@ static proc henselLocal(poly f, int slN, int slD, int order)
   int dbg = printlevel - voice + 5;
   int i;
   intvec vy = 0, 1;
-  poly x = var(1);
-  poly y = var(2);
   int d = deg(f, vy);
 
   //"Transformation...", slN, slD;
@@ -4015,13 +4007,13 @@ static proc henselLocal(poly f, int slN, int slD, int order)
   // we map x to x^slD and y to x^slN*y.)
   poly f1 = mapTo(f, slN, slD);
   int fD = slN * d;
-  f1 = f1 / (x^fD);
-  poly f0 = subst(f1, x, 0);
-  list l1 = divideBy(f0, y);
+  f1 = f1 / (var(1)^fD);
+  poly f0 = subst(f1, var(1), 0);
+  list l1 = divideBy(f0, var(2));
   poly g0 = l1[1];
   int gD = deg(g0, vy);
   int hD = l1[2];
-  poly h0 = y^hD;
+  poly h0 = var(2)^hD;
 
   // We set up to which order we have to compute the expansions
   int ordCommon;
@@ -4045,11 +4037,11 @@ static proc henselLocal(poly f, int slN, int slD, int order)
   // We transform everything back to the original setting
   // The case of several blocks with the same slope is not implemented.
   //list comps = henselFacs(g, order * slD - ordCommon);
-  poly g = l2[1] * (x^(gD * slN));
+  poly g = l2[1] * (var(1)^(gD * slN));
 
   g = mapFrom(g, slN, slD);
 
-  poly h = l2[2] * (x^(hD*slN));
+  poly h = l2[2] * (var(1)^(hD*slN));
   h = mapFrom(h, slN, slD);
   return(list(g, h));
 }
@@ -4100,9 +4092,6 @@ static proc henselBlocks(poly f, int globOrder, int loc)
   //  "---- henselBlock begins";
   //}
 
-  poly x = var(1);
-  poly y = var(2);
-
   int comp = 1;
   list comps;
   list compsT;
@@ -4123,11 +4112,11 @@ static proc henselBlocks(poly f, int globOrder, int loc)
 
   if(loc == 1)
   {
-    poly f0 = subst(f, x, 0);
+    poly f0 = subst(f, var(1), 0);
 
-    list fl = divideBy(f0, y);
+    list fl = divideBy(f0, var(2));
 
-    list fGlob = henselGlobal(y^fl[2], fl[1], f, maxOrder);
+    list fGlob = henselGlobal(var(2)^fl[2], fl[1], f, maxOrder);
 
     poly fLoc = fGlob[1];
 
@@ -4208,8 +4197,6 @@ static proc henselInSegment(poly f, int globOrder)
   int loc;
   list comps;
 
-  poly x = var(1);
-  poly y = var(2);
   intvec vx = (1,0);
   intvec vy = (0,1);
   int d = deg(f, vy);
@@ -4231,10 +4218,10 @@ static proc henselInSegment(poly f, int globOrder)
   // (In fact, to avoid fractional exponents,
   // we map x to x^slD and y to x^slN*y.)
   poly f1 = mapTo(f, slN, slD);
-  f1 = f1 / (x^(d*slN));
+  f1 = f1 / (var(1)^(d*slN));
 
   poly je1 = mapTo(je, slN, slD);
-  je1 = je1 / (x^(d*slN));
+  je1 = je1 / (var(1)^(d*slN));
 
   // For each factor of the equation, compute the corresponding lifted factor
   list lLoc;
@@ -4246,7 +4233,7 @@ static proc henselInSegment(poly f, int globOrder)
   for(i = 1; i < sFac; i++)
   {
     fJe1 = mapTo(fJe[1][i+1]^(fJe[2][i+1]), slN, slD);
-    fJe1 = fJe1 / (x^(deg(fJe1, vy) * slN));
+    fJe1 = fJe1 / (var(1)^(deg(fJe1, vy) * slN));
     je1 = je1 / fJe1;
     lLoc = henselGlobal(fJe1, je1, fLoc, globOrder);
     hFactor[i] = lLoc[1];
@@ -4261,7 +4248,7 @@ static proc henselInSegment(poly f, int globOrder)
   for(i = 1; i <= sFac; i++)
   {
     degFac = deg(fJe[1][i+1], vy) * fJe[2][i+1];
-    hFactor[i] = hFactor[i] * (x^(degFac * slN));
+    hFactor[i] = hFactor[i] * (var(1)^(degFac * slN));
     hFactor[i] = mapFrom(hFactor[i], slN, slD);
     compsT = splitFact(hFactor[i], fJe[1][i+1], fJe[2][i+1], globOrder);
     for(j = 1; j <= size(compsT); j++)
@@ -4289,11 +4276,9 @@ static proc henselTotal(poly h, int order)
   list hFacts;
   int comp = 1;
 
-  poly x = var(1);
-  poly y = var(2);
   intvec vy = (0,1);
 
-  poly h0 = subst(h, x, 0);
+  poly h0 = subst(h, var(1), 0);
   list fc = factorize(h0);
   fc = sortFactors(fc);
 
@@ -4327,9 +4312,6 @@ static proc henselTotal(poly h, int order)
 // Split poly f assuming that it corresponds to a factor factor^exp
 static proc splitFact(poly f, poly fact, int exp, int order)
 {
-  poly x = var(1);
-  poly y = var(2);
-
   fact = monic(fact);
   int i, j;
   list comps;
@@ -4345,12 +4327,12 @@ static proc splitFact(poly f, poly fact, int exp, int order)
   {
     // The rational part.
     fact = monic(fact);
-    poly ratPart = subst(fact, y, 0);
-    poly fNew = subst(f, y, y - ratPart);
+    poly ratPart = subst(fact, var(2), 0);
+    poly fNew = subst(f, var(2), var(2) - ratPart);
 
     int loc;
     int start;
-    if(fact == y)
+    if(fact == var(2))
     {
       loc = 1;    // Separate only the factors at the origin.
       start = 2;
@@ -4362,7 +4344,7 @@ static proc splitFact(poly f, poly fact, int exp, int order)
     list compsT = henselBlocks(fNew, order, loc);
     for(j = start; j <= size(compsT); j++)
     {
-      comps[comp] = subst(compsT[j], y, y + ratPart);
+      comps[comp] = subst(compsT[j], var(2), var(2) + ratPart);
       comp++;
     }
   } else
@@ -4579,8 +4561,6 @@ static proc ibNonRatY(poly f, poly py, int locBasis){
   int b;    // Multiplicity of the singularity.
   int dbg = printlevel - voice + 5;
 
-  poly x = var(1);
-  poly y = var(2);
   intvec vY = (0,1);
   intvec vX = (1,0);
 
@@ -4626,15 +4606,12 @@ static proc ibNonRatYSplit(poly f, poly fOrig, poly py, poly PE, int locBasis)
   int i;
   int dbg = printlevel - voice + 5;
 
-  poly x = var(1);
-  poly y = var(2);
-
   intvec vY = (0,1);
   intvec vX = (1,0);
   int d = deg(fOrig,vY);
 
   // We compute the multiplicity of the singularity.
-  poly f0 = subst(fOrig,x,0);
+  poly f0 = subst(fOrig,var(1),0);
   list fc = divideBy(f0, py);
   int b = fc[2];
 
@@ -4650,7 +4627,7 @@ static proc ibNonRatYSplit(poly f, poly fOrig, poly py, poly PE, int locBasis)
     // The first term of the Puiseux expansions is repeated.
     // We remove it and compute the integral basis recursively.
     //"DBG - Change coord (linear term in PE)";
-    f = subst(f, y, y - dat[2]);
+    f = subst(f, var(2), var(2) - dat[2]);
 
     // We add the new terms of the Puiseux expansion
     PE = PE - dat[2];
@@ -4716,12 +4693,12 @@ static proc ibNonRatYSplit(poly f, poly fOrig, poly py, poly PE, int locBasis)
         if (ordU < 0){ordU = 0;}
         expPY = (int(i-dU) div dPY);
         expY = i-dU-(expPY * dPY);
-        ib[i+1] = list(PEGround^expPY * y^expY, x^(expDen));
+        ib[i+1] = list(PEGround^expPY * var(2)^expY, var(1)^(expDen));
         if(dU > 0){
           ib[i+1][1] = ib[i+1][1] * jet(u, ordU, vX);
         }
       } else {
-        ib[i+1] = list(y^i, 1);
+        ib[i+1] = list(var(2)^i, 1);
       }
     }
   } else
@@ -4733,7 +4710,7 @@ static proc ibNonRatYSplit(poly f, poly fOrig, poly py, poly PE, int locBasis)
         expDen = (slN* (i div dPY)) div slD;
         expPY = (i/dPY);
         expY = i-(expPY * dPY);
-        ib[i+1] = list(py^expPY * y^expY, x^(expDen));
+        ib[i+1] = list(py^expPY * var(2)^expY, var(1)^(expDen));
       } else
       {
         ib[1] = list(1, 0);
