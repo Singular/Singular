@@ -293,15 +293,13 @@ example
 // slD is the denominator
 static proc puiseuxStep(poly f, int slN, int slD){
   def R = basering;
-  poly x = var(1);
-  poly y = var(2);
 
   // We treat the negative exponents separately
-  poly f2 = subst(f, x, x^slD);
+  poly f2 = subst(f, var(1), var(1)^slD);
   if(slN >= 0)
   {
-    poly f3 = subst(f2, y, y*(x^slN));
-    matrix M = coef(f3,x);
+    poly f3 = subst(f2, var(2), var(2)*(var(1)^slN));
+    matrix M = coef(f3,var(1));
     poly c = M[2, ncols(M)];
   } else
   {
@@ -312,7 +310,7 @@ static proc puiseuxStep(poly f, int slN, int slD){
 
     // We multiply by a large enough power of x so that the next
     // substitution is possible.
-    poly f3 = f2*x^(-slN*dy);
+    poly f3 = f2*var(1)^(-slN*dy);
 
     // Now we replace x^(|slN|)*y by  x^(|slN|)*x^slN*y = y
     poly f3Temp = f3;
@@ -323,12 +321,12 @@ static proc puiseuxStep(poly f, int slN, int slD){
     {
       leadP = lead(f3Temp);
       dy3 = deg(leadP, intvec(0,1));
-      f4 = f4 + leadP / x^(dy3*(-slN));
+      f4 = f4 + leadP / var(1)^(dy3*(-slN));
       f3Temp = f3Temp - leadP;
     }
     // We can now take the equation to vanish the term with
     // smalles degree in x
-    matrix M = coef(f4,x);
+    matrix M = coef(f4,var(1));
     poly c = M[2, ncols(M)];
   }
 
