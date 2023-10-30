@@ -76,10 +76,11 @@ typedef enum rRingOrder_t
   ringorder_s, ///< s?
   ringorder_lp,
   ringorder_dp,
-  ringorder_rp,
+  ringorder_ip,
   ringorder_Dp,
   ringorder_wp,
   ringorder_Wp,
+  ringorder_Ip, /// degree, ip
   ringorder_ls,
   ringorder_ds,
   ringorder_Ds,
@@ -89,10 +90,14 @@ typedef enum rRingOrder_t
   ringorder_L,
   // the following are only used internally
   ringorder_aa, ///< for idElimination, like a, except pFDeg, pWeigths ignore it
-  ringorder_rs, ///< opposite of ls
+  ringorder_is, ///< opposite of ls
   ringorder_IS, ///< Induced (Schreyer) ordering
   ringorder_unspec
 } rRingOrder_t;
+
+// compat entries:
+#define ringorder_rp ringorder_ip
+#define ringorder_rs ringorder_is
 
 typedef enum rOrderType_t
 {

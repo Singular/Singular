@@ -56,10 +56,11 @@ static const char * const ringorder_name[] =
   "s", ///< ringorder_s,
   "lp", ///< ringorder_lp,
   "dp", ///< ringorder_dp,
-  "rp", ///< ringorder_rp,
+  "rp", ///< ringorder_ip, // will become "ip"
   "Dp", ///< ringorder_Dp,
   "wp", ///< ringorder_wp,
   "Wp", ///< ringorder_Wp,
+  "Ip", ///< ringorder_Ip,
   "ls", ///< ringorder_ls,
   "ds", ///< ringorder_ds,
   "Ds", ///< ringorder_Ds,
@@ -68,7 +69,7 @@ static const char * const ringorder_name[] =
   "am",  ///< ringorder_am,
   "L", ///< ringorder_L,
   "aa", ///< ringorder_aa
-  "rs", ///< ringorder_rs,
+  "rs", ///< ringorder_is, // will become "is"
   "IS", ///<  ringorder_IS
   " _" ///< ringorder_unspec
 };
@@ -3551,12 +3552,12 @@ BOOLEAN rComplete(ring r, int force)
                        tmp_ordsgn,v, bits, -1);
         break;
 
-      case ringorder_rs:
+      case ringorder_is:
         rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
         break;
 
-      case ringorder_rp:
+      case ringorder_ip:
         rO_LexVars(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
         break;
@@ -3590,6 +3591,22 @@ BOOLEAN rComplete(ring r, int force)
           typ_i++;
           rO_LexVars(j, j_bits, r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
+        }
+        break;
+
+      case ringorder_Ip:
+        if (r->block0[i]==r->block1[i])
+        {
+          rO_LexVars(j, j_bits, r->block0[i],r->block0[i], prev_ordsgn,
+                     tmp_ordsgn,v, bits, -1);
+        }
+        else
+        {
+          rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
+                     tmp_typ[typ_i]);
+          typ_i++;
+          rO_LexVars(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
+                       tmp_ordsgn,v, bits, -1);
         }
         break;
 
