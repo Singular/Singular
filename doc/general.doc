@@ -1928,7 +1928,7 @@ lexicographical ordering
 @item @code{rp}
 inverse lexicographical ordering, i.e. a lexicographical ordering from the right
 with 1 < x_1 < ... <x_n
-(should not be used as it reverses the "natural" x_1 > ... > x_n,
+@*(should not be used as it reverses the "natural" x_1 > ... > x_n,
 reorder the variables instead)
 
 @item @code{dp}
@@ -1944,6 +1944,13 @@ consist of positive integers only.
 @item @code{Wp(} intvec_expression @code{)}
 weighted lexicographical ordering; the weight vector is expected to consist of
 positive integers only.
+
+@item @code{Ip}
+degree inverse lexicographical ordering, i.e.sorting by degree, followed by a
+lexicographical ordering from the right with 1 < x_1 < ... <x_n
+@*(should not be used as it reverses the "natural" x_1 > ... > x_n,
+reorder the variables instead)
+
 @end table
 
 Global orderings are well-orderings, i.e., @math{1 < x} for each ring
@@ -1956,8 +1963,8 @@ character in their name.
 negative lexicographical ordering
 
 @item @code{rs}
-negative reverse lexicographical ordering, i.e. a lexicographical ordering from the right
-(should not be used as it reverses the "natural" x_1 < ... < x_n,
+negative inverse lexicographical ordering, i.e. a lexicographical ordering from the right
+@*(should not be used as it reverses the "natural" x_1 < ... < x_n,
 reorder the variables instead)
 
 @item @code{ds}
