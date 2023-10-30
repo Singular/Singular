@@ -1180,3 +1180,33 @@ void syMinimize_with_map(syStrategy res, ideal &trans)
   if (r==NULL) r=res->fullres;
   trans=idLift(org,r[0],NULL,TRUE,FALSE,FALSE,NULL);
 }
+
+syStrategy syMinimizeCopy(syStrategy org)
+{
+  syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
+
+  result->length=org->length;
+  if (org->weights!=NULL)
+  {
+    result->weights=(intvec**)omAlloc0(org->length*sizeof(intvec*));
+    for (int i=org->length-1;i>=0;i--)
+    {
+      if (org->weights[i]!=NULL)
+      {
+        result->weights[i]=ivCopy(org->weights[i]);
+      }
+    }
+  }
+  result->fullres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
+  resolvente fr = org->minres;
+  if (fr==NULL) fr=org->fullres;
+
+  for (int i=result->length-1;i>=0;i--)
+  {
+    if (fr[i]!=NULL)
+      result->fullres[i] = idCopy(fr[i]);
+  }
+  result->list_length=result->length;
+  result=syMinimize(result);
+  return result;
+}
