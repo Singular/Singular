@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version paraplanecurves.lib 4.3.2.3 Jul_2023 "; // $Id$
+version="version paraplanecurves.lib 4.3.2.10 Nov_2023 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
@@ -505,73 +505,90 @@ KEYWORDS: integral basis; normalization.
 EXAMPLE: example adjointIdeal; shows an example
 "
 {
-  list choices = #;
-  if(size(#)==0)
+  def save_ring=basering;
+  ring r=QQ,(x,y,z),dp;
+  poly f=fetch(save_ring,f);
+  ideal I=adjointIdeal0(f,#);
+  setring save_ring;
+  ideal I=fetch(r,I);
+  return(I);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R = 0,(x,y,z),dp;
+  poly f = y^8-x^3*(z+x)^5;
+  adjointIdeal(f);
+}
+
+static proc adjointIdeal0(poly f, list choices)
+{
+  list o_choices=choices;
+  if(size(o_choices)==0)
+  {
+    checkAssumptions(f);
+    choices = list(2, "rattestno");
+  }
+  if(size(o_choices)==1)
+  {
+    if(typeof(choices[1])=="int")
     {
       checkAssumptions(f);
-      choices = list(2, "rattestno");
+      choices = list(choices[1], "rattestno");
     }
-  if(size(#)==1)
+    else
     {
-      if(typeof(choices[1])=="int")
-        {
-          checkAssumptions(f);
-          choices = list(choices[1], "rattestno");
-        }
+      if(not(find(choices[1], "firstchecksdone")))
+      {
+        checkAssumptions(f);
+      }
       else
-         {
-           if(not(find(choices[1], "firstchecksdone")))
-             {
-               checkAssumptions(f);
-             }
-           else
-             {
-               choices = list(2, choices[1]);
-             }
-        }
+      {
+        choices = list(2, choices[1]);
+      }
     }
-  if(size(#) == 2)
+  }
+  if(size(o_choices) == 2)
+  {
+    if(not(find(choices[2],"firstchecksdone")))
     {
-      if(not(find(choices[2],"firstchecksdone")))
-        {
-          checkAssumptions(f);
-        }
+      checkAssumptions(f);
     }
+  }
   ideal JAC = diff(maxideal(1),ideal(f));
   ideal Jfinfty = JAC,var(3);
   /*applying a change of coordinates if (f=0) has singularities at infinity*/
   int bb1;
   if(dim(std(Jfinfty)) >= 1)
-    {
-       bb1 = 1;
-       int a,b,c  = findCoordChange(f,JAC);
-       f = subst(f,var(3),var(3)-number(a)/c*var(1)-number(b)/c*var(2));
-    }
+  {
+     bb1 = 1;
+     int a,b,c  = findCoordChange(f,JAC);
+     f = subst(f,var(3),var(3)-number(a)/c*var(1)-number(b)/c*var(2));
+  }
   /*applying a change of coordinates if the point (0:1:0) lies on the curve*/
   matrix co = coeffs(f,var(2));
   int bb2 = ((size(co)-1) != deg(f));
   if(bb2)
-    {
-       co = coeffs(f,var(1));
-       int bb2x = ((size(co)-1) == deg(f));
-       if(bb2x)
-         {
-           map perm = basering, var(2), var(1), var(3);
-           f = perm(f);
-         }
-       else
-         {
-           number cc=1;
-           int tst=0;
-           poly ff;
-           while (tst==0){
-              ff = subst(f,var(1),var(1)+cc*var(2));
-              tst=((size(coeffs(ff,var(2)))-1) == deg(ff));
-              if (tst==0){cc=cc+1;}
-           }
-           f = subst(f,var(1),var(1)+cc*var(2));
-         }
-    }
+  {
+     co = coeffs(f,var(1));
+     int bb2x = ((size(co)-1) == deg(f));
+     if(bb2x)
+     {
+       map perm = basering, var(2), var(1), var(3);
+       f = perm(f);
+     }
+     else
+     {
+       number cc=1;
+       int tst=0;
+       poly ff;
+       while (tst==0){
+         ff = subst(f,var(1),var(1)+cc*var(2));
+         tst=((size(coeffs(ff,var(2)))-1) == deg(ff));
+         if (tst==0){cc=cc+1;}
+       }
+       f = subst(f,var(1),var(1)+cc*var(2));
+     }
+  }
   co = coeffs(f,var(2));
   f = f/co[size(co),1];
   /*the actual computation*/
