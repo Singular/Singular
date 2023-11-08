@@ -14,7 +14,7 @@ as authors of Singular libraries.
 
 KEYWORDS:  parallelization; parallel skeletons; distributed computing
 
-SEE ALSO:  resources_lib, tasks_lib, modstd_lib, modnormal_lib
+SEE ALSO:  resources_lib, tasks_lib, modstd_lib, normal_lib
 
 PROCEDURES:
   parallelWaitN();      execute several jobs in parallel

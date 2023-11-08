@@ -7731,7 +7731,7 @@ REFERENCES:
          [2] Gert-Martin Greuel, Santiago Laplagne, Frank Seelisch: Normalization of Rings,
              Journal of Symbolic Computation 9 (2010), p. 887-901
 KEYWORDS: normalization; local methods; modular methods.
-SEE ALSO: normal_lib, modnormal_lib.
+SEE ALSO: normal_lib
 EXAMPLE: example locNormal; shows an example
 "
 {
