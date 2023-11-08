@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-version="version integralbasis.lib 4.3.1.0 Jul_2022 "; // $Id$
+version="version integralbasis.lib 4.3.2.10 Nov_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  integralbasis.lib  Integral basis in algebraic function fields
@@ -53,7 +53,7 @@ proc integralBasis(poly f, int intVar, list #)
         the singular locus of R/<f> and puts everything together.
         (Default option for normal algorithm.)@*
         Options for hensel algorithm:@*
-        - \"opti\" -> The integral basis for the branches are merged 
+        - \"opti\" -> The integral basis for the branches are merged
         using a combinatorial approach. (Default option.)@*
         - \"noOpti\" -> the integral basis for the different branches
         are merged using the Chinese remainder theorem. This is usually
@@ -618,7 +618,7 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
     dbprint(dbg, "----Computing the integral basis of component ", i);
     dbprint(dbg, "----Component: ");
     if(dbg>=1){compo;}
-  
+
     norOut = intBasisComp(f, compType, compo, algorithm, locBasis, useRotation, optimize, #);
     norT = norOut[1];
     denomT = norOut[2];
@@ -1144,7 +1144,7 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation, int optimize
     {
       fT = f;
     }
-    
+
     ideal ibN = ibAt0(fT, locBasis, optimize);
 
     if(size(ibN) == 0){
@@ -1193,13 +1193,13 @@ static proc optimizationSteps(f, classes, slopes, degExpand)
   int i, k;
   intvec vy = (0,1);
   int dbg = printlevel - voice;
-  
+
   // 1) Compute Puiseux sets (we use segments for easier implementation)
   list pSegmentFull = getSegments(f, classes, slopes, degExpand);
   list pSegment = pSegmentFull[1]; // The segments corresponding to expansions at the origin
   poly unitPoly = pSegmentFull[2]; // The unit outside the origin
-  dbprint(dbg, "Step 1 finished");  
-  
+  dbprint(dbg, "Step 1 finished");
+
   // 2) Compute IB in each set
   list ibSeg;
   for(i = 1; i <= size(pSegment); i++)
@@ -1209,16 +1209,16 @@ static proc optimizationSteps(f, classes, slopes, degExpand)
     ibSeg[i] = ibSegment(pSegment[i][1], pSegment[i][3], degExpand);
   }
   dbprint(dbg, "Step 2 finished");
-      
+
   // 3) Merge all the integral basis for the segments using the combinatorial approach
   list ib = optiBase(ibSeg, pSegment);
   dbprint(dbg, "Step 3 finished");
-    
+
   // 4) We add the unit outside the origin and convert to ib shape.
   ideal IOut;
   int intExp = int(ib[size(ib)-1][1]);
   poly condu = var(1)^intExp;  // The denominator of the integral basis.
-  
+
   for(k = 0; k < deg(unitPoly, vy); k++)
   {
     IOut[k+1] = condu * var(2)^(k);
@@ -1230,7 +1230,7 @@ static proc optimizationSteps(f, classes, slopes, degExpand)
   dbprint(dbg, "Step 4 finished");
   return(IOut);
 }
-  
+
 
 ///////////////////////////////////////////////////////////////////////
 // Computation of Puiseux segments and classes in each segment
@@ -1255,7 +1255,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
   list fSegment;
 
   number slopeSegment;
-    
+
   list out;
 
   intvec vx = (1,0);
@@ -1276,7 +1276,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
     list fl = divideBy(f0, y);
     list fGlob = henselGlobal(y^fl[2], fl[1], f, maxOrder);
     poly fLoc = fGlob[1];
-    
+
     if(fLoc == 1)
     {
       dbprint(dbg,"Warning! No local component. This may indicate you are computing the basis at a value of X where there is no singularity.");
@@ -1286,10 +1286,10 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
     dbprint(dbg, "----Computing Puiseux Segments...");
     fSegment = henselSegments(fLoc, maxOrder);
     dbprint(dbg, "Number of segments: ", size(fSegment));
-    
+
     list pExpRecomputed;
     list nPoly;
-    
+
     //"Check output of henselSegments";
     //fSegment;
     for(i = 1; i <= size(fSegment); i++)
@@ -1306,29 +1306,29 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
         if(slopes[j][1] * nPoly[1][2] == slopes[j][2] * nPoly[2][1])  // same slope
         {
           // If slopes coincide we add the class to the list
-          classesNew[size(classesNew) + 1] = classes[j];  
+          classesNew[size(classesNew) + 1] = classes[j];
         }
-      }  
-      
-      // If the number of classes in the segments is larger than one, 
+      }
+
+      // If the number of classes in the segments is larger than one,
       // we need to recompute expansions up to degree maxOrder so that
       // the factors can be computed correctly.
-      if(size(classesNew) > 1) 
+      if(size(classesNew) > 1)
       {
         // puiseux(poly f, int maxDeg, int atOrigin)
         pExpRecomputed = puiseux(fSegment[i], globOrder, 1);
         debug_log_intbas(3, "------Puiseux expansions recomputed: ");
         classesNew = getClasses(pExpRecomputed);
       }
-      
+
       // We put everything together
       out[i] = list(fSegment[i], slopeSegment, classesNew);
     }
   }
-  
+
   // We reorder according to the slope
   out = sortSegments(out);
-  
+
   // We also return the unit outside the origin
   list outFull = list(out, fGlob[2]);
   return(outFull);
@@ -1366,13 +1366,13 @@ proc ibSegment(poly f, list classes, int degExpand)
   list polySet;
   intvec degPolySet;
   intvec vy = (0,1);
-  
+
   // We get all the possible polynomials, including the full polys
   //"Building factors from classes...";
   list bF = buildFactors(classes);
-  
+
   int degF = deg(f, vy);
-  
+
   // We consider the union of all polynomials
   poly pGround;
   for(i = 1; i <= size(classes); i++)
@@ -1385,7 +1385,7 @@ proc ibSegment(poly f, list classes, int degExpand)
         polySet[size(polySet)+1] = bF[1][i][j];
       }
     }
-    
+
     // We compute the full polynomial up to the integrality exponent.
     // When there is only one class we use the polynomial obtained from Hensel lifting.
     // If there are more than 1 class in the segment we need to compute the
@@ -1402,13 +1402,13 @@ proc ibSegment(poly f, list classes, int degExpand)
       }
     }
   }
-  
+
   // Degrees of the polynomials
   for(i = 1; i <= size(polySet); i++)
   {
     degPolySet[i] = deg(polySet[i], vy);
   }
-  
+
   // We compute the order of each expansion at each of the polynomials
   list ordExpAtPoly;
   for(i = 1; i <= size(polySet); i++)
@@ -1424,8 +1424,8 @@ proc ibSegment(poly f, list classes, int degExpand)
   list ib = ibExhaustive(polySet, degPolySet, ordExpAtPoly, degF);
   return(ib);
 }
-  
-// For each degree up to the degree of f, we compute the best 
+
+// For each degree up to the degree of f, we compute the best
 // possible product of factors by checking exhaustively all possible
 // combinations such that the product has the correct degree.
 // Used for the direct approach.
@@ -1440,19 +1440,19 @@ proc ibExhaustive(list polySet, intvec degPolySet, list ordExpAtPoly, int degF)
   number oMax;
   intvec cBest;
   poly pBest;
-  
+
   // The first element is polynomial 1
   intvec zero = 0 * (1..s);
   ib[1] = list(0, zero, 1);
-  
+
   for (d = 1; d <= degF; d++)
   {
     // The best element of degree d;
     oMax  = 0;
-    
+
     // We generate the list of all possible combinations
     c = summandsFac(degPolySet, d);
-    
+
     // We compute the valuation of each combination,
     // and we keep the largest one.
     for(i = 1; i <= size(c); i++)
@@ -1484,7 +1484,7 @@ proc getValuation(c, ordExpAtPoly)
 {
   //"c, ordExpAtPoly";
   //c, ordExpAtPoly;
-  
+
   number o;
   number oBest;
   int i, j;
@@ -1501,7 +1501,7 @@ proc getValuation(c, ordExpAtPoly)
         {
           if(ordExpAtPoly[i][j] >= 0)
           {
-            o = o + c[i] * ordExpAtPoly[i][j];   // We consider c[i] equal factors, each one with valuation 
+            o = o + c[i] * ordExpAtPoly[i][j];   // We consider c[i] equal factors, each one with valuation
                                                  // ordExpAtPoly[i][j] at the jth Puiseux expansion
           } else {
             o = -1;  // Infinite valuation
@@ -1549,19 +1549,19 @@ proc summandsFac(intvec degPolySet, int degTotal)
   return(l);
 }
 
-  
+
 //We implement the optimization approach from scratch
 proc optiBase(list ibSeg, list segmentSlope)
 {
   int i, k;
   int s = size(ibSeg);
-  
+
   if(s == 1) {return(ibSeg[1]);}
-  
+
   // We initialize the recursion step
   list ibSegRec = ibSeg[s];
   list segmentSlopeRec = segmentSlope[s]; // Should be fixed to contain only slopes
-  
+
   for(k = s-1; k >= 1; k--)
   {
     ibSegRec = optiTwoSets(ibSeg[k], segmentSlope[k][2], ibSegRec, segmentSlopeRec[2]);
@@ -1574,23 +1574,23 @@ proc optiBase(list ibSeg, list segmentSlope)
 proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
 {
   //"optiTwoSets begin...";
-  
+
   int s1 = size(ib1)-1;  // max degree
   int s2 = size(ib2)-1;  // max degree
   int c1, c2;
   intvec cBest;
   int d;
-  
+
   //"s1 + s2 = ", s1 + s2;
-  
+
   number o, o1, o2;
   number oBest;
   poly polyBest;
-  
+
   list out;
   out[1] = list(0, intvec(0,0), 1);
   // Best element of degree d
-  
+
   int m1, m2;
   for(d = 1; d <= s1 + s2; d++)
   {
@@ -1614,19 +1614,19 @@ proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
         if(c1 == s1)
         {
           o = o2;
-        } else 
+        } else
         {
-          if(c2 == s2) 
+          if(c2 == s2)
           {
             o = o1;
-          } else 
+          } else
           {
             if(o1 < o2) {o = o1;}
             else {o = o2;}
           }
         }
         //"c1 = ", c1, "c2 = ", c2, "s1 = ", s1, "s2 = ", s2, "o = ", o;
-        
+
         if(o > oBest)
         {
           oBest = o;
@@ -1638,11 +1638,11 @@ proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
     out[size(out) + 1] = list(oBest, cBest, polyBest);
   }
   //"optiTwoSets finished...";
-  
+
   return(out);
 }
-    
-  
+
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1686,7 +1686,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
 
   // puiseux(poly f, int maxDeg, int atOrigin)
   list pExp = puiseux(f, -1, 1);
-  
+
   debug_log_intbas(3, "------Time puiseux expansions: ", timer - tt);
   tt = timer;
 
@@ -1707,11 +1707,11 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   // Tables of vanishing order of diferences of puiseux expansions
   dbprint(dbg, "--Computing vanishing orders...");
   matrix MClass = valIKClass(classes);
-  
+
   list vS = valIKSelf(bF, md);
   list MSelf = vS[1];
   list bestElem = vS[2];
-  
+
 
   // The highest exponent of the denominator
   if(size(classes) > 1)
@@ -1732,15 +1732,15 @@ static proc ibAt0(poly f, int locBasis, int optimize)
       intvec elem = 0;
     }
   }
-  
+
   dbprint(dbg, "The maximum integrality exponent is ", maxExp);
-  
+
   debug_log_intbas(3, "------Time for factors info: ", timer - tt);
   tt = timer;
 
   int degExpand = int(maxExp) + 1;
   dbprint(dbg, "---- Degree of expansions: ", degExpand);
-  
+
   if((pardeg(minpoly) > 0) and (optimize == 1))
   {
     "Optimization not implemented for conjugated singularities. Using chinese remainder algorithm for this component.";
@@ -1762,7 +1762,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
 {
   int i, j, k;
   intvec vy = (0,1);
-   
+
   // Computing hensel blocks...
   dbprint(dbg, "--Building HenselBlocks...");
   int tt = timer;
@@ -1829,7 +1829,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
     // Only one block with one class of expansions
     blocks[1] = 1;
     matrix M = valIK(classes);
-  
+
   }
 
   // RECOMPUTATION FINISHED
@@ -1859,7 +1859,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
   }
 
   debug_log_intbas(3, "------Time for ordFull: ", timer - tt);
-  
+
   tt = timer;
 
   list ordsBest;
@@ -1884,7 +1884,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
 
   int mdm = 0;
   int mdmTemp;
-  
+
   // maxDegMerge computes the maximum degree required when adding the
   // factors from the Chinese remainder approach
   for(i = 1; i <= nClasses; i++)
@@ -1905,7 +1905,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
 
   // The classes are reordered in the same order as the irreducible factors
   classes = ifOut[5];
-  
+
   if((ifOut[4] == 1))  // Wrong number of factors, recompute orders
   {
     kill ordsFull;
@@ -2014,7 +2014,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
 
     //debug_log_intbas(3, "------Time for recomputation: ", timer - tt);
   }
-  
+
   ideal tmp_var_mdm=std(var(1)^mdm);
   for(i = 1; i <= size(I2LiftedFull); i++)
   {
@@ -2141,7 +2141,7 @@ static proc ibNonRatXY(poly f, poly px, poly py, int locBasis, int optimize)
 
   //ideal IOut = ibOrigin(fT, locBasis);
   ideal IOut = ibAt0(fT, locBasis, optimize);
-  
+
   list ib = intBasIdealToList(IOut);
 
   dbprint(dbg, "ibNonRatXY - Integral basis at the origin: ", ib);
@@ -2461,7 +2461,7 @@ proc buildFactors(list classes)
 {
   int dbg = printlevel - voice + 4;
   dbprint(dbg, "--buildFactors begins");
-  
+
   int i, j;
   int d = -1;
   int ind;
@@ -2489,9 +2489,9 @@ proc buildFactors(list classes)
   def S;
 
   list polyGround;
-  
+
   int isGround = 1;
-    
+
   int algExt;
   for(i = 1; i <= size(classes); i++)
   {
@@ -2503,9 +2503,9 @@ proc buildFactors(list classes)
     ind = 1;
     first = 1;
     stop1 = 0;
-    
+
     // If the denominator is 1 there is nothing to do
-    
+
     algExt = 0;
     if(typeof(classes[i][1]) == "ring")
     {
@@ -2515,7 +2515,7 @@ proc buildFactors(list classes)
     {
       if(classes[i][1][2] > 1) {algExt = 1;}
     }
-    
+
     if(algExt == 1)
     {
       // Reading the characteristic exponents and the denominator of the exponent
@@ -2544,9 +2544,9 @@ proc buildFactors(list classes)
         }
         den = classes[i][1][2];
       }
-      exps = expsT;      
+      exps = expsT;
       //"exponents for class ", i, " = ", expsT;
-      
+
       for(k = 1; k <= size(exps); k++)
       {
         d = exps[k];
@@ -2566,7 +2566,7 @@ proc buildFactors(list classes)
 
           S = classes[i][1];
           setring S;
-          
+
           // d = -1 for computing polynomial of full degree
           if(d >= 0){
             poly fF = jet(PE[1][1], d-1, vx);
@@ -2582,7 +2582,7 @@ proc buildFactors(list classes)
             poly fFB = buildPolyFracNew(fF, mpX);
             ideal rel = extendBack(fFB, erg[1], dMP);
             matrix CC = coef(fFB, var(1)*var(2));
-            
+
             setring R;
             ideal rel = imap(S, rel);
             matrix CC = imap(S, CC);
@@ -2632,7 +2632,7 @@ proc buildFactors(list classes)
           // "Error. Conjugation classes are wrongly computed. The polynomial obtained is not over the ground field. ";
           ind++;
           isGround = 0;
-        } else 
+        } else
         {
           debug_log_intbas(4, "------Time for this factor: ", timer - t);
           if(dbg - 1 > 0)
@@ -2662,7 +2662,7 @@ proc buildFactors(list classes)
         if(d>=0)
         {
           ords[i][ind] = number(d) / number(den);
-        } else 
+        } else
         {
           ords[i][ind] = number(deg(facs[i][ind],vx)) / number(den);
         }
@@ -2678,7 +2678,7 @@ proc buildFactors(list classes)
       //gfChecks[i][ind] = 1;
     }
   }
-  
+
   return(list(facs, ords, degs, gfChecks, isGround));
 }
 
@@ -2699,7 +2699,7 @@ static proc buildPolyFrac(poly f)
   int degX = deg(f, dx);
 
   poly mp = minpoly;
-  
+
   mp = subst(minpoly, @a, var(1));
   int d = pardeg(minpoly);
   def Q = ring(0, (var(1), var(2), @a, T(1..d)), lp);
@@ -2767,7 +2767,7 @@ static proc multiplicateConjugates(poly f)
   int degX = deg(f, dx);
 
   poly mp = minpoly;
-  
+
   mp = subst(minpoly, @a, var(1));
   int d = pardeg(minpoly);
   def Q = ring(0, (var(1), var(2), @a, T(1..d)), lp);
@@ -2917,9 +2917,9 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
 
   intvec dx = (1,0);
   int degX = deg(f, dx);
-  
+
   if(d == -1) {d = degX + 1;}
-  
+
   //"Check buildPG";
   //f;
 
@@ -2930,7 +2930,7 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
     l[2][size(l[2])+1]="T(1)";
     def S = ring(l);
     setring S;
-    
+
     // We divide the exponents by the GCD of the exponents and the degree of the extension
     poly ff;
     ff = fetch(R, f);
@@ -2939,7 +2939,7 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
     den = den div g2;
     list ffList = buildPolyGround(list(ff), g2);
     poly ffRed = ffList[1];
-    
+
     list pols;
     pols[1] = ffRed;
     for(i = 1; i < den; i++)
@@ -2947,10 +2947,10 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
       ff = subst(ffRed, var(1), var(1) * (var(3)^i));
       pols[i+1] = ff;
     }
-    
+
     if(den > 1)
     {
-      // T(1) is a den-th root of unity, the only relation is 
+      // T(1) is a den-th root of unity, the only relation is
       // 0 = 1 + T(1) + ... + T(1)^(den-1)
       poly pExt = 1; // A root of unity
       for(i = 1; i < den; i++)
@@ -2959,7 +2959,7 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
       }
       ideal I = pExt;
       I = groebner(I);
-          
+
       poly fNewTemp = 1;
       for(i = 1; i<=den; i++)
       {
@@ -2976,7 +2976,7 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
       // If denominator is 1, nothing to do.
       poly fNew = reduce((var(2) - ffRed), groebner(var(1)^(d*den+1)));
     }
-    
+
     // We replace x^den by x
     ring P = (0, @a), (@x, @y, @X), dp;
     poly fNew = fetch(S, fNew);
@@ -2987,7 +2987,7 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
       gfCheck = 0;
     }
     f2 = subst(f2, @X, @x);
-        
+
     setring R;
     poly fNew = fetch(P, f2);
     // If there is still an algebraic extension, we compute the poly over the ground field
@@ -2995,7 +2995,7 @@ proc buildPolyGroundXRoot(poly f, int den, int d)
     {
       // We look for a polynomial over Q.
       // This algorithm is not implemented for complex singularities.
-      // In that case we would need to distinguish the extension in the basering 
+      // In that case we would need to distinguish the extension in the basering
       // from the extension in the Puiseux expansion, as in buildPolyFracNew.
       fNew = multiplicateConjugates(fNew);
     }
@@ -3012,7 +3012,7 @@ proc exponentsGCD(poly f, int indVar)
 {
   matrix M = coef(f,var(indVar));
   int g;
-  for(int i = 1; i <= ncols(M); i++) 
+  for(int i = 1; i <= ncols(M); i++)
   {
     if(i == 1){g = leadexp(M[1,1])[indVar];}
     else
@@ -3032,7 +3032,7 @@ proc exponentsGCD(poly f, int indVar)
 // Output: polynomial = the product of all the expansions in the input list.
 //         The common denominator is now cancelled with the numerators.
 static proc buildPolyGround(list fFrac, int sD)
-{  
+{
   int i;
   int gfCheck = 1;  // The polynomial computed is over the ground field.
                     // This means the conjugacy  is computed correctly.
@@ -3200,14 +3200,14 @@ static proc valIK(list classes)
 // Input:  a list classes of classes of conjugate expansions, as given by
 //         proc getClasses
 // Output: a matrix M of number, where M[i, j] is the valuation
-//         of gamma_i at the product of the conjugated factors (Y - gamma_j), 
+//         of gamma_i at the product of the conjugated factors (Y - gamma_j),
 //         expansions of the i-th and j-th conjugacy class respectively.
 static proc valIKClass(list classes)
 {
   int i, j;
   def R = basering;
   matrix MC[size(classes)][size(classes)];
-  
+
   // Order for each class of expansions
   for(i = 1; i <= size(classes); i++)
   {
@@ -3242,9 +3242,9 @@ static proc valIKClass(list classes)
   int k;
   poly differ;
   number ordDiff;
-  
-  list l; 
-  
+
+  list l;
+
   for(i = 1; i <= size(classes); i++)
   {
     MC[i, i] = o(i);
@@ -3368,16 +3368,16 @@ static proc ibElementMax(matrix M, list MSelf, intvec md)
     minOrd = 0;
     for(j = 1; j <= s; j++)
     {
-      if(i == j) 
+      if(i == j)
       {
         //"md = ", md;
         //"i = ", i;
-        if(md[i] > 1) 
+        if(md[i] > 1)
         {
           minOrd = minOrd + number(MSelf[i][md[i]-1]);
         }
         //"it worked";
-      } else 
+      } else
       {
         minOrd = minOrd + number(M[i,j]);
       }
@@ -3465,7 +3465,7 @@ static proc ibElement(matrix M, list MSelf, int d, intvec md)
       maxExpi = i;
     }
   }
-  
+
   intvec elem = sums[maxExpi];
   return(list(maxExp, elem));
 }
@@ -3772,7 +3772,7 @@ static proc getDegs(list classes)
       def S = classes[i][1];
       setring S;
       // The number of conjugated expansions is the common demoninator of the exponents times the degree of the extension,
-      // except when the algebraic extension comes from taking root of unity. 
+      // except when the algebraic extension comes from taking root of unity.
       // This degree should be checked if it is always correct computation, or if we should compute this number
       // while computing the Puiseux expansions.
       degs[i] = lcm((pardeg(minpoly) div degBase),PE[1][2]);
@@ -3931,9 +3931,9 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 {
   int dbg = printlevel - voice - 2;
   dbprint(dbg, "START - irreducibleFactors");
-  
+
   list I2Lifted = henselBlocks(f, degExpand, 1);
-  
+
   list updatedClasses = classes;
   int nClasses;
   nClasses = size(classes);
@@ -3994,7 +3994,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
         dbprint(dbg, "Computing Puiseux expansions up to degree ", degExpand, " of factor ", i, ": ", I2Red);
 
         newL = puiseux(I2Red, degExpand, 1);
-        
+
         classes2 = getClasses(newL);
         dbprint(dbg, "getClasses finished");
 
@@ -4013,9 +4013,9 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
           {
             def S = classes2[j][1];
             setring S;
-            
+
             list bP = buildPolyGroundXRoot(PE[1][1], PE[1][2], degExpand);
-            
+
             //"bP ring", bP;
 
 
@@ -4032,9 +4032,9 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
             bP = buildPolyGroundXRoot(classes2[j][1][1], classes2[j][1][2], degExpand);
             fuProd = bP[1];
             gfCheck = bP[2];
-            
+
             //"bP poly", bP;
-            
+
           }
 
           bPG = list(fuProd, gfCheck);
@@ -4121,7 +4121,7 @@ static proc maxDegMerge(int n, int cl, int locBasis, int d0, matrix M, list MSel
     }
     // The first term containing the locloc unit
     expBaseFactor = expUnit;
-       
+
     // If the order of hi is not integer, we add a factor.
     // This is used in the Chinese remainder strategy
     if(int(denominator(expBaseFactor)) > 1)
@@ -5052,10 +5052,10 @@ static proc henselBlocks(poly f, int globOrder, int loc)
     comp = 2;
     dbprint(dbg, "----Computing Puiseux Segments...");
     fSegment = henselSegments(fLoc, maxOrder);
-    
+
     //"Check output of henselSegments";
     //fSegment;
-    
+
     for(i = 1; i <= size(fSegment); i++)
     {
       //"i, fSegment", i, fSegment, maxOrder;
@@ -5175,18 +5175,18 @@ static proc henselInSegment(poly f, int globOrder)
   int comp = 1;
   poly ratPart;
   list compsT;
-  
+
   dbprint(dbg, "sFac = ", sFac);
   for(i = 1; i <= sFac; i++)
   {
     degFac = deg(fJe[1][i+1], vy) * fJe[2][i+1];
     hFactor[i] = hFactor[i] * (var(1)^(degFac * slN));
     hFactor[i] = mapFrom(hFactor[i], slN, slD);
-  
+
     dbprint(dbg, "henselInSegment - splitFact - i = ", i);
     compsT = splitFact(hFactor[i], fJe[1][i+1], fJe[2][i+1], globOrder);
     dbprint(dbg, "henselInSegment - splitFact - finished");
-    
+
     for(j = 1; j <= size(compsT); j++)
     {
       comps[comp] = compsT[j];

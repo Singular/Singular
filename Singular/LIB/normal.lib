@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-version="version normal.lib 4.3.1.1 Jan_2023 "; // $Id$
+version="version normal.lib 4.3.2.10 Nov_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -76,7 +76,7 @@ proc normal(ideal id, list #)
          or equidimensional decompositions.@*
          If this option is not set, normal changes to dp ordering and performs
          all computations with respect to this ordering.@*
-         - \"withDelta\" (or \"wd\") -> returns also the delta invariants. 
+         - \"withDelta\" (or \"wd\") -> returns also the delta invariants.
          Not valid for options \"locNormal\" and \"modNormal\".@*
          If the optional parameter choose is not given or empty, only
          \"equidim\" but no other option is used.@*
@@ -96,36 +96,36 @@ proc normal(ideal id, list #)
          universal denominator.@*
          - \"var2\" -> uses a polynomial in the second variable as universal
          denominator.@*
-         - \"GBRadical\" -> it computes a Groebner basis of the radical 
+         - \"GBRadical\" -> it computes a Groebner basis of the radical
          ideal computed for the test ideal.@*
-         - \"noGBRadical\" -> it does not compute a Groebner basis of 
+         - \"noGBRadical\" -> it does not compute a Groebner basis of
          the radical ideal computed for the test ideal.@*
-         - \"locNormal\" -> uses locNormal procedure to compute the 
+         - \"locNormal\" -> uses locNormal procedure to compute the
          normalization, which implements a local-to-global algorithm
          (for this option it is required that the ideal I is prime).@*
          - \"modular\" -> combined with \"locNormal\" option, it will
          use modNormal algorithm for the local computations.@*
          - \"modNormal\" -> uses modNormal procedure to compute the
-         normalization, which implements a modular algorithm (for this 
+         normalization, which implements a modular algorithm (for this
          option it is required that the ideal I is prime).@*
          - list(\"nPrimes\", int n) -> parameter for modNormal. We consider
-         n primes at a time until the result lifted to the rationals is 
+         n primes at a time until the result lifted to the rationals is
          correct modulo one additional prime. (default: n = 10)@*
-         - \"noVerification\" -> if the modular approach is used (using 
-         modNormal option or modular option in locNormal), the 
+         - \"noVerification\" -> if the modular approach is used (using
+         modNormal option or modular option in locNormal), the
          result will not be verified.@*
          If the optional parameter choose is not given or empty, only
          \"equidim\" but no other option is used.@*
          - \"withRing\" -> the ring structure of the normalization is
          computed. The number of variables in the new ring is reduced as much
-         as possible. This is the default option, except when using 
+         as possible. This is the default option, except when using
          modNormal or locNormal options.@*
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (id=radical(id); makes id radical). However, when using the
          \"prim\" option the minimal associated primes of id are computed first
          and hence normal computes the normalization of the radical of id.@*
 NOTE:    \"isPrim\" should only be used if id is known to be prime.
-RETURN:  If \"withRing\" option is set, a list, say nor, of size 2 
+RETURN:  If \"withRing\" option is set, a list, say nor, of size 2
          (resp. 3 with option \"withDelta\").
          Let R denote the basering and id the input ideal.
          * nor[1] is a list of r rings, where r is the number of associated
@@ -148,7 +148,7 @@ RETURN:  If \"withRing\" option is set, a list, say nor, of size 2
          of size r, the delta invariants of the r components, and an integer,
          the total delta invariant of basering/id (-1 means infinite, and 0
          that R/P_i resp. R/id is normal).@*
-         If \"withRing\" option is not set, a list of an ideal U and 
+         If \"withRing\" option is not set, a list of an ideal U and
          a polynomial d such that U/d is the normalization
 THEORY:  We use here a general algorithm described in [G.-M.Greuel, S.Laplagne,
          F.Seelisch: Normalization of Rings (2009)].@*
@@ -197,24 +197,24 @@ EXAMPLE: example normal; shows an example
       list opt = remove_from_list(#, "modNormal");
       opt = remove_from_list(opt, "locNormal");
       list out = locNormal(id, opt);
-    }  
+    }
     if(in_array(#, "withRing")) {
       // We compute the ring structure
-      def outRing = computeRing(out[1], id);  
-      
+      def outRing = computeRing(out[1], id);
+
       // We put the conductor as the last element of the ideal.
       ideal OO = reduce(out[1], groebner(out[2]));
       OO = interred(OO);
       OO[ncols(OO)+1]=out[2];
-      
+
       list outWR = list(list(outRing), list(OO));
       return(outWR);
     } else {
       return(out);
     }
   }
-  
-  
+
+
   ASSUME(0, not isQuotientRing(basering) );
 
   intvec opt = option(get);     // Save current options
@@ -4845,7 +4845,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   J = fetch(Q, J);
   printlevel = printlevel + 1;
 
-  if(normalCheck == 1) 
+  if(normalCheck == 1)
   {
     int out = normalMEqui(I, J, condu, D, withDelta, normalCheck, options);
     printlevel = printlevel - 1;
@@ -5255,7 +5255,7 @@ static proc getGenerators(ideal J, ideal U, poly c)
 ///////////////////////////////////////////////////////////////////////////////
 
 // Checks if string s is an element of list l
-proc in_array(list l, string s)
+static proc in_array(list l, string s)
 {
   int i;
   int n = size(l);
@@ -5297,14 +5297,14 @@ proc getParameterValue(list l, string s);
   }
   return(0);
 }
-  
+
 
 static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list options)
 {
 
   ASSUME(1, not isQuotientRing(basering) );
-  
-  
+
+
 
 // Internal procedure, used in normalM.
 // Computes the test ideal in the new ring.
@@ -5371,7 +5371,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list option
   } else {
     //"DEBUG - we do not compute the GB of radical output";
   }
- 
+
   if(dbg > 1)
   {
     "The radical in the generated ring is";
@@ -5449,7 +5449,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list option
 
   ideal J = imap(R, J);
   poly c = imap(R, c);
-  
+
   t = timer;
   for(i = 1; i<=ncols(J); i++)
   {
@@ -5474,7 +5474,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D, list option
 
   // --------------------------- prepare output ----------------------------
   // Groebner basis in the ring with only the original variables
-  
+
   t = timer;
   J = groebner(J);
   //"DEBUG - time for final GB computation:", timer - t;
@@ -7179,7 +7179,7 @@ normalConductor(I);
 //           A. Steenpass    steenpass@mathematik.uni-kl.de
 //           S. Steidel      steidel@mathematik.uni-kl.de
 // @*
-// 
+//
 // OVERVIEW:
 // Suppose A is an affine domain over a perfect field.@*
 // This library implements a modular strategy for finding the normalization of A.
@@ -7187,18 +7187,18 @@ normalConductor(I);
 // over finite fields and lift the results via Chinese remaindering and rational
 // reconstruction as described in [3]. This approach is inherently parallel.@*
 // The strategy is available both as a randomized and as a verified algorithm.
-// 
+//
 // REFERENCES:
-// 
+//
 // [1] Janko Boehm, Wolfram Decker, Santiago Laplagne, Gerhard Pfister, Stefan Steidel,
 // Andreas Steenpass: Parallel algorithms for normalization, preprint, 2011.
-// 
+//
 // [2] Gert-Martin Greuel, Santiago Laplagne, Frank Seelisch: Normalization of Rings,
 // Journal of Symbolic Computation 9 (2010), p. 887-901
-// 
+//
 // [3] Janko Boehm, Wolfram Decker, Claus Fieker, Gerhard Pfister:
 // The use of Bad Primes in Rational Reconstruction, preprint, 2012.
-// 
+//
 // KEYWORDS:
 // normalization; modular methods
 
@@ -7683,9 +7683,9 @@ static proc normalCheck(ideal U, ideal I,int printTimings)
 //           G. Pfister      pfister@mathematik.uni-kl.de
 //           S. Steidel      steidel@mathematik.uni-kl.de
 //           A. Steenpass    steenpass@mathematik.uni-kl.de
-// 
+//
 // OVERVIEW:
-// 
+//
 // Suppose A is an affine domain over a perfect field.@*
 // This library implements a local-to-global strategy for finding the normalization
 // of A. Following [1], the idea is to stratify the singular locus of A, apply the
@@ -7693,15 +7693,15 @@ static proc normalCheck(ideal U, ideal I,int printTimings)
 // results together. This approach is inherently parallel.@*
 // Furthermore we allow for the optional modular computation of the local results
 // as provided by modnormal.lib. See again [1] for details.
-// 
+//
 // REFERENCES:
-// 
+//
 // [1] Janko Boehm, Wolfram Decker, Santiago Laplagne, Gerhard Pfister, Stefan Steidel,
 // Andreas Steenpass: Parallel algorithms for normalization, http://arxiv.org/abs/1110.4299, 2011.
-// 
+//
 // [2] Gert-Martin Greuel, Santiago Laplagne, Frank Seelisch: Normalization of Rings,
 // Journal of Symbolic Computation 9 (2010), p. 887-901
-// 
+//
 // KEYWORDS:
 // normalization; modular methods
 
