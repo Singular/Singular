@@ -4012,7 +4012,7 @@ EXAMPLE: example zeroRad; shows an example"
 
    option(redSB);
    ASSUME(1, dim(I)==0);
-   ideal F=finduni(I);//F[i] generates I intersected with K[var(i)]
+   ideal F=finduni(I); //F[i] generates I intersected with K[var(i)]
 
    option(set,op);
    if(size(#)>0){I=#[1];}
@@ -6393,7 +6393,7 @@ EXAMPLE: example radical; shows an example
   intvec dp_w;
   for(j=nvars(P0);j>0;j--) {dp_w[j]=1;}
   Pl[3]=list(list("dp",dp_w),list("C",0));
-  def @P=ring(Pl);
+  def @P=ring(Pl); // Ring with same variables and DP ordering in all variables
   setring @P;
   ideal i=imap(P0,i);
 
@@ -6471,10 +6471,13 @@ EXAMPLE: example radical; shows an example
   ideal rad = 1;
   intvec op = option(get);
   list qr = simplifyIdeal(i);
-  map phi = @P, qr[2];
-
+  map phi = @P, qr[2];  // map from the same ring, to simplify the ideal
+  
+  
   option(redSB);
-  i = groebner(qr[1]);
+  i = groebner(qr[1]);  // We use the transformed variables, and we 
+                        // will use map phi to go back to the original
+                        // variables
   option(set, op);
   int di = dim(i);
 
@@ -6547,7 +6550,8 @@ EXAMPLE: example radical; shows an example
       dbprint(printlevel-voice, "il", il);
     }
   }
-  rad=interred(phi(rad));
+    
+  rad=interred(phi(rad));  // Eliminate redundant polynomials
   setring(P0);
   i=imap(@P,rad);
   return(i);
