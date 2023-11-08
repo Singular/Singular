@@ -14,7 +14,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 	homolog.lib hyperel.lib integralbasis.lib inout.lib intprog.lib \
 	jacobson.lib \
 	kskernel.lib latex.lib linalg.lib makedbm.lib \
-	matrix.lib moddiq.lib modnormal.lib modular.lib modstd.lib mondromy.lib monomialideal.lib \
+	matrix.lib moddiq.lib modular.lib modstd.lib mondromy.lib monomialideal.lib \
 	mprimdec.lib mregular.lib \
 	nfmodstd.lib nfmodsyz.lib noether.lib normal.lib normaliz.lib ntsolve.lib \
 	paraplanecurves.lib pfd.lib phindex.lib \
@@ -44,8 +44,9 @@ SLIB1 = arr.lib arnoldclassify.lib \
         gfan.lib gitfan.lib gradedModules.lib GND.lib graal.lib goettsche.lib \
 	hess.lib hdepth.lib hodge.lib\
 	JMBTest.lib JMSConst.lib \
-        locnormal.lib \
+	locnormal.lib \
 	methods.lib modules.lib multigrading.lib modwalk.lib\
+	modnormal.lib \
 	nets.lib ncfrac.lib ncloc.lib \
 	numerAlg.lib numerDecom.lib \
         olga.lib orbitparam.lib \

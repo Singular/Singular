@@ -28,6 +28,7 @@ New libraries:
 
 Changed libraries:
 @itemize
+@item @code{normal.lib}: optimized, integrated @code{locnorma.lib} and @code{modnormal.lib} (@nref{normal_lib})
 @item @code{normaliz.lib}: update to normaliz 3.10 (@nref{normaliz_lib})
 @item @code{hess.lib}: fixes (@nref{hess_lib})
 @item @code{sheafcoh.lib}: new routines @nref{sheafCohBGGregul}, @nref{sheafCohBGGregul_w}, @nref{sheafCoh_w}, (@nref{sheafcoh_lib})

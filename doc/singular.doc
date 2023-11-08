@@ -395,9 +395,7 @@ LIB "all.lib";
 * homolog_lib:: procedures for homological algebra
 * integralbasis_lib:: Integral basis in algebraic function fields
 * intprog_lib:: Integer Programming
-* locnormal_lib:: Normalization of affine domains using local methods
 * moddiq_lib:: ideal quotient and saturation using modular methods
-* modnormal_lib:: Normalization of affine domains using modular methods
 * modstd_lib:: Groebner basis of ideals via modular computations
 * modules_lib:: Representations of Modules
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
