@@ -472,17 +472,9 @@ LIB "all.lib";
 @subsection intprog_lib
 @c lib intprog.lib
 @c ----------------------------------------------------------
-@node locnormal_lib
-@subsection locnormal_lib
-@c lib locnormal.lib
-@c ----------------------------------------------------------
 @node moddiq_lib
 @subsection moddiq_lib
 @c lib moddiq.lib
-@c ---------------------------------------------------------
-@node modnormal_lib
-@subsection modnormal_lib
-@c lib modnormal.lib
 @c ---------------------------------------------------------
 @node modules_lib
 @subsection modules_lib
