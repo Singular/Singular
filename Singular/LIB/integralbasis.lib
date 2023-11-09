@@ -24,7 +24,6 @@ PROCEDURES:
 ";
 
 LIB "normal.lib";
-LIB "locnormal.lib";
 LIB "assprimeszerodim.lib";
 LIB "puiseuxexpansions.lib";
 LIB "classify.lib";  // For init_debug() and debug_log() procedures

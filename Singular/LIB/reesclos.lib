@@ -23,7 +23,7 @@ PROCEDURES:
  normalI(I[,p[,r]]);    computes the integral closure of an ideal I using R[It]
 ";
 
-LIB "locnormal.lib";       // for HomJJ
+LIB "normal.lib";       // for HomJJ
 LIB "standard.lib";     // for groebner
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "locnormal.lib";
+LIB "normal.lib";
 // plane curves
 
 ring r24 = 0,(x,y,z),dp;
