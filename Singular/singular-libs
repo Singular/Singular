@@ -70,4 +70,5 @@ PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
 SLIB2 = KVequiv.lib deflation.lib enumpoints.lib invar.lib lejeune.lib\
         ncHilb.lib ncrat.lib \
 	mathml.lib maxlike.lib recover.lib autgradalg.lib dummy.lib \
-	interval.lib lrcalc.lib nchilbert.lib sagbigrob.lib systhreads.lib VecField.lib
+	interval.lib lrcalc.lib nchilbert.lib sagbigrob.lib systhreads.lib VecField.lib \
+	stdmodule.lib
