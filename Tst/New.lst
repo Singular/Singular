@@ -50,6 +50,7 @@ New/ring_ring.tst
 New/ringlocal.tst
 New/rref.tst
 New/sat_cleardenom.tst
+New/stdmodule.tst
 New/short_print.tst
 New/sres_bug.tst
 New/stdZ.tst
