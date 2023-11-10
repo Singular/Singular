@@ -1,5 +1,4 @@
 /////// Procedure to compute Standard Bases for Modules Over Subalgebras //////
-
 category="Commutative Algebra";
 info="
 LIBRARY: stdmodule.lib  Compute Standard Bases of submodule of free module over polynomial subalgebra w.r.t Natural Grading.
@@ -12,6 +11,9 @@ PROCUDURES:
  SNF(f,G,A);        normalform of vector f wrt. G in subalgebra A.
  MSPOLY(G,A);       S-vectors of module G over subalgebra A.
  MSGB(G,A):         Standard basis of module G over subalgebra A.
+
+REFERENCE:
+N, Kanwal, N, Jabeen & J. A, Khan (2021) Standard bases for modules over polynomial subalgebras, Communications in Algebra, 49:1, 58-72, DOI: 10.1080/00927872.2020.1793160
 
 SEE ALSO: sagbi_lib
 ";
