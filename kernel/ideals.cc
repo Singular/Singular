@@ -2744,7 +2744,7 @@ ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
   int del=0;
   ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
   trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
-  idDeleteComps(res,red_comp,del);
+  //idDeleteComps(res,red_comp,del);
   omFree(red_comp);
   return res;
 }
