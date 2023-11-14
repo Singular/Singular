@@ -454,7 +454,7 @@ template<class mvtyp, class mvtypDouble, class mvtypDivisor>
                         //chioices are "relative" so no update is needed.
 
                         choices=parent.choices;
-                        int numberToDrop=(subconfigurationIndex!=0) ? numberToDrop=k+1 : 0;
+                        int numberToDrop=(subconfigurationIndex!=0) ? k+1 : 0;
 
                         choices[subconfigurationIndex-1].first-=numberToDrop;
                         choices[subconfigurationIndex-1].second-=numberToDrop;
