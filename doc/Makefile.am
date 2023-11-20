@@ -141,7 +141,6 @@ EXTRA_DIST += 					\
 	images/xy_up_gr.gif.uu			\
 	latex2html.init				\
 	lib2doc.texi				\
-	manual-titlepage.tex			\
 	memory/OMALLOC.texi			\
 	orbits.gp				\
 	orbitsG25.gp				\
