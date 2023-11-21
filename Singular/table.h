@@ -238,7 +238,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     LIST_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjPRINT),      PRINT_CMD,       STRING_CMD,     DEF_CMD       , ALLOW_NC |ALLOW_RING}
 ,{D(jjDUMMY),      PROC_CMD,        PROC_CMD,       PROC_CMD       , ALLOW_NC |ALLOW_RING}
-,{D(jjPRUNE),      PRUNE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjPRUNE),      PRUNE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{D(kQHWeight),    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(kQHWeight),    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRANK1),      RANK_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_NC |NO_RING}

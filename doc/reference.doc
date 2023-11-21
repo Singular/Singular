@@ -6076,6 +6076,7 @@ If for the input module the attribute @code{"isHomog"} is
 set, @code{prune} also sets the attribute @code{"isHomog"}.@*
 For non-global orderings, only reduction steps with constant units are
 performed. Hence, the returned module does not need to be minimal.
+@item @strong{Note:} The coefficiensts must be a field.
 @item @strong{Example:}
 @smallexample
 @c example
