@@ -2738,8 +2738,19 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   return res;
 }
 
-extern void ipPrint_MA0(matrix m, const char *name);
 ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
+{
+  int *red_comp=(int*)omAlloc((arg->rank+1)*sizeof(int));
+  int del=0;
+  ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
+  trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
+  //idDeleteComps(res,red_comp,del);
+  omFree(red_comp);
+  return res;
+}
+
+extern void ipPrint_MA0(matrix m, const char *name);
+ideal idMinEmbedding_with_map0(ideal arg,intvec **w, ideal &trans)
 {
   ideal a=idCopy(arg);
   // add unit matrix to a
@@ -2754,7 +2765,7 @@ ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
     a->m[i]=p_Add_q(a->m[i],p,currRing);
   }
   // search a unit in orig part of a
-  // and substract, start at start
+  // and subtract, start at start
   int start=0;
   loop
   {
