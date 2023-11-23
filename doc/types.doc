@@ -543,7 +543,7 @@ a type cast to bigintvec (@pxref{bigintvec type cast})
 @smallexample
 @c example
   bigintmat m1[2][2]=1, 2, 6, 3;
-  bigintvev v=m1[1,1..2];
+  bigintvec v=m1[1,1..2];
   v;
 @c example
 @end smallexample

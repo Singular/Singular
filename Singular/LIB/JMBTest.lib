@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-version="version JMBTest.lib 4.2.0.2 dec_2021 "; // $Id$
+version="version JMBTest.lib 4.4.0.0 Nov_2023 "; // $Id$
 category="Algebraic Geometry";
 // summary description of the library
 info="
@@ -23,7 +23,7 @@ explained in [CR];@*
 -if it exist an Eliahou-Kervaire polynomial such that its reduction
 mod Vm is different from zero, the given one is not a J-Marked basis.
 
-The algorithm terminates only if the ordering is rp.
+The algorithm terminates only if the ordering is ip.
 Anyway, the number of reduction steps is bounded.
 
 REFERENCES:
@@ -71,7 +71,7 @@ return(T);
 }
 example
 { "EXAMPLE:"; echo = 2;
-ring r=0, (x,y,z), rp;
+ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -147,7 +147,7 @@ jmp p;
 return (V);}
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -180,7 +180,7 @@ return(min);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 ideal I=y,x,z;
 Minimus(I);
 }
@@ -202,7 +202,7 @@ return(max);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 ideal I=y,x,z;
 Maximus(I);
 }
@@ -245,7 +245,7 @@ EXAMPLE:  example GJmpMins; shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp p1;
 p1.h=poly(1);
 p1.t=poly(1);
@@ -291,7 +291,7 @@ else
   {
     if(A[1]>B[1])
       {
-//the ordering MUST be rp
+//the ordering MUST be ip
         //print("Maggiore per Lex");
         d=1;
       }
@@ -300,7 +300,7 @@ return(d);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -344,7 +344,7 @@ return(R);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -386,7 +386,7 @@ return(R);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -414,7 +414,7 @@ EXAMPLE:  example StartOrderingV; shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -446,7 +446,7 @@ K.t=L[1]*g.t;
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
  list P=x^2,1,1;
 jmp r1;
 r1.h=z^3;
@@ -491,7 +491,7 @@ return(I);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z,t), rp;
+ ring r=0, (x,y,z,t), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -632,7 +632,7 @@ EXAMPLE:  example NewWeight; shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
  jmp r1;
  r1.h=z^3;
  r1.t=poly(0);
@@ -675,7 +675,7 @@ return(R);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -729,7 +729,7 @@ return (L);
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp A;
 A.h=y*z^2;
 A.t=poly(0);
@@ -785,7 +785,7 @@ return(EK, D);
 }
 example
 { "EXAMPLE:"; echo = 2;
-  ring r=0, (x,y,z), rp;
+  ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -815,7 +815,7 @@ return(var(EK[1])*(u.h+u.t)-EK[2]*(q.h+q.t));
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -958,7 +958,7 @@ EXAMPLE:  example TestJMark; shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring r=0, (x,y,z), rp;
+ ring r=0, (x,y,z), ip;
  jmp r1;
  r1.h=z^3;
  r1.t=poly(0);
