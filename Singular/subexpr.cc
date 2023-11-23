@@ -107,6 +107,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case CMATRIX_CMD: // like BIGINTMAT
 #endif
+	case BIGINTVEC_CMD:
         case BIGINTMAT_CMD:
           ((bigintmat *)d)->pprint(colmax);
           break;
@@ -445,6 +446,7 @@ static inline void * s_internalCopy(const int t,  void *d)
     case CMATRIX_CMD: // like BIGINTMAT
 #endif
     case BIGINTMAT_CMD:
+    case BIGINTVEC_CMD:
       return (void*)bimCopy((bigintmat *)d);
     case BUCKET_CMD:
       return (void*)sBucketCopy((sBucket_pt)d);
@@ -545,6 +547,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case CMATRIX_CMD: //like BIGINTMAT
 #endif
     case BIGINTMAT_CMD:
+    case BIGINTVEC_CMD:
     {
       bigintmat *v=(bigintmat*)d;
       delete v;
@@ -947,6 +950,20 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           else
             return omStrDup(s);
         }
+        case BIGINTVEC_CMD:
+        {
+          bigintmat *bim=(bigintmat*)d;
+          s = bim->String();
+          if (typed)
+          {
+            size_t len=strlen(s) + 40;
+            char* ns = (char*) omAlloc(len);
+            snprintf(ns,len, "bigintvec(%s)", s);
+            return ns;
+          }
+          else
+            return omStrDup(s);
+        }
 
         case RING_CMD:
           s  = rString((ring)d);
@@ -1085,6 +1102,7 @@ int  sleftv::Typ()
     case INTMAT_CMD:
       r=INT_CMD;
       break;
+    case BIGINTVEC_CMD:
     case BIGINTMAT_CMD:
       r=BIGINT_CMD;
       break;
@@ -1268,6 +1286,19 @@ void * sleftv::Data()
       }
       else
         r=(char *)(long)(IMATELEM((*iv),index,e->next->start));
+      break;
+    }
+    case BIGINTVEC_CMD:
+    {
+      bigintmat *m=(bigintmat *)d;
+      if ((index<1)
+         ||(index>m->cols()))
+      {
+        if (!errorreported)
+          Werror("wrong range[%d] in bigintvec %s(%d)",index,this->Name(),m->cols());
+      }
+      else
+        r=(char *)(BIMATELEM((*m),1,index));
       break;
     }
     case BIGINTMAT_CMD:

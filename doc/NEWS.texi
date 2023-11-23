@@ -24,6 +24,8 @@
 New libraries:
 @itemize
 @item @code{sagbiNormaliz.lib}: computation of Sagbi bases via normaliz (@nref{sagbiNormaliz_lib})
+@item @code{stdmodule.lib}: Compute Standard Bases of submodule of free module
+over polynomial subalgebra (@nref{stdmodule_lib})
 @end itemize
 
 Changed libraries:
@@ -37,6 +39,27 @@ Changed libraries:
 @item @code{primdec.lib}: fixed a bug in absolute primary decomposition (@nref{primdec_lib})
 @end itemize
 
+New type:
+@itemize
+@item @code{bigintvec}: @nref{bigintvec}
+@end itemize
+
+New commands:
+@itemize
+@item new command @nref{prune_map}
+@item new command @nref{mres_map}
+@end itemize
+
+New/renamed monomial orderings:
+
+To avoid confusion (with the degree reverse lexicographic ordering)
+the orderings @code{rp} and @code{rs} are renamed:
+@itemize
+@item renamed orderings: @code{rp} -> @code{ip},
+@code{rs} -> @code{is}
+@item new ordering @code{Ip}
+@end itemize
+
 Changes in the kernel/build system:
 @itemize
 @item new algorithm for @nref{std} in the case of ordering @code{ds}
@@ -45,6 +68,10 @@ Changes in the kernel/build system:
 @item mstd for local rings (@nref{mstd})
 @item use the new Hilbert function algorithm for @nref{hilb}. (Different output format)
 @item overflow in @code{hilb} is an error (on request of a single user)
+@item renamed orderings: @code{ringorder_rp} -> @code{ringorder_ip},
+@code{ringorder_rs} -> @code{ringorder_is}
+@item new ordering @code{ringorder_Ip}
+@item changes for FLINT 3.0.x
 @end itemize
 
 @heading News for version 4-3-2

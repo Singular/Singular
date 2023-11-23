@@ -575,7 +575,7 @@ lead(gJ);
 reduce (J,gJ ) ;
 kill rng;
 
-ring rng = (integer),(x(1),x(2),x(3)),(rs(2),rs(1),C);
+ring rng = (integer),(x(1),x(2),x(3)),(is(2),is(1),C);
 ideal I = 2*x(3)+15*x(3)^3+x(1),-15+13*x(3)+6*x(1);
 ideal gI =  std(I);
 lead(gI);

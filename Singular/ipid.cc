@@ -151,6 +151,8 @@ void *idrecDataInit(int t)
 #endif
     case BIGINTMAT_CMD:
       return (void *)new bigintmat();
+    case BIGINTVEC_CMD:
+      return (void *)new bigintmat(1,0,coeffs_BIGINT);
     case BUCKET_CMD:
       if (currRing!=NULL)
       return (void*)sBucketCreate(currRing);

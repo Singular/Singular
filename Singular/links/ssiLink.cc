@@ -49,7 +49,7 @@
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
 
-#define SSI_VERSION 14
+#define SSI_VERSION 15
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
@@ -59,6 +59,7 @@
 // 11->12: add rank to ideal/module, add smatrix
 // 12->13: NC rings
 // 13->14: ring references
+// 14->15: bigintvec, prune_map, mres_map
 
 VAR link_list ssiToBeClosed=NULL;
 VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
@@ -473,6 +474,16 @@ static void ssiWriteBigintmat(const ssiInfo *d,bigintmat * v)
   }
 }
 
+static void ssiWriteBigintvec(const ssiInfo *d,bigintmat * v)
+{
+  fprintf(d->f_write,"%d ",v->cols());
+  int i;
+  for(i=0;i<v->length();i++)
+  {
+    ssiWriteBigInt(d,(*v)[i]);
+  }
+}
+
 static char *ssiReadString(const ssiInfo *d)
 {
   char *buf;
@@ -875,6 +886,17 @@ static bigintmat* ssiReadBigintmat(const ssiInfo *d)
   c=s_readint(d->f_read);
   bigintmat *v=new bigintmat(r,c,coeffs_BIGINT);
   for(int i=0;i<r*c;i++)
+  {
+    (*v)[i]=ssiReadBigInt(d);
+  }
+  return v;
+}
+static bigintmat* ssiReadBigintvec(const ssiInfo *d)
+{
+  int c;
+  c=s_readint(d->f_read);
+  bigintmat *v=new bigintmat(1,c,coeffs_BIGINT);
+  for(int i=0;i<c;i++)
   {
     (*v)[i]=ssiReadBigInt(d);
   }
@@ -1593,6 +1615,9 @@ leftv ssiRead1(si_link l)
     case 23: ssiReadRingProperties(l);
              return ssiRead1(l);
              break;
+    case 24: res->rtyp=BIGINTVEC_CMD;
+             res->data=ssiReadBigintvec(d);
+             break;
     // ------------
     case 98: // version
              {
@@ -1786,6 +1811,10 @@ BOOLEAN ssiWrite(si_link l, leftv data)
           case BIGINTMAT_CMD:
                    fputs("19 ",d->f_write);
                    ssiWriteBigintmat(d,(bigintmat *)dd);
+                   break;
+          case BIGINTVEC_CMD:
+                   fputs("24 ",d->f_write);
+                   ssiWriteBigintvec(d,(bigintmat *)dd);
                    break;
           default:
             if (tt>MAX_TOK)
@@ -2403,6 +2432,7 @@ BOOLEAN ssiGetDump(si_link l)
 // 23 0 <log(bitmask)> ring properties: max.exp.
 // 23 1 <log(bitmask)> <r->IsLPRing> ring properties:LPRing
 // 23 2 <matrix C> <matrix D> ring properties: PLuralRing
+// 24 bigintvec <c>
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular

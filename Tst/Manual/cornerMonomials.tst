@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 LIB "pointid.lib";
-ring R = 0,x(1..3),rp;
+ring R = 0,x(1..3),ip;
 poly n1 = 1;
 poly n2 = x(1);
 poly n3 = x(2);

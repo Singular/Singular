@@ -6,7 +6,7 @@ LIB"JMBTest.lib";
 
 //Example 1
 
-ring r=0, (x,y,z),rp;
+ring r=0, (x,y,z),ip;
 jmp r1;
 r1.h=z^5;
 r1.t=poly(0);
@@ -54,7 +54,7 @@ TestJMark(G1V,r);
 
 
 //Example 2
-ring r=0, (x,y,z),rp;
+ring r=0, (x,y,z),ip;
 jmp r1;
 r1.h=z^3;
 r1.t=poly(0);
@@ -76,7 +76,7 @@ TestJMark(G2F,r);
 
 
 //Example 3
-ring r=0, (x(0..3)), rp;
+ring r=0, (x(0..3)), ip;
 jmp r1;
 r1.h=x(3)^2;
 r1.t=-4*x(0)*x(2)+x(1)^2;
@@ -104,7 +104,7 @@ TestJMark(G3F,r);
 
 
 //Example 4
-ring r=31991, (x(0..3)), rp;
+ring r=31991, (x(0..3)), ip;
 jmp r1;
 r1.h=x(3)^2;
 r1.t=11415*x(1)*x(2) + 12545*x(0)*x(2) + 5551*x(1)^2 + 2052*x(0)*x(1) - 5996*x(0)^2;
@@ -140,7 +140,7 @@ TestJMark(G4V,r);
 
 
 //Example 5
-ring r=0, (x,y,z),rp;
+ring r=0, (x,y,z),ip;
 jmp r1;
 r1.h=xy;
 r1.t=poly(0);
@@ -164,7 +164,7 @@ TestJMark(G5V,r);
 
 
 //Example 6
-ring r=0, (x,y,z),rp;
+ring r=0, (x,y,z),ip;
 jmp r1;
 r1.h=xy;
 r1.t=poly(0);
@@ -189,7 +189,7 @@ TestJMark(G6F,r);
 
 
 //Example 7
-ring r=0, (z,y,x),rp;
+ring r=0, (z,y,x),ip;
 jmp r1;
 r1.h=x^4;
 r1.t=poly(0);
@@ -223,7 +223,7 @@ TestJMark(G7V,r);
 
 
 //Example 8
-ring r=0, (z,y,x),rp;
+ring r=0, (z,y,x),ip;
 jmp r1;
 r1.h=x^4;
 r1.t=poly(0);
@@ -257,7 +257,7 @@ TestJMark(G8F,r);
 
 
 //Example 9
-ring r=0, (x,y,z),rp;
+ring r=0, (x,y,z),ip;
 jmp r1;
 r1.h=z;
 r1.t=poly(0);
@@ -276,7 +276,7 @@ TestJMark(G9V,r);
 
 
 //Example 10
-ring r=0, (x,y,z), rp;
+ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z;
 r1.t=poly(0);
@@ -295,7 +295,7 @@ TestJMark(G10F,r);
 
 
 //Example 11
-ring r=0, (x,y,z), rp;
+ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z;
 r1.t=poly(0);
@@ -313,7 +313,7 @@ TestJMark(G11V,r);
 
 
 //Example 12
-ring r=0, (x,y,z), rp;
+ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z;
 r1.t=poly(0);
@@ -329,7 +329,7 @@ TestJMark(G12V,r);
 //=>1
 
 //Example 13
-ring r=0, (x,y,z), rp;
+ring r=0, (x,y,z), ip;
 jmp r1;
 r1.h=z;
 r1.t=x+y;
@@ -346,7 +346,7 @@ TestJMark(G13F,r);
 //0
 
 //Example 14
-ring r=0, (x,y,z),rp;
+ring r=0, (x,y,z),ip;
 jmp r1;
 r1.h=yz;
 r1.t=y^2;
@@ -376,7 +376,7 @@ TestJMark(G14V,r);
 
 
 //Example 15
-ring r=0, (x,y,z),rp;
+ring r=0, (x,y,z),ip;
 jmp r1;
 r1.h=yz;
 r1.t=y^2;

@@ -680,17 +680,19 @@ static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
       return TRUE;
     }
     bigintmat *iv=(bigintmat *)res->data;
-    if (e->next==NULL)
+    if ((e->next==NULL)&&(res->rtyp==BIGINTMAT_CMD))
     {
       WerrorS("only one index given");
       return TRUE;
     }
     else
     {
-      int c=e->next->start;
+      int c;
+      if (res->rtyp==BIGINTMAT_CMD) c=e->next->start;
+      else { c=i+1; i=0;}
       if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
       {
-        Werror("wrong range [%d,%d] in bigintmat %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
+        Werror("wrong range [%d,%d] in bigintmat/bigintvec %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
         return TRUE;
       }
       else
@@ -904,10 +906,40 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr)
   }
 #endif
 }
+static BOOLEAN jiA_INTVEC_BI(leftv res, leftv a, Subexpr)
+{
+  //Warn("bigintvec -> intvec in >>%s<<",my_yylinebuf);
+  if (res->data!=NULL) delete ((intvec *)res->data);
+  bigintmat *b=(bigintmat*)a->Data();
+  intvec *iv=new intvec(1,b->cols());
+  for(int i=0;i<b->cols();i++)
+  {
+    (*iv)[i]=n_Int(BIMATELEM(*b,1,i+1),coeffs_BIGINT);
+  }
+   res->data=(void *)iv;
+  jiAssignAttr(res,a);
+  return FALSE;
+}
 static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) delete ((bigintmat *)res->data);
-  res->data=(void *)a->CopyD(BIGINTMAT_CMD);
+  res->data=(void *)a->CopyD();
+  jiAssignAttr(res,a);
+  return FALSE;
+}
+static BOOLEAN jiA_BIGINTVEC_IV(leftv res, leftv a, Subexpr)
+{
+  if (res->data!=NULL) delete ((bigintmat *)res->data);
+  intvec *aa=(intvec*)a->Data();
+  int l=aa->rows();
+  bigintmat* bim=new bigintmat(1,l,coeffs_BIGINT);
+  for(int i=0;i<l;i++)
+  {
+    number tp = n_Init((*aa)[i], coeffs_BIGINT);
+    n_Delete(&BIMATELEM((*bim),1,i+1), coeffs_BIGINT);
+    BIMATELEM((*bim),1,i+1)=tp;
+  }
+  res->data=(void*)bim;
   jiAssignAttr(res,a);
   return FALSE;
 }
@@ -1719,6 +1751,45 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
   IDBIMAT((idhdl)l->data)=bim;
   return FALSE;
 }
+static BOOLEAN jjA_L_BIGINTVEC(leftv l,leftv r,bigintmat *bim)
+{
+  /* left side is bigintvec, right side is list (of int,intvec,intmat)*/
+  leftv hh=r;
+  int i = 0;
+  delete bim;
+  bim=new bigintmat(1,exprlist_length(r),coeffs_BIGINT);
+  while (hh!=NULL)
+  {
+    if (i>=bim->cols())
+    {
+      if (traceit&TRACE_ASSIGN)
+      {
+        Warn("expression list length(%d) does not match bigintvec size(%d)",
+              exprlist_length(hh),bim->cols());
+      }
+      break;
+    }
+    if (hh->Typ() == INT_CMD)
+    {
+      number tp = n_Init((int)((long)(hh->Data())), coeffs_BIGINT);
+      bim->set(i++, tp);
+      n_Delete(&tp, coeffs_BIGINT);
+    }
+    else if (hh->Typ() == BIGINT_CMD)
+    {
+      bim->set(i++, (number)(hh->Data()));
+    }
+    else
+    {
+      delete bim;
+      return TRUE;
+    }
+    hh = hh->next;
+  }
+  if (IDBIMAT((idhdl)l->data)!=NULL) delete IDBIMAT((idhdl)l->data);
+  IDBIMAT((idhdl)l->data)=bim;
+  return bim==NULL;
+}
 static BOOLEAN jjA_L_STRING(leftv l,leftv r)
 {
   /* left side is string, right side is list of string*/
@@ -2058,6 +2129,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       /* a = ... */
       if ((lt!=MATRIX_CMD)
       &&(lt!=BIGINTMAT_CMD)
+      &&(lt!=BIGINTVEC_CMD)
       &&(lt!=CMATRIX_CMD)
       &&(lt!=INTMAT_CMD)
       &&((lt==rt)||(lt!=LIST_CMD)))
@@ -2079,6 +2151,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       if (((lt!=LIST_CMD)
         &&((rt==MATRIX_CMD)
           ||(rt==BIGINTMAT_CMD)
+          ||(rt==BIGINTVEC_CMD)
           ||(rt==CMATRIX_CMD)
           ||(rt==INTMAT_CMD)
           ||(rt==INTVEC_CMD)
@@ -2142,6 +2215,11 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
     case INTMAT_CMD:
     {
       b=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
+      break;
+    }
+    case BIGINTVEC_CMD:
+    {
+      b=jjA_L_BIGINTVEC(l, r, new bigintmat(IDBIMAT((idhdl)l->data)));
       break;
     }
     case BIGINTMAT_CMD:

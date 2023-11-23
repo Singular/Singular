@@ -60,6 +60,7 @@
 // operation: size (intvec)  ->  int
 // operation: size (intmat)  ->  int
 // operation: size (bigintmat)  ->  int
+// operation: size (bigintvec)  ->  int
 // operation: size (list)  ->  int
 // operation: size (ring)  ->  int
 // operation: cring (ring)  ->  cring
@@ -267,10 +268,15 @@
 // operation: + (smatrix, smatrix)  ->  smatrix
 // operation: + (string, string)  ->  string
 // operation: + (bigintmat, bigintmat)  ->  bigintmat
+// operation: + (bigintvec, bigintvec)  ->  bigintvec
 // operation: + (bigintmat, int)  ->  bigintmat
 // operation: + (int, bigintmat)  ->  bigintmat
 // operation: + (bigintmat, bigint)  ->  bigintmat
 // operation: + (bigint, bigintmat)  ->  bigintmat
+// operation: + (bigintvec, int)  ->  bigintvec
+// operation: + (int, bigintvec)  ->  bigintvec
+// operation: + (bigintvec, bigint)  ->  bigintvec
+// operation: + (bigint, bigintvec)  ->  bigintvec
 // operation: + (intvec, int)  ->  intvec
 // operation: + (int, intvec)  ->  intvec
 // operation: + (intmat, int)  ->  intmat
@@ -296,6 +302,11 @@
 // operation: - (int, bigintmat)  ->  bigintmat
 // operation: - (bigintmat, bigint)  ->  bigintmat
 // operation: - (bigint, bigintmat)  ->  bigintmat
+// operation: - (bigintvec, bigintvec)  ->  bigintvec
+// operation: - (bigintvec, int)  ->  bigintvec
+// operation: - (int, bigintvec)  ->  bigintvec
+// operation: - (bigintvec, bigint)  ->  bigintvec
+// operation: - (bigint, bigintvec)  ->  bigintvec
 // operation: - (intvec, int)  ->  intvec
 // operation: - (intmat, int)  ->  intmat
 // operation: - (intvec, intvec)  ->  intvec
@@ -334,6 +345,10 @@
 // operation: * (int, bigintmat)  ->  bigintmat
 // operation: * (bigintmat, bigint)  ->  bigintmat
 // operation: * (bigint, bigintmat)  ->  bigintmat
+// operation: * (bigintvec, int)  ->  bigintvec
+// operation: * (int, bigintvec)  ->  bigintvec
+// operation: * (bigintvec, bigint)  ->  bigintvec
+// operation: * (bigint, bigintvec)  ->  bigintvec
 // operation: * (intvec, int)  ->  intvec
 // operation: * (int, intvec)  ->  intvec
 // operation: * (intmat, int)  ->  intmat
@@ -419,6 +434,7 @@
 // operation: == (intvec, intvec)  ->  int
 // operation: == (intmat, intmat)  ->  int
 // operation: == (bigintmat, bigintmat)  ->  int
+// operation: == (bigintvec, bigintvec)  ->  int
 // operation: == (cring, cring)  ->  int
 // operation: == (matrix, matrix)  ->  int
 // operation: == (smatrix, smatrix)  ->  int
@@ -437,6 +453,8 @@
 // operation: <> (intmat, intmat)  ->  int
 // operation: <> (matrix, matrix)  ->  int
 // operation: <> (smatrix, smatrix)  ->  int
+// operation: <> (bigintmat, bigintmat)  ->  int
+// operation: <> (bigintvec, bigintvec)  ->  int
 // operation: <> (cring, cring)  ->  int
 // DUMMY // operation: <> (ideal, ideal)  ->  $INVALID$
 // DUMMY // operation: <> (module, module)  ->  $INVALID$
@@ -446,6 +464,8 @@
 // operation: .. (int, int)  ->  intvec
 // operation: [ (intvec, int)  ->  int
 // operation: [ (intvec, intvec)  ->  int
+// operation: [ (bigintvec, int)  ->  bigint
+// operation: [ (bigintvec, intvec)  ->  bigint
 // operation: [ (ideal, int)  ->  poly
 // operation: [ (map, int)  ->  poly
 // operation: [ (ideal, intvec)  ->  poly
@@ -535,8 +555,8 @@
 // operation: gcd (number, number)  ->  number
 // operation: gcd (bigint, bigint)  ->  bigint
 // operation: gcd (poly, poly)  ->  poly, only commutative rings
-// operation: hilb (ideal, int)  ->  intvec, domain coeffs
-// operation: hilb (module, int)  ->  intvec, domain coeffs
+// operation: hilb (ideal, int)  ->  bigintvec, domain coeffs
+// operation: hilb (module, int)  ->  bigintvec, domain coeffs
 // operation: homog (ideal, intvec)  ->  int
 // operation: homog (module, intvec)  ->  int
 // operation: homog (poly, poly)  ->  poly
@@ -590,6 +610,7 @@
 // operation: oppose (ring, def)  ->  any_type, field coeffs
 // operation: parstr (ring, int)  ->  string
 // operation: print (def, string)  ->  string
+// operation: prune_map (module, smatrix)  ->  module
 // operation: quotient (ideal, ideal)  ->  ideal
 // operation: quotient (module, ideal)  ->  module
 // operation: quotient (module, module)  ->  ideal
@@ -666,6 +687,8 @@
 // operation: frwalk (ring, def, int)  ->  ideal requires currRing, only commutative rings
 // operation: hilb (ideal, int, intvec)  ->  intvec, domain coeffs
 // operation: hilb (module, int, intvec)  ->  intvec, domain coeffs
+// operation: hilb (ideal, ring, string)  ->  nothing, domain coeffs
+// operation: hilb (module, ring, string)  ->  nothing, domain coeffs
 // operation: homog (poly, poly, intvec)  ->  poly
 // operation: homog (vector, poly, intvec)  ->  vector
 // operation: homog (ideal, poly, intvec)  ->  ideal
@@ -700,6 +723,8 @@
 // operation: modulo (ideal, ideal, string)  ->  module
 // operation: modulo (module, module, matrix)  ->  module
 // operation: modulo (module, module, string)  ->  module
+// operation: mres_map (ideal, int, smatrix)  ->  resolution, field coeffs
+// operation: mres_map (module, int, smatrix)  ->  resolution, field coeffs
 // operation: smatrix (module, int, int)  ->  smatrix
 // operation: smatrix (smatrix, int, int)  ->  smatrix
 // operation: newstruct (string, string, string)  ->  nothing
@@ -747,6 +772,9 @@
 // operation: fetch (...)  ->  any_type ( 2 arguments )
 // operation: fetch (...)  ->  any_type ( 3 arguments )
 // operation: fetch (...)  ->  any_type ( 4 arguments )
+// operation: hilb (...)  ->  any_type ( 1 arguments )
+// operation: hilb (...)  ->  any_type ( 2 arguments )
+// operation: hilb (...)  ->  any_type ( 3 arguments )
 // operation: ideal (...)  ->  ideal ( 1 arguments )
 // operation: ideal (...)  ->  ideal ( any number of arguments )
 // operation: intersect (...)  ->  ideal ( 2 arguments )
@@ -805,6 +833,8 @@
 // operation: factmodd (...)  ->  list ( number of arguments >0 )
 /*---------------------------------------------*/
 // assign: bigint =  bigint
+// assign: bigintvec =  bigintvec
+// assign: bigintvec =  intvec
 // assign: bigintmat =  bigintmat
 // assign: cring =  cring
 // assign: ideal =  ideal
@@ -813,6 +843,7 @@
 // assign: int =  int
 // assign: int =  intmat
 // assign: intvec =  intvec
+// assign: intvec =  bigintvec
 // assign: intmat =  intmat
 // assign: link =  string
 // assign: link =  link
@@ -839,6 +870,7 @@
 // assign: vector =  vector
 // assign: def =  def
 /*---------------------------------------------*/
+// convert bigintvec -> bigintmat
 // convert intmat -> bigintmat
 // convert intvec -> intmat
 // convert polyBucket -> ideal
@@ -901,470 +933,474 @@
 // token 265 : ++
 // token 266 : ::
 // token 269 : bigintmat
-// token 270 : intmat
-// token 271 : proc
-// token 272 : ring
-// token 274 : polyBucket
-// token 275 : ideal
-// token 276 : map
-// token 277 : matrix
-// token 278 : module
-// token 279 : number
-// token 280 : poly
-// token 281 : resolution
-// token 282 : smatrix
-// token 283 : vector
-// token 284 : betti
-// token 285 : gen
-// token 286 : fetch
-// token 287 : freemodule
-// token 288 : keepring
-// token 289 : imap
-// token 290 : koszul
-// token 291 : maxideal
-// token 292 : monomial
-// token 293 : par
-// token 294 : preimage
-// token 295 : var
-// token 297 : degBound
-// token 298 : multBound
-// token 299 : noether
-// token 300 : minpoly
-// token 301 : nothing
-// token 314 : example
-// token 315 : export
-// token 317 : kill
-// token 318 : LIB
-// token 319 : listvar
-// token 320 : setring
-// token 321 : type
-// token 328 : apply
-// token 329 : ASSUME
-// token 330 : break
-// token 331 : continue
-// token 332 : else
-// token 333 : eval
-// token 334 : quote
-// token 336 : forif
-// token 339 : return
-// token 340 : parameter
-// token 344 : command
-// token 345 : any_type
-// token 346 : identifier
-// token 357 : alias
-// token 358 : align
-// token 359 : attrib
-// token 360 : bareiss
-// token 361 : bigint
-// token 362 : branchTo
-// token 363 : bracket
-// token 364 : breakpoint
-// token 365 : char
-// token 366 : charstr
-// token 367 : char_series
-// token 368 : chinrem
-// token 372 : close
-// token 373 : coeffs
-// token 374 : coef
-// token 375 : ncols
-// token 376 : cleardenom
-// token 377 : contract
-// token 378 : size
-// token 379 : cring
-// token 380 : dbprint
-// token 381 : def
-// token 382 : defined
-// token 383 : deg
-// token 384 : degree
-// token 385 : delete
-// token 386 : denominator
-// token 387 : det
-// token 388 : diff
-// token 389 : dim
-// token 390 : division
-// token 391 : dump
-// token 392 : eliminate
-// token 393 : RETURN
-// token 394 : envelope
-// token 395 : ERROR
-// token 396 : execute
-// token 397 : exportto
-// token 398 : extgcd
-// token 399 : factorize
-// token 400 : farey
-// token 401 : find
-// token 402 : facstd
-// token 403 : factmodd
-// token 404 : fres
-// token 405 : frwalk
-// token 406 : fglm
-// token 407 : fglmquot
-// token 408 : finduni
-// token 409 : gcd
-// token 410 : getdump
-// token 411 : highcorner
-// token 412 : hilb
-// token 413 : homog
-// token 414 : hres
-// token 415 : impart
-// token 416 : importfrom
-// token 417 : indepSet
-// token 418 : insert
-// token 419 : int
-// token 420 : div
-// token 421 : interpolation
-// token 422 : interred
-// token 423 : intersect
-// token 424 : intvec
-// token 425 : rvar
-// token 426 : jacob
-// token 427 : janet
-// token 428 : jet
-// token 429 : kbase
-// token 430 : kernel
-// token 431 : killattrib
-// token 432 : kres
-// token 433 : laguerre
-// token 434 : lead
-// token 435 : leadcoef
-// token 436 : leadexp
-// token 437 : leadmonom
-// token 438 : liftstd
-// token 439 : lift
-// token 440 : link
-// token 441 : list
-// token 442 : load
-// token 443 : lres
-// token 444 : ludecomp
-// token 445 : luinverse
-// token 446 : lusolve
-// token 447 : memory
-// token 448 : minbase
-// token 449 : minor
-// token 450 : minres
-// token 451 : modulo
-// token 452 : monitor
-// token 453 : mpresmat
-// token 454 : mres
-// token 455 : mstd
-// token 456 : mult
-// token 457 : nameof
-// token 458 : names
-// token 459 : newstruct
-// token 460 : ncalgebra
-// token 461 : nc_algebra
-// token 462 : convhull
-// token 463 : npars
-// token 464 : numerator
-// token 465 : nvars
-// token 466 : ord
-// token 467 : open
-// token 468 : oppose
-// token 469 : opposite
-// token 470 : option
-// token 471 : ordstr
-// token 472 : package
-// token 473 : pardeg
-// token 475 : parstr
-// token 476 : primefactors
-// token 477 : prime
-// token 478 : print
-// token 479 : prune
-// token 480 : qhweight
-// token 481 : qring
-// token 482 : qrds
-// token 483 : quotient
-// token 484 : random
-// token 485 : rank
-// token 486 : read
-// token 487 : reduce
-// token 488 : regularity
-// token 489 : repart
-// token 490 : nres
-// token 491 : reservedName
-// token 492 : reservedNameList
-// token 493 : restart
-// token 494 : resultant
-// token 495 : rightstd
-// token 496 : ringlist
-// token 497 : ring_list
-// token 498 : nrows
-// token 499 : sba
-// token 500 : simplex
-// token 501 : simplify
-// token 502 : slimgb
-// token 503 : sortvec
-// token 504 : sqrfree
-// token 505 : sres
-// token 506 : status
-// token 507 : std
-// token 508 : string
-// token 509 : subst
-// token 510 : system
-// token 511 : syz
-// token 512 : tensor
-// token 513 : test
-// token 514 : transpose
-// token 515 : trace
-// token 516 : twostd
-// token 517 : typeof
-// token 518 : univariate
-// token 520 : uressolve
-// token 521 : vandermonde
-// token 522 : variables
-// token 523 : varstr
-// token 524 : vdim
-// token 525 : waitfirst
-// token 526 : waitall
-// token 527 : wedge
-// token 528 : weight
-// token 529 : write
-// token 530 : echo
-// token 531 : pagewidth
-// token 532 : timer
-// token 533 : rtimer
-// token 534 : TRACE
-// token 535 : voice
-// token 536 : short
-// token 537 : printlevel
-/*--max. token: 538, gr: 342 --*/
+// token 270 : bigintvec
+// token 271 : intmat
+// token 272 : proc
+// token 273 : ring
+// token 275 : polyBucket
+// token 276 : ideal
+// token 277 : map
+// token 278 : matrix
+// token 279 : module
+// token 280 : number
+// token 281 : poly
+// token 282 : resolution
+// token 283 : smatrix
+// token 284 : vector
+// token 285 : betti
+// token 286 : gen
+// token 287 : fetch
+// token 288 : freemodule
+// token 289 : keepring
+// token 290 : imap
+// token 291 : koszul
+// token 292 : maxideal
+// token 293 : monomial
+// token 294 : par
+// token 295 : preimage
+// token 296 : var
+// token 298 : degBound
+// token 299 : multBound
+// token 300 : noether
+// token 301 : minpoly
+// token 302 : nothing
+// token 315 : example
+// token 316 : export
+// token 318 : kill
+// token 319 : LIB
+// token 320 : listvar
+// token 321 : setring
+// token 322 : type
+// token 329 : apply
+// token 330 : ASSUME
+// token 331 : break
+// token 332 : continue
+// token 333 : else
+// token 334 : eval
+// token 335 : quote
+// token 337 : forif
+// token 340 : return
+// token 341 : parameter
+// token 345 : command
+// token 346 : any_type
+// token 347 : identifier
+// token 358 : alias
+// token 359 : align
+// token 360 : attrib
+// token 361 : bareiss
+// token 362 : bigint
+// token 363 : branchTo
+// token 364 : bracket
+// token 365 : breakpoint
+// token 366 : char
+// token 367 : charstr
+// token 368 : char_series
+// token 369 : chinrem
+// token 373 : close
+// token 374 : coeffs
+// token 375 : coef
+// token 376 : ncols
+// token 377 : cleardenom
+// token 378 : contract
+// token 379 : size
+// token 380 : cring
+// token 381 : dbprint
+// token 382 : def
+// token 383 : defined
+// token 384 : deg
+// token 385 : degree
+// token 386 : delete
+// token 387 : denominator
+// token 388 : det
+// token 389 : diff
+// token 390 : dim
+// token 391 : division
+// token 392 : dump
+// token 393 : eliminate
+// token 394 : RETURN
+// token 395 : envelope
+// token 396 : ERROR
+// token 397 : execute
+// token 398 : exportto
+// token 399 : extgcd
+// token 400 : factorize
+// token 401 : farey
+// token 402 : find
+// token 403 : facstd
+// token 404 : factmodd
+// token 405 : fres
+// token 406 : frwalk
+// token 407 : fglm
+// token 408 : fglmquot
+// token 409 : finduni
+// token 410 : gcd
+// token 411 : getdump
+// token 412 : highcorner
+// token 413 : hilb
+// token 414 : homog
+// token 415 : hres
+// token 416 : impart
+// token 417 : importfrom
+// token 418 : indepSet
+// token 419 : insert
+// token 420 : int
+// token 421 : div
+// token 422 : interpolation
+// token 423 : interred
+// token 424 : intersect
+// token 425 : intvec
+// token 426 : rvar
+// token 427 : jacob
+// token 428 : janet
+// token 429 : jet
+// token 430 : kbase
+// token 431 : kernel
+// token 432 : killattrib
+// token 433 : kres
+// token 434 : laguerre
+// token 435 : lead
+// token 436 : leadcoef
+// token 437 : leadexp
+// token 438 : leadmonom
+// token 439 : liftstd
+// token 440 : lift
+// token 441 : link
+// token 442 : list
+// token 443 : load
+// token 444 : lres
+// token 445 : ludecomp
+// token 446 : luinverse
+// token 447 : lusolve
+// token 448 : memory
+// token 449 : minbase
+// token 450 : minor
+// token 451 : minres
+// token 452 : modulo
+// token 453 : monitor
+// token 454 : mpresmat
+// token 455 : mres
+// token 456 : mres_map
+// token 457 : mstd
+// token 458 : mult
+// token 459 : nameof
+// token 460 : names
+// token 461 : newstruct
+// token 462 : ncalgebra
+// token 463 : nc_algebra
+// token 464 : convhull
+// token 465 : npars
+// token 466 : numerator
+// token 467 : nvars
+// token 468 : ord
+// token 469 : open
+// token 470 : oppose
+// token 471 : opposite
+// token 472 : option
+// token 473 : ordstr
+// token 474 : package
+// token 475 : pardeg
+// token 477 : parstr
+// token 478 : primefactors
+// token 479 : prime
+// token 480 : print
+// token 481 : prune
+// token 482 : prune_map
+// token 483 : qhweight
+// token 484 : qring
+// token 485 : qrds
+// token 486 : quotient
+// token 487 : random
+// token 488 : rank
+// token 489 : read
+// token 490 : reduce
+// token 491 : regularity
+// token 492 : repart
+// token 493 : nres
+// token 494 : reservedName
+// token 495 : reservedNameList
+// token 496 : restart
+// token 497 : resultant
+// token 498 : rightstd
+// token 499 : ringlist
+// token 500 : ring_list
+// token 501 : nrows
+// token 502 : sba
+// token 503 : simplex
+// token 504 : simplify
+// token 505 : slimgb
+// token 506 : sortvec
+// token 507 : sqrfree
+// token 508 : sres
+// token 509 : status
+// token 510 : std
+// token 511 : string
+// token 512 : subst
+// token 513 : system
+// token 514 : syz
+// token 515 : tensor
+// token 516 : test
+// token 517 : transpose
+// token 518 : trace
+// token 519 : twostd
+// token 520 : typeof
+// token 521 : univariate
+// token 523 : uressolve
+// token 524 : vandermonde
+// token 525 : variables
+// token 526 : varstr
+// token 527 : vdim
+// token 528 : waitfirst
+// token 529 : waitall
+// token 530 : wedge
+// token 531 : weight
+// token 532 : write
+// token 533 : echo
+// token 534 : pagewidth
+// token 535 : timer
+// token 536 : rtimer
+// token 537 : TRACE
+// token 538 : voice
+// token 539 : short
+// token 540 : printlevel
+/*--max. token: 541, gr: 343 --*/
 /*---------------------------------------------*/
 const struct sValCmdTab dArithTab1[]=
 {
  { 40,11 }, /* ( */
  { 45,2 }, /* - */
  { 262,1 }, /* -- */
- { 263,149 }, /* not */
+ { 263,150 }, /* not */
  { 265,0 }, /* ++ */
  { 269,22 }, /* bigintmat */
- { 270,98 }, /* intmat */
- { 271,171 }, /* proc */
- { 272,187 }, /* ring */
- { 275,84 }, /* ideal */
- { 276,130 }, /* map */
- { 277,131 }, /* matrix */
- { 278,138 }, /* module */
- { 279,150 }, /* number */
- { 280,165 }, /* poly */
- { 281,180 }, /* resolution */
- { 282,201 }, /* smatrix */
- { 283,228 }, /* vector */
- { 284,15 }, /* betti */
- { 285,69 }, /* gen */
- { 287,74 }, /* freemodule */
- { 291,132 }, /* maxideal */
- { 292,140 }, /* monomial */
- { 293,161 }, /* par */
- { 294,167 }, /* preimage */
- { 295,231 }, /* var */
- { 320,198 }, /* setring */
- { 359,12 }, /* attrib */
- { 360,13 }, /* bareiss */
- { 361,19 }, /* bigint */
- { 365,23 }, /* char */
- { 366,25 }, /* charstr */
- { 367,24 }, /* char_series */
- { 370,153 }, /* $INVALID$ */
- { 372,26 }, /* close */
- { 373,27 }, /* coeffs */
- { 375,28 }, /* ncols */
- { 376,34 }, /* cleardenom */
- { 378,36 }, /* size */
- { 379,50 }, /* cring */
- { 381,51 }, /* def */
- { 382,58 }, /* defined */
- { 383,53 }, /* deg */
- { 384,56 }, /* degree */
- { 386,59 }, /* denominator */
- { 387,61 }, /* det */
- { 389,65 }, /* dim */
- { 391,68 }, /* dump */
- { 394,211 }, /* envelope */
- { 395,71 }, /* ERROR */
- { 396,70 }, /* execute */
- { 399,72 }, /* factorize */
- { 402,75 }, /* facstd */
- { 408,73 }, /* finduni */
- { 410,76 }, /* getdump */
- { 411,77 }, /* highcorner */
- { 412,79 }, /* hilb */
- { 413,82 }, /* homog */
- { 415,89 }, /* impart */
- { 417,90 }, /* indepSet */
- { 419,91 }, /* int */
- { 422,96 }, /* interred */
- { 424,100 }, /* intvec */
- { 425,102 }, /* rvar */
- { 426,105 }, /* jacob */
- { 427,108 }, /* janet */
- { 429,109 }, /* kbase */
- { 430,111 }, /* kernel */
- { 431,117 }, /* killattrib */
- { 433,113 }, /* laguerre */
- { 434,118 }, /* lead */
- { 435,122 }, /* leadcoef */
- { 436,124 }, /* leadexp */
- { 437,126 }, /* leadmonom */
- { 440,128 }, /* link */
- { 441,129 }, /* list */
- { 442,236 }, /* load */
- { 444,114 }, /* ludecomp */
- { 447,133 }, /* memory */
- { 448,134 }, /* minbase */
- { 450,136 }, /* minres */
- { 452,139 }, /* monitor */
- { 455,143 }, /* mstd */
- { 456,141 }, /* mult */
- { 457,145 }, /* nameof */
- { 458,146 }, /* names */
- { 462,237 }, /* convhull */
- { 463,154 }, /* npars */
- { 464,60 }, /* numerator */
- { 465,155 }, /* nvars */
- { 466,158 }, /* ord */
- { 467,156 }, /* open */
- { 469,212 }, /* opposite */
- { 470,157 }, /* option */
- { 471,160 }, /* ordstr */
- { 473,162 }, /* pardeg */
- { 475,163 }, /* parstr */
- { 476,115 }, /* primefactors */
- { 477,168 }, /* prime */
- { 478,169 }, /* print */
- { 479,172 }, /* prune */
- { 480,173 }, /* qhweight */
- { 485,175 }, /* rank */
- { 486,176 }, /* read */
- { 488,177 }, /* regularity */
- { 489,178 }, /* repart */
- { 491,179 }, /* reservedName */
- { 493,182 }, /* restart */
- { 495,183 }, /* rightstd */
- { 496,184 }, /* ringlist */
- { 497,185 }, /* ring_list */
- { 498,189 }, /* nrows */
- { 499,196 }, /* sba */
- { 502,199 }, /* slimgb */
- { 503,202 }, /* sortvec */
- { 504,204 }, /* sqrfree */
- { 507,205 }, /* std */
- { 508,208 }, /* string */
- { 511,209 }, /* syz */
- { 514,217 }, /* transpose */
- { 515,215 }, /* trace */
- { 516,213 }, /* twostd */
- { 517,223 }, /* typeof */
- { 518,224 }, /* univariate */
- { 522,225 }, /* variables */
- { 523,232 }, /* varstr */
- { 524,229 }, /* vdim */
- { 525,238 }, /* waitfirst */
- { 526,239 }, /* waitall */
- { 528,234 }, /* weight */
+ { 271,99 }, /* intmat */
+ { 272,172 }, /* proc */
+ { 273,188 }, /* ring */
+ { 276,85 }, /* ideal */
+ { 277,131 }, /* map */
+ { 278,132 }, /* matrix */
+ { 279,139 }, /* module */
+ { 280,151 }, /* number */
+ { 281,166 }, /* poly */
+ { 282,181 }, /* resolution */
+ { 283,202 }, /* smatrix */
+ { 284,229 }, /* vector */
+ { 285,15 }, /* betti */
+ { 286,70 }, /* gen */
+ { 288,75 }, /* freemodule */
+ { 292,133 }, /* maxideal */
+ { 293,141 }, /* monomial */
+ { 294,162 }, /* par */
+ { 295,168 }, /* preimage */
+ { 296,232 }, /* var */
+ { 321,199 }, /* setring */
+ { 360,12 }, /* attrib */
+ { 361,13 }, /* bareiss */
+ { 362,19 }, /* bigint */
+ { 366,23 }, /* char */
+ { 367,25 }, /* charstr */
+ { 368,24 }, /* char_series */
+ { 371,154 }, /* $INVALID$ */
+ { 373,26 }, /* close */
+ { 374,27 }, /* coeffs */
+ { 376,28 }, /* ncols */
+ { 377,34 }, /* cleardenom */
+ { 379,36 }, /* size */
+ { 380,51 }, /* cring */
+ { 382,52 }, /* def */
+ { 383,59 }, /* defined */
+ { 384,54 }, /* deg */
+ { 385,57 }, /* degree */
+ { 387,60 }, /* denominator */
+ { 388,62 }, /* det */
+ { 390,66 }, /* dim */
+ { 392,69 }, /* dump */
+ { 395,212 }, /* envelope */
+ { 396,72 }, /* ERROR */
+ { 397,71 }, /* execute */
+ { 400,73 }, /* factorize */
+ { 403,76 }, /* facstd */
+ { 409,74 }, /* finduni */
+ { 411,77 }, /* getdump */
+ { 412,78 }, /* highcorner */
+ { 413,80 }, /* hilb */
+ { 414,83 }, /* homog */
+ { 416,90 }, /* impart */
+ { 418,91 }, /* indepSet */
+ { 420,92 }, /* int */
+ { 423,97 }, /* interred */
+ { 425,101 }, /* intvec */
+ { 426,103 }, /* rvar */
+ { 427,106 }, /* jacob */
+ { 428,109 }, /* janet */
+ { 430,110 }, /* kbase */
+ { 431,112 }, /* kernel */
+ { 432,118 }, /* killattrib */
+ { 434,114 }, /* laguerre */
+ { 435,119 }, /* lead */
+ { 436,123 }, /* leadcoef */
+ { 437,125 }, /* leadexp */
+ { 438,127 }, /* leadmonom */
+ { 441,129 }, /* link */
+ { 442,130 }, /* list */
+ { 443,237 }, /* load */
+ { 445,115 }, /* ludecomp */
+ { 448,134 }, /* memory */
+ { 449,135 }, /* minbase */
+ { 451,137 }, /* minres */
+ { 453,140 }, /* monitor */
+ { 457,144 }, /* mstd */
+ { 458,142 }, /* mult */
+ { 459,146 }, /* nameof */
+ { 460,147 }, /* names */
+ { 464,238 }, /* convhull */
+ { 465,155 }, /* npars */
+ { 466,61 }, /* numerator */
+ { 467,156 }, /* nvars */
+ { 468,159 }, /* ord */
+ { 469,157 }, /* open */
+ { 471,213 }, /* opposite */
+ { 472,158 }, /* option */
+ { 473,161 }, /* ordstr */
+ { 475,163 }, /* pardeg */
+ { 477,164 }, /* parstr */
+ { 478,116 }, /* primefactors */
+ { 479,169 }, /* prime */
+ { 480,170 }, /* print */
+ { 481,173 }, /* prune */
+ { 483,174 }, /* qhweight */
+ { 488,176 }, /* rank */
+ { 489,177 }, /* read */
+ { 491,178 }, /* regularity */
+ { 492,179 }, /* repart */
+ { 494,180 }, /* reservedName */
+ { 496,183 }, /* restart */
+ { 498,184 }, /* rightstd */
+ { 499,185 }, /* ringlist */
+ { 500,186 }, /* ring_list */
+ { 501,190 }, /* nrows */
+ { 502,197 }, /* sba */
+ { 505,200 }, /* slimgb */
+ { 506,203 }, /* sortvec */
+ { 507,205 }, /* sqrfree */
+ { 510,206 }, /* std */
+ { 511,209 }, /* string */
+ { 514,210 }, /* syz */
+ { 517,218 }, /* transpose */
+ { 518,216 }, /* trace */
+ { 519,214 }, /* twostd */
+ { 520,224 }, /* typeof */
+ { 521,225 }, /* univariate */
+ { 525,226 }, /* variables */
+ { 526,233 }, /* varstr */
+ { 527,230 }, /* vdim */
+ { 528,239 }, /* waitfirst */
+ { 529,240 }, /* waitall */
+ { 531,235 }, /* weight */
  { 10000,0 }
 };
 #define JJTAB1LEN 130
 const struct sValCmdTab dArithTab2[]=
 {
- { 37,105 }, /* % */
- { 38,152 }, /* and */
- { 40,208 }, /* ( */
- { 42,51 }, /* * */
+ { 37,119 }, /* % */
+ { 38,166 }, /* and */
+ { 40,227 }, /* ( */
+ { 42,61 }, /* * */
  { 43,1 }, /* + */
- { 45,29 }, /* - */
- { 47,89 }, /* / */
- { 58,213 }, /* : */
- { 60,125 }, /* < */
- { 62,143 }, /* > */
- { 91,191 }, /* [ */
- { 94,111 }, /* ^ */
- { 124,153 }, /* or */
- { 258,190 }, /* .. */
- { 259,154 }, /* == */
- { 260,134 }, /* >= */
- { 261,116 }, /* <= */
- { 264,174 }, /* <> */
+ { 45,34 }, /* - */
+ { 47,103 }, /* / */
+ { 58,232 }, /* : */
+ { 60,139 }, /* < */
+ { 62,157 }, /* > */
+ { 91,208 }, /* [ */
+ { 94,125 }, /* ^ */
+ { 124,167 }, /* or */
+ { 258,207 }, /* .. */
+ { 259,168 }, /* == */
+ { 260,148 }, /* >= */
+ { 261,130 }, /* <= */
+ { 264,189 }, /* <> */
  { 266,0 }, /* :: */
- { 284,217 }, /* betti */
- { 286,271 }, /* fetch */
- { 289,291 }, /* imap */
- { 290,308 }, /* koszul */
- { 358,214 }, /* align */
- { 359,216 }, /* attrib */
- { 363,221 }, /* bracket */
- { 368,222 }, /* chinrem */
- { 373,227 }, /* coeffs */
- { 374,225 }, /* coef */
- { 377,231 }, /* contract */
- { 383,232 }, /* deg */
- { 385,235 }, /* delete */
- { 387,242 }, /* det */
- { 388,244 }, /* diff */
- { 389,251 }, /* dim */
- { 390,253 }, /* division */
- { 392,255 }, /* eliminate */
- { 397,259 }, /* exportto */
- { 398,260 }, /* extgcd */
- { 399,263 }, /* factorize */
- { 400,265 }, /* farey */
- { 401,274 }, /* find */
- { 402,264 }, /* facstd */
- { 404,275 }, /* fres */
- { 405,277 }, /* frwalk */
- { 406,272 }, /* fglm */
- { 407,273 }, /* fglmquot */
- { 409,278 }, /* gcd */
- { 412,282 }, /* hilb */
- { 413,284 }, /* homog */
- { 414,290 }, /* hres */
- { 416,292 }, /* importfrom */
- { 417,293 }, /* indepSet */
- { 418,294 }, /* insert */
- { 420,99 }, /* div */
- { 421,295 }, /* interpolation */
- { 423,296 }, /* intersect */
- { 427,298 }, /* janet */
- { 428,299 }, /* jet */
- { 429,304 }, /* kbase */
- { 430,306 }, /* kernel */
- { 431,307 }, /* killattrib */
- { 432,310 }, /* kres */
- { 438,313 }, /* liftstd */
- { 439,311 }, /* lift */
- { 442,315 }, /* load */
- { 443,316 }, /* lres */
- { 451,317 }, /* modulo */
- { 452,319 }, /* monitor */
- { 453,320 }, /* mpresmat */
- { 454,322 }, /* mres */
- { 459,321 }, /* newstruct */
- { 460,326 }, /* ncalgebra */
- { 461,330 }, /* nc_algebra */
- { 468,334 }, /* oppose */
- { 475,335 }, /* parstr */
- { 476,324 }, /* primefactors */
- { 478,336 }, /* print */
- { 483,337 }, /* quotient */
- { 484,340 }, /* random */
- { 485,341 }, /* rank */
- { 486,342 }, /* read */
- { 487,343 }, /* reduce */
- { 490,349 }, /* nres */
- { 499,351 }, /* sba */
- { 501,353 }, /* simplify */
- { 504,357 }, /* sqrfree */
- { 505,360 }, /* sres */
- { 506,358 }, /* status */
- { 507,362 }, /* std */
- { 511,368 }, /* syz */
- { 512,370 }, /* tensor */
- { 523,373 }, /* varstr */
- { 525,374 }, /* waitfirst */
- { 526,375 }, /* waitall */
- { 527,376 }, /* wedge */
+ { 285,236 }, /* betti */
+ { 287,290 }, /* fetch */
+ { 290,310 }, /* imap */
+ { 291,327 }, /* koszul */
+ { 359,233 }, /* align */
+ { 360,235 }, /* attrib */
+ { 364,240 }, /* bracket */
+ { 369,241 }, /* chinrem */
+ { 374,246 }, /* coeffs */
+ { 375,244 }, /* coef */
+ { 378,250 }, /* contract */
+ { 384,251 }, /* deg */
+ { 386,254 }, /* delete */
+ { 388,261 }, /* det */
+ { 389,263 }, /* diff */
+ { 390,270 }, /* dim */
+ { 391,272 }, /* division */
+ { 393,274 }, /* eliminate */
+ { 398,278 }, /* exportto */
+ { 399,279 }, /* extgcd */
+ { 400,282 }, /* factorize */
+ { 401,284 }, /* farey */
+ { 402,293 }, /* find */
+ { 403,283 }, /* facstd */
+ { 405,294 }, /* fres */
+ { 406,296 }, /* frwalk */
+ { 407,291 }, /* fglm */
+ { 408,292 }, /* fglmquot */
+ { 410,297 }, /* gcd */
+ { 413,301 }, /* hilb */
+ { 414,303 }, /* homog */
+ { 415,309 }, /* hres */
+ { 417,311 }, /* importfrom */
+ { 418,312 }, /* indepSet */
+ { 419,313 }, /* insert */
+ { 421,113 }, /* div */
+ { 422,314 }, /* interpolation */
+ { 424,315 }, /* intersect */
+ { 428,317 }, /* janet */
+ { 429,318 }, /* jet */
+ { 430,323 }, /* kbase */
+ { 431,325 }, /* kernel */
+ { 432,326 }, /* killattrib */
+ { 433,329 }, /* kres */
+ { 439,332 }, /* liftstd */
+ { 440,330 }, /* lift */
+ { 443,334 }, /* load */
+ { 444,335 }, /* lres */
+ { 452,336 }, /* modulo */
+ { 453,338 }, /* monitor */
+ { 454,339 }, /* mpresmat */
+ { 455,341 }, /* mres */
+ { 461,340 }, /* newstruct */
+ { 462,345 }, /* ncalgebra */
+ { 463,349 }, /* nc_algebra */
+ { 470,353 }, /* oppose */
+ { 477,354 }, /* parstr */
+ { 478,343 }, /* primefactors */
+ { 480,355 }, /* print */
+ { 482,356 }, /* prune_map */
+ { 486,357 }, /* quotient */
+ { 487,360 }, /* random */
+ { 488,361 }, /* rank */
+ { 489,362 }, /* read */
+ { 490,363 }, /* reduce */
+ { 493,369 }, /* nres */
+ { 502,371 }, /* sba */
+ { 504,373 }, /* simplify */
+ { 507,377 }, /* sqrfree */
+ { 508,380 }, /* sres */
+ { 509,378 }, /* status */
+ { 510,382 }, /* std */
+ { 514,388 }, /* syz */
+ { 515,390 }, /* tensor */
+ { 526,393 }, /* varstr */
+ { 528,394 }, /* waitfirst */
+ { 529,395 }, /* waitall */
+ { 530,396 }, /* wedge */
  { 10000,0 }
 };
-#define JJTAB2LEN 96
+#define JJTAB2LEN 97
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
@@ -1374,253 +1410,256 @@ const struct sValCmdTab dArithTab2[]=
 void iiInitCmdName()
 {
   sArithBase.nCmdUsed      = 0;
-  sArithBase.nCmdAllocated = 242;
-  sArithBase.sCmds = (cmdnames*)omAlloc0(242/*sArithBase.nCmdAllocated*/ *sizeof(cmdnames));
+  sArithBase.nCmdAllocated = 245;
+  sArithBase.sCmds = (cmdnames*)omAlloc0(245/*sArithBase.nCmdAllocated*/ *sizeof(cmdnames));
 
   // name-string                   alias  tokval toktype index
   iiArithAddCmd("$INVALID$",           0,  -1, 0, 0);
-  iiArithAddCmd("ASSUME",              0, 329, 329, 1);
-  iiArithAddCmd("ERROR",               0, 395, CMD_1, 2);
-  iiArithAddCmd("GCD",                 2, 409, CMD_2, 3);
-  iiArithAddCmd("IN",                  1, 434, CMD_1, 4);
-  iiArithAddCmd("LIB",                 0, 318, SYSVAR, 5);
-  iiArithAddCmd("NF",                  1, 487, CMD_M, 6);
-  iiArithAddCmd("RETURN",              0, 393, 339, 7);
-  iiArithAddCmd("TRACE",               0, 534, SYSVAR, 8);
-  iiArithAddCmd("alias",               0, 357, 340, 9);
-  iiArithAddCmd("align",               0, 358, CMD_2, 10);
+  iiArithAddCmd("ASSUME",              0, 330, 330, 1);
+  iiArithAddCmd("ERROR",               0, 396, CMD_1, 2);
+  iiArithAddCmd("GCD",                 2, 410, CMD_2, 3);
+  iiArithAddCmd("IN",                  1, 435, CMD_1, 4);
+  iiArithAddCmd("LIB",                 0, 319, SYSVAR, 5);
+  iiArithAddCmd("NF",                  1, 490, CMD_M, 6);
+  iiArithAddCmd("RETURN",              0, 394, 340, 7);
+  iiArithAddCmd("TRACE",               0, 537, SYSVAR, 8);
+  iiArithAddCmd("alias",               0, 358, 341, 9);
+  iiArithAddCmd("align",               0, 359, CMD_2, 10);
   iiArithAddCmd("and",                 0,  38, '&', 11);
-  iiArithAddCmd("apply",               0, 328, 328, 12);
-  iiArithAddCmd("attrib",              0, 359, CMD_123, 13);
-  iiArithAddCmd("bareiss",             0, 360, CMD_13, 14);
-  iiArithAddCmd("betti",               0, 284, CMD_12, 15);
-  iiArithAddCmd("bigint",              0, 361, ROOT_DECL, 16);
+  iiArithAddCmd("apply",               0, 329, 329, 12);
+  iiArithAddCmd("attrib",              0, 360, CMD_123, 13);
+  iiArithAddCmd("bareiss",             0, 361, CMD_13, 14);
+  iiArithAddCmd("betti",               0, 285, CMD_12, 15);
+  iiArithAddCmd("bigint",              0, 362, ROOT_DECL, 16);
   iiArithAddCmd("bigintmat",           0, 269, 269, 17);
-  iiArithAddCmd("bracket",             0, 363, CMD_23, 18);
-  iiArithAddCmd("branchTo",            0, 362, CMD_M, 19);
-  iiArithAddCmd("break",               0, 330, 330, 20);
-  iiArithAddCmd("breakpoint",          0, 364, CMD_M, 21);
-  iiArithAddCmd("char",                0, 365, CMD_1, 22);
-  iiArithAddCmd("char_series",         0, 367, CMD_1, 23);
-  iiArithAddCmd("charstr",             0, 366, CMD_1, 24);
-  iiArithAddCmd("chinrem",             0, 368, CMD_2, 25);
-  iiArithAddCmd("cleardenom",          0, 376, CMD_1, 26);
-  iiArithAddCmd("close",               0, 372, CMD_1, 27);
-  iiArithAddCmd("coef",                0, 374, CMD_M, 28);
-  iiArithAddCmd("coeffs",              0, 373, CMD_123, 29);
-  iiArithAddCmd("continue",            0, 331, 331, 30);
-  iiArithAddCmd("contract",            0, 377, CMD_2, 31);
-  iiArithAddCmd("convhull",            0, 462, CMD_1, 32);
-  iiArithAddCmd("cring",               0, 379, ROOT_DECL, 33);
-  iiArithAddCmd("dbprint",             0, 380, CMD_M, 34);
-  iiArithAddCmd("def",                 0, 381, ROOT_DECL, 35);
-  iiArithAddCmd("defined",             0, 382, CMD_1, 36);
-  iiArithAddCmd("deg",                 0, 383, CMD_12, 37);
-  iiArithAddCmd("degBound",            0, 297, SYSVAR, 38);
-  iiArithAddCmd("degree",              0, 384, CMD_1, 39);
-  iiArithAddCmd("delete",              0, 385, CMD_2, 40);
-  iiArithAddCmd("denominator",         0, 386, CMD_1, 41);
-  iiArithAddCmd("det",                 0, 387, CMD_12, 42);
-  iiArithAddCmd("diff",                0, 388, CMD_2, 43);
-  iiArithAddCmd("dim",                 0, 389, CMD_12, 44);
-  iiArithAddCmd("div",                 0, 420, '/', 45);
-  iiArithAddCmd("division",            0, 390, CMD_M, 46);
-  iiArithAddCmd("dump",                0, 391, CMD_1, 47);
-  iiArithAddCmd("echo",                0, 530, SYSVAR, 48);
-  iiArithAddCmd("eliminate",           0, 392, CMD_23, 49);
-  iiArithAddCmd("else",                0, 332, 332, 50);
-  iiArithAddCmd("envelope",            0, 394, CMD_1, 51);
-  iiArithAddCmd("eval",                0, 333, 333, 52);
-  iiArithAddCmd("example",             0, 314, 314, 53);
-  iiArithAddCmd("execute",             0, 396, CMD_1, 54);
-  iiArithAddCmd("export",              0, 315, 315, 55);
-  iiArithAddCmd("exportto",            0, 397, CMD_2, 56);
-  iiArithAddCmd("extgcd",              0, 398, CMD_2, 57);
-  iiArithAddCmd("facstd",              0, 402, CMD_12, 58);
-  iiArithAddCmd("factmodd",            0, 403, CMD_M, 59);
-  iiArithAddCmd("factorize",           0, 399, CMD_12, 60);
-  iiArithAddCmd("farey",               0, 400, CMD_2, 61);
-  iiArithAddCmd("fetch",               0, 286, CMD_M, 62);
-  iiArithAddCmd("fglm",                0, 406, CMD_2, 63);
-  iiArithAddCmd("fglmquot",            0, 407, CMD_2, 64);
-  iiArithAddCmd("find",                0, 401, CMD_23, 65);
-  iiArithAddCmd("finduni",             0, 408, CMD_1, 66);
-  iiArithAddCmd("forif",               0, 336, 336, 67);
-  iiArithAddCmd("freemodule",          0, 287, CMD_1, 68);
-  iiArithAddCmd("fres",                0, 404, CMD_23, 69);
-  iiArithAddCmd("frwalk",              0, 405, CMD_23, 70);
-  iiArithAddCmd("gcd",                 0, 409, CMD_2, 71);
-  iiArithAddCmd("gen",                 0, 285, CMD_1, 72);
-  iiArithAddCmd("getdump",             0, 410, CMD_1, 73);
-  iiArithAddCmd("highcorner",          0, 411, CMD_1, 74);
-  iiArithAddCmd("hilb",                0, 412, CMD_123, 75);
-  iiArithAddCmd("homog",               0, 413, CMD_123, 76);
-  iiArithAddCmd("hres",                0, 414, CMD_2, 77);
-  iiArithAddCmd("ideal",               0, 275, 313, 78);
-  iiArithAddCmd("if",                  0, 336, 336, 79);
-  iiArithAddCmd("imap",                0, 289, CMD_2, 80);
-  iiArithAddCmd("impart",              0, 415, CMD_1, 81);
-  iiArithAddCmd("importfrom",          0, 416, CMD_2, 82);
-  iiArithAddCmd("indepSet",            0, 417, CMD_12, 83);
-  iiArithAddCmd("insert",              0, 418, CMD_23, 84);
-  iiArithAddCmd("int",                 0, 419, ROOT_DECL, 85);
-  iiArithAddCmd("interpolation",       0, 421, CMD_2, 86);
-  iiArithAddCmd("interred",            0, 422, CMD_1, 87);
-  iiArithAddCmd("intersect",           0, 423, CMD_M, 88);
-  iiArithAddCmd("intmat",              0, 270, 270, 89);
-  iiArithAddCmd("intvec",              0, 424, ROOT_DECL_LIST, 90);
-  iiArithAddCmd("jacob",               0, 426, CMD_1, 91);
-  iiArithAddCmd("janet",               0, 427, CMD_12, 92);
-  iiArithAddCmd("jet",                 0, 428, CMD_M, 93);
-  iiArithAddCmd("kbase",               0, 429, CMD_12, 94);
-  iiArithAddCmd("keepring",            0, 288, 288, 95);
-  iiArithAddCmd("kernel",              0, 430, CMD_12, 96);
-  iiArithAddCmd("kill",                0, 317, 317, 97);
-  iiArithAddCmd("killattrib",          0, 431, CMD_12, 98);
-  iiArithAddCmd("koszul",              0, 290, CMD_23, 99);
-  iiArithAddCmd("kres",                0, 432, CMD_2, 100);
-  iiArithAddCmd("laguerre",            0, 433, CMD_13, 101);
-  iiArithAddCmd("lead",                0, 434, CMD_1, 102);
-  iiArithAddCmd("leadcoef",            0, 435, CMD_1, 103);
-  iiArithAddCmd("leadexp",             0, 436, CMD_1, 104);
-  iiArithAddCmd("leadmonom",           0, 437, CMD_1, 105);
-  iiArithAddCmd("lift",                0, 439, CMD_M, 106);
-  iiArithAddCmd("liftstd",             0, 438, CMD_M, 107);
-  iiArithAddCmd("link",                0, 440, ROOT_DECL, 108);
-  iiArithAddCmd("list",                0, 441, ROOT_DECL_LIST, 109);
-  iiArithAddCmd("listvar",             0, 319, 319, 110);
-  iiArithAddCmd("load",                0, 442, CMD_12, 111);
-  iiArithAddCmd("lres",                0, 443, CMD_2, 112);
-  iiArithAddCmd("ludecomp",            0, 444, CMD_1, 113);
-  iiArithAddCmd("luinverse",           0, 445, CMD_M, 114);
-  iiArithAddCmd("lusolve",             0, 446, CMD_M, 115);
-  iiArithAddCmd("map",                 0, 276, RING_DECL, 116);
-  iiArithAddCmd("matrix",              0, 277, 277, 117);
-  iiArithAddCmd("maxideal",            0, 291, CMD_1, 118);
-  iiArithAddCmd("memory",              0, 447, CMD_1, 119);
-  iiArithAddCmd("minbase",             0, 448, CMD_1, 120);
-  iiArithAddCmd("minor",               0, 449, CMD_M, 121);
-  iiArithAddCmd("minpoly",             0, 300, SYSVAR, 122);
-  iiArithAddCmd("minres",              0, 450, CMD_1, 123);
-  iiArithAddCmd("mod",                 0,  37, '/', 124);
-  iiArithAddCmd("module",              0, 278, 313, 125);
-  iiArithAddCmd("modulo",              0, 451, CMD_M, 126);
-  iiArithAddCmd("monitor",             0, 452, CMD_12, 127);
-  iiArithAddCmd("monomial",            0, 292, CMD_1, 128);
-  iiArithAddCmd("mpresmat",            0, 453, CMD_2, 129);
-  iiArithAddCmd("mres",                0, 454, CMD_2, 130);
-  iiArithAddCmd("mstd",                0, 455, CMD_1, 131);
-  iiArithAddCmd("mult",                0, 456, CMD_1, 132);
-  iiArithAddCmd("multBound",           0, 298, SYSVAR, 133);
-  iiArithAddCmd("multiplicity",        1, 456, CMD_1, 134);
-  iiArithAddCmd("nameof",              0, 457, CMD_1, 135);
-  iiArithAddCmd("names",               0, 458, CMD_M, 136);
-  iiArithAddCmd("nc_algebra",          0, 461, CMD_2, 137);
-  iiArithAddCmd("ncalgebra",           2, 460, CMD_2, 138);
-  iiArithAddCmd("ncols",               0, 375, CMD_1, 139);
-  iiArithAddCmd("newstruct",           0, 459, CMD_23, 140);
-  iiArithAddCmd("noether",             0, 299, SYSVAR, 141);
-  iiArithAddCmd("not",                 0, 263, 263, 142);
-  iiArithAddCmd("npars",               0, 463, CMD_1, 143);
-  iiArithAddCmd("nres",                0, 490, CMD_2, 144);
-  iiArithAddCmd("nrows",               0, 498, CMD_1, 145);
-  iiArithAddCmd("number",              0, 279, RING_DECL, 146);
-  iiArithAddCmd("numerator",           0, 464, CMD_1, 147);
-  iiArithAddCmd("nvars",               0, 465, CMD_1, 148);
-  iiArithAddCmd("open",                0, 467, CMD_1, 149);
-  iiArithAddCmd("oppose",              0, 468, CMD_2, 150);
-  iiArithAddCmd("opposite",            0, 469, CMD_1, 151);
-  iiArithAddCmd("option",              0, 470, CMD_M, 152);
-  iiArithAddCmd("or",                  0, 124, '&', 153);
-  iiArithAddCmd("ord",                 0, 466, CMD_1, 154);
-  iiArithAddCmd("ordstr",              0, 471, CMD_1, 155);
-  iiArithAddCmd("package",             0, 472, ROOT_DECL, 156);
-  iiArithAddCmd("pagewidth",           0, 531, SYSVAR, 157);
-  iiArithAddCmd("par",                 0, 293, CMD_1, 158);
-  iiArithAddCmd("parameter",           0, 340, 340, 159);
-  iiArithAddCmd("pardeg",              0, 473, CMD_1, 160);
-  iiArithAddCmd("parstr",              0, 475, CMD_12, 161);
-  iiArithAddCmd("poly",                0, 280, RING_DECL, 162);
-  iiArithAddCmd("polyBucket",          0, 274, RING_DECL, 163);
-  iiArithAddCmd("preimage",            0, 294, CMD_13, 164);
-  iiArithAddCmd("prime",               0, 477, CMD_1, 165);
-  iiArithAddCmd("primefactors",        0, 476, CMD_12, 166);
-  iiArithAddCmd("print",               0, 478, CMD_12, 167);
-  iiArithAddCmd("printlevel",          0, 537, SYSVAR, 168);
-  iiArithAddCmd("proc",                0, 271, 271, 169);
-  iiArithAddCmd("prune",               0, 479, CMD_1, 170);
-  iiArithAddCmd("qhweight",            0, 480, CMD_1, 171);
-  iiArithAddCmd("qrds",                0, 482, CMD_M, 172);
-  iiArithAddCmd("qring",               0, 481, ROOT_DECL, 173);
-  iiArithAddCmd("quote",               0, 334, 334, 174);
-  iiArithAddCmd("quotient",            0, 483, CMD_2, 175);
-  iiArithAddCmd("random",              0, 484, CMD_23, 176);
-  iiArithAddCmd("rank",                0, 485, CMD_12, 177);
-  iiArithAddCmd("read",                0, 486, CMD_12, 178);
-  iiArithAddCmd("reduce",              0, 487, CMD_M, 179);
-  iiArithAddCmd("regularity",          0, 488, CMD_1, 180);
-  iiArithAddCmd("repart",              0, 489, CMD_1, 181);
-  iiArithAddCmd("reservedName",        0, 491, CMD_M, 182);
-  iiArithAddCmd("reservedNameList",    0, 492, CMD_M, 183);
-  iiArithAddCmd("resolution",          0, 281, RING_DECL, 184);
-  iiArithAddCmd("restart",             0, 493, CMD_1, 185);
-  iiArithAddCmd("resultant",           0, 494, CMD_3, 186);
-  iiArithAddCmd("return",              0, 339, 339, 187);
-  iiArithAddCmd("rightstd",            0, 495, CMD_1, 188);
-  iiArithAddCmd("ring",                0, 272, 272, 189);
-  iiArithAddCmd("ring_list",           0, 497, CMD_1, 190);
-  iiArithAddCmd("ringlist",            0, 496, CMD_1, 191);
-  iiArithAddCmd("rtimer",              0, 533, SYSVAR, 192);
-  iiArithAddCmd("rvar",                0, 425, CMD_1, 193);
-  iiArithAddCmd("sba",                 0, 499, CMD_123, 194);
-  iiArithAddCmd("setring",             0, 320, 320, 195);
-  iiArithAddCmd("short",               0, 536, SYSVAR, 196);
-  iiArithAddCmd("simplex",             0, 500, CMD_M, 197);
-  iiArithAddCmd("simplify",            0, 501, CMD_2, 198);
-  iiArithAddCmd("size",                0, 378, CMD_1, 199);
-  iiArithAddCmd("slimgb",              0, 502, CMD_1, 200);
-  iiArithAddCmd("smatrix",             0, 282, 282, 201);
-  iiArithAddCmd("sortvec",             0, 503, CMD_1, 202);
-  iiArithAddCmd("sqrfree",             0, 504, CMD_12, 203);
-  iiArithAddCmd("sres",                0, 505, CMD_2, 204);
-  iiArithAddCmd("status",              0, 506, CMD_M, 205);
-  iiArithAddCmd("std",                 0, 507, CMD_M, 206);
-  iiArithAddCmd("string",              0, 508, ROOT_DECL_LIST, 207);
-  iiArithAddCmd("subst",               0, 509, CMD_M, 208);
-  iiArithAddCmd("system",              0, 510, CMD_M, 209);
-  iiArithAddCmd("syz",                 0, 511, CMD_12, 210);
-  iiArithAddCmd("tensor",              0, 512, CMD_2, 211);
-  iiArithAddCmd("test",                0, 513, CMD_M, 212);
-  iiArithAddCmd("timer",               0, 532, SYSVAR, 213);
-  iiArithAddCmd("trace",               0, 515, CMD_1, 214);
-  iiArithAddCmd("transpose",           0, 514, CMD_1, 215);
-  iiArithAddCmd("twostd",              0, 516, CMD_1, 216);
-  iiArithAddCmd("type",                0, 321, 321, 217);
-  iiArithAddCmd("typeof",              0, 517, CMD_1, 218);
-  iiArithAddCmd("univariate",          0, 518, CMD_1, 219);
-  iiArithAddCmd("uressolve",           0, 520, CMD_M, 220);
-  iiArithAddCmd("vandermonde",         0, 521, CMD_3, 221);
-  iiArithAddCmd("var",                 0, 295, CMD_1, 222);
-  iiArithAddCmd("variables",           0, 522, CMD_1, 223);
-  iiArithAddCmd("varstr",              0, 523, CMD_12, 224);
-  iiArithAddCmd("vdim",                0, 524, CMD_1, 225);
-  iiArithAddCmd("vector",              0, 283, RING_DECL, 226);
-  iiArithAddCmd("verbose",             2, 470, CMD_M, 227);
-  iiArithAddCmd("voice",               0, 535, SYSVAR, 228);
-  iiArithAddCmd("waitall",             0, 526, CMD_12, 229);
-  iiArithAddCmd("waitfirst",           0, 525, CMD_12, 230);
-  iiArithAddCmd("wedge",               0, 527, CMD_2, 231);
-  iiArithAddCmd("weight",              0, 528, CMD_1, 232);
-  iiArithAddCmd("whileif",             0, 336, 336, 233);
-  iiArithAddCmd("write",               0, 529, CMD_M, 234);
-  iiArithAddCmd("exit",                0,  -1, 0, 235);
-  iiArithAddCmd("for",                 0,  -1, 0, 236);
-  iiArithAddCmd("help",                0,  -1, 0, 237);
-  iiArithAddCmd("newline",             0,  -1, 0, 238);
-  iiArithAddCmd("pause",               2,  -1, 0, 239);
-  iiArithAddCmd("quit",                0,  -1, 0, 240);
-  iiArithAddCmd("while",               0,  -1, 0, 241);
+  iiArithAddCmd("bigintvec",           0, 270, ROOT_DECL_LIST, 18);
+  iiArithAddCmd("bracket",             0, 364, CMD_23, 19);
+  iiArithAddCmd("branchTo",            0, 363, CMD_M, 20);
+  iiArithAddCmd("break",               0, 331, 331, 21);
+  iiArithAddCmd("breakpoint",          0, 365, CMD_M, 22);
+  iiArithAddCmd("char",                0, 366, CMD_1, 23);
+  iiArithAddCmd("char_series",         0, 368, CMD_1, 24);
+  iiArithAddCmd("charstr",             0, 367, CMD_1, 25);
+  iiArithAddCmd("chinrem",             0, 369, CMD_2, 26);
+  iiArithAddCmd("cleardenom",          0, 377, CMD_1, 27);
+  iiArithAddCmd("close",               0, 373, CMD_1, 28);
+  iiArithAddCmd("coef",                0, 375, CMD_M, 29);
+  iiArithAddCmd("coeffs",              0, 374, CMD_123, 30);
+  iiArithAddCmd("continue",            0, 332, 332, 31);
+  iiArithAddCmd("contract",            0, 378, CMD_2, 32);
+  iiArithAddCmd("convhull",            0, 464, CMD_1, 33);
+  iiArithAddCmd("cring",               0, 380, ROOT_DECL, 34);
+  iiArithAddCmd("dbprint",             0, 381, CMD_M, 35);
+  iiArithAddCmd("def",                 0, 382, ROOT_DECL, 36);
+  iiArithAddCmd("defined",             0, 383, CMD_1, 37);
+  iiArithAddCmd("deg",                 0, 384, CMD_12, 38);
+  iiArithAddCmd("degBound",            0, 298, SYSVAR, 39);
+  iiArithAddCmd("degree",              0, 385, CMD_1, 40);
+  iiArithAddCmd("delete",              0, 386, CMD_2, 41);
+  iiArithAddCmd("denominator",         0, 387, CMD_1, 42);
+  iiArithAddCmd("det",                 0, 388, CMD_12, 43);
+  iiArithAddCmd("diff",                0, 389, CMD_2, 44);
+  iiArithAddCmd("dim",                 0, 390, CMD_12, 45);
+  iiArithAddCmd("div",                 0, 421, '/', 46);
+  iiArithAddCmd("division",            0, 391, CMD_M, 47);
+  iiArithAddCmd("dump",                0, 392, CMD_1, 48);
+  iiArithAddCmd("echo",                0, 533, SYSVAR, 49);
+  iiArithAddCmd("eliminate",           0, 393, CMD_23, 50);
+  iiArithAddCmd("else",                0, 333, 333, 51);
+  iiArithAddCmd("envelope",            0, 395, CMD_1, 52);
+  iiArithAddCmd("eval",                0, 334, 334, 53);
+  iiArithAddCmd("example",             0, 315, 315, 54);
+  iiArithAddCmd("execute",             0, 397, CMD_1, 55);
+  iiArithAddCmd("export",              0, 316, 316, 56);
+  iiArithAddCmd("exportto",            0, 398, CMD_2, 57);
+  iiArithAddCmd("extgcd",              0, 399, CMD_2, 58);
+  iiArithAddCmd("facstd",              0, 403, CMD_12, 59);
+  iiArithAddCmd("factmodd",            0, 404, CMD_M, 60);
+  iiArithAddCmd("factorize",           0, 400, CMD_12, 61);
+  iiArithAddCmd("farey",               0, 401, CMD_2, 62);
+  iiArithAddCmd("fetch",               0, 287, CMD_M, 63);
+  iiArithAddCmd("fglm",                0, 407, CMD_2, 64);
+  iiArithAddCmd("fglmquot",            0, 408, CMD_2, 65);
+  iiArithAddCmd("find",                0, 402, CMD_23, 66);
+  iiArithAddCmd("finduni",             0, 409, CMD_1, 67);
+  iiArithAddCmd("forif",               0, 337, 337, 68);
+  iiArithAddCmd("freemodule",          0, 288, CMD_1, 69);
+  iiArithAddCmd("fres",                0, 405, CMD_23, 70);
+  iiArithAddCmd("frwalk",              0, 406, CMD_23, 71);
+  iiArithAddCmd("gcd",                 0, 410, CMD_2, 72);
+  iiArithAddCmd("gen",                 0, 286, CMD_1, 73);
+  iiArithAddCmd("getdump",             0, 411, CMD_1, 74);
+  iiArithAddCmd("highcorner",          0, 412, CMD_1, 75);
+  iiArithAddCmd("hilb",                0, 413, CMD_M, 76);
+  iiArithAddCmd("homog",               0, 414, CMD_123, 77);
+  iiArithAddCmd("hres",                0, 415, CMD_2, 78);
+  iiArithAddCmd("ideal",               0, 276, 314, 79);
+  iiArithAddCmd("if",                  0, 337, 337, 80);
+  iiArithAddCmd("imap",                0, 290, CMD_2, 81);
+  iiArithAddCmd("impart",              0, 416, CMD_1, 82);
+  iiArithAddCmd("importfrom",          0, 417, CMD_2, 83);
+  iiArithAddCmd("indepSet",            0, 418, CMD_12, 84);
+  iiArithAddCmd("insert",              0, 419, CMD_23, 85);
+  iiArithAddCmd("int",                 0, 420, ROOT_DECL, 86);
+  iiArithAddCmd("interpolation",       0, 422, CMD_2, 87);
+  iiArithAddCmd("interred",            0, 423, CMD_1, 88);
+  iiArithAddCmd("intersect",           0, 424, CMD_M, 89);
+  iiArithAddCmd("intmat",              0, 271, 271, 90);
+  iiArithAddCmd("intvec",              0, 425, ROOT_DECL_LIST, 91);
+  iiArithAddCmd("jacob",               0, 427, CMD_1, 92);
+  iiArithAddCmd("janet",               0, 428, CMD_12, 93);
+  iiArithAddCmd("jet",                 0, 429, CMD_M, 94);
+  iiArithAddCmd("kbase",               0, 430, CMD_12, 95);
+  iiArithAddCmd("keepring",            0, 289, 289, 96);
+  iiArithAddCmd("kernel",              0, 431, CMD_12, 97);
+  iiArithAddCmd("kill",                0, 318, 318, 98);
+  iiArithAddCmd("killattrib",          0, 432, CMD_12, 99);
+  iiArithAddCmd("koszul",              0, 291, CMD_23, 100);
+  iiArithAddCmd("kres",                0, 433, CMD_2, 101);
+  iiArithAddCmd("laguerre",            0, 434, CMD_13, 102);
+  iiArithAddCmd("lead",                0, 435, CMD_1, 103);
+  iiArithAddCmd("leadcoef",            0, 436, CMD_1, 104);
+  iiArithAddCmd("leadexp",             0, 437, CMD_1, 105);
+  iiArithAddCmd("leadmonom",           0, 438, CMD_1, 106);
+  iiArithAddCmd("lift",                0, 440, CMD_M, 107);
+  iiArithAddCmd("liftstd",             0, 439, CMD_M, 108);
+  iiArithAddCmd("link",                0, 441, ROOT_DECL, 109);
+  iiArithAddCmd("list",                0, 442, ROOT_DECL_LIST, 110);
+  iiArithAddCmd("listvar",             0, 320, 320, 111);
+  iiArithAddCmd("load",                0, 443, CMD_12, 112);
+  iiArithAddCmd("lres",                0, 444, CMD_2, 113);
+  iiArithAddCmd("ludecomp",            0, 445, CMD_1, 114);
+  iiArithAddCmd("luinverse",           0, 446, CMD_M, 115);
+  iiArithAddCmd("lusolve",             0, 447, CMD_M, 116);
+  iiArithAddCmd("map",                 0, 277, RING_DECL, 117);
+  iiArithAddCmd("matrix",              0, 278, 278, 118);
+  iiArithAddCmd("maxideal",            0, 292, CMD_1, 119);
+  iiArithAddCmd("memory",              0, 448, CMD_1, 120);
+  iiArithAddCmd("minbase",             0, 449, CMD_1, 121);
+  iiArithAddCmd("minor",               0, 450, CMD_M, 122);
+  iiArithAddCmd("minpoly",             0, 301, SYSVAR, 123);
+  iiArithAddCmd("minres",              0, 451, CMD_1, 124);
+  iiArithAddCmd("mod",                 0,  37, '/', 125);
+  iiArithAddCmd("module",              0, 279, 314, 126);
+  iiArithAddCmd("modulo",              0, 452, CMD_M, 127);
+  iiArithAddCmd("monitor",             0, 453, CMD_12, 128);
+  iiArithAddCmd("monomial",            0, 293, CMD_1, 129);
+  iiArithAddCmd("mpresmat",            0, 454, CMD_2, 130);
+  iiArithAddCmd("mres",                0, 455, CMD_2, 131);
+  iiArithAddCmd("mres_map",            0, 456, CMD_3, 132);
+  iiArithAddCmd("mstd",                0, 457, CMD_1, 133);
+  iiArithAddCmd("mult",                0, 458, CMD_1, 134);
+  iiArithAddCmd("multBound",           0, 299, SYSVAR, 135);
+  iiArithAddCmd("multiplicity",        1, 458, CMD_1, 136);
+  iiArithAddCmd("nameof",              0, 459, CMD_1, 137);
+  iiArithAddCmd("names",               0, 460, CMD_M, 138);
+  iiArithAddCmd("nc_algebra",          0, 463, CMD_2, 139);
+  iiArithAddCmd("ncalgebra",           2, 462, CMD_2, 140);
+  iiArithAddCmd("ncols",               0, 376, CMD_1, 141);
+  iiArithAddCmd("newstruct",           0, 461, CMD_23, 142);
+  iiArithAddCmd("noether",             0, 300, SYSVAR, 143);
+  iiArithAddCmd("not",                 0, 263, 263, 144);
+  iiArithAddCmd("npars",               0, 465, CMD_1, 145);
+  iiArithAddCmd("nres",                0, 493, CMD_2, 146);
+  iiArithAddCmd("nrows",               0, 501, CMD_1, 147);
+  iiArithAddCmd("number",              0, 280, RING_DECL, 148);
+  iiArithAddCmd("numerator",           0, 466, CMD_1, 149);
+  iiArithAddCmd("nvars",               0, 467, CMD_1, 150);
+  iiArithAddCmd("open",                0, 469, CMD_1, 151);
+  iiArithAddCmd("oppose",              0, 470, CMD_2, 152);
+  iiArithAddCmd("opposite",            0, 471, CMD_1, 153);
+  iiArithAddCmd("option",              0, 472, CMD_M, 154);
+  iiArithAddCmd("or",                  0, 124, '&', 155);
+  iiArithAddCmd("ord",                 0, 468, CMD_1, 156);
+  iiArithAddCmd("ordstr",              0, 473, CMD_1, 157);
+  iiArithAddCmd("package",             0, 474, ROOT_DECL, 158);
+  iiArithAddCmd("pagewidth",           0, 534, SYSVAR, 159);
+  iiArithAddCmd("par",                 0, 294, CMD_1, 160);
+  iiArithAddCmd("parameter",           0, 341, 341, 161);
+  iiArithAddCmd("pardeg",              0, 475, CMD_1, 162);
+  iiArithAddCmd("parstr",              0, 477, CMD_12, 163);
+  iiArithAddCmd("poly",                0, 281, RING_DECL, 164);
+  iiArithAddCmd("polyBucket",          0, 275, RING_DECL, 165);
+  iiArithAddCmd("preimage",            0, 295, CMD_13, 166);
+  iiArithAddCmd("prime",               0, 479, CMD_1, 167);
+  iiArithAddCmd("primefactors",        0, 478, CMD_12, 168);
+  iiArithAddCmd("print",               0, 480, CMD_12, 169);
+  iiArithAddCmd("printlevel",          0, 540, SYSVAR, 170);
+  iiArithAddCmd("proc",                0, 272, 272, 171);
+  iiArithAddCmd("prune",               0, 481, CMD_1, 172);
+  iiArithAddCmd("prune_map",           0, 482, CMD_2, 173);
+  iiArithAddCmd("qhweight",            0, 483, CMD_1, 174);
+  iiArithAddCmd("qrds",                0, 485, CMD_M, 175);
+  iiArithAddCmd("qring",               0, 484, ROOT_DECL, 176);
+  iiArithAddCmd("quote",               0, 335, 335, 177);
+  iiArithAddCmd("quotient",            0, 486, CMD_2, 178);
+  iiArithAddCmd("random",              0, 487, CMD_23, 179);
+  iiArithAddCmd("rank",                0, 488, CMD_12, 180);
+  iiArithAddCmd("read",                0, 489, CMD_12, 181);
+  iiArithAddCmd("reduce",              0, 490, CMD_M, 182);
+  iiArithAddCmd("regularity",          0, 491, CMD_1, 183);
+  iiArithAddCmd("repart",              0, 492, CMD_1, 184);
+  iiArithAddCmd("reservedName",        0, 494, CMD_M, 185);
+  iiArithAddCmd("reservedNameList",    0, 495, CMD_M, 186);
+  iiArithAddCmd("resolution",          0, 282, RING_DECL, 187);
+  iiArithAddCmd("restart",             0, 496, CMD_1, 188);
+  iiArithAddCmd("resultant",           0, 497, CMD_3, 189);
+  iiArithAddCmd("return",              0, 340, 340, 190);
+  iiArithAddCmd("rightstd",            0, 498, CMD_1, 191);
+  iiArithAddCmd("ring",                0, 273, 273, 192);
+  iiArithAddCmd("ring_list",           0, 500, CMD_1, 193);
+  iiArithAddCmd("ringlist",            0, 499, CMD_1, 194);
+  iiArithAddCmd("rtimer",              0, 536, SYSVAR, 195);
+  iiArithAddCmd("rvar",                0, 426, CMD_1, 196);
+  iiArithAddCmd("sba",                 0, 502, CMD_123, 197);
+  iiArithAddCmd("setring",             0, 321, 321, 198);
+  iiArithAddCmd("short",               0, 539, SYSVAR, 199);
+  iiArithAddCmd("simplex",             0, 503, CMD_M, 200);
+  iiArithAddCmd("simplify",            0, 504, CMD_2, 201);
+  iiArithAddCmd("size",                0, 379, CMD_1, 202);
+  iiArithAddCmd("slimgb",              0, 505, CMD_1, 203);
+  iiArithAddCmd("smatrix",             0, 283, 283, 204);
+  iiArithAddCmd("sortvec",             0, 506, CMD_1, 205);
+  iiArithAddCmd("sqrfree",             0, 507, CMD_12, 206);
+  iiArithAddCmd("sres",                0, 508, CMD_2, 207);
+  iiArithAddCmd("status",              0, 509, CMD_M, 208);
+  iiArithAddCmd("std",                 0, 510, CMD_M, 209);
+  iiArithAddCmd("string",              0, 511, ROOT_DECL_LIST, 210);
+  iiArithAddCmd("subst",               0, 512, CMD_M, 211);
+  iiArithAddCmd("system",              0, 513, CMD_M, 212);
+  iiArithAddCmd("syz",                 0, 514, CMD_12, 213);
+  iiArithAddCmd("tensor",              0, 515, CMD_2, 214);
+  iiArithAddCmd("test",                0, 516, CMD_M, 215);
+  iiArithAddCmd("timer",               0, 535, SYSVAR, 216);
+  iiArithAddCmd("trace",               0, 518, CMD_1, 217);
+  iiArithAddCmd("transpose",           0, 517, CMD_1, 218);
+  iiArithAddCmd("twostd",              0, 519, CMD_1, 219);
+  iiArithAddCmd("type",                0, 322, 322, 220);
+  iiArithAddCmd("typeof",              0, 520, CMD_1, 221);
+  iiArithAddCmd("univariate",          0, 521, CMD_1, 222);
+  iiArithAddCmd("uressolve",           0, 523, CMD_M, 223);
+  iiArithAddCmd("vandermonde",         0, 524, CMD_3, 224);
+  iiArithAddCmd("var",                 0, 296, CMD_1, 225);
+  iiArithAddCmd("variables",           0, 525, CMD_1, 226);
+  iiArithAddCmd("varstr",              0, 526, CMD_12, 227);
+  iiArithAddCmd("vdim",                0, 527, CMD_1, 228);
+  iiArithAddCmd("vector",              0, 284, RING_DECL, 229);
+  iiArithAddCmd("verbose",             2, 472, CMD_M, 230);
+  iiArithAddCmd("voice",               0, 538, SYSVAR, 231);
+  iiArithAddCmd("waitall",             0, 529, CMD_12, 232);
+  iiArithAddCmd("waitfirst",           0, 528, CMD_12, 233);
+  iiArithAddCmd("wedge",               0, 530, CMD_2, 234);
+  iiArithAddCmd("weight",              0, 531, CMD_1, 235);
+  iiArithAddCmd("whileif",             0, 337, 337, 236);
+  iiArithAddCmd("write",               0, 532, CMD_M, 237);
+  iiArithAddCmd("exit",                0,  -1, 0, 238);
+  iiArithAddCmd("for",                 0,  -1, 0, 239);
+  iiArithAddCmd("help",                0,  -1, 0, 240);
+  iiArithAddCmd("newline",             0,  -1, 0, 241);
+  iiArithAddCmd("pause",               2,  -1, 0, 242);
+  iiArithAddCmd("quit",                0,  -1, 0, 243);
+  iiArithAddCmd("while",               0,  -1, 0, 244);
 /* end of list marker */
-  sArithBase.nLastIdentifier = 234;
+  sArithBase.nLastIdentifier = 237;
 }
-#define LAST_IDENTIFIER 234
+#define LAST_IDENTIFIER 237

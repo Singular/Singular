@@ -151,6 +151,7 @@ and @code{LIB} no brackets are allowed.
 * monomial::
 * mpresmat::
 * mres::
+* mres_map::
 * mstd::
 * mult::
 * nameof::
@@ -174,6 +175,7 @@ and @code{LIB} no brackets are allowed.
 * print::
 * printf::
 * prune::
+* prune_map::
 * qhweight::
 * qrds::
 * quit::
@@ -340,8 +342,10 @@ basis like
 @item isHomog (for ideal, module)
 the weight vector of module generators for homogeneous or quasihomogeneous ideals/modules,
 @*used by @code{betti}, @code{degree}, @code{highcorner}, @code{hilbert},
-@code{homog}, @code{prune}, @code{sba}, @code{slimgb}, @code{std}, @code{syz},
-@code{kbase}, @code{modulo}, @code{mres}, @code{nres}, @code{stdhilb}.
+@code{homog}, @code{prune}, @code{prune_map}, @code{sba}, @code{slimgb},
+@code{std}, @code{syz},
+@code{kbase}, @code{modulo}, @code{mres}, @code{mres_map}, @code{nres},
+@code{stdhilb}.
 @item isCI
 complete intersection property
 @item isCM
@@ -474,7 +478,7 @@ generators in degree i+j of the j-th syzygy module (= module of
 relations) of R^n/M (the 0th (resp.@: 1st) syzygy module of R^n/M is R^n
 (resp.@: M)).
 @end ifinfo
-The argument is considered to be the result of a res/fres/sres/mres/nres/lres
+The argument is considered to be the result of a res/fres/sres/mres/mres_map/nres/lres
 command. This implies that a zero is only allowed (and counted) as a
 generator in the first module.
 @*For the computation betti uses only the initial monomials. This could lead
@@ -539,6 +543,7 @@ See
 @ref{hres};
 @ref{lres};
 @ref{mres};
+@ref{mres_map};
 @ref{print};
 @ref{res};
 @ref{sres};
@@ -3029,6 +3034,7 @@ See
 @ref{minres};
 @ref{module};
 @ref{mres};
+@ref{mres_map};
 @ref{res};
 @ref{fres};
 @ref{lres};
@@ -4177,6 +4183,7 @@ See
 @ref{minres};
 @ref{module};
 @ref{mres};
+@ref{mres_map};
 @ref{res};
 @ref{fres};
 @ref{hres};
@@ -4608,6 +4615,7 @@ See
 @ref{res};
 @ref{fres};
 @ref{mres};
+@ref{mres_map};
 @ref{sres}.
 @c ref
 @c --------------------------------------
@@ -4820,7 +4828,7 @@ See
 @ref{uressolve}.
 @c ref
 @c ---------------------------------------
-@node  mres, mstd, mpresmat, Functions
+@node  mres
 @subsection mres
 @cindex mres
 @table @code
@@ -4903,7 +4911,93 @@ See
 @ref{sres}.
 @c ref
 @c ---------------------------------------
-@node  mstd, mult, mres, Functions
+@node  mres_map
+@subsection mres_map
+@cindex mres_map
+@table @code
+@item @strong{Syntax:}
+@code{mres_map (} ideal_expression@code{,} int_expression @code{)}
+@*@code{mres_map (} module_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a minimal free resolution of an ideal or module M with the
+standard basis method. More precisely, let A=@code{matrix}(M), then @code{mres_map}
+computes a free resolution of
+@ifinfo
+coker(A)=F0/M
+@format
+                    A2       A1
+      ... ----> F2 ----> F1 ----> F0 --> F0/M --> 0.
+@end format
+@end ifinfo
+@tex
+$coker(A)=F_0/M$
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1
+\buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M
+\longrightarrow 0,$$
+@end tex
+where the columns of the matrix
+@tex
+$A_1$
+@end tex
+@ifinfo
+A1
+@end ifinfo
+are a minimal set of generators
+of M if the basering is local or if M is homogeneous.
+If the int expression k is not zero, then the computation stops after k steps
+and returns a list of modules
+@tex
+$M_i={\tt module}(A_i)$, i=1...k.
+@end tex
+@ifinfo
+Mi=module(Ai), i=1...k.
+@end ifinfo
+@*@code{mres_map(M,0,T)} returns a resolution consisting of at most n+2 modules,
+where n is the number of variables of the basering.
+Let @code{list L=mres_map(M,0,T);}
+ then @code{L[1]} consists of a minimal set of generators of the input, @code{L[2]}
+consists of a minimal set of generators for the first syzygy module of
+@code{L[1]}, etc., until @code{L[p+1]}, such that
+@ifinfo
+L[i]<>0 for i<=p,
+@end ifinfo
+@tex
+${\tt L[i]}\neq 0$ for $i \le p$,
+@end tex
+ but @code{L[p+1]}, the first syzygy module of @code{L[p]},
+is 0 (if the basering is not a qring).
+@item @strong{Note:}
+Accessing single elements of a resolution may require some partial
+computations to be finished and may therefore take some time.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=31991,(t,x,y,z,w),ls;
+  ideal M=t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
+          t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
+  smatrix T;
+  resolution L=mres_map(M,0,T);
+  L;
+  // projective dimension of M is 5
+  print(T);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{hres};
+@ref{lres};
+@ref{module};
+@ref{res};
+@ref{fres};
+@ref{mres};
+@ref{sres}.
+@c ref
+@c ---------------------------------------
+@node  mstd
 @subsection mstd
 @cindex mstd
 @table @code
@@ -6060,7 +6154,7 @@ See
 @c lib standard.lib:printf lib_fun lib_ex subsection
 
 @c ---------------------------------------
-@node prune, qhweight, printf, Functions
+@node prune
 @subsection prune
 @cindex prune
 @table @code
@@ -6092,7 +6186,43 @@ See
 @ref{module}.
 @c ref
 @c ---------------------------------------
-@node qhweight, qrds, prune, Functions
+@node prune_map
+@subsection prune_map
+@cindex prune_map
+@table @code
+@item @strong{Syntax:}
+@code{prune_map(} module_expression @code{,} smatrix_name @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+returns the module minimally embedded in a free module such that the
+corresponding factor modules are isomorphic together with the map
+(as matrix)
+@item @strong{Note:}
+If for the input module the attribute @code{"isHomog"} is
+set, @code{prune} also sets the attribute @code{"isHomog"}.@*
+For non-global orderings, only reduction steps with constant units are
+performed. Hence, the returned module does not need to be minimal.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  module m=gen(1),gen(3),[x,y,0,z],[x+y,0,0,0,1];
+  smatrix M;
+  print(m);
+  print(prune_map(m,M)); // pruned module
+  print(m*M); // apply map
+  print(M); // map
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{prune},
+@ref{module}.
+@c ref
+@c ---------------------------------------
+@node qhweight
 @subsection qhweight
 @cindex qhweight
 @table @code
@@ -7108,12 +7238,14 @@ See
 @*@code{size (} bigint_expression @code{)}
 @*@code{size (} number_expression @code{)}
 @*@code{size (} intvec_expression @code{)}
+@*@code{size (} bigintvec_expression @code{)}
 @*@code{size (} intmat_expression @code{)}
 @*@code{size (} poly_expression @code{)}
 @*@code{size (} vector_expression @code{)}
 @*@code{size (} ideal_expression @code{)}
 @*@code{size (} module_expression @code{)}
 @*@code{size (} matrix_expression @code{)}
+@*@code{size (} bigintmat_expression @code{)}
 @*@code{size (} list_expression @code{)}
 @*@code{size (} resolution_expression @code{)}
 @*@code{size (} ring_expression @code{)}
@@ -7124,11 +7256,11 @@ depends on the type of argument:
 @table @asis
 @item ideal or module
 returns the number of (non-zero) generators.
-@item string, intvec, list or resolution
+@item string, intvec, bigintvec, list or resolution
 returns the length, i.e., the number of characters, entries or elements.
 @item poly or vector
 returns the number of monomials.
-@item matrix or intmat
+@item matrix, bigintmat or intmat
 returns the number of entries (rows*columns).
 @item ring
 returns the number of elements in the ground field

@@ -6601,6 +6601,35 @@ BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
   return TRUE;
 }
 
+#if 0
+void iiReportMethods(int args, int iiOp, char* cmd)
+{
+  if (iiOp!=0)
+  {
+    int i=0;
+    const char*s =iiTwoOps(iiOp);
+    if (args==1)
+    {
+      while ((dArith1[i].cmd)!=0)
+      {
+        if (dArith1[i].cmd==iiOp)
+        {
+          Print(" %s (%s)  ->  %s",
+          s,
+          Tok2Cmdname(dArith1[i].arg),
+          Tok2Cmdname(dArith1[i].res));
+        }
+        i++;
+      }
+    }
+    else if (args==2)
+    {
+
+    }
+  }
+}
+#endif
+
 void iiSetReturn(const leftv source)
 {
   if ((source->next==NULL)&&(source->e==NULL))

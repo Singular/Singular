@@ -36,6 +36,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * cring::
 * bigint::
 * bigintmat::
+* bigintvec::
 * def::
 * ideal::
 * int::
@@ -315,7 +316,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node bigintmat, def, bigint, Data types
+@node bigintmat, bigintvec, bigint, Data types
 @section bigintmat
 @cindex bigintmat
 
@@ -481,9 +482,149 @@ second the column
 @c example
 @end smallexample
 
+@c ---------------------------------------
+@node bigintvec, def, bigintmat, Data types
+@section bigintvec
+@cindex bigintvec
+
+Big integer vectors are vectors with big integer entries.
+No basering definition is required to use bigint vectors, for they
+do not belong to a ring. Bigintvec entries can have any size because
+of the use of bigint.
+
+@menu
+* bigintvec declarations::
+* bigintvec expressions::
+* bigintvec type cast::
+* bigintvec operations::
+@end menu
+
+@c ------------------------------
+@node bigintvec declarations, bigintvec expressions, bigintvec, bigintvec
+@subsection bigintvec declarations
+@cindex bigintvec declarations
+
+@table @strong
+@item Syntax:
+@code{bigintvec} name @code{=} bigintvec_expression @code{;}
+@*@code{bigintvec} name @code{] =} list_of_int_and_bigint expressions @code{;}
+
+@item Purpose:
+defines a bigintvec variable.
+
+@item Default:
+empty
+
+@item Example:
+@smallexample
+@c example
+ bigintvec v=2, 5, 224553233465, 232444, 434, 0, 0, 4544232222;
+ v;
+ v[2];
+@c example
+@end smallexample
+@end table
+@c ------------------------------
+@node bigintvec expressions, bigintvec type cast, bigintvec declarations, bigintvec
+@subsection bigintvec expressions
+@cindex bigintvec expressions
+
+A bigintvec expression is:
+@enumerate
+@item
+an identifier of type bigintvec
+@item
+a function returning bigintvec
+@item
+a type cast to bigintvec (@pxref{bigintvec type cast})
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+  bigintmat m1[2][2]=1, 2, 6, 3;
+  bigintvev v=m1[1,1..2];
+  v;
+@c example
+@end smallexample
+@c ref
+See
+@ref{bigintvec};
+@ref{Type conversion and casting}.
+@c ref
+
+@c ------------------------------
+@node bigintvec type cast,  bigintvec operations, bigintvec expressions, bigintvec
+@subsection bigintvec type cast
+@cindex bigintvec type cast
+@table @code
+@item @strong{Syntax:}
+@code{bigintvec (} expression @code{)}
+@item @strong{Type:}
+bigintvec
+@item @strong{Purpose:}
+Converts expression to a bigintvec, where expression must be of type
+intvec, or bigintmat.The size of the created bigintvec
+equals the size of the expression.
+@item @strong{Example:}
+@smallexample
+@c example
+// TODO
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{bigintvec};
+@ref{Type conversion and casting}.
+@c ref
+
+@c ------------------------------
+@node bigintvec operations,, bigintvec type cast, bigintvec
+@subsection bigintvec operations
+@cindex bigintvec operations
+@cindex +
+@cindex -
+@cindex *
+
+@table @asis
+@item @code{+}
+addition with intvec, int, or bigint. In case of (big-)int, it is added to
+every entry of the vector.
+
+@item @code{-}
+negation or subtraction with intvec, int, or bigint. In case of (big-)int,
+it is subtracted from every entry of the matrix.
+
+@item @code{*}
+multiplication with int, or bigint; every entry
+of the vector is multiplied by the (big-)int
+
+@item @code{<>}, @code{==}
+comparators
+
+@item bigintvec_expression @code{[} int @code{]}
+is a bigintvec entry.
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example error
+  bigintvec v = 3,3,6,3,5,2,2,7,0,0,45,3;
+  v;
+  v[3];               // show entry at [3]
+  v[3] = 10;          // set entry at [3] to 10
+  v;
+  size(v);         // number of entries
+  -v;
+  v-10;
+  v*2;           // double each entry of v
+@c example
+@end smallexample
+
 
 @c ---------------------------------------
-@node def, ideal, bigintmat, Data types
+@node def, ideal, bigintvec, Data types
 @section def
 @cindex def
 @cindex untyped definitions

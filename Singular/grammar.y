@@ -190,6 +190,7 @@ void yyerror(const char * fmt)
 /* types, part 1 (ring indep.)*/
 %token <i> GRING_CMD
 %token <i> BIGINTMAT_CMD
+%token <i> BIGINTVEC_CMD
 %token <i> INTMAT_CMD
 %token <i> PROC_CMD
 %token <i> RING_CMD

@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 LIB "pointid.lib";
-ring R = 0,x(1..3),rp;
+ring R = 0,x(1..3),ip;
 vector a1 = [4,0,0];
 vector a2 = [2,1,4];
 vector a3 = [2,4,0];

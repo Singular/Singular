@@ -2738,15 +2738,87 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   return res;
 }
 
+extern void ipPrint_MA0(matrix m, const char *name);
 ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
 {
-  int *red_comp=(int*)omAlloc((arg->rank+1)*sizeof(int));
-  int del=0;
-  ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
-  trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
-  //idDeleteComps(res,red_comp,del);
-  omFree(red_comp);
-  return res;
+  ideal a=idCopy(arg);
+  // add unit matrix to a
+  int k=a->rank+1;
+  const int rk=a->rank;
+  poly p;
+  int i;
+  for(i=0;i<IDELEMS(a);i++,k++)
+  {
+    p=pOne();
+    pSetComp(p,k);pSetmComp(p);
+    a->m[i]=p_Add_q(a->m[i],p,currRing);
+  }
+  // search a unit in orig part of a
+  // and substract, start at start
+  int start=0;
+  loop
+  {
+  PrintS("matrix:\n");
+  ipPrint_MA0((matrix)a,"a");
+    i=start;
+    if (i>=IDELEMS(a)) break;
+    p=a->m[i];
+    start=IDELEMS(a);
+    while((p!=NULL)&&(pGetComp(p)<=rk)&&(p_Totaldegree(p,currRing)>0)) pIter(p);
+    if ((p!=NULL)&&(pGetComp(p)<=rk)&&(p_Totaldegree(p,currRing)==0))
+    { // found const in vector i, comp k
+      k=pGetComp(p);
+      // normalize:
+      number n=nCopy(pGetCoeff(p));
+      n=nInpNeg(n);
+      a->m[i]=p_Div_nn(p,n,currRing);
+      // subtract
+      BOOLEAN changed=FALSE;
+      for(int j=IDELEMS(a)-1;j>=0;j--)
+      {
+        if (j!=i)
+        {
+          poly q=p_Vec2Poly(a->m[j],k,currRing);
+          if (q!=NULL)
+          {
+            start=j; // changed entries start at j
+            changed=TRUE;
+            poly s=p_Mult_q(a->m[i],q,currRing);
+            a->m[j]=p_Add_q(a->m[j],s,currRing);
+          }
+        }
+      }
+      if(changed) continue;
+    }
+    else i++;
+  }
+  // a -> result,trans
+  trans=idInit(IDELEMS(a),IDELEMS(a));
+  ideal result=idInit(IDELEMS(a),rk);
+  for(i=0;i<IDELEMS(a);i++)
+  {
+    while(a->m[i]!=NULL)
+    {
+      poly p=a->m[i];
+      a->m[i]=p->next;
+      p->next=NULL;
+      if(pGetComp(p)<=rk)
+      {
+        result->m[i]=p_Add_q(result->m[i],p,currRing);
+      }
+      else
+      {
+        p_Shift(&p,-rk,currRing);
+        trans->m[i]=p_Add_q(trans->m[i],p,currRing);
+      }
+    }
+  }
+  PrintS("prune:\n");
+  ipPrint_MA0((matrix)result,"R");
+  PrintS("trans:\n");
+  ipPrint_MA0((matrix)trans,"T");
+  idDelete(&a);
+  return result;
 }
 #include "polys/clapsing.h"
 

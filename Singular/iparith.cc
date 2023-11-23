@@ -374,6 +374,7 @@ static BOOLEAN jjCOMPARE_BIM(leftv res, leftv u, leftv v)
   int r=a->compare(b);
   switch  (iiOp)
   {
+  #if 0
     case '<':
       res->data  = (char *) (r<0);
       break;
@@ -386,6 +387,7 @@ static BOOLEAN jjCOMPARE_BIM(leftv res, leftv u, leftv v)
     case GE:
       res->data  = (char *) (r>=0);
       break;
+   #endif   
     case EQUAL_EQUAL:
     case NOTEQUAL: /* negation handled by jjEQUAL_REST */
       res->data  = (char *) (r==0);
@@ -2418,6 +2420,17 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 #endif
   assumeStdFlag(u);
   intvec *module_w=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
+#if 1  
+  switch((int)(long)v->Data())
+  {
+    case 1:
+      res->data=(void *)hFirstSeries0b((ideal)u->Data(),currRing->qideal,NULL,module_w,currRing,coeffs_BIGINT);
+      return FALSE;
+    case 2:
+      res->data=(void *)hSecondSeries0b((ideal)u->Data(),currRing->qideal,NULL,module_w,currRing,coeffs_BIGINT);
+      return FALSE;
+  }
+#else
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal);
   if (errorreported) return TRUE;
 
@@ -2432,6 +2445,7 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
       return FALSE;
   }
   delete iv;
+#endif
   WerrorS(feNotImplemented);
   return TRUE;
 }
@@ -3046,6 +3060,44 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 }
 #endif /* HAVE_PLURAL */
 
+static BOOLEAN jjPRUNE_MAP(leftv res, leftv v, leftv ma)
+{
+  if ((ma->rtyp!=IDHDL)||(ma->e!=NULL))
+  {
+    WerrorS("2nd argument must have a name");
+    return TRUE;
+  }
+
+  intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  ideal v_id=(ideal)v->Data();
+  if (w!=NULL)
+  {
+    if (!idTestHomModule(v_id,currRing->qideal,w))
+    {
+      WarnS("wrong weights");
+      w=NULL;
+      // and continue at the non-homog case below
+    }
+    else
+    {
+      w=ivCopy(w);
+      intvec **ww=&w;
+      ideal mat;
+      res->data = (char *)idMinEmbedding_with_map(v_id,ww,mat);
+      atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
+      idhdl h=(idhdl)ma->data;
+      idDelete(&IDIDEAL(h));
+      IDIDEAL(h)=mat;
+      return FALSE;
+    }
+  }
+  ideal mat;
+  res->data = (char *)idMinEmbedding_with_map(v_id,NULL,mat);
+  idhdl h=(idhdl)ma->data;
+  idDelete(&IDIDEAL(h));
+  IDIDEAL(h)=mat;
+  return FALSE;
+}
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idQuot((ideal)u->Data(),(ideal)v->Data(),
@@ -6507,6 +6559,89 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     res->data = getMinorIdeal(m, mk, (noK ? 0 : k), algorithm,
                               (noIdeal ? 0 : IasSB), false);
   if (v_typ!=MATRIX_CMD) idDelete((ideal *)&m);
+  return FALSE;
+}
+static BOOLEAN jjMRES_MAP(leftv res, leftv u, leftv v, leftv ma)
+{
+  if ((ma->rtyp!=IDHDL)||(ma->e!=NULL))
+  {
+    WerrorS("3rd argument must have a name");
+    return TRUE;
+  }
+  int maxl=(int)(long)v->Data();
+  if (maxl<0)
+  {
+    WerrorS("length for res must not be negative");
+    return TRUE;
+  }
+  syStrategy r;
+  intvec *weights=NULL;
+  int wmaxl=maxl;
+  ideal u_id=(ideal)u->Data();
+
+  maxl--;
+  if (/*(*/ maxl==-1 /*)*/)
+  {
+    maxl = currRing->N-1+2;
+    if (currRing->qideal!=NULL)
+    {
+      Warn(
+      "full resolution in a qring may be infinite, setting max length to %d",
+      maxl+1);
+    }
+  }
+  weights=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
+  if (weights!=NULL)
+  {
+    if (!idTestHomModule(u_id,currRing->qideal,weights))
+    {
+      WarnS("wrong weights given:");weights->show();PrintLn();
+      weights=NULL;
+    }
+  }
+  intvec *ww=NULL;
+  int add_row_shift=0;
+  if (weights!=NULL)
+  {
+     ww=ivCopy(weights);
+     add_row_shift = ww->min_in();
+     (*ww) -= add_row_shift;
+  }
+  unsigned save_opt=si_opt_1;
+  si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
+  u_id=(ideal)u->CopyD();
+  ideal mat;
+  r=syMres_with_map(u_id,maxl,ww,mat);
+  idhdl h=(idhdl)ma->data;
+  idDelete(&IDIDEAL(h));
+  IDIDEAL(h)=mat;
+  if (r->list_length>wmaxl)
+  {
+    for(int i=wmaxl-1;i>=r->list_length;i--)
+    {
+      if (r->fullres[i]!=NULL) id_Delete(&r->fullres[i],currRing);
+      if (r->minres[i]!=NULL) id_Delete(&r->minres[i],currRing);
+    }
+  }
+  r->list_length=wmaxl;
+  res->data=(void *)r;
+  if ((weights!=NULL) && (ww!=NULL)) { delete ww; ww=NULL; }
+  if ((r->weights!=NULL) && (r->weights[0]!=NULL))
+  {
+    ww=ivCopy(r->weights[0]);
+    if (weights!=NULL) (*ww) += add_row_shift;
+    atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
+  }
+  else
+  {
+    if (weights!=NULL)
+    {
+      atSet(res,omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
+    }
+  }
+  assume( (r->syRing != NULL) == (r->resPairs != NULL) );
+  assume( (r->minres != NULL) || (r->fullres != NULL) );
+  si_opt_1=save_opt;
   return FALSE;
 }
 static BOOLEAN jjNEWSTRUCT3(leftv, leftv u, leftv v, leftv w)

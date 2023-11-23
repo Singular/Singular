@@ -1,6 +1,6 @@
 #!/bin/sh
 # generate iparith.inc, feOpt.inc, feOptTS.inc,feOptES.inc
-BUILD_DIR=/tmp/wawa
+BUILD_DIR=/tmp/tst2
 g++ -I.. -I../libpolys -I$BUILD_DIR -I$BUILD_DIR/libpolys gentable.cc -o gentable
 ./gentable
 g++ feOptGen.cc -I.. -I../libpolys -I$BUILD_DIR -I$BUILD_DIR/libpolys -o feOptGen

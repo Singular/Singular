@@ -56,7 +56,7 @@ static const char * const ringorder_name[] =
   "s", ///< ringorder_s,
   "lp", ///< ringorder_lp,
   "dp", ///< ringorder_dp,
-  "rp", ///< ringorder_ip, // will become "ip"
+  "ip", ///< ringorder_ip,
   "Dp", ///< ringorder_Dp,
   "wp", ///< ringorder_wp,
   "Wp", ///< ringorder_Wp,
@@ -69,7 +69,7 @@ static const char * const ringorder_name[] =
   "am",  ///< ringorder_am,
   "L", ///< ringorder_L,
   "aa", ///< ringorder_aa
-  "rs", ///< ringorder_is, // will become "is"
+  "is", ///< ringorder_is,
   "IS", ///<  ringorder_IS
   " _" ///< ringorder_unspec
 };

@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 LIB "pointid.lib";
-ring R1 = 0,x(1..3),rp;
+ring R1 = 0,x(1..3),ip;
 vector a1 = [4,0,0];
 vector a2 = [2,1,4];
 vector a3 = [2,4,0];
@@ -19,7 +19,7 @@ nonMonomials(MAT);
 module MOD = gen(3),gen(2)-2*gen(3),2*gen(1)+2*gen(3),2*gen(2)-2*gen(3),gen(1)+3*gen(3),gen(1)+gen(2)+3*gen(3),gen(1)+gen(2)+gen(3);
 print(MOD);
 nonMonomials(MOD);
-ring R2 = 0,x(1..2),rp;
+ring R2 = 0,x(1..2),ip;
 list l1 = 0,0;
 list l2 = 0,1;
 list l3 = 2,0;
