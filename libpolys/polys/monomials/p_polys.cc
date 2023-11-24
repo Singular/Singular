@@ -1508,30 +1508,33 @@ poly p_Div_nn(poly p, const number n, const ring r)
   p_Test(p, r);
   poly result = p;
   poly prev = NULL;
-  while (p!=NULL)
+  if (!n_IsOne(n,r->cf))
   {
-    number nc = n_Div(pGetCoeff(p),n,r->cf);
-    if (!n_IsZero(nc,r->cf))
+    while (p!=NULL)
     {
-      p_SetCoeff(p,nc,r);
-      prev=p;
-      pIter(p);
-    }
-    else
-    {
-      if (prev==NULL)
+      number nc = n_Div(pGetCoeff(p),n,r->cf);
+      if (!n_IsZero(nc,r->cf))
       {
-        p_LmDelete(&result,r);
-        p=result;
+        p_SetCoeff(p,nc,r);
+        prev=p;
+        pIter(p);
       }
       else
       {
-        p_LmDelete(&pNext(prev),r);
-        p=pNext(prev);
+        if (prev==NULL)
+        {
+          p_LmDelete(&result,r);
+          p=result;
+        }
+        else
+        {
+          p_LmDelete(&pNext(prev),r);
+          p=pNext(prev);
+        }
       }
     }
+    p_Test(result,r);
   }
-  p_Test(result,r);
   return(result);
 }
 
