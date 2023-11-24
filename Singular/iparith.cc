@@ -387,7 +387,7 @@ static BOOLEAN jjCOMPARE_BIM(leftv res, leftv u, leftv v)
     case GE:
       res->data  = (char *) (r>=0);
       break;
-   #endif   
+   #endif
     case EQUAL_EQUAL:
     case NOTEQUAL: /* negation handled by jjEQUAL_REST */
       res->data  = (char *) (r==0);
@@ -2420,7 +2420,7 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 #endif
   assumeStdFlag(u);
   intvec *module_w=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
-#if 1  
+#if 1
   switch((int)(long)v->Data())
   {
     case 1:
@@ -4469,6 +4469,15 @@ static BOOLEAN jjINTERRED(leftv res, leftv v)
   ideal result=kInterRed((ideal)(v->Data()), currRing->qideal);
   if (TEST_OPT_PROT) { PrintLn(); mflush(); }
   res->data = result;
+  return FALSE;
+}
+static BOOLEAN jjBIV2IV(leftv res, leftv v)
+{
+  bigintmat* aa= (bigintmat *)v->Data();
+  int l=aa->cols();
+  intvec *iv=new intvec(l);
+  for(int i=0;i<l;i++) (*iv)[i]=iin_Int(BIMATELEM((*aa),1,i+1),coeffs_BIGINT);
+  res->data = (void*)iv;
   return FALSE;
 }
 static BOOLEAN jjIS_RINGVAR_P(leftv res, leftv v)
@@ -7897,6 +7906,67 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
     h=h->next;
   }
   res->data=(char *)iv;
+  return FALSE;
+}
+static BOOLEAN jjBIGINTVEC_PL(leftv res, leftv v)
+{
+  leftv h=v;
+  int l=0;
+  while (h!=NULL)
+  {
+    if(h->Typ()==INT_CMD) l++;
+    else if (h->Typ()==BIGINT_CMD) l++;
+    else if (h->Typ()==INTVEC_CMD)
+    {
+      intvec *ivv=(intvec*)h->Data();
+      l+=ivv->rows();
+    }
+    else if (h->Typ()==BIGINTVEC_CMD)
+    {
+      bigintmat *ivv=(bigintmat *)h->Data();
+      l+=ivv->rows();
+    }
+    else return TRUE;
+    h=h->next;
+  }
+  bigintmat *bim=new bigintmat(1,l,coeffs_BIGINT);
+  h=v;
+  int i=0;
+  while (h!=NULL)
+  {
+    if(h->Typ()==INT_CMD)
+    {
+      number tp = n_Init((long)(h->Data()), coeffs_BIGINT);
+      bim->set(i++, tp);
+      n_Delete(&tp, coeffs_BIGINT);
+    }
+    else if (h->Typ()==INTVEC_CMD)
+    {
+      intvec *ivv=(intvec*)h->Data();
+      for(int j=0;j<ivv->length();j++)
+      {
+        number tp = n_Init((long)(*ivv)[j], coeffs_BIGINT);
+        bim->set(i++, tp);
+        n_Delete(&tp, coeffs_BIGINT);
+      }
+    }
+    else if(h->Typ()==BIGINT_CMD)
+    {
+      number tp = (number)h->Data();
+      bim->set(i++, tp);
+    }
+    else if(h->Typ()==BIGINTVEC_CMD)
+    {
+      bigintmat *b=(bigintmat*)h->Data();
+      for(int j=0;j<b->cols();j++)
+      {
+        number tp=BIMATELEM((*b),1,j);
+        bim->set(i++, tp);
+      }
+    }
+    h=h->next;
+  }
+  res->data=(char *)bim;
   return FALSE;
 }
 static BOOLEAN jjJET4(leftv res, leftv u)

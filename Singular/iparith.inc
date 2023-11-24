@@ -35,6 +35,7 @@
 // operation: bigint (number)  ->  bigint
 // operation: bigint (poly)  ->  bigint
 // operation: bigintmat (bigintmat)  ->  bigintmat
+// operation: bigintvec (bigintvec)  ->  bigintvec
 // operation: char (ring)  ->  int
 // operation: char_series (ideal)  ->  matrix, only commutative rings, field coeffs
 // operation: charstr (ring)  ->  string
@@ -115,6 +116,7 @@
 // operation: intmat (intmat)  ->  intmat
 // operation: intvec (intmat)  ->  intvec
 // operation: intvec (intvec)  ->  intvec
+// operation: intvec (bigintvec)  ->  intvec
 // operation: rvar (poly)  ->  int
 // operation: rvar (string)  ->  int
 // operation: rvar (any_type)  ->  int
@@ -185,7 +187,7 @@
 // operation: print (list)  ->  string
 // operation: print (def)  ->  string
 // operation: proc (proc)  ->  proc
-// operation: prune (module)  ->  module
+// operation: prune (module)  ->  module, field coeffs
 // operation: qhweight (ideal)  ->  intvec
 // operation: qhweight (module)  ->  intvec
 // operation: rank (matrix)  ->  int, field coeffs
@@ -760,6 +762,8 @@
 /*---------------------------------------------*/
 // operation: ( (...)  ->  any_type ( number of arguments >0 )
 // operation: [ (...)  ->  ring ( number of arguments >0 )
+// operation: bigintvec (...)  ->  bigintvec ( 1 arguments )
+// operation: bigintvec (...)  ->  bigintvec ( number of arguments >0 )
 // operation: breakpoint (...)  ->  nothing ( 0 arguments )
 // operation: breakpoint (...)  ->  nothing ( number of arguments >0 )
 // operation: branchTo (...)  ->  nothing ( number of arguments >0 )
@@ -872,6 +876,7 @@
 /*---------------------------------------------*/
 // convert bigintvec -> bigintmat
 // convert intmat -> bigintmat
+// convert intvec -> bigintvec
 // convert intvec -> intmat
 // convert polyBucket -> ideal
 // convert poly -> ideal
@@ -1169,136 +1174,137 @@ const struct sValCmdTab dArithTab1[]=
  { 40,11 }, /* ( */
  { 45,2 }, /* - */
  { 262,1 }, /* -- */
- { 263,150 }, /* not */
+ { 263,152 }, /* not */
  { 265,0 }, /* ++ */
  { 269,22 }, /* bigintmat */
- { 271,99 }, /* intmat */
- { 272,172 }, /* proc */
- { 273,188 }, /* ring */
- { 276,85 }, /* ideal */
- { 277,131 }, /* map */
- { 278,132 }, /* matrix */
- { 279,139 }, /* module */
- { 280,151 }, /* number */
- { 281,166 }, /* poly */
- { 282,181 }, /* resolution */
- { 283,202 }, /* smatrix */
- { 284,229 }, /* vector */
+ { 270,23 }, /* bigintvec */
+ { 271,100 }, /* intmat */
+ { 272,174 }, /* proc */
+ { 273,190 }, /* ring */
+ { 276,86 }, /* ideal */
+ { 277,133 }, /* map */
+ { 278,134 }, /* matrix */
+ { 279,141 }, /* module */
+ { 280,153 }, /* number */
+ { 281,168 }, /* poly */
+ { 282,183 }, /* resolution */
+ { 283,204 }, /* smatrix */
+ { 284,231 }, /* vector */
  { 285,15 }, /* betti */
- { 286,70 }, /* gen */
- { 288,75 }, /* freemodule */
- { 292,133 }, /* maxideal */
- { 293,141 }, /* monomial */
- { 294,162 }, /* par */
- { 295,168 }, /* preimage */
- { 296,232 }, /* var */
- { 321,199 }, /* setring */
+ { 286,71 }, /* gen */
+ { 288,76 }, /* freemodule */
+ { 292,135 }, /* maxideal */
+ { 293,143 }, /* monomial */
+ { 294,164 }, /* par */
+ { 295,170 }, /* preimage */
+ { 296,234 }, /* var */
+ { 321,201 }, /* setring */
  { 360,12 }, /* attrib */
  { 361,13 }, /* bareiss */
  { 362,19 }, /* bigint */
- { 366,23 }, /* char */
- { 367,25 }, /* charstr */
- { 368,24 }, /* char_series */
- { 371,154 }, /* $INVALID$ */
- { 373,26 }, /* close */
- { 374,27 }, /* coeffs */
- { 376,28 }, /* ncols */
- { 377,34 }, /* cleardenom */
- { 379,36 }, /* size */
- { 380,51 }, /* cring */
- { 382,52 }, /* def */
- { 383,59 }, /* defined */
- { 384,54 }, /* deg */
- { 385,57 }, /* degree */
- { 387,60 }, /* denominator */
- { 388,62 }, /* det */
- { 390,66 }, /* dim */
- { 392,69 }, /* dump */
- { 395,212 }, /* envelope */
- { 396,72 }, /* ERROR */
- { 397,71 }, /* execute */
- { 400,73 }, /* factorize */
- { 403,76 }, /* facstd */
- { 409,74 }, /* finduni */
- { 411,77 }, /* getdump */
- { 412,78 }, /* highcorner */
- { 413,80 }, /* hilb */
- { 414,83 }, /* homog */
- { 416,90 }, /* impart */
- { 418,91 }, /* indepSet */
- { 420,92 }, /* int */
- { 423,97 }, /* interred */
- { 425,101 }, /* intvec */
- { 426,103 }, /* rvar */
- { 427,106 }, /* jacob */
- { 428,109 }, /* janet */
- { 430,110 }, /* kbase */
- { 431,112 }, /* kernel */
- { 432,118 }, /* killattrib */
- { 434,114 }, /* laguerre */
- { 435,119 }, /* lead */
- { 436,123 }, /* leadcoef */
- { 437,125 }, /* leadexp */
- { 438,127 }, /* leadmonom */
- { 441,129 }, /* link */
- { 442,130 }, /* list */
- { 443,237 }, /* load */
- { 445,115 }, /* ludecomp */
- { 448,134 }, /* memory */
- { 449,135 }, /* minbase */
- { 451,137 }, /* minres */
- { 453,140 }, /* monitor */
- { 457,144 }, /* mstd */
- { 458,142 }, /* mult */
- { 459,146 }, /* nameof */
- { 460,147 }, /* names */
- { 464,238 }, /* convhull */
- { 465,155 }, /* npars */
- { 466,61 }, /* numerator */
- { 467,156 }, /* nvars */
- { 468,159 }, /* ord */
- { 469,157 }, /* open */
- { 471,213 }, /* opposite */
- { 472,158 }, /* option */
- { 473,161 }, /* ordstr */
- { 475,163 }, /* pardeg */
- { 477,164 }, /* parstr */
- { 478,116 }, /* primefactors */
- { 479,169 }, /* prime */
- { 480,170 }, /* print */
- { 481,173 }, /* prune */
- { 483,174 }, /* qhweight */
- { 488,176 }, /* rank */
- { 489,177 }, /* read */
- { 491,178 }, /* regularity */
- { 492,179 }, /* repart */
- { 494,180 }, /* reservedName */
- { 496,183 }, /* restart */
- { 498,184 }, /* rightstd */
- { 499,185 }, /* ringlist */
- { 500,186 }, /* ring_list */
- { 501,190 }, /* nrows */
- { 502,197 }, /* sba */
- { 505,200 }, /* slimgb */
- { 506,203 }, /* sortvec */
- { 507,205 }, /* sqrfree */
- { 510,206 }, /* std */
- { 511,209 }, /* string */
- { 514,210 }, /* syz */
- { 517,218 }, /* transpose */
- { 518,216 }, /* trace */
- { 519,214 }, /* twostd */
- { 520,224 }, /* typeof */
- { 521,225 }, /* univariate */
- { 525,226 }, /* variables */
- { 526,233 }, /* varstr */
- { 527,230 }, /* vdim */
- { 528,239 }, /* waitfirst */
- { 529,240 }, /* waitall */
- { 531,235 }, /* weight */
+ { 366,24 }, /* char */
+ { 367,26 }, /* charstr */
+ { 368,25 }, /* char_series */
+ { 371,156 }, /* $INVALID$ */
+ { 373,27 }, /* close */
+ { 374,28 }, /* coeffs */
+ { 376,29 }, /* ncols */
+ { 377,35 }, /* cleardenom */
+ { 379,37 }, /* size */
+ { 380,52 }, /* cring */
+ { 382,53 }, /* def */
+ { 383,60 }, /* defined */
+ { 384,55 }, /* deg */
+ { 385,58 }, /* degree */
+ { 387,61 }, /* denominator */
+ { 388,63 }, /* det */
+ { 390,67 }, /* dim */
+ { 392,70 }, /* dump */
+ { 395,214 }, /* envelope */
+ { 396,73 }, /* ERROR */
+ { 397,72 }, /* execute */
+ { 400,74 }, /* factorize */
+ { 403,77 }, /* facstd */
+ { 409,75 }, /* finduni */
+ { 411,78 }, /* getdump */
+ { 412,79 }, /* highcorner */
+ { 413,81 }, /* hilb */
+ { 414,84 }, /* homog */
+ { 416,91 }, /* impart */
+ { 418,92 }, /* indepSet */
+ { 420,93 }, /* int */
+ { 423,98 }, /* interred */
+ { 425,102 }, /* intvec */
+ { 426,105 }, /* rvar */
+ { 427,108 }, /* jacob */
+ { 428,111 }, /* janet */
+ { 430,112 }, /* kbase */
+ { 431,114 }, /* kernel */
+ { 432,120 }, /* killattrib */
+ { 434,116 }, /* laguerre */
+ { 435,121 }, /* lead */
+ { 436,125 }, /* leadcoef */
+ { 437,127 }, /* leadexp */
+ { 438,129 }, /* leadmonom */
+ { 441,131 }, /* link */
+ { 442,132 }, /* list */
+ { 443,239 }, /* load */
+ { 445,117 }, /* ludecomp */
+ { 448,136 }, /* memory */
+ { 449,137 }, /* minbase */
+ { 451,139 }, /* minres */
+ { 453,142 }, /* monitor */
+ { 457,146 }, /* mstd */
+ { 458,144 }, /* mult */
+ { 459,148 }, /* nameof */
+ { 460,149 }, /* names */
+ { 464,240 }, /* convhull */
+ { 465,157 }, /* npars */
+ { 466,62 }, /* numerator */
+ { 467,158 }, /* nvars */
+ { 468,161 }, /* ord */
+ { 469,159 }, /* open */
+ { 471,215 }, /* opposite */
+ { 472,160 }, /* option */
+ { 473,163 }, /* ordstr */
+ { 475,165 }, /* pardeg */
+ { 477,166 }, /* parstr */
+ { 478,118 }, /* primefactors */
+ { 479,171 }, /* prime */
+ { 480,172 }, /* print */
+ { 481,175 }, /* prune */
+ { 483,176 }, /* qhweight */
+ { 488,178 }, /* rank */
+ { 489,179 }, /* read */
+ { 491,180 }, /* regularity */
+ { 492,181 }, /* repart */
+ { 494,182 }, /* reservedName */
+ { 496,185 }, /* restart */
+ { 498,186 }, /* rightstd */
+ { 499,187 }, /* ringlist */
+ { 500,188 }, /* ring_list */
+ { 501,192 }, /* nrows */
+ { 502,199 }, /* sba */
+ { 505,202 }, /* slimgb */
+ { 506,205 }, /* sortvec */
+ { 507,207 }, /* sqrfree */
+ { 510,208 }, /* std */
+ { 511,211 }, /* string */
+ { 514,212 }, /* syz */
+ { 517,220 }, /* transpose */
+ { 518,218 }, /* trace */
+ { 519,216 }, /* twostd */
+ { 520,226 }, /* typeof */
+ { 521,227 }, /* univariate */
+ { 525,228 }, /* variables */
+ { 526,235 }, /* varstr */
+ { 527,232 }, /* vdim */
+ { 528,241 }, /* waitfirst */
+ { 529,242 }, /* waitall */
+ { 531,237 }, /* weight */
  { 10000,0 }
 };
-#define JJTAB1LEN 130
+#define JJTAB1LEN 131
 const struct sValCmdTab dArithTab2[]=
 {
  { 37,119 }, /* % */

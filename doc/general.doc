@@ -2881,6 +2881,8 @@ conversions are:
 @   28. @tab @code{string}  @tab @expansion{} @code{link}
 @item
 @   29. @tab @code{resolution}  @tab @expansion{} @code{list}
+@item
+@   30. @tab @code{intvec}  @tab @expansion{} @code{bigintvec}
 @end multitable
 
 @subsubheading Type casting
@@ -2908,7 +2910,7 @@ Possible type casts are:
 @item
 @    @tab  @code{int} @tab    @code{number}, @code{poly}
 @item
-@    @tab  @code{intvec} @tab expression lists of @code{int}, @code{intmat}
+@    @tab  @code{intvec} @tab expression lists of @code{int}, @code{intmat}, @code{bigintvec}
 @item
 @    @tab  @code{intmat} @tab @code{intvec} (@pxref{intmat type cast})
 @item

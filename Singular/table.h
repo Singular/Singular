@@ -69,6 +69,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjN2BI),       BIGINT_CMD,      BIGINT_CMD,     NUMBER_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjP2BI),       BIGINT_CMD,      BIGINT_CMD,     POLY_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjDUMMY),      BIGINTMAT_CMD,   BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_NC |ALLOW_RING}
+,{D(jjDUMMY),      BIGINTVEC_CMD,   BIGINTVEC_CMD,  BIGINTVEC_CMD , ALLOW_NC |ALLOW_RING}
 ,{D(jjCHAR),       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCHARSERIES), CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD     , NO_NC |NO_RING}
 ,{D(jjrCharStr),   CHARSTR_CMD,     STRING_CMD,     RING_CMD      , ALLOW_NC |ALLOW_RING}
@@ -160,6 +161,7 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjDUMMY),      INTMAT_CMD,      INTMAT_CMD,     INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjIm2Iv),      INTVEC_CMD,      INTVEC_CMD,     INTMAT_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjDUMMY),      INTVEC_CMD,      INTVEC_CMD,     INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
+,{D(jjBIV2IV),     INTVEC_CMD,      INTVEC_CMD,     BIGINTVEC_CMD , ALLOW_NC |ALLOW_RING}
 ,{D(jjIS_RINGVAR_P), IS_RINGVAR,    INT_CMD,        POLY_CMD      , ALLOW_NC |ALLOW_RING}
 ,{D(jjIS_RINGVAR_S), IS_RINGVAR,    INT_CMD,        STRING_CMD    , ALLOW_NC |ALLOW_RING}
 ,{D(jjIS_RINGVAR0),IS_RINGVAR,      INT_CMD,        ANY_TYPE      , ALLOW_NC |ALLOW_RING}
@@ -939,6 +941,8 @@ const struct sValCmdM dArithM[]=
 // proc            cmd               res        number_of_args   context
  {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjRING_PL),   '[',             RING_CMD,           -2      , ALLOW_NC |ALLOW_RING}
+,{D(jjCALL1ARG),  BIGINTVEC_CMD,   BIGINTVEC_CMD,       1       , ALLOW_NC |ALLOW_RING}
+,{D(jjBIGINTVEC_PL), BIGINTVEC_CMD,BIGINTVEC_CMD,      -2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_NC |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_NC |ALLOW_RING}
 ,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_NC |ALLOW_RING}
@@ -1340,6 +1344,7 @@ const struct sConvertTypes dConvertTypes[] =
    { INT_CMD,         INTVEC_CMD,     D(iiI2Iv) , NULL_VAL },
 //  intvec -> intmat
    { INTVEC_CMD,      INTMAT_CMD,     D(iiDummy), NULL_VAL },
+   { INTVEC_CMD,      BIGINTVEC_CMD,  D(iiIV2BIV), NULL_VAL },
 //  intvec -> matrix
    { INTVEC_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL_VAL },
 //  intmat -> bigintmat
