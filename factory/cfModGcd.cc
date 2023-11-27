@@ -1826,7 +1826,6 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   #else
   factoryError("NTL/FLINT missing: gaussianElimFq");
   #endif
-  delete N;
 
   M= (*N) (1, M.rows(), 1, M.columns());
   L= CFArray (M.rows());
