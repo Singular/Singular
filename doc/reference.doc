@@ -1724,8 +1724,8 @@ See
 @*@code{eliminate (} module_expression@code{,} product_of_ring_variables @code{)}
 @*@code{eliminate (} ideal_expression@code{,} intvec_expression @code{)}
 @*@code{eliminate (} module_expression@code{,} intvec_expression @code{)}
-@*@code{eliminate (} ideal_expression@code{,} product_of_ring_variables@code{,} intvec_hilb @code{)}
-@*@code{eliminate (} module_expression@code{,} product_of_ring_variables@code{,} intvec_hilb @code{)}
+@*@code{eliminate (} ideal_expression@code{,} product_of_ring_variables@code{,} bigintvec_hilb @code{)}
+@*@code{eliminate (} module_expression@code{,} product_of_ring_variables@code{,} bigintvec_hilb @code{)}
 @item @strong{Type:}
 the same as the type of the first argument
 @item @strong{Purpose:}
@@ -7620,8 +7620,8 @@ See
 @code{std (} ideal_expression@code{)}
 @*@code{std (} module_expression@code{)}
 @*@code{std (} smatrix_expression@code{)}
-@*@code{std (} ideal_expression@code{,} intvec_expression @code{)}
-@*@code{std (} module_expression@code{,} intvec_expression @code{)}
+@*@code{std (} ideal_expression@code{,} bigintvec_expression @code{)}
+@*@code{std (} module_expression@code{,} bigintvec_expression @code{)}
 @*@code{std (} ideal_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @*@code{std (} module_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @*@code{std (} ideal_expression@code{,} poly_expression @code{)}
