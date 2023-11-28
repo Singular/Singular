@@ -1964,7 +1964,7 @@ EXAMPLE:  example milnorcode; shows an example"
   int  e=1;
   if(size(#)==1) { e=#[1]; }
   ideal jf=std(jacob(f)^e);
-  intvec v=hilb(jf,2);
+  intvec v=intvec(hilb(jf,2));
 
   return(Hcode(v));
 }

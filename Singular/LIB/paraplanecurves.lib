@@ -151,7 +151,7 @@ EXAMPLE: example invertBirMap; shows an example
    matrix HM[2][m] = concat(transpose(yv),transpose(phi));
    ideal graph = sat(I+minor(HM,2),phi);
    graph = sat(graph,xv);
-   intvec Hgraph = hilb(graph,1);
+   bigintvec Hgraph = hilb(graph,1);
    setring Roriginal;
    rl[3]= list(list("dp",1:n),list("dp",1:m),list("C",0));
    def Rbig = ring(rl);
@@ -993,7 +993,7 @@ EXAMPLE: example mapToRatNormCurve; shows an example
        J=J,var(k+3)-AI[k];
      }
    ideal SJ = std(J);
-   intvec HJ = hilb(SJ,1);
+   bigintvec HJ = hilb(SJ,1);
    ideal RNC = eliminate(J,x(1)*x(2)*x(3),HJ);
    list rl = ring_list(Relim);
    list rl2 = rl[2];
@@ -1106,7 +1106,7 @@ EXAMPLE: example rncItProjOdd; shows an example
   def Rnew;
   def Rbig;
   def Relim;
-  intvec HJJ;
+  bigintvec HJJ;
   while(n>2)
      {
         ideal PR = rncAntiCanonicalMap(J);
@@ -1222,7 +1222,7 @@ EXAMPLE: example rncItProjEven; shows an example
   def Rnew;
   def Rbig;
   def Relim;
-  intvec HJJ;
+  bigintvec HJJ;
   while(n>3)
      {
         ideal PR = rncAntiCanonicalMap(J);
@@ -2719,7 +2719,7 @@ EXAMPLE: example testParametrization; shows an example
        JJ=JJ,var(k+2)-PARA[k];
      }
   ideal SJJ = std(JJ);
-  intvec HJJ = hilb(SJJ,1);
+  bigintvec HJJ = hilb(SJJ,1);
   ideal J = eliminate(JJ,var(1)*var(2),HJJ);
   setring rTT;
   /*end workaround elimination*/

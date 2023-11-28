@@ -2457,7 +2457,7 @@ EXAMPLE: example genus; shows an example
       "degree:";d;"";
    }
 
-   intvec v = hilb(I,1);
+   bigintvec v = hilb(I,1);
    int i,o;
    if(nvars(basering)>3)
    {

@@ -53,7 +53,7 @@ RETURN:  poly, the inverse of the poly p in the power series ring till order bou
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-static proc hilbconstruct(intvec v)
+static proc hilbconstruct(bigintvec v)
 "USAGE:   hilbconstruct(v), v is the result of hilb(M,2)
 RETURN:  poly, the Hilbert Series of M
 AASUME: the ring when called is R = 0,t,ds;
@@ -175,7 +175,7 @@ EXAMPLE: example hdepth; shows examples
   {debug = 1;}
   M = std(M);
   int d=nvars(basering)-dim(M);
-  intvec v=hilb(M,2);
+  bigintvec v=hilb(M,2);
   ring R = 0,t,ds;
   poly hp=hilbconstruct(v);
   if(debug == 0)

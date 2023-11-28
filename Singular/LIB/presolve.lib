@@ -638,7 +638,7 @@ EXAMPLE: example fastelim; shows an example.
    else
 //------- h!=0: homogenize and compute Hilbert series using hilbvec ----------
    {
-      intvec hi = hilbvec(L[1]);         // Hilbert series of i
+      bigintvec hi = hilbvec(L[1]);         // Hilbert series of i
       ring r2 = create_ring(ring_list(P)[1], "("+varstr(basering)+",@homo)", "dp", "no_minpoly");
       list L = imap(r1,L);
       L[1] = homog(L[1],@homo);          // @homo = homogenizing var
@@ -884,7 +884,7 @@ example
 proc hilbvec (def @id, list #)
 "USAGE:   hilbvec(id[,c,o]); id=poly/ideal/vector/module/matrix, c,o=strings,@*
           c=char, o=ordering used by @code{hilb} (default: c=\"32003\", o=\"dp\")
-RETURN:  intvec of 1st Hilbert-series of id, computed in char c and ordering o
+RETURN:  bigintvec of 1st Hilbert-series of id, computed in char c and ordering o
 NOTE:    id must be homogeneous (i.e. all vars have weight 1)
 EXAMPLE: example hilbvec; shows an example
 "
@@ -897,7 +897,7 @@ EXAMPLE: example hilbvec; shows an example
    def @i = imap(@P,@id);
    //show(basering);
    @i = std(@i);
-   intvec @hi = hilb(@i,1);         // intvec of 1-st Hilbert-series of id
+   bigintvec @hi = hilb(@i,1);         // intvec of 1-st Hilbert-series of id
    return(@hi);
 }
 example

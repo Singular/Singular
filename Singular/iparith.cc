@@ -3474,7 +3474,14 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
       hom=isHomog;
     }
   }
-  result=kStd(u_id,currRing->qideal,hom,&w,(intvec *)v->Data());
+  bigintmat *vv=(bigintmat*)v->Data();
+  intvec* vvv=new intvec(1,vv->cols());
+  for(int i=0;i<vv->cols();i++)
+  {
+    (*vvv)[i]=n_Int(BIMATELEM(*vv,1,i+1),coeffs_BIGINT);
+  }
+  result=kStd(u_id,currRing->qideal,hom,&w,vvv);
+  delete vvv;
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -6157,8 +6164,16 @@ static BOOLEAN jjELIMIN_ALG(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjELIMIN_HILB(leftv res, leftv u, leftv v, leftv w)
 {
+  bigintmat *ww=(bigintmat*)w->Data();
+  intvec* vvv=new intvec(1,ww->cols());
+  for(int i=0;i<ww->cols();i++)
+  {
+    (*vvv)[i]=n_Int(BIMATELEM(*ww,1,i+1),coeffs_BIGINT);
+  }
+
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data(),
-    (intvec *)w->Data());
+    vvv);
+  delete vvv;
   //setFlag(res,FLAG_STD);
   return FALSE;
 }

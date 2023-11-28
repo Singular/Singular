@@ -282,7 +282,7 @@ EXAMPLE:   example radzero; shows no example"
  ideal j;
  ideal jmap=randomLast(20);
  string ri;
- intvec @hilb;
+ bigintvec @hilb;
  ideal trans,transprep;// the transformation ideals
  int nva=nvars(r);
  int zz,k,l;//counter

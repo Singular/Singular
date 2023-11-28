@@ -642,8 +642,8 @@
 // operation: std (module, vector)  ->  module
 // operation: std (ideal, ideal)  ->  ideal
 // operation: std (module, module)  ->  module
-// operation: std (ideal, intvec)  ->  ideal, field coeffs
-// operation: std (module, intvec)  ->  module, field coeffs
+// operation: std (ideal, bigintvec)  ->  ideal, field coeffs
+// operation: std (module, bigintvec)  ->  module, field coeffs
 // operation: syz (ideal, string)  ->  module
 // operation: syz (module, string)  ->  module
 // operation: tensor (matrix, matrix)  ->  matrix
@@ -679,8 +679,8 @@
 // operation: coeffs (module, poly, matrix)  ->  matrix
 // operation: coeffs (ideal, ideal, poly)  ->  matrix
 // operation: coeffs (module, module, poly)  ->  matrix
-// operation: eliminate (ideal, poly, intvec)  ->  ideal, only commutative rings
-// operation: eliminate (module, poly, intvec)  ->  module, only commutative rings
+// operation: eliminate (ideal, poly, bigintvec)  ->  ideal, only commutative rings
+// operation: eliminate (module, poly, bigintvec)  ->  module, only commutative rings
 // operation: eliminate (ideal, poly, string)  ->  ideal
 // operation: eliminate (module, poly, string)  ->  module
 // operation: find (string, string, int)  ->  int

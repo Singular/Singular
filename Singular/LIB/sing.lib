@@ -949,9 +949,9 @@ EXAMPLE: example codim; shows an example
      dd = 1;
    }
   //--------------------------- compute first hilbertseries ------------------
-   iv1 = hilb(id1,1);
+   iv1 = intvec(hilb(id1,1));
    i1 = size(iv1);
-   iv2 = hilb(id2,1);
+   iv2 = intvec(hilb(id2,1));
    i2 = size(iv2);
   //--------------------------- difference of hilbertseries ------------------
    if (i2 > i1)
