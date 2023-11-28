@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.3.0.0 Jan_2022 "; // $Id$
+version="version standard.lib 4.4.0.0 Nov_2023 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -220,7 +220,6 @@ EXAMPLE: example stdhilb;  shows an example"
     }
   }
 
-
   if (npars(P) > 0)             //clear denominators of parameters
   {
     for( k=ncols(i); k>0; k-- )
@@ -289,7 +288,7 @@ EXAMPLE: example stdhilb;  shows an example"
     if (p_opt) {"compute hilbert series with std in ring " + string(Philb);
                 "weights used for hilbert series:",W;}
     Id[1] = std(Id[1]);
-    intvec hi = hilb( Id[1],1,W );
+    bigintvec hi = hilb( Id[1],1,W );
   }
   if (( algorithm=="slimgb" || ( algorithm=="stdorslimgb" && char(P)==0 ) )
   && (defined(hi)!=voice))
@@ -297,7 +296,7 @@ EXAMPLE: example stdhilb;  shows an example"
     if (p_opt) {"compute hilbert series with slimgb in ring " + string(Philb);
                 "weights used for hilbert series:",W;}
     Id[1] = qslimgb(Id[1]);
-    intvec hi = hilb( Id[1],1,W );
+    bigintvec hi = hilb( Id[1],1,W );
   }
 
   //-------------- we need another intermediate ring Phelp ----------------
@@ -387,7 +386,7 @@ example
    ideal  i = y3+x2,x2y+x2z2,x3-z9,z4-y2-xz;  //ideal is homogeneous
    ideal j = stdhilb(i,"std"); j;
    //this is equivalent to:
-   intvec v = hilb(std(i),1);
+   bigintvec v = hilb(std(i),1);
    ideal j1 = std(i,v,intvec(3,2,1)); j1;
 
    size(NF(j,j1))+size(NF(j1,j));            //j and j1 define the same ideal

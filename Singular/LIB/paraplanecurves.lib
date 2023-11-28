@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version paraplanecurves.lib 4.3.2.10 Nov_2023 "; // $Id$
+version="version paraplanecurves.lib 4.4.0.0 Nov_2023 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves

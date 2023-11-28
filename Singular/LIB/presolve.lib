@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version presolve.lib 4.3.1.3 Feb_2023 "; // $Id$
+version="version presolve.lib 4.4.0.0 Nov_2023 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations

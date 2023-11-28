@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version arnoldclassify.lib 4.3.1.2 Nov_2022 "; // $Id$
+version="version arnoldclassify.lib 4.4.0.0 Nov_2023 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  arnoldClassify.lib     Arnol'd Classifier of Singularities
@@ -1131,7 +1131,7 @@ EXAMPLE: example arnoldMilnorCode; shows an example"
   int  e=1;
   if(size(#)==1) { e=#[1]; }
   ideal jf=std(jacob(f)^e);
-  intvec v=hilb(jf,2);
+  intvec v=intvec(hilb(jf,2));
 
   return(Hcode(v));
 }

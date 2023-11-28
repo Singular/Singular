@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version sing.lib 4.2.0.2 May_2021 "; // $Id$
+version="version sing.lib 4.4.0.0 Nov_2023 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
