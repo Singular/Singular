@@ -7304,14 +7304,21 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
       hom=isHomog;
     }
   }
+  bigintmat *vv=(bigintmat*)v->Data();
+  intvec* vvv=new intvec(1,vv->cols());
+  for(int i=0;i<vv->cols();i++)
+  {
+    (*vvv)[i]=n_Int(BIMATELEM(*vv,1,i+1),coeffs_BIGINT);
+  }
   result=kStd(u_id,
               currRing->qideal,
               hom,
-              &ww,                  // module weights
-              (intvec *)v->Data(),  // hilbert series
-              0,0,                  // syzComp, newIdeal
-              vw);                  // weights of vars
+              &ww,  // module weights
+              vvv,  // hilbert series
+              0,0,  // syzComp, newIdeal
+              vw);  // weights of vars
   idSkipZeroes(result);
+  delete vvv;
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
   if (ww!=NULL) atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);

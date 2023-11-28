@@ -7622,8 +7622,8 @@ See
 @*@code{std (} smatrix_expression@code{)}
 @*@code{std (} ideal_expression@code{,} bigintvec_expression @code{)}
 @*@code{std (} module_expression@code{,} bigintvec_expression @code{)}
-@*@code{std (} ideal_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
-@*@code{std (} module_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
+@*@code{std (} ideal_expression@code{,} bigintvec_expression@code{,} intvec_expression @code{)}
+@*@code{std (} module_expression@code{,} bigintvec_expression@code{,} intvec_expression @code{)}
 @*@code{std (} ideal_expression@code{,} poly_expression @code{)}
 @*@code{std (} module_expression@code{,} vector_expression @code{)}
 @*@code{std (} ideal_expression@code{,} ideal_expression @code{)}
@@ -7678,7 +7678,7 @@ chooses the "best" algorithm to compute a Groebner basis.
   ring rhom=32003,(x,y,z,h),dp;
   ideal i=homog(imap(r,i),h);
   ideal j=std(i);
-  intvec iv=hilb(j,1);
+  bigintvec iv=hilb(j,1);
   ring rlex=32003,(x,y,z,h),lp;
   ideal i=fetch(rhom,i);
   ideal j=std(i,iv);
@@ -7689,7 +7689,7 @@ chooses the "best" algorithm to compute a Groebner basis.
   ring whom=32003,(x,y,z),wp(w);
   ideal i=fetch(r,i);
   ideal j=std(i);
-  intvec iw=hilb(j,1,w);
+  bigintvec iw=hilb(j,1,w);
   ring wlex=32003,(x,y,z),lp;
   ideal i=fetch(whom,i);
   ideal j=std(i,iw,w);

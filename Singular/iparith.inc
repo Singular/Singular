@@ -747,8 +747,8 @@
 // operation: sba (ideal, int, int)  ->  ideal
 // operation: sba (module, int, int)  ->  module
 // operation: status (link, string, string)  ->  int
-// operation: std (ideal, intvec, intvec)  ->  ideal, field coeffs
-// operation: std (module, intvec, intvec)  ->  module, field coeffs
+// operation: std (ideal, bigintvec, intvec)  ->  ideal, field coeffs
+// operation: std (module, bigintvec, intvec)  ->  module, field coeffs
 // operation: subst (def, poly, polyBucket)  ->  any_type
 // operation: subst (poly, poly, poly)  ->  poly
 // operation: subst (vector, poly, poly)  ->  vector
@@ -847,7 +847,6 @@
 // assign: int =  int
 // assign: int =  intmat
 // assign: intvec =  intvec
-// assign: intvec =  bigintvec
 // assign: intmat =  intmat
 // assign: link =  string
 // assign: link =  link
