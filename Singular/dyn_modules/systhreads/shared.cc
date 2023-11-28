@@ -1,11 +1,6 @@
 #include "threadconf.h"
 #include <iostream>
 #include "kernel/mod2.h"
-#include "Singular/ipid.h"
-#include "Singular/ipshell.h"
-#include "Singular/links/silink.h"
-#include "Singular/lists.h"
-#include "Singular/blackbox.h"
 #include "Singular/feOpt.h"
 #include "Singular/libsingular.h"
 #include <cstring>
