@@ -48,10 +48,10 @@ hilb(GI);
 //->    // dimension (proj.)  = 1
 //->    // degree      = 3
 
-intvec co1 = hilb(GI,1);
+bigintvec co1 = hilb(GI,1);
 co1;
 //->    1,0,-3,2,0
-intvec co2 = hilb(GI,2);
+bigintvec co2 = hilb(GI,2);
 co2;
 //->    1,2,0
 
@@ -65,7 +65,7 @@ NOTE:    Displays the Hilbert polynomial of R/I.
 "
 {
   int d = dim(G)-1;       // degree of Hibert polynomial
-  intvec co = hilb(G,2);  // representation II of Hilbert series
+  bigintvec co = hilb(G,2);  // representation II of Hilbert series
   int s = size(co)-1;     // s = deg(Q_M) +1
   ring Qt = 0, t, dp;     // change active ring to Q[t]
   poly QM = 0;

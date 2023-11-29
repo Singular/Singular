@@ -1431,7 +1431,7 @@ const struct sValAssign dAssign[]=
 ,{D(jiA_INT),      INT_CMD,        INT_CMD }
 ,{D(jiA_1x1INTMAT), INT_CMD,       INTMAT_CMD }
 ,{D(jiA_INTVEC),   INTVEC_CMD,     INTVEC_CMD }
-,{D(jiA_INTVEC_BI),INTVEC_CMD,     BIGINTVEC_CMD }
+//,{D(jiA_INTVEC_BI),INTVEC_CMD,     BIGINTVEC_CMD }
 ,{D(jiA_INTVEC),   INTMAT_CMD,     INTMAT_CMD }
 ,{D(jiA_LINK),     LINK_CMD,       STRING_CMD }
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }

@@ -307,7 +307,7 @@ ideal I = imap(S,I);
 ideal Ih = homog(I,t);   // generators of I are homogenized
 int aa = timer;
 Ih = std(Ih);
-intvec H = hilb(Ih,1);
+bigintvec H = hilb(Ih,1);
 ring Shom = 0, (x,y,z,t), lp;
 ideal Ih = imap(Rhom,Ih);
 Ih = std(Ih,H);
@@ -458,7 +458,7 @@ ideal I = imap(R,I);
 ideal J = homog(I,h);    // homogenize the given generators
 int aa = timer;
 ideal L = std(J);
-intvec H = hilb(L,1);    // assign Hilbert series
+bigintvec H = hilb(L,1);    // assign Hilbert series
 ideal K = eliminate(J,abcdefgtuvw,H);
 K = subst(K,h,1);        // dehomogenize
 size(K);

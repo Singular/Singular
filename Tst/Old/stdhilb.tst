@@ -1,4 +1,4 @@
-intvec hi;
+bigintvec hi;
 ring r0=0,(x,y,z),dp;
 module mm=
 (x2z2-xy2z)*gen(1)-(x2zy2+xyz3)*gen(3)+(xy2+xyz)*gen(2),

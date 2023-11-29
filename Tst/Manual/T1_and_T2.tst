@@ -26,8 +26,8 @@ LIB "tst.lib"; tst_init();
   module M=T_1(i);       // a presentation matrix of T_1
   vdim(M);              // Tjurina number
   hilb(M);              // display of both Hilbert series
-  intvec v1=hilb(M,1);  // first Hilbert series as intvec
-  intvec v2=hilb(M,2);  // second Hilbert series as intvec
+  bigintvec v1=hilb(M,1);  // first Hilbert series as intvec
+  bigintvec v2=hilb(M,2);  // second Hilbert series as intvec
   v1;
   v2;
   v1[3];                // 3rd coefficient of the 1st Hilbert series

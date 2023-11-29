@@ -12,7 +12,7 @@ for(k=2;k<=size(J);k++){ In=In,jet(J[k],ord(J[k]));}
 
 In;
 
-intvec v=hilb(J,1);
+bigintvec v=hilb(J,1);
 v;
 
 ideal I1=I+maxideal(5);

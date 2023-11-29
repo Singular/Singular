@@ -21,7 +21,7 @@ ideal I=x5y2,x3,y3,xy4,xy7;
 
 MonomialHilbertPoincare(I);
 
-intvec v=hilb(std(I),1);
+bigintvec v=hilb(std(I),1);
 v;
 
 tst_status(1);$

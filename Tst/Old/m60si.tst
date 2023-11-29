@@ -4,6 +4,6 @@
   ring R=0,(x,y,t,s,z),dp;
   ideal i=x-t,y-t2,z-t3,s-x+y3;
   eliminate(i,ts);
-  intvec v=hilb(std(i),1);
+  bigintvec v=hilb(std(i),1);
   eliminate(i,ts,v);
 LIB "tst.lib";tst_status(1);$

@@ -5,7 +5,7 @@ option(prot);
 ring R=0,(x,y,z),ds;
 ideal i= x3yz+x10,xy2z2,xyz3;
 ideal si=std(i);
-intvec v=hilb(si,1);
+bigintvec v=hilb(si,1);
 ideal ss=std(i,v);
 for(int l=1;l<=size(si);l++)
 {
@@ -18,7 +18,7 @@ option(prot);
 ring R=0,(x,y,z),ls;
 ideal i= x3yz+x100,xy2z2+x13y66,xyz3+z10;
 ideal si=std(i);
-intvec v=hilb(si,1);
+bigintvec v=hilb(si,1);
 ideal ss=std(i,v);
 for(int l=1;l<=size(si);l++)
 {
