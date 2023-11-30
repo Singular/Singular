@@ -2749,6 +2749,15 @@ ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
   return res;
 }
 
+ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int* red_comp)
+{
+  int del=0;
+  ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
+  trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
+  //idDeleteComps(res,red_comp,del);
+  return res;
+}
+
 extern void ipPrint_MA0(matrix m, const char *name);
 ideal idMinEmbedding_with_map0(ideal arg,intvec **w, ideal &trans)
 {

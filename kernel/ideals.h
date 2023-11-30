@@ -161,6 +161,7 @@ ideal   idMinors(matrix a, int ar, ideal R = NULL);
 
 ideal idMinEmbedding(ideal arg,BOOLEAN inPlace=FALSE, intvec **w=NULL);
 ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans);
+ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int*red_comp);
 
 ideal   idHead(ideal h);
 
