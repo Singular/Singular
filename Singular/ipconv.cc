@@ -490,8 +490,8 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
             }
             else
             {
-              char *tmp=(char *)omAlloc(4);
-              sprintf(tmp,"%c%d",*(currRing->names[nr-1]),
+              char *tmp=(char *)omAlloc(8);
+              snprintf(tmp,8,"%c%d",*(currRing->names[nr-1]),
                 (int)pGetExp((poly)input->data,nr));
               output->name=tmp;
             }

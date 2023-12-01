@@ -154,7 +154,8 @@ int main(          /* main entry to Singular */
   {
     int pid=getpid();
     char *buf=(char*)malloc(10+strlen((char*) feOptSpec[FE_OPT_LOG].value));
-    sprintf(buf,"%s.%d",(char*) feOptSpec[FE_OPT_LOG].value,pid);
+    snprintf(buf,10+strlen((char*) feOptSpec[FE_OPT_LOG].value),
+      "%s.%d",(char*) feOptSpec[FE_OPT_LOG].value,pid);
     File_Log=fopen(buf,"w");
   }
 

@@ -1464,7 +1464,8 @@ void piShowProcList()
       if(strcmp(proc->procname, IDID(h))!=0)
       {
         name = (char *)omAlloc(strlen(IDID(h))+strlen(proc->procname)+4);
-        sprintf(name, "%s -> %s", IDID(h), proc->procname);
+        snprintf(name, strlen(IDID(h))+strlen(proc->procname)+4,
+	     "%s -> %s", IDID(h), proc->procname);
         Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname, name);
         omFree((ADDRESS)name);
       }

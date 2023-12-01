@@ -89,7 +89,7 @@ private:
     PyRun_SimpleString("_SINGULAR_IMPORTED = dict()");
 
     char cmd[MAXPATHLEN + 20];
-    sprintf(cmd, "path.insert(0, '%s')", feGetResource('b'));
+    snprintf(cmd,MAXPATHLEN + 20, "path.insert(0, '%s')", feGetResource('b'));
     PyRun_SimpleString(cmd);
     PyRun_SimpleString("del path");  // cleanup
   }
@@ -459,7 +459,7 @@ BOOLEAN python_run(leftv result, leftv arg)
 PythonObject names_from_module(const char* module_name)
 {
   char buffer[strlen(module_name) + 30];
-  sprintf (buffer, "SINGULAR_MODULE_NAME = '%s'", module_name);
+  snprintf (buffer,strlen(module_name) + 30, "SINGULAR_MODULE_NAME = '%s'", module_name);
   PyRun_SimpleString(buffer);
   PyRun_SimpleString("from sys import modules");
   PyRun_SimpleString("exec('from ' + SINGULAR_MODULE_NAME + ' import *')");
@@ -470,7 +470,7 @@ PythonObject names_from_module(const char* module_name)
 void from_module_import_all(const char* module_name)
 {
   char buffer[strlen(module_name) + 20];
-  sprintf (buffer, "from %s import *", module_name);
+  snprintf (buffer,strlen(module_name) + 20, "from %s import *", module_name);
   PyRun_SimpleString(buffer);
 }
 
