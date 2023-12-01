@@ -2749,12 +2749,20 @@ ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
   return res;
 }
 
-ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int* red_comp)
+ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int* g)
 {
+  int *red_comp=(int*)omAlloc((arg->rank+1)*sizeof(int));
   int del=0;
   ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
   trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
-  //idDeleteComps(res,red_comp,del);
+  int curr=0;
+  for(int i=1;i<=arg->rank;i++)
+  {
+    g[i-1]=red_comp[i];
+    if (red_comp[i]==curr) g[i-1]=0;
+    curr=red_comp[i];
+  }
+  omFree(red_comp);
   return res;
 }
 

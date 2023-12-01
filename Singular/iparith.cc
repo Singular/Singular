@@ -3083,22 +3083,22 @@ static BOOLEAN jjPRUNE_MAP(leftv res, leftv v, leftv ma)
       w=ivCopy(w);
       intvec **ww=&w;
       ideal mat;
-      int *g=(int*)omAlloc((v_id->rank+1)*sizeof(int));
+      int *g=(int*)omAlloc(v_id->rank*sizeof(int));
       res->data = (char *)idMinEmbedding_with_map_v(v_id,ww,mat,g);
       atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
       idhdl h=(idhdl)ma->data;
       idDelete(&IDIDEAL(h));
       IDIDEAL(h)=mat;
-      for(int i=0;i<=v_id->rank;i++) Print("v[%d]:%d ",i,g[i]); PrintLn();
-      omFree(g);
+      for(int i=0;i<v_id->rank;i++) Print("v[%d]:%d ",i+1,g[i]); PrintLn();
+      omFreeSize(g,v_id->rank*sizeof(int));
       return FALSE;
     }
   }
   ideal mat;
-  int *g=(int*)omAlloc((v_id->rank+1)*sizeof(int));
+  int *g=(int*)omAlloc(v_id->rank*sizeof(int));
   res->data = (char *)idMinEmbedding_with_map_v(v_id,NULL,mat,g);
-  for(int i=0;i<=v_id->rank;i++) Print("v[%d]:%d ",i,g[i]); PrintLn();
-  omFree(g);
+  for(int i=0;i<v_id->rank;i++) Print("v[%d]:%d ",i+1,g[i]); PrintLn();
+  omFreeSize(g,v_id->rank*sizeof(int));
   idhdl h=(idhdl)ma->data;
   idDelete(&IDIDEAL(h));
   IDIDEAL(h)=mat;
