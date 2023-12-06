@@ -10377,7 +10377,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
       }
       #endif
       if (rHasGlobalOrdering(currRing))
-        strat->S[i] = redtailBba(&L, end_pos, strat, withT);
+        strat->S[i] = redtailBba(&L, end_pos, strat, withT,FALSE /*no normalize*/);
       else
         strat->S[i] = redtail(&L, strat->sl, strat);
       #ifdef KDEBUG

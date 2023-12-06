@@ -3849,7 +3849,7 @@ ideal kInterRed (ideal F,const ideal Q)
     idDelete(&FF);
     null=idInit(1,1);
     if (need_retry)
-      res1=kNF(null,Q,res,0,KSTD_NF_LAZY);
+      res1=kNF(null,Q,res,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
     else
       res1=kNF(null,Q,res);
     idDelete(&res);
@@ -3871,7 +3871,7 @@ ideal kInterRed (ideal F,const ideal Q)
     if ((Q!=NULL) && (TEST_OPT_REDSB))
     {
       if (need_retry)
-        res=kNF(null,Q,res1,0,KSTD_NF_LAZY);
+        res=kNF(null,Q,res1,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
       else
         res=kNF(null,Q,res1);
       idDelete(&res1);
