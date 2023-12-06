@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.3.2.9 Oct_2023 "; // $Id$
+version="version primdec.lib 4.4.0.0 Dec_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2445,7 +2445,7 @@ EXAMPLE:example equidim; shows an example
      {
         w[n]=ord(var(n));
      }
-     intvec hil=hilb(j,1,w);
+     bigintvec hil=hilb(j,1,w);
   }
 
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)
@@ -2552,7 +2552,7 @@ EXAMPLE: example equidimMax; shows an example
      {
         w[n]=ord(var(n));
      }
-     intvec hil=hilb(j,1,w);
+     bigintvec hil=hilb(j,1,w);
   }
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)
                   ||(dim(j)==0)||(dim(j)+g==nvars(basering)))
@@ -2988,8 +2988,8 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     {
       @w[@n]=ord(var(@n));
     }
-    intvec @hilb=hilb(tras,1,@w);
-    intvec keephilb=@hilb;
+    bigintvec @hilb=hilb(tras,1,@w);
+    bigintvec keephilb=@hilb;
   }
 
   //----------------------------------------------------------------
@@ -6906,7 +6906,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     {
       rad = intersect(rad, collectrad);
       te = intersect(te, collectrad);
-      te = simplify(reduce(te, I, 1), 2);
+      te = simplify(reduce(te, I, 5), 2);
     }
     else
     {
@@ -6914,7 +6914,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
       {
         rad = collectrad;
         te = intersect(te, collectrad);
-        te = simplify(reduce(te, I, 1), 2);
+        te = simplify(reduce(te, I, 5), 2);
       }
     }
 
@@ -7447,7 +7447,7 @@ EXAMPLE: example newDecompStep; shows an example
   ideal ser,tras;
   list data;
   list result;
-  intvec @hilb;
+  bigintvec @hilb;
   int isS=attrib(i,"isSB");
 
   // Debug
@@ -7543,7 +7543,7 @@ EXAMPLE: example newDecompStep; shows an example
       @w[@n]=ord(var(@n));
     }
     @hilb=hilb(tras,1,@w);
-    intvec keephilb=@hilb;
+    bigintvec keephilb=@hilb;
   }
 
   //----------------------------------------------------------------
@@ -8341,7 +8341,7 @@ example
 // this part was separated as a soubrutine to make the code more clear.
 // Also, since the reduction is performed twice in proc newDecompStep, it should use both times this routine.
 // This is not yet implemented, since the reduction is not exactly the same and some changes should be made.
-static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim, int abspri, int @wr, list data)
+static proc newReduction(ideal @j, ideal ser, bigintvec @hilb, intvec @w, int jdim, int abspri, int @wr, list data)
 {
    ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
@@ -8890,7 +8890,7 @@ EXAMPLE: example newZero_decomp; shows an example
   list primary,lres0,lres1,act,@lh,@wh;
   map phi,psi,phi1,psi1;
   ideal jmap,jmap1,jmap2,helpprim,@qh,@qht,ser1;
-  intvec @vh,@hilb;
+  bigintvec @vh,@hilb;
   string @ri;
   poly @f;
 
