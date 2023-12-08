@@ -2067,9 +2067,7 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
   int j;          // Counter
   def P0 = basering;
   list Pl=ring_list(P0);
-  intvec dp_w;
-  for(j=nvars(P0);j>0;j--) {dp_w[j]=1;}
-  Pl[3]=list(list("dp",dp_w),list("C",0));
+  Pl[3]=list(list("dp",1:nvars(P0)),list("C",0));
   def P=ring(Pl);
   setring P;
   ideal i=imap(P0,i);
@@ -6390,9 +6388,7 @@ EXAMPLE: example radical; shows an example
   int j;
   def P0 = basering;
   list Pl=ring_list(P0);
-  intvec dp_w;
-  for(j=nvars(P0);j>0;j--) {dp_w[j]=1;}
-  Pl[3]=list(list("dp",dp_w),list("C",0));
+  Pl[3]=list(list("dp",1:nvars(P0)),list("C",0));
   def @P=ring(Pl); // Ring with same variables and DP ordering in all variables
   setring @P;
   ideal i=imap(P0,i);
