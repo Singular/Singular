@@ -1195,6 +1195,7 @@ Comments should be send to the author of the library directly.
 * hodge_lib:: Algorithms for Hodge ideals
 * lrcalc_lib:: interface to the Littlewood-Richardson Calculator by Anders Buch
 * maxlike_lib:: maximum likelihood estimates
+* modfinduni_lib:: parallel computation of finduni
 * modwalk_lib:: Groebner basis conversion
 * multigrading_lib:: Multigradings and related computations
 * pfd_lib:: Multivartiate partial fraction decomposition
@@ -1259,6 +1260,10 @@ Issues:
 @node maxlike_lib
 @subsection maxlike_lib
 @c lib maxlike.lib
+@c ----------------------------------------------------------
+@node modfinduni_lib
+@subsection modfinduni_lib
+@c lib modfinduni.lib
 @c ----------------------------------------------------------
 @node modwalk_lib
 @subsection modwalk_lib

@@ -1,0 +1,181 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version modfinduni.lib 4.4.0.0 Dec_2023 "; // $Id$
+category="Commutative Algebra";
+info="
+LIBRARY:  modfinduni.lib  finduni using modular methods
+
+AUTHORS:  H. Schoenemann  hannes@mathematik.uni-kl.de
+
+OVERVIEW: parallel version of finduni via modular.lib
+
+PROCEDURES:
+  modFinduni(I);    finduni of I using modular methods
+";
+
+LIB "modular.lib";
+
+proc modFinduni(ideal I)
+"USAGE:   modFinduni(I); I ideal
+RETURN:
+NOTE:     The procedure computes a standard basis of I (over the rational
+          numbers) by using modular methods.
+SEE ALSO: modular
+EXAMPLE:  example modFinduni; shows an example"
+{
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+    /* choose the right command */
+    string command = "nFinduni";
+
+    /* call modular() */
+    I = modular(command, list(I), primeTest_std,
+            deleteUnluckyPrimes_default, pTest_default,
+	    finalTest_finduni,536870909);
+    /* return the result */
+    option(set, opt);
+    return(I);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+}
+
+/* test if the prime p is suitable for the input, i.e. it does not divide
+ * the numerator or denominator of any of the coefficients */
+static proc primeTest_std(int p, alias list args)
+{
+    /* erase zero generators */
+    def I = simplify(args[1], 2);
+
+    /* clear denominators and count the terms */
+    def J=I; // dummy assign, to get the type of I
+    ideal K;
+    int n = ncols(I);
+    intvec sizes;
+    number cnt;
+    int i;
+    for(i = n; i > 0; i--)
+    {
+        J[i] = cleardenom(I[i]);
+        cnt = leadcoef(J[i])/leadcoef(I[i]);
+        K[i] = numerator(cnt)*var(1)+denominator(cnt);
+    }
+    sizes = size(J[1..n]);
+
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") { lbr[1] = p; }
+    else { lbr[1][1] = p; }
+    def rp = ring(lbr);
+    setring(rp);
+    def Jp = fetch(br, J);
+    ideal Kp = fetch(br, K);
+
+    /* test if any coefficient is missing */
+    if (intvec(size(Kp[1..n])) != 2:n) { setring(br); return(0); }
+    if (intvec(size(Jp[1..n])) != sizes) { setring(br); return(0); }
+    setring(br);
+    return(1);
+}
+
+static proc deleteUnluckyPrimes_default(alias list modresults)
+{
+    return(list());
+}
+
+proc nFinduni(ideal I)
+{
+  attrib(I,"isSB",1);
+  I=finduni(I);
+  I=simplify(I,1);
+  return(I);
+}
+
+/* find entries in modresults which come from unlucky primes.
+ * For this, sort the entries into categories depending on their leading
+ * ideal and return the indices in all but the biggest category. */
+static proc deleteUnluckyPrimes_std(alias list modresults)
+{
+    int size_modresults = size(modresults);
+
+    /* sort results into categories.
+     * each category is represented by three entries:
+     * - the corresponding leading ideal
+     * - the number of elements
+     * - the indices of the elements
+     */
+    list cat;
+    int size_cat;
+    def L=modresults[1]; // dummy assign to get the type of L
+    int i;
+    int j;
+    for (i = 1; i <= size_modresults; i++)
+    {
+        L = lead(modresults[i]);
+        attrib(L, "isSB", 1);
+        for (j = 1; j <= size_cat; j++)
+        {
+            if (size(L) == size(cat[j][1])
+            && size(reduce(L, cat[j][1], 5)) == 0
+            && size(reduce(cat[j][1], L, 5)) == 0)
+            {
+                cat[j][2] = cat[j][2]+1;
+                cat[j][3][cat[j][2]] = i;
+                break;
+            }
+        }
+        if (j > size_cat)
+        {
+            size_cat++;
+            cat[size_cat] = list();
+            cat[size_cat][1] = L;
+            cat[size_cat][2] = 1;
+            cat[size_cat][3] = list(i);
+        }
+    }
+
+    /* find the biggest categories */
+    int cat_max = 1;
+    int max = cat[1][2];
+    for (i = 2; i <= size_cat; i++)
+    {
+        if (cat[i][2] > max)
+        {
+            cat_max = i;
+            max = cat[i][2];
+        }
+    }
+
+    /* return all other indices */
+    list unluckyIndices;
+    for (i = 1; i <= size_cat; i++)
+    {
+        if (i != cat_max) { unluckyIndices = unluckyIndices + cat[i][3]; }
+    }
+    return(unluckyIndices);
+}
+////////////////////////////////////////////////////////////////////////////////
+
+/* test if 'result' is finduni of the input ideal */
+static proc finalTest_finduni(string command, alias list args, def result)
+{
+    /* test if args[1] is in result */
+    int i;
+    ideal I=args[1];
+    attrib(I,"isSB",1);
+    for (i = ncols(result); i > 0; i--)
+    {
+        if (reduce(result[i], I, 5) != 0) { return(0); }
+    }
+    return(1);
+}
+
+static proc pTest_default(string command, alias list args, alias def result,
+    int p)
+{
+    return(1);
+}
+

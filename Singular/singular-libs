@@ -45,6 +45,7 @@ SLIB1 = arr.lib arnoldclassify.lib \
 	hess.lib hdepth.lib hodge.lib\
 	JMBTest.lib JMSConst.lib \
 	locnormal.lib \
+	modfinduni.lib \
 	methods.lib modules.lib multigrading.lib modwalk.lib\
 	modnormal.lib \
 	nets.lib ncfrac.lib ncloc.lib \

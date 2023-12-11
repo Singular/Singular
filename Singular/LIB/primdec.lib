@@ -61,6 +61,7 @@ LIB "matrix.lib";
 LIB "triang.lib";
 LIB "absfact.lib";
 LIB "ring.lib";
+LIB "modfinduni.lib";
 ///////////////////////////////////////////////////////////////////////////////
 //
 //                      Gianni/Trager/Zacharias
@@ -1294,8 +1295,14 @@ proc zeroSp(ideal i)
 
   //i has to be a reduced groebner basis
   ASSUME(1, dim(i)==0);
-  ideal F=finduni(i);
-
+  if (hasQQCoefficient(basering) && (nvars(basering)*vdim(I)>300))
+  {
+    ideal F=modFinduni(i);
+  }
+  else
+  {
+    ideal F=finduni(i);
+  }
   int j,k,l,ready;
   list fa;
   fa[1]=factorize(F[1],1);
@@ -4010,7 +4017,14 @@ EXAMPLE: example zeroRad; shows an example"
 
    option(redSB);
    ASSUME(1, dim(I)==0);
-   ideal F=finduni(I); //F[i] generates I intersected with K[var(i)]
+   if (hasQQCoefficient(basering) && (nvars(basering)*vdim(I)>300))
+   {
+     ideal F=modFinduni(I); //F[i] generates I intersected with K[var(i)]
+   }
+   else
+   {
+     ideal F=finduni(I); //F[i] generates I intersected with K[var(i)]
+   }
 
    option(set,op);
    if(size(#)>0){I=#[1];}
