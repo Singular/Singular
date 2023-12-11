@@ -480,18 +480,21 @@ number fglmVector::gcd () const
   }
   if(found)
   {
-    while(i > 0 && !gcdIsOne)
+    if (getCoeffType(currRing->cf)!=n_Zp)
     {
-      current = rep->getconstelem (i);
-      if(!nIsZero (current))
+      while(i > 0 && !gcdIsOne)
       {
-        number temp = n_SubringGcd (theGcd, current, currRing->cf);
-        nDelete (&theGcd);
-        theGcd = temp;
-        if(nIsOne (theGcd))
-          gcdIsOne = TRUE;
+        current = rep->getconstelem (i);
+        if(!nIsZero (current))
+        {
+          number temp = n_SubringGcd (theGcd, current, currRing->cf);
+          nDelete (&theGcd);
+          theGcd = temp;
+          if(nIsOne (theGcd))
+            gcdIsOne = TRUE;
+        }
+        i--;
       }
-      i--;
     }
   }
   else
@@ -502,6 +505,10 @@ number fglmVector::gcd () const
 number fglmVector::clearDenom ()
 {
   number theLcm = nInit (1);
+  if (getCoeffType(currRing->cf)==n_Zp)
+  {
+    return theLcm;
+  }
   BOOLEAN isZero = TRUE;
   int i;
   for(i = size (); i > 0; i--)
