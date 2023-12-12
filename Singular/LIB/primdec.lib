@@ -283,28 +283,6 @@ static proc quotMin(list tsil)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc testFactor(list act,poly p)
-{
-  ASSUME(1, hasFieldCoefficient(basering) );
-  ASSUME(1, not isQuotientRing(basering) ) ;
-  ASSUME(1, hasGlobalOrdering(basering) ) ;
-  poly keep=p;
-
-  int i;
-  poly q=act[1][1]^act[2][1];
-  for(i=2;i<=size(act[1]);i++)
-  {
-    q=q*act[1][i]^act[2][i];
-  }
-  q=1/leadcoef(q)*q;
-  p=1/leadcoef(p)*p;
-  if(p-q!=0)
-  {
-    "ERROR IN FACTOR, please inform the authors";
-  }
-}
-///////////////////////////////////////////////////////////////////////////////
-
 static proc factor(poly p)
 "USAGE:   factor(p) p poly
 RETURN:  list=;
@@ -954,7 +932,6 @@ EXAMPLE: example zero_decomp; shows an example
   if(deg(j[1])>0)
   {
     act=factor(j[1]);
-    testFactor(act,j[1]);
   }
   else
   {
@@ -7361,7 +7338,6 @@ EXAMPLE: example zerodec; shows an example
   {
     time = timer;
     list fac=factor(charpol);
-    testFactor(fac,charpol);
     dbprint(printlevel-voice+2,"// time for factorizing char poly: "+
             string(timer-time));
     int f=size(fac[1]);
@@ -8979,7 +8955,6 @@ EXAMPLE: example newZero_decomp; shows an example
   if(deg(j[1])>0)
   {
     act=factor(j[1]);
-    testFactor(act,j[1]);
   }
   else
   {
