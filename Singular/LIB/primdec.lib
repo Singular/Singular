@@ -4017,7 +4017,7 @@ EXAMPLE: example zeroRad; shows an example"
    {
      intvec save=option(get);
      option(redSB);
-     I=interred(I+F);
+     I=std(I+F);
      option(set,save);
      return(I);
    }
