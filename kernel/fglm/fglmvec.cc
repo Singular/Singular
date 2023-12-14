@@ -310,7 +310,7 @@ fglmVector & fglmVector::operator += (const fglmVector & v)
   if(rep->isUnique ())
   {
     for(i = rep->size (); i > 0; i--)
-      rep->setelem (i, nAdd (rep->getconstelem (i), v.rep->getconstelem (i)));
+      n_InpAdd (rep->getelem(i), v.rep->getconstelem (i), currRing->cf);
   }
   else
   {
@@ -363,7 +363,7 @@ fglmVector & fglmVector::operator *= (const number & n)
   else
   {
     for(i = s; i > 0; i--)
-      rep->setelem (i, nMult (rep->getconstelem (i), n));
+      nInpMult (rep->getelem (i), n);
   }
   return *this;
 }

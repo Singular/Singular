@@ -1154,20 +1154,20 @@ FindUnivariatePolys( const idealFunctionals & l )
         poly result=NULL;
         for ( k= p.size(); k > 0; k-- )
         {
-          number n = nCopy( p.getconstelem( k ) );
+          number n = p.getconstelem( k );
           if ( ! nIsZero( n ) )
           {
             if ( temp == NULL )
             {
-              result= pOne();
+              result= p_Init(currRing);
               temp= result;
             }
             else
             {
-              temp->next= pOne();
+              temp->next= p_Init(currRing);
               pIter( temp );
             }
-            pSetCoeff( temp, n );
+            pSetCoeff0( temp, nCopy(n) );
             pSetExp( temp, i /*varpermutation[i]*/, k-1 );
             pSetm( temp );
           }
