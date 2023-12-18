@@ -31,7 +31,7 @@ EXAMPLE:  example modFinduni; shows an example"
     /* call modular() */
     I = modular(command, list(I), primeTest_std,
             deleteUnluckyPrimes_default, pTest_default,
-	    finalTest_finduni,536870909);
+            finalTest_finduni,536870909);
     /* return the result */
     option(set, opt);
     return(I);
