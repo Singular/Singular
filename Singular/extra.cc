@@ -3981,7 +3981,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         matrix U = id_Module2Matrix(unit,currRing);
         lists L=(lists)omAllocBin(slists_bin);
         L->Init(3);
-        L->m[0].rtyp=IDEAL_CMD;   L->m[0].data=(void *)quot;
+        L->m[0].rtyp=h->Typ();   L->m[0].data=(void *)quot;
         L->m[1].rtyp=MATRIX_CMD;  L->m[1].data=(void *)T;
         L->m[2].rtyp=MATRIX_CMD;  L->m[2].data=(void *)U;
         res->rtyp=LIST_CMD;

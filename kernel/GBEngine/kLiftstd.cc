@@ -430,7 +430,7 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
       }
     }
     rest->m[i]=d;
-    p_Shift(&result->m[i],-k-lsmod,syz_ring);
+    p_Shift(&result->m[i],-lsmod,syz_ring);
   }
   /* interpret rest: factors */
   factor=idInit(IDELEMS(rest),IDELEMS(quot));
@@ -439,7 +439,7 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
     for(int i=0;i<IDELEMS(rest);i++)
     {
       poly p=rest->m[i];
-      p_Shift(&p,-k-lsmod-1,syz_ring);
+      p_Shift(&p,-k-lsmod,syz_ring);
       factor->m[i]=p;
       factor->m[i]=p_Neg(factor->m[i],syz_ring);
       rest->m[i]=NULL;
