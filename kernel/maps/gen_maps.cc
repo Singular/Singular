@@ -86,6 +86,9 @@ non_trivial:
 // nMap: map for coefficients
 ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id, const ring image_r, const nMapFunc nMap)
 {
+  // handle special cases
+  if (IDELEMS(map_id)<=0)
+    return idInit(0,map_id->rank);
   if(!rIsNCRing(image_r))
   {
     // heuristic:
