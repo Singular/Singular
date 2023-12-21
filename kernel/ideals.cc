@@ -2755,14 +2755,11 @@ ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int* g)
   int del=0;
   ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
   trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
-  int curr=0;
   for(int i=1;i<=arg->rank;i++)
   {
     g[i-1]=red_comp[i];
-    if (red_comp[i]==curr) g[i-1]=0;
-    curr=red_comp[i];
   }
-  omFree(red_comp);
+  idDeleteComps(res,red_comp,del);
   return res;
 }
 

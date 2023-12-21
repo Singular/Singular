@@ -3062,9 +3062,9 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 
 static BOOLEAN jjPRUNE_MAP(leftv res, leftv v, leftv ma)
 {
-  if ((ma->rtyp!=IDHDL)||(ma->e!=NULL))
+  if (ma->Typ()!=SMATRIX_CMD)
   {
-    WerrorS("2nd argument must have a name");
+    WerrorS("expected prune_map(`module`,`smatrix`)`");
     return TRUE;
   }
 

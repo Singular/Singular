@@ -37,6 +37,7 @@ New/print_minpoly.tst
 New/print_nc_relations.tst
 New/print_param_poly_short.tst
 New/print_qring.tst
+New/prune_map.tst
 New/qring_2tom.tst
 New/qring_ZmtoZmn.tst
 New/qring_ZmtoZmn_errorCoprime.tst
