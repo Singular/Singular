@@ -671,6 +671,8 @@ long p_WTotaldegree(poly p, const ring r)
           //break;
           return j;
         }
+      default:
+      #if 0
       case ringorder_c: /* nothing to do*/
       case ringorder_C: /* nothing to do*/
       case ringorder_S: /* nothing to do*/
@@ -680,6 +682,7 @@ long p_WTotaldegree(poly p, const ring r)
       case ringorder_no: /* to make clang happy, does not occur*/
       case ringorder_L: /* to make clang happy, does not occur*/
       case ringorder_aa: /* ignored by p_WTotaldegree*/
+      #endif
         break;
     /* no default: all orderings covered */
     }
