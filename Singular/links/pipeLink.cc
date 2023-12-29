@@ -39,8 +39,15 @@ static BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
   }
   int pc[2];
   int cp[2];
-  pipe(pc);
-  pipe(cp);
+  int err1=pipe(pc);
+  int err2=pipe(cp);
+  if (err1 || err2)
+  {
+    Werror("pipe failed with %d\n",errno);
+    omFreeSize(d,sizeof(*d));
+    return TRUE;
+  }
+  /* else */
   pid_t pid=fork();
   if (pid==0) /*child*/
   {

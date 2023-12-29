@@ -308,7 +308,7 @@ void   rWrite(ring r, BOOLEAN details)
 
   for (int l=0, nlen=0 ; l<nblocks; l++)
   {
-    int i;
+    int i=0;
     Print("\n//        block %3d : ",l+1);
 
     Print("ordering %s", rSimpleOrdStr(r->order[l]));
@@ -359,9 +359,10 @@ void   rWrite(ring r, BOOLEAN details)
         Warn("should not have wvhdl entry at pos. %d",l);
       }
       #endif
+      int bl=r->block1[l]-r->block0[l]+1;
       for (int j= 0;
            j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
-           j+=i)
+           j+=bl)
       {
         PrintS("\n//                  : weights ");
         for (i = 0; i<=r->block1[l]-r->block0[l]; i++)
@@ -382,9 +383,9 @@ void   rWrite(ring r, BOOLEAN details)
       }
       if (r->order[l]==ringorder_am)
       {
-        int m=r->wvhdl[l][i];
+        int m=r->wvhdl[l][bl];
         Print("\n//                  : %d module weights ",m);
-        m+=i;i++;
+        m+=bl;i=bl+1;
         for(;i<=m;i++) Print(" %*d" ,nlen,r->wvhdl[l][i]);
       }
     }

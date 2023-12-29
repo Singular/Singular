@@ -1928,7 +1928,7 @@ int slStatusSsiL(lists L, int timeout)
 //           0:  timeout (or polling): none ready,
 //           i>0: (at least) L[i] is ready
   si_link l;
-  ssiInfo *d;
+  ssiInfo *d=NULL;
   int d_fd;
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);

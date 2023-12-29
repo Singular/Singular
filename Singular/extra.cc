@@ -496,7 +496,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*========reduce procedure like the global one but with jet bounds=======*/
     if(strcmp(sys_cmd,"reduce_bound")==0)
     {
-      poly p;
+      poly p=NULL;
       ideal pid=NULL;
       const short t1[]={3,POLY_CMD,IDEAL_CMD,INT_CMD};
       const short t2[]={3,IDEAL_CMD,IDEAL_CMD,INT_CMD};
@@ -3564,10 +3564,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "PrintMat") == 0)
     {
-      int a;
-      int b;
-      ring r;
-      int metric;
+      int a=0;
+      int b=0;
+      ring r=NULL;
+      int metric=0;
       if (h!=NULL)
       {
         if (h->Typ()==INT_CMD)

@@ -202,7 +202,7 @@ static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL,
   //Print("syz=%d\n",syzComp);
   //PrintS(showOption());
   //PrintLn();
-  ideal temp1;
+  ideal res=NULL;
   if (w==NULL)
   {
     if (hom==testHomog)
@@ -219,24 +219,24 @@ static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL,
   if ((alg==GbStd)||(alg==GbDefault))
   {
     if (TEST_OPT_PROT &&(alg==GbStd)) { PrintS("std:"); mflush(); }
-    temp1 = kStd(temp,currRing->qideal,hom,&w,hilb,syzComp);
+    res = kStd(temp,currRing->qideal,hom,&w,hilb,syzComp);
     idDelete(&temp);
   }
   else if (alg==GbSlimgb)
   {
     if (TEST_OPT_PROT) { PrintS("slimgb:"); mflush(); }
-    temp1 = t_rep_gb(currRing, temp, syzComp);
+    res = t_rep_gb(currRing, temp, syzComp);
     idDelete(&temp);
   }
   else if (alg==GbGroebner)
   {
     if (TEST_OPT_PROT) { PrintS("groebner:"); mflush(); }
     BOOLEAN err;
-    temp1=(ideal)iiCallLibProc1("groebner",temp,MODUL_CMD,err);
+    res=(ideal)iiCallLibProc1("groebner",temp,MODUL_CMD,err);
     if (err)
     {
       Werror("error %d in >>groebner<<",err);
-      temp1=idInit(1,1);
+      res=idInit(1,1);
     }
   }
   else if (alg==GbModstd)
@@ -246,18 +246,18 @@ static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL,
     void *args[]={temp,(void*)1,NULL};
     int arg_t[]={MODUL_CMD,INT_CMD,0};
     leftv temp0=ii_CallLibProcM("modStd",args,arg_t,currRing,err);
-    temp1=(ideal)temp0->data;
+    res=(ideal)temp0->data;
     omFreeBin((ADDRESS)temp0,sleftv_bin);
     if (err)
     {
       Werror("error %d in >>modStd<<",err);
-      temp1=idInit(1,1);
+      res=idInit(1,1);
     }
   }
   else if (alg==GbSba)
   {
     if (TEST_OPT_PROT) { PrintS("sba:"); mflush(); }
-    temp1 = kSba(temp,currRing->qideal,hom,&w,1,0,NULL);
+    res = kSba(temp,currRing->qideal,hom,&w,1,0,NULL);
     if (w!=NULL) delete w;
   }
   else if (alg==GbStdSat)
@@ -296,17 +296,17 @@ static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL,
       void *args[]={temp,v,NULL};
       int arg_t[]={MODUL_CMD,IDEAL_CMD,0};
       leftv temp0=ii_CallLibProcM("satstd",args,arg_t,currRing,err);
-      temp1=(ideal)temp0->data;
+      res=(ideal)temp0->data;
       omFreeBin((ADDRESS)temp0, sleftv_bin);
     }
     if (err)
     {
       Werror("error %d in >>satstd<<",err);
-      temp1=idInit(1,1);
+      res=idInit(1,1);
     }
   }
   if (w!=NULL) delete w;
-  return temp1;
+  return res;
 }
 
 /*2
@@ -2744,7 +2744,7 @@ ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
   int del=0;
   ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
   trans=idLift(arg,res,NULL,TRUE,FALSE,FALSE,NULL);
-  idDeleteComps(res,red_comp,del);
+  //idDeleteComps(res,red_comp,del);
   omFree(red_comp);
   return res;
 }

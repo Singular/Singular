@@ -647,7 +647,7 @@ static void nfReadTable(const int c, const coeffs r)
     int k;
     while ( i < r->m_nfCharQ )
     {
-      (void)fgets( buf, sizeof(buf), fp);
+      if (fgets( buf, sizeof(buf), fp)==NULL) goto err;
       //( strlen( buffer ) == (size_t)digs * 30, "illegal table" );
       bufptr = buf;
       k = 0;
@@ -770,7 +770,8 @@ static nMapFunc nfSetMap(const coeffs src, const coeffs dst)
         nfReadTable(save_ch, r);
         nfMapGG_factor= r->m_nfPlus1Table[0] / nn;
         //Print("nfMapGG_factor=%d (%d / %d)\n",nfMapGG_factor, r->m_nfPlus1Table[0], nn);
-        return nfMapGG;
+	if (errorreported) return NULL;
+        else return nfMapGG;
       }
       else if ((n1 % n2)==0)
       {

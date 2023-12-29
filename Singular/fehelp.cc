@@ -1027,7 +1027,11 @@ static void heGenHelp(heEntry hentry, int br)
     }
   }
   Print("running `%s`\n",sys);
-  if (!FE_OPT_NO_SHELL_FLAG) (void) system(sys);
+  if (!FE_OPT_NO_SHELL_FLAG) 
+  {
+    int err=system(sys);
+    if (err!=0) Warn("exit code: %d\n",err);
+  }
 }
 
 static BOOLEAN heDummyInit(int /*warn*/, int /*br*/)

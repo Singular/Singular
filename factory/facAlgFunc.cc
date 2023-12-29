@@ -763,7 +763,7 @@ SteelTrager (const CanonicalForm & f, const CFList & AS)
   CFListIterator i, ii;
 
   bool derivZeroF= false;
-  int j, expF= 0, tmpExp;
+  int j, expF=0, tmpExp=0;
   CFFList varsMapLevel, tmp;
   CFFListIterator iter;
 
