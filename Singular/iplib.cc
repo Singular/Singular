@@ -205,7 +205,8 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     return NULL;
   }
 
-  fseek(fp, pi->data.s.proc_start, SEEK_SET);
+  int res=fseek(fp, pi->data.s.proc_start, SEEK_SET);
+  if (res==1) return NULL;
   if(part==0)
   { // load help string
     int i, offset=0;
@@ -219,10 +220,13 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
     s = (char *)omAlloc(procbuflen+head+3);
-    myfread(s, head, 1, fp);
+    res=myfread(s, head, 1, fp);
+    if (res<=0) /* error*/ { omFree(s); return NULL; }
     s[head] = '\n';
-    fseek(fp, pi->data.s.help_start, SEEK_SET);
-    myfread(s+head+1, procbuflen, 1, fp);
+    int res=fseek(fp, pi->data.s.help_start, SEEK_SET);
+    if (res==-1) /*error*/ { omFree(s); return NULL; }
+    res=myfread(s+head+1, procbuflen, 1, fp);
+    if (res<=0) /* error*/ { omFree(s); return NULL; }
     fclose(fp);
     s[procbuflen+head+1] = '\n';
     s[procbuflen+head+2] = '\0';
@@ -280,7 +284,11 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
       return NULL; // example part does not exist
     // load example
     fseek(fp, pi->data.s.example_start, SEEK_SET);
-    /*char *dummy=*/ (void) fgets(buf, sizeof(buf), fp); // skip line with "example"
+    char* res=fgets(buf, sizeof(buf), fp); // skip line with "example"
+    if (res==NULL) /*error or eof*/
+    {
+      return omStrDup("");
+    }
     procbuflen = pi->data.s.proc_end - pi->data.s.example_start - strlen(buf);
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);

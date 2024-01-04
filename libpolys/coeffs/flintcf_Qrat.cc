@@ -69,7 +69,7 @@ static void fmpq_rat_clear(fmpq_rat_ptr a, const coeffs r)
   fmpq_mpoly_clear(a->den, ((data_ptr)r->data)->ctx);
 }
 
-static void fmpq_rat_canonicalise(fmpq_rat_ptr a, const coeffs r)
+static void fmpq_rat_canonicalise(fmpq_rat_ptr a, const coeffs /*r*/)
 {
   fmpz_t n, d;
   fmpz_init(n);
@@ -98,7 +98,6 @@ static BOOLEAN CoeffIsEqual(const coeffs c, n_coeffType n, void * parameter)
 {
   if (c->type == n)
   {
-    const fmpq_ctx_ptr ctx = (fmpq_ctx_ptr) ((data_ptr)c->data)->ctx;
     const QaInfo *par=(QaInfo*)parameter;
     if (par->N != c->iNumberOfParameters) return FALSE;
     // compare parameter names
@@ -629,7 +628,6 @@ static void MPZ(mpz_t result, number &n, const coeffs c)
   const fmpq_ctx_ptr ctx = (fmpq_ctx_ptr) ((data_ptr)c->data)->ctx;
   if (fmpq_mpoly_is_fmpq(x->den, ctx) && fmpq_mpoly_is_fmpq(x->num, ctx))
   {
-    long nl = 0;
     fmpq_t r;
     fmpq_init(r);
     fmpq_div(r, x->num->content, x->den->content);
@@ -1183,19 +1181,19 @@ static number GetNumerator(number &n, const coeffs c)
   return (number) res;
 }
 
-static number ExtGcd(number a, number b, number *s, number *t, const coeffs c)
+static number ExtGcd(number /*a*/, number /*b*/, number* /*s*/, number* /*t*/, const coeffs /*c*/)
 {
   WerrorS("not a Euclidean ring: ExtGcd");
   return NULL;
 }
 
-static number Lcm(number a, number b, const coeffs c)
+static number Lcm(number /*a*/, number /*b*/, const coeffs /*c*/)
 {
   WerrorS("not yet: Lcm");
   return NULL;
 }
 
-static number Q2Frac(number a, const coeffs src, const coeffs dst)
+static number Q2Frac(number a, const coeffs /*src*/, const coeffs dst)
 {
   number res;
   if (SR_HDL(a) & SR_INT)
@@ -1221,7 +1219,7 @@ static number Q2Frac(number a, const coeffs src, const coeffs dst)
   return res;
 }
 
-static number Z2Frac(number a, const coeffs src, const coeffs dst)
+static number Z2Frac(number a, const coeffs /*src*/, const coeffs dst)
 {
   return InitMPZ((mpz_ptr)a,dst);
 }
@@ -1507,69 +1505,66 @@ coeffs flintQratInitCfByName(char *s, n_coeffType n)
 static BOOLEAN DBTest(number c, const char *, const int, const coeffs cf)
 {
   const fmpq_rat_ptr x = (fmpq_rat_ptr) c;
-  if ((x!=NULL)
-  && ((x->num==NULL)||(x->den==NULL)))
+  if (x!=NULL)
   {
-    dReportError("NULL num., or den.\n");
-    return FALSE;
-  }
-  const fmpq_ctx_ptr ctx = (fmpq_ctx_ptr) ((data_ptr)cf->data)->ctx;
-  fmpq_mpoly_assert_canonical(x->num,ctx);
-  fmpq_mpoly_assert_canonical(x->den,ctx);
-  if (fmpq_mpoly_is_zero(x->den, ctx))
-  {
-    dReportError("den.==0\n");
-    return FALSE;
-  }
-  fmpz_t n, d;
-  fmpz_init(n);
-  fmpz_init(d);
-  fmpz_gcd(n, fmpq_numref(x->num->content), fmpq_numref(x->den->content));
-  fmpz_lcm(d, fmpq_denref(x->num->content), fmpq_denref(x->den->content));
-  if (!fmpz_is_one(d))
-  {
-     dReportError("canon needed (1)");
-     return TRUE;
-  }
-  if (!fmpz_is_one(n))
-  {
-     dReportError("canon needed (2)");
-     return TRUE;
-  }
-  fmpz_clear(n);
-  fmpz_clear(d);
-  #ifdef QA_DEBUG
-  poly pp=convFlintMPSingP(x->num,ctx,((data_ptr)cf->data)->C->extRing);
-  fraction f=(fraction)x->p;
-  if (f==NULL)
-  {
-    dReportError("x->p==NULL\n");
-    return FALSE;
-  }
-  else
-  {
-    if (!p_EqualPolys(pp,NUM(f),((data_ptr)cf->data)->C->extRing))
+    const fmpq_ctx_ptr ctx = (fmpq_ctx_ptr) ((data_ptr)cf->data)->ctx;
+    fmpq_mpoly_assert_canonical(x->num,ctx);
+    fmpq_mpoly_assert_canonical(x->den,ctx);
+    if (fmpq_mpoly_is_zero(x->den, ctx))
     {
-      p_Write(pp,((data_ptr)cf->data)->C->extRing);
-      PrintS("num, p=");
-      p_Write(NUM(f),((data_ptr)cf->data)->C->extRing);
-      dReportError("num wrong.\n");
+      dReportError("den.==0\n");
       return FALSE;
     }
-    if (DEN(f)!=NULL)
+    fmpz_t n, d;
+    fmpz_init(n);
+    fmpz_init(d);
+    fmpz_gcd(n, fmpq_numref(x->num->content), fmpq_numref(x->den->content));
+    fmpz_lcm(d, fmpq_denref(x->num->content), fmpq_denref(x->den->content));
+    if (!fmpz_is_one(d))
     {
-      pp=convFlintMPSingP(x->den,ctx,((data_ptr)cf->data)->C->extRing);
-      if (!p_EqualPolys(pp,DEN(f),((data_ptr)cf->data)->C->extRing))
+       dReportError("canon needed (1)");
+       return TRUE;
+    }
+    if (!fmpz_is_one(n))
+    {
+       dReportError("canon needed (2)");
+       return TRUE;
+    }
+    fmpz_clear(n);
+    fmpz_clear(d);
+    #ifdef QA_DEBUG
+    poly pp=convFlintMPSingP(x->num,ctx,((data_ptr)cf->data)->C->extRing);
+    fraction f=(fraction)x->p;
+    if (f==NULL)
+    {
+      dReportError("x->p==NULL\n");
+      return FALSE;
+    }
+    else
+    {
+      if (!p_EqualPolys(pp,NUM(f),((data_ptr)cf->data)->C->extRing))
       {
         p_Write(pp,((data_ptr)cf->data)->C->extRing);
-        PrintS("den, p=");
+        PrintS("num, p=");
         p_Write(NUM(f),((data_ptr)cf->data)->C->extRing);
-        dReportError("den wrong.\n");
+        dReportError("num wrong.\n");
         return FALSE;
       }
+      if (DEN(f)!=NULL)
+      {
+        pp=convFlintMPSingP(x->den,ctx,((data_ptr)cf->data)->C->extRing);
+        if (!p_EqualPolys(pp,DEN(f),((data_ptr)cf->data)->C->extRing))
+        {
+          p_Write(pp,((data_ptr)cf->data)->C->extRing);
+          PrintS("den, p=");
+          p_Write(NUM(f),((data_ptr)cf->data)->C->extRing);
+          dReportError("den wrong.\n");
+          return FALSE;
+        }
+      }
     }
+    #endif
   }
-  #endif
   return TRUE;
 }
 

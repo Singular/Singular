@@ -45,6 +45,6 @@ LIBS=${BACKUP_LIBS}
 
 if test "x$HAVE_CCLUSTER" != "xyes"; then
   AC_MSG_RESULT(not found)
-fi  
+fi
 AM_CONDITIONAL(SING_HAVE_CCLUSTER, test "x$HAVE_CCLUSTER" = "xyes")
 ])

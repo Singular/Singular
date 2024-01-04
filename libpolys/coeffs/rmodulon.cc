@@ -71,7 +71,7 @@ static char* nrnCoeffName(const coeffs r)
   l+=24;
   nrnCoeffName_buff=(char*)omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
-  int ll;
+  int ll=0;
   if (nCoeff_is_Zn(r))
   {
     if (strlen(s)<10)

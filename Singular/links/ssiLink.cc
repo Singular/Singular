@@ -1023,16 +1023,21 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
     {
       if (strcmp(mode,"fork")==0)
       {
+        int pc[2];
+        int cp[2];
+        int err1=pipe(pc);
+        int err2=pipe(cp);
+	if (err1 || err2)
+	{
+          Werror("pipe failed with %d\n",errno);
+          return TRUE;
+	}
         link_list n=(link_list)omAlloc(sizeof(link_struct));
         n->u=u;
         n->l=l;
         n->next=(void *)ssiToBeClosed;
         ssiToBeClosed=n;
 
-        int pc[2];
-        int cp[2];
-        pipe(pc);
-        pipe(cp);
         pid_t pid = fork();
         if (pid == -1 && errno == EAGAIN)   // RLIMIT_NPROC too low?
         {
@@ -1256,7 +1261,15 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         omFree(path);
         omFree(cli_host);
         if (TEST_OPT_PROT) { Print("running >>%s<<\n",ssh_command); }
-        system(ssh_command);
+        int re=system(ssh_command);
+	if (re<0)
+	{
+          Werror("ERROR running `%s` (%d)",ssh_command,re);
+          l->data=NULL;
+          l->flags=0;
+          omFree(d);
+          return TRUE;
+	}
         omFree(ssh_command);
         omFree(ser_host);
         clilen = sizeof(cli_addr);

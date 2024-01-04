@@ -1757,6 +1757,7 @@ number _nlCopy_NoImm(number a)
     case 0:
     case 1:
             mpz_init_set(b->n,a->n);
+            /*no break*/
     case 3:
             mpz_init_set(b->z,a->z);
             break;
@@ -1773,6 +1774,7 @@ void _nlDelete_NoImm(number *a)
       case 0:
       case 1:
         mpz_clear((*a)->n);
+        /*no break*/
       case 3:
         mpz_clear((*a)->z);
     }

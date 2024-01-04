@@ -143,8 +143,15 @@ void sdb_edit(procinfo *pi)
       }
     }
 
-    write(f,pi->data.s.body,strlen(pi->data.s.body));
+    size_t res=write(f,pi->data.s.body,strlen(pi->data.s.body));
     close(f);
+    if (res==-1)
+    {
+      PrintS("cannot write the procedure body\n");
+      si_unlink(filename);
+      omFree(filename);
+      return;
+    }
 
     int pid=fork();
     if (pid!=0)
@@ -163,7 +170,11 @@ void sdb_edit(procinfo *pi)
         size_t len=strlen(editor)+strlen(filename)+2;
         char *p=(char *)omAlloc(len);
         snprintf(p,len,"%s %s",editor,filename);
-        system(p);
+        int res=system(p);
+	if (res<0)
+	{
+          Print("cannot call `%s`\n",editor);
+	}
       }
       exit(0);
     }

@@ -6459,10 +6459,10 @@ EXAMPLE: example radical; shows an example
   intvec op = option(get);
   list qr = simplifyIdeal(i);
   map phi = @P, qr[2];  // map from the same ring, to simplify the ideal
-  
-  
+
+
   option(redSB);
-  i = groebner(qr[1]);  // We use the transformed variables, and we 
+  i = groebner(qr[1]);  // We use the transformed variables, and we
                         // will use map phi to go back to the original
                         // variables
   option(set, op);
@@ -6537,7 +6537,7 @@ EXAMPLE: example radical; shows an example
       dbprint(printlevel-voice, "il", il);
     }
   }
-    
+
   rad=interred(phi(rad));  // Eliminate redundant polynomials
   setring(P0);
   i=imap(@P,rad);

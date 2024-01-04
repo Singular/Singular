@@ -602,7 +602,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfImPart  = ngcImPart;
     // cfSize  = ndSize;
 #ifdef LDEBUG
-  //n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
+  n->cfDBTest  = ngcDBTest; // not yet implemented: ngcDBTest
 #endif
 
   n->nCoeffIsEqual = ngcCoeffIsEqual;

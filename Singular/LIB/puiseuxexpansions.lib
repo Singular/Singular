@@ -478,7 +478,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
 
         @c = puiseuxStep(fTemp, slN, 1);
         fc = factorize(@c);
-        
+
         for(j = 2; j <= size(fc[1]); j++)
         {
 
@@ -504,7 +504,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
               if(defined(erg))
               {
                 sizeErg = size(erg);
-              } else 
+              } else
               {
                 sizeErg = 1;
               }
@@ -537,7 +537,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                     if(slN >= 0)
                     {
                       cs[size(cs) + 1] = list((csT[k][1] + c1)*(var(1)^(csT[k][2]*slN)), csT[k][2]*slD);
-                    } else 
+                    } else
                     {
                       cs[size(cs) + 1] = list(csT[k][1] + c1, csT[k][2]*slD);
                       cs[size(cs)][8] = list("Denominator", var(1) ^ (-slN*csT[k][2]));
@@ -546,7 +546,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
 
                     // NEW CODING FOR CONJUGATED EXPANSIONS
                     cs[size(cs)][6] = insert(csT[k][6], cod);
-                    
+
                     if(newExt == 1)
                     {
                       if(typeof(csT[k][7])=="none")
@@ -564,7 +564,7 @@ static proc puiseuxMain(poly f, int maxDeg, int sN, int sD, int firstTime)
                         cs[size(cs)][7] = sum2All(csT[k][7], slN * csT[k][2]);
                       }
                     }
-                  } else 
+                  } else
                   {
                     def RT = csT[k];
                     setring RT;
@@ -927,7 +927,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
       fJe = Integralbasis::sortFactors(fJe);
 
       fNew1 = subst(f, var(1), var(1)^slD);
-      
+
       for(ii = 2; ii <= size(fJe[1]); ii++)
       {
         if((ii == 2) || (nonRatCoeff(fJe[1][ii]) == 0))  // If the factor is over the ground field then it is a new conjugacy class.
@@ -947,7 +947,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
 
         @c = puiseuxStep(fTemp, slN, 1);
         fc = factorize(@c);
-        
+
         // Stopping criterium
         stop = 0;
         if(maxDeg <= 0)
@@ -956,7 +956,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
           {
             stop = 1;
           }
-        } else 
+        } else
         {
           if(slN >= slD * maxDeg)
           {
@@ -967,7 +967,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
         if(fJe[1][ii] != var(2))
         {
           //minP = fc[1][j];
-          
+
           // The minpoly of Y^5-1 is Y-1 and the minpoly of Y^5-2 is Y^5-2.
           minPBefore = subst(fJe[1][ii],var(1),1);
           minPFacs = factorize(minPBefore);
@@ -980,7 +980,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
             if(defined(erg))
             {
               sizeErg = size(erg);
-            } else 
+            } else
             {
               sizeErg = 1;
             }
@@ -1013,7 +1013,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
                   if(slN >= 0)
                   {
                     cs[size(cs) + 1] = list((csT[k][1] + c1)*(var(1)^(csT[k][2]*slN)), csT[k][2]*slD);
-                  } else 
+                  } else
                   {
                     cs[size(cs) + 1] = list(csT[k][1] + c1, csT[k][2]*slD);
                     cs[size(cs)][8] = list("Denominator", var(1) ^ (-slN*csT[k][2]));
@@ -1022,7 +1022,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
 
                   // NEW CODING FOR CONJUGATED EXPANSIONS
                   cs[size(cs)][6] = insert(csT[k][6], cod);
-                  
+
                   if(newExt == 1)
                   {
                     if(typeof(csT[k][7])=="none"){
@@ -1038,7 +1038,7 @@ static proc puiseuxMainOneExpansion(poly f, int maxDeg, int sN, int sD, int firs
                       cs[size(cs)][7] = sum2All(csT[k][7], slN * csT[k][2]);
                     }
                   }
-                } else 
+                } else
                 {
                   def RT = csT[k];
                   setring RT;
