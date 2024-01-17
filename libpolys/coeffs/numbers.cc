@@ -373,7 +373,7 @@ number ndQuotRem (number a, number b, number * r, const coeffs R)
     return d;
   }
 }
-STATIC_VAR n_coeffType nLastCoeffs=n_CF;
+STATIC_VAR n_coeffType nLastCoeffs=n_Nemo_Ring;
 VAR cfInitCharProc nInitCharTableDefault[]=
 { NULL,        /*n_unknown */
  npInitChar,   /* n_Zp */
@@ -404,7 +404,14 @@ VAR cfInitCharProc nInitCharTableDefault[]=
  NULL,         /* n_Z2m */
  #endif
  flintQrat_InitChar, /* n_FlintQrat */
- NULL         /* n_CF */
+ NULL,         /* n_CF */
+ NULL,         /*  n_Nemo_AnticNumberField */
+ NULL,         /* n_Nemo_QQField */
+ NULL,         /* n_Nemo_ZZRing */
+ NULL,         /* n_Nemo_FqPolyRepField */
+ NULL,         /* n_Nemo_fqPolyRepField */
+ NULL,         /* n_Nemo_Field */
+ NULL          /* n_Nemo_Ring */
 };
 
 STATIC_VAR cfInitCharProc *nInitCharTable=nInitCharTableDefault;
