@@ -86,7 +86,7 @@ void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t
     nmod_poly_set(a, b);
     fq_nmod_reduce(a, ctx);
 }
-#else
+#elif  (__FLINT_RELEASE < 30000)
 void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
                                                        const fq_nmod_ctx_t ctx)
 {
