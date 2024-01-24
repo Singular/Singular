@@ -47,6 +47,11 @@ extern "C"
 #include <flint/fq_nmod_mpoly_factor.h>
 #include <flint/fmpz_mod.h>
 #endif
+#if ( __FLINT_RELEASE >= 30000)
+#include <flint/nmod.h>
+#include <flint/nmod_mpoly.h>
+#include <flint/fmpz_vec.h>
+#endif
 #endif
 
 EXTERN_VAR flint_rand_t FLINTrandom;
