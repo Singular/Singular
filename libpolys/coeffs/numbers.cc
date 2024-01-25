@@ -348,11 +348,11 @@ static nMapFunc ndSetMap(const coeffs src, const coeffs dst)
   return ndCopyMap;
 }
 
-static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
+static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *d)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
   /* if parameter is not needed */
-  return (n==r->type);
+  return (n==r->type) &&(r->data==d);
 }
 
 number ndQuotRem (number a, number b, number * r, const coeffs R)
@@ -624,7 +624,7 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
   }
   else
   {
-    if (nInitCharTable[n]!=NULL) Print("coeff %d already initialized\n",n);
+    //if (nInitCharTable[n]!=NULL) Print("coeff %d already initialized\n",n);
     nInitCharTable[n]=p;
     return n;
   }
