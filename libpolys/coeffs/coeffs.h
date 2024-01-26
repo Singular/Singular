@@ -46,13 +46,13 @@ enum n_coeffType
   n_Z2m, /**< only used if HAVE_RINGS is defined */
   n_FlintQrat, /**< rational funtion field over Q */
   n_CF, /**< ? */
-  n_Nemo_AnticNumberField,
-  n_Nemo_QQField,
-  n_Nemo_ZZRing,
-  n_Nemo_FqPolyRepField,
-  n_Nemo_fqPolyRepField,
-  n_Nemo_Field,
-  n_Nemo_Ring
+  n_Nemo_AnticNumberField, /*17 */
+  n_Nemo_QQField,          /*18 */
+  n_Nemo_ZZRing,           /*19 */
+  n_Nemo_FqPolyRepField,   /*20 */
+  n_Nemo_fqPolyRepField,   /*21 */
+  n_Nemo_Field,            /*22 */
+  n_Nemo_Ring              /*23 */
 };
 
 extern const unsigned short fftable[];
