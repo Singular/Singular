@@ -351,7 +351,6 @@ static nMapFunc ndSetMap(const coeffs src, const coeffs dst)
 static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *d)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
-  /* if parameter is not needed */
   return (n==r->type) &&(r->data==d);
 }
 
