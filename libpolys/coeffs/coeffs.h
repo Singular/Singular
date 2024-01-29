@@ -48,7 +48,7 @@ enum n_coeffType
   n_CF, /**< ? */
   n_Nemo_AnticNumberField, /*17 */
   n_Nemo_QQField,          /*18 */
-  n_Nemo_ZZRing,           /*19 */
+  n_Nemo_ZZRing,           /*19*/
   n_Nemo_FqPolyRepField,   /*20 */
   n_Nemo_fqPolyRepField,   /*21 */
   n_Nemo_Field,            /*22 */
