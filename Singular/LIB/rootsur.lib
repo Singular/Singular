@@ -440,7 +440,7 @@ EXAMPLE:   example maxabs; shows an example"
 
   for (i = 1; i <= size(monic); i++)
   {
-    maximum = max(abs(leadcoef(p[i])),maximum);
+    maximum = max(abs(leadcoef(monic[i])),maximum);
   }
 
   return (maximum + 1);
@@ -501,7 +501,7 @@ EXAMPLE:   example sturm; shows an example"
   signsA = varsigns(pa);
   signsB = varsigns(pb);
 
-  nroots = signsA - signsB + nroots;
+  nroots = signsA - signsB;
 
   return (nroots);
 }
@@ -623,7 +623,6 @@ EXAMPLE:   example sturmha; shows an example"
   list seqa,seqb;
   poly variable;
   number bound;
-  //number result;
   int result;
 
   if (isparam(P) || isparam(a) || isparam(b))
@@ -649,18 +648,12 @@ EXAMPLE:   example sturmha; shows an example"
 
   if (b > bound) { b = bound; }
 
-//  if (a == -bound && b == bound) {
-//    for (i = size(seq);i >= 1;i--) {
-//      seq[i] = leadcoef(seq[i]);
-//    }
-//    result = D(seq);
-//  } else {
     for (i = size(seq);i >= 1;i--) {
       seqa[i] = leadcoef(subst(seq[i],variable,a));
       seqb[i] = leadcoef(subst(seq[i],variable,b));
     }
     result = (W(seqa) - W(seqb));
-//  }
+
   return (result);
 }
 example
@@ -855,69 +848,7 @@ example
   l;
   rev;
 }
-///////////////////////////////////////////////////////////////////////////////
-static proc D(list l)
-{
-  int p;
-  int q;
-  int i;
-  int sc; // The modified number of sign changes
 
-  if (l[size(l)] == 0) {
-    ERROR("l[size(l)] cannot be 0");
-  }
-
-  sc = 0;
-
-  // We know that l[size(l)]] != 0
-  p = size(l);
-  q = p - 1;
-
-  while (searchnot(l,q,-1,0)) {
-    q = searchnot(l,q,-1,0);
-    if ((p - q) % 2 == 1) { // if p-q is odd
-      sc = sc + ((-1)^(((p-q)*(p-q-1)) / 2))*sign(l[p]*l[q]);
-    }
-    p = q;
-    q = p - 1;
-  }
-
-  return (sc);
-}
-///////////////////////////////////////////////////////////////////////////////
-static proc search(list l,int from,int dir,number element)
-{
-  int i;
-  int result;
-  i = from;
-
-  result = 0;
-
-  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result)
-  {
-    if (l[i] == element) { result = i; }
-    i = i + dir;
-  }
-
-  return (result);
-}
-///////////////////////////////////////////////////////////////////////////////
-static proc searchnot(list l,int from,int dir,number element)
-{
-  int i;
-  int result;
-  i = from;
-
-  result = 0;
-
-  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result)
-  {
-    if (l[i] != element) { result = i; }
-    i = i + dir;
-  }
-
-  return (result);
-}
 ///////////////////////////////////////////////////////////////////////////////
 static proc W(list l)
 {
@@ -952,7 +883,3 @@ static proc W(list l)
   return (sc);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
-
