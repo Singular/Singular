@@ -474,8 +474,8 @@ static proc shortNumeratorDecompStep(list l, ideal q, list #)
   ideal q_denom = q[indices]; // factors occurring in the denominator
   matrix T;
   ideal q_std = liftstd(q_denom,T);
-  list divrem = division(f,q_std);
-  poly r = divrem[2][1]/divrem[3][1,1];
+  list Divrem = division(f,q_std);
+  poly r = Divrem[2][1]/Divrem[3][1,1];
 
   if(r!=0)
   {
@@ -485,7 +485,7 @@ static proc shortNumeratorDecompStep(list l, ideal q, list #)
     return(list(list(),list(l))); // if there is a rest, decomposing further would
   }                               // not help in the next step (alg. depend. decomposition)
 
-  matrix a = divrem[1]/divrem[3][1,1]; // now f = r + a[1,1]*q_std[1] + ... +a[m,1]*q_std[m]
+  matrix a = Divrem[1]/Divrem[3][1,1]; // now f = r + a[1,1]*q_std[1] + ... +a[m,1]*q_std[m]
   a = T*a;   // lift coefficients   ==>   now f = r + a[1,1]*q[1]     + ... +a[m,1]*q[m]
 
   // reduce w.r.t. groebner basis of syz(q) to make the numerators "smaller":
@@ -631,9 +631,9 @@ static proc numeratorDecompStep(list l, ideal q, list #)
   ideal q_denom = q[indices]; // factors in the denominator
   matrix T;
   ideal q_std = liftstd(q_denom,T);
-  list divrem = division(f,q_std);
-  matrix a = divrem[1]/divrem[3][1,1];
-  poly r = divrem[2][1]/divrem[3][1,1]; // now f = r + a[1,1]*q_std[1] + ... +a[m,1]*q_std[m]
+  list Divrem = division(f,q_std);
+  matrix a = Divrem[1]/Divrem[3][1,1];
+  poly r = Divrem[2][1]/Divrem[3][1,1]; // now f = r + a[1,1]*q_std[1] + ... +a[m,1]*q_std[m]
   a = T*a;   // lift coefficients    ==>   now f = r + a[1,1]*q[1]     + ... +a[m,1]*q[m]
 
   // reduce w.r.t. groebner basis of syz(q) to make the numerators "smaller"
