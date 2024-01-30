@@ -435,6 +435,7 @@ EXAMPLE:   example maxabs; shows an example"
   }
 
   monic =  simplify(p,1);
+  if (abs(leadcoef(p))>1) { monic=p;}
 
   maximum = 0;
 
