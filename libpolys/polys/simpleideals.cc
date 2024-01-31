@@ -215,6 +215,7 @@ void idSkipZeroes (ideal ide)
       if (change)
       {
         ide->m[j] = ide->m[k];
+	ide->m[k] = NULL;
       }
     }
     else
@@ -226,18 +227,13 @@ void idSkipZeroes (ideal ide)
   {
     if (j == -1)
       j = 0;
-    else
-    {
-      for (k=j+1; k<idelems; k++)
-        ide->m[k] = NULL;
-    }
     j++;
     pEnlargeSet(&(ide->m),idelems,j-idelems);
     IDELEMS(ide) = j;
   }
 }
 
-int idSkipZeroes0 (ideal ide)
+int idSkipZeroes0 (ideal ide) /*idSkipZeroes without realloc*/
 {
   assume (ide != NULL);
 
@@ -1781,6 +1777,19 @@ ideal id_Jet(const ideal i,int d, const ring R)
 
   for(long k=((long)(i->nrows))*((long)(i->ncols))-1;k>=0; k--)
     r->m[k]=pp_Jet(i->m[k],d,R);
+
+  return r;
+}
+
+ideal id_Jet0(const ideal i, const ring R)
+{
+  ideal r=idInit((i->nrows)*(i->ncols),i->rank);
+  r->nrows = i-> nrows;
+  r->ncols = i-> ncols;
+  //r->rank = i-> rank;
+
+  for(long k=((long)(i->nrows))*((long)(i->ncols))-1;k>=0; k--)
+    r->m[k]=pp_Jet0(i->m[k],R);
 
   return r;
 }

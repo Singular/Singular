@@ -138,6 +138,7 @@ BOOLEAN id_HomModuleW (ideal id, ideal Q,  const intvec *w, const intvec *module
 BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R);
 BOOLEAN id_IsZeroDim(ideal I, const ring r);
 ideal id_Jet(const ideal i,int d, const ring R);
+ideal id_Jet0(const ideal i, const ring R);/*id_Jet(i,0,R)*/
 ideal id_JetW(const ideal i,int d, intvec * iv, const ring R);
 ideal  id_Subst(ideal id, int n, poly e, const ring r);
 matrix id_Module2Matrix(ideal mod, const ring R);
