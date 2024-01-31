@@ -48,8 +48,8 @@ matrix evRowElim(matrix M,int i,int j,int k)
 {
   if(MATELEM(M,i,k)==NULL||MATELEM(M,j,k)==NULL)
     return(M);
-  poly p1=pp_Jet(MATELEM(M,i,k),0,currRing);
-  poly p2=pp_Jet(MATELEM(M,j,k),0,currRing);
+  poly p1=pp_Jet0(MATELEM(M,i,k),currRing);
+  poly p2=pp_Jet0(MATELEM(M,j,k),currRing);
   if ((p1==NULL)||(p2==NULL)) return (M);
 
   poly p=pNSet(nDiv(pGetCoeff(p1),pGetCoeff(p2)));

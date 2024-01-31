@@ -90,9 +90,9 @@ static void syMinStep(ideal mod,ideal &syz,BOOLEAN final=FALSE,ideal up=NULL,
   if ((final) && (h==isHomog))
   /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
   {
-    ideal deg0=id_Jet(syz,0,currRing);
+    ideal deg0=id_Jet0(syz,currRing);
     id_Delete(&syz,currRing);
-    idSkipZeroes(deg0);
+    idSkipZeroes0(deg0);
     syz=deg0;
   }
 /*--cancels empty entees and their related components above--*/
@@ -297,7 +297,7 @@ static void syMinStep1(resolvente res, int length)
 /*---we take out dependent elements from syz---------------------*/
     if (res[index+1]!=NULL)
     {
-      ideal deg0 = id_Jet(res[index+1],0,currRing);
+      ideal deg0 = id_Jet0(res[index+1],currRing);
       ideal reddeg0 = kInterRedOld(deg0);
       idDelete(&deg0);
       have_del = new intvec(IDELEMS(res[index]));
