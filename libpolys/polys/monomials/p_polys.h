@@ -2087,6 +2087,7 @@ void p_SetModDeg(intvec *w, ring r);
 
 /*------------ Jet ----------------------------------*/
 poly pp_Jet(poly p, int m, const ring R);
+poly pp_Jet0(poly p, const ring R); /*pp_Jet(p,0,R)*/
 poly p_Jet(poly p, int m,const ring R);
 poly pp_JetW(poly p, int m, int *w, const ring R);
 poly p_JetW(poly p, int m, int *w, const ring R);

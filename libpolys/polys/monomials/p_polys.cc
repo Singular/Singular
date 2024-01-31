@@ -3562,12 +3562,13 @@ void p_DeleteComp(poly * p,int k, const ring r)
   }
   while (pNext(q)!=NULL)
   {
-    if (__p_GetComp(pNext(q),r)==kk)
+    long c=__p_GetComp(pNext(q),r);
+    if (/*__p_GetComp(pNext(q),r)*/c==kk)
       p_LmDelete(&(pNext(q)),r);
     else
     {
       pIter(q);
-      if (__p_GetComp(q,r)>kk)
+      if (/*__p_GetComp(q,r)*/c>kk)
       {
         p_SubComp(q,1,r);
         p_SetmComp(q,r);
@@ -4369,6 +4370,34 @@ poly pp_Jet(poly p, int m, const ring R)
   while (p!=NULL)
   {
     if (p_Totaldegree(p,R)<=m)
+    {
+      if (r==NULL)
+        r=p_Head(p,R);
+      else
+      if (t==NULL)
+      {
+        pNext(r)=p_Head(p,R);
+        t=pNext(r);
+      }
+      else
+      {
+        pNext(t)=p_Head(p,R);
+        pIter(t);
+      }
+    }
+    pIter(p);
+  }
+  return r;
+}
+
+poly pp_Jet0(poly p, const ring R)
+{
+  poly r=NULL;
+  poly t=NULL;
+
+  while (p!=NULL)
+  {
+    if (p_LmIsConstantComp(p,R))
     {
       if (r==NULL)
         r=p_Head(p,R);
