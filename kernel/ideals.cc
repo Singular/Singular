@@ -2688,6 +2688,89 @@ static void idDeleteComps(ideal arg,int* red_comp,int del)
   (arg->rank) -= del;
 }
 
+/*3
+* searches for the next unit in the components of the module arg and
+* returns the first one;
+*/
+static int id_ReadOutPivot(ideal arg,int* comp, const ring r)
+{
+  int i=0,j, generator=-1;
+  int rk_arg=arg->rank; //idRankFreeModule(arg);
+  int * componentIsUsed =(int *)omAlloc((rk_arg+1)*sizeof(int));
+  poly p;
+
+  while ((generator<0) && (i<IDELEMS(arg)))
+  {
+    memset(componentIsUsed,0,(rk_arg+1)*sizeof(int));
+    p = arg->m[i];
+    if (rField_is_Ring(r))
+    {
+      while (p!=NULL)
+      {
+        j = __p_GetComp(p,r);
+        if (componentIsUsed[j]==0)
+        {
+          if (p_LmIsConstantComp(p,r) &&
+              n_IsUnit(pGetCoeff(p),r->cf))
+          {
+            generator = i;
+            componentIsUsed[j] = 1;
+          }
+          else
+          {
+            componentIsUsed[j] = -1;
+          }
+        }
+        else if (componentIsUsed[j]>0)
+        {
+          (componentIsUsed[j])++;
+        }
+        pIter(p);
+      }
+    }
+    else
+    {
+      while (p!=NULL)
+      {
+        j = __p_GetComp(p,r);
+        if (componentIsUsed[j]==0)
+        {
+          if (p_LmIsConstantComp(p,r))
+          {
+            generator = i;
+            componentIsUsed[j] = 1;
+          }
+          else
+          {
+            componentIsUsed[j] = -1;
+          }
+        }
+        else if (componentIsUsed[j]>0)
+        {
+          (componentIsUsed[j])++;
+        }
+        pIter(p);
+      }
+    }
+    i++;
+  }
+  i = 0;
+  *comp = -1;
+  for (j=0;j<=rk_arg;j++)
+  {
+    if (componentIsUsed[j]>0)
+    {
+      if ((*comp==-1) || (componentIsUsed[j]<i))
+      {
+        *comp = j;
+        i= componentIsUsed[j];
+      }
+    }
+  }
+  omFree(componentIsUsed);
+  return generator;
+}
+
 /*2
 * returns the presentation of an isomorphic, minimally
 * embedded  module (arg represents the quotient!)

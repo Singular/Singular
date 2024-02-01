@@ -1814,63 +1814,6 @@ ideal id_JetW(const ideal i,int d, intvec * iv, const ring R)
   return r;
 }
 
-/*3
-* searches for the next unit in the components of the module arg and
-* returns the first one;
-*/
-int id_ReadOutPivot(ideal arg,int* comp, const ring r)
-{
-  if (idIs0(arg)) return -1;
-  int i=0,j, generator=-1;
-  int rk_arg=arg->rank; //idRankFreeModule(arg);
-  int * componentIsUsed =(int *)omAlloc((rk_arg+1)*sizeof(int));
-  poly p;
-
-  while ((generator<0) && (i<IDELEMS(arg)))
-  {
-    memset(componentIsUsed,0,(rk_arg+1)*sizeof(int));
-    p = arg->m[i];
-    while (p!=NULL)
-    {
-      j = __p_GetComp(p,r);
-      if (componentIsUsed[j]==0)
-      {
-        if (p_LmIsConstantComp(p,r) &&
-            (!rField_is_Ring(r) || n_IsUnit(pGetCoeff(p),r->cf)))
-        {
-          generator = i;
-          componentIsUsed[j] = 1;
-        }
-        else
-        {
-          componentIsUsed[j] = -1;
-        }
-      }
-      else if (componentIsUsed[j]>0)
-      {
-        (componentIsUsed[j])++;
-      }
-      pIter(p);
-    }
-    i++;
-  }
-  i = 0;
-  *comp = -1;
-  for (j=0;j<=rk_arg;j++)
-  {
-    if (componentIsUsed[j]>0)
-    {
-      if ((*comp==-1) || (componentIsUsed[j]<i))
-      {
-        *comp = j;
-        i= componentIsUsed[j];
-      }
-    }
-  }
-  omFree(componentIsUsed);
-  return generator;
-}
-
 #if 0
 static void idDeleteComp(ideal arg,int red_comp)
 {
