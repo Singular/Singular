@@ -5576,8 +5576,8 @@ ring rOpposite(ring src)
           j++;
           break;
         }
-	default:
-	#if 0
+        default:
+        #if 0
         // not yet done:
         case ringorder_ls:
         case ringorder_rs:
@@ -5594,7 +5594,7 @@ ring rOpposite(ring src)
         case ringorder_aa:
         case ringorder_L:
         case ringorder_unspec:
-	#endif
+        #endif
           Werror("order %s not (yet) supported", rSimpleOrdStr(src->order[i]));
           break;
       }

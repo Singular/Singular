@@ -215,7 +215,7 @@ void idSkipZeroes (ideal ide)
       if (change)
       {
         ide->m[j] = ide->m[k];
-	ide->m[k] = NULL;
+        ide->m[k] = NULL;
       }
     }
     else
