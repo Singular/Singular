@@ -3447,14 +3447,28 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
   if (__p_GetComp(q,r)==k)
   {
     result = q;
-    do
+    if (UNLIKELY(use_setmcomp))
     {
-      p_SetComp(q,0,r);
-      if (use_setmcomp) p_SetmComp(q,r);
-      qq = q;
-      pIter(q);
+      do
+      {
+        p_SetComp(q,0,r);
+        p_SetmComp(q,r);
+        qq = q;
+        pIter(q);
+      }
+      while ((q!=NULL) && (__p_GetComp(q,r)==k));
     }
-    while ((q!=NULL) && (__p_GetComp(q,r)==k));
+    else
+    {
+      do
+      {
+        p_SetComp(q,0,r);
+        qq = q;
+        pIter(q);
+      }
+      while ((q!=NULL) && (__p_GetComp(q,r)==k));
+    }
+
     *p = q;
     pNext(qq) = NULL;
   }
@@ -3467,7 +3481,8 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
   poly pNext_q;
   while ((pNext_q=pNext(q))!=NULL)
   {
-    if (__p_GetComp(pNext_q,r)==k)
+    long c=__p_GetComp(pNext_q,r);
+    if (/*__p_GetComp(pNext_q,r)*/c==k)
     {
       if (result==NULL)
       {
@@ -3487,7 +3502,7 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
     else
     {
       /*pIter(q);*/ q=pNext_q;
-      if (__p_GetComp(q,r) > k)
+      if (/*__p_GetComp(q,r)*/c > k)
       {
         p_SubComp(q,1,r);
         if (use_setmcomp) p_SetmComp(q,r);
