@@ -84,7 +84,7 @@ void VoiceBackTrack()
     if (s==NULL)
       PrintS("-- called from ? --\n");
     else
-      Print("-- called from %s --\n",s);
+      Print("-- called from %s:%d --\n",s, p->curr_lineno);
   }
 }
 
