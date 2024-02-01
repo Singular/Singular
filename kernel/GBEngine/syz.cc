@@ -220,10 +220,10 @@ void syGaussForOne(ideal syz, int elnum, int ModComp,int from,int till)
   int /*k,j,i,*/lu;
   poly unit1,unit2;
   poly actWith=syz->m[elnum];
+  syz->m[elnum] = NULL;
 
   if (from<0) from = 0;
   if ((till<=0) || (till>IDELEMS(syz))) till = IDELEMS(syz);
-  syz->m[elnum] = NULL;
   if (!rField_has_simple_inverse(currRing)) p_Cleardenom(actWith, currRing);
 /*--makes Gauss alg. for the column ModComp--*/
   pTakeOutComp(&(actWith), ModComp, &unit1, &lu);
@@ -250,14 +250,8 @@ static void syDeleteAbove1(ideal up, int k)
     for (int i=0;i<IDELEMS(up);i++)
     {
       p = up->m[i];
-      while ((p!=NULL) && (pGetComp(p)==k))
+      while ((p!=NULL) && ((int)__p_GetComp(p,currRing)==k))
       {
-        /*
-        pp = pNext(p);
-        pNext(p) = NULL;
-        pDelete(&p);
-        p = pp;
-        */
         pLmDelete(&p);
       }
       up->m[i] = p;
@@ -265,14 +259,8 @@ static void syDeleteAbove1(ideal up, int k)
       {
         while (pNext(p)!=NULL)
         {
-          if (pGetComp(pNext(p))==k)
+          if ((int)__p_GetComp(pNext(p),currRing)==k)
           {
-            /*
-            pp = pNext(pNext(p));
-            pNext(pNext(p)) = NULL;
-            pDelete(&pNext(p));
-            pNext(p) = pp;
-            */
             pLmDelete(&pNext(p));
           }
           else
@@ -305,7 +293,7 @@ static void syMinStep1(resolvente res, int length)
       {
         if (reddeg0->m[i]!=NULL)
         {
-          j = pGetComp(reddeg0->m[i]);
+          j = (int)__p_GetComp(reddeg0->m[i],currRing);
           pDelete(&(res[index]->m[j-1]));
           /*res[index]->m[j-1] = NULL;*/
           (*have_del)[j-1] = 1;
@@ -325,15 +313,20 @@ static void syMinStep1(resolvente res, int length)
           while (k<IDELEMS(res[index]))
           {
             p = res[index]->m[k];
-            while ((p!=NULL) && ((!pLmIsConstantComp(p)) || (pGetComp(p)!=j)))
+            while ((p!=NULL)
+            && ((!pLmIsConstantComp(p)) || ((int)__p_GetComp(p,currRing)!=j)))
               pIter(p);
-            if ((p!=NULL) && (pLmIsConstantComp(p)) && (pGetComp(p)==j)) break;
+            if ((p!=NULL)
+            && (pLmIsConstantComp(p))
+            && ((int)__p_GetComp(p,currRing)==j)) break;
             k++;
           }
+          #ifndef SING_NDEBUG
           if (k>=IDELEMS(res[index]))
           {
             PrintS("out of range\n");
           }
+          #endif
           syGaussForOne(res[index],k,j);
           if (res[index+1]!=NULL)
             syDeleteAbove1(res[index+1],k+1);
@@ -842,9 +835,9 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       if (res[i]->m[j]!=NULL)
       {
         if ((pGetComp(res[i]->m[j])>l)
-	// usual resolutions do not the following, but artifulal built may: (tr. #763)
+        // usual resolutions do not the following, but artifulal built may: (tr. #763)
         //|| ((i>1) && (res[i-1]->m[pGetComp(res[i]->m[j])-1]==NULL))
-	)
+        )
         {
           WerrorS("input not a resolution");
           omFreeSize((ADDRESS)temp1,(l+1)*sizeof(int));
