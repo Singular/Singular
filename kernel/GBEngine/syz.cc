@@ -227,17 +227,36 @@ void syGaussForOne(ideal syz, int elnum, int ModComp,int from,int till)
   if (!rField_has_simple_inverse(currRing)) p_Cleardenom(actWith, currRing);
 /*--makes Gauss alg. for the column ModComp--*/
   pTakeOutComp(&(actWith), ModComp, &unit1, &lu);
-  while (from<till)
+  if (lu==1) /*p_IsConstantComp(unit1,currRing)*/
   {
-    poly tmp=syz->m[from];
-    if (/*syz->m[from]*/ tmp!=NULL)
+    number n_unit1=pGetCoeff(unit1);
+    while (from<till)
     {
-      pTakeOutComp(&(tmp), ModComp, &unit2, &lu);
-      tmp = pMult(pCopy(unit1),tmp);
-      syz->m[from] = pSub(tmp,
-        pMult(unit2,pCopy(actWith)));
+      poly tmp=syz->m[from];
+      if (/*syz->m[from]*/ tmp!=NULL)
+      {
+        pTakeOutComp(&tmp, ModComp, &unit2, &lu);
+        tmp = p_Mult_nn(tmp,n_unit1,currRing);
+        syz->m[from] = pSub(tmp,
+          pMult(unit2,pCopy(actWith)));
+      }
+      from++;
     }
-    from++;
+  }
+  else
+  {
+    while (from<till)
+    {
+      poly tmp=syz->m[from];
+      if (/*syz->m[from]*/ tmp!=NULL)
+      {
+        pTakeOutComp(&tmp, ModComp, &unit2, &lu);
+        tmp = pMult(pCopy(unit1),tmp);
+        syz->m[from] = pSub(tmp,
+          pMult(unit2,pCopy(actWith)));
+      }
+      from++;
+    }
   }
   pDelete(&actWith);
   pDelete(&unit1);

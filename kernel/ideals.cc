@@ -2847,6 +2847,7 @@ ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int* g)
 }
 
 extern void ipPrint_MA0(matrix m, const char *name);
+#if 0 // unused
 ideal idMinEmbedding_with_map0(ideal arg,intvec **w, ideal &trans)
 {
   ideal a=idCopy(arg);
@@ -2928,6 +2929,7 @@ ideal idMinEmbedding_with_map0(ideal arg,intvec **w, ideal &trans)
   idDelete(&a);
   return result;
 }
+#endif
 #include "polys/clapsing.h"
 
 #if 0

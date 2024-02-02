@@ -1642,7 +1642,6 @@ resolvente syReorder(resolvente res,int length,
         syStrategy syzstr,BOOLEAN toCopy,resolvente totake)
 {
   int i,j,l;
-  poly p,q,tq;
   polyset ri1;
   resolvente fullres;
   ring origR=syzstr->syRing;
@@ -1661,10 +1660,11 @@ resolvente syReorder(resolvente res,int length,
         ri1 = totake[i-1]->m;
         for (j=IDELEMS(res[i])-1;j>=0;j--)
         {
-          p = res[i]->m[j];
-          q = NULL;
+          sBucket_pt bucket = sBucketCreate(currRing);
+          poly p = res[i]->m[j];
           while (p!=NULL)
           {
+            poly tq;
             if (toCopy)
             {
               if (origR!=NULL)
@@ -1701,10 +1701,11 @@ resolvente syReorder(resolvente res,int length,
             }
             pSetm(tq);
             pTest(tq);
-            q = pAdd(q,tq);
-            pTest(q);
+            sBucket_Add_m(bucket,tq);
           }
-          fullres[i-1]->m[j] = q;
+          int l_dummy;
+          sBucketClearMerge(bucket, &(fullres[i-1]->m[j]), &l_dummy);
+          sBucketDestroy(&bucket);
         }
       }
       else
