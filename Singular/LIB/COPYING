@@ -107,6 +107,7 @@ matrix.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Bernd Martin                    martin@math.tu-cottbus.de
 mprimdec.lib    Alexander Dreyer                dreyer@mathematik.uni-kl.de
 moddiq.lib      Y. Ishihara                     yishihara@rikkyo.ac.jp
+modfinduni.lib  H. Schoenemann                  hannes@mathematik.uni-kl.de
 modstd.lib      A. Hashemi                      Amir.Hashemi@lip6.fr
                 G. Pfister                      pfister@mathematik.uni-kl.de
                 H. Schoenemann                  hannes@mathematik.uni-kl.de
@@ -169,6 +170,7 @@ rootsmr.lib     Enrique A. Tobis                etobis@dc.uba.ar
 rootsur.lib     Enrique A. Tobis                etobis@dc.uba.ar
 sagbi.lib       Gerhard Pfister                 pfister@mathematik.uni-kl.de
                 Anen Lakhal                     alakhal@mathematik.uni-kl.de
+sagbiNormaliz.lib Winfried Bruns                wbruns@uos.de
 sheafcoh.lib    Wolfram Decker                  decker@mathematik.uni-kl.de
                 Christoph Lossen                lossen@mathematik.uni-kl.de
                 Gerhard Pfister                 pfister@mathematik.uni-kl.de
@@ -180,6 +182,7 @@ spcurve.lib     Anne Fruehbis-Krueger           anne@mathematik.uni-kl.de
 spectrum.lib    S. Endrass
 standard.lib    Olaf Bachmann                   obachman@mathematik.uni-kl.de
                 Hans Schoenemann                hannes@mathematik.uni-kl.de
+stdmodule.lib   Nazish Kanwal                   nkanwal@iba.edu.pk
 stratify.lib    Anne Fruehbis-Krueger           anne@mathematik.uni-kl.de
 surf.lib        Hans Schoenemann                hannes@mathematik.uni-kl.de
                 S. Endrass
