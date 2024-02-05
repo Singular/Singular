@@ -47,10 +47,10 @@ bfun.lib        Daniel Andres                   daniel.andres@math.rwth-aachen.d
 brnoeth.lib     Jose Ignacio Farran Martin      ignfar@eis.uva.es
                 Christoph Lossen                lossen@mathematik.uni-kl.de
 central.lib     Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
-chern.lib	Oleksandr Iena                  o.g.yena@gmail.com
-cimonom.lib     I.Bermejo                       ibermejo@ull.es
-                I.Garcia-Marco                  iggarcia@ull.es
-                J.-J.Salazar-Gonzalez           jjsalaza@ull.es
+chern.lib       Oleksandr Iena                  o.g.yena@gmail.com
+cimonom.lib     I. Bermejo                      ibermejo@ull.es
+                I. Garcia-Marco                 iggarcia@ull.es
+                J.-J. Salazar-Gonzalez          jjsalaza@ull.es
 classify.lib    Kai Krueger                     krueger@mathematik.uni-kl.de
 compregb.lib    Akira Suzuki                    sakira@kobe-u.ac.jp
 control.lib     Oleksandr Iena                  yena@mathematik.uni-kl.de
@@ -73,13 +73,13 @@ finvar.lib      Agnes E. Heydtmann
 freegb.lib      Viktor Levandovskyy             levandov@math.rwth-aachen.de
 general.lib     Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Anne Fruehbis-Krueger           anne@mathematik.uni-kl.de
-gkdim.lib       Lobillo, F.J.                   jlobillo@ugr.es
-                Rabelo, C.                      crabelo@ugr.es
+gkdim.lib       F.J. Lobillo                    jlobillo@ugr.es
+                C. Rabelo                       crabelo@ugr.es
 gmspoly.lib     Mathias Schulze                 mschulze@mathematik.uni-kl.de
 gmssing.lib     Mathias Schulze                 mschulze@mathematik.uni-kl.de
 graphics.lib    Christian Gorzel                gorzelc@math.uni-muenster.de
-grobcov.lib	Antonio Montes
-		Hans Schoenemann
+grobcov.lib     Antonio Montes
+                Hans Schoenemann
 groups.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Gerhard Pfister                 pfister@mathematik.uni-kl.de
 grwalk.lib      I Made Sulandra
@@ -106,7 +106,7 @@ makedbm.lib     Kai Krueger                     krueger@mathematik.uni-kl.de
 matrix.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Bernd Martin                    martin@math.tu-cottbus.de
 mprimdec.lib    Alexander Dreyer                dreyer@mathematik.uni-kl.de
-moddiq.lib	Y. Ishihara                     yishihara@rikkyo.ac.jp
+moddiq.lib      Y. Ishihara                     yishihara@rikkyo.ac.jp
 modstd.lib      A. Hashemi                      Amir.Hashemi@lip6.fr
                 G. Pfister                      pfister@mathematik.uni-kl.de
                 H. Schoenemann                  hannes@mathematik.uni-kl.de
@@ -129,7 +129,7 @@ nctools.lib     Levandovskyy V.                 levandov@mathematik.uni-kl.de
 noether.lib     A. Hashemi                      Amir.Hashemi@lip6.fr
 normal.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 G. Pfister                      pfister@mathematik.uni-kl.de
-normaliz.ib     W. Bruns                        Winfried.Bruns@Uni-Osnabrueck.de
+normaliz.lib    W. Bruns                        Winfried.Bruns@Uni-Osnabrueck.de
                 C. Soeger                       Christof.Soeger@Uni-Osnabrueck.de
 ntsolve.lib     Wilfred Pohl                    pohl@mathematik.uni-kl.de
                 Dietmar Hillebrand
@@ -148,8 +148,8 @@ primdec.lib     Gerhard Pfister                 pfister@mathematik.uni-kl.de
                 Santiago Laplagne               slaplagn@dm.uba.ar
 primitiv.lib    Martin Lamm                     lamm@mathematik.uni-kl.de
 qhmoduli.lib    Thomas Bayer                    bayert@in.tum.de
-qmatrix.lib     Lobillo, F.J.                   jlobillo@ugr.es
-                Rabelo, C.                      crabelo@ugr.es
+qmatrix.lib     F.J. Lobillo                    jlobillo@ugr.es
+                C. Rabelo                       crabelo@ugr.es
 random.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Bernd Martin                    martin@math.tu-cottbus.de
 realrad.lib     Silke Spang
@@ -163,7 +163,7 @@ resolve.lib     A. Fruehbis-Krueger             anne@mathematik.uni-kl.de
                 G. Pfister                      pfister@mathematik.uni-kl.de
 reszeta.lib     A. Fruehbis-Krueger             anne@mathematik.uni-kl.de
                 G. Pfister                      pfister@mathematik.uni-kl.de
-ring.lib        G.-M.Greuel                     greuel@mathematik.uni-kl.de
+ring.lib        G.-M. Greuel                    greuel@mathematik.uni-kl.de
 rinvar.lib      Thomas Bayer                    bayert@in.tum.de
 rootsmr.lib     Enrique A. Tobis                etobis@dc.uba.ar
 rootsur.lib     Enrique A. Tobis                etobis@dc.uba.ar
