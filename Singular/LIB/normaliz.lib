@@ -1,5 +1,5 @@
 //// Singular library normaliz.lib
-version="version normaliz.lib 4.3.1.0 June_2022 "; // $Id$
+version="version normaliz.lib 4.3.2.14 Apr_2023 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 3.10.0 or
@@ -37,7 +37,7 @@ data. Moreover, the library provides functions for access to these files.
 Deletion of the files is left to the user.  (Not all output files
 of Normaliz can be read by this library.)
 
-Use of this library requires the program Normaliz to be installed.
+Use of this library requires the program Normaliz >=3.10.0 to be installed.
 You can download it from
 @uref{https://github.com/Normaliz/Normaliz/releases}. Please make sure
 that the executable is in the search path or use setNmzExecPath
