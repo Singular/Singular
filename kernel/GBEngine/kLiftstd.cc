@@ -411,7 +411,7 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   id_Delete(&s_quot,syz_ring);
   id_Delete(&s_A,syz_ring);
   /* interpret rest: remainder */
-  ideal result=idInit(IDELEMS(rest),1);
+  ideal result=idInit(IDELEMS(rest),A->rank);
   for(int i=0;i<IDELEMS(rest);i++)
   {
     poly p=rest->m[i];
@@ -489,4 +489,3 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   }
   return result;
 }
-

@@ -3974,14 +3974,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         ideal p=(ideal)h->CopyD();
         ideal q=(ideal)h->next->CopyD();
-        ideal rest;
+        ideal factors;
         ideal unit;
-        ideal quot=idDivRem(p,q,rest,&unit,0);
-        matrix T = id_Module2Matrix(rest,currRing);
+        ideal rest=idDivRem(p,q,factors,&unit,0);
+        matrix T = id_Module2Matrix(factors,currRing);
         matrix U = id_Module2Matrix(unit,currRing);
         lists L=(lists)omAllocBin(slists_bin);
         L->Init(3);
-        L->m[0].rtyp=h->Typ();   L->m[0].data=(void *)quot;
+        L->m[0].rtyp=h->Typ();   L->m[0].data=(void *)rest;
         L->m[1].rtyp=MATRIX_CMD;  L->m[1].data=(void *)T;
         L->m[2].rtyp=MATRIX_CMD;  L->m[2].data=(void *)U;
         res->rtyp=LIST_CMD;
