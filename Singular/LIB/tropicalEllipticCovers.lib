@@ -1,0 +1,2935 @@
+////////////////////////////////////////////////////////////////
+version="version tropicalEllipticCovers.lib 4.2.1 Jan_2020 ";
+category="Algebraic geometry, Tropical geometry";
+info="
+LIBRARY:  tropicalEllipticCovers.lib    Gromov-Witten numbers of tropical elliptic curves and their covers
+
+AUTHORS:  J. Boehm, boehm @ mathematik.uni-kl.de
+          F. Dastur, dastur.firoozeh @ gmail.com
+
+OVERVIEW:
+
+We implement a formula for computing the number of covers of (abstract) elliptic curves
+with and without tangency conditions, and for the surface ExP1.
+For the first case, we have used methods discussed in [BGM1].
+For the covers without tangency conditions, we obtain the covers of an elliptic curve
+using tropical methods in [BBM], and for ExP1, we have used the concepts from [BGM2].
+A Feynman graph G of genus g is a trivalent, connected graph (of genus g) with n number
+of vertices and r number of edges (in case of abstract elliptic curve in [BBM] we have
+2g-2 vertices and 3g-3 edges, since we consider only trivalent graphs).
+A pearl chain P of type (d_2, g) is a genus g, connected graph of degree d_1 such that
+it has two different types of vertices, say vertices of type w and b (where w represent
+the white vertices and b the black ones).
+Every edge in P connect vertex of type w to vertex of type b such that the vertices
+adjacent to each edge are not of the same type. There are precisely d_2 vertices of
+type w and d_2+g-1 vertices of type b. The vertices of type b should be 2-valent and the
+vertices of type w can have any valency.
+For each case we compute the respective propagator function from which we later use terms
+to compute the Gromov-Witten invariants N_(g,d), N_(g,d,Omega) and N_(P,d_1,d_2,g).
+
+
+REFERENCES:
+
+[BBM]  J. Boehm, A. Buchholz, H. Markwig: Tropical mirror symmetry for elliptic curves,
+		   arXiv:1309.5893 (2013).
+[BGM1] J. Boehm, C. Goldner, H. Markwig: Tropical mirror symmetry in dimension one,
+		   arXiv:1809.10659 (2018).
+[BGM2] J. Boehm, C. Goldner, H. Markwig, Counts of (tropical) curves in ExP1 and Feynman
+		   integrals, arXiv:1812.04936 (2018).
+
+
+KEYWORDS:
+tropical geometry; mirror symmetry; tropical mirror symmetry; Gromov-Witten invariants;
+elliptic curves; propagator; Feynman graph; Feynman integral; tropical covers;
+tropical stable maps;
+
+TYPES:
+graph,number,list,poly,string
+
+PROCEDURES:
+
+cf_of(poly, poly)                                       computes the coefficient of a given monomial g from a polynomial f.
+preim(list, def)                                        returns the entry number of an element x in a list O.
+coverTuple(graph, list, list, int[, list])              depending on int, computes a list of tuples of the form (a_k, N_k, D_k)
+                                                        for all k=1,...,r, where r is the number of edges, a_k is the k-th entry
+                                                        of the partion aa of the degree of G, N_k and D_k are the corresponding
+                                                        numerator and denominator (respectively) of the propagator function whose
+                                                        product would return the coefficient of the Feynman integral. Every list
+                                                        of tuples corresponds to a cover of the elliptic curve E.
+CoverMult(graph, list, list, int[, list])               depending on int, computes a list of cover multiplicity corresponding to
+					                      						            each cover of an elliptic curve having source curve G.
+Tropicalcover(graph, list, list, int[, list])           depending on int, computes a list of matrices such that each matrix in the
+												                                list represents a cover of an elliptic curve E.
+
+sinh(poly, int)                                         returns the power series expansion of the hyperbolic sine function given a
+				                                                polynomial f up to first n terms.
+Sfunction(poly, int)                                    computes the S-function in the form of (1+X), where X is a taylor series
+						                                            expansion of the sinh function upto n terms.
+FloorDiagrams(graph,list,list,list,int)                 returns a Latex file illustrating floor diagrams, such that each floor
+                                                        diagram corresponds to a tropical stable map to ExP1 for a given curled
+                                                        pearl chain of elliptic curve E.
+
+PropagatorFunction(graph,list,list,int[,list])          depending on int, computes the propagator for the edges of a Feynman graph G.
+FeynmanIntegralo(graph,list,list,int,int[,list])        depending on the second int, computes the coefficient of the Feynman
+						                          							    integral for a given ordering of the vertices of the graph G.
+FeynmanIntegralO(graph,list,list,int,int[,list])        depending on the second int, computes the coefficients of the sum of Feynman
+													                              integrals (over all orderings of the vertices of the graph G).
+FeynmanIntegralA(graph,list,int,list,int,int[,list])    depending on the third int, computes the coefficients of the sum of Feynman
+														                            integrals for fixed ordering (sum goes over all partitions of the degree of G).
+DrawCovers(graph,list,list,int,int[,list])              depending on int, returns a Latex file illustrating a cover of the elliptic curve E.
+
+TropCovandMaps(graph,list,list,list,int)                returns a Latex file that draws all the (cut open) curled pearl chains and its
+                                                        corresponding stable maps (as a floor diagram) given a pearl chain and other
+                                                        information regarding the leaks and white pearls of the pearl chain.
+";
+
+LIB "ellipticcovers.lib";
+LIB "combinat.lib";
+LIB "ring.lib";
+LIB "presolve.lib";
+
+proc cf_of(poly f, poly g)
+"USAGE:  cf_of(f,g); f poly, g poly@*
+ASSUME:  f is a polynomial, g is a monomial@*
+RETURN:  poly.
+THEORY:  For a given polynomial f, it computes the coefficient of g in f @*
+
+KEYWORDS: coefficient of a polynomial.
+EXAMPLE:  example cf_of; shows an example
+"
+{
+  int i;
+  poly ff,r;
+  def v;
+  ff=f/g;
+  for(i=1;i<=size(ff);i++)
+  {
+    v=variables(ff[i]);
+    if(v==0)
+    {
+      r=r+ff[i];
+    }
+  }
+  return(r);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x1,x2,x3,x4),dp;
+  poly f=3*x1^6+11*x1^4*x2^2+x1^2*x2^4+3*x2^6;
+  cf_of(f,x1^4*x2^2);
+}
+
+proc preim(list O, def x)
+"USAGE:  preim(O, x); O list, x poly/number@*
+ASSUME:  O is a list of ordering of the set of vertices (or indices of the vertices),
+         x is a monomial representing a vertex of a graph (or the index of the vertex we are interested in).
+RETURN:  int.
+THEORY:  This gives the entry number of x in list O.
+
+KEYWORDS: preimage
+EXAMPLE:  example preim; shows an example
+"
+{
+  int j;
+  for(j=1; j<=size(O); j++)
+  {
+    if(x==O[j])
+    {return(j);}
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x1,x2,x3,x4),dp;
+  preim(list(x1,x3,x4,x2),x2);
+}
+
+//This gives the entry number of variable x in basering r.
+static proc varnum(poly x)
+{
+  int i;
+  for(i=1;i<=nvars(basering);i++)
+  {
+    if(variables(x)==var(i))
+    {return(i);}
+  }
+}
+
+//We choose poly x and poly y such that |x/y|<1 w.r.t the ordering (eqn 2,2)
+//int N is one more than the degree of the cover
+static proc prpcal(poly x, poly y, int N)
+{
+  int a,w,i,j,k;
+  poly p1,p2,q;
+  list xx,ND,xx1,xx2,P,PP,Q;
+  for (i=1; i<=N-1; i++)
+  {
+    //pk are the constant term of propagator if a_k==0
+    p1= p1+i*(x^i)*(y^((N-1)-i)); //if y>x
+    p2= p2+i*(y^i)*(x^((N-1)-i)); //if x>y
+    PP=p1,p2;
+  }
+  for (a=1; a<=N-1; a++)
+  {
+    //poly q_a;
+    for(w=1; w<=N; w++)
+    {
+      if((a mod w)==0)
+      {
+        q=q+w*((x^(2*w)+y^(2*w))*(x*y)^(a-w));
+        P[a]=q;
+      }
+    }
+    xx[a]=(x*y)^a;
+  }
+  for(k=1;k<=size(P)-1;k++)
+  {
+    Q[1]=P[1];
+    Q[k+1]=P[k+1]-P[k];
+  }
+  for(j=1;j<=N-1;j++)
+  {
+    xx1[1]=y^(N-1); //if y>x
+    xx1[j+1]=xx[j]; //if y>x
+    xx2[1]=x^(N-1); //if x>y
+    xx2[j+1]=xx[j]; //if x>y
+  }
+  ND=PP,Q,xx1,xx2;
+  return(ND);
+}
+
+//Computes the propagator list for only one edge, given an ordering of the vertices
+static proc propfor1(poly x, poly y, list pe, int N)
+{
+  int u,v;
+  poly p;
+  list P,PP,ND,R,xx;
+  P=prpcal(x,y,N);
+  u=preim(pe,y);
+  v=preim(pe,x);
+  if(u>v) //i.e y>x
+  {
+    p=P[1][1];
+    xx=P[3];
+  }else //i.e x>y
+  {
+    p=P[1][2];
+    xx=P[4];
+  }
+  ND=list(p)+P[2];
+  R=pe,ND,xx;
+  return(R);
+}
+
+//Computes propagator function for all possible orderings of the vertices
+static proc prop(poly x, poly y, list L, int N)
+{
+  int i;
+  list pe,P;
+  pe=permute(L);
+  for(i=1;i<=size(pe);i++)
+  {P[i]=propfor1(x,y,pe[i],N);}
+  return(P);
+}
+
+//returns a list with numerator and denominator of the propagator for an edge of the graph.
+static proc Propagatorfor1(poly x,poly y,int a, list O, int d)
+{
+  poly f,g;
+  list P1,P2,PP;
+  P1=prpcal(x,y,d+1);
+  P2=propfor1(x,y,O,d+1);
+  if(a==0)
+  {
+    f=P2[2][1];
+    g=P2[3][1];
+  }else
+  {
+    f=P2[2][a+1];
+    g=P2[3][a+1];
+  }
+  PP=f,g;
+  return(PP);
+}
+
+//returns a list with numerator and denominator of the propagator for every edge of the graph.
+static proc Propagator(graph G, list aa,list O)
+{
+  int i,j,d;
+  poly x,y;
+  list P,E;
+  E=G.edges;
+  for(j=1;j<=size(aa);j++)
+  {d=d+aa[j];}
+  for(i=1;i<=size(aa);i++)
+  {
+    x=var(E[i][1]);
+    y=var(E[i][2]);
+    P[i]=Propagatorfor1(x,y,aa[i],O,d);
+  }
+  return(P);
+}
+
+//This function computes the coefficient of the Feynman integral for a given order of
+//the vertices of the graph G.
+static proc feynmanIntegral1(graph G, list aa, list pe,int n)
+{
+  int i,j,d;
+  list E,P,Q;
+  poly x,y,f,g,c;
+  f=1;
+  g=1;
+  E=G.edges;
+  for(j=1;j<=size(aa);j++)
+  {d=d+aa[j];}
+  for(i=1;i<=size(aa);i++)
+  {
+    x=var(E[i][1]);
+    y=var(E[i][2]);
+    P[i]=Propagatorfor1(x,y,aa[i],pe,d);
+    f=f*P[i][1];
+    g=g*P[i][2];
+  }
+  c=cf_of(f,g);
+  Q=Q+list(pe,c);
+  if(n==0)
+  {return(c);}
+  else
+  {return(Q);}
+}
+
+//This function computes the sum of coefficients of Feynman integrals, where goes over all
+//orderings of the vertices of the graph G.
+static proc feynmanIntegral(graph G,list aa,int n)
+{
+  int i,j;
+  poly x,s;
+  list pe,L,LL,P,PP,Q,QQ;
+  L=G.vertices;
+  for(j=1;j<=size(L);j++)
+  {
+    x=var(L[j]);
+    LL[j]=x;
+  }
+  pe=permute(LL);
+  for(i=1;i<=size(pe);i++)
+  {
+    P[i]=feynmanIntegral1(G,aa,pe[i],1);
+    PP[i]=pe[i];
+    while(P[i][2]!=0)
+    {
+      Q[i]=list(P[i]);
+      s=s+P[i][2];
+      break;
+    }
+  }
+  if(n==0)
+  {return(s);}
+  else
+  {
+    QQ=list(Q,s);
+    return(QQ);
+  }
+}
+
+//Computes sum of Feynman Integrals for a fixed ordering, where the sum goes over all aa.
+static proc FeynmanInt(graph G,list O,int d,int r)
+proc FeynmanInt(graph G,list O,int d,int r)
+{
+  int i,ii,j,jj,n;
+  poly c;
+  list aa,a,Q,F,FF;
+  n=size(G.edges);
+  aa=partitions(n,d);
+  for(i=1;i<=size(aa);i++)
+  {
+    aa[i]=intmat(aa[i]);
+    for(ii=1;ii<=size(aa[i]);ii++)
+    {a[ii]=aa[i][ii,1];}
+    Q[i]=feynmanIntegral1(G,a,O,0);
+    F[i]=list(aa[i],Q[i]);
+  }
+  for(j=1;j<=size(F);j++)
+  {
+    if(F[j][2] != 0)
+    {FF=FF+list(F[j]);}
+  }
+  for(jj=1;jj<=size(Q);jj++)
+  {c=c+Q[jj];}
+  if(r==0)
+  {return(c);}
+  else
+  {return(list(FF,c));}
+}
+
+//returns a list of intvecs for the degree of each term of the propagator
+//t=0,1,2,3 --> [BBM], [BGM1] w/o vertex contributions, [BGM1] w/ vertex contributions and [BGM2]
+static proc degvec1(poly x, poly y, int a,list O, int d, int t,list #)
+{
+  int i,j,k1,k2,r,c,k;
+  intvec e;
+  poly z1,z2;
+  list P,E;
+  k1=varnum(x);
+  k2=varnum(y);
+  if(t==0 || t==3)
+  {P=Propagatorfor1(x,y,a,O,d);}
+  if(t==1)
+  {
+    if(x==y)
+    {P=list(Proploop1(a));}
+    else
+    {P=Propagatorfor1(x,y,a,O,d);}
+  }
+  if(t==2)
+  {
+    z1=var(size(O)+k1);
+    z2=var(size(O)+k2);
+    if(x==y)
+    {P=list(ProploopNew(z1,#[k1],a));}
+    else
+    {P=PropNoloopfor1(x,y,a,O,d,z1,z2,#[k1],#[k2]);}
+  }
+  for(i=1;i<=size(P[1]);i++)
+  {
+    e=leadexp(P[1][i]);
+    E[i]=e;
+  }
+  return(E);
+}
+
+//List the intvec for all propagators
+//t=0,1,2,3 --> [BBM], [BGM1] w/o vertex contributions, [BGM1] w/ vertex contributions and [BGM2]
+static proc degvec(graph G,list aa, list O, int t, list #)
+{
+  int i,u,d;
+  intvec tt;
+  list E,P,D,R;
+  poly x,y,g,z1,z2;
+  g=1;
+  E=G.edges;
+  P=PropagatorFunction(G,aa,O,t,#);
+  for(u=1;u<=size(aa);u++)
+  {d=d+aa[u];}
+  for(i=1;i<=size(aa);i++)
+  {
+    x=var(E[i][1]);
+    y=var(E[i][2]);
+    D[i]=degvec1(x,y,aa[i],O,d,t,#);
+    g=g*P[i][2];
+  }
+  tt=leadexp(g);
+  R=D,tt;
+  return(R);
+}
+
+//Adds two integer vectors and returns the result if the sum of the first entry is equal to
+//some given integer.
+static proc add1(list A,list B,int t)
+{
+  int j,k;
+  intvec ad;
+  list L,M,N;
+  for(j=1;j<=size(A);j++)
+  {
+    for(k=1;k<=size(B);k++)
+    {
+      ad=A[j]+B[k];
+      if(ad[1]<=t)
+      {
+        L=L+list(ad);
+        M=M+list(j,k);
+      }
+    }
+  }
+  N=L,M;
+  return(N);
+}
+
+//Adds all intvecs in a list and returns the results whose first entry is equal to a given int
+static proc addall(list V,int t)
+{
+  int i;
+  list L,M,N,P;
+  L=V[1];
+  M[1]=add1(L[1],L[2],t)[1];
+  N[1]=add1(L[1],L[2],t)[2];
+  for(i=1;i<=size(L)-2;i++)
+  {
+    M[i+1]=add1(M[i],L[i+2],t)[1];
+    N[i+1]=add1(M[i],L[i+2],t)[2];
+  }
+  P=M[size(M)],N;
+  return(P);
+}
+
+//From a list of intvecs extracts all intvecs that are equal to a given intvect
+static proc extract1(list A, intvec t)
+{
+  int i,a,b;
+  list PP,P;
+  list val1,val2;
+  for(i=1;i<=size(A[1]);i++)
+  {
+    if(A[1][i]==t)
+    {
+      a=(2*i)-1;
+      b=2*i;
+      val1=A[2][size(A[2])][a];
+      val2=A[2][size(A[2])][b];
+      PP=val1+val2;
+      P=P+list(PP);
+    }
+  }
+  return(P);
+}
+
+//Generalisation of extract1 procedure
+static proc extract(list A,intvec t)
+{
+  int i,j,a,b,M1,M2;
+  list L,M,N,NN;
+  L=extract1(A,t);
+  for(i=1;i<=size(L);i++)
+  {
+    a=(2*L[i][1])-1;
+    b=2*L[i][1];
+    N=L[i][2];
+    for(j=size(A[2])-1;j>=1;j--)
+    {
+      M1=A[2][j][a];
+      M2=A[2][j][b];
+      M=M1,M2;
+      N=N+list(M[2]);
+      a=(2*M[1])-1;
+      b=2*M[1];
+    }
+    N=N+list(M1);
+    NN=NN+list(N);
+  }
+  return(NN);
+}
+
+//Reverses the entries in a given list
+static proc reverselist(list L)
+{
+  int i;
+  list M;
+  for(i=1;i<=size(L);i++)
+  {M[i]=L[size(L)+1-i];}
+  return(M);
+}
+
+//Returns a list of numerators of the propagator function whose product is equal to the
+//product of the respective denominators, that is, it returns the terms whose product is
+//the coefficient of q^{2aa} in the Feynman integral.
+static proc bookkeep(graph G,list aa, list O,int t, list #)
+{
+  int i,j,k,i1,j1,k1;
+  intvec tt;
+  list P,V,A,E,R,e,exp,BK;
+  P=PropagatorFunction(G,aa,O,t,#);
+  V=degvec(G,aa,O,t,#);
+  tt=V[2];
+  A=addall(V,tt[1]);
+  E=extract(A,tt);
+  for(i=1;i<=size(E);i++)
+  {e[i]=reverselist(E[i]);}
+  for(j=1;j<=size(e);j++)
+  {
+    for(k=1;k<=size(P);k++)
+    {
+      if(P[k][1][e[j][k]] != 0)
+      {exp[k]=P[k][1][e[j][k]];}
+      else
+      {exp[k]=string("none");}
+    }
+    R=R+list(exp);
+  }
+  for(i1=1;i1<=size(R);i1++)
+  {
+    for(j1=1;j1<=size(R[i1]);j1++)
+    {
+      if(typeof(R[i1][j1])=="string")
+      {R[i1]=delete(R[i1],j1);}
+      else
+      {R[i1]=R[i1];}
+    }
+  }
+  for(k1=1;k1<=size(R);k1++)
+  {
+    if(size(R[k1])==size(aa))
+    {BK=BK+list(R[k1]);}
+  }
+  return(BK);
+}
+
+proc coverTuple(graph G,list aa,list O,int t, list #)
+"USAGE:  coverTuple(G,aa,O,t[,l]); G graph, aa list, O list, t int, l list@*
+ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O is a
+		 	   given ordering of the vertices of G, t is an integer and l is a list of leaks in G.
+RETURN:  list.
+THEORY:  Computes a list of tuples (depending on the int t) of the form (a_k, N_k, D_k) for
+         all k=1,...,r, where r is the number of edges, a_k is the k-th entry in the
+         partion aa of the degree of G, N_k and D_k are the corresponding numerator and
+         denominator (respectively) of the propagator function whose product would return
+         the coefficient of the Feynman integral.
+         Every list of the tuples corresponds to a cover of the elliptic curve E.
+         (For t=0, we get the results for simply ramified covers [BBM]. t=1, 2 we get results
+         for graphs w/o vertex contributions respectively w/ vertex contributions as in [BGM1],
+         and for t=3 we get the results for pearl chains as in [BGM2])
+
+KEYWORDS: tuple to compute a cover of elliptic curve
+EXAMPLE:  example coverTuple; shows an example
+"
+{
+  int i,j;
+  list P,B,T,TT;
+  P=PropagatorFunction(G,aa,O,t,#);
+  B=bookkeep(G,aa,O,t,#);
+  for(i=1;i<=size(B);i++)
+  {
+    for(j=1;j<=size(aa);j++)
+    {T[j]=list(aa[j],B[i][j],P[j][2]);}
+    TT=TT+list(T);
+  }
+  return(TT);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x1,x2,x3,z1,z2,z3),dp;
+  graph F=makeGraph(list(1,2,3),list(list(1,1),list(1,2),list(2,3),list(1,3)));
+  coverTuple(F,list(1,0,0,2),list(x1,x2,x3),2,list(0,0,0));
+}
+
+//gives the list of intvecs that we are interested in
+static proc bk(graph G,list aa, list O,int t, list #)
+{
+  int i,j,k,l,m;
+  intvec tt,s;
+  list VV,V,A,E,R,e,exp;
+  VV=degvec(G,aa,O,t,#);
+  V=VV[1];
+  tt=VV[2];
+  A=addall(VV,tt[1]);
+  E=extract(A,tt);
+  for(i=1;i<=size(E);i++)
+  {e[i]=reverselist(E[i]);}
+  for(j=1;j<=size(e);j++)
+  {
+    for(k=1;k<=size(V);k++)
+    {exp[k]=V[k][e[j][k]];}
+    R=R+list(exp);
+  }
+  return(R);
+}
+
+//Converts a list of intvecs to a list of monomials
+static proc degtomon1(list BB)
+{
+  int i,j,k;
+  list P,PP;
+  poly xx=1;
+  for(i=1;i<=size(BB);i++)
+  {
+    for(j=1;j<=nvars(basering);j++)
+    {
+      xx=xx*var(j)^BB[i][j];
+      P[i]=xx;
+    }
+  }
+  for(k=1;k<=size(P)-1;k++)
+  {
+    PP[1]=P[1];
+    PP[k+1]=P[k+1]/P[k];
+  }
+  return(PP);
+}
+
+//Generalisation of degtomon1
+static proc degtomon(list BB)
+{
+  int i;
+  list M;
+  for(i=1;i<=size(BB);i++)
+  {M[i]=degtomon1(BB[i]);}
+  return(M);
+}
+
+//Computes weights of the edges of a graph
+static proc wt_cf(list T,list M)
+{
+  int i,j;
+  list C,W;
+  for(i=1;i<=size(T);i++)
+  {
+    for(j=1;j<=size(T[i]);j++)
+    {C[j]=T[i][j][2]/M[i][j];}
+    W=W+list(C);
+  }
+  return(W);
+}
+
+//Computes multiplicity of one cover given a list of weights
+static proc covmult(list W)
+{
+  int i;
+  poly m=1;
+  for(i=1;i<=size(W);i++)
+  {m=m*W[i];}
+  return(m);
+}
+
+proc CoverMult(graph G,list aa,list O,int t, list #)
+"USAGE:  CoverMult(G,aa,O,t[, l]); G graph, aa list, O list, t int, l list@*
+ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O is a
+		 	   given ordering of the vertices of G, l is a list of leaks of G and t is some integer between 0 and 3.
+RETURN:  list.
+THEORY:  For a given ordering of the vertices of G, this function computes a list  of
+         multiplicity for each cover of G. Each entry in the list is a multiplicity of
+         a cover of G.
+         (For t=0, we get the results for simply ramified covers [BBM]. t=1, 2 we get results
+         for graphs w/o vertex contributions respectively w/ vertex contributions as in [BGM1],
+         and for t=3 we get the results for pearl chains as in [BGM2])
+
+
+KEYWORDS: elliptic curve cover multiplicities
+EXAMPLE:  example CoverMult; shows an example
+"
+{
+  int i,j;
+  list B,M,T,W,R,RR;
+  B=bk(G,aa,O,t,#);
+  M=degtomon(B);
+  T=coverTuple(G,aa,O,t,#);
+  W=wt_cf(T,M);
+  for(i=1;i<=size(W);i++)
+  {R[i]=covmult(W[i]);}
+  for(j=1;j<=size(R);j++)
+  {
+    while(R[j] != 0)
+    {
+      RR=RR+list(R[j]);
+      break;
+    }
+  }
+  return(RR);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0, (x1,x2,x3,x4),dp;
+  graph G=makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
+  CoverMult(G,list(0,2,1,0,0,1), list(x2,x4,x3,x1),0);
+}
+
+//Computes pre-image points on each edge of a graph given a list of weights and partition
+//of the degree of the source curve
+static proc intpts(list W, list aa)
+{
+  int i;
+  list A;
+  for(i=1;i<=size(aa);i++)
+  {
+    if(aa[i]!=0)
+    {
+      if(W[i] != 0)
+      {A=A+list(aa[i]/W[i]);}
+    }
+    else
+    {A=A+list(0);}
+  }
+  return(A);
+}
+
+//returns a list of intvecs, where each intvec is for a given cover for the elliptic
+//curve E and it shows how many times each edge of the cover of type G wraps around so
+//that it passes through the preimage of the base point p_0.
+static proc intersectionpoints(graph G,list aa,list O,int t, list #)
+{
+  int i,j;
+  list T,B,M,W,A;
+  B=bk(G,aa,O,t,#);
+  T=coverTuple(G,aa,O,t,#);
+  M=degtomon(B);
+  W=wt_cf(T,M);
+  for(i=1;i<=size(W);i++)
+  {A[i]=intpts(W[i],aa);}
+  for(j=1;j<=size(A);j++)
+  {
+    if(size(A[j]) != size(aa))
+    {A=delete(A,j);}
+  }
+  return(A);
+}
+
+//extracts all the ring variables from a monomial
+static proc polydiv(poly f)
+{
+  int i;
+  list xx;
+  for(i=1;i<=nvars(basering);i++)
+  {
+    if(f/var(i)!=0)
+    {xx=xx+list(var(i));}
+  }
+  return(xx);
+}
+
+//extracts the ring variables from a given list of monomials
+static proc numden(list T)
+{
+  int i,j;
+  list V1,V2,R;
+  for(i=1;i<=size(T);i++)
+  {
+    V1=V1+list(polydiv(T[i][2]));
+    V2=V2+list(polydiv(T[i][3]));
+  }
+  R=V1,V2;
+  return(R);
+}
+
+//returns a list of ring variables from a list of monomials
+static proc NumDen(list T)
+{
+  int i,j;
+  list R,V1,V2,V;
+  R=numden(T);
+  for(i=1;i<=size(R[1]);i++)
+  {
+    if(size(R[1][i]) > 0)
+    {
+      if(size(R[1][i])==2)
+      {V1[i]=R[1][i];}
+      else
+      {
+        if(size(R[2][i])==2)
+        {V1[i]=R[2][i];}
+        else
+        {V1[i]=list(R[1][i][1],R[2][i][1]);}
+      }
+    }
+    else
+    {V1[i]=1;}
+  }
+  return(V1);
+}
+
+//Generalisation of NumDen procedure
+static proc NumDenall(list T)
+{
+  int i;
+  list N;
+  for(i=1;i<=size(T);i++)
+  {N[i]=NumDen(T[i]);}
+  return(N);
+}
+
+//returns a list of vertices (in terms of ring variables) for a given graph
+static proc vertices(graph G,list aa,list O,int t, list #)
+{
+  int i;
+  list T,V;
+  T=coverTuple(G,aa,O,t,#);
+  for(i=1;i<=size(T);i++)
+  {V[i]=NumDen(T[i]);}
+  return(V);
+}
+
+//Computes a matrix representing a single cover of an elliptic curve
+static proc Tropcov(list V, list I,list O)
+{
+  int i,j,k,l,m,n;
+  poly x;
+  matrix C[size(V)][size(O)+1];
+  for(i=1;i<=size(I);i++)
+  {C[i,1]=I[i];}
+  for(j=1;j<=nrows(C);j++)
+  {
+    if(size(V[j])==2)
+    {
+      for(k=1;k<=ncols(C)-1;k++)
+      {
+        for(l=1;l<=2;l++)
+        {
+          if(V[j][l]==O[k])
+          {C[j,k+1]=V[j][l];}
+        }
+      }
+    }else
+    {
+      x=O[j];
+      C[j,j+1]=x;
+    }
+  }
+  return(C);
+}
+
+proc Tropicalcover(graph G,list aa,list O,int t, list #)
+"USAGE:  Tropicalcover(G,aa,O,t[, l]); G graph, aa list, O list, t int, l list@*
+ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O is a
+		     given ordering of the vertices of G, t is an integer and l is a list of leaks of G.
+RETURN:  list of matrices.
+THEORY:  For a given ordering of the vertices of G, this function computes a list of
+         matrices such that each matrix in the list represents a cover of the elliptic
+         curve E. The first coloumn of each matrix shows how many points on each edge of
+         the cover (of type G) has a preimage of the base point p_0. The rows of the
+         matrix represents an edge of the cover and each non-zero entry in a row
+         represents a vertex connected to that edge.
+         (For t=0, we get the results for simply ramified covers [BBM]. t=1, 2 we get results
+         for graphs w/o vertex contributions respectively w/ vertex contributions as in [BGM1],
+         and for t=3 we get the results for pearl chains as in [BGM2])
+
+
+KEYWORDS: elliptic curve covers
+EXAMPLE:  example Tropicalcover; shows an example
+"
+{
+  int i;
+  list V,I,C;
+  V=vertices(G,aa,O,t,#);
+  I=intersectionpoints(G,aa,O,t,#);
+  for(i=1;i<=size(V);i++)
+  {C[i]=print(Tropcov(V[i],I[i],O));}
+  return(C);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0, (x1,x2,x3,x4),dp;
+  graph G=makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
+  Tropicalcover(G,list(0,2,1,0,0,1), list(x2,x4,x3,x1),0);
+}
+
+//Given an integer n returns a variable q_n in the form of a string
+static proc edgestr(int n)
+{
+  int i;
+  list E;
+  for(i=1;i<=n;i++)
+  {E[i]=string("q",i);}
+  return(E);
+}
+
+//Converts the vertices of graph G into coordinates on a cartesian plane
+static proc coordinategenerator(list V,list I,list O)
+{
+  int i,j,k,l,m,n,xx;
+  number yy;
+  list cd1,cd2,cd3,ccd2,ccd3,cd;
+  //Step1: converting the vertices of graph G to tuples in cartesian plane
+  xx=2;
+  yy=5/2;
+  cd1[1]=list(xx,yy);
+  for(i=1;i<=size(O)-1;i++)
+  {
+    yy=yy+1/2;
+    cd1[i+1]=list(2*(i+1),yy);
+  }
+  //Step2: converting end points on the left and right to tuples in cartesian plane
+  for(j=1;j<=size(I);j++)
+  {
+    n=2*(size(O)+1);
+    if(I[j] != 0)
+    {
+      cd2[j]=list(0,j);
+      cd3[j]=list(n,j);
+    }
+  }
+  for(k=1;k<=size(cd2);k++)
+  {
+    if(typeof(cd2[k])=="list")
+    {ccd2=ccd2+list(cd2[k]);}
+  }
+  for(l=1;l<=size(cd3);l++)
+  {
+    if(typeof(cd3[l])=="list")
+    {ccd3=ccd3+list(cd3[l]);}
+  }
+  for(m=1;m<=size(cd1);m++)
+  {
+    if(m mod 2 == 0)
+    {cd1[m][2]=cd1[m][2]+1/2;}
+    else
+    {cd1[m][2]=cd1[m][2]-1/2;}
+  }
+  cd=cd1,ccd2,ccd3;
+  return(cd);
+}
+
+//returns the list of end points for the edges of G after it has been cut open at the base point p_0
+//Generates a list of coordinates that would be our initial graph in the actual drawing code
+//The 1st list are the edges connecting vertices s.t a_k = 0, The second and the third lists
+//are the coordinates connecting the vertices to the left resp. right of the rectangle
+//(i.e. each pair can be identified together and joined to form a cover)
+//Stage 1 for drawing covers
+static proc edgecoord(list V,list I,list O)
+{
+  int i,j,k,l,ll,m,mm,p,q,r,a,b,a1,b1,u;
+  number v;
+  list e,eC,ec,eL,el,eR,er,cd;
+  cd=coordinategenerator(V,I,O);
+  for(i=1;i<=size(I);i++)
+  {
+    if(I[i]==0)
+    {
+      if(size(V[i])==2)
+      {
+        a=preim(O,V[i][1]);
+        b=preim(O,V[i][2]);
+        for(j=1;j<=size(cd[1]);j++)
+        {
+          for(k=1;k<=size(O);k++)
+          {
+            if(2*a==cd[1][j][1] && 2*b==cd[1][k][1])
+            {
+              //This is an added extra step to make sure the edges for which a_k=0 do not intersect each other
+              if(absValue(cd[1][j][1]-cd[1][k][1])>2)
+              {
+                if(cd[1][j][1] < cd[1][k][1])
+                {eC[i]=list(i,cd[1][j],cd[1][k]);}
+                else
+                {eC[i]=list(i,cd[1][k],cd[1][j]);}
+              }
+              else
+              {
+                if(cd[1][j][1] < cd[1][k][1])
+                {eC[i]=list(i,cd[1][j],cd[1][k]);}
+                else
+                {eC[i]=list(i,cd[1][k],cd[1][j]);}
+              }//Extra step ends here. If we want to remove it then just keep "eC[i]=list(cd[1][j],cd[1][k]);" and remove all the loops
+            }
+          }
+        }
+        eL[i]=0;
+        eR[i]=0;
+      }
+      else
+      {
+        a=i;
+        b=i;
+        for(j=1;j<=size(cd[1]);j++)
+        {
+          for(k=1;k<=size(O);k++)
+          {
+            if(2*a==cd[1][j][1] && 2*b==cd[1][k][1])
+            {
+              //This is an added extra step to make sure the edges for which a_k=0 do not intersect each other
+              if(absValue(cd[1][j][1]-cd[1][k][1])>2)
+              {
+                if(cd[1][j][1] < cd[1][k][1])
+                {eC[i]=list(i,cd[1][j],cd[1][k]);}
+                else
+                {eC[i]=list(i,cd[1][k],cd[1][j]);}
+              }
+              else
+              {
+                if(cd[1][j][1] < cd[1][k][1])
+                {eC[i]=list(i,cd[1][j],cd[1][k]);}
+                else
+                {eC[i]=list(i,cd[1][k],cd[1][j]);}
+              }//Extra step ends here. If we want to remove it then just keep "eC[i]=list(cd[1][j],cd[1][k]);" and remove all the loops
+            }
+          }
+        }
+        eL[i]=0;
+        eR[i]=0;
+      }
+    }
+    else
+    {
+      eC[i]=0;
+      if(size(V[i])==2)
+      {
+        a1=preim(O,V[i][1]);
+        b1=preim(O,V[i][2]);
+        for(l=1;l<=size(cd[2]);l++)
+        {
+          for(ll=1;ll<=size(cd[1]);ll++)
+          {
+            if(a1 < b1)
+            {
+              if(i==cd[2][l][2] && 2*a1==cd[1][ll][1])
+              {
+                eL[i]=list(i,cd[2][l],cd[1][ll]);//take coordinates from cd[2] and one of the vertices v[i][1]
+              }
+            }
+            else
+            {
+              if(i==cd[2][l][2] && 2*b1==cd[1][ll][1])
+              {
+                eL[i]=list(i,cd[2][l],cd[1][ll]);//take coordinates from cd[2] and one of the vertices v[i][1]
+              }
+            }
+          }
+        }
+        for(m=1;m<=size(cd[3]);m++)
+        {
+          for(mm=1;mm<=size(cd[1]);mm++)
+          {
+            if(a1 < b1)
+            {
+              if(2*b1==cd[1][mm][1] && i==cd[3][m][2])
+              {eR[i]=list(i,cd[1][mm],cd[3][m]);}
+            }
+            else
+            {
+              if(2*a1==cd[1][mm][1] && i==cd[3][m][2])
+              {eR[i]=list(i,cd[1][mm],cd[3][m]);}
+            }
+          }
+        }
+      }
+      else
+      {
+        a1=i;
+        b1=i;
+        for(l=1;l<=size(cd[2]);l++)
+        {
+          for(ll=1;ll<=size(cd[1]);ll++)
+          {
+            if(a1 < b1)
+            {
+              if(i==cd[2][l][2] && 2*a1==cd[1][ll][1])
+              {
+                eL[i]=list(i,cd[2][l],cd[1][ll]);//take coordinates from cd[2] and one of the vertices v[i][1]
+              }
+            }
+            else
+            {
+              if(i==cd[2][l][2] && 2*b1==cd[1][ll][1])
+              {
+                eL[i]=list(i,cd[2][l],cd[1][ll]);//take coordinates from cd[2] and one of the vertices v[i][1]
+              }
+            }
+          }
+        }
+        for(m=1;m<=size(cd[3]);m++)
+        {
+          for(mm=1;mm<=size(cd[1]);mm++)
+          {
+            if(a1 < b1)
+            {
+              if(2*b1==cd[1][mm][1] && i==cd[3][m][2])
+              {eR[i]=list(i,cd[1][mm],cd[3][m]);}
+            }
+            else
+            {
+              if(2*a1==cd[1][mm][1] && i==cd[3][m][2])
+              {eR[i]=list(i,cd[1][mm],cd[3][m]);}
+            }
+          }
+        }
+      }
+    }
+  }
+  for(p=1;p<=size(eC);p++)
+  {
+    if(typeof(eC[p])=="list")
+    {ec=ec+list(eC[p]);}
+  }
+  for(q=1;q<=size(eL);q++)
+  {
+    if(typeof(eL[q])=="list")
+    {el=el+list(eL[q]);}
+  }
+  for(r=1;r<=size(eR);r++)
+  {
+    if(typeof(eR[r])=="list")
+    {er=er+list(eR[r]);}
+  }
+  e=ec,el,er;
+  return(e);
+}
+
+//returns a more refined version of a list of coordinates for each edge of the cover
+//Stage 2 for drawing covers
+static proc Edgecoord(list V,list I,list O)
+{
+  int i,ii,j,k,kk,l,i1,i2,j1,j2;
+  number e1,e2,ee1,ee2;
+  list ed,E;
+  ed=edgecoord(V,I,O);
+  for(i=1;i<=size(ed[2]);i++)
+  {
+    for(j=2;j<=size(ed[2]);j++)
+    {
+      if(i < j)
+      {
+        if(ed[2][i][2][1]==ed[2][j][2][1] && ed[2][i][2][2]==ed[2][j][2][2])
+        {
+          e1=ed[2][i][3][2]+(1/2);
+          e2=ed[2][i][3][2]-(1/2);
+          ed[2][i][2][2]=e1;
+          ed[2][j][2][2]=e2;
+        }
+        else
+        {
+          for(ii=1;ii<=size(ed[2]);ii++)
+          {
+            e1=ed[2][ii][3][2]+(1/2);
+            //e2=ed[2][ii][3][2]-(1/2);//improve so that it has -1/2 as an option and then picks the one that suits better
+            ed[2][ii][2][2]=e1;
+          }
+        }
+      }
+    }
+  }
+  for(k=1;k<=size(ed[3]);k++)
+  {
+    for(l=1;l<=size(ed[3]);l++)
+    {
+      if(k < l)
+      {
+        if(ed[3][k][2][1]==ed[3][l][2][1] && ed[3][k][2][2]==ed[3][l][2][2])
+        {
+          ee1=ed[3][k][2][2]+(1/2);
+          ee2=ed[3][k][2][2]-(1/2);
+          ed[3][k][3][2]=ee1;
+          ed[3][l][3][2]=ee2;
+        }
+        else
+        {
+          for(kk=1;kk<=size(ed[3]);kk++)
+          {
+            ee1=ed[3][kk][2][2]+(1/2);
+            //ee2=ed[3][kk][3][2]-(1/2);//improve so that it has -1/2 as an option and then picks the one that suits better
+            ed[3][kk][3][2]=ee1;
+          }
+        }
+      }
+    }
+  }
+  for(i1=1;i1<=size(ed[2]);i1++)
+  {
+    for(i2=2;i2<=size(ed[2]);i2++)
+    {
+      if(i1<i2)
+      {
+        if(ed[2][i1][2][2]==ed[2][i2][2][2])
+        {
+          if(ed[2][i1][3][1]<ed[2][i2][3][1])
+          {ed[2][i2][2][2]=ed[2][i2][2][2]+1/4;}
+          else
+          {ed[2][i1][2][2]=ed[2][i1][2][2]+1/4;}
+        }
+      }
+    }
+  }
+  for(j1=1;j1<=size(ed[3]);j1++)
+  {
+    for(j2=2;j2<=size(ed[3]);j2++)
+    {
+      if(j1<j2)
+      {
+        if(ed[3][j1][3][2]==ed[3][j2][3][2])
+        {
+          if(ed[3][j1][2][1]<ed[3][j2][2][1])
+          {ed[3][j1][3][2]=ed[3][j1][3][2]+1/4;}
+          else
+          {ed[3][j2][3][2]=ed[3][j2][3][2]+1/4;}
+        }
+      }
+    }
+  }
+  return(ed);
+}
+
+//Given a list of coordinates modifies the coordinates a little according to our requirements
+static proc cdnew(list cd,list Ed)
+{
+  int i,j;
+  for(i=1;i<=size(cd);i++)
+  {
+    for(j=1;j<=size(Ed);j++)
+    {
+      if(cd[i][1]==Ed[j][2][1])
+      {cd[i][2]=Ed[j][2][2];}
+      if(cd[i][1]==Ed[j][3][1])
+      {cd[i][2]=Ed[j][3][2];}
+    }
+  }
+  return(cd);
+}
+
+//Converts the coordinates for the edges into a list of linear equations
+static proc crdToEqn(list ed1, list #)
+{
+  int i,j,ii,jj,nn;
+  number x1,x2,y1,y2;
+  list M1,M2,M,III;
+  poly xx,yy,f,g;
+  ideal II,JJ;
+  for(i=1;i<=size(ed1);i++)
+  {
+    x1=ed1[i][2][1];
+    y1=ed1[i][2][2];
+    x2=ed1[i][3][1];
+    y2=ed1[i][3][2];
+    if(x1 != x2)
+    {M1[i]=(y2-y1)/(x2-x1);}
+    else
+    {M1[i]=(y2-y1);}
+  }
+  for(j=1;j<=size(#);j++)
+  {
+    x1=#[j][2][1];
+    y1=#[j][2][2];
+    x2=#[j][3][1];
+    y2=#[j][3][2];
+    if(x1 != x2)
+    {M2[j]=(y2-y1)/(x2-x1);}
+    else
+    {M2[j]=(y2-y1);}
+  }
+  nn=nvars(basering);
+  xx=var(1);
+  yy=var(2);
+  for(ii=1;ii<=size(M1);ii++)
+  {
+    x1=ed1[ii][2][1];
+    y1=ed1[ii][2][2];
+    f=yy-M1[ii]*xx+M1[ii]*x1-y1;
+    II=II+ideal(f);
+  }
+  for(jj=1;jj<=size(M2);jj++)
+  {
+    x1=#[jj][2][1];
+    y1=#[jj][2][2];
+    g=yy-M2[jj]*xx+M2[jj]*x1-y1;
+    JJ=JJ+g;
+  }
+  III=II,JJ;
+  return(III);
+}
+
+//Returns the intersection points between edges for a given cover
+//Local method for drawing covers
+static proc rtnIntPts(list ed1,list #)
+{
+  int i,j;
+  list e,E;
+  ideal J,S;
+  e=crdToEqn(ed1,#);
+  for(i=1;i<=size(e[1]);i++)
+  {
+    if(size(e[2]) != 0)
+    {
+      for(j=1;j<=size(e[2]);j++)
+      {
+        J=e[1][i],e[2][j];
+        S=solvelinearpart(J);
+        E=E+list(S); //intersection points of each line in the list e
+      }
+    }
+    else
+    {
+      for(j=1;j<=size(e[1]);j++)
+      {
+        while(i<j)
+        {
+          J=e[1][i],e[1][j];
+          S=solvelinearpart(J);
+          E=E+list(S); //intersection points of each line in the list e
+          break;
+         }
+      }
+    }
+  }
+  return(E);
+}
+
+//generates coordinates that will be used to draw covers in Latex
+static proc drawcrds(list V,list I,list O)
+{
+  int i,i1,i2,j,j1,j2,k,k1,k2,l,l1,l2,n;
+  number a,b;
+  list ed,e1,e2,e3,e4;
+  poly x,y;
+  n=2*(size(O)+1);
+  ed=Edgecoord(V,I,O);
+  e1=rtnIntPts(ed[1],ed[2]);
+  e2=rtnIntPts(ed[1],ed[3]);
+  for(i=1;i<=size(e1);i++)
+  {
+    if(size(e1[i])==2)
+    {
+      x=var(1)-e1[i][2];
+      y=var(2)-e1[i][1];
+      for(i1=1;i1<=size(ed[1]);i1++)
+      {
+        for(i2=1;i2<=size(ed[2]);i2++)
+        {
+          if(ed[2][i2][3][1] > ed[1][i1][2][1] && ed[2][i2][3][1] > ed[1][i1][3][1])
+          {
+            if(ed[1][i1][2][1]<x<ed[1][i1][3][1] && ed[1][i1][2][2]<y<ed[1][i1][3][2])
+            {ed[2][i2][2][2]=ed[1][i1][2][2]-3/2;}
+          }
+        }
+      }
+    }
+  }
+  for(j=1;j<=size(e2);j++)
+  {
+    if(size(e2[j])==2)
+    {
+      x=var(1)-e2[j][2];
+      y=var(2)-e2[j][1];
+      for(j1=1;j1<=size(ed[1]);j1++)
+      {
+        for(j2=1;j2<=size(ed[3]);j2++)
+        {
+          if(ed[3][j2][2][1] < ed[1][j1][2][1] && ed[3][j2][2][1] < ed[1][j1][3][1])
+          {
+            if(ed[1][j1][2][1]<x<ed[1][j1][3][1] && ed[1][j1][2][2]<y<ed[1][j1][3][2])
+            {ed[3][j2][3][2]=ed[1][j1][3][2]+3/2;}
+          }
+        }
+      }
+    }
+  }
+  e3=rtnIntPts(ed[2]);
+  for(k=1;k<=size(e3);k++)
+  {
+    if(size(e3[k])==2)
+    {
+      x=var(1)-e3[k][2];
+      for(k1=1;k1<=size(ed[2]);k1++)
+      {
+        for(k2=1;k2<=size(ed[2]);k2++)
+        {
+          while(k1<k2)
+          {
+            if(0<x<ed[2][k1][3][1] && 0<x<ed[2][k2][3][1])
+            {
+              a=ed[2][k1][2][2];
+              b=ed[2][k2][2][2];
+              ed[2][k1][2][2]=b;
+              ed[2][k2][2][2]=a;
+            }
+          }
+          break;
+        }
+      }
+    }
+  }
+  e4=rtnIntPts(ed[3]);
+  for(l=1;l<=size(e4);l++)
+  {
+    if(size(e4[l])==2)
+    {
+      x=var(1)-e4[l][2];
+      //y=var(2)-e4[l][1];
+      for(l1=1;l1<=size(ed[3]);l1++)
+      {
+        for(l2=1;l2<=size(ed[3]);l2++)
+        {
+          while(l1<l2)
+          {
+            if(size(e4[l])==2)
+            {
+              if(n>x>ed[3][l1][2][1] && n>x>ed[3][l2][2][1])
+              {
+                a=ed[3][l1][3][2];
+                b=ed[3][l2][3][2];
+                ed[3][l1][3][2]=b;
+                ed[3][l2][3][2]=a;
+              }
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+  return(ed);
+}
+
+//Draws only one tropical cover of an elliptic curve that is cut open at the base point p_0
+static proc DrawinTikZ(list V,list I,list O,poly f,list #)
+{
+  int i,j,jj,k,l,ll,i1,j1,i2,ii2,j2,i3,j3,i4,j4,i5,j5,i6,n,m,mm,y;
+  list cd,cdn,E,L1,L2,L3,L4,L5,L6,L7,L8,L9,l6,l7,l8,Le;
+  string s,r,rr,b1,b2,s1,s2,s3,S,p1,p2,p3,p4,p5,p6,R1,ll6,ll7,ll8,le,beg,en;
+  cd=coordinategenerator(V,I,O);
+  E=drawcrds(V,I,O);
+  cdn=cdnew(cd[1],E[1]);
+  //Step1+Step2:
+  n=2*(size(O)+1);
+  for(i=1;i<=size(I);i++)
+  {
+    if(I[i] >= 2)
+    {
+      for(jj=1;jj<=I[i]-1;jj++)
+      {mm=mm+jj;}
+    }
+  }
+  m=size(I)+mm+2;
+  s=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (0,-1) -- (%s,-1);",n)+newline;
+  r=sprintf("\\draw (0,0) rectangle (%s,%s);",n,m)+newline;
+  rr=sprintf("\\path (0,0) --  (%s,0) node[midway,below,red] {\\Large{$mult(\\pi)=%s$}};",n,f)+newline;
+  b1="\\node [below] at (0,-1) {$p_0$};"+newline;
+  b2=sprintf("\\node [below] at (%s,-1) {$p_0$};",n)+newline;
+
+  L1[1]=string(sprintf("\\draw plot[mark=*,mark options={thick}] coordinates{(%s,-1)",2));
+  L2[1]=sprintf("\\node [below] at (2,-1) {$p_1$};")+newline;//take
+
+  for(j=1;j<=size(O)-1;j++)
+  {
+    L1[j+1]=string(sprintf("(%s,-1)",2*(j+1)));
+    L2[j+1]=string(sprintf("\\node [below] at (%s,-1) {$p_%s$};",2*(j+1),(j+1)))+newline; //Step2
+  }
+  for(k=1;k<=size(L1);k++)
+  {
+    p1=p1+L1[k];
+    p2=p2+L2[k]; //Step2
+    }
+  for(l=1;l<=size(cdn);l++)
+  {
+    L3[l]=string(sprintf("\\draw plot[mark=*,mark options={thick}] coordinates{(%s,%s)};",cdn[l][1],cdn[l][2]))+newline;
+    L4[l]=sprintf("\\node [above] at (%s,%s) {$x_%s$};",cdn[l][1],cdn[l][2],varnum(O[l]))+newline;//Step3
+    L5[l]=sprintf("\\draw[dashed] (%s,%s)--(%s,-1);",cdn[l][1],cdn[l][2],cdn[l][1])+newline;//Step4
+  }
+  for(ll=1;ll<=size(L3);ll++)
+  {
+    p3=p3+L3[ll];
+    p4=p4+L4[ll];
+    p5=p5+L5[ll];
+  }
+  R1=s,r,rr,p1,"};"+newline,p2,p3,b1,b2,p4,p5;
+
+  for(i1=1;i1<=size(E[1]);i1++)
+  {
+    if(E[1][i1][2][1] != E[1][i1][3][1])
+    {L6[i1]=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s) node [below,align=center,midway]{$q_%s$};",E[1][i1][2][1],E[1][i1][2][2],E[1][i1][3][1],E[1][i1][3][2],E[1][i1][1][1])+newline;}
+    else
+    {L6[i1]=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] plot [smooth cycle] coordinates {(%s,%s) (%s-0.3,%s+0.5) (%s,%s+1) (%s+0.3,%s+0.5)}; \\node [above] at (%s,%s+1) {$q_%s$};",E[1][i1][2][1],E[1][i1][2][2],E[1][i1][2][1],E[1][i1][2][2],E[1][i1][2][1],E[1][i1][2][2],E[1][i1][2][1],E[1][i1][2][2],E[1][i1][2][1],E[1][i1][2][2],E[1][i1][1][1])+newline;}
+  }
+  for(j1=1;j1<=size(E[2]);j1++)
+  {
+    L7[j1]=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (%s,%s) node[left]{$q_%s$}--(%s,%s);",E[2][j1][2][1],E[2][j1][2][2],E[2][j1][1][1],E[2][j1][3][1],E[2][j1][3][2])+newline;
+    L8[j1]=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (%s,%s)--(%s,%s) node[right]{$q_%s$};",E[3][j1][2][1],E[3][j1][2][2],E[3][j1][3][1],E[3][j1][3][2],E[3][j1][1][1])+newline;
+  }
+  for(i3=1;i3<=size(L6);i3++)
+  {s1=s1+L6[i3];}
+  for(j3=1;j3<=size(L7);j3++)
+  {
+    s2=s2+L7[j3];
+    s3=s3+L8[j3];
+  }
+  //Step7:
+  for(i4=1;i4<=size(I);i4++)
+  {
+    if(I[i4]>=2)
+    {
+      for(j4=1;j4<=I[i4]-1;j4++)
+      {
+        y=y+j4;
+        L9=L9+list(sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (0,%s) node[left]{$q_%s$}--(%s,%s) node[right]{$q_%s$};",size(I)+y,i4,n,size(I)+y,i4)+newline);
+      }
+    }
+  }
+  for(j5=1;j5<=size(L9);j5++)
+  {p6=p6+L9[j5];}
+  for(i5=1;i5<=size(#);i5++)
+  {
+    if(#[i5]!=0)
+    {
+      Le[i5]=sprintf("\\draw[thick,gray] (%s,%s)--(%s,%s); \\node[above] at (%s,%s) {$L_%s=%s$};",cdn[i5][1],cdn[i5][2],cdn[i5][1],m,cdn[i5][1],m,i5,#[i5])+newline;//leaky edges
+    }
+    else
+    {Le[i5]="";}
+  }
+  for(i6=1;i6<=size(Le);i6++)
+  {le=le+Le[i6];}
+  beg="\\begin{tikzpicture}"+newline;
+  en="\\end{tikzpicture}"+newline;
+  S=beg,s1+newline,s2+newline,s3+newline,p6+newline,le+newline,R1,en;
+  return(S);
+}
+
+//----------------------------------------------------------------------------------------
+//Procedures for Paper on covers with leaks and self-looping edges [BGM1]
+//Returns the propagator for a looped edge in a graph from Def (2.10)
+//Prop for non-looped edges is same as the one constructed previously i.e. Propagatorfor1()
+static proc Proploop1(int a)
+{
+  int w;
+  poly p;
+  if(a!=0)
+  {
+    for(w=1;w<=a;w++)
+    {
+      if(a mod w == 0)
+      {p=p+w;}
+    }
+  }
+  else
+  {p=0;}
+  return(list(p,1));
+}
+
+//Computes the propagator function for every edge of a graph w/o vertex contributions
+static proc PropagatornoVC(graph G, list aa,list O)
+{
+  int i,j,d;
+  poly x,y;
+  list P,E;
+  E=G.edges;
+  for(j=1;j<=size(aa);j++)
+  {d=d+aa[j];}
+  for(i=1;i<=size(E);i++)
+  {
+    if(E[i][1]==E[i][2])
+    {P[i]=Proploop1(aa[i]);}
+    else
+    {
+      x=var(E[i][1]);
+      y=var(E[i][2]);
+      P[i]=Propagatorfor1(x,y,aa[i],O,d);
+    }
+  }
+  return(P);
+}
+
+//Computes the Feynman Integral without vertex contributions for G given a fixed ordering
+static proc FeynmanIntnoVC1(graph G, list aa, list pe,list l, int n)
+{
+  int i,j,jj,k,ll,m,d,s;
+  list E,P,Q;
+  poly x,y,f,ff,gg,g,h,h1,c;
+  f=1;
+  g=1;
+  h=1;
+  h1=1;
+  E=G.edges;
+  for(i=1;i<=size(aa);i++)
+  {d=d+aa[i];}
+  P=PropagatornoVC(G,aa,pe);
+  for(j=1;j<=size(E)-1;j++)
+  {
+    f=f*P[1][1]*P[j+1][1];
+    g=g*P[j+1][2];
+  }
+  for(m=1;m<=size(l);m++)
+  {
+    if(l[m]>=0)
+    {h=h*var(m)^l[m];}
+    else
+    {h1=h1*(var(m)^(absValue(l[m])));}
+  }
+  ff=f*h1;
+  gg=g*h;
+  c=cf_of(ff,gg);
+  Q=Q+list(pe,c);
+  if(n==0)
+  {return(c);}
+  else
+  {return(Q);}
+}
+
+//Feynman integral of Feynman graph G over all possible orders of the vertices and its sum
+static proc FeynmanIntegralnoVC(graph G,list aa,list l,int n)
+{
+  int i,j;
+  poly x;
+  number s;
+  list pe,L,LL,P,PP,Q,QQ;
+  L=G.vertices;
+  for(i=1;i<=size(L);i++)
+  {
+    x=var(L[i]);
+    LL[i]=x;
+  }
+  pe=permute(LL);
+  for(j=1;j<=size(pe);j++)
+  {
+    P[j]=FeynmanIntnoVC1(G,aa,pe[j],l,1);
+    PP[j]=pe[j];
+    if(P[j][2]!=0)
+    {Q[j]=list(pe[j],P[j][2]);}
+    s=s+P[j][2];
+  }
+  if(n==0)
+  {return(s);}
+  else
+  {
+    QQ=list(Q,s);
+    return(QQ);
+  }
+}
+
+//Computes Feynman Integral over all aa.
+static proc GWinvariantnoVC(graph G,list O,list l,int d,int r)
+{
+  int i,ii,j,jj,n;
+  number c;
+  list aa,a,Q,F,FF;
+  n=size(G.edges);
+  aa=partitions(n,d);
+  for(i=1;i<=size(aa);i++)
+  {
+    for(ii=1;ii<=size(aa[i]);ii++)
+    {a[ii]=aa[i][ii,1];}
+    Q[i]=FeynmanIntnoVC1(G,a,O,l,0);
+    F[i]=list(aa[i],Q[i]);
+  }
+  for(j=1;j<=size(F);j++)
+  {
+    if(F[j][2] != 0)
+    {FF=FF+list(F[j]);}
+  }
+  for(jj=1;jj<=size(Q);jj++)
+  {c=c+Q[jj];}
+  if(r==0)
+  {return(c);}
+  else
+  {return(list(FF,c));}
+}
+
+//------------------------------------------------------------------------
+//Procedures for graphs with vertex contributions
+//Need a ring with x_i and z_i variables for these procedures
+
+//Computes the factorial of an integer
+static proc Factorial(int n)
+{
+  int i;
+  bigint j=1;
+  for(i=1;i<=n;i++)
+  {j=j*i;}
+  return(j);
+}
+
+proc sinh(poly t,int n)
+"USAGE:  sinh(t,n); t poly, n int@*
+ASSUME:  t is a polynomial and n is a non-zero integer
+RETURN:  poly
+THEORY:  Returns the power series expansion of the hyperbolic sine function up to n terms.
+
+KEYWORDS: elliptic curves, hyperbolic sine series expansion
+EXAMPLE:  example sinh; shows an example
+"
+{
+  int i;
+  poly N;
+  if(n==0)
+  {N=0;}
+  else
+  {
+    for(i=1;i<=n;i++)
+    {N=N+t^((2*i)-1)/Factorial((2*i)-1);}
+  }
+  return(N);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),dp;
+  sinh(x,5);// expands sine hyperbolic function for variable x to first 5 terms
+}
+
+//Returns the S-function in the form of (1+X) (where X is a taylor series expansion of
+//the sinh() upto n terms)
+proc Sfunction(poly z, int k)
+"USAGE:  Sfunction(z,k); z poly, k int@*
+ASSUME:  z is a polynomial and k is an integer
+RETURN:  poly
+THEORY:  Returns the S-function in the form of (1+X), where X is a taylor series
+    	 	 expansion of the sinh function upto k terms.
+
+KEYWORDS: elliptic curves, S-function
+EXAMPLE:  example Sfunction; shows an example
+"
+{
+  poly N,D,S;
+  N=2*sinh(z/2,k);
+  D=z;
+  S=N/D;
+  return(S);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),dp;
+  Sfunction(x,3);
+}
+
+//Computes the series (1+X)^(-1) where (1+X) is the Sfunction()
+static proc invrtSfunction(poly z, int n)
+{
+  int i;
+  poly s,S,X,N,D;
+  S=Sfunction(z,n);
+  X=S-1;
+  for(i=1;i<=n;i++)
+  {s=s+((-1)^(i-1))*(X^(i-1));}
+  return(s);
+}
+
+//Returns propagator for a looped edge using the S-function
+static proc ProploopNew(poly z, int g, int a)
+{
+  int w;
+  poly p,q,S1,S2;
+  if(a != 0)
+  {
+    for(w=1;w<=a;w++)
+    {
+      if((a mod w)==0)
+      {
+        S1=Sfunction(w*z,a);
+        p=p+(S1^2)*w;
+      }
+    }
+    q=cf_of(p,z^(2*g))*z^(2*g);
+  }
+  else
+  {q=0;}
+  return(list(q,1));
+}
+
+//merges prpcal() and propfor1() together
+static proc propNoloop1(poly x, poly y, poly z1, poly z2, int aa, list pe, int N)
+{
+  int a,w,i,j,k,u,v;
+  //number d1,d2;
+  poly p1,p2,q,d1,d2,p,s1,s2,S1,S2,SS1,SS2;
+  list xx,ND,xx1,xx2,P,PP,Q,R;
+  for(i=1;i<=N-1;i++)
+  {
+    S1=Sfunction(i*z1,N-1);
+    S2=Sfunction(i*z2,N-1);
+    //pk are the constant term of propagator if a_k==0
+    p1= p1+S1*S2*i*(x^i)*(y^((N-1)-i)); //if y>x
+    p2= p2+S1*S2*i*(y^i)*(x^((N-1)-i)); //if x>y
+    PP=p1,p2;
+  }
+  for (a=1;a<=N-1;a++)
+  {
+    //poly q_a;
+    for(w=1;w<=N;w++)
+    {
+      if((a mod w)==0)
+      {
+        SS1=Sfunction(w*z1,N-1);
+        SS2=Sfunction(w*z2,N-1);
+        q=q+SS1*SS2*w*((x^(2*w)+y^(2*w))*(x*y)^(a-w));
+        P[a]=q;
+      }
+    }
+    xx[a]=(x*y)^a;
+  }
+  for(k=1;k<=size(P)-1;k++)
+  {
+    Q[1]=P[1];
+    Q[k+1]=P[k+1]-P[k];
+  }
+  for(j=1;j<=N-1;j++)
+  {
+    xx1[1]=y^(N-1); //if y>x
+    xx1[j+1]=xx[j]; //if y>x
+    xx2[1]=x^(N-1); //if x>y
+    xx2[j+1]=xx[j]; //if x>y
+  }
+  //ND=PP,Q,xx1,xx2;
+  //Up to here we get a list of propagator numerator and denominator for both the possible outcomes
+  //Now we convert this list into the numerator and denominator of the propagator we are interested in
+  u=preim(pe,y);
+  v=preim(pe,x);
+  if(u>v) //i.e y>x
+  {
+    p=PP[1];
+    xx=xx1;
+  }
+  else //i.e x>y
+  {
+    p=PP[2];
+    xx=xx2;
+  }
+  ND=list(p)+Q;
+  R=pe,ND,xx;
+  return(R);
+}
+
+//Propagator for non looping edges.
+//Computes the numerator and denominator for the propagator of only one edge
+static proc PropNoloopfor1(poly x,poly y,int a,list O, int d,poly z1,poly z2,int g1,int g2)
+{
+  poly f,g,ff;
+  list P1,P2;
+  P1=propNoloop1(x,y,z1,z2,a,O,d+1);
+  if(a==0)
+  {
+    f=P1[2][1];
+    g=P1[3][1];
+  }
+  else
+  {
+    f=P1[2][a+1];
+    g=P1[3][a+1];
+  }
+  P2=f,g;
+  return(P2);
+}
+
+//Propagator with vertex contributions for each edge of the graph G
+//Returns the propagator for edges of the Feynman graph G with vertex contributions as in Def (2.14) [BGM1]
+static proc PropagatorVC(graph G,list aa,list O,list gg)
+{
+  int a,d,ii,i,j,jj,g,g1,g2;
+  poly x,y,z,zz1,zz2;
+  list E,P,Z;
+  E=G.edges;
+  for(jj=1;jj<=size(aa);jj++)
+  {d=d+aa[jj];}
+  for(ii=1;ii<=size(O);ii++)
+  {Z[ii]=var(size(O)+ii);}
+  for(i=1;i<=size(E);i++)
+  {
+    if(E[i][1]==E[i][2])
+    {
+      z=Z[E[i][1]];
+      g=gg[E[i][1]];
+      P[i]=ProploopNew(z,g,aa[i]);
+    }
+    else
+    {
+      x=var(E[i][1]);
+      y=var(E[i][2]);
+      zz1=Z[E[i][1]];
+      zz2=Z[E[i][2]];
+      g1=gg[E[i][1]];
+      g2=gg[E[i][1]];
+      P[i]=PropNoloopfor1(x,y,aa[i],O,d,zz1,zz2,g1,g2);
+    }
+  }
+  return(P);
+}
+
+//Computes the Feynman Integral with vertex contributions for G
+//Feynman integral for a given ordering
+static proc FeynmanIntegralVC1(graph G, list aa, list pe, list l, list gg, int r)
+{
+  int ii,i,j,k,d;
+  poly s,pp,p,qq,q,u,v,xx,xx1,zz,cf;
+  list P,Q,Z;
+  s=1;
+  pp=1;
+  p=1;
+  q=1;
+  xx=1;
+  xx1=1;
+  zz=1;
+  for(ii=1;ii<=size(l);ii++)
+  {Z[ii]=var(size(l)+ii);}
+  for(i=1;i<=size(aa);i++)
+  {d=d+aa[i];}
+  P=PropagatorVC(G,aa,pe,gg);
+  for(j=1;j<=size(Z);j++)
+  {
+    s=s*invrtSfunction(Z[j],gg[j]+1);
+    if(l[j]>=0)
+    {xx=xx*(var(j)^l[j]);}
+    else
+    {xx1=xx1*(var(j)^(absValue(l[j])));}
+    zz=zz*Z[j]^(2*gg[j]);
+  }
+  for(k=1;k<=size(P);k++)
+  {
+    if(typeof(P[k])=="poly")
+    {pp=pp*P[k];}
+    else
+    {
+      p=p*P[k][1];
+      q=q*P[k][2];
+    }
+  }
+  u=s*pp*p*xx1;
+  v=q*xx*zz;
+  cf=cf_of(u,v);
+  Q=Q+list(pe,cf);
+  if(r==0)
+  {return(cf);}
+  else
+  {return(Q);}
+}
+
+//Feynman integral for all possible orderings and their sum
+static proc FeynmanIntegralVC(graph G,list aa, list l, list gg, int r)
+{
+  int i,j;
+  poly x;
+  number s;
+  list pe,L,LL,P,PP,Q,QQ;
+  L=G.vertices;
+  for(i=1;i<=size(L);i++)
+  {
+    x=var(L[i]);
+    LL[i]=x;
+  }
+  pe=permute(LL);
+  for(j=1;j<=size(pe);j++)
+  {
+    P[j]=FeynmanIntegralVC1(G,aa,pe[j],l,gg,1);
+    PP[j]=pe[j];
+    if(P[j][2]!=0)
+    {Q[j]=list(pe[j],P[j][2]);}
+    s=s+P[j][2];
+  }
+  if(r==0)
+  {return(s);}
+  else
+  {
+    QQ=list(Q,s);
+    return(QQ);
+  }
+}
+
+//Computes Feynman Integral over all aa.
+static proc GWinvariantVC(graph G,list O,list l,list gg,int d,int r)
+{
+  int i,ii,j,jj,n;
+  number c;
+  list aa,a,Q,F,FF;
+  n=size(G.edges);
+  aa=partitions(n,d);
+  for(i=1;i<=size(aa);i++)
+  {
+    for(ii=1;ii<=size(aa[i]);ii++)
+    {a[ii]=aa[i][ii,1];}
+    Q[i]=FeynmanIntegralVC1(G,a,O,l,gg,0);
+    F[i]=list(aa[i],Q[i]);
+  }
+  for(j=1;j<=size(F);j++)
+  {
+    if(F[j][2] != 0)
+    {FF=FF+list(F[j]);}
+  }
+  for(jj=1;jj<=size(Q);jj++)
+  {c=c+Q[jj];}
+  if(r==0)
+  {return(c);}
+  else
+  {return(list(FF,c));}
+}
+
+//--------------------------------------------------------------------
+//Computations for results from [BGM2] (Tropical covers of E and stable maps to ExP1)
+//Propagator
+//Remains same as for [BBM]
+//Feynman Integral for a given ordering and a fixed partition of the degree d1.
+//here G is a pearl chain of type (d2,g) and degree d1.
+static proc FeynmanIntegral1(graph G,list aa,list pe, list l, int n)
+{
+  int i,j,k,d;
+  list E,P,Q;
+  poly x,y,f,ff,g,gg,xx,xx1,c;
+  f=1;
+  g=1;
+  xx=1;
+  xx1=1;
+  E=G.edges;
+  for(i=1;i<=size(aa);i++)
+  {d=d+aa[i];}
+  for(j=1;j<=size(aa);j++)
+  {
+    x=var(E[j][1]);
+    y=var(E[j][2]);
+    P[j]=Propagatorfor1(x,y,aa[j],pe,d);
+    f=f*P[j][1];
+    g=g*P[j][2];
+  }
+  for(k=1;k<=size(l);k++)
+  {
+    if(l[k]>=0)
+    {xx=xx*var(k)^l[k];}
+    else
+    {xx1=xx1*(var(k)^(absValue(l[k])));}
+  }
+  ff=f*xx1;
+  gg=g*xx;
+  c=cf_of(ff,gg);
+  Q=Q+list(pe,c);
+  if(n==0)
+  {return(c);}
+  else
+  {return(Q);}
+}
+
+//Feynman Integral over all possible orders for a fixed partition of the degree and their sum
+static proc FeynmanIntegral(graph G,list aa,list l,int n)
+{
+  int i,j;
+  poly x,s;
+  list pe,L,LL,P,PP,Q,QQ;
+  L=G.vertices;
+  for(i=1;i<=size(L);i++)
+  {
+    x=var(L[i]);
+    LL[i]=x;
+  }
+  pe=permute(LL);
+  for(j=1;j<=size(pe);j++)
+  {
+    P[j]=FeynmanIntegral1(G,aa,pe[j],l,1);
+    PP[j]=pe[j];
+    while(P[j][2]!=0)
+    {
+      Q[j]=list(P[j]);
+      s=s+P[j][2];
+      break;
+    }
+  }
+  if(n==0)
+  {return(s);}
+  else
+  {
+    QQ=list(Q,s);
+    return(QQ);
+  }
+}
+
+//Computes Feynman Integral over all aa.
+static proc FeynmanIntgrl(graph G,list O,list l,int d, int r)
+{
+  int i,ii,j,jj,n;
+  number c;
+  list aa,a,Q,F,FF;
+  n=size(G.edges);
+  aa=partitions(n,d);
+  for(i=1;i<=size(aa);i++)
+  {
+    for(ii=1;ii<=size(aa[i]);ii++)
+    {a[ii]=aa[i][ii,1];}
+    Q[i]=FeynmanIntegral1(G,a,O,l,0);
+    F[i]=list(aa[i],Q[i]);
+  }
+  for(j=1;j<=size(F);j++)
+  {
+    if(F[j][2] != 0)
+    {FF=FF+list(F[j]);}
+  }
+  for(jj=1;jj<=size(Q);jj++)
+  {c=c+Q[jj];}
+  if(r==0)
+  {return(c);}
+  else
+  {return(list(FF,c));}
+}
+
+//draws a curled pearl chain in TikZ
+static proc DrawinTikZcpc(list V,list I,list O,poly f,list w,list L)
+{
+  int i,j,jj,k,l,l1,ll,i1,j1,i2,ii2,j2,i3,j3,i4,j4,j5,i5,i6,n,m,mm,y;
+  list cd,cdn,E,L1,L2,L3,L4,L5,L6,L7,L8,L9,l6,l7,l8,Le;
+  string s,r,rr,b1,b2,s1,s2,s3,S,p1,p2,p3,p4,p5,p6,R1,ll6,ll7,ll8,le,beg,en;
+  cd=coordinategenerator(V,I,O);
+  E=drawcrds(V,I,O);
+  cdn=cdnew(cd[1],E[1]);
+  //Step1+Step2:
+  n=2*(size(O)+1);
+  for(i=1;i<=size(I);i++)
+  {
+    if(I[i] >= 2)
+    {
+      for(jj=1;jj<=I[i]-1;jj++)
+      {mm=mm+jj;}
+    }
+  }
+  m=size(I)+mm+2;
+  s=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (0,-1) -- (%s,-1);",n)+newline;
+  r=sprintf("\\draw (0,0) rectangle (%s,%s);",n,m)+newline;
+  rr=sprintf("\\path (0,0) --  (%s,0) node[midway,below,red] {\\Large{$mult(\\pi)=%s$}};",n,f)+newline;
+  b1="\\node [below] at (0,-1) {$p_0$};"+newline;
+  b2=sprintf("\\node [below] at (%s,-1) {$p_0$};",n)+newline;
+
+  L1[1]=string(sprintf("\\draw plot[mark=*,mark options={thick}] coordinates{(%s,-1)",2));
+  L2[1]=sprintf("\\node [below] at (2,-1) {$p_1$};")+newline;//take
+
+  for(j=1;j<=size(O)-1;j++)
+  {
+    L1[j+1]=string(sprintf("(%s,-1)",2*(j+1)));
+    L2[j+1]=string(sprintf("\\node [below] at (%s,-1) {$p_%s$};",2*(j+1),(j+1)))+newline; //Step2
+  }
+  for(k=1;k<=size(L1);k++)
+  {
+    p1=p1+L1[k];
+    p2=p2+L2[k]; //Step2
+  }
+  for(l=1;l<=size(cdn);l++)
+  {
+    L3[1]=string(sprintf("\\node[draw,fill=white,circle,inner sep=1.75pt] at (%s,%s){};",cdn[1][1],cdn[1][2]))+newline;
+    for(l1=1;l1<=size(w);l1++)
+    {
+      if(l==w[l1])
+      {L3[l]=string(sprintf("\\node[draw,fill=white,circle,inner sep=1.75pt] at (%s,%s){};",cdn[l][1],cdn[l][2]))+newline;}
+      else
+      {L3[l]=string(sprintf("\\draw plot[mark=*,mark options={thick}] coordinates{(%s,%s)};",cdn[l][1],cdn[l][2]))+newline;}
+    }
+    L4[l]=sprintf("\\node [above] at (%s,%s) {$x_%s$};",cdn[l][1],cdn[l][2],varnum(O[l]))+newline;//Step3
+    L5[l]=sprintf("\\draw[dashed] (%s,%s)--(%s,-1);",cdn[l][1],cdn[l][2],cdn[l][1])+newline;//Step4
+  }
+  for(ll=1;ll<=size(L3);ll++)
+  {
+    p3=p3+L3[ll];
+    p4=p4+L4[ll];
+    p5=p5+L5[ll];
+  }
+  R1=s,r,rr,p1,"};"+newline,p4,p5,p2,p3,b1,b2;
+
+  for(i1=1;i1<=size(E[1]);i1++)
+  {L6[i1]=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s) node [below,align=center,midway]{$q_%s$};",E[1][i1][2][1],E[1][i1][2][2],E[1][i1][3][1],E[1][i1][3][2],E[1][i1][1][1])+newline;}
+  for(j1=1;j1<=size(E[2]);j1++)
+  {
+    L7[j1]=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (%s,%s) node[left]{$q_%s$}--(%s,%s);",E[2][j1][2][1],E[2][j1][2][2],E[2][j1][1][1],E[2][j1][3][1],E[2][j1][3][2])+newline;
+    L8[j1]=sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (%s,%s)--(%s,%s) node[right]{$q_%s$};",E[3][j1][2][1],E[3][j1][2][2],E[3][j1][3][1],E[3][j1][3][2],E[3][j1][1][1])+newline;
+  }
+  for(i3=1;i3<=size(L6);i3++)
+  {s1=s1+L6[i3];}
+  for(j3=1;j3<=size(L7);j3++)
+  {
+    s2=s2+L7[j3];
+    s3=s3+L8[j3];
+  }
+  //Step7:
+  for(i4=1;i4<=size(I);i4++)
+  {
+    if(I[i4]>=2)
+    {
+      for(j4=1;j4<=I[i4]-1;j4++)
+      {
+        y=y+j4;
+        L9=L9+list(sprintf("\\draw [thick,preaction={draw=white, line width=2pt}] (0,%s) node[left]{$q_%s$}--(%s,%s) node[right]{$q_%s$};",size(I)+y,i4,n,size(I)+y,i4)+newline);
+      }
+    }
+  }
+  for(j5=1;j5<=size(L9);j5++)
+  {p6=p6+L9[j5];}
+  for(i5=1;i5<=size(L);i5++)
+  {
+    if(L[i5]!=0)
+    {Le[i5]=sprintf("\\draw[thick,gray] (%s,%s)--(%s,%s); \\node[above] at (%s,%s) {$L_%s=%s$};",cdn[i5][1],cdn[i5][2],cdn[i5][1],m,cdn[i5][1],m,i5,L[i5])+newline;}//leaky edges
+    else
+    {Le[i5]="";}
+  }
+  for(i6=1;i6<=size(Le);i6++)
+  {le=le+Le[i6];}
+  beg="\\begin{tikzpicture}"+newline;
+  en="\\end{tikzpicture}"+newline;
+  S=beg,s1+newline,s2+newline,s3+newline,p6+newline,le+newline,R1,en;
+  return(S);
+}
+
+//Procedures required for drawing floor diagrams of given curled pearl chains
+//STEP 1: convert the coordinates to the step points required in the floor diagram
+static proc floorcds(graph G)
+{
+  int i,k,s,x,y;
+  list V,R;
+  V=G.vertices;
+  s=size(V);
+  k=s+3;
+  x=2;
+  y=k-2;
+  R[1]=list(x,y);
+  for(i=1;i<=s-1;i++)
+  {
+    x=2*(i+1);
+    y=y-1;
+    R[i+1]=list(x,y);
+  }
+  return(R);
+}
+
+//STEP 2: Give a list of white pearls assuming the first vertex is always white
+//STEP 3: Write a drawing procedure using your construction to draw the floor diagram.
+static proc DrawfloorinTikz(graph G,list w,list L,list V, list I)
+{
+  int i,ii,j,k,l,ll,i1,ii1,i2,i3,i4,j1,j2,j3,jj3,jjj3,jjjj3,j4,k1,kk1,kk2,k2,k3,m,n,a,a1,a2,aa1,b,b1,b2,bb1,c,c1,c2,d1,d2,d3,d4,x,x1,x2,y,u,v;
+  list cd,p,pp,f,f1,f2,f3,e,wr,wr1;
+  string r,p1,p2,R1,ff,ff1,ff2,ff3,F1,F2,R2,ee,R3,wrr,wrr1,R4,D,beg,en;
+  cd=floorcds(G);
+
+  //part a: draw a rectangle of a given dimension
+  m=size(cd)+3; //height of the rectangle
+  n=2*size(cd)+2; //width of the rectangle
+  r=sprintf("\\draw (0,0) rectangle (%s,%s);",n,m)+newline;
+
+  //part b: draw dots for floors and elevators
+  for(i=1;i<=size(cd);i++)
+  {
+    a=cd[i][1];
+    b=cd[i][2];
+    pp[i]=sprintf("\\node [above] at (%s,%s) {$p_%s$};",a,b,i)+newline;
+    p[i]=sprintf("\\draw plot[mark=*,mark options={thick}] coordinates{(%s,%s)};",a,b)+newline;
+    for(ii=1;ii<=size(w);ii++)
+    {
+      while(w[ii]==i)
+      {
+        p[i]=sprintf("\\node[draw,fill=white,circle,inner sep=1.75pt] at (%s.5,%s){};",a,b)+newline;
+        break;
+      }
+    }
+  }
+  for(j=1;j<=size(p);j++)
+  {
+    p1=p1+p[j];
+    p2=p2+pp[j];
+  }
+  R1=r,p1,p2;
+
+  //part c: draw elevators connecting different floors depending on the edges of the cover.
+  for(i1=1;i1<=size(I);i1++)
+  {
+    if(I[i1]==0)
+      {
+        a1=varnum(V[i1][1]);
+        b1=varnum(V[i1][2]);
+        for(i2=1;i2<=size(w);i2++)
+        {
+          if(a1==w[i2])
+          {e[i1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s);",cd[a1][1],cd[b1][2],cd[b1][1],cd[b1][2])+newline;}
+          else
+          {
+            if(b1==w[i2])
+            {e[i1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s);",cd[a1][1],cd[a1][2],cd[b1][1],cd[a1][2])+newline;}
+          }
+        }
+      }
+    else
+    {
+      a1=varnum(V[i1][1]);
+      b1=varnum(V[i1][2]);
+      for(i3=1;i3<=size(w);i3++)
+      {
+        if(a1==w[i3])
+        {
+          if(i3<5)
+          {e[i1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s+0.1+0.%s5); \\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s+0.1+0.%s5)--(%s,%s+0.1+0.%s5);",cd[b1][1],cd[b1][2],n,cd[b1][2],i3,0,cd[b1][2],i3,cd[a1][1],cd[b1][2],i3)+newline;}
+          else
+          {e[i1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s+0.1+0.%s5-0.5); \\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s+0.1+0.%s5-0.5)--(%s,%s+0.1+0.%s5-0.5);",cd[b1][1],cd[b1][2],n,cd[b1][2],i3,0,cd[b1][2],i3,cd[a1][1],cd[b1][2],i3)+newline;}
+        }
+        else
+        {
+          if(b1==w[i3])
+          {
+            if(i3<5)
+            {e[i1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s+0.%s5); \\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s+0.%s5)--(%s,%s+0.%s5);",cd[a1][1],cd[a1][2],n,cd[a1][2],i3,0,cd[a1][2],i3,cd[b1][1],cd[a1][2],i3)+newline;}
+            else
+            {e[i1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s) -- (%s,%s+0.%s5-0.5); \\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s+0.%s5-0.5)--(%s,%s+0.%s5-0.5);",cd[a1][1],cd[a1][2],n,cd[a1][2],i3,0,cd[a1][2],i3,cd[b1][1],cd[a1][2],i3)+newline;}
+          }
+        }
+      }
+    }
+  }
+
+  for(i4=1;i4<=size(e);i4++)
+  {ee=ee+string(e[i4]);}
+  R3=ee;
+
+  //part d: draw floors corresponding to the white pearls
+  c=2*w[1];
+  d1=cd[w[1]][2];
+  d2=cd[w[1]+1][2];
+  if(L[1]==0)
+  {f1[1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] plot [smooth] coordinates{(%s.5,%s)(%s.5,%s)(%s,%s)",c,m,c,d1,c,d2);}
+  else
+  {
+    if(L[1]<0)
+    {
+      c1=c-1;
+      //added a string to identify the direction of L_i
+      f1[1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] plot [smooth] coordinates{(%s.5,%s)(%s.5,%s)(%s,%s)",c1,m,c,d1,c,d2)+newline;
+      f3[1]=sprintf("\\node [above] at (%s,%s) {\\small{$(L_%s,1)=(%s,1)$}};",c1,m,1,L[1])+newline;
+    }
+    else
+    {
+      c1=c+1;
+      //added a string to identify the direction of L_i
+      f1[1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] plot [smooth] coordinates{(%s.5,%s)(%s.5,%s)(%s,%s)",c1,m,c,d1,c,d2)+newline;
+      f3[1]=sprintf("\\node [above] at (%s,%s) {\\small{$(L_%s,1)=(%s,1)$}};",c1,m,1,L[1])+newline;
+    }
+  }
+  for(j1=1;j1<=size(cd)-2;j1++)
+  {f1[j1+1]=sprintf("(%s,%s)",c,cd[j1+2][2]);}
+  for(j2=1;j2<=size(f1);j2++)
+  {ff1=ff1+f1[j2];}
+  F1=ff1,sprintf("(%s,0)};",c)+newline;
+  for(k=1;k<=size(w)-1;k++)
+  {
+    c=2*w[k+1];
+    if(L[k+1]==0)
+    {f2[1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] plot [smooth] coordinates{(%s,%s)(%s,%s)",c,m,c,d2);}
+    else
+    {
+      if(L[k+1]<0)
+      {
+        c1=c-1;
+        //added a string to identify the direction of L_i
+        f2[1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] plot [smooth] coordinates{(%s,%s)(%s,%s)",c1,m,c,d2);
+        f3[k+1]=sprintf("\\node [above] at (%s.5,%s) {\\small{$(L_%s,1)=(%s,1)$}};",c1,m,k+1,L[k+1])+newline;
+      }
+      else
+      {
+        c1=c+1;
+        //added a string to identify the direction of L_i
+        f2[1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] plot [smooth] coordinates{(%s,%s)(%s,%s)",c1,m,c,d2);
+        f3[k+1]=sprintf("\\node [above] at (%s.5,%s) {\\small{$(L_%s,1)=(%s,1)$}};",c1,m,k+1,L[k+1])+newline;
+      }
+    }
+    for(j3=1;j3<=size(cd)-2;j3++)
+    {
+      for(jj3=1;jj3<=size(w);jj3++)
+      {
+        if((j3+2)==w[jj3])
+        {f2[j3+2]=sprintf("(%s.5,%s)",c,cd[j3+2][2]);}
+        else
+        {f2[j3+2]=sprintf("(%s,%s+0.35) (%s,%s)",c,cd[j3+2][2],c,cd[j3+2][2]);}
+      }
+    }
+    for(j4=1;j4<=size(f2);j4++)
+    {ff2=ff2+string(f2[j4]);}
+    F2=ff2,sprintf("(%s,0)};",cd[w[k+1]][1])+newline;
+    f[k+1]=F2;
+  }
+  for(l=1;l<=size(f);l++)
+  {ff=ff+string(f[l]);}
+  for(ll=1;ll<=size(f3);ll++)
+  {ff3=ff3+string(f3[ll]);}
+  R2=F1,ff,ff3;
+
+  //part e: draw lines representing wrapped edges
+  for(k1=1;k1<=size(I);k1++)
+  {
+    if(I[k1]>1)
+    {
+      if(I[k1]<6)
+      {
+        aa1=varnum(V[k1][1]);
+        bb1=varnum(V[k1][2]);
+        for(k2=1;k2<=size(w);k2++)
+        {
+          if(aa1==w[k2])
+          {
+            for(kk1=1;kk1<=I[k1]-1;kk1++)
+            {
+              wr1[kk1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s-0.%s) -- (%s,%s-0.%s);",0,cd[bb1][2],kk1,n,cd[bb1][2],kk1)+newline;
+              wrr1=wrr1+wr1[kk1];
+            }
+            wr[k1]=wrr1;
+          }
+          else
+          {
+            if(bb1==w[k2])
+            {
+              for(kk1=1;kk1<=I[k]-1;kk1++)
+              {
+                wr1[kk1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s-0.%s) -- (%s,%s-0.%s);",0,cd[aa1][2],kk1,n,cd[aa1][2],kk1)+newline;
+                wrr1=wrr1+wr1[kk1];
+              }
+              wr[k1]=wrr1;
+            }
+          }
+        }
+      }
+      else
+      {
+        aa1=varnum(V[k1][1]);
+        bb1=varnum(V[k1][2]);
+        for(k2=1;k2<=size(w);k2++)
+        {
+          if(aa1==w[k2])
+          {wr[k1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s-0.2) -- (%s,%s-0.2); \\node [left,blue] at (%s,%s-0.2) {$%s$};",0,cd[bb1][2],n,cd[bb1][2],0,cd[bb1][2],I[k1])+newline;}
+          else
+          {
+            if(bb1==w[k2])
+            {wr[k1]=sprintf("\\draw[thick,preaction={draw=white, line width=2pt}] (%s,%s-0.2) -- (%s,%s-0.2); \\node [left,blue] at (%s,%s-0.2) {$%s$};",0,cd[aa1][2],n,cd[aa1][2],0,cd[aa1][2],I[k1])+newline;}
+          }
+        }
+      }
+    }
+    else
+    {wr[k1]="";}
+  }
+  for(k3=1;k3<=size(wr);k3++)
+  {wrr=wrr+string(wr[k3]);}
+  R4=wrr;
+
+  beg="\\begin{tikzpicture}"+newline;
+  en="\\end{tikzpicture}"+newline;
+  D=beg,R2,R3,R1,R4,en;
+  return(D);
+}
+
+proc FloorDiagrams(graph G,list aa,list O,list Lw, int n)
+"USAGE:   FloorDiagrams(G,aa,O,Lw,n); G graph,aa list, O list, Lw list,n int@*
+ASSUME:   G is a pearl chain of the degree d, aa is a partition of degree d, O is an
+  		    ordering of the vertices of G, Lw is a list where the first n terms represent
+	  	    the leaks in G and the next d2 terms is a list of white pearls (assuming the
+		      first pearl is always white). NOTE: Requires pdflatex to be installed.
+RETURN:   Latex file.
+THEORY:   If n=0: the procedure generates a Latex file for all the tropical stable maps
+			    to ExP1 and if n=1:the procedure generates the source file that can be executed
+			    in Latex to get all the stable maps of ExP1 (in the form of floor diagrams) for
+			    every curled pearl chain of an elliptic curve E provided similar information.
+
+KEYWORDS: elliptic curves, tropical stable maps, floor diagrams
+EXAMPLE:  example FloorDiagrams; shows an example
+"
+{
+  int i1,i2,i3,i,j,k;
+  list T,V,I,R,S,F,w,L;
+  string dc,upt,utl1,utl2,up1,up3,bd,bcen,ecen,ed,pve,B,E,Fin;
+  link dr;
+  T=coverTuple(G,aa,O,3);
+  V=NumDenall(T);
+  I=intersectionpoints(G,aa,O,3);
+  dc="\\documentclass[12pt]{article}"+newline;
+  upt="\\usepackage{tikz}"+newline;
+  utl1="\\usetikzlibrary{shapes.geometric}"+newline;
+  utl2="\\usetikzlibrary{fit}"+newline;
+  up1="\\usepackage[graphics, active, tightpage]{preview}"+newline;
+  up3="\\usepackage[a4paper, total={6in, 8in}]{geometry}"+newline;
+  pve="\\PreviewEnvironment{tikzpicture}"+newline;
+  bd="\\begin{document}"+newline;
+  bcen="\\begin{center}"+newline;
+  ecen="\\end{center}"+newline;
+  ed="\\end{document}"+newline;
+  B=dc,upt,utl1,utl2,up1,up3,pve,bd,bcen;
+  E=ecen,ed;
+  Fin=B;
+  for(i1=1;i1<=size(Lw)-size(O);i1++)
+  {w[i1]=Lw[i1+size(O)];}
+  for(i2=1;i2<=size(O);i2++)
+  {
+    for(i3=1;i3<=size(w);i3++)
+    {
+      if(i2==w[i3])
+      {L=L+list(Lw[i2]);}
+    }
+  }
+  for(i=1;i<=size(V);i++)
+  {
+    R[i]=DrawfloorinTikz(G,w,L,V[i],I[i]);
+    Fin=Fin+string(R[i]);
+  }
+  write(":w FloorDiagrams",Fin);
+  write(":a FloorDiagrams",E);
+  //dr=":a FloorDiagrams";
+  system("sh","pdflatex FloorDiagrams");
+  if(n==0)
+  {return(system("sh","open FloorDiagrams.pdf"));}
+  else
+  {return(system("sh","open FloorDiagrams"));}
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x1,x2,x3,x4,x5),dp;
+  graph P=makeGraph(list(1,2,3,4,5),list(list(1,2),list(1,3),list(3,4),list(2,4),list(4,5),list(1,5)));
+  //graph P is a pearl chain
+  FloorDiagrams(P,list(0,0,2,0,0,1),list(x5,x4,x2,x1,x3),list(0,0,0,0,0,1,4),0);
+}
+
+//------------------------------------------------------------------------------
+//The following procedures combines all the previous procedures for propagators and integrals.
+//t=0,1,2,3, where 0 does computations for results from [BBM], 1,2 computes results from [BGM1]
+//for no VC and VC resp. and t=3 computes for results in [BGM2]
+
+proc PropagatorFunction(graph G,list aa, list O,int t, list #)
+"USAGE:   PropagatorFunction(G,aa,O,t[,l]); G graph, aa list, O list, t int, l list@*
+ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, aa is a partition
+	  	    of degree d, O is an ordering of the vertices of G, l is a list representing the
+		      leaky edges of G and t is one of 0,1,2 or 3.
+RETURN:   list P_t of propagator function for each edge of G as follows:
+		@format
+      P_0: Propagator for a Feynman graph G as in [BBM], i.e., a graph without any self-
+          looping edges, leaks or vertex contributions.
+      P_1: Propagator for a Feynman graph G without vertex contributions as in [BGM1],
+          i.e., A graph that may have self-looping edges and leaks.
+      P_2: Propagator for a Feynman graph G with vertex contributions as in [BGM1]
+          possibly with self-looping edges and leaks.
+      P_3: Propagator for a pearl chain G as in [BGM2], i.e., graph G may have leaks.
+THEORY:   Computes the numerator and the denominator of the propagator function for every
+	  	    edge of graph G depending on the integer t.
+
+KEYWORDS: elliptic curves, propagator of a graph
+EXAMPLE:  example PropagatorFunction; shows an example
+"
+{
+  list P;
+  if(t==0)
+  {P=Propagator(G,aa,O);}
+  if(t==1 || t==3)
+  {P=PropagatornoVC(G,aa,O);}
+  if(t==2)
+  {P=PropagatorVC(G,aa,O,#);}
+return(P);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r1=0, (x1,x2,x3,x4),dp;
+  graph G = makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
+  PropagatorFunction(G,list (0,2,1,0,0,1), list (x1,x3,x4,x2),0);
+
+  //This is another example:
+  ring r2=0,(x1,x2,x3,z1,z2,z3),dp;
+  graph GG = makeGraph(list(1,2,3),list(list(1,1),list(1,2),list(2,3),list(3,1)));
+  PropagatorFunction(GG,list(1,0,0,3),list(x1,x2,x3),1);
+
+  //Yet another example
+  ring r3=0,(x1,x2,x3,x4,x5),dp;
+  graph P=makeGraph(list(1,2,3,4),list(list(1,2),list(2,3),list(3,4),list(4,1)));
+  //graph P is a pearl chain
+  PropagatorFunction(P, list (1,0,0,1),list (x1,x2,x3,x4),3);
+}
+
+proc FeynmanIntegralo(graph G,list aa, list O,list l,int k,int t, list #)
+"USAGE:   FeynmanIntegralo(G,aa,O,l,k,t[,gg]); G graph, aa list, O list, l list, k int,
+  		    t int, gg list@*
+ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, aa is a
+	    		partition of degree d, O is an ordering of the vertices of G, l is a list
+			    representing the leaky edges of G, k is any integer, gg is a list representing
+			    the genus function and t is one of 0,1,2 or 3.
+RETURN:   number or list Q_t (depending on k) of Feynman integral for a fixed ordering of
+			    vertices of G, the results are as follows:
+		@format
+      Q_0: Feynman integral for a fixed ordering of a Feynman graph G as in [BBM], i.e.,
+          a graph without any self-looping edges, leaks or vertex contributions.
+      Q_1: Feynman integral for a fixed ordering of a Feynman graph G without vertex
+          contributions as in [BGM1], i.e. A graph that may have self-looping edges
+          and leaks.
+      Q_2: Feynman integral for a fixed ordering of a Feynman graph G with vertex
+          contributions as in [BGM1] possibly with self-looping edges and leaks.
+      Q_3: Feynman integral for a fixed ordering of a pearl chain G as in [BGM2], i.e.,
+          graph G may have leaks.
+THEORY:   If k is zero it returns the coefficient of the Feynman integral for a given
+	  	    ordering of the vertices of the graph G. Otherwise, returns a list showing the
+		      ordering and the coefficient of the Feynman integral for the corresponding ordering.
+
+
+KEYWORDS: elliptic curves, Feynman integral of a graph for a fixed ordering
+EXAMPLE:  example FeynmanIntegralo; shows an example
+"
+{
+  int i;
+  def Q;
+  list g;
+  for(i=1;i<=size(#);i++)
+  {g=g+list(#[i]);}
+  if(t==0)
+  {Q=feynmanIntegral1(G,aa,O,k);}
+  if(t==1)
+  {Q=FeynmanIntnoVC1(G,aa,O,l,k);}
+  if(t==2)
+  {Q=FeynmanIntegralVC1(G,aa,O,l,g,k);}
+  if(t==3)
+  {Q=FeynmanIntegral1(G,aa,O,l,k);}
+  return(Q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r1=0, (x1,x2,x3,x4),dp;
+  graph G = makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
+  FeynmanIntegralo(G,list (0,2,1,0,0,1), list (x1,x3,x4,x2),list(0,0,0,0,0,0),1,0);
+
+  //This is another example:
+  ring r2=0,(x1,x2,x3,z1,z2,z3),dp;
+  graph GG = makeGraph(list(1,2,3),list(list(1,1),list(1,2),list(2,3),list(3,1)));
+  FeynmanIntegralo(GG, list (2,0,0,1), list (x1,x2,x3),list (0,0,0), 0,1);
+
+  //Yet another example
+  ring r3=0,(x1,x2,x3,x4,x5),dp;
+  graph P=makeGraph(list(1,2,3,4),list(list(1,2),list(2,3),list(3,4),list(4,1)));
+  //graph P is a pearl chain
+  FeynmanIntegralo(P,list (1,0,0,1),list (x1,x2,x3,x4), list (0,0,0,0), 0,3);
+}
+
+proc FeynmanIntegralO(graph G,list aa,list l,int k,int t, list #)
+"USAGE:   FeynmanIntegralO(G,aa,l,k,t[,gg]); G graph, aa list, l list, k int, t int, gg list@*
+ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, aa is a partition
+          of degree d, l is a list representing the leaky edges of G, k is any integer,
+		  	  gg is a list representing the genus function and t is one of 0,1,2 or 3.
+RETURN:   number or list Q_t (depending on k) of Feynman integral for all possible
+		      orderings of vertices of G, the results are as follows:
+		@format
+      Q_0: Feynman integral for all orderings of a Feynman graph G as in [BBM], i.e., a
+          graph without any self-looping edges, leaks or vertex contributions.
+      Q_1: Feynman integral for all orderings of a Feynman graph G without vertex contributions
+          as in [BGM1], i.e. A graph that may have self-looping edges and leaks.
+      Q_2: Feynman integral for all orderings of a Feynman graph G with vertex contributions
+          as in [BGM1] possibly with self-looping edges and leaks.
+      Q_3: Feynman integral for all orderings of a pearl chain G as in [BGM2], i.e., a graph G
+          may have leaks.
+THEORY:   If k is zero it returns the coefficient which is a sum of Feynman integrals over
+	  		  all orderings of the vertices of the graph G. Otherwise, returns a list showing
+			    the ordering, the coefficient of the Feynman integral for the corresponding
+			    ordering and the sum.
+
+KEYWORDS: elliptic curves, sum of Feynman integrals
+EXAMPLE:  example FeynmanIntegralO; shows an example
+"
+{
+  int i;
+  def Q;
+  list g;
+  for(i=1;i<=size(#);i++)
+  {g=g+list(#[i]);}
+  if(t==0)
+  {Q=feynmanIntegral(G,aa,k);}
+  if(t==1)
+  {Q=FeynmanIntegralnoVC(G,aa,l,k);}
+  if(t==2)
+  {Q=FeynmanIntegralVC(G,aa,l,g,k);}
+  if(t==3)
+  {Q=FeynmanIntegral(G,aa,l,k);}
+  return(Q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r1=0, (x1,x2,x3,x4),dp;
+  graph G = makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
+  FeynmanIntegralO(G,list (0,2,1,0,0,1),list (0,0,0,0,0,0),1,0);
+}
+
+proc FeynmanIntegralA(graph G,list O,int d,list l,int k,int t,list #)
+"USAGE:   FeynmanIntegralA(G,O,d,l,k,t[,gg]); G graph, O list, d int, l list, k int, t int, gg list@*
+ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, O is an ordering
+          of vertices of G, d is the degree of G, l is a list representing the leaky edges
+          of G, k is any integer, gg is a list representing the genus function and t is
+          one of 0,1,2 or 3.
+RETURN:   number or list Q_t (depending on k) of Feynman integral for a fixed ordering of
+    			vertices of G, the results are as follows:
+		@format
+      Q_0: sum of Feynman integrals (over all partitions of d) for a fixed ordering of a
+          Feynman graph G as in [BBM], i.e. a graph without any self-looping edges, leaks
+          or vertex contributions.
+      Q_1: sum of Feynman integrals (over all partitions of d) for a fixed ordering of a
+          Feynman graph G without vertex contributions as in [BGM1], i.e. A graph that may
+          have self-looping edges and leaks.
+      Q_2: sum of Feynman integrals (over all partitions of d) for a fixed ordering of a
+          Feynman graph G with vertex contributions as in [BGM1] possibly with self-looping
+          edges and leaks.
+      Q_3: sum of Feynman integrals (over all partitions of d) for a fixed ordering of a
+          pearl chain G as in [BGM2], i.e. graph G may have leaks.
+THEORY:   If k is zero it returns the coefficient which is a sum of Feynman integrals over
+          all partitions of d. Otherwise, returns a list showing the partition from which
+          the Feynman integral is computed, the respective coefficient of the Feynman
+          integral for the given ordering and the sum over all partitions.
+
+
+KEYWORDS: elliptic curves, Gromov-Witten invariants,Feynman integrals
+EXAMPLE:  example FeynmanIntegralA; shows an example
+"
+ {
+  int i;
+  def Q;
+  list gg;
+  for(i=1;i<=size(#);i++)
+  {gg=gg+list(#[i]);}
+  if(t==0)
+  {Q=FeynmanInt(G,O,d,k);}
+  if(t==1)
+  {Q=GWinvariantnoVC(G,O,l,d,k);}
+  if(t==2)
+  {Q=GWinvariantVC(G,O,l,gg,d,k);}
+  if(t==3)
+  {Q=FeynmanIntgrl(G,O,l,d,k);}
+  return(Q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r1=0, (x1,x2,x3,x4),dp;
+  graph G = makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
+  FeynmanIntegralA(G,list(x1,x3,x4,x2),4,list(0,0,0,0,0,0),0,0);
+}
+
+proc DrawCovers(graph G,list aa,list O,int t,int n, list #)
+"USAGE:   DrawCovers(G,aa,O,t[, lw]); G graph, aa list, O list, t int,n int and lw list@*
+ASSUME:   G is a Feynman graph/pearl chain, aa is a partition of the degree of the graph G,
+  			  O is a given ordering of the vertices of G, t is an integer between 0 and 3 and
+			    lw is a list where the first n entries represent the leaks in G and the remaining
+			    terms tells us about the white pearls of G. NOTE: Requires pdflatex to be installed.
+RETURN:   if n=0: C_t is a Latex file generating all the covers of an elliptic curve and
+          if n=1: C_t is the source file that can be executed in Latex to get the covers
+          of an elliptic curve (given an ordering O and a partition aa).
+          The results for C_t are as follows:
+		 @format
+      C_0: returns a Latex file drawing all simply ramified covers of an elliptic curve
+          given a fixed ordering of the vertices of G and a fixed partition of its degree.
+      C_1: returns a Latex file drawing all covers of an elliptic curve such that G has no
+          vertex contributions, given a fixed ordering of the vertices of G and a fixed
+          partition of its degree.
+      C_2: returns a Latex file drawing all covers of an elliptic curve such that G has
+          vertex contributions, given a fixed ordering of the vertices of G and a fixed
+          partition of its degree.
+      C_3: returns a Latex file drawing all curled pearl chains of an elliptic curve given
+          a fixed ordering of the vertices of G and a fixed partition of its degree.
+
+THEORY:   For a given ordering of the vertices of G, this function computes Latex file
+          drawing all the covers of an elliptic curve E. If G is a pearl chain then this
+          procedure draws the black and white pearls of G accordingly using information
+          from list lw.
+          (For t=0, we get the results for simply ramified covers as in [BBM]. For t=1, 2
+          we get results for graphs w/o vertex contributions respectively w/ vertex
+          contributions as in [BGM1], and for t=3 we get the results for pearl chains as in [BGM2])
+
+
+KEYWORDS: elliptic curve draw covers
+EXAMPLE:  example DrawCovers; shows an example
+"
+{
+  int iii,ii,i,j,jj;
+  list T,V,I,M,P,w,le,lle,g;
+  string dc,upt,utl1,utl2,up1,up3,bd,bcen,ecen,ed,pve,B,E,Fin;
+  link dr;
+  for(jj=1;jj<=size(O);jj++)
+  {g[jj]=#[jj];}
+  T=coverTuple(G,aa,O,t,g);
+  V=NumDenall(T);
+  I=intersectionpoints(G,aa,O,t,g);
+  M=CoverMult(G,aa,O,t,g);
+  dc="\\documentclass[12pt]{article}"+newline;
+  upt="\\usepackage{tikz}"+newline;
+  utl1="\\usetikzlibrary{shapes.geometric}"+newline;
+  utl2="\\usetikzlibrary{fit}"+newline;
+  up1="\\usepackage[graphics, active, tightpage]{preview}"+newline;
+  up3="\\usepackage[a4paper, total={6in, 8in}]{geometry}"+newline;
+  pve="\\PreviewEnvironment{tikzpicture}"+newline;
+  bd="\\begin{document}"+newline;
+  bcen="\\begin{center}"+newline;
+  ecen="\\end{center}"+newline;
+  ed="\\end{document}"+newline;
+  B=dc,upt,utl1,utl2,up1,up3,pve,bd,bcen;
+  E=ecen,ed;
+  Fin=B;
+  for(ii=1;ii<=size(O);ii++)
+  {le[ii]=#[size(O)+ii];}
+  for(iii=1;iii<=size(O);iii++)
+  {lle[iii]=#[iii];}
+  for(j=1;j<=size(#)-size(O);j++)
+  {w[j]=#[size(O)+j];}
+  for(i=1;i<=size(V);i++)
+  {
+    if(t==3)
+    {
+      P[i]=DrawinTikZcpc(V[i],I[i],O,M[i],w,lle);
+      Fin=Fin+string(P[i]);
+    }
+    else
+    {
+      P[i]=DrawinTikZ(V[i],I[i],O,M[i],le);
+      Fin=Fin+string(P[i]);
+    }
+  }
+  write(":w TropCovers",Fin);
+  write(":a TropCovers",E);
+  //dr=":a TropCovers";
+  system("sh","pdflatex TropCovers");
+  if(n==0)
+  {return(system("sh","open TropCovers.pdf"));}
+  else
+  {return(system("sh","open TropCovers"));}
+}
+example
+{"EXAMPLE:"; echo=2;
+  ring r1=0, (x1,x2,x3,x4),dp;
+  graph G=makeGraph(list(1,2,3,4),list(list(1,3),list(1,2),list(1,2),list(2,4),list(3,4),list(3,4)));
+  DrawCovers(G,list(0,2,1,0,0,1), list(x2,x4,x3,x1),0,0);
+
+
+  //This is another example:
+  ring r2=0,(x1,x2,x3,z1,z2,z3),dp;
+  //F is graph with loops
+  graph F=makeGraph(list(1,2,3),list(list(1,1),list(1,2),list(2,3),list(1,3)));
+  DrawCovers(F,list(1,0,0,2),list(x1,x2,x3),2,0,list(0,0,0));
+
+  //Yet another example
+  ring r3=0,(x1,x2,x3,x4,x5),dp;
+  //in P vertices 1 and 3 are white, genus 2
+  graph P=makeGraph(list(1,2,3,4,5),list(list(1,2),list(2,3),list(3,4),list(1,4),list(1,5),list(3,5)));
+  DrawCovers(P,list(0,0,0,1,2,0),list(x1,x2,x3,x4,x5),3,1, list(0,0,0,0,0,1,3));
+}
+
+proc TropCovandMaps(graph G,list aa, list O,list Lw,int n)
+"USAGE:   TropCovandMaps(G,aa,O,Lw,n); G graph, aa list, O list, Lw list, n int@*
+ASSUME:   G is a pearl chain, aa is a partition of the degree of the graph G, O is a given
+  		    ordering of the vertices of G, Lw is a list of leaks and white vertices in G.
+          NOTE: Requires pdflatex to be installed.
+RETURN:   Depending on n this procedure returns either a pdf or a latex file for the curled
+          pearl chains of an elliptic curve and their corresponding stable maps of ExP1
+          for a fixed ordering of the vertices of the source curve and a fixed partition
+          of its degree.
+
+THEORY:   For a given ordering of the vertices of G, this function computes a list of
+          commands that can be executed in TikZ. Each list represents a cover of the
+          elliptic curve E and its corresponding stable map of ExP1. Since G is a pearl
+          chain this procedure draws the black and white pearls of G accordingly using
+          information from list lw.
+
+
+KEYWORDS: elliptic curve draw covers
+EXAMPLE:  example TropCovandMaps; shows an example
+"
+{
+  int i1,i2,i3,ii,i;
+  list cov,stm,row,T,V,I,M,L,w,le;
+  string dc,upt,utl1,utl2,up1,up2,up3,bd,bcen,blt,cap,h1,h2,elt,ecen,ed,pve,B,E,F,Cov,Stm;
+  link Tb;
+  dc="\\documentclass[12pt]{article}"+newline;
+  upt="\\usepackage{tikz}"+newline;
+  utl1="\\usetikzlibrary{shapes.geometric}"+newline;
+  utl2="\\usetikzlibrary{fit}"+newline;
+  up1="\\usepackage[graphics, active, tightpage]{preview}"+newline;
+  up2="\\usepackage{longtable}"+newline;
+  up3="\\usepackage[a4paper, total={6in, 8in}]{geometry}"+newline;
+  pve="\\PreviewEnvironment{tikzpicture}"+newline;
+  bd="\\begin{document}"+newline;
+  bcen="\\begin{center}"+newline;
+  blt="\\begin{longtable}{|c|}"+newline;
+  h1="\\hline"+newline;
+
+  h2="\\hline"+newline;
+  elt="\\end{longtable}"+newline;
+  ecen="\\end{center}"+newline;
+  ed="\\end{document}"+newline;
+
+  B=dc,upt,utl1,utl2,up1,up2,up3,pve,bd,bcen,blt,h1;
+  E=h2,elt,ecen,ed;
+  T=coverTuple(G,aa,O,3);
+  V=NumDenall(T);
+  I=intersectionpoints(G,aa,O,3);
+  M=CoverMult(G,aa,O,3);
+  F=B;
+  for(ii=1;ii<=size(O);ii++)
+  {le[ii]=Lw[ii];}
+  for(i1=1;i1<=size(Lw)-size(O);i1++)
+  {w[i1]=Lw[i1+size(O)];}
+  for(i2=1;i2<=size(O);i2++)
+  {
+    for(i3=1;i3<=size(w);i3++)
+    {
+      if(i2==w[i3])
+      {L=L+list(Lw[i2]);}
+    }
+  }
+  for(i=1;i<=size(V);i++)
+  {
+    cov[i]=DrawinTikZcpc(V[i],I[i],O,M[i],w,le);
+    stm[i]=DrawfloorinTikz(G,w,L,V[i],I[i]);
+    row[i]=string(cov[i])+"\\"+"\\"+string(stm[i]);
+    F=F+string(row[i])+"\\"+"\\"+newline;
+  }
+  write(":w CoversWithStableMaps",F);
+  write(":a CoversWithStableMaps",E);
+  //Tb=":a CoversWithStableMaps";
+  system("sh","pdflatex CoversWithStableMaps");
+  if(n==0)
+  {return(system("sh","open CoversWithStableMaps.pdf"));}
+  else
+  {return(system("sh","open CoversWithStableMaps"));}
+}
+example
+{"EXAMPLE:"; echo=2;
+  ring r=0,(x1,x2,x3,x4,x5),dp;
+  graph P=makeGraph(list(1,2,3,4,5),list(list(1,2),list(2,3),list(3,4),list(4,1),list(1,5),list(5,3)));
+  graph P1=makeGraph(list(1,2,3,4),list(list(1,2),list(2,3),list(3,4),list(4,1)));
+  //graphs P and P1 are pearl chains
+  TropCovandMaps(P,list(0,0,0,1,2,0),list(x1,x2,x3,x4,x5),list(0,0,0,0,0,1,3), 0);
+}
