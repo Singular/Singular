@@ -1331,7 +1331,7 @@ Todos/Issues:
 @c ---------------------------------------------------------
 @node tropicalEllipticCovers_lib
 @subsection tropicalEllipticCovers_lib
-@c lib tropicalEllipticCovers.lib
+@c lib tropicalEllipticCovers.lib no_ex
 @c ---------------------------------------------------------
 @node VecField_lib
 @subsection VecField_lib
