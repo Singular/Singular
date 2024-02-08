@@ -3182,7 +3182,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       list resu,tempo;
       string absotto;
       map sigma,invsigma;
-      ideal II,jmap;
+      ideal II,jmap,IItmp;
       nn=nvars(basering);
       for(ab=1;ab<=size(primary) div 2;ab++)
       {
@@ -3197,11 +3197,19 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         else
         {
           invsigma=basering,maxideal(1);
-          jmap=randomLast(50);
-          sigma=basering,jmap;
-          jmap[nn]=2*var(nn)-jmap[nn];
-          invsigma=basering,jmap;
-          II=groebner(sigma(II));
+          while(1)
+          {
+            jmap=randomLast(50);
+            sigma=basering,jmap;
+            jmap[nn]=2*var(nn)-jmap[nn];
+            invsigma=basering,jmap;
+            IItmp=groebner(sigma(II));
+            if (deg(IItmp[1]) == vdim(IItmp))
+            {
+              II=IItmp;
+              break;
+            }
+          }
           absotto = absFactorize(II[1],77);
           II=var(nn);
           tempo= primary[2*ab-1],primary[2*ab],absotto,string(invsigma(II));
@@ -3399,7 +3407,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       list uprimary= zero_decomp(@j,ser,@wr);
       if(abspri)
       {
-        ideal II;
+        ideal II,IItmp;
         ideal jmap;
         map sigma;
         nn=nvars(basering);
@@ -3408,13 +3416,14 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         {
           II=uprimary[2*ab];
           attrib(II,"isSB",1);
-          if(deg(II[1])!=vdim(II))
+          IItmp=II;
+          while(deg(II[1])!=vdim(II))
           {
             jmap=randomLast(50);
             sigma=basering,jmap;
             jmap[nn]=2*var(nn)-jmap[nn];
             invsigma=basering,jmap;
-            II=groebner(sigma(II));
+            II=groebner(sigma(IItmp));
           }
           absprimarytmp[ab]= absFactorize(II[1],77);
           II=var(nn);
@@ -3697,7 +3706,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         list uprimary= zero_decomp(@j,ser,@wr);
         if(abspri)
         {
-          ideal II;
+          ideal II,IItmp;
           ideal jmap;
           map sigma;
           nn=nvars(basering);
@@ -3706,13 +3715,14 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
           {
             II=uprimary[2*ab];
             attrib(II,"isSB",1);
-            if(deg(II[1])!=vdim(II))
+            IItmp=II;
+            while(deg(II[1])!=vdim(II))
             {
               jmap=randomLast(50);
               sigma=basering,jmap;
               jmap[nn]=2*var(nn)-jmap[nn];
               invsigma=basering,jmap;
-              II=groebner(sigma(II));
+              II=groebner(sigma(IItmp));
             }
             absprimarytmp[ab]= absFactorize(II[1],77);
             II=var(nn);
@@ -8115,7 +8125,7 @@ EXAMPLE: example newDecompStep; shows an example
           list uprimary= newZero_decomp(@j,ser,@wr);
           if(abspri)
           {
-             ideal II;
+             ideal II,IItmp;
              ideal jmap;
              map sigma;
              nn=nvars(basering);
@@ -8124,13 +8134,14 @@ EXAMPLE: example newDecompStep; shows an example
              {
                 II=uprimary[2*ab];
                 attrib(II,"isSB",1);
-                if(deg(II[1])!=vdim(II))
+                IItmp=II;
+                while(deg(II[1])!=vdim(II))
                 {
                    jmap=randomLast(50);
                    sigma=basering,jmap;
                    jmap[nn]=2*var(nn)-jmap[nn];
                    invsigma=basering,jmap;
-                   II=groebner(sigma(II));
+                   II=groebner(sigma(IItmp));
                  }
                  absprimarytmp[ab]= absFactorize(II[1],77);
                  II=var(nn);
@@ -8480,7 +8491,7 @@ static proc newReduction(ideal @j, ideal ser, bigintvec @hilb, intvec @w, int jd
 //HIER
      if(abspri)
      {
-       ideal II;
+       ideal II,IItmp;
        ideal jmap;
        map sigma;
        nn=nvars(basering);
@@ -8489,13 +8500,14 @@ static proc newReduction(ideal @j, ideal ser, bigintvec @hilb, intvec @w, int jd
        {
          II=uprimary[2*ab];
          attrib(II,"isSB",1);
-         if(deg(II[1])!=vdim(II))
+         IItmp=II;
+         while(deg(II[1])!=vdim(II))
          {
            jmap=randomLast(50);
            sigma=basering,jmap;
            jmap[nn]=2*var(nn)-jmap[nn];
            invsigma=basering,jmap;
-           II=groebner(sigma(II));
+           II=groebner(sigma(IItmp));
          }
          absprimarytmp[ab]= absFactorize(II[1],77);
          II=var(nn);
