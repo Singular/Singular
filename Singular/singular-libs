@@ -25,6 +25,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 	resgraph.lib resjung.lib resolve.lib \
 	reszeta.lib ring.lib ringgb.lib rinvar.lib rootsmr.lib rootsur.lib \
 	sagbi.lib sheafcoh.lib sing.lib sing4ti2.lib signcond.lib \
+	sagbiNormaliz.lib \
 	solve.lib spcurve.lib spectrum.lib standard.lib stanleyreisner.lib stratify.lib \
 	surf.lib surf_jupyter.lib surfacesignature.lib surfex.lib \
 	teachstd.lib toric.lib triang.lib \
