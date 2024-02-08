@@ -94,7 +94,7 @@ ASSUME:  f is a polynomial, g is a monomial@*
 RETURN:  poly.
 THEORY:  For a given polynomial f, it computes the coefficient of g in f @*
 
-KEYWORDS: coefficient of a polynomial.
+KEYWORDS: coefficient of a polynomial
 EXAMPLE:  example cf_of; shows an example
 "
 {
@@ -1705,7 +1705,7 @@ ASSUME:  t is a polynomial and n is a non-zero integer
 RETURN:  poly
 THEORY:  Returns the power series expansion of the hyperbolic sine function up to n terms.
 
-KEYWORDS: elliptic curves, hyperbolic sine series expansion
+KEYWORDS: elliptic curves; hyperbolic sine series expansion
 EXAMPLE:  example sinh; shows an example
 "
 {
@@ -1735,7 +1735,7 @@ RETURN:  poly
 THEORY:  Returns the S-function in the form of (1+X), where X is a taylor series
     	 	 expansion of the sinh function upto k terms.
 
-KEYWORDS: elliptic curves, S-function
+KEYWORDS: elliptic curves; S-function
 EXAMPLE:  example Sfunction; shows an example
 "
 {
@@ -2470,7 +2470,7 @@ THEORY:   If n=0: the procedure generates a Latex file for all the tropical stab
 			    in Latex to get all the stable maps of ExP1 (in the form of floor diagrams) for
 			    every curled pearl chain of an elliptic curve E provided similar information.
 
-KEYWORDS: elliptic curves, tropical stable maps, floor diagrams
+KEYWORDS: elliptic curves; tropical stable maps; floor diagrams
 EXAMPLE:  example FloorDiagrams; shows an example
 "
 {
@@ -2538,7 +2538,6 @@ ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, aa is
 	  	    of degree d, O is an ordering of the vertices of G, l is a list representing the
 		      leaky edges of G and t is one of 0,1,2 or 3.
 RETURN:   list P_t of propagator function for each edge of G as follows:
-		@format
       P_0: Propagator for a Feynman graph G as in [BBM], i.e., a graph without any self-
           looping edges, leaks or vertex contributions.
       P_1: Propagator for a Feynman graph G without vertex contributions as in [BGM1],
@@ -2549,7 +2548,7 @@ RETURN:   list P_t of propagator function for each edge of G as follows:
 THEORY:   Computes the numerator and the denominator of the propagator function for every
 	  	    edge of graph G depending on the integer t.
 
-KEYWORDS: elliptic curves, propagator of a graph
+KEYWORDS: elliptic curves; propagator of a graph
 EXAMPLE:  example PropagatorFunction; shows an example
 "
 {
@@ -2604,7 +2603,7 @@ THEORY:   If k is zero it returns the coefficient of the Feynman integral for a 
 		      ordering and the coefficient of the Feynman integral for the corresponding ordering.
 
 
-KEYWORDS: elliptic curves, Feynman integral of a graph for a fixed ordering
+KEYWORDS: elliptic curves; Feynman integral of a graph for a fixed ordering
 EXAMPLE:  example FeynmanIntegralo; shows an example
 "
 {
@@ -2662,7 +2661,7 @@ THEORY:   If k is zero it returns the coefficient which is a sum of Feynman inte
 			    the ordering, the coefficient of the Feynman integral for the corresponding
 			    ordering and the sum.
 
-KEYWORDS: elliptic curves, sum of Feynman integrals
+KEYWORDS: elliptic curves; sum of Feynman integrals
 EXAMPLE:  example FeynmanIntegralO; shows an example
 "
 {
@@ -2714,7 +2713,7 @@ THEORY:   If k is zero it returns the coefficient which is a sum of Feynman inte
           integral for the given ordering and the sum over all partitions.
 
 
-KEYWORDS: elliptic curves, Gromov-Witten invariants,Feynman integrals
+KEYWORDS: elliptic curves; Gromov-Witten invariants;Feynman integrals
 EXAMPLE:  example FeynmanIntegralA; shows an example
 "
  {
