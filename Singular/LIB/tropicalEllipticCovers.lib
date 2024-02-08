@@ -31,11 +31,11 @@ to compute the Gromov-Witten invariants N_(g,d), N_(g,d,Omega) and N_(P,d_1,d_2,
 REFERENCES:
 
 [BBM]  J. Boehm, A. Buchholz, H. Markwig: Tropical mirror symmetry for elliptic curves,
-		   arXiv:1309.5893 (2013).
+   arXiv:1309.5893 (2013).
 [BGM1] J. Boehm, C. Goldner, H. Markwig: Tropical mirror symmetry in dimension one,
-		   arXiv:1809.10659 (2018).
+   arXiv:1809.10659 (2018).
 [BGM2] J. Boehm, C. Goldner, H. Markwig, Counts of (tropical) curves in ExP1 and Feynman
-		   integrals, arXiv:1812.04936 (2018).
+   integrals, arXiv:1812.04936 (2018).
 
 
 KEYWORDS:
@@ -57,25 +57,25 @@ coverTuple(graph, list, list, int[, list])              depending on int, comput
                                                         product would return the coefficient of the Feynman integral. Every list
                                                         of tuples corresponds to a cover of the elliptic curve E.
 CoverMult(graph, list, list, int[, list])               depending on int, computes a list of cover multiplicity corresponding to
-					                      						            each cover of an elliptic curve having source curve G.
+                                                        each cover of an elliptic curve having source curve G.
 Tropicalcover(graph, list, list, int[, list])           depending on int, computes a list of matrices such that each matrix in the
-												                                list represents a cover of an elliptic curve E.
+                                                        list represents a cover of an elliptic curve E.
 
 sinh(poly, int)                                         returns the power series expansion of the hyperbolic sine function given a
-				                                                polynomial f up to first n terms.
+                                                        polynomial f up to first n terms.
 Sfunction(poly, int)                                    computes the S-function in the form of (1+X), where X is a taylor series
-						                                            expansion of the sinh function upto n terms.
+                                                        expansion of the sinh function upto n terms.
 FloorDiagrams(graph,list,list,list,int)                 returns a Latex file illustrating floor diagrams, such that each floor
                                                         diagram corresponds to a tropical stable map to ExP1 for a given curled
                                                         pearl chain of elliptic curve E.
 
 PropagatorFunction(graph,list,list,int[,list])          depending on int, computes the propagator for the edges of a Feynman graph G.
 FeynmanIntegralo(graph,list,list,int,int[,list])        depending on the second int, computes the coefficient of the Feynman
-						                          							    integral for a given ordering of the vertices of the graph G.
+                                                        integral for a given ordering of the vertices of the graph G.
 FeynmanIntegralO(graph,list,list,int,int[,list])        depending on the second int, computes the coefficients of the sum of Feynman
-													                              integrals (over all orderings of the vertices of the graph G).
+                                                        integrals (over all orderings of the vertices of the graph G).
 FeynmanIntegralA(graph,list,int,list,int,int[,list])    depending on the third int, computes the coefficients of the sum of Feynman
-														                            integrals for fixed ordering (sum goes over all partitions of the degree of G).
+                                                        integrals for fixed ordering (sum goes over all partitions of the degree of G).
 DrawCovers(graph,list,list,int,int[,list])              depending on int, returns a Latex file illustrating a cover of the elliptic curve E.
 
 TropCovandMaps(graph,list,list,list,int)                returns a Latex file that draws all the (cut open) curled pearl chains and its
@@ -566,7 +566,7 @@ static proc bookkeep(graph G,list aa, list O,int t, list #)
 proc coverTuple(graph G,list aa,list O,int t, list #)
 "USAGE:  coverTuple(G,aa,O,t[,l]); G graph, aa list, O list, t int, l list@*
 ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O is a
-		 	   given ordering of the vertices of G, t is an integer and l is a list of leaks in G.
+         given ordering of the vertices of G, t is an integer and l is a list of leaks in G.
 RETURN:  list.
 THEORY:  Computes a list of tuples (depending on the int t) of the form (a_k, N_k, D_k) for
          all k=1,...,r, where r is the number of edges, a_k is the k-th entry in the
@@ -682,7 +682,7 @@ static proc covmult(list W)
 proc CoverMult(graph G,list aa,list O,int t, list #)
 "USAGE:  CoverMult(G,aa,O,t[, l]); G graph, aa list, O list, t int, l list@*
 ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O is a
-		 	   given ordering of the vertices of G, l is a list of leaks of G and t is some integer between 0 and 3.
+         given ordering of the vertices of G, l is a list of leaks of G and t is some integer between 0 and 3.
 RETURN:  list.
 THEORY:  For a given ordering of the vertices of G, this function computes a list  of
          multiplicity for each cover of G. Each entry in the list is a multiplicity of
@@ -867,7 +867,7 @@ static proc Tropcov(list V, list I,list O)
 proc Tropicalcover(graph G,list aa,list O,int t, list #)
 "USAGE:  Tropicalcover(G,aa,O,t[, l]); G graph, aa list, O list, t int, l list@*
 ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O is a
-		     given ordering of the vertices of G, t is an integer and l is a list of leaks of G.
+         given ordering of the vertices of G, t is an integer and l is a list of leaks of G.
 RETURN:  list of matrices.
 THEORY:  For a given ordering of the vertices of G, this function computes a list of
          matrices such that each matrix in the list represents a cover of the elliptic
@@ -1733,7 +1733,7 @@ proc Sfunction(poly z, int k)
 ASSUME:  z is a polynomial and k is an integer
 RETURN:  poly
 THEORY:  Returns the S-function in the form of (1+X), where X is a taylor series
-    	 	 expansion of the sinh function upto k terms.
+         expansion of the sinh function upto k terms.
 
 KEYWORDS: elliptic curves; S-function
 EXAMPLE:  example Sfunction; shows an example
@@ -2461,14 +2461,14 @@ static proc DrawfloorinTikz(graph G,list w,list L,list V, list I)
 proc FloorDiagrams(graph G,list aa,list O,list Lw, int n)
 "USAGE:   FloorDiagrams(G,aa,O,Lw,n); G graph,aa list, O list, Lw list,n int@*
 ASSUME:   G is a pearl chain of the degree d, aa is a partition of degree d, O is an
-  		    ordering of the vertices of G, Lw is a list where the first n terms represent
-	  	    the leaks in G and the next d2 terms is a list of white pearls (assuming the
-		      first pearl is always white). NOTE: Requires pdflatex to be installed.
+          ordering of the vertices of G, Lw is a list where the first n terms represent
+          the leaks in G and the next d2 terms is a list of white pearls (assuming the
+          first pearl is always white). NOTE: Requires pdflatex to be installed.
 RETURN:   Latex file.
 THEORY:   If n=0: the procedure generates a Latex file for all the tropical stable maps
-			    to ExP1 and if n=1:the procedure generates the source file that can be executed
-			    in Latex to get all the stable maps of ExP1 (in the form of floor diagrams) for
-			    every curled pearl chain of an elliptic curve E provided similar information.
+          to ExP1 and if n=1:the procedure generates the source file that can be executed
+          in Latex to get all the stable maps of ExP1 (in the form of floor diagrams) for
+          every curled pearl chain of an elliptic curve E provided similar information.
 
 KEYWORDS: elliptic curves; tropical stable maps; floor diagrams
 EXAMPLE:  example FloorDiagrams; shows an example
@@ -2535,8 +2535,8 @@ example
 proc PropagatorFunction(graph G,list aa, list O,int t, list #)
 "USAGE:   PropagatorFunction(G,aa,O,t[,l]); G graph, aa list, O list, t int, l list@*
 ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, aa is a partition
-	  	    of degree d, O is an ordering of the vertices of G, l is a list representing the
-		      leaky edges of G and t is one of 0,1,2 or 3.
+          of degree d, O is an ordering of the vertices of G, l is a list representing the
+          leaky edges of G and t is one of 0,1,2 or 3.
 RETURN:   list P_t of propagator function for each edge of G as follows:
       P_0: Propagator for a Feynman graph G as in [BBM], i.e., a graph without any self-
           looping edges, leaks or vertex contributions.
@@ -2546,7 +2546,7 @@ RETURN:   list P_t of propagator function for each edge of G as follows:
           possibly with self-looping edges and leaks.
       P_3: Propagator for a pearl chain G as in [BGM2], i.e., graph G may have leaks.
 THEORY:   Computes the numerator and the denominator of the propagator function for every
-	  	    edge of graph G depending on the integer t.
+          edge of graph G depending on the integer t.
 
 KEYWORDS: elliptic curves; propagator of a graph
 EXAMPLE:  example PropagatorFunction; shows an example
@@ -2581,28 +2581,25 @@ example
 
 proc FeynmanIntegralo(graph G,list aa, list O,list l,int k,int t, list #)
 "USAGE:   FeynmanIntegralo(G,aa,O,l,k,t[,gg]); G graph, aa list, O list, l list, k int,
-  		    t int, gg list@*
+          t int, gg list@*
 ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, aa is a
-	    		partition of degree d, O is an ordering of the vertices of G, l is a list
-			    representing the leaky edges of G, k is any integer, gg is a list representing
-			    the genus function and t is one of 0,1,2 or 3.
+          partition of degree d, O is an ordering of the vertices of G, l is a list
+          representing the leaky edges of G, k is any integer, gg is a list representing
+          the genus function and t is one of 0,1,2 or 3.
 RETURN:   number or list Q_t (depending on k) of Feynman integral for a fixed ordering of
-			    vertices of G, the results are as follows:
-		@format
-      Q_0: Feynman integral for a fixed ordering of a Feynman graph G as in [BBM], i.e.,
-          a graph without any self-looping edges, leaks or vertex contributions.
-      Q_1: Feynman integral for a fixed ordering of a Feynman graph G without vertex
-          contributions as in [BGM1], i.e. A graph that may have self-looping edges
-          and leaks.
-      Q_2: Feynman integral for a fixed ordering of a Feynman graph G with vertex
-          contributions as in [BGM1] possibly with self-looping edges and leaks.
-      Q_3: Feynman integral for a fixed ordering of a pearl chain G as in [BGM2], i.e.,
-          graph G may have leaks.
+          vertices of G, the results are as follows:
+          Q_0: Feynman integral for a fixed ordering of a Feynman graph G as in [BBM], i.e.,
+               a graph without any self-looping edges, leaks or vertex contributions.
+          Q_1: Feynman integral for a fixed ordering of a Feynman graph G without vertex
+               contributions as in [BGM1], i.e. A graph that may have self-looping edges
+               and leaks.
+          Q_2: Feynman integral for a fixed ordering of a Feynman graph G with vertex
+               contributions as in [BGM1] possibly with self-looping edges and leaks.
+          Q_3: Feynman integral for a fixed ordering of a pearl chain G as in [BGM2], i.e.,
+               graph G may have leaks.
 THEORY:   If k is zero it returns the coefficient of the Feynman integral for a given
-	  	    ordering of the vertices of the graph G. Otherwise, returns a list showing the
-		      ordering and the coefficient of the Feynman integral for the corresponding ordering.
-
-
+         ordering of the vertices of the graph G. Otherwise, returns a list showing the
+         ordering and the coefficient of the Feynman integral for the corresponding ordering.
 KEYWORDS: elliptic curves; Feynman integral of a graph for a fixed ordering
 EXAMPLE:  example FeynmanIntegralo; shows an example
 "
@@ -2644,10 +2641,9 @@ proc FeynmanIntegralO(graph G,list aa,list l,int k,int t, list #)
 "USAGE:   FeynmanIntegralO(G,aa,l,k,t[,gg]); G graph, aa list, l list, k int, t int, gg list@*
 ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, aa is a partition
           of degree d, l is a list representing the leaky edges of G, k is any integer,
-		  	  gg is a list representing the genus function and t is one of 0,1,2 or 3.
+          gg is a list representing the genus function and t is one of 0,1,2 or 3.
 RETURN:   number or list Q_t (depending on k) of Feynman integral for all possible
-		      orderings of vertices of G, the results are as follows:
-		@format
+      orderings of vertices of G, the results are as follows:
       Q_0: Feynman integral for all orderings of a Feynman graph G as in [BBM], i.e., a
           graph without any self-looping edges, leaks or vertex contributions.
       Q_1: Feynman integral for all orderings of a Feynman graph G without vertex contributions
@@ -2657,10 +2653,9 @@ RETURN:   number or list Q_t (depending on k) of Feynman integral for all possib
       Q_3: Feynman integral for all orderings of a pearl chain G as in [BGM2], i.e., a graph G
           may have leaks.
 THEORY:   If k is zero it returns the coefficient which is a sum of Feynman integrals over
-	  		  all orderings of the vertices of the graph G. Otherwise, returns a list showing
-			    the ordering, the coefficient of the Feynman integral for the corresponding
-			    ordering and the sum.
-
+          all orderings of the vertices of the graph G. Otherwise, returns a list showing
+          the ordering, the coefficient of the Feynman integral for the corresponding
+          ordering and the sum.
 KEYWORDS: elliptic curves; sum of Feynman integrals
 EXAMPLE:  example FeynmanIntegralO; shows an example
 "
@@ -2694,8 +2689,7 @@ ASSUME:   G is a graph (a Feynman graph or a pearl chain) of the degree d, O is 
           of G, k is any integer, gg is a list representing the genus function and t is
           one of 0,1,2 or 3.
 RETURN:   number or list Q_t (depending on k) of Feynman integral for a fixed ordering of
-    			vertices of G, the results are as follows:
-		@format
+          vertices of G, the results are as follows:
       Q_0: sum of Feynman integrals (over all partitions of d) for a fixed ordering of a
           Feynman graph G as in [BBM], i.e. a graph without any self-looping edges, leaks
           or vertex contributions.
@@ -2711,8 +2705,6 @@ THEORY:   If k is zero it returns the coefficient which is a sum of Feynman inte
           all partitions of d. Otherwise, returns a list showing the partition from which
           the Feynman integral is computed, the respective coefficient of the Feynman
           integral for the given ordering and the sum over all partitions.
-
-
 KEYWORDS: elliptic curves; Gromov-Witten invariants;Feynman integrals
 EXAMPLE:  example FeynmanIntegralA; shows an example
 "
@@ -2742,14 +2734,13 @@ example
 proc DrawCovers(graph G,list aa,list O,int t,int n, list #)
 "USAGE:   DrawCovers(G,aa,O,t[, lw]); G graph, aa list, O list, t int,n int and lw list@*
 ASSUME:   G is a Feynman graph/pearl chain, aa is a partition of the degree of the graph G,
-  			  O is a given ordering of the vertices of G, t is an integer between 0 and 3 and
-			    lw is a list where the first n entries represent the leaks in G and the remaining
-			    terms tells us about the white pearls of G. NOTE: Requires pdflatex to be installed.
+          O is a given ordering of the vertices of G, t is an integer between 0 and 3 and
+          lw is a list where the first n entries represent the leaks in G and the remaining
+          terms tells us about the white pearls of G. NOTE: Requires pdflatex to be installed.
 RETURN:   if n=0: C_t is a Latex file generating all the covers of an elliptic curve and
           if n=1: C_t is the source file that can be executed in Latex to get the covers
           of an elliptic curve (given an ordering O and a partition aa).
           The results for C_t are as follows:
-		 @format
       C_0: returns a Latex file drawing all simply ramified covers of an elliptic curve
           given a fixed ordering of the vertices of G and a fixed partition of its degree.
       C_1: returns a Latex file drawing all covers of an elliptic curve such that G has no
@@ -2760,7 +2751,6 @@ RETURN:   if n=0: C_t is a Latex file generating all the covers of an elliptic c
           partition of its degree.
       C_3: returns a Latex file drawing all curled pearl chains of an elliptic curve given
           a fixed ordering of the vertices of G and a fixed partition of its degree.
-
 THEORY:   For a given ordering of the vertices of G, this function computes Latex file
           drawing all the covers of an elliptic curve E. If G is a pearl chain then this
           procedure draws the black and white pearls of G accordingly using information
@@ -2768,8 +2758,6 @@ THEORY:   For a given ordering of the vertices of G, this function computes Late
           (For t=0, we get the results for simply ramified covers as in [BBM]. For t=1, 2
           we get results for graphs w/o vertex contributions respectively w/ vertex
           contributions as in [BGM1], and for t=3 we get the results for pearl chains as in [BGM2])
-
-
 KEYWORDS: elliptic curve draw covers
 EXAMPLE:  example DrawCovers; shows an example
 "
@@ -2849,7 +2837,7 @@ example
 proc TropCovandMaps(graph G,list aa, list O,list Lw,int n)
 "USAGE:   TropCovandMaps(G,aa,O,Lw,n); G graph, aa list, O list, Lw list, n int@*
 ASSUME:   G is a pearl chain, aa is a partition of the degree of the graph G, O is a given
-  		    ordering of the vertices of G, Lw is a list of leaks and white vertices in G.
+         ordering of the vertices of G, Lw is a list of leaks and white vertices in G.
           NOTE: Requires pdflatex to be installed.
 RETURN:   Depending on n this procedure returns either a pdf or a latex file for the curled
           pearl chains of an elliptic curve and their corresponding stable maps of ExP1
