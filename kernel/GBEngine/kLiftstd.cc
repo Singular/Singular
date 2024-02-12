@@ -358,6 +358,10 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   int k=id_RankFreeModule(quot,orig_ring);
   int lsmod=0;
   if (k==0) { lsmod=1;k=1;}  /*ideal*/
+  else { k=A->rank;}
+  /* NF(A 0 E,quot E 0)
+   * A,quot: 1..k, 0,E: k+1..k+IDELEMS(quot),
+   * E,0: k+IDELEMS(quot)..k+IDELEMS(quot)+IDELEMS(A) */
   /* new ring */
   ring syz_ring=rAssure_SyzOrder(orig_ring,TRUE);
   rSetSyzComp(1,syz_ring);
@@ -378,10 +382,10 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   /* quot[i] -> quot[i]+e(k+i+1) */
   for(int i=0;i<IDELEMS(s_quot);i++)
   {
-    p_Shift(&s_quot->m[i],lsmod,syz_ring);
     poly p=p_One(syz_ring);
-    p_SetComp(p,k+i+2,syz_ring);
+    p_SetComp(p,k+i+1,syz_ring);
     p_Setm(p,syz_ring);
+    if (lsmod==1) p_Shift(&(s_quot->m[i]),1,syz_ring);
     s_quot->m[i]=p_Add_q(s_quot->m[i],p,syz_ring);
   }
   s_quot->rank=k+IDELEMS(quot)+1;
@@ -406,7 +410,32 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
     s_A->rank=k+IDELEMS(quot)+IDELEMS(A)+1;
   }
   /* normalform */
+  #if 0
+  PrintS("to reduce:\n");
+  {
+    void ipPrint_MA0(matrix m, const char *name);
+    matrix m = id_Module2Matrix(id_Copy(s_A,currRing),currRing);
+    ipPrint_MA0(m, "A");
+    id_Delete((ideal *) &m,currRing);
+  }
+  PrintS("with:\n");
+  {
+    void ipPrint_MA0(matrix m, const char *name);
+    matrix m = id_Module2Matrix(id_Copy(s_quot,currRing),currRing);
+    ipPrint_MA0(m, "B");
+    id_Delete((ideal *) &m,currRing);
+  }
+  #endif
   ideal rest=kNF(s_quot,syz_ring->qideal,s_A,0,lazyReduce);
+  #if 0
+  PrintS("result NF:\n");
+  {
+    void ipPrint_MA0(matrix m, const char *name);
+    matrix m = id_Module2Matrix(id_Copy(rest,currRing),currRing);
+    ipPrint_MA0(m, "A");
+    id_Delete((ideal *) &m,currRing);
+  }
+  #endif
   /* clean s_quot,s_A */
   id_Delete(&s_quot,syz_ring);
   id_Delete(&s_A,syz_ring);
@@ -429,50 +458,67 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
         d=p_Add_q(d,q,syz_ring);
       }
     }
+    p_Shift(&d,-k,syz_ring);
     rest->m[i]=d;
-    p_Shift(&result->m[i],-lsmod,syz_ring);
   }
+  rest->rank-=k;
+  #if 0
+  PrintS("rest:\n");
+  {
+    void ipPrint_MA0(matrix m, const char *name);
+    matrix m = id_Module2Matrix(id_Copy(result,currRing),currRing);
+    ipPrint_MA0(m, "_");
+    id_Delete((ideal *) &m,currRing);
+  }
+  PrintS("factor+unit:\n");
+  {
+    void ipPrint_MA0(matrix m, const char *name);
+    matrix m = id_Module2Matrix(id_Copy(rest,currRing),currRing);
+    ipPrint_MA0(m, "_");
+    id_Delete((ideal *) &m,currRing);
+  }
+  #endif
   /* interpret rest: factors */
   factor=idInit(IDELEMS(rest),IDELEMS(quot));
-  if (unit==NULL)
+  int uk=IDELEMS(quot);
+  for(int i=0;i<IDELEMS(rest);i++)
   {
-    for(int i=0;i<IDELEMS(rest);i++)
+    poly d=NULL;
+    poly p=rest->m[i];
+    while(p!=NULL)
     {
-      poly p=rest->m[i];
-      p_Shift(&p,-k-lsmod,syz_ring);
-      factor->m[i]=p;
-      factor->m[i]=p_Neg(factor->m[i],syz_ring);
-      rest->m[i]=NULL;
-    }
-  }
-  else
-  {
-    *unit=idInit(IDELEMS(A),IDELEMS(A));
-    /* comp k+1..u_k-1 -> rest, u_k.. -> unit*/
-    int u_k=k+IDELEMS(quot)+2;
-    for(int i=0;i<IDELEMS(rest);i++)
-    {
-      poly p=rest->m[i];
-      rest->m[i]=NULL;
-      poly d=NULL;
-      while(p!=NULL)
+      poly q=p; pIter(p);
+      pNext(q)=NULL;
+      if (p_GetComp(q,syz_ring)<=uk)
       {
-        poly q=p; pIter(p);
-        pNext(q)=NULL;
-        if(p_GetComp(q,syz_ring)<u_k)
-        {
-          p_Shift(&q,-k-1,syz_ring);
-          factor->m[i]=p_Add_q(factor->m[i],q,syz_ring);
-        }
-        else
-        {
-          d=p_Add_q(d,q,syz_ring);
-        }
+        factor->m[i]=p_Add_q(factor->m[i],q,syz_ring);
       }
-      (*unit)->m[i]=d;
-      /*fix sign:*/
-      factor->m[i]=p_Neg(factor->m[i],syz_ring);
-      p_Shift(&(*unit)->m[i],-(IDELEMS(quot)+k+1),syz_ring);
+      else
+      {
+        d=p_Add_q(d,q,syz_ring);
+      }
+    }
+    p_Shift(&d,-uk-1,syz_ring);
+    rest->m[i]=d;
+    factor->m[i]=p_Neg(factor->m[i],syz_ring);
+  }
+  if (unit!=NULL)
+  {
+  #if 0
+  PrintS("unit:\n");
+  {
+    void ipPrint_MA0(matrix m, const char *name);
+    matrix m = id_Module2Matrix(id_Copy(rest,currRing),currRing);
+    ipPrint_MA0(m, "_");
+    id_Delete((ideal *) &m,currRing);
+  }
+  #endif
+    *unit=idInit(IDELEMS(A),IDELEMS(A));
+    for(int i=0;i<IDELEMS(rest);i++)
+    {
+      poly p=rest->m[i];
+      rest->m[i]=NULL;
+      (*unit)->m[i]=p;
     }
   }
   id_Delete(&rest,syz_ring);
