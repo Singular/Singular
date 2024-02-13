@@ -61,9 +61,7 @@
 
 /* define for parallel processes with shared memory */
 #ifndef __CCYGWIN__
-#if !defined(__MACH__) || !defined(__APPLE__)
 #define HAVE_VSPACE 1
-#endif
 #endif
 
 /*#define PROFILING*/
