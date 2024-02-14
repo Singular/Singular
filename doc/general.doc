@@ -3107,8 +3107,10 @@ programs or for parallel computations (see, for example,
 @xref{Ssi links}, for more information.
 
 @strong{Example:}
+@c the following example is may interfere with local firewalls:
+@c it start another Singular directly (on localhost) or via ssh
+@c and uses system, socket, bind, listen, accept, open, close
 @smallexample
-@c example
   ring r;
   link l = "ssi:tcp localhost:"+system("Singular"); // declare a link explicitly
   open(l);  // needs an open, launches another SINGULAR as a server
@@ -3116,8 +3118,9 @@ programs or for parallel computations (see, for example,
   kill r;
   def p = read(l);
   typeof(p); p;
+  @expansion{} poly
+  @expansion{} x+y
   close(l); // shuts down SINGULAR server
-@c example
 @end smallexample
 
 @subheading DBM links
