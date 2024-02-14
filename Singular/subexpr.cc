@@ -107,9 +107,11 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case CMATRIX_CMD: // like BIGINTMAT
 #endif
-	case BIGINTVEC_CMD:
         case BIGINTMAT_CMD:
           ((bigintmat *)d)->pprint(colmax);
+          break;
+        case BIGINTVEC_CMD:
+          ((bigintmat *)d)->pprint(4096); // allow longer bigintvec
           break;
         case BUCKET_CMD:
           {
