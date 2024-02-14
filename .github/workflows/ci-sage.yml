@@ -137,15 +137,14 @@ jobs:
     needs: [dist, kanarienvogel]
 
   macos:
-    uses: sagemath/sage/.github/workflows/macos.yml@develop
+    # Use https://github.com/sagemath/sage/pull/37237
+    uses: mkoeppe/sage/.github/workflows/macos.yml@ci-macos-2024
+    #uses: sagemath/sage/.github/workflows/macos.yml@develop
     with:
-      osversion_xcodeversion_toxenv_tuples: >-
-        [["latest", "",           "homebrew-macos-usrlocal-minimal"],
-         ["latest", "",           "homebrew-macos-usrlocal-standard"],
-         ["13",     "xcode_15.0", "homebrew-macos-usrlocal-standard"]]
       targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular singular
       targets_optional: SAGE_CHECK=no SAGE_CHECK_pysingular=warn pysingular
       sage_repo:         sagemath/sage
-      sage_ref:          develop
+      sage_ref:          refs/pull/37237/head
+      #sage_ref:          develop
       upstream_artifact: upstream
     needs: [dist, kanarienvogel]
