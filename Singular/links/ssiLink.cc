@@ -1027,11 +1027,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         int cp[2];
         int err1=pipe(pc);
         int err2=pipe(cp);
-	if (err1 || err2)
-	{
+        if (err1 || err2)
+        {
           Werror("pipe failed with %d\n",errno);
           return TRUE;
-	}
+        }
         link_list n=(link_list)omAlloc(sizeof(link_struct));
         n->u=u;
         n->l=l;
@@ -1196,7 +1196,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       }
     }
     // =========================================================================
-    else /*l->name=NULL*/
+    else /*now l->name!=NULL*/
     {
       // tcp mode
       if(strcmp(mode,"tcp")==0)
@@ -1252,7 +1252,10 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         }
         char* ssh_command = (char*)omAlloc(256);
         char* ser_host = (char*)omAlloc(64);
-        gethostname(ser_host,64);
+        if(strcmp(cli_host,"localhost")==0)
+          strcpy(ser_host,"localhost");
+        else
+          gethostname(ser_host,64);
         if (strcmp(cli_host,"localhost")==0) /*avoid "ssh localhost" as key may change*/
           snprintf(ssh_command,256,"%s -q --batch --link=ssi --MPhost=%s --MPport=%d &",path,ser_host,portno);
         else
@@ -1262,14 +1265,14 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         omFree(cli_host);
         if (TEST_OPT_PROT) { Print("running >>%s<<\n",ssh_command); }
         int re=system(ssh_command);
-	if (re<0)
-	{
+        if (re<0)
+        {
           Werror("ERROR running `%s` (%d)",ssh_command,re);
           l->data=NULL;
           l->flags=0;
           omFree(d);
           return TRUE;
-	}
+        }
         omFree(ssh_command);
         omFree(ser_host);
         clilen = sizeof(cli_addr);
