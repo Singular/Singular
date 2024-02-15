@@ -459,7 +459,7 @@ static poly pMaken(std::vector<int> vbase)
   {
     p = pOne();pSetExp(p, vbase[i], 1);pSetm(p);pSetCoeff(p, nInit(1));
     //pWrite(p);
-    q=pp_Mult_mm(q,p,currRing);
+    q=p_Mult_m(q,p,currRing);
   }
   return q;
 }
@@ -469,8 +469,8 @@ static ideal idMaken(std::vector<std::vector<int> > vecs)
 {
   ideal id_re=idInit(1,1);
   poly p;
-  int i,lv=vecs.size();
-  for(i=0;i<lv;i++)
+  int lv=vecs.size();
+  for(int i=0;i<lv;i++)
   {
     p=pMaken(vecs[i]);
     idInsertPoly(id_re, p);
@@ -484,19 +484,18 @@ static ideal idMaken(std::vector<std::vector<int> > vecs)
 
 static std::vector<std::vector<int> > b_subsets(std::vector<int> vec)
 {
-  int i,j;
   std::vector<int> bv;
   std::vector<std::vector<int> > vecs;
-  for(i=0;i<vec.size();i++)
+  for(int i=0;i<vec.size();i++)
   {
     bv.push_back(vec[i]);
     vecs.push_back(bv);
     bv.clear();
   }
   //listsprint(vecs);
-  for(i=0;i<vecs.size();i++)
+  for(int i=0;i<vecs.size();i++)
   {
-    for(j=i+1;j<vecs.size();j++)
+    for(int j=i+1;j<vecs.size();j++)
     {
       bv=vecUnion(vecs[i], vecs[j]);
       if(!vInvsl(bv,vecs))
@@ -510,35 +509,31 @@ static std::vector<std::vector<int> > b_subsets(std::vector<int> vec)
 //the number of the variables
 static int idvert(ideal h)
 {
-  int i, j, vert=0;
   if(idIs0(h))
-    return vert;
-  for(i=currRing->N;i>0;i--)
+    return 0;
+  for(int i=currRing->N;i>0;i--)
   {
-    for(j=0;j<IDELEMS(h);j++)
+    for(int j=0;j<IDELEMS(h);j++)
     {
       if(pGetExp(h->m[j],i)>0)
       {
-        vert=i;
-        return vert;
+        return i;
       }
     }
   }
-  return vert;
+  return 0;
 }
 
 static int pvert(poly p)
 {
-  int i, vert=0;
-  for(i=currRing->N;i>0;i--)
+  for(int i=currRing->N;i>0;i--)
   {
       if(pGetExp(p,i)>0)
       {
-        vert=i;
-        return vert;
+        return i;
       }
   }
-  return vert;
+  return 0;
 }
 
 /*
@@ -606,13 +601,13 @@ static ideal id_complement(ideal h)
 static ideal idMinus(ideal h1,ideal h2)
 {
   ideal h=idInit(1,1);
-  int i,j,eq=0;
-  for(i=0;i<IDELEMS(h1);i++)
+  int eq=0;
+  for(int i=0;i<IDELEMS(h1);i++)
   {
     eq=0;
-    for(j=0;j<IDELEMS(h2);j++)
+    for(int j=0;j<IDELEMS(h2);j++)
     {
-      if(p_EqualPolys(pCopy(h1->m[i]),pCopy(h2->m[j]), currRing))
+      if(p_EqualPolys(h1->m[i],h2->m[j], currRing))
       {
         eq=1;
         break;
@@ -631,8 +626,8 @@ static ideal idMinus(ideal h1,ideal h2)
 //returns 0 otherwise,
 static bool p_Ifsfree(poly P)
 {
-  int i,sf=1;
-  for(i=1;i<=rVar(currRing);i++)
+  int sf=1;
+  for(int i=1;i<=rVar(currRing);i++)
   {
     if (pGetExp(P,i)>1)
     {
@@ -646,16 +641,14 @@ static bool p_Ifsfree(poly P)
 //returns the set of all squarefree monomials of degree deg in ideal h
 static ideal sfreemon(ideal h,int deg)
 {
-  int j;
-  ideal temp;
-  temp=idInit(1,1);
+  ideal temp=idInit(1,1);
   if(!idIs0(h))
   {
-    for(j=0;j<IDELEMS(h);j++)
+    for(int j=0;j<IDELEMS(h);j++)
     {
-      if((p_Ifsfree(h->m[j]))&&(pTotaldegree(h->m[j])==deg))
+      if(p_Ifsfree(h->m[j])&&(pTotaldegree(h->m[j])==deg))
       {
-        idInsertPoly(temp, h->m[j]);
+        idInsertPoly(temp, pCopy(h->m[j]));
       }
     }
     idSkipZeroes(temp);
@@ -668,14 +661,18 @@ static ideal sfreemon(ideal h,int deg)
 static ideal id_sfmon(ideal h)
 {
   ideal asfmons,sfmons,mons;
-  int j, vert=idvert(h);
+  int vert=idvert(h);
   mons=id_MaxIdeal(1, currRing);
   asfmons=sfreemon(mons,1);
-  for(j=2;j<=vert;j++)
+  for(int j=2;j<=vert;j++)
   {
     mons=id_MaxIdeal(j, currRing);
     sfmons=sfreemon(mons,j);
+    idDelete(&mons);
+    ideal old_asfmons=asfmons;
     asfmons=id_Add(asfmons,sfmons,currRing);
+    idDelete(&sfmons);
+    idDelete(&old_asfmons);
   }
   return asfmons;
 }
@@ -686,19 +683,21 @@ static ideal id_sfmon(ideal h)
 //returns the complement of the ideal h (consisting of only squarefree polynomials)
 static ideal id_complement(ideal h)
 {
-  int j, vert=idvert(h);
+  int vert=idvert(h);
   ideal i1=id_sfmon(h);
   ideal i3=idInit(1,1);
   poly p;
-  for(j=0;j<IDELEMS(i1);j++)
+  for(int j=0;j<IDELEMS(i1);j++)
   {
-    p=pCopy(i1->m[j]);
+    p=i1->m[j];
     if(pvert(p)<=vert)
     {
-      idInsertPoly(i3, p);
+      idInsertPoly(i3, pCopy(p));
     }
   }
   ideal i2=idMinus(i3,h);
+  idDelete(&i3);
+  idDelete(&i1);
   idSkipZeroes(i2);
   return (i2);
 }
@@ -707,8 +706,7 @@ static ideal id_complement(ideal h)
 //returns false otherwise
 static bool IsInX(poly p,ideal X)
 {
-  int i;
-  for(i=0;i<IDELEMS(X);i++)
+  for(int i=0;i<IDELEMS(X);i++)
   {
     if(pEqualPolys(p,X->m[i]))
     {
@@ -726,15 +724,15 @@ static ideal qringadd(ideal h1, ideal h2, int deg)
   ideal h,qrh;
   h=idAdd(h1,h2);
   qrh=scKBase(deg,h);
+  idDelete(&h);
   return qrh;
 }
 
 //returns the maximal degree of the monomials in ideal h
 static int id_maxdeg(ideal h)
 {
-  int i,max;
-  max=pTotaldegree(h->m[0]);
-  for(i=1;i<IDELEMS(h);i++)
+  int max=pTotaldegree(h->m[0]);
+  for(int i=1;i<IDELEMS(h);i++)
   {
     if(pTotaldegree(h->m[i]) > max)
       max=pTotaldegree(h->m[i]);
@@ -746,27 +744,33 @@ static int id_maxdeg(ideal h)
 //and returns the Stanley-Reisner ideal(minimal generators)
 static ideal idsrRing(ideal h)
 {
-  int i,n;
   ideal pp,qq,rsr,ppp,hc=idCopy(h);
-  for(i=1;i<=rVar(currRing);i++)
+  for(int i=1;i<=rVar(currRing);i++)
   {
     pp=sfreemon(hc,i);
+    ideal old_pp=pp;
     pp=scKBase(i,pp);//quotient ring (R/I_i)_i
+    idDelete(&old_pp);
     if(!idIs0(pp))
     {
+      old_pp=pp;
       pp=sfreemon(pp,i);
+      idDelete(&old_pp);
       rsr=pp;
       //Print("This is the first quotient generators %d:\n",i);
       //id_print(rsr);
       break;
     }
   }
-  for(n=i+1;n<=rVar(currRing);n++)
+  for(int n=i+1;n<=rVar(currRing);n++)
   {
     qq=sfreemon(hc,n);
     pp=qringadd(qq,rsr,n);
     ppp=sfreemon(pp,n);
+    ideal old_rsr=rsr;
     rsr=idAdd(rsr,ppp);
+    idDelete(&old_rsr);
+    idDelete(&ppp);
   }
   idSkipZeroes(rsr);
   return rsr;
@@ -775,20 +779,23 @@ static ideal idsrRing(ideal h)
 //returns the set of all the polynomials could divide p
 static ideal SimFacset(poly p)
 {
-  int i,j,max=pTotaldegree(p);
+  int max=pTotaldegree(p);
   ideal h1,mons,id_re=idInit(1,1);
-  for(i=1;i<max;i++)
+  for(int i=1;i<max;i++)
   {
     mons=id_MaxIdeal(i, currRing);
     h1=sfreemon(mons,i);
+    idDelete(&mons);
 
-    for(j=0;j<IDELEMS(h1);j++)
+    for(int j=0;j<IDELEMS(h1);j++)
     {
       if(p_DivisibleBy(h1->m[j],p,currRing))
       {
         idInsertPoly(id_re, h1->m[j]);
+        h1->m[j]=NULL;
       }
     }
+    idDelete(&h1);
   }
   idSkipZeroes(id_re);
   return id_re;
@@ -801,14 +808,14 @@ static ideal idadda(ideal h1, ideal h2)
   {
     if(!IsInX(h1->m[i],h))
     {
-      idInsertPoly(h, h1->m[i]);
+      idInsertPoly(h, pCopy(h1->m[i]));
     }
   }
   for(int i=0;i<IDELEMS(h2);i++)
   {
     if(!IsInX(h2->m[i],h))
     {
-      idInsertPoly(h, h2->m[i]);
+      idInsertPoly(h, pCopy(h2->m[i]));
     }
   }
   idSkipZeroes(h);
@@ -820,20 +827,25 @@ static ideal idadda(ideal h1, ideal h2)
 //input h is need to be at least part of faces
 static ideal IsSimplex(ideal h)
 {
-  int i,max=id_maxdeg(h);
+  int max=id_maxdeg(h);
   poly e=pOne();
   ideal id_re, id_so=idCopy(h);
-  for(i=0;i<IDELEMS(h);i++)
+  for(int i=0;i<IDELEMS(h);i++)
   {
     id_re=SimFacset(h->m[i]);
     if(!idIs0(id_re))
     {
+      ideal old_id_so=id_so;
       id_so=idadda(id_so, id_re);//idAdd(id_so,id_re);
+      idDelete(&old_id_so);
     }
+    idDelete(&id_re);
   }
   idInsertPoly(id_so,e);
   idSkipZeroes(id_so);
-  return (idMinus(id_so,h));
+  ideal res=idMinus(id_so,h);
+  idDelete(&id_so);
+  return res;
 }
 
 //input is the subset of the Stainley-Reisner ideal
@@ -841,21 +853,25 @@ static ideal IsSimplex(ideal h)
 //is not used
 static ideal complementsimplex(ideal h)
 {
-  int i,j;poly p,e=pOne();
+  poly p,e=pOne();
   ideal h1=idInit(1,1), pp, h3;
-  for(i=1;i<=rVar(currRing);i++)
+  for(int i=1;i<=rVar(currRing);i++)
   {
-    p = pOne(); pSetExp(p, i, 2); pSetm(p); pSetCoeff(p, nInit(1));
+    p = pOne(); pSetExp(p, i, 2); pSetm(p);
     idInsertPoly(h1, p);
   }
   idSkipZeroes(h1);
   ideal h2=idAdd(h,h1);
+  idDelete(&h1);
   pp=scKBase(1,h2);
-  h3=idCopy(pp);
-  for(j=2;j<=rVar(currRing);j++)
+  h3=pp;
+  for(int j=2;j<=rVar(currRing);j++)
   {
     pp=scKBase(j,h2);
+    ideal old_h3=h3;
     h3=idAdd(h3,pp);
+    idDelete(&old_h3);
+    idDelete(&pp);
   }
   idInsertPoly(h3, e);
   idSkipZeroes(h3);
@@ -864,8 +880,8 @@ static ideal complementsimplex(ideal h)
 
 static int dim_sim(ideal h)
 {
-  int dim=pTotaldegree(h->m[0]), i;
-  for(i=1; i<IDELEMS(h);i++)
+  int dim=pTotaldegree(h->m[0]);
+  for(int i=1; i<IDELEMS(h);i++)
   {
     if(dim<pTotaldegree(h->m[i]))
     {
@@ -898,20 +914,22 @@ static ideal findb(ideal h)
 {
   ideal ib=id_sfmon(h), nonf=id_complement(h), bset=idInit(1,1);
   poly e=pOne();
-  int i,j;
-  for(i=0;i<IDELEMS(ib);i++)
+  for(int i=0;i<IDELEMS(ib);i++)
   {
-    for(j=0;j<IDELEMS(nonf);j++)
+    for(int j=0;j<IDELEMS(nonf);j++)
     {
       if(p_DivisibleBy(ib->m[i],nonf->m[j],currRing))
       {
         idInsertPoly(bset, ib->m[i]);
+        ib->m[i]=NULL;
         break;
       }
     }
   }
   idInsertPoly(bset,e);
   idSkipZeroes(bset);
+  idDelete(&ib);
+  idDelete(&nonf);
   return bset;
 }
 
