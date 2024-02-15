@@ -47,7 +47,7 @@ LIB "parallel.lib";
 static proc mod_init()
 {
     string arg_type;
-    exportto(Top,arg_type);
+    exportto(Modular,arg_type);
     if (!defined(Resources))
     {
         LIB "resources.lib";
