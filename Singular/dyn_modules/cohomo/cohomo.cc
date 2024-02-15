@@ -459,7 +459,7 @@ static poly pMaken(std::vector<int> vbase)
   {
     p = pOne();pSetExp(p, vbase[i], 1);pSetm(p);pSetCoeff(p, nInit(1));
     //pWrite(p);
-    q=p_Mult_m(q,p,currRing);
+    q=p_Mult_q(q,p,currRing);
   }
   return q;
 }
@@ -745,7 +745,8 @@ static int id_maxdeg(ideal h)
 static ideal idsrRing(ideal h)
 {
   ideal pp,qq,rsr,ppp,hc=idCopy(h);
-  for(int i=1;i<=rVar(currRing);i++)
+  int i;
+  for(i=1;i<=rVar(currRing);i++)
   {
     pp=sfreemon(hc,i);
     ideal old_pp=pp;
