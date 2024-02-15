@@ -48,8 +48,7 @@
 //print vector of integers.
 static void listprint(std::vector<int> vec)
 {
-  unsigned i;
-  for(i=0;i<vec.size();i++)
+  for(unsigned i=0;i<vec.size();i++)
   {
     Print("   _[%d]=%d\n",i+1,vec[i]);
     PrintLn();
@@ -64,12 +63,11 @@ static void listprint(std::vector<int> vec)
 //print vector of vectors of integers.
 static void listsprint(std::vector<std::vector<int> > posMat)
 {
-  unsigned i;
-  for(i=0;i<posMat.size();i++)
+  for(unsigned i=0;i<posMat.size();i++)
   {
     Print("[%d]:\n",i+1);
     listprint(posMat[i]);
-    Print("\n");
+    PrintLn();
     PrintLn();
   }
   if(posMat.size()==0)
@@ -83,8 +81,7 @@ static void listsprint(std::vector<std::vector<int> > posMat)
 //print ideal.
 static void id_print(ideal h)
 {
-  int i;
-  for(i=0;i<IDELEMS(h);i++)
+  for(int i=0;i<IDELEMS(h);i++)
   {
     Print(" [%d]\n",i+1);
     pWrite(h->m[i]);
@@ -115,7 +112,7 @@ static void lpsprint(std::vector<std::vector<poly> > pvs)
   {
     Print("[%d]:\n",i+1);
     lpprint(pvs[i]);
-    Print("\n");
+    PrintLn();
     PrintLn();
   }
   if(pvs.size()==0)
@@ -131,8 +128,7 @@ static void lpsprint(std::vector<std::vector<poly> > pvs)
 //otherwise, returns false
 static bool IsinL(int a, std::vector<int> vec)
 {
-  unsigned i;
-  for(i=0;i<vec.size();i++)
+  for(unsigned i=0;i<vec.size();i++)
   {
     if(a==vec[i])
     {
@@ -146,9 +142,8 @@ static bool IsinL(int a, std::vector<int> vec)
 //returns empty if they are disjoint
 static std::vector<int> vecIntersection(std::vector<int> p, std::vector<int> q)
 {
-  unsigned i;
   std::vector<int> inte;
-  for(i=0;i<p.size();i++)
+  for(unsigned i=0;i<p.size();i++)
   {
     if(IsinL(p[i],q))
       inte.push_back(p[i]);
@@ -159,10 +154,9 @@ static std::vector<int> vecIntersection(std::vector<int> p, std::vector<int> q)
 //returns true if vec1 is contained in vec2
 static bool vsubset(std::vector<int> vec1, std::vector<int> vec2)
 {
-  int i;
   if(vec1.size()>vec2.size())
     return false;
-  for(i=0;i<vec1.size();i++)
+  for(int i=0;i<vec1.size();i++)
   {
     if(!IsinL(vec1[i],vec2))
       return false;
@@ -185,8 +179,7 @@ static bool vEvl(std::vector<int> vec1, std::vector<int> vec2)
 //returns false if vec is not in vecs
 static bool vInvsl(std::vector<int> vec, std::vector<std::vector<int> > vecs)
 {
-  int i;
-  for(i=0;i<vecs.size();i++)
+  for(int i=0;i<vecs.size();i++)
   {
     if(vEvl(vec,vecs[i]))
     {
@@ -200,8 +193,7 @@ static bool vInvsl(std::vector<int> vec, std::vector<std::vector<int> > vecs)
 static std::vector<int> vecUnion(std::vector<int> vec1, std::vector<int> vec2)
 {
   std::vector<int> vec=vec1;
-  unsigned i;
-  for(i=0;i<vec2.size();i++)
+  for(unsigned i=0;i<vec2.size();i++)
   {
     if(!IsinL(vec2[i],vec))
       vec.push_back(vec2[i]);
@@ -224,9 +216,8 @@ static std::vector<int> vecMinus(std::vector<int> vec1,std::vector<int> vec2)
 
 static std::vector<std::vector<int> > vsMinusv(std::vector<std::vector<int> > vecs, std::vector<int> vec)
 {
-  int i;
   std::vector<std::vector<int> > rem;
-  for(i=0;i<vecs.size();i++)
+  for(int i=0;i<vecs.size();i++)
   {
     if(!vEvl(vecs[i],vec))
     {
@@ -238,9 +229,8 @@ static std::vector<std::vector<int> > vsMinusv(std::vector<std::vector<int> > ve
 
 static std::vector<std::vector<int> > vsUnion(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
 {
-  int i;
   std::vector<std::vector<int> > vs=vs1;
-  for(i=0;i<vs2.size();i++)
+  for(int i=0;i<vs2.size();i++)
   {
     if(!vInvsl(vs2[i],vs))
     {
@@ -252,9 +242,8 @@ static std::vector<std::vector<int> > vsUnion(std::vector<std::vector<int> > vs1
 
 static std::vector<std::vector<int> > vsIntersection(std::vector<std::vector<int> > vs1, std::vector<std::vector<int> > vs2)
 {
-  int i;
   std::vector<std::vector<int> > vs;
-  for(i=0;i<vs2.size();i++)
+  for(int i=0;i<vs2.size();i++)
   {
     if(vInvsl(vs2[i],vs1))
     {
@@ -270,10 +259,9 @@ static std::vector<std::vector<int> > vsIntersection(std::vector<std::vector<int
 // vector version of poly support(poly p)
 static std::vector<int> support1(poly p)
 {
-  int j;
   std::vector<int> supset;
-  if(p==0) return supset;
-  for(j=1;j<=rVar(currRing);j++)
+  if(p==NULL) return supset;
+  for(int j=1;j<=rVar(currRing);j++)
   {
     if(pGetExp(p,j)>0)
     {
@@ -303,12 +291,11 @@ static std::vector<std::vector<int> >  supports(ideal h)
 // p could be any polynomial
 static std::vector<int> support2(poly p)
 {
-  int j;
   poly q;
   std::vector<int> supset;
-  for(j=1;j<=rVar(currRing);j++)
+  for(int j=1;j<=rVar(currRing);j++)
   {
-    q=pCopy(p);
+    q=p;
     while (q!=NULL)
     {
       if(p_GetExp(q,j,currRing)!=0)
@@ -316,7 +303,7 @@ static std::vector<int> support2(poly p)
         supset.push_back(j);
         break;
       }
-      q=pNext(q);
+      pIter(q);
     }
   }
   return (supset);
@@ -342,7 +329,8 @@ static std::vector<std::vector<int> >  supports2(ideal h)
 //vector vbase has length of currRing->N.
 static poly pMake(std::vector<int> vbase)
 {
-  int n=vbase.size(); poly p,q=0;
+  int n=vbase.size(); poly p,q;
+  q=NULL;
   for(int i=0;i<n;i++)
   {
     if(vbase[i]!=0)
@@ -357,10 +345,10 @@ static poly pMake(std::vector<int> vbase)
 //convert the vectors to a ideal(for T^1)
 static ideal idMake(std::vector<std::vector<int> > vecs)
 {
-  int lv=vecs.size(), i;
+  int lv=vecs.size();
   poly p;
   ideal id_re=idInit(1,1);
-  for(i=0;i<lv;i++)
+  for(int i=0;i<lv;i++)
   {
     p=pMake(vecs[i]);
     idInsertPoly(id_re, p);
@@ -378,6 +366,7 @@ static ideal idmodulo(ideal h1,ideal h2)
   idSkipZeroes(gb);
   ideal idq=kNF(gb,NULL,h1);
   idSkipZeroes(idq);
+  idDelete(&gb);
   return idq;
 }
 
@@ -385,8 +374,8 @@ static ideal idmodulo(ideal h1,ideal h2)
 //assume the polynomial p has form of y1+y2+...
 static int pcoef(poly p, int m)
 {
-  int i,co; poly q=pCopy(p);
-  for(i=1;i<=currRing->N;i++)
+  int co; poly q=p;
+  for(int i=1;i<=currRing->N;i++)
   {
     if(p_GetExp(q,m,currRing)!=0)
     {
@@ -404,7 +393,7 @@ static int pcoef(poly p, int m)
 //returns true if p involves the mth variable of the current ring
 static bool vInp(int m,poly p)
 {
-  poly q=pCopy(p);
+  poly q=p;
   while (q!=NULL)
   {
     if(p_GetExp(q,m,currRing)!=0)
@@ -419,9 +408,8 @@ static bool vInp(int m,poly p)
 //returns the vector w.r.t. polynomial p
 static std::vector<int> vMake(poly p)
 {
-  int i;
   std::vector<int> vbase;
-  for(i=1;i<=currRing->N;i++)
+  for(int i=1;i<=currRing->N;i++)
   {
     if(vInp(i,p))
     {
@@ -440,8 +428,7 @@ static std::vector<std::vector<int> > vsMake(ideal h)
 {
   std::vector<int> vec;
   std::vector<std::vector<int> > vecs;
-  int i;
-  for(i=0;i<IDELEMS(h);i++)
+  for(int i=0;i<IDELEMS(h);i++)
   {
     vec=vMake(h->m[i]);
     vecs.push_back(vec);
@@ -455,6 +442,8 @@ static std::vector<std::vector<int> > vecqring(std::vector<std::vector<int> > ve
 {
   ideal h1=idMake(vec1), h2=idMake(vec2);
   ideal h=idmodulo(h1,h2);
+  idDelete(&h1);
+  idDelete(&h2);
   std::vector<std::vector<int> > vecs= vsMake(h);
   return vecs;
 }
@@ -933,7 +922,6 @@ static ideal findb(ideal h)
 //returns all the possible x^a according conditions 1. 2. 3.
 static ideal finda(ideal h,poly S,int ddeg)
 {
-  poly e=pOne();
   ideal h2=id_complement(h), aset=idInit(1,1);
   int i,deg1=pTotaldegree(S);
   int tdeg=deg1+ddeg;
@@ -953,7 +941,11 @@ static ideal finda(ideal h,poly S,int ddeg)
     }
     idSkipZeroes(aset);
   }
-  else idInsertPoly(aset,e);
+  else
+  {
+    poly e=pOne();
+    idInsertPoly(aset,e);
+  }
   return(aset);
 }
 
