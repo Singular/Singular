@@ -334,6 +334,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_systhreads=false
   bi_loctriv=false
   bi_sispasm=false
+  bi_cohomo=false
 
 
  if test -z "$with_builtinmodules"; then
@@ -374,6 +375,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        systhreads ) bi_systhreads=true;;
        loctriv ) bi_loctriv=true;;
        sispasm ) bi_sispasm=true;;
+       cohomo ) bi_cohomo=true;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -418,6 +420,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_LOCTRIV], [test x$bi_loctriv = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_MACHINELEARNING], [test x$bi_machinelearning = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SISPASM], [test x$bi_sispasm = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_COHOMO], [test x$bi_cohomo = xtrue])
 
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})
