@@ -45,6 +45,7 @@
 #include <time.h>
 
 /***************************print(only for debugging)***********************************************/
+#if 0
 //print vector of integers.
 static void listprint(std::vector<int> vec)
 {
@@ -59,7 +60,9 @@ static void listprint(std::vector<int> vec)
     PrintLn();
   }
 }
+#endif
 
+#if 0
 //print vector of vectors of integers.
 static void listsprint(std::vector<std::vector<int> > posMat)
 {
@@ -76,8 +79,9 @@ static void listsprint(std::vector<std::vector<int> > posMat)
     PrintLn();
   }
 }
+#endif
 
-
+#if 0
 //print ideal.
 static void id_print(ideal h)
 {
@@ -88,7 +92,9 @@ static void id_print(ideal h)
     PrintLn();
   }
 }
+#endif
 
+#if 0
 //only for T^2,
 //print vector of polynomials.
 static void lpprint( std::vector<poly> pv)
@@ -104,7 +110,9 @@ static void lpprint( std::vector<poly> pv)
     PrintLn();
   }
 }
+#endif
 
+#if 0
 //print vector of vectors of polynomials.
 static void lpsprint(std::vector<std::vector<poly> > pvs)
 {
@@ -121,6 +129,7 @@ static void lpsprint(std::vector<std::vector<poly> > pvs)
     PrintLn();
   }
 }
+#endif
 
 /*************operations for vectors (regard vectors as sets)*********/
 
@@ -1640,8 +1649,8 @@ static void equmab(int num)
   tt=(char**)omAlloc(num*sizeof(char *));
   for(i=0; i <num; i++)
   {
-    tt[i] = (char*)omalloc(10); //if required enlarge it later
-    snprintf (tt[i],10, "t(%d)", i+1);
+    tt[i] = (char*)omalloc(16);
+    snprintf (tt[i],16, "t(%d)", i+1);
   }
   ring R=rDefault(cf,num,tt,ringorder_lp);
   idhdl h=enterid(omStrDup("Re"),0,RING_CMD,&IDROOT,FALSE);
@@ -1649,6 +1658,7 @@ static void equmab(int num)
   rSetHdl(h);
 }
 
+#if 0
 //returns the trivial case of T^1
 //b must only contain one variable
 static std::vector<int> subspace1(std::vector<std::vector<int> > mv, std::vector<int> bv)
@@ -1664,6 +1674,7 @@ static std::vector<int> subspace1(std::vector<std::vector<int> > mv, std::vector
   }
   return base;
 }
+#endif
 
 /***************************only for T^2*************************************/
 //vbase only has two elements which records the position of the monomials in mv
@@ -1702,6 +1713,7 @@ static std::vector<std::vector<poly> > idMakei(std::vector<std::vector<int> > mv
 
 //return the graded pieces of cohomology T^1 according to a,b
 //original method (only for debugging)
+#if 0
 static void gradedpiece1(ideal h,poly a,poly b)
 {
   int i,j,m;
@@ -1760,7 +1772,9 @@ static void gradedpiece1(ideal h,poly a,poly b)
     PrintS("No element considered!\n");
   }
 }
+#endif
 
+#if 0
 //Returns true if b can divide p*q
 static bool condition1for2(std::vector<int > pv,std::vector<int > qv,std::vector<int > bv)
 {
@@ -1773,7 +1787,9 @@ static bool condition1for2(std::vector<int > pv,std::vector<int > qv,std::vector
   //PrintS("condition1for2 no\n");
   return false;
 }
+#endif
 
+#if 0
 //Returns true if support(p) union support(q) union support(s) union support(a) minus support(b) is face
 static bool condition2for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> qv, std::vector<int> sv, std::vector<int> av,  std::vector<int> bv)
 {
@@ -1787,7 +1803,9 @@ static bool condition2for2(std::vector<std::vector<int> > hvs, std::vector<int> 
   //PrintS("condition2for2 no\n");
   return (false);
 }
+#endif
 
+#if 0
 static bool condition3for2(std::vector<std::vector<int> > hvs, std::vector<int> pv,  std::vector<int> qv,  std::vector<int> av,  std::vector<int> bv)
 {
   std::vector<int> v1,v2,v3;
@@ -1804,6 +1822,7 @@ static bool condition3for2(std::vector<std::vector<int> > hvs, std::vector<int> 
   //PrintS("condition3for2 no\n");
   return(false);
 }
+#endif
 
 /****************solve the equations got from T^2*********************/
 
@@ -1937,6 +1956,7 @@ static std::vector<std::vector<int> > getvector(ideal h,int n)
 
 /**************************************************************************/
 
+#if 0
 //subspace of T2(find all the possible values of alpha)
 static std::vector<int> findalpha(std::vector<std::vector<int> > mv, std::vector<int> bv)
 {
@@ -1952,6 +1972,7 @@ static std::vector<int> findalpha(std::vector<std::vector<int> > mv, std::vector
   //listprint(alset);
   return alset;
 }
+#endif
 
 static std::vector<int> subspacet1(int num, std::vector<std::vector<int> > ntvs)
 {
@@ -1979,6 +2000,7 @@ static std::vector<int> subspacet1(int num, std::vector<std::vector<int> > ntvs)
   return subase;
 }
 
+#if 0
 //subspace for T^2(mab method)
 static std::vector<std::vector<int> > subspacet(std::vector<std::vector<int> > mv, std::vector<int> bv,std::vector<std::vector<int> > ntvs)
 {
@@ -1993,6 +2015,7 @@ static std::vector<std::vector<int> > subspacet(std::vector<std::vector<int> > m
   //listsprint(subases);
   return subases;
 }
+#endif
 
 static std::vector<std::vector<int> > mabtv(std::vector<std::vector<int> > hvs,  std::vector<std::vector<int> > Mv,   std::vector<int> av,  std::vector<int> bv)
 {
@@ -2015,6 +2038,7 @@ static std::vector<std::vector<int> > mabtv(std::vector<std::vector<int> > hvs, 
   return vars;
 }
 
+#if 0
 //fix the problem of the number of the new variables
 //original method for T^2(only for debugging)
 static void gradedpiece2(ideal h,poly a,poly b)
@@ -2098,6 +2122,7 @@ static void gradedpiece2(ideal h,poly a,poly b)
     PrintS("No element considered!");
   }
 }
+#endif
 
 /**********************************************************************/
 //For the method of N_{a-b}
@@ -2250,7 +2275,7 @@ static intvec *Tmat(std::vector<std::vector<int> > vecs)
    //Print("the size of solve is: %ld\n",solve.size());
  //vtm(solve);
   intvec *m;
-  int i,j, a=vecs.size();
+  unsigned a=vecs.size();
   if(a==0)
   {
     m=new intvec(1,1,10);
@@ -2259,11 +2284,11 @@ static intvec *Tmat(std::vector<std::vector<int> > vecs)
   {
     int b=vecs[0].size();
     m=new intvec(a,b,0);
-    for(i=1;i<=a;i++)
+    for(unsigned i=1;i<=a;i++)
     {
-      for(j=1;j<=b;j++)
+      for(unsigned j=1;j<=b;j++)
       {
-        IMATELEM(*m,i,j)=vecs[i-1][j-1];
+        IMATELEM((*m),i,j)=vecs[i-1][j-1];
       }
     }
   }
@@ -2326,7 +2351,7 @@ static std::vector<std::vector<int> >  minisolve(std::vector<std::vector<int> > 
 //regardless of links
 static intvec * gradedpiece1n(ideal h,poly a,poly b)
 {
-  int i,j,co,n;
+  int co;
   std::vector<std::vector<int> > hvs=supports(h),mv=Mabv(h,a,b),sbv,nv,good,solve;
   std::vector<int> av=support1(a), bv=support1(b), bad, tnv, index;
   ideal sub=psubset(b),M;
@@ -2334,19 +2359,19 @@ static intvec * gradedpiece1n(ideal h,poly a,poly b)
   nv=Nabv(hvs,av,bv);
   M=idMaken(mv);
   index = gensindex(M, idsrRing(h));
-  n=nv.size();
+  unsigned n=nv.size();
   ring r=currRing;
   if(n > 0)
   {
     tnv=tnab(hvs,nv,sbv);
-    for(i=0;i<tnv.size();i++)
+    for(unsigned i=0;i<tnv.size();i++)
     {
       co=tnv[i];
       bad.push_back(co+1);
     }
-    for(i=0;i<n;i++)
+    for(unsigned i=0;i<n;i++)
     {
-      for(j=i+1;j<n;j++)
+      for(unsigned j=i+1;j<n;j++)
       {
         if(nabtconditionv(hvs,nv[i],nv[j]))
         {
@@ -2390,6 +2415,7 @@ static intvec * gradedpiece1n(ideal h,poly a,poly b)
   return sl;
 }
 
+#if 0
 //for debugging
 static void T1(ideal h)
 {
@@ -2420,6 +2446,7 @@ static void T1(ideal h)
   }
   Print("Finished %d!\n",mm);
 }
+#endif
 
 static bool condition2for2nv(std::vector<std::vector<int> > hvs, std::vector<int> pv, std::vector<int> qv,  std::vector<int> fv)
 {
@@ -2572,9 +2599,9 @@ static intvec * gradedpiece2n(ideal h,poly a,poly b)
         vecs.push_back(vec);
         vec.clear();
       }
-      for(int t1=t0+1;t1<ntvs.size();t1++)
+      for(unsigned t1=t0+1;t1<ntvs.size();t1++)
       {
-        for(int t2=t1+1;t2<ntvs.size();t2++)
+        for(unsigned t2=t1+1;t2<ntvs.size();t2++)
         {
           if(ntvs[t0][0]==ntvs[t1][0]&&ntvs[t1][1]==ntvs[t2][1]&&ntvs[t0][1]==ntvs[t2][0])
           {
@@ -2617,6 +2644,7 @@ static intvec * gradedpiece2n(ideal h,poly a,poly b)
   return sl;
 }
 
+#if 0
 //for debugging
 static void T2(ideal h)
 {
@@ -2657,6 +2685,7 @@ static void T2(ideal h)
       PrintS("Finished!\n");
   Print("There are %d graded pieces in total.\n",gp);
 }
+#endif
 
 /*****************************for links*******************************************/
 //the image phi(pv)=pv minus av minus bv
@@ -2672,7 +2701,6 @@ static std::vector<int> phimagel(std::vector<int> fv,  std::vector<int> av, std:
 //vecs is the solution of nab
 static std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > lks, std::vector<std::vector<int> > vecs,std::vector<int> av, std::vector<int> bv)
 {
-  int j;
   std::vector<int> pv;
   std::vector<int> base;
   std::vector<std::vector<int> > bases;
@@ -2681,7 +2709,7 @@ static std::vector<std::vector<int> > value1l(std::vector<std::vector<int> > mvs
     for(unsigned i=0;i<mvs.size();i++)
     {
       pv=phimagel(mvs[i], av, bv);
-      for(j=0;j<lks.size();j++)
+      for(unsigned j=0;j<lks.size();j++)
       {
         if(vEvl(pv,lks[j]))
         {
@@ -2717,7 +2745,7 @@ static void TimeShow(clock_t t_construct, clock_t t_solve, clock_t t_value ,cloc
 
 static std::vector<std::vector<int> > gpl(ideal h,poly a,poly b)
 {
-  int i,j,co;
+  int co;
   std::vector<std::vector<int> > hvs=supports(h),sbv,nv,mv,good,solve;
   std::vector<int> av=support1(a), bv=support1(b),index,bad,tnv;
   ideal sub=psubset(b);
@@ -2726,20 +2754,20 @@ static std::vector<std::vector<int> > gpl(ideal h,poly a,poly b)
   mv=Mabv(h,a,b);
   ideal M=idMaken(mv);
   index = gensindex(M, idsrRing(h));
-  int n=nv.size();
+  unsigned n=nv.size();
   ring r=currRing;
   t_begin=clock();
   if(n > 0)
   {
     tnv=tnab(hvs,nv,sbv);
-    for(i=0;i<tnv.size();i++)
+    for(unsigned i=0;i<tnv.size();i++)
     {
       co=tnv[i];
       bad.push_back(co+1);
     }
-    for(i=0;i<n;i++)
+    for(unsigned i=0;i<n;i++)
     {
-      for(j=i+1;j<n;j++)
+      for(unsigned j=i+1;j<n;j++)
       {
         if(nabtconditionv(hvs,nv[i],nv[j]))
         {
@@ -2806,7 +2834,7 @@ static intvec * gradedpiece1nl(ideal h,poly a,poly b, int set)
 static std::vector<std::vector<int> > value2l(std::vector<std::vector<int> > mvs, std::vector<std::vector<int> > lks, std::vector<std::vector<int> > mts, std::vector<std::vector<int> > lkts, std::vector<std::vector<int> > vecs,std::vector<int> av,   std::vector<int> bv)
 {
   std::vector<int> pv,qv,base;
-  int row,col,j;
+  int row,col;
   std::vector<std::vector<int> > bases;
   if(vecs.size()==0)
   {
@@ -2824,7 +2852,7 @@ static std::vector<std::vector<int> > value2l(std::vector<std::vector<int> > mvs
         base.push_back(0);
       else
       {
-        for(j=0;j<lkts.size();j++)
+        for(unsigned j=0;j<lkts.size();j++)
         {
           row=lkts[j][0];
           col=lkts[j][1];
@@ -2885,9 +2913,9 @@ static std::vector<std::vector<int> > gpl2(ideal h,poly a,poly b)
           vecs.push_back(vec);
           vec.clear();
         }
-        for(int t1=t0+1;t1<ntvs.size();t1++)
+        for(unsigned t1=t0+1;t1<ntvs.size();t1++)
         {
-          for(int t2=t1+1;t2<ntvs.size();t2++)
+          for(unsigned t2=t1+1;t2<ntvs.size();t2++)
           {
             if(ntvs[t0][0]==ntvs[t1][0]&&ntvs[t1][1]==ntvs[t2][1]&&ntvs[t0][1]==ntvs[t2][0])
             {
@@ -3486,10 +3514,9 @@ static std::vector<int> gdegree(poly a, poly b)
 
 static std::vector<std::vector<int> > star(poly a, ideal h)
 {
-  int i;
   std::vector<std::vector<int> > st,X=supports(h);
   std::vector<int> U,av=support1(a);
-  for(i=0;i<X.size();i++)
+  for(unsigned i=0;i<X.size();i++)
   {
     U=vecUnion(av,X[i]);
     if(vInvsl(U,X))
@@ -3514,10 +3541,10 @@ static std::vector<std::vector<int> > stellarsub(poly a, ideal h)
 {
   std::vector<std::vector<int> > vecs_minus, vecs_plus, lk=links(a,h), hvs=supports(h), sub, bys=boundary(a);
   std::vector<int> av=support1(a), vec, vec_n;
-  int i,j,vert=0;
-  for(i=1;i<=currRing->N;i++)
+  int vert=0;
+  for(int i=1;i<=currRing->N;i++)
   {
-    for(j=0;j<IDELEMS(h);j++)
+    for(int j=0;j<IDELEMS(h);j++)
     {
       if(pGetExp(h->m[j],i)>0)
       {
@@ -3527,11 +3554,11 @@ static std::vector<std::vector<int> > stellarsub(poly a, ideal h)
     }
   }
   vec_n.push_back(vert);
-  for(i=0;i<lk.size();i++)
+  for(unsigned i=0;i<lk.size();i++)
   {
     vec=vecUnion(av, lk[i]);
     vecs_minus.push_back(vec);
-    for(j=0;j<bys.size();j++)
+    for(unsigned j=0;j<bys.size();j++)
     {
       vec=vecUnion(lk[i], vec_n);
       vec=vecUnion(vec, bys[j]);
@@ -3549,7 +3576,7 @@ static std::vector<std::vector<int> > bsubsets_1(poly b)
   std::vector<std::vector<int> > bset;
   for(unsigned i=0;i<bvs.size();i++)
   {
-    for(int j=0;j!=i; j++)
+    for(unsigned j=0;j!=i; j++)
     {
       vs.push_back(bvs[j]);
     }
@@ -3619,8 +3646,9 @@ static BOOLEAN SRideal(leftv res, leftv args)
      ideal hh=(ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =idsrRing(hh);
+     return FALSE;
    }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN idcomplement(leftv res, leftv args)
@@ -3632,8 +3660,9 @@ static BOOLEAN idcomplement(leftv res, leftv args)
      ideal h2= id_complement(hh);
      res->rtyp =IDEAL_CMD;
      res->data =h2;
+     return FALSE;
    }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN t1h(leftv res, leftv args)
@@ -3644,8 +3673,9 @@ static BOOLEAN t1h(leftv res, leftv args)
      ideal hh=(ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =T_1h(hh);
+     return FALSE;
    }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN idsr(leftv res, leftv args)
@@ -3664,10 +3694,11 @@ static BOOLEAN idsr(leftv res, leftv args)
          poly q= (poly)h->Data();
          res->rtyp =IDEAL_CMD;
          res->data =mingens(h1,p,q);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static intvec *dmat(poly a, poly b)
@@ -3700,9 +3731,10 @@ static BOOLEAN gd(leftv res, leftv args)
        poly q= (poly)h->Data();
        res->rtyp =INTVEC_CMD;
        res->data =dmat(p,q);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN comedg(leftv res, leftv args)
@@ -3717,9 +3749,10 @@ static BOOLEAN comedg(leftv res, leftv args)
        poly q= (poly)h->Data();
        res->rtyp =INTVEC_CMD;
        res->data =edgemat(p,q);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN fb(leftv res, leftv args)
@@ -3730,8 +3763,9 @@ static BOOLEAN fb(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =findb(h1);
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN pa(leftv res, leftv args)
@@ -3742,8 +3776,9 @@ static BOOLEAN pa(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =p_a(h1);
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN makeSimplex(leftv res, leftv args)
@@ -3754,8 +3789,9 @@ static BOOLEAN makeSimplex(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =complementsimplex(h1);
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN pb(leftv res, leftv args)
@@ -3770,9 +3806,10 @@ static BOOLEAN pb(leftv res, leftv args)
        poly p= (poly)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =p_b(h1,p);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN fa(leftv res, leftv args)
@@ -3791,10 +3828,11 @@ static BOOLEAN fa(leftv res, leftv args)
          int d= (int)(long)h->Data();
          res->rtyp =IDEAL_CMD;
          res->data =finda(h1,q,d);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN fgp(leftv res, leftv args)
@@ -3813,7 +3851,7 @@ static BOOLEAN fgp(leftv res, leftv args)
          poly q= (poly)h->Data();
          res->rtyp =INTVEC_CMD;
          res->data =gradedpiece1n(h1,p,q);
-	 return FALSE;
+         return FALSE;
        }
      }
   }
@@ -3840,11 +3878,12 @@ static BOOLEAN fgpl(leftv res, leftv args)
            int d= (int)(long)h->Data();
            res->rtyp =INTVEC_CMD;
            res->data =gradedpiece1nl(h1,p,q,d);
+           return FALSE;
          }
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN genstt(leftv res, leftv args)
@@ -3863,10 +3902,11 @@ static BOOLEAN genstt(leftv res, leftv args)
          poly q= (poly)h->Data();
          res->rtyp =IDEAL_CMD;
          res->data =genst(h1,p,q);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN sgp(leftv res, leftv args)
@@ -3885,10 +3925,11 @@ static BOOLEAN sgp(leftv res, leftv args)
          poly q= (poly)h->Data();
          res->rtyp =INTVEC_CMD;
          res->data =gradedpiece2n(h1,p,q);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN sgpl(leftv res, leftv args)
@@ -3907,10 +3948,11 @@ static BOOLEAN sgpl(leftv res, leftv args)
          poly q= (poly)h->Data();
          res->rtyp =INTVEC_CMD;
          res->data =gradedpiece2nl(h1,p,q);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN Links(leftv res, leftv args)
@@ -3926,9 +3968,10 @@ static BOOLEAN Links(leftv res, leftv args)
        res->rtyp =IDEAL_CMD;
        std::vector<std::vector<int> > vecs=links(p,h1);
        res->data =idMaken(vecs);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN isSim(leftv res, leftv args)
@@ -3939,8 +3982,9 @@ static BOOLEAN isSim(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =IsSimplex(h1);
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 BOOLEAN nfaces1(leftv res, leftv args)
@@ -3959,10 +4003,11 @@ BOOLEAN nfaces1(leftv res, leftv args)
          int d= (int)(long)h->Data();
          res->rtyp =IDEAL_CMD;
          res->data =triangulations1(h1, p, d);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN nfaces2(leftv res, leftv args)
@@ -3985,11 +4030,12 @@ static BOOLEAN nfaces2(leftv res, leftv args)
            int d= (int)(long)h->Data();
            res->rtyp =IDEAL_CMD;
            res->data =triangulations2(h1,p,q,d);
+           return FALSE;
          }
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN nfaces3(leftv res, leftv args)
@@ -4016,12 +4062,13 @@ static BOOLEAN nfaces3(leftv res, leftv args)
              int d= (int)(long)h->Data();
              res->rtyp =IDEAL_CMD;
              res->data =triangulations3(h1,p,q,g,d);
+             return FALSE;
            }
          }
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN eqsolve1(leftv res, leftv args)
@@ -4059,10 +4106,11 @@ static BOOLEAN eqsolve1(leftv res, leftv args)
          res->rtyp =INTVEC_CMD;
          std::vector<std::vector<int> > vecs=eli2(n,bset,gset);
          res->data =Tmat(vecs);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN tsets(leftv res, leftv args)
@@ -4073,8 +4121,9 @@ static BOOLEAN tsets(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =trisets(h1);
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN Valency(leftv res, leftv args)
@@ -4089,9 +4138,10 @@ static BOOLEAN Valency(leftv res, leftv args)
        poly p= (poly)h->Data();
        res->rtyp =INT_CMD;
        res->data =(void *)(long)valency(h1,p);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN nabvl(leftv res, leftv args)
@@ -4112,10 +4162,11 @@ static BOOLEAN nabvl(leftv res, leftv args)
          std::vector<std::vector<int> > vecs=supports(h1);
          std::vector<int> pv=support1(p), qv=support1(q);
          res->data =idMaken(Nabv(vecs,pv,qv));
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN tnabvl(leftv res, leftv args)
@@ -4132,7 +4183,6 @@ static BOOLEAN tnabvl(leftv res, leftv args)
        if((h != NULL)&&(h->Typ() == POLY_CMD))
        {
          poly q= (poly)h->Data();
-         res->rtyp =IDEAL_CMD;
          std::vector<std::vector<int> > vecs=supports(h1), sbv,tnbr;
          std::vector<int> pv=support1(p), qv=support1(q);
          std::vector<std::vector<int> > nvs=Nabv(vecs, pv, qv);
@@ -4143,11 +4193,13 @@ static BOOLEAN tnabvl(leftv res, leftv args)
          {
            tnbr.push_back(nvs[tnv[i]]);
          }
+         res->rtyp =IDEAL_CMD;
          res->data =idMaken(tnbr);
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN vsIntersec(leftv res, leftv args)
@@ -4160,12 +4212,13 @@ static BOOLEAN vsIntersec(leftv res, leftv args)
      if((h != NULL)&&(h->Typ() == IDEAL_CMD))
      {
        ideal h2= (ideal)h->Data();
-       res->rtyp =INT_CMD;
        std::vector<std::vector<int> > vs1=supports(h1), vs2=supports(h2);
+       res->rtyp =INT_CMD;
        res->data =(void *)(long)(vsIntersection(vs1, vs2).size());
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN mabvl(leftv res, leftv args)
@@ -4184,10 +4237,11 @@ static BOOLEAN mabvl(leftv res, leftv args)
          poly q= (poly)h->Data();
          res->rtyp =IDEAL_CMD;
          res->data =idMaken(Mabv(h1,p,q));
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN nabtvl(leftv res, leftv args)
@@ -4218,10 +4272,11 @@ static BOOLEAN nabtvl(leftv res, leftv args)
          idSkipZeroes(gens);
          res->rtyp =IDEAL_CMD;
          res->data =gens;
+         return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN linkn(leftv res, leftv args)
@@ -4248,12 +4303,13 @@ static BOOLEAN linkn(leftv res, leftv args)
             int ord= (int)(long)h->Data();
             res->rtyp =IDEAL_CMD;
             res->data =idMaken(links_new(a,  Xo,  Sigma,  vert,  ord));
+            return FALSE;
           }
         }
       }
     }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN existsub(leftv res, leftv args)
@@ -4268,9 +4324,10 @@ static BOOLEAN existsub(leftv res, leftv args)
        ideal h1= (ideal)h->Data();
        res->rtyp =INT_CMD;
        res->data =(void *)(long)existIn(p, h1);
+       return FALSE;
      }
    }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN pConstant(leftv res, leftv args)
@@ -4285,9 +4342,10 @@ static BOOLEAN pConstant(leftv res, leftv args)
        ideal h2= (ideal)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =idMaken(p_constant(h1,h2));
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN pChange(leftv res, leftv args)
@@ -4298,8 +4356,9 @@ static BOOLEAN pChange(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =idMaken(p_change(h1));
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN p_New(leftv res, leftv args)
@@ -4314,9 +4373,10 @@ static BOOLEAN p_New(leftv res, leftv args)
        ideal h2= (ideal)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =idMaken(p_new(h1,h2));
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN support(leftv res, leftv args)
@@ -4327,8 +4387,9 @@ static BOOLEAN support(leftv res, leftv args)
      poly p= (poly)h->Data();
      res->rtyp =INT_CMD;
      res->data =(void *)(long)(support1(p).size());
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN bprime(leftv res, leftv args)
@@ -4339,8 +4400,9 @@ static BOOLEAN bprime(leftv res, leftv args)
      poly p= (poly)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =idMaken(bsubsets_1(p));
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN psMinusp(leftv res, leftv args)
@@ -4355,9 +4417,10 @@ static BOOLEAN psMinusp(leftv res, leftv args)
        poly p= (poly)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =idMinusp(h1, p);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN stellarremain(leftv res, leftv args)
@@ -4375,9 +4438,10 @@ static BOOLEAN stellarremain(leftv res, leftv args)
        std::vector<std::vector<int> > re= vsMinusvs(hvs, st);
        res->rtyp =IDEAL_CMD;
        res->data =idMaken(re);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN cNew(leftv res, leftv args)
@@ -4392,9 +4456,10 @@ static BOOLEAN cNew(leftv res, leftv args)
        ideal h2= (ideal)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =c_New(h1, h2);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN stars(leftv res, leftv args)
@@ -4409,9 +4474,10 @@ static BOOLEAN stars(leftv res, leftv args)
        ideal h1= (ideal)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =idMaken(star(p, h1));
+       return FALSE;
      }
    }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN stellarsubdivision(leftv res, leftv args)
@@ -4426,9 +4492,10 @@ static BOOLEAN stellarsubdivision(leftv res, leftv args)
        poly p= (poly)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =idMaken(stellarsub(p, h2));
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN idModulo(leftv res, leftv args)
@@ -4443,9 +4510,10 @@ static BOOLEAN idModulo(leftv res, leftv args)
        ideal h2= (ideal)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =idmodulo(h1, h2);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN idminus(leftv res, leftv args)
@@ -4460,9 +4528,10 @@ static BOOLEAN idminus(leftv res, leftv args)
        ideal h2= (ideal)h->Data();
        res->rtyp =IDEAL_CMD;
        res->data =idMinus(h1, h2);
+       return FALSE;
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN isoNumber(leftv res, leftv args)
@@ -4485,11 +4554,12 @@ static BOOLEAN isoNumber(leftv res, leftv args)
           poly b= (poly)h->Data();
           res->rtyp =INT_CMD;
           res->data =(void *)(long)isoNum(p, h1, a, b);
+          return FALSE;
         }
       }
     }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN ifIsomorphism(leftv res, leftv args)
@@ -4520,13 +4590,14 @@ static BOOLEAN ifIsomorphism(leftv res, leftv args)
                poly b= (poly)h->Data();
                res->rtyp =INT_CMD;
                res->data =(void *)(long)ifIso(p,q,f,g, a, b);
+               return FALSE;
              }
            }
          }
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN newDegree(leftv res, leftv args)
@@ -4541,9 +4612,10 @@ static BOOLEAN newDegree(leftv res, leftv args)
        int num= (int)(long)h->Data();
        res->rtyp =INT_CMD;
        res->data =(void *)(long)redefinedeg( p, num);
+       return FALSE;
     }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN nonf2f(leftv res, leftv args)
@@ -4554,8 +4626,9 @@ static BOOLEAN nonf2f(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =IDEAL_CMD;
      res->data =complementsimplex(h1);
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN dimsim(leftv res, leftv args)
@@ -4566,8 +4639,9 @@ static BOOLEAN dimsim(leftv res, leftv args)
      ideal h1= (ideal)h->Data();
      res->rtyp =INT_CMD;
      res->data =(void *)(long)dim_sim(h1);
+     return FALSE;
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN numdim(leftv res, leftv args)
@@ -4582,9 +4656,10 @@ static BOOLEAN numdim(leftv res, leftv args)
        int num= (int)(long)h->Data();
        res->rtyp =INT_CMD;
        res->data =(void *)(long)num4dim( h1, num);
+       return FALSE;
     }
   }
-  return false;
+  return TRUE;
 }
 
 /**************************************interface T2****************************************/
