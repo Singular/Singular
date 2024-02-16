@@ -956,7 +956,7 @@ static ideal finda(ideal h,poly S,int ddeg)
       if(vInvsl(v,hvs)&&in.size()==0)
       {
         idInsertPoly(aset, ia->m[i]);
-	ia->m[i]=NULL;
+        ia->m[i]=NULL;
       }
     }
     idSkipZeroes(aset);
@@ -1343,32 +1343,35 @@ static int redefinedeg(poly p, int  num)
 static ideal p_a(ideal h)
 {
   poly p;
-  int i,j,deg=0,deg0;
+  int deg=0,deg0;
   ideal aset=idCopy(h),ia,h1=idsrRing(h);
 //PrintS("idsrRing is:\n");id_print(h1);
   std::vector<int> as;
   std::vector<std::vector<int> > hvs=supports(h);
-  for(i=0;i<IDELEMS(h1);i++)
+  for(int i=0;i<IDELEMS(h1);i++)
   {
     deg0=pTotaldegree(h1->m[i]);
     if(deg < deg0)
       deg=deg0;
   }
-  for(i=2;i<=deg;i++)
+  idDelete(&h1);
+  for(int i=2;i<=deg;i++)
   {
     ia=id_MaxIdeal(i, currRing);
-    for(j=0;j<IDELEMS(ia);j++)
+    for(int j=0;j<IDELEMS(ia);j++)
     {
-      p=pCopy(ia->m[j]);
+      p=ia->m[j];
       if(!IsInX(p,h))
       {
         as=support1(p);
         if(vInvsl(as,hvs))
         {
           idInsertPoly(aset, p);
+          ia->m[j]=NULL;
         }
       }
     }
+    idDelete(&ia);
   }
   idSkipZeroes(aset);
   return(aset);
@@ -1411,12 +1414,11 @@ static ideal p_a(ideal h)
 
 static std::vector<int> vertset(std::vector<std::vector<int> > vecs)
 {
-  int i,j;
   std::vector<int> vert;
   std::vector<std::vector<int> > vvs;
-  for(i=1;i<=currRing->N;i++)
+  for(int i=1;i<=currRing->N;i++)
   {
-    for(j=0;j<vecs.size();j++)
+    for(unsigned j=0;j<vecs.size();j++)
     {
       if(IsinL(i, vecs[j]))
       {
@@ -1437,10 +1439,10 @@ static ideal p_b(ideal h, poly a)
   std::vector<std::vector<int> > pbv,lk=links(a,h), res;
   std::vector<int> vert=vertset(lk), bv;
   res=b_subsets(vert);
-  int i, adg=pTotaldegree(a);
+  int adg=pTotaldegree(a);
   poly e=pOne();
   ideal idd=idInit(1,1);
-  for(i=0;i<res.size();i++)
+  for(unsigned i=0;i<res.size();i++)
   {
     if(res[i].size()==adg)
       pbv.push_back(res[i]);
@@ -1451,6 +1453,7 @@ static ideal p_b(ideal h, poly a)
     idSkipZeroes(idd);
     return (idd);
   }
+  pDelete(&e);
   idd=idMaken(pbv);
   return(idd);
 }
@@ -1546,17 +1549,22 @@ static ideal p_b(ideal h, poly a)
 //output is all the squarefree monomials which could divid p(including p itself?)
 static ideal psubset(poly p)
 {
-  int i,j,max=pTotaldegree(p);
+  int max=pTotaldegree(p);
   ideal h1,mons, id_re=idInit(1,1);
-  for(i=1;i<max;i++)
+  for(int i=1;i<max;i++)
   {
     mons=id_MaxIdeal(i, currRing);
     h1=sfreemon(mons,i);
-    for(j=0;j<IDELEMS(h1);j++)
+    idDelete(&mons);
+    for(int j=0;j<IDELEMS(h1);j++)
     {
       if(p_DivisibleBy(h1->m[j],p,currRing))
+      {
         idInsertPoly(id_re, h1->m[j]);
+        h1->m[j]=NULL;
+      }
     }
+    idDelete(&h1);
   }
   idSkipZeroes(id_re);
   //PrintS("This is the facset\n");
@@ -1591,16 +1599,15 @@ static std::vector<int> makeequation(int i,int j, int t)
 static poly pMake3(std::vector<int> vbase)
 {
   int co=1;
-  poly p,q=0;
+  poly p,q=NULL;
   for(int i=0;i<3;i++)
   {
     if(vbase[i]!=0)
     {
       if(i==1) co=-1;
       p = pOne();pSetExp(p, vbase[i], 1);pSetm(p);pSetCoeff(p, nInit(co));
-    }
-    else p=0;
       q = pAdd(q, p);
+    }
     co=1;
   }
   return q;
@@ -1610,8 +1617,8 @@ static ideal idMake3(std::vector<std::vector<int> > vecs)
 {
   ideal id_re=idInit(1,1);
   poly p;
-  int i,lv=vecs.size();
-  for(i=0;i<lv;i++)
+  unsigned lv=vecs.size();
+  for(unsigned i=0;i<lv;i++)
   {
     p=pMake3(vecs[i]);
     idInsertPoly(id_re, p);
@@ -3806,10 +3813,11 @@ static BOOLEAN fgp(leftv res, leftv args)
          poly q= (poly)h->Data();
          res->rtyp =INTVEC_CMD;
          res->data =gradedpiece1n(h1,p,q);
+	 return FALSE;
        }
      }
   }
-  return false;
+  return TRUE;
 }
 
 static BOOLEAN fgpl(leftv res, leftv args)
