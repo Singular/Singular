@@ -941,24 +941,26 @@ static ideal findb(ideal h)
 //returns all the possible x^a according conditions 1. 2. 3.
 static ideal finda(ideal h,poly S,int ddeg)
 {
-  ideal h2=id_complement(h), aset=idInit(1,1);
-  int i,deg1=pTotaldegree(S);
+  ideal aset=idInit(1,1);
+  int deg1=pTotaldegree(S);
   int tdeg=deg1+ddeg;
   if(tdeg!=0)
   {
     std::vector<int> v,bv=support1(S),in;
     std::vector<std::vector<int> > hvs=supports(h);
     ideal ia=id_MaxIdeal(tdeg, currRing);
-    for(i=0;i<IDELEMS(ia);i++)
+    for(int i=0;i<IDELEMS(ia);i++)
     {
       v=support1(ia->m[i]);
       in=vecIntersection(v,bv);
       if(vInvsl(v,hvs)&&in.size()==0)
       {
         idInsertPoly(aset, ia->m[i]);
+	ia->m[i]=NULL;
       }
     }
     idSkipZeroes(aset);
+    idDelete(&ia);
   }
   else
   {
@@ -996,6 +998,7 @@ static std::vector<std::vector<int> > Mabv(ideal h,poly a,poly b)
       vecs.push_back(pv);
     }
   }
+  idDelete(&h2);
   return vecs;
 }
 
@@ -1095,17 +1098,17 @@ static std::vector<std::vector<int> > soleli1( std::vector<std::vector<int> > eq
 //get the free variables and the dimension
 static std::vector<int> freevars(int n,  std::vector<int> bset, std::vector<std::vector<int> > gset)
 {
-  int ql=gset.size(), bl=bset.size(), i;
+  int ql=gset.size(), bl=bset.size();
   std::vector<int> mvar, fvar;
-  for(i=0;i<bl;i++)
+  for(int i=0;i<bl;i++)
   {
     mvar.push_back(bset[i]);
   }
-  for(i=0;i<ql;i++)
+  for(int i=0;i<ql;i++)
   {
     mvar.push_back(gset[i][0]);
   }
-  for(i=1;i<=n;i++)
+  for(int i=1;i<=n;i++)
   {
     if(!IsinL(i,mvar))
     {
@@ -1118,9 +1121,8 @@ static std::vector<int> freevars(int n,  std::vector<int> bset, std::vector<std:
 //return the set of free variables except the vnum one
 static std::vector<int> fvarsvalue(int vnum, std::vector<int> fvars)
 {
-  int i;
   std::vector<int> fset=fvars;
-  for(i=0;i<fset.size();i++)
+  for(int i=0;i<fset.size();i++)
   {
     if(fset[i]==vnum)
     {
@@ -1136,11 +1138,11 @@ static std::vector<int> fvarsvalue(int vnum, std::vector<int> fvars)
 static std::vector<std::vector<int> > vAbsorb( std::vector<int> bset,std::vector<std::vector<int> > gset)
 {
   std::vector<int> badset=bset;
-  int i,j,m, bl=bset.size(), gl=gset.size();
-  for(i=0;i<bl;i++)
+  int m, bl=bset.size(), gl=gset.size();
+  for(int i=0;i<bl;i++)
   {
     m=badset[i];
-    for(j=0;j<gl;j++)
+    for(int j=0;j<gl;j++)
     {
       if(gset[j][0]==m && !IsinL(gset[j][1],badset))
       {
@@ -1179,9 +1181,8 @@ static std::vector<std::vector<int> > vAbsorb( std::vector<int> bset,std::vector
 //returns a vector of solution space according to index
 static std::vector<int> vecbase1(int num, std::vector<int> oset)
 {
-  int i;
   std::vector<int> base;
-  for(i=0;i<num;i++)
+  for(int i=0;i<num;i++)
   {
     if(IsinL(i+1,oset))
       base.push_back(1);
@@ -1195,9 +1196,8 @@ static std::vector<int> vecbase1(int num, std::vector<int> oset)
 //and all the entries are 0.
 static std::vector<int> make0(int n)
 {
-  int i;
   std::vector<int> vec;
-  for(i=0;i<n;i++)
+  for(int i=0;i<n;i++)
   {
     vec.push_back(0);
   }
@@ -1208,9 +1208,8 @@ static std::vector<int> make0(int n)
 //and all the entries are 1.
 static std::vector<int> make1(int n)
 {
-  int i;
   std::vector<int> vec;
-  for(i=0;i<n;i++)
+  for(int i=0;i<n;i++)
   {
     vec.push_back(1);
   }
@@ -1237,7 +1236,6 @@ static std::vector<int> ofindbases1(int num, int vnum, std::vector<int> bset,std
 //bset must be the zero set after absorbing
 static std::vector<std::vector<int> > ofindbases(int num,  std::vector<int> bset,std::vector<std::vector<int> > gset)
 {
-  int i,m;
   std::vector<std::vector<int> > bases;
   std::vector<int> fvars=freevars(num,   bset,  gset), base1;
   if (fvars.size()==0)
@@ -1247,9 +1245,9 @@ static std::vector<std::vector<int> > ofindbases(int num,  std::vector<int> bset
   }
   else
   {
-    for(i=0;i<fvars.size();i++)
+    for(unsigned i=0;i<fvars.size();i++)
     {
-      m=fvars[i];
+      int m=fvars[i];
       base1=ofindbases1(num, m, bset, gset);
       bases.push_back(base1);
     }
@@ -1303,10 +1301,9 @@ static std::vector<std::vector<int> > eli2(int num, std::vector<int> bset,std::v
 //returns the links of face a in simplicial complex X
 static std::vector<std::vector<int> > links(poly a, ideal h)
 {
-  int i;
   std::vector<std::vector<int> > lk,X=supports(h);
   std::vector<int> U,In,av=support1(a);
-  for(i=0;i<X.size();i++)
+  for(int i=0;i<X.size();i++)
   {
     U=vecUnion(av,X[i]);
     In=vecIntersection(av,X[i]);
