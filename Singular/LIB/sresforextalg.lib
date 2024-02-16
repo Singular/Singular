@@ -408,7 +408,6 @@ proc ext_elimination_(module m, module syz_mod){
   int n = nvars(basering);
   module ans_mod;
   matrix needed_mat = submat(matrix(syz_mod), 1..r, 1..size(syz_mod));
-  print(needed_mat);
   ans_mod = module(needed_mat);
   int i,j,k;
 
