@@ -118,26 +118,26 @@ singular.info: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterp
 dvi: manual.dvi usercard.dvi
 
 singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterplace.tex
-	tex singular.tex
-	texindex singular.cp
-	tex singular.tex
-	texindex singular.cp
-	tex singular.tex
+	$(TEX) singular.tex
+	$(TEXINDEX) singular.cp
+	$(TEX) singular.tex
+	$(TEXINDEX) singular.cp
+	$(TEX) singular.tex
 
 singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex s-letterplace.tex
 	${TEXI2PDF} singular.tex
 
 manual.dvi: ${MANUAL_FILES} manual.tex s-plural.tex s-plulibs.tex  s-letterplace.tex
-	tex manual.tex
-	texindex manual.cp
-	tex manual.tex
-	texindex manual.cp
-	tex manual.tex
+	$(TEX) manual.tex
+	$(TEXINDEX) manual.cp
+	$(TEX) manual.tex
+	$(TEXINDEX) manual.cp
+	$(TEX) manual.tex
 
 tutor.dvi: ${TUTOR_FILES}
-	tex tutor.tex
-	tex tutor.tex
-	tex tutor.tex
+	$(TEX) tutor.tex
+	$(TEX) tutor.tex
+	$(TEX) tutor.tex
 
 tutor.pdf: ${TUTOR_FILES}
 	${TEXI2PDF} tutor.tex
