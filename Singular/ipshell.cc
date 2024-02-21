@@ -2604,18 +2604,26 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         &&(R->order[j_in_R]!=ringorder_c)
         &&(R->order[j_in_R]!=ringorder_C))
         {
-          R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+iv_len-1);
+          if (R->order[j_in_R]==ringorder_M)
+          {
+            int sq=(int)sqrt((double)(iv_len));
+            R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+sq-1);
+          }
+          else
+            R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+iv_len-1);
           if (R->block1[j_in_R]>R->N)
           {
             if (R->block0[j_in_R]>R->N)
             {
+            Print("R->block0[j_in_R]=%d,N=%d\n",R->block0[j_in_R],R->N);
               Werror("not enough variables for ordering %d (%s)",j_in_R,rSimpleOrdStr(R->order[j_in_R]));
               return TRUE;
             }
             R->block1[j_in_R]=R->N;
             iv_len=R->block1[j_in_R]-R->block0[j_in_R]+1;
           }
-          //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
+          //Print("block %d(%s) from %d to %d\n",j_in_R,
+          //  rSimpleOrdStr(R->order[j_in_R]),R->block0[j_in_R], R->block1[j_in_R]);
         }
         int i;
         switch (R->order[j_in_R])
@@ -2649,7 +2657,6 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_M:
              R->wvhdl[j_in_R] =( int *)omAlloc((iv->length())*sizeof(int));
              for (i=0; i<iv->length();i++) R->wvhdl[j_in_R][i]=(*iv)[i];
-             R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+(int)sqrt((double)(iv->length())));
              if (R->block1[j_in_R]>R->N)
              {
                R->block1[j_in_R]=R->N;
