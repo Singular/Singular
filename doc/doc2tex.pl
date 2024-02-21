@@ -394,8 +394,16 @@ sub HandleExample
     {
       last if (/^STDIN\s*([0-9]+)..\$/);
       # check for error
-      Error("while running example $ex_prefix from $doc_file:$lline.\nCall: '$Singular $Singular_opts $ex_file > $res_file'\n")
-	if (/error occurred/ && ! $error_ok);
+      if (/error occurred/ && ! $error_ok)
+      {
+        if ($ENV{GITHUB_ACTIONS})
+        {
+          print STDERR "::group::${$res_file}";
+          &System("cat $res_file >&2");
+          print STDERR "::endgroup::";
+        }
+        Error("while running example $ex_prefix from $doc_file:$lline.\nCall: '$Singular $Singular_opts $ex_file > $res_file'\n");
+      }
       # remove stuff from echo
       if (/^$ex_file\s*([0-9]+)../)
       {
