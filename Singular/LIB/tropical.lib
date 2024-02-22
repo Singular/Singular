@@ -2579,7 +2579,7 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
   {
     whomog[j+1]=w[j]+M;
   }
-  whomog[size(w)+2]=M;
+  whomog[size(w)+2]=1;
   intmat O=weightVectorToOrderMatrix(whomog);
   list RL=ring_list(basering);
   RL[3]=list(list("M",O));
@@ -5632,6 +5632,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   // consider each ring which has been returned when computing the zeros of the
   // the t-initial ideal, equivalently, consider
   // each zero which has been returned
+  int ggteiler;
   for (jj=1;jj<=size(trring);jj++)
   {
     def TRRING=trring[jj];
@@ -5779,7 +5780,7 @@ NOTE:    - the procedure is also called recursively by itself, and
             for (jjj=1;jjj<=size(NewtP)-1;jjj++)
             {
               wneu=NewtP[jjj]-NewtP[jjj+1];
-              int ggteiler=gcd(wneu[1],wneu[2]);
+              ggteiler=gcd(wneu[1],wneu[2]);
               wneu[1]=-wneu[1] div ggteiler;
               wneu[2]=wneu[2] div ggteiler;
               if (wneu[1]>0)
@@ -5792,7 +5793,7 @@ NOTE:    - the procedure is also called recursively by itself, and
               }
               wneulist[jjj]=wneu;
             }
-            kill NewtP,ggteiler;
+            kill NewtP;
           }
           else // we have to set the points in the tropical variety by hand
           {
