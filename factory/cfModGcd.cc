@@ -1806,7 +1806,11 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   fq_nmod_mat_t FLINTN;
   convertFacCFMatrix2Fq_nmod_mat_t (FLINTN, ctx, *N);
   // rank
+  #if __FLINT_RELEASE >= 30100
+  long rk= fq_nmod_mat_rref (FLINTN,FLINTN,ctx);
+  #else
   long rk= fq_nmod_mat_rref (FLINTN,ctx);
+  #endif
   // clean up
   fq_nmod_mat_clear (FLINTN,ctx);
   fq_nmod_ctx_clear(ctx);
@@ -1912,7 +1916,11 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   fq_nmod_mat_t FLINTN;
   convertFacCFMatrix2Fq_nmod_mat_t (FLINTN, ctx, *N);
   // rank
+  #if __FLINT_RELEASE >= 30100
+  long rk= fq_nmod_mat_rref (FLINTN,FLINTN,ctx);
+  #else
   long rk= fq_nmod_mat_rref (FLINTN,ctx);
+  #endif
   #elif defined(HAVE_NTL)
   int p= getCharacteristic ();
   if (fac_NTL_char != p)
