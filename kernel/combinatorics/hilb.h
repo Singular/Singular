@@ -21,7 +21,6 @@ poly hBIV2Poly(bigintmat* b, const ring Qt, const coeffs biv_cf);
 bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts,const ring src, const coeffs biv_cf);
 bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts,const ring src, const coeffs biv_cf);
 poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring src, const ring Qt);
-intvec* hFirstSeries0wm(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring src, const ring Qt);
 
 intvec * hSecondSeries(intvec *hseries1);
 

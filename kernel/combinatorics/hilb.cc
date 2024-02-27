@@ -2153,31 +2153,6 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
   return ss;
 }
 
-intvec* hFirstSeries0wm(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring src, const ring Qt)
-{
-  poly s=hFirstSeries0m(A,Q,wdegree,shifts,src,Qt);
-  intvec *ss;
-  if (s==NULL)
-    ss=new intvec(2);
-  else
-  {
-    ss=new intvec(p_Totaldegree(s,Qt)+2);
-    while(s!=NULL)
-    {
-      int i=p_Totaldegree(s,Qt);
-      long l=n_Int(pGetCoeff(s),Qt->cf);
-      (*ss)[i]=n_Int(pGetCoeff(s),Qt->cf);
-      if((l==0)||(l<=-INT_MAX)||(l>INT_MAX))
-      {
-        if(!errorreported) Werror("overflow at t^%d\n",i);
-      }
-      else (*ss)[i]=(int)l;
-      p_LmDelete(&s,Qt);
-    }
-  }
-  return ss;
-}
-
 static ideal getModuleComp(ideal A, int c, const ring src)
 {
   ideal res=idInit(IDELEMS(A),A->rank);
@@ -2731,28 +2706,3 @@ bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, co
   p_Delete(&h2,hilb_Qt);
   return biv;
 }
-
-void scDegree(ideal S, intvec *modulweight, ideal Q)
-{
-  id_Test(S, currRing);
-  if( Q!=NULL ) id_Test(Q, currRing);
-
-  int co, mu, l;
-  intvec *hseries2;
-  if (hilb_Qt==NULL) hilb_Qt=makeQt();
-  intvec *hseries1 = hFirstSeries0wm(S,Q,NULL, modulweight,currRing,hilb_Qt);
-  l = hseries1->length()-1;
-  if (l > 1)
-    hseries2 = hSecondSeries(hseries1);
-  else
-    hseries2 = hseries1;
-  hDegreeSeries(hseries1, hseries2, &co, &mu);
-  if ((l == 1) &&(mu == 0))
-    scPrintDegree((currRing->N)+1, 0);
-  else
-    scPrintDegree(co, mu);
-  if (l>1)
-    delete hseries2;
-  delete hseries1;
-}
-
