@@ -101,7 +101,7 @@ jobs:
         ["standard"]
       # Extra system packages to install. See available packages at
       # https://github.com/sagemath/sage/tree/develop/build/pkgs
-      extra_sage_packages: "info"
+      extra_sage_packages: "info ncurses readline"
       # Sage distribution packages to build
       targets_pre: SAGE_CHECK=no singular-build-deps
       targets: GITHUB_ACTIONS=1 SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular V=1 singular
@@ -123,7 +123,7 @@ jobs:
     with:
       # Extra system packages to install. See available packages at
       # https://github.com/sagemath/sage/tree/develop/build/pkgs
-      extra_sage_packages: "info"
+      extra_sage_packages: "info ncurses readline"
       # Sage distribution packages to build
       targets_pre: SAGE_CHECK=no singular-build-deps
       targets: GITHUB_ACTIONS=1 SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular V=1 singular
