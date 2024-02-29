@@ -292,12 +292,12 @@ sub FormatInfoText
       next;
     }
     my $ref = 'ref';
-    if ($line =~ /([^\@]|^)\@(code|math|xref|pxref|$ref){(.*?)}/)
+    if ($line =~ /([^\@]|^)\@(code|math|xref|pxref|$ref)\{(.*?)\}/)
     {
       my $l = $line;
       $l =~ s/^\s*//;
       $l =~ s/\s$//;
-      while ($l =~ /([^\@]|^)\@(code|math|xref|pxref|$ref){(.*?)}/)
+      while ($l =~ /([^\@]|^)\@(code|math|xref|pxref|$ref)\{(.*?)\}/)
       {
 	$text .= CleanAscii($`.$1);
 	$text .= "\@$2\{$3\}";
