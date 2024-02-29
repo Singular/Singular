@@ -1,9 +1,11 @@
+
 //////////////////////////////////////////////////////////////////////////////
-version="version schreyforncalg.lib 1.0.0.0 Feb_2024 "; // $Id$
+version="version sresforextalg.lib 1.0.0.0 Feb_2024 "; // $Id$
 category="Noncommutative";
 info="
-LIBRARY: schreyforncalg.lib     Schreyer's algorithm for modules over the exterior algebra
+LIBRARY: sresforextalg.lib     Schreyer's algorithm for modules over the exterior algebra
 AUTHORS:   Ramesh, L.,     ramesh@mathematik.uni-kl.de
+           Gnawali, S.,    
 
 
 OVERVIEW:
@@ -13,20 +15,25 @@ PROCEDURES:
 --
 ";
 
-
+static proc mod_init()
+{
 LIB "nctools.lib"; // for ncalg
 LIB "matrix.lib"; // for submat
+LIB "classify.lib" // for swap 
+LIB "tst.lib"; tst_init(); tst_ignore("// ** loaded "); tst_ignore("// ** _ is no standard basis");
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc leadmonomial(def s) 
-"USAGE:   leadmonomial(s); s a vector or a polynomial
+proc leadmonomial_ext(def s) 
+"USAGE:   leadmonomial_ext(s); s a vector or a polynomial
 RETURN:   poly
 PURPOSE:  to compute lcm of lead terms of two vectors over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
 THEORY:   -
-EXAMPLE:  example leadmonomial; shows examples
+EXAMPLE:  example leadmonomial_ext; shows examples
 SEE ALSO: leadterm
-"{
+"
+{
   int e;
   poly m;
 
@@ -44,7 +51,7 @@ example
   "EXAMPLE:";echo=2;
   ring r = 0,(x,y,z),dp;
   vector v = [x2+y,0,z];
-  leadmonomial(v);
+  leadmonomial_ext(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,8 +62,9 @@ RETURN:   poly
 PURPOSE:  to compute lcm of lead terms of two vectors over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
 THEORY:   -
 EXAMPLE:  example leadterm; shows examples
-SEE ALSO: leadmonomial
-"{
+SEE ALSO: leadmonomial_ext
+"
+{
   int e;
   poly m;
 
@@ -88,8 +96,9 @@ RETURN:   poly
 PURPOSE:  to compute lcm of lead terms of two vectors over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
 THEORY:   -
 EXAMPLE:  example lcm_; shows examples
-SEE ALSO: leadmonomial, leadterm
-"{
+SEE ALSO: leadmonomial_ext, leadterm
+"
+{
     string strv = string(v);
     string strw = string(w);
     int sizev = size(strv);
@@ -146,10 +155,7 @@ SEE ALSO: leadmonomial, leadterm
       }
     }
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -160,19 +166,14 @@ assumes that the generators of the given matrix are lifted from the exterior alg
 
 
 proc schreyers_syz_(module m)
-"USAGE:   Gweights(r); r a ring or a square matrix
-RETURN:   intvec
-PURPOSE: compute an appropriate weight int vector for a G-algebra, i.e., such that
-\foral\;i<j\;\;lm_w(d_{ij}) <_w x_i x_j.
-@*       the polynomials d_{ij} are taken from r itself, if it is of the type ring
-@*       or defined by the given square polynomial matrix
-THEORY:   @code{Gweights} returns an integer vector, whose weighting should be used to redefine the G-algebra in order
-to get the same non-commutative structure w.r.t. a weighted ordering. If the input is a matrix and the output is the zero
-vector then there is not a G-algebra structure associated to these relations with respect to the given variables.
-@*Another possibility is to use @code{weightedRing} to obtain directly a G-algebra with the new appropriate (weighted) ordering.
-EXAMPLE: example Gweights; shows examples
-SEE ALSO: weightedRing
-"{
+"USAGE:   schreyers_syz_(m);
+RETURN:   module
+PURPOSE:  returns the syzygy module of m using the schreyer algorithm, where m is a module 
+over a non-commutative ring where x_i*x_j = -x_j*x_i
+THEORY:   
+SEE ALSO: 
+"
+{
   module lead_mod = lead_syz_(m);
   module ans;
   vector s;
@@ -182,10 +183,6 @@ SEE ALSO: weightedRing
     ans[size(ans)+1] = s;
   }
   return(ans);
-}
-example
-{
-  //TODO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -208,8 +205,8 @@ proc lead_syz_(module m){
       expi = leadexp(pi)[n+1];
       expj = leadexp(pj)[n+1];
       if(expi == expj){
-        Li = leadmonomial(pi);
-        Lj = leadmonomial(pj);
+        Li = leadmonomial_ext(pi);
+        Lj = leadmonomial_ext(pj);
         mji = lcm_(Lj,Li)/leadterm(pi);
         t = mji*M[i];
         for (k=1;k<=size(lead_mod);k++){
@@ -232,10 +229,7 @@ proc lead_syz_(module m){
   }
   return(lead_mod);
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -253,7 +247,7 @@ proc lift_tree_(vector s, module M){
     L = lead(g);
     for(i=1; i<=size(M); i++){
       if(NF(L, leadmonom(M[i]))==0){
-        m = leadmonomial(L)/leadterm(M[i]); 
+        m = leadmonomial_ext(L)/leadterm(M[i]); 
         
         //check sign: 
         im = m; iF_ = leadterm(M[i]); imif = im*iF_; iL = leadterm(L);
@@ -271,10 +265,7 @@ proc lift_tree_(vector s, module M){
   }
   return(ans);
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -293,7 +284,7 @@ proc lift_subtree_(vector s, module M){
     L = lead(g);
     for(i=1; i<=size(M); i++){
       if(NF(L, leadmonom(M[i]))==0){
-        m = leadmonomial(L)/leadmonomial(M[i]); //TODO check sign!
+        m = leadmonomial_ext(L)/leadmonomial_ext(M[i]); //TODO check sign!
 
         //check sign: 
         im = m; iF_ = leadterm(M[i]); imif = im*iF_; iL =leadterm(L);
@@ -309,10 +300,7 @@ proc lift_subtree_(vector s, module M){
   }
   return(ans);
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -326,10 +314,7 @@ proc phi_(vector s, module m){
   poly t = leadterm(s);
   return(t*m[i]);
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -352,10 +337,7 @@ proc remove_LOT_(vector g, module m){
   }
   return(LOT);
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -365,8 +347,8 @@ proc greater_than_(vector s, vector v, module M){
   int n = nvars(basering);
   int i = leadexp(s)[n+1];
   int j = leadexp(v)[n+1];
-  poly mi = leadmonomial(s);
-  poly mj = leadmonomial(v);
+  poly mi = leadmonomial_ext(s);
+  poly mj = leadmonomial_ext(v);
   if (lead(mi*M[i]) > lead(mj*M[j])){
     return(1);
   }
@@ -377,10 +359,7 @@ proc greater_than_(vector s, vector v, module M){
     return(0);
   }
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -427,36 +406,34 @@ proc ext_elimination_(module m, module syz_mod){
   }
   return(ans_mod);
 }
-example
-{
-  //TODO
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
 //THIS IS THE MAIN USER CALLABLE PROCEDURE
-proc total_syz_alg(module m)
-"USAGE:   total_syz_alg(m); m a module over a noncommutative ring where var(i)*var(j) = -var(j)*var(i)
+proc schrey_syz(module m)
+"USAGE:   schrey_syz(m); m a module over a noncommutative ring where var(i)*var(j) = -var(j)*var(i)
 and the generators of m are 0 modulo var(i)^2 for all i.
 RETURN:   module
 PURPOSE:  computes the syzygy module of a module m over the exterior algebra. 
 THEORY:   TODO
 SEE ALSO: -
-"{
+"
+{
   module lift_m = add_ideal_gens_(m);
   module syz_mod = schreyers_syz_(lift_m);
   module ans_mod = ext_elimination_(m,syz_mod);
-  return(ans_mod);
+  return(sort(ans_mod));
 }
 example
 {
   "EXAMPLE:";echo=2;
-  ring r = (0,q),(a,b,c,d),lp;
+  ring r = (0,q),(x,y,z),dp;
   int N = nvars(basering);
-  ring @R = create_ring(ring_list(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
-  matrix @E = UpOneMatrix(N);
-  @E = -1*(@E);
-  def @@RR = nc_algebra(@E,0); setring @@RR;
+  ring R = create_ring(ring_list(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
+  matrix E = UpOneMatrix(N);
+  E = -1*(E);
+  def RR = nc_algebra(E,0); setring RR;
   vector f1 = [x,y,0,z,0,0];
   vector f2 = [0,x,y,0,z,0];
   vector f3 = [0,0,0,x,y,z];
@@ -464,5 +441,230 @@ example
   vector f5 = [0,0,0,0,xy,xz];
   vector f6 = [0,0,0,0,0,xyz];
   module m = f1,f2,f3,f4,f5,f6;
-  total_syz_alg(m);
+  schrey_syz(m);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+//assume m is a module over the correct ring.
+proc sres_(module m, int p)
+{
+  int i,j; 
+  
+  //ring r = basering;
+  //ring @R = create_ring(ring_list(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
+  //matrix @E = UpOneMatrix(N);
+  //@E = -1*(@E);
+  //def @@RR = nc_algebra(@E,0); setring @@RR;
+  
+  list res_list, lead_terms_list;
+  //this is the module we start with. We sort it so M[1]<M[2]...
+  module M = sort(m)[1];
+  res_list[1] = M;
+  lead_terms_list[1] = lead(M);
+  for (i = 1; i<p; i++){
+    res_list[i+1] = total_syz_alg(res_list[i], lead_terms_list);
+    lead_terms_list[i+1] = lead(res_list[i+1]);
+  }
+  resolution ans_res = res_list;
+  //can't return something in a different ring!!! 
+  print(res_list);
+  return(ans_res);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc total_syz_alg(module m, list L)
+{
+  module lift_m = add_ideal_gens_(m);
+  module syz_mod = schreyers_syz_with_order(lift_m, L);
+  module ans_mod = ext_elimination_(m,syz_mod);
+  //sort ans_mod according to L!
+  return(bubble_sort(ans_mod,L));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc schreyers_syz_with_order(module m, list L)
+{
+  module lead_mod = lead_syz_(m);
+  module ans;
+  vector s;
+  int i;
+  for (i=1;i<=size(lead_mod); i++){
+    s = lift_tree_with_order(lead_mod[i], m, L);
+    ans[size(ans)+1] = s;
+  }
+  return(ans);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc lift_tree_with_order(vector s, module M, list LL){
+  vector g = phi_(s, M);
+  vector T = remove_LOT_(g, M);
+  vector L;
+  vector ans = s; 
+  int i;
+  poly m;
+
+  ideal im, iF_, imif, iL;
+
+  while (g != 0){
+    L = lead(g);
+    for(i=1; i<=size(M); i++){
+      if(NF(L, leadmonom(M[i]))==0){
+        m = leadmonomial_ext(L)/leadterm(M[i]); 
+        
+        //check sign: 
+        im = m; iF_ = leadterm(M[i]); imif = im*iF_; iL = leadterm(L);
+        if (imif[1] != iL[1]){
+          m = -m;
+        } 
+        //schreyer order algorithm called here
+        if (greater_than_for_res(s, m*gen(i), M, LL)){
+          ans = ans - lift_subtree_(m*gen(i),M);
+          break;
+        }
+      }
+    }
+    g = g - L;
+  }
+  return(ans);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+//TEST!
+proc greater_than_for_res(vector s, vector v, list L){
+  if (size(L) == 1){
+    return(greater_than_(s,v,L[1]));
+  }
+  int n = nvars(basering);
+  int i;
+  poly m1 = leadmonomial_ext(s); poly m2 = leadmonomial_ext(v);
+  int e1 = leadexp(s)[n+1]; int e2 = leadexp(v)[n+1];
+  if (m2 < m1 && e2 < e1){
+    return(1);
+  }
+  else{
+    if (m1 < m2 && e1 < e2){
+      return(0);
+    }
+    else{
+      s = m1*L[size(L)][e1]; v = m2*L[size(L)][e2];
+      L = delete(L, size(L));
+      return(greater_than_for_res(s,v,L));
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+//THIS SECTION DOES NOT WORK. GO TO NEXT SECTION.
+
+proc sort_for_res(module m, list L){
+  int n = size(m);
+  m[n+1] = 0;
+  return(quick_sort_(m,1,n+1,L));
+}
+
+proc quick_sort_(module m, int l, int h, list L){
+  int j;
+  if (l<h){
+    poly pivot = m[l];
+    int i = l; int j = h;
+    while(i<j){
+      i++;
+      while (! (greater_than_for_res(pivot, m[i], L))){
+        j--;
+        while(greater_than_for_res(m[j], pivot, L)){
+          if(i<j){
+            //swap(m[i],m[j]);
+            m[i],m[j] = swap(m[i],m[j]);
+          }
+        }
+      }
+    }
+    //swap(m[l],m[j]);
+    m[l],m[j] = swap(m[l],m[j]);
+
+    //do these change the global object? I guess not? 
+    m = quick_sort_(m,l,j,L);
+    m = quick_sort_(m,j+1,h,L);
+  }
+  return(m);
+}
+
+//figure out export.
+proc partition_(module m, int l, int h, list L){
+  poly pivot = m[l];
+  int i = l; int j = h;
+  while(i<j){
+    i++;
+    while (!(greater_than_for_res(pivot, m[i], L))){
+      j--;
+      while(greater_than_for_res(m[j], pivot, L)){
+        if(i<j){
+          //swap(m[i],m[j]);
+          m[i],m[j] = swap(m[i],m[j]);
+        }
+      }
+    }
+  }
+  //swap(m[l],m[j]);
+  m[l],m[j] = swap(m[l],m[j]);
+  export(j);
+  return(m);
+}
+
+//trial with list - does NOT work right now. 
+proc quick_sort_list_(int l, int h, list L){
+  int j;
+  if (l<h){
+    def pivot = L[l];
+    int i = l; int j = h;
+    while(i<j){
+      i++;
+      while (!(pivot > L[i])){
+        j--;
+        while(L[j] > pivot){
+          if(i<j){
+            //swap(m[i],m[j]);
+            L[i],L[j] = swap(L[i],L[j]);
+          }
+        }
+      }
+    }
+    //swap(m[l],m[j]);
+    L[l],L[j] = swap(L[l],L[j]);
+
+    //do these change the global object? I guess not? 
+    //m = quick_sort_(l,j,L);
+    //m = quick_sort_(j+1,h,L);
+  }
+  return(L);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc bubble_sort(module m, list L){
+    int n = size(m);
+    int i, j, swapped;
+    for (i = 0; i < n; i++) {
+        swapped = 0;
+        for (j = 1; j < n - i; j++) {
+            if (greater_than_for_res(m[j], m[j+1],L)){
+                m[j], m[j + 1] = swap(m[j], m[j + 1]);
+                swapped = 1;
+            }
+        }
+ 
+        // If no two elements were swapped
+        // by inner loop, then break
+        if (swapped == 0){
+            break;
+        }
+    }
+    return(m);
 }
