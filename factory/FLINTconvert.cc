@@ -15,6 +15,7 @@
 
 #include <config.h>
 
+#include <string.h>
 
 #include "canonicalform.h"
 #include "fac_util.h"

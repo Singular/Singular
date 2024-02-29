@@ -23,7 +23,6 @@
 #include "kernel/combinatorics/hilb.h"
 #include "kernel/combinatorics/stairc.h"
 #include "kernel/combinatorics/hutil.h"
-#include "cohomo.h"//for my thing
 #include "kernel/GBEngine/tgb.h"//
 #include "Singular/ipid.h"//for ggetid
 #include "polys/monomials/ring.h"
@@ -1236,7 +1235,7 @@ static std::vector<int> ofindbases1(int num, int vnum, std::vector<int> bset,std
   oset.push_back(vnum);
   goodset=vAbsorb(oset, gset);
   oset=goodset[goodset.size()-1];
-  goodset.erase(goodset.end());
+  goodset.pop_back();
   base= vecbase1(num,  oset);
   return base;
 }
@@ -1284,7 +1283,7 @@ static std::vector<std::vector<int> > eli2(int num, std::vector<int> bset,std::v
       goodset=vAbsorb(bset, gset);//e.g. x_1=0, put x_i into the badset if x_i-x_1=0 or x_1-x_i=0
       int m=goodset.size();
       badset=goodset[m-1];
-      goodset.erase(goodset.end());
+      goodset.pop_back();
     }
     else //bset is empty
     {

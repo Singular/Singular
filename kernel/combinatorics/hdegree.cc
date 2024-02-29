@@ -923,30 +923,6 @@ void scPrintDegree(int co, int mu)
     Print("// dimension (local)   = %d\n// multiplicity = %d\n", di, mu);
 }
 
-void scDegree(ideal S, intvec *modulweight, ideal Q)
-{
-  id_Test(S, currRing);
-  if( Q!=NULL ) id_Test(Q, currRing);
-
-  int co, mu, l;
-  intvec *hseries2;
-  intvec *hseries1 = hFirstSeries(S, modulweight, Q);
-  if (errorreported) return;
-  l = hseries1->length()-1;
-  if (l > 1)
-    hseries2 = hSecondSeries(hseries1);
-  else
-    hseries2 = hseries1;
-  hDegreeSeries(hseries1, hseries2, &co, &mu);
-  if ((l == 1) &&(mu == 0))
-    scPrintDegree((currRing->N)+1, 0);
-  else
-    scPrintDegree(co, mu);
-  if (l>1)
-    delete hseries1;
-  delete hseries2;
-}
-
 long  scMult0Int(ideal S, ideal Q)
 {
   id_LmTest(S, currRing);

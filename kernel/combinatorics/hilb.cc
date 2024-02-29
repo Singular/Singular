@@ -795,7 +795,6 @@ poly hFirst2Second(poly h, const ring Qt, int &co)
 #endif
   return di1;
 }
-
 static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
 {
   if ((modul_weight!=NULL)&&(modul_weight->compare(0)!=0))
@@ -2705,4 +2704,62 @@ bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, co
   bigintmat *biv=hPoly2BIV(h2,hilb_Qt,biv_cf);
   p_Delete(&h2,hilb_Qt);
   return biv;
+}
+
+void scDegree(ideal S, intvec *modulweight, ideal Q)
+{
+  int co;
+  int mu=0;
+#if 0
+  if (hilb_Qt==NULL) hilb_Qt=makeQt();
+  poly hseries;
+  if (modulweight==NULL)
+  {
+    // ideal or module?
+    int i=0;
+    loop
+    {
+      if (S->m[i]!=NULL)
+      {
+        if (p_GetComp(S->m[i],hilb_Qt)==0)
+        {
+          hseries = hFirstSeries0p(S,Q,NULL,currRing,hilb_Qt);
+          break;
+        }
+      }
+      i++;
+      if (i==IDELEMS(S)) break;
+    }
+    if (i==IDELEMS(S)) hseries = hFirstSeries0m(S,Q,NULL, modulweight,currRing,hilb_Qt);
+  }
+  else
+    hseries = hFirstSeries0m(S,Q,NULL, modulweight,currRing,hilb_Qt);
+
+  poly h2=hFirst2Second(hseries,hilb_Qt,co);
+  int di = (currRing->N)-co;
+  if (hseries==NULL) di=0;
+  poly p=h2;
+  while(p!=NULL)
+  {
+    mu+=n_Int(pGetCoeff(p),hilb_Qt->cf);
+    p_LmDelete(&p,hilb_Qt);
+  }
+#else
+  intvec *hseries2;
+  intvec *hseries1 = hFirstSeries(S, modulweight, Q);
+  if (errorreported) return;
+  int l = hseries1->length()-1;
+  if (l > 1)
+    hseries2 = hSecondSeries(hseries1);
+  else
+    hseries2 = hseries1;
+  hDegreeSeries(hseries1, hseries2, &co, &mu);
+  if (l>1)
+    delete hseries1;
+  delete hseries2;
+  if ((l == 1) &&(mu == 0))
+    scPrintDegree((currRing->N)+1, 0);
+  else
+#endif
+    scPrintDegree(co, mu);
 }
