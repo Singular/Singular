@@ -2710,6 +2710,7 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
 {
   int co;
   int mu=0;
+#if 0
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   poly hseries;
   if (modulweight==NULL)
@@ -2743,13 +2744,22 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
     mu+=n_Int(pGetCoeff(p),hilb_Qt->cf);
     p_LmDelete(&p,hilb_Qt);
   }
-  if (currRing->OrdSgn == 1)
-  {
-    if (di>0)
-      Print("// dimension (proj.)  = %d\n// degree (proj.)   = %d\n", di-1, mu);
-    else
-      Print("// dimension (affine) = 0\n// degree (affine)  = %d\n",       mu);
-  }
+#else
+  intvec *hseries2;
+  intvec *hseries1 = hFirstSeries(S, modulweight, Q);
+  if (errorreported) return;
+  int l = hseries1->length()-1;
+  if (l > 1)
+    hseries2 = hSecondSeries(hseries1);
   else
-    Print("// dimension (local)   = %d\n// multiplicity = %d\n", di, mu);
+    hseries2 = hseries1;
+  hDegreeSeries(hseries1, hseries2, &co, &mu);
+  if (l>1)
+    delete hseries1;
+  delete hseries2;
+  if ((l == 1) &&(mu == 0))
+    scPrintDegree((currRing->N)+1, 0);
+  else
+#endif
+    scPrintDegree(co, mu);
 }
