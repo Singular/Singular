@@ -499,7 +499,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 */
 void HEckeTest (poly pp,kStrategy strat)
 {
-  int   j,/*k,*/p;
+  int   j,p;
 
   if (currRing->pLexOrder
   || rHasMixedOrdering(currRing)
@@ -511,6 +511,7 @@ void HEckeTest (poly pp,kStrategy strat)
   p=pIsPurePower(pp);
   if (p!=0)
     strat->NotUsedAxis[p] = FALSE;
+  else return; /*nothing new*/
   /*- the leading term of pp is a power of the p-th variable -*/
   for (j=(currRing->N);j>0; j--)
   {
@@ -6921,10 +6922,10 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
       {
+        strat->kAllAxis = save_HE;
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
         {
-          strat->kAllAxis = save_HE;
           return redtail(L, end_pos, strat);
         }
         else
