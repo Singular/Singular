@@ -961,12 +961,13 @@ BOOLEAN idIs0 (ideal h)
   assume (h != NULL); // will fail :(
 //  if (h == NULL) return TRUE;
 
-  for( int i = IDELEMS(h)-1; i >= 0; i-- )
-    if(h->m[i] != NULL)
-      return FALSE;
-
+  if (h->m!=NULL)
+  {
+    for( int i = IDELEMS(h)-1; i >= 0; i-- )
+      if(h->m[i] != NULL)
+        return FALSE;
+  }
   return TRUE;
-
 }
 
 /// return the maximal component number found in any polynomial in s
