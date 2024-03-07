@@ -3530,7 +3530,7 @@ ideal kInterRedOld (ideal F,const ideal Q)
   idSkipZeroes(shdl);
   if (strat->fromQ)
   {
-    omfree(strat-fromQ);
+    omfree(strat->fromQ);
     strat->fromQ=NULL;
     ideal res=kInterRed(shdl,NULL);
     idDelete(&shdl);
