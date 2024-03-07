@@ -7638,6 +7638,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
 
   if (Q!=NULL) i=((IDELEMS(F)+IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   else         i=((IDELEMS(F)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (i<setmaxTinc) i=setmaxT;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
   strat->S_2_R=initS_2_R(i);
@@ -7730,7 +7731,11 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
@@ -7826,7 +7831,11 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 void initSLSba (ideal F, ideal Q,kStrategy strat)
 {
   int   i,pos;
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   strat->ecartS =   initec(i);
   strat->sevS   =   initsevS(i);
@@ -8132,7 +8141,11 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   i=((i+IDELEMS(F)+IDELEMS(P)+setmax-1)/setmax)*setmax;
   strat->ecartS=initec(i);
@@ -8276,7 +8289,11 @@ void initSSpecialSba (ideal F, ideal Q, ideal P,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   i=((i+IDELEMS(F)+IDELEMS(P)+setmax-1)/setmax)*setmax;
   strat->sevS=initsevS(i);
