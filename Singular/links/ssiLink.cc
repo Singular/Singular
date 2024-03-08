@@ -1886,6 +1886,12 @@ const char* slStatusSsi(si_link l, const char* request)
     fd_set  mask;
     struct timeval wt;
     if (s_isready(d->f_read)) return "ready";
+    if (FD_SETSIZE<=d->f_read)
+    {
+      Werror("file descriptor number too high (%d)",d->f_read);
+      return "error";
+    }
+
     loop
     {
       /* Don't block. Return socket status immediately. */
@@ -2010,6 +2016,11 @@ int slStatusSsiL(lists L, int timeout)
     }
   }
   max_fd++;
+  if (FD_SETSIZE<=max_fd)
+  {
+    Werror("file descriptor number too high (%d)",max_fd);
+    return -2;
+  }
 
 do_select:
   /* copy fdmask to mask */

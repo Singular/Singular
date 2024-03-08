@@ -179,6 +179,11 @@ static const char* slStatusPipe(si_link l, const char* request)
   {
     int s;
     if ((!SI_LINK_R_OPEN_P(l)) || (feof(d->f_read))) s=0;
+    else if (FD_SETSIZE<=d->f_read)
+    {
+      Werror("file descriptor number too high (%d)",d->f_read);
+      s=-1;
+    }
     else
     {
       fd_set  mask/*, fdmask*/;
