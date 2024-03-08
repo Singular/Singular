@@ -1886,9 +1886,9 @@ const char* slStatusSsi(si_link l, const char* request)
     fd_set  mask;
     struct timeval wt;
     if (s_isready(d->f_read)) return "ready";
-    if (FD_SETSIZE<=d->f_read)
+    if (FD_SETSIZE<=d->fd_read)
     {
-      Werror("file descriptor number too high (%d)",d->f_read);
+      Werror("file descriptor number too high (%d)",d->fd_read);
       return "error";
     }
 
