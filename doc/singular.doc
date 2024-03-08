@@ -1307,7 +1307,7 @@ Todos/Issues:
 @c ----------------------------------------------------------
 @node sagbiNormaliz_lib
 @subsection sagbiNormaliz_lib
-@c lib sagbiNormaliz.lib
+@c lib sagbiNormaliz.lib tag:normaliz
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
