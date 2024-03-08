@@ -4023,6 +4023,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
+  strat->fromQ=NULL;
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
@@ -4097,6 +4098,7 @@ poly kNF2Bound (ideal F,ideal Q,poly q,int bound,kStrategy strat, int lazyReduce
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
+  strat->fromQ=NULL;
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
@@ -4182,6 +4184,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
+  strat->fromQ=NULL;
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
@@ -4262,6 +4265,7 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
   assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
   omfree(strat->fromQ);
+  strat->fromQ=NULL;
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();

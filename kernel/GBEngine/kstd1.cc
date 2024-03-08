@@ -3519,7 +3519,8 @@ ideal kInterRedOld (ideal F,const ideal Q)
     {
       if(strat->fromQ[j]) pDelete(&strat->Shdl->m[j]);
     }
-    omFreeSize((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+    omFree((ADDRESS)strat->fromQ);
+    strat->fromQ=NULL;
   }
 //  if (TEST_OPT_PROT)
 //  {
