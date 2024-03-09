@@ -423,7 +423,7 @@ SEE ALSO: -
   module lift_m = add_ideal_gens_(m);
   module syz_mod = schreyers_syz_(lift_m);
   module ans_mod = ext_elimination_(m,syz_mod);
-  return(sort(ans_mod));
+  return(sort(ans_mod)[1]);
 }
 example
 {
@@ -562,22 +562,39 @@ proc greater_than_for_res(vector s, vector v, list L){
 ///////////////////////////////////////////////////////////////////////////////
 
 proc bubble_sort(module m, list L){
-    int n = size(m);
-    int i, j, swapped;
-    for (i = 0; i < n; i++) {
-        swapped = 0;
-        for (j = 1; j < n - i; j++) {
-            if (greater_than_for_res(m[j], m[j+1],L)){
-                m[j], m[j + 1] = swap(m[j], m[j + 1]);
-                swapped = 1;
-            }
-        }
- 
-        // If no two elements were swapped
-        // by inner loop, then break
-        if (swapped == 0){
-            break;
-        }
+  int n = size(m);
+  int i, j, swapped;
+  for (i = 0; i < n; i++) {
+    swapped = 0;
+    for (j = 1; j < n - i; j++) {
+      if (m[j] == m[j+1] || m[j] == -m[j+1]){
+        m = delete(m,j+1);
+        n--; j--;
+      }
+      if (greater_than_for_res(m[j], m[j+1],L)){
+        m[j], m[j + 1] = swap(m[j], m[j + 1]);
+        swapped = 1;
+      }
     }
-    return(m);
+    // If no two elements were swapped
+    // by inner loop, then break
+    if (swapped == 0){
+      break;
+    }
+  }
+  //for (i = 1; i <n; i++){
+  //  for (j = i+1; j<=n; j++){
+  //    if (i != j && NF(m[j],m[i]) == 0){
+  //      m = delete(m,j);
+  //      n--;j--;
+  //   }
+  //    else{
+  //      if(NF(m[i],m[j]) == 0){
+  //        m = delete(m,i);
+  //        i--;j--;n--;
+  //      }
+  //    }
+  //  }
+  //}
+  return(m);
 }
