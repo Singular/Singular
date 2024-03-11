@@ -162,7 +162,7 @@ dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win surfex
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
 ESingular_LDADD =  ${top_builddir}/libpolys/reporter/libreporter.la \
 ${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
-${top_builddir}/resources/libsingular_resources.la
+$(RESOURCES_LIBS)
 
 
 ESingular_SOURCES = emacs.cc feOptES.inc feOpt.cc
@@ -171,7 +171,7 @@ ESingular_SOURCES = emacs.cc feOptES.inc feOpt.cc
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
 TSingular_LDADD = ${top_builddir}/libpolys/reporter/libreporter.la \
 ${top_builddir}/libpolys/misc/libmisc.la ${OMALLOC_LIBS} \
-${top_builddir}/resources/libsingular_resources.la
+$(RESOURCES_LIBS)
 
 TSingular_SOURCES = emacs.cc feOptTS.inc feOpt.cc
 # utils.cc utils.h
@@ -213,7 +213,7 @@ TESTS=test
 check_PROGRAMS=$(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD = ${builddir}/../omalloc/libomalloc.la libSingular.la
+test_LDADD = $(OMALLOC_LIBS) libSingular.la $(RESOURCES_LIBS)
 
 #########################################################
 # These files are built first

@@ -51,7 +51,7 @@ TESTS = test
 check_PROGRAMS = $(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD   = libkernel.la ${builddir}/../omalloc/libomalloc.la ${builddir}/../Singular/libSingular.la
+test_LDADD   = libkernel.la $(OMALLOC_LIBS) ${builddir}/../Singular/libSingular.la $(RESOURCES_LIBS)
 
 # These files are built first
 # BUILT_SOURCES = MOD
