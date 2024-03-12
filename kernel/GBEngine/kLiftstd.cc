@@ -450,6 +450,7 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
       pNext(q)=NULL;
       if (p_GetComp(q,syz_ring)<=k)
       {
+        p_Shift(&q,-lsmod,syz_ring);
         result->m[i]=p_Add_q(result->m[i],q,syz_ring);
       }
       else
