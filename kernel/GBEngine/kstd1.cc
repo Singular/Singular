@@ -3205,6 +3205,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   {
     idSkipZeroes(strat->M);
     M=strat->M;
+    strat->M=NULL;
   }
   delete(strat);
   if (reduced>2)
