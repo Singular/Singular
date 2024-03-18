@@ -32,6 +32,7 @@
   #endif
 #endif
 #include "polys/clapconv.h"
+#include "Singular/ipid.h" //coeffs_BIGINT
 
 #if SIZEOF_LONG == 8
 #define OVERFLOW_MAX LONG_MAX
@@ -2712,32 +2713,15 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   int mu=0;
 #if 0
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
-  poly hseries;
-  if (modulweight==NULL)
-  {
-    // ideal or module?
-    int i=0;
-    loop
-    {
-      if (S->m[i]!=NULL)
-      {
-        if (p_GetComp(S->m[i],hilb_Qt)==0)
-        {
-          hseries = hFirstSeries0p(S,Q,NULL,currRing,hilb_Qt);
-          break;
-        }
-      }
-      i++;
-      if (i==IDELEMS(S)) break;
-    }
-    if (i==IDELEMS(S)) hseries = hFirstSeries0m(S,Q,NULL, modulweight,currRing,hilb_Qt);
-  }
+  poly h1;
+  if (isModule(S,currRing))
+    h1 = hFirstSeries0p(S,Q,NULL,currRing,hilb_Qt);
   else
-    hseries = hFirstSeries0m(S,Q,NULL, modulweight,currRing,hilb_Qt);
+    h1 = hFirstSeries0m(S,Q,NULL, modulweight,currRing,hilb_Qt);
 
-  poly h2=hFirst2Second(hseries,hilb_Qt,co);
+  poly h2=hFirst2Second(h1,hilb_Qt,co);
   int di = (currRing->N)-co;
-  if (hseries==NULL) di=0;
+  if (h1==NULL) di=0;
   poly p=h2;
   while(p!=NULL)
   {
@@ -2745,9 +2729,13 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
     p_LmDelete(&p,hilb_Qt);
   }
 #else
+  bigintmat *h1=hFirstSeries0b(S,Q,NULL,modulweight,currRing,coeffs_BIGINT);
+  intvec *hseries1=new intvec(1,h1->cols());
+  for(int i=0;i<h1->cols();i++)
+  {
+    (*hseries1)[i]=n_Int(BIMATELEM(*h1,1,i+1),coeffs_BIGINT);
+  }
   intvec *hseries2;
-  intvec *hseries1 = hFirstSeries(S, modulweight, Q);
-  if (errorreported) return;
   int l = hseries1->length()-1;
   if (l > 1)
     hseries2 = hSecondSeries(hseries1);

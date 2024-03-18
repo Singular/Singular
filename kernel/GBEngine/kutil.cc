@@ -499,7 +499,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 */
 void HEckeTest (poly pp,kStrategy strat)
 {
-  int   j,/*k,*/p;
+  int   j,p;
 
   if (currRing->pLexOrder
   || rHasMixedOrdering(currRing)
@@ -511,6 +511,7 @@ void HEckeTest (poly pp,kStrategy strat)
   p=pIsPurePower(pp);
   if (p!=0)
     strat->NotUsedAxis[p] = FALSE;
+  else return; /*nothing new*/
   /*- the leading term of pp is a power of the p-th variable -*/
   for (j=(currRing->N);j>0; j--)
   {
@@ -6921,10 +6922,10 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
       {
+        strat->kAllAxis = save_HE;
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
         {
-          strat->kAllAxis = save_HE;
           return redtail(L, end_pos, strat);
         }
         else
@@ -7637,6 +7638,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
 
   if (Q!=NULL) i=((IDELEMS(F)+IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   else         i=((IDELEMS(F)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (i<setmaxTinc) i=setmaxT;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
   strat->S_2_R=initS_2_R(i);
@@ -7729,7 +7731,11 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
@@ -7825,7 +7831,11 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 void initSLSba (ideal F, ideal Q,kStrategy strat)
 {
   int   i,pos;
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   strat->ecartS =   initec(i);
   strat->sevS   =   initsevS(i);
@@ -8131,7 +8141,11 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   i=((i+IDELEMS(F)+IDELEMS(P)+setmax-1)/setmax)*setmax;
   strat->ecartS=initec(i);
@@ -8275,7 +8289,11 @@ void initSSpecialSba (ideal F, ideal Q, ideal P,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  if (Q!=NULL)
+  {
+    i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+    if (i<setmaxTinc) i=setmaxT;
+  }
   else i=setmaxT;
   i=((i+IDELEMS(F)+IDELEMS(P)+setmax-1)/setmax)*setmax;
   strat->sevS=initsevS(i);

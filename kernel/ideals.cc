@@ -3446,11 +3446,20 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
 
 ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
 {
-  if(idIs0(I))
+  if(idIs0(J))
   {
-     I=idCopy(I);
-     idSkipZeroes(I);
-     return(I);
+     ideal res;
+     if(isIdeal)
+     {
+       res=idInit(1,1);
+       res->m[0]=pOne();
+     }
+     else
+     {
+       res=idFreeModule(I->rank);
+     }
+     k=1;
+     return(res);
   }
   //if (idElem(J)==1)
   //{

@@ -60,15 +60,15 @@ SI_EINTR_SAVE_FUNC(ssize_t,  read, (int fd, void *buf, size_t count),
                    (fd, buf, count))
 
 
-SI_EINTR_SAVE_FUNC(ssize_t, readv,
-                   (int fd, const struct iovec *iov, int iovcnt),
-                   (fd, iov,iovcnt))
+//SI_EINTR_SAVE_FUNC(ssize_t, readv,
+//                   (int fd, const struct iovec *iov, int iovcnt),
+//                   (fd, iov,iovcnt))
 
 SI_EINTR_SAVE_FUNC(ssize_t, write, (int fd, const void *buf, size_t count),
                    (fd, buf, count))
 
-SI_EINTR_SAVE_FUNC(ssize_t, writev, (int fd, const struct iovec *iov, int iovcnt),
-                   (fd, iov, iovcnt) )
+//SI_EINTR_SAVE_FUNC(ssize_t, writev, (int fd, const struct iovec *iov, int iovcnt),
+//                   (fd, iov, iovcnt) )
 
 SI_EINTR_SAVE_FUNC_TEMPLATE(int, si_open1, open, (const char *pathname, int flags),
                             (pathname, flags), < 0)
@@ -80,8 +80,8 @@ SI_EINTR_SAVE_FUNC_TEMPLATE(int, si_open2, open,
 #define SI_GET_FIFTH(_4,_3, _2, _1, N, ...) N
 #define si_open(...) SI_GET_FIFTH(X,##__VA_ARGS__, si_open2, si_open1)(__VA_ARGS__)
 
-SI_EINTR_SAVE_FUNC(int, creat, (const char *pathname, mode_t mode),
-                   (pathname, mode))
+//SI_EINTR_SAVE_FUNC(int, creat, (const char *pathname, mode_t mode),
+//                   (pathname, mode))
 
 
 SI_EINTR_SAVE_FUNC(int, close, (int fd), (fd))
@@ -94,12 +94,13 @@ SI_EINTR_SAVE_FUNC(int, connect,
                    (int sockfd, const struct sockaddr *addr, socklen_t addrlen),
                    (sockfd, addr, addrlen))
 
+#if 0
 /* @note: We respect that the user may explictely deactivate the
  * restart feature by setting the second argumetn to NULL.
  */
 static inline int
-si_nanosleep(const struct timespec *req, struct timespec *rem) {
-
+si_nanosleep(const struct timespec *req, struct timespec *rem)
+{
   int res = -1;
   do
   {
@@ -107,6 +108,7 @@ si_nanosleep(const struct timespec *req, struct timespec *rem) {
   } while((rem != NULL) && (res < 0) && (errno == EINTR));
   return res;
 }
+#endif
 
 static inline unsigned int
 si_sleep(unsigned int seconds)
@@ -118,7 +120,7 @@ si_sleep(unsigned int seconds)
   return 0;
 }
 
-SI_EINTR_SAVE_FUNC(int, dup, (int oldfd), (oldfd))
+//SI_EINTR_SAVE_FUNC(int, dup, (int oldfd), (oldfd))
 SI_EINTR_SAVE_FUNC(int, dup2, (int oldfd, int newfd), (oldfd, newfd))
 //SI_EINTR_SAVE_FUNC(int, dup3, (int oldfd, int newfd, int flags),
 //                   (oldfd, newfd, flags))

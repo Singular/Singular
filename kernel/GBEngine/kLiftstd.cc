@@ -358,7 +358,6 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   int k=id_RankFreeModule(quot,orig_ring);
   int lsmod=0;
   if (k==0) { lsmod=1;k=1;}  /*ideal*/
-  else { k=A->rank;}
   /* NF(A 0 E,quot E 0)
    * A,quot: 1..k, 0,E: k+1..k+IDELEMS(quot),
    * E,0: k+IDELEMS(quot)..k+IDELEMS(quot)+IDELEMS(A) */
@@ -382,10 +381,10 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   /* quot[i] -> quot[i]+e(k+i+1) */
   for(int i=0;i<IDELEMS(s_quot);i++)
   {
+    p_Shift(&s_quot->m[i],lsmod,syz_ring);
     poly p=p_One(syz_ring);
-    p_SetComp(p,k+i+1,syz_ring);
+    p_SetComp(p,k+i+2,syz_ring);
     p_Setm(p,syz_ring);
-    if (lsmod==1) p_Shift(&(s_quot->m[i]),1,syz_ring);
     s_quot->m[i]=p_Add_q(s_quot->m[i],p,syz_ring);
   }
   s_quot->rank=k+IDELEMS(quot)+1;
@@ -451,6 +450,7 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
       pNext(q)=NULL;
       if (p_GetComp(q,syz_ring)<=k)
       {
+        p_Shift(&q,-lsmod,syz_ring);
         result->m[i]=p_Add_q(result->m[i],q,syz_ring);
       }
       else
@@ -458,10 +458,10 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
         d=p_Add_q(d,q,syz_ring);
       }
     }
-    p_Shift(&d,-k,syz_ring);
+    p_Shift(&d,-lsmod,syz_ring);
     rest->m[i]=d;
   }
-  rest->rank-=k;
+  rest->rank-=lsmod;
   #if 0
   PrintS("rest:\n");
   {
@@ -470,6 +470,8 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
     ipPrint_MA0(m, "_");
     id_Delete((ideal *) &m,currRing);
   }
+  #endif
+  #if 0
   PrintS("factor+unit:\n");
   {
     void ipPrint_MA0(matrix m, const char *name);
@@ -480,7 +482,7 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   #endif
   /* interpret rest: factors */
   factor=idInit(IDELEMS(rest),IDELEMS(quot));
-  int uk=IDELEMS(quot);
+  int uk=IDELEMS(quot)+lsmod;
   for(int i=0;i<IDELEMS(rest);i++)
   {
     poly d=NULL;
@@ -491,6 +493,7 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
       pNext(q)=NULL;
       if (p_GetComp(q,syz_ring)<=uk)
       {
+        if (lsmod!=0) p_Shift(&q,-lsmod,syz_ring);
         factor->m[i]=p_Add_q(factor->m[i],q,syz_ring);
       }
       else
@@ -514,6 +517,9 @@ ideal idDivRem(ideal A,const ideal quot, ideal &factor,ideal *unit,int lazyReduc
   }
   #endif
     *unit=idInit(IDELEMS(A),IDELEMS(A));
+    /* comp k+1..u_k-1 -> rest, u_k.. -> unit*/
+    int u_k=k+IDELEMS(quot)+2;
+
     for(int i=0;i<IDELEMS(rest);i++)
     {
       poly p=rest->m[i];

@@ -2246,12 +2246,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   omFree(strat->S_2_R);
   omFree(strat->R);
 
-  if ((Q!=NULL)&&(strat->fromQ!=NULL))
-  {
-    i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
-    omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
-    strat->fromQ=NULL;
-  }
+  omfree((ADDRESS)strat->fromQ);
+  strat->fromQ=NULL;
   if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
@@ -2398,12 +2394,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   omFree(strat->sevT);
   omFree(strat->S_2_R);
   omFree(strat->R);
-  if ((Q!=NULL)&&(strat->fromQ!=NULL))
-  {
-    i=((IDELEMS(F)+IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
-    omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
-    strat->fromQ=NULL;
-  }
+  omfree((ADDRESS)strat->fromQ);
+  strat->fromQ=NULL;
   if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
@@ -3213,6 +3205,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   {
     idSkipZeroes(strat->M);
     M=strat->M;
+    strat->M=NULL;
   }
   delete(strat);
   if (reduced>2)
@@ -3527,7 +3520,8 @@ ideal kInterRedOld (ideal F,const ideal Q)
     {
       if(strat->fromQ[j]) pDelete(&strat->Shdl->m[j]);
     }
-    omFreeSize((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+    omFree((ADDRESS)strat->fromQ);
+    strat->fromQ=NULL;
   }
 //  if (TEST_OPT_PROT)
 //  {
@@ -3538,6 +3532,7 @@ ideal kInterRedOld (ideal F,const ideal Q)
   idSkipZeroes(shdl);
   if (strat->fromQ)
   {
+    omfree(strat->fromQ);
     strat->fromQ=NULL;
     ideal res=kInterRed(shdl,NULL);
     idDelete(&shdl);

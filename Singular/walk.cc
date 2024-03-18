@@ -120,6 +120,7 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
 
   if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   else i=setmaxT;
+  if (i==0) i=setmaxT;
 
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);

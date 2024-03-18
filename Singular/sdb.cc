@@ -119,7 +119,7 @@ void sdb_edit(procinfo *pi)
   if (pi->language!= LANG_SINGULAR)
   {
     Print("cannot edit type %d\n",pi->language);
-    close(f);
+    si_close(f);
   }
   else
   {
@@ -136,7 +136,7 @@ void sdb_edit(procinfo *pi)
       if (pi->data.s.body==NULL)
       {
         PrintS("cannot get the procedure body\n");
-        close(f);
+        si_close(f);
         si_unlink(filename);
         omFree(filename);
         return;
@@ -144,7 +144,7 @@ void sdb_edit(procinfo *pi)
     }
 
     size_t res=write(f,pi->data.s.body,strlen(pi->data.s.body));
-    close(f);
+    si_close(f);
     if (res==-1)
     {
       PrintS("cannot write the procedure body\n");
