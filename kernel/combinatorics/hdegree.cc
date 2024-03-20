@@ -1962,30 +1962,34 @@ static std::vector<std::vector<int> > iv2vv(intvec* M)
   return mat;
 }
 
+#if 0
 static void vvPrint(const std::vector<std::vector<int> >& mat)
 {
-  for (int i = 0; i < mat.size(); i++)
+  for (std::vector<std::vector<int> >::size_type i = 0; i < mat.size(); i++)
   {
-    for (int j = 0; j < mat[i].size(); j++)
+    for (std::vector<std::vector<int> >::size_type j = 0; j < mat[i].size(); j++)
     {
       Print("%d ", mat[i][j]);
     }
     PrintLn();
   }
 }
+#endif
 
+#if 0
 static void vvTest(const std::vector<std::vector<int> >& mat)
 {
   if (mat.size() > 0)
   {
-    int cols = mat[0].size();
-    for (int i = 1; i < mat.size(); i++)
+    std::vector<std::vector<int> >::size_type cols = mat[0].size();
+    for (std::vector<std::vector<int> >::size_type i = 1; i < mat.size(); i++)
     {
       if (cols != mat[i].size())
         WerrorS("number of cols in matrix inconsistent");
     }
   }
 }
+#endif
 
 static void vvDeleteRow(std::vector<std::vector<int> >& mat, int row)
 {
@@ -1994,7 +1998,7 @@ static void vvDeleteRow(std::vector<std::vector<int> >& mat, int row)
 
 static void vvDeleteColumn(std::vector<std::vector<int> >& mat, int col)
 {
-  for (int i = 0; i < mat.size(); i++)
+  for (std::vector<std::vector<int> >::size_type i = 0; i < mat.size(); i++)
   {
     mat[i].erase(mat[i].begin() + col);
   }
@@ -2002,7 +2006,7 @@ static void vvDeleteColumn(std::vector<std::vector<int> >& mat, int col)
 
 static BOOLEAN vvIsRowZero(const std::vector<std::vector<int> >& mat, int row)
 {
-  for (int i = 0; i < mat[row].size(); i++)
+  for (std::vector<std::vector<int> >::size_type i = 0; i < mat[row].size(); i++)
   {
     if (mat[row][i] != 0)
       return FALSE;
@@ -2012,7 +2016,7 @@ static BOOLEAN vvIsRowZero(const std::vector<std::vector<int> >& mat, int row)
 
 static BOOLEAN vvIsColumnZero(const std::vector<std::vector<int> >& mat, int col)
 {
-  for (int i = 0; i < mat.size(); i++)
+  for (std::vector<std::vector<int> >::size_type i = 0; i < mat.size(); i++)
   {
     if (mat[i][col] != 0)
       return FALSE;
@@ -2022,7 +2026,7 @@ static BOOLEAN vvIsColumnZero(const std::vector<std::vector<int> >& mat, int col
 
 static BOOLEAN vvIsZero(const std::vector<std::vector<int> >& mat)
 {
-  for (int i = 0; i < mat.size(); i++)
+  for (std::vector<std::vector<int> >::size_type i = 0; i < mat.size(); i++)
   {
     if (!vvIsRowZero(mat, i))
       return FALSE;
@@ -2032,10 +2036,10 @@ static BOOLEAN vvIsZero(const std::vector<std::vector<int> >& mat)
 
 static std::vector<std::vector<int> > vvMult(const std::vector<std::vector<int> >& a, const std::vector<std::vector<int> >& b)
 {
-  int ra = a.size();
-  int rb = b.size();
-  int ca = a.size() > 0 ? a[0].size() : 0;
-  int cb = b.size() > 0 ? b[0].size() : 0;
+  std::vector<std::vector<int> >::size_type ra = a.size();
+  std::vector<std::vector<int> >::size_type rb = b.size();
+  std::vector<std::vector<int> >::size_type ca = a.size() > 0 ? a[0].size() : 0;
+  std::vector<std::vector<int> >::size_type cb = b.size() > 0 ? b[0].size() : 0;
 
   if (ca != rb)
   {
@@ -2044,12 +2048,12 @@ static std::vector<std::vector<int> > vvMult(const std::vector<std::vector<int> 
   }
 
   std::vector<std::vector<int> > res(ra, std::vector<int>(cb));
-  for (int i = 0; i < ra; i++)
+  for (std::vector<std::vector<int> >::size_type i = 0; i < ra; i++)
   {
-    for (int j = 0; j < cb; j++)
+    for (std::vector<std::vector<int> >::size_type j = 0; j < cb; j++)
     {
       int sum = 0;
-      for (int k = 0; k < ca; k++)
+      for (std::vector<std::vector<int> >::size_type k = 0; k < ca; k++)
         sum += a[i][k] * b[k][j];
       res[i][j] = sum;
     }
@@ -2218,7 +2222,7 @@ int lp_kDim(const ideal _G)
   }
 
   std::vector<std::vector<int> > vvUG = iv2vv(UG);
-  for (int i = 0; i < vvUG.size(); i++)
+  for (std::vector<std::vector<int> >::size_type i = 0; i < vvUG.size(); i++)
   {
     if (vvIsRowZero(vvUG, i) && vvIsColumnZero(vvUG, i)) // i is isolated vertex
     {
@@ -2240,9 +2244,9 @@ int lp_kDim(const ideal _G)
   {
     if (TEST_OPT_PROT)
       PrintS("Start count graph entries.\n");
-    for (int i = 0; i < UGpower.size(); i++)
+    for (std::vector<std::vector<int> >::size_type i = 0; i < UGpower.size(); i++)
     {
-      for (int j = 0; j < UGpower[i].size(); j++)
+      for (std::vector<std::vector<int> >::size_type j = 0; j < UGpower[i].size(); j++)
       {
         numberOfNormalWords += UGpower[i][j];
       }

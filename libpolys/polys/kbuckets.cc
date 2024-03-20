@@ -106,7 +106,7 @@ BOOLEAN kbTest_i(kBucket_pt bucket, int i)
   }
   #endif
   pFalseReturn(p_Test(bucket->buckets[i], bucket->bucket_ring));
-  if ((unsigned)bucket->buckets_length[i] != pLength(bucket->buckets[i]))
+  if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
   {
     dReportError("Bucket %d lengths difference should:%d has:%d",
                  i, bucket->buckets_length[i], pLength(bucket->buckets[i]));
@@ -336,7 +336,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
 {
   //assume(false);
   assume(bucket != NULL);
-  assume(length <= 0 || (unsigned)length == pLength(lm));
+  assume(length <= 0 || length == pLength(lm));
   assume(kBucketIsCleared(bucket));
 
   if (lm == NULL) return;
@@ -437,7 +437,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
     assume(bucket->coef[0]==NULL);
     assume(bucket->coef[i]==NULL);
   #endif
-  assume(pLength(p) == (unsigned)pl);
+  assume(pLength(p) == pl);
   //if (TEST_OPT_PROT) { Print("C(%d)",pl); }
   kbTest(bucket);
   return i;
@@ -745,7 +745,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   {
     if ((i <= bucket->buckets_used) && (bucket->buckets[i] != NULL))
     {
-      assume(pLength(bucket->buckets[i])==(unsigned)bucket->buckets_length[i]);
+      assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
 //#ifdef USE_COEF_BUCKETS
 //     if(bucket->coef[i]!=NULL)
 //     {
@@ -815,7 +815,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 {
     assume((!rIsPluralRing(bucket->bucket_ring))||p_IsConstant(m, bucket->bucket_ring));
-  assume(l <= 0 || pLength(p) == (unsigned)l);
+  assume(l <= 0 || pLength(p) == l);
   int i, l1;
   poly p1 = p;
   ring r = bucket->bucket_ring;
@@ -1046,9 +1046,9 @@ void kBucketTakeOutComp(kBucket_pt bucket,
       p_TakeOutComp(&(bucket->buckets[i]), comp, &q, &lq, bucket->bucket_ring);
       if (q != NULL)
       {
-        assume(pLength(q) == (unsigned)lq);
+        assume(pLength(q) == lq);
         bucket->buckets_length[i] -= lq;
-        assume(pLength(bucket->buckets[i]) == (unsigned)bucket->buckets_length[i]);
+        assume(pLength(bucket->buckets[i]) == bucket->buckets_length[i]);
         p = p_Add_q(p, q, lp, lq, bucket->bucket_ring);
       }
     }
@@ -1076,7 +1076,7 @@ number kBucketPolyRed(kBucket_pt bucket,
   assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
   assume(p1 != NULL &&
          p_DivisibleBy(p1,  kBucketGetLm(bucket), r));
-  assume(pLength(p1) == (unsigned) l1);
+  assume(pLength(p1) == l1);
 
   poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
   BOOLEAN reset_vec=FALSE;
@@ -1127,7 +1127,7 @@ number kBucketPolyRed(kBucket_pt bucket,
   p_ExpVectorSub(lm, p1, r);
   l1--;
 
-  assume((unsigned)l1==pLength(a1));
+  assume(l1==pLength(a1));
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;
@@ -1193,7 +1193,7 @@ void kBucketPolyRedNF(kBucket_pt bucket,
   assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
   assume(p1 != NULL &&
          p_DivisibleBy(p1,  kBucketGetLm(bucket), r));
-  assume(pLength(p1) == (unsigned) l1);
+  assume(pLength(p1) == l1);
 
   poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
   BOOLEAN reset_vec=FALSE;
@@ -1240,7 +1240,7 @@ void kBucketPolyRedNF(kBucket_pt bucket,
   p_ExpVectorSub(lm, p1, r);
   l1--;
 
-  assume((unsigned)l1==pLength(a1));
+  assume(l1==pLength(a1));
 
 #ifdef HAVE_SHIFTBBA
   poly lmRight;

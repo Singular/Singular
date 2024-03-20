@@ -9691,14 +9691,12 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         {
           case 3:
             memcpy(&d->arg3,a->next->next,sizeof(sleftv));
-            a->next->next->Init();
-            /* no break */
+            a->next->next->Init(); /* no break */
           case 2:
             memcpy(&d->arg2,a->next,sizeof(sleftv));
             a->next->Init();
             a->next->next=d->arg2.next;
-            d->arg2.next=NULL;
-            /* no break */
+            d->arg2.next=NULL; /* no break */
           case 1:
             a->Init();
             a->next=d->arg1.next;

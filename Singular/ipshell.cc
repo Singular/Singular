@@ -2438,8 +2438,8 @@ static void rRenameVars(ring R)
 //        rParameter(R)[i]=(char *)omAlloc(10);
 //        sprintf(rParameter(R)[i],"@@(%d)",i+1);
         omFree(R->names[j]);
-        R->names[j]=(char *)omAlloc(10);
-        snprintf(R->names[j],10,"@@(%d)",i+1);
+        R->names[j]=(char *)omAlloc(16);
+        snprintf(R->names[j],16,"@@(%d)",i+1);
       }
     }
   }
@@ -2671,6 +2671,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_dp:
            case ringorder_Dp:
            case ringorder_rp:
+	   case ringorder_Ip:
              #if 0
              for (i=0; i<iv_len;i++)
              {

@@ -177,8 +177,7 @@ void p_Setm_General(poly p, const ring r)
           break;
         }
         case ro_wp_neg:
-          ord=POLY_NEGWEIGHT_OFFSET;
-          // no break;
+          ord=POLY_NEGWEIGHT_OFFSET; // no break;
         case ro_wp:
         {
           int a,e;
@@ -630,8 +629,7 @@ long p_WTotaldegree(poly p, const ring r)
         }
         break;
       case ringorder_am:
-        b1=si_min(b1,r->N);
-        /* no break, continue as ringorder_a*/
+        b1=si_min(b1,r->N); /* no break, continue as ringorder_a*/
       case ringorder_a:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         { // only one line
@@ -3441,10 +3439,11 @@ void   p_VectorHasUnit(poly p, int * k, int * len, const ring r)
 poly p_TakeOutComp(poly * p, int k, const ring r)
 {
   poly q = *p,qq=NULL,result = NULL;
+  unsigned long kk=(unsigned long)k;
 
   if (q==NULL) return NULL;
   BOOLEAN use_setmcomp=rOrd_SetCompRequiresSetm(r);
-  if (__p_GetComp(q,r)==k)
+  if (__p_GetComp(q,r)==kk)
   {
     result = q;
     if (UNLIKELY(use_setmcomp))
@@ -3456,7 +3455,7 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
         qq = q;
         pIter(q);
       }
-      while ((q!=NULL) && (__p_GetComp(q,r)==k));
+      while ((q!=NULL) && (__p_GetComp(q,r)==kk));
     }
     else
     {
@@ -3466,14 +3465,14 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
         qq = q;
         pIter(q);
       }
-      while ((q!=NULL) && (__p_GetComp(q,r)==k));
+      while ((q!=NULL) && (__p_GetComp(q,r)==kk));
     }
 
     *p = q;
     pNext(qq) = NULL;
   }
   if (q==NULL) return result;
-  if (__p_GetComp(q,r) > k)
+  if (__p_GetComp(q,r) > kk)
   {
     p_SubComp(q,1,r);
     if (use_setmcomp) p_SetmComp(q,r);
@@ -3481,8 +3480,8 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
   poly pNext_q;
   while ((pNext_q=pNext(q))!=NULL)
   {
-    long c=__p_GetComp(pNext_q,r);
-    if (/*__p_GetComp(pNext_q,r)*/c==k)
+    unsigned long c=__p_GetComp(pNext_q,r);
+    if (/*__p_GetComp(pNext_q,r)*/c==kk)
     {
       if (result==NULL)
       {
@@ -3502,7 +3501,7 @@ poly p_TakeOutComp(poly * p, int k, const ring r)
     else
     {
       /*pIter(q);*/ q=pNext_q;
-      if (/*__p_GetComp(q,r)*/c > k)
+      if (/*__p_GetComp(q,r)*/c > kk)
       {
         p_SubComp(q,1,r);
         if (use_setmcomp) p_SetmComp(q,r);
@@ -3556,7 +3555,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
   *r_q = pNext(&qq);
   *lq = l;
 #ifndef SING_NDEBUG
-  assume(pLength(*r_p) + pLength(*r_q) == (unsigned)lp);
+  assume(pLength(*r_p) + pLength(*r_q) == lp);
 #endif
   p_Test(*r_p,r);
   p_Test(*r_q,r);
@@ -3577,7 +3576,7 @@ void p_DeleteComp(poly * p,int k, const ring r)
   }
   while (pNext(q)!=NULL)
   {
-    long c=__p_GetComp(pNext(q),r);
+    unsigned long c=__p_GetComp(pNext(q),r);
     if (/*__p_GetComp(pNext(q),r)*/c==kk)
       p_LmDelete(&(pNext(q)),r);
     else

@@ -287,26 +287,18 @@ bool gmp_float::isMOne() const
 }
 bool operator > ( const gmp_float & a, const gmp_float & b )
 {
-  if (a.t == b.t)
-    return false;
   return mpf_cmp( a.t, b.t ) > 0;
 }
 bool operator < ( const gmp_float & a, const gmp_float & b )
 {
-  if (a.t == b.t)
-    return false;
   return mpf_cmp( a.t, b.t ) < 0;
 }
 bool operator >= ( const gmp_float & a, const gmp_float & b )
 {
-  if (a.t == b.t)
-    return true;
   return mpf_cmp( a.t, b.t ) >= 0;
 }
 bool operator <= ( const gmp_float & a, const gmp_float & b )
 {
-  if (a.t == b.t)
-    return true;
   return mpf_cmp( a.t, b.t ) <= 0;
 }
 
