@@ -2003,6 +2003,11 @@ int slStatusSsiL(lists L, int timeout)
         d_fd=d->fd_read;
         if (!s_isready(d->f_read))
         {
+          if (FD_SETSIZE<=d_fd)
+          {
+            Werror("file descriptor number too high (%d)",d_fd);
+            return -2;
+          }
           FD_SET(d_fd, &fdmask);
           if (d_fd > max_fd) max_fd=d_fd;
         }
