@@ -19,7 +19,7 @@ static proc mod_init()
 {
 LIB "nctools.lib"; // for ncalg
 LIB "matrix.lib"; // for submat
-LIB "classify.lib" // for swap 
+LIB "classify.lib"; // for swap 
 LIB "tst.lib"; tst_init(); tst_ignore("// ** loaded "); tst_ignore("// ** _ is no standard basis");
 }
 
@@ -93,7 +93,7 @@ example
 proc lcm_(poly v, poly w)
 "USAGE:   lcm_(v,w); v and w in a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
 RETURN:   poly
-PURPOSE:  to compute lcm of lead terms of two vectors over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
+PURPOSE:  to return the lead monomial and coefficient (not component) of a vector over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
 THEORY:   -
 EXAMPLE:  example lcm_; shows examples
 SEE ALSO: leadmonomial_ext, leadterm
@@ -227,7 +227,6 @@ proc lead_syz_(module m){
       }
     }
   }
-  //print(lead_mod);
   return(lead_mod);
 }
 
@@ -242,25 +241,17 @@ proc lift_tree_(vector s, module M){
   int i;
   poly m;
 
-  poly im, iF_, imif, iL;
 
   while (T != 0){
     L = lead(T);
     for(i=1; i<=size(M); i++){
       if(NF(L, leadmonom(M[i]))==0){
-        m = leadmonomial_ext(L)/leadterm(M[i]); 
-        
+        m = leadmonomial_ext(L)/leadterm(M[i]);
         //check sign: 
-        im = m; iF_ = leadterm(M[i]); imif = im*iF_; iL = leadterm(L);
-        //print(imif == iL);
-        if (imif != iL){
-        //print("checking sign in tree");
-        //print(im); print(iF_); print(imif); print(iL);
+        if (m*leadterm(M[i]) != leadterm(L)){
           m = -m;
         } 
-
         if (greater_than_(s, m*gen(i), M)){
-            //print("tree");print(m*gen(i)); 
           ans = ans - lift_subtree_(m*gen(i),M);
           break;
         }
@@ -283,22 +274,18 @@ proc lift_subtree_(vector s, module M){
   int i;
   vector L;
 
-  poly im, iF_, imif, iL;
-
   while (T != 0){
+    if (leadexp(T)[nvars(basering)+1] > 15){
+    }
     L = lead(T);
     for(i=1; i<=size(M); i++){
       if(NF(L, leadmonom(M[i]))==0){
         m = leadmonomial_ext(L)/leadmonomial_ext(M[i]); //TODO check sign!
 
         //check sign: 
-        im = m; iF_ = leadterm(M[i]); imif = im*iF_; iL =leadterm(L);
-        //print("checking sign"); 
-        //print(m); print(leadterm(M[i])); print(leadterm(L));
-        if (imif[1] != iL[1]){
+        if (m*leadterm(M[i]) != leadterm(L)){
           m = -m;
         } 
-        //print("subtree"); print(m*gen(i));
         ans = ans - lift_subtree_(m*gen(i),M);
         break;
       }
@@ -354,8 +341,8 @@ proc greater_than_(vector s, vector v, module M){
   int n = nvars(basering);
   int i = leadexp(s)[n+1];
   int j = leadexp(v)[n+1];
-  poly mi = leadmonomial_ext(s);
-  poly mj = leadmonomial_ext(v);
+  poly mi = leadterm(s);
+  poly mj = leadterm(v);
   if (lead(mi*M[i]) > lead(mj*M[j])){
     return(1);
   }
@@ -384,7 +371,6 @@ proc add_ideal_gens_(module m){
       m[size(m)+1] = var(i)^2 * gen(j);
     }
   }
-  //print("after adding ideal gens"); print(m);
   return(m);
 }
 
@@ -395,8 +381,6 @@ proc ext_elimination_(module m, module syz_mod){
   int n = nvars(basering);
   module ans_mod;
   
-
-  //print("size(syz_mod)");print(size(syz_mod));
   matrix needed_mat = submat(matrix(syz_mod), 1..r, 1..size(syz_mod));
   ans_mod = module(needed_mat);
   int i,j,k;
@@ -446,7 +430,6 @@ SEE ALSO: -
 
   module lift_m = add_ideal_gens_(M);
   module syz_mod = schreyers_syz_(lift_m);
-
   module ans_mod_ = ext_elimination_(M,syz_mod);
 
   //setring original ring
@@ -454,6 +437,7 @@ SEE ALSO: -
 
   //fetch ans_mod
   module ans_mod = imap(RR,ans_mod_);
+
   return(ans_mod);
 }
 example
@@ -481,7 +465,6 @@ proc sres_(module m, int p)
   
   res_list[1] = m;
   for (i = 1; i<p; i++){
-    //print("resolution part"); print(i); 
     print(res_list);
     res_list[i+1] = total_syz_alg(res_list[i], lead_terms_list);
     lead_terms_list[i+1] = lead(res_list[i+1]);
@@ -499,10 +482,18 @@ proc total_syz_alg(module mod_, list L)
   L[size(L)] = lead(lift_m);
   module syz_mod = schreyers_syz_with_order(lift_m, L);
 
-  //print("size(syz_mod)");print(size(syz_mod));
   module ans_mod = ext_elimination_(mod_,syz_mod);
   L[size(L)] = lead(mod_);
   //we are not sorting here!
+  int i,j;
+  for (i = 1; i<size(ans_mod); i++){
+    for (j = i+1; j<=size(ans_mod); j++){
+      if (ans_mod[i] == ans_mod[j]){
+        ans_mod = delete(ans_mod,j);
+        j--;
+      }
+    }
+  }
   return(ans_mod);
 }
 
@@ -513,7 +504,7 @@ proc schreyers_syz_with_order(module m, list L)
   module lead_mod = lead_syz_(m);
   module ans;
   vector s;
-  int i;
+  int i,j;
   for (i=1;i<=size(lead_mod); i++){
     s = lift_tree_with_order(lead_mod[i], m, L);
     ans[size(ans)+1] = s;
@@ -539,12 +530,11 @@ proc lift_tree_with_order(vector s, module M, list LL){
         m = leadmonomial_ext(L)/leadterm(M[i]); 
         
         //check sign: 
-        im = m; iF_ = leadterm(M[i]); imif = im*iF_; iL = leadterm(L);
-        if (imif[1] != iL[1]){
+        if (m*leadterm(M[i])!= leadterm(L)){
           m = -m;
         } 
         //schreyer order algorithm should be called here
-        if (greater_than_(s,m*gen(i),M)){
+        if (gr_than_for_res(s,m*gen(i),LL)){
           ans = ans - lift_subtree_(m*gen(i),M);
           break;
         }
@@ -562,10 +552,20 @@ proc gr_than_for_res(vector s, vector v, list L){
     return(greater_than_(s,v,L[1]));
   }
   int n = nvars(basering);
-  int i;
-  poly m1 = leadmonomial_ext(s); poly m2 = leadmonomial_ext(v);
+  poly m1 = leadterm(s); poly m2 = leadterm(v);
   int e1 = leadexp(s)[n+1]; int e2 = leadexp(v)[n+1];
+  if(e1 == e2){
+    return(m1>m2);
+  }
   s = m1*L[size(L)][e1]; v = m2*L[size(L)][e2];
+  if (s == v || s == -v){
+    if(e1 > e2){
+      return(1);
+    }
+    else{
+      return(0);
+    }
+  }
   L = delete(L, size(L));
   return(gr_than_for_res(s,v,L));
 }
@@ -591,7 +591,6 @@ proc minimal_free_resolution(module m, int p){
 
   //create the non-minimal resolution over the non-commutative ring.
   resolution res_ = sres_(M,p);
-  print(res_);
   int s = size(res_);
 
   //create the quotient ring over the symmetric algebra.
@@ -626,37 +625,4 @@ proc minimal_free_resolution(module m, int p){
   }
   resolution ans_res = ans_L;
   return(ans_res);
-}
-
-
-/////////////////////////
-//maybe i can make something less complicated. 
-proc try_this_res(module m, int n){
-  //assume m is over a commutative ring.
-  //create needed ring
-  ring r = basering;
-  int N = nvars(r);
-  ring R = create_ring(ring_list(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
-  matrix E = UpOneMatrix(N);
-  E = -1*(E);
-  def RR = nc_algebra(E,0); setring RR;
-  module M = imap(r,m);
-
-  //now we work on M.
-  int i;
-  list res_list; 
-  res_list[1] = M;
-  for (i = 1; i <= n; i++){
-    res_list[i+1] = schrey_syz(M);
-  }
-
-  setring r;
-  list ans_list;
-  ans_list[1] = m;
-  for (i=2; i<=n; i++){
-    ans_list[i] = imap(RR, res_list[i]);
-  }
-  resolution ans = ans_list;
-  return(ans);
-
 }
