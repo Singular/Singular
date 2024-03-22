@@ -6,7 +6,7 @@ AUTHORS:
  Nazish Kanwal, Assistant Professor of Mathematics, Department of Sciences & Humanities, FAST-National University of Computer & Emerging Sciences-Karachi, Pakistan
  Email: nkanwal@iba.edu.pk, nazish.kanwal@nu.edu.pk
 
-PROCUDURES:
+PROCEDURES:
  MPGS(G,A);         Maximal part generating set for syzygies of G over subalgebra A
  SNF(f,G,A);        normalform of vector f wrt. G in subalgebra A.
  MSPOLY(G,A);       S-vectors of module G over subalgebra A.

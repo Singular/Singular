@@ -46,23 +46,23 @@ NTL_MAX_FFTPRIMES
 // FFT primes, this allows for polynomials with 20*50/2 = 500K-bit
 // coefficients, while the table itself takes 160KB.
 @item
-the number of elements in GF(p,n) must be less than 65536
+the number of elements in GF(p,n) must be less than 65536 (2^16)
 @item
-the (weighted) degree of a monomial must be less or equal  than 2147483647
+the (weighted) degree of a monomial must be less than 2147483648 (2^31)
 @item
 the rank of any free module
-must be less or equal than 2147483647
+must be less than 2147483648 (2^31)
 @item
 the maximal allowed exponent of a ring variable
-depends on the ordering of the ring and is at least 32767.
+depends on the ordering of the ring and is at least 32767 (2^15-1).
 See also @ref{Monomial orderings} for setting other limits.
 @c TBC -- number of max parameters
 @item
 the precision of long floating point numbers (for ground field @code{real})
-must be less or equal  than 32767
+must be less than 32768 (2^15)
 @item
 integers (of type @code{int}) have the limited range
-from -2147483648 to 2147483647
+from -2147483648 to 2147483647 (-2^31..2^31-1)
 @item
 floating point numbers (type @code{number} from field @code{real}) have
 a limited range which is machine dependent. A typical range is -1.0e-38

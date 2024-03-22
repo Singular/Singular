@@ -572,8 +572,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     {
       map m=(map)d;
       omFreeBinAddr((ADDRESS)m->preimage);
-      m->preimage=NULL;
-      /* no break: continue as IDEAL*/
+      m->preimage=NULL; /* no break: continue as IDEAL*/
     }
     case SMATRIX_CMD:
     case MATRIX_CMD:
