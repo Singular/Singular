@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <semaphore.h>
 #include <stdarg.h>
+#ifdef HAVE_POLL_H
 #include <poll.h>
+#endif
 
 #ifndef SINGULAR_SI_SIGNALS_H
 #define SINGULAR_SI_SIGNALS_H
@@ -49,10 +51,12 @@ SI_EINTR_SAVE_FUNC(int, select,
                    (nfds,readfds, writefds, exceptfds, timeout)
                    )
 
+#ifdef HAVE_POLL
 SI_EINTR_SAVE_FUNC(int, poll,
                    (struct pollfd *fds, nfds_t nfds, int timeout),
                    (fds, nfds, timeout)
                    )
+#endif
 
 SI_EINTR_SAVE_FUNC(pid_t, wait, (int *status), (status))
 SI_EINTR_SAVE_FUNC(pid_t, waitpid, (pid_t pid, int *status, int options),

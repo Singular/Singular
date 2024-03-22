@@ -42,9 +42,9 @@ AM_PROG_AR
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
-AC_CHECK_HEADERS(unistd.h iostream.h fstream.h iomanip.h limits.h sys/time.h sys/times.h asm/sigcontext.h spasm.h)
+AC_CHECK_HEADERS(unistd.h iostream.h fstream.h iomanip.h limits.h sys/time.h sys/times.h asm/sigcontext.h poll.h spasm.h)
 
-AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r)
+AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r poll)
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
