@@ -5575,9 +5575,12 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
       break;
     }
     j = 1;
-    Lforks->m[i-1].CleanUp();
-    Lforks->m[i-1].rtyp=DEF_CMD;
-    Lforks->m[i-1].data=NULL;
+    if (i>0)
+    {
+      Lforks->m[i-1].CleanUp();
+      Lforks->m[i-1].rtyp=DEF_CMD;
+      Lforks->m[i-1].data=NULL;
+    }
   }
   res->data = (void*)(long)j;
   Lforks->Clean();

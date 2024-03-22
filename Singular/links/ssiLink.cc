@@ -1953,6 +1953,92 @@ int slStatusSsiL(lists L, int timeout)
   si_link l;
   ssiInfo *d=NULL;
   int d_fd;
+  int s;
+#ifdef HAVE_POLL
+  int nfd=L->nr+1;
+  int wait_for=0;
+  pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
+  for(int i=L->nr; i>=0; i--)
+  {
+    if (L->m[i].Typ()!=DEF_CMD)
+    {
+      if (L->m[i].Typ()!=LINK_CMD)
+      { WerrorS("all elements must be of type link"); return -2;}
+      l=(si_link)L->m[i].Data();
+      if(SI_LINK_OPEN_P(l)==0)
+      { WerrorS("all links must be open"); return -2;}
+      if (((strcmp(l->m->type,"ssi")!=0) && (strcmp(l->m->type,"MPtcp")!=0))
+      || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
+        && (strcmp(l->mode,"launch")!=0) && (strcmp(l->mode,"connect")!=0)))
+      {
+        WerrorS("all links must be of type ssi:fork, ssi:tcp, ssi:connect");
+        return -2;
+      }
+      if (strcmp(l->m->type,"ssi")==0)
+      {
+        d=(ssiInfo*)l->data;
+        d_fd=d->fd_read;
+        if (!s_isready(d->f_read))
+        {
+          pfd[i].fd=d_fd;
+          pfd[i].events=POLLIN;
+          wait_for++;
+        }
+        else
+        {
+          return i+1;
+        }
+      }
+      else
+      {
+        Werror("wrong link type >>%s<<",l->m->type);
+        return -2;
+      }
+    }
+  }
+  if (timeout>0) timeout=timeout/1000000;
+do_poll:
+  s=poll(pfd,nfd,timeout);
+  if (s==-1)
+  {
+    WerrorS("error in poll call");
+    return -2; /*error*/
+  }
+  if(s==0)
+  {
+    return 0; /*timeout*/
+  }
+  for(int i=L->nr; i>=0; i--)
+  {
+    if (L->m[i].rtyp==LINK_CMD)
+    {
+      // the link type is ssi, that's already tested
+      l=(si_link)L->m[i].Data();
+      d=(ssiInfo*)l->data;
+      d_fd=d->fd_read;
+      //for(int j=nfd-1;j>=0;j--)
+      if (!s_isready(d->f_read))
+      {
+        if (pfd[i].fd==d_fd)
+        {
+          if (pfd[i].revents &POLLIN)
+          {
+            omFree(pfd);
+            return i+1;
+          }
+          if (pfd[i].revents &POLLERR)
+          {
+            wait_for--;
+	    pfd[i].events=0;
+          }
+        }
+      }
+    }
+  }
+  // none ready, wait again:
+  if ((timeout!=0)&&(wait_for>0)) goto do_poll;
+  return 0;
+#else
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);
   FD_ZERO(&mask);
@@ -1976,7 +2062,6 @@ int slStatusSsiL(lists L, int timeout)
   int i;
   int j;
   int k;
-  int s;
   char fdmaskempty;
 
   /* check the links and fill in fdmask */
@@ -2059,20 +2144,12 @@ do_select:
       if (L->m[i].rtyp==LINK_CMD)
       {
         l=(si_link)L->m[i].Data();
-        if (strcmp(l->m->type,"ssi")==0)
-        {
-          d=(ssiInfo*)l->data;
-          d_fd=d->fd_read;
-          if(j==d_fd) break;
-        }
-        else
-        {
-          Werror("wrong link type >>%s<<",l->m->type);
-          return -2;
-        }
+        // only ssi links:
+        d=(ssiInfo*)l->data;
+        d_fd=d->fd_read;
+        if(j==d_fd) break;
       }
     }
-    // only ssi links:
     loop
     {
       /* yes: read 1 char*/
@@ -2117,6 +2194,7 @@ do_select:
       goto do_select;
     }
   }
+#endif
 }
 
 int ssiBatch(const char *host, const char * port)
