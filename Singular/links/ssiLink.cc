@@ -1956,7 +1956,6 @@ const char* slStatusSsi(si_link l, const char* request)
 
 int slStatusSsiL(lists L, int timeout)
 {
-  PrintS("select 1\n");
 // input: L: a list with links of type
 //           ssi-connect, ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
 //           Note: Not every entry in L must be set.
