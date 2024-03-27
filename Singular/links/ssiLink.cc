@@ -2015,7 +2015,7 @@ int slStatusSsiL(lists L, int timeout)
       }
     }
   }
-  if (timeout>0) timeout=timeout/1000000;
+  if (timeout>0) timeout=timeout/1000;
 do_poll:
   s=si_poll(pfd,nfd,timeout);
   if (s==-1)
