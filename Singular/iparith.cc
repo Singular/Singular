@@ -5568,6 +5568,7 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
     i = slStatusSsiL(Lforks, -1);
     if(i == -2) /* error */
     {
+      Lforks->Clean();
       return TRUE;
     }
     if(i == -1)

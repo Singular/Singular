@@ -1884,9 +1884,25 @@ const char* slStatusSsi(si_link l, const char* request)
   ||(strcmp(l->mode,"connect")==0))
   && (strcmp(request, "read") == 0))
   {
+    if (s_isready(d->f_read)) return "ready";
+#ifdef HAVE_POLL
+    pollfd pfd;
+    loop
+    {
+      /* Don't block. Return socket status immediately. */
+      pfd.fd=d->fd_read;
+      pfd.events=POLLIN;
+      //Print("test fd %d\n",d->fd_read);
+    /* check with select: chars waiting: no -> not ready */
+      switch (si_poll(&pfd,1,0))
+      {
+        case 0: /* not ready */ return "not ready";
+        case -1: /*error*/      return "error";
+        case 1: /*ready ? */    break;
+      }
+#else
     fd_set  mask;
     struct timeval wt;
-    if (s_isready(d->f_read)) return "ready";
     if (FD_SETSIZE<=d->fd_read)
     {
       Werror("file descriptor number too high (%d)",d->fd_read);
@@ -1909,6 +1925,7 @@ const char* slStatusSsi(si_link l, const char* request)
         case -1: /*error*/      return "error";
         case 1: /*ready ? */    break;
       }
+#endif
     /* yes: read 1 char*/
     /* if \n, check again with select else ungetc(c), ready*/
       int c=s_getc(d->f_read);
@@ -1954,12 +1971,14 @@ int slStatusSsiL(lists L, int timeout)
   ssiInfo *d=NULL;
   int d_fd;
   int s;
-#ifdef HAVE_POLL
+//#ifdef HAVE_POLL
+#if 0
   int nfd=L->nr+1;
   int wait_for=0;
   pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
   for(int i=L->nr; i>=0; i--)
   {
+    pfd[i].fd=-1;
     if (L->m[i].Typ()!=DEF_CMD)
     {
       if (L->m[i].Typ()!=LINK_CMD)
@@ -1998,7 +2017,7 @@ int slStatusSsiL(lists L, int timeout)
   }
   if (timeout>0) timeout=timeout/1000000;
 do_poll:
-  s=poll(pfd,nfd,timeout);
+  s=si_poll(pfd,nfd,timeout);
   if (s==-1)
   {
     WerrorS("error in poll call");
@@ -2026,18 +2045,20 @@ do_poll:
             omFree(pfd);
             return i+1;
           }
-          if (pfd[i].revents &POLLERR)
+          if (pfd[i].revents) // anything else
           {
             wait_for--;
-	    pfd[i].events=0;
+            pfd[i].fd=-1;
+            pfd[i].events=0;
           }
         }
       }
     }
   }
   // none ready, wait again:
-  if ((timeout!=0)&&(wait_for>0)) goto do_poll;
-  return 0;
+  if ((timeout<0)&&(wait_for>0)) goto do_poll;
+  if (timeout==0) return 0;
+  return -1;
 #else
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);
