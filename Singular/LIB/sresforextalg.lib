@@ -607,6 +607,7 @@ proc minimal_free_resolution(module m, int p){
 
   //now we fetch the given module.
   module M = imap(r, m);
+  module temp_mod;
 
   //create the non-minimal resolution over the non-commutative ring.
   resolution res_ = sres_(M,p);
@@ -617,6 +618,7 @@ proc minimal_free_resolution(module m, int p){
   for (i = 1; i<=N; i++){
     Q[i] = var(i)^2;
   }
+  attrib(Q, "isSB", 1);
   qring @r = Q;
 
 
@@ -625,7 +627,7 @@ proc minimal_free_resolution(module m, int p){
   list ans_L;
   for (i=1; i<=s; i++){
     setring RR;
-    module temp_mod = res_[i];
+    temp_mod = res_[i];
     setring @r;
     ans_L[i] = fetch(RR, temp_mod);
   }
@@ -633,15 +635,15 @@ proc minimal_free_resolution(module m, int p){
   //minimise the resolution over the quotient algebra.
   resolution quo_res = ans_L;
   quo_res = minres(quo_res);
-
+  module temp_mod_1;
   //return the minimised resolution over the symmetric algebra.
-  list ans_L;
+  list ans_L_;
   for (i=1; i<=s; i++){
     setring @r;
-    module temp_mod = quo_res[i];
+    temp_mod_1 = quo_res[i];
     setring r;
-    ans_L[i] = fetch(@r, temp_mod);
+    ans_L_[i] = fetch(@r, temp_mod_1);
   }
-  resolution ans_res = ans_L;
+  resolution ans_res = ans_L_;
   return(ans_res);
 }
