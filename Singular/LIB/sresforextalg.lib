@@ -196,6 +196,7 @@ proc lead_syz_(module m){
   vector pi, pj, t, s;
   poly Li, Lj, mji;
   int i, j, k, expi, expj;
+  module temp_mod_1, temp_mod_2;
   module lead_mod; //this is what we will return
 
   for(i=2; i<=r; i++){
@@ -210,12 +211,16 @@ proc lead_syz_(module m){
         mji = lcm_(Lj,Li)/leadterm(pi);
         t = mji*M[i];
         for (k=1;k<=size(lead_mod);k++){
-          if (NF(t, lead_mod[k])==0){
+          temp_mod_1 = lead_mod[k];
+          attrib(temp_mod_1, "isSB", 1);
+          if (NF(t, temp_mod_1)==0){
             t = 0;
             break;
           }
           else{
-            if(NF(lead_mod[k], t)==0){
+            temp_mod_2 = t;
+            attrib(temp_mod_2, "isSB", 1);
+            if(NF(lead_mod[k], temp_mod_2)==0){
               lead_mod = delete(lead_mod, k);
               k = k-1;
             }
@@ -240,12 +245,15 @@ proc lift_tree_(vector s, module M){
   vector ans = s; 
   int i;
   poly m;
+  module temp_I;
 
 
   while (T != 0){
     L = lead(T);
     for(i=1; i<=size(M); i++){
-      if(NF(L, leadmonom(M[i]))==0){
+      temp_I = leadmonom(M[i]);
+      attrib(temp_I, "isSB", 1);
+      if(NF(L, temp_I)==0){
         m = leadmonomial_ext(L)/leadterm(M[i]);
         //check sign: 
         if (m*leadterm(M[i]) != leadterm(L)){
@@ -273,13 +281,16 @@ proc lift_subtree_(vector s, module M){
   poly m;
   int i;
   vector L;
+  module temp_I;
 
   while (T != 0){
     if (leadexp(T)[nvars(basering)+1] > 15){
     }
     L = lead(T);
     for(i=1; i<=size(M); i++){
-      if(NF(L, leadmonom(M[i]))==0){
+      temp_I = leadmonom(M[i]);
+      attrib(temp_I, "isSB", 1);
+      if(NF(L, temp_I)==0){
         m = leadmonomial_ext(L)/leadmonomial_ext(M[i]); //TODO check sign!
 
         //check sign: 
@@ -319,10 +330,13 @@ proc remove_LOT_(vector g, module m){
   vector L;
   int i;
   vector LOT;
+  module temp_I;
   while(g != 0){
     for(i=1; i<=size(m); i++){
       L = lead(g);
-      if(NF(L, leadmonom(m[i])) == 0){
+      temp_I = leadmonom(m[i]);
+      attrib(temp_I, "isSB", 1);
+      if(NF(L, temp_I) == 0){
         LOT = LOT+L;
         break;
       }
@@ -379,7 +393,7 @@ proc ext_elimination_(module m, module syz_mod){
   //note m is NOT lifted.
   int r = size(m);
   int n = nvars(basering);
-  module ans_mod;
+  module ans_mod, temp_I;
   
   matrix needed_mat = submat(matrix(syz_mod), 1..r, 1..size(syz_mod));
   ans_mod = module(needed_mat);
@@ -388,7 +402,9 @@ proc ext_elimination_(module m, module syz_mod){
   for(i=1;i<=size(ans_mod);i++){
     for(j=1;j<=nrows(matrix(ans_mod[i]));j++){
       for(k=1;k<=n;k++){
-        if ((NF(ans_mod[i][j], var(k)^2) == 0) && ans_mod[i][j] != 0){
+        temp_I = var(k)^2;
+        attrib(temp_I, "isSB", 1);
+        if ((NF(ans_mod[i][j], temp_I) == 0) && ans_mod[i][j] != 0){
           ans_mod[i] = ans_mod[i] - ans_mod[i][j]*gen(j);
           break;
         }
@@ -465,7 +481,7 @@ proc sres_(module m, int p)
   
   res_list[1] = m;
   for (i = 1; i<p; i++){
-    print(res_list);
+    //print(res_list);
     res_list[i+1] = total_syz_alg(res_list[i], lead_terms_list);
     lead_terms_list[i+1] = lead(res_list[i+1]);
   }
@@ -521,12 +537,15 @@ proc lift_tree_with_order(vector s, module M, list LL){
   vector ans = s; 
   int i;
   poly m;
+  module temp_I;
   
   ideal im, iF_, imif, iL;
   while (T != 0){
     L = lead(T);
     for(i=1; i<=size(M); i++){
-      if(NF(L, leadmonom(M[i]))==0){
+      temp_I = leadmonom(M[i]);
+      attrib(temp_I, "isSB", 1);
+      if(NF(L, temp_I)==0){
         m = leadmonomial_ext(L)/leadterm(M[i]); 
         
         //check sign: 
