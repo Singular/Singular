@@ -5,3 +5,4 @@ poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy;
 ring f1 = (7, a) , (b, x, y), lp; minpoly = a2 + 1;
 imap(s2, p);
 tst_status(1);$
+

@@ -1,4 +1,32 @@
 AnnFD-sl2-15
+dmod_lib
+doc-bracket
+doc-elimination
+doc-ideal-decl
+doc-ideal-expr
+doc-ideal-ops
+doc-minres
+doc-module-decl
+doc-module-ops
+doc-mres
+doc-nres
+doc-plural
+doc-poly-decl
+doc-poly-expr
+doc-qring-decl
+doc-reduce
+doc-resolution-decl
+doc-ring-ops
+doc-std
+doc-syz
+doc-syz-resol
+doc-twostd
+doc-vdim
+involut_lib
+; memory
 mult_general1
 mult_general_q1
+mult_lie1
+mult_skew1
 ; ucha2
+; ucha4
