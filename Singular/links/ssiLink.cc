@@ -1956,7 +1956,6 @@ const char* slStatusSsi(si_link l, const char* request)
 
 int slStatusSsiL(lists L, int timeout)
 {
-printf("slStatusSsiL\n");
 // input: L: a list with links of type
 //           ssi-connect, ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
 //           Note: Not every entry in L must be set.
@@ -1972,7 +1971,7 @@ printf("slStatusSsiL\n");
   ssiInfo *d=NULL;
   int d_fd;
   int s;
-#ifdef HAVE_POLL
+#if defiined(HAVE_POLL) && !defined(__APPLE__)
   int nfd=L->nr+1;
   pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
   for(int i=L->nr; i>=0; i--)
