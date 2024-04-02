@@ -108,7 +108,7 @@ public:
   BOOLEAN put(leftv res) { return broken() || m_data.put(res);  }
 
   /// Extract (shallow) copy of stored data
-  LeftvShallow operator*() const { return (broken()? LeftvShallow(): (const LeftvShallow&)m_data); }
+  LeftvShallow operator*() { return (broken()? LeftvShallow(): LeftvShallow(m_data)); }
 
   /// Determine active ring when ring dependency changes
   BOOLEAN rering() {
