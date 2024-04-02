@@ -1971,7 +1971,7 @@ int slStatusSsiL(lists L, int timeout)
   ssiInfo *d=NULL;
   int d_fd;
   int s;
-#if defiined(HAVE_POLL) && !defined(__APPLE__)
+#if defined(HAVE_POLL) && !defined(__APPLE__)
   int nfd=L->nr+1;
   pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
   for(int i=L->nr; i>=0; i--)
