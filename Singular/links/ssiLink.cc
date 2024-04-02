@@ -1956,6 +1956,7 @@ const char* slStatusSsi(si_link l, const char* request)
 
 int slStatusSsiL(lists L, int timeout)
 {
+printf("slStatusSsiL\n");
 // input: L: a list with links of type
 //           ssi-connect, ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
 //           Note: Not every entry in L must be set.
@@ -1971,10 +1972,8 @@ int slStatusSsiL(lists L, int timeout)
   ssiInfo *d=NULL;
   int d_fd;
   int s;
-//#ifdef HAVE_POLL
-#if 0
+#ifdef HAVE_POLL
   int nfd=L->nr+1;
-  int wait_for=0;
   pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
   for(int i=L->nr; i>=0; i--)
   {
@@ -2001,7 +2000,6 @@ int slStatusSsiL(lists L, int timeout)
         {
           pfd[i].fd=d_fd;
           pfd[i].events=POLLIN;
-          wait_for++;
         }
         else
         {
@@ -2016,7 +2014,6 @@ int slStatusSsiL(lists L, int timeout)
     }
   }
   if (timeout>0) timeout=timeout/1000;
-do_poll:
   s=si_poll(pfd,nfd,timeout);
   if (s==-1)
   {
@@ -2035,30 +2032,18 @@ do_poll:
       l=(si_link)L->m[i].Data();
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
-      //for(int j=nfd-1;j>=0;j--)
-      if (!s_isready(d->f_read))
+      if (pfd[i].fd==d_fd)
       {
-        if (pfd[i].fd==d_fd)
+        if (pfd[i].revents &POLLIN)
         {
-          if (pfd[i].revents &POLLIN)
-          {
-            omFree(pfd);
-            return i+1;
-          }
-          if (pfd[i].revents) // anything else
-          {
-            wait_for--;
-            pfd[i].fd=-1;
-            pfd[i].events=0;
-          }
+          omFree(pfd);
+          return i+1;
         }
       }
     }
   }
-  // none ready, wait again:
-  if ((timeout<0)&&(wait_for>0)) goto do_poll;
-  if (timeout==0) return 0;
-  return -1;
+  // none ready
+  return 0;
 #else
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);
