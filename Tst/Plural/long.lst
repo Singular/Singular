@@ -1,5 +1,4 @@
 AnnFD-sl2-15
-dmod_lib
 doc-bracket
 doc-elimination
 doc-ideal-decl
@@ -22,7 +21,6 @@ doc-syz
 doc-syz-resol
 doc-twostd
 doc-vdim
-involut_lib
 ; memory
 mult_general1
 mult_general_q1
