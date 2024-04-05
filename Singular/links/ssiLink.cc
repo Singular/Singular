@@ -1885,7 +1885,7 @@ const char* slStatusSsi(si_link l, const char* request)
   && (strcmp(request, "read") == 0))
   {
     if (s_isready(d->f_read)) return "ready";
-#ifdef HAVE_POLL
+#if defined(HAVE_POLL)
     pollfd pfd;
     loop
     {
@@ -1967,35 +1967,16 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
 //           -1: the read state of all links is eof
 //           0:  timeout (or polling): none ready,
 //           i>0: (at least) L[i] is ready
+#if defined(HAVE_POLL) && !defined(__APPLE__)
   si_link l;
   ssiInfo *d=NULL;
   int d_fd;
   int s;
-#if defined(HAVE_POLL)
   int nfd=L->nr+1;
   pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
-#else
-  fd_set  fdmask;
-  FD_ZERO(&fdmask);
-  int max_fd=0; /* 1 + max fd in fd_set */
-  /* timeout */
-  struct timeval wt;
-  struct timeval *wt_ptr=&wt;
-  if (timeout== -1)
-  {
-    wt_ptr=NULL;
-  }
-  else
-  {
-    wt.tv_sec  = timeout / 1000;
-    wt.tv_usec = (timeout % 1000)*1000;
-  }
-#endif
   for(int i=L->nr; i>=0; i--)
   {
-#if defined(HAVE_POLL)
     pfd[i].fd=-1;
-#endif
     if (L->m[i].Typ()!=DEF_CMD)
     {
       if (L->m[i].Typ()!=LINK_CMD)
@@ -2016,18 +1997,8 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
         d_fd=d->fd_read;
         if (!s_isready(d->f_read))
         {
-#if defined(HAVE_POLL)
           pfd[i].fd=d_fd;
           pfd[i].events=POLLIN;
-#else
-          if (FD_SETSIZE<=d_fd)
-          {
-            Werror("file descriptor number too high (%d)",d_fd);
-            return -2;
-          }
-          FD_SET(d_fd, &fdmask);
-          if (d_fd > max_fd) max_fd=d_fd;
-#endif
         }
         else
         {
@@ -2045,14 +2016,10 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
       ignore[i]=TRUE; // not a link
     }
   }
-#if defined(HAVE_POLL)
   s=si_poll(pfd,nfd,timeout);
-#else
-  s = si_select(max_fd, &fdmask, NULL, NULL, wt_ptr);
-#endif
   if (s==-1)
   {
-    WerrorS("error in poll/select call");
+    Werror("error in poll call (errno:%d)",errno);
     return -2; /*error*/
   }
   if(s==0)
@@ -2068,7 +2035,6 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
       l=(si_link)L->m[i].Data();
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
-#if defined(HAVE_POLL)
       if (pfd[i].fd==d_fd)
       {
         if (pfd[i].revents &POLLIN)
@@ -2078,17 +2044,174 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
           return i+1;
         }
       }
-#else
-      if (FD_ISSET(d_fd, &fdmask))
-      {
-        if (ignore!=NULL) ignore[i]=TRUE;
-        return i+1;
-      }
-#endif
     }
   }
   // no ready
   return 0;
+#else
+  si_link l;
+  ssiInfo *d=NULL;
+  int d_fd;
+  fd_set  mask, fdmask;
+  FD_ZERO(&fdmask);
+  FD_ZERO(&mask);
+  int max_fd=0; /* 1 + max fd in fd_set */
+
+  /* timeout */
+  struct timeval wt;
+  struct timeval *wt_ptr=&wt;
+  int startingtime = getRTimer()/TIMER_RESOLUTION;  // in seconds
+  if (timeout== -1)
+  {
+    wt_ptr=NULL;
+  }
+  else
+  {
+    wt.tv_sec  = timeout / 1000;
+    wt.tv_usec = timeout % 1000;
+  }
+
+  /* auxiliary variables */
+  int i;
+  int j;
+  int k;
+  int s;
+  char fdmaskempty;
+
+  /* check the links and fill in fdmask */
+  /* check ssi links for ungetc_buf */
+  for(i=L->nr; i>=0; i--)
+  {
+    if (L->m[i].Typ()!=DEF_CMD)
+    {
+      if (L->m[i].Typ()!=LINK_CMD)
+      { WerrorS("all elements must be of type link"); return -2;}
+      l=(si_link)L->m[i].Data();
+      if(SI_LINK_OPEN_P(l)==0)
+      { WerrorS("all links must be open"); return -2;}
+      if (((strcmp(l->m->type,"ssi")!=0) && (strcmp(l->m->type,"MPtcp")!=0))
+      || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
+        && (strcmp(l->mode,"launch")!=0) && (strcmp(l->mode,"connect")!=0)))
+      {
+        WerrorS("all links must be of type ssi:fork, ssi:tcp, ssi:connect");
+        return -2;
+      }
+      if (strcmp(l->m->type,"ssi")==0)
+      {
+        d=(ssiInfo*)l->data;
+        d_fd=d->fd_read;
+        if (!s_isready(d->f_read))
+        {
+          FD_SET(d_fd, &fdmask);
+          if (d_fd > max_fd) max_fd=d_fd;
+        }
+        else
+          return i+1;
+      }
+      else
+      {
+        Werror("wrong link type >>%s<<",l->m->type);
+        return -2;
+      }
+    }
+  }
+  max_fd++;
+  if (FD_SETSIZE<=max_fd)
+  {
+    Werror("file descriptor number too high (%d)",max_fd);
+    return -2;
+  }
+
+do_select:
+  /* copy fdmask to mask */
+  FD_ZERO(&mask);
+  for(k = 0; k < max_fd; k++)
+  {
+    if(FD_ISSET(k, &fdmask))
+    {
+      FD_SET(k, &mask);
+    }
+  }
+
+  /* check with select: chars waiting: no -> not ready */
+  s = si_select(max_fd, &mask, NULL, NULL, wt_ptr);
+  if (s==-1)
+  {
+    Werror("error in select call (errno:%d)",errno);
+    return -2; /*error*/
+  }
+  if (s==0)
+  {
+    return 0; /*poll: not ready */
+  }
+  else /* s>0, at least one ready  (the number of fd which are ready is s)*/
+  {
+    j=0;
+    while (j<=max_fd) { if (FD_ISSET(j,&mask)) break; j++; }
+    for(i=L->nr; i>=0; i--)
+    {
+      if (L->m[i].rtyp==LINK_CMD)
+      {
+        l=(si_link)L->m[i].Data();
+        if (strcmp(l->m->type,"ssi")==0)
+        {
+          d=(ssiInfo*)l->data;
+          d_fd=d->fd_read;
+          if(j==d_fd) break;
+        }
+        else
+        {
+          Werror("wrong link type >>%s<<",l->m->type);
+          return -2;
+        }
+      }
+    }
+    // only ssi links:
+    loop
+    {
+      /* yes: read 1 char*/
+      /* if \n, check again with select else ungetc(c), ready*/
+      /* setting: d: current ssiInfo, j current fd, i current entry in L*/
+      int c=s_getc(d->f_read);
+      //Print("try c=%d\n",c);
+      if (c== -1) /* eof */
+      {
+        FD_CLR(j,&fdmask);
+        fdmaskempty = 1;
+        for(k = 0; k < max_fd; k++)
+        {
+          if(FD_ISSET(k, &fdmask))
+          {
+            fdmaskempty = 0;
+            break;
+          }
+        }
+        if(fdmaskempty)
+        {
+          return -1;
+        }
+        if(timeout != -1)
+        {
+          timeout = si_max(0,
+             timeout - 1000*(getRTimer()/TIMER_RESOLUTION - startingtime));
+          wt.tv_sec  = timeout / 1000;
+          wt.tv_usec = (timeout % 1000);
+        }
+        goto do_select;
+      }
+
+      else if (isdigit(c))
+      { s_ungetc(c,d->f_read); return i+1; }
+      else if (c>' ')
+      {
+        Werror("unknown char in ssiLink(%d)",c);
+        return -2;
+      }
+      /* else: next char */
+      goto do_select;
+    }
+  }
+#endif
 }
 
 int ssiBatch(const char *host, const char * port)
