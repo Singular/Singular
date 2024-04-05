@@ -2102,8 +2102,11 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
         d_fd=d->fd_read;
         if (!s_isready(d->f_read))
         {
-          FD_SET(d_fd, &fdmask);
-          if (d_fd > max_fd) max_fd=d_fd;
+	  if ((ignore!=NULL) && (ignore[i]==FALSE))
+	  {
+            FD_SET(d_fd, &fdmask);
+            if (d_fd > max_fd) max_fd=d_fd;
+	  }
         }
         else
           return i+1;
