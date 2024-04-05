@@ -445,9 +445,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
       {
         if (iterate) list1(prefix,h,TRUE,fullname);
         if (IDTYP(h)==ALIAS_CMD) PrintS("A");
-        if ((IDTYP(h)==RING_CMD)
-            //|| (IDTYP(h)==PACKAGE_CMD)
-        )
+        if (IDTYP(h)==RING_CMD)
         {
           h=IDRING(h)->idroot;
         }
