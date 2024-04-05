@@ -1971,7 +1971,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
   ssiInfo *d=NULL;
   int d_fd;
   int s;
-#if defined(HAVE_POLL) && !defined(__APPLE__)
+#if defined(HAVE_POLL)
   int nfd=L->nr+1;
   pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
 #else
@@ -1993,7 +1993,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
 #endif
   for(int i=L->nr; i>=0; i--)
   {
-#if defined(HAVE_POLL) && !defined(__APPLE__)
+#if defined(HAVE_POLL)
     pfd[i].fd=-1;
 #endif
     if (L->m[i].Typ()!=DEF_CMD)
@@ -2016,7 +2016,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
         d_fd=d->fd_read;
         if (!s_isready(d->f_read))
         {
-#if defined(HAVE_POLL) && !defined(__APPLE__)
+#if defined(HAVE_POLL)
           pfd[i].fd=d_fd;
           pfd[i].events=POLLIN;
 #else
@@ -2045,7 +2045,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
       ignore[i]=TRUE; // not a link
     }
   }
-#if defined(HAVE_POLL) && !defined(__APPLE__)
+#if defined(HAVE_POLL)
   s=si_poll(pfd,nfd,timeout);
 #else
   s = si_select(max_fd, &fdmask, NULL, NULL, wt_ptr);
@@ -2068,7 +2068,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
       l=(si_link)L->m[i].Data();
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
-#if defined(HAVE_POLL) && !defined(__APPLE__)
+#if defined(HAVE_POLL)
       if (pfd[i].fd==d_fd)
       {
         if (pfd[i].revents &POLLIN)

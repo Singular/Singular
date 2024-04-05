@@ -3690,13 +3690,13 @@ static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
 //           -1: the read state of all links is eof
 //            0: timeout (or polling): none ready
 //           i>0: (at least) L[i] is ready
-  lists Lforks = (lists)u->Data();
+  lists L = (lists)u->Data();
   int t = (int)(long)v->Data();
   if(t < 0)
   {
     t= -1;
   }
-  int i = slStatusSsiL(Lforks, t);
+  int i = slStatusSsiL(L, t);
   if(i == -2) /* error */
   {
     return TRUE;
@@ -5544,8 +5544,8 @@ BOOLEAN jjWAIT1ST1(leftv res, leftv u)
 //           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
 // returns: -1:  the read state of all links is eof or error
 //          i>0: (at least) u[i] is ready
-  lists Lforks = (lists)u->Data();
-  int i = slStatusSsiL(Lforks, -1);
+  lists L = (lists)u->Data();
+  int i = slStatusSsiL(L, -1);
   if(i == -2) /* error */
   {
     return TRUE;
