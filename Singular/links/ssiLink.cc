@@ -2052,9 +2052,8 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
   si_link l;
   ssiInfo *d=NULL;
   int d_fd;
-  fd_set  mask, fdmask;
+  fd_set fdmask;
   FD_ZERO(&fdmask);
-  FD_ZERO(&mask);
   int max_fd=0; /* 1 + max fd in fd_set */
 
   /* timeout */
@@ -2068,7 +2067,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
   else
   {
     wt.tv_sec  = timeout / 1000;
-    wt.tv_usec = timeout % 1000;
+    wt.tv_usec = (timeout % 1000)*1000;
   }
 
   /* auxiliary variables */
@@ -2102,11 +2101,11 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
         d_fd=d->fd_read;
         if (!s_isready(d->f_read))
         {
-	  if ((ignore!=NULL) && (ignore[i]==FALSE))
-	  {
+          if ((ignore==NULL) || (ignore[i]==FALSE))
+          {
             FD_SET(d_fd, &fdmask);
             if (d_fd > max_fd) max_fd=d_fd;
-	  }
+          }
         }
         else
           return i+1;
@@ -2125,19 +2124,8 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
     return -2;
   }
 
-do_select:
-  /* copy fdmask to mask */
-  FD_ZERO(&mask);
-  for(k = 0; k < max_fd; k++)
-  {
-    if(FD_ISSET(k, &fdmask))
-    {
-      FD_SET(k, &mask);
-    }
-  }
-
   /* check with select: chars waiting: no -> not ready */
-  s = si_select(max_fd, &mask, NULL, NULL, wt_ptr);
+  s = si_select(max_fd, &fdmask, NULL, NULL, wt_ptr);
   if (s==-1)
   {
     Werror("error in select call (errno:%d)",errno);
@@ -2150,7 +2138,7 @@ do_select:
   else /* s>0, at least one ready  (the number of fd which are ready is s)*/
   {
     j=0;
-    while (j<=max_fd) { if (FD_ISSET(j,&mask)) break; j++; }
+    while (j<=max_fd) { if (FD_ISSET(j,&fdmask)) break; j++; }
     for(i=L->nr; i>=0; i--)
     {
       if (L->m[i].rtyp==LINK_CMD)
@@ -2160,60 +2148,12 @@ do_select:
         {
           d=(ssiInfo*)l->data;
           d_fd=d->fd_read;
-          if(j==d_fd) break;
-        }
-        else
-        {
-          Werror("wrong link type >>%s<<",l->m->type);
-          return -2;
+          if(j==d_fd) return i+1;
         }
       }
-    }
-    // only ssi links:
-    loop
-    {
-      /* yes: read 1 char*/
-      /* if \n, check again with select else ungetc(c), ready*/
-      /* setting: d: current ssiInfo, j current fd, i current entry in L*/
-      int c=s_getc(d->f_read);
-      //Print("try c=%d\n",c);
-      if (c== -1) /* eof */
-      {
-        FD_CLR(j,&fdmask);
-        fdmaskempty = 1;
-        for(k = 0; k < max_fd; k++)
-        {
-          if(FD_ISSET(k, &fdmask))
-          {
-            fdmaskempty = 0;
-            break;
-          }
-        }
-        if(fdmaskempty)
-        {
-          return -1;
-        }
-        if(timeout != -1)
-        {
-          timeout = si_max(0,
-             timeout - 1000*(getRTimer()/TIMER_RESOLUTION - startingtime));
-          wt.tv_sec  = timeout / 1000;
-          wt.tv_usec = (timeout % 1000);
-        }
-        goto do_select;
-      }
-
-      else if (isdigit(c))
-      { s_ungetc(c,d->f_read); return i+1; }
-      else if (c>' ')
-      {
-        Werror("unknown char in ssiLink(%d)",c);
-        return -2;
-      }
-      /* else: next char */
-      goto do_select;
     }
   }
+  return 0;
 #endif
 }
 
