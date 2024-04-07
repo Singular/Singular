@@ -2040,7 +2040,6 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
         if (pfd[i].revents &POLLIN)
         {
           omFree(pfd);
-          if (ignore!=NULL) ignore[i]=TRUE;
           return i+1;
         }
       }
