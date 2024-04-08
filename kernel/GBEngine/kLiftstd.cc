@@ -187,7 +187,7 @@ int redLiftstd (LObject* h, kStrategy strat)
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
 
-  // split h into mina part (h) and tail (h_tail)
+  // split h into main part (h) and tail (h_tail)
   poly h_tail=kSplitAt(strat->syzComp,h,strat);
   // fix h-pLength
   h->pLength=0;
