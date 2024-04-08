@@ -612,7 +612,7 @@
 // operation: oppose (ring, def)  ->  any_type, field coeffs
 // operation: parstr (ring, int)  ->  string
 // operation: print (def, string)  ->  string
-// operation: prune_map (module, smatrix)  ->  module
+// operation: prune_map (module, identifier)  ->  module
 // operation: quotient (ideal, ideal)  ->  ideal
 // operation: quotient (module, ideal)  ->  module
 // operation: quotient (module, module)  ->  ideal
@@ -679,8 +679,8 @@
 // operation: coeffs (module, poly, matrix)  ->  matrix
 // operation: coeffs (ideal, ideal, poly)  ->  matrix
 // operation: coeffs (module, module, poly)  ->  matrix
-// operation: eliminate (ideal, poly, bigintvec)  ->  ideal, only commutative rings
-// operation: eliminate (module, poly, bigintvec)  ->  module, only commutative rings
+// operation: eliminate (ideal, poly, bigintvec)  ->  ideal, only commutative rings, field coeffs
+// operation: eliminate (module, poly, bigintvec)  ->  module, only commutative rings, field coeffs
 // operation: eliminate (ideal, poly, string)  ->  ideal
 // operation: eliminate (module, poly, string)  ->  module
 // operation: find (string, string, int)  ->  int
