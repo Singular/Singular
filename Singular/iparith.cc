@@ -5446,6 +5446,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     //case QRING_CMD:
     case INTMAT_CMD:
     case BIGINTMAT_CMD:
+    case BIGINTVEC_CMD:
     case NUMBER_CMD:
     #ifdef SINGULAR_4_2
     case CNUMBER_CMD:
