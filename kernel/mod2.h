@@ -17,9 +17,9 @@
 #endif
 
 #define SINGULAR_MAJOR_VERSION 4
-#define SINGULAR_MINOR_VERSION 3
-#define SINGULAR_SUB_VERSION 2
-#define SINGULAR_PATCHLEVEL 16
+#define SINGULAR_MINOR_VERSION 4
+#define SINGULAR_SUB_VERSION 0
+#define SINGULAR_PATCHLEVEL 0
 #define S_ROOT_DIR ""
 
 /*******************************************************************
