@@ -1322,6 +1322,7 @@ const struct sConvertTypes dConvertTypes[] =
 //   input type       output type     convert procedure(destr.)/(non-destr.)
 //  int -> bigint
    { INT_CMD,         BIGINT_CMD,     D(iiI2BI) , NULL_VAL },
+   { INT_CMD,         BIGINTVEC_CMD,  D(iiI2BIV) , NULL_VAL },
 //  int -> number
    { INT_CMD,         NUMBER_CMD,     D(iiI2N) , NULL_VAL },
    { BIGINT_CMD,      NUMBER_CMD,     D(iiBI2N) , NULL_VAL },

@@ -223,6 +223,14 @@ static void * iiI2BI(void *data)
   return (void *)n;
 }
 
+static void * iiI2BIV(void *data)
+{
+  number n=n_Init((int)(long)data, coeffs_BIGINT);
+  bigintmat *b=new bigintmat(1,1,coeffs_BIGINT);
+  n_Delete(&((*b)[0]),coeffs_BIGINT);
+  (*b)[0]=n;
+  return (void *)b;
+}
 #ifdef SINGULAR_4_2
 static void * iiI2NN(void *data)
 {
