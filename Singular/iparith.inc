@@ -875,6 +875,7 @@
 /*---------------------------------------------*/
 // convert bigintvec -> bigintmat
 // convert intmat -> bigintmat
+// convert int -> bigintvec
 // convert intvec -> bigintvec
 // convert intvec -> intmat
 // convert polyBucket -> ideal
