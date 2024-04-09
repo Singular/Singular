@@ -1420,6 +1420,7 @@ const struct sValAssign dAssign[]=
 // same res types must be grouped together
 // proc            res             arg
  {D(jiA_BIGINT),   BIGINT_CMD,     BIGINT_CMD }
+,{D(jiA_BIGINT_N), BIGINT_CMD,     NUMBER_CMD }
 ,{D(jiA_BIGINTMAT),BIGINTVEC_CMD,  BIGINTVEC_CMD }
 ,{D(jiA_BIGINTVEC_IV),BIGINTVEC_CMD,INTVEC_CMD }
 ,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}

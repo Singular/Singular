@@ -837,6 +837,7 @@
 // operation: factmodd (...)  ->  list ( number of arguments >0 )
 /*---------------------------------------------*/
 // assign: bigint =  bigint
+// assign: bigint =  number
 // assign: bigintvec =  bigintvec
 // assign: bigintvec =  intvec
 // assign: bigintmat =  bigintmat
