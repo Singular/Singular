@@ -70,14 +70,14 @@ Changes in the kernel/build system:
       and zero dimensional ideal over @code{QQ}
 @item new algorithm for lift function (@nref{lift})
 @item mstd for local rings (@nref{mstd})
-@item use the new Hilbert function algorithm for @nref{hilb}. (Different output format)
-@item overflow in @code{hilb} is an error (on request of a single user)
+@item use the new Hilbert function algorithm for @nref{hilb}.
+(Different output format/ diffren return type)
 @item renamed orderings
 @code{ringorder_rp} -> @code{ringorder_ip}
 @code{ringorder_rs} -> @code{ringorder_is}
 @item new ordering
 @code{ringorder_Ip}
-@item changes for FLINT 3.0.x
+@item changes for FLINT 3.0.x/3.1.x
 @end itemize
 
 @heading News for version 4-3-2
@@ -128,7 +128,7 @@ New commands:
 Changed commands:
 @itemize
 @item overflow check for @nref{vdim}
-@item better overflow check/les overflows for Hilbert function (@nref{hilb})
+@item Hilbert function (@nref{hilb}) cannot overflow (different return type)
 @item @code{delete} accepts @code{intvec} for the indices to delete (@nref{delete})
 @item several GB based commands accept the choice of the algorithm:
 @code{"std","slimgb","sba","modstd","singmatic","groebner","ffmod","nfmod"} (@nref{syz}, @nref{eliminate}, @nref{intersect}, @nref{modulo}, @nref{liftstd}, @nref{lift})
