@@ -10,5 +10,5 @@ system("--random", 12345678);
 // allow netscape to access HTML pages from the net
 system("--allow-net", 1);
 // and set help browser to netscape
-system("--browser", "netscape");
+system("--browser", "netscape-www");
 tst_status(1);$
