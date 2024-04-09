@@ -913,6 +913,7 @@ pIntersect
 pIntersectSyz
 Pipe_links
 pmat
+PocklingtonLehmer
 Polar_curves
 poly
 poly2list
@@ -1124,9 +1125,11 @@ setring
 ShanksMestre
 sheafCoh
 sheafCohBGG
+sheafCohBGG2
 short
 show
 showNmzOptions
+showNuminvs
 showrecursive
 signatureBrieskorn
 signatureL
@@ -1270,6 +1273,7 @@ tolessvars
 Tor
 toric_ideal
 toric_std
+torusInvariants
 totalmultiplicities
 _trace
 TRACE
