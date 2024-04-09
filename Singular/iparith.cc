@@ -94,13 +94,8 @@ long farey_cnt=0L;
   #define  NC_MASK     0
 #endif /* HAVE_PLURAL */
 
-#ifdef HAVE_RINGS
-  #define RING_MASK        4
-  #define ZERODIVISOR_MASK 8
-#else
-  #define RING_MASK        0
-  #define ZERODIVISOR_MASK 0
-#endif
+#define RING_MASK        4
+#define ZERODIVISOR_MASK 8
 #define ALLOW_PLURAL     1
 #define NO_NC            0
 #define COMM_PLURAL      2
@@ -2411,13 +2406,11 @@ static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
   }
-#endif
   assumeStdFlag(u);
   intvec *module_w=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
 #if 1
@@ -4050,13 +4043,11 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
 static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
   SPrintStart();
-#ifdef HAVE_RINGS
   if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of degree is being performed for\n");
     PrintS("//       generic fibre, that is, over Q\n");
   }
-#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   scDegree((ideal)v->Data(),module_w,currRing->qideal);
@@ -4163,13 +4154,11 @@ static BOOLEAN jjDIM(leftv res, leftv v)
 #ifdef HAVE_SHIFTBBA
   if (rIsLPRing(currRing))
   {
-#ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
     {
       WerrorS("`dim` is not implemented for letterplace rings over rings");
       return TRUE;
     }
-#endif
     if (currRing->qideal != NULL)
     {
       WerrorS("qring not supported by `dim` for letterplace rings at the moment");
@@ -4348,13 +4337,11 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 }
 static BOOLEAN jjHILBERT(leftv, leftv v)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
   }
-#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   //scHilbertPoly((ideal)v->Data(),currRing->qideal);
@@ -4363,13 +4350,11 @@ static BOOLEAN jjHILBERT(leftv, leftv v)
 }
 static BOOLEAN jjHILBERT_IV(leftv res, leftv v)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
   }
-#endif
   res->data=(void *)hSecondSeries((intvec *)v->Data());
   return FALSE;
 }
@@ -5516,13 +5501,11 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 #ifdef HAVE_SHIFTBBA
   if (rIsLPRing(currRing))
   {
-#ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
     {
       WerrorS("`vdim` is not implemented for letterplace rings over rings");
       return TRUE;
     }
-#endif
     if (currRing->qideal != NULL)
     {
       WerrorS("qring not supported by `vdim` for letterplace rings at the moment");
@@ -6237,13 +6220,11 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
            currRing->N,wdegree->length());
     return TRUE;
   }
-#ifdef HAVE_RINGS
   if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
   }
-#endif
   assumeStdFlag(u);
   intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal,wdegree);
@@ -6265,13 +6246,11 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjHILBERT3Qt(leftv res, leftv u, leftv v, leftv w)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Z(currRing))
   {
     PrintS("// NOTE: computation of Hilbert series etc. is being\n");
     PrintS("//       performed for generic fibre, that is, over Q\n");
   }
-#endif
   assumeStdFlag(u);
   ring Qt =(ring)v->Data();
   char *name=(char*)w->Data();

@@ -30,9 +30,7 @@ int dim(ideal I, ring r)
   {
     int i = idPosConstant(I);
     if ((i != -1)
-    #ifdef HAVE_RINGS
     && (n_IsUnit(p_GetCoeff(I->m[i],currRing->cf),currRing->cf))
-    #endif
     )
       return -1;
     ideal vv = id_Head(I,currRing);

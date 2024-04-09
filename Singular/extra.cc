@@ -103,9 +103,7 @@
 #include "Singular/pyobject_setup.h"
 
 
-#ifdef HAVE_RINGS
 #include "kernel/GBEngine/ringgb.h"
-#endif
 
 #ifdef HAVE_F5
 #include "kernel/GBEngine/f5gb.h"
@@ -2962,7 +2960,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        else
   #endif
   /*==================== redNF_ring =================*/
-  #ifdef HAVE_RINGS
       if (strcmp(sys_cmd, "redNF_ring")==0)
       {
         ring r = currRing;
@@ -2974,7 +2971,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
-  #endif
   /*==================== Roune Hilb  =================*/
        if (strcmp(sys_cmd, "hilbroune") == 0)
        {
@@ -3029,7 +3025,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
   #endif
   /*==================== Testing groebner basis =================*/
-  #ifdef HAVE_RINGS
       if (strcmp(sys_cmd, "NF_ring")==0)
       {
         ring r = currRing;
@@ -3062,7 +3057,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
-  #endif
     /*==================== sca:AltVar ==================================*/
   #ifdef HAVE_PLURAL
       if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )

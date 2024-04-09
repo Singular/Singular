@@ -383,7 +383,6 @@ int redEcart (LObject* h,kStrategy strat)
   }
 }
 
-#ifdef HAVE_RINGS
 int redRiloc (LObject* h,kStrategy strat)
 {
   int i,at,ei,li,ii;
@@ -788,7 +787,6 @@ int redRiloc_Z (LObject* h,kStrategy strat)
         }
     }
 }
-#endif
 
 /*2
 *reduces h with elements from T choosing  the first possible
@@ -1079,7 +1077,6 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   }
 }
 
-#ifdef HAVE_RINGS
 static poly redMoraNFRing (poly h,kStrategy strat, int flag)
 {
     LObject H;
@@ -1218,7 +1215,6 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
         }
     }
 }
-#endif
 
 /*2
 *reorders  L with respect to posInL
@@ -3899,11 +3895,7 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
   }
   else
   {
-    #ifdef HAVE_RINGS
     assume(strat->red == redEcart || strat->red == redRiloc || strat->red == redRiloc_Z);
-    #else
-    assume(strat->red == redEcart);
-    #endif
     if (strat->honey && (strat->syzComp==0))
       return TRUE;
   }

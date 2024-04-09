@@ -17,13 +17,8 @@
 // need to include all tokens: *_CMD:
 #include "Singular/tok.h"
 
-#ifdef HAVE_RINGS
-  #define RING_MASK        4
-  #define ZERODIVISOR_MASK 8
-#else
-  #define RING_MASK        0
-  #define ZERODIVISOR_MASK 0
-#endif
+#define RING_MASK        4
+#define ZERODIVISOR_MASK 8
 
 static inline int RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 
@@ -876,8 +871,6 @@ void ttGen4()
             break;
         }
         #endif
-        #ifdef HAVE_RINGS
-        #endif
       }
     }
     i++;
@@ -905,8 +898,6 @@ void ttGen4()
             fprintf(outfile,"@item @ref{%s} @tab %s\n",s,s);
             break;
         }
-        #endif
-        #ifdef HAVE_RINGS
         #endif
       }
     }
@@ -936,8 +927,6 @@ void ttGen4()
             break;
         }
         #endif
-        #ifdef HAVE_RINGS
-        #endif
       }
     }
     i++;
@@ -963,8 +952,6 @@ void ttGen4()
             fprintf(outfile,"@item @ref{%s} @tab %s\n",s,s);
             break;
         }
-        #endif
-        #ifdef HAVE_RINGS
         #endif
     }
     i++;

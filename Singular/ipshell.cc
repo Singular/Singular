@@ -1884,7 +1884,6 @@ static void rDecomposeC(leftv h,const ring R)
   // ----------------------------------------
 }
 
-#ifdef HAVE_RINGS
 static void rDecomposeRing_41(leftv h,const coeffs C)
 /* field is R or C */
 {
@@ -1911,12 +1910,10 @@ static void rDecomposeRing_41(leftv h,const coeffs C)
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
 }
-#endif
 
 void rDecomposeRing(leftv h,const ring R)
 /* field is R or C */
 {
-#ifdef HAVE_RINGS
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (rField_is_Z(R)) L->Init(1);
   else                     L->Init(2);
@@ -1939,9 +1936,6 @@ void rDecomposeRing(leftv h,const ring R)
   LL->m[1].data=(void *) R->cf->modExponent;
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
-#else
-  WerrorS("rDecomposeRing");
-#endif
 }
 
 
@@ -1959,12 +1953,10 @@ BOOLEAN rDecompose_CF(leftv res,const coeffs C)
   {
     rDecomposeC_41(res,C);
   }
-#ifdef HAVE_RINGS
   else if (nCoeff_is_Ring(C))
   {
     rDecomposeRing_41(res,C);
   }
-#endif
   else if ( C->extRing!=NULL )// nCoeff_is_algExt(r->cf))
   {
     rDecomposeCF(res, C->extRing, currRing);
@@ -2307,7 +2299,6 @@ void rComposeC(lists L, ring R)
   }
 }
 
-#ifdef HAVE_RINGS
 void rComposeRing(lists L, ring R)
 /* field is R or C */
 {
@@ -2399,7 +2390,6 @@ void rComposeRing(lists L, ring R)
   }
   mpz_clear(modBase);
 }
-#endif
 
 static void rRenameVars(ring R)
 {
@@ -2848,13 +2838,11 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
   {
     lists LL=(lists)L->m[0].Data();
 
-#ifdef HAVE_RINGS
     if (LL->m[0].Typ() == STRING_CMD) // 1st comes a string?
     {
       rComposeRing(LL, R); // Ring!?
     }
     else
-#endif
     if (LL->nr < 3)
       rComposeC(LL,R); // R, long_R, long_C
     else
@@ -5807,7 +5795,6 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     }
     assume( cf != NULL );
   }
-#ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
     // TODO: change to use coeffs_BIGINT!?
@@ -5894,7 +5881,6 @@ ring rInit(leftv pn, leftv rv, leftv ord)
     assume( cf != NULL );
     mpz_clear(modBase);
   }
-#endif
   // ring NEW = OLD, (), (); where OLD is a polynomial ring...
   else if ((pn->Typ()==RING_CMD) && (P == 1))
   {
