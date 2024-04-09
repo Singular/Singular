@@ -162,6 +162,7 @@ Short/decodegb.tst
 Short/deform_s.tst
 Short/dim-test_for_rings_over_integers.tst
 Short/div_lift_s.tst
+Short/divisors_s.tst
 Short/ecyclic_5_32003_lp.tst
 Short/ecyclic_6_32003_lp.tst
 Short/ecyclic_7_32003_lp.tst
@@ -187,6 +188,7 @@ Short/gaussm_ex.tst
 Short/gcd0_s.tst
 Short/gcdp_s.tst
 Short/gerhard_1_32003_lp.tst
+Short/gitfan.tst
 Short/graphics.tst
 Short/groebner_s.tst
 Short/highcorner_s.tst
