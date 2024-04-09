@@ -897,16 +897,10 @@ static void heGenHelp(heEntry hentry, int br)
                    #ifdef HAVE_VSNPRINTF
                    {
                      if (*p=='H')
-                     #ifdef SINGULAR_4_2
+                     // starting with 4.4.0
                        snprintf(temp,256,"%s/%d-%d/%s", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100,
-                     #else
-                       snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100,
-                                 (SINGULAR_VERSION % 100)/10,
-                     #endif
+                                  SINGULAR_VERSION/10000,
+                                 (SINGULAR_VERSION % 10000)/1000,
                        hentry->url);
                      else
                        snprintf(temp,256,"%s/%s", htmldir, hentry->url);
@@ -914,55 +908,32 @@ static void heGenHelp(heEntry hentry, int br)
                    else
                    {
                      if (*p=='H')
-                     #ifdef SINGULAR_4_2
+                     // starting with 4-4-0
                        snprintf(temp,256,"%s/%d-%d/index.htm", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100
+                                  SINGULAR_VERSION/10000,
+                                 (SINGULAR_VERSION % 10000)/1000
                        );
-                     #else
-                       snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100,
-                                 (SINGULAR_VERSION % 100)/10
-                       );
-                     #endif
                      else
                        snprintf(temp,256,"%s/index.htm", htmldir);
                    }
                    #else
                    {
                      if (*p=='H')
-                     #ifdef SINGULAR_4_2
+                     // starting with 4-4-0
                        snprintf(temp,256,"%s/%d-%d/%s", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100,
+                                  SINGULAR_VERSION/10000,
+                                 (SINGULAR_VERSION % 10000)/1000,
                        hentry->url);
                      else
                        snprintf(temp,256,"%s/%s", htmldir, hentry->url);
-                     #else
-                       snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100,
-                                 (SINGULAR_VERSION % 100)/10,
-                       hentry->url);
-                     else
-                       snprintf(temp,256,"%s/%s", htmldir, hentry->url);
-                     #endif
                    }
                    else
                      if (*p=='H')
-                     #ifdef SINGULAR_4_2
+                     // starting with 4-4-0
                        snprintf(temp,256,"%s/%d-%d/index.htm", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100
+                                  SINGULAR_VERSION/10000,
+                                 (SINGULAR_VERSION % 10000)/1000
                        );
-                     #else
-                       snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir,
-                                  SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100,
-                                 (SINGULAR_VERSION % 100)/10
-                       );
-                     #endif
                      else
                        snprintf(temp,256,"%s/index.htm", htmldir);
                    }
@@ -1009,9 +980,8 @@ static void heGenHelp(heEntry hentry, int br)
         case 'v': /* version number*/
                  {
                    char temp[256];
-                   snprintf(temp,256,"%d-%d-%d",SINGULAR_VERSION/1000,
-                                 (SINGULAR_VERSION % 1000)/100,
-                                 (SINGULAR_VERSION % 100)/10);
+                   snprintf(temp,256,"%d-%d",SINGULAR_VERSION/10000,
+                                 (SINGULAR_VERSION % 10000)/1000);
                    strcat(sys,temp);
                    i=strlen(sys);
                    break;
@@ -1163,30 +1133,16 @@ static int singular_manual(char *str, BOOLEAN isIndexEntry,heEntry hentry)
    if (hentry != NULL && *(hentry->url) != '\0')
    #ifdef HAVE_VSNPRINTF
    {
-     #ifdef SINGULAR_4_2
      snprintf(temp,256,"%s/%d-%d/%s", htmldir,
-       SINGULAR_VERSION/1000,
-       (SINGULAR_VERSION % 1000)/100,
-     #else
-     snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
-       SINGULAR_VERSION/1000,
-       (SINGULAR_VERSION % 1000)/100,
-       (SINGULAR_VERSION % 100)/10,
-     #endif
+       SINGULAR_VERSION/10000,
+       (SINGULAR_VERSION % 10000)/1000,
        hentry->url);
    }
    #else
    {
-     #ifdef SINGULAR_4_2
      snprintf(temp,256,"%s/%d-%d/%s", htmldir,
-     SINGULAR_VERSION/1000,
-     (SINGULAR_VERSION % 1000)/100,
-     #else
-     snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
-     SINGULAR_VERSION/1000,
-     (SINGULAR_VERSION % 1000)/100,
-     (SINGULAR_VERSION % 100)/10,
-     #endif
+     SINGULAR_VERSION/10000,
+     (SINGULAR_VERSION % 10000)/1000,
      hentry->url);
    }
    #endif
