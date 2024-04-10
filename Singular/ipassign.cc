@@ -17,6 +17,7 @@
 #include "coeffs/coeffs.h"
 #include "coeffs/numbers.h"
 #include "coeffs/bigintmat.h"
+#include "coeffs/longrat.h"
 
 
 #include "polys/ext_fields/algext.h"
@@ -709,9 +710,17 @@ static BOOLEAN jiA_BIGINT_N(leftv res, leftv a, Subexpr e)
 {
   number p=(number)a->Data();
   number pp=NULL;
-  if (rField_is_Q(currRing))
-    pp=nCopy(p);
-  else if (rField_is_Z(currRing))
+  if (currRing->cf->rep==n_rep_gap_rat)
+  {
+    if (SR_HDL(a) & SR_INT) pp=p;
+    else if (p->s==3) pp=nCopy(p);
+    else
+    {
+      WerrorS("cannot assign to bigint");
+      return TRUE;
+    }
+  }
+  else if (currRing->cf->rep==n_rep_gmp)
     pp=coeffs_BIGINT->cfInitMPZ((mpz_ptr)p,coeffs_BIGINT);
   else
   {
