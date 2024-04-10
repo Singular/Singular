@@ -366,13 +366,11 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfSize  = ndSize;
   r->cfInt  = npInt;
   r->cfInitMPZ = npInitMPZ;
-  #ifdef HAVE_RINGS
   //r->cfDivComp = NULL; // only for ring stuff
   //r->cfIsUnit = NULL; // only for ring stuff
   //r->cfGetUnit = NULL; // only for ring stuff
   //r->cfExtGcd = NULL; // only for ring stuff
   // r->cfDivBy = NULL; // only for ring stuff
-  #endif
   r->cfInpNeg   = npNeg;
   r->cfInvers= npInvers;
   //r->cfCopy  = ndCopy;
@@ -568,7 +566,6 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
   return (number)iz;
 }
 
-#ifdef HAVE_RINGS
 /*2
 * convert from a GMP integer
 */
@@ -595,7 +592,6 @@ static number npMapMachineInt(number from, const coeffs /*src*/,const coeffs dst
   long i = (long) (((unsigned long) from) % dst->ch);
   return (number) i;
 }
-#endif
 
 static number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs dst)
 {
@@ -606,7 +602,6 @@ static number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs d
 
 static nMapFunc npSetMap(const coeffs src, const coeffs)
 {
-#ifdef HAVE_RINGS
   if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src))
   {
     return npMapMachineInt;
@@ -619,7 +614,6 @@ static nMapFunc npSetMap(const coeffs src, const coeffs)
   {
     return npMapZ;
   }
-#endif
   if (src->rep==n_rep_gap_rat)  /* Q, Z */
   {
     return nlModP; // npMap0; // FIXME? TODO? // extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to Zp // FIXME!

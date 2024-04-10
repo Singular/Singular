@@ -122,12 +122,8 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
 #endif
   if (strcmp(s_field, "RingGeneral") == 0)
   {
-#ifdef HAVE_RINGS
     printf("#define HAVE_RINGS\n");
     printf("#define HAVE_ZERODIVISORS\n");
-#else
-    printf("#if 0\n");
-#endif
   }
   else
   {
@@ -206,12 +202,8 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   printf("#undef %s\n", s_what);
   if (strcmp(s_field, "RingGeneral") == 0)
   {
-#ifdef HAVE_RINGS
     printf("#undef HAVE_RINGS\n");
     printf("#undef HAVE_ZERODIVISORS\n");
-#else
-    printf("#endif\n");
-#endif
   }
 #ifndef p_Procs_Static
   printf("#endif // p_Procs_[Kernel|Field*]\n");

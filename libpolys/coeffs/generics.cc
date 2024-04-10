@@ -485,13 +485,11 @@ BOOLEAN gInitChar(coeffs r, void* p)
   r->cfInit = gInit;
   r->cfSize  = gSize;
   r->cfInt  = gInt;
-  #ifdef HAVE_RINGS
   r->cfDivComp = gDivComp;
   r->cfIsUnit = gIsUnit;
   r->cfGetUnit = gGetUnit;
   r->cfExtGcd = gExtGcd;
    r->cfDivBy = gDivBy;
-  #endif
   r->cfInpNeg   = gInpNeg;
   r->cfInvers= gInvers;
   r->cfCopy  = gCopy;

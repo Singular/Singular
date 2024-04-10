@@ -522,7 +522,6 @@ static FORCE_INLINE BOOLEAN n_IsUnit(number n, const coeffs r)
 static FORCE_INLINE coeffs n_CoeffRingQuot1(number c, const coeffs r)
 { assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
 
-#ifdef HAVE_RINGS
 static FORCE_INLINE int n_DivComp(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfDivComp!=NULL); return r->cfDivComp (a,b,r); }
 
@@ -535,8 +534,6 @@ static FORCE_INLINE int n_DivComp(number a, number b, const coeffs r)
 //   it would make more sense to return the inverse...
 static FORCE_INLINE number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
-
-#endif
 
 /// a number representing i in the given coeff field/ring r
 static FORCE_INLINE number n_Init(long i,       const coeffs r)
@@ -724,7 +721,6 @@ static FORCE_INLINE void   n_CoeffWrite(const coeffs r, BOOLEAN details = TRUE)
 { assume(r != NULL); assume(r->cfCoeffWrite != NULL); r->cfCoeffWrite(r, details); }
 
 // Tests:
-#ifdef HAVE_RINGS
 static FORCE_INLINE BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_Z2m); }
 
@@ -733,11 +729,6 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Ring_PtoM(const coeffs r)
 
 static FORCE_INLINE BOOLEAN nCoeff_is_Ring(const coeffs r)
 { assume(r != NULL); return (r->is_field==0); }
-#else
-#define nCoeff_is_Ring_2toM(A) 0
-#define nCoeff_is_Ring_PtoM(A) 0
-#define nCoeff_is_Ring(A)      0
-#endif
 
 /// returns TRUE, if r is a field or r has no zero divisors (i.e is a domain)
 static FORCE_INLINE BOOLEAN nCoeff_is_Domain(const coeffs r)
@@ -756,12 +747,10 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Domain(const coeffs r)
 ///                  or ((a, b <> 0) and (b/gcd(a, b) is odd))
 static FORCE_INLINE BOOLEAN n_DivBy(number a, number b, const coeffs r)
 { assume(r != NULL);
-#ifdef HAVE_RINGS
   if( nCoeff_is_Ring(r) )
   {
     assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r);
   }
-#endif
   return !n_IsZero(b, r);
 }
 

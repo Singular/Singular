@@ -8,7 +8,6 @@
 #define RINGGB_HEADER
 // #include "kernel/mod2.h"
 
-#ifdef HAVE_RINGS
 #include "kernel/polys.h"
 
 poly ringNF(poly f, ideal G, ring r);
@@ -18,5 +17,4 @@ int testGB(ideal I, ideal GI);
 poly reduce_poly_fct(poly p, ring r);
 poly ringRedNF(poly f, ideal G, ring r);
 
-#endif
 #endif

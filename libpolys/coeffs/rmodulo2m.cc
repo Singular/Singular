@@ -20,8 +20,6 @@
 
 #include <string.h>
 
-#ifdef HAVE_RINGS
-
 #ifdef LDEBUG
 static BOOLEAN nr2mDBTest(number a, const char *f, const int l, const coeffs r)
 {
@@ -855,6 +853,3 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->has_simple_Alloc=TRUE;
   return FALSE;
 }
-
-#endif
-/* #ifdef HAVE_RINGS */

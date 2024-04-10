@@ -4,7 +4,6 @@
 /*
 * ABSTRACT: numbers (integers)
 */
-#ifdef HAVE_RINGS
 #if SI_INTEGER_VARIANT == 3
 #define POW_2_28 (1L<<60)
 
@@ -1212,7 +1211,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfInitMPZ = nrzInitMPZ;
   r->cfSize  = nrzSize;
   r->cfInt  = nrzInt;
-  //#ifdef HAVE_RINGS
   r->cfDivComp = nrzDivComp; // only for ring stuff
   r->cfIsUnit = nrzIsUnit; // only for ring stuff
   r->cfGetUnit = nrzGetUnit; // only for ring stuff
@@ -1222,7 +1220,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfEucNorm = nrzEucNorm;
   r->cfQuotRem = nrzQuotRem;
   r->cfDivBy = nrzDivBy; // only for ring stuff
-  //#endif
   r->cfInpNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
@@ -1260,5 +1257,4 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->has_simple_Inverse=FALSE;
   return FALSE;
 }
-#endif
 #endif

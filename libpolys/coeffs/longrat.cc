@@ -199,7 +199,6 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst);
 static number nlMapR(number from, const coeffs src, const coeffs dst);
 
 
-#ifdef HAVE_RINGS
 /*2
 * convert from a GMP integer
 */
@@ -231,8 +230,6 @@ number nlMapMachineInt(number from, const coeffs /*src*/, const coeffs /*dst*/)
   z=nlShort3(z);
   return z;
 }
-#endif
-
 
 #ifdef LDEBUG
 BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
@@ -1117,7 +1114,6 @@ coeffs nlQuot1(number c, const coeffs r)
   {
     rr = nInitChar(n_Zp,(void*)ch);
   }
-  #ifdef HAVE_RINGS
   else
   {
     mpz_t dummy;
@@ -1128,7 +1124,6 @@ coeffs nlQuot1(number c, const coeffs r)
     rr = nInitChar(n_Zn, (void*)&info);
     mpz_clear(dummy);
   }
-  #endif
   return(rr);
 }
 
@@ -1612,7 +1607,6 @@ number nlModP(number q, const coeffs /*Q*/, const coeffs Zp)
   return z;
 }
 
-#ifdef HAVE_RINGS
 /*2
 * convert number i (from Q) to GMP and warn if denom != 1
 */
@@ -1632,7 +1626,6 @@ void nlGMP(number &i, mpz_t n, const coeffs r)
   }
   mpz_set(n, i->z);
 }
-#endif
 
 /*2
 * acces to denominator, other 1 for integers
@@ -2508,7 +2501,6 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
   {
     return nlMapC; /* C -> Q */
   }
-#ifdef HAVE_RINGS
   if (src->rep==n_rep_gmp) // nCoeff_is_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Zn(src))
   {
     return nlMapGMP;
@@ -2521,7 +2513,6 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
   {
     return nlMapMachineInt;
   }
-#endif
   return NULL;
 }
 /*2

@@ -622,12 +622,10 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->cfInit = nlInit;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
-#ifdef HAVE_RINGS
   r->cfDivComp = NULL; // only for ring stuff
   r->cfIsUnit = NULL; // only for ring stuff
   r->cfGetUnit = NULL; // only for ring stuff
   r->cfExtGcd = NULL; // only for ring stuff
-#endif
   r->cfInpNeg   = nlNeg;
   r->cfInvers= nlInvers;
   r->cfCopy  = nl_Copy;
@@ -637,9 +635,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->cfRead = nlRead;
   r->cfNormalize=nlNormalize;
   r->cfGreater = nlGreater;
-#ifdef HAVE_RINGS
   r->cfDivBy = NULL; // only for ring stuff
-#endif
   r->cfEqual = nlEqual;
   r->cfIsZero = nlIsZero;
   r->cfIsOne = nlIsOne;

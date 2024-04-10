@@ -218,26 +218,20 @@ int main( int, char *argv[] )
   n_coeffType type;
 
 
-#ifdef HAVE_RINGS
 //  TODO(Frank, Segmentation fault! (if used wihout omalloc???). Please_ investigate!);
   type =  n_Z2m;
   if( Test(type, (void*) 4) )
     c ++;
-#endif
 
   type =  n_Zp;
   if( Test(type, (void*) 101) )
     c ++;
 
-#ifdef HAVE_RINGS
 //  TODO(Frank, memmory corruption_ if used wihout omalloc??? Please_ investigate!);
 
   type = n_Z2m;
   if( Test(type, (void*) 8) )
     c ++;
-
-#endif
-
 
   type =  n_Q;
   if( Test(type) )
@@ -247,11 +241,10 @@ int main( int, char *argv[] )
   if( Test(type) )
     c ++;
 
-#ifdef HAVE_RINGS
   type = n_Z;
   if( Test(type) )
     c ++;
-#endif
+
    type = n_GF;
 
 
@@ -280,10 +273,6 @@ int main( int, char *argv[] )
 
    delete param;
 
-
-
-
-#ifdef HAVE_RINGS
   type = n_Zn;
 
   ZnmInfo Znmparam;
@@ -294,8 +283,6 @@ int main( int, char *argv[] )
   if( Test(type, (void*) &Znmparam) )
     c ++;
 
-#endif
-
   type = n_long_C;
   if( Test(type) )
     c ++;
@@ -304,11 +291,9 @@ int main( int, char *argv[] )
   if( Test(type) )
     c ++;
 
-#ifdef HAVE_RINGS
   type = n_Z2m;
   if( Test(type, (void*) 2) )
     c ++;
-#endif
 
   // polynomial rings needed for: n_algExt, n_transExt !
 
