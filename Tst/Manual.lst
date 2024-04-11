@@ -301,7 +301,6 @@ Manual/denominator.tst
 Manual/derivate.tst
 Manual/det_B.tst
 Manual/diag.tst
-Manual/diagInvariants.tst
 Manual/dimMon.tst
 Manual/divisor.tst
 Manual/elimlinearpart.tst
@@ -503,7 +502,6 @@ Manual/headStand.tst
 Manual/hermiteNormalForm.tst
 Manual/hilbvec.tst
 Manual/iMult.tst
-Manual/intclMonIdeal.tst
 Manual/intersectLattices.tst
 Manual/intmat_declarations.tst
 Manual/intvec_declarations.tst
@@ -555,7 +553,6 @@ Manual/randomLast.tst
 Manual/randommat.tst
 Manual/Return_type_of_procedures_1.tst
 Manual/rho.tst
-Manual/showNuminvs.tst
 Manual/signatureL.tst
 Manual/sortandmap.tst
 Manual/sortIntvec.tst
@@ -598,7 +595,6 @@ Manual/DeltaList.tst
 Manual/Depth.tst
 Manual/ecart.tst
 Manual/eexgcdN.tst
-Manual/ehrhartRing.tst
 Manual/ellipticAdd.tst
 Manual/envelope.tst
 Manual/equidimMax.tst
@@ -791,7 +787,6 @@ Manual/ideal_expressions_BR_PLURAL_BR.tst
 Manual/imageLattice.tst
 Manual/inForm.tst
 Manual/initialIdealW.tst
-Manual/intclToricRing.tst
 Manual/invunit.tst
 Manual/iostruct.tst
 Manual/isGroup.tst
@@ -915,7 +910,6 @@ Manual/fourier.tst
 Manual/getOneVar.tst
 Manual/iniD.tst
 Manual/intersection.tst
-Manual/intersectionValRings.tst
 Manual/isCMcod2.tst
 Manual/isFlat.tst
 Manual/lift_kbase.tst
@@ -1058,7 +1052,6 @@ Manual/slocus.tst
 Manual/std_BR_PLURAL_BR.tst
 Manual/sysNewton.tst
 Manual/sysQE.tst
-Manual/torusInvariants.tst
 Manual/Tracing_of_procedures.tst
 Manual/annRat.tst
 Manual/CenCharDec.tst
@@ -1069,7 +1062,6 @@ Manual/CurveRes.tst
 Manual/ECoef.tst
 Manual/extdevelop.tst
 Manual/factmodd.tst
-Manual/finiteDiagInvariants.tst
 Manual/Free_resolution.tst
 Manual/GKZsystem.tst
 Manual/integralIdeal.tst
@@ -1083,9 +1075,7 @@ Manual/makeUsp1.tst
 Manual/mres_BR_PLURAL_BR.tst
 Manual/multiDegPartition.tst
 Manual/newtonpoly.tst
-Manual/normalize.tst
 Manual/normalToricRing.tst
-Manual/normalToricRingFromBinomials.tst
 Manual/primary_char0_no_molien.tst
 Manual/primary_char0_random.tst
 Manual/primary_charp.tst
@@ -1107,7 +1097,6 @@ Manual/fl2poly.tst
 Manual/fouriersystem.tst
 Manual/GBWeight.tst
 Manual/getModuleGrading.tst
-Manual/intersectionValRingIdeals.tst
 Manual/invariants.tst
 Manual/lieBracket.tst
 Manual/lp2iv.tst
@@ -1391,7 +1380,6 @@ Manual/solve_IP.tst ; needs solve_IP!
 ; ; Manual/rmx.tst ; depends on LaTeX
 ; ; Manual/xdvi.tst ; Latex!
 ; output is system HW -dependent!
-;;; Manual/timeStd.tst ; doesn't seem to work :(((((((
 ; the following example outputs timings :(((
 ; Manual/grobcovold.tst
 Manual/ellipticcovers.tst

@@ -236,7 +236,6 @@ determinecenter
 develop
 diag
 diag_test
-diagInvariants
 diff
 difpoly2tex
 dim
@@ -265,7 +264,6 @@ ecart
 ECoef
 Edatalist
 eexgcdN
-ehrhartRing
 eigenvals
 elemSymmId
 elim1
@@ -342,7 +340,6 @@ fglm
 fglmquot
 fglm_solve
 fibonacci
-finiteDiagInvariants
 find
 findAuto
 findifs_example
@@ -476,10 +473,6 @@ iniD
 init_debug
 initialIdealW
 initialMalgrange
-intclMonIdeal
-intclToricRing
-intersectionValRingIdeals
-intersectionValRings
 insert
 insertGenerator
 inSubring
@@ -844,11 +837,9 @@ normal
 normalC
 normalform
 normalI
-normaliz
 Normalization
 normalize
 normalP
-normalToricRingFromBinomials
 norTest
 npar
 npars
@@ -1129,7 +1120,6 @@ sheafCohBGG2
 short
 show
 showNmzOptions
-showNuminvs
 showrecursive
 signatureBrieskorn
 signatureL
@@ -1273,7 +1263,6 @@ tolessvars
 Tor
 toric_ideal
 toric_std
-torusInvariants
 totalmultiplicities
 _trace
 TRACE
