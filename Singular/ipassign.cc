@@ -722,6 +722,8 @@ static BOOLEAN jiA_BIGINT_N(leftv res, leftv a, Subexpr e)
   }
   else if (currRing->cf->rep==n_rep_gmp)
     pp=coeffs_BIGINT->cfInitMPZ((mpz_ptr)p,coeffs_BIGINT);
+  else if (currRing->cf->rep==n_rep_int)
+    pp=coeffs_BIGINT->cfInit((long)p,coeffs_BIGINT);
   else
   {
     WerrorS("cannot assign to bigint");
