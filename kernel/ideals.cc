@@ -2834,6 +2834,15 @@ ideal idMinEmbedding_with_map(ideal arg,intvec **w, ideal &trans)
 
 ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int* g)
 {
+  if (idIs0(arg))
+  {
+    trans=idFreeModule(arg->rank);
+    if (g!=NULL)
+    {
+      for(int i=0;i<arg->rank;i++) g[i]=i+1;
+    }
+    return arg;
+  }
   int *red_comp=(int*)omAlloc((arg->rank+1)*sizeof(int));
   int del=0;
   ideal res=idMinEmbedding1(arg,FALSE,w,red_comp,del);
