@@ -1,1 +1,1 @@
-//#define MAKE_DISTRIBUTION
+#define MAKE_DISTRIBUTION
