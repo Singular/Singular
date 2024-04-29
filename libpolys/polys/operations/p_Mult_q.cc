@@ -335,49 +335,52 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   BOOLEAN pure_polys=(p_GetComp(p,r)==0) && (p_GetComp(q,r)==0);
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
-  if (lq>MIN_FLINT_QQ)
+  if (pure_polys)
   {
-    fmpq_mpoly_ctx_t ctx;
-    if (pure_polys && rField_is_Q(r) && !convSingRFlintR(ctx,r))
+    if ((lq>MIN_FLINT_QQ) && rField_is_Q(r))
     {
-      // lq is a lower bound for the length of p and  q
-      poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
-      if (!copy)
+      fmpq_mpoly_ctx_t ctx;
+      if (!convSingRFlintR(ctx,r))
       {
-        p_Delete(&p,r);
-        p_Delete(&q,r);
+        // lq is a lower bound for the length of p and  q
+        poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
+        if (!copy)
+        {
+          p_Delete(&p,r);
+          p_Delete(&q,r);
+        }
+        return res;
       }
-      return res;
     }
-  }
-  if (lq>MIN_FLINT_Zp)
-  {
-    nmod_mpoly_ctx_t ctx;
-    if (pure_polys && rField_is_Zp(r) && !convSingRFlintR(ctx,r))
+    if ((lq>MIN_FLINT_Zp) && rField_is_Zp(r))
     {
-      // lq is a lower bound for the length of p and  q
-      poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
-      if (!copy)
+      nmod_mpoly_ctx_t ctx;
+      if (!convSingRFlintR(ctx,r))
       {
-        p_Delete(&p,r);
-        p_Delete(&q,r);
+        // lq is a lower bound for the length of p and  q
+        poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
+        if (!copy)
+        {
+          p_Delete(&p,r);
+          p_Delete(&q,r);
+        }
+        return res;
       }
-      return res;
     }
-  }
-  if (lq>MIN_FLINT_Z)
-  {
-    fmpz_mpoly_ctx_t ctx;
-    if (pure_polys && rField_is_Z(r) && !convSingRFlintR(ctx,r))
+    if ((lq>MIN_FLINT_Z) && rField_is_Z(r))
     {
-      // lq is a lower bound for the length of p and  q
-      poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
-      if (!copy)
+      fmpz_mpoly_ctx_t ctx;
+      if (!convSingRFlintR(ctx,r))
       {
-        p_Delete(&p,r);
-        p_Delete(&q,r);
+        // lq is a lower bound for the length of p and  q
+        poly res=Flint_Mult_MP(p,lq,q,lq,ctx,r);
+        if (!copy)
+        {
+          p_Delete(&p,r);
+          p_Delete(&q,r);
+        }
+        return res;
       }
-      return res;
     }
   }
   #endif
