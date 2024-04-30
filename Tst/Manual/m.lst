@@ -904,6 +904,7 @@ pIntersect
 pIntersectSyz
 Pipe_links
 pmat
+PocklingtonLehmer
 Polar_curves
 poly
 poly2list
@@ -1115,6 +1116,7 @@ setring
 ShanksMestre
 sheafCoh
 sheafCohBGG
+sheafCohBGG2
 short
 show
 showNmzOptions

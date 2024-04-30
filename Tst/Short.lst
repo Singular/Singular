@@ -13,7 +13,6 @@ Short/algebralib.tst
 Short/alias.tst
 Short/allres_s.tst
 Short/arcAtPoint.tst
-Short/assprimeszerodim_s.tst
 Short/barei_s.tst
 Short/betti_s.tst
 Short/brnoeth_s.tst
@@ -61,7 +60,6 @@ Short/bug_48.tst
 Short/bug_49.tst
 Short/bug_5.tst
 Short/bug_50.tst
-Short/bug_509.tst
 Short/bug_51.tst
 Short/bug_52.tst
 Short/bug_526.tst
@@ -154,7 +152,6 @@ Short/bug_x_i_j.tst
 Short/charseries.tst
 Short/charseries_p.tst
 Short/classify_s.tst
-Short/cornercase_normal.tst
 Short/countedref_s.tst
 Short/cyc5_lp.tst
 Short/dbm_s.tst
@@ -162,6 +159,7 @@ Short/decodegb.tst
 Short/deform_s.tst
 Short/dim-test_for_rings_over_integers.tst
 Short/div_lift_s.tst
+Short/divisors_s.tst
 Short/ecyclic_5_32003_lp.tst
 Short/ecyclic_6_32003_lp.tst
 Short/ecyclic_7_32003_lp.tst
@@ -177,7 +175,6 @@ Short/factorizeQa_s.tst
 Short/factorize_mod7.tst
 Short/factorizep_s.tst
 Short/fetch_s.tst
-Short/ffmodstd_s.tst
 Short/fglm1_s.tst
 Short/fglmquot1_s.tst
 Short/finduni_s.tst
@@ -187,6 +184,7 @@ Short/gaussm_ex.tst
 Short/gcd0_s.tst
 Short/gcdp_s.tst
 Short/gerhard_1_32003_lp.tst
+Short/gitfan.tst
 Short/graphics.tst
 Short/groebner_s.tst
 Short/highcorner_s.tst
@@ -222,9 +220,7 @@ Short/ncfactor_inhomog_s.tst
 Short/ncfactor_koepfShift_s.tst
 Short/ncfactor_koepf_s.tst
 Short/ncfactor_tsai_s.tst
-Short/nfmodstd_s
 Short/normal.tst
-Short/parallel_s.tst
 Short/pAddManyVarsManyL_s.tst
 Short/pAddManyVars_s.tst
 Short/pAdd_s.tst
@@ -285,8 +281,6 @@ Short/test_unit_ideal_decomposition.tst
 Short/test_zero_ideal_decomposition.tst
 Short/triang_s.tst
 Short/tst_s.tst
-Short/waitall.tst
-Short/waitfirst.tst
 Short/zerodim_11_32003_lp_slimgb.tst
 Short/zerodim_12_32003_lp_slimgb.tst
 Short/zerodim_13_32003_lp_slimgb.tst

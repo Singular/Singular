@@ -299,9 +299,7 @@ class bigintmat
     void hnf(); ///< transforms INPLACE to HNF
     void howell(); ///<dito, but Howell form (only different for zero-divsors)
     void swapMatrix(bigintmat * a);
-    #ifdef HAVE_RINGS
     bigintmat * modhnf(number p, coeffs c); ///< computes HNF(this | p*I)
-    #endif
     bigintmat * modgauss(number p, coeffs c);
     void skaldiv(number b); ///< Macht Ganzzahldivision aller Matrixeinträge mit b
     void colskaldiv(int j, number b); ///< Macht Ganzzahldivision aller j-ten Spalteneinträge mit b

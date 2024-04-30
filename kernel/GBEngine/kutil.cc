@@ -131,7 +131,6 @@ inline void _my_memmove(void* d, void* s, long l)
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
 
-#ifdef HAVE_RINGS
 #define pDivComp_EQUAL 2
 #define pDivComp_LESS 1
 #define pDivComp_GREATER -1
@@ -178,7 +177,6 @@ static inline int pDivCompRing(poly p, poly q)
   }
   return pDivComp_INCOMP;
 }
-#endif
 
 static inline int pDivComp(poly p, poly q)
 {
@@ -1220,22 +1218,18 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
   }
   if (set[j].sig!=NULL)
   {
-#ifdef HAVE_RINGS
     if (pGetCoeff(set[j].sig) != NULL)
       pLmDelete(set[j].sig);
     else
-#endif
       pLmFree(set[j].sig);
   }
   if (set[j].p!=NULL)
   {
     if (pNext(set[j].p) == strat->tail)
     {
-#ifdef HAVE_RINGS
       if (pGetCoeff(set[j].p) != NULL)
         pLmDelete(set[j].p);
       else
-#endif
         pLmFree(set[j].p);
       /*- tail belongs to several int spolys -*/
     }
@@ -1339,7 +1333,6 @@ static inline BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
   return (ecart1 <= ecart2);
 }
 
-#ifdef HAVE_RINGS
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p) (ring case)
 */
@@ -1943,7 +1936,6 @@ static BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /
   enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   return TRUE;
 }
-#endif
 
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p)
@@ -4001,7 +3993,7 @@ void initenterpairsSigRing (poly h,poly hSig,int hFrom,int k,int ecart,int isFro
 #endif
   }
 }
-#ifdef HAVE_RINGS
+
 /*2
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
@@ -4158,9 +4150,7 @@ void chainCritRing (poly p,int, kStrategy strat)
     j--;
   }
 }
-#endif
 
-#ifdef HAVE_RINGS
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 */
@@ -4240,9 +4230,7 @@ static void initenterstrongPairsSig (poly h,poly hSig, int k,int ecart,int isFro
     }
   }
 }
-#endif
 
-#ifdef HAVE_RINGS
 /*2
 * Generates spoly(0, h) if applicable. Assumes ring has zero divisors
 */
@@ -4446,9 +4434,7 @@ void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
   nDelete(&gcd);
   nDelete(&zero);
 }
-#endif
 
-#ifdef HAVE_RINGS
 void clearSbatch (poly h,int k,int pos,kStrategy strat)
 {
   int j = pos;
@@ -4468,9 +4454,7 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
     // Print("end clearS sl=%d\n",strat->sl);
   }
 }
-#endif
 
-#ifdef HAVE_RINGS
 /*2
 * Generates a sufficient set of spolys (maybe just a finite generating
 * set of the syzygys)
@@ -4500,7 +4484,6 @@ void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStr
   if(strat->sigdrop) return;
   clearSbatch(h, k, pos, strat);
 }
-#endif
 
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
@@ -5008,7 +4991,6 @@ int posInT11 (const TSet set,const int length,LObject &p)
   }
 }
 
-#ifdef HAVE_RINGS
 int posInT11Ring (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
@@ -5043,7 +5025,6 @@ int posInT11Ring (const TSet set,const int length,LObject &p)
       an=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of p in T
@@ -5092,7 +5073,6 @@ int posInT110 (const TSet set,const int length,LObject &p)
   }
 }
 
-#ifdef HAVE_RINGS
 int posInT110Ring (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
@@ -5133,7 +5113,6 @@ int posInT110Ring (const TSet set,const int length,LObject &p)
       an=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of p in set
@@ -5261,7 +5240,6 @@ int posInT15 (const TSet set,const int length,LObject &p)
   }
 }
 
-#ifdef HAVE_RINGS
 int posInT15Ring (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
@@ -5296,7 +5274,6 @@ int posInT15Ring (const TSet set,const int length,LObject &p)
       an=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of p in set
@@ -5364,7 +5341,6 @@ int posInT17 (const TSet set,const int length,LObject &p)
   }
 }
 
-#ifdef HAVE_RINGS
 int posInT17Ring (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
@@ -5404,7 +5380,6 @@ int posInT17Ring (const TSet set,const int length,LObject &p)
       an=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of p in set
@@ -5472,7 +5447,6 @@ int posInT17_c (const TSet set,const int length,LObject &p)
   }
 }
 
-#ifdef HAVE_RINGS
 int posInT17_cRing (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
@@ -5532,7 +5506,6 @@ int posInT17_cRing (const TSet set,const int length,LObject &p)
       an=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of p in set
@@ -5667,7 +5640,6 @@ int posInL0 (const LSet set, const int length,
   }
 }
 
-#ifdef HAVE_RINGS
 int posInL0Ring (const LSet set, const int length,
              LObject* p,const kStrategy)
 {
@@ -5692,7 +5664,6 @@ int posInL0Ring (const LSet set, const int length,
     /*aend. fuer lazy == in !=- machen */
   }
 }
-#endif
 
 /*2
 * looks up the position of polynomial p in set
@@ -5865,7 +5836,6 @@ int posInL11 (const LSet set, const int length,
   }
 }
 
-#ifdef HAVE_RINGS
 /*2
 * looks up the position of polynomial p in set
 * set[length] is the smallest element in set with respect
@@ -5940,9 +5910,7 @@ int posInLF5CRing (const LSet set, int start,const int length,
       en=i;
   }
 }
-#endif
 
-#ifdef HAVE_RINGS
 int posInL11Ringls (const LSet set, const int length,
               LObject* p,const kStrategy)
 {
@@ -6024,7 +5992,6 @@ int posInL11Ringls (const LSet set, const int length,
     }
   }
 }
-#endif
 
 /*2 Position for rings L: Here I am
 * looks up the position of polynomial p in set
@@ -6131,7 +6098,6 @@ int posInL110 (const LSet set, const int length,
   }
 }
 
-#ifdef HAVE_RINGS
 int posInL110Ring (const LSet set, const int length,
                LObject* p,const kStrategy)
 {
@@ -6171,7 +6137,6 @@ int posInL110Ring (const LSet set, const int length,
       en=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of polynomial p in set
@@ -6249,7 +6214,6 @@ int posInL15 (const LSet set, const int length,
   }
 }
 
-#ifdef HAVE_RINGS
 int posInL15Ring (const LSet set, const int length,
               LObject* p,const kStrategy)
 {
@@ -6283,7 +6247,6 @@ int posInL15Ring (const LSet set, const int length,
       en=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of polynomial p in set
@@ -6335,7 +6298,6 @@ int posInL17 (const LSet set, const int length,
   }
 }
 
-#ifdef HAVE_RINGS
 int posInL17Ring (const LSet set, const int length,
               LObject* p,const kStrategy)
 {
@@ -6378,7 +6340,6 @@ int posInL17Ring (const LSet set, const int length,
       en=i;
   }
 }
-#endif
 
 /*2
 * looks up the position of polynomial p in set
@@ -6450,7 +6411,6 @@ int posInL17_c (const LSet set, const int length,
   }
 }
 
-#ifdef HAVE_RINGS
 int posInL17_cRing (const LSet set, const int length,
                 LObject* p,const kStrategy)
 {
@@ -6513,7 +6473,6 @@ int posInL17_cRing (const LSet set, const int length,
       en=i;
   }
 }
-#endif
 
 /*
  * SYZYGY CRITERION for signature-based standard basis algorithms
@@ -6769,7 +6728,6 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
         j++;
       }
     }
-    #ifdef HAVE_RINGS
     else
     {
       loop
@@ -6792,7 +6750,6 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
         j++;
       }
     }
-    #endif
     // if called from NF, T objects do not exist:
     if (strat->tl < 0 || strat->S_2_R[j] == -1)
     {
@@ -6842,7 +6799,6 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
         j++;
       }
     }
-    #ifdef HAVE_RINGS
     else
     {
       loop
@@ -6876,7 +6832,6 @@ TObject* kFindDivisibleByInS_T(kStrategy strat, int end_pos, LObject* L, TObject
         j++;
       }
     }
-    #endif
   }
 }
 
@@ -7184,7 +7139,6 @@ poly redtailBbaBound (LObject* L, int end_pos, kStrategy strat, int bound, BOOLE
   return L->GetLmCurrRing();
 }
 
-#ifdef HAVE_RINGS
 void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat )
 // normalize=FALSE, withT=FALSE, coeff=Z
 {
@@ -7504,7 +7458,6 @@ poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat )
   kTest_L(L,strat);
   return L->GetLmCurrRing();
 }
-#endif
 
 /*2
 *checks the change degree and write progress report
@@ -7718,9 +7671,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
   }
   /*- test, if a unit is in F -*/
   if ((strat->sl>=0)
-#ifdef HAVE_RINGS
        && n_IsUnit(pGetCoeff(strat->S[0]),currRing->cf)
-#endif
        && pIsConstant(strat->S[0]))
   {
     while (strat->sl>0) deleteInS(strat->sl,strat);
@@ -7819,9 +7770,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   /*- test, if a unit is in F -*/
 
   if ((strat->Ll>=0)
-#ifdef HAVE_RINGS
        && n_IsUnit(pGetCoeff(strat->L[strat->Ll].p), currRing->cf)
-#endif
        && pIsConstant(strat->L[strat->Ll].p))
   {
     while (strat->Ll>0) deleteInL(strat->L,&strat->Ll,strat->Ll-1,strat);
@@ -7973,9 +7922,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
   /*- test, if a unit is in F -*/
 
   if ((strat->Ll>=0)
-#ifdef HAVE_RINGS
        && n_IsUnit(pGetCoeff(strat->L[strat->Ll].p), currRing->cf)
-#endif
        && pIsConstant(strat->L[strat->Ll].p))
   {
     while (strat->Ll>0) deleteInL(strat->L,&strat->Ll,strat->Ll-1,strat);
@@ -8458,12 +8405,10 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
 
   if (!pIsVector((*p).p) && ((*p).ecart != 0))
   {
-#ifdef HAVE_RINGS
     // Leading coef have to be a unit: no
     // example 2x+4x2 should be simplified to 2x*(1+2x)
     // and 2 is not a unit in Z
     //if ( !(n_IsUnit(pGetCoeff((*p).p), currRing->cf)) ) return;
-#endif
     k = 0;
     h1 = r = pCopy((*p).p);
     h =pNext(r);
@@ -9291,7 +9236,6 @@ void enterT(LObject &p, kStrategy strat, int atT)
 /*2
 * puts p to the set T at position atT
 */
-#ifdef HAVE_RINGS
 void enterT_strong(LObject &p, kStrategy strat, int atT)
 {
   assume(rField_is_Ring(currRing));
@@ -9389,7 +9333,6 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   #endif
   kTest_T(&(strat->T[atT]),strat);
 }
-#endif
 
 /*2
 * puts signature p.sig to the set syz
@@ -9426,10 +9369,8 @@ void enterSyz(LObject &p, kStrategy strat, int atT)
   //i = strat->syzl;
   i = atT;
   //Makes sure the syz saves just the signature
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
     pNext(p.sig) = NULL;
-  #endif
   strat->syz[atT] = p.sig;
   strat->sevSyz[atT] = p.sevSig;
   strat->syzl++;
@@ -9445,10 +9386,8 @@ void enterSyz(LObject &p, kStrategy strat, int atT)
     //printf("\npLmShDivBy(syz,L) = %i\nn_DivBy(L,syz) = %i\n pLtCmp(L,syz) = %i",p_LmShortDivisibleBy( strat->syz[atT], strat->sevSyz[atT],strat->L[cc].sig, ~strat->L[cc].sevSig, currRing), n_DivBy(pGetCoeff(strat->L[cc].sig),pGetCoeff(strat->syz[atT]),currRing), pLtCmp(strat->L[cc].sig,strat->syz[atT])==1);
     if (p_LmShortDivisibleBy( strat->syz[atT], strat->sevSyz[atT],
                               strat->L[cc].sig, ~strat->L[cc].sevSig, currRing)
-                              #ifdef HAVE_RINGS
                               &&((!rField_is_Ring(currRing))
                               || (n_DivBy(pGetCoeff(strat->L[cc].sig),pGetCoeff(strat->syz[atT]),currRing->cf) && (pLtCmp(strat->L[cc].sig,strat->syz[atT])==1)))
-                              #endif
                               )
     {
       //printf("\nYES!\n");
@@ -9496,13 +9435,11 @@ void initBuchMoraCrit(kStrategy strat)
   strat->chainCrit=chainCritNormal;
   if (TEST_OPT_SB_1)
     strat->chainCrit=chainCritOpt_1;
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->enterOnePair=enterOnePairRing;
     strat->chainCrit=chainCritRing;
   }
-#endif
 #ifdef HAVE_RATGRING
   if (rIsRatGRing(currRing))
   {
@@ -9574,13 +9511,11 @@ void initSbaCrit(kStrategy strat)
   {
     strat->syzCrit  = syzCriterion;
   }
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->enterOnePair=enterOnePairRing;
     strat->chainCrit=chainCritRing;
   }
-#endif
 #ifdef HAVE_RATGRING
   if (rIsRatGRing(currRing))
   {
@@ -9632,9 +9567,7 @@ BOOLEAN kPosInLDependsOnLength(int (*pos_in_l)
 {
   if (pos_in_l == posInL110
   ||  pos_in_l == posInL10
-  #ifdef HAVE_RINGS
   ||  pos_in_l == posInL110Ring
-  #endif
   )
     return TRUE;
 
@@ -9726,7 +9659,6 @@ void initBuchMoraPos (kStrategy strat)
   strat->posInLDependsOnLength = kPosInLDependsOnLength(strat->posInL);
 }
 
-#ifdef HAVE_RINGS
 void initBuchMoraPosRing (kStrategy strat)
 {
   if (rHasGlobalOrdering(currRing))
@@ -9812,7 +9744,6 @@ void initBuchMoraPosRing (kStrategy strat)
     strat->posInT = posInT1;
   strat->posInLDependsOnLength = kPosInLDependsOnLength(strat->posInL);
 }
-#endif
 
 void initBuchMora (ideal F,ideal Q,kStrategy strat)
 {
@@ -10186,7 +10117,6 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
     }
-    #ifdef HAVE_RINGS
     else
     {
       for (l=IDELEMS(r)-1;l>=0;l--)
@@ -10220,7 +10150,6 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
     }
-    #endif
   }
   else
   {
@@ -10254,7 +10183,6 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
     }
-    #ifdef HAVE_RINGS
     //Also need divisibility of the leading coefficients
     else
     {
@@ -10286,10 +10214,8 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
     }
-    #endif
     if (/*TEST_OPT_REDSB &&*/ reduction_found)
     {
-      #ifdef HAVE_RINGS
       if(rField_is_Ring(currRing))
       {
         for (l=IDELEMS(r)-1;l>=0;l--)
@@ -10321,7 +10247,6 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
       else
-      #endif
       {
         for (l=IDELEMS(r)-1;l>=0;l--)
         {
@@ -10580,7 +10505,6 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   return TRUE;
 }
 
-#ifdef HAVE_RINGS
 /***************************************************************
  *
  * Checks, if we can compute the gcd poly / strong pair
@@ -10602,9 +10526,7 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
   }
   return TRUE;
 }
-#endif
 
-#ifdef HAVE_RINGS
 /*!
   used for GB over ZZ: look for constant and monomial elements in the ideal
   background: any known constant element of ideal suppresses
@@ -10769,9 +10691,7 @@ poly preIntegerCheck(const ideal Forig, const ideal Q)
   rDelete(QQ_ring);
   return NULL;
 }
-#endif
 
-#ifdef HAVE_RINGS
 /*!
   used for GB over ZZ: intermediate reduction by monomial elements
   background: any known constant element of ideal suppresses
@@ -11033,7 +10953,6 @@ void finalReduceByMon(kStrategy strat)
   }
   idSkipZeroes(strat->Shdl);
 }
-#endif
 
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
@@ -11595,13 +11514,11 @@ void kDebugPrint(kStrategy strat)
     else if (strat->posInT==posInT17_c) printf("posInT17_c\n");
     else if (strat->posInT==posInT19) printf("posInT19\n");
     else if (strat->posInT==posInT2) printf("posInT2\n");
-    #ifdef HAVE_RINGS
     else if (strat->posInT==posInT11Ring) printf("posInT11Ring\n");
     else if (strat->posInT==posInT110Ring) printf("posInT110Ring\n");
     else if (strat->posInT==posInT15Ring) printf("posInT15Ring\n");
     else if (strat->posInT==posInT17Ring) printf("posInT17Ring\n");
     else if (strat->posInT==posInT17_cRing) printf("posInT17_cRing\n");
-    #endif
 #ifdef HAVE_MORE_POS_IN_T
     else if (strat->posInT==posInT_EcartFDegpLength) printf("posInT_EcartFDegpLength\n");
     else if (strat->posInT==posInT_FDegpLength) printf("posInT_FDegpLength\n");
@@ -11618,7 +11535,6 @@ void kDebugPrint(kStrategy strat)
     else if (strat->posInL==posInL15) printf("posInL15\n");
     else if (strat->posInL==posInL17) printf("posInL17\n");
     else if (strat->posInL==posInL17_c) printf("posInL17_c\n");
-    #ifdef HAVE_RINGS
     else if (strat->posInL==posInL0) printf("posInL0Ring\n");
     else if (strat->posInL==posInL11Ring) printf("posInL11Ring\n");
     else if (strat->posInL==posInL11Ringls) printf("posInL11Ringls\n");
@@ -11626,7 +11542,6 @@ void kDebugPrint(kStrategy strat)
     else if (strat->posInL==posInL15Ring) printf("posInL15Ring\n");
     else if (strat->posInL==posInL17Ring) printf("posInL17Ring\n");
     else if (strat->posInL==posInL17_cRing) printf("posInL17_cRing\n");
-    #endif
     else if (strat->posInL==posInLSpecial) printf("posInLSpecial\n");
     else  printf("%p\n",(void*)strat->posInL);
   printf("enterS: ");
@@ -12160,11 +12075,9 @@ static BOOLEAN enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int
     q_isFromQ = strat->fromQ[q_inS];
 
   BOOLEAN (*enterPair)(poly, poly, int, int, kStrategy, int, int, int, int, int);
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
     enterPair = enterOneStrongPolyAndEnterOnePairRingShift;
   else
-#endif
     enterPair = enterOnePairShift;
 
   int degbound = currRing->N/currRing->isLPring;
@@ -12185,7 +12098,6 @@ static BOOLEAN enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int
       delete_pair=FALSE;
   }
 
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing) && p_lastVblock >= firstShift && p_lastVblock <= maxPossibleShift)
   {
     // add pairs (m*shifts(q), p) where m is a monomial and the pair has no overlap
@@ -12200,7 +12112,6 @@ static BOOLEAN enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int
       idDelete(&fillers);
     }
   }
-#endif
   return delete_pair;
 }
 #endif
@@ -12223,14 +12134,12 @@ static BOOLEAN enterOnePairWithoutShifts (int p_inS /*also i*/, poly q, poly p, 
   if (strat->fromQ != NULL && p_inS >= 0)
     p_isFromQ = strat->fromQ[p_inS];
 
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     assume(q_shift <= p_lastVblock); // we allow the special case where there is no overlap
     return enterOneStrongPolyAndEnterOnePairRingShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
   }
   else
-#endif
   {
     assume(q_shift <= p_lastVblock - ((pGetComp(q) > 0 || pGetComp(p) > 0) ? 0 : 1)); // there should be an overlap (in the module case epsilon overlap is also allowed)
     return enterOnePairShift(q, p, ecartp, p_isFromQ, strat, -1, ecartq, q_isFromQ, q_shift, -1);
@@ -12682,7 +12591,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
                   if(!enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i))
                     delete_hh=FALSE;
                 }
-#ifdef HAVE_RINGS
                 else if (rField_is_Ring(currRing))
                 {
                   assume(i >= s_lastVblock); // this is always the case, but just to be very sure
@@ -12694,7 +12602,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
                   }
                   idDelete(&fillers);
                 }
-#endif
               }
             }
             if (delete_hh) p_LmDelete(hh,currRing);
@@ -12722,7 +12629,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             if (i < s_lastVblock || (pGetComp(s) > 0 && i == s_lastVblock)) // in the module case, product criterion does not hold (note: comp h is always zero here)
               delete_hh=enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i)
                 && delete_hh;
-#ifdef HAVE_RINGS
             else if (rField_is_Ring(currRing))
             {
               assume(i >= s_lastVblock); // this is always the case, but just to be very sure
@@ -12734,12 +12640,10 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
               }
               idDelete(&fillers);
             }
-#endif
           }
           if (i < h_lastVblock) // in the module case, product criterion does not hold (note: comp h is always zero here)
             delete_hh=enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i)
               && delete_hh;
-#ifdef HAVE_RINGS
           else if (rField_is_Ring(currRing))
           {
             assume(i >= h_lastVblock); // this is always the case, but just to be very sure
@@ -12751,7 +12655,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             }
             idDelete(&fillers);
           }
-#endif
           if (delete_hh) pLmDelete(hh);
         }
       }
@@ -12806,7 +12709,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
               int s_lastVblock = pmLastVblock(s);
               if (i <= s_lastVblock) // in the module case, product criterion does not hold
                 enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i);
-#ifdef HAVE_RINGS
               else if (rField_is_Ring(currRing))
               {
                 assume(i >= s_lastVblock); // this is always the case, but just to be very sure
@@ -12818,12 +12720,10 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
                 }
                 idDelete(&fillers);
               }
-#endif
             }
           }
           if (i <= h_lastVblock) // in the module case, product criterion does not hold
             enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i);
-#ifdef HAVE_RINGS
           else if (rField_is_Ring(currRing))
           {
             assume(i >= h_lastVblock); // this is always the case, but just to be very sure
@@ -12838,7 +12738,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             }
             idDelete(&fillers);
           }
-#endif
         }
       }
     }

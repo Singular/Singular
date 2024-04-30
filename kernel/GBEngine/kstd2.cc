@@ -550,7 +550,6 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
   }
 }
 
-#ifdef HAVE_RINGS
 static long ind_fact_2(long arg)
 {
   if (arg <= 0) return 0;
@@ -563,9 +562,7 @@ static long ind_fact_2(long arg)
   }
   return ind;
 }
-#endif
 
-#ifdef HAVE_RINGS
 poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 {
   // m = currRing->ch
@@ -673,10 +670,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   } */
   return NULL;
 }
-#endif
 
-
-#ifdef HAVE_RINGS
 /*2
 *  reduction procedure for the ring coeffs
 */
@@ -1105,7 +1099,6 @@ static int redRing_S (LObject* h,kStrategy strat)
     pass++;
   }
 }
-#endif
 
 /*2
 *  reduction procedure for the homogeneous case
@@ -2320,10 +2313,8 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   LObject P(h);
   P.SetShortExpVector();
   P.t_p=NULL;
-#ifdef HAVE_RINGS
   BOOLEAN is_ring = rField_is_Ring(currRing);
   if(is_ring) nonorm=TRUE;
-#endif
 #ifdef KDEBUG
 //  if (TEST_OPT_DEBUG)
 //  {
@@ -2443,7 +2434,6 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       kbTest(P.bucket);
       P.SetShortExpVector();
     }
-#ifdef HAVE_RINGS
     else if (is_ring && (j_ring>=0) && (currRing->cf->cfQuotRem!=ndQuotRem))
     {
       number r;
@@ -2491,7 +2481,6 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       pNormalize(P.p);
       return P.p;
     }
-#endif
     else
     {
       P.p=kBucketClear(P.bucket);
@@ -2522,19 +2511,15 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
   P.bucket = kBucketCreate(currRing);
   kBucketInit(P.bucket,P.p,pLength(P.p));
   kbTest(P.bucket);
-#ifdef HAVE_RINGS
   BOOLEAN is_ring = rField_is_Ring(currRing);
-#endif
 
   loop
   {
     j=kFindDivisibleByInS(strat,&max_ind,&P);
     if (j>=0)
     {
-#ifdef HAVE_RINGS
       if (!is_ring)
       {
-#endif
         int sl=pSize(strat->S[j]);
         int jj=j;
         loop
@@ -2558,9 +2543,7 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
           pNorm(strat->S[j]);
           //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
         }
-#ifdef HAVE_RINGS
       }
-#endif
       nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
@@ -3407,11 +3390,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
-      #ifdef HAVE_RINGS
       poly beforetailred;
       if(rField_is_Ring(currRing))
         beforetailred = pCopy(strat->P.sig);
-      #endif
 #if SBA_TAIL_RED
       if(rField_is_Ring(currRing))
       {
@@ -3823,7 +3804,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if(!rField_is_Ring(currRing))
       exitSba(strat);
   // I have to add the initial input polynomials which where not used (p1 and p2 = NULL)
-  #ifdef HAVE_RINGS
   int k;
   if(rField_is_Ring(currRing))
   {
@@ -3860,7 +3840,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->sig[k] = pCopy(strat->sig[k-1]);
     }
   }
-  #endif
   #endif
   //Never do this - you will damage S
   //idSkipZeroes(strat->Shdl);

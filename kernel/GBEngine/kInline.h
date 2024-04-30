@@ -480,7 +480,6 @@ KINLINE void  sTObject::pCleardenom()
     }
     nDelete(&n);
   }
-  #ifdef HAVE_RINGS
   else if (is_ring)
   {
     number c;
@@ -520,7 +519,6 @@ KINLINE void  sTObject::pCleardenom()
     }
     n_Delete(&u,C);
   }
-  #endif
   else
   {
     if (t_p != NULL)
@@ -1053,7 +1051,6 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
   return FALSE;
 }
 
-#ifdef HAVE_RINGS
 // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
 //     m2 = LCM(LM(p1), LM(p2))/LM(p2)   in tailRing
 //    lcm = LCM(LM(p1), LM(p2))          in leadRing
@@ -1098,7 +1095,6 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
   p_Setm(m2, tailRing);
   p_Setm(lcm, leadRing);
 }
-#endif
 
 /***************************************************************
  *
@@ -1222,7 +1218,6 @@ KINLINE poly redtailBbaBound (poly p,int pos,kStrategy strat,int bound,BOOLEAN n
   return redtailBbaBound(&L, pos, strat,bound, FALSE, normalize);
 }
 
-#ifdef HAVE_RINGS
 KINLINE poly redtailBba_Ring (poly p,int pos,kStrategy strat)
 {
   LObject L(p, currRing, strat->tailRing);
@@ -1233,14 +1228,12 @@ KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat)
   LObject L(p, currRing, strat->tailRing);
   return redtailBba_Z(&L, pos, strat);
 }
-#endif
 
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
                     kStrategy strat)
 {
   assume(p_sev == pGetShortExpVector(p));
   if (strat->noClearS) return;
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at]))
@@ -1249,7 +1242,6 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
       return;
   }
   else
-  #endif
   {
     if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
   }

@@ -114,7 +114,7 @@ bug_tr873
 bug_tr874
 bug_genus_etc
 conv_bi
-divrem2
+; divrem2
 facstd
 fermat_gcd_1var
 fermat_gcd_2var
@@ -137,8 +137,6 @@ gmssin_s
 homalg
 invar_lib
 liftstd_m
-modular_s
-modstd_s
 modules
 nets
 ncfactor_facNthShift1_s
@@ -155,13 +153,10 @@ ncfactor_facSubWeyl4_s
 ncfactor_nthweylringalt2_s
 ncfactor_usl2_reducible_bug_s
 ncfactor_usl2_s
-newstruct_ring
-nfmodsyz_s
 polyclass
 primdec3
 reesclos
 resources_s
-tasks_s
 nchilb_rcolon1
 nchilb_test1
 nchilb_test2
@@ -174,6 +169,5 @@ sagbi2
 sets
 ssi_Z
 ssi_ringref
-pfd
 puiseuxexpansion
 vdim_overflow

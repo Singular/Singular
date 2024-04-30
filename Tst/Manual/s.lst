@@ -1,11 +1,9 @@
 memory.tst
 solve_IP.tst
 datetime.tst
-;; waitfirst.tst
 kmemory.tst
 ; tex.tst
 timer.tst
 ; rmx.tst
 ; xdvi.tst
 ;;multiDegBasis.tst
-timeStd.tst

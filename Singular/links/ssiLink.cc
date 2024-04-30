@@ -1885,7 +1885,7 @@ const char* slStatusSsi(si_link l, const char* request)
   && (strcmp(request, "read") == 0))
   {
     if (s_isready(d->f_read)) return "ready";
-#ifdef HAVE_POLL
+#if defined(HAVE_POLL)
     pollfd pfd;
     loop
     {
@@ -1954,27 +1954,25 @@ const char* slStatusSsi(si_link l, const char* request)
   else return "unknown status request";
 }
 
-int slStatusSsiL(lists L, int timeout)
+int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
 {
 // input: L: a list with links of type
 //           ssi-connect, ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
 //           Note: Not every entry in L must be set.
-//        timeout: timeout for select in micro-seconds
+//        timeout: timeout for select in milli-seconds
 //           or -1 for infinity
 //           or 0 for polling
 // returns: ERROR (via Werror): L has wrong elements or link not open
-//           -2: select returns an error
+//           -2: error in L
 //           -1: the read state of all links is eof
 //           0:  timeout (or polling): none ready,
 //           i>0: (at least) L[i] is ready
+#if defined(HAVE_POLL) && !defined(__APPLE__)
   si_link l;
   ssiInfo *d=NULL;
   int d_fd;
   int s;
-//#ifdef HAVE_POLL
-#if 0
   int nfd=L->nr+1;
-  int wait_for=0;
   pollfd *pfd=(pollfd*)omAlloc0(nfd*sizeof(pollfd));
   for(int i=L->nr; i>=0; i--)
   {
@@ -2001,7 +1999,6 @@ int slStatusSsiL(lists L, int timeout)
         {
           pfd[i].fd=d_fd;
           pfd[i].events=POLLIN;
-          wait_for++;
         }
         else
         {
@@ -2014,13 +2011,15 @@ int slStatusSsiL(lists L, int timeout)
         return -2;
       }
     }
+    else if (ignore!=NULL)
+    {
+      ignore[i]=TRUE; // not a link
+    }
   }
-  if (timeout>0) timeout=timeout/1000000;
-do_poll:
   s=si_poll(pfd,nfd,timeout);
   if (s==-1)
   {
-    WerrorS("error in poll call");
+    Werror("error in poll call (errno:%d)",errno);
     return -2; /*error*/
   }
   if(s==0)
@@ -2029,40 +2028,31 @@ do_poll:
   }
   for(int i=L->nr; i>=0; i--)
   {
-    if (L->m[i].rtyp==LINK_CMD)
+    if ((L->m[i].rtyp==LINK_CMD)
+    && ((ignore==NULL)||(ignore[i]==FALSE)))
     {
       // the link type is ssi, that's already tested
       l=(si_link)L->m[i].Data();
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
-      //for(int j=nfd-1;j>=0;j--)
-      if (!s_isready(d->f_read))
+      if (pfd[i].fd==d_fd)
       {
-        if (pfd[i].fd==d_fd)
+        if (pfd[i].revents &POLLIN)
         {
-          if (pfd[i].revents &POLLIN)
-          {
-            omFree(pfd);
-            return i+1;
-          }
-          if (pfd[i].revents) // anything else
-          {
-            wait_for--;
-            pfd[i].fd=-1;
-            pfd[i].events=0;
-          }
+          omFree(pfd);
+          return i+1;
         }
       }
     }
   }
-  // none ready, wait again:
-  if ((timeout<0)&&(wait_for>0)) goto do_poll;
-  if (timeout==0) return 0;
-  return -1;
+  // no ready
+  return 0;
 #else
-  fd_set  mask, fdmask;
+  si_link l;
+  ssiInfo *d=NULL;
+  int d_fd;
+  fd_set fdmask;
   FD_ZERO(&fdmask);
-  FD_ZERO(&mask);
   int max_fd=0; /* 1 + max fd in fd_set */
 
   /* timeout */
@@ -2075,14 +2065,15 @@ do_poll:
   }
   else
   {
-    wt.tv_sec  = timeout / 1000000;
-    wt.tv_usec = timeout % 1000000;
+    wt.tv_sec  = timeout / 1000;
+    wt.tv_usec = (timeout % 1000)*1000;
   }
 
   /* auxiliary variables */
   int i;
   int j;
   int k;
+  int s;
   char fdmaskempty;
 
   /* check the links and fill in fdmask */
@@ -2109,13 +2100,11 @@ do_poll:
         d_fd=d->fd_read;
         if (!s_isready(d->f_read))
         {
-          if (FD_SETSIZE<=d_fd)
+          if ((ignore==NULL) || (ignore[i]==FALSE))
           {
-            Werror("file descriptor number too high (%d)",d_fd);
-            return -2;
+            FD_SET(d_fd, &fdmask);
+            if (d_fd > max_fd) max_fd=d_fd;
           }
-          FD_SET(d_fd, &fdmask);
-          if (d_fd > max_fd) max_fd=d_fd;
         }
         else
           return i+1;
@@ -2134,22 +2123,11 @@ do_poll:
     return -2;
   }
 
-do_select:
-  /* copy fdmask to mask */
-  FD_ZERO(&mask);
-  for(k = 0; k < max_fd; k++)
-  {
-    if(FD_ISSET(k, &fdmask))
-    {
-      FD_SET(k, &mask);
-    }
-  }
-
   /* check with select: chars waiting: no -> not ready */
-  s = si_select(max_fd, &mask, NULL, NULL, wt_ptr);
+  s = si_select(max_fd, &fdmask, NULL, NULL, wt_ptr);
   if (s==-1)
   {
-    WerrorS("error in select call");
+    Werror("error in select call (errno:%d)",errno);
     return -2; /*error*/
   }
   if (s==0)
@@ -2159,62 +2137,22 @@ do_select:
   else /* s>0, at least one ready  (the number of fd which are ready is s)*/
   {
     j=0;
-    while (j<=max_fd) { if (FD_ISSET(j,&mask)) break; j++; }
+    while (j<=max_fd) { if (FD_ISSET(j,&fdmask)) break; j++; }
     for(i=L->nr; i>=0; i--)
     {
       if (L->m[i].rtyp==LINK_CMD)
       {
         l=(si_link)L->m[i].Data();
-        // only ssi links:
-        d=(ssiInfo*)l->data;
-        d_fd=d->fd_read;
-        if(j==d_fd) break;
-      }
-    }
-    loop
-    {
-      /* yes: read 1 char*/
-      /* if \n, check again with select else ungetc(c), ready*/
-      /* setting: d: current ssiInfo, j current fd, i current entry in L*/
-      int c=s_getc(d->f_read);
-      //Print("try c=%d\n",c);
-      if (c== -1) /* eof */
-      {
-        FD_CLR(j,&fdmask);
-        fdmaskempty = 1;
-        for(k = 0; k < max_fd; k++)
+        if (strcmp(l->m->type,"ssi")==0)
         {
-          if(FD_ISSET(k, &fdmask))
-          {
-            fdmaskempty = 0;
-            break;
-          }
+          d=(ssiInfo*)l->data;
+          d_fd=d->fd_read;
+          if(j==d_fd) return i+1;
         }
-        if(fdmaskempty)
-        {
-          return -1;
-        }
-        if(timeout != -1)
-        {
-          timeout = si_max(0,
-             timeout - 1000000*(getRTimer()/TIMER_RESOLUTION - startingtime));
-          wt.tv_sec  = timeout / 1000000;
-          wt.tv_usec = (timeout % 1000000);
-        }
-        goto do_select;
       }
-
-      else if (isdigit(c))
-      { s_ungetc(c,d->f_read); return i+1; }
-      else if (c>' ')
-      {
-        Werror("unknown char in ssiLink(%d)",c);
-        return -2;
-      }
-      /* else: next char */
-      goto do_select;
     }
   }
+  return 0;
 #endif
 }
 

@@ -355,7 +355,6 @@ public:
   int lastAxis;
   int newIdeal;
   int minim;
-  #ifdef HAVE_RINGS
   bool sigdrop; //This is used to check sigdrop in sba over Z
   int nrsyzcrit; // counts how many pairs are deleted by SyzCrit
   int nrrewcrit; // counts how many pairs are deleted by FaugereRewCrit
@@ -363,7 +362,6 @@ public:
                  // add directly sbaEnterS elements into S
   int blockred;  // counter for blocked reductions in redSig
   int blockredmax;
-  #endif
   #ifdef HAVE_SHIFTBBA
   int cv; // in shift bases: counting V criterion
   /*BOOLEAN*/ char rightGB;
@@ -487,14 +485,12 @@ int posInL110 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int end_pos,kStrategy strat,BOOLEAN normalize=FALSE);
 KINLINE poly redtailBbaBound (poly p,int end_pos,kStrategy strat,int bound,BOOLEAN normalize=FALSE);
-#ifdef HAVE_RINGS
 KINLINE poly redtailBba_Ring (poly p,int end_pos,kStrategy strat);
 KINLINE poly redtailBba_Z (poly p,int end_pos,kStrategy strat);
 poly redtailBba_NF (poly p, kStrategy strat );
 poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat );
 poly redtailBba_Z (LObject* L, int end_pos, kStrategy strat );
 void redtailBbaAlsoLC_Z (LObject* L, int end_pos, kStrategy strat );
-#endif
 poly redtailBba (LObject *L, int end_pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
 poly redtailBbaBound (LObject *L, int end_pos,kStrategy strat,int bound,
@@ -510,7 +506,6 @@ poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
 int redHoneyM (LObject* h, kStrategy strat);
 int redLiftstd (LObject* h, kStrategy strat);
-#ifdef HAVE_RINGS
 int redRing (LObject* h,kStrategy strat);
 int redRing_Z (LObject* h,kStrategy strat);
 int redRiloc (LObject* h,kStrategy strat);
@@ -518,7 +513,6 @@ void enterExtendedSpoly(poly h,kStrategy strat);
 void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat);
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy strat, int atR = -1);
-#endif
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);
 int redSig (LObject* h,kStrategy strat);
@@ -557,9 +551,7 @@ void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
 void enterT (LObject &p,kStrategy strat, int atT = -1);
 void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat);
-#ifdef HAVE_RINGS
 void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
-#endif
 void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);
@@ -635,10 +627,8 @@ KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing);
 // return FALSE and m1 == NULL, m2 == NULL     , otherwise
 KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
                                poly &m1, poly &m2, const ring m_r);
-#ifdef HAVE_RINGS
 KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadRing,
                                poly &m1, poly &m2, poly &lcm, const ring taiRing);
-#endif
 #ifdef KDEBUG
 // test strat
 BOOLEAN kTest(kStrategy strat);
@@ -810,7 +800,6 @@ KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = c
 //             exponent bound of strat->tailRing
 //      FALSE, otherwise
 BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
-#ifdef HAVE_RINGS
 // return TRUE if gcdpoly creation of R[atR] and S[atS] does not violate
 //             exponent bound of strat->tailRing
 //      FALSE, otherwise
@@ -819,7 +808,6 @@ poly preIntegerCheck(ideal F, ideal Q);
 void postReduceByMon(LObject* h, kStrategy strat);
 void postReduceByMonSig(LObject* h, kStrategy strat);
 void finalReduceByMon(kStrategy strat);
-#endif
 // change strat->tailRing and adjust all data in strat, L, and T:
 // new tailRing has larger exponent bound
 // do nothing and return FALSE if exponent bound increase would result in
@@ -881,11 +869,9 @@ static inline void kDeleteLcm(LObject *P)
 {
  if (P->lcm!=NULL)
  {
- #ifdef HAVE_RINGS
    if (rField_is_Ring(currRing))
      pLmDelete(P->lcm);
    else
- #endif
      pLmFree(P->lcm);
    P->lcm=NULL;
  }

@@ -897,13 +897,11 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->cfInitMPZ = nfInitMPZ;
   //r->cfSize  = ndSize;
   r->cfInt  = nfInt;
-  #ifdef HAVE_RINGS
   //r->cfDivComp = NULL; // only for ring stuff
   //r->cfIsUnit = NULL; // only for ring stuff
   //r->cfGetUnit = NULL; // only for ring stuff
   //r->cfExtGcd = NULL; // only for ring stuff
   // r->cfDivBy = NULL; // only for ring stuff
-  #endif
   r->cfInpNeg   = nfNeg;
   r->cfInvers= nfInvers;
   //r->cfCopy  = ndCopy;

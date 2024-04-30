@@ -23,8 +23,6 @@
 
 #include <string.h>
 
-#ifdef HAVE_RINGS
-
 void nrnWrite (number a, const coeffs);
 #ifdef LDEBUG
 static BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
@@ -1069,6 +1067,3 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   }
   return FALSE;
 }
-
-#endif
-/* #ifdef HAVE_RINGS */

@@ -27,11 +27,9 @@
 #include "coeffs/ntupel.h"
 #include "coeffs/flintcf_Qrat.h"
 
-#ifdef HAVE_RINGS
 #include "coeffs/rmodulo2m.h"
 #include "coeffs/rmodulon.h"
 #include "coeffs/rintegers.h"
-#endif
 
 #ifdef HAVE_POLYEXTENSIONS
 #include "polys/ext_fields/algext.h"
@@ -223,7 +221,6 @@ static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 
   number &curr = numberCollectionEnumerator.Current();
 
-#ifdef HAVE_RINGS
   /// TODO: move to a separate implementation
   if (nCoeff_is_Ring(r))
   {
@@ -250,7 +247,6 @@ static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 
     return;
   }
-#endif
 
   assume(!nCoeff_is_Ring(r));
   assume(nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r) || nCoeff_is_Q_algext(r));
@@ -304,11 +300,9 @@ static void ndSetChar(const coeffs) {}
 static number ndCopy(number a, const coeffs) { return a; }
 number nd_Copy(number a, const coeffs r) { return r->cfCopy(a, r); }
 
-#ifdef HAVE_RINGS
 static BOOLEAN ndDivBy(number, number, const coeffs) { return TRUE; } // assume a,b !=0
 static int ndDivComp(number, number, const coeffs) { return 2; }
 static number  ndExtGcd (number, number, number *, number *, const coeffs r) { return r->cfInit(1,r); }
-#endif
 
 CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
 {
@@ -391,17 +385,10 @@ VAR cfInitCharProc nInitCharTableDefault[]=
  #endif
  ngcInitChar,  /* n_long_C */
  nnInitChar,   /* n_nTupel */
- #ifdef HAVE_RINGS
  nrzInitChar,  /* n_Z */
  nrnInitChar,  /* n_Zn */
  nrnInitChar,  /* n_Znm */
  nr2mInitChar, /* n_Z2m */
- #else
- NULL,         /* n_Z */
- NULL,         /* n_Zn */
- NULL,         /* n_Znm */
- NULL,         /* n_Z2m */
- #endif
  flintQrat_InitChar, /* n_FlintQrat */
  NULL,         /* n_CF */
  NULL,         /*  n_Nemo_AnticNumberField */
@@ -473,13 +460,11 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfClearDenominators = ndClearDenominators;
 
     n->cfEucNorm = ndEucNorm;
-#ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
     n->cfExtGcd = ndExtGcd;
     n->cfXExtGcd = ndXExtGcd;
     //n->cfGetUnit = ndGetUnit_Ring;// set afterwards
-#endif
 
     // report error, if not redefined
     n->cfRead=ndRead;
@@ -514,7 +499,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
       if (n->is_field) n->cfIsUnit=ndIsUnit_Field;
       else             n->cfIsUnit=ndIsUnit_Ring;
     }
-    #ifdef HAVE_RINGS
     if (n->cfGetUnit==NULL)
     {
       if (n->is_field) n->cfGetUnit=n->cfCopy;
@@ -524,8 +508,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     {
       n->cfInvers=ndInvers_Ring;
     }
-    #endif
-
 
     if(n->cfMult==NULL)  PrintS("cfMult missing\n");
     if(n->cfSub==NULL)  PrintS("cfSub missing\n");

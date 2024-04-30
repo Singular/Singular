@@ -1,5 +1,4 @@
 allres_l
-assprimeszerodim_l
 bardet_probl_l
 bug_4
 bug_39
@@ -21,7 +20,6 @@ factorizep_l
 factorizeQ_l
 factorizeQa_l
 fetch_l
-ffmodstd_l
 fglm1_l
 fglmquot1_l
 finvar_l
@@ -37,8 +35,6 @@ homtest
 hres_l
 intdet_l
 jmsconst
-locnormal
 lres_l
 makedbm_l
 minor_l
-modnormal

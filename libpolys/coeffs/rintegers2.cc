@@ -6,7 +6,6 @@
 */
 
 
-#ifdef HAVE_RINGS
 #if SI_INTEGER_VARIANT == 2
 
 #include "coeffs/si_gmp.h"
@@ -717,5 +716,4 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->has_simple_Inverse=FALSE;
   return FALSE;
 }
-#endif
 #endif

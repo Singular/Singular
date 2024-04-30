@@ -1,4 +1,4 @@
-AC_INIT([singular_resources], [4.3.2])
+AC_INIT([singular_resources], [4.4.0])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([../build-aux])

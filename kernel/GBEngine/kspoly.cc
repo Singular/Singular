@@ -16,9 +16,7 @@
 #include "polys/monomials/p_polys.h"
 #include "polys/templates/p_Procs.h"
 #include "polys/nc/nc.h"
-#ifdef HAVE_RINGS
 #include "kernel/polys.h"
-#endif
 #ifdef HAVE_SHIFTBBA
 #include "polys/shiftop.h"
 #endif
@@ -342,7 +340,6 @@ int ksReducePoly(LObject* PR,
   return ret;
 }
 
-#ifdef HAVE_RINGS
 #ifdef STDZ_EXCHANGE_DURING_REDUCTION
 int ksReducePolyGCD(LObject* PR,
                  TObject* PW,
@@ -468,7 +465,6 @@ int ksReducePolyGCD(LObject* PR,
 
   return ret;
 }
-#endif
 #endif
 
 /* Computes a reduction of the lead coefficient only. We have already tested
@@ -1304,9 +1300,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   {
     a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
   }
-#ifdef HAVE_RINGS
   if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
-#endif
 
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
 
@@ -1472,7 +1466,6 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   int cm,i;
   BOOLEAN equal;
 
-#ifdef HAVE_RINGS
   BOOLEAN is_Ring=rField_is_Ring(currRing);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   if (is_Ring)
@@ -1493,7 +1486,6 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
       if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);
     }
   }
-#endif
 
 #ifdef HAVE_SHIFTBBA
   // shift the next monomial on demand
@@ -1530,7 +1522,6 @@ x2:
         p_SetComp(m2,c1,currRing);
       }
       p_Setm(m2, currRing);
-#ifdef HAVE_RINGS
       if (is_Ring)
       {
           nDelete(&lc1);
@@ -1538,7 +1529,6 @@ x2:
           nDelete(&t2);
           pSetCoeff0(m2, t1);
       }
-#endif
 #ifdef HAVE_SHIFTBBA
       if (tailRing->isLPring && (shift2!=0)) /*a1==NULL*/
       {
@@ -1549,7 +1539,6 @@ x2:
     }
     else
     {
-#ifdef HAVE_RINGS
       if (is_Ring)
       {
         nDelete(&lc1);
@@ -1557,7 +1546,6 @@ x2:
         nDelete(&t1);
         nDelete(&t2);
       }
-#endif
       return NULL;
     }
   }
@@ -1586,7 +1574,6 @@ x1:
       p_SetComp(m1,c2,currRing);
     }
     p_Setm(m1, currRing);
-#ifdef HAVE_RINGS
     if (is_Ring)
     {
       pSetCoeff0(m1, t2);
@@ -1594,7 +1581,6 @@ x1:
       nDelete(&lc2);
       nDelete(&t1);
     }
-#endif
 #ifdef HAVE_SHIFTBBA
     if (tailRing->isLPring && (shift1!=0)) /*a2==NULL*/
     {
@@ -1647,7 +1633,6 @@ x1:
       if(cm==1)
       {
         p_LmFree(m2,currRing);
-#ifdef HAVE_RINGS
         if (is_Ring)
         {
           pSetCoeff0(m1, t2);
@@ -1655,7 +1640,6 @@ x1:
           nDelete(&lc2);
           nDelete(&t1);
         }
-#endif
 #ifdef HAVE_SHIFTBBA
        if (tailRing->isLPring)
        {
@@ -1668,7 +1652,6 @@ x1:
       else
       {
         p_LmFree(m1,currRing);
-#ifdef HAVE_RINGS
         if (is_Ring)
         {
           pSetCoeff0(m2, t1);
@@ -1676,7 +1659,6 @@ x1:
           nDelete(&lc2);
           nDelete(&t2);
         }
-#endif
 #ifdef HAVE_SHIFTBBA
        if (tailRing->isLPring)
        {
@@ -1687,13 +1669,11 @@ x1:
         return m2;
       }
     }
-#ifdef HAVE_RINGS
     if (is_Ring)
     {
       equal = nEqual(t1,t2);
     }
     else
-#endif
     {
       t1 = nMult(pGetCoeff(a2),pGetCoeff(p1));
       t2 = nMult(pGetCoeff(a1),pGetCoeff(p2));
@@ -1704,7 +1684,6 @@ x1:
     if (!equal)
     {
       p_LmFree(m2,currRing);
-#ifdef HAVE_RINGS
       if (is_Ring)
       {
           pSetCoeff0(m1, nSub(t1, t2));
@@ -1713,7 +1692,6 @@ x1:
           nDelete(&t1);
           nDelete(&t2);
       }
-#endif
 #ifdef HAVE_SHIFTBBA
       if (tailRing->isLPring)
       {
@@ -1725,7 +1703,6 @@ x1:
     }
     pIter(a1);
     pIter(a2);
-#ifdef HAVE_RINGS
     if (is_Ring)
     {
       if (a2 != NULL)
@@ -1757,7 +1734,6 @@ x1:
         }
       }
     }
-#endif
 #ifdef HAVE_SHIFTBBA
     if (tailRing->isLPring)
     {
@@ -1770,7 +1746,6 @@ x1:
       p_LmFree(m2,currRing);
       if (a1==NULL)
       {
-#ifdef HAVE_RINGS
         if (is_Ring)
         {
           nDelete(&lc1);
@@ -1778,7 +1753,6 @@ x1:
           nDelete(&t1);
           nDelete(&t2);
         }
-#endif
         p_LmFree(m1,currRing);
         return NULL;
       }

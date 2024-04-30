@@ -25,7 +25,6 @@
 
 #include "kernel/GBEngine/ringgb.h"
 
-#ifdef HAVE_RINGS
 poly reduce_poly_fct(poly p, ring r)
 {
    return kFindZeroPoly(p, r, r);
@@ -137,10 +136,6 @@ poly ringRedNF (poly f, ideal G, ring r)
   }
   return h;
 }
-
-#endif
-
-#ifdef HAVE_RINGS
 
 /*
  * Find an index i from G, such that
@@ -298,5 +293,3 @@ int testGB(ideal I, ideal GI) {
   PrintLn();
   return(1);
 }
-
-#endif

@@ -17,6 +17,7 @@
 #include "coeffs/coeffs.h"
 #include "coeffs/numbers.h"
 #include "coeffs/bigintmat.h"
+#include "coeffs/longrat.h"
 
 
 #include "polys/ext_fields/algext.h"
@@ -699,6 +700,68 @@ static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
       {
         n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
         BIMATELEM(*iv,i+1,c) = p;
+      }
+    }
+  }
+  jiAssignAttr(res,a);
+  return FALSE;
+}
+static BOOLEAN jiA_BIGINT_N(leftv res, leftv a, Subexpr e)
+{
+  number p=(number)a->Data();
+  number pp=NULL;
+  if (currRing->cf->rep==n_rep_gap_rat)
+  {
+    if (SR_HDL(a) & SR_INT) pp=p;
+    else if (p->s==3) pp=nCopy(p);
+    else
+    {
+      WerrorS("cannot assign to bigint");
+      return TRUE;
+    }
+  }
+  else if (currRing->cf->rep==n_rep_gmp)
+    pp=coeffs_BIGINT->cfInitMPZ((mpz_ptr)p,coeffs_BIGINT);
+  else if (currRing->cf->rep==n_rep_int)
+    pp=coeffs_BIGINT->cfInit((long)p,coeffs_BIGINT);
+  else
+  {
+    WerrorS("cannot assign to bigint");
+    return TRUE;
+  }
+  if (e==NULL)
+  {
+    if (res->data!=NULL) n_Delete((number *)&res->data,coeffs_BIGINT);
+    res->data=(void*)pp;
+  }
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if ((e->next==NULL)&&(res->rtyp==BIGINTMAT_CMD))
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c;
+      if (res->rtyp==BIGINTMAT_CMD) c=e->next->start;
+      else { c=i+1; i=0;}
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in bigintmat/bigintvec %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else
+      {
+        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
+        BIMATELEM(*iv,i+1,c) = pp;
       }
     }
   }

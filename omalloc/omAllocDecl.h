@@ -233,7 +233,7 @@
 #define omrealloc(addr,size)            _omrealloc(addr, size)
 #define omrealloc0(addr,size)           _omrealloc0(addr, size)
 
-#define omfreeSize(addr,size)   do {if (addr && size) omFreeSize(addr, size);} while (0)
+#define omfreeSize(addr,size)   do {if (addr && (size!=0)) omFreeSize(addr, size);} while (0)
 #define omfree(addr)            do {if (addr) omFree(addr);} while (0)
 
 #ifdef OM_ALIGNMENT_NEEDS_WORK

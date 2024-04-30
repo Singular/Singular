@@ -8,7 +8,6 @@
 */
 #include "misc/auxiliary.h"
 
-#ifdef HAVE_RINGS
 #include "coeffs/coeffs.h"
 
 #if SI_INTEGER_VARIANT == 3
@@ -32,7 +31,5 @@ void nrzWriteFd(number n, const ssiInfo* d, const coeffs); /*for rmodulon.cc*/
 number nrzReadFd(const ssiInfo *d, const coeffs);  /*for rmodulon.cc*/
 
 number  nrzInit        (long i, const coeffs r); /*for SAGE, better: n_Init*/
-
-#endif
 
 #endif

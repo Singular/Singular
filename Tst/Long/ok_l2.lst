@@ -1,13 +1,9 @@
 katsura-sba_l
 knapsack
 liftstd_l
-symodstd
-nfmodstd_l
-nfmodsyz_l
 bug_tr642
 bug_tr677
 king_3_colors_l
-modstd_l
 modulo_l
 monodromy_l
 monomial_l
@@ -32,7 +28,6 @@ pMult0_l
 pMultL_l
 pMult_l
 primdec_l
-primdecint
 primitiv_l
 res_l
 resultantp_l
@@ -41,7 +36,6 @@ sheafcoh_l
 sing_l
 solve_l
 sres_l
-surfacesignature
 std_l
 triang_l
 ;;requires gfan

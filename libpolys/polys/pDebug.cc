@@ -152,12 +152,8 @@ BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, ring r)
     i--;
   }
   while (i);
-#ifdef HAVE_RINGS
   return n_DivBy(pGetCoeff(b), pGetCoeff(a), r->cf);
-#else
-  return TRUE;
-#endif
-     }
+}
 
 
 /***************************************************************

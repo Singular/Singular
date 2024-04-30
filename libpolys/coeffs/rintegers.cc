@@ -7,7 +7,6 @@
 
 #include "misc/auxiliary.h"
 
-#ifdef HAVE_RINGS
 #include "factory/factory.h"
 
 #include "misc/mylimits.h"
@@ -39,5 +38,4 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
 }
 #else
 #error set SI_INTEGER_VARIANT
-#endif
 #endif

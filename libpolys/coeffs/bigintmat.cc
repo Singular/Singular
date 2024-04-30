@@ -16,7 +16,6 @@
 
 #include <cmath>
 
-#ifdef HAVE_RINGS
 ///create Z/nA of type n_Zn
 static coeffs numbercoeffs(number n, coeffs c) // TODO: FIXME: replace with n_CoeffRingQuot1
 {
@@ -30,7 +29,6 @@ static coeffs numbercoeffs(number n, coeffs c) // TODO: FIXME: replace with n_Co
   delete pp;
   return nc;
 }
-#endif
 
 //#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
 
@@ -1758,7 +1756,6 @@ void bigintmat::hnf()
         }
       }
 
-      #ifdef HAVE_RINGS
       // normalize by units:
       if (!n_IsZero(view(i, j), basecoeffs()))
       {
@@ -1769,7 +1766,6 @@ void bigintmat::hnf()
         }
         n_Delete(&u, basecoeffs());
       }
-      #endif
       // Zum Schluss mache alle Einträge rechts vom Diagonalelement betragsmäßig kleiner als dieses
       for (int l=j+1; l<=col; l++)
       {
@@ -1820,7 +1816,6 @@ bigintmat * bimChangeCoeff(bigintmat *a, coeffs cnew)
   return b;
 }
 
-#ifdef HAVE_RINGS
 //OK: a HNF of (this | p*I)
 //so the result will always have FULL rank!!!!
 //(This is different form a lift of the HNF mod p: consider the matrix (p)
@@ -1850,8 +1845,6 @@ bigintmat * bigintmat::modhnf(number p, coeffs R)
   delete a;
   return C;
 }
-#endif
-
 
 //exactly divide matrix by b
 void bigintmat::skaldiv(number b)
@@ -2100,7 +2093,6 @@ static number bimFarey(bigintmat *A, number N, bigintmat *L)
   return den;
 }
 
-#ifdef HAVE_RINGS
 static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat *kern) {
   coeffs R = A->basecoeffs();
 
@@ -2288,7 +2280,6 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
   nKillChar(Rp);
   return NULL;
 }
-#endif
 
 //TODO: re-write using reduce_mod_howell
 static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat *kern)
@@ -2442,14 +2433,12 @@ number solveAx(bigintmat *A, bigintmat *b, bigintmat *x)
 
   switch (getCoeffType(R))
   {
-  #ifdef HAVE_RINGS
     case n_Z:
       return solveAx_dixon(A, b, x, NULL);
     case n_Zn:
     case n_Znm:
     case n_Z2m:
       return solveAx_howell(A, b, x, NULL);
-  #endif
     case n_Zp:
     case n_Q:
     case n_GF:
@@ -2589,7 +2578,6 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
   A->copy(a);
 }
 
-#ifdef HAVE_RINGS
 //a "q-base" for the kernel of a.
 //Should be re-done to use Howell rather than smith.
 //can be done using solveAx now.
@@ -2636,7 +2624,6 @@ int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q)
   c->copy(bimChangeCoeff(k, q));
   return c->cols();
 }
-#endif
 
 bool nCoeffs_are_equal(coeffs r, coeffs s)
 {

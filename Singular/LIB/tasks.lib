@@ -745,9 +745,13 @@ static proc startTasks_child(list localtasks, int pid_parent)
             }
             if (code == 3) {   // got result
                 id = read(l(pid_parent));
-                close(links[assignment[id]]);
-                if (nlinks > granted_leaves) {
-                    tmp = system("semaphore", "release", sem_leaves);
+                if(typeof(links[assignment[id]])=="link")
+                {
+                  close(links[assignment[id]]);
+                }
+                if (nlinks > granted_leaves)
+                {
+                  tmp = system("semaphore", "release", sem_leaves);
                 }
                 links[assignment[id]] = def(0);
                 nlinks--;

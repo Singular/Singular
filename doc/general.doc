@@ -2904,6 +2904,8 @@ Possible type casts are:
 @item
 @    @tab  @code{bigint} @tab  expression @code{int}, @code{number}, @code{poly}
 @item
+@    @tab  @code{bigintvec} @tab  expression @code{int}, @code{bigint}
+@item
 @    @tab  @code{ideal} @tab  expression lists of @code{int}, @code{number}, @code{poly}
 @item
 @    @tab  @code{ideal} @tab  @code{int}, @code{matrix}, @code{module}, @code{number}, @code{poly}, @code{vector}

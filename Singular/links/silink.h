@@ -114,7 +114,7 @@ EXTERN_VAR omBin s_si_link_extension_bin;
 EXTERN_VAR omBin sip_link_bin;
 EXTERN_VAR omBin ip_link_bin;
 
-int slStatusSsiL(lists L, int timeout);
+int slStatusSsiL(lists L, int timeout, BOOLEAN* ignore=NULL);
 int ssiBatch(const char *host, const char * port);
 
 

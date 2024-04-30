@@ -413,8 +413,8 @@ See
 bigintmat
 @item @strong{Purpose:}
 Converts expression to a bigintmat, where expression must be of type
-intmat, or bigintmat.The size (resp.@: dimension) of the created bigintmat
-equals the size (resp.@: dimension) of the expression.
+intmat, bigintvec, or bigintmat.The size (resp.@: dimension) of the
+created bigintmat equals the size (resp.@: dimension) of the expression.
 @item @strong{Example:}
 @smallexample
 @c example

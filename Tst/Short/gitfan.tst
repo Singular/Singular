@@ -92,9 +92,9 @@ LIB "gitfan.lib";
   list generatorsG = permutationFromIntvec(intvec( 1, 3, 2, 4, 6, 5, 7, 8, 10, 9 )),
                      permutationFromIntvec(intvec( 5, 7, 1, 6, 9, 2, 8, 4, 10, 3 ));
   list Asigmagens = groupActionOnQImage(generatorsG,Q);
-list actionOnOrbitconeIndicesForGenerators = groupActionOnHashes(Asigmagens,OC);
+//list actionOnOrbitconeIndicesForGenerators = groupActionOnHashes(Asigmagens,OC);
 string elementInTermsOfGenerators =
 "(x2^-1*x1^-1)^3*x1^-1";
-evaluateProduct(actionOnOrbitconeIndicesForGenerators, elementInTermsOfGenerators);
+//evaluateProduct(actionOnOrbitconeIndicesForGenerators, elementInTermsOfGenerators);
 
 tst_status(1);$

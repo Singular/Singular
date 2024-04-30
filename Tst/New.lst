@@ -1,4 +1,5 @@
 New/AnnExt_R_bug.tst
+New/alg_ext_imap.tst
 New/algext_numbers.tst
 New/algext_ring_compose.tst
 New/bigints.tst
@@ -47,6 +48,8 @@ New/qring_with_constant.tst
 New/quotient_cleardenom.tst
 New/quotient_error.tst
 New/redTail.tst
+New/res1_ideal_module.tst
+New/ring_create_bug.tst
 New/ring_ring.tst
 New/ringlocal.tst
 New/rref.tst

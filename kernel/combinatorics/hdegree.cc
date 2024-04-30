@@ -135,7 +135,6 @@ int  scDimInt(ideal S, ideal Q)
 
 int  scDimIntRing(ideal vid, ideal Q)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     int i = idPosConstant(vid);
@@ -197,7 +196,6 @@ int  scDimIntRing(ideal vid, ideal Q)
     idDelete(&vv);
     return d;
   }
-#endif
   return scDimInt(vid,Q);
 }
 
@@ -1080,7 +1078,6 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge)
 
   int  i;
   int  k = ak;
-  #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
     //consider just monic generators (over rings with zero-divisors)
@@ -1104,7 +1101,6 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge)
     pWrite(S->m[ii]);
   }
   //getchar();
-  #endif
   #endif
   if(idElem(S) == 0)
     return;
