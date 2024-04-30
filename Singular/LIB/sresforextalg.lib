@@ -171,7 +171,7 @@ RETURN:   module
 PURPOSE:  returns the syzygy module of m using the schreyer algorithm, where m is a module 
 over a non-commutative ring where x_i*x_j = -x_j*x_i
 THEORY:   
-SEE ALSO: 
+SEE ALSO: lead_syz_, lift_tree_, lift_subtree_, remove_LOT_, phi_, greater_than_
 "
 {
   module lead_mod = lead_syz_(m);
@@ -646,4 +646,79 @@ proc minimal_free_resolution(module m, int p){
   }
   resolution ans_res = ans_L_;
   return(ans_res);
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+                    The code that gets parallelised
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+proc lift_tree_for_gpi(vector s, module M, list LL){
+  vector g = phi_(s, M);
+  vector T = remove_LOT_(g, M);
+  vector L;
+  list ans; 
+  int i;
+  poly m;
+  module temp_I;
+  
+  ideal im, iF_, imif, iL;
+  while (T != 0){
+    L = lead(T);
+    for(i=1; i<=size(M); i++){
+      temp_I = leadmonom(M[i]);
+      attrib(temp_I, "isSB", 1);
+      if(NF(L, temp_I)==0){
+        m = leadmonomial_ext(L)/leadterm(M[i]); 
+        
+        //check sign: 
+        if (m*leadterm(M[i])!= leadterm(L)){
+          m = -m;
+        } 
+        //schreyer order algorithm should be called here
+        if (gr_than_for_res(s,m*gen(i),LL)){
+          ans[size(ans)+1] = list(m*gen(i), s);
+          break;
+        }
+      }
+    }
+    T = T - L;
+  }
+  return(ans);
+}
+
+proc lift_subtree_(vector lead_s, vector s, module M){
+  //lead_s keeps track of the lead syz term
+  vector g = phi_(s, M);
+  g = g - lead(g);
+  vector T = remove_LOT_(g, M);
+  list ans;
+  poly m;
+  int i;
+  vector L;
+  module temp_I;
+
+  while (T != 0){
+    if (leadexp(T)[nvars(basering)+1] > 15){
+    }
+    L = lead(T);
+    for(i=1; i<=size(M); i++){
+      temp_I = leadmonom(M[i]);
+      attrib(temp_I, "isSB", 1);
+      if(NF(L, temp_I)==0){
+        m = leadmonomial_ext(L)/leadmonomial_ext(M[i]); //TODO check sign!
+
+        //check sign: 
+        if (m*leadterm(M[i]) != leadterm(L)){
+          m = -m;
+        } 
+        ans[size(ans)+1] = list(m*gen(i), lead_s);
+        break;
+      }
+    }
+    T = T - L;
+  }
+  return(ans);
 }
