@@ -109,7 +109,7 @@ number convFlintNSingN (fmpz_t f, const coeffs cf)
 #if __FLINT_RELEASE > 20502
   number z;
   if(COEFF_IS_MPZ(*f))
-    nlMPZ(COEFF_TO_PTR(*f),z,NULL);
+    z=n_InitMPZ(COEFF_TO_PTR(*f),cf);
   else if (cf->rep==n_rep_gmp)
   {
     z=nrzInit(1,NULL); // alloc and initialization
@@ -157,7 +157,6 @@ number convFlintNSingN_QQ (fmpq_t f, const coeffs cf)
     mpz_init(z->n);
     fmpq_get_mpz_frac(z->z,z->n,f);
   }
-  n_Test(z,cf);
   return z;
 #else
   WerrorS("not implemented");
