@@ -97,7 +97,7 @@ static void pqLengthApprox(poly p, poly q, int &lp, int &lq, const int min)
 }
 
 
-static poly _p_Mult_q_Bucket(poly p, const int lp,
+poly _p_Mult_q_Bucket(poly p, const int lp,
                              poly q, const int lq,
                              const int copy, const ring r)
 {
@@ -220,7 +220,7 @@ static poly _p_Mult_q_Normal_ZeroDiv(poly p, poly q, const int copy, const ring 
 }
 #endif
 
-static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
+poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 {
   assume(r != NULL);
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
@@ -301,11 +301,10 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
 // Use factory if min(pLength(p), pLength(q)) >= MIN_LENGTH_FACTORY (>MIN_LENGTH_BUCKET)
 // Not thoroughly tested what is best
-#define MIN_LENGTH_FACTORY 200
-#define MIN_LENGTH_FACTORY_QQ 60
-#define MIN_FLINT_QQ 10
-#define MIN_FLINT_Zp 20
-#define MIN_FLINT_Z 10
+#define MIN_LENGTH_FACTORY 300
+#define MIN_FLINT_QQ 80
+#define MIN_FLINT_Zp 85
+#define MIN_FLINT_Z 50
 
 /// Returns:  p * q,
 /// Destroys: if !copy then p, q
@@ -387,13 +386,12 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   #endif
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
     return _p_Mult_q_Normal(p, q, copy, r);
+  #if 0
   else if (pure_polys
   && ((r->cf->extRing==NULL)||(r->cf->extRing->qideal!=NULL))
     /* exclude trans. extensions: may contain rat.funct as cf */
-  && (((lq >= MIN_LENGTH_FACTORY)
-      && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
-    || ((lq >= MIN_LENGTH_FACTORY_QQ)
-      && rField_is_Q(r))))
+  && (lq >= MIN_LENGTH_FACTORY)
+  && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
   {
     poly h=singclap_pmult(p,q,r);
     if (!copy)
@@ -403,6 +401,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     }
     return h;
   }
+  #endif
   else
   {
     lp=pLength(p);

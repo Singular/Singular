@@ -16,10 +16,11 @@
 
 #include "coeffs/coeffs.h"
 #include "coeffs/longrat.h"
+#include "coeffs/rintegers.h"
 #include "polys/monomials/p_polys.h"
 
 #include "polys/sbuckets.h"
-#include "polys/clapconv.h"
+//#include "polys/clapconv.h"
 
 #include "simpleideals.h"
 
@@ -46,52 +47,57 @@ void convFlintNSingN (mpz_t z, fmpz_t f)
 
 number convFlintNSingN (fmpz_t f)
 {
-  number n;
+#if __FLINT_RELEASE > 20502
+  number z;
   if(COEFF_IS_MPZ(*f))
-    nlMPZ(COEFF_TO_PTR(*f),n,NULL);
+    nlMPZ(COEFF_TO_PTR(*f),z,NULL);
   else
   {
-    mpz_t z;
-    mpz_init(z);
-    fmpz_get_mpz(z,f);
-    nlMPZ(z,n,NULL);
-    mpz_clear(z);
+    mpz_t a;
+    mpz_init(a);
+    fmpz_get_mpz(a,f);
+    nlMPZ(a,z,NULL);
+    mpz_clear(a);
   }
-  return n;
+  return z;
+#else
+  WerrorS("not implemented");
+  return NULL;
+#endif
 }
 
 number convFlintNSingN (fmpq_t f, const coeffs cf)
 {
 #if __FLINT_RELEASE > 20502
-  number z;
   if (getCoeffType(cf)==n_Q) /* QQ, bigint */
   {
-    z=ALLOC_RNUMBER();
-    #if defined(LDEBUG)
-    z->debug=123456;
-    #endif
-    z->s=0;
-    mpz_init(z->z);
-    mpz_init(z->n);
-    fmpq_get_mpz_frac(z->z,z->n,f);
+    return convFlintNSingN_QQ(f,cf);
   }
   else
   {
+    number z;
     mpz_t a,b;
     mpz_init(a);
     mpz_init(b);
     fmpq_get_mpz_frac(a,b,f);
-    number na=n_InitMPZ(a,cf);
-    number nb=n_InitMPZ(b,cf);
-    z=n_Div(na,nb,cf);
-    n_Delete(&na,cf);
-    n_Delete(&nb,cf);
+    if (mpz_cmp_si(b,1L)!=0)
+    {
+      number na=n_InitMPZ(a,cf);
+      number nb=n_InitMPZ(b,cf);
+      z=n_Div(na,nb,cf);
+      n_Delete(&nb,cf);
+      n_Delete(&na,cf);
+      n_Normalize(z,cf);
+    }
+    else
+    {
+      z=n_InitMPZ(a,cf);
+    }
     mpz_clear(a);
     mpz_clear(b);
+    n_Test(z,cf);
+    return z;
   }
-  n_Normalize(z,cf);
-  n_Test(z,cf);
-  return z;
 #else
   WerrorS("not implemented");
   return NULL;
@@ -102,13 +108,21 @@ number convFlintNSingN (fmpz_t f, const coeffs cf)
 {
 #if __FLINT_RELEASE > 20502
   number z;
-  mpz_t a;
-  mpz_init(a);
-  fmpz_get_mpz(a,f);
-  z=n_InitMPZ(a,cf);
-  mpz_clear(a);
-  n_Normalize(z,cf);
-  n_Test(z,cf);
+  if(COEFF_IS_MPZ(*f))
+    nlMPZ(COEFF_TO_PTR(*f),z,NULL);
+  else if (cf->rep==n_rep_gmp)
+  {
+    z=nrzInit(1,NULL); // alloc and initialization
+    fmpz_get_mpz((mpz_ptr)z,f);
+  }
+  else
+  {
+    mpz_t a;
+    mpz_init(a);
+    fmpz_get_mpz(a,f);
+    z=n_InitMPZ(a,cf);
+    mpz_clear(a);
+  }
   return z;
 #else
   WerrorS("not implemented");
@@ -165,7 +179,7 @@ void convSingNFlintN(fmpz_t f, number n)
 
 void convSingNFlintN(fmpq_t f, number n, const coeffs cf)
 {
-  if (getCoeffType(cf)==n_Q) /* QQ, bigint */
+  if (LIKELY(getCoeffType(cf)==n_Q)) /* QQ, bigint */
   {
     fmpq_init(f);
     if (SR_HDL(n)&SR_INT)
