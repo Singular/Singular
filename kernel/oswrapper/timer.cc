@@ -56,7 +56,6 @@ void SetMinDisplayTime(double mtime)
 * the start time of the timer
 */
 STATIC_VAR int64 siStartTime;
-STATIC_VAR int64 startl;
 
 /*3
 * temp structure to get the time
@@ -80,11 +79,11 @@ int initTimer()
 void startTimer()
 {
   getrusage(RUSAGE_SELF,&t_rec);
-  startl = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+  siStartTime = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
   getrusage(RUSAGE_CHILDREN,&t_rec);
-  startl += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+  siStartTime += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
 }
@@ -92,7 +91,7 @@ void startTimer()
 /*2
 * returns the time since a fixed point in seconds
 */
-int getTimer()
+long getTimer()
 {
   int64 curr;
   getrusage(RUSAGE_SELF,&t_rec);
@@ -105,7 +104,7 @@ int getTimer()
          +(int64)5000)/(int64)10000; // unit is 1/100 sec
   curr -= siStartTime;
   double f =  ((double)curr) * timer_resolution / (double)100;
-  return (int)(f+0.5);
+  return (long)(f+0.5);
 }
 
 /*2
@@ -127,7 +126,7 @@ void writeTime(const char* v)
   curr += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
-  curr -= startl;
+  curr -= siStartTime;
   double f =  ((double)curr) * timer_resolution / (double)100;
   if (f/timer_resolution > mintime)
   {
