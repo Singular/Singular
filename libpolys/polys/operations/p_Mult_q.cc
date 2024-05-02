@@ -304,7 +304,7 @@ poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 #define MIN_LENGTH_FACTORY 300
 #define MIN_FLINT_QQ 80
 #define MIN_FLINT_Zp 85
-#define MIN_FLINT_Z 50
+#define MIN_FLINT_Z 100
 
 /// Returns:  p * q,
 /// Destroys: if !copy then p, q

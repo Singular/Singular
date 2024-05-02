@@ -18,7 +18,7 @@
 // Use buckets if min(pLength(p), pLength(q)) >= MIN_LENGTH_BUCKET
 // Not thoroughly tested what is best
 #ifndef MIN_LENGTH_BUCKET
-#define MIN_LENGTH_BUCKET 25
+#define MIN_LENGTH_BUCKET 30
 #endif
 
 ///  return TRUE and lp == pLength(p), lq == pLength(q),
