@@ -674,7 +674,7 @@ proc lift_tree_for_gpi(vector s, module M, list LL){
         m = leadmonomial_ext(L)/leadterm(M[i]); 
         
         //check sign: 
-        if (m*leadterm(M[i])!= leadterm(L)){
+        if (m*leadterm(M[i]) == leadterm(L)){
           m = -m;
         } 
         //schreyer order algorithm should be called here
@@ -711,7 +711,7 @@ proc lift_subtree_(vector lead_s, vector s, module M){
         m = leadmonomial_ext(L)/leadmonomial_ext(M[i]); //TODO check sign!
 
         //check sign: 
-        if (m*leadterm(M[i]) != leadterm(L)){
+        if (m*leadterm(M[i]) == leadterm(L)){
           m = -m;
         } 
         ans[size(ans)+1] = list(m*gen(i), lead_s);
