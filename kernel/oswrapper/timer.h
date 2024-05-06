@@ -8,10 +8,9 @@
 */
 
 EXTERN_VAR int timerv;
-void startTimer(void);
+int startTimer(void);
 void writeTime(const char* s);
 
-int  initTimer();
 long getTimer();
 
 EXTERN_VAR int rtimerv;

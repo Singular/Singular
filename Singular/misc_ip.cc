@@ -1429,7 +1429,7 @@ void siInit(char *name)
 #endif
 
 // random generator: -----------------------------------------------
-  int t=initTimer();
+  int t=startTimer();
   if (t==0) t=1;
   initRTimer();
   siSeed=t;

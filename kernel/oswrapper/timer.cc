@@ -63,20 +63,7 @@ STATIC_VAR int64 siStartTime;
 STATIC_VAR struct rusage t_rec;
 /*0 implementation*/
 
-int initTimer()
-{
-  getrusage(RUSAGE_SELF,&t_rec);
-  siStartTime = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
-               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
-               +5000)/10000; // unit is 1/100 sec
-  getrusage(RUSAGE_CHILDREN,&t_rec);
-  siStartTime += (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
-               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
-               +5000)/10000; // unit is 1/100 sec
-  return (int)time(NULL);
-}
-
-void startTimer()
+int startTimer()
 {
   getrusage(RUSAGE_SELF,&t_rec);
   siStartTime = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
@@ -86,6 +73,7 @@ void startTimer()
   siStartTime += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  return (int)time(NULL);
 }
 
 /*2
@@ -95,14 +83,11 @@ long getTimer()
 {
   int64 curr;
   getrusage(RUSAGE_SELF,&t_rec);
-  curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
-         +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
-         +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  curr = (int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+         +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec;
   getrusage(RUSAGE_CHILDREN,&t_rec);
-  curr += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
-         +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
-         +(int64)5000)/(int64)10000; // unit is 1/100 sec
-  curr -= siStartTime;
+  curr += (int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+         +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec;
   double f =  ((double)curr) * timer_resolution / (double)100;
   return (long)(f+0.5);
 }
