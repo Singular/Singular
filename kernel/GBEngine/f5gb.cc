@@ -165,7 +165,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
         // the corresponding rules to the list rules
         // NOTE: inside there is a second check of criterion 2 if new rules are
         // added
-        //int timer4  =   initTimer();
+        //int timer4  =   startTimer();
         //startTimer();
         //critPairs->print();
 
@@ -205,7 +205,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
             //temp    =   temp->getNext();
         //}
         // reduction process of new S-polynomials and also adds new critical pairs to critPairs
-        //int timer3  =   initTimer();
+        //int timer3  =   startTimer();
         //startTimer();
         //sPolyList->print();
         //reduction(sPolyList, critPairs, gPrev, rules, lTag, rTag, gbPrev);
@@ -1708,7 +1708,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs,
     LNode* tempRed;
     poly pOne               =   pOne();
     do {
-        //int timer5  =   initTimer();
+        //int timer5  =   startTimer();
         //startTimer();
         //Print("TOP REDUCTION:  ");
         //pWrite(l->getPoly());
@@ -1904,7 +1904,7 @@ ideal F5main(ideal id, ring r, int opt, int plus, int termination)
       return id;
   }
 
-    int timer   =   initTimer();
+    int timer   =   startTimer();
     startTimer();
     int i,j,k,l;
     int gbLength;
