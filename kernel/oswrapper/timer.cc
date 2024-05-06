@@ -66,13 +66,11 @@ STATIC_VAR struct rusage t_rec;
 int startTimer()
 {
   getrusage(RUSAGE_SELF,&t_rec);
-  siStartTime = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
-               +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
-               +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  siStartTime = (int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+               +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec;
   getrusage(RUSAGE_CHILDREN,&t_rec);
-  siStartTime += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
-               +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
-               +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  siStartTime += (int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+               +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec;
   return (int)time(NULL);
 }
 
@@ -88,7 +86,7 @@ long getTimer()
   getrusage(RUSAGE_CHILDREN,&t_rec);
   curr += (int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
          +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec;
-  double f =  ((double)curr) * timer_resolution / (double)100;
+  double f =  ((double)curr) * timer_resolution / (double)1000000;
   return (long)(f+0.5);
 }
 
@@ -104,15 +102,13 @@ void writeTime(const char* v)
 {
   int64 curr;
   getrusage(RUSAGE_SELF,&t_rec);
-  curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
-               +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
-               +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  curr = (int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+        +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec;
   getrusage(RUSAGE_CHILDREN,&t_rec);
-  curr += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
-               +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
-               +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  curr += (int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+         +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec;
   curr -= siStartTime;
-  double f =  ((double)curr) * timer_resolution / (double)100;
+  double f =  ((double)curr) * timer_resolution / (double)1000000;
   if (f/timer_resolution > mintime)
   {
 #ifdef EXTEND_TIMER_D
