@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: numbers modulo n
+* ABSTRACT: numbers as ZZ
 */
 #include "misc/auxiliary.h"
 
