@@ -24,6 +24,8 @@
 #include "gmpext.h"
 #include "singext.h"
 #include "cf_algorithm.h"
+#include "int_int.h"
+#include "int_rat.h"
 
 #ifdef HAVE_OMALLOC
 #define Alloc(L) omAlloc(L)
@@ -136,13 +138,10 @@ void convertCF2initFmpz (fmpz_t result, const CanonicalForm& f)
     fmpz_set_si (result, f.intval());
   else
   {
-    mpz_t gmp_val;
-    f.mpzval(gmp_val);
-
-    mpz_swap(gmp_val, _fmpz_promote(result));
+    InternalInteger *fi=(InternalInteger*)f.getval();
+    mpz_set(_fmpz_promote(result),fi->thempi);
     _fmpz_demote_val(result);
-
-    mpz_clear (gmp_val);
+    fi->deleteObject();
   }
 }
 
@@ -156,19 +155,17 @@ void convertFacCF2Fmpz_poly_t (fmpz_poly_t result, const CanonicalForm& f)
 
 CanonicalForm convertFmpz2CF (const fmpz_t coefficient)
 {
-  if(!COEFF_IS_MPZ(*coefficient)
-  &&  (fmpz_cmp_si (coefficient, MINIMMEDIATE) >= 0)
-  &&  (fmpz_cmp_si (coefficient, MAXIMMEDIATE) <= 0))
+  if(!COEFF_IS_MPZ(*coefficient))
   {
-    long coeff= fmpz_get_si (coefficient);
-    return CanonicalForm (coeff);
+    long coeff= fmpz_get_si(coefficient);
+    return CanonicalForm(coeff);
   }
   else
   {
     mpz_t gmp_val;
-    mpz_init (gmp_val);
-    fmpz_get_mpz (gmp_val, coefficient);
-    CanonicalForm result= CanonicalForm (CFFactory::basic (gmp_val));
+    mpz_init(gmp_val);
+    fmpz_get_mpz(gmp_val, coefficient);
+    CanonicalForm result= CanonicalForm(CFFactory::basic (gmp_val));
     return result;
   }
 }
@@ -180,19 +177,19 @@ convertFmpz_poly_t2FacCF (const fmpz_poly_t poly, const Variable& x)
   fmpz* coeff;
   for (int i= 0; i < fmpz_poly_length (poly); i++)
   {
-    coeff= fmpz_poly_get_coeff_ptr (poly, i);
-    if (!fmpz_is_zero (coeff))
-      result += convertFmpz2CF (coeff)*power (x,i);
+    coeff= fmpz_poly_get_coeff_ptr(poly, i);
+    if (!fmpz_is_zero(coeff))
+      result += convertFmpz2CF(coeff)*power (x,i);
   }
   return result;
 }
 
 void
-convertFacCF2nmod_poly_t (nmod_poly_t result, const CanonicalForm& f)
+convertFacCF2nmod_poly_t(nmod_poly_t result, const CanonicalForm& f)
 {
-  bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
-  if (save_sym_ff) Off (SW_SYMMETRIC_FF);
-  nmod_poly_init2 (result, getCharacteristic(), degree (f)+1);
+  bool save_sym_ff= isOn(SW_SYMMETRIC_FF);
+  if (save_sym_ff) Off(SW_SYMMETRIC_FF);
+  nmod_poly_init2(result, getCharacteristic(), degree (f)+1);
   for (CFIterator i= f; i.hasTerms(); i++)
   {
     CanonicalForm c= i.coeff();
@@ -206,28 +203,28 @@ convertFacCF2nmod_poly_t (nmod_poly_t result, const CanonicalForm& f)
     else
       nmod_poly_set_coeff_ui (result, i.exp(), c.intval());
   }
-  if (save_sym_ff) On (SW_SYMMETRIC_FF);
+  if (save_sym_ff) On(SW_SYMMETRIC_FF);
 }
 
 CanonicalForm
-convertnmod_poly_t2FacCF (const nmod_poly_t poly, const Variable& x)
+convertnmod_poly_t2FacCF(const nmod_poly_t poly, const Variable& x)
 {
   CanonicalForm result= 0;
-  for (int i= 0; i < nmod_poly_length (poly); i++)
+  for (int i= 0; i < nmod_poly_length(poly); i++)
   {
-    ulong coeff= nmod_poly_get_coeff_ui (poly, i);
+    ulong coeff= nmod_poly_get_coeff_ui(poly, i);
     if (coeff != 0)
       result += CanonicalForm ((long)coeff)*power (x,i);
   }
   return result;
 }
 
-void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
+void convertCF2Fmpq(fmpq_t result, const CanonicalForm& f)
 {
   //ASSERT (isOn (SW_RATIONAL), "expected rational");
   if (f.isImm ())
   {
-    fmpq_set_si (result, f.intval(), 1);
+    fmpq_set_si(result, f.intval(), 1);
   }
   else if(f.inQ())
   {
@@ -239,13 +236,12 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
     fmpz_set_mpz (fmpq_denref (result), gmp_val);
     mpz_clear (gmp_val);
   }
-  else if(f.inZ())
+  else if(f.inZ()) /* and not isImm() */
   {
-    mpz_t gmp_val;
-    f.mpzval(gmp_val);
-    fmpz_set_mpz (fmpq_numref (result), gmp_val);
-    mpz_clear (gmp_val);
+    InternalInteger *fi=(InternalInteger*)f.getval();
+    fmpz_set_mpz (fmpq_numref (result), fi->thempi);
     fmpz_one(fmpq_denref(result));
+    fi->deleteObject();
   }
   else
   {
@@ -256,8 +252,23 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
 CanonicalForm convertFmpq2CF (const fmpq_t q)
 {
   bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
-    On (SW_RATIONAL);
+  if (!isRat) On (SW_RATIONAL);
+  CanonicalForm result;
+  if (fmpz_is_one(fmpq_denref(q)))
+  {
+    if (fmpz_fits_si(fmpq_numref(q)))
+    {
+      long i=fmpz_get_si(fmpq_numref(q));
+      if (!isRat) Off (SW_RATIONAL);
+      return CanonicalForm(i);
+    }
+    mpz_t nnum;
+    mpz_init (nnum);
+    fmpz_get_mpz (nnum, fmpq_numref (q));
+    result= CanonicalForm (CFFactory::basic(nnum));
+    if (!isRat) Off (SW_RATIONAL);
+    return result;
+  }
 
   CanonicalForm num, den;
   mpz_t nnum, nden;
@@ -266,31 +277,8 @@ CanonicalForm convertFmpq2CF (const fmpq_t q)
   fmpz_get_mpz (nnum, fmpq_numref (q));
   fmpz_get_mpz (nden, fmpq_denref (q));
 
-  CanonicalForm result;
-  if (mpz_is_imm (nden))
-  {
-    if (mpz_is_imm(nnum))
-    {
-      num= CanonicalForm (mpz_get_si(nnum));
-      den= CanonicalForm (mpz_get_si(nden));
-      mpz_clear (nnum);
-      mpz_clear (nden);
-      result= num/den;
-    }
-    else if (mpz_cmp_si(nden,1)==0)
-    {
-      result= CanonicalForm( CFFactory::basic(nnum));
-      mpz_clear (nden);
-    }
-    else
-      result= CanonicalForm( CFFactory::rational( nnum, nden, false));
-  }
-  else
-  {
-    result= CanonicalForm( CFFactory::rational( nnum, nden, false));
-  }
-  if (!isRat)
-    Off (SW_RATIONAL);
+  result= CanonicalForm( CFFactory::rational( nnum, nden, false));
+  if (!isRat) Off (SW_RATIONAL);
   return result;
 }
 
