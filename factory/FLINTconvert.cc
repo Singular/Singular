@@ -228,13 +228,23 @@ void convertCF2Fmpq(fmpq_t result, const CanonicalForm& f)
   }
   else if(f.inQ())
   {
-    mpz_t gmp_val;
-    gmp_numerator (f, gmp_val);
-    fmpz_set_mpz (fmpq_numref (result), gmp_val);
-    mpz_clear (gmp_val);
-    gmp_denominator (f, gmp_val);
-    fmpz_set_mpz (fmpq_denref (result), gmp_val);
-    mpz_clear (gmp_val);
+    InternalCF *fi=f.getval();
+    if (fi->levelcoeff() == RationalDomain)
+    {
+      fmpz_set_mpz(fmpq_numref(result), InternalRational::MPQNUM( fi ));
+      fmpz_set_mpz(fmpq_denref(result), InternalRational::MPQDEN( fi ));
+    }
+    else
+    {
+      mpz_t gmp_val;
+      gmp_numerator (f, gmp_val);
+      fmpz_set_mpz (fmpq_numref (result), gmp_val);
+      mpz_clear (gmp_val);
+      gmp_denominator (f, gmp_val);
+      fmpz_set_mpz (fmpq_denref (result), gmp_val);
+      mpz_clear (gmp_val);
+    }
+    fi->deleteObject();
   }
   else if(f.inZ()) /* and not isImm() */
   {
@@ -265,7 +275,7 @@ CanonicalForm convertFmpq2CF (const fmpq_t q)
     mpz_t nnum;
     mpz_init (nnum);
     fmpz_get_mpz (nnum, fmpq_numref (q));
-    result= CanonicalForm (CFFactory::basic(nnum));
+    result= CanonicalForm( CFFactory::basic(nnum));
     if (!isRat) Off (SW_RATIONAL);
     return result;
   }
