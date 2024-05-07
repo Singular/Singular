@@ -117,11 +117,19 @@ number convFlintNSingN (fmpz_t f, const coeffs cf)
   }
   else
   {
-    mpz_t a;
-    mpz_init(a);
-    fmpz_get_mpz(a,f);
-    z=n_InitMPZ(a,cf);
-    mpz_clear(a);
+    if (fmpz_fits_si(f))
+    {
+      long i=fmpz_get_si(f);
+      z=n_Init(i,cf);
+    }
+    else
+    {
+      mpz_t a;
+      mpz_init(a);
+      fmpz_get_mpz(a,f);
+      z=n_InitMPZ(a,cf);
+      mpz_clear(a);
+    }
   }
   return z;
 #else
@@ -190,11 +198,8 @@ void convSingNFlintN(fmpq_t f, number n, const coeffs cf)
     }
     else
     {
-      mpz_t one;
-      mpz_init_set_si(one,1);
       fmpz_set_mpz(fmpq_numref(f), n->z);
-      fmpz_set_mpz(fmpq_denref(f), one);
-      mpz_clear(one);
+      fmpz_set_si(fmpq_denref(f), 1);
     }
   }
   else

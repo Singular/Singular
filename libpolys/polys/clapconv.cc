@@ -126,7 +126,7 @@ static CanonicalForm convSingPFactoryP_intern( poly p, int l, BOOLEAN & setChar,
     setChar_loc=FALSE;
     for ( int i = 1; i <=n; i++ )
     {
-      if ( (e = p_GetExp( p, i, r)) != 0 )
+      if (LIKELY( (e = p_GetExp( p, i, r)) != 0 ))
         term *= CanonicalForm( Variable( i ), e );
     }
     result += term;
@@ -137,8 +137,29 @@ static CanonicalForm convSingPFactoryP_intern( poly p, int l, BOOLEAN & setChar,
 
 CanonicalForm convSingPFactoryP( poly p, const ring r )
 {
-  BOOLEAN setChar=TRUE;
-  return convSingPFactoryP_intern(p,pLength(p),setChar,r);
+  if (rVar(r)>1)
+  {
+    BOOLEAN setChar=TRUE;
+    return convSingPFactoryP_intern(p,pLength(p),setChar,r);
+  }
+  else
+  {
+    CanonicalForm result = 0;
+    BOOLEAN setChar=TRUE;
+    coeffs cf=r->cf;
+    int e;
+    while ( p!=NULL )
+    {
+      CanonicalForm term=cf->convSingNFactoryN(pGetCoeff( p ),setChar, cf);
+      if (errorreported) break;
+      setChar=FALSE;
+      if (LIKELY( (e = p_GetExp( p, 1, r)) != 0 ))
+        term *= CanonicalForm( Variable( 1 ), e );
+      result += term;
+      pIter( p );
+    }
+    return result;
+  }
 }
 
 int convFactoryISingI( const CanonicalForm & f)
