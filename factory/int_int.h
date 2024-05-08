@@ -151,7 +151,6 @@ public:
     friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
     friend void getmpi ( InternalCF * value, mpz_t mpi);
     #ifdef HAVE_FLINT
-    friend void convertCF2Fmpz (fmpz_t result, const CanonicalForm& f);
     friend void convertCF2initFmpz (fmpz_t result, const CanonicalForm& f);
     friend void convertCF2Fmpq(fmpq_t result, const CanonicalForm& f);
     #endif
