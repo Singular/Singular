@@ -400,11 +400,8 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   #endif
   else
   {
-    if (lq==MIN_LENGTH_MAX)
-    {
-      lp=pLength(p);
-      lq=pLength(q);
-    }
+    lp=pLength(p);
+    lq=pLength(q);
     return _p_Mult_q_Bucket(p, lp, q, lq, copy, r);
   }
 }
