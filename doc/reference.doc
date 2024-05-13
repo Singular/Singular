@@ -4482,6 +4482,7 @@ See
 @node minbase, minor, min, Functions
 @subsection minbase
 @cindex minbase
+@cindex minimal generating set
 @table @code
 @item @strong{Syntax:}
 @code{minbase (} ideal_expression @code{)}
@@ -5000,6 +5001,7 @@ See
 @node  mstd
 @subsection mstd
 @cindex mstd
+@cindex minimal generating set
 @table @code
 @item @strong{Syntax:}
 @code{mstd (} ideal_expression @code{)}
