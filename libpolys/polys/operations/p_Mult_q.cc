@@ -298,13 +298,10 @@ poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   return res;
 }
 
-
-// Use factory if min(pLength(p), pLength(q)) >= MIN_LENGTH_FACTORY (>MIN_LENGTH_BUCKET)
-// Not thoroughly tested what is best
-#define MIN_LENGTH_FACTORY 300
-#define MIN_FLINT_QQ 80
-#define MIN_FLINT_Zp 85
-#define MIN_FLINT_Z 100
+#define MIN_LENGTH_MAX 250
+#define MIN_FLINT_QQ 130
+#define MIN_FLINT_Zp 250
+#define MIN_FLINT_Z 230
 
 /// Returns:  p * q,
 /// Destroys: if !copy then p, q
@@ -319,8 +316,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   int lp, lq, l;
   poly pt;
 
-  // MIN_LENGTH_FACTORY must be >= MIN_LENGTH_FACTORY_QQ, MIN_FLINT_QQ, MIN_FLINT_Zp 20
-  pqLengthApprox(p, q, lp, lq, MIN_LENGTH_FACTORY);
+  pqLengthApprox(p, q, lp, lq, MIN_LENGTH_MAX);
 
   if (lp < lq)
   {
@@ -351,7 +347,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
         return res;
       }
     }
-    if ((lq>MIN_FLINT_Zp) && rField_is_Zp(r))
+    else if ((lq>MIN_FLINT_Zp) && rField_is_Zp(r))
     {
       nmod_mpoly_ctx_t ctx;
       if (!convSingRFlintR(ctx,r))
@@ -366,7 +362,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
         return res;
       }
     }
-    if ((lq>MIN_FLINT_Z) && rField_is_Z(r))
+    else if ((lq>MIN_FLINT_Z) && rField_is_Z(r))
     {
       fmpz_mpoly_ctx_t ctx;
       if (!convSingRFlintR(ctx,r))
@@ -404,8 +400,11 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   #endif
   else
   {
-    lp=pLength(p);
-    lq=pLength(q);
+    if (lq==MIN_LENGTH_MAX)
+    {
+      lp=pLength(p);
+      lq=pLength(q);
+    }
     return _p_Mult_q_Bucket(p, lp, q, lq, copy, r);
   }
 }
