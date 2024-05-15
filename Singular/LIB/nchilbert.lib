@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version nchilbert.lib 4.2.0.0 Dec_2020 "; // $Id$
+version="version nchilbert.lib 4.4.0.1 May_2024 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: nchilbert.lib   Hilbert series, polynomial and multiplicity for G-Algebras (Plural)
@@ -31,7 +31,7 @@ LIB "gkdim.lib";
 
 proc ncHilb(module I, int j)
 "USAGE:     ncHilb(M,j); M a module, j an int
-RETURN:     intvec
+RETURN:     bigintvec
 ASSUME:
 - M is given via a Groebner basis; j is 1 or 2;
 - the weights of all the ring variables are positive
@@ -79,7 +79,7 @@ EXAMPLE:    example ncHilb;
     def KomR = ring(L);
     setring KomR;
     def J = std(imap(R,LI));
-    intvec hl = hilb(J,j,weights);
+    bigintvec hl = hilb(J,j,weights);
     setring R;
     // cleanup:
     kill KomR; kill Rhelp;
