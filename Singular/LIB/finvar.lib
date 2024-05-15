@@ -6678,7 +6678,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   def RHilb = newR+br; // the new variables only appear linearly, so that block order wouldn't hurt
   setring RHilb;
   ideal ElimP=imap(R,ElimP);
-  intvec EPvec = hilb(groebner(ElimP),1,degvec(maxideal(1)));
+  bigintvec EPvec = hilb(groebner(ElimP),1,degvec(maxideal(1)));
   setring R;
   ideal GElimP = std(ElimP,EPvec,degvec(maxideal(1)));
   attrib(GElimP,"isSB",1);

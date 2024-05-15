@@ -6227,20 +6227,17 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   }
   assumeStdFlag(u);
   intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
-  intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal,wdegree);
   if (errorreported) return TRUE;
 
   switch((int)(long)v->Data())
   {
     case 1:
-      res->data=(void *)iv;
+      res->data=(void *)hFirstSeries0b((ideal)u->Data(),currRing->qideal,wdegree,module_w,currRing,coeffs_BIGINT);
       return FALSE;
     case 2:
-      res->data=(void *)hSecondSeries(iv);
-      delete iv;
+      res->data=(void *)hSecondSeries0b((ideal)u->Data(),currRing->qideal,wdegree,module_w,currRing,coeffs_BIGINT);
       return FALSE;
   }
-  delete iv;
   WerrorS(feNotImplemented);
   return TRUE;
 }

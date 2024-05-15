@@ -21,6 +21,13 @@
 
 @heading News for version @value{VERSION}
 
+Changes in the kernel/build system:
+@itemize
+@item use new algorithm for weighted Hilbert function @nref{hilb}
+@end itemize
+
+@heading News for version 4-3-2
+
 New libraries:
 @itemize
 @item @code{modfinduni.lib}: parallel computation of finduni (@nref{modfinduni_lib} @nref{finduni})
@@ -71,7 +78,7 @@ Changes in the kernel/build system:
 @item new algorithm for lift function (@nref{lift})
 @item mstd for local rings (@nref{mstd})
 @item use the new Hilbert function algorithm for @nref{hilb}.
-(Different output format/ diffren return type)
+(Different output format/ different return type)
 @item renamed orderings
 @code{ringorder_rp} -> @code{ringorder_ip}
 @code{ringorder_rs} -> @code{ringorder_is}
