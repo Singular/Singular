@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version assprimeszerodim.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version assprimeszerodim.lib 4.4.0.1 May_2024 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  assprimeszerodim.lib   associated primes of a zero-dimensional ideal
@@ -30,6 +30,7 @@ LIB "modstd.lib";
 proc zeroRadical(ideal I, list #)
 "USAGE:  zeroRadical(I[, exactness]); I ideal, exactness int
 ASSUME:  I is zero-dimensional in Q[variables]
+         or Z/p[variables] with p>>0
 RETURN:  the radical of I
 NOTE:    A final test is applied to the result if exactness != 0 (default),
          otherwise no final test is done.
@@ -38,6 +39,7 @@ EXAMPLE: example zeroRadical; shows an example
 {
    /* read optional parameter */
    int exactness = 1;
+   int parallel=(system("cpu")>1)&&(attrib (basering,"cf_class")==2);
    if(size(#) > 0)
    {
       if(size(#) > 1 || typeof(#[1]) != "int")
@@ -50,22 +52,32 @@ EXAMPLE: example zeroRadical; shows an example
    /* compute a standard basis if necessary */
    if (!attrib(I, "isSB"))
    {
-      I = modStd(I, exactness);
+      if(parallel)
+      {
+        I=groebner(I);
+      }
+      else
+      {
+        I = modStd(I, exactness);
+      }
    }
 
    /* call modular() */
    // TODO: write deleteUnluckyPrimes_zeroRadical()
-   if(exactness)
+   if (parallel)
    {
+     if(exactness)
+     {
       ideal F = modular("Assprimeszerodim::zeroRadP", list(I),
          Modstd::primeTest_std, Modular::deleteUnluckyPrimes_default,
          pTest_zeroRadical, finalTest_zeroRadical);
-   }
-   else
-   {
+     }
+     else
+     {
       ideal F = modular("Assprimeszerodim::zeroRadP", list(I),
          Modstd::primeTest_std, Modular::deleteUnluckyPrimes_default,
          pTest_zeroRadical);
+     }
    }
 
    /* compute the squarefree parts */
@@ -86,7 +98,14 @@ EXAMPLE: example zeroRadical; shows an example
    }
    else
    {
-      return(modStd(I + F, exactness));
+     if(parallel)
+     {
+       return(modStd(I + F, exactness));
+     }
+     else
+     {
+       return(groebner(I+F));
+     }
    }
 }
 example
