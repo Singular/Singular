@@ -7642,7 +7642,7 @@ For Letterplace rings, a twosided Groebner basis is computed.
 A standard basis is a set of generators such that
 the leading terms generate the leading ideal, resp.@: module.
 @*Use an optional
-second argument of type intvec as Hilbert series
+second argument of type bigintvec as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal, resp.@: module, is homogeneous
 (Hilbert driven standard basis computation, @ref{stdhilb}).
