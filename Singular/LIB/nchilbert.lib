@@ -13,7 +13,7 @@ and in the bachelor thesis by
 Andre Ranft, Hilbert polynomials of modules over noncommutative G-algebras, RWTH Aachen, 2014.
 
 PROCEDURES:
-ncHilb(M,j);    computes first resp. second Hilbert series of a module as intvec
+ncHilb(M,j);    computes first resp. second Hilbert series of a module as bigintvec
 ncHilbertSeries(M,j); computes first resp. second Hilbert series of a module as a poly
 ncHilbertPolynomial(M,j); computes the Hilbert polynomial of coker(M)
 ncHilbertMultiplicity(M); computes the (Hilbert) multiplicity of coker(M)
@@ -36,7 +36,7 @@ ASSUME:
 - M is given via a Groebner basis; j is 1 or 2;
 - the weights of all the ring variables are positive
 NOTE:
-- computes the first (if j=1) or second (j=2) Hilbert series of I as intvec
+- computes the first (if j=1) or second (j=2) Hilbert series of I as bigintvec
 - the procedure works analogously to the commutative procedure @code{hilb}
 - If the returned vector has the form @code{v=(v_0,v_1,...,v_d,0)}, then
 the Hilbert series is @code{v_0 + v_1*t + ... + v_d*t^d}
@@ -123,7 +123,7 @@ EXAMPLE:    example ncHilbertSeries;
 "
 {
 // note, that ALL assumes are checked by the procedure ncHilb
-    intvec ser=ncHilb(I,j);
+    bigintvec ser=ncHilb(I,j);
     ring R=0,(t),dp;
     setring R;
     int i;
@@ -164,7 +164,7 @@ example
 
 proc ncHilbertMultiplicity(module I)
 "USAGE:     ncHilbertMultiplicity(M); M is a module
-RETURN:     int
+RETURN:     bigint
 PURPOSE:    compute the (Hilbert) multiplicity of the module coker(M)
 ASSUME:
 - M is given via a Groebner basis
@@ -174,9 +174,9 @@ EXAMPLE:  example ncHilbertMultiplicity;
 "
 {
 // note, that ALL assumes are checked by the procedure ncHilb
-    int k,l;
-    intvec ser = ncHilb(I,2);
-    for (k=1; k<=size(ser)-1; k++)
+    bigint l;
+    bigintvec ser = ncHilb(I,2);
+    for (int k=1; k<=size(ser)-1; k++)
     {
         l=l+ser[k];
     }
@@ -235,7 +235,7 @@ EXAMPLE:  example ncHilbertPolynomial;
     def R=basering;
     int i;
     if(!attrib(I,"isSB")){I=std(I);}
-    intvec G=ncHilb(I,2);//2nd Hilbert series
+    bigintvec G=ncHilb(I,2);//2nd Hilbert series
     int s=dim(I); //GKdim
     int d=size(G)-1;    //deg of the second Hilbert series
     ring @@t=0,(t),dp; setring @@t;
