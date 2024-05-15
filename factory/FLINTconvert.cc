@@ -123,11 +123,9 @@ void convertCF2Fmpz (fmpz_t result, const CanonicalForm& f)
     *result=f.intval();
   else
   {
-    mpz_t gmp_val;
-    f.mpzval(gmp_val);
     fmpz_init(result);
-    fmpz_set_mpz (result, gmp_val);
-    mpz_clear (gmp_val);
+    InternalInteger *fi=(InternalInteger*)f.getval();
+    fmpz_set_mpz (result, fi->thempi);
   }
 }
 
