@@ -10271,7 +10271,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     pl=(lists)v->Data();
     if (pl->nr!=rl-1)
     {
-      WerrorS("wromg number of primes");
+      Werror("wromg number of primes (%d:%d) for chinrem",pl->nr+1,rl);
       return TRUE;
     }
   }
@@ -10280,7 +10280,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     p=(intvec*)v->Data();
     if (p->length()!=rl)
     {
-      WerrorS("wromg number of primes");
+      Werror("wromg number of primes (%d:%d) for chinrem",p->length(),rl);
       return TRUE;
     }
   }
