@@ -11,6 +11,15 @@
 #include "cf_defs.h"
 #include "ffops.h"
 
+/// For optimizing if-branches
+#ifdef __GNUC__
+#define LIKELY(expression) (__builtin_expect(!!(expression), 1))
+#define UNLIKELY(expression) (__builtin_expect(!!(expression), 0))
+#else
+#define LIKELY(expression) (expression)
+#define UNLIKELY(expression) (expression)
+#endif
+
 VAR int ff_prime = 0;
 VAR int ff_halfprime = 0;
 VAR bool ff_big = false;
@@ -71,7 +80,7 @@ int ff_newinv ( const int a )
 
 int ff_biginv ( const int a )
 {
-    if (a < 2)
+    if (UNLIKELY(a < 2))
       return a;
     int p, q, r1, r2, y1, y2;
     r1 = p = ff_prime;
