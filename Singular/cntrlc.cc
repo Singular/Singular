@@ -553,7 +553,7 @@ VAR si_hdl_typ si_sig_chld_hdl;
 //VAR si_hdl_typ si_sig_pipe_hdl;
 //VAR si_hdl_typ si_sig_term_hdl;
 
-void set_signals()
+void si_set_signals()
 {
   //si_sigint_handler=si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
   si_sig_chld_hdl=si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
@@ -561,7 +561,7 @@ void set_signals()
   //si_sig_term_hdl=si_set_signal(SIGTERM, (si_hdl_typ)sig_term_hdl);
 }
 
-void reset_signals()
+void si_reset_signals()
 {
 // signal handler -------------------------------------------------------
   //si_set_signal(SIGINT ,si_sigint_handler);

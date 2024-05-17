@@ -22,6 +22,6 @@ EXTERN_VAR BOOLEAN singular_in_batchmode;
 EXTERN_VAR volatile BOOLEAN do_shutdown;
 EXTERN_VAR volatile int defer_shutdown;
 
-void set_signals();
-void reset_signals();
+void si_set_signals();
+void si_reset_signals();
 #endif
