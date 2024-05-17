@@ -26,7 +26,7 @@ Changes in the kernel/build system:
 @item use new algorithm for weighted Hilbert function @nref{hilb}
 @end itemize
 
-@heading News for version 4-3-2
+@heading News for version 4-4-0
 
 New libraries:
 @itemize
