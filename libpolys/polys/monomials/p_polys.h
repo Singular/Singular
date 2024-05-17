@@ -1109,18 +1109,22 @@ static inline poly p_Neg(poly p, const ring r)
   return r->p_Procs->p_Neg(p, r);
 }
 
-extern poly  _p_Mult_q(poly p, poly q, const int copy, const ring r);
+poly _p_Mult_q(poly p, poly q, const int copy, const ring r);
+#ifdef HAVE_RINGS
+poly _p_Mult_q_Normal_ZeroDiv(poly p, poly q, const int copy, const ring r);
+#endif
+
 // returns p*q, destroys p and q
 static inline poly p_Mult_q(poly p, poly q, const ring r)
 {
   assume( (p != q) || (p == NULL && q == NULL) );
 
-  if (p == NULL)
+  if (UNLIKELY(p == NULL))
   {
     p_Delete(&q, r);
     return NULL;
   }
-  if (q == NULL)
+  if (UNLIKELY(q == NULL))
   {
     p_Delete(&p, r);
     return NULL;
@@ -1140,8 +1144,13 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
     return p;
   }
 #if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
-  if (rIsNCRing(r))
+  if (UNLIKELY(rIsNCRing(r)))
     return _nc_p_Mult_q(p, q, r);
+  else
+#endif
+#ifdef HAVE_RINGS
+  if (UNLIKELY(!nCoeff_is_Domain(r->cf)))
+    return _p_Mult_q_Normal_ZeroDiv(p, q, 0, r);
   else
 #endif
   return _p_Mult_q(p, q, 0, r);
@@ -1150,7 +1159,7 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
 // returns p*q, does neither destroy p nor q
 static inline poly pp_Mult_qq(poly p, poly q, const ring r)
 {
-  if (p == NULL || q == NULL) return NULL;
+  if (UNLIKELY(p == NULL || q == NULL)) return NULL;
 
   if (pNext(p) == NULL)
   {
@@ -1163,18 +1172,23 @@ static inline poly pp_Mult_qq(poly p, poly q, const ring r)
   }
 
   poly qq = q;
-  if (p == q)
+  if (UNLIKELY(p == q))
     qq = p_Copy(q, r);
 
   poly res;
 #if defined(HAVE_PLURAL) || defined(HAVE_SHIFTBBA)
-  if (rIsNCRing(r))
+  if (UNLIKELY(rIsNCRing(r)))
     res = _nc_pp_Mult_qq(p, qq, r);
+  else
+#endif
+#ifdef HAVE_RINGS
+  if (UNLIKELY(!nCoeff_is_Domain(r->cf)))
+    return _p_Mult_q_Normal_ZeroDiv(p, q, 1, r);
   else
 #endif
     res = _p_Mult_q(p, qq, 1, r);
 
-  if (qq != q)
+  if (UNLIKELY(qq != q))
     p_Delete(&qq, r);
   return res;
 }
