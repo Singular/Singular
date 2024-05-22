@@ -299,9 +299,9 @@ poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 }
 
 #define MIN_LENGTH_MAX 81
-#define MIN_FLINT_QQ 80
+#define MIN_FLINT_QQ 60
 #define MIN_FLINT_Zp 80
-#define MIN_FLINT_Z 80
+#define MIN_FLINT_Z 60
 
 /// Returns:  p * q,
 /// Destroys: if !copy then p, q
@@ -312,7 +312,6 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   int lp=0, lq=0;
   poly pt;
 
-  //pqLengthApprox(p, q, lp, lq, MIN_LENGTH_MAX);
   BOOLEAN pure_polys=(p_GetComp(p,r)==0) && (p_GetComp(q,r)==0);
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
@@ -377,7 +376,8 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   }
   #endif
   #endif
-  if (lp==0) pqLengthApprox(p, q, lp, lq, MIN_LENGTH_BUCKET);
+  if (lp==0)
+    pqLengthApprox(p, q, lp, lq, MIN_LENGTH_BUCKET);
   if (lp < lq)
   {
     int l;
