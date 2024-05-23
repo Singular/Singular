@@ -22,7 +22,6 @@ jobs:
                if [ "$RUNNER_OS" == "Linux" ]; then
                     # sharutils is for uudecode
                     sudo apt install sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev 4ti2 normaliz libopenblas-dev
-                    # install new enough FLINT
                     wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-linux-gnu.tar.gz"
                     sudo tar -C /usr -xvf FLINT.tar.gz
                     rm -f FLINT.tar.gz
@@ -33,9 +32,9 @@ jobs:
                     # install new enough FLINT
                     #wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-apple-darwin.tar.gz"
                     #wget -O FLINT.tar.gz "${FLINT_JLL}.aarch64-apple-darwin.tar.gz"
-                    sudo mkdir -p /usr/local
-                    sudo tar -C /usr/local -xvf FLINT.tar.gz
-                    rm -f FLINT.tar.gz
+                    #sudo mkdir -p /usr/local
+                    #sudo tar -C /usr/local -xvf FLINT.tar.gz
+                    #rm -f FLINT.tar.gz
                else
                     echo "$RUNNER_OS not supported"
                     exit 1
