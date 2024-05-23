@@ -1647,7 +1647,6 @@ idhdl rDefault(const char *s)
   if (s!=NULL) tmp = enterid(s, myynest, RING_CMD, &IDROOT);
   if (tmp==NULL) return NULL;
 
-// if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
@@ -6196,7 +6195,6 @@ void rKill(ring r)
     if (r==currRing)
     {
       // all dependend stuff is done, clean global vars:
-      if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
       if (sLastPrinted.RingDependend())
       {
         sLastPrinted.CleanUp();

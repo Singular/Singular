@@ -1823,14 +1823,14 @@ void initMora(ideal F,kStrategy strat)
   strat->posInLOld = strat->posInL;
   strat->posInLOldFlag = TRUE;
   strat->initEcart = initEcartNormal;
-  strat->kAllAxis = (currRing->ppNoether) != NULL; //!!
-  if ( currRing->ppNoether != NULL )
+  strat->kAllAxis = (currRing->ppNoether) != NULL;
+  if ( strat->kAllAxis )
   {
     strat->kNoether = pCopy((currRing->ppNoether));
     strat->red = redFirst;  /*take the first possible in T*/
     if (TEST_OPT_PROT)
     {
-      Print("H(%ld)",p_FDeg(currRing->ppNoether,currRing)+1);
+      Print("H(%ld)",p_FDeg(strat->kNoether,currRing)+1);
       mflush();
     }
   }
@@ -1838,9 +1838,9 @@ void initMora(ideal F,kStrategy strat)
     strat->red = redFirst;  /*take the first possible in T*/
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
-  if (currRing->ppNoether != NULL)
+  if (strat->kAllAxis)
   {
-    HCord = currRing->pFDeg((currRing->ppNoether),currRing)+1;
+    HCord = currRing->pFDeg((strat->kNoether),currRing)+1;
   }
   else
   {
@@ -2141,7 +2141,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   //  return pCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),pMaxComp(q));
   /*- creating temp data structures------------------- -*/
-  //strat->kAllAxis = (currRing->ppNoether) != NULL;
+  strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether    = pCopy((currRing->ppNoether));
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   if (!rField_is_Ring(currRing))
@@ -2284,7 +2284,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   //  return idCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
   /*- creating temp data structures------------------- -*/
-  //strat->kAllAxis = (currRing->ppNoether) != NULL;
+  strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether=pCopy((currRing->ppNoether));
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   if (TEST_OPT_STAIRCASEBOUND
@@ -2665,6 +2665,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 //Print("%d reductions canceled \n",strat->cel);
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  if (currRing->ppNoether!=save_noether) pLmDelete(&currRing->ppNoether);
   currRing->ppNoether=save_noether;
   return r;
 }
