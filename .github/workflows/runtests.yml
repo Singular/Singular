@@ -31,7 +31,8 @@ jobs:
                     # TODO: 4ti2?
                     # TODO: normaliz?
                     # install new enough FLINT
-                    wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-apple-darwin.tar.gz"
+                    #wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-apple-darwin.tar.gz"
+                    wget -O FLINT.tar.gz "${FLINT_JLL}.aarch64-apple-darwin.tar.gz"
                     sudo mkdir -p /usr/local
                     sudo tar -C /usr/local -xvf FLINT.tar.gz
                     rm -f FLINT.tar.gz
