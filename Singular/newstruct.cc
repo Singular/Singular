@@ -640,15 +640,18 @@ BOOLEAN newstruct_deserialize(blackbox **, void **d, si_link f)
   // rtyp must be set correctly (to the blackbox id) by routine calling
   // newstruct_deserialize
   leftv l=f->m->Read(f); // int: length of list
-  int Ll=(int)(long)(l->data);
+  int Ll=(int)(long)l->data;
   omFreeBin(l,sleftv_bin);
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(Ll+1);
   for(int i=0;i<=Ll;i++)
   {
     l=f->m->Read(f);
-    memcpy(&(L->m[i]),l,sizeof(sleftv));
-    omFreeBin(l,sleftv_bin);
+    if (l!=NULL)
+    {
+      memcpy(&(L->m[i]),l,sizeof(sleftv));
+      omFreeBin(l,sleftv_bin);
+    }
   }
   //newstruct_desc n=(newstruct_desc)b->data;
   //TODO: check compatibility of list l->data with description in n

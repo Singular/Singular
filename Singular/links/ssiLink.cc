@@ -906,8 +906,9 @@ static bigintmat* ssiReadBigintvec(const ssiInfo *d)
 static void ssiReadBlackbox(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  int throwaway=s_readint(d->f_read);
-  char *name=ssiReadString(d);
+  leftv lv=ssiRead1(l);
+  char *name=(char*)lv->data;
+  omFreeBin(lv,sleftv_bin);
   int tok;
   blackboxIsCmd(name,tok);
   if (tok>MAX_TOK)
@@ -1532,20 +1533,25 @@ leftv ssiRead1(si_link l)
   {
     case 1:res->rtyp=INT_CMD;
            res->data=(char *)(long)ssiReadInt(d->f_read);
+	   //Print("int: %d\n",(int)(long)res->data);
            break;
     case 2:res->rtyp=STRING_CMD;
            res->data=(char *)ssiReadString(d);
+	   //Print("str: %s\n",(char*)res->data);
            break;
     case 3:res->rtyp=NUMBER_CMD;
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char *)ssiReadNumber(d);
+	   //Print("number\n");
            break;
     case 4:res->rtyp=BIGINT_CMD;
            res->data=(char *)ssiReadBigInt(d);
+	   //Print("bigint\n");
            break;
     case 15:
     case 5:{
+	   //Print("ring %d\n",t);
              d->r=ssiReadRing(d);
              if (errorreported) return NULL;
              res->data=(char*)d->r;
@@ -1560,21 +1566,25 @@ leftv ssiRead1(si_link l)
            }
            break;
     case 6:res->rtyp=POLY_CMD;
+	   //Print("poly\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
            break;
     case 7:res->rtyp=IDEAL_CMD;
+	   //Print("ideal\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadIdeal(d);
            break;
     case 8:res->rtyp=MATRIX_CMD;
+	   //Print("matrix\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadMatrix(d);
            break;
     case 9:res->rtyp=VECTOR_CMD;
+	   //Print("vector\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
@@ -1582,6 +1592,7 @@ leftv ssiRead1(si_link l)
     case 10:
     case 22:if (t==22) res->rtyp=SMATRIX_CMD;
            else        res->rtyp=MODUL_CMD;
+	   //Print("module/smatrix %d\n",t);
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            {
@@ -1593,6 +1604,7 @@ leftv ssiRead1(si_link l)
            break;
     case 11:
            {
+	   //Print("cmd\n",t);
              res->rtyp=COMMAND;
              res->data=ssiReadCommand(l);
              int nok=res->Eval();
@@ -1601,6 +1613,7 @@ leftv ssiRead1(si_link l)
            }
     case 12: /*DEF_CMD*/
            {
+	   //Print("def\n",t);
              res->rtyp=0;
              res->name=(char *)ssiReadString(d);
              int nok=res->Eval();
@@ -2496,7 +2509,7 @@ BOOLEAN ssiGetDump(si_link l)
 // 17 intvec <len> ...
 // 18 intmat
 // 19 bigintmat <r> <c> ...
-// 20 blackbox <name> 1 <len> ...
+// 20 blackbox <name> <len> ...
 // 21 attrib <bit-attrib> <len> <a-name1> <val1>... <data>
 // 22 smatrix
 // 23 0 <log(bitmask)> ring properties: max.exp.
