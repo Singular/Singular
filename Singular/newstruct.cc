@@ -94,13 +94,12 @@ char * newstruct_String(blackbox *b, void *d)
       || (((ring)l->m[a->pos-1].data==currRing)
          && (currRing!=NULL)))
       {
-        #if 0
+        // list may depend on currRing
         if (l->m[a->pos].rtyp==LIST_CMD)
         {
           StringAppendS("<list>");
         }
         else
-        #endif
         if (l->m[a->pos].rtyp==STRING_CMD)
         {
           StringAppendS((char*)l->m[a->pos].Data());
