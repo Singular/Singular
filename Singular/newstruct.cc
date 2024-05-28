@@ -90,14 +90,18 @@ char * newstruct_String(blackbox *b, void *d)
       StringAppendS(a->name);
       StringAppendS("=");
       if (((!RingDependend(a->typ)&&!RingDependend(l->m[a->pos].rtyp)))
-      || ((rEqual((ring)l->m[a->pos-1].data,currRing))
+      //|| ((rEqual((ring)l->m[a->pos-1].data,currRing))
+      || (((ring)l->m[a->pos-1].data==currRing)
          && (currRing!=NULL)))
       {
+        #if 0
         if (l->m[a->pos].rtyp==LIST_CMD)
         {
           StringAppendS("<list>");
         }
-        else if (l->m[a->pos].rtyp==STRING_CMD)
+        else
+        #endif
+        if (l->m[a->pos].rtyp==STRING_CMD)
         {
           StringAppendS((char*)l->m[a->pos].Data());
         }
@@ -114,7 +118,12 @@ char * newstruct_String(blackbox *b, void *d)
           omFree(tmp2);
         }
       }
-      else StringAppendS("??");
+      else
+      {
+        StringAppendS("<");
+        StringAppendS(Tok2Cmdname(l->m[a->pos].rtyp));
+        StringAppendS(">");
+      }
       if (a->next==NULL) break;
       StringAppendS("\n");
       if(errorreported) break;
