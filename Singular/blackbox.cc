@@ -58,12 +58,12 @@ void blackbox_default_Print(blackbox *b,void *d)
   PrintS(s);
   omFree(s);
 }
-void *blackbox_default_Init(blackbox */*b*/)
+void *blackbox_default_Init(blackbox* /*b*/)
 {
   return NULL;
 }
 
-BOOLEAN blackbox_default_serialize(blackbox */*b*/, void */*d*/, si_link /*f*/)
+BOOLEAN blackbox_default_serialize(blackbox* /*b*/, void* /*d*/, si_link /*f*/)
 {
   WerrorS("blackbox_serialize is not implemented");
   return TRUE;
