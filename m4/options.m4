@@ -27,7 +27,7 @@ AC_ARG_ENABLE(plural, AS_HELP_STRING([--disable-plural], [Disable non-commutativ
 
 if test "x$ENABLE_PLURAL" != xno; then
   AC_DEFINE(HAVE_PLURAL,[1],[Enable non-commutative subsystem])
-  #TODO make a seperate switch
+  #TODO make a separate switch
   AC_DEFINE(HAVE_SHIFTBBA,[1],[Enable letterplace])
 fi
 

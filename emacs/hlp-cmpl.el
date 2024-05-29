@@ -420,7 +420,7 @@
     ("calculate_ordering" . "calculate_ordering.  (line   6")
     ("calculateI" . "calculateI.          (line   6")
     ("cancelunit, option" . "option.              (line 146")
-    ("canoncial form" . "PtoCrep.             (line  23")
+    ("canonical form" . "PtoCrep.             (line  23")
     ("canonical" . "grobcov.             (line 121")
     ("canonical form" . "DifConsLCSets.       (line  15")
     ("canonical," . "extendGC.            (line  49")

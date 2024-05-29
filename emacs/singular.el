@@ -1951,15 +1951,15 @@ Assumes that no narrowing is in effect."
     (setcdr sections-end
 	    (cons (singular-section-create simple-section type start end) nil))
 
-    ;; we should not forget to pop off our auxilliary cons-cell
+    ;; we should not forget to pop off our auxiliary cons-cell
     (cdr sections)))
 
 (defun singular-section-mapsection (func sections &optional type-filter negate-filter)
   "Apply FUNC to each section in SECTIONS, and make a list of the results.
 If optional argument TYPE-FILTER is non-nil it should be a list of section
-types.  FUNC is then applied only to those sections with type occuring in
+types.  FUNC is then applied only to those sections with type occurring in
 TYPE-FILTER.  If in addition optional argument NEGATE-FILTER is non-nil
-FUNC is applied only to those sections with type not occuring in
+FUNC is applied only to those sections with type not occurring in
 TYPE-FILTER.
 
 In any case the length of the list this function returns equals the
@@ -2406,7 +2406,7 @@ Narrowing has no effect on this function."
 ;;   a new window.
 ;;
 ;; To show some online help, the online help manual has to be available, of
-;; course.  There is a number of possibilites for the user to set the file
+;; course.  There is a number of possibilities for the user to set the file
 ;; name of the manual explicitly, as described in the documentation string
 ;; to `singular-help'.  But in general the file name should be recognized
 ;; automatically by Singular interactive mode.  For that to work, Singular
@@ -2661,7 +2661,7 @@ This function is called at mode initialization time."
 This variable is buffer-local.")
 
 (defvar singular-help-topics-alist nil
-  "An alist containg all Singular help topics to complete.
+  "An alist containing all Singular help topics to complete.
 
 This variable is buffer-local.")
 
@@ -2823,7 +2823,7 @@ This function is called by `singular-exit-sentinel'."
   "Path to the emacs sub-directory of Singular as string.
 `singular-scan-header-pre-output-filter' searches the Singular header for
 the path and sets this variable to the corresponding value.
-Its value is redifined on every start of Singular.
+Its value is redefined on every start of Singular.
 
 This variable is buffer-local.")
 
@@ -3751,7 +3751,7 @@ NOT READY [much more to come.  See shell.el.]!"
   ;; first as the filters are accessed in the following initialization
   ;; functions.  NOT READY [should be moved to the respective foldings]
   (make-local-variable 'singular-pre-input-filter-functions)
-  ;;make-local-hook is obsolete in emcas >=21.1
+  ;;make-local-hook is obsolete in emacs >=21.1
   ;;(make-local-hook 'singular-post-input-filter-functions)
   (make-local-variable 'singular-pre-output-filter-functions)
   ;;(make-local-hook 'singular-post-output-filter-functions)
@@ -3982,7 +3982,7 @@ switches.  START-FILE should be the name of a file which contents is
 sent to the process.
 
 Deletes any old processes running in that buffer.
-Removes any empty string in SWITCHES befor passing to Singular.
+Removes any empty string in SWITCHES before passing to Singular.
 Moves point to the end of BUFFER.
 Initializes all important markers and the simple sections.
 Runs the hooks on `singular-exec-hook'.
@@ -4180,7 +4180,7 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 Starts a Singular process, with I/O through an Emacs buffer.
 
 If called interactively, the user is asked in the minibuffer area for an
-existing executable (with or without path), an exisiting directory or nil
+existing executable (with or without path), an existing directory or nil
 (if non-nil, sets the buffers default directory to this directory), the
 complete command line arguments to be passed to Singular (as a single
 string) and the buffer name of the singular buffer, which is surrounded by

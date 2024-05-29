@@ -204,7 +204,7 @@ AC_MSG_RESULT($ac_cv_pagesize)
 if test "$ac_cv_pagesize" = 4096 || test "$ac_cv_pagesize" = 8192; then
   AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize, "Page-size of the build-system")
 else
-AC_MSG_ERROR([need sytem page to be of size 4096 or 8192, but is $ac_cv_pagesize])
+AC_MSG_ERROR([need system page to be of size 4096 or 8192, but is $ac_cv_pagesize])
 fi
 
 AC_DEFINE_UNQUOTED(SIZEOF_OM_PAGE,SIZEOF_SYSTEM_PAGE,Page-size of the build-system)
@@ -260,7 +260,7 @@ if test "${with_external_config_h+set}" = set; then
     cp ${with_external_config_h} omExternalConfig.h
 fi
 if test "${with_external_config_c+set}" = set; then
-    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_C,1,"Wether we have an external config.c")
+    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_C,1,"Whether we have an external config.c")
     EXTERNAL_CONFIG_SOURCE=${with_external_config_c}
 fi
 AC_SUBST(EXTERNAL_CONFIG_HEADER)

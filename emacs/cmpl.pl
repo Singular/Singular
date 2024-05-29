@@ -74,7 +74,7 @@ elsif ($cmpl eq 'hlp')
   	  # quote characters special to Emacs
   	  $node =~ s/([\"#\\])/\\\1/g;    #'
   	  $rawNode =~ s/([\"#\\])/\\\1/g; #'
-	  # only the first occurence of $node is inserted to @string!
+	  # only the first occurrence of $node is inserted to @string!
           # all subsequent entries are discarded.
 	  push @strings, "(\"$node\" . \"$rawNode\")" if $node ne $prev;
 	  $prev = $node;

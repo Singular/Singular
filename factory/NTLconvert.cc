@@ -331,7 +331,7 @@ CanonicalForm convertNTLGF2X2CF(const GF2X & poly,const Variable & x)
     bigone.mapinto();
     // Compute the canonicalform coefficient by coefficient,
     // bigone summarizes the result.
-    // In constrast to the more general conversion to ZZpX
+    // In contrast to the more general conversion to ZZpX
     // the only possible coefficients are zero
     // and one yielding the following simplified loop
     for (int j=0;j<=deg(poly);j++)

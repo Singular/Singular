@@ -351,7 +351,7 @@ void traverse(FanTraverser &traverser, Target &target, SymmetryGroup const *symm
 //                  log1 fprintf(Stderr,"-------------------------------------\n");
                   lastNumberOfEdges=boundary.size();
 
-//                  target.process(traverser);//Postponed until extrem rays have been computed
+//                  target.process(traverser);//Postponed until extreme rays have been computed
                   ZMatrix extremeRays=traverser.refToPolyhedralCone().extremeRays(&linealitySpaceGenerators);
                   target.process(traverser);
 

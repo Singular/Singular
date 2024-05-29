@@ -1311,7 +1311,7 @@ set modsource(formatting.tcl) {
 
 # Module which provides common text formatting
 
-# This is designed for documenation which looks like:
+# This is designed for documentation which looks like:
 # code {...}
 # or
 # code {

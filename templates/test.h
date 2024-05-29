@@ -32,7 +32,7 @@
    *
    * This is function 2.
    *
-   * @params <- We would prefere all parameters to be here...
+   * @params <- We would prefer all parameters to be here...
    *
    * @param []
    *
