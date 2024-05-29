@@ -103,7 +103,7 @@ popdef([ac_cv_prog_cxx_works])dnl
 popdef([ac_cv_prog_gxx])dnl
 popdef([ac_cv_prog_CXXCPP])dnl
 
-dnl restore global variables (dependant on the current
+dnl restore global variables (dependent on the current
 dnl language after popping):
 AC_LANG_POP([C++])
 

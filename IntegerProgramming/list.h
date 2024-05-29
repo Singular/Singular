@@ -282,8 +282,8 @@ public:
   // Deletes the referenced binomial.
 
   list_iterator& extract_element();
-  // Only resets pointers so that the refenced binomial is no longer found
-  // when iterating over the list.
+  // Only resets pointers so that the referenced binomial
+  // is no longer found when iterating over the list.
 
   list_iterator& mark_element_done();
   // Sets the "done"-component of the referenced element to TRUE.

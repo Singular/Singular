@@ -78,7 +78,7 @@ a memory manager for @sc{Singular}:
 If managing one memory block requires one or more words
 (e.g., to store its size) then the total overhead of the
 memory manager could sum up to 25% of the overall used memory, which is
-an unnacceptable waste of memory.
+an unacceptable waste of memory.
 @item (4) the memory manager must have a clean API and it must support debugging
 The API of the memory manager must be similar to the standard API's of
 memory managers, otherwise its usability is greatly limited. Furthermore,

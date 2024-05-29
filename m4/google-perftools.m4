@@ -15,7 +15,7 @@ dnl    limitations under the License.
 dnl
 
 dnl
-dnl Autoconf support for linking with google's performace code
+dnl Autoconf support for linking with google's performance code
 dnl
 
 AC_DEFUN([AC_CONFIG_GOOGLE_PERFTOOLS], [

@@ -761,7 +761,7 @@ void ZCone::ensureStateAsMinimum(int s)const
             }
           inequalities=LpSolver::fastNormals(inequalities2);
           goto noFallBack;
-        fallBack://alternativ (disabled)
+        fallBack://alternative (disabled)
           lpSolver.removeRedundantRows(inequalities,equations,true);
         noFallBack:;
         }
@@ -1127,7 +1127,7 @@ ZMatrix ZCone::extremeRays(ZMatrix const *generatorsOfLinealitySpace)const
     {
       /* At this point we know lineality space, implied equations and
          also inequalities for the ray. To construct a vector on the
-         ray which is stable under (or independant of) angle and
+         ray which is stable under (or independent of) angle and
          linearity preserving transformation we find the dimension 1
          subspace orthogonal to the implied equations and the
          lineality space and pick a suitable primitive generator */

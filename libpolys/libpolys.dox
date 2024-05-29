@@ -4,7 +4,7 @@
  \brief Basic Data Structures for Singular
 
 
- This is a (mostly) separate package containing the definition and implementaion for
+ This is a (mostly) separate package containing the definition and implementation for
  Singular data structures, such as,
  numbers in coefficient rings and fields (\ref libpolys_coeffs_page),
  polynomials, ideals and modules over polynomial rings (\ref libpolys_polys_page),

@@ -437,7 +437,7 @@ void omFreeTrackAddr(void* d_addr)
     omSetTrackOfUsedBlocks(page->used_blocks);
   else
   {
-    /* Still need to check wheter we need to get rid of SpecBin */
+    /* Still need to check whether we need to get rid of SpecBin */
     if (bin->last_page == NULL && ! omIsStaticTrackBin(bin))
       omDeleteSpecBin(&bin);
   }

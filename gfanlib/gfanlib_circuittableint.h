@@ -244,7 +244,7 @@ public:
         }
 };
 
-inline CircuitTableInt32 CircuitTableInt32::Double::castToSingle()const//casts and checks precission
+inline CircuitTableInt32 CircuitTableInt32::Double::castToSingle()const//casts and checks precision
 {
         if(v>=0x7fffffff || -v>=0x7fffffff) throw MVMachineIntegerOverflow;
         return CircuitTableInt32(v);

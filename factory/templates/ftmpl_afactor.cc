@@ -17,7 +17,7 @@ AFactor<T>& AFactor<T>::operator= ( const AFactor<T>& f )
 template <class T>
 int operator== ( const AFactor<T> &f1, const AFactor<T> &f2 )
 {
-    return (f1.exp() == f2.exp()) && (f1.factor() == f2.factor()) && (f1.minpoly() == f2.minpoly()); //minpoly comparision may not be enough but checking the fields they define are equal
+    return (f1.exp() == f2.exp()) && (f1.factor() == f2.factor()) && (f1.minpoly() == f2.minpoly()); //minpoly comparison may not be enough but checking the fields they define are equal
 }
 
 #ifndef NOSTREAMIO

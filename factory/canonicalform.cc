@@ -1535,7 +1535,7 @@ operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
  *
  * Both operands should have coefficients from the same base domain.
  *
- * The scheme how both operators are implemented is allmost the
+ * The scheme how both operators are implemented is almost the
  * same as for the assignment operators (check for immediates,
  * then check levels, then check levelcoeffs, then call the
  * appropriate internal comparesame()/comparecoeff() method).

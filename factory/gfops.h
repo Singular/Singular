@@ -218,7 +218,7 @@ inline void gf_print ( OSTREAM & os, int a )
 #endif /* NOSTREAMIO */
 //}}}
 
-//{{{ exponentation
+//{{{ exponentiation
 inline int gf_power ( int a, int n )
 {
     if ( n == 0 )
