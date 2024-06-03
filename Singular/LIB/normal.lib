@@ -5515,8 +5515,7 @@ EXAMPLE: example changeDenominator; shows an example
 }
 example
 {
-  "EXAMPLE:";
-  echo = 2;
+  "EXAMPLE:"; echo = 2;
   ring s = 0,(x,y),dp;
   ideal I = y5-y4x+4y2x2-x4;
   ideal U1 = normal(I)[2][1];
@@ -7567,9 +7566,8 @@ EXAMPLE: example modNormal; shows an example
   OutCondu=modStd(Out),condu;
   return(OutCondu);
 }
-
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
 ring R = 0,(x,y,z),dp;
 int k = 4;
 poly f = (x^(k+1)+y^(k+1)+z^(k+1))^2-4*(x^(k+1)*y^(k+1)+y^(k+1)*z^(k+1)+z^(k+1)*x^(k+1));
@@ -7850,7 +7848,7 @@ EXAMPLE: example locNormal; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 int k = 4;
 poly f = (x^(k+1)+y^(k+1)+z^(k+1))^2-4*(x^(k+1)*y^(k+1)+y^(k+1)*z^(k+1)+z^(k+1)*x^(k+1));
@@ -7859,6 +7857,7 @@ ring S = 0,(x,y),dp;
 poly f = imap(R,f);
 ideal i = f;
 list L = locNormal(i);
+L;
 }
 
 proc locNormal_parallelTask(ideal pdi, ideal I, poly condu, int i, int locmod,
