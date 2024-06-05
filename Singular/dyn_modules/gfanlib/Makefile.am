@@ -18,7 +18,7 @@ else
 if HAVE_GFANLIB
   module_LTLIBRARIES=gfanlib.la
 endif
-  moduledir = $(libexecdir)/singular/MOD
+  moduledir = $(libdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
   P_PROCS_MODULE_LDFLAGS =  -module -export-dynamic -avoid-version
 endif
