@@ -137,7 +137,7 @@ int main(          /* main entry to Singular */
     if (feOptValue(FE_OPT_NO_SHELL))
     {
       WarnS("running in restricted mode:"
-      " shell invocation and links are disallowed");
+      " shell invocation and file links are disallowed");
       FE_OPT_NO_SHELL_FLAG=TRUE;
     }
   }

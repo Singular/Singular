@@ -20,6 +20,8 @@
 #include <errno.h>
 #include <sys/types.h>          /* for portability */
 
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
+
 typedef struct
 {
   FILE *f_read;
@@ -32,6 +34,7 @@ typedef struct
 //**************************************************************************/
 static BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
 {
+  if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
   pipeInfo *d=(pipeInfo*)omAlloc0(sizeof(pipeInfo));
   if (flag & SI_LINK_OPEN)
   {

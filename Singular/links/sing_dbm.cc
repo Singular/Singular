@@ -36,6 +36,7 @@ typedef struct {
 //**************************************************************************/
 LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv u)
 {
+  if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
   char *mode = "r";
   GDBM_info *db;
   datum d_key;
