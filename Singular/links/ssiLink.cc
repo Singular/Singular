@@ -49,6 +49,7 @@
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
 
+
 #define SSI_VERSION 15
 // 5->6: changed newstruct representation
 // 6->7: attributes
@@ -61,6 +62,7 @@
 // 13->14: ring references
 // 14->15: bigintvec, prune_map, mres_map
 
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 VAR link_list ssiToBeClosed=NULL;
 VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
@@ -1359,6 +1361,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       else
       {
         // normal link to a file
+        if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
         FILE *outfile;
         char *filename=l->name;
 
