@@ -2969,6 +2969,12 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
 {
   assume(rIsLPRing(currRing));
   assume(idIsInV(F));
+  if (rHasLocalOrMixedOrdering(currRing))
+  {
+    /* error: no local ord yet with shifts */
+    WerrorS("No local ordering possible for shift algebra");
+    return(NULL);
+  }
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
@@ -3034,20 +3040,11 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
 #ifdef KDEBUG
   idTest(F);
 #endif
-  if (rHasLocalOrMixedOrdering(currRing))
-  {
-    /* error: no local ord yet with shifts */
-    WerrorS("No local ordering possible for shift algebra");
-    return(NULL);
-  }
+  /* global ordering */
+  if (w!=NULL)
+    r=bbaShift(F,Q,*w,hilb,strat);
   else
-  {
-    /* global ordering */
-    if (w!=NULL)
-      r=bbaShift(F,Q,*w,hilb,strat);
-    else
-      r=bbaShift(F,Q,NULL,hilb,strat);
-  }
+    r=bbaShift(F,Q,NULL,hilb,strat);
 #ifdef KDEBUG
   idTest(r);
 #endif
