@@ -14,6 +14,8 @@ VAR ring  currRing = NULL;
 
 void rChangeCurrRing(ring r)
 {
+  if (currRing!=NULL)
+    currRing->options = si_opt_1 & TEST_RINGDEP_OPTS;
   //------------ set global ring vars --------------------------------
   currRing = r;
   if( r != NULL )
