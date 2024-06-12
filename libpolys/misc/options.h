@@ -98,7 +98,8 @@ EXTERN_VAR BOOLEAN siCntrlc;
 
 /* define ring dependent options */
 #define TEST_RINGDEP_OPTS \
- (Sy_bit(OPT_INTSTRATEGY) | Sy_bit(OPT_REDTHROUGH) | Sy_bit(OPT_REDTAIL))
+ (Sy_bit(OPT_INTSTRATEGY) | Sy_bit(OPT_REDTHROUGH) | Sy_bit(OPT_REDTAIL) \
+ | Sy_bit(OPT_REDTAIL_SYZ))
 
 #define TEST_OPT_PROT              BTEST1(OPT_PROT)
 #define TEST_OPT_REDSB             BTEST1(OPT_REDSB)
