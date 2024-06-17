@@ -3936,6 +3936,9 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   // do only a reduction of the leading term
 //#define KSTD_NF_NONORM 4
   // only global: avoid normalization, return a multiply of NF
+//#define KSTD_NF_NOLF   8
+  // avoid PrintLn with OPT_PROT
+
   poly   p;
 
   //if ((idIs0(F))&&(Q==NULL))
@@ -4005,7 +4008,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   strat->fromQ=NULL;
   idDelete(&strat->Shdl);
   SI_RESTORE_OPT1(save1);
-  if (TEST_OPT_PROT) PrintLn();
+  if (TEST_OPT_PROT && ((lazyReduce &KSTD_NF_NOLF)==0)) PrintLn();
   return p;
 }
 

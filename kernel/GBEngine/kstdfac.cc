@@ -675,7 +675,8 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
           {
             if (n->D->m[j]!=NULL)
             {
-              poly r=kNF(n->Shdl,NULL,n->D->m[j],0,KSTD_NF_LAZY | KSTD_NF_NONORM);
+              poly r=kNF(n->Shdl,NULL,n->D->m[j],0,
+	        KSTD_NF_LAZY | KSTD_NF_NONORM | KSTD_NF_NOLF);
               if (r==NULL)
               {
                 if (TEST_OPT_DEBUG)
@@ -722,7 +723,8 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
           {
             if ((n->sl>=0)&&(n->S[0]!=NULL))
             {
-              ideal r=kNF(n->Shdl,NULL,Lj->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
+              ideal r=kNF(n->Shdl,NULL,Lj->d,0,
+	        KSTD_NF_LAZY | KSTD_NF_NONORM | KSTD_NF_NOLF);
               if (idIs0(r))
               {
                 if (TEST_OPT_DEBUG)
