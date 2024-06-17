@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1628299544:4210, 64 bit:4.2.1:x86_64-Linux:terra:482920
-1 >> tst_memory_1 :: 1628299544:4210, 64 bit:4.2.1:x86_64-Linux:terra:2400256
-1 >> tst_memory_2 :: 1628299544:4210, 64 bit:4.2.1:x86_64-Linux:terra:2400256
-1 >> tst_timer_1 :: 1628299544:4210, 64 bit:4.2.1:x86_64-Linux:terra:14
+1 >> tst_memory_0 :: 1718623367:44002, 64 bit:4.4.0:x86_64-Linux:nepomuck:518552
+1 >> tst_memory_1 :: 1718623367:44002, 64 bit:4.4.0:x86_64-Linux:nepomuck:2400256
+1 >> tst_memory_2 :: 1718623367:44002, 64 bit:4.4.0:x86_64-Linux:nepomuck:2400256
+1 >> tst_timer_1 :: 1718623367:44002, 64 bit:4.4.0:x86_64-Linux:nepomuck:12

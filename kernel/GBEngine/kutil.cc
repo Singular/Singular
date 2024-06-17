@@ -11319,6 +11319,7 @@ skStrategy::skStrategy()
 
 skStrategy::~skStrategy()
 {
+  if(kNoether!=NULL) pLmFree(&kNoether);
   if (lmBin != NULL)
     omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
   if (tailBin != NULL)// && !rField_is_Ring(currRing))

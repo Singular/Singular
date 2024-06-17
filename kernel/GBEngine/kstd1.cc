@@ -2098,8 +2098,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     else
       Kstd1_mu=-1;
   }
-  if (strat->kNoether!=NULL) pLmFree(&strat->kNoether);
-  if (strat->kNoether!=NULL) pLmDelete(&strat->kNoether);
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   if ((TEST_OPT_PROT)||(TEST_OPT_DEBUG))  messageStat(hilbcount,strat);
 //  if (TEST_OPT_WEIGHTM)
@@ -2433,39 +2431,53 @@ long kHomModDeg(poly p,const ring r)
   if (i==0) return j;
   return j+(*kModW)[i-1];
 }
+static int kFindLuckyPrime(ideal F, ideal Q) // TODO
+{
+  int prim=32003;
+  // assume coeff are in Q
+  return prim;
+}
 
 static poly kTryHC(ideal F, ideal Q)
 {
-  if (TEST_OPT_PROT) PrintS("try HC in Zp ring\n");
+  int prim=kFindLuckyPrime(F,Q);
+  if (TEST_OPT_PROT) Print("try HC in ring over ZZ/%d\n",prim);
   // create Zp_ring
   ring save_ring=currRing;
   ring Zp_ring=rCopy0(save_ring);
   nKillChar(Zp_ring->cf);
-  Zp_ring->cf=nInitChar(n_Zp, (void*)(long)32003);
+  Zp_ring->cf=nInitChar(n_Zp, (void*)(long)prim);
   rComplete(Zp_ring);
   // map data
   rChangeCurrRing(Zp_ring);
   nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
-  ideal FF=id_PermIdeal(F,IDELEMS(F),1,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
+  ideal FF=id_PermIdeal(F,1,IDELEMS(F),NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   ideal QQ=NULL;
-  if (Q!=NULL) QQ=id_PermIdeal(Q,IDELEMS(Q),1,NULL,save_ring,Zp_ring,nMap,NULL,0,0);
+  if (Q!=NULL) QQ=id_PermIdeal(Q,1,IDELEMS(Q),NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   // call std
-  ideal res=kStd(FF,QQ,testHomog,NULL,NULL);
+  kStrategy strat=new skStrategy;
+  strat->LazyPass=20;
+  strat->LazyDegree = 1;
+  strat->kModW=kModW=NULL;
+  strat->kHomW=kHomW=NULL;
+  strat->homog = (tHomog)idHomIdeal(F,Q);
+  ideal res=mora(FF,QQ,NULL,NULL,strat);
   // clean
   idDelete(&FF);
   if (QQ!=NULL) idDelete(&QQ);
   idDelete(&res);
+  poly HC=strat->kNoether; strat->kNoether=NULL;
+  delete strat;
   // map back
   rChangeCurrRing(save_ring);
-  poly p=NULL;
-  if (Zp_ring->ppNoether!=NULL)
+  if (HC!=NULL)
   {
-    p=p_PermPoly(Zp_ring->ppNoether,NULL,Zp_ring,save_ring,nMap,NULL,0,0);
-    Zp_ring->ppNoether=NULL;
-    if (TEST_OPT_PROT) PrintS("HC found in Zp ring\n");
+    p_IncrExp(HC,save_ring->N,save_ring);
+    p_Setm(HC,save_ring);
+    if (TEST_OPT_PROT) Print("HC(%ld) found\n",pTotaldegree(HC));
   }
   rDelete(Zp_ring);
-  return p;
+  return HC;
 }
 
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
@@ -2480,24 +2492,23 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
 
   /* test HC precomputation*/
-  poly save_noether=currRing->ppNoether;
   int ak = id_RankFreeModule(F,currRing);
+  kStrategy strat=new skStrategy;
   if((ak==0)
   && (h!=isHomog)
-  && (w==NULL)
   && (hilb==NULL)
   && (vw==NULL)
   && (newIdeal==0)
   && (sp==NULL)
   && rOrd_is_ds(currRing)
   && rField_is_Q (currRing)
-  && !rIsPluralRing(currRing))
-    currRing->ppNoether=kTryHC(F,Q);
+  && !rIsPluralRing(currRing)
+  && (currRing->ppNoether==NULL))
+    strat->kNoether=kTryHC(F,Q);
 
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=new skStrategy;
 
   strat->s_poly=sp;
   if(!TEST_OPT_RETURN_SB)
@@ -2665,8 +2676,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 //Print("%d reductions canceled \n",strat->cel);
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  if (currRing->ppNoether!=save_noether) pLmDelete(&currRing->ppNoether);
-  currRing->ppNoether=save_noether;
   return r;
 }
 
