@@ -56,9 +56,7 @@ VAR feResourceConfig_s feResourceConfigs[] =
    "%b/MOD;"
    "%b/../MOD;" // Singular in .libs/Singular
    "%r/lib/singular/MOD;"
-   "%r/libexec/singular/MOD;"
    LIB_DIR "/singular/MOD;"
-   LIBEXEC_DIR "/singular/MOD;"
    "%b;"
    "%b/..", // Singular in .libs/Singular
    (char *)""},
@@ -70,9 +68,8 @@ VAR feResourceConfig_s feResourceConfigs[] =
      "%b/../MOD;" // Singular in .libs/Singular
      "%b/..;" // Singular in .libs/Singular, programs in .
      "%r/lib/singular/MOD;"
-     "%r/libexec/singular/MOD;"
      LIB_DIR "/singular/MOD;"   /*debian: -> /usr/lib/singular/MOD */
-     LIBEXEC_DIR "/singular/MOD" ,                  (char *)""},
+     ,(char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
