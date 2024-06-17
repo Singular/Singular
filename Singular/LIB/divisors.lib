@@ -67,8 +67,8 @@ LIB "primdec.lib";
 
 static proc mod_init()
 {
-LIB"customstd.so";
-LIB"gfanlib.so";
+LIB"customstd.lib";
+LIB"gfan.lib";
 newstruct("divisor","ideal den,ideal num");
 newstruct("formaldivisor","list summands");
 newstruct("pdivisor","list summands, cone tail");
@@ -748,6 +748,3 @@ cone C = coneViaPoints(rays);
 polytope C2 = polytopeViaPoints(rays2);
 return(list(C,C2));
 }
-
-
-

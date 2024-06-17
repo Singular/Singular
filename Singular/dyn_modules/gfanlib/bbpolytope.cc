@@ -558,29 +558,29 @@ void bbpolytope_setup(SModulFunctions* p)
   b->blackbox_Init=bbpolytope_Init;
   b->blackbox_Copy=bbpolytope_Copy;
   b->blackbox_Assign=bbpolytope_Assign;
-  p->iiAddCproc("gfan.lib","polytopeViaPoints",FALSE,polytopeViaVertices);
-  p->iiAddCproc("gfan.lib","polytopeViaInequalities",FALSE,polytopeViaNormals);
-  p->iiAddCproc("gfan.lib","vertices",FALSE,vertices);
-  p->iiAddCproc("gfan.lib","newtonPolytope",FALSE,newtonPolytope);
-  p->iiAddCproc("gfan.lib","scalePolytope",FALSE,scalePolytope);
-  p->iiAddCproc("gfan.lib","dualPolytope",FALSE,dualPolytope);
-  p->iiAddCproc("gfan.lib","mixedVolume",FALSE,mixedVolume);
+  p->iiAddCproc("gfan.lib","polytopeViaPointsInternal",FALSE,polytopeViaVertices);
+  p->iiAddCproc("gfan.lib","polytopeViaInequalitiesInternal",FALSE,polytopeViaNormals);
+  p->iiAddCproc("gfan.lib","verticesInternal",FALSE,vertices);
+  p->iiAddCproc("gfan.lib","newtonPolytopeInternal",FALSE,newtonPolytope);
+  p->iiAddCproc("gfan.lib","scalePolytopeInternal",FALSE,scalePolytope);
+  p->iiAddCproc("gfan.lib","dualPolytopeInternal",FALSE,dualPolytope);
+  p->iiAddCproc("gfan.lib","mixedVolumeInternal",FALSE,mixedVolume);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
-  // iiAddCproc("gfan.lib","getAmbientDimension",FALSE,getAmbientDimension);
-  // iiAddCproc("gfan.lib","getCodimension",FALSE,getAmbientDimension);
-  // iiAddCproc("gfan.lib","getDimension",FALSE,getDimension);
+  // iiAddCproc("gfan.lib","getAmbientDimensionInternal",FALSE,getAmbientDimension);
+  // iiAddCproc("gfan.lib","getCodimensionInternal",FALSE,getAmbientDimension);
+  // iiAddCproc("gfan.lib","getDimensionInternal",FALSE,getDimension);
   /********************************************************/
   /* the following functions are identical to those in bbcone.cc */
-  // iiAddCproc("gfan.lib","facets",FALSE,facets);
-  // iiAddCproc("gfan.lib","setLinearForms",FALSE,setLinearForms);
-  // iiAddCproc("gfan.lib","getLinearForms",FALSE,getLinearForms);
-  // iiAddCproc("gfan.lib","setMultiplicity",FALSE,setMultiplicity);
-  // iiAddCproc("gfan.lib","getMultiplicity",FALSE,getMultiplicity);
-  // iiAddCproc("gfan.lib","hasFace",FALSE,hasFace);
+  // iiAddCproc("gfan.lib","facetsInternal",FALSE,facets);
+  // iiAddCproc("gfan.lib","setLinearFormsInternal",FALSE,setLinearForms);
+  // iiAddCproc("gfan.lib","getLinearFormsInternal",FALSE,getLinearForms);
+  // iiAddCproc("gfan.lib","setMultiplicityInternal",FALSE,setMultiplicity);
+  // iiAddCproc("gfan.lib","getMultiplicityInternal",FALSE,getMultiplicity);
+  // iiAddCproc("gfan.lib","hasFaceInternal",FALSE,hasFace);
   /***************************************************************/
-  // iiAddCproc("gfan.lib","getEquations",FALSE,getEquations);
-  // iiAddCproc("gfan.lib","getInequalities",FALSE,getInequalities);
+  // iiAddCproc("gfan.lib","getEquationsInternal",FALSE,getEquations);
+  // iiAddCproc("gfan.lib","getInequalitiesInternal",FALSE,getInequalities);
   polytopeID=setBlackboxStuff(b,"polytope");
   //Print("created type %d (polytope)\n",polytopeID);
 }

@@ -82,8 +82,8 @@ static proc mod_init()
 {
   intvec save=option(get);
   option(noredefine);
-  LIB "customstd.so";
-  LIB "gfanlib.so";
+  LIB "customstd.lib";
+  LIB "gfan.lib";
   load("polymake.so","try");
   option(set,save);
 }
@@ -1900,4 +1900,3 @@ RETURN:  intmat, a first column has been added to the matrix"
     return (N);
   }
 }
-

@@ -1114,7 +1114,7 @@ BOOLEAN randomPoint(leftv res, leftv args)
 BOOLEAN setMultiplicity(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->rtyp==IDHDL) || (u->rtyp==ALIAS_CMD)) && (u->e==NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     leftv v = u->next;
@@ -1136,7 +1136,7 @@ BOOLEAN setMultiplicity(leftv res, leftv args)
 BOOLEAN setLinearForms(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->rtyp==IDHDL) || (u->rtyp==ALIAS_CMD)) && (u->e==NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     leftv v = u->next;
@@ -2113,46 +2113,46 @@ void bbcone_setup(SModulFunctions* p)
   b->blackbox_Op2=bbcone_Op2;
   b->blackbox_serialize=bbcone_serialize;
   b->blackbox_deserialize=bbcone_deserialize;
-  p->iiAddCproc("gfan.lib","coneViaInequalities",FALSE,coneViaNormals);
-  p->iiAddCproc("gfan.lib","coneViaPoints",FALSE,coneViaRays);
+  p->iiAddCproc("gfan.lib","coneViaInequalitiesInternal",FALSE,coneViaNormals);
+  p->iiAddCproc("gfan.lib","coneViaPointsInternal",FALSE,coneViaRays);
   p->iiAddCproc("","listContainsCone",FALSE,containsCone);
-  // iiAddCproc("gfan.lib","makePolytope",FALSE,coneToPolytope);
-  p->iiAddCproc("gfan.lib","ambientDimension",FALSE,ambientDimension);
-  p->iiAddCproc("gfan.lib","canonicalizeCone",FALSE,canonicalizeCone);
-  p->iiAddCproc("gfan.lib","codimension",FALSE,codimension);
-  p->iiAddCproc("gfan.lib","coneLink",FALSE,coneLink);
-  p->iiAddCproc("gfan.lib","containsAsFace",FALSE,hasFace);
-  p->iiAddCproc("gfan.lib","containsInSupport",FALSE,containsInSupport);
-  p->iiAddCproc("gfan.lib","containsPositiveVector",FALSE,containsPositiveVector);
-  p->iiAddCproc("gfan.lib","containsRelatively",FALSE,containsRelatively);
-  p->iiAddCproc("gfan.lib","convexHull",FALSE,convexHull);
-  p->iiAddCproc("gfan.lib","convexIntersection",FALSE,intersectCones);
-  p->iiAddCproc("gfan.lib","dimension",FALSE,dimension);
-  p->iiAddCproc("gfan.lib","dualCone",FALSE,dualCone);
-  p->iiAddCproc("gfan.lib","equations",FALSE,equations);
-  p->iiAddCproc("gfan.lib","facets",FALSE,facets);
-  p->iiAddCproc("gfan.lib","generatorsOfLinealitySpace",FALSE,generatorsOfLinealitySpace);
-  p->iiAddCproc("gfan.lib","generatorsOfSpan",FALSE,generatorsOfSpan);
-  p->iiAddCproc("gfan.lib","getLinearForms",FALSE,getLinearForms);
-  p->iiAddCproc("gfan.lib","getMultiplicity",FALSE,getMultiplicity);
-  p->iiAddCproc("gfan.lib","inequalities",FALSE,inequalities);
-  p->iiAddCproc("gfan.lib","isFullSpace",FALSE,isFullSpace);
-  p->iiAddCproc("gfan.lib","isOrigin",FALSE,isOrigin);
-  p->iiAddCproc("gfan.lib","isSimplicial",FALSE,isSimplicial);
-  p->iiAddCproc("gfan.lib","linealityDimension",FALSE,linealityDimension);
-  p->iiAddCproc("gfan.lib","linealitySpace",FALSE,linealitySpace);
-  p->iiAddCproc("gfan.lib","negatedCone",FALSE,negatedCone);
-  p->iiAddCproc("gfan.lib","quotientLatticeBasis",FALSE,quotientLatticeBasis);
-  p->iiAddCproc("gfan.lib","randomPoint",FALSE,randomPoint);
-  p->iiAddCproc("gfan.lib","rays",FALSE,rays);
-  p->iiAddCproc("gfan.lib","relativeInteriorPoint",FALSE,relativeInteriorPoint);
-  p->iiAddCproc("gfan.lib","semigroupGenerator",FALSE,semigroupGenerator);
-  p->iiAddCproc("gfan.lib","setLinearForms",FALSE,setLinearForms);
-  p->iiAddCproc("gfan.lib","setMultiplicity",FALSE,setMultiplicity);
-  p->iiAddCproc("gfan.lib","span",FALSE,impliedEquations);
-  p->iiAddCproc("gfan.lib","uniquePoint",FALSE,uniquePoint);
-  p->iiAddCproc("gfan.lib","faceContaining",FALSE,faceContaining);
-  p->iiAddCproc("gfan.lib","onesVector",FALSE,onesVector);
+  // iiAddCproc("gfan.lib","makePolytopeInternal",FALSE,coneToPolytope);
+  p->iiAddCproc("gfan.lib","ambientDimensionInternal",FALSE,ambientDimension);
+  p->iiAddCproc("gfan.lib","canonicalizeConeInternal",FALSE,canonicalizeCone);
+  p->iiAddCproc("gfan.lib","codimensionInternal",FALSE,codimension);
+  p->iiAddCproc("gfan.lib","coneLinkInternal",FALSE,coneLink);
+  p->iiAddCproc("gfan.lib","containsAsFaceInternal",FALSE,hasFace);
+  p->iiAddCproc("gfan.lib","containsInSupportInternal",FALSE,containsInSupport);
+  p->iiAddCproc("gfan.lib","containsPositiveVectorInternal",FALSE,containsPositiveVector);
+  p->iiAddCproc("gfan.lib","containsRelativelyInternal",FALSE,containsRelatively);
+  p->iiAddCproc("gfan.lib","convexHullInternal",FALSE,convexHull);
+  p->iiAddCproc("gfan.lib","convexIntersectionInternal",FALSE,intersectCones);
+  p->iiAddCproc("gfan.lib","dimensionInternal",FALSE,dimension);
+  p->iiAddCproc("gfan.lib","dualConeInternal",FALSE,dualCone);
+  p->iiAddCproc("gfan.lib","equationsInternal",FALSE,equations);
+  p->iiAddCproc("gfan.lib","facetsInternal",FALSE,facets);
+  p->iiAddCproc("gfan.lib","generatorsOfLinealitySpaceInternal",FALSE,generatorsOfLinealitySpace);
+  p->iiAddCproc("gfan.lib","generatorsOfSpanInternal",FALSE,generatorsOfSpan);
+  p->iiAddCproc("gfan.lib","getLinearFormsInternal",FALSE,getLinearForms);
+  p->iiAddCproc("gfan.lib","getMultiplicityInternal",FALSE,getMultiplicity);
+  p->iiAddCproc("gfan.lib","inequalitiesInternal",FALSE,inequalities);
+  p->iiAddCproc("gfan.lib","isFullSpaceInternal",FALSE,isFullSpace);
+  p->iiAddCproc("gfan.lib","isOriginInternal",FALSE,isOrigin);
+  p->iiAddCproc("gfan.lib","isSimplicialInternal",FALSE,isSimplicial);
+  p->iiAddCproc("gfan.lib","linealityDimensionInternal",FALSE,linealityDimension);
+  p->iiAddCproc("gfan.lib","linealitySpaceInternal",FALSE,linealitySpace);
+  p->iiAddCproc("gfan.lib","negatedConeInternal",FALSE,negatedCone);
+  p->iiAddCproc("gfan.lib","quotientLatticeBasisInternal",FALSE,quotientLatticeBasis);
+  p->iiAddCproc("gfan.lib","randomPointInternal",FALSE,randomPoint);
+  p->iiAddCproc("gfan.lib","raysInternal",FALSE,rays);
+  p->iiAddCproc("gfan.lib","relativeInteriorPointInternal",FALSE,relativeInteriorPoint);
+  p->iiAddCproc("gfan.lib","semigroupGeneratorInternal",FALSE,semigroupGenerator);
+  p->iiAddCproc("gfan.lib","setLinearFormsInternal",FALSE,setLinearForms);
+  p->iiAddCproc("gfan.lib","setMultiplicityInternal",FALSE,setMultiplicity);
+  p->iiAddCproc("gfan.lib","spanInternal",FALSE,impliedEquations);
+  p->iiAddCproc("gfan.lib","uniquePointInternal",FALSE,uniquePoint);
+  p->iiAddCproc("gfan.lib","faceContainingInternal",FALSE,faceContaining);
+  p->iiAddCproc("gfan.lib","onesVectorInternal",FALSE,onesVector);
   p->iiAddCproc("gfan.lib","convexIntersectionOld",FALSE,convexIntersectionOld);
   coneID=setBlackboxStuff(b,"cone");
 }

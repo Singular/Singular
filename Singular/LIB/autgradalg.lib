@@ -16,8 +16,6 @@ ASSUMPTIONS:
 * the grading is pointed, i.e., no generator has degree 0 and the cone over all generator degrees is pointed.
 * For Mori dream spaces X, we assume them to be given as X = X(R,w) with the Cox ring R of X (given as the algebra R before) and an ample class w in the grading group K with the torsion entries removed.
 
-NOTE: we require the user to execute 'LIB'gfanlib.so'' before using this library.
-
 PROCEDURES:
 autKS(): compute the automorphism group of the basering (must be a polynomial ring) as an algebraic subgroup V(I) of some GL(n)
 autGradAlg(I0, TOR): compute the automorphism group of R as an algebraic subgroup V(I) of some GL(n).
@@ -41,6 +39,7 @@ KEYWORDS: automorphisms; graded algebra; Mori dream spaces; automorphism group; 
 LIB "multigrading.lib";
 LIB "gitfan.lib";
 LIB "normaliz.lib";
+LIB "gfan.lib";
 
 ////////////////////////
 

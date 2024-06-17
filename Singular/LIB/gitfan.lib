@@ -81,7 +81,7 @@ LIB "parallel.lib";
 
 static proc mod_init()
 {
-  LIB "gfanlib.so";
+  LIB "gfan.lib";
   LIB "gitfan.so";
   //LIB "subsets.so";
   newstruct("permutation","intvec image");
