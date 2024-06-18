@@ -2249,7 +2249,7 @@ diophantine (const CFList& recResult, const CFList& factors,
       ASSERT (j.getItem().isUnivariate() || j.getItem().inCoeffDomain(),
               "constant or univariate poly expected");
       buf= mulNTL (E, i.getItem());
-      result.append (modNTL (buf, j.getItem()));
+      if(!j.getItem().isZero()) result.append (modNTL (buf, j.getItem()));
     }
     return result;
   }
