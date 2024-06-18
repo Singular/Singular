@@ -6550,6 +6550,8 @@ static void iiReportTypes(int nr,int t,const short *T)
   buf[0]='\0';
   if (nr==0)
     snprintf(buf,250,"wrong length of parameters(%d), expected ",t);
+  else if (t==0)
+    snprintf(buf,250,"par. %d is of undefined, expected ",nr);
   else
     snprintf(buf,250,"par. %d is of type `%s`, expected ",nr,Tok2Cmdname(t));
   for(int i=1;i<=T[0];i++)
