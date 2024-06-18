@@ -361,7 +361,7 @@ EXAMPLE: example splitring;  shows an example
   setring splt2;
   map nach_splt2=splt1,0,var(1);     // x->0, y->a
   minp=string(nach_splt2(primit)[1]);
-  if (printlevel > -1) { "// new minimal polynomial:",minp; }
+  if (printlevel > voice) { "// new minimal polynomial:",minp; }
   //--------------------- definiere den neuen Ring: ---------------------------
   ring neuring = create_ring("("+charakt+","+algname+")", "("+varnames+")", "("+ordstr(altring)+")");
   execute("minpoly="+minp+";");
