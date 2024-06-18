@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version transformation.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version transformation.lib 4.4.0.3 Jun_2024 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: transWithPrecision.lib   The image of a transformation given up to a specified degree
@@ -11,12 +11,12 @@ OVERVIEW:
 
 The image of a map defined by a matrix is given up to a specified degree. This tool can be used, particularly in Singularity theory, working with right equivalence.
 
-It is known that a  nondegenerate germ which has finite determinacy d is right equivalent to its d-jet. Therefore, in these cases, it is often enough to know the image of a transformation up to degree d. 
+It is known that a  nondegenerate germ which has finite determinacy d is right equivalent to its d-jet. Therefore, in these cases, it is often enough to know the image of a transformation up to degree d.
 
 KEYWORDS:
 right equivalence; transformation; precision;
 
-SEE ALSO: 
+SEE ALSO:
 
 PROCEDURES:
  transWithPrecision :  the image of a transformation of a polynomial defined by a matrix up to a specified degree
@@ -46,7 +46,7 @@ EXAMPLE: example transWithPrecision, shows an example"
   int maxsingledegree=deg(f, e);
   for (i=2;i<=n;i++)
   {
-    e[i-1]=0; 
+    e[i-1]=0;
     e[i]=1;
     if (deg(f, e)>maxsingledegree) {maxsingledegree=deg(f, e);}
   }
