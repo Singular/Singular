@@ -1247,7 +1247,7 @@ EXAMPLE: example determineNormalFormEquation, shows an example"
         for(j=1;j<=p3+1;j++)
         {
             gen1 = gen1+genx(j);
-        }
+        }    
         poly gen2;
         for(j=1;j<=p3+1;j++)
         {
