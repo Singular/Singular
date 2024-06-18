@@ -45,5 +45,10 @@ printlevel=0;
  F.singularityType = "X[13]";
  F;
 
+
+example printNormalForm;
+example printPolynomialRightEquivalence;
+example printRightEquivalenceChainWithPrecision;
+
 tst_status(1);$
 
