@@ -58,24 +58,25 @@ transformationsBeforeSplit(N); the transformations (and in some cases their inve
 transformationsBeforeSplit(N); the transformations (and in some cases their inverses) that was transformed on the degenerate part of a given polynomial was splitted off to transform it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), is given up to filtration d, where d is a determinacy bound for the polynomial, if possible
 ";
 
+LIB "gfanlib.so";
+LIB "polyclass.lib";
+LIB "absfact.lib";
+LIB "primdec.lib";
+LIB "realclassify.lib";
+LIB "zeroset.lib";
+LIB "elim.lib";
+LIB "hnoether.lib";
+LIB "arr.lib";
+LIB "presolve.lib";
+LIB "random.lib";
+LIB "general.lib";
+LIB "monomialideal.lib";
+LIB "parallel.lib";
+LIB "primitiv.lib";
+LIB "transformation.lib";
+
 static proc mod_init()
 {
-  LIB "gfanlib.so";
-  LIB "polyclass.lib";
-  LIB "absfact.lib";
-  LIB "primdec.lib";
-  LIB "realclassify.lib";
-  LIB "zeroset.lib";
-  LIB "elim.lib";
-  LIB "hnoether.lib";
-  LIB "arr.lib";
-  LIB "presolve.lib";
-  LIB "random.lib";
-  LIB "general.lib";
-  LIB "monomialideal.lib";
-  LIB "parallel.lib";
-  LIB "primitiv.lib";
-  LIB "transformation.lib";
   newstruct("List","ring in,number newFromOld, list values");
 }
 

@@ -1,6 +1,6 @@
 LIB"tst.lib";
 tst_init();
-LIB"arnoldfinal.lib";
+LIB"arnold.lib";
 example monomials;
 example coeff;
 example newtonPolygon;
