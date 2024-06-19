@@ -34,7 +34,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 # libs in beta testing:
 # the will be included in share.tar.gz, but not in all.lib
 # (they should be ordered alphabetically)
-SLIB1 = arr.lib arnoldclassify.lib \
+SLIB1 = arr.lib arnold.lib arnoldclassify.lib \
 	brillnoether.lib\
 	classify2.lib classifyMapGerms.lib classifyceq.lib classifyci.lib classify_aeq.lib\
 	chern.lib cimonom.lib combinat.lib customstd.lib curveInv.lib \
@@ -58,7 +58,8 @@ SLIB1 = arr.lib arnoldclassify.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib sets.lib SingularityDBM.lib symodstd.lib schubert.lib swalk.lib \
 	tateProdCplxNegGrad.lib tasks.lib tropical.lib \
-	tropicalEllipticCovers.lib tropicalNewton.lib
+	tropicalEllipticCovers.lib tropicalNewton.lib \
+	transformation.lib
 
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
         dmodideal.lib \
