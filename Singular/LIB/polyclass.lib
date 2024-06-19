@@ -32,7 +32,7 @@ attributed to the National Research Foundation, South Africa.
 KEYWORDS:
 polynomials
 
-SEE ALSO: realclassify_lib, classify2_lib, arnold.lib
+SEE ALSO: realclassify_lib, classify2_lib, arnold_lib
 
 PROCEDURES:
 makePoly(f);  constructor for ring independent polynomial type Poly
