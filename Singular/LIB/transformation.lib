@@ -17,13 +17,10 @@ KEYWORDS:
 right equivalence; transformation; precision
 
 PROCEDURES:
- transWithPrecision :  the image of a transformation of a polynomial defined by a matrix up to a specified degree
+ transWithPrecision(f,T,prec);  the image of a transformation of a polynomial defined by a matrix up to a specified degree
 ";
 
-static proc mod_init()
-{
-  LIB "arr.lib";
-}
+LIB "arr.lib";
 
 proc transWithPrecision(poly f, matrix T, int precision)
 "USAGE: transWithPrecision(f,T,d); f poly, T 1xn matrix, where n is the number of variables of the basering, d int
