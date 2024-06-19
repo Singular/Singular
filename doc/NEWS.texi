@@ -21,6 +21,17 @@
 
 @heading News for version @value{VERSION}
 
+New libraries:
+@itemize
+@item @code{arnold.lib}: Classification of isolated singularities with a nondegenerate Newton Boundary (@nref{arnold_lib})
+@item @code{transformation.lib}: The image of a transformation given up to a specified degree (@nref{transformation_lib})
+@end itemize
+
+Changed libraries:
+@itemize
+@item @code{polyclass.lib}: extended (@nref{polyclass_lib})
+@end itemize
+
 Changes in the kernel/build system:
 @itemize
 @item use new algorithm for weighted Hilbert function @nref{hilb}

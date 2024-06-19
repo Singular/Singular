@@ -27,7 +27,7 @@ Acknowledgements: This research was supported by the Rubbi fund of the Departmen
 KEYWORDS:
 singularities; classification; modality; delta invariant, determinacy bound, milnor number, normal form, normal form equation
 
-SEE ALSO: realclassify_lib, classify_lib, classify2_lib
+SEE ALSO: realclassify_lib, classify_lib, classify2_lib, arnoldclassify_lib
 
 PROCEDURES:
 poshull(L); determine the convex hull of a list of monomials in mon[x,y]
