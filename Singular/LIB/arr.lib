@@ -117,6 +117,8 @@ arrBoundedChambers(arr A)       number of bounded chambers of the arrangement
 printMoebius(arr A)             displays the moebius values of all the flats in the poset
 ";
 
+LIB "general.lib";
+LIB "monomialideal.lib";
 
 //============================================================================//
 //-------------------------- #1 NEWSTRUCTS & OVERLOADS -----------------------//
@@ -175,11 +177,6 @@ static proc mod_init()
     system("install","arr","rank"           ,arrRank            ,1);
     system("install","arrflats","print"     ,arrPrintFlats      ,1);
     system("install","arrposet","print"     ,arrPrintPoset      ,1);
-
-    // NEEDED LIBRARIES
-    LIB "general.lib";
-    LIB "monomialideal.lib";
-
 }
 
 
