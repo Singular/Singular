@@ -2685,7 +2685,6 @@ static proc doLinearTransformation(RightEquivalenceChainWithPrecision Tr)
   Lin.imagesInverse = list(fx,fy);
   Tr.transformations = list(Lin);
   Tr.targetgerm = FF;
-  FF.trans[1]=list(fx,fy);
   return(Tr);
 }
 
@@ -3411,7 +3410,6 @@ static proc morsesplitarnold(RightEquivalenceChainWithPrecision Tr, int k)
     }
     RE.images = L;
     Tr.transformations[size(Tr.transformations)+1]=RE;
-    F.trans = insert(F.trans, list(matrix(maxideal(1))*transpose(T)));
     poly cpf = transWithPrecision(f,corank_part,k);
     h = f-jet(f,2)-cpf;
     h=jet(h,k);
@@ -3692,7 +3690,6 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
                 Tr.transformations[size(Tr.transformations)+1]=RE;
                 Tr.targetgerm.in = basering;
                 Tr.targetgerm.value=g;
-                F.trans = insert(F.trans, list(var(1),var(2)-rs));
                 Tr = truncateAtHighestCorner(Tr,Tr.precision);
                 F = Tr.targetgerm;
                 g=F.value;
