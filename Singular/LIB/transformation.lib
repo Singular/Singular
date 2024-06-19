@@ -14,9 +14,7 @@ The image of a map defined by a matrix is given up to a specified degree. This t
 It is known that a  nondegenerate germ which has finite determinacy d is right equivalent to its d-jet. Therefore, in these cases, it is often enough to know the image of a transformation up to degree d.
 
 KEYWORDS:
-right equivalence; transformation; precision;
-
-SEE ALSO:
+right equivalence; transformation; precision
 
 PROCEDURES:
  transWithPrecision :  the image of a transformation of a polynomial defined by a matrix up to a specified degree
