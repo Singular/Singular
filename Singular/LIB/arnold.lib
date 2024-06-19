@@ -3316,7 +3316,7 @@ static proc cutCoordinateAxes(poly f)
   return(list(cx,cy,c))
 }
 
-static proc morsesplit(RightEquivalenceChainWithPrecision Tr, int k)
+static proc morsesplitarnold(RightEquivalenceChainWithPrecision Tr, int k)
 {
   ring R = basering;
   Poly F = Tr.sourcegerm;
@@ -3479,7 +3479,7 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
   if(Tr.precision==-1){return(list(-1,Tr,nv,H,TrMorse,0));}
   if(maximumFiltration(F.value)<3)
   {
-    list L = morsesplit(Tr,Tr.precision);
+    list L = morsesplitarnold(Tr,Tr.precision);
     H = L[3];
     TrMorse = L[2];
     Poly F = TrMorse.targetgerm;
