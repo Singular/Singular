@@ -9,10 +9,10 @@ OVERVIEW:
 This library provides helper functions for managing SSI files in Singular. 
 
 KEYWORDS:
-ssi; read; write;
+ssi file handling; serialization
 
 SEE ALSO: 
-link
+link, read, write
 
 PROCEDURES:
  openSSI; Opens an SSI file for reading or writing.
