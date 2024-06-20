@@ -2774,7 +2774,7 @@ static proc doWeightedLinearTransformationExt(poly f1,list NF1,RightEquivalenceC
          g=g*h;
        }
     }
-    g = sat(ideal(g),ideal(var(1)*var(2)))[1][1];
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
     if(milnor(g)==-1 && g!=1)
     {
       return(Tr,0);
@@ -2809,7 +2809,7 @@ static proc doWeightedLinearTransformationExt(poly f1,list NF1,RightEquivalenceC
       }
     }
     ideal I =g;
-    g = sat(ideal(g),ideal(var(1)*var(2)))[1][1];
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
     if(milnor(g)==-1 && g!=1)
     {
       return(Tr,0);
@@ -2865,7 +2865,7 @@ static proc doWeightedLinearTransformation(poly f1,list NF1,RightEquivalenceChai
          g=g*h;
        }
     }
-    g = sat(ideal(g),ideal(var(1)*var(2)))[1][1];
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
     if(milnor(g)==-1 && g!=1)
     {
       return(Tr,0);
@@ -2893,7 +2893,7 @@ static proc doWeightedLinearTransformation(poly f1,list NF1,RightEquivalenceChai
       }
     }
     ideal I =g;
-    g = sat(ideal(g),ideal(var(1)*var(2)))[1][1];
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
     if(milnor(g)==-1 && g!=1)
     {
       return(Tr,0);
@@ -3067,7 +3067,7 @@ static proc deltaInvariant(Poly F,mu)
   {
     poly mon(i) = latticeToMonomials(V[i])[1];
     g=g+mon(i);
-    poly gs = sat(ideal(g),ideal(var(1)*var(2)))[1][1];
+    poly gs = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
     map phix = R,var(1),0;
     map phiy = R,0,var(2);
     poly gsx = phix(gs);
@@ -3219,10 +3219,10 @@ static proc modalityNB(Poly F) //wrapper
 
 static proc Test(poly f)
 {
-  poly g = sat(ideal(f),ideal(var(1)*var(2)))[1][1];
+  poly g = sat_with_exp(ideal(f),ideal(var(1)*var(2)))[1][1];
   if(milnornumber(g)>-1)
   {
-    if(sat(ideal(f),ideal(var(1)))[2]==0 || sat(ideal(f),ideal(var(2)))[2]==0 )
+    if(sat_with_exp(ideal(f),ideal(var(1)))[2]==0 || sat_with_exp(ideal(f),ideal(var(2)))[2]==0 )
     {
       list fact=factorize(g);
       for(int i=1;i<=size(fact[1]);i++)
@@ -3600,7 +3600,7 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
     {
        Delta[1]=NP[i];
        termsOnDelta = termsOnPolygon(f1,Delta);
-       PolyTermsOnDelta=sat(termsOnDelta,ideal(var(1)*var(2)))[1][1];
+       PolyTermsOnDelta=sat_with_exp(termsOnDelta,ideal(var(1)*var(2)))[1][1];
        mu1 = milnornumber(PolyTermsOnDelta);
        if(mu1<mu)
        {
@@ -3621,7 +3621,7 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
          }
          Delta[1]=NP[i];
          termsOnDelta = termsOnPolygon(f1,list(Delta[1]));
-         PolyTermsOnDelta=sat(termsOnDelta,ideal(var(1)*var(2)))[1][1];
+         PolyTermsOnDelta=sat_with_exp(termsOnDelta,ideal(var(1)*var(2)))[1][1];
          if(Test(termsOnDelta[1])==0)
          {
           if(flag==1)
@@ -3630,7 +3630,7 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
             setring R;
             return(list(mu,Tr,nv,H,TrMorse,1));
           }
-           satTermsOnChooseFace = sat(ideal(termsOnDelta),ideal(x*y))[1][1];
+           satTermsOnChooseFace = sat_with_exp(ideal(termsOnDelta),ideal(x*y))[1][1];
            Tr=doWeightedLinearTransformationExt(satTermsOnChooseFace,Delta[1],Tr);
            Tr = truncateAtHighestCorner(Tr,Tr.precision);
            F = Tr.targetgerm;
@@ -3745,7 +3745,7 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
       {
          chooseFace = adjacentFacesElementS0[i];
          termsOnChooseFace = termsOnPolygon(F.value,list(chooseFace));
-         satTermsOnChooseFace = sat(ideal(termsOnChooseFace),ideal(x*y))[1][1];
+         satTermsOnChooseFace = sat_with_exp(ideal(termsOnChooseFace),ideal(x*y))[1][1];
          // while satTermsOnChooseFace is degenerate and the conditions in Rmk 17 are not satisfied do the required weighted transformation
          while(milnornumber(satTermsOnChooseFace)==-1)
          {
@@ -3762,7 +3762,7 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
            adjacentFacesElementS0 = findFaces(F.value,NP,s01);
            chooseFace = adjacentFacesElementS0[i];
            poly termsOnChooseFace=termsOnPolygon(F.value,list(chooseFace));
-           poly satTermsOnChooseFace = sat(ideal(termsOnChooseFace),ideal(var(1)*var(2)))[1][1];
+           poly satTermsOnChooseFace = sat_with_exp(ideal(termsOnChooseFace),ideal(var(1)*var(2)))[1][1];
          }
       }
       NP = newtonPolygon(F.value);
