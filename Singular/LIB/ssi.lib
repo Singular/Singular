@@ -1,17 +1,17 @@
 //////////////////////////////////////////////////////////////////////////////
-version="ssiFiles.lib 1.0.0.0 Jun_2024 "; // $Id$
+version="ssiFiles.lib 4.4.0.3 Jun_2024 "; // $Id$
 category="Data Handling";
 info="
 LIBRARY: ssiFiles.lib   Wrapper for handling SSI files in Singular
 AUTHORS:               Janko Boehm,      boehm@mathematik.uni-kl.de
 
 OVERVIEW:
-This library provides helper functions for managing SSI files in Singular. 
+This library provides helper functions for managing SSI files in Singular.
 
 KEYWORDS:
 ssi file handling; serialization
 
-SEE ALSO: 
+SEE ALSO:
 link, read, write
 
 PROCEDURES:
@@ -107,7 +107,7 @@ EXAMPLE: example readDataFromSSI, shows an example"
   while (1)
   {
     def data = read(l);
-    if (typeof(data) == "none"){break;} 
+    if (typeof(data) == "none"){break;}
     allData[i] = data;
     i++;
     kill data;
