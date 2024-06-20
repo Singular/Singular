@@ -57,6 +57,7 @@ SLIB1 = arr.lib arnold.lib arnoldclassify.lib \
 	realizationMatroids.lib resources.lib \
 	rootisolation.lib rwalk.lib rstandard.lib \
 	schreyer.lib sets.lib SingularityDBM.lib symodstd.lib schubert.lib swalk.lib \
+	ssi.lib \
 	tateProdCplxNegGrad.lib tasks.lib tropical.lib \
 	tropicalEllipticCovers.lib tropicalNewton.lib \
 	transformation.lib

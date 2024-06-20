@@ -1206,6 +1206,7 @@ Comments should be send to the author of the library directly.
 * rwalk_lib:: Groebner Walk Conversion
 * sagbigrob_lib:: Sagbi-Groebner basis of an ideal of a subalgebra
 * sagbiNormaliz_lib:: computation of Sagbi bases via normaliz
+* ssi_lib:: Wrapper for handling SSI files
 * stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * stdmodule_lib:: Compute Standard Bases of submodule of free module over polynomial subalgebra
 * swalk_lib:: Sagbi Walk Conversion Algorithm
@@ -1314,6 +1315,10 @@ Todos/Issues:
 @node sagbiNormaliz_lib
 @subsection sagbiNormaliz_lib
 @c lib sagbiNormaliz.lib tag:normaliz
+@c ----------------------------------------------------------
+@node ssi_lib
+@subsection ssi_lib
+@c lib ssi.lib
 @c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
