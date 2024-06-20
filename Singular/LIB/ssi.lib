@@ -1,0 +1,145 @@
+//////////////////////////////////////////////////////////////////////////////
+version="ssiFiles.lib 1.0.0.0 Jun_2024 "; // $Id$
+category="Data Handling";
+info="
+LIBRARY: ssiFiles.lib   Wrapper for handling SSI files in Singular
+AUTHORS:               Janko Boehm,      boehm@mathematik.uni-kl.de
+
+OVERVIEW:
+This library provides helper functions for managing SSI files in Singular. 
+
+KEYWORDS:
+ssi file handling; serialization
+
+SEE ALSO: 
+link, read, write
+
+PROCEDURES:
+ openSSI; Opens an SSI file for reading or writing.
+ writeSSI; Writes data to an SSI file.
+ readSSI; Reads data from an SSI file.
+ closeSSI; Closes an SSI file link.
+ writeDataToSSI; Writes a list of expressions to an SSI file.
+ readDataFromSSI; Reads all expressions from an SSI file.
+ appendDataToSSI; Appends a list of expressions to an SSI file.
+";
+
+
+
+proc openSSI(string mode, string filename)
+"USAGE: openSSI(mode, filename); mode string, filename string, mode is 'read', 'write', 'append', filename is the path to file
+RETURN: a link to the opened SSI file
+"
+{
+  link l;
+  if (mode == "read")
+  {
+    l = "ssi:r " + filename;
+  }
+  else
+  {
+    if (mode == "write")
+    {
+      l = "ssi:w " + filename;
+    }
+    else
+    {
+      if (mode == "append")
+      {
+        l = "ssi:a " + filename;
+      }
+      else
+      {
+        error("Invalid mode. Use 'read', 'write', or 'append'.");
+      }
+    }
+  }
+  return(l);
+}
+
+proc writeSSI(link l, list data)
+"USAGE: writeSSI(l, data); l link, data list, l is a link to an SSI file, data is a list of expressions to write"
+{
+  for (int i = 1; i <= size(data); i++)
+  {
+    write(l, data[i]);
+  }
+}
+
+proc readSSI(link l)
+"USAGE: readSSI(l); l link, l is a link to an SSI file
+RETURN: the next expression from the SSI file"
+{
+  return(read(l));
+}
+
+proc closeSSI(link l)
+"USAGE: closeSSI(l); l = link to an SSI file"
+{
+  close(l);
+}
+
+proc writeDataToSSI(string filename, list data)
+"USAGE: writeDataToSSI(filename, data); filename string, data list, filename is the path to the SSI file, data is the list of expressions to write
+EXAMPLE: example writeDataToSSI, shows an example"
+{
+  link l = openSSI("write", filename);
+  writeSSI(l, data);
+  closeSSI(l);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0, (x, y, z), dp;
+ writeDataToSSI("example.ssi", list(x^2, y^2, z^2, "hello world"));
+}
+
+
+proc readDataFromSSI(string filename)
+"USAGE: readDataFromSSI(filename); filename string, filename is the path to SSI file
+RETURN: list of all expressions read from the file
+EXAMPLE: example readDataFromSSI, shows an example"
+{
+  def R = basering;
+  list allData = list();
+  link l = openSSI("read", filename);
+  int i = 1;
+  while (1)
+  {
+    def data = read(l);
+    if (typeof(data) == "none"){break;} 
+    allData[i] = data;
+    i++;
+    kill data;
+  }
+  closeSSI(l);
+  setring(R);
+  return(allData);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0, (x, y, z), dp;
+ writeDataToSSI("example.ssi", list(x^2, y^2, z^2, "hello world"));
+ list readData = readDataFromSSI("example.ssi");
+ readData;
+}
+
+proc appendDataToSSI(string filename, list data)
+"USAGE: appendDataToSSI(filename, data); filename string, data list, filename is the path to SSI file, data is the list of expressions to write
+EXAMPLE: example appendDataToSSI, shows an example"
+{
+  link l = openSSI("append", filename);
+  writeSSI(l, data);
+  closeSSI(l);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0, (x, y, z), dp;
+ writeDataToSSI("example.ssi", list(x^2, y^2, z^2, "hello world"));
+ module M = x*gen(1),y*gen(2);
+ appendDataToSSI("example.ssi", list(x^3, ideal(x,y), M));
+ list readData = readDataFromSSI("example.ssi");
+ readData;
+}
