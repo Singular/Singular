@@ -12,19 +12,17 @@ KEYWORDS:
 ssi file handling; serialization
 
 SEE ALSO:
-link, read, write
+link; read; write
 
 PROCEDURES:
- openSSI; Opens an SSI file for reading or writing.
- writeSSI; Writes data to an SSI file.
- readSSI; Reads data from an SSI file.
- closeSSI; Closes an SSI file link.
- writeDataToSSI; Writes a list of expressions to an SSI file.
- readDataFromSSI; Reads all expressions from an SSI file.
- appendDataToSSI; Appends a list of expressions to an SSI file.
+ openSSI(); Opens an SSI file for reading or writing.
+ writeSSI(); Writes data to an SSI file.
+ readSSI(); Reads data from an SSI file.
+ closeSSI(); Closes an SSI file link.
+ writeDataToSSI(); Writes a list of expressions to an SSI file.
+ readDataFromSSI(); Reads all expressions from an SSI file.
+ appendDataToSSI(); Appends a list of expressions to an SSI file.
 ";
-
-
 
 proc openSSI(string mode, string filename)
 "USAGE: openSSI(mode, filename); mode string, filename string, mode is 'read', 'write', 'append', filename is the path to file
