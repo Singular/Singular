@@ -9,20 +9,32 @@ AUTHORS:               Janko Boehm,      email: boehm@mathematik.uni-kl.de
 
 OVERVIEW:
 
-We classify isolated singularities at 0 which is equivalent to a nondegenerate Newton boundary of corank <=2 with respect to right- and stable equivalence. We do this by giving a unique normal form corresponding to a normalized nondegenerate Newton boundary. We furthermore determine the normal form equation, that is a polynomial in the given normal form family of the input polynomial. In addition we determine the Milnor number, modality, delta invariant and the number of branches of an input polynomial that is equivalent to a germ with a nondegenerate Newton boundary in a new alternative efficient way, as well as, a regular basis of a germ with a nondegenerate Newton boundary.
+We classify isolated singularities at 0 which is equivalent to a nondegenerate Newton boundary of corank <=2 with respect to right- and stable equivalence. We do this by @* 
+giving a unique normal form corresponding to a normalized nondegenerate Newton boundary. We furthermore determine the normal form equation, that is a polynomial in the @*
+given normal form family of the input polynomial. In addition we determine the Milnor number, modality, delta invariant and the number of branches of an input polynomial @* 
+that is equivalent to a germ with a nondegenerate Newton boundary in a new alternative efficient way, as well as, a regular basis of a germ with a nondegenerate @*
+Newton boundary.@*
 
-V.I. Arnold has listed normal forms for all isolated hypersurface singularities over the complex numbers with, in particular, either modality <=2 or Milnor number <=16. Moreover, he has described an algorithmic classifier, which determines the type of a given such singularity.
-This library extends Arnold's work to a large class of singularities which is unbounded with regard to modality and Milnor number. It implements an algorithmic classifier, which determines a normal form, as well as a normal form equation, for any corank <=2 singularity which is equivalent to a germ with non-degenerate Newton boundary in the sense of Kouchnirenko.
+
+V.I. Arnold has listed normal forms for all isolated hypersurface singularities over the complex numbers with, in particular, either modality <=2 or Milnor number <=16. @*
+Moreover, he has described an algorithmic classifier, which determines the type of a given such singularity. @*
+This library extends Arnold's work to a large class of singularities which is unbounded with regard to modality and Milnor number. It implements an algorithmic @*
+classifier, which determines a normal form, as well as a normal form equation, for any corank <=2 singularity which is equivalent to a germ with non-degenerate Newton @*
+boundary in the sense of Kouchnirenko.@*
+
 
 The implementation is based on the papers:
 
-Janko Boehm, Magdaleen Marais, Gerhard Pfister: Classification of Complex Singularities with Non-Degenerate Newton Boundary, https://doi.org/10.48550/arXiv.2010.10185
+Janko Boehm, Magdaleen Marais, Gerhard Pfister: Classification of Complex Singularities with Non-Degenerate Newton Boundary,@* 
+https://doi.org/10.48550/arXiv.2010.10185
 
-Janko Boehm, Magdaleen Marais, Gerhard Pfister: Moduli Parameters of Complex Singularities with Non-Degenerate Newton Boundary, https://doi.org/10.48550/arXiv.2402.05093
+Janko Boehm, Magdaleen Marais, Gerhard Pfister: Moduli Parameters of Complex Singularities with Non-Degenerate Newton Boundary,@* 
+https://doi.org/10.48550/arXiv.2402.05093
 
 General assumption: the input polynomial is given in a ring with ordering ds;
 
-Acknowledgements: This research was supported by the Rubbi fund of the Department of Mathematical Sciences of Stellenbosch University, DFG SPP 1489, DFG TRR 195 (Project B5). The financial assistance of the National Research Foundation (NRF), South Africa, towards this research is hereby acknowledged. Opinions expressed and conclusions arrived at are those of the author and are not necessarily to be attributed to the National Research Foundation, South Africa.
+Acknowledgements: This research was supported by the Rubbi fund of the Department of Mathematical Sciences of Stellenbosch University, DFG SPP 1489,@* 
+DFG TRR 195 (Project B5). 
 
 KEYWORDS:
 singularities; classification; modality; delta invariant; determinacy bound; milnor number; normal form; normal form equation
@@ -31,7 +43,7 @@ SEE ALSO: realclassify_lib, classify_lib, classify2_lib, arnoldclassify_lib
 
 PROCEDURES:
 poshull(L); determine the convex hull of a list of monomials in mon[x,y]
-facetsAsCones(c);
+facetsAsCones(c); return the facets of a cone
 monomials(f); determine the set of monomials of a polynomial
 coeff(f,m); determine the coefficient of a given monomial of a polynomial
 newtonPolygon(poly f); determine the Newton polygon of the points corresponding to the monomials of a polynomial
@@ -44,18 +56,27 @@ piecewiseWeightOfPolygon(NP); determine the piecewise weight defined by a given 
 piecewiseOrd(f,w); determine the piecewise order of a given polynomial with regard to a given piecewise weight
 piecewisedegree(f,w); determine the piecewise degree of a given polynomial with regard to a given piecewise weight
 piecewiseJet(f,w,d); determine the piecewise jet of a given polynomial of a given degree, with regard to a given piecewise weight
-determineNormalForm(F); determine a normal form, modality, milnor number, delta invariant, number of branches, determinacy bound and corank of a given polynomial, if possible
+regularBasis(F,n); determine a regular basis for a polynomial with respect to the piecewise weight defined by its Newton polygon
+determineNormalForm(F); determine a normal form, modality, milnor number, delta invariant, number of branches, determinacy bound and corank @*
+of a given polynomial, if possible
+determineNormalFormEquation(N); determine a normalform equation of a polynomial in the give normalform
 nondegeneratePart(N); determine the nondegenrate part of a singularity
 germWithNNB(N); determine a germ with a nondegenrate Newton boundary that is equivalent to a given polynomial, if possible
-germWithNormalizedNNB(N); determine a germ with a nondegenerate normalized Newton boundary, up to scalar multiplication of each of its variables, of a given polynomial, if possibles
-modalityNNB(f); determine the modality of the singularity defined by a polynomial,if the polynomial is right equivalent to a germ with a nondegenerate Newton boundary
+germWithNormalizedNNB(N); determine a germ with a nondegenerate normalized Newton boundary, up to scalar multiplication of each of its variables,@* 
+of a given polynomial, if possibles
+modalityNNB(f); determine the modality of the singularity defined by a polynomial,if the polynomial is right equivalent to a germ with @*
+a nondegenerate Newton boundary
 milnorNNB(f); determine the Milnor number of a polynomial that is equivalent to a germ with a nondegenerate Newton boundary
 determinacyBound(f); determine an upper bound for the determinacy of a polynomial
-deltaNNB(f); determine the Delta invariant and number of branches of a polynomial that is right equivalent to a germ with a nondegenerate Newton boundary
+deltaNNB(f); determine the Delta invariant and number of branches of a polynomial that is right equivalent to a germ @*
+with a nondegenerate Newton boundary
 moduliMonomials(N); give the monomials corresponding to the moduli terms in a given normal form
 newtonNumber(F); determine the Newton number of a polynomial in Q[x,y]
-transformationsBeforeSplit(N); the transformations (and in some cases their inverses) that was transformed on a given polynomial to write it as a direct sum of its degenerate and nondegenerate parts, given up to filtration d, where d is a determinacy bound for the given polynomial
-transformationsBeforeSplit(N); the transformations (and in some cases their inverses) that was transformed on the degenerate part of a given polynomial was splitted off to transform it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), is given up to filtration d, where d is a determinacy bound for the polynomial, if possible
+transformationsBeforeSplit(N); the transformations (and in some cases their inverses) that was transformed on a given polynomial to write it as a direct sum @*
+of its degenerate and nondegenerate parts, given up to filtration d, where d is a determinacy bound for the given polynomial
+transformationsAfterSplit(N); the transformations (and in some cases their inverses) that was transformed on the degenerate part of a given polynomial @*
+was splitted off to transform it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), @*
+is given up to filtration d, where d is a determinacy bound for the polynomial, if possible
 ";
 
 LIB "gfanlib.so";
@@ -190,7 +211,8 @@ example
 
 proc newtonPolygon(poly f)
 "USAGE: newtonPolygon(f); poly f
-RETURN: a list with an entry for each of the finite facets of f; each entry consists out of a list with first entry the normal vector of the corresponding facet and second entry a list containing the coordinates of the vertices of the corresponding facet
+RETURN: a list with an entry for each of the finite facets of f; each entry consists out of a list with first entry the normal vector of the corresponding facet and second entry @*
+a list containing the coordinates of the vertices of the corresponding facet
 EXAMPLE: example newtonPolygon, shows an example"
 {
   list M=monomials(f);
@@ -466,7 +488,7 @@ example
 }
 
 proc piecewiseJet(poly f, list pw, int d)
-"USAGE: piecewisedegree(f,w,d); f poly, w a piecewise weight given by a list, which can be computed using @ref(piecewiseWeightOfPolygon), d int
+"USAGE: piecewiseJet(f,w,d); f poly, w a piecewise weight given by a list, which can be computed using @ref(piecewiseWeightOfPolygon), d int
 RETURN:  the piecewise d-jet of f, with regard to the weight w
 EXAMPLE: example piecewiseJet, shows an example"
 {
@@ -492,23 +514,46 @@ example
 
 proc determineNormalForm(Poly F)
 "USAGE: determineNormalForm(F); F poly
-RETURN: if F.value is right equivalent to a germ with a nondegenerate Newton boundary a N of type NormalForm with fields:
-        N.inputRing: the ring F.in
-        N.numbervars: the embedding dimension (given as type int)
-        N.normalForm: a normal form of F.value (given as type Poly)
-        N.singularityType: the corner points of the Newton boundary of the normal form of F.value, which classifies the singularity type (given as type string)
-        N.parameters: the monomials corresponding to the moduli terms in N.normalForm (given as a list with entries of type poly)
-        N.corank: the corank of the singularity defined by F.value (given as type int)
-        N.modality: the modality of the singularity defined by F.value (given as type int)
-        N.milnorNumber: the Milnor number of F.value (given as type int)
-        N.delta: the Delta invariant of F.value (given as type int)
-        N.numberOfBranches: the number of branches of F.value (given as type int)
-        N.determinacy: a determinacy bound for F.value (given as type int)
-        N.nondegeneratePart: the nondegenerate part of the normal form of F.value (given as type Poly)
-        N.nonNormalizedNNBGerm: a polynomial that is stable equivalent to F.value with a nondegenerate Newton boundary (that is not necessarily normalized, given as type Poly)
-        N.normalizedNNBGerm: a polynomial that is stable equivalent to F.value with a normalized nondegenerate Newton boundary up to scalar multiplication of each of its variables (given as type Poly)
-        N.phiBeforeMorseSplit: the transformations (and in some cases their inverses) of the transformations that was transformed on F.value to write F.value as a direct sum of its degenerate and nondegenerate parts, given up to filtration d, where d is a determinacy bound for F.value (given as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))
-        N.phi: the transformations (and in some cases their inverses) of the transformations that was transformed on the degenerate part of F.value to transform it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), is given up to filtration d, where d is a determinacy bound for F.value (given as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib)),
+RETURN: if F.value is right equivalent to a germ with a nondegenerate Newton boundary an N of type NormalForm with fields:@*
+        N.inputRing: the ring F.in@*
+        @*
+        N.numbervars: the embedding dimension (given as type int)@*
+        @*
+        N.normalForm: a normal form of F.value (given as type Poly)@*
+        @*
+        N.singularityType: the corner points of the Newton boundary of the normal form of F.value, which classifies the singularity type (given as type string)@*
+        @*
+        N.parameters: the monomials corresponding to the moduli terms in N.normalForm (given as a list with entries of type poly)@*
+        @*
+        N.corank: the corank of the singularity defined by F.value (given as type int)@*
+        @*
+        N.modality: the modality of the singularity defined by F.value (given as type int)@*
+        @*
+        N.milnorNumber: the Milnor number of F.value (given as type int)@*
+        @*
+        N.delta: the Delta invariant of F.value (given as type int)@*
+        @*
+        N.numberOfBranches: the number of branches of F.value (given as type int)@*
+        @*
+        N.determinacy: a determinacy bound for F.value (given as type int)@*
+        @*
+        N.nondegeneratePart: the nondegenerate part of the normal form of F.value (given as type Poly)@*
+        @*
+        N.nonNormalizedNNBGerm: a polynomial that is stable equivalent to F.value with a nondegenerate Newton boundary @*
+        (that is not necessarily normalized, given as type Poly)@*
+        @*
+        N.normalizedNNBGerm: a polynomial that is stable equivalent to F.value with a normalized nondegenerate Newton boundary up to scalar multiplication @*
+        of each of its variables (given as type Poly)@*
+        @*
+        N.phiBeforeMorseSplit: the transformations (and in some cases their inverses) of the transformations that was transformed on F.value to write F.value @*
+        as a direct sum of its degenerate and nondegenerate parts, given up to filtration d, where d is a determinacy bound for F.value @*
+        (given as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))@*
+        @*
+        N.phi: the transformations (and in some cases their inverses) of the transformations that was transformed on the degenerate part of F.value to transform @*
+        it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given),@* 
+        is given up to filtration d, where d is a determinacy bound for F.value (given as type RightEquivalenceChainWithPrecision as @* 
+        defined in @ref(polyclass.lib)),@*
+
 an ERROR message otherwise
 EXAMPLE: example determineNormalForm, shows an example"
 {
@@ -741,7 +786,8 @@ example
 
 proc germWithNormalizedNNB(NormalForm N)
 "USAGE: germWithNormalizedNNB(N); N NormalForm as given by @ref(determineNormalForm)
-RETURN:  a polynomial, returned as a Poly, that is stable equivalent to N.phi.sourcegerm.value with a normalized nondegenerate Newton boundary up to scalar multiplication of each of its variables, if possible, or an ERROR message otherwise
+RETURN:  a polynomial, returned as a Poly, that is stable equivalent to N.phi.sourcegerm.value with a normalized nondegenerate Newton boundary up to scalar multiplication @*
+of each of its variables, if possible, or an ERROR message otherwise
 EXAMPLE: example germWithNormalizedNNB, shows an example"
 {
     ring R = basering;
@@ -789,7 +835,8 @@ example
 
 proc modalityNNB(def f)
 "USAGE: modalityNNB(f,w); f poly or Poly or NormalForm
-RETURN:  the modality of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) is equivalent to a germ with a nondegenerate Newton boundary, or an ERROR message otherwise
+RETURN:  the modality of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) is equivalent to a germ with a nondegenerate Newton boundary, @*
+or an ERROR message otherwise
 EXAMPLE: example modalityNNB, shows an example"
 {
   int k=0;
@@ -840,7 +887,8 @@ example
 
 proc milnorNNB(def f)
 "USAGE: milnorNNB(f,w); f poly or Poly or NormalForm
-RETURN:  the Milnor number of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) is equivalent to a germ with a nondegenerate Newton boundary, or an ERROR message otherwise
+RETURN:  the Milnor number of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) is equivalent to a germ with a nondegenerate Newton boundary, @*
+or an ERROR message otherwise
 EXAMPLE: example milnorNNB, shows an example"
 {
   int k =0;
@@ -932,7 +980,8 @@ example
 
 proc deltaNNB(def f)
 "USAGE: deltaNNB(f); f poly or Poly or NormalForm
-RETURN:  a List with entries d,n, where d is the Delta invariant and n is the number of branches of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) is equivalent to a germ with a nondegenerate Newton Boundary, or an ERROR message otherwise
+RETURN:  a List with entries d,n, where d is the Delta invariant and n is the number of branches of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) @*
+is equivalent to a germ with a nondegenerate Newton Boundary, or an ERROR message otherwise
 EXAMPLE: example deltaNNB, shows an example"
 {
   int k =0;
@@ -1043,7 +1092,8 @@ example
 
 proc transformationsBeforeSplit(NormalForm N)
 "USAGE: transformationsBeforeSplit(N); N NormalForm as given by @ref(determineNormalForm)
-RETURN:  the transformations (and in some cases their inverses) that was transformed on N.phi.sourcegerm.value to write it as a direct sum of its degenerate and nondegenerate parts, given up to filtration d, where d is a determinacy bound for F.value (returned as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))
+RETURN:  the transformations (and in some cases their inverses) that was transformed on N.phi.sourcegerm.value to write it as a direct sum of its degenerate and nondegenerate parts, @*
+given up to filtration d, where d is a determinacy bound for F.value (returned as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))
 EXAMPLE: example transformationsBeforeSplit, shows an example"
 {
     return(N.phiBeforeMorseSplit);
@@ -1064,7 +1114,8 @@ example
 }
 proc transformationsAfterSplit(NormalForm N)
 "USAGE: transformationsAfterSplit(N); N NormalForm as given by @ref(determineNormalForm)
-RETURN:  the transformations (and in some cases their inverses) that was transformed, after the degenerate part was splitted off, of N.phi.sourcegerm.value to transform it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), is given up to filtration d, where d is a determinacy bound for N.source (returned as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))
+RETURN:  the transformations (and in some cases their inverses) that was transformed, after the degenerate part was splitted off, of N.phi.sourcegerm.value to transform it to a germ @*
+with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), is given up to filtration d, where d is a determinacy bound for N.source (returned as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))@*
 EXAMPLE: example transformationsAfterSplit, shows an example"
 {
   Poly normalizedNNBGerm = N.normalizedNNBGerm;
@@ -1092,7 +1143,8 @@ example
 
 proc determineNormalFormEquation(NormalForm N)
 "USAGE: determineNormalFormEquation(N); N a NormalForm as given by @ref(NormalForm)
-RETURN: a normalform equation, stored in N.normalFormEquation, occuring in the normalform, stored in N.normalForm, of the polynomial, stored in N.phi.sourcegerm, as well as polynomials, stored in N.extension1 and N.extension2 (of type Poly), defining the paramaters, given as ring variables in N.normalFormEquation.
+RETURN: a normalform equation, stored in N.normalFormEquation, occuring in the normalform, stored in N.normalForm, of the polynomial, stored in N.phi.sourcegerm, as well as polynomials, stored in N.extension1 and N.extension2 (of type Poly), defining the paramaters, @*
+given as ring variables in N.normalFormEquation.
 EXAMPLE: example determineNormalFormEquation, shows an example"
 {
   def B = basering;
@@ -1986,18 +2038,18 @@ example
 
 proc determineNormalFormList(poly f)
 "USAGE: determineNormalFormList(f); f poly
-RETURN: if f is right equivalent to a germ with a nondegenerate Newton boundary a list with entries:
-        [1]: the embedding dimension (given as type int)
-        [2]: the corank of the singularity defined by f (given as type int)
-        [3]: the corner points of the Newton boundary of the normal form of f, which classifies the singularity type (given as type string)
-        [4]: a ring that contains a polynomial "normalform" that is the normalform of f (given as type poly)
-        [5]: a ring that contains a polynomial "nondegeneratepart" that is the nondegenerate part of the normalform of f (given as type poly)
-        [6]: a list of the monomials corresponding to the moduli terms in normalform (given as a list with entries of type poly)
-        [7]: the modality of the singularity defined by f (given as type int)
-        [8]: the Milnor number of f (given as type int)
-        [9]: the Delta invariant of f (given as type int)
-        [10]: the number of branches of f (given as type int)
-        [11]: a determinacy bound for f (given as type int),
+RETURN: if f is right equivalent to a germ with a nondegenerate Newton boundary a list with entries:@*
+        [1]: the embedding dimension (given as type int)@*
+        [2]: the corank of the singularity defined by f (given as type int)@*
+        [3]: the corner points of the Newton boundary of the normal form of f, which classifies the singularity type (given as type string)@*
+        [4]: a ring that contains a polynomial "normalform" that is the normalform of f (given as type poly)@*
+        [5]: a ring that contains a polynomial "nondegeneratepart" that is the nondegenerate part of the normalform of f (given as type poly)@*
+        [6]: a list of the monomials corresponding to the moduli terms in normalform (given as a list with entries of type poly)@*
+        [7]: the modality of the singularity defined by f (given as type int)@*
+        [8]: the Milnor number of f (given as type int)@*
+        [9]: the Delta invariant of f (given as type int)@*
+        [10]: the number of branches of f (given as type int)@*
+        [11]: a determinacy bound for f (given as type int),@*
 an ERROR message otherwise
 EXAMPLE: example determineNormalFormList, shows an example"
 {
@@ -2063,19 +2115,20 @@ example
 
 proc determineNormalFormEquationList(poly f)
 "USAGE: determineNormalFormEquationList(f); f poly
-RETURN: if f is right equivalent to a germ with a nondegenerate Newton boundary a list with entries:
-        [1]: the embedding dimension (given as type int)
-        [2]: the corank of the singularity defined by f (given as type int)
-        [3]: the corner points of the Newton boundary of the normal form of f, which classifies the singularity type (given as type string)
-        [4]: a ring that contains a polynomial "normalform" that is the normalform of f (given as type poly)
-        [5]: a ring that contains a polynomial "nondegeneratepart" that is the nondegenerate part of the normalform of f (given as type poly)
-        [6]: a list of the monomials corresponding to the moduli terms in normalform (given as a list with entries of type poly)
-        [7]: a ring containing a normalform equation "normalformequation" of f in the normalform "normalform" (given as a poly), as well as polynomials "extension1" and "extension2" (given as poly's) that defines the parameters, given as variables, in the given normalform equation
-        [8]: the modality of the singularity defined by f (given as type int)
-        [9]: the Milnor number of f (given as type int)
-        [10]: the Delta invariant of f (given as type int)
-        [11]: the number of branches of f (given as type int)
-        [12]: a determinacy bound for f (given as type int),
+RETURN: if f is right equivalent to a germ with a nondegenerate Newton boundary a list with entries:@*
+        [1]: the embedding dimension (given as type int)@*
+        [2]: the corank of the singularity defined by f (given as type int)@*
+        [3]: the corner points of the Newton boundary of the normal form of f, which classifies the singularity type (given as type string)@*
+        [4]: a ring that contains a polynomial "normalform" that is the normalform of f (given as type poly)@*
+        [5]: a ring that contains a polynomial "nondegeneratepart" that is the nondegenerate part of the normalform of f (given as type poly)@*
+        [6]: a list of the monomials corresponding to the moduli terms in normalform (given as a list with entries of type poly)@*
+        [7]: a ring containing a normalform equation "normalformequation" of f in the normalform "normalform" (given as a poly), @*
+             as well as polynomials "extension1" and "extension2" (given as poly's) that defines the parameters, given as variables, in the given normalform equation @*
+        [8]: the modality of the singularity defined by f (given as type int)@*
+        [9]: the Milnor number of f (given as type int)@*
+        [10]: the Delta invariant of f (given as type int)@*
+        [11]: the number of branches of f (given as type int)@*
+        [12]: a determinacy bound for f (given as type int),@*
 an ERROR message otherwise
 EXAMPLE: example determineNormalFormEquationList, shows an example"
 {
