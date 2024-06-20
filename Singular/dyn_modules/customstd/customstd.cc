@@ -657,9 +657,9 @@ static BOOLEAN monomialabortstd(leftv res, leftv args)
 extern "C" int SI_MOD_INIT(customstd)(SModulFunctions* p)
 {
   // p->iiAddCproc("std_demo","std_with_display",FALSE,std_with_display);
-  p->iiAddCproc("customstd.lib","satstd",FALSE,satstd);
+  p->iiAddCproc("customstd.lib","satstdInternal",FALSE,satstd);
   // p->iiAddCproc("std_demo","satstdWithInitialCheck",FALSE,satstdWithInitialCheck);
-  p->iiAddCproc("customstd.lib","monomialabortstd",FALSE,monomialabortstd);
+  p->iiAddCproc("customstd.lib","monomialabortstdInternal",FALSE,monomialabortstd);
   // PrintS("init of std_demo - type `listvar(Std_demo);` to its contents\n");
   p->iiAddCproc("customstd.lib","std_print_spoly",FALSE,std_print_spoly);
   p->iiAddCproc("customstd.lib","syz_print_spoly",FALSE,std_print_spoly);
