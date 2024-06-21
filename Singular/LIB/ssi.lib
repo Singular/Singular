@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////
-version="ssiFiles.lib 4.4.0.3 Jun_2024 "; // $Id$
+version="version ssi.lib 4.4.0.3 Jun_2024 "; // $Id$
 category="Data Handling";
 info="
-LIBRARY: ssiFiles.lib   Wrapper for handling SSI files in Singular
-AUTHORS:               Janko Boehm,      boehm@mathematik.uni-kl.de
+LIBRARY: ssi.lib   Wrapper for handling SSI files in Singular
+AUTHORS:           Janko Boehm,      boehm@mathematik.uni-kl.de
 
 OVERVIEW:
 This library provides helper functions for managing SSI files in Singular.
