@@ -141,16 +141,13 @@ jobs:
     needs: [dist, kanarienvogel]
 
   macos:
-    # Use https://github.com/sagemath/sage/pull/37237
-    uses: mkoeppe/sage/.github/workflows/macos.yml@ci-macos-2024
-    #uses: sagemath/sage/.github/workflows/macos.yml@develop
+    uses: sagemath/sage/.github/workflows/macos.yml@develop
     with:
       targets_pre: SAGE_CHECK=no singular-build-deps
       targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular V=1 singular
       targets_optional: SAGE_CHECK=no SAGE_CHECK_pysingular=warn pysingular
       timeout: 5000
       sage_repo:         sagemath/sage
-      sage_ref:          refs/pull/37237/head
-      #sage_ref:          develop
+      sage_ref:          develop
       upstream_artifact: upstream
     needs: [dist, kanarienvogel]
