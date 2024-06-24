@@ -1,38 +1,30 @@
-//in this file we remove the sort function. It takes more time to sort than to check schreyer order with a list. 
 //////////////////////////////////////////////////////////////////////////////
-version="version sresforextalg.lib 1.0.0.0 Feb_2024 "; // $Id$
+version="version sresforextalg.lib 1.0.0.0 June_2024 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: sresforextalg.lib     Schreyer's algorithm for modules over the exterior algebra
-AUTHORS:   Ramesh, L.,     ramesh@mathematik.uni-kl.de
-           Gnawali, S.,    
-
+AUTHORS: Ramesh, L.,           ramesh@mathematik.uni-kl.de   
 
 OVERVIEW:
 --
 
 PROCEDURES:
---
+schrey_syz_ext(m);            (refined) Schreyer syzygy of a module over the exterior algebra 
+sres_ext(m,p);                free resolution of module m over the exterior algebra using refined Schreyer alg        
+mres_ext(m,p);                minimal free resolution of module m over the exterior algebra using refined Schreyer alg
 ";
 
 static proc mod_init()
 {
 LIB "nctools.lib"; // for ncalg
 LIB "matrix.lib"; // for submat
-LIB "classify.lib"; // for swap 
+LIB "sheafcoh.lib"; // for displayCohom
 LIB "tst.lib"; tst_init(); tst_ignore("// ** loaded "); tst_ignore("// ** _ is no standard basis");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc leadmonomial_ext(def s) 
-"USAGE:   leadmonomial_ext(s); s a vector or a polynomial
-RETURN:   poly
-PURPOSE:  to compute lcm of lead terms of two vectors over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
-THEORY:   -
-EXAMPLE:  example leadmonomial_ext; shows examples
-SEE ALSO: leadterm
-"
+static proc leadmonomial_nc(def s) 
 {
   int e;
   poly m;
@@ -51,19 +43,10 @@ example
   "EXAMPLE:";echo=2;
   ring r = 0,(x,y,z),dp;
   vector v = [x2+y,0,z];
-  leadmonomial_ext(v);
+  leadmonomial_nc(v);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-proc leadterm(def s)
-"USAGE:   leadterm(s); s a vector or a polynomial
-RETURN:   poly
-PURPOSE:  to compute lcm of lead terms of two vectors over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
-THEORY:   -
-EXAMPLE:  example leadterm; shows examples
-SEE ALSO: leadmonomial_ext
-"
+static proc leadterm(def s)
 {
   int e;
   poly m;
@@ -85,19 +68,10 @@ example
   leadterm(v);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-// This procedure was implemented as there is no lcm over non-commutative rings
-
-//assumes v,w are terms that are either linear in each variable, or quadratic in one variable
-proc lcm_(poly v, poly w)
-"USAGE:   lcm_(v,w); v and w in a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
-RETURN:   poly
-PURPOSE:  to return the lead monomial and coefficient (not component) of a vector over a non-commutative ring where var(i)*var(j) = -var(j)*var(i)
-THEORY:   -
-EXAMPLE:  example lcm_; shows examples
-SEE ALSO: leadmonomial_ext, leadterm
-"
+/*to compute the least common divisor of two monomials that came from the lifting of a module over the exterior algebra. 
+That is, each monomial may either be a square of a variable, or a monomial where the power of each variable is 0 or 1.
+This function is used to compute the lead syzygy module of a module over the exterior algebra and may not be appropriate for other purposes. */
+static proc lcm_(poly v, poly w)
 {
     string strv = string(v);
     string strw = string(w);
@@ -156,23 +130,7 @@ SEE ALSO: leadmonomial_ext, leadterm
     }
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-/* This procedure computes the schreyers syzygy algorithm over a non-commutative ring 
-where var(i)*var(j) = -var(j)*var(i), and 
-assumes that the generators of the given matrix are lifted from the exterior algebra to the non-commutative algebra.*/
-
-
-proc schreyers_syz_(module m)
-"USAGE:   schreyers_syz_(m);
-RETURN:   module
-PURPOSE:  returns the syzygy module of m using the schreyer algorithm, where m is a module 
-over a non-commutative ring where x_i*x_j = -x_j*x_i
-THEORY:   
-SEE ALSO: lead_syz_, lift_tree_, lift_subtree_, remove_LOT_, phi_, greater_than_
-"
+static proc schreyers_syz_(module m)
 {
   module lead_mod = lead_syz_(m);
   module ans;
@@ -185,11 +143,8 @@ SEE ALSO: lead_syz_, lift_tree_, lift_subtree_, remove_LOT_, phi_, greater_than_
   return(ans);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-//not user-callable
-
-proc lead_syz_(module m){
+static proc lead_syz_(module m)
+{
   int r = size(m);
   int n = nvars(basering);
   module M = std(freemodule(r));
@@ -206,8 +161,8 @@ proc lead_syz_(module m){
       expi = leadexp(pi)[n+1];
       expj = leadexp(pj)[n+1];
       if(expi == expj){
-        Li = leadmonomial_ext(pi);
-        Lj = leadmonomial_ext(pj);
+        Li = leadmonomial_nc(pi);
+        Lj = leadmonomial_nc(pj);
         mji = lcm_(Lj,Li)/leadterm(pi);
         t = mji*M[i];
         for (k=1;k<=size(lead_mod);k++){
@@ -235,10 +190,8 @@ proc lead_syz_(module m){
   return(lead_mod);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-proc lift_tree_(vector s, module M){
+static proc lift_tree_(vector s, module M)
+{
   vector g = phi_(s, M);
   vector T = remove_LOT_(g, M);
   vector L;
@@ -254,7 +207,7 @@ proc lift_tree_(vector s, module M){
       temp_I = leadmonom(M[i]);
       attrib(temp_I, "isSB", 1);
       if(NF(L, temp_I)==0){
-        m = leadmonomial_ext(L)/leadterm(M[i]);
+        m = leadmonomial_nc(L)/leadterm(M[i]);
         //check sign: 
         if (m*leadterm(M[i]) != leadterm(L)){
           m = -m;
@@ -270,10 +223,8 @@ proc lift_tree_(vector s, module M){
   return(ans);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-proc lift_subtree_(vector s, module M){
+static proc lift_subtree_(vector s, module M)
+{
   vector g = phi_(s, M);
   g = g - lead(g);
   vector T = remove_LOT_(g, M);
@@ -291,7 +242,7 @@ proc lift_subtree_(vector s, module M){
       temp_I = leadmonom(M[i]);
       attrib(temp_I, "isSB", 1);
       if(NF(L, temp_I)==0){
-        m = leadmonomial_ext(L)/leadmonomial_ext(M[i]); //TODO check sign!
+        m = leadmonomial_nc(L)/leadmonomial_nc(M[i]); //TODO check sign!
 
         //check sign: 
         if (m*leadterm(M[i]) != leadterm(L)){
@@ -306,13 +257,8 @@ proc lift_subtree_(vector s, module M){
   return(ans);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-//used in lift_tree_ and lift_subtree_
-//computes the image of an element of lead_syz(m) in m
-
-proc phi_(vector s, module m){
+static proc phi_(vector s, module m)
+{
   int n = nvars(basering);
   int i = leadexp(s)[n+1];
   //s is a term
@@ -320,13 +266,8 @@ proc phi_(vector s, module m){
   return(t*m[i]);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-//removes lower order terms from a vector with respect to a module in std form
-
-//used in lift_tree_ and lift_subtree_
-proc remove_LOT_(vector g, module m){
+static proc remove_LOT_(vector g, module m)
+{
   vector L;
   int i;
   vector LOT;
@@ -346,12 +287,8 @@ proc remove_LOT_(vector g, module m){
   return(LOT);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-// This procedure is implemented as a substitute for the schreyer ordering check in lift_tree
-
-proc greater_than_(vector s, vector v, module M){
+static proc greater_than_(vector s, vector v, module M)
+{
   int n = nvars(basering);
   int i = leadexp(s)[n+1];
   int j = leadexp(v)[n+1];
@@ -368,16 +305,8 @@ proc greater_than_(vector s, vector v, module M){
   }
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-//
-//NOTE: in the following code, there is no quotient ring computation. 
-//
-//now for exterior algebra 
-//lifting the module from the quotient ring to the ncalg
-proc add_ideal_gens_(module m){
+static proc add_ideal_gens_(module m)
+{
   int n = nvars(basering);
   int i,j;
   for (i = 1; i<= n; i++){
@@ -388,8 +317,8 @@ proc add_ideal_gens_(module m){
   return(m);
 }
 
-
-proc ext_elimination_(module m, module syz_mod){
+static proc ext_elimination_(module m, module syz_mod)
+{
   //note m is NOT lifted.
   int r = size(m);
   int n = nvars(basering);
@@ -421,14 +350,14 @@ proc ext_elimination_(module m, module syz_mod){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//THIS IS THE MAIN USER CALLABLE PROCEDURE. WHAT RING SHOULD BE THE BASERING? 
-proc schrey_syz(module m)
-"USAGE:   schrey_syz(m); m a module over a commutative ring 
-and the generators of m are 0 modulo var(i)^2 for all i.
+//THIS IS THE MAIN USER CALLABLE PROCEDURE. 
+proc schrey_syz_ext(module m)
+"USAGE:   schrey_syz_ext(m); m a module over the exterior algebra.
 RETURN:   module
-PURPOSE:  computes the syzygy module of a module m over the exterior algebra. 
-THEORY:   TODO
-SEE ALSO: -
+PURPOSE:  computes the syzygy module of a m over the exterior algebra.
+THEORY:   
+SEE ALSO: sres_ext, mres_ext
+EXAMPLE: example schrey_syz_ext; shows an example
 "
 {
   int i,j;
@@ -463,17 +392,14 @@ example
   vector f1 = [x,y,0,z,0,0];
   vector f2 = [0,x,y,0,z,0];
   vector f3 = [0,0,0,x,y,z];
-  vector f4 = [0,0,xy,0,xz,0];
-  vector f5 = [0,0,0,0,xy,xz];
-  vector f6 = [0,0,0,0,0,xyz];
-  module m = f1,f2,f3,f4,f5,f6;
-  schrey_syz(m);
+  module m = f1,f2,f3;
+  m = std(m);
+  schrey_syz_ext(m);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//assume m is a module over the correct ring.
-proc sres_(module m, int p)
+static proc sres_ext_(module m, int p)
 {
   int i,j; 
   list res_list, lead_terms_list;
@@ -492,7 +418,51 @@ proc sres_(module m, int p)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc total_syz_alg(module mod_, list L)
+proc sres_ext(module m, int p) 
+"USAGE:   mres_ext(m,p); m a module over the polynomial ring.
+RETURN:   resolution
+PURPOSE:  to compute the minimal free resolution of m, 
+          where m represents a module over the exterior algebra, up to pth cohomological degree. 
+THEORY:   
+SEE ALSO: mres_ext, schrey_syz_ext
+EXAMPLE: example sres_ext; shows an example
+"
+{
+  //assume basering is the exterior algebra
+  ring ext_ring = basering;
+  int n = nvars(basering);
+  intmat E = UpOneMatrix(n);
+  E = -1*(E);
+  //N is the anti-commutative polynomial ring
+  ring R = create_ring(ring_list(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
+  def N = nc_algebra(E,0); setring N;
+  list L; int i;
+
+  module M = imap(ext_ring, m);
+  resolution res1 = sres_ext_(M,p);
+  for (i=1; i<=size(res1); i++){
+    L[i] = res1[i];
+  }
+  setring ext_ring;
+  list LL = imap(N, L);
+  resolution ans_res = LL;
+  return(ans_res);
+}
+example
+{"EXAMPLE:";
+  ring r = 0,(x,y,z),dp;
+  def E = Exterior();
+  vector f1 = [x,y,0,z,0,0];
+  vector f2 = [0,x,y,0,z,0];
+  vector f3 = [0,0,0,x,y,z];
+  module m = f1,f2,f3;
+  m = std(m);
+  sres_ext(m,4);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc total_syz_alg(module mod_, list L)
 {
   module lift_m = add_ideal_gens_(mod_);
   L[size(L)] = lead(lift_m);
@@ -515,7 +485,7 @@ proc total_syz_alg(module mod_, list L)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc schreyers_syz_with_order(module m, list L)
+static proc schreyers_syz_with_order(module m, list L)
 {
   module lead_mod = lead_syz_(m);
   module ans;
@@ -530,7 +500,8 @@ proc schreyers_syz_with_order(module m, list L)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc lift_tree_with_order(vector s, module M, list LL){
+static proc lift_tree_with_order(vector s, module M, list LL)
+{
   vector g = phi_(s, M);
   vector T = remove_LOT_(g, M);
   vector L;
@@ -546,7 +517,7 @@ proc lift_tree_with_order(vector s, module M, list LL){
       temp_I = leadmonom(M[i]);
       attrib(temp_I, "isSB", 1);
       if(NF(L, temp_I)==0){
-        m = leadmonomial_ext(L)/leadterm(M[i]); 
+        m = leadmonomial_nc(L)/leadterm(M[i]); 
         
         //check sign: 
         if (m*leadterm(M[i])!= leadterm(L)){
@@ -566,7 +537,8 @@ proc lift_tree_with_order(vector s, module M, list LL){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gr_than_for_res(vector s, vector v, list L){
+static proc gr_than_for_res(vector s, vector v, list L)
+{
   if (size(L) == 1){
     return(greater_than_(s,v,L[1]));
   }
@@ -589,136 +561,214 @@ proc gr_than_for_res(vector s, vector v, list L){
   return(gr_than_for_res(s,v,L));
 }
 
-
 ///////////////////////////////////////////////////////////////////////////
-/*enter a module m over the symmetric algebra
-and compute the schreyer free resolution over the exterior algebra
-fetch it back to the symmetric algebra and minimise*/
 
-proc minimal_free_resolution(module m, int p){
+proc mres_ext(module m, int p)
+"USAGE:   mres_ext(m,p); m a module over the polynomial ring.
+RETURN:   resolution
+PURPOSE:  to compute the minimal free resolution of m, 
+          where m represents a module over the exterior algebra, up to pth cohomological degree. 
+THEORY:   
+SEE ALSO: sres_ext, schrey_syz_ext
+EXAMPLE: example mres_ext; shows an example
+"
+{ //first compute groebner basis
+  m = std(m);
   //first we build our required non-commutative ring.
   ring r = basering;
   int i;
-  int N = nvars(basering);
-  ring R = create_ring(ring_list(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
-  intmat E = UpOneMatrix(N);
+  int n = nvars(basering);
+  intmat E = UpOneMatrix(n);
   E = -1*(E);
-  def RR = nc_algebra(E,0); setring RR;
+  ring R = create_ring(ring_list(basering)[1], ringlist(basering)[2], "("+ordstr(basering)+")", "no_minpoly");
+  //N is the anti-commutative polynomial ring
+  def N = nc_algebra(E,0); setring N;
 
-  //now we fetch the given module.
+  //now we fetch the given module. 
   module M = imap(r, m);
   module temp_mod;
 
   //create the non-minimal resolution over the non-commutative ring.
-  resolution res_ = sres_(M,p);
+  resolution res_ = sres_ext_(M,p);
   int s = size(res_);
 
-  //create the quotient ring over the symmetric algebra.
-  ideal Q;
-  for (i = 1; i<=N; i++){
-    Q[i] = var(i)^2;
-  }
-  attrib(Q, "isSB", 1);
-  qring @r = Q;
-
-
   //fetch the resolution to the quotient ring over the symmetric algebra.
-  
   list ans_L;
   for (i=1; i<=s; i++){
-    setring RR;
+    setring N;
     temp_mod = res_[i];
-    setring @r;
-    ans_L[i] = fetch(RR, temp_mod);
+    setring r;
+    ans_L[i] = fetch(N, temp_mod);
   }
 
   //minimise the resolution over the quotient algebra.
   resolution quo_res = ans_L;
   quo_res = minres(quo_res);
-  module temp_mod_1;
-  //return the minimised resolution over the symmetric algebra.
-  list ans_L_;
-  for (i=1; i<=s; i++){
-    setring @r;
-    temp_mod_1 = quo_res[i];
-    setring r;
-    ans_L_[i] = fetch(@r, temp_mod_1);
-  }
-  resolution ans_res = ans_L_;
-  return(ans_res);
+  return(quo_res);
+}
+example
+{"EXAMPLE:";
+  ring r = 0,(x,y,z),dp;
+  def E = Exterior();
+  vector f1 = [x,y,0,z,0,0];
+  vector f2 = [0,x,y,0,z,0];
+  vector f3 = [0,0,0,x,y,z];
+  module m = f1,f2,f3;
+  m = std(m);
+  mres_ext(m,4);
 }
 
-
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-                    The code that gets parallelised
-///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-proc lift_tree_for_gpi(vector s, module M, list LL){
-  vector g = phi_(s, M);
-  vector T = remove_LOT_(g, M);
-  vector L;
-  list ans; 
-  int i;
-  poly m;
-  module temp_I;
-  
-  ideal im, iF_, imif, iL;
-  while (T != 0){
-    L = lead(T);
-    for(i=1; i<=size(M); i++){
-      temp_I = leadmonom(M[i]);
-      attrib(temp_I, "isSB", 1);
-      if(NF(L, temp_I)==0){
-        m = leadmonomial_ext(L)/leadterm(M[i]); 
-        
-        //check sign: 
-        if (m*leadterm(M[i]) == leadterm(L)){
-          m = -m;
-        } 
-        //schreyer order algorithm should be called here
-        if (gr_than_for_res(s,m*gen(i),LL)){
-          ans[size(ans)+1] = list(m*gen(i), s);
-          break;
+proc sheafCohBGG_sres(module M,int l,int h)
+"USAGE:   sheafCohBGG_sres(M,l,h);    M module, l,h int
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute, @code{h>=l}, and the basering has @code{n+1}
+         variables.
+RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
+         associated to coker(M). The range of twists is determined by @code{l},
+         @code{h}.
+DISPLAY: The intmat is displayed in a diagram of the following form:
+         with @code{displayCohom(A,l,h,nvars(r)-1);}@*
+  @format
+                l            l+1                      h
+  ----------------------------------------------------------
+      n:     h^n(F(l))    h^n(F(l+1))   ......    h^n(F(h))
+           ...............................................
+      1:     h^1(F(l))    h^1(F(l+1))   ......    h^1(F(h))
+      0:     h^0(F(l))    h^0(F(l+1))   ......    h^0(F(h))
+  ----------------------------------------------------------
+    chi:     chi(F(l))    chi(F(l+1))   ......    chi(F(h))
+  @end format
+         A @code{'-'} in the diagram refers to a zero entry; a @code{'*'}
+         refers to a negative entry (= dimension not yet determined).
+         refers to a not computed dimension. @*
+NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
+         correspondence and on Tate resolution ( see [Eisenbud, Floystad,
+         Schreyer: Sheaf cohomology and free resolutions over exterior
+         algebras, Trans AMS 355 (2003)] ).@*
+         @code{sheafCohBGG(M,l,h)} does not compute all values in the above
+         table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
+         use @code{sheafCohBGG(M,l-n,h+n)}.
+SEE ALSO: sheafCoh, dimH, displayCohom
+EXAMPLE: example sheafCohBGG; shows an example
+"
+{
+  int i,j,k,row,col;
+  if( typeof(attrib(M,"isHomog"))!="intvec" )
+  {
+     if (size(M)==0) { attrib(M,"isHomog",0); }
+     else { ERROR("No admissible degree vector assigned"); }
+  }
+  int n=nvars(basering)-1;
+  int ell=l+n;
+  def R=basering;
+  int reg = CM_regularity(M);
+  int bound=max(reg+1,h-1);
+  module MT=truncate(M,bound);
+  int m=nrows(MT);
+  MT=transpose(jacobM(MT));
+  MT=syz(MT);
+  matrix ML[n+1][1]=maxideal(1);
+  matrix S=transpose(outer(ML,unitmat(m)));
+  matrix SS=transpose(S*MT);
+  //--- to the exterior algebra
+  def AR = Exterior();
+  setring AR;
+  intvec saveopt=option(get);
+  option(redSB);
+  option(redTail);
+  module EM=imap(R,SS);
+  intvec w;
+  //--- here we are with our matrix
+  int bound1=max(1,bound-ell+1);
+  for (i=1; i<=nrows(EM); i++)
+  {
+     w[i]=-bound-1;
+  }
+  attrib(EM,"isHomog",w);
+  resolution RE=mres_ext(EM,bound1);
+  print(RE);
+  intmat Betti=betti(RE);
+  print(Betti);
+  print(attrib(Betti,"rowShift"));
+  k=ncols(Betti);
+  row=nrows(Betti);
+  int shift=attrib(Betti,"rowShift")+(k+ell-1);
+  print("shift=");
+  print(shift);
+  intmat newBetti[n+1][h-l+1];
+  for (j=1; j<=row; j++)
+  {
+    for (i=l; i<=h; i++)
+    {
+      if (((n+2-shift-j)>0)&&((n+2-shift-j)<=(n+1))
+      && ((i-l+1)>0)&&((i-l+1)<=(h-l+1)))
+      {
+        if ((k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1))
+        {
+          newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
+        }
+        else
+        {
+          newBetti[n+2-shift-j,i-l+1]=-1;
         }
       }
     }
-    T = T - L;
   }
-  return(ans);
+  for (j=2; j<=n+1; j++)
+  {
+    for (i=1; i<j; i++)
+    {
+      newBetti[j,i]=-1;
+    }
+  }
+  int d=k-h+ell-1;
+  for (j=1; j<=n; j++)
+  {
+    for (i=h-l+1; i>=k+j; i--)
+    {
+      newBetti[j,i]=-1;
+    }
+  }
+  //print(newBetti);
+  option(set,saveopt);
+  setring R;
+  //print(newBetti);
+  return(newBetti);
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  // cohomology of structure sheaf on P^4:
+  //-------------------------------------------
+  ring r=0,x(1..5),dp;
+  module M=0;
+  intmat A=sheafCohBGG_sres(M,-9,4);
+  A;
+  displayCohom(A,-9,4,nvars(r)-1);
+  // cohomology of cotangential bundle on P^3:
+  //-------------------------------------------
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  attrib(M,"isHomog",v);
+  intmat B=sheafCohBGG_sres(M,-8,4);
+  B;
+  displayCohom(B,-8,4,nvars(R)-1);
 }
 
-proc lift_subtree_(vector lead_s, vector s, module M){
-  //lead_s keeps track of the lead syz term
-  vector g = phi_(s, M);
-  g = g - lead(g);
-  vector T = remove_LOT_(g, M);
-  list ans;
-  poly m;
-  int i;
-  vector L;
-  module temp_I;
+///////////////////////////////////////////////////////////////////////////
 
-  while (T != 0){
-    if (leadexp(T)[nvars(basering)+1] > 15){
-    }
-    L = lead(T);
-    for(i=1; i<=size(M); i++){
-      temp_I = leadmonom(M[i]);
-      attrib(temp_I, "isSB", 1);
-      if(NF(L, temp_I)==0){
-        m = leadmonomial_ext(L)/leadmonomial_ext(M[i]); //TODO check sign!
-
-        //check sign: 
-        if (m*leadterm(M[i]) == leadterm(L)){
-          m = -m;
-        } 
-        ans[size(ans)+1] = list(m*gen(i), lead_s);
-        break;
-      }
-    }
-    T = T - L;
-  }
-  return(ans);
+static proc jacobM(matrix M) //kopiert aus sheafcoh.lib
+{
+   int n=nvars(basering);
+   matrix B=transpose(diff(M,var(1)));
+   int i;
+   for(i=2;i<=n;i++)
+   {
+     B=concat(B,transpose(diff(M,var(i))));
+   }
+   return(transpose(B));
 }
