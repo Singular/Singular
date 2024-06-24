@@ -8560,13 +8560,13 @@ proc nsdScaleFactor (list graphs)
 /////////////////////////////////////////////////////////////////////////
 
 
-proc groebnerCone()
+proc groebnerCone(def idealOrPoly, def intvecOrBigintmat)
 "USAGE:      groebnerCone(I,w); I ideal or poly, w intvec or bigintmat
 ASSUME:      I a reduced standard basis and w contained in the maximal Groebner cone
 RETURN:      cone, the Groebner cone of I with respect to w
 EXAMPLE:     example groebnerCone;  shows an example"
 {
-
+	return (groebnerConeInternal(idealOrPoly, intvecOrBigintmat));
 }
 example
 {
@@ -8590,13 +8590,13 @@ example
 }
 
 
-proc maximalGroebnerCone()
+proc maximalGroebnerCone(def idealOrPoly)
 "USAGE:      maximalGroebnerCone(I); I ideal or poly
 ASSUME:      I a reduced standard basis
 RETURN:      cone, the maximal Groebner cone of I with respect to the current ordering
 EXAMPLE:     example maximalGroebnerCone;  shows an example"
 {
-
+	return (maximalGroebnerConeInternal(idealOrPoly));
 }
 example
 {
@@ -8623,13 +8623,13 @@ example
 }
 
 
-proc homogeneitySpace()
+proc homogeneitySpace(def idealOrPoly)
 "USAGE:      homogeneitySpace(I); I ideal or poly
 ASSUME:      I a reduced standard basis
 RETURN:      cone, the set of all weight vectors with respect to whom I is weighted homogeneous
 EXAMPLE:     example homogeneitySpace;  shows an example"
 {
-
+	return (homogeneitySpaceInternal(idealOrPoly));
 }
 example
 {
@@ -8649,7 +8649,7 @@ example
 }
 
 
-proc initial()
+proc initial(def idealOrPoly, def intvecOrBigintmat)
 "USAGE:      initial(f,w); f poly, w intvec or bigintmat
              initial(I,w); I ideal, w intvec or bigintmat
 ASSUME:      I reduced Groebner basis,
@@ -8657,7 +8657,7 @@ ASSUME:      I reduced Groebner basis,
 RETURN:      poly or ideal, the initial form of f or the initial ideal of I with respect to w
 EXAMPLE:     example initial;  shows an example"
 {
-
+	return (initialInternal(idealOrPoly, intvecOrBigintmat));
 }
 example
 {
@@ -8673,7 +8673,7 @@ example
 }
 
 
-proc tropicalVariety()
+proc tropicalVariety(def idealOrPoly, list #)
 "USAGE:      tropicalVariety(f[,p]); f poly, p optional number
              tropicalVariety(I[,p]); I ideal, p optional number
 ASSUME:      I homogeneous, p prime number
@@ -8681,7 +8681,11 @@ RETURN:      fan, the tropical variety of f resp. I with respect to the trivial 
 NOTE:        set printlevel=1 for output during traversal
 EXAMPLE:     example tropicalVariety;  shows an example"
 {
-
+	if (size(#)>0)
+	{
+		return (tropicalVarietyInternal(idealOrPoly,#[1]));
+	}
+	return (tropicalVarietyInternal(idealOrPoly));
 }
 example
 {
@@ -8696,7 +8700,7 @@ example
 }
 
 
-proc groebnerFan()
+proc groebnerFan(def idealOrPoly)
 "USAGE:      groebnerFan(f); f poly
              groebnerFan(I); I ideal
 ASSUME:      I homogeneous
@@ -8704,7 +8708,7 @@ RETURN:      fan, the Groebner fan of f resp. I
 NOTE:        set printlevel=1 for output during traversal
 EXAMPLE:     example groebnerFan;  shows an example"
 {
-
+	return (groebnerFanInternal(idealOrPoly));
 }
 example
 {
@@ -8715,7 +8719,7 @@ example
 }
 
 
-proc groebnerComplex()
+proc groebnerComplex(def idealOrPoly, number p)
 "USAGE:      groebnerComplex(f,p); f poly, p number
              groebnerComplex(I,p); I ideal, p number
 ASSUME:      I homogeneous, p prime number
@@ -8723,7 +8727,7 @@ RETURN:      fan, the Groebner complex of f resp. I with respect to the p-adic v
 NOTE:        set printlevel=1 for output during traversal
 EXAMPLE:     example groebnerComplex;  shows an example"
 {
-
+	return (groebnerComplexInternal(idealOrPoly,p));
 }
 example
 {

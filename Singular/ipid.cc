@@ -910,8 +910,16 @@ BOOLEAN iiAlias(leftv p)
          break;
        // case ring: cannot happen
        default:
-         Werror("unknown type %d",p->Typ());
-         return TRUE;
+         {
+           int t=p->Typ();
+           if (t<MAX_TOK)
+           {
+             Werror("unknown type %d(%s)",t,Tok2Cmdname(t));
+             return TRUE;
+           }
+           /*else: blackbox type, not yet set*/
+           break;
+         }
   }
   pp->typ=ALIAS_CMD;
   IDDATA(pp)=(char*)h->data;

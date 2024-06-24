@@ -26,6 +26,22 @@
 #include "int_cf.h"
 #include "imm.h"
 
+#ifdef HAVE_FLINT
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
+#include <flint/fmpz.h>
+#include <flint/fmpq.h>
+#ifdef __cplusplus
+}
+#endif
+#endif
+
+
 /**
  * factory's class for rationals
  *
@@ -114,6 +130,9 @@ public:
     friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );
     friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
     friend CanonicalForm make_cf ( const mpz_ptr n, const mpz_ptr d );
+#ifdef HAVE_FLINT
+    friend void convertCF2Fmpq(fmpq_t result, const CanonicalForm& f);
+#endif
 };
 
 inline mpz_ptr InternalRational::MPQNUM( const InternalCF * const c )

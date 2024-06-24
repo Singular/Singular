@@ -562,7 +562,7 @@ public:
     }
   /**
      Computes a reduced row echelon form from a row echelon form. In
-     Groebner basis terms this is the same as tranforming a minimal
+     Groebner basis terms this is the same as transforming a minimal
      Groebner basis to a reduced one except that we do not force
      pivots to be 1 unless the scalePivotsToOne parameter is set.
    */

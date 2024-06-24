@@ -6227,20 +6227,17 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   }
   assumeStdFlag(u);
   intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
-  intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal,wdegree);
   if (errorreported) return TRUE;
 
   switch((int)(long)v->Data())
   {
     case 1:
-      res->data=(void *)iv;
+      res->data=(void *)hFirstSeries0b((ideal)u->Data(),currRing->qideal,wdegree,module_w,currRing,coeffs_BIGINT);
       return FALSE;
     case 2:
-      res->data=(void *)hSecondSeries(iv);
-      delete iv;
+      res->data=(void *)hSecondSeries0b((ideal)u->Data(),currRing->qideal,wdegree,module_w,currRing,coeffs_BIGINT);
       return FALSE;
   }
-  delete iv;
   WerrorS(feNotImplemented);
   return TRUE;
 }
@@ -10274,7 +10271,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     pl=(lists)v->Data();
     if (pl->nr!=rl-1)
     {
-      WerrorS("wromg number of primes");
+      Werror("wromg number of primes (%d:%d) for chinrem",pl->nr+1,rl);
       return TRUE;
     }
   }
@@ -10283,7 +10280,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     p=(intvec*)v->Data();
     if (p->length()!=rl)
     {
-      WerrorS("wromg number of primes");
+      Werror("wromg number of primes (%d:%d) for chinrem",p->length(),rl);
       return TRUE;
     }
   }

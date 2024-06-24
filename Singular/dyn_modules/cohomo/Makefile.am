@@ -6,7 +6,7 @@ if SI_BUILTIN_COHOMO
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
 else
   module_LTLIBRARIES=cohomo.la
-  moduledir = $(libexecdir)/singular/MOD
+  moduledir = $(libdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
   P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version
 endif
@@ -20,8 +20,6 @@ SOURCES = cohomo.cc
 cohomo_la_SOURCES   = $(SOURCES)
 cohomo_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 cohomo_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} $(SINGULAR_LDFLAGS)
-SOURCES = cohomo.cc
-cohomo_la_SOURCES   = $(SOURCES)
 
 if SING_WIN
 if !SI_BUILTIN_COHOMO

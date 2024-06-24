@@ -616,12 +616,12 @@ static void iiCallLibProcEnd(idhdl save_ringhdl, ring save_ring)
   if ((currRing!=NULL)
   &&(currRing!=save_ring))
   {
-    rDecRefCnt(currRing);
     idhdl hh=IDROOT;
     idhdl prev=NULL;
     while((hh!=currRingHdl) && (hh!=NULL)) { prev=hh; hh=hh->next; }
-    if (hh!=NULL)
+    if ((hh!=NULL)&&(strcmp(IDID(hh)," tmpRing")==0))
     {
+      rDecRefCnt(currRing);
       if (prev==NULL) IDROOT=hh->next;
       else prev->next=hh->next;
       omFree((ADDRESS)IDID(hh));

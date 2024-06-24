@@ -21,6 +21,21 @@
 #endif
 #endif /* NOSTREAMIO */
 
+#ifdef HAVE_FLINT
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
+#include <flint/fmpz.h>
+#include <flint/fmpq.h>
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 #include "cf_assert.h"
 
 #include "int_cf.h"
@@ -135,6 +150,11 @@ public:
     friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result);
     friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
     friend void getmpi ( InternalCF * value, mpz_t mpi);
+    #ifdef HAVE_FLINT
+    friend void convertCF2Fmpz(fmpz*, const CanonicalForm&);
+    friend void convertCF2initFmpz (fmpz_t result, const CanonicalForm& f);
+    friend void convertCF2Fmpq(fmpq_t result, const CanonicalForm& f);
+    #endif
 };
 
 /**

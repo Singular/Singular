@@ -199,8 +199,6 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
 
     if (l->m == NULL) slInit(l, ((char*)""));
 
-    if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
-
     const char *c="_";;
     if (h!=NULL) c=h->Name();
 

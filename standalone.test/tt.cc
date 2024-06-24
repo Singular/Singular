@@ -31,7 +31,7 @@ int main( int, char *argv[] )
   // create the polynomial 1
   poly p1=p_ISet(1,R);
 
-  // create tthe polynomial 2*x^3*z^2
+  // create the polynomial 2*x^3*z^2
   poly p2=p_ISet(2,R);
   pSetExp(p2,1,3);
   pSetExp(p2,3,2);

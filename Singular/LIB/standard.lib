@@ -2332,9 +2332,9 @@ example
 proc projInvariants(ideal i,list #)
 "SYNTAX: @code{projInvariants (} ideal_expression @code{)} @*
          @code{projInvariants (} ideal_expression@code{,} list of string_expres          sions@code{)}
-TYPE:    list, say L, with L[1] and L[2] of type int and L[3] of type intvec
+TYPE:    list, say L, with L[1] and L[2] of type int and L[3] of type bigintvec
 PURPOSE: Computes the (projective) dimension (L[1]), degree (L[2]) and the
-         first Hilbert series (L[3], as intvec) of the homogenized ideal
+         first Hilbert series (L[3], as bigintvec) of the homogenized ideal
          in the ring given by the procedure @code{hilbRing} with global
          ordering dp (resp. wp if the variables have weights >1)
          If an argument of type string @code{\"std\"} resp. @code{\"slimgb\"}
@@ -2380,7 +2380,7 @@ EXAMPLE: example projInvariants;  shows an example"
      def Philb = hiRi[1];      //note: Philb is no qring and the predefined
      setring Philb;            //ideal Id[1] in Philb is homogeneous
      int di, de;               //for dimension, degree
-     intvec hi;                //for hilbert series
+     bigintvec hi;                //for hilbert series
 
 //-------- compute Hilbert function of homogenized ideal in Philb ---------
 //Philb has only 1 block. There are three cases

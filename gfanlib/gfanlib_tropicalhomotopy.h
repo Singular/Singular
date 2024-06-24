@@ -19,7 +19,7 @@ public:
  };
 
 /**
- * We identify six possibly different types needed with possibly varying precission:
+ * We identify six possibly different types needed with possibly varying precision:
  * 1) The entries of the circuits (or possibly their packed representation)
  * 2) The mixed volume contribution of a single cell. This is obtained from an entry of a circuit and therefore can be represented by the above type.
  * 3) The accumulated mixed volume. This will exceed the bound of the above type in many cases. Overflows are easily checked.
@@ -34,7 +34,7 @@ public:
  * To simplify our design:
  *  we assume that type 4 is the same as 1 and 2. This is reasonable, as we need some bound to make type 6 efficient.
  *  we use a special (longer) type for 5, as that allows to do overflow checks at the end, assuming some bound on the target.
- *  In 6, we observe that there is no accumulation taking place. Moreover, with the assumption that 4 and 1 are the same, we only need a type with double precission to do the comparisons here, and now overflow check will be required.
+ *  In 6, we observe that there is no accumulation taking place. Moreover, with the assumption that 4 and 1 are the same, we only need a type with double precision to do the comparisons here, and now overflow check will be required.
  *
  *
  * To conclude, we make two types. A single precision type for 1,2,4 and a double precision type for 3,5,6

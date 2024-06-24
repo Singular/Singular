@@ -167,7 +167,7 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
   if((0<=VIndex)&&(VIndex<=ul->nr))
   {
     ul=(lists)u->CopyD();
-    int i,j;
+    int i;
     lists l=(lists) omAllocBin(slists_bin);
     l->Init(EndIndex+(VIndex>EndIndex));
 

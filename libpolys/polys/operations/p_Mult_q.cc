@@ -97,7 +97,7 @@ static void pqLengthApprox(poly p, poly q, int &lp, int &lq, const int min)
 }
 
 
-static poly _p_Mult_q_Bucket(poly p, const int lp,
+poly _p_Mult_q_Bucket(poly p, const int lp,
                              poly q, const int lq,
                              const int copy, const ring r)
 {
@@ -192,7 +192,7 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
 }
 
 #ifdef HAVE_RINGS
-static poly _p_Mult_q_Normal_ZeroDiv(poly p, poly q, const int copy, const ring r)
+poly _p_Mult_q_Normal_ZeroDiv(poly p, poly q, const int copy, const ring r)
 {
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
   pAssume1(! pHaveCommonMonoms(p, q));
@@ -220,7 +220,7 @@ static poly _p_Mult_q_Normal_ZeroDiv(poly p, poly q, const int copy, const ring 
 }
 #endif
 
-static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
+poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 {
   assume(r != NULL);
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
@@ -298,45 +298,36 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   return res;
 }
 
-
-// Use factory if min(pLength(p), pLength(q)) >= MIN_LENGTH_FACTORY (>MIN_LENGTH_BUCKET)
-// Not thoroughly tested what is best
-#define MIN_LENGTH_FACTORY 200
-#define MIN_LENGTH_FACTORY_QQ 60
-#define MIN_FLINT_QQ 10
-#define MIN_FLINT_Zp 20
-#define MIN_FLINT_Z 10
+#define MIN_LENGTH_MAX 81
+#define MIN_FLINT_QQ 60
+#define MIN_FLINT_Zp 80
+#define MIN_FLINT_Z 60
 
 /// Returns:  p * q,
 /// Destroys: if !copy then p, q
-/// Assumes: pLength(p) >= 2 pLength(q) >=2, !rIsPluralRing(r)
+/// Assumes: pLength(p) >= 2 pLength(q) >=2, !rIsPluralRing(r), nCoeff_is_Domain
 poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
   assume(r != NULL);
-#ifdef HAVE_RINGS
-  if (!nCoeff_is_Domain(r->cf))
-    return _p_Mult_q_Normal_ZeroDiv(p, q, copy, r);
-#endif
-  int lp, lq, l;
+  int lp=0, lq=0;
   poly pt;
 
-  // MIN_LENGTH_FACTORY must be >= MIN_LENGTH_FACTORY_QQ, MIN_FLINT_QQ, MIN_FLINT_Zp 20
-  pqLengthApprox(p, q, lp, lq, MIN_LENGTH_FACTORY);
-
-  if (lp < lq)
-  {
-    pt = p;
-    p =  q;
-    q = pt;
-    l = lp;
-    lp = lq;
-    lq = l;
-  }
   BOOLEAN pure_polys=(p_GetComp(p,r)==0) && (p_GetComp(q,r)==0);
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
   if (pure_polys)
   {
+    pqLengthApprox(p, q, lp, lq, MIN_LENGTH_MAX);
+    if (lp < lq)
+    {
+      int l;
+      pt = p;
+      p =  q;
+      q = pt;
+      l = lp;
+      lp = lq;
+      lq = l;
+    }
     if ((lq>MIN_FLINT_QQ) && rField_is_Q(r))
     {
       fmpq_mpoly_ctx_t ctx;
@@ -352,7 +343,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
         return res;
       }
     }
-    if ((lq>MIN_FLINT_Zp) && rField_is_Zp(r))
+    else if ((lq>MIN_FLINT_Zp) && rField_is_Zp(r))
     {
       nmod_mpoly_ctx_t ctx;
       if (!convSingRFlintR(ctx,r))
@@ -367,7 +358,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
         return res;
       }
     }
-    if ((lq>MIN_FLINT_Z) && rField_is_Z(r))
+    else if ((lq>MIN_FLINT_Z) && rField_is_Z(r))
     {
       fmpz_mpoly_ctx_t ctx;
       if (!convSingRFlintR(ctx,r))
@@ -385,15 +376,26 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   }
   #endif
   #endif
+  if (lp==0)
+    pqLengthApprox(p, q, lp, lq, MIN_LENGTH_BUCKET);
+  if (lp < lq)
+  {
+    int l;
+    pt = p;
+    p =  q;
+    q = pt;
+    l = lp;
+    lp = lq;
+    lq = l;
+  }
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
     return _p_Mult_q_Normal(p, q, copy, r);
+  #if 0
   else if (pure_polys
   && ((r->cf->extRing==NULL)||(r->cf->extRing->qideal!=NULL))
     /* exclude trans. extensions: may contain rat.funct as cf */
-  && (((lq >= MIN_LENGTH_FACTORY)
-      && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
-    || ((lq >= MIN_LENGTH_FACTORY_QQ)
-      && rField_is_Q(r))))
+  && (lq >= MIN_LENGTH_FACTORY)
+  && (r->cf->convSingNFactoryN!=ndConvSingNFactoryN))
   {
     poly h=singclap_pmult(p,q,r);
     if (!copy)
@@ -403,10 +405,21 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     }
     return h;
   }
+  #endif
   else
   {
     lp=pLength(p);
     lq=pLength(q);
+    if (lp < lq)
+    {
+      int l;
+      pt = p;
+      p =  q;
+      q = pt;
+      l = lp;
+      lp = lq;
+      lq = l;
+    }
     return _p_Mult_q_Bucket(p, lp, q, lq, copy, r);
   }
 }

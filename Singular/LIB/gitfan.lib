@@ -78,10 +78,11 @@ LIB "customstd.lib";
 LIB "linalg.lib";
 LIB "multigrading.lib";
 LIB "parallel.lib";
+LIB "gfan.lib";
 
 static proc mod_init()
 {
-  LIB "gfanlib.so";
+  LIB "gfan.lib";
   LIB "gitfan.so";
   //LIB "subsets.so";
   newstruct("permutation","intvec image");

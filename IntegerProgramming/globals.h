@@ -135,7 +135,7 @@ typedef char BOOLEAN;
 #define B_CRITERION        8
 #define SECOND_CRITERION  16
 
-// The names of tehse criteria are chosen according to the criteria
+// The names of these criteria are chosen according to the criteria
 // described in Gebauer/Moeller (except from the last).
 // The first one (relatively prime leading terms) is a local criterion
 // and the most effective.

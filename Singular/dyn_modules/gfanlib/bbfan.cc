@@ -393,7 +393,7 @@ BOOLEAN isCompatible(leftv res, leftv args)
 BOOLEAN insertCone(leftv res, leftv args)
 {
   leftv u=args;
-  if ((u != NULL) && (u->rtyp==IDHDL) && (u->e==NULL) && (u->Typ() == fanID))
+  if ((u != NULL) && ((u->rtyp==IDHDL) || (u->rtyp==ALIAS_CMD)) && (u->e==NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
@@ -1093,34 +1093,34 @@ void bbfan_setup(SModulFunctions* p)
   b->blackbox_Assign=bbfan_Assign;
   b->blackbox_serialize=bbfan_serialize;
   b->blackbox_deserialize=bbfan_deserialize;
-  p->iiAddCproc("gfan.lib","emptyFan",FALSE,emptyFan);
-  p->iiAddCproc("gfan.lib","fullFan",FALSE,fullFan);
+  p->iiAddCproc("gfan.lib","emptyFanInternal",FALSE,emptyFan);
+  p->iiAddCproc("gfan.lib","fullFanInternal",FALSE,fullFan);
   /* the following functions are implemented in bbcone.cc */
-  // iiAddCproc("gfan.lib","containsInSupport",FALSE,containsInSupport);
-  // iiAddCproc("gfan.lib","getAmbientDimension",FALSE,getAmbientDimension);
-  // iiAddCproc("gfan.lib","getCodimension",FALSE,getDimension);
-  // iiAddCproc("gfan.lib","getDimension",FALSE,getDimension);
-  // iiAddCproc("gfan.lib","getLinealityDimension",FALSE,getLinealityDimension);
-  // iiAddCproc("gfan.lib","isSimplicial",FALSE,isSimplicial);
+  // iiAddCproc("gfan.lib","containsInSupportInternal",FALSE,containsInSupport);
+  // iiAddCproc("gfan.lib","getAmbientDimensionInternal",FALSE,getAmbientDimension);
+  // iiAddCproc("gfan.lib","getCodimensionInternal",FALSE,getDimension);
+  // iiAddCproc("gfan.lib","getDimensionInternal",FALSE,getDimension);
+  // iiAddCproc("gfan.lib","getLinealityDimensionInternal",FALSE,getLinealityDimension);
+  // iiAddCproc("gfan.lib","isSimplicialInternal",FALSE,isSimplicial);
   /********************************************************/
-  p->iiAddCproc("gfan.lib","isCompatible",FALSE,isCompatible);
-  p->iiAddCproc("gfan.lib","numberOfConesOfDimension",FALSE,numberOfConesOfDimension);
-  p->iiAddCproc("gfan.lib","ncones",FALSE,ncones);
-  p->iiAddCproc("gfan.lib","nmaxcones",FALSE,nmaxcones);
-  p->iiAddCproc("gfan.lib","insertCone",FALSE,insertCone);
-  p->iiAddCproc("gfan.lib","removeCone",FALSE,removeCone);
-  p->iiAddCproc("gfan.lib","getCone",FALSE,getCone);
-  p->iiAddCproc("gfan.lib","getCones",FALSE,getCones);
-  p->iiAddCproc("gfan.lib","isPure",FALSE,isPure);
-  p->iiAddCproc("gfan.lib","fanFromString",FALSE,fanFromString);
-  p->iiAddCproc("gfan.lib","fanViaCones",FALSE,fanViaCones);
-  p->iiAddCproc("gfan.lib","numberOfConesWithVector",FALSE,numberOfConesWithVector);
-  // iiAddCproc("gfan.lib","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
-  p->iiAddCproc("gfan.lib","fVector",FALSE,fVector);
-  p->iiAddCproc("gfan.lib","containsInCollection",FALSE,containsInCollection);
-  // p->iiAddCproc("gfan.lib","tropicalVariety",FALSE,tropicalVariety);
-  p->iiAddCproc("gfan.lib","commonRefinement",FALSE,commonRefinement);
-  // iiAddCproc("gfan.lib","grFan",FALSE,grFan);
+  p->iiAddCproc("gfan.lib","isCompatibleInternal",FALSE,isCompatible);
+  p->iiAddCproc("gfan.lib","numberOfConesOfDimensionInternal",FALSE,numberOfConesOfDimension);
+  p->iiAddCproc("gfan.lib","nconesInternal",FALSE,ncones);
+  p->iiAddCproc("gfan.lib","nmaxconesInternal",FALSE,nmaxcones);
+  p->iiAddCproc("gfan.lib","insertConeInternal",FALSE,insertCone);
+  p->iiAddCproc("gfan.lib","removeConeInternal",FALSE,removeCone);
+  p->iiAddCproc("gfan.lib","getConeInternal",FALSE,getCone);
+  p->iiAddCproc("gfan.lib","getConesInternal",FALSE,getCones);
+  p->iiAddCproc("gfan.lib","isPureInternal",FALSE,isPure);
+  p->iiAddCproc("gfan.lib","fanFromStringInternal",FALSE,fanFromString);
+  p->iiAddCproc("gfan.lib","fanViaConesInternal",FALSE,fanViaCones);
+  p->iiAddCproc("gfan.lib","numberOfConesWithVectorInternal",FALSE,numberOfConesWithVector);
+  // iiAddCproc("gfan.lib","isCompleteInternal",FALSE,isComplete);  not working as expected, should leave this to polymake
+  p->iiAddCproc("gfan.lib","fVectorInternal",FALSE,fVector);
+  p->iiAddCproc("gfan.lib","containsInCollectionInternal",FALSE,containsInCollection);
+  // p->iiAddCproc("gfan.lib","tropicalVarietyInternal",FALSE,tropicalVariety);
+  p->iiAddCproc("gfan.lib","commonRefinementInternal",FALSE,commonRefinement);
+  // iiAddCproc("gfan.lib","grFanInternal",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID);
 }

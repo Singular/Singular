@@ -358,8 +358,9 @@ set/get the rank of a module (see @ref{nrows})
 the coefficients of the polynomial ring are considered to be a ring
 @item withSB
 value of type ideal, resp.@: module, is std
-@item withHilb
-value of type intvec is hilb(_,1) (see @ref{hilb})
+@c unused
+@c @item withHilb
+@c value of type bigintvec is hilb(_,1) (see @ref{hilb})
 @item withRes
 value of type list is a free resolution
 @item withDim
@@ -2847,7 +2848,7 @@ See
 @*@code{hilb (} module_expression@code{,} int_expression @code{,} intvec_expression @code{)}
 @item @strong{Type:}
 none (if called with one argument)
-@*intvec (if called with two or three arguments)
+@*bigintvec (if called with two or three arguments)
 @item @strong{Purpose:}
 computes the (weighted) Hilbert series of the base ring R modulo the ideal, resp.@: R^k modulo the module,
 defined by the leading terms of the generators of the given ideal, resp.@: module.@*
@@ -2866,7 +2867,7 @@ but is used in the Hilbert driven standard basis computation (see @ref{stdhilb})
 intvec
 @item @strong{Purpose:}
 computes the second Hilbert series from the first, i.e.
-if @code{intvec v=hilb(I,1);} then @code{hilb(v)} yields the same result
+if @code{bigintvec v=hilb(I,1);} then @code{hilb(v)} yields the same result
 as @code{hilb(I,2)}.
 @item @strong{Syntax:}
 @code{hilb (} ideal_expression@code{,} ring@code{,} string_expression @code{)}
@@ -4482,6 +4483,7 @@ See
 @node minbase, minor, min, Functions
 @subsection minbase
 @cindex minbase
+@cindex minimal generating set
 @table @code
 @item @strong{Syntax:}
 @code{minbase (} ideal_expression @code{)}
@@ -5000,6 +5002,7 @@ See
 @node  mstd
 @subsection mstd
 @cindex mstd
+@cindex minimal generating set
 @table @code
 @item @strong{Syntax:}
 @code{mstd (} ideal_expression @code{)}
@@ -7639,7 +7642,7 @@ For Letterplace rings, a twosided Groebner basis is computed.
 A standard basis is a set of generators such that
 the leading terms generate the leading ideal, resp.@: module.
 @*Use an optional
-second argument of type intvec as Hilbert series
+second argument of type bigintvec as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal, resp.@: module, is homogeneous
 (Hilbert driven standard basis computation, @ref{stdhilb}).

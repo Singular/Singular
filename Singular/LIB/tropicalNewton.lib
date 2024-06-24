@@ -40,6 +40,7 @@ PROCEDURES:
 ///////////////////////////////////////////////////////////////////////////////
 
 LIB "gfan.lib";
+LIB "tropical.lib";
 LIB "triang.lib";
 LIB "linalg.lib";
 LIB "ring.lib";
@@ -1125,5 +1126,3 @@ example
 
 //   return (I);
 // }
-
-

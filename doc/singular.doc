@@ -1186,6 +1186,7 @@ see @ref{Libraries}.
 Comments should be send to the author of the library directly.
 
 @menu
+* arnold_lib:: Classification of isolated singularities with a nondegenerate Newton Boundary
 * autgradalg_lib:: automorphism groups of pointedly graded algebras and of Mori dream spaces
 * difform_lib:: Procedures for differential forms
 * enumpoints_lib:: enumerating rational points
@@ -1205,14 +1206,20 @@ Comments should be send to the author of the library directly.
 * rwalk_lib:: Groebner Walk Conversion
 * sagbigrob_lib:: Sagbi-Groebner basis of an ideal of a subalgebra
 * sagbiNormaliz_lib:: computation of Sagbi bases via normaliz
+* ssi_lib:: Wrapper for handling SSI files
 * stanleyreisner_lib:: T1 and T2 for a general Stanley-Reiser ring
 * stdmodule_lib:: Compute Standard Bases of submodule of free module over polynomial subalgebra
 * swalk_lib:: Sagbi Walk Conversion Algorithm
 * systhreads_lib:: multi-threaded objects
 * tateProdCplxNegGrad_lib:: sheaf cohomology on product of projective spaces
+* transformation_lib:: image of a transformation given up to a specified degree
 * tropicalEllipticCovers_lib:: Gromov-Witten numbers of tropical elliptic curves and their covers
 * VecField_lib:: vector fields
 @end menu
+@c ----------------------------------------------------------
+@node arnold_lib
+@subsection arnold_lib
+@c lib arnold.lib
 @c ----------------------------------------------------------
 @node autgradalg_lib
 @subsection autgradalg_lib
@@ -1309,6 +1316,10 @@ Todos/Issues:
 @subsection sagbiNormaliz_lib
 @c lib sagbiNormaliz.lib tag:normaliz
 @c ----------------------------------------------------------
+@node ssi_lib
+@subsection ssi_lib
+@c lib ssi.lib
+@c ----------------------------------------------------------
 @node stanleyreisner_lib
 @subsection stanleyreisner_lib
 @c lib stanleyreisner.lib
@@ -1328,6 +1339,10 @@ Todos/Issues:
 @node tateProdCplxNegGrad_lib
 @subsection tateProdCplxNegGrad_lib
 @c lib tateProdCplxNegGrad.lib tag:sing4ti2
+@c ---------------------------------------------------------
+@node transformation_lib
+@subsection transformation_lib
+@c lib transformation.lib
 @c ---------------------------------------------------------
 @node tropicalEllipticCovers_lib
 @subsection tropicalEllipticCovers_lib

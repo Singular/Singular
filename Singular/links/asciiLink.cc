@@ -30,10 +30,12 @@ static BOOLEAN CollectLibs(char *name, char ***list_of_libs);
 //static BOOLEAN DumpLibs(FILE *fd, char ***list_of_libs);
 
 EXTERN_VAR si_link_extension si_link_root;
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 
 /* =============== ASCII ============================================= */
 static BOOLEAN slOpenAscii(si_link l, short flag, leftv /*h*/)
 {
+  if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
   const char *mode;
   if (flag & SI_LINK_OPEN)
   {

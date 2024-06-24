@@ -687,8 +687,8 @@
 // operation: fres (ideal, int, string)  ->  resolution, only commutative rings, field coeffs
 // operation: fres (module, int, string)  ->  resolution, only commutative rings, field coeffs
 // operation: frwalk (ring, def, int)  ->  ideal requires currRing, only commutative rings
-// operation: hilb (ideal, int, intvec)  ->  intvec, domain coeffs
-// operation: hilb (module, int, intvec)  ->  intvec, domain coeffs
+// operation: hilb (ideal, int, intvec)  ->  bigintvec, domain coeffs
+// operation: hilb (module, int, intvec)  ->  bigintvec, domain coeffs
 // operation: hilb (ideal, ring, string)  ->  nothing, domain coeffs
 // operation: hilb (module, ring, string)  ->  nothing, domain coeffs
 // operation: homog (poly, poly, intvec)  ->  poly

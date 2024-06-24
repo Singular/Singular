@@ -20,6 +20,8 @@ typedef BOOLEAN (*s_poly_proc_t)(kStrategy strat);
   // only local: reduce even with bad ecart
 #define KSTD_NF_NONORM 4
   // only global: avoid normalization, return a multiply of NF
+#define KSTD_NF_NOLF   8
+  // avoid PrintLn with OPT_PROT
 
 poly kNF1(ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);

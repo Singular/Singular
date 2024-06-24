@@ -457,6 +457,7 @@ void rDelete(ring r)
   if( r->ref > 0 ) // ->ref means the number of Interpreter objects referring to the ring...
     return;
 
+  if (r->ppNoether!=NULL) p_Delete(&(r->ppNoether),r);
   if( r->qideal != NULL )
   {
     ideal q = r->qideal;
@@ -3430,8 +3431,6 @@ static void rCheckOrdSgn(ring r,int i/*last block*/);
 
 void p_SetGlobals(const ring r, BOOLEAN complete)
 {
-// // //  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r); // ???
-
   r->pLexOrder=r->LexOrder;
   if (complete)
   {

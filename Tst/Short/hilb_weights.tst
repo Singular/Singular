@@ -11,7 +11,7 @@ option(prot);
 ideal j = subst(i,t, t^11);
 j=subst(j,x,x23);
 ideal std_j = std(j);
-intvec v_j = hilb(std_j, 1, w);
+bigintvec v_j = hilb(std_j, 1, w);
 ideal k=std(j,v_j,w);
 
 matrix(k) == matrix(std_j);

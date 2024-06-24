@@ -25,7 +25,7 @@ Springer Science and Business Media, 2012
 [Hem17] Eva Maria Hemmerling: Algorithmic Arnol'd Classification in SINGULAR,
 Master Thesis, TU Kaiserslautern, 2017.
 
-SEE ALSO:  classify_lib, realclassify_lib
+SEE ALSO:  classify_lib, realclassify_lib, arnold_lib
 
 KEYWORDS: singularities; Arnol'd; classification; Milnor code
 

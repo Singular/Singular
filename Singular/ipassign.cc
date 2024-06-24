@@ -68,7 +68,7 @@ static BOOLEAN jjCOLMAX(leftv, leftv a)
 static BOOLEAN jjTIMER(leftv, leftv a)
 {
   timerv=(int)((long)(a->Data()));
-  initTimer();
+  startTimer();
   return FALSE;
 }
 #ifdef HAVE_GETTIMEOFDAY

@@ -58,12 +58,12 @@ void blackbox_default_Print(blackbox *b,void *d)
   PrintS(s);
   omFree(s);
 }
-void *blackbox_default_Init(blackbox */*b*/)
+void *blackbox_default_Init(blackbox* /*b*/)
 {
   return NULL;
 }
 
-BOOLEAN blackbox_default_serialize(blackbox */*b*/, void */*d*/, si_link /*f*/)
+BOOLEAN blackbox_default_serialize(blackbox* /*b*/, void* /*d*/, si_link /*f*/)
 {
   WerrorS("blackbox_serialize is not implemented");
   return TRUE;
@@ -238,7 +238,7 @@ void printBlackboxTypes()
   for(int i=blackboxTableCnt-1;i>=0;i--)
   {
     if (blackboxName[i]!=NULL)
-       Print("type %d: %s\n",i,blackboxName[i]);
+       Print("type %d: %s\n",i+BLACKBOX_OFFSET,blackboxName[i]);
   }
 }
 

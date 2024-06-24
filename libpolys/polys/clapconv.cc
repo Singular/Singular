@@ -54,7 +54,7 @@ poly convFactoryPSingP ( const CanonicalForm & f, const ring r )
 static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r )
 {
   // assume f!=0
-  if ( ! f.inCoeffDomain() )
+  if (LIKELY(! f.inCoeffDomain()))
   {
     int l = f.level();
     for ( CFIterator i = f; i.hasTerms(); i++ )
@@ -66,10 +66,11 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
   }
   else
   {
-    number n=r->cf->convFactoryNSingN(f, r->cf);
-    if ( n_IsZero(n, r->cf) )
+    coeffs cf=r->cf;
+    number n=cf->convFactoryNSingN(f, cf);
+    if (UNLIKELY( n_IsZero(n, cf) ))
     {
-      n_Delete(&n,r->cf);
+      n_Delete(&n,cf);
     }
     else
     {
@@ -117,14 +118,15 @@ static CanonicalForm convSingPFactoryP_intern( poly p, int l, BOOLEAN & setChar,
   }
   BOOLEAN setChar_loc=setChar;
   setChar=FALSE;
+  coeffs cf=r->cf;
   while ( p!=NULL )
   {
-    CanonicalForm term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar_loc, r->cf);
+    CanonicalForm term=cf->convSingNFactoryN(pGetCoeff( p ),setChar_loc, cf);
     if (errorreported) break;
     setChar_loc=FALSE;
     for ( int i = 1; i <=n; i++ )
     {
-      if ( (e = p_GetExp( p, i, r)) != 0 )
+      if (LIKELY( (e = p_GetExp( p, i, r)) != 0 ))
         term *= CanonicalForm( Variable( i ), e );
     }
     result += term;
@@ -135,8 +137,29 @@ static CanonicalForm convSingPFactoryP_intern( poly p, int l, BOOLEAN & setChar,
 
 CanonicalForm convSingPFactoryP( poly p, const ring r )
 {
-  BOOLEAN setChar=TRUE;
-  return convSingPFactoryP_intern(p,pLength(p),setChar,r);
+  if (rVar(r)>1)
+  {
+    BOOLEAN setChar=TRUE;
+    return convSingPFactoryP_intern(p,pLength(p),setChar,r);
+  }
+  else
+  {
+    CanonicalForm result = 0;
+    BOOLEAN setChar=TRUE;
+    coeffs cf=r->cf;
+    int e;
+    while ( p!=NULL )
+    {
+      CanonicalForm term=cf->convSingNFactoryN(pGetCoeff( p ),setChar, cf);
+      if (errorreported) break;
+      setChar=FALSE;
+      if (LIKELY( (e = p_GetExp( p, 1, r)) != 0 ))
+        term *= CanonicalForm( Variable( 1 ), e );
+      result += term;
+      pIter( p );
+    }
+    return result;
+  }
 }
 
 int convFactoryISingI( const CanonicalForm & f)

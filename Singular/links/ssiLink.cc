@@ -49,6 +49,7 @@
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
 
+
 #define SSI_VERSION 15
 // 5->6: changed newstruct representation
 // 6->7: attributes
@@ -61,6 +62,7 @@
 // 13->14: ring references
 // 14->15: bigintvec, prune_map, mres_map
 
+EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 VAR link_list ssiToBeClosed=NULL;
 VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
@@ -906,8 +908,9 @@ static bigintmat* ssiReadBigintvec(const ssiInfo *d)
 static void ssiReadBlackbox(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  int throwaway=s_readint(d->f_read);
-  char *name=ssiReadString(d);
+  leftv lv=ssiRead1(l);
+  char *name=(char*)lv->data;
+  omFreeBin(lv,sleftv_bin);
   int tok;
   blackboxIsCmd(name,tok);
   if (tok>MAX_TOK)
@@ -1358,6 +1361,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       else
       {
         // normal link to a file
+        if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
         FILE *outfile;
         char *filename=l->name;
 
@@ -1532,20 +1536,25 @@ leftv ssiRead1(si_link l)
   {
     case 1:res->rtyp=INT_CMD;
            res->data=(char *)(long)ssiReadInt(d->f_read);
+           //Print("int: %d\n",(int)(long)res->data);
            break;
     case 2:res->rtyp=STRING_CMD;
            res->data=(char *)ssiReadString(d);
+           //Print("str: %s\n",(char*)res->data);
            break;
     case 3:res->rtyp=NUMBER_CMD;
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char *)ssiReadNumber(d);
+           //Print("number\n");
            break;
     case 4:res->rtyp=BIGINT_CMD;
            res->data=(char *)ssiReadBigInt(d);
+           //Print("bigint\n");
            break;
     case 15:
     case 5:{
+           //Print("ring %d\n",t);
              d->r=ssiReadRing(d);
              if (errorreported) return NULL;
              res->data=(char*)d->r;
@@ -1560,21 +1569,25 @@ leftv ssiRead1(si_link l)
            }
            break;
     case 6:res->rtyp=POLY_CMD;
+           //Print("poly\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
            break;
     case 7:res->rtyp=IDEAL_CMD;
+           //Print("ideal\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadIdeal(d);
            break;
     case 8:res->rtyp=MATRIX_CMD;
+           //Print("matrix\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadMatrix(d);
            break;
     case 9:res->rtyp=VECTOR_CMD;
+           //Print("vector\n");
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            res->data=(char*)ssiReadPoly(d);
@@ -1582,6 +1595,7 @@ leftv ssiRead1(si_link l)
     case 10:
     case 22:if (t==22) res->rtyp=SMATRIX_CMD;
            else        res->rtyp=MODUL_CMD;
+           //Print("module/smatrix %d\n",t);
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
            {
@@ -1593,6 +1607,7 @@ leftv ssiRead1(si_link l)
            break;
     case 11:
            {
+           //Print("cmd\n",t);
              res->rtyp=COMMAND;
              res->data=ssiReadCommand(l);
              int nok=res->Eval();
@@ -1601,6 +1616,7 @@ leftv ssiRead1(si_link l)
            }
     case 12: /*DEF_CMD*/
            {
+           //Print("def\n",t);
              res->rtyp=0;
              res->name=(char *)ssiReadString(d);
              int nok=res->Eval();
@@ -1793,11 +1809,13 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         }
                         if(tt==IDEAL_CMD)       fputs("7 ",d->f_write);
                         else if(tt==MATRIX_CMD) fputs("8 ",d->f_write);
-                        else if(tt==SMATRIX_CMD) fputs("22 ",d->f_write);
-                        else /* tt==MODUL_CMD*/
+                        else /* tt==MODUL_CMD, SMATRIX_CMD*/
                         {
                           ideal M=(ideal)dd;
-                          fprintf(d->f_write,"10 %d ",(int)M->rank);
+                          if (tt==MODUL_CMD)
+                            fprintf(d->f_write,"10 %d ",(int)M->rank);
+                          else /*(tt==SMATRIX_CMD)*/
+                            fprintf(d->f_write,"22 %d ",(int)M->rank);
                         }
                         ssiWriteIdeal(d,tt,(ideal)dd);
                         break;
@@ -2496,7 +2514,7 @@ BOOLEAN ssiGetDump(si_link l)
 // 17 intvec <len> ...
 // 18 intmat
 // 19 bigintmat <r> <c> ...
-// 20 blackbox <name> 1 <len> ...
+// 20 blackbox <name> <len> ...
 // 21 attrib <bit-attrib> <len> <a-name1> <val1>... <data>
 // 22 smatrix
 // 23 0 <log(bitmask)> ring properties: max.exp.

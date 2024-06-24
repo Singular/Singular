@@ -59,7 +59,7 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
     // To test criterion M, we then only have to consider lists whose support
     // is a subset of the union of (first_iter.get_element()).head_support and
     // (second_iter.get_element()).head_support. As only elements before
-    // second_iter.get_element() are tested, we can stop iteraton as soon as
+    // second_iter.get_element() are tested, we can stop iteration as soon as
     // we reach this element.
 
     int supp2=bin2.head_support%Number_of_Lists;

@@ -486,7 +486,7 @@ public:
   }
 
 
-  // Requst a job from another thread. The return value is NULL if all
+  // Request a job from another thread. The return value is NULL if all
   // jobs are done.
   Job*  getJob( void )
   {

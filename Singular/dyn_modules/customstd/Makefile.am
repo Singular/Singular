@@ -13,7 +13,7 @@ if SI_BUILTIN_CUSTOMSTD
   P_PROCS_MODULE_LDFLAGS  = -module
 else
   module_LTLIBRARIES=customstd.la
-  moduledir = $(libexecdir)/singular/MOD
+  moduledir = $(libdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
   P_PROCS_MODULE_LDFLAGS =  -module -export-dynamic -avoid-version
 endif

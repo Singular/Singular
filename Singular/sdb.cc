@@ -143,7 +143,7 @@ void sdb_edit(procinfo *pi)
       }
     }
 
-    size_t res=write(f,pi->data.s.body,strlen(pi->data.s.body));
+    ssize_t res=write(f,pi->data.s.body,strlen(pi->data.s.body));
     si_close(f);
     if (res==-1)
     {

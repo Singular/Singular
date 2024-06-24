@@ -1,0 +1,3835 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version arnold.lib 4.4.0.3 Jun_2024 "; // $Id$
+category="Commutative Algebra";
+info="
+LIBRARY: arnold.lib   Classification of isolated singularities with a nondegenerate Newton Boundary
+AUTHORS:               Janko Boehm,      email: boehm@mathematik.uni-kl.de
+                       Magdaleen Marais, email: msmarais@sun.ac.za
+                       Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
+
+OVERVIEW:
+
+We classify isolated singularities at 0 which is equivalent to a nondegenerate Newton boundary of corank <=2 with respect to right- and stable equivalence. We do this by @* 
+giving a unique normal form corresponding to a normalized nondegenerate Newton boundary. We furthermore determine the normal form equation, that is a polynomial in the @*
+given normal form family of the input polynomial. In addition we determine the Milnor number, modality, delta invariant and the number of branches of an input polynomial @* 
+that is equivalent to a germ with a nondegenerate Newton boundary in a new alternative efficient way, as well as, a regular basis of a germ with a nondegenerate @*
+Newton boundary.@*
+
+
+V.I. Arnold has listed normal forms for all isolated hypersurface singularities over the complex numbers with, in particular, either modality <=2 or Milnor number <=16. @*
+Moreover, he has described an algorithmic classifier, which determines the type of a given such singularity. @*
+This library extends Arnold's work to a large class of singularities which is unbounded with regard to modality and Milnor number. It implements an algorithmic @*
+classifier, which determines a normal form, as well as a normal form equation, for any corank <=2 singularity which is equivalent to a germ with non-degenerate Newton @*
+boundary in the sense of Kouchnirenko.@*
+
+
+The implementation is based on the papers:
+
+Janko Boehm, Magdaleen Marais, Gerhard Pfister: Classification of Complex Singularities with Non-Degenerate Newton Boundary,@* 
+https://doi.org/10.48550/arXiv.2010.10185
+
+Janko Boehm, Magdaleen Marais, Gerhard Pfister: Moduli Parameters of Complex Singularities with Non-Degenerate Newton Boundary,@* 
+https://doi.org/10.48550/arXiv.2402.05093
+
+General assumption: the input polynomial is given in a ring with ordering ds;
+
+Acknowledgements: This research was supported by the Rubbi fund of the Department of Mathematical Sciences of Stellenbosch University, DFG SPP 1489,@* 
+DFG TRR 195 (Project B5). 
+
+KEYWORDS:
+singularities; classification; modality; delta invariant; determinacy bound; milnor number; normal form; normal form equation
+
+SEE ALSO: realclassify_lib, classify_lib, classify2_lib, arnoldclassify_lib
+
+PROCEDURES:
+poshull(L); determine the convex hull of a list of monomials in mon[x,y]
+facetsAsCones(c); return the facets of a cone
+monomials(f); determine the set of monomials of a polynomial
+coeff(f,m); determine the coefficient of a given monomial of a polynomial
+newtonPolygon(poly f); determine the Newton polygon of the points corresponding to the monomials of a polynomial
+verticesOfNP(NP); determine the vertices of a Newton polygon
+termsOnPolygon(f1,NP); determine the sum of the terms of a given polynomial of which the corresponding points lie on its corresponding Newton polygon
+latticePoints(NP); determine all the points that lie on a given Newton polygon
+latticeToMonomials(L); determine the corresponding monomials of a list of points
+terms(f); determine the terms of a given polynomial
+piecewiseWeightOfPolygon(NP); determine the piecewise weight defined by a given Newton polygon
+piecewiseOrd(f,w); determine the piecewise order of a given polynomial with regard to a given piecewise weight
+piecewisedegree(f,w); determine the piecewise degree of a given polynomial with regard to a given piecewise weight
+piecewiseJet(f,w,d); determine the piecewise jet of a given polynomial of a given degree, with regard to a given piecewise weight
+regularBasis(F,n); determine a regular basis for a polynomial with respect to the piecewise weight defined by its Newton polygon
+determineNormalForm(F); determine a normal form, modality, milnor number, delta invariant, number of branches, determinacy bound and corank @*
+of a given polynomial, if possible
+determineNormalFormEquation(N); determine a normalform equation of a polynomial in the give normalform
+nondegeneratePart(N); determine the nondegenrate part of a singularity
+germWithNNB(N); determine a germ with a nondegenrate Newton boundary that is equivalent to a given polynomial, if possible
+germWithNormalizedNNB(N); determine a germ with a nondegenerate normalized Newton boundary, up to scalar multiplication of each of its variables,@* 
+of a given polynomial, if possibles
+modalityNNB(f); determine the modality of the singularity defined by a polynomial,if the polynomial is right equivalent to a germ with @*
+a nondegenerate Newton boundary
+milnorNNB(f); determine the Milnor number of a polynomial that is equivalent to a germ with a nondegenerate Newton boundary
+determinacyBound(f); determine an upper bound for the determinacy of a polynomial
+deltaNNB(f); determine the Delta invariant and number of branches of a polynomial that is right equivalent to a germ @*
+with a nondegenerate Newton boundary
+moduliMonomials(N); give the monomials corresponding to the moduli terms in a given normal form
+newtonNumber(F); determine the Newton number of a polynomial in Q[x,y]
+transformationsBeforeSplit(N); the transformations (and in some cases their inverses) that was transformed on a given polynomial to write it as a direct sum @*
+of its degenerate and nondegenerate parts, given up to filtration d, where d is a determinacy bound for the given polynomial
+transformationsAfterSplit(N); the transformations (and in some cases their inverses) that was transformed on the degenerate part of a given polynomial @*
+was splitted off to transform it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), @*
+is given up to filtration d, where d is a determinacy bound for the polynomial, if possible
+";
+
+LIB "gfanlib.so";
+LIB "polyclass.lib";
+LIB "absfact.lib";
+LIB "primdec.lib";
+LIB "realclassify.lib";
+LIB "zeroset.lib";
+LIB "elim.lib";
+LIB "hnoether.lib";
+LIB "arr.lib";
+LIB "presolve.lib";
+LIB "random.lib";
+LIB "general.lib";
+LIB "monomialideal.lib";
+LIB "parallel.lib";
+LIB "primitiv.lib";
+LIB "transformation.lib";
+
+static proc mod_init()
+{
+  newstruct("List","ring in,number newFromOld, list values");
+}
+
+
+proc poshull(list L)
+"USAGE: poshull(L); L list
+RETURN: the cone generated by the integer vectors in L
+EXAMPLE: example poshull, shows an example"
+{
+  intmat A[size(L)][size(L[1])]=L[1..size(L)];
+  return(coneViaPoints(A));
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ intvec v1 = 1,1;
+ intvec v2=1,2;
+ def c = poshull(list(v1,v2));
+ c;
+}
+
+static proc facetsAsCones(cone c)
+"USAGE: facetsAsCones(c); c cone
+RETURN: return the facets of c as lists where the first entry is the normal vector and the second entry is a list of generators of the cone
+EXAMPLE: example facetsAsCones, shows an example"
+{
+intmat R= intmat(rays(c));
+intmat Fc=intmat(facets(c));
+intmat M = intmat(facets(c)*transpose(R));
+  intmat r[1][ncols(R)];
+  int j;
+  int l=1;
+  list F;
+  for (int i=1;i<=nrows(M);i++)
+  {
+    list L;
+    l=1;
+    for (j=1;j<=ncols(M);j++)
+    {
+      if (M[i,j]==0)
+      {
+        r=R[j,1..ncols(R)];
+        L[l]=intvec(r);
+        l=l+1;
+      }
+    }
+  F[i]=list(intvec(Fc[i,1..ncols(Fc)]),L);kill L;
+}
+return(F);}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ intvec v1 = 1,1;
+ intvec v2=1,2;
+ def c = poshull(list(v1,v2));
+ facetsAsCones(c);
+}
+
+proc monomials(poly f)
+"USAGE: monomials(f); f poly
+RETURN: the set of monomials of f as a list
+EXAMPLE: example monomials, shows an example"
+{
+  list L;
+  poly m;
+  poly p = f;
+  int i = 1;
+  while (p<>0)
+  {
+    L[i]=leadmonom(p);
+    p=p-lead(p);
+    i=i+1;
+  }
+  return(L);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = 2*x^2+5*x*y+7*x^7;
+ monomials(f);
+}
+
+proc coeff(poly f, poly m)
+"USAGE: coeff(f,m); f poly, m poly
+RETURN: the coefficient of m in f
+EXAMPLE: example coeff, shows an example"
+{
+  poly p = f;
+  int i = 1;
+  while (p<>0)
+  {
+    if (m==leadmonom(p))
+    {
+      return(leadcoef(p));
+    }
+    p=p-lead(p);
+  }
+  return(0);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = 2*x^2+5*x*y+7*x^7;
+ poly m = x*y;
+ coeff(f,m);
+}
+
+proc newtonPolygon(poly f)
+"USAGE: newtonPolygon(f); poly f
+RETURN: a list with an entry for each of the finite facets of f; each entry consists out of a list with first entry the normal vector of the corresponding facet and second entry @*
+a list containing the coordinates of the vertices of the corresponding facet
+EXAMPLE: example newtonPolygon, shows an example"
+{
+  list M=monomials(f);
+  list E;
+  intvec v;
+  for (int i=1;i<=size(M);i++)
+  {
+    v=exponentvector(M[i]);
+    v[size(v)+1]=1;
+    E[i]=v;
+  }
+  E[size(M)+1]=intvec(1,0,0);
+  E[size(M)+2]=intvec(0,1,0);
+  cone c = poshull(E);
+  list F=facetsAsCones(c);
+  list F1;
+  list ry;
+  int r=1;
+  intvec nv;
+  intvec ry1,ry2;
+  list ryy;
+  list fi;
+  for (i=1;i<=size(F);i++)
+  {
+    ry=F[i][2];
+    nv=F[i][1];
+    nv=nv[1..2];
+    ry1=ry[1];ry1=ry1[1..2];
+    ry2=ry[2];ry2=ry2[1..2];
+    if (ry1[1]>ry2[1]) {ryy=list(ry2,ry1);} else {ryy=list(ry1,ry2);}
+    if ((ry[1][3]<>0) and (ry[2][3]<>0)){fi[r]=ryy[1][1];F1[r]=list(nv,ryy);r=r+1;}
+  }
+  intvec fii=sort(fi)[2];
+  list F2;
+  int j;
+  for (i=1;i<=size(fii);i++)
+  {
+    F2[i]=F1[fii[i]];
+  }
+  return(F2);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8;
+ newtonPolygon(f);
+}
+
+proc verticesOfNP(list NP)
+"USAGE: verticesOfNP(NP); NP list as given by @ref(newtonPolygon)
+RETURN: the vertices of the Newton polygon NP as a list
+EXAMPLE: example verticesOfNP, shows an example"
+{
+  list L;
+  int j,jj;
+  intvec co;
+  L[1]=NP[1][2][1];
+  for (j=1;j<=size(NP);j++)
+  {
+    L[j+1]=NP[j][2][2];
+  }
+  return(L);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=(0),(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8;
+ list NP = newtonPolygon(f);
+ verticesOfNP(NP);
+}
+
+proc termsOnPolygon(poly f1,list NP)
+"USAGE: termsOnPolygon(f, NP); poly f, NP list as given by @ref(newtonPolygon)
+RETURN: the sum of the terms of f on the Newton polygon NP
+EXAMPLE: example termsOnPolygon, shows an example"
+{
+  list HB=latticePoints(NP);
+  poly g;
+  for (int j=1;j<=size(HB);j++)
+  {
+    g=g+coeff(f1,x^HB[j][1]*y^HB[j][2])*x^HB[j][1]*y^HB[j][2];
+  }
+  return(g);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ list NP = newtonPolygon(f);
+ termsOnPolygon(f,NP);
+}
+
+proc latticePoints(list NP)
+"USAGE: latticePoints(NP); NP list as given by @ref(newtonPolygon)
+RETURN: a list of all the points lying on NP
+EXAMPLE: example latticePoints, shows an example"
+{
+  int maxx,maxy;
+  for (int i=1;i<=size(NP);i++)
+  {
+    if (NP[i][2][1][1]>maxx) {maxx=NP[i][2][1][1];}
+    if (NP[i][2][2][1]>maxx) {maxx=NP[i][2][2][1];}
+    if (NP[i][2][1][2]>maxy) {maxy=NP[i][2][1][2];}
+    if (NP[i][2][2][2]>maxy) {maxy=NP[i][2][2][2];}
+  }
+  int x,y;
+  list LP;
+  for (x=0;x<=maxx;x++)
+  {
+    for (y=0;y<=maxy;y++)
+    {
+       if (isOnPolygon(intvec(x,y),NP)){LP[size(LP)+1]=intvec(x,y);}
+    }
+  }
+  return(LP);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ list NP = newtonPolygon(f);
+ latticePoints(NP);
+}
+
+proc latticeToMonomials(list L)
+"USAGE: latticeToMonomials(L); a list L of points in N^2
+RETURN: a list of monomials corresponding to the points in L
+EXAMPLE: example latticeToMonomials, shows an example"
+{
+  list M;
+  for (int i=1;i<=size(L);i++)
+  {
+    M[size(M)+1]=var(1)^(L[i][1])*var(2)^(L[i][2]);
+  }
+  return(M);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ list NP = newtonPolygon(f);
+ list L =latticePoints(NP);
+ latticeToMonomials(L);
+}
+
+proc terms(poly f)
+"USAGE: terms(f); poly f
+RETURN: a list of the terms of f
+EXAMPLE: example terms, shows an example"
+{
+  list L;
+  poly m;
+  poly p = f;
+  int i = 1;
+  while (p<>0)
+  {
+    L[i]=lead(p);
+    p=p-lead(p);
+    i=i+1;
+  }
+  return(L);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = 2*x^9+5*x^2*y^4+10*y^2*x^4+11*y^8+x^3*y^5+21*y^2*x^5;
+ terms(f);
+}
+
+proc piecewiseWeightOfPolygon(list NP)
+"USAGE: piecewiseWeightOfPolygon(NP); a list NP as given by @ref(newtonPolygon)
+RETURN:  the piecewiseweight defined by the Newton polygon NP
+EXAMPLE: example piecewiseWeightOfPolygon, shows an example"
+{
+  if (size(NP)==1){return(list(NP[1][1]));}
+  list w;
+  list l;
+  intvec vt = setintersection(NP[1][2],NP[2][2])[1];
+  int d1=weighteddeg(var(1)^vt[1]*var(2)^vt[2],NP[1][1]);
+  int d2=weighteddeg(var(1)^vt[1]*var(2)^vt[2],NP[2][1]);
+  int c1 = lcm(d1,d2) div d1;
+  int c2 = lcm(d1,d2) div d2;
+  NP[1][1]=c1*NP[1][1];
+  NP[2][1]=c2*NP[2][1];
+  w =NP[1][1],NP[2][1];
+  for (int i=3;i<=size(NP);i++)
+  {
+    vt = setintersection(NP[i-1][2],NP[i][2])[1];
+    int d1=weighteddeg(var(1)^vt[1]*var(2)^vt[2],NP[i-1][1]);
+    int d2=weighteddeg(var(1)^vt[1]*var(2)^vt[2],NP[i][1]);
+    int c1 = lcm(d1,d2) div d1;
+    int c2 = lcm(d1,d2) div d2;
+    for (int j =1;j<=i-1;j++)
+    {
+      NP[j][1]=c1*NP[j][1];
+    }
+    NP[i][1]=c2*NP[i][1];
+    w=l;
+    for(int k=1;k<=i;k++)
+    {
+      w[size(w)+1]=NP[k][1];
+    }
+  }
+  return(w);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ list NP = newtonPolygon(f);
+ piecewiseWeightOfPolygon(NP);
+}
+
+proc piecewiseOrd(poly f, list w)
+"USAGE: piecewiseOrd(f,w); f poly, w a piecewise weight given by a list, which can be computed using @ref(piecewiseWeightOfPolygon)
+RETURN:  the piecewiseOrd with regard to the weight w of f
+EXAMPLE: example piecewiseOrd, shows an example"
+{
+  list Mon = monomials(f);
+  if(size(Mon)==0){return(-1);}
+  int d = piecewisedegree(Mon[1],w);
+  int d0;
+  for(int i=2;i<=size(Mon);i++)
+  {
+     d0 = piecewisedegree(Mon[i],w);
+     if(d0<d){d=d0;}
+  }
+  return(d);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ list NP = newtonPolygon(f);
+ list w = piecewiseWeightOfPolygon(NP);
+ piecewiseOrd(f,w);
+}
+
+proc piecewisedegree(poly f, list pw)
+"USAGE: piecewisedegree(f,w); f poly, w a piecewise weight given by a list, which can be computed using @ref(piecewiseWeightOfPolygon)
+RETURN:  the piecewise degree of f, with regard to the weight w
+EXAMPLE: example piecewisedegree, shows an example"
+{
+list mon = monomials(f);
+int d3=0;
+for(int i=1;i<=size(mon);i++)
+{
+  int d1=weighteddeg(mon[i],pw[1]);
+  int d2;
+  for (int j=2;j<=size(pw);j++){
+   d2=weighteddeg(mon[i],pw[j]);
+   if(d2<d1){d1=d2;}
+   }
+  if(d1>d3){d3=d1;}
+}
+return(d3);}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ list NP = newtonPolygon(f);
+ list w = piecewiseWeightOfPolygon(NP);
+ piecewisedegree(f,w);
+}
+
+proc piecewiseJet(poly f, list pw, int d)
+"USAGE: piecewiseJet(f,w,d); f poly, w a piecewise weight given by a list, which can be computed using @ref(piecewiseWeightOfPolygon), d int
+RETURN:  the piecewise d-jet of f, with regard to the weight w
+EXAMPLE: example piecewiseJet, shows an example"
+{
+if (f==0){return(f);}
+poly ff=0;
+poly g(0)=0;
+for(int i=1;i<=size(pw);i++)
+{
+  poly g(i)= jet(f,d,pw[i]);
+  ff=ff+g(i)-jet(g(i-1),d,pw[i]);
+}
+return(ff);}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ list NP = newtonPolygon(f);
+ list w = piecewiseWeightOfPolygon(NP);
+ int d =piecewiseOrd(f,w);
+ piecewiseJet(f,w,d);
+}
+
+proc determineNormalForm(Poly F)
+"USAGE: determineNormalForm(F); F poly
+RETURN: if F.value is right equivalent to a germ with a nondegenerate Newton boundary an N of type NormalForm with fields:@*
+        N.inputRing: the ring F.in@*
+        @*
+        N.numbervars: the embedding dimension (given as type int)@*
+        @*
+        N.normalForm: a normal form of F.value (given as type Poly)@*
+        @*
+        N.singularityType: the corner points of the Newton boundary of the normal form of F.value, which classifies the singularity type (given as type string)@*
+        @*
+        N.parameters: the monomials corresponding to the moduli terms in N.normalForm (given as a list with entries of type poly)@*
+        @*
+        N.corank: the corank of the singularity defined by F.value (given as type int)@*
+        @*
+        N.modality: the modality of the singularity defined by F.value (given as type int)@*
+        @*
+        N.milnorNumber: the Milnor number of F.value (given as type int)@*
+        @*
+        N.delta: the Delta invariant of F.value (given as type int)@*
+        @*
+        N.numberOfBranches: the number of branches of F.value (given as type int)@*
+        @*
+        N.determinacy: a determinacy bound for F.value (given as type int)@*
+        @*
+        N.nondegeneratePart: the nondegenerate part of the normal form of F.value (given as type Poly)@*
+        @*
+        N.nonNormalizedNNBGerm: a polynomial that is stable equivalent to F.value with a nondegenerate Newton boundary @*
+        (that is not necessarily normalized, given as type Poly)@*
+        @*
+        N.normalizedNNBGerm: a polynomial that is stable equivalent to F.value with a normalized nondegenerate Newton boundary up to scalar multiplication @*
+        of each of its variables (given as type Poly)@*
+        @*
+        N.phiBeforeMorseSplit: the transformations (and in some cases their inverses) of the transformations that was transformed on F.value to write F.value @*
+        as a direct sum of its degenerate and nondegenerate parts, given up to filtration d, where d is a determinacy bound for F.value @*
+        (given as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))@*
+        @*
+        N.phi: the transformations (and in some cases their inverses) of the transformations that was transformed on the degenerate part of F.value to transform @*
+        it to a germ with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given),@* 
+        is given up to filtration d, where d is a determinacy bound for F.value (given as type RightEquivalenceChainWithPrecision as @* 
+        defined in @ref(polyclass.lib)),@*
+
+an ERROR message otherwise
+EXAMPLE: example determineNormalForm, shows an example"
+{
+  def R = basering;
+  RightEquivalenceChainWithPrecision Tr;
+  RightEquivalenceChainWithPrecision TrMorse;
+  NormalForm N;
+  poly ff=0;
+  Poly FF = makePoly(ff);
+  N.normalizedNNBGerm =FF;
+  poly h1=0;
+  Poly H1 = makePoly(h1);
+  N.extension1 = H1;
+  poly h2=0;
+  Poly H2 = makePoly(h2);
+  N.extension2 = H2;
+  N.inputRing =F.in;
+  N.numbervars = nvars(F.in);
+  list L;
+  Tr.sourcegerm = F;
+  Tr.targetgerm = F;
+  L = classifyNB(Tr,1,0);
+  if(L[1]==-1){ERROR("The input polynomial is degenerate, that is, has infinite milnornumber.");return(N);}
+  N.milnorNumber = L[1];
+  Tr = L[2];
+  if(L[6]==1)
+  {
+    Poly P =Tr.targetgerm;
+    def S = P.in;
+    setring S;
+    N.nonNormalizedNNBGerm=P;
+    poly f = P.value;
+    list NP = newtonPolygon(f);
+    list V =latticePoints(NP);
+    list Vm = latticeToMonomials(V);
+    f=0;
+    int l1;
+    int l2;
+    for (int i = 1;i<=size(Vm);i++)
+    {
+      if(leadexp(Vm[i])[1]==1){l1=1;}
+      if(leadexp(Vm[i])[2]==1){l2=1;}
+      f = f+Vm[i];
+    }
+    if(l1==1)
+    {
+      poly fy = subst(f,var(1),0);
+      f=f-fy;
+      f =f+var(2)^(L[1]+1);
+    }
+    if(l2==1)
+    {
+      poly fx = subst(f,var(2),0);
+      f=f-fx;
+      f =f+var(1)^(L[1]+1);
+    }
+    Poly P = makePoly(f);
+  }
+  else
+  {
+    Poly P =Tr.targetgerm;
+    def S = P.in;
+    setring S;
+    if(L[3]<>0)
+    {
+      N.nonNormalizedNNBGerm=P;
+      N.normalizedNNBGerm = P;
+    }
+    else
+    {
+      Poly J = makePoly(0);
+      N.nonNormalizedNNBGerm=J;
+      N.normalizedNNBGerm = J;
+    }
+  }
+  TrMorse = L[5];
+  Poly H = L[4];
+  N.nondegeneratePart=H;
+  N.phiBeforeMorseSplit = TrMorse;
+  N.corank = L[3];
+  if(L[3]<>0 && L[3]<>1)
+  {
+   list RB = regularBasis(P,1);
+  }
+  else
+  {
+    list RB;
+  }
+  N.determinacy = Tr.precision;
+  if(L[3]<>0 && L[3]<>1)
+  {
+    list NB = newtonPolygon(P.value);
+    int n = size(NB);
+    int a = 0;
+    number b;
+    number c;
+    while(0==0)
+    {
+      b = number(NB[n-a][1][2])/number(NB[n-a][1][1]);
+      c = number(NB[a+1][1][1])/number(NB[a+1][1][2]);
+      if(b<c)
+      {
+        map phi = S,var(2),var(1);
+        poly p = P.value;
+        P.value = phi(p);
+        Tr.targetgerm=P;
+        NB = newtonPolygon(P.value);
+        break;
+      }
+     a=a+1;
+     if(a+1>=(n-a)){break;}
+    }
+     string s= "("+string(NB[1][2][1][1])+","+string(NB[1][2][1][2])+")";
+     for(int i=1;i<=n;i++)
+     {
+       s =s+",("+string(NB[i][2][2][1])+","+string(NB[i][2][2][2])+")";
+     }
+     N.singularityType=s;
+     list V =verticesOfNP(NB);
+     list M = latticeToMonomials(V);
+     ring K = (0,a(1..size(RB))),(var(1),var(2)),ds;
+     setring K;
+     poly f;
+     list M=fetch(S,M);
+     list RB = fetch(S,RB);
+     list SM = setminus(M,RB);
+     for(int i=1;i<=size(SM);i++)
+     {
+       f=f+SM[i];
+     }
+     for(i=1;i<=size(RB);i++)
+     {
+       f=f+a(i)*RB[i];
+     }
+     Poly F=makePoly(f);
+     N.normalForm=F;
+     setring R;
+  }
+  else
+  {
+    N.singularityType = "A["+string(L[1])+"]";
+    N.normalForm =P;
+    setring R;
+  }
+  if(L[3]<>0 && L[3]<>1)
+  {
+    list Q = deltaInvariant(P,L[1]);
+    N.delta = Q[1];
+    N.numberOfBranches = Q[2];
+  }
+  else
+  {
+    N.delta =  L[1];
+    N.numberOfBranches =1;
+  }
+  if(L[3]<>0 && L[3]<>1)
+  {
+    list RB = fetch(S,RB);
+  }
+  else
+  {
+    list RB;
+  }
+  N.modality=size(RB);
+  N.parameters = RB;
+  poly g=0;
+  Poly G = makePoly(g);
+  G.value = g;
+  N.normalFormEquation = G;
+  N.phi=Tr;
+  setring R;
+  return(N);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y,z),ds;
+ poly g = (x^2+y^2)^2+5*x^(10)+y^(11)+z^2;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ poly phiz = z+2x+x^2+y^4*x;
+ map phi = R,phix,phiy,phiz;
+ g = phi(g);
+ Poly F = makePoly(g);
+ determineNormalForm(F);
+}
+
+proc nondegeneratePart(NormalForm N)
+"USAGE: nondegeneratePart(N); N NormalForm as given by @ref(determineNormalForm)
+RETURN:  the nondegenerate part, returned as type Poly, of the singularity defined by N.phi.sourcegerm.value
+EXAMPLE: example nondegeneratePart, shows an example"
+{
+  return(N.nondegeneratePart);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y,z),ds;
+ poly g = (x^2+y^2)^2+5*x^(10)+y^(11)+z^2;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ poly phiz = z+2x+x^2+y^4*x;
+ map phi = R,phix,phiy,phiz;
+ g = phi(g);
+ Poly F = makePoly(g);
+ NormalForm N = determineNormalForm(F);
+ nondegeneratePart(N);
+}
+
+proc germWithNNB(NormalForm N)
+"USAGE: germWithNNB(N); N NormalForm as given by @ref(determineNormalForm)
+RETURN:  a germ with a nondegenerate Newton boundary, returned as type Poly, that is stable equivalent to N.phi.sourcegerm.value, if possible, or an ERROR message otherwise
+EXAMPLE: example germWithNNB, shows an example"
+{
+    return(N.nonNormalizedNNBGerm);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y),ds;
+ poly g = (x^2+y^2)^2+5*x^(10)+y^(11);
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ map phi = R,phix,phiy;
+ g = phi(g);
+ Poly F = makePoly(g);
+ NormalForm N = determineNormalForm(F);
+ germWithNNB(N);
+}
+
+proc germWithNormalizedNNB(NormalForm N)
+"USAGE: germWithNormalizedNNB(N); N NormalForm as given by @ref(determineNormalForm)
+RETURN:  a polynomial, returned as a Poly, that is stable equivalent to N.phi.sourcegerm.value with a normalized nondegenerate Newton boundary up to scalar multiplication @*
+of each of its variables, if possible, or an ERROR message otherwise
+EXAMPLE: example germWithNormalizedNNB, shows an example"
+{
+    ring R = basering;
+    Poly FF =N.normalizedNNBGerm;
+    def S = FF.in;
+    setring S;
+    if(FF.value <>0 || N.corank==0)
+    {
+      setring R;
+      return(N.normalizedNNBGerm);
+    }
+    else
+    {
+        RightEquivalenceChainWithPrecision Tr1;
+        RightEquivalenceChainWithPrecision Tr2;
+        Tr1 = N.phi;
+        list L =classifyNB(Tr1,0,1);
+        Tr2 = L[2];
+        Poly H = Tr2.targetgerm;
+        def RR = H.in;
+        setring RR;
+        if(H.value==0)
+        {
+          ERROR("The degenerate part of the germ is 0");
+        }
+        N.normalizedNNBGerm=Tr2.targetgerm;
+        setring R;
+        return(N.normalizedNNBGerm);
+    }
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y),ds;
+ poly g = (x^2+y^2)^2+5*x^(10)+y^(11);
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ map phi = R,phix,phiy;
+ g = phi(g);
+ Poly F = makePoly(g);
+ NormalForm N = determineNormalForm(F);
+ germWithNNB(N);
+}
+
+
+proc modalityNNB(def f)
+"USAGE: modalityNNB(f,w); f poly or Poly or NormalForm
+RETURN:  the modality of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) is equivalent to a germ with a nondegenerate Newton boundary, @*
+or an ERROR message otherwise
+EXAMPLE: example modalityNNB, shows an example"
+{
+  int k=0;
+  if(typeof(f)=="poly")
+  {
+    Poly F = makePoly(f);
+    k=1;
+  }
+  if(typeof(f)=="Poly")
+  {
+    Poly F = f;
+    k=1;
+  }
+  if(typeof(f)=="NormalForm")
+  {
+    int m = f.modality;
+    return(m);
+  }
+  if(k==0)
+  {
+    ERROR("Input of wrong type.");
+  }
+  RightEquivalenceChainWithPrecision Tr;
+  Tr.sourcegerm = F;
+  Tr.targetgerm = F;
+  list L = classifyNB(Tr,0,0);
+  Tr = L[2];
+  F = Tr.targetgerm;
+  int m = modalityNB(F);
+  return(m);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ map phi = R,phix,phiy;
+ f = phi(f);                        // f is equivalent to a germ with a nondegenerate Newton boundary
+ Poly F = makePoly(f);
+ NormalForm N;
+ N = determineNormalForm(F);
+ modalityNNB(f);
+ modalityNNB(F);
+ modalityNNB(N);
+}
+
+proc milnorNNB(def f)
+"USAGE: milnorNNB(f,w); f poly or Poly or NormalForm
+RETURN:  the Milnor number of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) is equivalent to a germ with a nondegenerate Newton boundary, @*
+or an ERROR message otherwise
+EXAMPLE: example milnorNNB, shows an example"
+{
+  int k =0;
+  if(typeof(f)=="poly")
+  {
+    Poly F = makePoly(f);
+    k=1;
+  }
+  if(typeof(f)=="Poly")
+  {
+    Poly F = f;
+    k=1;
+  }
+  if(typeof(f)=="NormalForm")
+  {
+    int m = f.milnorNumber;
+    return(m);
+  }
+  if(k==0)
+  {
+    ERROR("Input of wrong type.");
+  }
+  RightEquivalenceChainWithPrecision Tr;
+  Tr.sourcegerm = F;
+  Tr.targetgerm = F;
+  list L = classifyNB(Tr,0,0);
+  int m = L[1];
+  return(m);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ map phi = R,phix,phiy;
+ f = phi(f);                        // f is equivalent to a germ with a nondegenerate Newton boundary
+ Poly F = makePoly(f);
+ NormalForm N = determineNormalForm(F);
+ milnorNNB(f);
+ milnorNNB(F);
+ milnorNNB(N);
+}
+
+proc determinacyBound(def f)
+"USAGE: determinacyBound(f); f poly or Poly or NormalForm
+RETURN:  an upper bound for the determinacy bound of f (or f.value or f.phi.sourcegerm.value)
+EXAMPLE: example determinacyBound, shows an example"
+{
+  int k =0;
+  if(typeof(f)=="poly")
+  {
+    Poly F = makePoly(f);
+    k=1;
+  }
+  if(typeof(f)=="Poly")
+  {
+    Poly F = f;
+    k=1;
+  }
+  if(typeof(f)=="NormalForm")
+  {
+    int d = f.determinacy;
+    return(d);
+  }
+  if(k==0)
+  {
+    ERROR("Input of wrong type.");
+  }
+  RightEquivalenceChainWithPrecision Tr;
+  Tr.sourcegerm = F;
+  Tr.targetgerm = F;
+  Tr = truncateAtHighestCorner(Tr);
+  int d =Tr.precision;
+  return(d);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ Poly F = makePoly(f);
+ NormalForm N = determineNormalForm(F);
+ determinacyBound(f);
+ determinacyBound(F);
+ determinacyBound(N);
+}
+
+proc deltaNNB(def f)
+"USAGE: deltaNNB(f); f poly or Poly or NormalForm
+RETURN:  a List with entries d,n, where d is the Delta invariant and n is the number of branches of f (or f.value or f.phi.sourcegerm.value), if f (or f.value or f.phi.sourcegerm.value) @*
+is equivalent to a germ with a nondegenerate Newton Boundary, or an ERROR message otherwise
+EXAMPLE: example deltaNNB, shows an example"
+{
+  int k =0;
+  if(typeof(f)=="poly")
+  {
+    Poly F = makePoly(f);
+    k=1;
+  }
+  if(typeof(f)=="Poly")
+  {
+    Poly F = f;
+    k=1;
+  }
+  if(typeof(f)=="NormalForm")
+  {
+    int d = f.delta;
+    int n = f.numberOfBranches;
+    list Q = d,n;
+    return(Q);
+  }
+  if(k==0)
+  {
+    ERROR("Input of wrong type.");
+  }
+  RightEquivalenceChainWithPrecision Tr;
+  Tr.sourcegerm = F;
+  Tr.targetgerm = F;
+  list L = classifyNB(Tr,0,0);
+  Tr =L[2];
+  Poly P = Tr.targetgerm;
+  list Q = deltaInvariant(P,L[1]);
+  return(Q);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ Poly F = makePoly(f);
+ NormalForm N = determineNormalForm(F);
+ deltaNNB(f);
+ deltaNNB(F);
+ deltaNNB(N);
+}
+
+proc moduliMonomials(NormalForm N)
+"USAGE: moduliMonomials(N); N NormalForm
+RETURN:  the list of the moduli monomials of the normal form N.normalForm
+EXAMPLE: example moduliMonomials, shows an example"
+{
+  list RB = N.parameters;
+  return(RB);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ Poly F = makePoly(f);
+ NormalForm N = determineNormalForm(F);
+ moduliMonomials(N);
+}
+
+proc newtonNumber(def F)
+"USAGE: newtonNumber(F); F poly or Poly
+RETURN:  the Newton number of F (or F.value)
+EXAMPLE: example newtonNumber, shows an example"
+{
+  def R = basering;
+  int k =0;
+  if(typeof(F)=="poly")
+  {
+    poly f = F;
+    k=1;
+  }
+  if(typeof(F)=="Poly")
+  {
+    def S = F.in;
+    setring S;
+    poly f = F.value;
+    k=1;
+  }
+  if(k==0)
+  {
+    ERROR("Input of wrong type.");
+  }
+   list NP = newtonPolygon(f);
+   list iv = verticesOfNP(NP);
+   number s=0;
+   for(int i=1;i<=size(iv)-1;i++)
+   {
+      s = s+(1/2)*absValue(iv[i+1][1]-iv[i][1])*absValue(iv[i+1][2]-iv[i][2]);
+      s = s+iv[i][1]*(iv[i][2]-iv[i+1][2]);
+   }
+   int newtonNumber = int(2*s-iv[1][2]-iv[size(iv)][1]+1);
+   setring R;
+   return(newtonNumber)
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly f = x^9+x^2*y^4+y^2*x^4+y^8+x^3*y^5+y^2*x^5;
+ Poly F = makePoly(f);
+ newtonNumber(F);
+ newtonNumber(f);
+}
+
+proc transformationsBeforeSplit(NormalForm N)
+"USAGE: transformationsBeforeSplit(N); N NormalForm as given by @ref(determineNormalForm)
+RETURN:  the transformations (and in some cases their inverses) that was transformed on N.phi.sourcegerm.value to write it as a direct sum of its degenerate and nondegenerate parts, @*
+given up to filtration d, where d is a determinacy bound for F.value (returned as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))
+EXAMPLE: example transformationsBeforeSplit, shows an example"
+{
+    return(N.phiBeforeMorseSplit);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y,z),ds;
+ poly g = (x^2+y^2)^2+5*x^(10)+y^(11)+z^2;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ poly phiz = z+2x+x^2+y^4*x;
+ map phi = R,phix,phiy,phiz;
+ g = phi(g);
+ Poly F = makePoly(g);
+ NormalForm N = determineNormalForm(F);
+ transformationsBeforeSplit(N);
+}
+proc transformationsAfterSplit(NormalForm N)
+"USAGE: transformationsAfterSplit(N); N NormalForm as given by @ref(determineNormalForm)
+RETURN:  the transformations (and in some cases their inverses) that was transformed, after the degenerate part was splitted off, of N.phi.sourcegerm.value to transform it to a germ @*
+with nondegenerate Newton boundary (in some cases the transformations normalize the Newton boundary is also given), is given up to filtration d, where d is a determinacy bound for N.source (returned as type RightEquivalenceChainWithPrecision as defined in @ref(polyclass.lib))@*
+EXAMPLE: example transformationsAfterSplit, shows an example"
+{
+  Poly normalizedNNBGerm = N.normalizedNNBGerm;
+  if(normalizedNNBGerm.value==0){
+"";
+"The transformations are only given up to transforming the input polynomial to a germ with a nondegenerate Newton boundary. The final transformations to normalize the germ are not yet determined.
+";}
+  return(N.phi);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y,z),ds;
+ poly g = (x^2+y^2)^2+5*x^(10)+y^(11)+z^2;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ poly phiz = z+2x+x^2+y^4*x;
+ map phi = R,phix,phiy,phiz;
+ g = phi(g);
+ Poly F = makePoly(g);
+ NormalForm N = determineNormalForm(F);
+ transformationsAfterSplit(N);
+}
+
+
+proc determineNormalFormEquation(NormalForm N)
+"USAGE: determineNormalFormEquation(N); N a NormalForm as given by @ref(NormalForm)
+RETURN: a normalform equation, stored in N.normalFormEquation, occuring in the normalform, stored in N.normalForm, of the polynomial, stored in N.phi.sourcegerm, as well as polynomials, stored in N.extension1 and N.extension2 (of type Poly), defining the paramaters, @*
+given as ring variables in N.normalFormEquation.
+EXAMPLE: example determineNormalFormEquation, shows an example"
+{
+  def B = basering;
+  RightEquivalenceChainWithPrecision Tr=N.phi;
+  list L = classifyNB(Tr,0,1);
+  Tr = L[2];
+  list RB = N.parameters;
+  Poly F = Tr.targetgerm;
+  N.normalizedNNBGerm=F;
+  if(size(RB)==0)
+  {
+    N.normalFormEquation = N.normalForm;
+    return(N);
+  }
+  ring R = F.in;
+  setring R;
+  if(R<>B)
+  {
+    list RB = fetch(B,RB);
+  }
+  list param = RB;
+  poly f = F.value;
+  list NB = newtonPolygon(f);
+  poly f1 = termsOnPolygon(f,NB);
+  poly diffx=diff(f,x);
+  poly diffy = diff(f,y);
+  int d=Tr.precision;
+  list w = piecewiseWeightOfPolygon(NB);
+  int wd = -1;
+  for(int i=1;i<=size(RB);i++)
+  {
+    int s=piecewisedegree(RB[i],w);
+    int dr = deg(RB[i]);
+    if(wd<s)
+    {wd=s;}
+    if(dr>d)
+    {d=dr;}
+  }
+  Tr.precision=d;
+  f = jet(f,d);
+  poly f11=jet(f1,d);
+  poly f1gprec = f1-f11;
+  f = piecewiseJet(f,w,wd);
+  poly fgamma = f-f11;
+  for(int i=1;i<=size(RB);i++)
+  {
+    fgamma = fgamma-coeff(fgamma,RB[i])*RB[i];
+  }
+  list S = monomials(fgamma);
+  int wfgamma = piecewiseOrd(fgamma,w);
+  int l=0;
+  while(size(S)<>0)
+  {
+    poly erase = piecewiseJet(fgamma,w,wfgamma)-piecewiseJet(fgamma,w,wfgamma-1);
+    if(erase<>0)
+    {
+      int HDT;
+      HDT = wfgamma+1;
+      noether = x^d;
+      ideal I=idealOfHigherWeightedDeg(f,HDT,w,d);
+      ideal Iparam;
+      for(int i=1;i<=size(param);i++)
+      {
+        int j = piecewisedegree(param[i],w);
+        if(j==wfgamma)
+        {
+          poly mm = poly(param[i]);
+          I =I,mm;
+          param=delete(param,i);
+        }
+      }
+      list L = ringlist(R);
+      L[3][1][1]="dp";
+      def R1 = ring(L);
+      setring R1;
+      noether = x^d;
+      poly diffx = fetch(R,diffx);
+      poly diffy = fetch(R,diffy);
+      ideal I = fetch(R,I);
+      poly erase = fetch(R,erase);
+      ideal G = diffx,diffy,I;
+      matrix T;
+      ideal L=liftstd(G,T);
+      list W =division(erase,L);
+      int c = ncols(T);
+      matrix subT =submat(T,1..2,1..c);
+      matrix Gen = subT*W[1];
+      poly gen1 = jet(Gen[1,1],d);
+      poly gen2 = jet(Gen[2,1],d);
+      setring R;
+      poly erase = fetch(R1,erase);
+      poly gen1 = fetch(R1,gen1);
+      poly gen2 = fetch(R1,gen2);
+      if(l==1)
+      {
+        poly gen1y = subst(gen1,x,0);
+        gen1 = CutOff(gen1-gen1y,diffx,wfgamma+1,w);
+        gen1 = gen1+gen1y;
+        poly gen2x = subst(gen2,y,0);
+        gen2 = CutOff(gen2-gen2x,diffy,wfgamma+1,w);
+        gen2 = gen2+gen2x;
+      }
+      matrix N1[1][2] = x-gen1,y-gen2;
+      int p1 = ord(gen1);
+      int p2 = ord(gen2);
+      int p3 = min(p1,p2);
+      int t =timer;
+      f=transWithPrecision(f,N1,d);
+      PolynomialRightEquivalence RE;
+      RE.in=basering;
+      RE.images = list(makePoly(var(1)-gen1),makePoly(var(2)-gen2));
+      Tr.transformations[size(Tr.transformations)+1]=RE;
+      int r=timer-t;
+      if(r>1){l=1;}
+      f = jet(f,d);
+      f = piecewiseJet(f,w,wd);
+      poly fgamma = f-f11;
+      for(int i=1;i<=size(RB);i++)
+      {
+        fgamma = fgamma-coeff(fgamma,RB[i])*RB[i];
+      }
+      list S = monomials(fgamma);
+      if(size(S)==0){break;}
+      int wfgamma1 = piecewiseOrd(fgamma,w);
+      while(wfgamma1<wfgamma || wfgamma==wfgamma1)
+      {
+        ideal P=y^(p3);
+        for(i=1;i<=p3;i++)
+        {
+            P=P,x^i*y^(p3-i);
+        }
+        P=diffx*P,diffy*P;
+        ideal J = P,I;
+        setring R1;
+        ideal G = fetch(R,J);
+        poly fgamma = fetch(R,fgamma);
+        poly erase = piecewiseJet(fgamma,w,wfgamma);
+        matrix T;
+        ideal L=liftstd(G,T);
+        list W =division(erase,L);
+        int c = ncols(T);
+        matrix subT =submat(T,1..2*p3+2,1..c);
+        matrix Gen = subT*matrix(W[1]);
+        for(int j=1;j<=p3+1;j++)
+        {
+            poly genx(j) = jet(x^(j-1)*y^(p3-(j-1))*Gen[j,1],d);
+        }
+        for(j=1;j<=p3+1;j++)
+        {
+            poly geny(j) = jet(x^(j-1)*y^(p3-(j-1))*Gen[j+p3+1,1],d);
+        }
+        poly gen1;
+        for(j=1;j<=p3+1;j++)
+        {
+            gen1 = gen1+genx(j);
+        }
+        poly gen2;
+        for(j=1;j<=p3+1;j++)
+        {
+            gen2 = gen2+geny(j);
+        }
+        setring R;
+        poly gen1 = fetch(R1,gen1);
+        poly gen2 = fetch(R1,gen2);
+        if(l==1)
+        {
+          poly gen1y = subst(gen1,x,0);
+          gen1 = CutOff(gen1-gen1y,diffx,wfgamma+1,w);
+          gen1 = gen1+gen1y;
+          poly gen2x = subst(gen2,y,0);
+          gen2 = CutOff(gen2-gen2x,diffy,wfgamma+1,w);
+          gen2 = gen2+gen2x;
+        }
+        matrix N1[1][2] = x-gen1,y-gen2;
+
+        int p1 = ord(gen1);
+        int p2 = ord(gen2);
+        if(p1==0){p3=p2;}
+        if(p2==0){p3=p1;}
+        if(p1==0 & p2==0)
+        {
+        int p3 = min(p1,p2);}
+        f=transWithPrecision(f,N1,d);
+        PolynomialRightEquivalence RE;
+        RE.in=basering;
+        RE.images = list(makePoly(var(1)-gen1),makePoly(var(2)-gen2));
+        Tr.transformations[size(Tr.transformations)+1]=RE;
+        f = jet(f,d);
+        f = piecewiseJet(f,w,wd);
+        poly fgamma = f-f11;
+        for(int i=1;i<=size(RB);i++)
+        {
+          fgamma = fgamma-coeff(fgamma,RB[i])*RB[i];
+        }
+        list S = monomials(fgamma);
+        if(size(S)==0){break;}
+        wfgamma1 = piecewiseOrd(fgamma,w);
+      }
+    }
+    else{wfgamma=piecewiseOrd(fgamma,w);}
+  }
+  if(basering<>R)
+  {
+      poly f1gprec =fetch(R,f1gprec);
+  }
+  f=f+f1gprec;
+  Poly F = makePoly(f);
+  N.nonNormalizedNormalFormEquation = F;
+  poly h1=0;
+  Poly H1 = makePoly(h1);
+  N.extension1 = H1;
+  poly h2=0;
+  Poly H2 = makePoly(h2);
+  N.extension2 = H2;
+  poly pp = f11;
+  int r;
+  number cp;
+  int e1;
+  int e2;
+  poly h;
+  int j=0;
+  int k1=0;
+  int k2=0;
+  int i=0;
+  int ll = size(f11);
+  for(int l = 1;l<=ll;l++)
+  {
+    if(basering <> R)
+    {
+      poly pp=fetch(R,pp);
+    }
+    poly m = leadmonom(pp);
+    pp=pp-leadcoef(pp)*m;
+    e2=leadexp(m)[2];
+    e1=leadexp(m)[1];
+    for(r=1;r<=size(RB);r++)
+    {
+      if(RB[r]==m)
+      {
+        break;
+      }
+      if(r==size(RB))
+      {
+        if(basering <>R)
+        {
+          number cp=0;
+        }
+        if(basering<>R)
+        {
+          poly f = F.value;
+        }
+        cp= (1/coeff(f,m));
+        if(cp==1){break;}
+        list L = ringlist(R);
+        if(minpoly==0)     //scaling without field extension
+        {
+          if(size(L[1])==1)
+          {
+             list LS = list(0,list(number(a),list(list("lp",1))),list(0));
+             L[1]=LS;
+          }
+          def S = ring(L);
+          if((e2==1||e1==0)&&j==0)
+          {
+             if(e2==1)
+             {
+               if(k1==0)      //the monomial xy^(e'2) has not been normalized   tested
+               {
+                  k2=1;       // set the monomial yx^(e1) to has been normalized
+                  poly my =m;
+                  f=jet(f,Tr.precision);
+                  f=subst(f,var(2),cp*var(2));
+                  Tr=addTransformation(Tr,poly(var(1)),poly(cp*var(2)),poly(var(1)),poly((1/cp)*var(2)));
+                  if(basering<>R)
+                  {
+                    poly f1gprec =fetch(R,f1gprec);
+                  }
+                  f=f+f1gprec;
+                  F = makePoly(f);
+                  Tr.targetgerm=F;
+               }
+               else           //the monomial xy^(e'2) has been normalized
+               {
+                  int n= leadexp(mx)[2];
+                  list LS = factorize(var(2)^(e1*n-1)-(1/cp));
+                  for(int k=1;k<=size(LS[1]);k++)
+                  {
+                    if(deg(LS[1][k])==1)
+                    {
+                       poly h = LS[1][k];
+                       if(LS[2][k]==1)      //do not need a field extension
+                       {
+                          number g = -number((subst(h,var(2),0))/coeff(h,var(2)));
+                          f=jet(f,Tr.precision);
+                          f = subst(f,var(2),g*var(2));
+                          Tr=addTransformation(Tr,poly(var(1)),poly(g*var(2)),poly(var(1)),poly((1/g)*var(2)));
+                          Tr.transformations[size(Tr.transformations)+1]=RE;
+                          f=subst(f,var(1),(1/(g^n))*var(1));
+                          Tr=addTransformation(Tr,poly((1/(g^n))*var(1)),poly(var(2)),poly((1/g^n)*var(1)),poly(var(2)));
+                          if(basering<>R)
+                          {
+                            poly f1gprec =fetch(R,f1gprec);
+                          }
+                          f=f+f1gprec;
+                          Poly F = makePoly(f);
+                          Tr.targetgerm=F;
+                          kill g;
+                          break;
+                        }
+                    }
+                    if(k==size(LS[1]))    //need a field extension  tested
+                    {
+                      poly h = LS[1][2];
+                      setring S;
+                      poly h = fetch(R,h);
+                      minpoly = number(subst(h,var(2),a));
+                      poly f = fetch(R,f);
+                      f = jet(f,Tr.precision);
+                      list RB = fetch(R,RB);
+                      f = subst(f,var(2),a*var(2));
+                      Tr=addTransformation(Tr,poly(var(1)),poly(a*var(2)),poly(var(1)),poly((1/a)*var(2)));
+                      f=subst(f,var(1),a^(-n)*var(1));
+                      Tr=addTransformation(Tr,poly(a^(-n)*var(1)),poly(var(2)),poly((1/(a^(-n)))*var(1)),poly(var(2)));
+                      if(basering<>R)
+                      {
+                          poly f1gprec =fetch(R,f1gprec);
+                      }
+                      f=f+f1gprec;
+                      F = makePoly(f);
+                      Tr.targetgerm=F;
+                      break;
+                    }
+                  }
+                }
+             }
+             else     //e2<>1  -->  m=y^(e2)
+             {
+                j=1;
+                if(k2==1) //the monomial yx^(e1) has been normalized   tested
+                {
+                  pp =pp+coeff(f,my)*my;
+                  l=l-1;
+                }
+                list LS = factorize(var(2)^e2-(cp));
+                for(int k=1;k<=size(LS[1]);k++)
+                {
+                  if(deg(LS[1][k])==1)      //no need for an field extension tested
+                  {
+                     poly h = LS[1][k];
+                     if(LS[2][k]==1)
+                     {
+                        number g = -number((subst(h,var(2),0))/coeff(h,var(2)));
+                        f=jet(f,Tr.precision);
+                        f = subst(f,var(2),g*var(2));
+                        Tr=addTransformation(Tr,poly(var(1)),poly(g*var(2)),poly(var(1)),poly((1/g)*var(2)));
+                        if(basering<>R)
+                        {
+                          poly f1gprec =fetch(R,f1gprec);
+                        }
+                        f=f+f1gprec;
+                        Poly F = makePoly(f);
+                        Tr.targetgerm=F;
+                        kill g;
+                        break;
+                      }
+                  }
+                  if(k==size(LS[1]))    //need for an field extension       tested
+                  {
+                    poly h = LS[1][2];
+                    setring S;
+                    poly h = fetch(R,h);
+                    minpoly = number(subst(h,var(2),a));
+                    poly f = fetch(R,f);
+                    f = jet(f,Tr.precision);
+                    list RB = fetch(R,RB);
+                    f = subst(f,var(2),a*var(2));
+                    Tr=addTransformation(Tr,poly(var(1)),poly(a*var(2)),poly(var(1)),poly((1/a)*var(2)));
+                    if(basering<>R)
+                    {
+                      poly f1gprec =fetch(R,f1gprec);
+                    }
+                    f=f+f1gprec;
+                    F = makePoly(f);
+                    Tr.targetgerm=F;
+                    break;
+                  }
+                }
+             }
+          }
+          else      //m=xy^(e2) || m=x^(e1)
+          {
+             if(e1==1)  //m=xy^(e2)
+             {
+              if(k2==0)       //the monomial yx^(e'1) has not been normalized   tested
+              {
+                poly mx = m;
+                k1=1;
+                f = jet(f,Tr.precision);
+                f=subst(f,var(1),cp*var(1));
+                Tr=addTransformation(Tr,poly(cp*var(1)),poly(var(2)),poly((1/cp)*var(1)),poly(var(2)));
+                if(basering<>R)
+                {
+                    poly f1gprec =fetch(R,f1gprec);
+                }
+                f=f+f1gprec;
+                F = makePoly(f);
+                Tr.targetgerm=F;
+              }
+              else      //the monomial yx^(e'1) has been normalized
+              {
+                  int n= leadexp(my)[1];
+                  list LS = factorize(var(1)^(e2*n-1)-(1/cp));
+                  for(int k=1;k<=size(LS[1]);k++)
+                  {
+                    if(deg(LS[1][k])==1)        //do not need a field extension
+                    {
+                       poly h = LS[1][k];
+                       if(LS[2][k]==1)
+                       {
+                          number g = -number((subst(h,var(1),0))/coeff(h,var(1)));
+                          f=jet(f,Tr.precision);
+                          f = subst(f,var(1),g*var(1));
+                          Tr=addTransformation(Tr,poly(g*var(1)),poly(var(2)),poly((1/g)*var(1)),poly(var(2)));
+                          f=subst(f,var(2),var(2),(1/(g^n))*var(2));
+                          Tr=addTransformation(Tr,poly(var(1)),poly((1/(g^n))*var(2)),poly(*var(1)),poly((g^n)*var(2)));
+                          if(basering<>R)
+                          {
+                            poly f1gprec =fetch(R,f1gprec);
+                          }
+                          f=f+f1gprec;
+                          Poly F = makePoly(f);
+                          Tr.targetgerm=F;
+                          kill g;
+                          break;
+                        }
+                    }
+                    if(k==size(LS[1]))          //need a field extension
+                    {
+                      poly h = LS[1][2];
+                      setring S;
+                      poly h = fetch(R,h);
+                      minpoly = number(subst(h,var(1),a));
+                      poly f = fetch(R,f);
+                      f = jet(f,Tr.precision);
+                      list RB = fetch(R,RB);
+                      f = subst(f,var(1),a*var(1));
+                      Tr=addTransformation(Tr,poly(a*var(1)),poly(var(2)),poly((1/a)*var(1)),poly(var(2)));
+                      f=subst(f,var(2),(1/(a^n))*var(2));
+                      Tr=addTransformation(Tr,poly(var(1)),poly((1/(a^n))*var(2)),poly(var(1)),poly(a^n*var(2)));
+                      if(basering<>R)
+                      {
+                        poly f1gprec =fetch(R,f1gprec);
+                      }
+                      f=f+f1gprec;
+                      F = makePoly(f);
+                      Tr.targetgerm=F;
+                      break;
+                    }
+                  }
+              }
+             }
+             else     //m=x^(e1) || j==1
+             {
+                j=0;
+                if(k1==1) //the monomial xy^(e'2) has been normalized   tested
+                {
+                  pp =pp+coeff(f,mx)*mx;
+                  l=l-1;
+                }
+                list LS = factorize(var(1)^e1-cp);
+                for(int k=1;k<=size(LS[1]);k++)
+                {
+                  if(deg(LS[1][k])==1)    //do not need a field extension  tested
+                  {
+                    poly h = LS[1][k];
+                    poly g = -subst(h,var(1),0);
+                    number ch = coeff(h,var(1));
+                    f = jet(f,Tr.precision);
+                    f = subst(f,var(1),(1/ch)*g*var(1));
+                    Tr=addTransformation(Tr,poly((1/ch)*g*var(1)),poly(var(2)),poly(ch*(1/g)*var(1)),poly(var(2)));
+                    if(basering<>R)
+                    {
+                      poly f1gprec =fetch(R,f1gprec);
+                    }
+                    f=f+f1gprec;
+                    Poly F = makePoly(f);
+                    Tr.targetgerm=F;
+                    kill g;
+                    break;
+                  }
+                  if(k==size(LS[1]))  //need a field extension      tested
+                  {
+                    poly h = LS[1][2];
+                    setring S;
+                    poly h = fetch(R,h);
+                    minpoly = number(subst(h,var(1),a));
+                    poly f = fetch(R,f);
+                    list RB = fetch(R,RB);
+                    f = jet(f,Tr.precision);
+                    f = subst(f,var(1),a*var(1));
+                    Tr=addTransformation(Tr,poly(a*var(1)),poly(var(2)),poly((1/a)*var(1)),poly(var(2)));
+                    if(basering<>R)
+                    {
+                      poly f1gprec =fetch(R,f1gprec);
+                    }
+                    f=f+f1gprec;
+                    F = makePoly(f);
+                    Tr.targetgerm=F;
+                    break;
+                  }
+                }
+             }
+          }
+        }
+        else  //scaling with field extension
+        {
+          if((e2==1||e1==0)&&j==0)
+          {
+             if(e2==1) //the monomial xy^(e'2) has not been normalized
+             {
+               if(k1==0) // set the monomial yx^(e1) to has been normalized
+               {
+                  k2=1;   // set the monomial yx^(e1) to has been normalized
+                  poly my =m;
+                  f=jet(f,Tr.precision);
+                  f=subst(f,var(2),cp*var(2));
+                  Tr=addTransformation(Tr,poly(var(1)),poly(cp*var(2)),poly(var(1)),poly((1/cp)*var(2)));
+                  if(basering<>R)
+                  {
+                    poly f1gprec =fetch(R,f1gprec);
+                  }
+                  f=f+f1gprec;
+                  F = makePoly(f);
+                  Tr.targetgerm=F;
+               }
+               else     //the monomial xy^(e'2) has been normalized
+               {
+                  int n= leadexp(mx)[2];
+                  list LS = factorize(var(2)^(e1*n-1)-(1/cp));
+                  for(int k=1;k<=size(LS[1]);k++)
+                  {
+                    if(deg(LS[1][k])==1)  //do not need a field extension
+                    {
+                       poly h = LS[1][k];
+                       if(LS[2][k]==1)
+                       {
+                          number g = -number((subst(h,var(2),0))/coeff(h,var(2)));
+                          f=jet(f,Tr.precision);
+                          f = subst(f,var(2),g*var(2));
+                          Tr=addTransformation(Tr,poly(var(1)),poly(g*var(2)),poly(var(1)),poly((1/g)*var(2)));
+                          f=subst(f,var(1),var(1),(1/(g^n))*var(1));
+                          Tr=addTransformation(Tr,poly(var(1)),poly((1/(g^n))*var(2)),poly(var(1)),poly((g^n)*var(2)));
+                          if(basering<>R)
+                          {
+                            poly f1gprec =fetch(R,f1gprec);
+                          }
+                          f=f+f1gprec;
+                          Poly F = makePoly(f);
+                          Tr.targetgerm=F;
+                          kill g;
+                          break;
+                        }
+                    }
+                    if(k==size(LS[1]))   //need a field extension
+                    {
+                      poly h = LS[1][2];
+                      def T = basering;
+                      def S = addvarsTo(R,list("e","v"),1);
+                      setring S;
+                      poly h = fetch(T,h);
+                      poly min1 = subst(h,var(2),e);
+                      poly min2 = e*v-1;
+                      Poly Min1 = makePoly(min1);
+                      Poly Min2 = makePoly(min2);
+                      N.extension1 =Min1;
+                      N.extension2 =Min2;
+                      ideal I = std(min1,min2);
+                      poly f = fetch(T,f);
+                      f = jet(f,Tr.precision);
+                      list RB = fetch(R,RB);
+                      f = subst(f,var(2),e*var(2));
+                      Tr=addTransformation(Tr,poly(var(1)),poly(e*var(2)),poly(var(1)),poly(v*var(2)));
+                      f=subst(f,var(1),v^n*var(1));
+                      Tr=addTransformation(Tr,poly(var(1)),poly(v*var(2)),poly(var(1)),poly(e^n*var(2)));
+                      poly fff = f;
+                      poly fff1;
+                      int s =size(f);
+                      for(int i=1;i<=s;i++)
+                      {
+                        poly c = leadcoef(fff)*leadmonom(fff);
+                        c = reduce(c,I);
+                        fff1=fff1+c;
+                        fff=fff-leadcoef(fff)*leadmonom(fff);
+                      }
+                      f= fff1;
+                      poly f1gprec = fetch(R,f1gprec);
+                      f=f+f1gprec;
+                      F = makePoly(f);
+                      Tr.targetgerm=F;
+                      break;
+                    }
+                  }
+                }
+             }
+             else     //e2<>1  -->  m=y^(e2)
+             {
+               j=1;
+               if(k2==1) //the monomial yx^(e1) has been normalized
+                {
+                  pp =pp+coeff(f,my)*my;
+                  l=l-1;
+                }
+                list LS = factorize(var(2)^e2-(cp));
+                for(int k=1;k<=size(LS[1]);k++)
+                {
+                  if(deg(LS[1][k])==1)
+                  {
+                     poly h = LS[1][k];
+                     if(LS[2][k]==1)  //no need for an field extension  tested
+                     {
+                        number g = -number((subst(h,var(2),0))/coeff(h,var(2)));
+                        f=jet(f,Tr.precision);
+                        f = subst(f,var(2),g*var(2));
+                        Tr=addTransformation(Tr,poly(var(1)),poly(g*var(2)),poly(var(1)),poly((1/g)*var(2)));
+                        if(basering<>R)
+                        {
+                            poly f1gprec =fetch(R,f1gprec);
+                        }
+                        f=f+f1gprec;
+                        Poly F = makePoly(f);
+                        Tr.targetgerm=F;
+                        kill g;
+                        break;
+                      }
+                  }
+                  if(k==size(LS[1]))  //need for a field extension
+                  {
+                    poly h = LS[1][2];
+                    def T = basering;
+                    def S = addvarsTo(T,list("e"),1);
+                    setring S;
+                    poly h = fetch(T,h);
+                    poly min = subst(h,var(2),e);
+                    Poly Min = makePoly(min);
+                    Poly H = N.extension1;
+                    def RH = basering;
+                    setring H.in;
+                    if(H.value==0)
+                    {
+                      int k=0;
+                    }
+                    setring RH;
+                    if(k==0)
+                    {
+                       N.extension1 =Min;
+                    }
+                    else
+                    {
+                      N.extension2= Min;
+                    }
+                    ideal I = std(min);
+                    poly f = fetch(T,f);
+                    f = jet(f,Tr.precision);
+                    list RB = fetch(R,RB);
+                    f = subst(f,var(2),e*var(2));
+                    Tr=addTransformation(Tr,poly(var(1)),poly(e*var(2)),poly(0),poly(0));
+                    poly fff = f;
+                    poly fff1;
+                    int s =size(f);
+                    for(int i=1;i<=s;i++)
+                    {
+                        poly ccc = leadcoef(fff)*leadmonom(fff);
+                        ccc = reduce(ccc,I);
+                        fff1=fff1+ccc;
+                        fff=fff-leadcoef(fff)*leadmonom(fff);
+                    }
+                    f= fff1;
+                    if(basering<>R)
+                    {
+                      poly f1gprec =fetch(R,f1gprec);
+                    }
+                    f=f+f1gprec;
+                    F = makePoly(f);
+                    Tr.targetgerm=F;
+                    break;
+                  }
+                }
+              }
+          }
+          else    //m=xy^(e2) || m=x^(e1)
+          {
+             if(e1==1)
+             {
+              if(k2==0) //the monomial yx^(e'1) has not been normalized
+              {
+                poly mx = m;
+                k1=1;
+                f = jet(f,Tr.precision);
+                f=subst(f,var(1),cp*var(1));
+                Tr=addTransformation(Tr,poly(cp*var(1)),poly(e*var(2)),poly((1/cp)*var(1)),poly(var(2)));
+                if(basering<>R)
+                {
+                   poly f1gprec =fetch(R,f1gprec);
+                }
+                f=f+f1gprec;
+                F = makePoly(f);
+                Tr.targetgerm=F;
+              }
+              else  //the monomial yx^(e'1) has been normalized
+              {
+                int n= leadexp(my)[1];
+                list LS = factorize(var(1)^(e2*n-1)-(1/cp));
+                for(int k=1;k<=size(LS[1]);k++)
+                {
+                  if(deg(LS[1][k])==1)
+                  {
+                    poly h = LS[1][k];
+                    if(LS[2][k]==1)  //do not need a field extension
+                    {
+                       number g = -number((subst(h,var(1),0))/coeff(h,var(1)));
+                       f=jet(f,Tr.precision);
+                       f = subst(f,var(1),g*var(1));
+                       Tr=addTransformation(Tr,poly(g*var(1)),poly(var(2)),poly((1/g)*var(1)),poly(var(2)));
+                       f=subst(f,var(2),var(2),(1/(g^n))*var(2));
+                       Tr=addTransformation(Tr,poly(var(1)),poly((1/(g^n))*var(2)),poly(var(1)),poly(g^n*var(2)));
+                       if(basering<>R)
+                       {
+                          poly f1gprec =fetch(R,f1gprec);
+                       }
+                       f=f+f1gprec;
+                       Poly F = makePoly(f);
+                       Tr.targetgerm=F;
+                       kill g;
+                       break;
+                    }
+                  }
+                  if(k==size(LS[1])) //need a field extension       tested
+                  {
+                    poly h = LS[1][2];
+                    def T = basering;
+                    def S = addvarsTo(R,list("e","v"),1);
+                    setring S;
+                    poly h = fetch(T,h);
+                    poly min1 = subst(h,var(1),v);
+                    poly min2 = e*v-1;
+                    Poly Min1 = makePoly(min1);
+                    Poly Min2 = makePoly(min2);
+                    N.extension1 =Min1;
+                    N.extension2= Min2;
+                    ideal I = min1,min2;
+                    I=std(I);
+                    poly f = fetch(T,f);
+                    f = jet(f,Tr.precision);
+                    list RB = fetch(R,RB);
+                    f = subst(f,var(1),v*var(1));
+                    Tr=addTransformation(Tr,poly(v*var(1)),poly(var(2)),poly(e*var(1)),poly(var(2)));
+                    f=subst(f,var(2),e^n*var(2));
+                    Tr=addTransformation(Tr,poly(var(1)),poly(e^n*var(2)),poly(var(1)),poly(v^n*var(2)));
+                    poly fff = f;
+                    poly fff1;
+                    int s =size(f);
+                    for(int i=1;i<=s;i++)
+                    {
+                        poly c = leadcoef(fff)*leadmonom(fff);
+                        c = reduce(c,I);
+                        fff1=fff1+c;
+                        fff=fff-leadcoef(fff)*leadmonom(fff);
+                    }
+                    f= fff1;
+                    if(basering<>R)
+                    {
+                      poly f1gprec =fetch(R,f1gprec);
+                    }
+                    f=f+f1gprec;
+                    F = makePoly(f);
+                    Tr.targetgerm=F;
+                    break;
+                  }
+                }
+              }
+            }
+            else //m=x^(e1) || j==1
+            {
+              j=0;
+              if(k1==1) //the monomial xy^(e'2) has been normalized   tested
+              {
+                pp =pp+coeff(f,mx)*mx;
+                l=l-1;
+              }
+              list LS = factorize(var(1)^e1-(cp));  //getoets
+                for(int k=1;k<=size(LS[1]);k++)
+                {
+                  if(deg(LS[1][k])==1)
+                  {
+                     poly h = LS[1][k];
+                     if(LS[2][k]==1) //do not need a field extension
+                     {
+                        number g = -number((subst(h,var(1),0))/coeff(h,var(1)));
+                        f=jet(f,Tr.precision);
+                        f = subst(f,var(1),g*var(1));
+                        Tr=addTransformation(Tr,poly(g*var(1)),poly(var(2)),poly((1/g)*var(1)),poly(var(2)));
+                        if(basering<>R)
+                        {
+                          poly f1gprec =fetch(R,f1gprec);
+                        }
+                        f=f+f1gprec;
+                        Poly F = makePoly(f);
+                        Tr.targetgerm=F;
+                        kill g;
+                        break;
+                      }
+                  }
+                  if(k==size(LS[1]))    //need a field extension  tested
+                  {
+                    def T = basering;
+                    poly h = LS[1][2];
+                    def S = addvarsTo(R,list("v"),1);
+                    setring S;
+                    poly h = fetch(T,h);
+                    poly min = subst(h,var(1),v);
+                    Poly Min = makePoly(min);
+                    Poly H = N.extension1;
+                    def RH = basering;
+                    setring H.in;
+                    if(H.value==0)
+                    {
+                      int k =0;
+                    }
+                    setring RH;
+                    if(k==0)
+                    {
+                      N.extension1 =Min;
+                    }
+                    else
+                    {
+                      N.extension2= Min;
+                    }
+                    ideal I = std(min);
+                    poly f = fetch(T,f);
+                    f = jet(f,Tr.precision);
+                    list RB = fetch(R,RB);
+                    f = subst(f,var(1),v*var(1));
+                    Tr=addTransformation(Tr,poly(v*var(1)),poly(var(2)),poly(0),poly(0));
+                    poly fff = f;
+                    poly fff1;
+                    int s =size(f);
+                    for(int i=1;i<=s;i++)
+                    {
+                        poly cc = leadcoef(fff)*leadmonom(fff);
+                        cc = reduce(cc,I);
+                        fff1=fff1+cc;
+                        fff=fff-leadcoef(fff)*leadmonom(fff);
+                    }
+                    f= fff1;
+                    if(basering<>R)
+                    {
+                      poly f1gprec =fetch(R,f1gprec);
+                    }
+                    f=f+f1gprec;
+                    F = makePoly(f);
+                    Tr.targetgerm=F;
+                    break;
+                  }
+                }
+              }
+            }
+        }
+      }
+    }
+  }
+  setring R;
+  N.phi = Tr;
+  N.normalFormEquation = F;
+  setring B;
+  return(N);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=0,(x,y),ds;
+ poly g = x4+2*x2y2+y4+x^(10)+y^(10);
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ map phi = R,phix,phiy;
+ g=phi(g);
+ Poly F = makePoly(g);
+ NormalForm N;
+ N = determineNormalForm(F);
+ determineNormalFormEquation(N);
+}
+
+proc determineNormalFormList(poly f)
+"USAGE: determineNormalFormList(f); f poly
+RETURN: if f is right equivalent to a germ with a nondegenerate Newton boundary a list with entries:@*
+        [1]: the embedding dimension (given as type int)@*
+        [2]: the corank of the singularity defined by f (given as type int)@*
+        [3]: the corner points of the Newton boundary of the normal form of f, which classifies the singularity type (given as type string)@*
+        [4]: a ring that contains a polynomial "normalform" that is the normalform of f (given as type poly)@*
+        [5]: a ring that contains a polynomial "nondegeneratepart" that is the nondegenerate part of the normalform of f (given as type poly)@*
+        [6]: a list of the monomials corresponding to the moduli terms in normalform (given as a list with entries of type poly)@*
+        [7]: the modality of the singularity defined by f (given as type int)@*
+        [8]: the Milnor number of f (given as type int)@*
+        [9]: the Delta invariant of f (given as type int)@*
+        [10]: the number of branches of f (given as type int)@*
+        [11]: a determinacy bound for f (given as type int),@*
+an ERROR message otherwise
+EXAMPLE: example determineNormalFormList, shows an example"
+{
+   def R = basering;
+   Poly F = makePoly(f);
+   NormalForm N;
+   N = determineNormalForm(F);
+   Poly P = N.normalForm;
+   list L;
+   L[1] = N.numbervars;
+   L[2] = N.corank;
+   L[3] = N.singularityType;
+   Poly NormalF = N.normalForm;
+   def RR = NormalF.in;
+   setring RR;
+   poly normalformpoly = NormalF.value;
+   export normalformpoly;
+   setring R;
+   L[4] = RR;
+   Poly NGP=N.nondegeneratePart;
+   def S = NGP.in;
+   setring S;
+   poly nondegeneratepart = NGP.value;
+   export nondegeneratepart;
+   setring R;
+   L[5] = N.parameters;
+   L[6] = S;
+   L[7] = N.modality;
+   L[8] = N.milnorNumber;
+   L[9] = N.delta;
+   L[10] = N.numberOfBranches;
+   L[11] = N.determinacy;
+   return(L);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y,z),ds;
+ poly f = (x^2+y^2)^2+5*x^(10)+y^(11)+z^2;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ poly phiz = z+2x+x^2+y^4*x;
+ map phi = R,phix,phiy,phiz;
+ f = phi(f);
+ list L = determineNormalFormList(f);
+ L[1];        //Embedding dimension
+ L[2];        //Corank of singularity
+ L[3];        //Normalform of type
+ def RR = L[4];
+ setring RR;
+ normalformpoly;  //Normalform
+ setring R;
+ L[5];        //Momomials corresponding to moduli terms
+ def SS = L[6];
+ setring SS;
+ nondegeneratepart;   //Nondegenerate part
+ L[7];        //Modality
+ L[8];        //Milnor number
+ L[9];        //Delta invariant
+ L[10];       //Number of branches
+ L[11];       //Determinacy
+}
+
+proc determineNormalFormEquationList(poly f)
+"USAGE: determineNormalFormEquationList(f); f poly
+RETURN: if f is right equivalent to a germ with a nondegenerate Newton boundary a list with entries:@*
+        [1]: the embedding dimension (given as type int)@*
+        [2]: the corank of the singularity defined by f (given as type int)@*
+        [3]: the corner points of the Newton boundary of the normal form of f, which classifies the singularity type (given as type string)@*
+        [4]: a ring that contains a polynomial "normalform" that is the normalform of f (given as type poly)@*
+        [5]: a ring that contains a polynomial "nondegeneratepart" that is the nondegenerate part of the normalform of f (given as type poly)@*
+        [6]: a list of the monomials corresponding to the moduli terms in normalform (given as a list with entries of type poly)@*
+        [7]: a ring containing a normalform equation "normalformequation" of f in the normalform "normalform" (given as a poly), @*
+             as well as polynomials "extension1" and "extension2" (given as poly's) that defines the parameters, given as variables, in the given normalform equation @*
+        [8]: the modality of the singularity defined by f (given as type int)@*
+        [9]: the Milnor number of f (given as type int)@*
+        [10]: the Delta invariant of f (given as type int)@*
+        [11]: the number of branches of f (given as type int)@*
+        [12]: a determinacy bound for f (given as type int),@*
+an ERROR message otherwise
+EXAMPLE: example determineNormalFormEquationList, shows an example"
+{
+   def R = basering;
+   Poly F = makePoly(f);
+   NormalForm N;
+   N = determineNormalForm(F);
+   N= determineNormalFormEquation(N);
+   Poly P = N.normalForm;
+   list L;
+   L[1] = N.numbervars;
+   L[2] = N.corank;
+   L[3] = N.singularityType;
+   Poly NormalF = N.normalForm;
+   def RR = NormalF.in;
+   setring RR;
+   poly normalformpoly = NormalF.value;
+   export normalformpoly;
+   setring R;
+   L[4] = RR;
+   Poly NGP=N.nondegeneratePart;
+   def S = NGP.in;
+   setring S;
+   poly nondegeneratepart = NGP.value;
+   export nondegeneratepart;
+   setring R;
+   L[5] = N.parameters;
+   L[6] = S;
+   Poly normalFE = N.normalFormEquation;
+   def SS = normalFE.in;
+   setring SS;
+   poly normalformequation = normalFE.value;
+   normalformequation;
+   export normalformequation;
+   Poly Ext1=N.extension1;
+   poly extension1=Ext1.value;
+   extension1;
+   Poly Ext2=N.extension2;
+   poly extension2=Ext2.value;
+   export extension1;
+   export extension2;
+   setring R;
+   L[7]=SS;
+   L[8] = N.modality;
+   L[9] = N.milnorNumber;
+   L[10] = N.delta;
+   L[11] = N.numberOfBranches;
+   L[12] = N.determinacy;
+   return(L);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R = 0,(x,y,z),ds;
+ poly f = (x^2+y^2)^2+5*x^(10)+y^(11)+z^2;
+ poly phix = x+y^2+x^2+x*y+x^2*y+x*y^3;
+ poly phiy = y+y^2+2*x^2+x*y+y*x^2+y^2*x+x*y^4;
+ poly phiz = z+2x+x^2+y^4*x;
+ map phi = R,phix,phiy,phiz;
+ f = phi(f);
+ list L = determineNormalFormEquationList(f);
+ L[1];        //Embedding dimension
+ L[2];        //Corank of singularity
+ L[3];        //Normalform of type
+ def RR = L[4];
+ setring RR;
+ normalformpoly;  //Normalform
+ setring R;
+ L[5];        //Momomials corresponding to moduli terms
+ def TT = L[6];
+ setring TT;
+ nondegeneratepart;   //Nondegenerate part
+ def SS = L[7];
+ setring SS;
+ normalformequation;  //Normalform equation
+ minpoly;             //minpoly defining the parameter in the underlying ring
+ extension1;          //poly defining a parameter, given as a variable, in the ring
+ extension2;          //poly defining a parameter, given as a varible, in the ring
+ setring R;
+ L[8];        //Modality
+ L[9];        //Milnor number
+ L[10];        //Delta invariant
+ L[11];       //Number of branches
+ L[12];       //Determinacy
+}
+
+static proc addTransformation(RightEquivalenceChainWithPrecision Tr, poly fx,poly fy,poly gx, poly gy)
+{
+  PolynomialRightEquivalence RE;
+  RE.in=basering;
+  Poly Fx = makePoly(fx);
+  Poly Fy = makePoly(fy);
+  Poly Gx= makePoly(gx);
+  Poly Gy = makePoly(gy);
+  RE.images = list(Fx,Fy);
+  RE.imagesInverse = list(Gx,Gy);
+  Tr.transformations[size(Tr.transformations)+1]=RE;
+  return(Tr);
+}
+
+static proc regularBasis(Poly F, int a)
+{
+  ring baseRing = basering;
+  int p = 33000;
+  p = prime(p);
+  ring R = F.in;
+  setring R;
+  int md = modalityNB(F);
+  poly f = F.value;
+  while(0==0)
+  {
+    list l = ringlist(R);
+    l[1] = p;
+    list NP = newtonPolygon(f);
+    list V =verticesOfNP(NP);
+    list Vm = latticeToMonomials(V);
+    def Rl=ring(l);
+    setring Rl;
+    list Vm = fetch(R,Vm);
+    poly f = fetch(R,f);
+    poly g;
+    list B;
+    for(int i=1;i<=size(Vm);i++)
+    {
+      g=g+Vm[i];
+    }
+    ideal J = std(jacob(g));
+    int h = deg(highcorner(J));
+    if(h<>-1)
+    {
+      int d=V[1][1]+V[1][2];
+      for(int i=2;i<=size(V);i++)
+      {
+         if(V[i][1]+V[i][2]<d)
+         {
+            d=V[i][1]+V[i][2];
+         }
+      }
+      list wt = piecewiseWeightOfPolygon(NP);
+      if(a==1)
+      {
+        int t = d-1;
+        int mind = piecewisedegree(Vm[1],wt);
+      }
+      else
+      {
+        int t = 0;
+      }
+      for(int i=t;i<= h;i++)
+      {
+        for(int j = 0;j<=i;j++)
+        {
+           poly mon = var(1)^(i-j)*var(2)^(j);
+           if(reduce(mon,J)<>0)
+           {
+             B[size(B)+1]=mon;
+           }
+        }
+      }
+      int maxd=0;
+      for(int i=1;i<=size(NP);i++)
+      {
+        for(int j = 1;j<=2;j++)
+        {
+           if(wt[i][j]>maxd)
+           {
+              maxd = wt[i][j];
+           }
+        }
+      }
+      maxd = maxd*h;
+      maxd=0;
+      for(int k=1;k<=size(B);k++)
+      {
+        int wd = piecewisedegree(B[k],wt);
+        if(defined(L(wd))==0)
+        {
+          list L(wd);
+        }
+        L(wd)[size(L(wd))+1]=B[k];
+        if(size(L(wd))>0 && maxd<wd)
+        {
+           maxd=wd;
+        }
+      }
+      list rBasis;
+      if(a==1)
+      {
+        for(int i=1;i<=(maxd-mind+1);i++)
+        {
+          if(defined(L(maxd-i+1))<>0)
+          {
+            for(int k=1;k<=size(L(maxd-i+1));k++)
+            {
+              poly mon = L(maxd-i+1)[k];
+              if(reduce(mon,J)!=0)
+              {
+                J=std(J+ideal(mon));
+                rBasis[size(rBasis)+1]= mon;
+              }
+            }
+          }
+        }
+      }
+      else
+      {
+        for(int i=1;i<=maxd;i++)
+        {
+          if(defined(L(maxd-i+1))<>0)
+          {
+            for(int k=1;k<=size(L(maxd-i+1));k++)
+            {
+              poly mon = L(maxd-i+1)[k];
+              if(reduce(mon,J)!=0)
+              {
+                J=std(J+ideal(mon));
+                rBasis[size(rBasis)+1]= mon;
+              }
+            }
+          }
+        }
+      }
+      if(size(rBasis)==md && a==1)
+      {
+        setring baseRing;
+        list rBasis = fetch(Rl,rBasis);
+        return(rBasis)
+      }
+      else
+      {
+        if(a<>1)
+        {
+          setring R;
+          list rBasis = fetch(Rl,rBasis);
+          return(rBasis)
+        }
+        setring R;
+        p=prime(p-1);
+      }
+    }
+    else
+      {
+        setring R;
+        p=prime(p-1);
+      }
+  }
+}
+
+static proc maximumFiltration(poly f){
+return(ord(f));
+}
+
+static proc setintersection(list A, list B)
+{
+  list L;
+  if ((size(A)==0) or (size(B)==0))
+  {
+    return(L);
+  }
+  int i,j,l;
+  l=1;
+  for (i=1;i<=size(A);i++)
+  {
+    for (j=1;j<=size(B);j++)
+    {
+       if (B[j]==A[i])
+       {
+         L[l]=A[i];l=l+1;
+       }
+    }
+  }
+  return(L);
+}
+
+static proc exponentvector(poly f)
+{
+  return(leadexp(f));
+}
+
+
+static proc innerVertices(NP)
+{
+  list L;
+  int j,jj;
+  intvec co;
+  for (j=1;j<=size(NP)-1;j++)
+  {
+    L[j]=NP[j][2][2];
+  }
+  return(L);
+}
+
+static proc dofaceelimination(poly f,intvec si)
+{
+  f = truncateAtHighestCorner(f);
+  poly fnew=faceelimination(f,si);
+  if (fnew==f)
+  {
+    return(f);
+  }
+  else
+  {
+    return(dofaceelimination(fnew, si));
+  }
+}
+
+static proc faceelimination(poly f,intvec co)
+{
+  int mu=milnor(f);
+  list NP=newtonPolygon(f);
+  list L=latticePoints(NP);
+  list L1;
+  int l=1;
+  for (int j=1;j<=size(L);j++)
+  {
+    if ((L[j][1]==co[1]-1) or (L[j][2]==co[2]-1))
+    {
+      L1[l]=L[j];
+      l=l+1;
+    }
+  }
+  poly f0=termsOnPolygon(f,NP);
+  poly f1=f;
+  intvec co1;
+  number c1;
+  poly mon;
+  list wt;
+  list NPadj=adjecentFacesOfNewtonPolygon(NP,co);
+  for (j=1;j<=size(L1);j++)
+  {
+    co1=L1[j];
+    mon=x^co1[1]*y^co1[2];
+    c1=coeff(f0,mon);
+    mon=c1*x^co1[1]*y^co1[2];
+    if (c1<>0)
+    {
+      wt=weightsOfNewtonPolygon(NPadj);
+      f1=removeMon(f,f0,wt[1],wt[2],mon);
+    }
+  }
+  return(f1);
+}
+
+static proc adjecentFacesOfNewtonPolygon(list NP,intvec co)
+{
+  list NP1;
+  for (int i=1;i<=size(NP);i++)
+  {
+    if (isVertexOfFace(NP[i][2],co))
+    {
+      NP1[size(NP1)+1]=NP[i];
+    }
+  }
+  return(NP1);
+}
+
+static proc isVertexOfFace(list F,intvec co)
+{
+  if ((F[1]==co) or (F[2]==co)){return(1);}
+  return(0);
+}
+
+static proc isOnPolygon(intvec v,list NP)
+{
+  int tst;
+  cone c1,c2;
+  v[size(v)+1]=1;
+  int j;
+  intvec w;
+  for (int i=1;i<=size(NP);i++)
+  {
+    list L;
+    for (j=1;j<=size(NP[i][2]);j++)
+    {
+      w=NP[i][2][j];
+      w[size(w)+1]=1;
+      L[j]=w;
+    }
+    c1=poshull(L);
+    L[size(L)+1]=v;
+    c2=poshull(L);
+    if (c1==c2){return(1);}
+    kill L;
+  }
+  return(0);
+}
+
+static proc weightsOfNewtonPolygon(list NP)
+{
+  list wt;
+  for (int i =1;i<=size(NP);i++)
+  {
+    wt[i]=NP[i][1];
+  }
+  return(wt);
+}
+
+static proc truncateAtHighestCorner(RightEquivalenceChainWithPrecision Tr,list #)
+{
+  def S = basering;
+  if(size(#) > 0)   // read optional parameter
+  {
+    if(size(#) > 1 || typeof(#[1]) != "int")
+    {
+      ERROR("Wrong optional parameters.");
+    }
+    else
+    {
+      int b = #[1];
+    }
+  }
+  else
+  {
+    int b=-1;
+  }
+  Poly F = Tr.targetgerm;
+  def R =F.in;
+  setring R;
+  poly f = F.value;
+  int i=0;
+  if(b<0)
+  {
+    int p = 33000;
+    while(b<0)
+    {
+      i=i+1;
+      if(i==3)
+      {
+        setring R;
+        list L=factorize(f);
+        for(int j = 1;j<=size(L[2]);j++)
+        {
+          if(L[2][j]>1)
+          {
+              Tr.precision=-1;
+              return(Tr);
+          }
+        }
+      }
+      p = prime(p-1);
+      list l = ringlist(R);
+      l[1] = p;
+      ring R1 = ring(l);
+      setring R1;
+      poly f = fetch(R,f);
+      ideal I = jacob(f);
+      I = std(I);
+      if(dim(I)<>0)
+      {
+        b=-1;
+      }
+      else
+      {
+        int hc;
+        b = deg(highcorner(I));
+        b = b+2;
+        int j;
+        for(j = 1; j < 3; j++)
+        {
+          hc = deg(highcorner(std(maxideal(j)*I)));
+          hc = hc+2-j;
+          if(hc < b)
+          {
+              b = hc;
+          }
+        }
+      }
+    }
+  }
+  setring R;
+  Tr.precision = b;
+  F.value = jet(F.value,b);
+  Tr.targetgerm = F;
+  setring S;
+  return(Tr);
+}
+
+static proc lowestJet(poly f, intvec w)
+{
+  if (f==0){return(f);}
+  list mon = terms(f);
+  int wt;
+  int mindg = weighteddeg(mon[1],w);
+  for (int i=2;i<=size(mon);i++)
+  {
+    wt = weighteddeg(mon[i],w);
+    if (wt<mindg){mindg=wt;}
+  }
+  return(jet(f,mindg,w));
+}
+
+static proc setminus(list A, list B)
+{
+  list L;
+  if (size(A)==0||size(B)==0){return(A);}
+  int i,j,l;
+  l=1;
+  int tst;
+  for (i=1;i<=size(A);i++)
+  {
+    tst=0;
+    for (j=1;j<=size(B);j++)
+    {
+       if(B[j]==A[i]){tst=1;break;}
+    }
+    if(tst==0){L[size(L)+1]=A[i];}
+  }
+  return(L);
+}
+
+static proc setminusList(list A, list B)
+{
+  list L;
+  if (size(A)==0||size(B)==0){return(A);}
+  int i,j,l;
+  l=1;
+  int tst;
+  for (i=1;i<=size(A);i++)
+  {
+    tst=0;
+    for (j=1;j<=size(B);j++)
+    {
+       if(B[j][1]==A[i][1] & B[j][2]==A[i][2]){tst=1;break;}
+    }
+    if(tst==0){L[size(L)+1]=A[i];}
+  }
+  return(L);
+}
+
+static proc weighteddeg(poly f,intvec w)
+{
+  return(deg(f,w));
+}
+
+static proc doLinearTransformation(RightEquivalenceChainWithPrecision Tr)
+{
+  Poly F = Tr.targetgerm;
+  setring(F.in);
+  poly f = F.value;
+  int m = maximumFiltration(f);
+  poly g= jet(f,m);
+  def R= basering;
+  def S=absFactorize(g);
+  setring S;
+  list L = absolute_factors;
+  intvec Sort = sort(L[2])[2];
+  number mp;
+  mp = leadcoef(L[3][Sort[size(Sort)]]);
+  if(mp<>a)
+  {
+     minpoly = mp;
+  }
+  poly g = fetch(R,g);
+  poly f = fetch(R,f);
+  list L = factorize(g);
+  Sort = sort(L[2])[2];
+  if(L[2][Sort[size(Sort)]]>1)
+  {
+    poly fx = L[1][Sort[size(Sort)]];
+  }
+  else
+  {
+    poly fx = var(1);
+  }
+  if(L[2][Sort[size(Sort)-1]]>1)
+  {
+    poly fy = L[1][Sort[size(Sort)-1]];
+  }
+  else
+  {
+    if(fx == var(2))
+    {
+      poly fy=var(1);
+    }
+    else
+    {
+      poly fy = var(2);
+    }
+  }
+  poly ff = lintrafo(f,ideal(fx,fy));
+  Poly recordx = lintrafo(var(1),ideal(fx,fy));
+  Poly recordy =  lintrafo(var(2),ideal(fx,fy));
+
+  int j = L[2][Sort[size(Sort)]];
+  int k = L[2][Sort[size(Sort)-1]];
+  if(j==1){j = 0;}
+  if(k==1){k=0;}
+  poly f0 = jet(ff,maximumFiltration(ff));
+  poly ff0 = f0/(var(1)^j*var(2)^k);
+  if(milnor(ff0)<0 && deg(ff0)!=0)
+  {
+    ERROR("The Normal for does not have a nondegenerate Newton Boundary");
+  }
+  if(k==0 && deg(ff0)!=0)
+  {
+    int max = maximumFiltration(ff);
+    number a1=coeff(ff,var(1)^(j+1)*var(2)^(max-j-1));
+    number a2=coeff(ff,var(1)^j*var(2)^(max-j));
+    ff=lintrafo(ff,ideal(var(1),var(2)+a1/((max-j)*a2)*x));
+    recordx = lintrafo(recordx,ideal(var(1),var(2)+a1/((max-j)*a2)*x));
+    recordy = lintrafo(recordy,ideal(var(1),var(2)+a1/((max-j)*a2)*x));
+  }
+  Poly FF=makePoly(ff);
+  PolynomialRightEquivalence Lin;
+  Lin.in = basering;
+  Lin.images = list(recordx,recordy);
+  Lin.imagesInverse = list(fx,fy);
+  Tr.transformations = list(Lin);
+  Tr.targetgerm = FF;
+  return(Tr);
+}
+
+static proc setunion(list A, list B)
+{
+  list L=A;
+  int i,j,l;
+  l=1;
+  int tst;
+  for (i=1;i<=size(B);i++)
+  {
+    tst=0;
+    for (j=1;j<=size(L);j++)
+    {
+       if (L[j]==B[i]){tst=1;}
+    }
+    if (tst==0){L[size(L)+1]=B[i];}
+  }
+  return(L);
+}
+
+static proc lintrafo(poly f, ideal T)
+{
+  def R=basering;
+  list L=ringlist(R);
+  L[2]=L[2]+list("xx","yy");
+  L[3][1][2]=intvec(1,1,1,1);
+  L[3][1][1]="lp";
+  def RR=ring(L);
+  setring RR;
+  ideal T=fetch(R,T);
+  ideal I = xx-T[1],yy-T[2];
+  option(redSB);
+  ideal Is = std(I);
+  poly fx = -subst(Is[2],x,0)/(coeff(Is[2],x));
+  poly fy = -subst(Is[1],y,0)/(coeff(Is[1],y));
+  poly ff = subst(fetch(R,f),x,fx,y,fy);
+  list L=ringlist(RR);
+  L[2]=list("xx","yy");
+  L[3][1][2]=intvec(1,1);
+  def R1=ring(L);
+  setring R1;
+  poly ff = imap(RR,ff);
+  setring R;
+  return(fetch(R1,ff));
+}
+
+static proc doWeightedLinearTransformationExt(poly f1,list NF1,RightEquivalenceChainWithPrecision Tr)
+{
+  ring R = basering;
+  int d = Tr.precision;
+  Poly F = Tr.targetgerm;
+  setring F.in;
+  poly fvalue = F.value;
+  list NPfvalue = newtonPolygon(fvalue);
+  List Fac=factorWeightedLowestJetExt(fvalue,NF1);
+  def S = Fac.in;
+  setring S;
+  if(S<>R)
+  {
+    poly f1 = fetch(R,f1);
+  }
+  list fac = Fac.values;
+  poly n = Fac.newFromOld;
+  int s;
+  for(int i = 1;i<=size(fac);i++)
+  {
+     if(deg(fac[i][1])>1 && ord(fac[i][1])==1)
+     {
+       s=i;
+     }
+  }
+  poly g=1;
+  if(n<>0)
+  {
+    f1 = subst(f1,a,n);
+  }
+  list NP = newtonPolygon(f1);
+  if(NP[1][1][1]>NP[1][1][2])
+  {
+    if(deg(subst(fac[s][1],var(2),0))>1){return(Tr,0);}
+    for(i=1;i<=size(fac);i++)
+    {
+       if(i!=s)
+       {
+         poly h = (fac[i][1])^(fac[i][2]);
+         g=g*h;
+       }
+    }
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
+    if(milnor(g)==-1 && g!=1)
+    {
+      return(Tr,0);
+    }
+    if(R<>S)
+    {
+      poly fvalue = fetch(R,fvalue);
+    }
+    if(n<>0)
+    {
+      fvalue = subst(fvalue,a,n);
+    }
+    poly rs=subst(fac[1][1],var(1),0);
+    fvalue=subst(fvalue,var(1),var(1)-rs);
+    PolynomialRightEquivalence RE;
+    RE.in=basering;
+    RE.images = list(makePoly(var(1)-rs),makePoly(var(2)));
+    RE.imagesInverse = list(makePoly(var(1)+rs),makePoly(var(2)));
+    Tr.transformations[size(Tr.transformations)+1]=RE;
+    Tr.targetgerm.in = basering;
+    Tr.targetgerm.value=fvalue;
+  }
+  else
+  {
+    if(deg(subst(fac[s][1],var(1),0))>1){return(Tr,0);}
+    for(int i=1;i<=size(fac);i++)
+    {
+      if(i!=s)
+      {
+        poly h = (fac[i][1])^(fac[i][2]);
+        g=g*h;
+      }
+    }
+    ideal I =g;
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
+    if(milnor(g)==-1 && g!=1)
+    {
+      return(Tr,0);
+    }
+    if(S<>R)
+    {
+      poly fvalue = fetch(R,fvalue);
+    }
+    if(n<>0)
+    {
+      fvalue = subst(fvalue,a,n);
+    }
+    poly rs=subst(fac[1][1],var(2),0);
+    fvalue=subst(fvalue,var(2),var(2)-rs);
+    PolynomialRightEquivalence RE;
+    RE.in=basering;
+    RE.images = list(makePoly(var(1)),makePoly(var(2)-rs));
+    RE.imagesInverse = list(makePoly(var(1)),makePoly(var(2)+rs));
+    Tr.transformations[size(Tr.transformations)+1]=RE;
+    Tr.targetgerm.in = basering;
+    Tr.targetgerm.value=fvalue;
+  }
+  Tr=truncateAtHighestCorner(Tr,Tr.precision);
+  return(Tr,1);
+}
+
+static proc doWeightedLinearTransformation(poly f1,list NF1,RightEquivalenceChainWithPrecision Tr)
+{
+  ring R = basering;
+  int d = Tr.precision;
+  Poly F = Tr.targetgerm;
+  poly fvalue = F.value;
+  list NPfvalue = newtonPolygon(fvalue);
+  list fac=factorWeightedLowestJet(fvalue,NF1);
+  int s;
+  for(int i = 1;i<=size(fac);i++)
+  {
+     if(deg(fac[i][1])>1 && ord(fac[i][1])==1)
+     {
+       s=i;
+     }
+  }
+  poly g=1;
+  list NP = newtonPolygon(f1);
+  if(NP[1][1][1]>NP[1][1][2])
+  {
+    if(deg(subst(fac[s][1],var(2),0))>1){return(Tr,0);}
+    for(i=1;i<=size(fac);i++)
+    {
+       if(i!=s)
+       {
+         poly h = (fac[i][1])^(fac[i][2]);
+         g=g*h;
+       }
+    }
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
+    if(milnor(g)==-1 && g!=1)
+    {
+      return(Tr,0);
+    }
+    number c = coeff(fac[1][1],var(1));
+    poly rs=(1/c)*subst(fac[1][1],var(1),0);
+    fvalue=subst(fvalue,var(1),var(1)-rs);
+    PolynomialRightEquivalence RE;
+    RE.in=basering;
+    RE.images = list(makePoly(var(1)-rs),makePoly(var(2)));
+    RE.imagesInverse = list(makePoly(var(1)+rs),makePoly(var(2)));
+    Tr.transformations[size(Tr.transformations)+1]=RE;
+    Tr.targetgerm.in = basering;
+    Tr.targetgerm.value=fvalue;
+  }
+  else
+  {
+    if(deg(subst(fac[s][1],var(1),0))>1){return(Tr,0);}
+    for(i=1; i<=size(fac);i++)
+    {
+      if(i!=s)
+      {
+        poly h = (fac[i][1])^(fac[i][2]);
+        g=g*h;
+      }
+    }
+    ideal I =g;
+    g = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
+    if(milnor(g)==-1 && g!=1)
+    {
+      return(Tr,0);
+    }
+    number c = coeff(fac[1][1],var(2));
+    poly rs=(1/c)*subst(fac[1][1],var(2),0);
+    fvalue=subst(fvalue,var(2),var(2)-rs);
+    PolynomialRightEquivalence RE;
+    RE.in=basering;
+    RE.images = list(makePoly(var(1)),makePoly(var(2)-rs));
+    RE.imagesInverse = list(makePoly(var(1)),makePoly(var(2)+rs));
+    Tr.transformations[size(Tr.transformations)+1]=RE;
+    Tr.targetgerm.in = basering;
+    Tr.targetgerm.value=fvalue;
+  }
+  Tr=truncateAtHighestCorner(Tr,Tr.precision);
+  return(Tr,1);
+}
+
+static proc twofaceelimination(poly f,intvec co){
+int mu=milnor(f);
+list NP=newtonPolygon(f);
+list L=latticePoints(NP);
+list L1;
+int l=1;
+for (int j=1;j<=size(L);j++){
+  if ((L[j][1]==co[1]-1) or (L[j][2]==co[2]-1)) {
+     L1[l]=L[j];
+     l=l+1;
+  }
+}
+poly f0=termsOnPolygon(f,NP);
+poly f1=f;
+intvec co1;
+number c1;
+poly mon;
+list wt;
+list NPadj=adjecentFacesOfNewtonPolygon(NP,co);
+for (j=1;j<=size(L1);j++){
+  co1=L1[j];
+  mon=x^co1[1]*y^co1[2];
+  c1=coeff(f0,mon);
+  mon=c1*x^co1[1]*y^co1[2];
+  if (c1<>0){
+     wt=weightsOfNewtonPolygon(NPadj);
+     f1=removeMon(f,f0,wt[1],wt[2],mon);
+  }
+}
+return(f1);
+}
+
+static proc findFaces(poly f,list NP,list S0)
+{
+if (printlevel>0){"S0 = "+string(S0);}
+list facescontainingS0;
+list mNPi;
+for (int i=1;i<=size(NP);i++)
+{
+   mNPi=monomials(termsOnPolygon(f,list(NP[i])));
+   if (printlevel>0){
+      "monomials on face "+string(mNPi);
+      "intersection "+string(setintersection(mNPi,S0));
+   }
+   if (size(S0)==size(setintersection(mNPi,S0)))
+   {facescontainingS0[size(facescontainingS0)+1]=NP[i];}
+}
+return(facescontainingS0);}
+
+static proc factorWeightedLowestJetExt(poly f,list F){
+def R = basering;
+list RL = ringlist(R);
+poly g= termsOnPolygon(f,list(F));
+List SLLL;
+SLLL.newFromOld =number(0);
+  list L = factorize(g);
+  int k=0;
+  for(int i = 2;i<=size(L[1]);i++)
+  {
+      int gcdf = gcd(deg(L[1][i]),ord(L[1][i]));
+      if(gcdf>1)
+      {
+          poly h = L[1][i];
+          poly h1 = subst(h,var(1),1);
+          poly h2 = subst(h,var(2),1);
+          if(deg(h1)<deg(h2))
+          {
+            poly g1 = subst(h1,var(2),var(1));
+          }
+          else
+          {
+            poly g1 = h2;
+          }
+          list H;
+          if(minpoly==0)
+          {
+             def S= ring(RL);
+             setring S;
+             poly g1=fetch(R,g1);
+             minpoly = number(subst(g1,var(1),a));
+             poly g = fetch(R,g);
+             list L  = factorize(g);
+          }
+          else
+          {
+            k=1;
+            def S = splitring(g1,a);
+            setring S;
+            SLLL.in = S;
+            poly h = fetch(R,h);
+            h = subst(h,a,erg[1]);
+            list L  = factorize(h);
+            SLLL.newFromOld = number(erg[1]);
+          }
+      }
+  }
+intvec fii=sort(L[2])[2];
+list LL;
+for (int i=1;i<=size(fii);i++){
+   LL[size(fii)-i+1]=list(L[1][fii[i]],L[2][fii[i]]);
+}
+list LLL=LL[1..size(LL)-1];
+if (size(LL)==2){
+SLLL.in = basering;
+SLLL.values=list(LL[1]);
+if(k==1){setring R;}
+   return(SLLL);
+}
+if(LLL[1][1]==var(1) || LLL[1][1]==var(2))
+  {
+    SLLL.values=list(LLL[2]);
+    SLLL.in=basering;
+if(k==1){setring R;}
+    return(SLLL);
+  }
+ SLLL.values=LLL;
+ SLLL.in = basering;
+ if(k==1){setring R;}
+return(SLLL);}
+
+static proc factorWeightedLowestJet(poly f,list F){
+def R = basering;
+list RL = ringlist(R);
+poly g= termsOnPolygon(f,list(F));
+list L=factorize(g);
+intvec fii=sort(L[2])[2];
+list LL;
+for (int i=1;i<=size(fii);i++){
+   LL[size(fii)-i+1]=list(L[1][fii[i]],L[2][fii[i]]);
+}
+list LLL=LL[1..size(LL)-1];
+if(size(LL)==2){
+   return(list(LL[1]));
+}
+if(LLL[1][1]==var(1) || LLL[1][1]==var(2))
+  {
+    return(list(LLL[2]));
+  }
+return(LLL);}
+
+static proc deltaInvariant(Poly F,mu)
+{
+  ring R = F.in;
+  setring R;
+  poly f = F.value;
+  list NP = newtonPolygon(f);
+  list V =verticesOfNP(NP);
+  poly mon(1) = latticeToMonomials(V[1])[1];
+  poly g = mon(1);
+  int numberBranches=0;
+  for(int i = 2;i<=size(V);i++)
+  {
+    poly mon(i) = latticeToMonomials(V[i])[1];
+    g=g+mon(i);
+    poly gs = sat_with_exp(ideal(g),ideal(var(1)*var(2)))[1][1];
+    map phix = R,var(1),0;
+    map phiy = R,0,var(2);
+    poly gsx = phix(gs);
+    poly gsy = phiy(gs);
+    int ix =exponentvector(gsx)[1];
+    int iy = exponentvector(gsy)[2];
+    numberBranches =numberBranches +gcd(ix,iy);
+    g=g-mon(i-1);
+  }
+  int delta = int((mu+numberBranches-1) div  2);
+  setring R;
+  return(list(delta, numberBranches))
+}
+
+
+static proc CutOff(poly g, poly h, int d, list w)
+{
+   g = piecewiseJet(g,w,d);
+   h = piecewiseJet(h,w,d);
+   list Mon = monomials(g);
+   poly g1;
+   int o;
+   for(int i = 1;i<=size(Mon);i++)
+   {
+      poly h1 = Mon[i]*h;
+      o=piecewiseOrd(h1,w);
+      if(o<d)
+      {
+        g1 = g1+coeff(g,Mon[i])*Mon[i];
+      }
+   }
+   return(g1);
+}
+
+static proc idealOfHigherWeightedDeg(poly f, int d, list w, int dt;)
+{
+  for(int i =1;i<=size(w);i++)
+  {
+     int gcdw(i)=gcd(w[i][1],w[i][2]);
+     intvec wo(i) = w[i][1] div gcdw(i),w[i][2] div gcdw(i);
+     int dg(i) = d div (gcdw(i));
+  }
+  ideal I;
+  while(1==1)
+  {
+    poly tst=0;
+    for(int i=1;i<=size(w);i++)
+    {
+        int di=d div gcdw(i);
+        poly m;
+        if(d mod gcdw(i) ==0)
+        {
+          int wsx = di div wo(i)[1];
+          int l=0;
+          for(int j=0;j<=wsx;j++)
+          {
+            int wsy = (di-(j*wo(i)[1])) div wo(i)[2];
+            if(j*wo(i)[1]+wsy*wo(i)[2]==di)
+            {
+              m = var(1)^(j)*var(2)^(wsy);
+              int dm=piecewisedegree(m,w);
+              if(dm==d){l=1;}
+              if(l==1)
+              {
+                tst=tst+m;
+                I=I,m;
+                l=0;
+              }
+            }
+          }
+        }
+    }
+    if(ord(tst)>dt){break;}
+    d=d+1;
+  }
+  for(int i =0;i<=dt+1;i++)
+  {
+    I=I,var(1)^i*var(2)^(dt+1-i);
+  }
+  return(I);
+}
+
+
+static proc modalityNB(Poly F) //wrapper
+{
+   ring R = F.in;
+   setring R;
+   poly f = F.value;
+   int k,d,b,i,j,c;
+   intvec v;
+   list m,l,t;
+   if (nvars(R)!=2)
+   {
+      return("check the number of variables");
+   }
+   l=newtonpoly(f);
+   k=2;
+   if (l[k][1]==2)
+   {
+     v=l[k][2]-l[k+1][2], l[k+1][1]-l[k][1];
+   }
+   else
+   {
+     v=l[k-1][2]-l[k][2], l[k][1]-l[k-1][1];
+   }
+   d=v[1]*l[k][1]+v[2]*l[k][2];
+   b=(d-2*v[1]) div v[2];
+   for (i=0;i<=b;i++)
+   {
+     j=0;
+     while ((2+j)<=l[k][1])
+     {
+       c=(2+j)*v[1]+(2+i)*v[2];
+       if (c<=d)
+       {
+         m=m+list(c);
+       }
+       j++;
+     }
+   }
+   if (size(l)==2)
+   {
+      return(size(m));
+   }
+   else
+   {
+     for (k=2;k<=size(l)-1;k++)
+     {
+      intvec u=l[k][2]-l[k+1][2], l[k+1][1]-l[k][1];
+      int e=u[1]*l[k][1]+u[2]*l[k][2];
+      int a=(e-l[k][1]*u[1]) div u[2];
+      for (i=0;i<=a;i++)
+      {
+       j=1;
+       while ((l[k][1]+j)<=l[k+1][1])
+       {
+         int s=(l[k][1]+j)*u[1]+(2+i)*u[2];
+         if (s<=e)
+         {
+           t=t+list(s);
+         }
+         j++;
+       }
+      }
+     }
+     return(size(m)+size(t));
+   }
+}
+
+static proc Test(poly f)
+{
+  poly g = sat_with_exp(ideal(f),ideal(var(1)*var(2)))[1][1];
+  if(milnornumber(g)>-1)
+  {
+    if(sat_with_exp(ideal(f),ideal(var(1)))[2]==0 || sat_with_exp(ideal(f),ideal(var(2)))[2]==0 )
+    {
+      list fact=factorize(g);
+      for(int i=1;i<=size(fact[1]);i++)
+      {
+         int o=2;
+         if(ord(fact[1][i])>0)
+         {
+           o=ord(fact[1][i]);
+         }
+         if(o>=1)
+         {
+           if(o>1)
+           {
+             int gcdf =gcd(deg(fact[1][i]),ord(fact[1][i]));
+             if(gcdf==o)
+             {
+                return(0);
+             }
+            }
+            if(o==1)
+            {
+              return(0);
+            }
+         }
+      }
+      return(1);
+    }
+    else
+    {
+      return(1);
+    }
+  }
+  return(0);
+}
+
+
+static proc cutCoordinateAxes(poly f)
+{
+  int cx;
+  int cy;
+  list NP = newtonPolygon(f);
+  list iv = verticesOfNP(NP);
+  list wt = piecewiseWeightOfPolygon(NP);
+  int d = wt[1][1]*iv[1][1]+wt[1][2]*iv[1][2];
+  f=piecewiseJet(f,wt,d);
+  ring R = basering;
+  map phiy = R,0,y;
+  map phix = R,x,0;
+  if(phiy(f)<>0)
+  {
+    cy=exponentvector(phiy(f))[2];
+  }
+  else
+  {
+    if(NP[1][2][1][1]==1)
+    {
+      int cy = int(NP[1][2][1][2]+(NP[1][1][1] div NP[1][1][2]));
+    }
+    if(NP[1][2][2][1]==1)
+    {
+      int cy = int(NP[1][2][2][2]+(NP[2][1][1] div NP[2][1][2]));
+    }
+    if(NP[1][2][1][1]>1)
+    {
+      int cy = -1;
+    }
+  }
+  if(phix(f)<>0)
+  {
+    cx=exponentvector(phix(f))[1];
+  }
+  else
+  {
+    if(NP[size(NP)][2][2][2]==1)
+    {
+      cx = int(NP[size(NP)][2][2][1]+(NP[size(NP)][1][1][2] div NP[size(NP)][1][1][1]));
+    }
+    if(NP[size(NP)][2][1][2]==1)
+    {
+      cx = int(NP[size(NP)][2][1][2]+(NP[size(NP)-1][1][1][2] div NP[size(NP)-1][1][1][1]));
+    }
+  }
+  if(NP[size(NP)][2][2][2]>1)
+  {
+    int cx=-1;
+  }
+  if(cx==-1 || cy==-1)
+  {int c==-1;}else{
+  int c = max(cx,cy);}
+  return(list(cx,cy,c))
+}
+
+static proc morsesplitarnold(RightEquivalenceChainWithPrecision Tr, int k)
+{
+  ring R = basering;
+  Poly F = Tr.sourcegerm;
+  setring F.in;
+  poly f = F.value;
+  int n = nvars(basering);
+  /* get jet(f, 2) right */
+  matrix H = concat(jet(jacob(jacob(f)), 0)/2, unitmat(n));
+  H = sym_reduce(H);
+  intvec perm_zero;
+  intvec perm_neg;
+  intvec perm_pos;
+  int c;
+  int lambda;
+  int i;
+  for(i = 1; i <= n; i++)
+  {
+    if(H[i, i] == 0)
+    {
+      perm_zero = perm_zero, i;
+      c++;
+    }
+    if(H[i, i] < 0)
+    {
+      perm_neg = perm_neg, i;
+      lambda++;
+    }
+    if(H[i, i] > 0)
+    {
+      perm_pos = perm_pos, i;
+    }
+  }
+  intvec perm;
+  if(size(perm_zero) > 1)
+  {
+    perm = perm, perm_zero[2..size(perm_zero)];
+  }
+  if(size(perm_neg) > 1)
+  {
+    perm = perm, perm_neg[2..size(perm_neg)];
+  }
+  if(size(perm_pos) > 1)
+  {
+    perm = perm, perm_pos[2..size(perm_pos)];
+  }
+  perm = perm[2..size(perm)];
+  matrix T[n][n];
+  matrix D[1][n];
+  for(i = 1; i <= n; i++)
+  {
+    T[1..n, i] = H[perm[i], (n+1)..(2*n)];
+    D[1, i] = H[perm[i], perm[i]];
+  }
+  matrix N[1][n] = matrix(maxideal(1))*transpose(T);
+  f=transWithPrecision(f,N,k);
+  PolynomialRightEquivalence RE;
+  RE.in=basering;
+  list L;
+  for(int r=1;r<=n;r++)
+  {
+    L[r]=makePoly(N[1,r]);
+  }
+  RE.images = L;
+  Tr.transformations[size(Tr.transformations)+1]=RE;
+
+  f = jet(f, k);
+
+  /* separate the variables */
+  N=matrix(maxideal(1));
+  matrix corank_part[1][n]=matrix(maxideal(1));
+  for(i = c+1; i <= n; i++)
+  {
+    corank_part[1,i] = 0;
+  }
+  poly cpf = transWithPrecision(f,corank_part,k);
+  poly h = f-jet(f, 2)-cpf;
+  poly hi;
+  while(h != 0)
+  {
+    for(i = c+1; i <= n; i++)
+    {
+      hi = h/var(i);
+      N[1,i] = var(i)-hi/(2*D[1, i]);
+      h = h-hi*var(i);
+    }
+    f=transWithPrecision(f,N,k);
+    f = jet(f, k);
+    RE.in=basering;
+    for(int r=1;r<=n;r++)
+    {
+      L[r]=makePoly(N[1,r]);
+    }
+    RE.images = L;
+    Tr.transformations[size(Tr.transformations)+1]=RE;
+    poly cpf = transWithPrecision(f,corank_part,k);
+    h = f-jet(f,2)-cpf;
+    h=jet(h,k);
+  }
+  poly g = f-jet(f, 2);
+  list M = monomials(jet(f,2));
+  poly h;
+  for(int j = 1;j<=size(M);j++)
+  {
+      h=h+M[j];
+  }
+  Poly P = makePoly(h);
+  Poly F = makePoly(g);
+  Tr.targetgerm = F;
+  return(list(c,Tr,P));
+}
+
+static proc sym_reduce(matrix A)//shifted
+{
+  int r = nrows(A);
+  int c = ncols(A);
+  int n = r;
+  if(n > c)
+  {
+    n = c;
+  }
+  poly q;
+  int i, j;
+  for(i = 1; i <= n; i++)
+  {
+    for(j = i+1; j <= n; j++)
+    {
+      if(A[i, j] != 0)
+      {
+        while(A[i, i] == 0)
+        {
+          A[1..r, i] = A[1..r, i]+A[1..r, j];
+          A[i, 1..c] = A[i, 1..c]+A[j, 1..c];
+        }
+        q = A[i, j]/A[i, i];
+        A[1..r, j] = A[1..r, j]-q*A[1..r, i];
+        A[j, 1..c] = A[j, 1..c]-q*A[i, 1..c];
+      }
+    }
+  }
+  return(A);
+}
+
+
+static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag2)
+{
+  def R=basering;
+  /* Apply the Splitting Lemma */
+  Tr.precision=-1;
+  Poly F =Tr.targetgerm;
+  def SS=F.in;
+  setring SS;
+  int nv = nvars(F.in);
+  list L;
+  L[1]=nv;
+  Tr = truncateAtHighestCorner(Tr);
+  Poly H;
+  RightEquivalenceChainWithPrecision TrMorse;
+  if(Tr.precision==-1){return(list(-1,Tr,nv,H,TrMorse,0));}
+  if(Tr.precision==-1){return(list(-1,Tr,nv,H,TrMorse,0));}
+  if(maximumFiltration(F.value)<3)
+  {
+    list L = morsesplitarnold(Tr,Tr.precision);
+    H = L[3];
+    TrMorse = L[2];
+    Poly F = TrMorse.targetgerm;
+    poly f = F.value;
+    nv=L[1];
+    if(nv<2){ if(nv==0){f=var(1)^2;}
+      ring RR = 0,(var(1)),ds;
+      setring RR;
+      poly f = fetch(SS,f);
+      int mu=milnor(f);
+      Poly F = makePoly(f);
+      Tr.targetgerm = F;
+      Tr.sourcegerm =F;
+      setring R;
+      return(list(mu,Tr,nv,H,TrMorse,0));
+    }
+    list Rl = ringlist(SS);
+    while(size(Rl[2])>nv)
+    {
+      Rl[2]=delete(Rl[2],nv+1);
+    }
+    def RR = ring(Rl);
+    setring RR;
+    poly f = fetch(SS,f);
+    Poly F = makePoly(f);
+    Tr.targetgerm =F;
+    Tr.sourcegerm = F;
+  }
+  else
+  {
+    poly h = 0;
+    Poly H=makePoly(h);
+  }
+  /* Case where corank(f)<=1*/
+
+  /*Transform the jet of maximal filtration*/
+  if(flag2==0)
+  {
+    Tr = doLinearTransformation(Tr);
+  }
+
+  /*Setring*/
+  def RR = Tr.targetgerm.in;
+  setring RR;
+
+  F = Tr.targetgerm;
+
+  /*Prelimanary Definitions*/
+
+  poly g = F.value;
+  list NP,mf0,iv,el;
+  poly f1,ff;
+  list si,T;
+  list delta;
+  list ef0;
+  list Gamma0;
+  list deltalist;
+  int foundcorner;
+  list si0,si1,si2;
+  int j;
+  list fact;
+  map phi1;
+  map phi2;
+  poly f1;
+  int mu1;
+  int i;
+  int n;
+  int d2;
+  list monsi;
+  list Delta;
+  list elementS0;
+  list chooseFace;
+  poly termsOnChooseFace;
+  poly satTermsOnChooseFace;
+  ideal termsOnDelta;
+  poly PolyTermsOnDelta;
+  poly f0 = jet(g,maximumFiltration(g));
+  NP=newtonPolygon(F.value);
+  iv=verticesOfNP(NP);
+  iv = latticeToMonomials(iv);
+
+  /*Define S0*/
+  list S0 = setintersection(monomials(f0),iv);
+  n = size(S0);
+  while(1==1)
+  {
+    Tr = truncateAtHighestCorner(Tr,Tr.precision);
+    F = Tr.targetgerm;
+    /* Make sure f is convenient*/
+
+    phi1 = RR,0,var(2);
+    phi2 = RR,var(1),0;
+    g = F.value;
+    if(phi1(g)==0)
+    {
+      NP=newtonPolygon(F.value);
+      f1 = termsOnPolygon(F.value,NP);
+      int mu = milnor(f1);
+      if(mu<>-1){d2=mu;}else{d2=Tr.precision;}
+      F.value=F.value+var(2)^(d2+1);
+      Tr.targetgerm = F;
+    }
+    if(phi2(g)==0)
+    {
+      NP=newtonPolygon(F.value);
+      f1 = termsOnPolygon(F.value,NP);
+      int mu = milnor(f1);
+      if(mu<>-1){d2=mu;}else{d2=Tr.precision;}
+      F.value=F.value+var(1)^(d2+1);
+      Tr.targetgerm=F;
+    }
+    si=el;
+    si2=el;
+    NP=newtonPolygon(F.value);
+    f1 = termsOnPolygon(F.value,NP);
+    int mu = 0;
+    j = size(NP);
+    /*Test whether the milnor number of jet(F.value,Delta_i) is finite for all the faces Delta_i of NP*/
+    for(i=1;i<=j;i++)
+    {
+       Delta[1]=NP[i];
+       termsOnDelta = termsOnPolygon(f1,Delta);
+       PolyTermsOnDelta=sat_with_exp(termsOnDelta,ideal(var(1)*var(2)))[1][1];
+       mu1 = milnornumber(PolyTermsOnDelta);
+       if(mu1<mu)
+       {
+          mu=mu1;
+       }
+     }
+     if(mu==0)
+     {
+       /* Test conditions of Definition 17*/
+       for(i=1;i<=j;i++)
+       {
+         if(basering<>RR)
+         {
+           poly f1 = fetch(RR,f1);
+           ideal termsOnDelta;
+           poly PolyTermsOnDelta;
+           poly satTermsOnChooseFace;
+         }
+         Delta[1]=NP[i];
+         termsOnDelta = termsOnPolygon(f1,list(Delta[1]));
+         PolyTermsOnDelta=sat_with_exp(termsOnDelta,ideal(var(1)*var(2)))[1][1];
+         if(Test(termsOnDelta[1])==0)
+         {
+          if(flag==1)
+          {
+            mu =milnornumber(f1);
+            setring R;
+            return(list(mu,Tr,nv,H,TrMorse,1));
+          }
+           satTermsOnChooseFace = sat_with_exp(ideal(termsOnDelta),ideal(x*y))[1][1];
+           Tr=doWeightedLinearTransformationExt(satTermsOnChooseFace,Delta[1],Tr);
+           Tr = truncateAtHighestCorner(Tr,Tr.precision);
+           F = Tr.targetgerm;
+           def S = F.in;
+           setring S;
+         }
+       }
+         poly g = F.value;
+         NP=newtonPolygon(F.value);
+         poly f1 = termsOnPolygon(F.value,NP);
+         list K = monomials(f1);
+         for(int i = 1;i<=size(K);i++)
+         {
+          intvec v = leadexp(K[i]);
+           if(v[1]==1)
+           {
+             poly gs=subst(g,var(1),0);
+             intvec w = leadexp(gs);
+             while(gs<>0)
+             {
+                number c1=coeff(f1,K[i]);
+                number c2=coeff(gs,leadmonom(gs));
+                poly rs=(c2/c1)*var(2)^(w[2]-v[2]);
+                matrix N[1][2] = var(1)-rs,var(2);
+                int d = Tr.precision;
+                g=transWithPrecision(g,N,d);
+                PolynomialRightEquivalence RE;
+                RE.in=basering;
+                RE.images = list(makePoly(var(1)-rs),makePoly(var(2)));
+                RE.imagesInverse = list(makePoly(var(1)+rs),makePoly(var(2)));
+                Tr.transformations[size(Tr.transformations)+1]=RE;
+                Tr.targetgerm.in = basering;
+                Tr.targetgerm.value=g;
+                Tr = truncateAtHighestCorner(Tr,Tr.precision);
+                F = Tr.targetgerm;
+                g=F.value;
+                gs=subst(g,var(1),0);
+                intvec w = leadexp(gs);
+             }
+           }
+           if(v[2]==1)
+           {
+             poly gs=subst(g,var(2),0);
+             intvec w = leadexp(gs);
+             while(gs<>0)
+             {
+                number c1=coeff(f1,K[i]);
+                number c2=coeff(gs,leadmonom(gs));
+                poly rs=(c2/c1)*var(1)^(w[1]-v[1]);
+                matrix N[1][2] = var(1),var(2)-rs;
+                int d = Tr.precision;
+                g=transWithPrecision(g,N,d);
+                PolynomialRightEquivalence RE;
+                RE.in=basering;
+                RE.images = list(var(1),var(2)-rs);
+                RE.imagesInverse = list(var(1),var(2)+rs);
+                Tr.transformations[size(Tr.transformations)+1]=RE;
+                Tr.targetgerm.in = basering;
+                Tr.targetgerm.value=g;
+                Tr = truncateAtHighestCorner(Tr,Tr.precision);
+                F = Tr.targetgerm;
+                g=F.value;
+                gs=subst(g,var(2),0);
+                intvec w = leadexp(gs);
+             }
+           }
+         }
+         if(subst(g,var(1),0)==0)
+         {
+           NP=newtonPolygon(F.value);
+           f1 = termsOnPolygon(F.value,NP);
+           int mu = milnor(f1);
+           if(mu<>-1){d2=mu;}else{d2=Tr.precision;}
+           F.value=F.value+var(2)^(d2+1);
+           Tr.targetgerm = F;
+         }
+         if(subst(g,var(2),0)==0)
+         {
+            NP=newtonPolygon(F.value);
+            f1 = termsOnPolygon(F.value,NP);
+            int mu = milnor(f1);
+            if(mu<>-1){d2=mu;}else{d2=Tr.precision;}
+            F.value=F.value+var(1)^(d2+1);
+            Tr.targetgerm=F;
+         }
+         mu =milnornumber(f1);
+         setring R;
+         return(list(mu,Tr,nv,H,TrMorse,0));
+      }
+      /* Write monomials in S0 in terms of their exponent vectors */
+
+      for (i=1;i<=size(S0);i++)
+      {
+         ef0[i]=exponentvector(S0[i]);
+      }
+
+      /* Determine the vertices of NP that is contained in S0 */
+
+      iv=verticesOfNP(NP);
+      si=setintersection(ef0,iv);
+
+      monsi = latticeToMonomials(si);
+
+      /* Choose one of the elements of S0*/
+
+      elementS0[1] = monsi[1];
+      poly s01 = elementS0[1];
+      /* Find adjacent faces*/
+      list adjacentFacesElementS0 = findFaces(F.value,NP,elementS0[1]);
+      int k = size(adjacentFacesElementS0);
+      for(int i = 1;i<=k;i++)
+      {
+         chooseFace = adjacentFacesElementS0[i];
+         termsOnChooseFace = termsOnPolygon(F.value,list(chooseFace));
+         satTermsOnChooseFace = sat_with_exp(ideal(termsOnChooseFace),ideal(x*y))[1][1];
+         // while satTermsOnChooseFace is degenerate and the conditions in Rmk 17 are not satisfied do the required weighted transformation
+         while(milnornumber(satTermsOnChooseFace)==-1)
+         {
+           poly ff = F.value;
+           Tr=doWeightedLinearTransformation(satTermsOnChooseFace,chooseFace,Tr);
+           Tr = truncateAtHighestCorner(Tr,Tr.precision);
+           F = Tr.targetgerm;
+           poly ff=F.value;
+           if(ff==0)
+           {
+               ERROR("the input polynomial is not equivalent to a germ with a nondegenerate Newton Boundary.")
+           }
+           NP = newtonPolygon(F.value);
+           adjacentFacesElementS0 = findFaces(F.value,NP,s01);
+           chooseFace = adjacentFacesElementS0[i];
+           poly termsOnChooseFace=termsOnPolygon(F.value,list(chooseFace));
+           poly satTermsOnChooseFace = sat_with_exp(ideal(termsOnChooseFace),ideal(var(1)*var(2)))[1][1];
+         }
+      }
+      NP = newtonPolygon(F.value);
+      list NPadj=adjecentFacesOfNewtonPolygon(NP,si[1]);
+      poly f2 = termsOnPolygon(F.value,NPadj);
+      T[size(T)+1]=monsi[1];
+      list L = setminus(monomials(f2),T);
+      S0 = setunion(S0,L);
+      S0=setminus(S0,T);
+      list iv=verticesOfNP(NP);
+      iv = latticeToMonomials(iv);
+      S0 = setintersection(S0,iv);
+   }
+
+
+}
+
