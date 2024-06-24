@@ -78,6 +78,7 @@ LIB "customstd.lib";
 LIB "linalg.lib";
 LIB "multigrading.lib";
 LIB "parallel.lib";
+LIB "gfan.lib";
 
 static proc mod_init()
 {
