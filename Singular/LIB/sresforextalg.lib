@@ -19,7 +19,7 @@ static proc mod_init()
 LIB "nctools.lib"; // for ncalg
 LIB "matrix.lib"; // for submat
 LIB "sheafcoh.lib"; // for displayCohom
-LIB "tst.lib"; tst_init(); tst_ignore("// ** loaded "); tst_ignore("// ** _ is no standard basis");
+//LIB "tst.lib"; tst_init(); tst_ignore("// ** loaded "); tst_ignore("// ** _ is no standard basis");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -407,7 +407,6 @@ static proc sres_ext_(module m, int p)
   
   res_list[1] = m;
   for (i = 1; i<p; i++){
-    //print(res_list);
     res_list[i+1] = total_syz_alg(res_list[i], lead_terms_list);
     lead_terms_list[i+1] = lead(res_list[i+1]);
   }
@@ -654,7 +653,7 @@ SEE ALSO: sheafCoh, dimH, displayCohom
 EXAMPLE: example sheafCohBGG; shows an example
 "
 {
-  int i,j,k,row,col;
+  int i,j,k,row,col,p;
   if( typeof(attrib(M,"isHomog"))!="intvec" )
   {
      if (size(M)==0) { attrib(M,"isHomog",0); }
@@ -688,15 +687,10 @@ EXAMPLE: example sheafCohBGG; shows an example
   }
   attrib(EM,"isHomog",w);
   resolution RE=mres_ext(EM,bound1);
-  print(RE);
   intmat Betti=betti(RE);
-  print(Betti);
-  print(attrib(Betti,"rowShift"));
   k=ncols(Betti);
   row=nrows(Betti);
-  int shift=attrib(Betti,"rowShift")+(k+ell-1);
-  print("shift=");
-  print(shift);
+  int shift = 0;
   intmat newBetti[n+1][h-l+1];
   for (j=1; j<=row; j++)
   {
@@ -731,10 +725,8 @@ EXAMPLE: example sheafCohBGG; shows an example
       newBetti[j,i]=-1;
     }
   }
-  //print(newBetti);
   option(set,saveopt);
   setring R;
-  //print(newBetti);
   return(newBetti);
 }
 example
