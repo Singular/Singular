@@ -389,6 +389,7 @@ example
 {
   "EXAMPLE:";echo=2;
   ring r = (0,q),(x,y,z),dp;
+  def e = Exterior(); setring e;
   vector f1 = [x,y,0,z,0,0];
   vector f2 = [0,x,y,0,z,0];
   vector f3 = [0,0,0,x,y,z];
@@ -450,7 +451,7 @@ EXAMPLE: example sres_ext; shows an example
 example
 {"EXAMPLE:";
   ring r = 0,(x,y,z),dp;
-  def E = Exterior();
+  def e = Exterior(); setring e;
   vector f1 = [x,y,0,z,0,0];
   vector f2 = [0,x,y,0,z,0];
   vector f3 = [0,0,0,x,y,z];
@@ -613,7 +614,6 @@ example
   vector f2 = [0,x,y,0,z,0];
   vector f3 = [0,0,0,x,y,z];
   module m = f1,f2,f3;
-  m = std(m);
   mres_ext(m,4);
 }
 
