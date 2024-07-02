@@ -2250,6 +2250,7 @@ diophantine (const CFList& recResult, const CFList& factors,
               "constant or univariate poly expected");
       buf= mulNTL (E, i.getItem());
       if(!j.getItem().isZero()) result.append (modNTL (buf, j.getItem()));
+      else result.append(buf);
     }
     return result;
   }
