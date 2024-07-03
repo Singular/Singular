@@ -14,6 +14,7 @@
 #define PLURAL_INTERNAL_DECLARATIONS 1
 
 #include "kernel/mod2.h"
+#include "kernel/oswrapper/vspace.h"
 #include "misc/sirandom.h"
 #include "omalloc/omalloc.h"
 #include "misc/mylimits.h"
@@ -1453,6 +1454,7 @@ void siInit(char *name)
   #elif defined(_SC_NPROCESSORS_CONF)
   if ((cpu_n=sysconf(_SC_NPROCESSORS_CONF))>cpus) cpus=cpu_n;
   #endif
+  if (cpus>vspace::internals::MAX_PROCESS) cpus=vspace::internals::MAX_PROCESS;
   feSetOptValue(FE_OPT_CPUS, cpus);
 // how many threads ? -----------------------------------------------------
   feSetOptValue(FE_OPT_THREADS, cpus);

@@ -14,6 +14,7 @@
 #include "kernel/oswrapper/feread.h"
 #include "Singular/fevoices.h"
 #include "kernel/oswrapper/timer.h"
+#include "kernel/oswrapper/vspace.h"
 
 #include "ipshell.h"
 #include "cntrlc.h"
@@ -97,6 +98,10 @@ int main(          /* main entry to Singular */
       errormsg = feSetOptValue((feOptIndex) option_index, (int) 1);
     else
       errormsg = feSetOptValue((feOptIndex) option_index, fe_optarg);
+    // not more than MAX_PROCESS cpus
+    long cpus=(long)feOptValue(FE_OPT_CPUS);
+    if (cpus>vspace::internals::MAX_PROCESS) cpus=vspace::internals::MAX_PROCESS;
+    feSetOptValue(FE_OPT_CPUS,cpus);
 
     if (errormsg)
     {
