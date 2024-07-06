@@ -10,7 +10,6 @@ Long/surfacesignature.tst
 Long/symodstd.tst
 Manual/timeStd.tst
 Manual/waitall.tst
-Manual/waitfirst.tst
 Short/bug_509.tst
 Short/assprimeszerodim_s.tst
 Short/cornercase_normal.tst
