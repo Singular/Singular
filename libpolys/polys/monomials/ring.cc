@@ -2858,7 +2858,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     omFreeSize(wvhdl,(nblocks+1)*sizeof(int *));
     return r;
   }
-  ring res=(ring)omAlloc0Bin(sip_sring_bin);
+  ring res=(ring)omAllocBin(sip_sring_bin);
   *res = *r;
 
 #ifdef HAVE_PLURAL

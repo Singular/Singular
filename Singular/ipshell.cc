@@ -1384,10 +1384,8 @@ BOOLEAN iiParameter(leftv p)
   }
   leftv h=iiCurrArgs;
   leftv rest=h->next; /*iiCurrArgs is not NULL here*/
-  BOOLEAN is_default_list=FALSE;
   if (strcmp(p->name,"#")==0)
   {
-    is_default_list=TRUE;
     rest=NULL;
   }
   else
@@ -1395,14 +1393,7 @@ BOOLEAN iiParameter(leftv p)
     h->next=NULL;
   }
   BOOLEAN res=iiAssign(p,h);
-  if (is_default_list)
-  {
-    iiCurrArgs=NULL;
-  }
-  else
-  {
-    iiCurrArgs=rest;
-  }
+  iiCurrArgs=rest; // may be NULL
   h->CleanUp();
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
@@ -2658,7 +2649,7 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
            case ringorder_dp:
            case ringorder_Dp:
            case ringorder_rp:
-	   case ringorder_Ip:
+           case ringorder_Ip:
              #if 0
              for (i=0; i<iv_len;i++)
              {
@@ -2878,18 +2869,16 @@ ring rCompose(const lists  L, const BOOLEAN check_comp, const long bitmask,const
         if( extRing->qideal != NULL ) // Algebraic extension
         {
           AlgExtInfo extParam;
-
           extParam.r = extRing;
-
           R->cf = nInitChar(n_algExt, (void*)&extParam);
         }
         else // Transcendental extension
         {
           TransExtInfo extParam;
           extParam.r = extRing;
-
           R->cf = nInitChar(n_transExt, &extParam);
         }
+        //rDecRefCnt(R);
       }
     }
   }
@@ -6513,7 +6502,8 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
     sleftv tmp;
     tmp.Init();
     tmp.rtyp=IDHDL;
-    idhdl h=rDefault(ring_name);
+    idhdl h=enterid(ring_name, myynest, RING_CMD, &IDROOT);
+    IDRING(h)=NULL;
     tmp.data=(char*)h;
     if (h!=NULL)
     {

@@ -1679,6 +1679,7 @@ char* singclap_neworder ( ideal I, const ring r)
         p=p_Copy(p,r);
         p_Cleardenom(p, r);
         L.append(convSingPFactoryP(p,r));
+        p_Delete(&p,r);
       }
     }
   }
@@ -1694,6 +1695,7 @@ char* singclap_neworder ( ideal I, const ring r)
         p=p_Copy(p,r);
         p_Cleardenom(p, r);
         L.append(convSingTrPFactoryP(p,r));
+        p_Delete(&p,r);
       }
     }
   }

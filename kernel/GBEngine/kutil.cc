@@ -7739,31 +7739,28 @@ void initSL (ideal F, ideal Q,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
+      if (rHasLocalOrMixedOrdering(currRing))
+      {
+        cancelunit(&h);  /*- tries to cancel a unit -*/
+        deleteHC(&h, strat);
+      }
       if (h.p!=NULL)
       {
-        if (rHasLocalOrMixedOrdering(currRing))
+        if (TEST_OPT_INTSTRATEGY)
         {
-          cancelunit(&h);  /*- tries to cancel a unit -*/
-          deleteHC(&h, strat);
+          h.pCleardenom(); // also does remove Content
         }
-        if (h.p!=NULL)
+        else
         {
-          if (TEST_OPT_INTSTRATEGY)
-          {
-            h.pCleardenom(); // also does remove Content
-          }
-          else
-          {
-            h.pNorm();
-          }
-          strat->initEcart(&h);
-          if (strat->Ll==-1)
-            pos =0;
-          else
-            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-          h.sev = pGetShortExpVector(h.p);
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+          h.pNorm();
         }
+        strat->initEcart(&h);
+        if (strat->Ll==-1)
+          pos =0;
+        else
+          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+        h.sev = pGetShortExpVector(h.p);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
       }
     }
   }

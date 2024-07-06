@@ -2250,7 +2250,7 @@ nMapFunc ntSetMap_T(const coeffs src, const coeffs dst)
 static void ntKillChar(coeffs cf)
 {
   rDecRefCnt(cf->extRing);
-  if (cf->extRing->ref < 0)
+  if (cf->extRing->ref <= 0)
     rDelete(cf->extRing);
 }
 static number ntConvFactoryNSingN( const CanonicalForm n, const coeffs cf)

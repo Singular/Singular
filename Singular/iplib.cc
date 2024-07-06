@@ -413,6 +413,7 @@ BOOLEAN iiPStart(idhdl pn, leftv v)
   }
   else
   {
+    if (iiCurrArgs!=NULL) omFreeBin(iiCurrArgs,sleftv_bin);
     iiCurrArgs=NULL;
   }
   /* start interpreter ======================================*/

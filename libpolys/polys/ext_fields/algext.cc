@@ -1338,7 +1338,7 @@ static void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 static void naKillChar(coeffs cf)
 {
   rDecRefCnt(cf->extRing);
-  if(cf->extRing->ref<0)
+  if(cf->extRing->ref<=0)
     rDelete(cf->extRing);
 }
 
