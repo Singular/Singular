@@ -1,5 +1,5 @@
 /////// Procedure to compute Sagbi-Groebner Bases //////
-version="version sagbi.lib 4.2.1.1 Sep_2021 "; // $Id$
+version="version sagbi.lib 4.4.0.3 Sep_2021 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: sagbigrob.lib  Compute Sagbi-Groebner basis of an ideal of a subalgebra
@@ -39,11 +39,11 @@ RETURN: a polynomial h: the normalform of f wrt. I in A
 "
 {
    A=sagbi(A);
-   ideal G=I ;
-   poly h=f ;
+   ideal G=I;
+   poly h=f;
    poly h1,j,m,c;
-   list L ;
-   map psi ;
+   list L;
+   map psi;
    int i,k;
 
    while(h!=0 && h1!=h)
@@ -56,9 +56,9 @@ RETURN: a polynomial h: the normalform of f wrt. I in A
          L= algebra_containment(m,lead(A),1);
          if (L[1]==1)
          { k=1;
-           def s= L[2] ;
-           psi= s,maxideal(1),A ;
-           j= psi(check) ;
+           def s= L[2];
+           psi= s,maxideal(1),A;
+           j= psi(check);
            c=leadcoef(h)/(leadcoef(j)*leadcoef(G[i]));
            h1=h;
            h=h-(c*j*G[i]);
@@ -104,9 +104,9 @@ RETURN: a list M."
   def bsr=R1;
   ideal B=lead(A);
   int i;
-  ideal vars = maxideal(1) ;
-  int n=nvars(r) ;
-  int m=size(I) ;
+  ideal vars = maxideal(1);
+  int n=nvars(basering);
+  int m=size(I);
   ideal Q;
   list M,Li;
   poly ji;
@@ -168,14 +168,14 @@ RETURN: a module M."
   A=sagbi(A);
   ideal F=lead(I);
   ideal B=lead(A);
-  ideal vars = maxideal(1) ;
-  int n=nvars(r) ;
-  int m=ncols(A) ;
-  int k ;
-  ideal Q1 ;
+  ideal vars = maxideal(1);
+  int n=nvars(r);
+  int m=ncols(A);
+  int k;
+  ideal Q1;
   if(I==0)
   {
-    return(Q1) ;
+    return(Q1);
   }
   else
   {
@@ -338,10 +338,10 @@ proc SGB(ideal I,ideal A)
 RETURN: an ideal SB."
 {
   ideal SB,oldSB;
-  poly Red ;
-  ideal T ;
-  int k,l ;
-  SB=I ;
+  poly Red;
+  ideal T;
+  int k,l;
+  SB=I;
   while( size(SB)!=size(oldSB))
   {
     A=sagbi(A);
@@ -355,11 +355,11 @@ RETURN: an ideal SB."
     {
       for (k=1; k<=l;k++)
       {
-        Red=T[k] ;
+        Red=T[k];
         Red=SGNF(Red,SB,A);
         Red;
-        oldSB=SB ;
-        SB=SB+Red ;
+        oldSB=SB;
+        SB=SB+Red;
       }
     }
   }
