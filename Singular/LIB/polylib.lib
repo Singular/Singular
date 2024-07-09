@@ -58,7 +58,7 @@ EXAMPLE: example hilbPoly; shows an example
    bigintvec v=hilb(I,2);
    int s=dim(I);
    intvec hp;
-   if(s==0){return(hp);}
+   if(s<=0){return(hp);}
    int d=size(v)-2;
    ring S=0,t,dp;
    poly p=v[1+d]*bino(s-1-d,s-1);
