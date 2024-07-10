@@ -7,4 +7,8 @@ int n=10923;
 ideal i=w^n,x^n,y^n,z^n,u^n,v^n;
 hilb(std(i),1);
 
+// special case hilb(ideal(1),1) PR #1233
+ideal I=1;
+hilb(std(I),1);
+
 tst_status(1);$
