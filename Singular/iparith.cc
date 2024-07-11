@@ -104,6 +104,7 @@ long farey_cnt=0L;
 #define NO_ZERODIVISOR   8
 #define ALLOW_ZERODIVISOR  0
 #define ALLOW_LP         64
+#define NO_LRING         128
 #define ALLOW_NC         ALLOW_LP|ALLOW_PLURAL
 
 #define ALLOW_ZZ (ALLOW_RING|NO_ZERODIVISOR)
@@ -10190,6 +10191,11 @@ static BOOLEAN check_valid(const int p, const int op)
     if ((p & RING_MASK)==0 /*NO_RING*/)
     {
       WerrorS("not implemented for rings with rings as coeffients");
+      return TRUE;
+    }
+    if (((p & NO_LRING)==NO_LRING) && rHasLocalOrMixedOrdering(currRing))
+    {
+      WerrorS("not implemented for rings with rings as coeffients and non-global orderings");
       return TRUE;
     }
     /* else ALLOW_RING */

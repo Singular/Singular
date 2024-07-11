@@ -29,6 +29,7 @@
 // ALLOW_RING:  coefficient domain may be a ring
 // NO_ZERODIVISOR: coefficient domain may be a ring without zero-divisors
 // NO_RING: coefficient domain must be a field
+// NO_LRING: coefficient domain must be a field for non-global orderings
 //
 // other stuff:
 // NO_CONVERSION: arguments must have EXACTLY these types
@@ -278,12 +279,12 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjSQR_FREE),   SQR_FREE_CMD,    LIST_CMD,      POLY_CMD      , NO_NC |NO_RING}
-,{D(jjSTD),        STD_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
-,{D(jjSTD),        STD_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING}
-,{D(jjSTD),        STD_CMD,         SMATRIX_CMD,    SMATRIX_CMD   , ALLOW_NC |ALLOW_RING}
+,{D(jjSTD),        STD_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING |NO_LRING}
+,{D(jjSTD),        STD_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING |NO_LRING}
+,{D(jjSTD),        STD_CMD,         SMATRIX_CMD,    SMATRIX_CMD   , ALLOW_NC |ALLOW_RING |NO_LRING}
 ,{D(jjDUMMY),      STRING_CMD,      STRING_CMD,     STRING_CMD    , ALLOW_NC |ALLOW_RING}
-,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
-,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING}
+,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING |NO_LRING}
+,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING |NO_LRING}
 ,{D(jjENVELOPE),   ENVELOPE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
 ,{D(jjOPPOSITE),   OPPOSITE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
 ,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}

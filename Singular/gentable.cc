@@ -50,6 +50,8 @@ VAR int produce_convert_table=0;
 // bit 5: do no try automatic conversions
 #define NO_CONVERSION    32
 
+// no ring-cf, if ordering is non-global
+#define NO_LRING         128
 /*=============== types =====================*/
 struct _scmdnames
 {
@@ -372,6 +374,8 @@ void ttGen1()
       fprintf(outfile,", domain coeffs");
     else if ((dArith1[i].valid_for & WARN_RING)==WARN_RING)
       fprintf(outfile,", QQ coeffs");
+    else if ((dArith1[i].valid_for & NO_LRING)==NO_LRING)
+      fprintf(outfile,", field coeffs for non-global orderings");
 
     fprintf(outfile,"\n");
     i++;
