@@ -220,9 +220,9 @@
 // operation: sortvec (ideal)  ->  intvec
 // operation: sortvec (module)  ->  intvec
 // operation: sqrfree (poly)  ->  list, only commutative rings, field coeffs
-// operation: std (ideal)  ->  ideal, field coeffs for non-global orderings
-// operation: std (module)  ->  module, field coeffs for non-global orderings
-// operation: std (smatrix)  ->  smatrix, field coeffs for non-global orderings
+// operation: std (ideal)  ->  ideal
+// operation: std (module)  ->  module
+// operation: std (smatrix)  ->  smatrix
 // operation: string (string)  ->  string
 // operation: syz (ideal)  ->  module, field coeffs for non-global orderings
 // operation: syz (module)  ->  module, field coeffs for non-global orderings
