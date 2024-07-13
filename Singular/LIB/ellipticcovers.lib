@@ -49,7 +49,7 @@ printGraph(graph)                         print procedure for graphs
 propagator(list,int)                      propagator factor of degree d in the quotient of two variables, or
                                           propagator for fixed graph and branch type
 computeConstant(number, number)           constant coefficient in the Laurent series expansion of a rational function in a given variable
-evalutateIntegral(number, list)           path integral for a given propagator and ordered sequence of variables
+evaluateIntegral(number, list)           path integral for a given propagator and ordered sequence of variables
 gromovWitten(number)                      sum of path integrals for a given propagator over all orderings of the variables, or
                                           Gromov Witten invariant for a given graph and a fixed branch type, or
                                           list of Gromov Witten invariants for a given graph and all branch types
