@@ -11,7 +11,7 @@ AUTHORS:  J. Boehm, boehm @ mathematik.uni-kl.de
 OVERVIEW:
 
 We implement a formula for computing the number of covers of elliptic curves.
-It has beed obtained by proving mirror symmetry
+It has been obtained by proving mirror symmetry
 for arbitrary genus by tropical methods in [BBM]. A Feynman graph of genus
 g is a trivalent, connected graph of genus g (with 2g-2 vertices
 and 3g-3 edges). The branch type b=(b_1,...,b_(3g-3)) of a stable map is the
