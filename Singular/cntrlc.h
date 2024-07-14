@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT - interupt and signal handling
+* ABSTRACT - interrupt and signal handling
 */
 #include <setjmp.h>
 #include "kernel/mod2.h"

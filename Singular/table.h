@@ -1,6 +1,6 @@
 #ifdef IPARITH
 // additional to the usual types: INT_CMD etc.
-// thre are special types:
+// there are special types:
 // for the input:
 // IDHDL: argument must have a name
 // DEF_CMD: no restriktions on the argument
@@ -22,7 +22,7 @@
 // ALLOW_NC: also for plural rings and letterplace rings
 // ALLOW_LP: also for letterplace rings, not for plural rings
 // ALLOW_PLURAL: not for letterplace rings, but for plural rings
-// COMM_PLURAL: only for commuative subrings of plural rings
+// COMM_PLURAL: only for commutative subrings of plural rings
 // NO_NC: not for non-commutative rings
 //
 // coefficient domain:

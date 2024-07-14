@@ -19,9 +19,9 @@ EXTERN_VAR char     my_yylinebuf[80];
 extern int  yyparse(void);
 #endif
 
-/* the follwing defines for infix operators should not be changed: *
+/* the following defines for infix operators should not be changed: *
 *  grammar.y does not use the symbolic names                       *
-*  scanner.l uses the identies for some optimzations              */
+*  scanner.l uses the identities for some optimizations              */
 #define LOGIC_OP         '&'
 #define MULDIV_OP        '/'
 #define COMP_OP          '<'

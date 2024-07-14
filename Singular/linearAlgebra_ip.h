@@ -5,7 +5,7 @@
 
 /**
  * Computes all eigenvalues of a given real quadratic matrix with
- * multiplicites.
+ * multiplicities.
  *
  * The method assumes that the current ground field is the complex numbers.
  * Computations are based on the QR double shift algorithm involving

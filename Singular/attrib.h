@@ -24,7 +24,7 @@ class sattr
     char *  name;
     void *  data;
     attr    next;
-    int     atyp; /* the type of the attribut, describes the data field
+    int     atyp; /* the type of the attribute, describes the data field
                   */
 
     void Print();

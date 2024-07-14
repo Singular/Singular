@@ -68,7 +68,7 @@ char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
 BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force );
-/* sees wheter library lib has already been loaded
+/* sees whether library lib has already been loaded
    if yes, writes filename of lib into where and returns TRUE,
    if  no, returns FALSE
 */
@@ -168,7 +168,7 @@ extern const struct sValCmdM dArithM[];
 #endif
 
 /* ================================================================== */
-/* Assigments : */
+/* Assignments : */
 BOOLEAN iiAssign(leftv left, leftv right, BOOLEAN toplevel=TRUE);
 coeffs jjSetMinpoly(coeffs cf, number a);
 

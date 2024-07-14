@@ -45,7 +45,7 @@ VAR struct fe_option feOptSpec[] =
 // The order in which options are specified is the order in which
 // their help is printed on -h
 //
-// Options whose hel starts with an "//" are considered undocumented,
+// Options whose help starts with an "//" are considered undocumented,
 // i.e., their help is not printed on -h
 //
 #if defined(ESINGULAR) || defined(TSINGULAR)
