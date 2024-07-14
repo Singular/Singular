@@ -2272,7 +2272,7 @@ proc nonnull(poly f, ideal N, ideal W)
 //   g2 belonging to the basis in the segment N2,W2
 // output:
 //   an ideal (with a single polynomial of more if a sheaf is needed)
-//   that specializes well on both segments to g1 and g2 respectivelly.
+//   that specializes well on both segments to g1 and g2 respectively.
 //   If ideal(0) is output, then no such polynomial nor sheaf exists.
 proc decide(poly g1, ideal N1, ideal W1, poly g2, ideal N2, ideal W2)
 {
@@ -2479,7 +2479,7 @@ proc selectcases(list bT)
   list s3;   // list of integers s whose segment cannot be summarized
              // in the actual case
   ideal lpp; // the summarized lpp (can contain repetitions)
-  ideal lppi;// in proecess of sumarizing lpp (can contain repetitions)
+  ideal lppi;// in proecess of summarizing lpp (can contain repetitions)
   ideal B;   // the summarized B (can contain polynomials with
              // the same lpp (sheaves))
   ideal Bi;  // in process of summarizing B (can contain polynomials with
@@ -2852,7 +2852,7 @@ proc GCS(intvec lab, list case)
 }
 
 // sorbylab:
-// pupose: given the list of mrcgs to order is by increasing label
+// purpose: given the list of mrcgs to order it by increasing label
 proc sortbylab(list L)
 {
   int n=L[1][2];

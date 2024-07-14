@@ -188,7 +188,7 @@ static proc spolynomialsGB(ideal algebra,def r,int method)
   dbprint(ppl-2,"//Spoly-3-1- ideal of new algebraic relations",algebraicRelationsNew);
   /*        algebraicRelationsOld is a groebner basis by construction (as variable
    *        ordering is
-   *        block ordering we have an elemination ordering for the varsBasering)
+   *        block ordering we have an elimination ordering for the varsBasering)
    *        Therefore, to only get the new algebraic relations, calculate
    *        <algebraicRelations>\<algebraicRelationsOld> using groebner reduction
    */
@@ -901,7 +901,7 @@ EXAMPLE: example algebraicDependence; shows an example"
   {
     parList[i]=string(parameterName,"(",i,")");
   }
-  l[1]=list(l[1],parList,list(list("dp",1:ncols(I)))); //add @c(i) to the ring as paramteres
+  l[1]=list(l[1],parList,list(list("dp",1:ncols(I)))); //add @c(i) to the ring as parameters
   ideal temp=0;
   l[1][4]=temp;
   // addition VL: noncomm case

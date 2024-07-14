@@ -676,7 +676,7 @@ EXAMPLE: example alexanderpolynomial;  shows an example
   {
     if (gr[i,i]>0)  // If it belongs to an exceptional curve.
     {
-      for (j=1;j<=e;j++)  // Calculate the Euler charateristik of the smooth locus of the exc. curve.
+      for (j=1;j<=e;j++)  // Calculate the Euler characteristic of the smooth locus of the exc. curve.
       {
         if ((gr[i,j]==1) and (i!=j))
         {

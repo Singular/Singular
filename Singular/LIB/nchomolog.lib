@@ -39,7 +39,7 @@ added doc for contraHom and coHom; assume check for ncHom etc.
  */
 
 /* TODO:
-add noncomm examples to important precedures ncHom,
+add noncomm examples to important procedures ncHom,
  */
 
 proc contraHom(matrix M, int s)

@@ -386,7 +386,7 @@ RETURN: A list, say repmatrix, containing two elements. repmatrix[1] is
   ideal IntBasis = imap(Rbase,IntBasis);
   ideal fred = std(imap(Rbase,f));
   IntBasis = reduce(IntBasis,fred);
-  //coeffiecient matrix w. r. t. the integral basis
+  //coefficient matrix w. r. t. the integral basis
   matrix M = coeffs(IntBasis,var(1));
 
   setring QF;
@@ -1175,7 +1175,7 @@ RETURN: A list, containing the maximum degree occurring in the
 
 //_________________________________________________________________
 static proc coefficientAt(matrix A, int j, int e);
-"USAGE: coefficientAt(A,j,e); A matrix, j,e intger
+"USAGE: coefficientAt(A,j,e); A matrix, j,e integer
 ASSUME: Base ring is polynomial ring in one variable,
         j describes a column of A, e non-negative integer
         smaller or equal to the column degree of

@@ -36,7 +36,7 @@ LIB "elim.lib";
 proc realrad(ideal id)
 "USAGE: realrad(id), id an ideal of arbitrary dimension
 RETURN: the real radical of id
-EXAMPE: example realrad; shows an example"
+EXAMPLE: example realrad; shows an example"
 {
 
   def r=basering;
@@ -871,7 +871,7 @@ EXAMPLE:   example is_real; shows an example"
    number b=leadcoef(sign(leadcoef(subst(f,isuni(f),length(f)))));
    if
    (a*b!=1)
-   //polynomials are contineous so the image is an interval
+   //polynomials are continuous so the image is an interval
    //referes to analysis
    {
       return(1);

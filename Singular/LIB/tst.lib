@@ -346,7 +346,7 @@ SEE ALSO: tst_StopTimer, tst_GetTimer, tst_ReportTimer
 proc tst_StopTimer()
 "USAGE: tst_StopTimer()
 RETURN: int, timer ticks of elapsed CPU time since last call to tst_InitTimer
-PUPOSE: stops the timer initialized by previous call to tst_InitTimer
+PURPOSE: stops the timer initialized by previous call to tst_InitTimer
 SEE ALSO: tst_InitTimer, tst_GetTimer, tst_ReportTimer
 "
 {
@@ -368,7 +368,7 @@ SEE ALSO: tst_InitTimer, tst_GetTimer, tst_ReportTimer
 proc tst_ReportTimer(list #)
 "USAGE: tst_ReportTimer([prefix])
 RETURN: none
-PUPOSE: stops the timer initialized by previous call to tst_InitTimer;
+PURPOSE: stops the timer initialized by previous call to tst_InitTimer;
         reports time to tst-output;
         if prefix is given, timer output is prefixed by it.
 SEE ALSO: tst_InitTimer, tst_GetTimer, tst_StopTimer, tst_OutTimer, tst_init

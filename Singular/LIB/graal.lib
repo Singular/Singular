@@ -1136,7 +1136,7 @@ static proc liftRes(markedResolution rh)
 
 /***
  * Given two ideals with the same generators modulo ordering
- * returns an intvec that respresents a permutation of the generators
+ * returns an intvec that represents a permutation of the generators
  **/
 static proc getPermutation(ideal I1, ideal I2)
 {

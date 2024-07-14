@@ -5694,7 +5694,7 @@ OPTIONS: An option is a pair of arguments: string, integer.
         \"numpar\", np  in order to consider the first np parameters of the ring
         to be fixed parameters of the locus, being the tracer variables
         the remaining parameters.
-        To be used for a paramteric locus. (New in release N12).
+        To be used for a parametric locus. (New in release N12).
 
         \"moverdim\", k  to force the mover-variables to be the last
          k variables. This determines the antiimage and its dimension.

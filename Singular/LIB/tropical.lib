@@ -293,7 +293,7 @@ REMARK:  - it is best to use the procedure displayTropicalLifting to
 @*       - the option 'findAll' cannot be used if 'noAbs' is set
 @*       - if the parameter 'findAll' is set AND the ideal i is zero-dimensional
            in Q{{t}}[x_1,...,x_n] then ALL points in V(i) lying over w are
-           computed up to order ord; if the ideal is not-zero dimenisonal, then
+           computed up to order ord; if the ideal is not-zero dimensional, then
            only the points in the ideal after cutting down to dimension zero
            will be computed
 @*       - the procedure requires that the program GFAN is installed on your
@@ -411,7 +411,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
     }
     // this option is not documented -- it prevents the execution of gfan and
     // just asks for wneu to be inserted -- it can be used to check problems
-    // with the precedure without calling gfan, if wneu is know from previous
+    // with the procedure without calling gfan, if wneu is know from previous
     // computations
     if (#[j]=="noGfan")
     {
@@ -1342,7 +1342,7 @@ RETURN:      list, each entry i=1,...,size(l)-1 corresponds to a vertex
                    l[size(l)][2] = list, the entries are pairs of integer
                                          vectors defining an interior
                                          edge of the Newton subdivision
-                   l[size(l)][3] = intvec, the monomials occuring in l[i][5]
+                   l[size(l)][3] = intvec, the monomials occurring in l[i][5]
                                            have to be shifted by this vector
                                            in order to represent marked
                                            vertices in the Newton polygon
@@ -1892,7 +1892,7 @@ RETURN:   NONE
 NOTE:     - the procedure creates the files /tmp/newtonsubdivisionNUMBER.tex,
             and /tmp/newtonsubdivisionNUMBER.ps, where NUMBER is a random
             four digit integer;
-            moreover it desplays the tropical curve defined by f via xdg-open;
+            moreover it displays the tropical curve defined by f via xdg-open;
             if you wish to remove all these files from /tmp, call the procedure
             cleanTmp;
 @*          if # is empty, then the tropical curve is computed w.r.t. minimum,
@@ -2932,7 +2932,7 @@ NOTE:    - if the list # is non-empty, the first entry should be a string;
            however, be a bad idea if several texDrawTropical outputs are
            put together to form one image; the scalefactor can be prescribed
            by the further optional entry of type poly
-@*       - one can add a string as last opional argument to the list #;
+@*       - one can add a string as last optional argument to the list #;
            it can be used to insert further texdraw commands (e.g. to have
            a lighter image as when called from inside conicWithTangents);
 @*       - the list # is optional and may as well be empty
@@ -3627,7 +3627,7 @@ ASSUME:   if f is of type poly then f is a linear polynomial with an
 @*        if f is of type list then it is a list of polynomials of
           the type just described in before
 RETURN:   poly, the detropicalisation of f over the field Q(t)
-NOTE:     the output will be a term where the coeffiecient is a Laurent
+NOTE:     the output will be a term where the coefficient is a Laurent
           monomial in the variable t
 EXAMPLE:  example tDetropicalise;   shows an example"
 {
@@ -3699,7 +3699,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Auxilary Procedures concerned with substitution
+/// Auxiliary Procedures concerned with substitution
 ///////////////////////////////////////////////////////////////////////////////
 
 proc parameterSubstitute (poly f,int N)
@@ -4477,7 +4477,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   def ALTRING=basering;
   int recursively; // is set 1 if the procedure is called recursively by itself
   int jj,kk;
-  if (size(#)==2) // this means the precedure has been called recursively
+  if (size(#)==2) // this means the procedure has been called recursively
   {
     // how many variables are true variables, and how many come
     // from the field extension
@@ -4919,7 +4919,7 @@ NOTE:    the procedure is called from inside the recursive procedure
          which reduce to a polynomial in X_1,...,X_k modulo m will be eliminated,
          while the others are replaced by new variables X_k+1,...,X_k'"
 {
-  def BASERING=basering;  // the variable t is acutally the LAST variable !!!
+  def BASERING=basering;  // the variable t is actually the LAST variable !!!
   int j,k;     // counters
   // store the weighted degrees of the elements of i in an integer vector
   intvec wdegs;
@@ -6172,7 +6172,7 @@ NOTE:    - the procedure is called from inside the recursive
     // sat(i+x_n,t), otherwise leave i as it is;
     // then check if the (remaining) ideal has as
     // solution where the n-1st component is zero ...,
-    // and procede as before; do the same for the remaining variables;
+    // and proceed as before; do the same for the remaining variables;
     // this way we make sure that the remaining ideal has
     // a solution which has no component zero;
     ideal variablen; // will contain the variables which are not eliminated
@@ -7897,7 +7897,7 @@ displayTropicalLifting(L,"subst");
 // --------------------------------------------------------
 poly g=(1+t2)*x2+t5x+t2;
 g;
-// The poin -1 is in the tropical variety.
+// The point -1 is in the tropical variety.
 displayTropicalLifting(tropicalLifting(g,intvec(1,-1),4),"subst");
 // --------------------------------------------------------
 // Example 3 - the ideal is not zero dimensional

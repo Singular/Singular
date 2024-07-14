@@ -3460,7 +3460,7 @@ example
   ideal I=x3+y3+z3;
   I;
   EulerProj(I);
-  // Euler characteritic of 3 non-collinear lines:
+  // Euler characteristic of 3 non-collinear lines:
   ideal J=x*y*z;
   J;
   EulerProj(J);

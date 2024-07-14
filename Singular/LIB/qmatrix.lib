@@ -271,7 +271,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// For tecnical reasons we work with a list of variables {y(1)...y(n^2)}.
+// For technical reasons we work with a list of variables {y(1)...y(n^2)}.
 // In quantum matrices the usual is to work with a square matrix of variables {y(ij)}.
 // The formulas are easier if we use matricial notation.
 // The following two procedures change the index of a list to a matrix and viceversa in order

@@ -760,7 +760,7 @@ PURPOSE: computes hash table of euler polynomials of twists of coker(M) in the r
 ASSUME:  M module, note that at the moment M is a module over S,
 RETURN:  (Z,eulerpolynomialtable), where eulerpolynomialtable is a hash table with entries in the ring Z = ZZ[h]
 NOTE:    this function works for arbitrary products P^{n_1} x \cdots x P^{n_t} and corresponding Z^t-gradings, entries can be accessed via
-     eulerpolynomialtable*(a_1,...,a_t) where a=(a_1,...,a_t) is a multidegree betweeen low and high
+     eulerpolynomialtable*(a_1,...,a_t) where a=(a_1,...,a_t) is a multidegree between low and high
 EXAMPLE: example eulerPolynomialTable
 "
 {
@@ -971,7 +971,7 @@ proc beilinsonWindow(multigradedcomplex T)
 PURPSOSE:compute the subquotient complex of T consisting of summands generated in degrees 0 <= a <= n
 ASSUME:  T is a multigraded complex of free E-modules
 RETURN:  multigradedcomplex, the Beilinson window of T
-NOTE:    The returend summands are the only ones that contribute to the Beilinson monad.
+NOTE:    The returned summands are the only ones that contribute to the Beilinson monad.
 EXAMPLE: example beilinsonWindow
 "
 {
@@ -1755,7 +1755,7 @@ ASSUME:  nrows(multiDegrees) == length(c);
 RETURN:  cohomologyMatrix in ZZ[h] (klappt aber leider irgendwie nicht, wegen Ringwechsel in Funktion)
 "
 {
-  // iterate through the columns of matrix multiDegrees and count how often c arises as a colum
+  // iterate through the columns of matrix multiDegrees and count how often c arises as a column
   int numc;
   int i;
   for (i=1;i<=ncols(multiDegrees);i++)
@@ -1830,7 +1830,7 @@ static proc matrixWithSpecificEntries(int a, int b, intvec c)
 static proc deleteZerosReso(list L)
 "USAGE:  deletes all the zero entries in the list which represents a complex
 RETURN:  list
-NOTE:  the shift of homological degreee stored in the first entry of L has to be adjusted
+NOTE:  the shift of homological degree stored in the first entry of L has to be adjusted
 "
 {
   int i=2;
@@ -2304,7 +2304,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc deleteZerosMultigradedComplex(multigradedcomplex T)
-"USAGE:  delete superflous zeros in a multigraded complex
+"USAGE:  delete superfluous zeros in a multigraded complex
 RETURN:  multigradedcomplex with deleted zeros
 "
 {

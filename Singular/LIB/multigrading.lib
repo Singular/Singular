@@ -5505,7 +5505,7 @@ EXAMPLE: example productgroup(G,H); shows an example
   intmat OL1[nrows(L1)][ncols(L2)];
   intmat OL2[nrows(L2)][ncols(L1)];
 
-  // concatinate matrices to get S
+  // concatenate matrices to get S
   intmat A = concatintmat(S1,OS1);
   intmat B = concatintmat(OS2,S2);
   intmat At = transpose(A);
@@ -5513,7 +5513,7 @@ EXAMPLE: example productgroup(G,H); shows an example
   intmat St = concatintmat(At,Bt);
   intmat S = transpose(St);
 
-  // concatinate matrices to get L
+  // concatenate matrices to get L
   intmat C = concatintmat(L1,OL1);
   intmat D = concatintmat(OL2,L2);
   intmat Ct = transpose(C);

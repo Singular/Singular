@@ -311,7 +311,7 @@ static proc formaldiff (poly f,intvec H)
           degree size(H)-1 are plugged into f. H defines, if and how
           often we differentiate each t-coefficient. We distinguish
           two different cases, the only difference being that we
-          diffentiate more often in the second case (this is still
+          differentiate more often in the second case (this is still
           defined by H). This leads to two systems of equations,
           each one defining a Zariski-closed set and the second one
           being contained in the first one

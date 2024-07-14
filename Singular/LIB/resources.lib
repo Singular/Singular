@@ -127,7 +127,7 @@ EXAMPLE:  example semaphore; shows an example"
         i++;
     }
     if (system("semaphore", "init", i, n) != 1) {
-        ERROR("no more semphores");
+        ERROR("no more semaphores");
     }
     return(i);
 }

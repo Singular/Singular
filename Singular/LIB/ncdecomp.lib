@@ -161,7 +161,7 @@ proc CentralSaturation(module M, ideal T)
 "USAGE:  CentralSaturation(M, T), for a module M and an ideal T
 ASSUME: T is an ideal in the center of the base ring
 RETURN:  module
-PURPOSE: compute the central saturation of M by T, that is M:T^{\infty}, by repititive application of @code{CentralQuot}
+PURPOSE: compute the central saturation of M by T, that is M:T^{\infty}, by repetitive application of @code{CentralQuot}
 NOTE:    the output module is not necessarily a Groebner basis
 SEE ALSO: CentralQuot, CenCharDec
 EXAMPLE: example CentralSaturation; shows examples

@@ -8477,7 +8477,7 @@ minimal homogeneous part");
   for (i = 1; i<=size(pqmax); i++)
   {//iterate over the maximal homogeneous combination possibilities
     for (j = 1; j<=size(pqmin); j++)
-    {//iterate over the minimal homogeneous combiniation possibilities
+    {//iterate over the minimal homogeneous combination possibilities
       if (degreeOfNthWeylPoly(pqmax[i][1])>=degreeOfNthWeylPoly(pqmin[j][1])
           and degreeOfNthWeylPoly(pqmax[i][2])>=degreeOfNthWeylPoly(pqmin[j][2]))
       {
@@ -8509,7 +8509,7 @@ minimal homogeneous part");
           result = result +list(list(pqmax[i][1]+pqmin[j][1],pqmax[i][2]+pqmin[j][2]));
         }
       }
-    }//iterate over the minimal homogeneous combiniation possibilities
+    }//iterate over the minimal homogeneous combination possibilities
   }//iterate over the maximal homogeneous combination possibilities
   //Now deleting double entries
   result = delete_duplicates_noteval_and_sort(result);

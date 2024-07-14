@@ -518,7 +518,7 @@ RETURN:  ideal, containing generators of the ring of invariants of the
 DISPLAY: if pa is given (any string as 5th or 6th argument), the computation
          pauses whenever new invariants are found and displays them
 THEORY:  The algorithm for computing the ring of invariants works in char 0
-         or suffiently large characteristic.
+         or sufficiently large characteristic.
          (K,+) acts as the exponential of the vector field defined by the
          matrix m.
          For background see G.-M. Greuel, G. Pfister,
