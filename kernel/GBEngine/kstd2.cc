@@ -417,7 +417,7 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
   }
 }
 
-static int kFindDivisibleByInT_ecart(const kStrategy strat, const LObject* L, const int ecart)
+int kFindDivisibleByInT_ecart(const kStrategy strat, const LObject* L, const int ecart)
 {
   if (TEST_OPT_LENGTH)
   {
@@ -429,10 +429,10 @@ static int kFindDivisibleByInT_ecart(const kStrategy strat, const LObject* L, co
       jj=kFindDivisibleByInT(strat,L,jj+1);
       if (jj== -1)
       {
-        if (j==-2) return r; // nothing found
+        if (j<0) return r; // nothing with good ecart
         else return j; // end of search, return best found
       }
-      else if (r== -1) r=j;
+      else if (r<0) r=jj; // save bad ecart found
       if (strat->T[jj].ecart<=ecart)  // good enough
       {
         if (strat->T[jj].pLength<=0)

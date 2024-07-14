@@ -590,6 +590,7 @@ int kFindInTShift(poly p, TSet T, int tlength);
 /// return -1 if no divisor is found
 ///        number of first divisor in T, otherwise
 int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start=0);
+int kFindDivisibleByInT_ecart(const kStrategy strat, const LObject* L, const int ecart);
 int kFindDivisibleByInT_Z(const kStrategy strat, const LObject* L, const int start=0);
 int kFindSameLMInT_Z(const kStrategy strat, const LObject* L, const int start=0);
 
