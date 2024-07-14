@@ -417,7 +417,54 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
   }
 }
 
-// same as above, only with set S
+static int kFindDivisibleByInT_ecart(const kStrategy strat, const LObject* L, const int ecart)
+{
+  if (TEST_OPT_LENGTH)
+  {
+    int r=-1; // found, but bad ecart
+    int j=-2; // found, good ecart
+    int jj=-1; // current search
+    loop
+    {
+      jj=kFindDivisibleByInT(strat,L,jj+1);
+      if (jj== -1)
+      {
+        if (j==-2) return r; // nothing found
+        else return j; // end of search, return best found
+      }
+      else if (r== -1) r=j;
+      if (strat->T[jj].ecart<=ecart)  // good enough
+      {
+        if (strat->T[jj].pLength<=0)
+          strat->T[jj].pLength=strat->T[jj].GetpLength();
+        if (j== -2) j=jj; // first found
+        else if (strat->T[j].pLength > strat->T[jj].pLength) // jj better then j
+          j=jj;
+        if (strat->T[j].pLength<=2) return j; // length already minimal
+      }
+    }
+  }
+  else
+  {
+    int r=-1;
+    int jj=-1;
+    loop
+    {
+      jj=kFindDivisibleByInT(strat,L,jj+1);
+      if (jj== -1)
+      {
+        return r; // nothing found
+      }
+      else if (r== -1) r=jj;
+      if (strat->T[jj].ecart<=ecart)  // good enough
+      {
+        return jj;
+      }
+    }
+  }
+}
+
+// same as kFindDivisibleByInT, only with set S
 int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
 {
   unsigned long not_sev = ~L->sev;
@@ -2083,49 +2130,15 @@ int redHoney (LObject* h, kStrategy strat)
   h->PrepareRed(strat->use_buckets);
   loop
   {
-    j=kFindDivisibleByInT(strat, h);
+    j=kFindDivisibleByInT_ecart(strat, h, h->ecart);
     if (j < 0) return 1;
 
-    ei = strat->T[j].ecart;
-    li = strat->T[j].pLength;
     ii = j;
+    ei = strat->T[ii].ecart;
     /*
      * the polynomial to reduce with (up to the moment) is;
      * pi with ecart ei (T[ii])
      */
-    i = j;
-    if (test_opt_length)
-    {
-      if (li<=0) li=strat->T[j].GetpLength();
-      if (li>2)
-      {
-        unsigned long not_sev = ~ h->sev;
-        loop
-        {
-          /*- takes the first possible with respect to ecart -*/
-          i++;
-          if (i > strat->tl) break;
-          if (ei <= h->ecart) break;
-          if(p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                                   h_p, not_sev, strat->tailRing))
-          {
-            strat->T[i].GetpLength();
-            if (((strat->T[i].ecart < ei) && (ei> h->ecart))
-             || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
-            {
-              /*
-              * the polynomial to reduce with is now;
-              */
-              ei = strat->T[i].ecart;
-              li = strat->T[i].pLength;
-              ii = i;
-              if (li==1) break;
-              if (ei<=h->ecart) break;
-            }
-          }
-        }
-      }
-    }
 
     /*
      * end of search: have to reduce with pi
