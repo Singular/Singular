@@ -5,7 +5,7 @@
 ****************************************/
 
 /*
-* ABSTRACT: identfier handling
+* ABSTRACT: identifier handling
 */
 #include "misc/options.h"
 #include "Singular/idrec.h"

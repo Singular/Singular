@@ -61,7 +61,7 @@ public:
   CountedRefPtr(const CountedRefPtr<ptr_type, !nondestructive, Never, count_type>& rhs):
     m_ptr(rhs.m_ptr) { reclaim(); }
 
-  /// Construct refernce copy
+  /// Construct reference copy
   CountedRefPtr(const self& rhs):
     m_ptr(rhs.m_ptr) { reclaim(); }
 
@@ -106,7 +106,7 @@ private:
 };
 
 /** @class RefCounter
- * This class implements implements a refernce counter which we can use
+ * This class implements implements a reference counter which we can use
  * as a public base of objects managed by @CountedRefPtr.
  **/
 class RefCounter {
@@ -208,7 +208,7 @@ private:
 
 /** @class LeftvHelper
  * This class implements some recurrent code sniplets to be used with
- * @c leftv and @c idhdl.implements a refernce counter which we can use
+ * @c leftv and @c idhdl.implements a reference counter which we can use
  **/
 class LeftvHelper {
 public:
@@ -275,7 +275,7 @@ public:
 };
 
 /** @class LeftvShallow
- * Ths class wraps @c leftv by taking into acount memory allocation, destruction
+ * This class wraps @c leftv by taking into account memory allocation, destruction
  * as well as shallowly copying of a given @c leftv, i.e. we just copy auxiliary
  * information (like subexpressions), but not the actual data.
  *
@@ -321,7 +321,7 @@ protected:
 };
 
 /** @class LeftvDeep
- * This class wraps @c leftv by taking into acount memory allocation, destruction
+ * This class wraps @c leftv by taking into account memory allocation, destruction
  * as well as deeply copying of a given @c leftv, i.e. we also take over
  * ownership of the @c leftv data.
  *

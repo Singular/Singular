@@ -35,7 +35,7 @@
 
 
 // internal Version: 1.18.1.6
-//     enumeration to handle the various errors to occour.
+//     enumeration to handle the various errors to occur.
 enum FglmState{
     FglmOk,
     FglmHasOne,
@@ -272,7 +272,7 @@ fglmIdealcheck( const ideal theIdeal )
 
 // The main function for the fglm-Algorithm.
 // Checks the input-data, and calls fglmzero (see fglmzero.cc).
-// Returns the new groebnerbasis or 0 if an error occoured.
+// Returns the new groebnerbasis or 0 if an error occured.
 BOOLEAN
 fglmProc( leftv result, leftv first, leftv second )
 {
@@ -406,7 +406,7 @@ ideal fglmQuot( ideal first, poly second )
 
 // fglmQuotProc: Calculate I:f with FGLM methods.
 // Checks the input-data, and calls fglmquot (see fglmzero.cc).
-// Returns the new groebnerbasis if I:f or 0 if an error occoured.
+// Returns the new groebnerbasis if I:f or 0 if an error occured.
 BOOLEAN
 fglmQuotProc( leftv result, leftv first, leftv second )
 {
@@ -536,7 +536,7 @@ ideal findUni( ideal first )
 // The main function for finduni().
 // Checks the input-data, and calls FindUnivariateWrapper (see fglmzero.cc).
 // Returns an ideal containing the univariate Polynomials or 0 if an error
-// has occoured.
+// has occured.
 BOOLEAN
 findUniProc( leftv result, leftv first )
 {

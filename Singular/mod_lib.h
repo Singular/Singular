@@ -29,7 +29,7 @@ lib_types type_of_LIB(const char *newlib, char *fullname);
 # define SI_BUILTIN_MATHIC(add) add(singmathic)
 #endif
 #ifdef EMBED_PYTHON
-//TODO: the line above means that syzextra should be staticly embedded IFF pyobjects do so :(((((
+//TODO: the line above means that syzextra should be statically embedded IFF pyobjects do so :(((((
 #define SI_BUILTIN_PYOBJECT(add) add(pyobject) add(syzextra) SI_BUILTIN_GFANLIB(add) SI_BUILTIN_MATHIC(add)
 #endif
 */

@@ -90,8 +90,8 @@ class sleftv
     BITSET      flag;
     int         rtyp;
                  /* the type of the expression, describes the data field
-                  * (E) markes the type field in iparith
-                  * (S) markes the rtyp in sleftv
+                  * (E) marks the type field in iparith
+                  * (S) marks the rtyp in sleftv
                   * ANY_TYPE:   data is int: real type or 0    (E)
                   * DEF_CMD:    all types, no change in sleftv (E)
                   * IDHDL: existing variable         (E)

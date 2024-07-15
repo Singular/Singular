@@ -62,7 +62,7 @@ inline int feOptValue(feOptIndex opt, int* val)
   return FALSE;
 }
 
-// maps name to otions
+// maps name to options
 feOptIndex feGetOptIndex(const char* name);
 feOptIndex feGetOptIndex(int optc);
 

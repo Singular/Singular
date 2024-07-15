@@ -48,7 +48,7 @@
  * We thus have: n = L[1][1]^L[2][1] * ... * L[1][k]^L[2][k] * L[3], where
  * k is the number of mutually distinct prime factors (<= a provided non-
  * zero bound).
- * Note that for n = 0, L[1] and L[2] will be emtpy lists and L[3] will be
+ * Note that for n = 0, L[1] and L[2] will be empty lists and L[3] will be
  * zero.
  *
  * @return the factorisation data in a SINGULAR-internal list

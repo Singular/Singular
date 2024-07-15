@@ -8001,7 +8001,7 @@ namespace svd
         {
 
             //
-            // We cant use additional memory or there is no need in such operations
+            // We cannot use additional memory or there is no need in such operations
             //
             result = bdsvd::rmatrixbdsvd<Precision>(w, e, minmn, isupper, false, u, nru, a, 0, vt, ncvt);
         }
@@ -8269,7 +8269,7 @@ namespace svd
         {
 
             //
-            // We cant use additional memory or there is no need in such operations
+            // We cannot use additional memory or there is no need in such operations
             //
             result = bdsvd::bidiagonalsvddecomposition<Precision>(w, e, minmn, isupper, false, u, nru, a, 0, vt, ncvt);
         }

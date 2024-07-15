@@ -11,7 +11,7 @@
 // first is the sourceRing, second is the given ideal in sourceRing.
 // Returns the groebnerbasis of the sourceIdeal in the currentRing.
 // Checks, if the ideal is really a reduced groebner basis of a
-// 0-dimensional Ideal. Returns TRUE if an error occoured.
+// 0-dimensional Ideal. Returns TRUE if an error occurred.
 BOOLEAN fglmProc( leftv result, leftv first, leftv second );
 
 // fglmquotproc(...):
@@ -21,7 +21,7 @@ BOOLEAN fglmProc( leftv result, leftv first, leftv second );
 // Returns the groebnerbasis of I:q in the currentRing.
 // Checks, if the ideal is really a reduced groebner basis of a
 // 0-dimensional Ideal and if q is really reduced.
-//  Returns TRUE if an error occoured.
+//  Returns TRUE if an error occurred.
 BOOLEAN fglmQuotProc( leftv result, leftv first, leftv second );
 ideal fglmQuot( ideal first, poly second );
 

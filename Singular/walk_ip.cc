@@ -45,7 +45,7 @@
 ///////////////////////////////////////////////////////////////////
 //Description: The main function for the Walk-Algorithm. Checks the
 //input-data, and calls walk64 (see walkMain.cc). Returns the new
-//groebner basis or something else if an error occoured.
+//groebner basis or something else if an error occured.
 ///////////////////////////////////////////////////////////////////
 //Uses: omAlloc0,walkConsistency,rGetGlobalOrderWeightVec,
 //omFreeSize,sizeof,IDIDEAL,walk64,rSetHdl,idrMoveR,Werror,idInit

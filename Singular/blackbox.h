@@ -48,7 +48,7 @@ struct  blackbox_struct
   BOOLEAN (*blackbox_deserialize)(blackbox **b,void **d, si_link f);
   /// additional type info
   void *data;
-  /// addtinional gneral properties
+  /// additional general properties
   int properties; // bit 0:blackbox is only a wrapper for lists
 #define  BB_LIKE_LIST(B) ((B)->properties &1)
 } ;
