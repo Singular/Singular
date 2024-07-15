@@ -11,7 +11,7 @@ AUTHORS:  J. Boehm, boehm @ mathematik.uni-kl.de
 OVERVIEW:
 
 We implement a formula for computing the number of covers of elliptic curves.
-It has beed obtained by proving mirror symmetry
+It has been obtained by proving mirror symmetry
 for arbitrary genus by tropical methods in [BBM]. A Feynman graph of genus
 g is a trivalent, connected graph of genus g (with 2g-2 vertices
 and 3g-3 edges). The branch type b=(b_1,...,b_(3g-3)) of a stable map is the
@@ -49,7 +49,7 @@ printGraph(graph)                         print procedure for graphs
 propagator(list,int)                      propagator factor of degree d in the quotient of two variables, or
                                           propagator for fixed graph and branch type
 computeConstant(number, number)           constant coefficient in the Laurent series expansion of a rational function in a given variable
-evalutateIntegral(number, list)           path integral for a given propagator and ordered sequence of variables
+evaluateIntegral(number, list)            path integral for a given propagator and ordered sequence of variables
 gromovWitten(number)                      sum of path integrals for a given propagator over all orderings of the variables, or
                                           Gromov Witten invariant for a given graph and a fixed branch type, or
                                           list of Gromov Witten invariants for a given graph and all branch types
