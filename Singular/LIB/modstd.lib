@@ -69,7 +69,7 @@ EXAMPLE:  example modStd; shows an example"
     }
 
     /* choose the right command */
-    string command = "groebner";
+    string command = "std";
     if (npars(basering) > 0) { command = "Modstd::groebner_norm"; }
 
     /* call modular() */

@@ -2152,7 +2152,7 @@ EXAMPLE: example primary_charp; shows an example
                                        // Pplus: P+B, CI: a complete
                                        // intersection with the same Hilbert
                                        // function as P
-  ideal sP=groebner(P);
+  ideal sP=std(P);
   dB=1;                                // used as degree bound
   int i=0;
  //---------------- loop that searches for primary invariants -----------------
@@ -2175,7 +2175,7 @@ EXAMPLE: example primary_charp; shows an example
     }
     if (B[1]<>0)
     { Pplus=P+B;
-      sPplus=groebner(Pplus);
+      sPplus=std(Pplus);
       newdim=dim(sPplus);
       dif=n-i-newdim;
     }
@@ -2415,7 +2415,7 @@ EXAMPLE: example primary_charp_no_molien; shows an example
                                        // Pplus: P+B, CI: a complete
                                        // intersection with the same Hilbert
                                        // function as P
-  ideal sP=groebner(P);
+  ideal sP=std(P);
   dB=1;                                // used as degree bound -
   d=0;                                 // initializing
   int i=0;
@@ -2431,7 +2431,7 @@ EXAMPLE: example primary_charp_no_molien; shows an example
                                        // degree d
     if (B[1]<>0)
     { Pplus=P+B;
-      sPplus=groebner(Pplus);
+      sPplus=std(Pplus);
       newdim=dim(sPplus);
       dif=n-i-newdim;
     }
@@ -2550,7 +2550,7 @@ EXAMPLE: example primary_charp_without; shows an example
                                        // Pplus: P+B, CI: a complete
                                        // intersection with the same Hilbert
                                        // function as P
-  ideal sP=groebner(P);
+  ideal sP=std(P);
   dB=1;                                // used as degree bound -
   d=0;                                 // initializing
   i=0;
@@ -2565,7 +2565,7 @@ EXAMPLE: example primary_charp_without; shows an example
     B=invariant_basis(d,#[1..gen_num]); // basis of invariants of degree d
     if (B[1]<>0)
     { Pplus=P+B;
-      sPplus=groebner(Pplus);
+      sPplus=std(Pplus);
       newdim=dim(sPplus);
       dif=n-i-newdim;
     }
@@ -2925,7 +2925,7 @@ proc p_search_random (int n,int d,ideal B,int cd,ideal P,int i,int dif,int dB,id
     { break;
     }
     // degBound=dB;
-    test_dim=dim(groebner(TEST));
+    test_dim=dim(std(TEST));
     // test_dim=dim(std(TEST,h));         // Hilbert driven std-calculation
     // degBound=0;
     if (n-test_dim==i+dif)
@@ -3232,7 +3232,7 @@ EXAMPLE: example primary_charp_random; shows an example
                                        // degree d
     if (B[1]<>0)
     { Pplus=P+B;
-      newdim=dim(groebner(Pplus));
+      newdim=dim(std(Pplus));
       dif=n-i-newdim;
     }
     else
@@ -3496,7 +3496,7 @@ EXAMPLE: example primary_charp_no_molien_random; shows an example
                                        // degree d
     if (B[1]<>0)
     { Pplus=P+B;
-      newdim=dim(groebner(Pplus));
+      newdim=dim(std(Pplus));
       dif=n-i-newdim;
     }
     else
@@ -3641,7 +3641,7 @@ EXAMPLE: example primary_charp_without_random; shows an example
     B=invariant_basis(d,#[1..gen_num]); // basis of invariants of degree d
     if (B[1]<>0)
     { Pplus=P+B;
-      newdim=dim(groebner(Pplus));
+      newdim=dim(std(Pplus));
       dif=n-i-newdim;
     }
     else
@@ -5179,7 +5179,7 @@ EXAMPLE: example secondary_charp; shows an example
   poly pp;
   int k;
   intvec deg_vec;
-  ideal sP=groebner(ideal(P));
+  ideal sP=std(ideal(P));
   ideal TEST,B,IS;
   ideal S=1;                           // 1 is the first secondary invariant
  //------------------- generating secondary invariants ------------------------
@@ -5433,7 +5433,7 @@ EXAMPLE:  example secondary_charp; shows an example
   degBound = 0;
   intvec saveopt=option(get);
   option(redSB);
-  ideal sP = groebner(ideal(P));
+  ideal sP = std(ideal(P));
                            // This is the only explicit Groebner basis computation!
   ideal Reductor,SaveRed;  // sP union Reductor is a Groebner basis up to degree i-1
   ideal sP_Reductor;          // will contain sP union Reductor.
@@ -6516,13 +6516,13 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
       { if (NewIScounter==0)
         { if (fin==0)
           { degBound = 0;
-            sIS = groebner(sIS);
+            sIS = std(sIS);
             fin=1;
           }
         }
         else
         { degBound = d+1;
-          sIS = groebner(sIS+NewIS);
+          sIS = std(sIS+NewIS);
           degBound = 0;
           fin = 0;
         }
