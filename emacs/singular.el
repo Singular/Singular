@@ -1186,9 +1186,9 @@ This function is called at mode initialization time."
 ;;   simple section.  Actually, as a lisp object a simple section is
 ;;   nothing else but the underlying overlay.
 ;; - There may be so-called clear simple sections.  Clear simple sections
-;;   have not an underlying overlay.  Instead, they start at the end of the
-;;   preceding non-clear simple section, end at the beginning of the next
-;;   non-clear simple section, and have the type defined by
+;;   do not have an underlying overlay.  Instead, they start at the end of
+;;   the preceding non-clear simple section, end at the beginning of the
+;;   next non-clear simple section, and have the type defined by
 ;;   `singular-simple-sec-clear-type'.  Clear simple sections are
 ;;   represented by nil.
 ;; - Buffer narrowing does not restrict the extent of completely or
