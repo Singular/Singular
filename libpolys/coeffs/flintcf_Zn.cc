@@ -245,7 +245,7 @@ static void WriteShort(number a, const coeffs r)
 static const char* Read(const char * st, number * a, const coeffs r)
 {
 // we only read "monomials" (i.e. [-][digits][parameter]),
-// everythings else (+,*,^,()) is left to the singular interpreter
+// everything else (+,*,^,()) is left to the singular interpreter
   const char *s=st;
   *a=(number)omAlloc(sizeof(nmod_poly_t));
   nmod_poly_init((nmod_poly_ptr)(*a),r->ch);

@@ -3,7 +3,7 @@
  *****************************************/
 /*
  * ABSTRACT: class bigintmat: matrices of numbers.
- * a few functinos might be limited to bigint or euclidean rings.
+ * a few functions might be limited to bigint or euclidean rings.
  */
 
 
@@ -1510,7 +1510,7 @@ number bigintmat::det()
   if (col == 1)
     return get(1, 1);
   // should work as well in Z/pZ of type n_Zp?
-  // relies on XExtGcd and the other euc. functinos.
+  // relies on XExtGcd and the other euc. functions.
   if ( getCoeffType(basecoeffs())== n_Z || getCoeffType(basecoeffs() )== n_Zn) {
     return hnfdet();
   }

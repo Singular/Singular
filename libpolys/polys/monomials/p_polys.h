@@ -111,7 +111,7 @@ void p_ShallowDelete(poly *p, const ring r);
 
 /***************************************************************
  *
- * Copying/Deleteion of polys: args may be NULL
+ * Copying/Deletion of polys: args may be NULL
  *  - p/q as arg mean a poly
  *  - m a monomial
  *  - n a number
@@ -288,7 +288,7 @@ static inline   void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
   }
 }
 
-// returns maximal column number in the modul element a (or 0)
+// returns maximal column number in the module element a (or 0)
 static inline long p_MaxComp(poly p, ring lmRing, ring tailRing)
 {
   long result,i;
@@ -373,7 +373,7 @@ void   p_String0Long(const poly p, ring lmRing, ring tailRing);
 
 /***************************************************************
  *
- * Degree stuff -- see p_polys.cc for explainations
+ * Degree stuff -- see p_polys.cc for explanations
  *
  ***************************************************************/
 
@@ -655,7 +655,7 @@ static inline int p_Comp_k_n(poly a, poly b, int k, ring r)
 
 /***************************************************************
  *
- * Allocation/Initalization/Deletion
+ * Allocation/Initialization/Deletion
  *
  ***************************************************************/
 #if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
@@ -923,7 +923,7 @@ static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
   }
 }
 
-// copys monomials of p, allocates new monomials from bin,
+// copies monomials of p, allocates new monomials from bin,
 // deletes monomials of p
 static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 {
@@ -1086,14 +1086,14 @@ static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, const 
 }
 
 
-// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
+// returns p*Coeff(m) for such monomials pm of p, for which m is divisible by pm
 static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
 {
   int shorter;
   return r->p_Procs->pp_Mult_Coeff_mm_DivSelect(p, m, shorter, r);
 }
 
-// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
+// returns p*Coeff(m) for such monomials pm of p, for which m is divisible by pm
 // if lp is length of p on input then lp is length of returned poly on output
 static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r)
 {
@@ -1229,7 +1229,7 @@ static inline poly p_Merge_q(poly p, poly q, const ring r)
   return r->p_Procs->p_Merge_q(p, q, r);
 }
 
-// like p_SortMerge, except that p may have equal monimals
+// like p_SortMerge, except that p may have equal monomials
 static inline poly p_SortAdd(poly p, const ring r, BOOLEAN revert= FALSE)
 {
   if (revert) p = pReverse(p);
@@ -1299,7 +1299,7 @@ while(0)
 
 /***************************************************************
  *
- * Allocation/Initalization/Deletion
+ * Allocation/Initialization/Deletion
  *
  ***************************************************************/
 // adjustments for negative weights

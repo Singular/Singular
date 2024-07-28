@@ -37,7 +37,7 @@ bool sIsEmpty(const sBucket_pt bucket);
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Convertion from/to SBpolys
+// Conversion from/to SBpolys
 //
 
 // Converts p into a bucket poly (SBpoly) and destroys p
@@ -57,14 +57,14 @@ void sBucketClearMerge(sBucket_pt bucket, poly *p, int *length);
 // bucket may contain equal monials
 void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length);
 
-// Converts SBpoly into a poly and detroys bucket
+// Converts SBpoly into a poly and destroys bucket
 inline void sBucketDestroyMerge(sBucket_pt bucket, poly *p, int *length)
 {
   sBucketClearMerge(bucket, p, length);
   sBucketDestroy(&bucket);
 }
 
-// Converts SBpoly into a poly and detroys bucket
+// Converts SBpoly into a poly and destroys bucket
 inline void sBucketDestroyAdd(sBucket_pt bucket, poly *p, int *length)
 {
   sBucketClearAdd(bucket, p, length);

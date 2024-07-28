@@ -428,7 +428,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfAnn = ndAnn;
     n->cfCoeffString = ndCoeffString;
     n->cfCoeffWrite = ndCoeffWrite;
-    n->cfCoeffName = ndCoeffName; // should alway be changed!
+    n->cfCoeffName = ndCoeffName; // should always be changed!
     n->cfInpAdd=ndInpAdd;
     n->cfInpMult=ndInpMult;
     n->cfCopy = ndCopy;

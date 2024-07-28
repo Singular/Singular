@@ -16,7 +16,7 @@
 
 // //////////////////////////////////////////////////////////////////////// //
 /// CPolynomialSummator: unifies bucket and polynomial summation as the
-/// later is brocken in buckets :(
+/// later is broken in buckets :(
 class CPolynomialSummator
 {
   private:

@@ -89,7 +89,7 @@ class CCacheHash
       PrintS("CCacheHash::History(a, b, [p])!\n");
     }
 
-  private: // no copy constuctors!
+  private: // no copy constructors!
     CCacheHash(const CCacheHash&);
     CCacheHash& operator=(const CCacheHash&);
 };

@@ -19,7 +19,7 @@
 
 /*2
 * writes a monomial (p),
-* uses form x*gen(.) if ko != coloumn number of p
+* uses form x*gen(.) if ko != column number of p
 */
 static void writemon(poly p, int ko, const ring r)
 {
@@ -98,7 +98,7 @@ static void writemon(poly p, int ko, const ring r)
 
 /*2
 * writes a monomial (p),
-* uses form x*gen(.) if ko != coloumn number of p
+* uses form x*gen(.) if ko != column number of p
 */
 #ifdef HAVE_SHIFTBBA
 static void writemonLP(poly p, int ko, const ring r)
@@ -183,7 +183,7 @@ static void writemonLP(poly p, int ko, const ring r)
 /// if possible print p in a short way...
 void p_String0Short(const poly p, ring lmRing, ring tailRing)
 {
-  // NOTE: the following (non-thread-safe!) UGLYNESS
+  // NOTE: the following (non-thread-safe!) UGLINESS
   // (changing naRing->ShortOut for a while) is due to Hans!
   // Just think of other ring using the VERY SAME naRing and possible
   // side-effects...
@@ -202,7 +202,7 @@ void p_String0Short(const poly p, ring lmRing, ring tailRing)
 /// print p in a long way...
 void p_String0Long(const poly p, ring lmRing, ring tailRing)
 {
-  // NOTE: the following (non-thread-safe!) UGLYNESS
+  // NOTE: the following (non-thread-safe!) UGLINESS
   // (changing naRing->ShortOut for a while) is due to Hans!
   // Just think of other ring using the VERY SAME naRing and possible
   // side-effects...

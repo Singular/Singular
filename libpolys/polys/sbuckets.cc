@@ -121,7 +121,7 @@ void sBucketDeleteAndDestroy(sBucket_pt *bucket_pt)
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Convertion from/to SBpolys
+// Conversion from/to SBpolys
 //
 
 void sBucket_Merge_m(sBucket_pt bucket, poly p)

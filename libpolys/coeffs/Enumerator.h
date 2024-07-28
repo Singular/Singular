@@ -6,7 +6,7 @@
  *
  * Abstract API for enumerators.
  *
- * ABSTRACT: Abstract interface for forward iteratable containers (enumerators)
+ * ABSTRACT: Abstract interface for forward iterable containers (enumerators)
  * of standalone objects (e.g. polynomials as sets of numbers), without any
  * knowledge of their internals.
  *
@@ -29,7 +29,7 @@
  * @code
  *   IBaseEnumerator& itr = ...;
  *   itr.Reset(); // goes to the "-1" element
- *   // NOTE: itr is not useable here!
+ *   // NOTE: itr is not usable here!
  *   while( itr.MoveNext() )
  *   {
  *      do something custom with itr...

@@ -27,7 +27,7 @@
 VAR omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 
 STATIC_VAR poly * idpower;
-/*collects the monomials in makemonoms, must be allocated befor*/
+/*collects the monomials in makemonoms, must be allocated before*/
 STATIC_VAR int idpowerpoint;
 /*index of the actual monomial in idpower*/
 
@@ -53,7 +53,7 @@ ideal idInit(int idsize, int rank)
 
 #ifdef PDEBUG
 // this is only for outputting an ideal within the debugger
-// therefor it accept the otherwise illegal id==NULL
+// therefore it accept the otherwise illegal id==NULL
 void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint)
 {
   assume( debugPrint >= 0 );
@@ -991,7 +991,7 @@ long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
 }
 
 /*2
-*returns true if id is homogenous with respect to the aktual weights
+*returns true if id is homogeneous with respect to the actual weights
 */
 BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r)
 {
@@ -1514,7 +1514,7 @@ ideal id_Matrix2Module(matrix mat, const ring R)
 }
 
 /*2
-* converts a module into a matrix, destroyes the input
+* converts a module into a matrix, destroys the input
 */
 matrix id_Module2Matrix(ideal mod, const ring R)
 {
@@ -1557,7 +1557,7 @@ matrix id_Module2Matrix(ideal mod, const ring R)
       MATELEM0(result,cp-1,i) = p_Add_q(MATELEM0(result,cp-1,i),h,R);
     }
   }
-  // obachman 10/99: added the following line, otherwise memory leack!
+  // obachman 10/99: added the following line, otherwise memory leak!
   id_Delete(&mod,R);
   return result;
 }
@@ -2049,7 +2049,7 @@ ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing)
       p_IncrExp(h, vv, rRing); // h *= var(j) && //      p_AddExp(h, vv, 1, rRing);
       p_SetComp(h, cc, rRing);
 
-      p_Setm(h, rRing);         // addjust degree after the previous steps!
+      p_Setm(h, rRing);         // adjust degree after the previous steps!
 
       pTempSum = p_Add_q(pTempSum, h, rRing); // it is slow since h will be usually put to the back of pTempSum!!!
 

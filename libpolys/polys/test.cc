@@ -407,7 +407,7 @@ int main( int, char *argv[] )
 
   feInitResources(argv[0]);
 
-  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+  StringSetS("resources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
   PrintLn();
 

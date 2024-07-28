@@ -297,7 +297,7 @@ static char * ngfEatFloatNExp(char * s )
   char *start= s;
 
   // eat floats (mantissa) like:
-  //   0.394394993, 102.203003008,  .300303032, pssibly starting with -
+  //   0.394394993, 102.203003008,  .300303032, possibly starting with -
   if (*s == '-') s++;
   while ((*s >= '0' && *s <= '9')||(*s == '.')) s++;
 

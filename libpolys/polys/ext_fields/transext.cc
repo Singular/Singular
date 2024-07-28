@@ -93,7 +93,7 @@ static void heuristicGcdCancellation(number a, const coeffs cf);
 static void definiteGcdCancellation(number a, const coeffs cf,
                              BOOLEAN simpleTestsHaveAlreadyBeenPerformed);
 
-/* test routine, usualy disabled *
+/* test routine, usually disabled *
  * if want to activate it, activate also the calls to check_N *
  *
 void check_normalized(number t,const coeffs cf, const char *f, int l)
@@ -2472,7 +2472,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       // cand === LCM( cand, den )!!!!
       // NOTE: maybe it's better to make the product and clearcontent afterwards!?
       // TODO: move the following to factory?
-      poly gcd = singclap_gcd_r(cand, den, R); // gcd(cand, den) is monic no mater leading coeffs! :((((
+      poly gcd = singclap_gcd_r(cand, den, R); // gcd(cand, den) is monic no matter leading coeffs! :((((
       if (nCoeff_is_Q (Q))
       {
         number LcGcd= n_SubringGcd (p_GetCoeff (cand, R), p_GetCoeff(den, R), Q);

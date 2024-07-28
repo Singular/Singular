@@ -11,9 +11,9 @@
 /***************************************************************
  *
  *   Returns:  p*Coeff(m)*a/b for such monomials pm of p, for which
- *             m is divisble by pm, shorter == #of monomials left out
+ *             m is divisible by pm, shorter == #of monomials left out
  *   Assumes:  m, a, b are monomials, ordering is (c, dp),
- *            (p*a) is divisble by b for all monimials in question
+ *            (p*a) is divisible by b for all monomials in question
  *   Const:    p, m, a, b
  *
  ***************************************************************/

@@ -31,7 +31,7 @@ enum n_coeffType
   n_R,  /**< single prescision (6,6) real numbers */
   n_GF, /**< \GF{p^n < 2^16} */
   n_long_R, /**< real floating point (GMP) numbers */
-  n_polyExt, /**< used to represent polys as coeffcients */
+  n_polyExt, /**< used to represent polys as coefficients */
   n_algExt,  /**< used for all algebraic extensions, i.e.,
                 the top-most extension in an extension tower
                 is algebraic */
@@ -44,7 +44,7 @@ enum n_coeffType
   n_Zn, /**< only used if HAVE_RINGS is defined */
   n_Znm, /**< only used if HAVE_RINGS is defined */
   n_Z2m, /**< only used if HAVE_RINGS is defined */
-  n_FlintQrat, /**< rational funtion field over Q */
+  n_FlintQrat, /**< rational function field over Q */
   n_CF, /**< ? */
   n_Nemo_AnticNumberField, /*17 */
   n_Nemo_QQField,          /*18 */
@@ -157,7 +157,7 @@ struct n_Procs_s
    /// string output of coeff description
    char* (*cfCoeffString)(const coeffs r);
 
-   /// default name of cf, should substitue cfCoeffWrite, cfCoeffString
+   /// default name of cf, should substitute cfCoeffWrite, cfCoeffString
    char* (*cfCoeffName)(const coeffs r);
 
    // ?
@@ -178,7 +178,7 @@ struct n_Procs_s
    //
    //   cfDiv does an exact division, but has to handle illegal input
    //   cfExactDiv does an exact division, but no error checking
-   //   (I'm not sure I understant and even less that this makes sense)
+   //   (I'm not sure I understand and even less that this makes sense)
    numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntMod, cfExactDiv;
 
    /// init with an integer
@@ -190,7 +190,7 @@ struct n_Procs_s
    /// how complicated, (0) => 0, or positive
    int     (*cfSize)(number n, const coeffs r);
 
-   /// convertion to long, 0 if impossible
+   /// conversion to long, 0 if impossible
    long    (*cfInt)(number &n, const coeffs r);
 
    /// Converts a (integer) number n into a GMP number, 0 if impossible
@@ -270,7 +270,7 @@ struct n_Procs_s
    //return NULL if a is already normalized
    //otherwise, the factor.
    //(for Z: make positive, for z/nZ make the gcd with n
-   //aparently it is GetUnit!
+   //apparently it is GetUnit!
    //in a Euclidean ring, return the quotient and compute the remainder
    //rem can be NULL
    number  (*cfQuotRem)(number a, number b, number *rem, const coeffs r);
@@ -303,7 +303,7 @@ struct n_Procs_s
    //    strange things happen in naChineseRemainder for example.
    number  (*cfChineseRemainder)(number *x, number *q,int rl, BOOLEAN sym,CFArray &inv_cache,const coeffs);
 
-   /// degree for coeffcients: -1 for 0, 0 for "constants", ...
+   /// degree for coefficients: -1 for 0, 0 for "constants", ...
    int (*cfParDeg)(number x,const coeffs r);
 
    /// create i^th parameter or NULL if not possible
@@ -530,7 +530,7 @@ static FORCE_INLINE int n_DivComp(number a, number b, const coeffs r)
 ///                                   is co-prime with k
 /// in Z/2^kZ: largest odd divisor of n (taken in Z)
 /// other cases: not implemented
-// CF: shold imply that n/GetUnit(n) is normalized in Z/kZ
+// CF: should imply that n/GetUnit(n) is normalized in Z/kZ
 //   it would make more sense to return the inverse...
 static FORCE_INLINE number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
@@ -844,7 +844,7 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Extension(const coeffs r)
 
 /* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
    svn trunk);
-   intension: should be TRUE iff the given r is an extension field above
+   intention: should be TRUE iff the given r is an extension field above
    some Z/pZ;
    actually: TRUE iff the given r is an extension tower of arbitrary
    height above some field of characteristic p (may be Z/pZ or some
@@ -857,7 +857,7 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Zp_a(const coeffs r)
 
 /* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
    svn trunk);
-   intension: should be TRUE iff the given r is an extension field above
+   intention: should be TRUE iff the given r is an extension field above
    Z/pZ (with p as provided);
    actually: TRUE iff the given r is an extension tower of arbitrary
    height above some field of characteristic p (may be Z/pZ or some
@@ -871,7 +871,7 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
 
 /* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
    svn trunk);
-   intension: should be TRUE iff the given r is an extension field
+   intention: should be TRUE iff the given r is an extension field
    above Q;
    actually: TRUE iff the given r is an extension tower of arbitrary
    height above some field of characteristic 0 (may be Q, R, or C) */

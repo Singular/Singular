@@ -912,7 +912,7 @@ row_col_weight::~row_col_weight()
 *    M = ( Xarray[qrow[i],qcol[j]] )
 *    if a_m = a_n and s_m = s_n
 *      det(X) = sign*div^(s_m-1)*det(M)
-*    resticted pivot for elimination
+*    restricted pivot for elimination
 *      0 <= j < piv_s
 */
 class mp_permmatrix
@@ -1290,7 +1290,7 @@ void mp_permmatrix::mpElimBareiss(poly div)
   }
 }
 /*
-* weigth of a polynomial, for pivot strategy
+* weight of a polynomial, for pivot strategy
 */
 static float mp_PolyWeight(poly p, const ring r)
 {
@@ -1792,7 +1792,7 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
 }
 
 // helper for sm_Tensor
-// destroyes f, keeps B
+// destroys f, keeps B
 static ideal sm_MultAndShift(poly f, ideal B, int s, const ring r)
 {
   assume(f!=NULL);
@@ -1811,7 +1811,7 @@ static ideal sm_MultAndShift(poly f, ideal B, int s, const ring r)
   return res;
 }
 // helper for sm_Tensor
-// updates res, destroyes contents of sm
+// updates res, destroys contents of sm
 static void sm_AddSubMat(ideal res, ideal sm, int col, const ring r)
 {
   for(int i=0;i<IDELEMS(sm);i++)
@@ -2065,7 +2065,7 @@ poly mp_DetMu(matrix A, const ring R)
   int n=MATROWS(A);
   assume(MATCOLS(A)==n);
     /*
-    *   Intput:
+    *   Input:
     *   int n: Dimension der Matrix
     *   int A: n*n Matrix
     *

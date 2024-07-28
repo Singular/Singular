@@ -30,9 +30,9 @@
 /*****************************************************************************
  *
  * General section
- * These are just wrappers around the repsective dynl_* calls
- * which look for the binary in the bin_dir of Singular and ommit warnings if
- * somethings goes wrong
+ * These are just wrappers around the respective dynl_* calls
+ * which look for the binary in the bin_dir of Singular and omit warnings if
+ * something goes wrong
  *
  *****************************************************************************/
 STATIC_VAR BOOLEAN warn_handle = FALSE;

@@ -253,7 +253,7 @@ static inline number npInversM (number c, const coeffs r)
 }
 
 
-// The folloing is reused inside gnumpc.cc, gnumpfl.cc and longrat.cc
+// The following is reused inside gnumpc.cc, gnumpfl.cc and longrat.cc
 long    npInt         (number &n, const coeffs r);
 
 #define npEqualM(A,B,r)  ((A)==(B))

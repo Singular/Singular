@@ -11,12 +11,12 @@ p_FDeg: a degree for use in GB computations:
        many monomials of the same degree which lead to infinite cycles in GB
        computations - p_FDeg uses p_Totaldegree in this case
 p_Totaldegree: the sum of all exponents (the usual total degree)
-p_WTotaldegree: the weighted sum of all exponents(the usual weigthed degree)*OrdSgn
+p_WTotaldegree: the weighted sum of all exponents(the usual weighted degree)*OrdSgn
                 For matrix orderings this is the scalar product of the first row
                 of the ordering matrix with the exponent vector
 p_WDegree: the weighted sum of all exponents (obsolete, currently not used):
            Difference to p_WTotaldegree:
-           - does not muliply by OrdSgn
+           - does not multiply by OrdSgn
            - uses p_WFirstTotalDegree for the first block
            - for all but the first block: use the first non-zero entry in each
              column of the ordering matrix as weight (and not the entry in the

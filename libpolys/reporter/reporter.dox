@@ -3,6 +3,6 @@
  The most basic printing and error/warning procedures
  which may be used by Singular (e.g. \ref Werror,\ref Warn,\ref Print).
 
- Also string streamming buffer handling (\ref StringAppend, \ref StringSetS, \ref StringEndS).
+ Also string streaming buffer handling (\ref StringAppend, \ref StringSetS, \ref StringEndS).
 
 */

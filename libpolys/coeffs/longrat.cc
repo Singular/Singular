@@ -1628,7 +1628,7 @@ void nlGMP(number &i, mpz_t n, const coeffs r)
 }
 
 /*2
-* acces to denominator, other 1 for integers
+* access to denominator, other 1 for integers
 */
 number nlGetDenom(number &n, const coeffs r)
 {
@@ -1657,7 +1657,7 @@ number nlGetDenom(number &n, const coeffs r)
 }
 
 /*2
-* acces to Nominator, nlCopy(n) for integers
+* access to Nominator, nlCopy(n) for integers
 */
 number nlGetNumerator(number &n, const coeffs r)
 {
@@ -2560,7 +2560,7 @@ number nlInit2gmp (mpz_t i, mpz_t j, const coeffs r)
 
 #else // DO_LINLINE
 
-// declare immedate routines
+// declare immediate routines
 number nlRInit (long i);
 BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b);
 number  _nlCopy_NoImm(number a);
@@ -3084,7 +3084,7 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
 
 VAR int n_SwitchChinRem=0;
 number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF)
-// elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
+// elements in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
   setCharacteristic( 0 ); // only in char 0
   Off(SW_RATIONAL);

@@ -105,8 +105,8 @@ SI_EINTR_SAVE_FUNC(int, connect,
                    (sockfd, addr, addrlen))
 
 #if 0
-/* @note: We respect that the user may explictely deactivate the
- * restart feature by setting the second argumetn to NULL.
+/* @note: We respect that the user may explicitly deactivate the
+ * restart feature by setting the second argument to NULL.
  */
 static inline int
 si_nanosleep(const struct timespec *req, struct timespec *rem)

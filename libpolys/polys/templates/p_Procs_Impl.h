@@ -24,7 +24,7 @@
               based on the ring properties.
  At generate-time, SetProcs is used to generate all
               possible PolyProcs.
- Which PolyProcs are generated/used can be controled by values of
+ Which PolyProcs are generated/used can be controlled by values of
  HAVE_FAST_P_PROCS, HAVE_FAST_LENGTH, HAVE_FAST_ORD, and FAST_FIELD
 
  At generate-time, the file p_Procs.inc is generated,
@@ -101,7 +101,7 @@
 
 // Here are the different parameters for setting the PolyProcs:
 
-// If you add/remove things from here, also remeber to adjust the
+// If you add/remove things from here, also remember to adjust the
 // respective *_2_String
 typedef enum p_Field
 {
