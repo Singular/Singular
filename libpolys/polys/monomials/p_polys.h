@@ -1183,7 +1183,7 @@ static inline poly pp_Mult_qq(poly p, poly q, const ring r)
 #endif
 #ifdef HAVE_RINGS
   if (UNLIKELY(!nCoeff_is_Domain(r->cf)))
-    return _p_Mult_q_Normal_ZeroDiv(p, q, 1, r);
+    res = _p_Mult_q_Normal_ZeroDiv(p, qq, 1, r);
   else
 #endif
     res = _p_Mult_q(p, qq, 1, r);
