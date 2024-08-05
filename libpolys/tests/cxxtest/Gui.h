@@ -2,7 +2,7 @@
 #define __CXXTEST__GUI_H
 
 //
-// GuiListener is a simple base class for the differes GUIs
+// GuiListener is a simple base class for the different GUIs
 // GuiTuiRunner<GuiT, TuiT> combines a GUI with a text-mode error formatter
 //
 

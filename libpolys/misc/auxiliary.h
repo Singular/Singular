@@ -37,7 +37,7 @@
  *                    2: given by SI_INTEGER_VARIANT */
 #define SI_BIGINT_VARIANT 1
 
-/* preparation for versio 4.2.0: cpoly, cnumber, cmatrix (4_2) */
+/* preparation for version 4.2.0: cpoly, cnumber, cmatrix (4_2) */
 #undef SINGULAR_4_2
 
 #ifndef SIZEOF_LONG
@@ -179,13 +179,13 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 
    The omDebug routines are controlled by the values of OM_TRACK, OM_CHECK
    and OM_KEEP.  There meaning is roughly as follows:
-   OM_TRACK: strored with address                              : extra space
-     0     : no additional info is stored                      : 0
-     1     : file:line of location where address was allocated : 1 word
-     2     : plus backtrace of stack where adress was allocated: 6 words
-     3     : plus size/bin info and front-, and back padding   : 9 words
-     4     : plus file:line of location where adress was freed : 10 words
-     5     : plus backtrace of stack where adress was allocated: 15 words
+   OM_TRACK: stored with address                                 : extra space
+     0     : no additional info is stored                        : 0
+     1     : file:line of location where address was allocated   : 1 word
+     2     : plus backtrace of stack where address was allocated : 6 words
+     3     : plus size/bin info and front-, and back padding     : 9 words
+     4     : plus file:line of location where address was freed  : 10 words
+     5     : plus backtrace of stack where address was allocated : 15 words
    OM_CHECK: checks done
      0     : no checks
      1     : constant-time checks: i.e. addr checks only
@@ -217,7 +217,7 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
      om_Opts.MinCheck = 3; om_Opts.MinTrack = 5; omOpts.Keep = LONG_MAX;
      ExternalRoutine();
      om_Opts.MinCheck = check; omOpts.MinTrack = track; omOpts.Keep = keep;
-   ensures that all calls omDebug routines  occuring during the computation of
+   ensures that all calls omDebug routines occurring during the computation of
    ExternalRoutine() are done with OM_CHECK==3 and OM_TRACK==5, and
    calls to omFree only mark addresses as free and not really free them.
 
@@ -247,7 +247,7 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
      NULL pointers and sizes == 0
    + You can safely use any free/realloc routine in combination with any alloc
      routine (including the debug versions): E.g., an address allocated with
-     omAllocBin can be freed with omfree, or an adress allocated with
+     omAllocBin can be freed with omfree, or an address allocated with
      om(Debug)Alloc can be freed with omfree, or omFree, or omFreeSize, etc.
      However, keep in mind that the efficiency decreases from
      Bin over Size to General routines (i.e., omFreeBin is more efficient than

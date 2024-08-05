@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: n-tupel of coeffcients
+* ABSTRACT: n-tupel of coefficients
 */
 #include "misc/auxiliary.h"
 

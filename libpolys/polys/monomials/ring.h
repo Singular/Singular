@@ -46,7 +46,7 @@ typedef poly (*pShallowCopyDeleteProc)(poly s_p, ring source_r, ring dest_r,
 
 // ro_typ describes what to store at the corresping "data" place in p->exp
 // none of the directly corresponds to a ring ordering (ringorder_*)
-// as each ringorder_* blocks corrsponds to 0..2 sro-blocks
+// as each ringorder_* blocks corresponds to 0..2 sro-blocks
 typedef enum
 {
   ro_dp, // total degree with weights 1
@@ -195,7 +195,7 @@ typedef struct sro_syz sro_syz;
 
 // due to prefix/suffix nature we need some placeholder:
 // prefix stores here initial state
-// suffix cleares this up
+// suffix clears this up
 struct sro_ISTemp
 {
   short start; // 1st member SHOULD be short "place"
@@ -203,8 +203,8 @@ struct sro_ISTemp
   int*  pVarOffset; // copy!
 };
 
-// So this is the actuall thing!
-// suffix uses last sro_ISTemp (cleares it up afterwards) and
+// So this is the actual thing!
+// suffix uses last sro_ISTemp (clears it up afterwards) and
 // creates this block
 struct sro_IS
 {
@@ -270,7 +270,7 @@ struct ip_sring
   sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
   /* if NegWeightL_Size > 0, then NegWeightL_Offset[0..size_1] is index of longs
   in ExpVector whose values need an offset due to negative weights */
-  /* array of NegWeigtL_Size indicies */
+  /* array of NegWeigtL_Size indices */
   int*      NegWeightL_Offset;
 
   int*     VarOffset;
@@ -817,7 +817,7 @@ int64 * rGetWeightVec(const ring r);
 void rSetWeightVec(ring r, int64 *wv);
 
 /////////////////////////////
-// Auxillary functions
+// Auxiliary functions
 //
 
 /* return the varIndex-th ring variable as a poly;

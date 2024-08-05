@@ -61,8 +61,8 @@ static poly NF_Proc_Dummy(ideal, ideal, poly, int, int, const ring)
 static ideal BBA_Proc_Dummy (const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring)
 { WerrorS("nc_NF not defined"); return NULL; }
 
-// the following funtion poiters are quasi-static:
-// they will be set in siInit and never changes afterwards:
+// the following function pointers are quasi-static:
+// they will be set in siInit and never change afterwards:
 VAR NF_Proc nc_NF=NF_Proc_Dummy;
 VAR BBA_Proc gnc_gr_bba=BBA_Proc_Dummy;
 VAR BBA_Proc gnc_gr_mora=BBA_Proc_Dummy;
@@ -1051,7 +1051,7 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     p_AddExp(out,j,b,r);
     p_Setm(out,r);
     return(out);
-  }/* zero exeptions and usual case */
+  }/* zero exceptions and usual case */
   /*  if ((a==0)||(b==0)||(i<=j)) return(out); */
 
   if (MATELEM(r->GetNC()->COM,j,i)!=NULL)
@@ -2747,7 +2747,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   nc_type nctype = nc_undef;
 
   //////////////////////////////////////////////////////////////////
-  // check the correctness of arguments, without any real chagnes!!!
+  // check the correctness of arguments, without any real changes!!!
 
 
 
@@ -3337,9 +3337,9 @@ poly pOppose(ring Rop, poly p, const ring dst)
   nMapFunc nMap = n_SetMap(Rop->cf, dst->cf); // reverse?
 
   /* nMapFunc nMap = nSetMap(Rop);*/
-  /* since we know that basefields coinside! */
+  /* since we know that basefields coincide! */
 
-  // coinside???
+  // coincide???
 
   int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
   if (!p_IsConstant(p, Rop))

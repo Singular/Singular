@@ -349,7 +349,7 @@ static inline poly sca_xi_Mult_mm(short i, const poly pMonom, const ring rRing)
     poly pResult = p_LmInit(pMonom, rRing);
 
     p_SetExp(pResult, i, 1, rRing); // pResult*=X_i &&
-    p_Setm(pResult, rRing);         // addjust degree after previous step!
+    p_Setm(pResult, rRing);         // adjust degree after previous step!
 
     number nCoeff = n_Copy(pGetCoeff(pMonom), rRing->cf); // new number!
 
@@ -1017,7 +1017,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
   if((iAltVarEnd == -1) || (iAltVarStart == (N+1)))
   {
-    if (N>1) return false; // no alternating varables
+    if (N>1) return false; // no alternating variables
     iAltVarEnd=iAltVarStart=1;
   }
 

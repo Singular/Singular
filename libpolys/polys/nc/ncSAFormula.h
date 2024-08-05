@@ -81,7 +81,7 @@ class CFormulaPowerMultiplier
     // Higher level abstraction for keeping track of all the pair types!
     poly Multiply( int i, int j, const int n, const int m);
 
-  private: // no copy constuctors!
+  private: // no copy constructors!
     CFormulaPowerMultiplier();
     CFormulaPowerMultiplier(const CFormulaPowerMultiplier&);
     CFormulaPowerMultiplier& operator=(const CFormulaPowerMultiplier&);

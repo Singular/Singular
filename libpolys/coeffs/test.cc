@@ -207,7 +207,7 @@ int main( int, char *argv[] )
 
   feInitResources(argv[0]);
 
-  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+  StringSetS("resources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
   PrintLn();
 
@@ -218,7 +218,7 @@ int main( int, char *argv[] )
   n_coeffType type;
 
 
-//  TODO(Frank, Segmentation fault! (if used wihout omalloc???). Please_ investigate!);
+//  TODO(Frank, Segmentation fault! (if used without omalloc???). Please_ investigate!);
   type =  n_Z2m;
   if( Test(type, (void*) 4) )
     c ++;
@@ -227,7 +227,7 @@ int main( int, char *argv[] )
   if( Test(type, (void*) 101) )
     c ++;
 
-//  TODO(Frank, memmory corruption_ if used wihout omalloc??? Please_ investigate!);
+//  TODO(Frank, memory corruption_ if used without omalloc??? Please_ investigate!);
 
   type = n_Z2m;
   if( Test(type, (void*) 8) )

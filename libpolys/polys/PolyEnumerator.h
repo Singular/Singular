@@ -24,7 +24,7 @@
  *
  * Base polynomial enumerator for simple iteration over terms of polynomials.
  *
- * Note that the first element desn't exist directly after Reset() call.
+ * Note that the first element does not exist directly after Reset() call.
  *
  * The class doesn't inherit from IAccessor and thus doesn't override Current().
  *
@@ -172,7 +172,7 @@ class CRecursivePolyCoeffsEnumerator: public IPolyCoeffsEnumerator
 
   public:
 
-    /// NOTE: carefull: don't destruct the input enumerator before doing it with this one...
+    /// NOTE: careful: don't destruct the input enumerator before doing it with this one...
     /// this also changes the original IPolyCoeffsEnumerator& itr!
     CRecursivePolyCoeffsEnumerator(IPolyCoeffsEnumerator& itr): m_global_enumerator(itr), m_local_enumerator(NULL) {}
 
@@ -189,7 +189,7 @@ class CRecursivePolyCoeffsEnumerator: public IPolyCoeffsEnumerator
       poly p = ConverterPolicy::convert(m_global_enumerator.Current()); // Assumes that these numbers are just polynomials!
       assume( p != NULL );
 
-      // the followig actually needs CPolyCoeffsEnumerator
+      // the following actually needs CPolyCoeffsEnumerator
       m_local_enumerator.Reset( p ); // -1 position in p :: to be skipped now!
 
       if( m_local_enumerator.MoveNext() ) // should be true

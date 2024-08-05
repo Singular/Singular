@@ -5,7 +5,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: accces single (coeffs of) monoms
+* ABSTRACT: access single (coeffs of) monoms
 */
 
 #include "misc/auxiliary.h"

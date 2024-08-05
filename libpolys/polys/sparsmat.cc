@@ -117,7 +117,7 @@ static poly sm_SelectCopy_ExpMultDiv(poly p, poly m, poly a, poly b, const ring 
 *        consider sign
 *      - elimination (smInitElim, sm0Elim, sm1Elim)
 *        clear zero column as result of elimination (smZeroElim)
-*      - tranfer from
+*      - transfer from
 *        piv and m_row to m_res (smRowToCol)
 *        m_act to m_row (smColToRow)
 */
@@ -1094,7 +1094,7 @@ void sparse_mat::smColToRow()
 }
 
 /*
-* store the pivot and the assosiated row in m_row
+* store the pivot and the associated row in m_row
 * to m_res (result):
 *   piv + m_row[rows][pos(cols)] => m_res[cols][pos(rows)]
 */
@@ -1379,7 +1379,7 @@ void sparse_mat::smMultCol()
 }
 
 /*
-* multiply and divide the m_act finaly
+* multiply and divide the m_act finally
 */
 void sparse_mat::smFinalMult()
 {
@@ -1470,7 +1470,7 @@ poly sparse_mat::smMultPoly(smpoly a)
 }
 
 /*
-* delete the m_act finaly
+* delete the m_act finally
 */
 void sparse_mat::smActDel()
 {
@@ -1614,7 +1614,7 @@ void sm_PolyDiv(poly a, poly b, const ring R)
 //disable that, as it fails with coef buckets
 //#define X_MAS
 #ifdef X_MAS
-// Note: the following in not addapted to SW :(
+// Note: the following is not adapted to SW :(
 /*
 ///  returns the part of (a*b)/exp(lead(c)) with nonegative exponents
 poly smMultDiv(poly a, poly b, const poly c)
@@ -2170,7 +2170,7 @@ static poly sm_Smpoly2Poly(smpoly a, const ring R)
 }
 
 /*
-* weigth of a polynomial, for pivot strategy
+* weight of a polynomial, for pivot strategy
 */
 static float sm_PolyWeight(smpoly a, const ring R)
 {
@@ -2434,7 +2434,7 @@ void sparse_number_mat::smSolv()
 
   m_row[nrows] = NULL;
   sol = (number *)omAlloc0(sizeof(number)*(crd+1));
-  while (r != NULL)  // expand the rigth hand side
+  while (r != NULL)  // expand the right hand side
   {
     sol[r->pos] = r->m;
     s = r;
@@ -2733,7 +2733,7 @@ void sparse_number_mat::smColToRow()
 }
 
 /*
-* store the pivot and the assosiated row in m_row
+* store the pivot and the associated row in m_row
 * to m_res (result):
 *   piv + m_row[rows][pos(cols)] => m_res[cols][pos(rows)]
 */

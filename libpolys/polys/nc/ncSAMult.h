@@ -82,7 +82,7 @@ class CMultiplier
     // Exponent * Monom
     virtual poly MultiplyEM(const CExponent expLeft, const poly pMonom) = 0;
 
-  private: // no copy constuctors!
+  private: // no copy constructors!
     CMultiplier();
     CMultiplier(const CMultiplier&);
     CMultiplier& operator=(const CMultiplier&);
@@ -587,7 +587,7 @@ class CShiftSpecialPairMultiplier: public CSpecialPairMultiplier
 // need: enum Enum_ncSAType;
 
 //////////////////////////////////////////////////////////////////////////
-// Using external 'formula' routins
+// Using external 'formula' routines
 class CExternalSpecialPairMultiplier: public CSpecialPairMultiplier
 {
   private:

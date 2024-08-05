@@ -36,7 +36,7 @@
 #include "coeffs/coeffs.h"
 #include "polys/monomials/ring.h"
 
-// restrict access to the internal represention as much as possible:
+// restrict access to the internal representation as much as possible:
 #ifdef TRANSEXT_PRIVATES
 
 /** a number in K(t_1, .., t_s) is represented by either NULL

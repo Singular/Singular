@@ -28,7 +28,7 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket);
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Convertion from/to Bpolys
+// Conversion from/to Bpolys
 //
 
 // Converts p into a bucket poly (Bpoly) and destroys p

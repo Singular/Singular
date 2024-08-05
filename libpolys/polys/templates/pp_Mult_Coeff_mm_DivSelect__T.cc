@@ -11,7 +11,7 @@
 /***************************************************************
  *
  *   Returns:  p*Coeff(m) for such monomials pm of p, for which
- *             m is divisble by pm
+ *             m is divisible by pm
  *   Const:    p, m
  *
  ***************************************************************/

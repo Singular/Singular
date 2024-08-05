@@ -16,7 +16,7 @@ sub usage() {
   print STDERR "  --no-std             Don't use standard library (even if found in tests)\n";
   print STDERR "  --have-eh            Use exception handling (even if not found in tests)\n";
   print STDERR "  --no-eh              Don't use exception handling (even if found in tests)\n";
-  print STDERR "  --longlong=[TYPE]    Use TYPE as `long long' (defaut = long long)\n";
+  print STDERR "  --longlong=[TYPE]    Use TYPE as `long long' (default = long long)\n";
   print STDERR "  --template=TEMPLATE  Use TEMPLATE file to generate the test runner\n";
   print STDERR "  --include=HEADER     Include \"HEADER\" in test runner before other headers\n";
   print STDERR "  --root               Write CxxTest globals\n";

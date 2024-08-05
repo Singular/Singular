@@ -237,7 +237,7 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Convertion from/to Bpolys
+// Conversion from/to Bpolys
 //
 #ifndef HAVE_PSEUDO_BUCKETS
 
@@ -1103,7 +1103,7 @@ number kBucketPolyRed(kBucket_pt bucket,
     p_SetCoeff(lm, bn, r);
     if ((ct == 0) || (ct == 2))
     {
-      /* correct factor for cancelation by changing sign if an=-1 */
+      /* correct factor for cancellation by changing sign if an=-1 */
       if (rField_is_Ring(r))
         lm = __p_Mult_nn(lm, an, r);
       else

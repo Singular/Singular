@@ -85,7 +85,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring r);
 matrix mp_CoeffProcId (ideal I, poly vars, const ring R);
 /// corresponds to Macauley's coef:
 /// the exponent vector of vars has to contain the variables, eg 'xy';
-/// then the poly f is searched for monomials in x and y, these monimials
+/// then the poly f is searched for monomials in x and y, these monomials
 /// are written to the first row of the matrix co.
 /// the second row of co contains the respective factors in f.
 /// Thus f = sum co[1,i]*co[2,i], i = 1..cols, rows equals 2.

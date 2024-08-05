@@ -659,7 +659,7 @@ static number nrnMod(number a, number b, const coeffs r)
  * 2nd phi(a) := gcd(a, n)
  * The 1st version is probably faster as everything just comes from Z,
  * but the 2nd version behaves nicely wrt. to quotient operations
- * and HNF and such. In agreement with nrnMod we imlement the 2nd here
+ * and HNF and such. In agreement with nrnMod we implement the 2nd here
  *
  * For quotrem note that if b exactly divides a, then
  *   min(v_p(a), v_p(n))  >= min(v_p(b), v_p(n))

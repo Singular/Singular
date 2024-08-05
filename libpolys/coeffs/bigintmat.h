@@ -6,7 +6,7 @@
 *
 * Matrices are stored as 1-dim c-arrays but interpreted 2-dim as matrices.
 * Both modes of addressing are supported, note however, that the 1-dim
-* adressing starts at 0, the 2-dim at 1.
+* addressing starts at 0, the 2-dim at 1.
 *
 * Matrices are meant to represent column modules, thus the default
 * operations are always by column.
@@ -32,7 +32,7 @@
  *
  * Matrices are stored as 1-dim c-arrays but interpreted 2-dim as matrices.
  * Both modes of addressing are supported, note however, that the 1-dim
- * adressing starts at 0, the 2-dim at 1.
+ * addressing starts at 0, the 2-dim at 1.
  *
  * Matrices are meant to represent column modules, thus the default
  * operations are always by column.

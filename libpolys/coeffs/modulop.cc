@@ -251,7 +251,7 @@ static const char * npRead (const char *s, number *a, const coeffs r)
 }
 
 /*2
-* set the charcteristic (allocate and init tables)
+* set the characteristic (allocate and init tables)
 */
 
 void npKillChar(coeffs r)

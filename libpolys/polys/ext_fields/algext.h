@@ -20,7 +20,7 @@
 *               cf->extRing->qideal->m[0] and which represents the minimal
 *               polynomial f(a) of the extension variable 'a' in K[a].
 *           3.) As soon as an std method for polynomial rings becomes
-*               availabe, all reduction steps modulo f(a) should be replaced
+*               available, all reduction steps modulo f(a) should be replaced
 *               by a call to std. Moreover, in this situation one can finally
 *               move from K[a] / < f(a) > to
 *                  K[a_1, ..., a_s] / I, with I some zero-dimensional ideal

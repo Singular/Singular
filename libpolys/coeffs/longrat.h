@@ -18,7 +18,7 @@ number   nlGetNumerator(number &n, const coeffs r); /*for SAGE, better: n_GetNum
 /*-----------------------------------------------------------------*/
 /**
 **  'SR_INT' is the type of those integers small enough to fit into  29  bits.
-**  Therefor the value range of this small integers is: $-2^{28}...2^{28}-1$.
+**  Therefore the value range of this small integers is: $-2^{28}...2^{28}-1$.
 **
 **  Small integers are represented by an immediate integer handle, containing
 **  the value instead of pointing  to  it,  which  has  the  following  form:
@@ -29,8 +29,8 @@ number   nlGetNumerator(number &n, const coeffs r); /*for SAGE, better: n_GetNum
 **      +-------+-------+-------+-------+- - - -+-------+-------+-------+
 **
 **  Immediate integers handles carry the tag 'SR_INT', i.e. the last bit is 1.
-**  This distuingishes immediate integers from other handles which  point  to
-**  structures aligned on 4 byte boundaries and therefor have last bit  zero.
+**  This distinguishes immediate integers from other handles which  point to
+**  structures aligned on 4 byte boundaries and therefore have last bit zero.
 **  (The second bit is reserved as tag to allow extensions of  this  scheme.)
 **  Using immediates as pointers and dereferencing them gives address errors.
 **
@@ -121,7 +121,7 @@ number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
 #if 0 // substituted by nlMPZ
 void   nlGMP(number &i, mpz_t n, const coeffs r);
 #endif
-// for ring similiar to Q/Z (char 0 required):
+// for ring similar to Q/Z (char 0 required):
 number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF);
 
 

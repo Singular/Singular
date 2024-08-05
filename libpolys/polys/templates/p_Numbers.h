@@ -73,7 +73,7 @@ static FORCE_INLINE void n_InpAdd_FieldGeneral(number &n1, number n2, const coef
 #define n_InpAdd_FieldZp(n1,n2,r)   npInpAddM(n1,n2,r)
 
 #define DO_LFORCE_INLINE
-#include "coeffs/longrat.cc" // for inlining... TODO: fix this Uglyness?!!!
+#include "coeffs/longrat.cc" // for inlining... TODO: fix this Ugliness?!!!
 
 #define n_Copy_FieldQ(n,r)          nlCopy(n,r)
 #define n_Delete_FieldQ(n,r)        nlDelete(n,r)

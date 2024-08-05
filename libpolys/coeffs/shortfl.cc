@@ -358,7 +358,7 @@ static const char * nrRead (const char *s, number *a, const coeffs r)
 }
 
 
-// the last used charcteristic
+// the last used characteristic
 // int nrGetChar(){ return 0; }
 
 

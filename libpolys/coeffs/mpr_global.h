@@ -12,7 +12,7 @@
 // to get detailed timigs, define MPR_TIMING
 //#define MPR_TIMING
 
-// Set to double or long double. double is recomended.
+// Set to double or long double. double is recommended.
 // Sets the global floating point type used in mpr_numeric.cc.
 typedef double mprfloat;
 
@@ -50,7 +50,7 @@ typedef double mprfloat;
 #endif
 
 #if defined(mprDEBUG_STICKY)
-// call 'option(prot);' to get status informations
+// call 'option(prot);' to get status information
 #define mprSTICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define mprSTICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
 #else

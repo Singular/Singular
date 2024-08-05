@@ -165,7 +165,7 @@ void maFindPerm(char const * const * const preim_names, int preim_n, char const 
                 int * perm, int *par_perm, n_coeffType ch)
 {
   int i,j;
-  /* find correspondig vars */
+  /* find corresponding vars */
   for (i=0; i<preim_n; i++)
   {
     for(j=0; j<n; j++)
@@ -233,7 +233,7 @@ void maFindPermLP(char const * const * const preim_names, int preim_n, char cons
                 int * perm, int *par_perm, n_coeffType ch, int lV)
 {
   int i,j,b;
-  /* find correspondig vars */
+  /* find corresponding vars */
   for  (b=0;b<preim_n/lV;b++)
   {
     for (i=b*lV; i<(b+1)*lV; i++)

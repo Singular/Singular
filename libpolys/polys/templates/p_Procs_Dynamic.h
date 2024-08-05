@@ -12,7 +12,7 @@
 #ifndef P_PROCS_DYNAMIC_H
 #define P_PROCS_DYNAMIC_H
 
-// see p_Procs_Impl.h for an explaination of these defines
+// see p_Procs_Impl.h for an explanation of these defines
 #define HAVE_FAST_P_PROCS   5
 #define HAVE_FAST_FIELD     2
 #define HAVE_FAST_ORD 4
@@ -25,7 +25,7 @@
 #define HAVE_FAST_LENGTH 4
 #endif
 
-// for the configuration of what goes into the kenel and what into
+// for the configuration of what goes into the kernel and what into
 // shared libs, see p_Procs_Generate.cc:IsKernelProc(...)
 
 #endif // P_PROCS_DYNAMC_H

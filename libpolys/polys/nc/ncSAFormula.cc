@@ -678,7 +678,7 @@ static inline poly ncSA_Multiply( Enum_ncSAType type, const int i, const int j, 
   if( type == _ncSA_1xy0x0yG ) // Weyl
     return ::ncSA_1xy0x0yG(i, j, n, m, g, r);
 
-  if( type == _ncSA_1xy0x0yT2 ) // Homogenous Weyl...
+  if( type == _ncSA_1xy0x0yT2 ) // Homogeneous Weyl...
     return ::ncSA_1xy0x0yT2(i, j, n, m, p_IsPurePower(d, r), r);
 
   if( type == _ncSA_1xyAx0y0 ) // Shift 1

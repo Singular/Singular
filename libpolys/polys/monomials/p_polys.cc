@@ -582,7 +582,7 @@ p_SetmProc p_GetSetmProc(const ring r)
 /* -------------------------------------------------------------------*/
 /* several possibilities for pFDeg: the degree of the head term       */
 
-/* comptible with ordering */
+/* compatible with ordering */
 long p_Deg(poly a, const ring r)
 {
   p_LmCheckPolyRing(a, r);
@@ -606,7 +606,7 @@ long p_WFirstTotalDegree(poly p, const ring r)
 
 /*2
 * compute the degree of the leading monomial of p
-* with respect to weigths from the ordering
+* with respect to weights from the ordering
 * the ordering is not compatible with degree so do not use p->Order
 */
 long p_WTotaldegree(poly p, const ring r)
@@ -1577,7 +1577,7 @@ poly p_Div_mm(poly p, const poly m, const ring r)
 
 /*2
 * divides a by the monomial b, ignores monomials which are not divisible
-* assumes that b is not NULL, destroyes b
+* assumes that b is not NULL, destroys b
 */
 poly p_DivideM(poly a, poly b, const ring r)
 {
@@ -1766,7 +1766,7 @@ void p_ContentRat(poly &ph, const ring r)
   int is = r->real_var_start - 1;
   while (p!=NULL)
   {
-    LM[k] = p_GetExp_k_n(p,1,is, r); // need LmRat istead of  p_HeadRat(p, is, currRing); !
+    LM[k] = p_GetExp_k_n(p,1,is, r); // need LmRat instead of  p_HeadRat(p, is, currRing); !
     C[k] = p_GetCoeffRat(p, is, r);
     D[k] =  p_Totaldegree(C[k], r);
     mintdeg = si_min(mintdeg,D[k]);
@@ -3318,7 +3318,7 @@ poly p_Homogen (poly p, int varnum, const ring r)
 }
 
 /*2
-*tests if p is homogeneous with respect to the actual weigths
+*tests if p is homogeneous with respect to the actual weights
 */
 BOOLEAN p_IsHomogeneous (poly p, const ring r)
 {
@@ -3342,7 +3342,7 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
 }
 
 /*2
-*tests if p is homogeneous with respect to the given weigths
+*tests if p is homogeneous with respect to the given weights
 */
 BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const ring r)
 {
@@ -3839,7 +3839,7 @@ void p_Normalize(poly p,const ring r)
     return;
   while (p!=NULL)
   {
-    // no test befor n_Normalize: n_Normalize should fix problems
+    // no test before n_Normalize: n_Normalize should fix problems
     n_Normalize(pGetCoeff(p),cf);
     pIter(p);
   }
@@ -4041,7 +4041,7 @@ poly p_Subst(poly p, int n, poly e, const ring r)
 }
 
 /*2
- * returns a re-ordered convertion of a number as a polynomial,
+ * returns a re-ordered conversion of a number as a polynomial,
  * with permutation of parameters
  * NOTE: this only works for Frank's alg. & trans. fields
  */
@@ -4789,7 +4789,7 @@ void p_Shift (poly * p,int i, const ring r)
 
 /***************************************************************
  *
- * Storage Managament Routines
+ * Storage Management Routines
  *
  ***************************************************************/
 

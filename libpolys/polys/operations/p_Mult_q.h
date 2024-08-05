@@ -3,7 +3,7 @@
 ****************************************/
 /***************************************************************
  *  File:    p_Mult_q.h
- *  Purpose: declaration of some auxillary routines for
+ *  Purpose: declaration of some auxiliary routines for
  *           p_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00

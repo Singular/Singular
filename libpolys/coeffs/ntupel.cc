@@ -443,7 +443,7 @@ static const char * nnRead (const char *s, number *a, const coeffs r)
     }
   }
   if (is_zero==0)
-  { // seting random values!=0 for Z/p
+  { // setting random values!=0 for Z/p
     i=0;
     loop
     {
@@ -539,7 +539,7 @@ static number nnMap(number from, const coeffs aRing, const coeffs r)
   loop
   {
     nMap=d[i]->cfSetMap(aRing,d[i]);
-    if (nMap==NULL) Werror("no map for compoment %d",i);
+    if (nMap==NULL) Werror("no map for component %d",i);
     else C[i]=nMap(from,aRing,d[i]);
     i++;
     if (d[i]==NULL) return (number)C;

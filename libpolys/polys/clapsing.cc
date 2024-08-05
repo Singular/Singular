@@ -452,7 +452,7 @@ resultant_returns_res:
 //  ggi->nrows=1;
 //  ideal gi=(ideal)ggi;
 //
-//  // contruct the matrix:
+//  // construct the matrix:
 //  int fn=IDELEMS(fi); //= deg(f,x)+1
 //  int gn=IDELEMS(gi); //= deg(g,x)+1
 //  matrix m=mpNew(fn+gn-2,fn+gn-2);
@@ -781,7 +781,7 @@ void singclap_divide_content ( poly f, const ring r )
     CanonicalForm g, h;
     poly p = pNext(f);
 
-    // first attemp: find 2 smallest g:
+    // first attempt: find 2 smallest g:
 
     number g1=pGetCoeff(f);
     number g2=pGetCoeff(p); // p==pNext(f);
@@ -1781,7 +1781,7 @@ poly singclap_det( const matrix m, const ring s )
 
 int singclap_det_i( intvec * m, const ring /*r*/)
 {
-//  assume( r == currRing ); // Anything else is not guaranted to work!
+//  assume( r == currRing ); // Anything else is not guaranteed to work!
 
   setCharacteristic( 0 ); // ?
   CFMatrix M(m->rows(),m->cols());

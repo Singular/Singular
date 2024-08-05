@@ -8,7 +8,7 @@
 #define POW_2_28 (1L<<60)
 
 //make sure that a small number is an immediate integer
-//bascially copied from longrat.cc nlShort3
+//basically copied from longrat.cc nlShort3
 //TODO: is there any point in checking 0 first???
 //TODO: it is not clear that this works in 32/64 bit everywhere.
 //      too many hacks.

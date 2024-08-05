@@ -124,7 +124,7 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, 
   r->block1 = block1;
   if (bitmask!=0) r->wanted_maxExp=bitmask;
 
-  /* complete ring intializations */
+  /* complete ring initializations */
   rComplete(r);
   return r;
 }
@@ -169,7 +169,7 @@ ring rDefault(int ch, int N, char **n)
 //-> ipshell.cc
 
 /////////////////////////////
-// Auxillary functions
+// Auxiliary functions
 //
 
 // check intvec, describing the ordering
@@ -249,14 +249,14 @@ void   rWrite(ring r, BOOLEAN details)
   PrintS("// coefficients: ");
   if( nCoeff_is_algExt(C) )
   {
-    // NOTE: the following (non-thread-safe!) UGLYNESS
+    // NOTE: the following (non-thread-safe!) UGLINESS
     // (changing naRing->ShortOut for a while) is due to Hans!
     // Just think of other ring using the VERY SAME naRing and possible
     // side-effects...
     ring R = C->extRing;
     const BOOLEAN bSaveShortOut = rShortOut(R); R->ShortOut = rShortOut(r) & rCanShortOut(R);
 
-    n_CoeffWrite(C, details); // for correct printing of minpoly... WHAT AN UGLYNESS!!!
+    n_CoeffWrite(C, details); // for correct printing of minpoly... WHAT AN UGLINESS!!!
 
     R->ShortOut = bSaveShortOut;
   }
@@ -744,7 +744,7 @@ ring nc_rCreateNCcomm_rCopy(ring r)
  *returns -1 for not compatible, (sum is undefined)
  *         1 for compatible (and sum)
  */
-/* vartest: test for variable/paramter names
+/* vartest: test for variable/parameter names
 * dp_dp: 0:block ordering
 *        1:for comm. rings: use block order dp + dp/ds/wp
 *        2:order aa(..),dp
@@ -2535,7 +2535,7 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
 
   for( int i = 0; i <= N; i++ ) // Note [0] == component !!! No Skip?
   {
-    // Was i-th variable allocated inbetween?
+    // Was i-th variable allocated in between?
     if( v[i] != pVarOffset[i] )
     {
       pVarOffset[i] = v[i]; // Save for later...
@@ -2568,7 +2568,7 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
 
 
   // Moreover: we need to allocate the module component (v[0]) here!
-  if( v[0] == -1) // It's possible that there was module component v0 at the begining (before prefix)!
+  if( v[0] == -1) // It's possible that there was module component v0 at the beginning (before prefix)!
   {
     // Start with a whole long exponent
     if( bitplace != BITS_PER_LONG )
@@ -3834,7 +3834,7 @@ BOOLEAN rComplete(ring r, int force)
   r->VarOffset=v;
 
   // ----------------------------
-  // other indicies
+  // other indices
   r->pCompIndex=(r->VarOffset[0] & 0xffff); //r->VarOffset[0];
   i=0; // position
   j=0; // index in r->typ
@@ -4391,7 +4391,7 @@ static inline void m_DebugPrint(const poly p, const ring R)
 
 
 /*2
-* asssume that rComplete was called with r
+* assume that rComplete was called with r
 * assume that the first block ist ringorder_S
 * change the block to reflect the sequence given by appending v
 */
@@ -5111,7 +5111,7 @@ int rGetISPos(const int p, const ring r)
 /// Changes r by setting induced ordering parameters: limit and reference leading terms
 /// F belong to r, we will DO a copy!
 /// We will use it AS IS!
-/// returns true is everything was allright!
+/// returns true is everything was alright!
 BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p)
 {
   // Put the reference set F into the ring -ordering -recor
@@ -5771,7 +5771,7 @@ ring rEnvelope(ring R)
 #ifdef HAVE_PLURAL
 BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 /* returns TRUE is there were errors */
-/* dest is actualy equals src with the different ordering */
+/* dest is actually equals src with the different ordering */
 /* we map src->nc correctly to dest->src */
 /* to be executed after rComplete, before rChangeCurrRing */
 {

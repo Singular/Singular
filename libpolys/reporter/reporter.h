@@ -44,7 +44,7 @@ EXTERN_VAR void (*WarnS_callback)(const char *s);
 #define TRACE_CALL       128
 // show all assigns (via ipassign):
 #define TRACE_ASSIGN     256
-// show all automtic type conversions (via ipconv):
+// show all automatic type conversions (via ipconv):
 #define TRACE_CONV       512
 // profiling: print line-no to smon.out:
 #define TRACE_PROFILING 1024

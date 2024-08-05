@@ -818,7 +818,7 @@ static void ivContent(intvec *w)
     (*w)[i] /= tgcd;
 }
 
-// columnwise concatination of two intvecs
+// columnwise concatenation of two intvecs
 intvec * ivConcat(intvec * a, intvec * b)
 {
   int ac=a->cols();
