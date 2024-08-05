@@ -70,7 +70,8 @@ EXAMPLE:  example modStd; shows an example"
 
     /* choose the right command */
     string command = "std";
-    if (npars(basering) > 0) { command = "Modstd::groebner_norm"; }
+    if ((system("nblocks")>2) || (npars(basering) > 0))
+    { command = "Modstd::groebner_norm"; }
 
     /* call modular() */
     if (exactness)
