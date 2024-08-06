@@ -10403,7 +10403,7 @@ BOOLEAN newHEdge(kStrategy strat)
   if (currRing->pLexOrder || rHasMixedOrdering(currRing))
     return FALSE;
   int i,j;
-  poly newNoether;
+  poly newNoether=strat->kNoether; // to keep previous kNoether
 
 #if 0
   if (currRing->weight_all_1)
@@ -10413,7 +10413,11 @@ BOOLEAN newHEdge(kStrategy strat)
 #else
   scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether);
 #endif
-  if (strat->kNoether==NULL) return FALSE;
+  if (strat->kNoether==NULL)
+  {
+    strat->kNoether=newNoether;
+    return FALSE;
+  }
   if (strat->t_kNoether != NULL)
   {
     p_LmFree(strat->t_kNoether, strat->tailRing);

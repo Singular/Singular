@@ -803,9 +803,10 @@ int redFirst (LObject* h,kStrategy strat)
   int cnt = RED_CANONICALIZE;
   int j = 0;
 
+  reddeg = d = h->GetpFDeg();
   if (! strat->homog)
   {
-    d = h->GetpFDeg() + h->ecart;
+    d += h->ecart;
     reddeg = strat->LazyDegree+d;
   }
   h->SetShortExpVector();
@@ -1844,7 +1845,7 @@ void initMora(ideal F,kStrategy strat)
   }
   else
   {
-    HCord = 32000;/*- very large -*/
+    HCord = INT_MAX-3;/*- very large -*/
   }
 
   if (rField_is_Ring(currRing))
@@ -2440,6 +2441,8 @@ static int kFindLuckyPrime(ideal F, ideal Q) // TODO
 
 static poly kTryHC(ideal F, ideal Q)
 {
+  if (TEST_V_NO_TRY_HC)
+    return NULL;
   int prim=kFindLuckyPrime(F,Q);
   if (TEST_OPT_PROT) Print("try HC in ring over ZZ/%d\n",prim);
   // create Zp_ring
@@ -2473,8 +2476,10 @@ static poly kTryHC(ideal F, ideal Q)
   if (HC!=NULL)
   {
     p_IncrExp(HC,save_ring->N,save_ring);
-    p_Setm(HC,save_ring);
     if (TEST_OPT_PROT) Print("HC(%ld) found\n",pTotaldegree(HC));
+    for(int i=1;i<save_ring->N;i++)
+       p_IncrExp(HC,i,save_ring);
+    p_Setm(HC,save_ring);
   }
   rDelete(Zp_ring);
   return HC;
@@ -2493,6 +2498,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 
   /* test HC precomputation*/
   int ak = id_RankFreeModule(F,currRing);
+  poly resetppNoether = currRing->ppNoether;
   kStrategy strat=new skStrategy;
   if((ak==0)
   && (h!=isHomog)
@@ -2504,7 +2510,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   && rField_is_Q (currRing)
   && !rIsPluralRing(currRing)
   && (currRing->ppNoether==NULL))
+  {
+    //currRing->ppNoether=kTryHC(F,Q);
     strat->kNoether=kTryHC(F,Q);
+  }
 
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
@@ -2676,6 +2685,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 //Print("%d reductions canceled \n",strat->cel);
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  currRing->ppNoether=resetppNoether;
   return r;
 }
 
@@ -3833,7 +3843,7 @@ ideal kInterRed (ideal F,const ideal Q)
   int need_retry;
   int counter=3;
   ideal res, res1;
-  int elems;
+  int elems=0;
   ideal null=NULL;
   if ((Q==NULL) || (!TEST_OPT_REDSB))
   {

@@ -38,38 +38,39 @@ EXTERN_VAR BOOLEAN siCntrlc;
 ** defines for BITSETs
 */
 
-#define V_QUIET       0
-#define V_QRING       1
-#define V_SHOW_MEM    2
-#define V_YACC        3
-#define V_REDEFINE    4
-#define V_READING     5
-#define V_LOAD_LIB    6
-#define V_DEBUG_LIB   7
-#define V_LOAD_PROC   8
-#define V_DEF_RES     9
+#define V_QUIET         0
+#define V_QRING         1
+#define V_SHOW_MEM      2
+#define V_YACC          3
+#define V_REDEFINE      4
+#define V_READING       5
+#define V_LOAD_LIB      6
+#define V_DEBUG_LIB     7
+#define V_LOAD_PROC     8
+#define V_DEF_RES       9
 
-#define V_SHOW_USE   11
-#define V_IMAP       12
-#define V_PROMPT     13
-#define V_NSB        14
-#define V_CONTENTSB  15
-#define V_CANCELUNIT 16
-#define V_MODPSOLVSB 17
-#define V_UPTORADICAL 18
-#define V_FINDMONOM  19
-#define V_COEFSTRAT  20
+#define V_SHOW_USE      11
+#define V_IMAP          12
+#define V_PROMPT        13
+#define V_NSB           14
+#define V_CONTENTSB     15
+#define V_CANCELUNIT    16
+#define V_MODPSOLVSB    17
+#define V_UPTORADICAL   18
+#define V_FINDMONOM     19
+#define V_COEFSTRAT     20
 // set V_IDLIFT for liftstd(A,B) command (no syzygies wanted)
-#define V_IDLIFT     21
-#define V_LENGTH     22
+#define V_IDLIFT        21
+#define V_LENGTH        22
 //#define V_REPORT_STD 23
 /*23: kDebugPrint */
-#define V_ALLWARN    24
+#define V_ALLWARN        24
 #define V_INTERSECT_ELIM 25
-#define V_INTERSECT_SYZ 26
-#define V_ASSIGN_NONE 27
+#define V_INTERSECT_SYZ  26
+#define V_ASSIGN_NONE    27
+#define V_NO_TRY_HC      28
 /* for tests: 28-30 */
-#define V_DEG_STOP   31
+#define V_DEG_STOP       31
 
 
 #define OPT_PROT           0
@@ -133,6 +134,7 @@ EXTERN_VAR BOOLEAN siCntrlc;
 #define TEST_V_NSB                 BVERBOSE(V_NSB)
 #define TEST_V_QUIET               BVERBOSE(V_QUIET)
 #define TEST_V_ASSIGN_NONE         BVERBOSE(V_ASSIGN_NONE)
+#define TEST_V_NO_TRY_HC           BVERBOSE(V_NO_TRY_HC)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)
