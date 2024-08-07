@@ -9,9 +9,12 @@ OVERVIEW:
 --
 
 PROCEDURES:
-schrey_syz_ext(m);            (refined) Schreyer syzygy of a module over the exterior algebra 
-sres_ext(m,p);                free resolution of module m over the exterior algebra using refined Schreyer alg        
+schreyerSyzExt(m);            (refined) Schreyer syzygy of a module over the exterior algebra 
+sresExt(m,p);                 free resolution of module m over the exterior algebra using refined Schreyer alg        
 mres_ext(m,p);                minimal free resolution of module m over the exterior algebra using refined Schreyer alg
+sheafCohBGGsres(M,l,h)        cohomology of twists of the coherent sheaf F on P^n
+                              associated to coker(M). The range of twists is determined by @code{l},
+                              @code{h}.
 ";
 
 static proc mod_init()
@@ -351,13 +354,13 @@ static proc ext_elimination_(module m, module syz_mod)
 ///////////////////////////////////////////////////////////////////////////////
 
 //THIS IS THE MAIN USER CALLABLE PROCEDURE. 
-proc schrey_syz_ext(module m)
-"USAGE:   schrey_syz_ext(m); m a module over the exterior algebra.
+proc schreyerSyzExt(module m)
+"USAGE:   schreyerSyzExt(m); m a module over the exterior algebra.
 RETURN:   module
 PURPOSE:  computes the syzygy module of a m over the exterior algebra.
 THEORY:   
-SEE ALSO: sres_ext, mres_ext
-EXAMPLE: example schrey_syz_ext; shows an example
+SEE ALSO: sresExt, mresExt
+EXAMPLE: example schreyerSyzExt; shows an example
 "
 {
   int i,j;
@@ -395,7 +398,7 @@ example
   vector f3 = [0,0,0,x,y,z];
   module m = f1,f2,f3;
   m = std(m);
-  schrey_syz_ext(m);
+  schreyerSyzExt(m);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -418,14 +421,14 @@ static proc sres_ext_(module m, int p)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sres_ext(module m, int p) 
-"USAGE:   mres_ext(m,p); m a module over the polynomial ring.
+proc sresExt(module m, int p) 
+"USAGE:   srexExt(m,p); m a module over the polynomial ring.
 RETURN:   resolution
 PURPOSE:  to compute the minimal free resolution of m, 
           where m represents a module over the exterior algebra, up to pth cohomological degree. 
 THEORY:   
-SEE ALSO: mres_ext, schrey_syz_ext
-EXAMPLE: example sres_ext; shows an example
+SEE ALSO: mresExt, schreyerSyzExt
+EXAMPLE: example sresExt; shows an example
 "
 {
   //assume basering is the exterior algebra
@@ -457,7 +460,7 @@ example
   vector f3 = [0,0,0,x,y,z];
   module m = f1,f2,f3;
   m = std(m);
-  sres_ext(m,4);
+  sresExt(m,4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -563,14 +566,14 @@ static proc gr_than_for_res(vector s, vector v, list L)
 
 ///////////////////////////////////////////////////////////////////////////
 
-proc mres_ext(module m, int p)
-"USAGE:   mres_ext(m,p); m a module over the polynomial ring.
+proc mresExt(module m, int p)
+"USAGE:   mresExt(m,p); m a module over the polynomial ring.
 RETURN:   resolution
 PURPOSE:  to compute the minimal free resolution of m, 
           where m represents a module over the exterior algebra, up to pth cohomological degree. 
 THEORY:   
-SEE ALSO: sres_ext, schrey_syz_ext
-EXAMPLE: example mres_ext; shows an example
+SEE ALSO: sresExt, schreyerSyzExt
+EXAMPLE: example mresExt; shows an example
 "
 { //first compute groebner basis
   m = std(m);
@@ -589,7 +592,7 @@ EXAMPLE: example mres_ext; shows an example
   module temp_mod;
 
   //create the non-minimal resolution over the non-commutative ring.
-  resolution res_ = sres_ext_(M,p);
+  resolution res_ = sresExt(M,p);
   int s = size(res_);
 
   //fetch the resolution to the quotient ring over the symmetric algebra.
@@ -614,13 +617,13 @@ example
   vector f2 = [0,x,y,0,z,0];
   vector f3 = [0,0,0,x,y,z];
   module m = f1,f2,f3;
-  mres_ext(m,4);
+  mresExt(m,4);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-proc sheafCohBGG_sres(module M,int l,int h)
-"USAGE:   sheafCohBGG_sres(M,l,h);    M module, l,h int
+proc sheafCohBGGsres(module M,int l,int h)
+"USAGE:   sheafCohBGGsres(M,l,h);    M module, l,h int
 ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
          vector as an attribute, @code{h>=l}, and the basering has @code{n+1}
          variables.
@@ -686,8 +689,8 @@ EXAMPLE: example sheafCohBGG; shows an example
      w[i]=-bound-1;
   }
   attrib(EM,"isHomog",w);
-  resolution RE=mres_ext(EM,bound1);
-  intmat Betti=betti(RE);
+  resolution RE = mresExt(EM,bound1);
+  intmat Betti = betti(RE);
   k=ncols(Betti);
   row=nrows(Betti);
   int shift = 0;
