@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version sresforextalg.lib 1.0.0.0 June_2024 "; // $Id$
+version="";
 category="Noncommutative";
 info="
 LIBRARY: sresforextalg.lib     Schreyer's algorithm for modules over the exterior algebra
 AUTHORS: Ramesh, L.,           ramesh@mathematik.uni-kl.de   
 
 OVERVIEW:
---
+Procedures for and involving computing Schreyer resolution of modules over the exterior algebra
 
 PROCEDURES:
 schreyerSyzExt(m);            (refined) Schreyer syzygy of a module over the exterior algebra 
