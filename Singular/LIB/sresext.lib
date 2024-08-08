@@ -11,7 +11,7 @@ Procedures for and involving computing Schreyer resolution of modules over the e
 PROCEDURES:
 schreyerSyzExt(m);            (refined) Schreyer syzygy of a module over the exterior algebra 
 sresExt(m,p);                 free resolution of module m over the exterior algebra using refined Schreyer alg        
-mres_ext(m,p);                minimal free resolution of module m over the exterior algebra using refined Schreyer alg
+mresExt(m,p);                 minimal free resolution of module m over the exterior algebra using refined Schreyer alg
 sheafCohBGGsres(M,l,h)        cohomology of twists of the coherent sheaf F on P^n
                               associated to coker(M). The range of twists is determined by @code{l},
                               @code{h}.
@@ -592,7 +592,7 @@ EXAMPLE: example mresExt; shows an example
   module temp_mod;
 
   //create the non-minimal resolution over the non-commutative ring.
-  resolution res_ = sresExt(M,p);
+  resolution res_ = sres_ext_(M,p);
   int s = size(res_);
 
   //fetch the resolution to the quotient ring over the symmetric algebra.
