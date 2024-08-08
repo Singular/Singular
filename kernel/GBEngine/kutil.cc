@@ -10402,8 +10402,9 @@ BOOLEAN newHEdge(kStrategy strat)
 {
   if (currRing->pLexOrder || rHasMixedOrdering(currRing))
     return FALSE;
-  int i,j;
-  poly newNoether=strat->kNoether; // to keep previous kNoether
+  int i,newHCord;
+  poly oldNoether=strat->kNoether; // to keep previous kNoether
+  strat->kNoether=NULL;
 
 #if 0
   if (currRing->weight_all_1)
@@ -10415,9 +10416,22 @@ BOOLEAN newHEdge(kStrategy strat)
 #endif
   if (strat->kNoether==NULL)
   {
-    strat->kNoether=newNoether;
+    strat->kNoether=oldNoether;
     return FALSE;
   }
+  // now a new kNoether, defined by scComputeHC
+  pSetCoeff0(strat->kNoether,NULL);
+  newHCord = p_FDeg(strat->kNoether,currRing);
+  for(int i=currRing->N; i>0;i--)
+  {
+    int j=pGetExp(strat->kNoether,i);
+    if (j>0)
+    {
+      j--;
+      pSetExp(strat->kNoether,i,j);
+    }
+  }
+  pSetm(strat->kNoether);
   if (strat->t_kNoether != NULL)
   {
     p_LmFree(strat->t_kNoether, strat->tailRing);
@@ -10426,35 +10440,29 @@ BOOLEAN newHEdge(kStrategy strat)
   if (strat->tailRing != currRing)
     strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
   /* compare old and new noether*/
-  newNoether = pLmInit(strat->kNoether);
-  pSetCoeff0(newNoether,nInit(1));
-  j = p_FDeg(newNoether,currRing);
-  for (i=1; i<=(currRing->N); i++)
-  {
-    if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
-  }
-  pSetm(newNoether);
-  if (j < HCord) /*- statistics -*/
+  if (newHCord < HCord) /*- statistics -*/
   {
     if (TEST_OPT_PROT)
     {
-      Print("H(%d)",j);
+      Print("H(%d)",newHCord);
       mflush();
     }
-    HCord=j;
+    HCord=newHCord;
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      Print("H(%d):",j);
+      Print("H(%d):",newHCord);
       wrp(strat->kNoether);
       PrintLn();
     }
     #endif
+    if (oldNoether!=NULL) pLmFree(oldNoether);
+    return TRUE;
   }
-  if (pCmp(strat->kNoether,newNoether)!=1)
+  else // no change for HCord -> no change for kNoether
   {
-    if (strat->kNoether!=NULL) p_LmDelete0(strat->kNoether,currRing);
-    strat->kNoether=newNoether;
+    p_LmFree(strat->kNoether,currRing);
+    strat->kNoether=oldNoether;
     if (strat->t_kNoether != NULL)
     {
       p_LmFree(strat->t_kNoether, strat->tailRing);
@@ -10463,9 +10471,7 @@ BOOLEAN newHEdge(kStrategy strat)
     if (strat->tailRing != currRing)
       strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
 
-    return TRUE;
   }
-  pLmDelete(newNoether);
   return FALSE;
 }
 
