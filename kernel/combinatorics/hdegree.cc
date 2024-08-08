@@ -1073,6 +1073,8 @@ static void hHedgeStep(scmon pure, scfmon stc,
 
 void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge)
 {
+  if(idElem(S) == 0)
+    return;
   id_LmTest(S, currRing);
   if (Q!=NULL) id_LmTest(Q, currRing);
 
@@ -1094,16 +1096,6 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge)
     S=id_Copy(SS,currRing);
     idSkipZeroes(S);
   }
-  #if 0
-  printf("\nThis is HC:\n");
-  for(int ii=0;ii<=idElem(S);ii++)
-  {
-    pWrite(S->m[ii]);
-  }
-  //getchar();
-  #endif
-  if(idElem(S) == 0)
-    return;
   hNvar = (currRing->N);
   hexist = hInit(S, Q, &hNexist);
   if (k!=0)

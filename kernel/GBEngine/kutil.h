@@ -27,11 +27,11 @@
 #define HAVE_TAIL_RING
 
 #define setmax 128
-#define setmaxL ((4096-12)/sizeof(LObject))
-#define setmaxLinc ((4096)/sizeof(LObject))
+#define setmaxL ((int)((4096-12)/sizeof(LObject)))
+#define setmaxLinc ((int)((4096)/sizeof(LObject)))
 
-#define setmaxT ((4096-12)/sizeof(TObject))
-#define setmaxTinc ((4096)/sizeof(TObject))
+#define setmaxT ((int)((4096-12)/sizeof(TObject)))
+#define setmaxTinc ((int)((4096)/sizeof(TObject)))
 
 #define RED_CANONICALIZE 200
 #define REDNF_CANONICALIZE 60

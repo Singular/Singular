@@ -504,7 +504,7 @@ int ksReducePolyLC(LObject* PR,
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
-  poly t2 = pNext(p2), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
+  poly lm = p1;    // really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
   assume(p1 != NULL && p2 != NULL);// Attention, we have rings and there LC(p2) and LC(p1) are special
   p_CheckPolyRing(p1, tailRing);
   p_CheckPolyRing(p2, tailRing);
@@ -546,7 +546,6 @@ int ksReducePolyLC(LObject* PR,
     tailRing = strat->tailRing;
     p1 = PR->GetLmTailRing();
     p2 = PW->GetLmTailRing();
-    t2 = pNext(p2);
     lm = p1;
     p_ExpVectorSub(lm, p2, tailRing);
     ret = 1;
