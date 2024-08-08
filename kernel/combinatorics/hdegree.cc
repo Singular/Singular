@@ -1098,6 +1098,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge)
   }
   hNvar = (currRing->N);
   hexist = hInit(S, Q, &hNexist);
+  if (hNexist==0) return;
   if (k!=0)
     hComp(hexist, hNexist, k, hexist, &hNstc);
   else
