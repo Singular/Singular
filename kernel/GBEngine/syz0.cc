@@ -326,7 +326,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 */
 //Print("toRed now (neuer ecart %d): ",ecartToRed);pWrite(toRed);
           notFound = TRUE;
-          bestEcart = 32000;  //a very large integer
+          bestEcart = INT_MAX-2;  //a very large integer
           p = NULL;
           int l=0;
 #define OLD_SEARCH
