@@ -10463,11 +10463,7 @@ BOOLEAN newHEdge(kStrategy strat)
   {
     p_LmFree(strat->kNoether,currRing);
     strat->kNoether=oldNoether;
-    if (strat->t_kNoether != NULL)
-    {
-      p_LmFree(strat->t_kNoether, strat->tailRing);
-      strat->t_kNoether=NULL;
-    }
+    assume(strat->t_kNoether == NULL);
     if (strat->tailRing != currRing)
       strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
 
