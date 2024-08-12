@@ -3739,21 +3739,22 @@ void pEnlargeSet(poly* *p, int l, int increment)
 */
 void p_Norm(poly p1, const ring r)
 {
-  if (LIKELY(rField_is_Ring(r)))
+  if (UNLIKELY(p1==NULL)) return;
+  if (rField_is_Ring(r))
   {
     if(!n_GreaterZero(pGetCoeff(p1),r->cf)) p1 = p_Neg(p1,r);
     if (!n_IsUnit(pGetCoeff(p1), r->cf)) return;
     // Werror("p_Norm not possible in the case of coefficient rings.");
   }
-  else if (LIKELY(p1!=NULL))
+  else //(p1!=NULL)
   {
-    if (UNLIKELY(pNext(p1)==NULL))
-    {
-      p_SetCoeff(p1,n_Init(1,r->cf),r);
-      return;
-    }
     if (!n_IsOne(pGetCoeff(p1),r->cf))
     {
+      if (UNLIKELY(pNext(p1)==NULL))
+      {
+        p_SetCoeff(p1,n_Init(1,r->cf),r);
+        return;
+      }
       number k = pGetCoeff(p1);
       pSetCoeff0(p1,n_Init(1,r->cf));
       poly h = pNext(p1);
