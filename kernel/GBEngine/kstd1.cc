@@ -188,7 +188,7 @@ int redEcart (LObject* h,kStrategy strat)
     ei = strat->T[j].ecart;
     ii = j;
 
-    if (ei > h->ecart && ii < strat->tl)
+    if (ei > h->ecart)
     {
       unsigned long not_sev=~h->sev;
       poly h_t= h->GetLmTailRing();
@@ -202,8 +202,8 @@ int redEcart (LObject* h,kStrategy strat)
       {
         /*- takes the first possible with respect to ecart -*/
         i++;
-#if 1
         if (i > strat->tl) break;
+#if 1
         if (strat->T[i].length<=0) strat->T[i].GetpLength();
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
@@ -227,7 +227,7 @@ int redEcart (LObject* h,kStrategy strat)
     }
 
     // end of search: have to reduce with pi
-    if (ei > h->ecart)
+    if ((ei > h->ecart)&&(strat->kNoether==NULL))
     {
       // It is not possible to reduce h with smaller ecart;
       // if possible h goes to the lazy-set L,i.e
@@ -1592,11 +1592,7 @@ void firstUpdate(kStrategy strat)
     if (TEST_OPT_FINDET)
       return;
 
-    if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
-    {
-      strat->red = redFirst;
-      strat->use_buckets = kMoraUseBucket(strat);
-    }
+    strat->use_buckets = kMoraUseBucket(strat);
     updateT(strat);
 
     if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
@@ -1828,14 +1824,13 @@ void initMora(ideal F,kStrategy strat)
   if ( strat->kAllAxis )
   {
     strat->kNoether = pCopy((currRing->ppNoether));
-    strat->red = redFirst;  /*take the first possible in T*/
     if (TEST_OPT_PROT)
     {
       Print("H(%ld)",p_FDeg(strat->kNoether,currRing)+1);
       mflush();
     }
   }
-  else if (strat->homog)
+  if (strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
@@ -3673,19 +3668,10 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       if (TEST_OPT_INTSTRATEGY)
       {
         strat->P.pCleardenom();
-        if (0)
-        //if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-        {
-          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
-          strat->P.pCleardenom();
-        }
       }
       else
       {
         strat->P.pNorm();
-        if (0)
-        //if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
       }
 
 #ifdef KDEBUG
@@ -3900,7 +3886,8 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
 #ifdef MORA_USE_BUCKETS
   if (TEST_OPT_NOT_BUCKETS)
     return FALSE;
-  if (strat->red == redFirst)
+  if ((strat->red == redFirst)
+  ||((strat->red == redEcart)&&(strat->kNoether!=NULL)))
   {
 #ifdef NO_LDEG
     if (strat->syzComp==0)
