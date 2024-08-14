@@ -1223,14 +1223,13 @@ static poly redMoraNFRing (poly h,kStrategy strat, int flag)
 void reorderL(kStrategy strat)
 {
   int i,j,at;
-  LObject p;
 
   for (i=1; i<=strat->Ll; i++)
   {
     at = strat->posInL(strat->L,i-1,&(strat->L[i]),strat);
     if (at != i)
     {
-      p = strat->L[i];
+      LObject p = strat->L[i];
       for (j=i-1; j>=at; j--) strat->L[j+1] = strat->L[j];
       strat->L[at] = p;
     }
@@ -1394,7 +1393,6 @@ int posInL10 (const LSet set,const int length, LObject* p,const kStrategy strat)
 */
 void updateL(kStrategy strat)
 {
-  LObject p;
   int dL;
   int j=strat->Ll;
   loop
@@ -1402,6 +1400,7 @@ void updateL(kStrategy strat)
     if (j<0) break;
     if (hasPurePower(&(strat->L[j]),strat->lastAxis,&dL,strat))
     {
+      LObject p;
       p=strat->L[strat->Ll];
       strat->L[strat->Ll]=strat->L[j];
       strat->L[j]=p;
@@ -1444,10 +1443,11 @@ void updateL(kStrategy strat)
 
         BOOLEAN pp = hasPurePower(&(strat->L[j]),strat->lastAxis,&dL,strat);
 
-        if (strat->use_buckets) strat->L[j].PrepareRed(TRUE);
+        strat->L[j].PrepareRed(strat->use_buckets);
 
         if (pp)
         {
+          LObject p;
           p=strat->L[strat->Ll];
           strat->L[strat->Ll]=strat->L[j];
           strat->L[j]=p;
@@ -1988,6 +1988,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
                     strat->tailRing, m1, m2, strat->R);
       if (!strat->use_buckets)
         strat->P.SetLength(strat->length_pLength);
+      strat->P.PrepareRed(strat->use_buckets);
     }
     else if (strat->P.p1 == NULL)
     {
