@@ -1440,6 +1440,7 @@ BOOLEAN ssiClose(si_link l)
       {
         fputs("99\n",d->f_write);
         fflush(d->f_write);
+        d->quit_sent=1;
       }
       // clean ring
       if (d->r!=NULL) rKill(d->r);
@@ -1448,50 +1449,45 @@ BOOLEAN ssiClose(si_link l)
         if (d->rings[i]!=NULL)  rKill(d->rings[i]);
         d->rings[i]=NULL;
       }
-      // did the child to stop ?
-      si_waitpid(d->pid,NULL,WNOHANG);
-      if ((d->pid!=0)
-      && (kill(d->pid,0)==0)) // child is still running
+      if (d->f_read!=NULL) { s_close(d->f_read);d->f_read=NULL;}
+      if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
+      if ((strcmp(l->mode,"tcp")==0)
+      || (strcmp(l->mode,"fork")==0))
       {
-        struct timespec t;
-        t.tv_sec=0;
-        t.tv_nsec=100000000; // <=100 ms
-        struct timespec rem;
-        int r;
-        loop
+        // did the child stop ?
+        int pid=si_waitpid(d->pid,NULL,WNOHANG);
+        if ((pid==0) /* ono staus change for child*/
+        && (kill(d->pid,0)==0)) // child is still running
         {
-          // wait till signal or time rem:
-          r = nanosleep(&t, &rem);
-          t = rem;
-          // child finished:
-          if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
-          // other signal, waited s>= 100 ms:
-          if ((r==0) || (errno != EINTR)) break;
-        }
-        if (kill(d->pid,0) == 0) // pid still exists
-        {
-          kill(d->pid,15);
-          t.tv_sec=5; // <=5s
-          t.tv_nsec=0;
-          loop
+          struct timespec t;
+          struct timespec rem;
+          // wait 5 sec
+          for(int i=0;i<50;i++)
           {
-            // wait till signal or time rem:
-            r = nanosleep(&t, &rem);
-            t = rem;
-            // child finished:
+            // wait till signal or 100ms:
+            t.tv_sec=0;
+            t.tv_nsec=100000000; // <=100 ms
+            nanosleep(&t, &rem);
+            // child finished ?
             if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
-            // other signal, waited s>=  5 s:
-            if ((r==0) || (errno != EINTR)) break;
           }
-          if (kill(d->pid,0) == 0)
+          if (kill(d->pid,0)==0) // child still exists
           {
-            kill(d->pid,9); // just to be sure
-            si_waitpid(d->pid,NULL,0);
+            kill(d->pid,SIGTERM);
+            // wait another 5 sec
+            for(int i=0;i<50;i++)
+            {
+              // wait till signal or 100ms:
+              t.tv_sec=0;
+              t.tv_nsec=100000000; // <=100 ms
+              nanosleep(&t, &rem);
+              // child finished ?
+              if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
+            }
+            kill(d->pid,SIGKILL);
           }
         }
       }
-      if (d->f_read!=NULL) { s_close(d->f_read);d->f_read=NULL;}
-      if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
       if ((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
       {
