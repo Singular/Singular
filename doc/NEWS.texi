@@ -35,6 +35,9 @@ Changed libraries:
 Changes in the kernel/build system:
 @itemize
 @item use new algorithm for weighted Hilbert function @nref{hilb}
+@item use new algorithm for @nref{std} in the case of ordering @code{ds}
+      and zero dimensional ideal over @code{QQ}
+@item changed reduction routine for local orderings
 @end itemize
 
 @heading News for version 4-4-0
