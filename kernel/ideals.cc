@@ -3492,7 +3492,8 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
       }
     }
   }
-  if (only_vars && isIdeal && rOrd_is_Totaldegree_Ordering(currRing))
+  if (only_vars && isIdeal && rOrd_is_Totaldegree_Ordering(currRing)
+  && (idElem(J)==1))
   {
     ideal Iquot,Istd;
     intvec *w=NULL;
@@ -3501,7 +3502,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
     loop
     {
       k++;
-      Iquot=idQuot(Istd,J,TRUE,TRUE/*isIdeal*/);
+      Iquot=idQuot(Istd,J,TRUE,isIdeal);
       ideal tmp=kNF(Istd,currRing->qideal,Iquot,5);
       int  elem=idElem(tmp);
       id_Delete(&tmp,currRing);
