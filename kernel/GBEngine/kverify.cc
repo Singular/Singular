@@ -2,6 +2,7 @@
 
 #include "misc/mylimits.h"
 #include "misc/options.h"
+#include "reporter/si_signals.h"
 #include "kernel/ideals.h"
 #include "kernel/polys.h"
 #include "polys/monomials/ring.h"
@@ -302,7 +303,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       if (res==0) // a child finished
       {
         if (TEST_OPT_PROT) { printf("c");mflush(); }
-        waitpid(-1,NULL,0); // ? see sig_chld_hdl
+        si_waitpid(-1,NULL,0); // ? see sig_chld_hdl
         remaining_children--;
       }
       else if (res==1) // not a GB - clean up and return 0
