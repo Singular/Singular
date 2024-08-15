@@ -100,7 +100,9 @@ int main(          /* main entry to Singular */
       errormsg = feSetOptValue((feOptIndex) option_index, fe_optarg);
     // not more than MAX_PROCESS cpus
     long cpus=(long)feOptValue(FE_OPT_CPUS);
+    #ifdef HAVE_VSPACE
     if (cpus>vspace::internals::MAX_PROCESS) cpus=vspace::internals::MAX_PROCESS;
+    #endif
     feSetOptValue(FE_OPT_CPUS,cpus);
 
     if (errormsg)
