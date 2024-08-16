@@ -1455,7 +1455,9 @@ void siInit(char *name)
   #elif defined(_SC_NPROCESSORS_CONF)
   if ((cpu_n=sysconf(_SC_NPROCESSORS_CONF))>cpus) cpus=cpu_n;
   #endif
+  #ifdef HAVE_VSPACE
   if (cpus>vspace::internals::MAX_PROCESS) cpus=vspace::internals::MAX_PROCESS;
+  #endif
   feSetOptValue(FE_OPT_CPUS, cpus);
 // how many threads ? -----------------------------------------------------
   feSetOptValue(FE_OPT_THREADS, cpus);

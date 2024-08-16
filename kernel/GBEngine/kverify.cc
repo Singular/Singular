@@ -213,6 +213,8 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   if (cpus>=vspace::internals::MAX_PROCESS)
     cpus=vspace::internals::MAX_PROCESS-1;
   /* start no more than MAX_PROCESS-1 children */
+  if (cpus>strat->Ll) cpus=strat->Ll;
+  /* start no more children than elements in L */
   int parent_pid=getpid();
   using namespace vspace;
   vmem_init();
@@ -223,7 +225,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   {
    queue->enqueue(i); // the tasks: process pair L[i]
   }
-  for(int i=cpus;i>=0;i--)
+  for(int i=cpus*2;i>=0;i--)
   {
     queue->enqueue(-1); // stop sign, one for each child
   }
@@ -233,6 +235,9 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     pid = fork_process();
     if (pid==0) break; //child
   }
+  // input queue: queue: <index of L> -1 ...-1
+  // output queue: rqueue: 0 pid... pid for failure
+  //                      pid ... pid for success
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
     loop
@@ -241,7 +246,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       if (ind== -1)
       {
         if (TEST_OPT_PROT) printf("child: end of queue\n");
-        rqueue->enqueue(0);
+        rqueue->enqueue(getpid()); // negative number as stop sign
         exit(0);
       }
       int red_result=1;
@@ -284,10 +289,13 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       if (red_result!=0)
       {
         if (TEST_OPT_PROT) printf("fail: result: %d\n",red_result);
-        rqueue->enqueue(1);
+        rqueue->enqueue(0);
+        rqueue->enqueue(getpid()); // stop sign
         exit(0); // found fail, no need to test further
       }
     }
+    // should never be reached:
+    rqueue->enqueue(-getpid()); // stop sign
     exit(0); // all done, quit child
   }
   else // parent ---------------------------------------------------
@@ -300,26 +308,24 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     while(remaining_children>0)
     {
       res=rqueue->dequeue();
-      if (res==0) // a child finished
+      if (res>0) // a child finished
       {
         if (TEST_OPT_PROT) { printf("c");mflush(); }
-        si_waitpid(-1,NULL,0); // ? see sig_chld_hdl
+        si_waitpid(res,NULL,0);
         remaining_children--;
       }
-      else if (res==1) // not a GB - clean up and return 0
+      else if (res==0) // not a GB - clean up and return 0
       {
         if (TEST_OPT_PROT) { printf("C"); mflush(); }
-        remaining_children--;
         all_okay=FALSE;
         // clean queue:
         int dummy;
         do
         {
           dummy=queue->dequeue(); // remove remaining tasks
-        } while (dummy==0);
+        } while (dummy>=0);
       }
     }
-    sleep(1); // let all the children finish
     // removes queues
     queue.free();
     rqueue.free();
