@@ -1907,7 +1907,7 @@ const char* slStatusSsi(si_link l, const char* request)
       pfd.fd=d->fd_read;
       pfd.events=POLLIN;
       //Print("test fd %d\n",d->fd_read);
-    /* check with select: chars waiting: no -> not ready */
+      /* check with select: chars waiting: no -> not ready */
       switch (si_poll(&pfd,1,0))
       {
         case 0: /* not ready */ return "not ready";
@@ -1932,7 +1932,7 @@ const char* slStatusSsi(si_link l, const char* request)
       FD_ZERO(&mask);
       FD_SET(d->fd_read, &mask);
       //Print("test fd %d\n",d->fd_read);
-    /* check with select: chars waiting: no -> not ready */
+      /* check with select: chars waiting: no -> not ready */
       switch (si_select(d->fd_read+1, &mask, NULL, NULL, &wt))
       {
         case 0: /* not ready */ return "not ready";
@@ -1940,8 +1940,8 @@ const char* slStatusSsi(si_link l, const char* request)
         case 1: /*ready ? */    break;
       }
 #endif
-    /* yes: read 1 char*/
-    /* if \n, check again with select else ungetc(c), ready*/
+      /* yes: read 1 char*/
+      /* if \n, check again with select else ungetc(c), ready*/
       int c=s_getc(d->f_read);
       //Print("try c=%d\n",c);
       if (c== -1) return "eof"; /* eof or error */
@@ -1982,6 +1982,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
 //           0:  timeout (or polling): none ready,
 //           i>0: (at least) L[i] is ready
 #if defined(HAVE_POLL) && !defined(__APPLE__)
+// fd is restricted on OsX by ulimit "file descriptors" (256)
   si_link l;
   ssiInfo *d=NULL;
   int d_fd;
@@ -2062,6 +2063,7 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
   // no ready
   return 0;
 #else
+  // fd is restricted to <=1024
   si_link l;
   ssiInfo *d=NULL;
   int d_fd;
