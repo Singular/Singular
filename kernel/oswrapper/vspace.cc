@@ -5,6 +5,9 @@
 #ifdef HAVE_CPP_THREADS
 #include <thread>
 #endif
+#ifdef HAVE_POLL
+#include <poll.h>
+#endif
 #include <cstddef>
 
 #if defined(__GNUC__) && (__GNUC__<9) &&!defined(__clang__)
@@ -386,11 +389,51 @@ ipc_signal_t check_signal(bool resume, bool lock) {
       char buf[1];
       if (lock && sigstate == Waiting) {
         unlock_process(vmem.current_process);
-        while (read(fd, buf, 1) != 1) {
+        loop
+        {
+          #if defined(HAVE_POLL)  && !defined(__APPLE__)
+          // fd is restricted on OsX by ulimit "file descriptors" (256)
+          pollfd pfd;
+          pfd.fd = fd;
+          pfd.events = POLLIN;
+          int rv = poll(&pfd, 1, 5000); /* msec*/
+          #else
+          // fd is restricted to <=1024
+          fd_set set;
+          FD_ZERO(&set); /* clear the set */
+          FD_SET(fd, &set); /* add our file descriptor to the set */
+          struct timeval timeout;
+          timeout.tv_sec = 5;
+          timeout.tv_usec = 0;
+          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          #endif
+          if (rv== -1) break; /* an error occurred */
+          if (rv== 0) break;  /* timeout */
+          read(fd, buf, 1);
         }
         lock_process(vmem.current_process);
       } else {
-        while (read(fd, buf, 1) != 1) {
+        loop
+        {
+          #if defined(HAVE_POLL)  && !defined(__APPLE__)
+          // fd is restricted on OsX by ulimit "file descriptors" (256)
+          pollfd pfd;
+          pfd.fd = fd;
+          pfd.events = POLLIN;
+          int rv = poll(&pfd, 1, 5000); /* msec*/
+          #else
+          // fd is restricted to <=1024
+          fd_set set;
+          FD_ZERO(&set); /* clear the set */
+          FD_SET(fd, &set); /* add our file descriptor to the set */
+          struct timeval timeout;
+          timeout.tv_sec = 5;
+          timeout.tv_usec = 0;
+          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          #endif
+          if (rv== -1) break;  /* an error occurred */
+          if (rv== 0) break;  /* timeout */
+          read(fd, buf, 1);
         }
       }
       result = process_info(vmem.current_process).signal;
@@ -953,11 +996,51 @@ ipc_signal_t check_signal(bool resume, bool lock) {
       char buf[1];
       if (lock && sigstate == Waiting) {
         unlock_process(vmem.current_process);
-        while (read(fd, buf, 1) != 1) {
+        loop
+        {
+          #if defined(HAVE_POLL)  && !defined(__APPLE__)
+          // fd is restricted on OsX by ulimit "file descriptors" (256)
+          pollfd pfd;
+          pfd.fd = fd;
+          pfd.events = POLLIN;
+          int rv = poll(&pfd, 1, 5000); /* msec*/
+          #else
+          // fd is restricted to <=1024
+          fd_set set;
+          FD_ZERO(&set); /* clear the set */
+          FD_SET(fd, &set); /* add our file descriptor to the set */
+          struct timeval timeout;
+          timeout.tv_sec = 5;
+          timeout.tv_usec = 0;
+          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          #endif
+          if (rv== -1) break;  /* an error occurred */
+          if (rv== 0) break;  /* timeout */
+          read(fd, buf, 1);
         }
         lock_process(vmem.current_process);
       } else {
-        while (read(fd, buf, 1) != 1) {
+        loop
+        {
+          #if defined(HAVE_POLL)  && !defined(__APPLE__)
+          // fd is restricted on OsX by ulimit "file descriptors" (256)
+          pollfd pfd;
+          pfd.fd = fd;
+          pfd.events = POLLIN;
+          int rv = poll(&pfd, 1, 5000); /* msec*/
+          #else
+          // fd is restricted to <=1024
+          fd_set set;
+          FD_ZERO(&set); /* clear the set */
+          FD_SET(fd, &set); /* add our file descriptor to the set */
+          struct timeval timeout;
+          timeout.tv_sec = 5;
+          timeout.tv_usec = 0;
+          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          #endif
+          if (rv== -1) break; /* an error occurred */
+          if (rv== 0) break;/* timeout */
+          read(fd, buf, 1);
         }
       }
       result = process_info(vmem.current_process).signal;

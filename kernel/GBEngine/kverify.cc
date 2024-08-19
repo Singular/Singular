@@ -295,7 +295,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       }
     }
     // should never be reached:
-    rqueue->enqueue(-getpid()); // stop sign
+    rqueue->enqueue(getpid()); // stop sign
     exit(0); // all done, quit child
   }
   else // parent ---------------------------------------------------

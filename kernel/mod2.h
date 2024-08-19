@@ -61,13 +61,7 @@
 
 /* define for parallel processes with shared memory */
 #ifndef __CCYGWIN__
-#ifdef __apple__ // not on intel-OsX, but on Mx-OsX
-#ifndef __arm__
 #define HAVE_VSPACE 1
-#endif
-#else
-#define HAVE_VSPACE 1
-#endif
 #endif
 
 /*#define PROFILING*/
