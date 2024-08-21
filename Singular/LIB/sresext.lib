@@ -692,7 +692,7 @@ EXAMPLE: example sheafCohBGG; shows an example
   resoltuion temp_res = mresExt(EM,bound1+1);
   list L;
   for (i = 1; i <= bound1; i++){
-    L[i] = temp_res[i]
+    L[i] = temp_res[i];
   }
   resolution RE = L;
   intmat Betti = betti(RE);
