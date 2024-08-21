@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="";
+version=" ";
 category="Noncommutative";
 info="
 LIBRARY: sresforextalg.lib     Schreyer's algorithm for modules over the exterior algebra
@@ -689,7 +689,12 @@ EXAMPLE: example sheafCohBGG; shows an example
      w[i]=-bound-1;
   }
   attrib(EM,"isHomog",w);
-  resolution RE = mresExt(EM,bound1);
+  resoltuion temp_res = mresExt(EM,bound1+1);
+  list L;
+  for (i = 1; i <= bound1; i++){
+    L[i] = temp_res[i]
+  }
+  resolution RE = L;
   intmat Betti = betti(RE);
   k=ncols(Betti);
   row=nrows(Betti);
