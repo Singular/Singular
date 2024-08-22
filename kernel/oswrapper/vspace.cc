@@ -409,7 +409,8 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           #endif
           if (rv== -1) break; /* an error occurred */
           if (rv== 0) break;  /* timeout */
-          read(fd, buf, 1);
+          while(read(fd, buf, 1)!=1) {}
+          break;
         }
         lock_process(vmem.current_process);
       } else {
@@ -433,7 +434,8 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           #endif
           if (rv== -1) break;  /* an error occurred */
           if (rv== 0) break;  /* timeout */
-          read(fd, buf, 1);
+          while(read(fd, buf, 1)!=1) {}
+          break;
         }
       }
       result = process_info(vmem.current_process).signal;
@@ -1016,7 +1018,8 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           #endif
           if (rv== -1) break;  /* an error occurred */
           if (rv== 0) break;  /* timeout */
-          read(fd, buf, 1);
+          while(read(fd, buf, 1)!=1) {}
+          break;
         }
         lock_process(vmem.current_process);
       } else {
@@ -1040,7 +1043,8 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           #endif
           if (rv== -1) break; /* an error occurred */
           if (rv== 0) break;/* timeout */
-          read(fd, buf, 1);
+          while(read(fd, buf, 1)!=1) {}
+          break;
         }
       }
       result = process_info(vmem.current_process).signal;
