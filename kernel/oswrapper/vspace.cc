@@ -396,21 +396,21 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 60000); /* msec*/
+          int rv = poll(&pfd, 1, 10000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 60;
+          timeout.tv_sec = 10;
           timeout.tv_usec = 0;
           int rv = select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
-          if (rv== -1) break; /* an error occurred */
+          if (rv== -1) continue; /* an error occurred */
           if (rv== 0) break;  /* timeout */
-          while(read(fd, buf, 1)!=1) {}
-          break;
+          //while(read(fd, buf, 1)!=1) {}
+          if(read(fd, buf, 1)==1) break;
         }
         lock_process(vmem.current_process);
       } else {
@@ -421,21 +421,21 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 60000); /* msec*/
+          int rv = poll(&pfd, 1, 10000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 60;
+          timeout.tv_sec = 10;
           timeout.tv_usec = 0;
           int rv = select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
-          if (rv== -1) break;  /* an error occurred */
+          if (rv== -1) continue;  /* an error occurred */
           if (rv== 0) break;  /* timeout */
-          while(read(fd, buf, 1)!=1) {}
-          break;
+          //while(read(fd, buf, 1)!=1) {}
+          if(read(fd, buf, 1)==1) break;
         }
       }
       result = process_info(vmem.current_process).signal;
@@ -1005,21 +1005,21 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 60000); /* msec*/
+          int rv = poll(&pfd, 1, 10000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 60;
+          timeout.tv_sec = 10;
           timeout.tv_usec = 0;
           int rv = select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
-          if (rv== -1) break;  /* an error occurred */
+          if (rv== -1) continue;  /* an error occurred */
           if (rv== 0) break;  /* timeout */
-          while(read(fd, buf, 1)!=1) {}
-          break;
+          //while(read(fd, buf, 1)!=1) {}
+          if(read(fd, buf, 1)==1) break;
         }
         lock_process(vmem.current_process);
       } else {
@@ -1030,21 +1030,21 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 60000); /* msec*/
+          int rv = poll(&pfd, 1, 10000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 60;
+          timeout.tv_sec = 10;
           timeout.tv_usec = 0;
           int rv = select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
-          if (rv== -1) break; /* an error occurred */
+          if (rv== -1) continue; /* an error occurred */
           if (rv== 0) break;/* timeout */
-          while(read(fd, buf, 1)!=1) {}
-          break;
+          //while(read(fd, buf, 1)!=1) {}
+          if(read(fd, buf, 1)==1) break;
         }
       }
       result = process_info(vmem.current_process).signal;
