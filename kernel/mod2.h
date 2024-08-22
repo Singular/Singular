@@ -19,7 +19,7 @@
 #define SINGULAR_MAJOR_VERSION 4
 #define SINGULAR_MINOR_VERSION 4
 #define SINGULAR_SUB_VERSION 0
-#define SINGULAR_PATCHLEVEL 4
+#define SINGULAR_PATCHLEVEL 5
 #define S_ROOT_DIR ""
 
 /*******************************************************************
@@ -61,7 +61,9 @@
 
 /* define for parallel processes with shared memory */
 #ifndef __CCYGWIN__
-#define HAVE_VSPACE 1
+  #if (!defined(__APPLE__)) ||(!defined(__x86_64__))
+    #define HAVE_VSPACE 1
+  #endif
 #endif
 
 /*#define PROFILING*/

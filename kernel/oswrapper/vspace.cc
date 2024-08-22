@@ -9,6 +9,7 @@
 #include <poll.h>
 #endif
 #include <cstddef>
+#include "reporter/si_signals.h"
 
 #if defined(__GNUC__) && (__GNUC__<9) &&!defined(__clang__)
 
@@ -405,7 +406,7 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           struct timeval timeout;
           timeout.tv_sec = 10;
           timeout.tv_usec = 0;
-          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
           if (rv== -1) continue; /* an error occurred */
           if (rv== 0) break;  /* timeout */
@@ -430,7 +431,7 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           struct timeval timeout;
           timeout.tv_sec = 10;
           timeout.tv_usec = 0;
-          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
           if (rv== -1) continue;  /* an error occurred */
           if (rv== 0) break;  /* timeout */
@@ -1014,7 +1015,7 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           struct timeval timeout;
           timeout.tv_sec = 10;
           timeout.tv_usec = 0;
-          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
           if (rv== -1) continue;  /* an error occurred */
           if (rv== 0) break;  /* timeout */
@@ -1039,7 +1040,7 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           struct timeval timeout;
           timeout.tv_sec = 10;
           timeout.tv_usec = 0;
-          int rv = select(fd + 1, &set, NULL, NULL, &timeout);
+          int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
           if (rv== -1) continue; /* an error occurred */
           if (rv== 0) break;/* timeout */
