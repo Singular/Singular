@@ -397,14 +397,14 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 10000); /* msec*/
+          int rv = poll(&pfd, 1, 100000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 10;
+          timeout.tv_sec = 100;
           timeout.tv_usec = 0;
           int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
@@ -422,14 +422,14 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 10000); /* msec*/
+          int rv = poll(&pfd, 1, 100000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 10;
+          timeout.tv_sec = 100;
           timeout.tv_usec = 0;
           int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
@@ -1006,14 +1006,14 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 10000); /* msec*/
+          int rv = poll(&pfd, 1, 100000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 10;
+          timeout.tv_sec = 100;
           timeout.tv_usec = 0;
           int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
@@ -1031,14 +1031,14 @@ ipc_signal_t check_signal(bool resume, bool lock) {
           pollfd pfd;
           pfd.fd = fd;
           pfd.events = POLLIN;
-          int rv = poll(&pfd, 1, 10000); /* msec*/
+          int rv = poll(&pfd, 1, 100000); /* msec*/
           #else
           // fd is restricted to <=1024
           fd_set set;
           FD_ZERO(&set); /* clear the set */
           FD_SET(fd, &set); /* add our file descriptor to the set */
           struct timeval timeout;
-          timeout.tv_sec = 10;
+          timeout.tv_sec = 100;
           timeout.tv_usec = 0;
           int rv = si_select(fd + 1, &set, NULL, NULL, &timeout);
           #endif
