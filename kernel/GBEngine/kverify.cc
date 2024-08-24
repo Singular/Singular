@@ -236,7 +236,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     if (pid==0) break; //child
   }
   // input queue: queue: <index of L> -1 ...-1
-  // output queue: rqueue: 0 pid... pid for failure
+  // output queue: rqueue: pid .. pid 0 pid... pid for failure
   //                      pid ... pid for success
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
