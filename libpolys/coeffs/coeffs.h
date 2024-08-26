@@ -904,12 +904,16 @@ static FORCE_INLINE BOOLEAN nCoeff_is_algExt(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_algExt); }
 
 /// is it an alg. ext. of Q?
-static FORCE_INLINE BOOLEAN nCoeff_is_Q_algext(const coeffs r)
+static FORCE_INLINE BOOLEAN nCoeff_is_Q_algExt(const coeffs r)
 { assume(r != NULL); return ((n_GetChar(r) == 0) && nCoeff_is_algExt(r)); }
 
 /// TRUE iff r represents a transcendental extension field
 static FORCE_INLINE BOOLEAN nCoeff_is_transExt(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_transExt); }
+
+/// is it an trans. ext. of Q?
+static FORCE_INLINE BOOLEAN nCoeff_is_Q_transExt(const coeffs r)
+{ assume(r != NULL); return ((n_GetChar(r) == 0) && nCoeff_is_transExt(r)); }
 
 /// Computes the content and (inplace) divides it out on a collection
 /// of numbers
@@ -979,6 +983,5 @@ static FORCE_INLINE CanonicalForm n_convSingNFactoryN( number n, BOOLEAN setChar
 // the following 2 inline functions are just convenience shortcuts for Frank's code:
 static FORCE_INLINE void number2mpz(number n, coeffs c, mpz_t m){ n_MPZ(m, n, c); }
 static FORCE_INLINE number mpz2number(mpz_t m, coeffs c){ return n_InitMPZ(m, c); }
-
 #endif
 

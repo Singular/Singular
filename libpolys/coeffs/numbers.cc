@@ -249,7 +249,7 @@ static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   }
 
   assume(!nCoeff_is_Ring(r));
-  assume(nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r) || nCoeff_is_Q_algext(r));
+  assume(nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r) || nCoeff_is_Q_algExt(r));
 
   n_Normalize(curr, r); // Q: good/bad/ugly??
 

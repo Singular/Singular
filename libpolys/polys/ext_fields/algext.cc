@@ -1118,7 +1118,7 @@ static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 {
   assume(cf != NULL);
   assume(getCoeffType(cf) == n_algExt);
-  assume(nCoeff_is_Q_algext(cf)); // only over (Q[a]/m(a)), while the default impl. is used over Zp[a]/m(a) !
+  assume(nCoeff_is_Q_algExt(cf)); // only over (Q[a]/m(a)), while the default impl. is used over Zp[a]/m(a) !
 
   const ring   R = cf->extRing;
   assume(R != NULL);
@@ -1323,7 +1323,7 @@ static void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 {
   assume(cf != NULL);
   assume((getCoeffType(cf) == n_algExt)||(getCoeffType(cf) == n_polyExt));
-  assume(nCoeff_is_Q_algext(cf)); // only over (Q[a]/m(a)), while the default impl. is used over Zp[a]/m(a) !
+  assume(nCoeff_is_Q_algExt(cf)); // only over (Q[a]/m(a)), while the default impl. is used over Zp[a]/m(a) !
 
   assume(cf->extRing != NULL);
   const coeffs Q = cf->extRing->cf;
