@@ -2450,6 +2450,7 @@ static poly kTryHC(ideal F, ideal Q)
   // map data
   rChangeCurrRing(Zp_ring);
   nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
+  if (nMap==NULL) return NULL;
   ideal FF=id_PermIdeal(F,1,IDELEMS(F),NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   ideal QQ=NULL;
   if (Q!=NULL) QQ=id_PermIdeal(Q,1,IDELEMS(Q),NULL,save_ring,Zp_ring,nMap,NULL,0,0);

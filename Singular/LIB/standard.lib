@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.4.0.0 Nov_2023 "; // $Id$
+version="version standard.lib 4.4.0.5 Aug_2024 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -811,8 +811,6 @@ PURPOSE: computes a standard basis of the first argument @code{I}
            The actual computation of the Groebner basis can be
            specified by @code{\"std\"} or by @code{\"slimgb\"}
            (not for all orderings implemented). @*
-         - @code{\"HC\"}: using the \"high corner\" from char p in char 0,
-	   finding a SB for 0-dimensional ideals in local orderings faster.@*
          A further string @code{\"par2var\"} converts parameters to an extra
          block of variables before a Groebner basis computation (and
          afterwards back).
@@ -888,37 +886,6 @@ EXAMPLE: example groebner;  shows an example"
      {
        method = method + "," + #[k];
      }
-  }
-// ------------------check for HC-- ---------------------------------------
-  if (attrib(P,"global")==0)
-  {
-    if (find(method,"HC")&&(typeof(i)=="ideal"))
-    {
-      if (char(P)==0)
-      {
-        list L=ring_list(P);
-        L[1]=ZZ/32003;
-        if (find(method,"prot")) { "computing HC in char 32003"; }
-        if (npars(P)!=0)
-        { ideal ii=subst(i,par(1),1); }
-        else
-        { ideal ii=i; }
-        ring S=ring(L); // switch to ring in char. 32003
-        ideal ii=imap(P,ii);
-        ii=std(ii);
-        poly HC=highcorner(ii)*var(nvars(S));
-        if (find(method,"prot"))
-        { "found HC in char 32003:",HC;
-          "computing std with HC";
-        }
-        setring P; // back to original ring
-        poly save_noether=noether;
-        noether=imap(S,HC);
-        i=std(i);
-        noether=save_noether;
-        return(i);
-      }
-    }
   }
 
 //--------------------- save data from basering ---------------------------
@@ -1257,11 +1224,6 @@ example
   groebner(i,"fglm");          //computes a reduced standard basis
 
   option(set,opt);
-
-  ring Rt = (0,t),(x,y,z),ds;
-  poly F = y10+(t2)*x7y7+x15+x9y6+(2t)*x6y9+x6y6z3+x5y11+z21;
-  ideal I = jacob(F);
-  I=groebner(I,"HC","prot");
 }
 
 //////////////////////////////////////////////////////////////////////////
