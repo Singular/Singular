@@ -588,7 +588,7 @@ intvec co1;
 number c1;
 poly mon;
 list wt;
-list NPadj=adjecentFacesOfNewtonPolygon(NP,co);
+list NPadj=adjacentFacesOfNewtonPolygon(NP,co);
 for (j=1;j<=size(L1);j++){
   co1=L1[j];
   mon=x^co1[1]*y^co1[2];
@@ -604,7 +604,7 @@ for (j=1;j<=size(L1);j++){
 return(f1);
 }
 
-static proc adjecentFacesOfNewtonPolygon(list NP,intvec co){
+static proc adjacentFacesOfNewtonPolygon(list NP,intvec co){
 list NP1;
 for (int i=1;i<=size(NP);i++){
   if (isVertexOfFace(NP[i][2],co)){

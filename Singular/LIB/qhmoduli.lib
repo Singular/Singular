@@ -457,13 +457,13 @@ dbprint(dbPrt, "
 // 'StabEqn' created a list of 2 rings.
 // To see the rings, type (if the name of your list is stab):
      show(stab);
-// To access the 1-st ring and map (and similair for the others), type:
+// To access the 1-st ring and map (and similarly for the others), type:
      def S1 = stab[1]; setring S1;  stabid;
 // S1/stabid is the coordinate ring of the variety of the
 // stabilizer, say G. If G x K^n --> K^n is the action of G on
 // K^n, then the ideal 'actionid' in the second ring describes
 // the dual map on the ring level.
-// To access the 2-nd ring and map (and similair for the others), type:
+// To access the 2-nd ring and map (and similarly for the others), type:
      def S2 = stab[2]; setring S2;  actionid;
 ");
 
@@ -639,13 +639,13 @@ dbprint(dbPrt, "
 // 'StabEqnId' created a list of 2 rings.
 // To see the rings, type (if the name of your list is stab):
      show(stab);
-// To access the 1-st ring and map (and similair for the others), type:
+// To access the 1-st ring and map (and similarly for the others), type:
      def S1 = stab[1]; setring S1;  stabid;
 // S1/stabid is the coordinate ring of the variety of the
 // stabilizer, say G. If G x K^n --> K^n is the action of G on
 // K^n, then the ideal 'actionid' in the second ring describes
 // the dual map on the ring level.
-// To access the 2-nd ring and map (and similair for the others), type:
+// To access the 2-nd ring and map (and similarly for the others), type:
      def S2 = stab[2]; setring S2;  actionid;
 ");
   return(ringList);
@@ -1177,7 +1177,7 @@ static proc StabVarComb(intvec wt)
 PURPOSE: list all possible indices of indeterminates for a quasihom. subs.
 RETURN:  list
          _[1] linear substitutions
-         _[2] nonlinear substiutions
+         _[2] nonlinear substitutions
 GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
 "
 {

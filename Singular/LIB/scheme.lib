@@ -25,7 +25,7 @@ an ideal dom, being ideal defining the locus that is the complement of the open 
 which is the domain of the chartmap, furthermore it contains a list ratFuncs containing the
 rational functions which are the images of the variables of the ring in im under the ring morphism
 induced by the charmap. You can use * in order to compute the composition of two chartmaps, as
-long as they are compatible. The contructor of chartmaps can be called by using =.
+long as they are compatible. The constructor of chartmaps can be called by using =.
 
 The scheme type is made up of two lists one containing the charts covering the scheme and the other
 containing the gluing morphisms between the charts.
@@ -33,7 +33,7 @@ containing the gluing morphisms between the charts.
 The divisor type represents a divisor of scheme.
 It contains a scheme space, representing the ambient space the divisor is in,
 as well as two lists schemes and mults, the forst containing the schemes
-which make up the divisor and the second containg the corresponding multiplicities. You can add and
+which make up the divisor and the second containing the corresponding multiplicities. You can add and
 substract divisors via + and -.
 
 The morphism type represents a morphism between two schemes, it contains two schemes preim and im,
@@ -2447,7 +2447,7 @@ ASSUME: C is a subscheme of X
 RETURN: return a list l=(B,pi,E),
           B scheme, is the blow-up of X in the center C
           pi blowUpMap, is the map corresponding to the blow-up and contains all the relevant information
-          E scheme, is the exeptional divisor of the blow-up
+          E scheme, is the exceptional divisor of the blow-up
 EXAMPLE: example blowUp;  shows an example
 "
 {
@@ -2754,7 +2754,7 @@ example
    "Maps between the affine charts";
    L[1].maps;
 
-   "Exeptional divisor";
+   "Exceptional divisor";
    L[3].cover;
 }
 
@@ -2853,7 +2853,7 @@ static proc findMaxMinors(ideal I, matrix J)
 "USAGE: findMaxMinors(I,J); I ideal, J matrix
 ASSUME: J is Jacobi matrix of II
 RETURN: A list of lists of the form (h,A,iv) where h is a maximal minor of J and iv contains
-        the colomns used in the formation of h and A is the matrix of cofactors of the matrix
+        the columns used in the formation of h and A is the matrix of cofactors of the matrix
         forming h
 "
 {

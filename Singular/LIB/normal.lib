@@ -1788,7 +1788,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          if ( y>=1 )
          {
            "// delta of first component:", delt1;
-           "// delta of second componenet:", delt2;
+           "// delta of second component:", delt2;
            "// intersection multiplicity of both components:", mul;
            "// total delta after splitting:", delt;
          }
@@ -2069,7 +2069,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       {
         "// zero divisor produced a splitting into two components";
         "// delta of first component:", delta1;
-        "// delta of second componenet:", delta2;
+        "// delta of second component:", delta2;
         "// intersection multiplicity of both components:", mul;
         "// total delta after splitting:", delt;
       }
@@ -6543,7 +6543,7 @@ EXAMPLE: example normalC; shows an example
 // * nor[1] is a list of",sr,"ring(s).
 // To access the i-th ring nor[1][i] give it a name, say Ri, and type e.g.
       def R1 = nor[1][1];  setring R1;  norid;  normap;
-// and similair for the other rings nor[1][i];
+// and similarly for the other rings nor[1][i];
 // Ri/norid is the affine algebra of the normalization of r/P_i  (where P_i
 // is an associated prime or an equidimensional part of the input ideal id)
 // and normap the normalization map from the basering to Ri/norid;

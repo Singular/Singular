@@ -1615,7 +1615,7 @@ static proc sum2All(list l, int k)
 
 
 
-// Checks if the coefficents of a polynomial are rational or contain some parameter
+// Checks if the coefficients of a polynomial are rational or contain some parameter
 static proc nonRatCoeff(poly p)
 {
   matrix cc = coef(p, var(1)*var(2));

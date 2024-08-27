@@ -348,7 +348,7 @@ EXAMPLE: example stdhilb;  shows an example"
   }
 
 //-------------------- go back to original ring ---------------------------
-//The main computation is done. Do not forget to simplfy before mapping.
+//The main computation is done. Do not forget to simplify before mapping.
 
   // subst 1 for homogenizing var
   if ( p_opt ) { "dehomogenization"; }
@@ -559,7 +559,7 @@ RETURN:  list, say L: L[1] is a ring and L[2] an intvec
          resp. @(i) if @ and @(1), ..., @(i-1) are defined.
          The monomial ordering of L[1] is consists of 1 block: dp if the
          weights of the variables of the basering, say R, are all 1, resp.
-         wp(w,1) wehre w is either given or the intvec of weights of the
+         wp(w,1) where w is either given or the intvec of weights of the
          variables of R, i.e. w[k]=deg(var(k)).
          If R is a quotient ring P/Q, then L[1] is not a quotient ring but
          contains the ideal @Qidealhilb@, the homogenized ideal Q of P.
@@ -1137,7 +1137,7 @@ EXAMPLE: example groebner;  shows an example"
     //block. Therefore we use always hilb for this block ordering:
     if ( conversion=="fglm" )
     {
-      i = (stdfglm(i));       //only uesful for 1 parameter with minpoly
+      i = (stdfglm(i));       //only useful for 1 parameter with minpoly
     }
     else
     {
@@ -2642,7 +2642,7 @@ proc create_ring(def l1, def l2, def l3, list #)
 RETURN:  ring(list(l1, l2, l3, l4))
 NOTE:    l1, l2, l3, l4 are assumed to be the four entries of ring_list(R)
          where R is the ring to be returned.
-         @* Optional arguments: If l4 is not given, it is assumend to be
+         @* Optional arguments: If l4 is not given, it is assumed to be
          ideal(0). If \"no_minpoly\" is given, then the minimal polynomial
          in l1, if present, is set to 0.
          @* Shortcuts: Strings such as \"0\", \"(32003)\" or \"(0,a,b,c)\" can

@@ -20,7 +20,7 @@ REFERENCES:
 [2] Castellanos,A.,Castellanos,J.,2005:Algorithm for the semigroup of a space curve singularity.
              Semigroup Forum 70,44-66.
 PROCEDURES:
- classifyicis(I);  Isolated simple complete intersection singularities for the base field of charateristic  0
+ classifyicis(I);  Isolated simple complete intersection singularities for the base field of characteristic  0
  Semigroup(I);     Weierstrass semigroup of the space curve given by equations
 ";
 LIB "classify.lib";

@@ -380,7 +380,7 @@ EXAMPLE: example finite; shows an example
         export groupideal;
         proc reynolds(poly f){return(torusreynolds(f));};
         export reynolds;                        // the procedure torusreynolds
-                                                // does exactely the right thing
+                                                // does exactly the right thing
                                                 // no need to implement
                                                 // 'finitereynolds'
 }

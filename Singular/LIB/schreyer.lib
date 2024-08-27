@@ -38,8 +38,8 @@ definition:
 comp(a) is the module component, for any module terms a and b from the same
 higher syzygy module.
 
-NOTE: Since most comutations require the module syzextra.so, please be make sure
- to build it into Singular on Windows.
+NOTE: Since most computations require the module syzextra.so, please be make
+ sure to build it into Singular on Windows.
 
 REFERENCES:
 @*

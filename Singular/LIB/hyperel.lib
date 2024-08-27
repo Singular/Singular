@@ -97,7 +97,7 @@ example
 }
 
 
-//================= Test, if a given ponit is on the curve ====================
+//================= Test, if a given point is on the curve ====================
 
 proc isoncurve(list P, poly h, poly f)
 "USAGE:   isoncurve(P,h,f); h,f=poly; P=list

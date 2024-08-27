@@ -310,7 +310,7 @@ static proc branchlocus(ideal id)
 //       J = ideal
 //ASSUME:  J  = two dimensional ideal in noether position with respect of
 //         the last two variables
-//RETURN:  A ring containing the ideal clocus respresenting the criticallocus
+//RETURN:  A ring containing the ideal clocus representing the criticallocus
 // of the projection V(J)-->C^2 on the last two coordinates
 //EXAMPLE: none"
   def A = basering;

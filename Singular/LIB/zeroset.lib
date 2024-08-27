@@ -817,7 +817,7 @@ EXAMPLE: example zeroSetMain; shows an example
 "
 {
   // main work is done in zeroSetMainWork, here the zero-set of each ideal from the
-  // primary decomposition is coputed by means of zeroSetMainWork, and then the
+  // primary decomposition is computed by means of zeroSetMainWork, and then the
   // minpoly and the parameter representing the algebraic extension are
   // transformed according to 'newA', i.e., only bookkeeping is done.
 

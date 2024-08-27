@@ -11,7 +11,7 @@ PROCEDURES:
  elimpart(id[,n]);      partial elimination of vars [among first n vars]
  elimpartanyr(i,p);     factors of p partially eliminated from i in any ring
  fastelim(i,p[..]);     fast elimination of factors of p from i [options]
- findvars(id);          variables occurrring/not occurring  in id
+ findvars(id);          variables occurring/not occurring  in id
  hilbvec(id[,c,o]);     intvec of Hilberseries of id [in char c and ord o]
  linearpart(id);        elements of id of total degree <=1
  tolessvars(id[,]);     maps id to new basering having only vars occurring in id

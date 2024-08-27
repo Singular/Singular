@@ -8,8 +8,8 @@ AUTHORS:  Deeba Afzal           deebafzal@gmail.com
           Faira Kanwal Janjua   fairakanwaljanjua@gmail.com
 
 OVERVIEW:
-   A library for classifying the simple singularities with respect to contact equivalence in charateristic p > 0 .
-   Simple hypersurface singularities in charateristic p > 0 were classified by Greuel and
+   A library for classifying the simple singularities with respect to contact equivalence in characteristic p > 0 .
+   Simple hypersurface singularities in characteristic p > 0 were classified by Greuel and
    Kroening [1] with respect to contact equivalence. The classifier we use has been proposed in [2].
 
 REFERENCES:
@@ -18,7 +18,7 @@ REFERENCES:
 [2] Afzal,D.;Binyamin,M.A.;Janjua,F.K.: On the classification of simple singularities in positive characteristic.
 
 PROCEDURES:
-  classifyCeq(f);     simple hypersurface singularities in charateristic p > 0
+  classifyCeq(f);     simple hypersurface singularities in characteristic p > 0
 ";
 LIB "sing.lib";
 LIB "classify.lib";
@@ -111,7 +111,7 @@ static proc blowupone(poly f)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  static proc classifyCeq1(poly f)
-//====Classify Simple hypersurface singularities when charateristic p!=2
+//====Classify Simple hypersurface singularities when characteristic p!=2
 {
       // char!=2
       //====input poly f
@@ -675,7 +675,7 @@ example
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc surEsing(poly f)
-//====Classifcation of Ek singularities.
+//====Classification of Ek singularities.
 {
      //===input: A function which is an isolated singularity.
      //===output: Normal form to which given function is contact equivalent.

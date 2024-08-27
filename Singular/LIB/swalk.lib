@@ -381,7 +381,7 @@ example
 static proc Lift(ideal In,ideal InG,ideal Gold)
 "USAGE:  Lift(In, InG, Gold); In, InG, Gold ideals;
          Gold given by Sagbi basis {g_1,...,g_t},
-         In given by tne initial forms In(g_1),...,In(g_t),
+         In given by the initial forms In(g_1),...,In(g_t),
          InG = {h_1,...,h_s} a Sagbi basis of In
 RETURN:  P_j, a polynomial in K[y_1,..,y_t] such that h_j =
          P_j(In(g_1),...,In_(g_t))

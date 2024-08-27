@@ -23,7 +23,7 @@ print       intervalPrint       pretty print
 [           boxGet              indexing
 ==          boxEqual            equality
 print       boxPrint            printing
--           boxSubtract         subraction
+-           boxSubtract         subtraction
 intersect   boxIntersect        intersection
 
 // intervalmatrices
@@ -90,7 +90,7 @@ proc bounds2(number a, number b)
 "USAGE: bounds2(a, b), a, b number
 RETURN: interval [a, b]."
 {
-    // depends on inplementation (TODO)
+    // depends on implementation (TODO)
     interval OUT;
     // bounds need not be supplied in order
     if (a < b) {
@@ -214,7 +214,7 @@ example
 proc intervalAdd(interval I, interval J)
 "USAGE: I + J, I, J interval
 RETURN: I+J
-EXAMPLE: adds two intervalls"
+EXAMPLE: adds two intervals"
 {
     // independent of implementation
     return(bounds2(I[1] + J[1], I[2] + J[2]));
@@ -776,7 +776,7 @@ example
 proc ivmatGet(ivmat A, int i)
 "USAGE: A[i], A ivmat, i int
 RETURN: list A[i] of i-th row of A
-EXAMPLE: get single interals of matrix"
+EXAMPLE: get single intervals of matrix"
 {
     return(A.rows[i]);
 }
@@ -1191,7 +1191,7 @@ EXAMPLE: computes interval extension of polynomial f"
 {
     int numvars = nvars(basering);
 
-    // neutral elemen of addition
+    // neutral element of addition
     interval resultWhole = 0;
     interval resultMonom;
 
@@ -1239,7 +1239,7 @@ example
 proc evalJacobianAtBox(ideal I, box B)
 "USAGE: evalJacobianAtBox(I, B), I ideal B box
 RETURN: jacobian matrix of I where polynomials are evaluated at the given box
-EXAMPLE: evalate Jacobian at box"
+EXAMPLE: evaluate Jacobian at box"
 {
     matrix J = jacob(I);
     int m = nrows(J);
@@ -1302,7 +1302,7 @@ EXAMPLE: tests the above for intersection of ellipses."
 
         def Bint = intersect(B, fB);
 
-        // if intersection is emtpy Bint == -1
+        // if intersection is empty Bint == -1
         if (typeof(Bint) == "int") { return(-1, B); }
         B = Bint;
 

@@ -204,7 +204,7 @@ example
 proc SetDeg(def mydeg)
 "USAGE: SetDeg(l), l list or intvec
 RETURN: nothing, saves own degrees for the different variables of the basering
-NOTE: should be used after decleration of the ring and shouldn't be changed afterwards
+NOTE: should be used after declaration of the ring and shouldn't be changed afterwards
 EXAMPLE: example SetDeg, shows an example"
 {
 list R=ringlist(basering);
@@ -1862,7 +1862,7 @@ tensorFreeModule(F,F);
 
 proc pruneModule(Module M)
 "USAGE = pruneModule(M); M Module
-RETURN: M in a simplyfied presentation
+RETURN: M in a simplified presentation
 EXAMPLE: example pruneModule; shows an example"
 {
         ring s = basering;
@@ -1963,7 +1963,7 @@ static proc pruneModule2(Matrix M) {
 
 proc simplePrune(Module M)
 "USAGE = simplePrune(M); M Module
-RETURN: Simplyfied Module with reduced dimension
+RETURN: Simplified Module with reduced dimension
 EXAMPLE: example simplePrune; shows an example"
 /*
 Whenever the relations of a presented Module include a 1-entry, we can reduce the dimension of the Module by representing the relevant variable. This allows us, to 'forget' this row after killing all the other row entries to 0. Therefore, we can reduce the dimension of the Module by 1 without losing any information.

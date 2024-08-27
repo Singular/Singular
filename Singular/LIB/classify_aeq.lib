@@ -22,7 +22,7 @@ REFERENCES:
   [3] Hefez,A;Hernandes,M.E.:The Analytic Classification Of Plane Branches. Bull.Lond Math Soc.43.(2011) 2,289-298.
   [4] Bruce, J.W.,Gaffney, T.J.: Simple singularities of mappings (C, 0) ->(C2,0).
   J. London Math. Soc. (2) 26 (1982), 465-474.
-  [5] Ishikawa,G; Janeczko,S.: The Complex Symplectic Moduli Spaces of Unimodal Parametric Plane Curve Singularities. Insitute of Mathematics of the Polish Academy of Sciences,Preprint 664(2006)
+  [5] Ishikawa,G; Janeczko,S.: The Complex Symplectic Moduli Spaces of Unimodal Parametric Plane Curve Singularities. Institute of Mathematics of the Polish Academy of Sciences,Preprint 664(2006)
 
 PROCEDURES:
   sagbiAlg(G);    Compute the Sagbi-basis of the Algebra.

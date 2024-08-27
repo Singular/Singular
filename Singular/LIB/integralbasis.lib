@@ -394,7 +394,7 @@ static proc integralBasisMain(poly f, string strategy, string algorithm, int mod
   int n = size(coeffs(f, var(2))) - 1;
 
   // If the integral variable is the first, then the universal denominator
-  // must be a polynomial in the second variable (and viceversa).
+  // must be a polynomial in the second variable (and vice-versa).
   // In this proc, the integral variables is always the second one.
   string conduStr = "var1";
   list opts = conduStr;
@@ -466,7 +466,7 @@ static proc integralBasisMain(poly f, string strategy, string algorithm, int mod
   if(norToInt == 1)
   {
     // We define a new ring where the integral variable is the first (needed for
-    // reduction) and has the appropiate ordering.
+    // reduction) and has the appropriate ordering.
     dbprint(dbg, "--Computing the integral basis from the normalization...");
     int needGroeb = 0;  // When all the components are already integral basis, no full groebner basis is needed.
 
@@ -638,7 +638,7 @@ static proc integralLocal(ideal I, int modular, string algorithm, int useRotatio
     }
     if(size(pd)>1)
     {
-      // We can remove redudant elements considering the generators as an ideal
+      // We can remove redundant elements considering the generators as an ideal
       // because the powers of Y will be added again later for merging
       // the bases for the different components.
       for(ii = 2; ii <= ncols(norT); ii++)
@@ -832,7 +832,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
   int t;
 
   // We define a new ring where the integral variable is the first (needed for
-  // reduction) and has the appropiate ordering.
+  // reduction) and has the appropriate ordering.
   def R = basering;
   list rl = ringlist(R);
   rl[2] = list(var(2), var(1));
@@ -982,7 +982,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
 // Computes the integral basis of R[y]/f, with R = k[x] localized at
 // the x coordinates of the points in P.
 // It uses the algorithm by Boehm, Decker, Laplagne, Pfister.
-// If locBasis = 1, it doesnt take into account the the unit from f
+// If locBasis = 1, it does not take into account the the unit from f
 // after localization
 
 static proc ibLocal(poly f, ideal P, int locBasis, int useRotation, int optimize){
@@ -1077,9 +1077,9 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation, int optimize
       }
 
       if(li == 20){
-        // No appropiate coordinate change was found. We return an empty
+        // No appropriate coordinate change was found. We return an empty
         // list.
-        "No appropiate coordinate change found. Procedure failed.";
+        "No appropriate coordinate change found. Procedure failed.";
         return(list());
       } else
       {
@@ -1106,7 +1106,7 @@ static proc ibLocal(poly f, ideal P, int locBasis, int useRotation, int optimize
       dbprint(dbg, "invch: ", invCh);
     }
 
-    // If we applied a linar coordinate change, we apply the inverse
+    // If we applied a linear coordinate change, we apply the inverse
     // transformation
     if(li > 0)
     {
@@ -1649,7 +1649,7 @@ proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
 
 // Computes the integral basis of R[y]/f, with R = k[x] localized at x=0.
 // It uses the algorithm by Boehm, Decker, Laplagne, Pfister.
-// If locBasis = 1, it doesnt take into account the the unit from f
+// If locBasis = 1, it does not take into account the the unit from f
 // after localization
 static proc ibAt0(poly f, int locBasis, int optimize)
 {
@@ -1700,7 +1700,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   list slopes = getSlopes(classes);
   intvec md = getDegs(classes);
 
-  // Tables of vanishing order of diferences of puiseux expansions
+  // Tables of vanishing order of differences of Puiseux expansions
   dbprint(dbg, "--Computing vanishing orders...");
   matrix MClass = valIKClass(classes);
 
@@ -1816,7 +1816,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
     list slopes = getSlopes(classes);
     md = getDegs(classes);
 
-    // Tables of vanishing order of diferences of puiseux expansions
+    // Tables of vanishing order of differences of Puiseux expansions
     dbprint(dbg, "Computing vanishing orders...");
     matrix M = valIK(classes);
 
@@ -1961,10 +1961,10 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
     ifOut = irreducibleFactors(f, classes, blocks, mdm);
     if(ifOut[3] == 0)
     {
-      dbprint(dbg, "// Recomputation unsuccesfull. Output may be wrong.");
+      dbprint(dbg, "// Recomputation unsuccessful. Output may be wrong.");
     } else
     {
-      dbprint(dbg, "// Recomputation succesfull. ");
+      dbprint(dbg, "// Recomputation successful. ");
     }
     I2LiftedFull = ifOut[1];
 
@@ -1974,7 +1974,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
     // Recomputation of classes info
     // Code should be reused
 
-    // Tables of vanishing order of diferences of puiseux expansions
+    // Tables of vanishing order of differences of Puiseux expansions
     dbprint(dbg, "Computing vanishing orders...");
     M = valIK(classes);
     vS = valIKSelf(bF, md);
@@ -2528,7 +2528,7 @@ proc buildFactors(list classes)
         setring S;
         if(typeof(PE[1][7]) != "none")
         {
-          debug_log_intbas(6, "Computation of the characterisitic exponents from the integral basis. Check if correct or characteristic orders are needed.");
+          debug_log_intbas(6, "Computation of the characteristic exponents from the integral basis. Check if correct or characteristic orders are needed.");
           expsT = list2intvec(PE[1][7]);
         } else
         {
@@ -3198,7 +3198,7 @@ static proc valIK(list classes)
 ////////////////////////////////////////////////////////////////////////
 
 // Valuations of expansions from one class at the product of all
-// conjugated factors (Y - gamma) corresponing to another class.
+// conjugated factors (Y - gamma) corresponding to another class.
 // This is required to compute the maximum integrality exponent.
 // Input:  a list classes of classes of conjugate expansions, as given by
 //         proc getClasses
@@ -3773,7 +3773,7 @@ static proc getDegs(list classes)
     {
       def S = classes[i][1];
       setring S;
-      // The number of conjugated expansions is the common demoninator of the exponents times the degree of the extension,
+      // The number of conjugated expansions is the common denominator of the exponents times the degree of the extension,
       // except when the algebraic extension comes from taking root of unity.
       // This degree should be checked if it is always correct computation, or if we should compute this number
       // while computing the Puiseux expansions.
@@ -3990,7 +3990,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
 
       if(size(classes2) > 1)
       {
-        // We recompute up to the appropiate order for merging
+        // We recompute up to the appropriate order for merging
         poly I2Red = reduce(I2Lifted[i], var(1)^(degExpand+1));
 
         dbprint(dbg, "Computing Puiseux expansions up to degree ", degExpand, " of factor ", i, ": ", I2Red);
@@ -4297,7 +4297,7 @@ static proc comDen(list ibNum, list ibDen)
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//          Auxiliar tools
+//          Auxiliary tools
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -4443,7 +4443,7 @@ static proc convertIB(list ib, poly px)
   return(new);
 }
 
-// Procedures to traslate polynomials
+// Procedures to translate polynomials
 static proc moveToVar(poly f, poly p, poly vari)
 {
   ////"START - ibasis.lib - moveToVar - 8";
@@ -4915,9 +4915,9 @@ example
 
 // This procedure separates the segment with slope slN / slD (assuming that
 // it is the smallest slope) from the rest.
-// It returns a list containing the factor correspoding to the slope slN / slD, and
+// It returns a list containing the factor corresponding to the slope slN / slD, and
 // the polynomial corresponding to all the factors with larger slope.
-// This procedure tranforms the polynomials so that the Hensel Lifting Lemma
+// This procedure transforms the polynomials so that the Hensel Lifting Lemma
 // can be applied, and uses it to lift the factorization up to the desired
 // order.
 static proc henselLocal(poly f, int slN, int slD, int order)
@@ -5012,7 +5012,7 @@ static proc henselBlocks(poly f, int globOrder, int loc)
   int dbg = printlevel - voice + 5;
 
   // If loc = 1, the factors outside the origin will be taken all together.
-  // The first poly in the ouput will be the factor corresponding to the component
+  // The first poly in the output will be the factor corresponding to the component
   // outside the origin.
 
   //if(dbg > 5)
@@ -5983,7 +5983,7 @@ COMPUTE:  Set the global variable @DeBug to level. The variable @DeBug is
           used by the function debug_log_intbas(level, list of strings) to know
           when to print the list of strings. init_debug() reports only
           changes of @DeBug.
-NOTE:     The procedure init_debug(n); is usefull as trace-mode. n may
+NOTE:     The procedure init_debug(n); is useful as trace-mode. n may
           range from 0 to 10, higher values of n give more information.
 EXAMPLE:  example init_debug; shows an example"
 {
@@ -6072,7 +6072,7 @@ static proc debug_lvl()
 
 // Alternative procedure for computing characteristic exponents
 // from the exponentes of the series.
-// Not used beacuse we need to use characteristic orders, it is
+// Not used because we need to use characteristic orders, it is
 // not enough to compute the characteristic exponents.
 static proc charExp(intvec v, int k)
 {

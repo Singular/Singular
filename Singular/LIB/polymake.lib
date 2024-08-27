@@ -681,7 +681,7 @@ EXAMPLE: example eta;   shows an example"
         etaij=etaij+triangarea[k];
         // then check if that triangle has a facet which is contained
         // in one of the
-        // two facets of the polygon which are adjecent to the given vertex ...
+        // two facets of the polygon which are adjacent to the given vertex ...
         // these two facets are seiten[j] and seiten[j+1]
         for (n=j;n<=j+1;n++)
         {

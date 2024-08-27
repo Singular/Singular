@@ -52,7 +52,7 @@ cf_of(poly, poly)                                       computes the coefficient
 preim(list, def)                                        returns the entry number of an element x in a list O.
 coverTuple(graph, list, list, int[, list])              depending on int, computes a list of tuples of the form (a_k, N_k, D_k)
                                                         for all k=1,...,r, where r is the number of edges, a_k is the k-th entry
-                                                        of the partion aa of the degree of G, N_k and D_k are the corresponding
+                                                        of the partition aa of the degree of G, N_k and D_k are the corresponding
                                                         numerator and denominator (respectively) of the propagator function whose
                                                         product would return the coefficient of the Feynman integral. Every list
                                                         of tuples corresponds to a cover of the elliptic curve E.
@@ -570,7 +570,7 @@ ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O
 RETURN:  list.
 THEORY:  Computes a list of tuples (depending on the int t) of the form (a_k, N_k, D_k) for
          all k=1,...,r, where r is the number of edges, a_k is the k-th entry in the
-         partion aa of the degree of G, N_k and D_k are the corresponding numerator and
+         partition aa of the degree of G, N_k and D_k are the corresponding numerator and
          denominator (respectively) of the propagator function whose product would return
          the coefficient of the Feynman integral.
          Every list of the tuples corresponds to a cover of the elliptic curve E.
@@ -871,7 +871,7 @@ ASSUME:  G is a Feynman graph, aa is a partition of the degree of the graph G, O
 RETURN:  list of matrices.
 THEORY:  For a given ordering of the vertices of G, this function computes a list of
          matrices such that each matrix in the list represents a cover of the elliptic
-         curve E. The first coloumn of each matrix shows how many points on each edge of
+         curve E. The first column of each matrix shows how many points on each edge of
          the cover (of type G) has a preimage of the base point p_0. The rows of the
          matrix represents an edge of the cover and each non-zero entry in a row
          represents a vertex connected to that edge.

@@ -196,7 +196,7 @@ SEE ALSO: divideUnits, jacobson
     m=m,MA[i];
   }
 
-  //if MA eqauls the zero matrix give back MA
+  //if MA equals the zero matrix give back MA
   if ( (size(module(m))==0) and (size(transpose(module(m)))==0) )
   {
     module L=freemodule(COL);
