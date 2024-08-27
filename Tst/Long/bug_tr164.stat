@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1591195018:4132, 64 bit:4.1.3:x86_64-Linux:nepomuck:1213720
-1 >> tst_memory_1 :: 1591195018:4132, 64 bit:4.1.3:x86_64-Linux:nepomuck:57737216
-1 >> tst_memory_2 :: 1591195018:4132, 64 bit:4.1.3:x86_64-Linux:nepomuck:98130032
-1 >> tst_timer_1 :: 1591195018:4132, 64 bit:4.1.3:x86_64-Linux:nepomuck:31292
+1 >> tst_memory_0 :: 1724763271:44005, 64 bit:4.4.0:x86_64-Linux:nepomuck:995416
+1 >> tst_memory_1 :: 1724763271:44005, 64 bit:4.4.0:x86_64-Linux:nepomuck:53870592
+1 >> tst_memory_2 :: 1724763271:44005, 64 bit:4.4.0:x86_64-Linux:nepomuck:98142560
+1 >> tst_timer_1 :: 1724763271:44005, 64 bit:4.4.0:x86_64-Linux:nepomuck:14632
