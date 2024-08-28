@@ -243,10 +243,10 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     loop
     {
       int ind=queue->dequeue();
-      if (ind== -1)
+      if (ind== -1) // negative number as stop sign
       {
         if (TEST_OPT_PROT) printf("child: end of queue\n");
-        rqueue->enqueue(getpid()); // negative number as stop sign
+        rqueue->enqueue(getpid()); // report pid of ending child
         exit(0);
       }
       int red_result=1;
@@ -290,7 +290,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       {
         if (TEST_OPT_PROT) printf("fail: result: %d\n",red_result);
         rqueue->enqueue(0);
-        rqueue->enqueue(getpid()); // stop sign
+        rqueue->enqueue(getpid()); // pid of ending child
         exit(0); // found fail, no need to test further
       }
     }
@@ -302,7 +302,8 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   {
     if (TEST_OPT_PROT) printf("%d children created\n",cpus);
     // wait for all process to stop:
-    // each process sends an 0 at end or a 1 for failure
+    // each process sends 0 for failure and its pid at end
+    // for success only the pid is send the end
     int res;
     int remaining_children=cpus;
     while(remaining_children>0)
