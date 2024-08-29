@@ -1456,7 +1456,7 @@ BOOLEAN ssiClose(si_link l)
       {
         // did the child stop ?
         int pid=si_waitpid(d->pid,NULL,WNOHANG);
-        if ((pid==0) /* ono staus change for child*/
+        if ((pid==0) /* no status change for child*/
         && (kill(d->pid,0)==0)) // child is still running
         {
           struct timespec t;
