@@ -1451,8 +1451,9 @@ BOOLEAN ssiClose(si_link l)
       }
       if (d->f_read!=NULL) { s_close(d->f_read);d->f_read=NULL;}
       if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
-      if ((strcmp(l->mode,"tcp")==0)
+      if (((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
+      && (d->pid>1))
       {
         // did the child stop ?
         int pid=si_waitpid(d->pid,NULL,WNOHANG);
@@ -1461,8 +1462,8 @@ BOOLEAN ssiClose(si_link l)
         {
           struct timespec t;
           struct timespec rem;
-          // wait 5 sec
-          for(int i=0;i<50;i++)
+          // wait 60 sec
+          for(int i=0;i<600;i++)
           {
             // wait till signal or 100ms:
             t.tv_sec=0;
@@ -1474,17 +1475,7 @@ BOOLEAN ssiClose(si_link l)
           if (kill(d->pid,0)==0) // child still exists
           {
             kill(d->pid,SIGTERM);
-            // wait another 5 sec
-            for(int i=0;i<50;i++)
-            {
-              // wait till signal or 100ms:
-              t.tv_sec=0;
-              t.tv_nsec=100000000; // <=100 ms
-              nanosleep(&t, &rem);
-              // child finished ?
-              if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
-            }
-            kill(d->pid,SIGKILL);
+	    si_waitpid(d->pid,NULL,0);
           }
         }
       }
@@ -2319,6 +2310,7 @@ void sig_chld_hdl(int)
   pid_t kidpid;
   int status;
 
+#if 0
   loop
   {
     kidpid = si_waitpid(-1, &status, WNOHANG);
@@ -2354,6 +2346,7 @@ void sig_chld_hdl(int)
       else hh=(link_list)hh->next;
     }
   }
+#endif
 }
 
 static BOOLEAN DumpSsiIdhdl(si_link l, idhdl h)

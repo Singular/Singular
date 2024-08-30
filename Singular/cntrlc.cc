@@ -136,7 +136,7 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
   if (sig==SIGINT)
     sigemptyset (&new_action.sa_mask);
   else
-    new_action.sa_flags = SA_RESTART;
+    new_action.sa_flags = SA_RESTART /*| SA_NOCLDWAIT*/;
 
   int r=si_sigaction (sig, &new_action, &old_action);
   si_hdl_typ retval=(si_hdl_typ)old_action.sa_handler;

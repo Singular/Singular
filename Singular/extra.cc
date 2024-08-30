@@ -10,6 +10,7 @@
 
 #define HAVE_WALK 1
 
+#include <errno.h>
 #include "kernel/mod2.h"
 #include "misc/sirandom.h"
 #include "resources/omFindExec.h"
@@ -488,6 +489,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->data = (void*)(long) system((char*)(h->Data()));
       else
         WerrorS("string expected");
+      if (errno==ECHILD) res->data=NULL;
       return FALSE;
     }
     else

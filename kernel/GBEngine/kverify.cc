@@ -312,7 +312,24 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       if (res>0) // a child finished
       {
         if (TEST_OPT_PROT) { printf("c");mflush(); }
-        si_waitpid(res,NULL,0);
+        if (si_waitpid(res,NULL,WNOHANG)==0) // child not finished
+        {
+          if (kill(res,0)==0) // child is still running
+          {
+            struct timespec t;
+            struct timespec rem;
+            // wait till signal or 100ms:
+            t.tv_sec=0;
+            t.tv_nsec=10000000; // <=10 ms
+            nanosleep(&t, &rem);
+            // child finished ?
+            if (si_waitpid(res,NULL,WNOHANG) ==0) //child not finished
+            {
+              kill(res,SIGTERM);
+              si_waitpid(res,NULL,0);
+            }
+          }
+        }
         remaining_children--;
       }
       else if (res==0) // not a GB - clean up and return 0
