@@ -12,7 +12,7 @@
 #include "kernel/groebner_walk/walkSupport.h"
 #include "kernel/GBEngine/kstd1.h"
 
-EXTERN_VAR BOOLEAN overflow_error;
+EXTERN_VAR int overflow_error;
 
 ///////////////////////////////////////////////////////////////////
 //Support functions for Groebner Walk and Fractal Walk
