@@ -1016,6 +1016,32 @@ BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r)
   return b;
 }
 
+/*2
+*returns true if id is homogeneous with respect to totaldegree
+*/
+BOOLEAN id_HomIdealDP (ideal id, ideal Q, const ring r)
+{
+  int i;
+  BOOLEAN b;
+  i = 0;
+  b = TRUE;
+  while ((i < IDELEMS(id)) && b)
+  {
+    b = p_IsHomogeneousDP(id->m[i],r);
+    i++;
+  }
+  if ((b) && (Q!=NULL) && (IDELEMS(Q)>0))
+  {
+    i=0;
+    while ((i < IDELEMS(Q)) && b)
+    {
+      b = p_IsHomogeneousDP(Q->m[i],r);
+      i++;
+    }
+  }
+  return b;
+}
+
 BOOLEAN id_HomIdealW (ideal id, ideal Q,  const intvec *w, const ring r)
 {
   int i;

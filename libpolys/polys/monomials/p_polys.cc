@@ -3342,6 +3342,25 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
 }
 
 /*2
+*tests if p is homogeneous with respect to totaldegree
+*/
+BOOLEAN p_IsHomogeneousDP (poly p, const ring r)
+{
+  poly qp=p;
+  int o;
+
+  if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
+  o = p_Totaldegree(p,r);
+  do
+  {
+    if (p_Totaldegree(qp,r) != o) return FALSE;
+    pIter(qp);
+  }
+  while (qp != NULL);
+  return TRUE;
+}
+
+/*2
 *tests if p is homogeneous with respect to the given weights
 */
 BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const ring r)

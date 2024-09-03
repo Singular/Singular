@@ -133,6 +133,7 @@ void id_Compactify(ideal id, const ring r);
 ideal  id_Mult (ideal h1,ideal  h2, const ring r);
 ideal id_Homogen(ideal h, int varnum,const ring r);
 BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r);
+BOOLEAN id_HomIdealDP (ideal id, ideal Q, const ring r);
 BOOLEAN id_HomIdealW (ideal id, ideal Q,  const intvec *w, const ring r);
 BOOLEAN id_HomModuleW (ideal id, ideal Q,  const intvec *w, const intvec *module_w, const ring r);
 BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R);
