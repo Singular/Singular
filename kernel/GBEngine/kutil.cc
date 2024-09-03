@@ -9177,6 +9177,13 @@ void enterT(LObject &p, kStrategy strat, int atT)
     p.t_p=p.GetLmTailRing();
   }
 #endif
+  if ((strat->kNoether!=NULL)&&(!strat->kAllAxis))
+  {
+    deleteHC(&p,strat, TRUE);
+    cancelunit(&p,FALSE);
+    p.SetDegStuffReturnLDeg();
+  }
+
   strat->newt = TRUE;
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
