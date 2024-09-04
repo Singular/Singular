@@ -12,6 +12,7 @@ New/bug_std.tst
 New/bug_std_qring_559.tst
 New/dim_integers.tst
 New/division_lift.tst
+New/empty_ideal.tst
 New/enumpoints.tst
 New/finduni.tst
 New/gf_coeff_short.tst

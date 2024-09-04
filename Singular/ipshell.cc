@@ -734,7 +734,8 @@ leftv iiMap(map theMap, const char * what)
         || (tmpW.rtyp==MAP_CMD))
       {
         ideal id=(ideal)tmpW.data;
-        long *degs=(long*)omAlloc(IDELEMS(id)*sizeof(long));
+        long *degs=NULL;
+	if (IDELEMS(id)>0) degs=(long*)omAlloc(IDELEMS(id)*sizeof(long));
         for(int i=IDELEMS(id)-1;i>=0;i--)
         {
           poly p=id->m[i];
@@ -759,7 +760,7 @@ leftv iiMap(map theMap, const char * what)
             }
           }
         }
-        omFreeSize(degs,IDELEMS(id)*sizeof(long));
+        if (degs!=NULL) omFreeSize(degs,IDELEMS(id)*sizeof(long));
       }
       else if (tmpW.rtyp==POLY_CMD)
       {
