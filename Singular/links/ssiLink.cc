@@ -1478,8 +1478,8 @@ BOOLEAN ssiClose(si_link l)
           if (kill(d->pid,0)==0) // child still exists
           {
             kill(d->pid,SIGTERM);
-            t.tv_sec=0;
-            t.tv_nsec=100000000; // <=100 ms
+            t.tv_sec=1;
+            t.tv_nsec=0; // <=1000 ms
             nanosleep(&t, &rem);
 	    si_waitpid(d->pid,NULL,WNOHANG);
           }
