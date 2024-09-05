@@ -1473,7 +1473,7 @@ BOOLEAN ssiClose(si_link l)
             t.tv_nsec=100000000; // <=100 ms
             nanosleep(&t, &rem);
             // child finished ?
-            if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
+            if (si_waitpid(d->pid,NULL,WNOHANG) == d->pid) break;
           }
           if (kill(d->pid,0)==0) // child still exists
           {
