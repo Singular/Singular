@@ -25,6 +25,7 @@ EXTERN_VAR volatile int defer_shutdown;
 void si_set_signals();
 void si_reset_signals();
 void sig_term_hdl_child(int /*sig*/);
+void sig_term_hdl(int /*sig*/);
 
 typedef void (*si_hdl_typ)(int);
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);

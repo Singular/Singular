@@ -1060,7 +1060,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           sigemptyset(&sigint);
           sigaddset(&sigint, SIGINT);
           sigprocmask(SIG_BLOCK, &sigint, NULL);
-	  si_set_signal(SIGTERM,sig_term_hdl_child);
+	  si_set_signal(SIGTERM,sig_term_hdl);
           /* set #cpu to 1 for the child:*/
           feSetOptValue(FE_OPT_CPUS,1);
 
