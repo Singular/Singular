@@ -1466,7 +1466,7 @@ BOOLEAN ssiClose(si_link l)
           struct timespec t;
           struct timespec rem;
           // wait 60 sec
-          for(int i=0;i<600;i++)
+          for(int i=0;i<50;i++)
           {
             // wait till signal or 100ms:
             t.tv_sec=0;
@@ -1478,7 +1478,10 @@ BOOLEAN ssiClose(si_link l)
           if (kill(d->pid,0)==0) // child still exists
           {
             kill(d->pid,SIGTERM);
-	    si_waitpid(d->pid,NULL,0);
+            t.tv_sec=0;
+            t.tv_nsec=100000000; // <=100 ms
+            nanosleep(&t, &rem);
+	    si_waitpid(d->pid,NULL,WNOHANG);
           }
         }
       }
