@@ -83,6 +83,12 @@ void sig_term_hdl(int /*sig*/)
   }
 }
 
+void sig_term_hdl_child(int /*sig*/)
+{
+  _exit(0);
+}
+
+
 /*---------------------------------------------------------------------*
  * File scope Variables (Variables shared by several functions in
  *                       the same file )
@@ -92,9 +98,6 @@ void sig_term_hdl(int /*sig*/)
 VAR jmp_buf si_start_jmpbuf;
 VAR int siRandomStart;
 VAR short si_restart=0;
-
-typedef void (*si_hdl_typ)(int);
-
 
 /*0 implementation*/
 /*---------------------------------------------------------------------*
@@ -550,13 +553,14 @@ void init_signals()
 
 //VAR si_hdl_typ si_sigint_handler;
 VAR si_hdl_typ si_sig_chld_hdl;
+VAR si_hdl_typ old_sig_chld_hdl;
 //VAR si_hdl_typ si_sig_pipe_hdl;
 //VAR si_hdl_typ si_sig_term_hdl;
 
 void si_set_signals()
 {
   //si_sigint_handler=si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
-  si_sig_chld_hdl=si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
+  old_sig_chld_hdl=si_sig_chld_hdl=si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
   //si_sig_pipe_hdl=si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
   //si_sig_term_hdl=si_set_signal(SIGTERM, (si_hdl_typ)sig_term_hdl);
 }
@@ -565,7 +569,7 @@ void si_reset_signals()
 {
 // signal handler -------------------------------------------------------
   //si_set_signal(SIGINT ,si_sigint_handler);
-  si_set_signal(SIGCHLD, si_sig_chld_hdl);
+  si_set_signal(SIGCHLD, old_sig_chld_hdl);
   //si_set_signal(SIGPIPE, si_sig_pipe_hdl);
   //si_set_signal(SIGTERM, si_sig_term_hdl);
 }

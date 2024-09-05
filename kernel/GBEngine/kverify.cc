@@ -2,7 +2,6 @@
 
 #include "misc/mylimits.h"
 #include "misc/options.h"
-#include "reporter/si_signals.h"
 #include "kernel/ideals.h"
 #include "kernel/polys.h"
 #include "polys/monomials/ring.h"
@@ -13,7 +12,9 @@
 #include <string.h>
 
 #ifdef HAVE_VSPACE
+#include "reporter/si_signals.h"
 #include "kernel/oswrapper/vspace.h"
+#include "Singular/cntrlc.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -240,6 +241,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   //                      pid ... pid for success
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
+    si_set_signal(SIGTERM,sig_term_hdl_child);
     loop
     {
       int ind=queue->dequeue();
@@ -247,7 +249,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       {
         if (TEST_OPT_PROT) printf("child: end of queue\n");
         rqueue->enqueue(getpid()); // report pid of ending child
-        exit(0);
+        _exit(0);
       }
       int red_result=1;
       /* picks the element from the lazyset L */
@@ -291,12 +293,12 @@ BOOLEAN kVerify2(ideal F, ideal Q)
         if (TEST_OPT_PROT) printf("fail: result: %d\n",red_result);
         rqueue->enqueue(0);
         rqueue->enqueue(getpid()); // pid of ending child
-        exit(0); // found fail, no need to test further
+        _exit(0); // found fail, no need to test further
       }
     }
     // should never be reached:
     rqueue->enqueue(getpid()); // stop sign
-    exit(0); // all done, quit child
+    _exit(0); // all done, quit child
   }
   else // parent ---------------------------------------------------
   {
@@ -321,7 +323,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
             // wait till signal or 100ms:
             t.tv_sec=0;
             t.tv_nsec=10000000; // <=10 ms
-            nanosleep(&t, &rem);
+            nanosleep(&t, &rem); // should be interrupted by signal: SIG_CHLD
             // child finished ?
             if (si_waitpid(res,NULL,WNOHANG) ==0) //child not finished
             {

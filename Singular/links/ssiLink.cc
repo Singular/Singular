@@ -14,6 +14,7 @@
 
 #include "reporter/si_signals.h"
 #include "reporter/s_buff.h"
+#include "reporter/si_signals.h"
 
 #include "coeffs/bigintmat.h"
 #include "coeffs/longrat.h"
@@ -24,6 +25,7 @@
 #include "polys/simpleideals.h"
 #include "polys/matpol.h"
 
+#include "kernel/oswrapper/timer.h"
 #include "kernel/oswrapper/timer.h"
 #include "kernel/oswrapper/feread.h"
 #include "kernel/oswrapper/rlimit.h"
@@ -1058,6 +1060,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           sigemptyset(&sigint);
           sigaddset(&sigint, SIGINT);
           sigprocmask(SIG_BLOCK, &sigint, NULL);
+	  si_set_signal(SIGTERM,sig_term_hdl_child);
           /* set #cpu to 1 for the child:*/
           feSetOptValue(FE_OPT_CPUS,1);
 
@@ -2191,7 +2194,7 @@ int ssiBatch(const char *host, const char * port)
     omFreeBin(h, sleftv_bin);
   }
   /* never reached*/
-  exit(0);
+  _exit(0);
 }
 
 STATIC_VAR int ssiReserved_P=0;

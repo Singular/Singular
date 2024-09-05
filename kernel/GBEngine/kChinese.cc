@@ -15,8 +15,10 @@
 #define mpz_isNeg(A) ((A)->_mp_size<0)
 number nlRInit (long i);
 
+#include "reporter/si_signals.h"
 #include "kernel/oswrapper/vspace.h"
 #include "kernel/ideals.h"
+#include "Singular/cntrlc.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -213,8 +215,9 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   if (cpus>=vspace::internals::MAX_PROCESS)
     cpus=vspace::internals::MAX_PROCESS-1;
   /* start no more than MAX_PROCESS-1 children */
-  if ((cpus==1) || (2*cpus>=cnt))
-    /* at least 2 polys for each process, or switch to seriell version */
+  cpus=si_min(cpus,cnt/5);
+  if (cpus<=1)
+    /* at least 5 polys for each process, or switch to seriell version */
     return id_ChineseRemainder(xx,q,rl,r);
   ideal result=idInit(cnt,xx[0]->rank);
   result->nrows=rw; // for lifting matrices
@@ -234,13 +237,16 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   }
   // Create a queue of polys
   VRef<Queue<VRef<VString> > > rqueue = vnew<Queue<VRef<VString> > >();
+  int *pids=(int*)omAlloc0(cpus*sizeof(int));
   for (int i=0;i<cpus;i++)
   {
     int pid = fork_process();
     if (pid==0) break; //child
+    pids[i]=pid;
   }
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
+    si_set_signal(SIGTERM,sig_term_hdl_child);
     number *x=(number *)omAlloc(rl*sizeof(number));
     poly *p=(poly *)omAlloc(rl*sizeof(poly));
     CFArray inv_cache(rl);
@@ -251,7 +257,7 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
       int ind=queue->dequeue();
       if (ind== -1)
       {
-        exit(0);
+        _exit(0);
       }
 
       for(int j=rl-1;j>=0;j--)
@@ -287,6 +293,15 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
       msg.free();
       cnt--;
     }
+    for (int i=0;i<cpus;i++)
+    {
+      if (pids[i]>0)
+      {
+        int p=si_waitpid(pids[i],NULL,WNOHANG);
+	if (p>0) pids[i]=0;
+      }
+    }
+    omFreeSize(pids,cpus*sizeof(int));
     // removes queues
     queue.free();
     rqueue.free();
@@ -302,7 +317,8 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   if (cpus>=vspace::internals::MAX_PROCESS)
     cpus=vspace::internals::MAX_PROCESS-1;
   /* start no more than MAX_PROCESS-1 children */
-  if ((cpus==1) || (2*cpus>=cnt)) /* at least 2 polys for each process,
+  cpus=si_min(cpus,cnt/5);
+  if (cpus<=1) /* at least 5 polys for each process,
                      or switch to seriell version */
     return id_Farey(x,N,r);
   ideal result=idInit(cnt,x->rank);
@@ -324,19 +340,22 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   }
   // Create a queue of polys
   VRef<Queue<VRef<VString> > > rqueue = vnew<Queue<VRef<VString> > >();
+  int *pids=(int*)omAlloc0(cpus*sizeof(int));
   for (int i=0;i<cpus;i++)
   {
     int pid = fork_process();
     if (pid==0) break; //child
+    pids[i]=pid;
   }
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
+    si_set_signal(SIGTERM,sig_term_hdl_child);
     loop
     {
       int ind=queue->dequeue();
       if (ind== -1)
       {
-        exit(0);
+        _exit(0);
       }
 
       poly res=p_Farey(x->m[ind],N,r);
@@ -364,8 +383,15 @@ ideal id_Farey_0(ideal x, number N, const ring r)
       msg.free();
       cnt--;
     }
-    // wait for the children to finish
-    sleep(1);
+    for (int i=0;i<cpus;i++)
+    {
+      if (pids[i]>0)
+      {
+        int p=si_waitpid(pids[i],NULL,WNOHANG);
+	if (p>0) pids[i]=0;
+      }
+    }
+    omFreeSize(pids,cpus*sizeof(int));
     // removes queues
     queue.free();
     rqueue.free();
