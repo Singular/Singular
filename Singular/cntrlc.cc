@@ -79,7 +79,7 @@ void sig_term_hdl(int /*sig*/)
   do_shutdown = TRUE;
   if (!defer_shutdown)
   {
-    m2_end(1);
+    m2_end(-1);
   }
 }
 
