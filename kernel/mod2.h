@@ -61,7 +61,8 @@
 
 /* define for parallel processes with shared memory */
 #ifndef __CCYGWIN__
-  #if (!defined(__APPLE__)) ||(!defined(__x86_64__))
+  //#if (!defined(__APPLE__)) ||(!defined(__x86_64__))
+  #if (!defined(__APPLE__))
     #define HAVE_VSPACE 1
   #endif
 #endif
