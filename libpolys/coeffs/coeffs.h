@@ -26,33 +26,33 @@ class CanonicalForm;
 enum n_coeffType
 {
   n_unknown=0,
-  n_Zp, /**< \F{p < 2^31} */
-  n_Q,  /**< rational (GMP) numbers */
-  n_R,  /**< single prescision (6,6) real numbers */
-  n_GF, /**< \GF{p^n < 2^16} */
-  n_long_R, /**< real floating point (GMP) numbers */
-  n_polyExt, /**< used to represent polys as coefficients */
-  n_algExt,  /**< used for all algebraic extensions, i.e.,
+  n_Zp=1, /**< \F{p < 2^31} */
+  n_Q=2,  /**< rational (GMP) numbers */
+  n_R=3,  /**< single prescision (6,6) real numbers */
+  n_GF=4, /**< \GF{p^n < 2^16} */
+  n_long_R=5, /**< real floating point (GMP) numbers */
+  n_polyExt=6, /**< used to represent polys as coefficients */
+  n_algExt=7,  /**< used for all algebraic extensions, i.e.,
                 the top-most extension in an extension tower
                 is algebraic */
-  n_transExt,  /**< used for all transcendental extensions, i.e.,
+  n_transExt=8,  /**< used for all transcendental extensions, i.e.,
                   the top-most extension in an extension tower
                   is transcendental */
-  n_long_C, /**< complex floating point (GMP) numbers */
-  n_nTupel, /**< n-tupel of cf: ZZ/p1,... ZZ/pn, R, long_R */
-  n_Z, /**< only used if HAVE_RINGS is defined  */
-  n_Zn, /**< only used if HAVE_RINGS is defined */
-  n_Znm, /**< only used if HAVE_RINGS is defined */
-  n_Z2m, /**< only used if HAVE_RINGS is defined */
-  n_FlintQrat, /**< rational function field over Q */
-  n_CF, /**< ? */
-  n_Nemo_AnticNumberField, /*17 */
-  n_Nemo_QQField,          /*18 */
-  n_Nemo_ZZRing,           /*19*/
-  n_Nemo_FqPolyRepField,   /*20 */
-  n_Nemo_fqPolyRepField,   /*21 */
-  n_Nemo_Field,            /*22 */
-  n_Nemo_Ring              /*23 */
+  n_long_C=9, /**< complex floating point (GMP) numbers */
+  n_nTupel=10, /**< n-tupel of cf: ZZ/p1,... ZZ/pn, R, long_R */
+  n_Z=11, /**< only used if HAVE_RINGS is defined  */
+  n_Zn=12, /**< only used if HAVE_RINGS is defined */
+  n_Znm=13, /**< only used if HAVE_RINGS is defined */
+  n_Z2m=14, /**< only used if HAVE_RINGS is defined */
+  n_FlintQrat=15, /**< rational function field over Q */
+  n_CF=16, /**< ? */
+  n_Nemo_AnticNumberField=17, /*17 */
+  n_Nemo_QQField=18,          /*18 */
+  n_Nemo_ZZRing=19,           /*19*/
+  n_Nemo_FqPolyRepField=20,   /*20 */
+  n_Nemo_fqPolyRepField=21,   /*21 */
+  n_Nemo_Field=22,            /*22 */
+  n_Nemo_Ring=23              /*23 */
 };
 
 extern const unsigned short fftable[];

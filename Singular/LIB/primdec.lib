@@ -2377,11 +2377,7 @@ NOTE:    An embedded component q (primary ideal) of I can be replaced in the
 EXAMPLE:example equidim; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)
-           ||hasQQCoefficient(basering)
-           ||hasAlgExtensionCoefficient(basering)
-           ||hasTransExtensionCoefficient(basering));
-  //ASSUME(0, hasFieldCoefficient(basering) );
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -5620,10 +5616,7 @@ NOTE:    - Algorithm of Gianni/Trager/Zacharias.
 EXAMPLE: example primdecGTZ; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)
-           ||hasQQCoefficient(basering)
-           ||hasAlgExtensionCoefficient(basering)
-           ||hasTransExtensionCoefficient(basering));
+  ASSUME(0, hasFieldCoefficient(basering) );
   return (primdecGTZ_i(0, I , #));
 }
 example
@@ -5999,10 +5992,7 @@ NOTE:    Algorithm of Shimoyama/Yokoyama.
 EXAMPLE: example primdecSY; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)
-           ||hasQQCoefficient(basering)
-           ||hasAlgExtensionCoefficient(basering)
-           ||hasTransExtensionCoefficient(basering));
+  ASSUME(0, hasFieldCoefficient(basering) );
   return (primdecSY_i(0,I,#));
 }
 example
@@ -6131,10 +6121,7 @@ NOTE:    - Designed for characteristic 0, works also in char k > 0 based
 EXAMPLE: example minAssGTZ; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)
-           ||hasQQCoefficient(basering)
-           ||hasAlgExtensionCoefficient(basering)
-           ||hasTransExtensionCoefficient(basering));
+  ASSUME(0, hasFieldCoefficient(basering) );
   list result = minAssGTZ_i(0,I,#);
   return(result);
 }
@@ -6396,11 +6383,7 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example radical; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)
-           ||hasQQCoefficient(basering)
-           ||hasAlgExtensionCoefficient(basering)
-           ||hasTransExtensionCoefficient(basering));
-  //ASSUME(0, hasFieldCoefficient(basering) );
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(size(i) == 0){return(ideal(0));}

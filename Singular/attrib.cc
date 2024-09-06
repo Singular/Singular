@@ -320,7 +320,7 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
     coeffs cf;
     if (t==RING_CMD) cf=((ring)v->Data())->cf;
     else             cf=(coeffs)v->Data();
-    res->data=(void *)(long)(cf->type);
+    res->data=(void *)(long)(int)(cf->type);
   }
   else if (strcmp(name,"qringNF")==0)
   {
