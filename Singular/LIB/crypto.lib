@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version crypto.lib 4.2.1.0 Jul_2021 "; // $Id$
+version="version crypto.lib 4.4.0.5 Jul_2024 "; // $Id$
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -1623,16 +1623,21 @@ EXAMPLE:example Schoof; shows an example
    bigint G=gcd(D,N);
    if(G==N){ERROR("not an elliptic curve");}
    if(G!=1){ERROR("not a prime");}
-
 //=== small N
-  // if((N<=500)&&(pr<5)){return(countPoints(int(N),a,b));}
-
+   if((N<=500)&&(pr<5)){return(countPoints(int(N),a,b));}
 //=== the general case
    bigint q=intRoot(4*N);
    list L=primL(2*q);
+   list L1=primList(100);
    int r=size(L);
+   L1=L1[r+1..size(L1)];
    list T;
    int i,j;
+   for(j=1;j<=size(L1);j++)
+   {
+      if(N mod L1[j]==2){L1=delete(L1,j);}
+   }
+   i=1;
    for(j=1;j<=r;j++)
    {
       T[j]=(testElliptic(int(N),a,b,L[j])+int(q)) mod L[j];
@@ -1659,9 +1664,8 @@ example
 }
 
 /*
-needs 518 sec
 Schoof(2147483629,17,3567);
-2147168895
+2147339065       //Aenderung
 */
 
 
@@ -1834,7 +1838,7 @@ EXAMPLE:example testElliptic; shows an example
          Q2=reduce(generateG(a,b,w+2)*generateG(a,b,w-1)^2
                -generateG(a,b,w-2)*generateG(a,b,w+1)^2,I);
       }
-      J=xq*P1-Q1,yq*P2-Q2;
+      J=xq*P1-Q1,yq*P2+Q2;  //Aenderung
       J=std(I+J);
       if(pr>=5)
       {
