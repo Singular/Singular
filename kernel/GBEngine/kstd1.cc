@@ -2464,19 +2464,28 @@ static poly kTryHC(ideal F, ideal Q)
   ideal res=mora(FF,QQ,NULL,NULL,strat);
   // clean
   idDelete(&FF);
+  poly HC=NULL;
+  if (strat->kNoether!=NULL) scComputeHC(res,QQ,0,HC);
+  delete strat;
   if (QQ!=NULL) idDelete(&QQ);
   idDelete(&res);
-  poly HC=strat->kNoether; strat->kNoether=NULL;
-  delete strat;
   // map back
   rChangeCurrRing(save_ring);
   if (HC!=NULL)
   {
-    p_IncrExp(HC,save_ring->N,save_ring);
     if (TEST_OPT_PROT) Print("HC(%ld) found\n",pTotaldegree(HC));
-    for(int i=1;i<save_ring->N;i++)
-       p_IncrExp(HC,i,save_ring);
+    if (rOrd_is_ds(save_ring)) p_IncrExp(HC,save_ring->N,save_ring);
+    else                       p_IncrExp(HC,1,save_ring);
+    for(int i=1;i<=save_ring->N;i++)
+    {
+      if (p_GetExp(HC,i,save_ring)>0)
+        p_DecrExp(HC,i,save_ring);
+    }
     p_Setm(HC,save_ring);
+  }
+  else
+  {
+    if (TEST_OPT_PROT) PrintS("HC not found\n");
   }
   rDelete(Zp_ring);
   return HC;
@@ -2498,13 +2507,14 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   poly resetppNoether = currRing->ppNoether;
   kStrategy strat=new skStrategy;
   if((ak==0)
+  && (IDELEMS(F)>1)
   && (h!=isHomog)
   && (hilb==NULL)
   && (vw==NULL)
   && (newIdeal==0)
   && (sp==NULL)
-  && rOrd_is_ds(currRing)
-  && rField_is_Q (currRing)
+  && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing))
+  && rField_is_Q(currRing)
   && !rIsPluralRing(currRing)
   && (currRing->ppNoether==NULL))
   {
