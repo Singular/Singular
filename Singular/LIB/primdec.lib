@@ -5840,9 +5840,11 @@ static proc absPrimdecGTZ_i(int @patchPrimaryDecomposition, ideal @I, list #)
      "// will not handle case with unit ideal";
   }
   if(typeof(@L[1])=="ideal") // unit ideal
-  { 
+  {
     list absolute_primes;
-    list prime_decomp;
+    list primary_decomp;
+    export(primary_decomp);
+    export(absolute_primes);
   dbprint( printlevel-voice+4,"
 // 'absPrimdecGTZ' returned the current ring, and two empty lists:
 // absolute_primes (the absolute prime components) and
@@ -5850,7 +5852,7 @@ static proc absPrimdecGTZ_i(int @patchPrimaryDecomposition, ideal @I, list #)
 // To access the list of absolute prime components, type (if the name S was
 // assigned to the return value):
         setring S; absolute_primes; ");
-    return(basering); 
+    return(basering);
   }
   string @newvar=@L[1][3];
   int @k=find(@newvar,",",find(@newvar,",")+1);
