@@ -2028,16 +2028,32 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
 
 BOOLEAN rOrd_is_dp(const ring r)
 {
+  int ord=0;
+  if ((r->order[0]==ringorder_C)||(r->order[0]==ringorder_c)) ord=1;
   return ((rVar(r) > 1) &&
-           (((r->order[0]==ringorder_dp)&&(r->block1[0]==r->N)) ||
-           ((r->order[1]==ringorder_dp)&&(r->block1[1]==r->N)&&((r->block0[1]==1)))));
+           (r->order[ord]==ringorder_dp)
+	   &&(r->block0[ord]==1)
+	   &&(r->block1[ord]==r->N));
 }
 
 BOOLEAN rOrd_is_ds(const ring r)
 {
+  int ord=0;
+  if ((r->order[0]==ringorder_C)||(r->order[0]==ringorder_c)) ord=1;
   return ((rVar(r) > 1) &&
-           (((r->order[0]==ringorder_ds)&&(r->block1[0]==r->N)) ||
-           ((r->order[1]==ringorder_ds)&&(r->block1[1]==r->N)&&((r->block0[1]==1)))));
+           (r->order[ord]==ringorder_ds)
+	   &&(r->block0[ord]==1)
+	   &&(r->block1[ord]==r->N));
+}
+
+BOOLEAN rOrd_is_Ds(const ring r)
+{
+  int ord=0;
+  if ((r->order[0]==ringorder_C)||(r->order[0]==ringorder_c)) ord=1;
+  return ((rVar(r) > 1) &&
+           (r->order[ord]==ringorder_Ds)
+	   &&(r->block0[ord]==1)
+	   &&(r->block1[ord]==r->N));
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
