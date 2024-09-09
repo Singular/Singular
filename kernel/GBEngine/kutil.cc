@@ -9181,7 +9181,6 @@ void enterT(LObject &p, kStrategy strat, int atT)
   {
     deleteHC(&p,strat, TRUE);
     cancelunit(&p,FALSE);
-    p.SetDegStuffReturnLDeg();
   }
 
   strat->newt = TRUE;
