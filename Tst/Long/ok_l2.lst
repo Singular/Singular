@@ -36,6 +36,7 @@ sheafcoh_l
 sing_l
 solve_l
 sres_l
+std_hc_l
 std_l
 triang_l
 ;;requires gfan
