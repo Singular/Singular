@@ -2437,7 +2437,7 @@ static int kFindLuckyPrime(ideal F, ideal Q) // TODO
 
 static poly kTryHC(ideal F, ideal Q)
 {
-  if (TEST_V_NO_TRY_HC)
+  if (TEST_V_NO_TRY_HC ||(Q!=NULL))
     return NULL;
   int prim=kFindLuckyPrime(F,Q);
   if (TEST_OPT_PROT) Print("try HC in ring over ZZ/%d\n",prim);
