@@ -509,7 +509,6 @@ void HEckeTest (poly pp,kStrategy strat)
   p=pIsPurePower(pp);
   if (p!=0)
     strat->NotUsedAxis[p] = FALSE;
-  else return; /*nothing new*/
   /*- the leading term of pp is a power of the p-th variable -*/
   for (j=(currRing->N);j>0; j--)
   {
@@ -6877,10 +6876,10 @@ poly redtail (LObject* L, int end_pos, kStrategy strat)
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
       {
-        strat->kAllAxis = save_HE;
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
         {
+          strat->kAllAxis = save_HE;
           return redtail(L, end_pos, strat);
         }
         else
@@ -7708,6 +7707,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
         if (rHasLocalOrMixedOrdering(currRing))
         {
           deleteHC(&h,strat);
+          cancelunit(&h);  /*- tries to cancel a unit -*/
         }
         if (TEST_OPT_INTSTRATEGY)
         {
@@ -7739,28 +7739,31 @@ void initSL (ideal F, ideal Q,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
-      if (rHasLocalOrMixedOrdering(currRing))
-      {
-        cancelunit(&h);  /*- tries to cancel a unit -*/
-        deleteHC(&h, strat);
-      }
       if (h.p!=NULL)
       {
-        if (TEST_OPT_INTSTRATEGY)
+        if (rHasLocalOrMixedOrdering(currRing))
         {
-          h.pCleardenom(); // also does remove Content
+          cancelunit(&h);  /*- tries to cancel a unit -*/
+          deleteHC(&h, strat);
         }
-        else
+        if (h.p!=NULL)
         {
-          h.pNorm();
+          if (TEST_OPT_INTSTRATEGY)
+          {
+            h.pCleardenom(); // also does remove Content
+          }
+          else
+          {
+            h.pNorm();
+          }
+          strat->initEcart(&h);
+          if (strat->Ll==-1)
+            pos =0;
+          else
+            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+          h.sev = pGetShortExpVector(h.p);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
         }
-        strat->initEcart(&h);
-        if (strat->Ll==-1)
-          pos =0;
-        else
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-        h.sev = pGetShortExpVector(h.p);
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
       }
     }
   }
@@ -9177,12 +9180,6 @@ void enterT(LObject &p, kStrategy strat, int atT)
     p.t_p=p.GetLmTailRing();
   }
 #endif
-  if ((strat->kNoether!=NULL)&&(!strat->kAllAxis))
-  {
-    deleteHC(&p,strat, TRUE);
-    cancelunit(&p,FALSE);
-  }
-
   strat->newt = TRUE;
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
@@ -10408,9 +10405,8 @@ BOOLEAN newHEdge(kStrategy strat)
 {
   if (currRing->pLexOrder || rHasMixedOrdering(currRing))
     return FALSE;
-  int i,newHCord;
-  poly oldNoether=strat->kNoether; // to keep previous kNoether
-  strat->kNoether=NULL;
+  int i,j;
+  poly newNoether;
 
 #if 0
   if (currRing->weight_all_1)
@@ -10420,24 +10416,7 @@ BOOLEAN newHEdge(kStrategy strat)
 #else
   scComputeHC(strat->Shdl,NULL,strat->ak,strat->kNoether);
 #endif
-  if (strat->kNoether==NULL)
-  {
-    strat->kNoether=oldNoether;
-    return FALSE;
-  }
-  // now a new kNoether, defined by scComputeHC
-  pSetCoeff0(strat->kNoether,NULL);
-  newHCord = p_FDeg(strat->kNoether,currRing);
-  for(int i=currRing->N; i>0;i--)
-  {
-    int j=pGetExp(strat->kNoether,i);
-    if (j>0)
-    {
-      j--;
-      pSetExp(strat->kNoether,i,j);
-    }
-  }
-  pSetm(strat->kNoether);
+  if (strat->kNoether==NULL) return FALSE;
   if (strat->t_kNoether != NULL)
   {
     p_LmFree(strat->t_kNoether, strat->tailRing);
@@ -10446,34 +10425,46 @@ BOOLEAN newHEdge(kStrategy strat)
   if (strat->tailRing != currRing)
     strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
   /* compare old and new noether*/
-  if (newHCord < HCord) /*- statistics -*/
+  newNoether = pLmInit(strat->kNoether);
+  pSetCoeff0(newNoether,nInit(1));
+  j = p_FDeg(newNoether,currRing);
+  for (i=1; i<=(currRing->N); i++)
+  {
+    if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
+  }
+  pSetm(newNoether);
+  if (j < HCord) /*- statistics -*/
   {
     if (TEST_OPT_PROT)
     {
-      Print("H(%d)",newHCord);
+      Print("H(%d)",j);
       mflush();
     }
-    HCord=newHCord;
+    HCord=j;
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      Print("H(%d):",newHCord);
+      Print("H(%d):",j);
       wrp(strat->kNoether);
       PrintLn();
     }
     #endif
-    if (oldNoether!=NULL) pLmFree(oldNoether);
-    return TRUE;
   }
-  else // no change for HCord -> no change for kNoether
+  if (pCmp(strat->kNoether,newNoether)!=1)
   {
-    p_LmFree(strat->kNoether,currRing);
-    strat->kNoether=oldNoether;
-    assume(strat->t_kNoether == NULL);
+    if (strat->kNoether!=NULL) p_LmDelete0(strat->kNoether,currRing);
+    strat->kNoether=newNoether;
+    if (strat->t_kNoether != NULL)
+    {
+      p_LmFree(strat->t_kNoether, strat->tailRing);
+      strat->t_kNoether=NULL;
+    }
     if (strat->tailRing != currRing)
       strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
 
+    return TRUE;
   }
+  pLmDelete(newNoether);
   return FALSE;
 }
 
