@@ -320,15 +320,18 @@ BOOLEAN kVerify2(ideal F, ideal Q)
           {
             struct timespec t;
             struct timespec rem;
-            // wait till signal or 100ms:
-            t.tv_sec=0;
-            t.tv_nsec=10000000; // <=10 ms
+            // wait till signal or 10s:
+            t.tv_sec=10;
+            t.tv_nsec=0;
             nanosleep(&t, &rem); // should be interrupted by signal: SIG_CHLD
             // child finished ?
             if (si_waitpid(res,NULL,WNOHANG) ==0) //child not finished
             {
               kill(res,SIGTERM);
-              si_waitpid(res,NULL,0);
+              t.tv_sec=10;
+              t.tv_nsec=0;
+              nanosleep(&t, &rem); // should be interrupted by signal: SIG_CHLD
+              si_waitpid(res,NULL,WNOHANG);
             }
           }
         }
