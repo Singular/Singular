@@ -562,7 +562,7 @@ const struct soptionStruct verboseStruct[]=
   {"warn",     Sy_bit(V_ALLWARN),   ~Sy_bit(V_ALLWARN)},
   {"intersectSyz",Sy_bit(V_INTERSECT_SYZ), ~Sy_bit(V_INTERSECT_SYZ)},
   {"intersectElim",Sy_bit(V_INTERSECT_ELIM), ~Sy_bit(V_INTERSECT_ELIM)},
-  {"no_try_HC",Sy_bit(V_NO_TRY_HC), ~Sy_bit(V_NO_TRY_HC)},
+  {"not_try_HC",Sy_bit(V_NO_TRY_HC), ~Sy_bit(V_NO_TRY_HC)},
 /*special for "none" and also end marker for showOption:*/
   {"ne",         0,          0 }
 };
