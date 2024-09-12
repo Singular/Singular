@@ -5510,6 +5510,7 @@ disables the regularity bound for @code{res} and @code{mres} (see
 @ref{regularity}).
 @c ---------
 @item @code{not_try_HC}
+@cindex not_try_HC, option
 @cindex highest corner, option
 @cindex corner (highest), option
 turns off searching HC in characteristic p during standard basis computation.
