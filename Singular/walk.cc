@@ -709,7 +709,7 @@ static  void  MLmWeightedDegree_gmp(mpz_t result, const poly p, intvec* weight)
     mpz_mul_ui(zmul, zvec, pGetExp(p, i));
     mpz_add(ztmp, ztmp, zmul);
   }
-  mpz_init_set(result, ztmp);
+  mpz_set(result, ztmp);
   mpz_clear(ztmp);
   mpz_clear(sing_int);
   mpz_clear(zvec);
