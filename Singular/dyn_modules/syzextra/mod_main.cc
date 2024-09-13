@@ -163,7 +163,7 @@ static BOOLEAN _ClearDenominators(leftv res, leftv h)
   return FALSE;
 }
 
-
+#if 0 // unused
 /// try to get an optional (simple) integer argument out of h
 /// or return the default value
 static int getOptionalInteger(const leftv& h, const int _n)
@@ -180,6 +180,7 @@ static int getOptionalInteger(const leftv& h, const int _n)
 
   return (_n);
 }
+#endif
 
 static inline number jjLONG2N(long d)
 {

@@ -137,6 +137,7 @@ static BOOLEAN print_spoly(kStrategy strat)
   return FALSE; // return TRUE if sp was changed, FALSE if not
 }
 
+#if 0 //unused
 STATIC_VAR int si_filenr;
 static BOOLEAN print_syz(kStrategy strat)
 {
@@ -165,7 +166,7 @@ static BOOLEAN print_syz(kStrategy strat)
   }
   return FALSE; // return TRUE if sp was changed, FALSE if not
 }
-
+#endif
 static BOOLEAN std_print_spoly(leftv res, leftv args)
 {
   if (args!=NULL)
@@ -186,6 +187,7 @@ static BOOLEAN std_print_spoly(leftv res, leftv args)
   return TRUE;
 }
 
+#if 0 // unused
 static ideal idGroebner_print(ideal temp,int syzComp, intvec* w=NULL, tHomog hom=testHomog)
 {
   ideal temp1;
@@ -204,7 +206,9 @@ static ideal idGroebner_print(ideal temp,int syzComp, intvec* w=NULL, tHomog hom
   if (w!=NULL) delete w;
   return temp1;
 }
+#endif
 
+#if 0 // unused
 static ideal idPrepare_print (ideal  h1, ideal h11, tHomog hom, int syzcomp, intvec **w)
 {
   ideal   h2,h22;
@@ -273,6 +277,7 @@ static ideal idPrepare_print (ideal  h1, ideal h11, tHomog hom, int syzcomp, int
   else         h3=idGroebner_print(h2,syzcomp,NULL,hom);
   return h3;
 }
+#endif
 
 #if 0
 static ideal idSyzygies_print (ideal  h1, tHomog h,intvec **w)
