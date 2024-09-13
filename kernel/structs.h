@@ -12,10 +12,6 @@
 /* for omBin */
 #include "omalloc/omalloc.h"
 
-/* standard types */
-#define BITSET  unsigned int
-
-
 /* C++-part */
 #ifdef __cplusplus
 #include "kernel/polys.h"

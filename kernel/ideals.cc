@@ -2324,14 +2324,12 @@ ideal idModuloLP (ideal h2,ideal h1, tHomog, intvec ** w, matrix *T, GbVariant a
   }
 
   idTest(s_temp);
-  unsigned save_opt,save_opt2;
-  SI_SAVE_OPT1(save_opt);
-  SI_SAVE_OPT2(save_opt2);
+  BITSET save_opt,save_opt2;
+  SI_SAVE_OPT(save_opt,save_opt2);
   if (T==NULL) si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   si_opt_1 |= Sy_bit(OPT_REDTAIL);
   ideal s_temp1 = idGroebner(s_temp,length,alg);
-  SI_RESTORE_OPT1(save_opt);
-  SI_RESTORE_OPT2(save_opt2);
+  SI_RESTORE_OPT(save_opt,save_opt2);
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
   if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))
@@ -2483,14 +2481,12 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w, matrix *T, GbVariant
       s2=idCopy(h2);
     }
 
-    unsigned save_opt,save_opt2;
-    SI_SAVE_OPT1(save_opt);
-    SI_SAVE_OPT2(save_opt2);
+    BITSET save_opt,save_opt2;
+    SI_SAVE_OPT(save_opt,save_opt2);
     if (T==NULL) si_opt_1 |= Sy_bit(OPT_REDTAIL);
     si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
     s_temp1 = idPrepare(s2,s1,testHomog,length,w,alg);
-    SI_RESTORE_OPT1(save_opt);
-    SI_RESTORE_OPT2(save_opt2);
+    SI_RESTORE_OPT(save_opt,save_opt2);
   }
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();

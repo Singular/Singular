@@ -73,7 +73,7 @@ poly p_Divide(poly p, poly q, const ring r)
         ideal R; matrix U;
         ring save_ring=currRing;
         if (r!=currRing) rChangeCurrRing(r);
-        int save_opt;
+        BITSET save_opt;
         SI_SAVE_OPT1(save_opt);
         si_opt_1 &= ~(Sy_bit(OPT_PROT));
         ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
@@ -131,7 +131,7 @@ poly p_Divide(poly p, poly q, const ring r)
             ideal R; matrix U;
             ring save_ring=currRing;
             if (r!=currRing) rChangeCurrRing(r);
-            int save_opt;
+            BITSET save_opt;
             SI_SAVE_OPT1(save_opt);
             si_opt_1 &= ~(Sy_bit(OPT_PROT));
             ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
@@ -210,7 +210,7 @@ poly pp_Divide(poly p, poly q, const ring r)
         ideal R; matrix U;
         ring save_ring=currRing;
         if (r!=currRing) rChangeCurrRing(r);
-        int save_opt;
+        BITSET save_opt;
         SI_SAVE_OPT1(save_opt);
         si_opt_1 &= ~(Sy_bit(OPT_PROT));
         ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
@@ -270,7 +270,7 @@ poly pp_Divide(poly p, poly q, const ring r)
             ideal R; matrix U;
             ring save_ring=currRing;
             if (r!=currRing) rChangeCurrRing(r);
-            int save_opt;
+            BITSET save_opt;
             SI_SAVE_OPT1(save_opt);
             si_opt_1 &= ~(Sy_bit(OPT_PROT));
             ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
@@ -357,7 +357,7 @@ poly p_DivRem(poly p, poly q, poly &rest, const ring r)
       ideal R; matrix U;
       ring save_ring=currRing;
       if (r!=currRing) rChangeCurrRing(r);
-      int save_opt;
+      BITSET save_opt;
       SI_SAVE_OPT1(save_opt);
       si_opt_1 &= ~(Sy_bit(OPT_PROT));
       ideal m = idLift(vi,ui,&R, FALSE,TRUE,TRUE,&U);
@@ -415,7 +415,7 @@ poly singclap_gcd ( poly f, poly g, const ring r )
     intvec *w=NULL;
     ring save_ring=currRing;
     if (r!=currRing) rChangeCurrRing(r);
-    int save_opt;
+    BITSET save_opt;
     SI_SAVE_OPT1(save_opt);
     si_opt_1 &= ~(Sy_bit(OPT_PROT));
     ideal S1=idSyzygies(I,testHomog,&w);

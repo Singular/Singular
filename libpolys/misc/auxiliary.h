@@ -81,7 +81,8 @@ typedef long int64;
 #endif /*ifndef BIT_SIZEOF_LONG*/
 
 
-
+/* standard types */
+#define BITSET  unsigned int
 
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;

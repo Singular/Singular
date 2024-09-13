@@ -112,11 +112,11 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
 
     nextG=(ideal)resMat;
 
-    BITSET save1,save2;
-    SI_SAVE_OPT(save1,save2);
+    BITSET save1;
+    SI_SAVE_OPT1(save1);
     si_opt_1|=Sy_bit(OPT_REDSB);
     nextG = idInterRed(nextG);
-    SI_RESTORE_OPT(save1,save2);
+    SI_RESTORE_OPT1(save1);
   }
   else
   {
@@ -196,11 +196,11 @@ WalkState walkStep64(ideal & G,int64vec* currw64)
 
   nextG=(ideal)resMat;
 
-  BITSET save1,save2;
-  SI_SAVE_OPT(save1,save2);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
   si_opt_1|=Sy_bit(OPT_REDSB);
   nextG = idInterRed(nextG);
-  SI_RESTORE_OPT(save1,save2);
+  SI_RESTORE_OPT1(save1);
 
   G=nextG;
   return(state);
@@ -224,8 +224,8 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
 {
   //some initializations
   WalkState state=WalkOk;
-  BITSET save1,save2;
-  SI_SAVE_OPT(save1,save2);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
 
   si_opt_1|=Sy_bit(OPT_REDTAIL);
   overflow_error=FALSE;
@@ -240,7 +240,7 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
   }
   else
     G=idInterRed(G);
-  SI_RESTORE_OPT(save1,save2);
+  SI_RESTORE_OPT1(save1);
 
   ideal nextG;
   state=firstWalkStep64(G,currw64,destRing);
@@ -360,8 +360,8 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing)
   WalkState state=WalkOk;
   /* OLDRING **************************************************** */
   ideal nextG;
-  BITSET save1,save2;
-  SI_SAVE_OPT(save1,save2);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
 
   if (currwOnBorder64(G,currw64))
   {
@@ -381,7 +381,7 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing)
     ideal newStdGw=idStd(newGw);
 
     //turn on bucket representation of polynomials and off redSB
-    SI_RESTORE_OPT(save1,save2);
+    SI_RESTORE_OPT1(save1);
 
     matrix L=matIdLift(newGw,newStdGw);
     idDelete(&newStdGw);
@@ -399,7 +399,7 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing)
 
     si_opt_1|=Sy_bit(OPT_REDSB);
     nextG = idInterRed(nextG);
-    SI_RESTORE_OPT(save1,save2);
+    SI_RESTORE_OPT1(save1);
   }
   else
   {
@@ -618,8 +618,8 @@ BOOLEAN unperturbedStartVectorStrategy)
 
   overflow_error=FALSE; //global
   WalkState state=WalkOk;
-  BITSET save1,save2;
-  SI_SAVE_OPT(save1,save2);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
 
   si_opt_1|= (Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
   ideal G;
@@ -634,7 +634,7 @@ BOOLEAN unperturbedStartVectorStrategy)
     G=idInterRed(idCopy(sourceIdeal));
   }
 
-  SI_RESTORE_OPT(save1,save2); //switches REDSB off
+  SI_RESTORE_OPT1(save1); //switches REDSB off
 
   //matrices for the orders of the rings
   intvec *destMat=int64VecToIntVec(rGetGlobalOrderMatrix(destRing));

@@ -10,11 +10,11 @@
 /*the general set of std-options : si_opt_1(test) */
 /*the general set of verbose-options : si_opt_2(verbose) */
 #ifdef __cplusplus
-extern "C" VAR unsigned si_opt_1; //< NOTE: Original option variable name: test
-extern "C" VAR unsigned si_opt_2; //< NOTE: Original option variable name: verbose
+extern "C" VAR BITSET si_opt_1; //< NOTE: Original option variable name: test
+extern "C" VAR BITSET si_opt_2; //< NOTE: Original option variable name: verbose
 #else
-EXTERN_VAR unsigned si_opt_1;
-EXTERN_VAR unsigned si_opt_2;
+EXTERN_VAR BITSET si_opt_1;
+EXTERN_VAR BITSET si_opt_2;
 #endif
 EXTERN_VAR BOOLEAN siCntrlc;
 #define SI_SAVE_OPT(A,B) { A=si_opt_1; B=si_opt_2; }
