@@ -5599,16 +5599,6 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
           pl = enterid( plib,0, PACKAGE_CMD, &(basePack->idroot), TRUE );
           IDPACKAGE(pl)->language = LANG_SINGULAR;
           IDPACKAGE(pl)->libname=omStrDup(s);
-          omFreeBinAddr(plib);
-          package savepack=currPack;
-          currPack=IDPACKAGE(pl);
-          IDPACKAGE(pl)->loaded=TRUE;
-          char libnamebuf[1024];
-          FILE * fp = feFopen( s, "r", libnamebuf, TRUE );
-          BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, autoexport, TRUE);
-          currPack=savepack;
-          IDPACKAGE(pl)->loaded=(!bo);
-          return bo;
         }
         else if (IDTYP(pl)!=PACKAGE_CMD)
         {
@@ -5627,6 +5617,16 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
             return TRUE;
           }
         }
+        omFreeBinAddr(plib);
+        package savepack=currPack;
+        currPack=IDPACKAGE(pl);
+        IDPACKAGE(pl)->loaded=TRUE;
+        char libnamebuf[1024];
+        FILE * fp = feFopen( s, "r", libnamebuf, TRUE );
+        BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, autoexport, TRUE);
+        currPack=savepack;
+        IDPACKAGE(pl)->loaded=(!bo);
+        return bo;
       }
       case LT_BUILTIN:
         SModulFunc_t iiGetBuiltinModInit(const char*);

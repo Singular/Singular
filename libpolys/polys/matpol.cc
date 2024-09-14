@@ -631,7 +631,6 @@ void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring R)
     }
     v = v->next;
   }
-  omFree(s);
 }
 
 int mp_Compare(matrix a, matrix b, const ring R)
