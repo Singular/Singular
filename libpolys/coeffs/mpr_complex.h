@@ -109,7 +109,9 @@ public:
     mpf_t b;
     mpf_init(b);
     mpf_pow_ui( b, this->t, (unsigned long)exp );
-    return gmp_float(b);
+    gmp_float res=gmp_float(b);
+    mpf_clear(b);
+    return res;
   };
 
   friend bool operator == ( const gmp_float & a, const gmp_float & b );
