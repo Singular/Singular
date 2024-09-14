@@ -903,6 +903,7 @@ BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOO
 
   if (fp==NULL)
   {
+    omFreeBinAddr(plib);
     return TRUE;
   }
   pl = basePack->idroot->get(plib,0);
