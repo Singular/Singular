@@ -794,6 +794,7 @@ poly hFirst2Second(poly h, const ring Qt, int &co)
     di1=convFactoryPSingP(Di1,Qt);
   }
 #endif
+  p_Delete(&o_t,Qt);
   return di1;
 }
 static void hPrintHilb(poly hseries, const ring Qt,intvec *modul_weight)
