@@ -1788,6 +1788,8 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
     for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
   }
   id_Delete((ideal *) &tmp, R);
+  omFree(colchoise);
+  omFree(rowchoise);
   return (result);
 }
 
