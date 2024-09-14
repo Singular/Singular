@@ -2474,8 +2474,6 @@ static poly kTryHC(ideal F, ideal Q)
   if (HC!=NULL)
   {
     if (TEST_OPT_PROT) Print("HC(%ld) found\n",pTotaldegree(HC));
-    p_IncrExp(HC,save_ring->N,save_ring);
-    p_Setm(HC,save_ring);
   }
   else
   {
