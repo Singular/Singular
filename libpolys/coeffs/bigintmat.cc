@@ -671,6 +671,7 @@ void bigintmat::pprint(int maxwid)
     }
     PrintS(ps);
     omFree(ps);
+    omFree(colwid);
   }
 }
 

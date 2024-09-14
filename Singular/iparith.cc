@@ -3200,7 +3200,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   si_opt_1 |= Sy_bit(OPT_REDTAIL_SYZ);
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
-    if (iiOp==MRES_CMD) u_id=(ideal)u->CopyD();
     r=syResolution(u_id,maxl, ww, iiOp==MRES_CMD);
   }
   else if (iiOp==SRES_CMD)

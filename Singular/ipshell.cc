@@ -3146,6 +3146,7 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
   }
 
   res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift,weights);
+  if (ww!=NULL) delete weights;
   //row_shift += add_row_shift;
   //Print("row_shift=%d, add_row_shift=%d\n",row_shift,add_row_shift);
   atSet(res,omStrDup("rowShift"),(void*)(long)add_row_shift,INT_CMD);

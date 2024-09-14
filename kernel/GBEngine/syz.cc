@@ -636,7 +636,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
     }
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
-    arg = id_KillSquares(arg, m_iFirstAltVar, m_iLastAltVar, currRing, false); // kill suares in input!
+    arg = id_KillSquares(idCopy(arg), m_iFirstAltVar, m_iLastAltVar, currRing, false); // kill squares in input!
   }
 #endif
 
