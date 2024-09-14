@@ -2736,6 +2736,7 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   {
     (*hseries1)[i]=n_Int(BIMATELEM(*h1,1,i+1),coeffs_BIGINT);
   }
+  delete h1;
   intvec *hseries2;
   int l = hseries1->length()-1;
   if (l > 1)
