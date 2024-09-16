@@ -990,6 +990,25 @@ long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
   return j; //  return -1;
 }
 
+BOOLEAN id_IsModule(ideal A, const ring src)
+{
+  if ((src->VarOffset[0]== -1)
+  || (src->pCompIndex<0))
+    return FALSE; // ring without components
+  for (int i=0;i<IDELEMS(A);i++)
+  {
+    if (A->m[i]!=NULL)
+    {
+      if (p_GetComp(A->m[i],src)>0)
+        return TRUE;
+      else
+        return FALSE;
+    }
+  }
+  return A->rank>1;
+}
+
+
 /*2
 *returns true if id is homogeneous with respect to the actual weights
 */

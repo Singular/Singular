@@ -1820,8 +1820,11 @@ void initMora(ideal F,kStrategy strat)
   strat->posInLOld = strat->posInL;
   strat->posInLOldFlag = TRUE;
   strat->initEcart = initEcartNormal;
-  strat->kAllAxis = (currRing->ppNoether) != NULL;
-  if ( strat->kAllAxis )
+  if (strat->homog)
+    strat->red = redFirst;  /*take the first possible in T*/
+  else
+    strat->red = redEcart;/*take the first possible in under ecart-restriction*/
+  if ( currRing->ppNoether!=NULL )
   {
     strat->kNoether = pCopy((currRing->ppNoether));
     if (TEST_OPT_PROT)
@@ -1830,11 +1833,7 @@ void initMora(ideal F,kStrategy strat)
       mflush();
     }
   }
-  if (strat->homog)
-    strat->red = redFirst;  /*take the first possible in T*/
-  else
-    strat->red = redEcart;/*take the first possible in under ecart-restriction*/
-  if (strat->kAllAxis)
+  if (strat->kNoether!=NULL)
   {
     HCord = currRing->pFDeg((strat->kNoether),currRing)+1;
   }
@@ -2437,7 +2436,7 @@ static int kFindLuckyPrime(ideal F, ideal Q) // TODO
 
 static poly kTryHC(ideal F, ideal Q)
 {
-  if (TEST_V_NO_TRY_HC ||(Q!=NULL))
+  if (TEST_V_NOT_TRICKS ||(Q!=NULL))
     return NULL;
   int prim=kFindLuckyPrime(F,Q);
   if (TEST_OPT_PROT) Print("try HC in ring over ZZ/%d\n",prim);
@@ -2473,7 +2472,14 @@ static poly kTryHC(ideal F, ideal Q)
   rChangeCurrRing(save_ring);
   if (HC!=NULL)
   {
+    //p_IncrExp(HC,Zp_ring->N,Zp_ring);
+    for (int i=rVar(Zp_ring)-1; i>0; i--)
+    {
+      if (pGetExp(HC, i) > 0) pDecrExp(HC,i);
+    }
+    p_Setm(HC,Zp_ring);
     if (TEST_OPT_PROT) Print("HC(%ld) found\n",pTotaldegree(HC));
+    pSetCoeff0(HC,nInit(1));
   }
   else
   {
@@ -2483,36 +2489,13 @@ static poly kTryHC(ideal F, ideal Q)
   return HC;
 }
 
-ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-          int newIdeal, intvec *vw, s_poly_proc_t sp)
+static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,
+         int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
-  if(idIs0(F))
-    return idInit(1,F->rank);
+  assume(!idIs0(F));
+  assume((Q==NULL)||(!idIs0(Q)));
 
-  if((Q!=NULL)&&(idIs0(Q))) Q=NULL;
-#ifdef HAVE_SHIFTBBA
-  if(rIsLPRing(currRing)) return kStdShift(F, Q, h, w, hilb, syzComp, newIdeal, vw, FALSE);
-#endif
-
-  /* test HC precomputation*/
-  int ak = id_RankFreeModule(F,currRing);
-  poly resetppNoether = currRing->ppNoether;
   kStrategy strat=new skStrategy;
-  if((ak==0)
-  && (IDELEMS(F)>1)
-  && (h!=isHomog)
-  && (hilb==NULL)
-  && (vw==NULL)
-  && (newIdeal==0)
-  && (sp==NULL)
-  && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing))
-  && rField_is_Q(currRing)
-  && !rIsPluralRing(currRing)
-  && (currRing->ppNoether==NULL))
-  {
-    //currRing->ppNoether=kTryHC(F,Q);
-    strat->kNoether=kTryHC(F,Q);
-  }
 
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
@@ -2530,7 +2513,8 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else
     strat->LazyPass=2;
   strat->LazyDegree = 1;
-  strat->ak = ak;
+  strat->ak = 0;
+  if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
   strat->kHomW=kHomW=NULL;
   if (vw != NULL)
@@ -2684,8 +2668,42 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 //Print("%d reductions canceled \n",strat->cel);
   delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  currRing->ppNoether=resetppNoether;
   return r;
+}
+
+ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+          int newIdeal, intvec *vw, s_poly_proc_t sp)
+{
+  if(idIs0(F))
+    return idInit(1,F->rank);
+
+  if((Q!=NULL)&&(idIs0(Q))) Q=NULL;
+#ifdef HAVE_SHIFTBBA
+  if(rIsLPRing(currRing)) return kStdShift(F, Q, h, w, hilb, syzComp, newIdeal, vw, FALSE);
+#endif
+
+  /* test HC precomputation*/
+  int ak = id_IsModule(F,currRing);
+  poly resetppNoether = currRing->ppNoether;
+  if((ak==0)
+  && (IDELEMS(F)>1)
+  && (h!=isHomog)
+  && (hilb==NULL)
+  && (vw==NULL)
+  && (newIdeal==0)
+  && (sp==NULL)
+  && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing))
+  && rField_is_Q(currRing)
+  && !rIsPluralRing(currRing)
+  && (currRing->ppNoether==NULL))
+  {
+    currRing->ppNoether=kTryHC(F,Q);
+    ideal res=kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
+    if (currRing->ppNoether!=NULL) pLmDelete(currRing->ppNoether);
+    currRing->ppNoether=resetppNoether;
+    return res;
+  }
+  return kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
 }
 
 ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intvec *hilb,int syzComp,
@@ -2726,7 +2744,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     strat->enterOnePair=enterOnePairNormal;
     strat->chainCrit=chainCritNormal;
     if (TEST_OPT_SB_1) strat->chainCrit=chainCritOpt_1;
-    strat->ak = id_RankFreeModule(F,currRing);
+    strat->ak = 0;
+    if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
     strat->kModW=kModW=NULL;
     strat->kHomW=kHomW=NULL;
     if (vw != NULL)
@@ -2876,7 +2895,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       strat->enterOnePair=enterOnePairNormal;
       strat->chainCrit=chainCritNormal;
       if (TEST_OPT_SB_1) strat->chainCrit=chainCritOpt_1;
-      strat->ak = id_RankFreeModule(F,currRing);
+      strat->ak = 0;
+      if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
       strat->kModW=kModW=NULL;
       strat->kHomW=kHomW=NULL;
       if (vw != NULL)
@@ -3010,7 +3030,8 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   else
     strat->LazyPass=2;
   strat->LazyDegree = 1;
-  strat->ak = id_RankFreeModule(F,currRing);
+  strat->ak = 0;
+  if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
   strat->kHomW=kHomW=NULL;
   if (vw != NULL)
@@ -3128,7 +3149,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     strat->LazyPass=2;
   strat->LazyDegree = 1;
   strat->minim=(reduced % 2)+1;
-  strat->ak = id_RankFreeModule(F,currRing);
+  strat->ak = 0;
+  if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
   if (delete_w)
   {
     temp_w=new intvec((strat->ak)+1);
@@ -3495,7 +3517,8 @@ ideal kInterRedOld (ideal F,const ideal Q)
   //strat->syzComp     = 0;
   strat->kAllAxis = (currRing->ppNoether) != NULL;
   strat->kNoether=pCopy((currRing->ppNoether));
-  strat->ak = id_RankFreeModule(tempF,currRing);
+  strat->ak = 0;
+  if (id_IsModule(tempF,currRing)) strat->ak = id_RankFreeModule(tempF,currRing);
   initBuchMoraCrit(strat);
   strat->NotUsedAxis = (BOOLEAN *)omAlloc(((currRing->N)+1)*sizeof(BOOLEAN));
   for (j=(currRing->N); j>0; j--) strat->NotUsedAxis[j] = TRUE;

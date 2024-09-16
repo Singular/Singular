@@ -853,29 +853,11 @@ static ring makeQt()
 }
 
 STATIC_VAR ring hilb_Qt=NULL;
-static BOOLEAN isModule(ideal A, const ring src)
-{
-  if ((src->VarOffset[0]== -1)
-  || (src->pCompIndex<0))
-    return FALSE; // ring without components
-  for (int i=0;i<IDELEMS(A);i++)
-  {
-    if (A->m[i]!=NULL)
-    {
-      if (p_GetComp(A->m[i],src)>0)
-        return TRUE;
-      else
-        return FALSE;
-    }
-  }
-  return FALSE;
-}
-
 void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
 {
   id_LmTest(S, currRing);
 
-  if (!isModule(S,currRing))
+  if (!id_IsModule(S,currRing))
   {
     if (hilb_Qt==NULL) hilb_Qt=makeQt();
     poly hseries=hFirstSeries0p(S,Q,wdegree,currRing,hilb_Qt);
@@ -2215,7 +2197,7 @@ intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
   #endif
 
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
-  if (!isModule(A,currRing))
+  if (!id_IsModule(A,currRing))
     return hFirstSeries0(A,Q,wdegree,currRing,hilb_Qt);
   res=NULL;
   int w_max=0,w_min=0;
@@ -2675,7 +2657,7 @@ bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, con
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   poly h;
   int m=0;
-  if (isModule(I,src))
+  if (id_IsModule(I,src))
   {
     h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
     if (shifts!=NULL) m=shifts->min_in();
@@ -2696,7 +2678,7 @@ bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, co
 {
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   poly h;
-  if (isModule(I,src))
+  if (id_IsModule(I,src))
     h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
   else
     h=hFirstSeries0p(I,Q,wdegree,src,hilb_Qt);
@@ -2715,7 +2697,7 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
 #if 0
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   poly h1;
-  if (isModule(S,currRing))
+  if (id_IsModule(S,currRing))
     h1 = hFirstSeries0p(S,Q,NULL,currRing,hilb_Qt);
   else
     h1 = hFirstSeries0m(S,Q,NULL, modulweight,currRing,hilb_Qt);

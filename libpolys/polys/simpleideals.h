@@ -104,6 +104,7 @@ ideal id_Add (ideal h1,ideal h2,const ring r);
 ideal id_Power(ideal given,int exp, const ring r);
 BOOLEAN idIs0 (ideal h);
 
+BOOLEAN id_IsModule(ideal A, const ring src);
 long id_RankFreeModule(ideal m, ring lmRing, ring tailRing);
 static inline long id_RankFreeModule(ideal m, ring r)
 {return id_RankFreeModule(m, r, r);}

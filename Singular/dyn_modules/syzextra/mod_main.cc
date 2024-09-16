@@ -39,32 +39,6 @@
 #include "polys/monomials/ring.h"
 
 
-// returns TRUE, if idRankFreeModule(m) > 0 ???
-/// test whether this input has vectors among entries or no enties
-/// result must be FALSE for only 0-entries
-static BOOLEAN id_IsModule(ideal id, ring r)
-{
-  id_Test(id, r);
-
-  if( id->rank != 1 ) return TRUE;
-
-  if (rRing_has_Comp(r))
-  {
-    const int l = IDELEMS(id);
-
-    for (int j=0; j<l; j++)
-      if (id->m[j] != NULL && p_GetComp(id->m[j], r) > 0)
-        return TRUE;
-
-    return FALSE; // rank: 1, only zero or no entries? can be an ideal OR module... BUT in the use-case should better be an ideal!
-  }
-
-  return FALSE;
-}
-
-
-
-
 static inline void NoReturn(leftv& res)
 {
   res->rtyp = NONE;
