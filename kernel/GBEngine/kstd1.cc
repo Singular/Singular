@@ -2683,15 +2683,14 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
 
   /* test HC precomputation*/
-  int ak = id_IsModule(F,currRing);
   poly resetppNoether = currRing->ppNoether;
-  if((ak==0)
-  && (IDELEMS(F)>1)
+  if ((IDELEMS(F)>1)
   && (h!=isHomog)
   && (hilb==NULL)
   && (vw==NULL)
   && (newIdeal==0)
   && (sp==NULL)
+  && (!id_IsModule(F,currRing))
   && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing))
   && rField_is_Q(currRing)
   && !rIsPluralRing(currRing)
