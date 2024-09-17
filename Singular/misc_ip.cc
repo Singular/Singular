@@ -1203,7 +1203,8 @@ void m2_end(int i)
         printf("\nhalt %d\n",i);
       }
     }
-    exit(i);
+    if (i>=0) exit(i);
+    else _exit(0);
   }
 }
 }
