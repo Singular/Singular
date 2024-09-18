@@ -22,6 +22,7 @@ number nlRInit (long i);
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "Singular/links/ssiLink.h"
 
 // send a number via a string s
 static char *send_number(char *s, number n)
@@ -247,6 +248,7 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
     si_set_signal(SIGTERM,sig_term_hdl_child);
+    singular_close_links();
     number *x=(number *)omAlloc(rl*sizeof(number));
     poly *p=(poly *)omAlloc(rl*sizeof(poly));
     CFArray inv_cache(rl);
@@ -350,6 +352,7 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
     si_set_signal(SIGTERM,sig_term_hdl_child);
+    singular_close_links();
     loop
     {
       int ind=queue->dequeue();

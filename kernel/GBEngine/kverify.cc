@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "Singular/links/ssiLink.h"
 #endif
 
 BOOLEAN kVerify1(ideal F, ideal Q)
@@ -242,6 +243,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
     si_set_signal(SIGTERM,sig_term_hdl_child);
+    singular_close_links();
     loop
     {
       int ind=queue->dequeue();

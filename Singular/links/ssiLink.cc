@@ -2490,6 +2490,26 @@ BOOLEAN ssiGetDump(si_link l)
   }
   return FALSE;
 }
+
+void singular_close_links()
+{
+  link_list hh=ssiToBeClosed;
+  while(hh!=NULL)
+  {
+    if ((hh->l->m!=NULL)
+    && (hh->l->m->Open==ssiOpen)
+    && SI_LINK_OPEN_P(hh->l)
+    && (strcmp(hh->l->mode, "fork")==0))
+    {
+      SI_LINK_SET_CLOSE_P(hh->l);
+      ssiInfo *d = (ssiInfo *)hh->l->data;
+      if (d->f_read!=NULL) { s_close(d->f_read);d->f_read=NULL;}
+      if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
+    }
+    hh=(link_list)hh->next;
+  }
+  ssiToBeClosed=NULL;
+}
 // ----------------------------------------------------------------
 // format
 // 1 int %d

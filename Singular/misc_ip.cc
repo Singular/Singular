@@ -1138,10 +1138,6 @@ void m2_end(int i)
     }
 #endif   // HAVE_SIMPLEIPC
     monitor(NULL,0);
-#ifdef PAGE_TEST
-    mmEndStat();
-#endif
-    fe_reset_input_mode();
     if (ssiToBeClosed_inactive)
     {
       link_list hh=ssiToBeClosed;
@@ -1176,29 +1172,18 @@ void m2_end(int i)
         hh=ssiToBeClosed;
       }
     }
+#ifdef PAGE_TEST
+    mmEndStat();
+#endif
+    fe_reset_input_mode();
     if (!singular_in_batchmode)
     {
-      if (i<=0)
+      if (TEST_V_QUIET)
       {
-        //extern long all_farey;
-        //extern long farey_cnt;
-        //if (all_farey!=0L) printf("farey:%ld, cnt=%ld\n",all_farey,farey_cnt);
-        if (TEST_V_QUIET)
-        {
-          if (i==0)
-            printf("Auf Wiedersehen.\n");
-          else
-            printf("\n$Bye.\n");
-        }
-        //#ifdef sun
-        //  #ifndef __svr4__
-        //    _cleanup();
-        //    _exit(0);
-        //  #endif
-        //#endif
-        i=0;
+        if (i==0)
+          printf("Auf Wiedersehen.\n");
       }
-      else
+      if (i>0)
       {
         printf("\nhalt %d\n",i);
       }

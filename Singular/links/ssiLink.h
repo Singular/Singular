@@ -22,4 +22,6 @@ si_link ssiCommandLink();
 
 void sig_chld_hdl(int sig);
 int ssiReservePort(int clients);
+
+void singular_close_links();
 #endif
