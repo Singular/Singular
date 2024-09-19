@@ -7666,14 +7666,20 @@ standard basis @code{G}, additional generator @code{p}, hilbert function @code{h
 @item @strong{Warning:}
 Groebner basis computations with inexact coefficients can not be trusted due to rounding errors.
 @item @strong{Note:}
-The
-standard basis is computed with a (more or less) straight-forward
+The standard basis is computed with a (more or less) straight-forward
 implementation of the classical
 Buchberger (resp.@: Mora) algorithm. For global orderings, use the
 @code{groebner} command instead (@pxref{groebner}), which heuristically
 chooses the "best" algorithm to compute a Groebner basis.
 @*To view the progress of long running computations, use
 @code{option(prot)} (see @ref{option(prot)}).
+
+@item @strong{Note:}
+For standard basis computations of 0-dim ideals in local rings and
+characteristic 0, we recommend std with ordering ds (or Ds), due to
+the implementation of the new algorithm described in ‘Using
+Semicontinuity for Standard Bases Computations’ (arXiv:2108.09735), as
+of Singular 4.4.0 (Sept 2024).
 
 @item @strong{Example:}
 @smallexample
