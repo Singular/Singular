@@ -1666,7 +1666,7 @@ leftv ssiRead1(si_link l)
                 omFreeBin(res,sleftv_bin);
                 return ssiRead1(l);
              }
-    case 99: omFreeBin(res,sleftv_bin); ssiClose(l); m2_end(0);
+    case 99: omFreeBin(res,sleftv_bin); ssiClose(l); m2_end(-1);
              break; /*to make compiler happy*/
     case 0: if (s_iseof(d->f_read))
             {
