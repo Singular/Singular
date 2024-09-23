@@ -162,6 +162,9 @@ $SINGULAR_EXECUTABLE
 default: $SINGULAR_DATA_DIR/singular/html
 @item SINGULAR_URL
 @*the URL of the manual, default: https://www.singular.uni-kl.de/Manual/
+@item SINGULAR_CPUS
+maximal number of cpu cores to use, default: all available
+@*can also be given by a command line argument: @code{--cpus=...}
 @end itemize
 
 The effective list of directories/files can be printed by @code{Singular -v},
