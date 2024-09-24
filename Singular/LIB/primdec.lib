@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.4.0.0 Dec_2023 "; // $Id$
+version="version primdec.lib 4.4.0.6 Sep_2024 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2486,8 +2486,7 @@ RETURN:  ideal of equidimensional locus (of maximal dimension) of i.
 EXAMPLE: example equidimMax; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)||hasQQCoefficient(basering));
-  //ASSUME(0, hasFieldCoefficient(basering) );
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -5745,7 +5744,6 @@ SEE ALSO: primdecGTZ; absFactorize
 EXAMPLE: example absPrimdecGTZ; shows an example
 "
 {
-  ASSUME(0,hasQQCoefficient(basering));
   return(absPrimdecGTZ_i(0,I,#));
 }
 example
@@ -6279,7 +6277,6 @@ NOTE:    If c=0, the given ordering of the variables is used. @*
 EXAMPLE: example minAssChar; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)||hasQQCoefficient(basering));
   return(minAssChar_i(0,I,#));
 }
 example
@@ -6347,8 +6344,7 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example equiRadical; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)||hasQQCoefficient(basering));
-  //ASSUME(0, hasFieldCoefficient(basering) );
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -7140,8 +7136,7 @@ NOTE:    Uses algorithm of Eisenbud/Huneke/Vasconcelos.
 EXAMPLE: example prepareAss; shows an example
 "
 {
-  ASSUME(0,hasZpCoefficient(basering)||hasQQCoefficient(basering));
-  //ASSUME(0, hasFieldCoefficient(basering) );
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {

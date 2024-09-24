@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version ring.lib 4.3.1.3 Feb_2023 "; // $Id$
+version="version ring.lib 4.4.0.6 Sep_2024 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -1108,7 +1108,7 @@ KEYWORDS: ring coefficients
 EXAMPLE: example hasZpCoefficient; shows an example
 "
 {
-  return(attrib(rng,"cf_class")==1);
+  return(attrib(rng,"cf_class_Zp"));
 }
 example
 {
@@ -1126,7 +1126,7 @@ KEYWORDS: ring coefficients
 EXAMPLE: example hasQQCoefficient; shows an example
 "
 {
-  return(attrib(rng,"cf_class")==2);
+  return(attrib(rng,"cf_class_QQ"));
 }
 example
 {

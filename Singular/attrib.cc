@@ -256,6 +256,8 @@ BOOLEAN atATTRIB1(leftv res,leftv v)
     if (v->Typ()==RING_CMD)
     {
       PrintS("attr:cf_class, type int\n");
+      PrintS("attr:cf_class_Zp, type int\n");
+      PrintS("attr:cf_class_QQ, type int\n");
       PrintS("attr:global, type int\n");
       PrintS("attr:maxExp, type int\n");
       PrintS("attr:ring_cf, type int\n");
@@ -313,14 +315,18 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
     res->rtyp=INT_CMD;
     res->data=(void *)(long)(rField_is_Ring((ring)v->Data()));
   }
-  else if ((strcmp(name,"cf_class")==0)
+  else if ((strncmp(name,"cf_class",strlen("cf_class"))==0)
   &&(/*v->Typ()*/t==RING_CMD))
   {
     res->rtyp=INT_CMD;
     coeffs cf;
-    if (t==RING_CMD) cf=((ring)v->Data())->cf;
-    else             cf=(coeffs)v->Data();
-    res->data=(void *)(long)(int)(cf->type);
+    cf=((ring)v->Data())->cf;
+    if (strcmp(name,"cf_class_Zp")==0)
+      res->data=(void *)(long)(int)(cf->type==n_Zp);
+    else if (strcmp(name,"cf_class_QQ")==0)
+      res->data=(void *)(long)(int)(cf->type==n_Q);
+    else  
+      res->data=(void *)(long)(int)cf->type;
   }
   else if (strcmp(name,"qringNF")==0)
   {
@@ -426,7 +432,7 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
     I->rank=si_max(rk,(int)((long)c->Data()));
   }
   else if (((strcmp(name,"global")==0)
-    || (strcmp(name,"cf_class")==0)
+    || (strncmp(name,"cf_class",strlen("cf_class"))==0)
     || (strcmp(name,"ring_cf")==0)
     || (strcmp(name,"maxExp")==0))
   &&(/*v->Typ()*/t==RING_CMD))
