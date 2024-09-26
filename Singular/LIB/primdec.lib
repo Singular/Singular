@@ -562,7 +562,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
 
     if(size(l[2*i])==0)
     {
-      if(homog(l[2*i-1])==1)
+      if(homog(l[2*i-1]))
       {
         l[2*i]=maxideal(1);
         continue;
@@ -588,7 +588,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
         if((r==1)&&(act[2][1]>1))
         {
           keepprime[i]=interred(keepprime[i]+ideal(act[1][1]));
-          if(homog(keepprime[i])==1)
+          if(homog(keepprime[i]))
           {
             l[2*i]=maxideal(1);
             break;
@@ -617,7 +617,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
           {
             l[2*i]=keepresult[1];
           }
-          if((homog(keepresult[1])==1)||(homog(keepprime[i])==1))
+          if((homog(keepresult[1]))||(homog(keepprime[i])))
           {
             l[2*i]=maxideal(1);
           }
@@ -634,7 +634,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
             {
               l[s+2*k]=ideal(0);
             }
-            if((homog(keepresult[k])==1)||(homog(keepprime[s div 2+k])==1))
+            if((homog(keepresult[k]))||(homog(keepprime[s div 2+k])))
             {
               l[s+2*k]=maxideal(1);
             }
@@ -651,20 +651,20 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
           {
             l[s+2]=ideal(0);
             l[s+1]=std(l[2*i-1],act[2]);
-            if(homog(l[s+1])==1)
+            if(homog(l[s+1]))
             {
               l[s+2]=maxideal(1);
             }
             //else { l[s+2]=ideal(0); }
             keepprime[s div 2+1]=interred(keepprime[i]+ideal(@f));
-            if(homog(keepprime[s div 2+1])==1)
+            if(homog(keepprime[s div 2+1]))
             {
               l[s+2]=maxideal(1);
             }
             keepprime[i]=act[1];
             l[2*i-1]=act[1];
             attrib(l[2*i-1],"isSB",1);
-            if(homog(l[2*i-1])==1)
+            if(homog(l[2*i-1]))
             {
               l[2*i]=maxideal(1);
             }
@@ -693,7 +693,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
     if((size(l[2*i])==0)&&(specialIdealsEqual(keepprime[i],l[2*i-1])!=1))
     {
       keepprime[i]=std(keepprime[i]);
-      if(homog(keepprime[i])==1)
+      if(homog(keepprime[i]))
       {
         l[2*i]=maxideal(1);
       }
@@ -907,7 +907,7 @@ EXAMPLE: example zero_decomp; shows an example
   }
 
   option(set,save);
-  if(homog(j)==1)
+  if(homog(j))
   {
     primary[1]=j;
     if((size(ser)>0)&&(size(reduce(ser,j,5))==0))
@@ -1369,7 +1369,7 @@ proc zeroSepClos(ideal I,ideal F)
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
-  if(homog(I)==1){return(maxideal(1));}
+  if(homog(I)){return(maxideal(1));}
 
   //assume F[i] irreducible in I and depending only on var(i)
 
@@ -2089,7 +2089,7 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
           valid = 1;
         }
       }
-      if(valid == 0)
+      if(!valid)
       {
         dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
       }
@@ -2111,7 +2111,7 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
 
     if(npars(P) == 0)  { option(redSB); }
 
-    if (attrib(i,"isSB")!=1)
+    if (!attrib(i,"isSB"))
     {
       i=groebner(q[1]);
     }
@@ -2379,7 +2379,7 @@ EXAMPLE:example equidim; shows an example
 {
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -2398,7 +2398,7 @@ EXAMPLE:example equidim; shows an example
      m=1;
   }
 
-  if(((homo==1)||(a))&&(find(ordstr(basering),"l")==0)
+  if(((homo)||(a))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
      def gnir=ring(ring_list(basering));
@@ -2421,7 +2421,7 @@ EXAMPLE:example equidim; shows an example
      ideal i=imap(P,i);
      ideal j=groebner(i);
   }
-  if(homo==1)
+  if(homo)
   {
      for(n=1;n<=nvars(basering);n++)
      {
@@ -2488,7 +2488,7 @@ EXAMPLE: example equidimMax; shows an example
 {
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
       ERROR(
       "Not implemented for this ordering, please change to a global ordering."
@@ -2503,7 +2503,7 @@ EXAMPLE: example equidimMax; shows an example
   int a=attrib(i,"isSB");
   int homo=homog(i);
 
-  if(((homo==1)||(a))&&(find(ordstr(basering),"l")==0)
+  if(((homo)||(a))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
      def gnir=ring(ring_list(basering));
@@ -2528,7 +2528,7 @@ EXAMPLE: example equidimMax; shows an example
   }
   list indep;
   ideal equ,equi;
-  if(homo==1)
+  if(homo)
   {
      for(n=1;n<=nvars(basering);n++)
      {
@@ -2545,7 +2545,7 @@ EXAMPLE: example equidimMax; shows an example
 
   indep=maxIndependSet(j);
   ring gnir1 = create_ring(ring_list(basering)[1],"("+indep[1][1]+")","("+indep[1][2]+")","no_minpoly");
-  if(homo==1)
+  if(homo)
   {
      ideal j=std(imap(gnir,j),hil,w);
   }
@@ -2918,7 +2918,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
   homo=homog(i);
   if(homo)
   {
-    if(isS/*attrib(i,"isSB")*/!=1)
+    if(!isS/*!attrib(i,"isSB")*/)
     {
       //ltras=mstd(i);
       tras=groebner(i);
@@ -2987,7 +2987,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
 
   ideal ser=fetch(@P,ser);
 
-  if(homo==1)
+  if(homo)
   {
     if(!lp)
     {
@@ -3276,7 +3276,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     setring @Phelp;
   }
 
-  if(homo==1)
+  if(homo)
   {
     if(((ordstr(@P)[3]=="d")||(ordstr(@P)[1]=="d")||(ordstr(@P)[1]=="w")
        ||(ordstr(@P)[3]=="w"))&&(size(ring_list(@P)[3])==2))
@@ -3552,7 +3552,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         @j=imap(@Phelp,jwork);
         break;
       }
-      if(homo==1)
+      if(homo)
       {
         @hilb=hilb(jwork,1,@w);
       }
@@ -3637,7 +3637,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
           execute("map phi=gnir,"+@va+";");
           op=option(get);
           option(redSB);
-          if(homo==1)
+          if(homo)
           {
             ideal @j=std(phi(jkeep),keephilb,@w);
           }
@@ -3981,7 +3981,7 @@ EXAMPLE: example zeroRad; shows an example"
    ASSUME(0, not isQuotientRing(basering) ) ;
    ASSUME(0, hasGlobalOrdering(basering) ) ;
 
-   if(homog(I)==1){return(maxideal(1));}
+   if(homog(I)){return(maxideal(1));}
    //I needs to be a reduced standard basis
    def R=basering;
    int m=npars(R);
@@ -4119,7 +4119,7 @@ EXAMPLE: example radicalEHV; shows an example
 {
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
     ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -4253,7 +4253,7 @@ static proc int_ass_primary_e(ideal i, int e)
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
-  if(homog(i)!=1)
+  if(!homog(i))
   {
      i=std(i);
   }
@@ -5639,7 +5639,7 @@ static proc primdecGTZ_i(int patchPrimaryDecomposition,ideal i, list #)
    {
       int keep_comp=1;
    }
-   if(attrib(basering,"global")!=1)
+   if(!attrib(basering,"global"))
    {
 // algorithms only work in global case!
 // pass to appropriate global ring
@@ -5777,7 +5777,7 @@ static proc absPrimdecGTZ_i(int @patchPrimaryDecomposition, ideal @I, list #)
      int @keep_comp=1;
   }
 
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
 // algorithm automatically passes to the global case
 // hence prepare to go back to an appropriate new ring
@@ -6017,7 +6017,7 @@ static proc primdecSY_i(int patchPrimaryDecomposition, ideal i, list #)
    {
       int keep_comp=1;
    }
-   if(attrib(basering,"global")!=1)
+   if(!attrib(basering,"global"))
    {
 // algorithms only work in global case!
 // pass to appropriate global ring
@@ -6149,7 +6149,7 @@ static proc minAssGTZ_i(int patchPrimaryDecomposition, ideal i,list #)
       int keep_comp=1;
    }
 
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
   // algorithms only work in global case!
 // pass to appropriate global ring
@@ -6216,7 +6216,7 @@ static proc minAssGTZ_i(int patchPrimaryDecomposition, ideal i,list #)
           valid = 1;
         }
       }
-      if(valid == 0)
+      if(!valid)
       {
         dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
       }
@@ -6301,7 +6301,7 @@ proc minAssChar_i(int patchPrimaryDecomposition, ideal i, list #)
    {
       int keep_comp=1;
    }
-   if(attrib(basering,"global")!=1)
+   if(!attrib(basering,"global"))
    {
 // algorithms only work in global case!
 // pass to appropriate global ring
@@ -6346,7 +6346,7 @@ EXAMPLE: example equiRadical; shows an example
 {
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
      ERROR(
      "// Not implemented for this ordering, please change to global ordering."
@@ -6385,7 +6385,7 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(size(i) == 0){return(ideal(0));}
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
 // algorithms only work in global case!
 // pass to appropriate global ring
@@ -6418,14 +6418,8 @@ EXAMPLE: example radical; shows an example
   // Set input parameters
   algorithm = "SL";                                 // Default: SL algorithm
   il = 0;                                           // Default: Full radical (not only equiRadical)
-  if (homog(i) == 1)
-  {   // Default: facStd is used, except if the ideal is homogeneous.
-    useFac = 0;
-  }
-  else
-  {
-    useFac = 1;
-  }
+  // Default: facStd is used, except if the ideal is homogeneous.
+  useFac = !homog(i);
   if(size(#) > 0)
   {
     int valid;
@@ -6475,7 +6469,7 @@ EXAMPLE: example radical; shows an example
           valid = 1;
         }
       }
-      if(valid == 0)
+      if(!valid)
       {
         dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
       }
@@ -6517,7 +6511,7 @@ EXAMPLE: example radical; shows an example
   {
     qq=i;
   }
-  if(useFac == 1)
+  if(useFac)
   {
     for(int ll=size(qq);ll>0;ll--)
     {
@@ -6532,7 +6526,7 @@ EXAMPLE: example radical; shows an example
   kill qq;
   option(set, op);
   int s = size(pr);
-  if(useFac == 1)
+  if(useFac)
   {
     dbprint(printlevel - voice, "Number of components returned by facstd: ", s);
   }
@@ -6600,7 +6594,7 @@ static proc radicalKL(ideal I, ideal ser, list #)
 // list #      If #[1] = 1, equiradical is computed.
 
   // I needs to be a Groebner basis.
-  if (attrib(I, "isSB") != 1)
+  if (!attrib(I, "isSB"))
   {
     I = groebner(I);
   }
@@ -6644,7 +6638,7 @@ static proc radicalSL(ideal I, list #)
   int iDim;                // The dimension of I
   int stop = 0;   // Checks if the radical has been obtained
 
-  if (attrib(I, "isSB") != 1)
+  if (!attrib(I, "isSB"))
   {
     I = groebner(I);
   }
@@ -6656,7 +6650,7 @@ static proc radicalSL(ideal I, list #)
     il = #[1];
   }
 
-  while(stop == 0)
+  while(!stop)
   {
     dbprint (printlevel-voice, "// We call radLoopR to find new prime ideals.");
     primes = radicalSLIteration(I, rad);                         // A list of primes or intersections of primes, not included in P
@@ -6670,7 +6664,7 @@ static proc radicalSL(ideal I, list #)
         rad = intersect(rad, primes[k]);
         if (il == 1)
         {
-          if (attrib(primes[k], "isSB") != 1)
+          if (!attrib(primes[k], "isSB"))
           {
             primes[k] = groebner(primes[k]);
           }
@@ -7138,7 +7132,7 @@ EXAMPLE: example prepareAss; shows an example
 {
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -7150,7 +7144,7 @@ EXAMPLE: example prepareAss; shows an example
   int e;
   list er;
   ideal ann;
-  if(homog(i)==1)
+  if(homog(i))
   {
      resolution re=sres(j,0);                   //the resolution
      re=minres(re);                       //minimized resolution
@@ -7189,7 +7183,7 @@ EXAMPLE: example equidimMaxEHV; shows an example
 {
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -7209,7 +7203,7 @@ EXAMPLE: example equidimMaxEHV; shows an example
 
   int e;
   ideal ann;
-  if(homog(i)==1)
+  if(homog(i))
   {
      resolution re=sres(j,0);                   //the resolution
      re=minres(re);                       //minimized resolution
@@ -7316,7 +7310,7 @@ EXAMPLE: example zerodec; shows an example
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(2, dim(groebner(I))==0 );
-  if(attrib(basering,"global")!=1)
+  if(!attrib(basering,"global"))
   {
     ERROR(
     "// Not implemented for this ordering, please change to global ordering."
@@ -7509,7 +7503,7 @@ EXAMPLE: example newDecompStep; shows an example
     list absprimary,abskeep,absprimarytmp,abskeeptmp;
   }
   homo=homog(i);
-  if(homo==1)
+  if(homo)
   {
     if(attrib(i,"isSB"))
     {
@@ -7590,7 +7584,7 @@ EXAMPLE: example newDecompStep; shows an example
   option(redSB);
 
   ideal ser=fetch(@P,ser);
-  if(homo==1)
+  if(homo)
   {
     if(!lp)
     {
@@ -7889,7 +7883,7 @@ EXAMPLE: example newDecompStep; shows an example
     setring @Phelp;
   }
 
-  if(homo==1)
+  if(homo)
   {
     if((ordstr(@P)[3]=="d")||(ordstr(@P)[1]=="d")||(ordstr(@P)[1]=="w")
        ||(ordstr(@P)[3]=="w"))
@@ -7978,7 +7972,7 @@ EXAMPLE: example newDecompStep; shows an example
         ser = imap(@Phelp, ser);
         break;
       }
-      if(homo == 1)
+      if(homo)
       {
         @hilb = hilb(jwork, 1, @w);
       }
@@ -8073,7 +8067,7 @@ EXAMPLE: example newDecompStep; shows an example
              execute("map phi=gnir,"+@va+";");
              op=option(get);
              option(redSB);
-             if(homo==1)
+             if(homo)
              {
                 ideal @j=std(phi(jkeep),keephilb,@w);
              }
@@ -8417,7 +8411,7 @@ static proc newReduction(ideal @j, ideal ser, bigintvec @hilb, intvec @w, int jd
      execute("map phi=gnir,"+@va+";");
      op=option(get);
      option(redSB);
-     if(homo==1)
+     if(homo)
      {
        ideal @j=std(phi(@j),@hilb,@w);
      }
@@ -8962,7 +8956,7 @@ EXAMPLE: example newZero_decomp; shows an example
     return(primary);
   }
 
-  if(homog(j)==1)
+  if(homog(j))
   {
     primary[1]=j;
     if((size(ser)>0)&&(size(reduce(ser,j,5))==0))
