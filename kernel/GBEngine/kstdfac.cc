@@ -477,7 +477,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
   }
 }
 
-ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
+ideal bbafac (ideal /*F*/, ideal Q,intvec* /*w*/,kStrategy strat, ideal_list FL)
 {
   int   olddeg,reduc=0;
   int red_result = 1;
