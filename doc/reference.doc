@@ -6382,12 +6382,20 @@ Then
 $\{a \in R \mid aJ \subset I\}$,
 @end tex
 @item
-@code{quotient(M,J)}=
+@code{quotient(M,N)}=
 @ifinfo
-@{b in R | bJ in M @}.
+@{b in R | bN in M @}.
 @end ifinfo
 @tex
-$\{b \in R^n \mid bJ \subset M\}$.
+$\{b \in R \mid bN \subset M\}$.
+@end tex
+@item
+@code{quotient(M,J)}=
+@ifinfo
+@{b in R^n | Jb in M @}.
+@end ifinfo
+@tex
+$\{b \in R^n \mid Jn \subset M\}$.
 @end tex
 @end itemize
 @item @strong{Example:}
