@@ -6410,6 +6410,8 @@ quotient(id2,id1);
 module m=x*freemodule(3),y*freemodule(2);
 ideal id3=x,y;
 quotient(m,id3);
+module n=y*freemodule(2);
+quotient(m,n);
 @c example
 @end smallexample
 @end table
