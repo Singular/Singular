@@ -5509,14 +5509,14 @@ select shorter reducers in std computations,
 disables the regularity bound for @code{res} and @code{mres} (see
 @ref{regularity}).
 @c ---------
-@item @code{not_try_tricks}
-@cindex not_try_tricks, option
+@item @code{not_tricks}
+@cindex not_tricks, option
 @cindex highest corner, option
 @cindex hilbert driven Groebner basis, option
 @cindex corner (highest), option
-turns off meta-Groebner stuff
+turns off meta-Groebner stuff (for commutative rings)
 (searching HC in characteristic p during standard basis computation,
-hilbert driven Groebner basis)
+hilbert driven Groebner basis for difficult orderingsi during Groebner basis computation)
 @c ---------
 @item @code{notSugar}
 @cindex notSugar, option
