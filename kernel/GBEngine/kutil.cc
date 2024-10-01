@@ -9411,7 +9411,7 @@ void enterSyz(LObject &p, kStrategy strat, int atT)
 }
 
 
-void initHilbCrit(ideal/*F*/, ideal /*Q*/, intvec **hilb,kStrategy strat)
+void initHilbCrit(ideal/*F*/, ideal /*Q*/, bigintmat **hilb,kStrategy strat)
 {
 
   //if the ordering is local, then hilb criterion

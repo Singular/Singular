@@ -2619,7 +2619,7 @@ poly redNFBound (poly h,int &max_ind,int nonorm,kStrategy strat,int bound)
 
 void kDebugPrint(kStrategy strat);
 
-ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+ideal bba (ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 {
   int   red_result = 1;
   int   olddeg,reduc;
@@ -2977,7 +2977,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   return (strat->Shdl);
 }
 
-ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+ideal sba (ideal F0, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 {
   // ring order stuff:
   // in sba we have (until now) two possibilities:
@@ -4277,7 +4277,7 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
 ********************************************************************/
 void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
-          intvec *w,intvec *hilb )
+          intvec *w,bigintmat *hilb )
 {
   int Ll_old, red_result = 1;
   int pos  = 0;
@@ -4587,7 +4587,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
 /* shiftgb stuff */
 #ifdef HAVE_SHIFTBBA
-ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+ideal bbaShift(ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 {
   int   red_result = 1;
   int   olddeg,reduc;

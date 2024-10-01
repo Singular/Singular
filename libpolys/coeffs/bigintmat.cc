@@ -2684,3 +2684,4 @@ void bigintmat::simplifyContentDen(number *d)
   if (!n_IsOne(g, r))
   skaldiv(g);
 }
+

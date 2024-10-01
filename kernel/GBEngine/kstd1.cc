@@ -1876,7 +1876,7 @@ void initMora(ideal F,kStrategy strat)
 
 void kDebugPrint(kStrategy strat);
 
-ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+ideal mora (ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 {
   int olddeg = 0;
   int reduc = 0;
@@ -2489,7 +2489,7 @@ static poly kTryHC(ideal F, ideal Q)
   return HC;
 }
 
-static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,
+static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
          int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
   assume(!idIs0(F));
@@ -2671,7 +2671,7 @@ static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,
   return r;
 }
 
-ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
           int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
   if(idIs0(F))
@@ -2705,7 +2705,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   return kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
 }
 
-ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intvec *hilb,int syzComp,
+ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, bigintmat *hilb,int syzComp,
           int newIdeal, intvec *vw)
 {
   if(idIs0(F))
@@ -3001,7 +3001,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
 }
 
 #ifdef HAVE_SHIFTBBA
-ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
                 int newIdeal, intvec *vw, BOOLEAN rightGB)
 {
   assume(rIsLPRing(currRing));
@@ -3106,7 +3106,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
 //##############################################################
 //##############################################################
 
-ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
+ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, bigintmat *hilb,
               int syzComp, int reduced)
 {
   if(idIs0(F))

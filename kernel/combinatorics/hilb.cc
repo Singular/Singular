@@ -2127,7 +2127,7 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
       (*ss)[i]=n_Int(pGetCoeff(s),Qt->cf);
       if((l==0)||(l<=-INT_MAX)||(l>INT_MAX))
       {
-        if(!errorreported) Werror("overflow at t^%d\n",i);
+        if(!errorreported) Werror("overflow in hilb at t^%d\n",i);
       }
       else (*ss)[i]=(int)l;
       p_LmDelete(&s,Qt);

@@ -24,7 +24,7 @@
 
 
 
-static inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat, const ring r)
+static inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const bigintmat *hilb, kStrategy strat, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->GetNC()->p_Procs.GB!=NULL);

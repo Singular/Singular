@@ -92,7 +92,7 @@ void addLObject(LObject& h, kStrategy& strat)
 }
 
 
-ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat *, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);
@@ -365,7 +365,7 @@ ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Under development!!!
-ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec * /*hilb*/, kStrategy strat, const ring _currRing)
+ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigintmat * /*hilb*/, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);
@@ -882,7 +882,7 @@ static BOOLEAN kMoraUseBucket(kStrategy)
 }
 
 // ideal sca_mora (ideal F, ideal Q, intvec *w, intvec *, kStrategy strat)
-ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigintmat *, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);

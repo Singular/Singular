@@ -25,7 +25,7 @@
 * compare the given hilbert series with the current one,
 * delete not needed pairs (if possible)
 */
-void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
+void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
               kStrategy strat)
   /* ideal S=strat->Shdl, poly p=strat->P.p */
 /*
@@ -45,7 +45,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
 * The weights w are needed in the module case, otherwise NULL.
 */
 {
-  intvec *newhilb;
+  bigintmat *newhilb;
   int deg,l,ln,mw;
   pFDegProc degp;
 
@@ -75,24 +75,28 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     // then pFDeg == degp == kHomModDeg (see kStd)
     if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=p_Totaldegree;
     // degp = pWDegree;
-    l = hilb->length()-1;
-    mw = (*hilb)[l];
-    newhilb =hFirstSeries(strat->Shdl,w,Q,strat->kHomW);
-    ln = newhilb->length()-1;
+    l = hilb->cols();
+    mw = n_Int(BIMATELEM(*hilb,1,l),coeffs_BIGINT);
+    newhilb =hFirstSeries0b(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
+    ln = newhilb->cols();
     deg = degp(strat->P.p,currRing);
     loop // compare the series in degree deg, try to increase deg -----------
     {
       if (deg < ln) // deg may be out of range
       {
         if (deg < l)
-          eledeg = (*newhilb)[deg]-(*hilb)[deg];
+        {
+          number s=n_Sub(BIMATELEM(*newhilb,1,deg+1),
+                         BIMATELEM(*hilb,1,deg+1),coeffs_BIGINT);
+          eledeg = n_Int(s,coeffs_BIGINT);
+        }
         else
-          eledeg = (*newhilb)[deg];
+          eledeg = n_Int(BIMATELEM(*newhilb,1,deg+1),coeffs_BIGINT);
       }
       else
       {
         if (deg < l)
-          eledeg = -(*hilb)[deg];
+          eledeg = -n_Int(BIMATELEM(*hilb,1,deg+1),coeffs_BIGINT);
         else // we have newhilb = hilb
         {
           while (strat->Ll>=0)
@@ -241,7 +245,7 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
 }
 #endif
 
-void khCheckLocInhom(ideal Q, intvec *w, intvec *hilb, int &count,
+void khCheckLocInhom(ideal Q, intvec *w, bigintmat *hilb, int &count,
              kStrategy strat)
 
 /*
@@ -254,11 +258,11 @@ so delete all the remaining pairs
 */
 {
   ideal Lm;
-  intvec *newhilb;
+  bigintmat *newhilb;
 
   Lm = id_Head(strat->Shdl,currRing);
 
-  newhilb =hFirstSeries(Lm,w,Q,strat->kHomW);
+  newhilb =hFirstSeries0b(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
 
   if(newhilb->compare(hilb) == 0)
   {

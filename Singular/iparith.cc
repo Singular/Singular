@@ -3474,13 +3474,7 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
     }
   }
   bigintmat *vv=(bigintmat*)v->Data();
-  intvec* vvv=new intvec(1,vv->cols());
-  for(int i=0;i<vv->cols();i++)
-  {
-    (*vvv)[i]=n_Int(BIMATELEM(*vv,1,i+1),coeffs_BIGINT);
-  }
-  result=kStd(u_id,currRing->qideal,hom,&w,vvv);
-  delete vvv;
+  result=kStd(u_id,currRing->qideal,hom,&w,vv);
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -6159,15 +6153,9 @@ static BOOLEAN jjELIMIN_ALG(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjELIMIN_HILB(leftv res, leftv u, leftv v, leftv w)
 {
   bigintmat *ww=(bigintmat*)w->Data();
-  intvec* vvv=new intvec(1,ww->cols());
-  for(int i=0;i<ww->cols();i++)
-  {
-    (*vvv)[i]=n_Int(BIMATELEM(*ww,1,i+1),coeffs_BIGINT);
-  }
 
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data(),
-    vvv);
-  delete vvv;
+    ww);
   //setFlag(res,FLAG_STD);
   return FALSE;
 }
@@ -7292,20 +7280,14 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
     }
   }
   bigintmat *vv=(bigintmat*)v->Data();
-  intvec* vvv=new intvec(1,vv->cols());
-  for(int i=0;i<vv->cols();i++)
-  {
-    (*vvv)[i]=n_Int(BIMATELEM(*vv,1,i+1),coeffs_BIGINT);
-  }
   result=kStd(u_id,
               currRing->qideal,
               hom,
               &ww,  // module weights
-              vvv,  // hilbert series
+              vv,  // hilbert series
               0,0,  // syzComp, newIdeal
               vw);  // weights of vars
   idSkipZeroes(result);
-  delete vvv;
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
   if (ww!=NULL) atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
@@ -8859,10 +8841,10 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   ideal i1=(ideal)(u->Data());
   ideal i0;
   if (((u->Typ()!=IDEAL_CMD)&&(u->Typ()!=MODUL_CMD))
-  || (h->Typ()!=INTVEC_CMD)
+  || (h->Typ()!=BIGINTVEC_CMD)
   || (w->Typ()!=INTVEC_CMD))
   {
-    WerrorS("expected `std(`ideal/module`,`poly/vector`,`intvec`,`intvec`)");
+    WerrorS("expected `std(`ideal/module`,`poly/vector`,`bigintvec`,`intvec`)");
     return TRUE;
   }
   intvec *vw=(intvec *)w->Data(); // weights of vars
@@ -8919,7 +8901,7 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
               currRing->qideal,
               hom,
               &ww,                  // module weights
-              (intvec *)h->Data(),  // hilbert series
+              (bigintmat *)h->Data(),  // hilbert series
               0,                    // syzComp, whatever it is...
               IDELEMS(i1)-ii0,      // new ideal
               vw);                  // weights of vars

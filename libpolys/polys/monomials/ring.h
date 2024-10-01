@@ -13,6 +13,7 @@
 #include "misc/intvec.h"
 #include "misc/int64vec.h"
 #include "coeffs/coeffs.h" // ring,number
+#include "coeffs/bigintmat.h" // bigintmat
 #include "polys/monomials/monomials.h"
 //#include "polys/monomials/polys-impl.h"
 //
@@ -246,7 +247,7 @@ class skStrategy;
 typedef skStrategy * kStrategy;
 
 typedef poly (*NF_Proc)(ideal, ideal, poly, int, int, const ring _currRing);
-typedef ideal (*BBA_Proc) (const ideal, const ideal, const intvec *, const intvec *, kStrategy strat, const ring);
+typedef ideal (*BBA_Proc) (const ideal, const ideal, const intvec *, const bigintmat *, kStrategy strat, const ring);
 
 
 struct ip_sring

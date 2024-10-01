@@ -134,7 +134,7 @@ class bigintmat
 
     /// UEberladener *=-Operator (fuer int und bigint)
     /// Frage hier: *= verwenden oder lieber = und * einzeln?
-    /// problem: what about non-commuting rings. Is this from left or right?
+    /// (coeffs in Singular are always commutative)
     void operator*=(int intop);
 
     /// inplace version of skalar mult. CHANGES input.

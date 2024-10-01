@@ -197,7 +197,7 @@ static ideal idSectWithElim (ideal h1,ideal h2, GbVariant alg)
   return res;
 }
 
-static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, intvec* hilb=NULL, intvec* w=NULL, tHomog hom=testHomog)
+static ideal idGroebner(ideal temp,int syzComp,GbVariant alg, bigintmat* hilb=NULL, intvec* w=NULL, tHomog hom=testHomog)
 {
   //Print("syz=%d\n",syzComp);
   //PrintS(showOption());
@@ -1602,7 +1602,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
 /*2
 * eliminate delVar (product of vars) in h1
 */
-ideal idElimination (ideal h1,poly delVar,intvec *hilb, GbVariant alg)
+ideal idElimination (ideal h1,poly delVar,bigintmat *hilb, GbVariant alg)
 {
   int    i,j=0,k,l;
   ideal  h,hh, h3;

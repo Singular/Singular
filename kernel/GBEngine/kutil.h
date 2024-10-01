@@ -22,6 +22,7 @@
 
 #include "kernel/structs.h"
 #include "kernel/GBEngine/kstd1.h"   /* for s_poly_proc_t */
+#include "coeffs/bigintmat.h"   /* for s_poly_proc_t */
 
 // define if tailrings should be used
 #define HAVE_TAIL_RING
@@ -556,7 +557,7 @@ void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);
 void initSbaCrit(kStrategy strat);
-void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat);
+void initHilbCrit(ideal F, ideal Q, bigintmat **hilb,kStrategy strat);
 void initBuchMoraPos(kStrategy strat);
 void initBuchMoraPosRing(kStrategy strat);
 void initSbaPos(kStrategy strat);
@@ -658,8 +659,8 @@ BOOLEAN kTest_S(kStrategy strat);
  *
  ***************************************************************/
 poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing);
-ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
-ideal sba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+ideal bba (ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat);
+ideal sba (ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat);
 poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF2 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
 poly kNF2Bound (ideal F, ideal Q, poly q,int bound, kStrategy strat, int lazyReduce);
@@ -668,7 +669,7 @@ void initBba(kStrategy strat);
 void initSba(ideal F,kStrategy strat);
 void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
-          intvec *w,intvec *hilb );
+          intvec *w,bigintmat *hilb );
 
 /***************************************************************
  *
@@ -858,7 +859,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
-ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+ideal bbaShift(ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat);
 #endif
 
 // test syz strategy: // will be removed soon

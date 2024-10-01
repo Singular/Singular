@@ -1027,7 +1027,7 @@ void nc_gr_initBba(ideal, kStrategy strat)
 
 #define MYTEST 0
 
-ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat *, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing; if( currRing != _currRing ) rChangeCurrRing(_currRing);
 
@@ -1280,7 +1280,7 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *,
   return (strat->Shdl);
 }
 
-ideal k_gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const bigintmat *, kStrategy strat, const ring _currRing)
 {
   if ((ncRingType(_currRing)==nc_skew)
   || id_HomIdeal(F,Q,_currRing))
