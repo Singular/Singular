@@ -2434,61 +2434,6 @@ static int kFindLuckyPrime(ideal F, ideal Q) // TODO
   return prim;
 }
 
-static poly kTryHC(ideal F, ideal Q)
-{
-  if (TEST_V_NOT_TRICKS ||(Q!=NULL))
-    return NULL;
-  int prim=kFindLuckyPrime(F,Q);
-  if (TEST_OPT_PROT) Print("try HC in ring over ZZ/%d\n",prim);
-  // create Zp_ring
-  ring save_ring=currRing;
-  ring Zp_ring=rCopy0(save_ring);
-  nKillChar(Zp_ring->cf);
-  Zp_ring->cf=nInitChar(n_Zp, (void*)(long)prim);
-  rComplete(Zp_ring);
-  // map data
-  rChangeCurrRing(Zp_ring);
-  nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
-  if (nMap==NULL) return NULL;
-  ideal FF=id_PermIdeal(F,1,IDELEMS(F),NULL,save_ring,Zp_ring,nMap,NULL,0,0);
-  ideal QQ=NULL;
-  if (Q!=NULL) QQ=id_PermIdeal(Q,1,IDELEMS(Q),NULL,save_ring,Zp_ring,nMap,NULL,0,0);
-  // call std
-  kStrategy strat=new skStrategy;
-  strat->LazyPass=20;
-  strat->LazyDegree = 1;
-  strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
-  strat->homog = (tHomog)idHomIdeal(F,Q);
-  ideal res=mora(FF,QQ,NULL,NULL,strat);
-  // clean
-  idDelete(&FF);
-  poly HC=NULL;
-  if (strat->kNoether!=NULL) scComputeHC(res,QQ,0,HC);
-  delete strat;
-  if (QQ!=NULL) idDelete(&QQ);
-  idDelete(&res);
-  // map back
-  rChangeCurrRing(save_ring);
-  if (HC!=NULL)
-  {
-    //p_IncrExp(HC,Zp_ring->N,Zp_ring);
-    for (int i=rVar(Zp_ring)-1; i>0; i--)
-    {
-      if (pGetExp(HC, i) > 0) pDecrExp(HC,i);
-    }
-    p_Setm(HC,Zp_ring);
-    if (TEST_OPT_PROT) Print("HC(%ld) found\n",pTotaldegree(HC));
-    pSetCoeff0(HC,nInit(1));
-  }
-  else
-  {
-    if (TEST_OPT_PROT) PrintS("HC not found\n");
-  }
-  rDelete(Zp_ring);
-  return HC;
-}
-
 static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
          int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
