@@ -1494,6 +1494,18 @@ ideal id_Homogen(ideal h, int varnum,const ring r)
   return m;
 }
 
+ideal id_HomogenDP(ideal h, int varnum,const ring r)
+{
+  ideal m = idInit(IDELEMS(h),h->rank);
+  int i;
+
+  for (i=IDELEMS(h)-1;i>=0; i--)
+  {
+    m->m[i]=p_HomogenDP(h->m[i],varnum,r);
+  }
+  return m;
+}
+
 /*------------------type conversions----------------*/
 ideal id_Vec2Ideal(poly vec, const ring R)
 {

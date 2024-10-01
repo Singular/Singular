@@ -3317,6 +3317,46 @@ poly p_Homogen (poly p, int varnum, const ring r)
   return q;
 }
 
+poly p_HomogenDP (poly p, int varnum, const ring r)
+{
+  poly q=NULL, qn;
+  int  o,ii;
+  sBucket_pt bp;
+
+  if (p!=NULL)
+  {
+    if ((varnum < 1) || (varnum > rVar(r)))
+    {
+      return NULL;
+    }
+    o=p_Totaldegree(p,r);
+    q=pNext(p);
+    while (q != NULL)
+    {
+      ii=p_Totaldegree(q,r);
+      if (ii>o) o=ii;
+      pIter(q);
+    }
+    q = p_Copy(p,r);
+    bp = sBucketCreate(r);
+    while (q != NULL)
+    {
+      ii = o-p_Totaldegree(q,r);
+      if (ii!=0)
+      {
+        p_AddExp(q,varnum, (long)ii,r);
+        p_Setm(q,r);
+      }
+      qn = pNext(q);
+      pNext(q) = NULL;
+      sBucket_Add_m(bp, q);
+      q = qn;
+    }
+    sBucketDestroyAdd(bp, &q, &ii);
+  }
+  return q;
+}
+
 /*2
 *tests if p is homogeneous with respect to the actual weights
 */

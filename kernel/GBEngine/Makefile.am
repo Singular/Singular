@@ -7,7 +7,7 @@ noinst_LTLIBRARIES=libGBEngine.la
 libGBEngine_la_SOURCES=khstd.cc kstdfac.cc kstd1.cc kstd2.cc kutil.cc nc.cc sca.cc gr_kstd2.cc kspoly.cc\
   kpolys.cc syz.cc syz0.cc syz1.cc syz2.cc syz3.cc syz4.cc units.cc tgb.cc tgbgauss.cc\
   f5data.cc f5lists.cc f5gb.cc ratgring.cc shiftgb.cc ringgb.cc janet.cc kverify.cc kChinese.cc\
-  kLiftstd.cc
+  kLiftstd.cc kstdhelper.cc
 
 libGBEngine_la_includedir=$(includedir)/singular/kernel/GBEngine
 libGBEngine_la_include_HEADERS=syz.h kstdfac.h kutil.h khstd.h kstd1.h units.h ratgring.h shiftgb.h nc.h\

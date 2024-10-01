@@ -224,6 +224,7 @@ int       p_Size( poly p, const ring r );
 
 // homogenizes p by multiplying certain powers of the varnum-th variable
 poly      p_Homogen (poly p, int varnum, const ring r);
+poly      p_HomogenDP (poly p, int varnum, const ring r);
 
 BOOLEAN   p_IsHomogeneous (poly p, const ring r);
 BOOLEAN   p_IsHomogeneousDP (poly p, const ring r);
