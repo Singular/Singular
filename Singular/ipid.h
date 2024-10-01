@@ -144,8 +144,6 @@ EXTERN_VAR omBin sip_package_bin;
 EXTERN_VAR omBin idrec_bin;
 EXTERN_VAR omBin sleftv_bin;
 
-EXTERN_VAR coeffs coeffs_BIGINT;
-
 /* options */
 struct soptionStruct
 {

@@ -47,8 +47,6 @@ VAR omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
 //omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
 VAR omBin idrec_bin = omGetSpecBin(sizeof(idrec));
 
-VAR coeffs coeffs_BIGINT;
-
 VAR proclevel *procstack=NULL;
 //idhdl idroot = NULL;
 
