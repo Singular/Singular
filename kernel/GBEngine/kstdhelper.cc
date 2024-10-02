@@ -29,7 +29,7 @@ static int kFindLuckyPrime(ideal F, ideal Q) // TODO
 
 poly kTryHC(ideal F, ideal Q)
 {
-  if (TEST_V_NOT_TRICKS ||(Q!=NULL))
+  if (Q!=NULL)
     return NULL;
   int prim=kFindLuckyPrime(F,Q);
   if (TEST_OPT_PROT) Print("try HC in ring over ZZ/%d\n",prim);
@@ -88,7 +88,8 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q)
 {
   // create Zp_ring
   ring save_ring=currRing;
-  coeffs cf=nInitChar(n_Zp, (void*)(long)32003);
+  int prim=kFindLuckyPrime(F,Q);
+  coeffs cf=nInitChar(n_Zp, (void*)(long)prim);
   ring Zp_ring=rDefault(cf,save_ring->N,save_ring->names,ringorder_dp);
   // map data
   nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);

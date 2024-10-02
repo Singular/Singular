@@ -993,9 +993,9 @@ ideal idLiftStd (ideal  h1, matrix* T, tHomog hi, ideal * S, GbVariant alg,
     return idInit(1,h1->rank);
   }
 
-  BITSET save2;
-  SI_SAVE_OPT2(save2);
-
+  BITSET saveOpt1,saveOpt2;
+  SI_SAVE_OPT(saveOpt1,saveOpt2);
+  si_opt_2|=Sy_bit(V_NOT_TRICKS);
   k=si_max(1,inputIsIdeal);
 
   if ((!lift3)&&(!TEST_OPT_RETURN_SB)) si_opt_2 |=Sy_bit(V_IDLIFT);
@@ -1034,7 +1034,7 @@ ideal idLiftStd (ideal  h1, matrix* T, tHomog hi, ideal * S, GbVariant alg,
 
   if (syz_ring!=orig_ring) rDelete(syz_ring);
   s_h3->rank=h1->rank;
-  SI_RESTORE_OPT2(save2);
+  SI_RESTORE_OPT(saveOpt1,saveOpt2);
   return s_h3;
 }
 

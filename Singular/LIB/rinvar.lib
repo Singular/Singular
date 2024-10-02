@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version rinvar.lib 4.3.1.3 Feb_2023 "; // $Id$
+version="version rinvar.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -88,6 +88,7 @@ ASSUME:  basering K[s(1..r),t(1..m)] has r + m variables, G is the ideal of an
 EXAMPLE: example ImageGroup; shows an example
 "
 {
+  intvec save_opt=option(get);option(not_tricks);
   int i, j, k, newVars, nrt, imageSize, dbPrt;
   ideal matrixEntries;
   matrix coMx;
@@ -187,6 +188,7 @@ EXAMPLE: example ImageGroup; shows an example
      setring R;  groupid; actionid;
 ");
   setring RIGB;
+  option(set,save_opt);
   return(RIGS);
 }
 example
@@ -289,6 +291,7 @@ RETURN:  polynomial ring over the same ground field, containing the ideal
 EXAMPLE: example ImageVariety; shows an example
 "
 {
+  intvec save_opt=option(get);option(not_tricks);
   int i, dbPrt, nrNewVars;
   intvec wt, wth, hs1;
   def RARB = basering;
@@ -346,6 +349,7 @@ EXAMPLE: example ImageVariety; shows an example
      setring R;  imageid;
 ");
   setring RARB;
+  option(set,save_opt);
   return(RAR2);
 }
 example
@@ -374,6 +378,7 @@ NOTE:    set printlevel > 0 to see a trace
 EXAMPLE: example LinearizeAction; shows an example
 "
 {
+  intvec save_opt=option(get);option(not_tricks);
   def altring = basering;
   int i, j, k, ok, loop, nrt, sizeOfDecomp, dbPrt;
   intvec wt;
@@ -392,7 +397,10 @@ EXAMPLE: example LinearizeAction; shows an example
   for(i = nrs + 1; i <= nrs + nrt; i++) { basis[i - nrs] = var(i); wt[i] = 1;}
   dbprint(dbPrt, "  basis = " + string(basis));
   if(attrib(Grp, "isSB")) { G = Grp; }
-  else { G = std(Grp); }
+  else
+  {
+    G = std(Grp);
+  }
   reduceIdeal = G;
   action = Gaction;
   loop = 1;
@@ -486,6 +494,7 @@ dbprint(dbPrt+1, "
      setring R; actionid; embedid; groupid
 ");
   setring altring;
+  option(set,save_opt);
   return(RLAR);
 }
 example
@@ -606,6 +615,7 @@ NOTE:    the minimal polynomial of the output ring depends on some random
 EXAMPLE: example InvariantRing; shows an example
 "
 {
+  intvec save_opt=option(get);option(not_tricks);
   int i, ok, dbPrt, noReynolds, primaryDec;
   ideal invarsGens, groupid;
 
@@ -617,7 +627,10 @@ EXAMPLE: example InvariantRing; shows an example
   dbprint(dbPrt, "InvariantRing of " + string(G));
   dbprint(dbPrt, " action  = " + string(action));
 
-  if(!attrib(G, "isSB")) { groupid = std(G);}
+  if(!attrib(G, "isSB"))
+  {
+    groupid = std(G);
+  }
   else { groupid = G; }
 
   // compute the nullcone of G by means of Derksen's algorithm
@@ -651,7 +664,6 @@ EXAMPLE: example InvariantRing; shows an example
         def RORN = ReynoldsOperator(groupid, action, primaryDec);
         setring RORN;
         ideal groupid = std(id);
-        attrib(groupid, "isSB", 1);
         ideal action = actionid;
         setring RIRR;
         string parName, minPoly;
@@ -722,6 +734,7 @@ EXAMPLE: example InvariantRing; shows an example
 // The representation of the algebraic number is given by 'newA'
 ");
   setring IRB;
+  option(set,save_opt);
   return(RIRS);
 }
 example
@@ -869,6 +882,7 @@ NOTE:    the generators of the nullcone are homogeneous, but in general not inva
 EXAMPLE: example NullCone; shows an example
 "
 {
+  intvec save_opt=option(get);option(not_tricks);
   int i, nt, dbPrt, offset, groupVars;
   string ringSTR, vars, order;
   def RNCB = basering;
@@ -926,6 +940,7 @@ EXAMPLE: example NullCone; shows an example
 
   generators = mstd(F(N))[2];
   setring RNCB;
+  option(set,save_opt);
   return(fetch(RNCR, generators));
 }
 example
@@ -957,6 +972,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
          group action of G
 "
 {
+  intvec saveOpt=option(get);option(not_tricks);
   def ROBR = basering;
   int i, j, n, ns, primaryDec;
   ideal G1 = Grp;
@@ -1012,6 +1028,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   }
   export actionid, ROelements;
   setring ROBR;
+  option(set,saveOpt);
   return(RORR);
 }
 

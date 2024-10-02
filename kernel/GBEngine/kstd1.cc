@@ -2427,12 +2427,6 @@ long kHomModDeg(poly p,const ring r)
   if (i==0) return j;
   return j+(*kModW)[i-1];
 }
-static int kFindLuckyPrime(ideal F, ideal Q) // TODO
-{
-  int prim=32003;
-  // assume coeff are in Q
-  return prim;
-}
 
 static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
          int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
@@ -2629,12 +2623,13 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
 
   /* test HC precomputation*/
   poly resetppNoether = currRing->ppNoether;
-  if ((IDELEMS(F)>1)
-  && (h!=isHomog)
+  if ((!TEST_V_NOT_TRICKS)
   && (hilb==NULL)
   && (vw==NULL)
   && (newIdeal==0)
   && (sp==NULL)
+  && (IDELEMS(F)>1)
+  && (h!=isHomog)
   && (!id_IsModule(F,currRing))
   && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing))
   && rField_is_Q(currRing)
@@ -2646,6 +2641,27 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
     if (currRing->ppNoether!=NULL) pLmDelete(currRing->ppNoether);
     currRing->ppNoether=resetppNoether;
     return res;
+  }
+  /* test hilbstd */
+  if ((!TEST_V_NOT_TRICKS)
+  && (hilb==NULL)
+  && (vw==NULL)
+  && (newIdeal==0)
+  && (sp==NULL)
+  && (IDELEMS(F)>1)
+  && (currRing->ppNoether==NULL)
+  && (!id_IsModule(F,currRing))
+  && rHasGlobalOrdering(currRing)
+  && (!rIsPluralRing(currRing))
+  && (!rIsLPRing(currRing))
+  && rField_is_Q(currRing)
+  && ((currRing->order[0]==ringorder_M)|| currRing->LexOrder))
+  {
+    ideal result=kTryHilbstd(F,Q);
+    if (result!=NULL)
+    {
+      return result;
+    }
   }
   return kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
 }

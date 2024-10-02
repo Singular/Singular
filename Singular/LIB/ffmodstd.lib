@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version ffmodstd.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version ffmodstd.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
@@ -1692,11 +1692,11 @@ static proc select_the_command(ideal I, list #)
 
 static proc ffmodStdOne(ideal I, list #)
 {
-    // compute std of I using dense univariate rationa interpolation
+    // compute std of I using dense univariate rational interpolation
+    intvec opt=option(get);option(not_tricks);
+    option(redSB);
     int tmp, tmp1, evbd;
     def G_t = basering;
-    intvec opt = option(get);
-    option(redSB);
     list pL;
     if(size(#) > 0)
     {
@@ -1755,6 +1755,7 @@ static proc ffmodStdOne(ideal I, list #)
     }
     setring G_t;
     list bL = imap(S_t, rL);
+    option(set,opt);
     return(bL);
 }
 
@@ -1796,8 +1797,6 @@ SEE ALSO: nfmodStd
 EXAMPLE: example ffmodStd; shows an example
 "
 {
-    intvec opt = option(get);
-    option(redSB); // to obtain the reduced standard basis
     def G_t = basering;
     int n,pa,kr;
     n = nvars(G_t);
@@ -1828,7 +1827,6 @@ EXAMPLE: example ffmodStd; shows an example
         if(finalTest(I,GF[1]))
         {
             attrib(GF[1], "isSB", 1);
-            option(set,opt);
             return(GF[1]);
         }
         else
@@ -1838,6 +1836,9 @@ EXAMPLE: example ffmodStd; shows an example
             return(ffmodStdOne(I, GF[3]+3));
         }
     }
+    intvec opt = option(get);
+    option(not_tricks);
+    option(redSB); // to obtain the reduced standard basis
     I = normalize(I);
     I = scalIdeal(I);
     list L = collect_coeffs(I);
@@ -1907,6 +1908,7 @@ EXAMPLE: example ffmodStd; shows an example
         if(!cd)
         {
             setring G_t;
+            option(set,opt);
             return(imap(StA, Jc));
         }
         else
@@ -1928,6 +1930,7 @@ EXAMPLE: example ffmodStd; shows an example
         if(!cd)
         {
             setring G_t;
+            option(set,opt);
             return(imap(StA, Jc));
         }
         else
@@ -1954,6 +1957,7 @@ EXAMPLE: example ffmodStd; shows an example
     {
         print("FAIL");
         if(rJ[2] < invalue){ rJ[2] = invalue;}
+        option(set,opt);
         return(ffmodStd(I, rJ[2]+3));
     }
 }

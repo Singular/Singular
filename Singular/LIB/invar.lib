@@ -1,6 +1,6 @@
 // Harm Derksen, hderksen@math.unibas.ch
 ////////////////////////////////////////////////////////////////////////////////
-version="version invar.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version invar.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  invar.lib Procedures to compute invariant rings of SL(n) and torus groups
@@ -96,7 +96,9 @@ EXAMPLE: example sympower; shows an example"
         int l=nvars(group);
         ring r=0,(z,x(1..n),g(1..l)),(dp(1),dp(n),dp(l));
         matrix mm=imap(group,m);
+        intvec save_opt=option(get);option(not_tricks);
         ideal gideal=std(imap(group,groupideal));
+        option(set,save_opt);
         matrix vx[n][1]=matrix([x(1..n)]);      // vector (x(1),...,x(n))^T
         poly prodx=prod(x(1..n));               // prodx=x(1)*x(2)*...*x(n)
         matrix w[n][1]=mm*vx;
@@ -252,7 +254,9 @@ NOTE: if the group is SL_n the omega-process is used"
         int l=nvars(group);
         ring r=0,(x(1..n),g(1..l)),(dp(n),dp(l));
         matrix m=imap(group,representation);
+        intvec save_opt=option(get);option(not_tricks);
         ideal gideal=std(imap(group,groupideal));
+        option(set,save_opt);
         matrix vx[n][1]=matrix([x(1..n)]);      // vector (x(1),...,x(n))^T
         poly prodx=prod(x(1..n));               // prodx=x(1)*x(2)*...*x(n)
         matrix w[1][n]=transpose(vx)*m;
@@ -350,7 +354,9 @@ proc torusreynolds(poly f)
         int n=nrows(representation);
         int l=nvars(group);
         ring r=0,(x(1..n),g(1..l)),(dp(n),dp(l));
+        intvec save_opt=option(get);option(not_tricks);
         ideal gideal=std(imap(group,groupideal));
+        option(set,save_opt);
         matrix m=imap(group,representation);
         matrix vx[n][1]=matrix([x(1..n)]);      // vector (x(1),...,x(n))^T
         matrix w[1][n]=transpose(vx)*m;
@@ -376,7 +382,9 @@ EXAMPLE: example finite; shows an example
 {       ring group=0,(g(1),g(2)),dp(2);
         export group;
         ideal groupideal=g(2)^n-1,cyclotomic(n);
+        intvec save_opt=option(get);option(not_tricks);
         groupideal=std(groupideal);
+        option(set,save_opt);
         export groupideal;
         proc reynolds(poly f){return(torusreynolds(f));};
         export reynolds;                        // the procedure torusreynolds

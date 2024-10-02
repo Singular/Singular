@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version nfmodstd.lib 4.1.2.0 Feb_2019 ";  // $Id$
+version="version nfmodstd.lib 4.4.0.6 Oct_2024 ";  // $Id$
 category="Commutative Algebra";
 info="
 
@@ -894,6 +894,7 @@ SEE ALSO: modStd
 EXAMPLE: example nfmodStd; shows an example
 "
 {
+     intvec save_opt=option(get);option(not_tricks);
      list L=#;
      def Rbs=basering;
      poly f;
@@ -917,11 +918,13 @@ EXAMPLE: example nfmodStd; shows an example
          if(typeof(I)=="module")
          {
              def J = modStdparallelized(I,1);
+             option(set,save_opt);
              return(J);
          }
          else
          {
              def J=modStd(I,L);
+             option(set,save_opt);
              return(J);
          }
      }
@@ -964,6 +967,7 @@ EXAMPLE: example nfmodStd; shows an example
      setring Rbs;
      def J=imap(S,J_I);
      J=simplify(J,2);
+     option(set,save_opt);
      return(J);
 }
 example
