@@ -258,7 +258,6 @@ static ideal kTryHilbstd_nonhomog(ideal F, ideal Q)
 
 ideal kTryHilbstd(ideal F, ideal Q)
 {
-  if (TEST_V_NOT_TRICKS) return NULL;
  tHomog h = (tHomog)id_HomIdealDP(F,Q,currRing);
  if (h==(tHomog)TRUE) return kTryHilbstd_homog(F,Q);
  if (h==(tHomog)FALSE) return kTryHilbstd_nonhomog(F,Q);

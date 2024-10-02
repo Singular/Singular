@@ -995,7 +995,7 @@ BOOLEAN id_IsModule(ideal A, const ring src)
   if ((src->VarOffset[0]== -1)
   || (src->pCompIndex<0))
     return FALSE; // ring without components
-  for (int i=0;i<IDELEMS(A);i++)
+  for (int i=IDELEMS(A)-1;i>=0;i--)
   {
     if (A->m[i]!=NULL)
     {

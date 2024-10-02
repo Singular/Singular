@@ -2621,46 +2621,38 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
   if(rIsLPRing(currRing)) return kStdShift(F, Q, h, w, hilb, syzComp, newIdeal, vw, FALSE);
 #endif
 
-  /* test HC precomputation*/
-  poly resetppNoether = currRing->ppNoether;
-  if ((!TEST_V_NOT_TRICKS)
-  && (hilb==NULL)
+  if ((hilb==NULL)
   && (vw==NULL)
   && (newIdeal==0)
   && (sp==NULL)
   && (IDELEMS(F)>1)
-  && (h!=isHomog)
-  && (!id_IsModule(F,currRing))
-  && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing))
-  && rField_is_Q(currRing)
-  && !rIsPluralRing(currRing)
-  && (currRing->ppNoether==NULL))
-  {
-    currRing->ppNoether=kTryHC(F,Q);
-    ideal res=kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
-    if (currRing->ppNoether!=NULL) pLmDelete(currRing->ppNoether);
-    currRing->ppNoether=resetppNoether;
-    return res;
-  }
-  /* test hilbstd */
-  if ((!TEST_V_NOT_TRICKS)
-  && (hilb==NULL)
-  && (vw==NULL)
-  && (newIdeal==0)
-  && (sp==NULL)
-  && (IDELEMS(F)>1)
+  && (!TEST_V_NOT_TRICKS)
   && (currRing->ppNoether==NULL)
-  && (!id_IsModule(F,currRing))
-  && rHasGlobalOrdering(currRing)
-  && (!rIsPluralRing(currRing))
+  && !rIsPluralRing(currRing)
   && (!rIsLPRing(currRing))
-  && rField_is_Q(currRing)
-  && ((currRing->order[0]==ringorder_M)|| currRing->LexOrder))
+  && (!id_IsModule(F,currRing)))
   {
-    ideal result=kTryHilbstd(F,Q);
-    if (result!=NULL)
+    /* test HC precomputation*/
+    if( rField_is_Q(currRing)
+    && (h!=isHomog)
+    && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing)))
     {
-      return result;
+      currRing->ppNoether=kTryHC(F,Q);
+      ideal res=kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
+      if (currRing->ppNoether!=NULL) pLmDelete(currRing->ppNoether);
+      currRing->ppNoether=NULL;
+      return res;
+    }
+    /* test hilbstd */
+    if ( rHasGlobalOrdering(currRing)
+    && rField_is_Q(currRing)
+    && ((currRing->order[0]==ringorder_M)|| currRing->LexOrder))
+    {
+      ideal result=kTryHilbstd(F,Q);
+      if (result!=NULL)
+      {
+        return result;
+      }
     }
   }
   return kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
