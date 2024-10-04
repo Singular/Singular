@@ -2617,6 +2617,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
   && (sp==NULL)
   && (IDELEMS(F)>1)
   && (!TEST_V_NOT_TRICKS)
+  && (!TEST_OPT_SB_1)
   && (currRing->ppNoether==NULL)
   && !rIsPluralRing(currRing)  /*!rIsLPRing already tested above*/
   && (!id_IsModule(F,currRing)))
