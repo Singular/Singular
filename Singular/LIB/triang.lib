@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version triang.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version triang.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets
@@ -771,7 +771,7 @@ EXAMPLE: example triangM; shows an example
             if (k > 1)
             {
                   dbprint(string(timer)+" S"+s+"L"+string(m-l-k)+": Lex. GB von (H + lc) berechnen, naechsten lc reduzieren.");
-                H = std(H + lcr); // Wg. reduce(...,H) oben notwendig.
+                H = std(H, lcr); // Wg. reduce(...,H) oben notwendig.
             }
         }
         else
@@ -940,6 +940,7 @@ EXAMPLE: example triangMH; shows an example
 
                   dbprint(string(timer)+" S"+s+"L"+string(m-l-k)+": Ggt und oberes Dreieckssystem anhaengen.");
                 // Ggt an jede Dreiecksbasis anhaengen.
+		option(not_tricks);
                 for (i = 1; i <= size(Fh); i++)
                 {
                     Fh[i] = std(Fh[i] + G[m-k]);
@@ -970,7 +971,7 @@ EXAMPLE: example triangMH; shows an example
             if (k > 1)
             {
                   dbprint(string(timer)+" S"+s+"L"+string(m-l-k)+": Lex. GB von (H + lc) berechnen, naechsten lc reduzieren.");
-                H = std(H + lcr); // wegen reduce(...,H) oben
+                H = std(H, lcr); // wegen reduce(...,H) oben
             }
         }
         else
