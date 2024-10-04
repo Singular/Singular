@@ -764,9 +764,9 @@ BOOLEAN rHasSimpleLexOrder(const ring r);
 //???? return TRUE if p->exp[r->pOrdIndex] holds total degree of p ???
 
 
-inline BOOLEAN rHasGlobalOrdering(const ring r){ return (r->OrdSgn==1); }
-inline BOOLEAN rHasLocalOrMixedOrdering(const ring r){ return (r->OrdSgn==-1); }
-inline BOOLEAN rHasMixedOrdering(const ring r) { return (r->MixedOrder); }
+static inline BOOLEAN rHasGlobalOrdering(const ring r){ return (r->OrdSgn==1); }
+static inline BOOLEAN rHasLocalOrMixedOrdering(const ring r){ return (r->OrdSgn==-1); }
+static inline BOOLEAN rHasMixedOrdering(const ring r) { return (r->MixedOrder); }
 
 // #define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
 // #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)

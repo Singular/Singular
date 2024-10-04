@@ -2527,23 +2527,13 @@ static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hi
         strat->kModW=kModW=NULL;
         if (h==testHomog)
         {
-            if (strat->ak == 0)
-            {
-              h = (tHomog)idHomIdeal(FCopy,Q);
-              w=NULL;
-            }
-            else if (!TEST_OPT_DEGBOUND)
-            {
-              if (w!=NULL)
-                h = (tHomog)idHomModule(FCopy,Q,w);
-              else
-                h = (tHomog)idHomIdeal(FCopy,Q);
-            }
+          h = (tHomog)idHomIdeal(FCopy,Q);
+          w=NULL;
         }
         currRing->pLexOrder=b;
         if (h==isHomog)
         {
-          if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+          if ((w!=NULL) && (*w!=NULL))
           {
             strat->kModW = kModW = *w;
             if (vw == NULL)
@@ -2628,13 +2618,12 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
   && (IDELEMS(F)>1)
   && (!TEST_V_NOT_TRICKS)
   && (currRing->ppNoether==NULL)
-  && !rIsPluralRing(currRing)
-  && (!rIsLPRing(currRing))
+  && !rIsPluralRing(currRing)  /*!rIsLPRing already tested above*/
   && (!id_IsModule(F,currRing)))
   {
     /* test HC precomputation*/
     if( rField_is_Q(currRing)
-    && (h!=isHomog)
+    && (!rHasGlobalOrdering(currRing))
     && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing)))
     {
       currRing->ppNoether=kTryHC(F,Q);

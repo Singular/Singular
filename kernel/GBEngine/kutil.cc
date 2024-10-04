@@ -10534,8 +10534,7 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
 */
 poly preIntegerCheck(const ideal Forig, const ideal Q)
 {
-  if(!nCoeff_is_Z(currRing->cf))
-    return NULL;
+  assume(nCoeff_is_Z(currRing->cf));
   ideal F = idCopy(Forig);
   idSkipZeroes(F);
   poly pmon;
