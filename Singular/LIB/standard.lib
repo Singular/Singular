@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.4.0.5 Aug_2024 "; // $Id$
+version="version standard.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -61,6 +61,8 @@ EXAMPLE: example stdfglm; shows an example"
     }
   }
 
+  intvec opt = option(get);            //save options
+  option(not_tricks);
   if((s > 0) && (typeof(#[1]) == "string"))
   {
     os = #[1];
@@ -106,7 +108,6 @@ EXAMPLE: example stdfglm; shows an example"
   }
   ideal i = fetch(P,i);
 
-  intvec opt = option(get);            //save options
   option(redSB);
   if (size(algorithm) > 0)
   {
@@ -187,6 +188,7 @@ EXAMPLE: example stdhilb;  shows an example"
 
   //save options:
   intvec gopt = option(get);
+  option(not_tricks);
   int p_opt;
   string s_opt = option();
   if (find(s_opt, "prot"))  { p_opt = 1; }
@@ -933,6 +935,7 @@ EXAMPLE: example groebner;  shows an example"
        ( find(ordstr_P,"M") > 0 )  || ( find(ordstr_P,"a") > 0 )  || neg )
   {
     if (p_opt) { "std in basering"; }
+    option(set,opt);
     return(std(i));
   }
 
@@ -1043,7 +1046,9 @@ EXAMPLE: example groebner;  shows an example"
   if ( algorithm=="mathicgb" )
   {
     if (p_opt) { algorithm + " in " + string(P); }
-    return( mathicgb(i) );
+    i=mathicgb(i);
+    option(set,opt);
+    return(i);
   }
   if ( direct == "yes" )
   {
@@ -1051,12 +1056,16 @@ EXAMPLE: example groebner;  shows an example"
     if ( algorithm=="std" || (algorithm=="stdorslimgb") )                //V2
     {
       if (p_opt) { "std in " + string(P); }
-      return(std(i));
+      i=std(i);
+      option(set,opt);
+      return(i);
     }
   //if( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0)) //V1
     if ( algorithm=="slimgb" )                                           //V2
     {
-      return(qslimgb(i));
+      i=qslimgb(i);
+      option(set,opt);
+      return(i);
     }
   }
 
@@ -1081,12 +1090,16 @@ EXAMPLE: example groebner;  shows an example"
     //if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) ) //V1
       if ( algorithm=="std" || (algorithm=="stdorslimgb") )              //V2
       {
-        return (stdfglm(i,"std"));
+        i=stdfglm(i,"std");
+        option(set,opt);
+        return (i);
       }
     //if(algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0))//V1
       if( algorithm=="slimgb" )                                          //V2
       {
-        return (stdfglm(i,"slimgb"));
+        i=stdfglm(i,"slimgb");
+        option(set,opt);
+        return (i);
       }
     }
     else
@@ -1094,12 +1107,16 @@ EXAMPLE: example groebner;  shows an example"
     //if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )//V1
       if ( algorithm=="std" || (algorithm=="stdorslimgb" ) )            //V2
       {
-        return (stdhilb(i,"std"));
+        i=stdhilb(i,"std");
+        option(set,opt);
+        return (i);
       }
     //if(algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0))//V1
       if ( algorithm=="slimgb" )                                         //V2
       {
-        return (stdhilb(i,"slimgb"));
+        i=stdhilb(i,"slimgb");
+        option(set,opt);
+        return (i);
       }
     }
   }
@@ -1137,7 +1154,7 @@ EXAMPLE: example groebner;  shows an example"
     //block. Therefore we use always hilb for this block ordering:
     if ( conversion=="fglm" )
     {
-      i = (stdfglm(i));       //only useful for 1 parameter with minpoly
+      i = stdfglm(i);       //only useful for 1 parameter with minpoly
     }
     else
     {

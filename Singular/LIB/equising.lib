@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-version="version equising.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version equising.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -616,8 +616,6 @@ static proc make_ring_small(ideal J)
 
 static proc esComputation (int typ, poly p_F, list #)
 {
-  intvec ov=option(get);  // store options set at beginning
-  option(redSB);
   // Initialize variables
   int branch=1;
   int blowup=1;
@@ -639,12 +637,10 @@ static proc esComputation (int typ, poly p_F, list #)
     print("family is trivial (no deformation parameters)!");
     if (typ==1) //isEquising
     {
-      option(set,ov);
       return(1);
     }
     else
     {
-      option(set,ov);
       return(list(ideal(0),0));
     }
   }
@@ -661,12 +657,10 @@ static proc esComputation (int typ, poly p_F, list #)
         print("No computation performed !");
         if (typ==1) //isEquising
         {
-          option(set,ov);
           return(1);
         }
         else
         {
-          option(set,ov);
           return(list(ideal(0),int(1)));
         }
       }
@@ -686,6 +680,8 @@ static proc esComputation (int typ, poly p_F, list #)
       }
     }
   }
+  intvec ov=option(get);  // store options
+  option(redSB);
   int ring_is_changed;
   def old_ring=basering;
   if(defined(@L)<=0)
@@ -904,7 +900,6 @@ static proc esComputation (int typ, poly p_F, list #)
     auxVar=auxVar+1;
     upper_bound[counter]=counter+M[2][blowup+1,counter]-1;
     counter=counter+M[2][blowup+1,counter];
-
   }
 
   list LeadDataFm=determine_coef(Fm);
@@ -1091,6 +1086,7 @@ static proc esComputation (int typ, poly p_F, list #)
       Jtriv=subst(Jtriv,b(i),0);
     }
   }
+  option(not_tricks);
   Jtriv=std(Jtriv);
 
 
