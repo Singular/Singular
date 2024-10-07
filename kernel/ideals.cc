@@ -3449,7 +3449,7 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
   return TTT;
 }
 
-ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
+ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal, BOOLEAN isSB)
 {
   if(idIs0(J))
   {
@@ -3466,6 +3466,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
      k=1;
      return(res);
   }
+  BITSET save_opt;SI_SAVE_OPT2(save_opt);
   //if (idElem(J)==1)
   //{
   //  idSkipZeroes(J);
@@ -3494,6 +3495,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
     ideal Iquot,Istd;
     intvec *w=NULL;
     Istd=id_Satstd(I,J,currRing);
+    si_opt_2|=Sy_bit(V_NOT_TRICKS);
     k=0;
     loop
     {
@@ -3517,6 +3519,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   //iiWriteMatrix((matrix)J,"J",1,currRing,0); PrintLn();
   //iiWriteMatrix((matrix)Istd,"res",1,currRing,0);PrintLn();
   //id_Delete(&Istd,currRing);
+    SI_RESTORE_OPT2(save_opt);
     return Istd;
   }
   //--------------------------------------------------
@@ -3527,7 +3530,9 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   loop
   {
     k++;
-    Iquot=idQuot(Istd,J,FALSE,isIdeal);
+    Iquot=idQuot(Istd,J,isSB,isIdeal);
+    isSB=FALSE;
+    si_opt_2|=Sy_bit(V_NOT_TRICKS); // used from 2nd loop on
     ideal tmp=kNF(Istd,currRing->qideal,Iquot,5);
     int  elem=idElem(tmp);
     id_Delete(&tmp,currRing);
@@ -3538,6 +3543,7 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
   k--;
   Istd=kStd(Iquot,currRing->qideal,testHomog,&w);
   idSkipZeroes(Istd);
+  SI_RESTORE_OPT2(save_opt);
   //if (only_vars)
   //{
   //  iiWriteMatrix((matrix)Istd,"org",1,currRing,0);
