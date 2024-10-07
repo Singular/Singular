@@ -836,6 +836,7 @@ EXAMPLE: example triangMH; shows an example
     option(redSB);
     option(redTail);
     option(returnSB);
+    option(not_tricks);
 
     list F,Fh;       // Ergebnislisten
     int nG = size(G);
