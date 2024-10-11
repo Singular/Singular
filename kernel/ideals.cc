@@ -3449,7 +3449,7 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
   return TTT;
 }
 
-ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal, BOOLEAN isSB)
+ideal idSaturate_intern(ideal I, ideal J, int &k, BOOLEAN isIdeal, BOOLEAN isSB)
 {
   if(idIs0(J))
   {
@@ -3549,6 +3549,14 @@ ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal, BOOLEAN isSB)
   //  iiWriteMatrix((matrix)Istd,"org",1,currRing,0);
   //}
   return Istd;
+}
+ideal idSaturate(ideal I, ideal J, int &k, BOOLEAN isIdeal)
+{
+ return idSaturate_intern(I,J,k,isIdeal,FALSE);
+}
+ideal idSaturateGB(ideal I, ideal J, int &k, BOOLEAN isIdeal)
+{
+ return idSaturate_intern(I,J,k,isIdeal,TRUE);
 }
 
 ideal id_Homogenize(ideal I, int var_num, const ring r)

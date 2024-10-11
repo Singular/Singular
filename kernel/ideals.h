@@ -203,7 +203,9 @@ ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // imag
 
 ideal id_Satstd(const ideal I, ideal J, const ring r);
 ideal id_Sat_principal(const ideal I, ideal J, const ring r);
-ideal idSaturate(ideal I, ideal J, int &ki, BOOLEAN isIdeal=TRUE, BOOLEAN isSB=FALSE);
+ideal idSaturate_intern(ideal I, ideal J, int &ki, BOOLEAN isIdeal, BOOLEAN isSB);
+ideal idSaturate(ideal I, ideal J, int &ki, BOOLEAN isIdeal=TRUE);
+ideal idSaturateGB(ideal I, ideal J, int &ki, BOOLEAN isIdeal=TRUE);
 ideal id_Homogenize(ideal I, int var_num, const ring r);
 ideal id_HomogenizeW(ideal I, int var_num, intvec *w,const ring r);
 

@@ -1549,7 +1549,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       ideal I= (ideal)h->Data();
       ideal J=(ideal)h->next->Data();
       int k;
-      ideal S=idSaturate(I,J,k,h->Typ()==IDEAL_CMD,hasFlag(h,FLAG_STD));
+      ideal S=idSaturate_intern(I,J,k,h->Typ()==IDEAL_CMD,hasFlag(h,FLAG_STD));
       res->rtyp=h->Typ();
       res->data=(void*)S;
       setFlag(res,FLAG_STD);
@@ -4118,7 +4118,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ideal I= (ideal)h->Data();
       ideal J=(ideal)h->next->Data();
       int k;
-      ideal S=idSaturate(I,J,k,h->Typ()==IDEAL_CMD,hasFlag(h,FLAG_STD));
+      ideal S=idSaturate_intern(I,J,k,h->Typ()==IDEAL_CMD,hasFlag(h,FLAG_STD));
       lists L = (lists)omAllocBin(slists_bin);
       L->Init(2);
       L->m[0].rtyp = h->Typ(); L->m[0].data=(void*)S; // ideal or module
