@@ -88,6 +88,7 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q)
 {
   // create Zp_ring
   ring save_ring=currRing;
+  BITSET save_opt;SI_SAVE_OPT1(save_opt);
   int prim=kFindLuckyPrime(F,Q);
   coeffs cf=nInitChar(n_Zp, (void*)(long)prim);
   ring Zp_ring=rDefault(cf,save_ring->N,save_ring->names,ringorder_dp);
@@ -99,6 +100,8 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q)
   ideal QQ=NULL;
   if (Q!=NULL) QQ=id_PermIdeal(Q,1,IDELEMS(Q),NULL,save_ring,Zp_ring,nMap,NULL,0,0);
   // compute GB in Zp_ring
+  si_opt_1&= ~Sy_bit(OPT_REDSB);
+  si_opt_1&= ~Sy_bit(OPT_REDTAIL);
   if(TEST_OPT_PROT) PrintS("std in charp  ------------------\n");
   ideal GB=kStd(FF,QQ,(tHomog)TRUE,NULL,NULL,0,0,NULL,NULL);
   // compute hilb
@@ -112,6 +115,7 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q)
   // std with hilb
   intvec *w=NULL;
   if(TEST_OPT_PROT) PrintS("stdhilb in basering  ------------------\n");
+  SI_RESTORE_OPT1(save_opt);
   ideal result=kStd(F,Q,(tHomog)TRUE,&w,hilb);
   if (w!=NULL) delete w;
   delete hilb;
@@ -123,6 +127,7 @@ static ideal kTryHilbstd_nonhomog(ideal F, ideal Q)
   if(TEST_OPT_PROT) PrintS("std in charp, homogenized ------------------\n");
   // create Zp_ring, need 1 more variable
   ring save_ring=currRing;
+  BITSET save_opt;SI_SAVE_OPT1(save_opt);
   coeffs cf=nInitChar(n_Zp, (void*)(long)32003);
   char **names=(char**)omAlloc0((currRing->N+1) * sizeof(char *));
   for(int i=0;i<currRing->N;i++)
@@ -149,6 +154,8 @@ static ideal kTryHilbstd_nonhomog(ideal F, ideal Q)
     QQ=tmp;
   }
   // compute GB in Zp_ring
+  si_opt_1&= ~Sy_bit(OPT_REDSB);
+  si_opt_1&= ~Sy_bit(OPT_REDTAIL);
   ideal GB=kStd(FF,QQ,(tHomog)TRUE,NULL,NULL,0,0,NULL,NULL);
   // compute hilb
   bigintmat* hilb=hFirstSeries0b(GB,QQ,NULL,NULL,Zp_ring,coeffs_BIGINT);
@@ -239,6 +246,7 @@ static ideal kTryHilbstd_nonhomog(ideal F, ideal Q)
   id_Delete(&tmp,Q_ring);
   rDelete(Q_ring);
   //omFreeBin(Q_ring,sip_sring_bin);
+  SI_RESTORE_OPT1(save_opt);
   int dummy;
   if (TEST_OPT_REDSB)
   {
