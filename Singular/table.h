@@ -287,8 +287,8 @@ const struct sValCmd1 dArith1[]=
 ,{D(jjSYZYGY),     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_NC |ALLOW_RING |NO_LRING}
 ,{D(jjENVELOPE),   ENVELOPE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
 ,{D(jjOPPOSITE),   OPPOSITE_CMD,    RING_CMD,       RING_CMD      , ALLOW_PLURAL |NO_RING}
-,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
-,{D(jjTWOSTD),     TWOSTD_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_LP |ALLOW_RING}
+,{D(jjTWOSTD),     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD     , ALLOW_NC |NO_RING}
+,{D(jjTWOSTD),     TWOSTD_CMD,      MODUL_CMD,      MODUL_CMD     , ALLOW_LP |NO_RING}
 //,{  jjWRONG ,      TRACE_CMD,       0,              INTVEC_CMD    , ALLOW_NC |ALLOW_RING}
 //,{  jjWRONG ,      TRACE_CMD,       0,              IDEAL_CMD     , ALLOW_NC |ALLOW_RING}
 ,{D(jjTRACE_IV),   TRACE_CMD,       INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING|NO_CONVERSION}
@@ -933,7 +933,7 @@ const struct sValCmd3 dArith3[]=
 ,{NULL_VAL,            0,          0,          0,          0,          0        , NO_NC |NO_RING}
 };
 /*=================== operations with many arg.: table =================*/
-/* number_of_args:  -1: any, -2: any >0, 1: 1, 2: 2, .. */
+/* number_of_args:  -1: any, -2: any >0, 0: 0, 1: 1, 2: 2, .. */
 const struct sValCmdM dArithM[]=
 {
 // operations:
@@ -941,7 +941,7 @@ const struct sValCmdM dArithM[]=
  {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjRING_PL),   '[',             RING_CMD,           -2      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL1ARG),  BIGINTVEC_CMD,   BIGINTVEC_CMD,       1       , ALLOW_NC |ALLOW_RING}
-,{D(jjBIGINTVEC_PL), BIGINTVEC_CMD,BIGINTVEC_CMD,      -2      , ALLOW_NC |ALLOW_RING}
+,{D(jjBIGINTVEC_PL), BIGINTVEC_CMD,BIGINTVEC_CMD,      -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_NC |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_NC |ALLOW_RING}
 ,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_NC |ALLOW_RING}
@@ -968,7 +968,7 @@ const struct sValCmdM dArithM[]=
 ,{D(jjCALL3ARG),  INTERSECT_CMD,   IDEAL_CMD,          3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjINTERSECT_PL),INTERSECT_CMD, IDEAL_CMD,          -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL1ARG),  INTVEC_CMD,      INTVEC_CMD,         1       , ALLOW_NC |ALLOW_RING}
-,{D(jjINTVEC_PL), INTVEC_CMD,      INTVEC_CMD,         -2      , ALLOW_NC |ALLOW_RING}
+,{D(jjINTVEC_PL), INTVEC_CMD,      INTVEC_CMD,         -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL2ARG),  JET_CMD,         POLY_CMD,/*or set by p*/ 2  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  JET_CMD,         POLY_CMD,/*or set by p*/ 3  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjJET4),      JET_CMD,         POLY_CMD,/*or set by p*/ 4  , ALLOW_PLURAL |ALLOW_RING}

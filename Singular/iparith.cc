@@ -7463,9 +7463,8 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
 //}
 static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
 {
-  int s=1;
   leftv h=v;
-  if (h!=NULL) s=exprlist_length(h);
+  int s=exprlist_length(h);
   ideal id=idInit(s,1);
   int rank=1;
   int i=0;
@@ -7868,9 +7867,8 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
 }
 static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 {
-  int i=0;
   leftv h=v;
-  if (h!=NULL) i=exprlist_length(h);
+  int i=exprlist_length(h);
   intvec *iv=new intvec(i);
   i=0;
   while (h!=NULL)

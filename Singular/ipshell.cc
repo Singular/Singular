@@ -3296,6 +3296,12 @@ BOOLEAN kWeight(leftv res,leftv id)
   s = F->m;
   sl = IDELEMS(F) - 1;
   n = rVar(currRing);
+  if (sl==-1)
+  {
+    for(int i=0;i<n;i++) (*iv)[i]=1;
+    return FALSE;
+  }
+
   double wNsqr = (double)2.0 / (double)n;
   wFunctional = wFunctionalBuch;
   x = (int * )omAlloc(2 * (n + 1) * sizeof(int));

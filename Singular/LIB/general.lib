@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version general.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version general.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -920,6 +920,8 @@ EXAMPLE:  example sum; shows an example
       ideal i = ideal(matrix(id));
       kill id;
       ideal id = simplify(i,2);                      //delete 0 entries
+      if (ty=="module") {vector Summe;}
+      else {poly Summe;}
    }
    if( ty=="int" or ty=="intvec" or ty=="intmat" )
    {                                                 //case: id = intvec
@@ -928,7 +930,9 @@ EXAMPLE:  example sum; shows an example
       intvec i = S[1..nrows(S),1..ncols(S)];
       kill id;
       intvec id = i;
+      int Summe;
    }
+   if(ty=="number") {number Summe;}
 //------------------- consider intvec v and empty sum  -----------------------
    if( tt!=0 )
    {
@@ -948,8 +952,12 @@ EXAMPLE:  example sum; shows an example
    { return( lsum(n div 2,list(id[1..(n div 2)])) + lsum(n-n div 2, list(id[(n div 2+1)..n])) );
    }
    else
-   { def Summe=id[1];
-     for (int lauf=2;lauf<=n;lauf++)
+   {
+     if(!defined(Summe))
+     { if(n>0) {def Summe=id[1];Summe=0;}
+       else {return(0);}
+     }
+     for (int lauf=1;lauf<=n;lauf++)
      { Summe=Summe+id[lauf];
      }
      return(Summe);

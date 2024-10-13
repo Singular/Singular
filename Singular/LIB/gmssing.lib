@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version gmssing.lib 4.1.2.0 Feb_2019 "; // $Id$
+version="version gmssing.lib 4.4.0.6 Oct_2024 "; // $Id$
 category="Singularities";
 
 info="
@@ -1507,7 +1507,7 @@ EXAMPLE: example spmul; shows examples
       }
       if(typeof(#[2])=="intvec")
       {
-        list sp0=list(ideal(),intvec(0));
+        list sp0=list(ideal(0),intvec(0));
         for(int i=size(#[2]);i>=1;i--)
         {
           sp0=spadd(sp0,spmul(#[1][i],#[2][i]));

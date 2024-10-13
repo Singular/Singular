@@ -154,22 +154,22 @@ void id_Delete (ideal * h, ring r)
 
 void id_Delete0 (ideal * h, ring r)
 {
-  const long elems = IDELEMS(*h);
+  long j = IDELEMS(*h);
 
- assume( (*h)->m != NULL );
+  if(j>0)
+  {
+    do
+    {
+      j--;
+      poly pp=((*h)->m[j]);
+      if (pp!=NULL) p_Delete(&pp, r);
+    }
+    while (j>0);
+    omFree((ADDRESS)((*h)->m));
+  }
 
- long j = elems;
- do
- {
-   j--;
-   poly pp=((*h)->m[j]);
-   if (pp!=NULL) p_Delete(&pp, r);
- }
- while (j>0);
-
- omFree((ADDRESS)((*h)->m));
- omFreeBin((ADDRESS)*h, sip_sideal_bin);
- *h=NULL;
+  omFreeBin((ADDRESS)*h, sip_sideal_bin);
+  *h=NULL;
 }
 
 
