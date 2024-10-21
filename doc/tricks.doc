@@ -101,7 +101,9 @@ definitions.
 @cindex verifyGB
 @cindex farey
 @item
-parallelization (like @code{modStd}) and
+parallelization (like @code{modStd}) can not
+use more than SIPC_MAX_SEMAPHORES (512) cpus. This limit can be changed in the source file @code{Singular/links/simpleipc.h}.
+@item
 @code{vspace}, used in @code{system("verifyGB",I)} and @code{farey} can not
 use more than MAX_PROCESS (64) cpus. This limit can be changed in the source file @code{kernel/oswrapper/vspace.h}.
 @end itemize

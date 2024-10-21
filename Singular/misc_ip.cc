@@ -1444,9 +1444,7 @@ void siInit(char *name)
     #elif defined(_SC_NPROCESSORS_CONF)
     if ((cpu_n=sysconf(_SC_NPROCESSORS_CONF))>cpus) cpus=cpu_n;
     #endif
-    #ifdef HAVE_VSPACE
-    if (cpus>vspace::internals::MAX_PROCESS) cpus=vspace::internals::MAX_PROCESS;
-    #endif
+    if (cpus>SIPC_MAX_SEMAPHORES) cpus=SIPC_MAX_SEMAPHORES;
     char *env_cpu=getenv("SINGULAR_CPUS");
     if (env_cpu!=NULL)
     {
