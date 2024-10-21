@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version grobcov.lib 4.2.0  February_2021 "; // $Id$;
+version="version grobcov.lib 4.4.0.6  Oct_2024 "; // $Id$;
            // version N12;  February 2021;
 
 info="
@@ -2737,6 +2737,7 @@ NOTE:    The basering R, must be of the form Q[a][x],
 KEYWORDS: Groebner cover; parametric ideal; canonical; discussion of parametric ideal
 EXAMPLE:  grobcov; shows an example"
 {
+  intvec save_opt=option(get);option(not_tricks);
   list S; int i; int ish=1; list GBR; list BR; int j; int k;
   ideal idp; ideal idq; int s; ideal ext; list SS;
   ideal E; ideal N; int canop;  int extop; int repop;
@@ -2838,6 +2839,7 @@ EXAMPLE:  grobcov; shows an example"
     string("Time in grobcov = ", timer-start);
     string("Number of segments of grobcov = ", size(S));
   }
+  option(set,save_opt);
   return(S);
 }
 example
