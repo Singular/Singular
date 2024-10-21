@@ -837,7 +837,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
   int m;  // Anzahl der Exponentvektoren im i-ten Polynom (gls->m)[i] des Ideals gls
   int idelem= IDELEMS(gls);
   ideal id;
-  poly p,pid;
+  poly p,pid=NULL;
   int * vert;
 
   n= (currRing->N);
@@ -861,7 +861,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
         {
           pNext(pid)= pHead(p);
           pIter(pid);
-          pNext(pid)= NULL;
+          //pNext(pid)= NULL;// done by pHead
         }
         mprSTICKYPROT(ST_SPARSE_VADD);
       }

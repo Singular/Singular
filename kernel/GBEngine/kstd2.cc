@@ -3010,8 +3010,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 #endif
 
   ideal F1 = F0;
-  ring sRing, currRingOld;
-  currRingOld  = currRing;
+  ring currRingOld = currRing;
+  ring sRing = currRing;
   if (strat->sbaOrder == 1 || strat->sbaOrder == 3)
   {
     sRing = sbaRing(strat);
