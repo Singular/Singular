@@ -69,7 +69,6 @@ VAR link_list ssiToBeClosed=NULL;
 VAR volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
 // forward declarations:
-static void ssiWriteIdeal(const ssiInfo *d, int typ,const ideal I);
 static void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r);
 static void ssiWriteIdeal_R(const ssiInfo *d, int typ,const ideal I, const ring r);
 static poly ssiReadPoly_R(const ssiInfo *D, const ring r);
@@ -410,7 +409,7 @@ static void ssiWriteIdeal_R(const ssiInfo *d, int typ,const ideal I, const ring 
      ssiWritePoly_R(d,tt,I->m[i],R);
    }
 }
-static void ssiWriteIdeal(const ssiInfo *d, int typ,const ideal I)
+void ssiWriteIdeal(const ssiInfo *d, int typ,const ideal I)
 {
   ssiWriteIdeal_R(d,typ,I,d->r);
 }
@@ -765,7 +764,7 @@ static ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
   return I;
 }
 
-static ideal ssiReadIdeal(ssiInfo *d)
+ideal ssiReadIdeal(ssiInfo *d)
 {
   return ssiReadIdeal_R(d,d->r);
 }

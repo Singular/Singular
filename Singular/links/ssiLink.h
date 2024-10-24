@@ -24,4 +24,8 @@ void sig_chld_hdl(int sig);
 int ssiReservePort(int clients);
 
 void singular_close_links();
+
+// for use in kstdhelper
+ideal ssiReadIdeal(ssiInfo *d);
+void ssiWriteIdeal(const ssiInfo *d, int typ,const ideal I);
 #endif
