@@ -4076,7 +4076,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         poly p=(poly)h->Data();
         ideal q=(ideal)h->next->Data();
-        res->data=p_CoeffTermMo(p,q,p_MaxComp(p,currRing),currRing);
+        res->data=p_CoeffTermMo(p,q,currRing);
         res->rtyp=VECTOR_CMD;
         return FALSE;
       }

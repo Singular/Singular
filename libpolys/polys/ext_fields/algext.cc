@@ -86,8 +86,6 @@ static void     naPower(number a, int exp, number *b, const coeffs cf);
 static number   naCopy(number a, const coeffs cf);
 static void     naWriteLong(number a, const coeffs cf);
 static void     naWriteShort(number a, const coeffs cf);
-static number   naGetDenom(number &a, const coeffs cf);
-static number   naGetNumerator(number &a, const coeffs cf);
 static number   naGcd(number a, number b, const coeffs cf);
 static void     naDelete(number *a, const coeffs cf);
 static void     naCoeffWrite(const coeffs cf, BOOLEAN details);

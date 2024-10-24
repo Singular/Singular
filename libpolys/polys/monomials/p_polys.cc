@@ -3589,7 +3589,7 @@ void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
 
   while(p != NULL)
   {
-    while (__p_GetComp(p,r) == comp)
+    while (__p_GetComp(p,r) == (unsigned long)comp)
     {
       pNext(q) = p;
       pIter(q);

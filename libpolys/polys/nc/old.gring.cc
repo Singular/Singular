@@ -121,7 +121,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2/*, poly spNoether*/, const ring r
 
 
 
-static void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c, BOOLEAN reduce);
+static void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c, BOOLEAN);
 static void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c, BOOLEAN reduce);
 
 void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c);
@@ -1945,7 +1945,7 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   kBucket_Add_q(b,pp,&l);
 }
 
-void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c, BOOLEAN reduce)
+static void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c, BOOLEAN)
 {
   const ring r = b->bucket_ring;
 #ifdef PDEBUG

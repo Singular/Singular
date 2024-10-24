@@ -22,7 +22,7 @@ LinearDependencyMatrix::LinearDependencyMatrix (unsigned n, unsigned long p)
   this->p = p;
 
   matrix = new unsigned long *[n];
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
   {
     matrix[i] = new unsigned long[2 * n + 1];
   }
@@ -36,7 +36,7 @@ LinearDependencyMatrix::~LinearDependencyMatrix ()
   delete[]tmprow;
   delete[]pivots;
 
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
   {
     delete[](matrix[i]);
   }
@@ -50,7 +50,7 @@ void LinearDependencyMatrix::resetMatrix ()
 
 int LinearDependencyMatrix::firstNonzeroEntry (unsigned long *row)
 {
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
     if(row[i] != 0)
       return i;
 
@@ -59,7 +59,7 @@ int LinearDependencyMatrix::firstNonzeroEntry (unsigned long *row)
 
 void LinearDependencyMatrix::reduceTmpRow ()
 {
-  for(int i = 0; i < rows; i++)
+  for(unsigned long i = 0; i < rows; i++)
   {
     unsigned piv = pivots[i];
     unsigned x = tmprow[piv];
@@ -67,7 +67,7 @@ void LinearDependencyMatrix::reduceTmpRow ()
     if(x != 0)
     {
       // subtract tmprow[i] times the i-th row
-      for(int j = piv; j < n + rows + 1; j++)
+      for(unsigned j = piv; j < n + rows + 1; j++)
       {
         if (matrix[i][j] != 0)
         {
@@ -89,7 +89,7 @@ void LinearDependencyMatrix::normalizeTmp (unsigned i)
 {
   unsigned long inv = modularInverse (tmprow[i], p);
   tmprow[i] = 1;
-  for(int j = i + 1; j < 2 * n + 1; j++)
+  for(unsigned long j = i + 1; j < 2 * n + 1; j++)
     tmprow[j] = multMod (tmprow[j], inv, p);
 }
 
@@ -97,7 +97,7 @@ bool LinearDependencyMatrix::findLinearDependency (unsigned long *newRow,
                                                    unsigned long *dep)
 {
   // Copy newRow to tmprow (we need to add RHS)
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
   {
     tmprow[i] = newRow[i];
     tmprow[n + i] = 0;
@@ -112,7 +112,7 @@ bool LinearDependencyMatrix::findLinearDependency (unsigned long *newRow,
   unsigned newpivot = firstNonzeroEntry (tmprow);
   if(newpivot == -1)
   {
-    for(int i = 0; i <= n; i++)
+    for(unsigned long i = 0; i <= n; i++)
     {
       dep[i] = tmprow[n + i];
     }
@@ -123,7 +123,7 @@ bool LinearDependencyMatrix::findLinearDependency (unsigned long *newRow,
   {
     normalizeTmp (newpivot);
 
-    for(int i = 0; i < 2 * n + 1; i++)
+    for(unsigned long i = 0; i < 2 * n + 1; i++)
     {
       matrix[rows][i] = tmprow[i];
     }
@@ -184,7 +184,7 @@ NewVectorMatrix::NewVectorMatrix (unsigned n, unsigned long p)
   this->p = p;
 
   matrix = new unsigned long *[n];
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
   {
     matrix[i] = new unsigned long[n];
   }
@@ -193,7 +193,7 @@ NewVectorMatrix::NewVectorMatrix (unsigned n, unsigned long p)
 
   nonPivots = new unsigned[n];
 
-  for (int i = 0; i < n; i++)
+  for (unsigned long i = 0; i < n; i++)
   {
      nonPivots[i] = i;
   }
@@ -206,7 +206,7 @@ NewVectorMatrix::~NewVectorMatrix ()
   delete nonPivots;
   delete pivots;
 
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
   {
     delete[]matrix[i];
   }
@@ -215,7 +215,7 @@ NewVectorMatrix::~NewVectorMatrix ()
 
 int NewVectorMatrix::firstNonzeroEntry (unsigned long *row)
 {
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
     if(row[i] != 0)
       return i;
 
@@ -227,7 +227,7 @@ void NewVectorMatrix::normalizeRow (unsigned long *row, unsigned i)
   unsigned long inv = modularInverse (row[i], p);
   row[i] = 1;
 
-  for(int j = i + 1; j < n; j++)
+  for(unsigned long j = i + 1; j < n; j++)
   {
     row[j] = multMod (row[j], inv, p);
   }
@@ -235,7 +235,7 @@ void NewVectorMatrix::normalizeRow (unsigned long *row, unsigned i)
 
 void NewVectorMatrix::insertRow (unsigned long *row)
 {
-  for(int i = 0; i < rows; i++)
+  for(unsigned long i = 0; i < rows; i++)
   {
     unsigned piv = pivots[i];
     unsigned x = row[piv];
@@ -253,7 +253,7 @@ void NewVectorMatrix::insertRow (unsigned long *row)
         smallestNonPivIndex++;
       }
 
-      for (int j = smallestNonPivIndex; j < n-rows; j++)
+      for (unsigned long j = smallestNonPivIndex; j < n-rows; j++)
       {
         unsigned ind = nonPivots[j];
         if (matrix[i][ind] != 0)
@@ -277,20 +277,20 @@ void NewVectorMatrix::insertRow (unsigned long *row)
     // Normalize and insert row into the matrix.
     // Then reduce upwards.
     normalizeRow (row, piv);
-    for(int i = 0; i < n; i++)
+    for(unsigned long i = 0; i < n; i++)
     {
       matrix[rows][i] = row[i];
     }
 
 
-    for (int i = 0; i < rows; i++)
+    for (unsigned long i = 0; i < rows; i++)
     {
       unsigned x = matrix[i][piv];
       // if the corresponding entry in the matrix is zero,
       // there is nothing to do
       if (x != 0)
       {
-        for (int j = piv; j < n; j++)
+        for (unsigned long j = piv; j < n; j++)
         {
           if (row[j] != 0)
           {
@@ -309,12 +309,12 @@ void NewVectorMatrix::insertRow (unsigned long *row)
     pivots[rows] = piv;
 
     // update nonPivots
-    for (int i = 0; i < n-rows; i++)
+    for (unsigned long i = 0; i < n-rows; i++)
     {
       if (nonPivots[i] == piv)
       {
         // shift everything one position to the left
-        for (int j = i; j < n-rows-1; j++)
+        for (unsigned long j = i; j < n-rows-1; j++)
         {
           nonPivots[j] = nonPivots[j+1];
         }
@@ -330,7 +330,7 @@ void NewVectorMatrix::insertRow (unsigned long *row)
 
 void NewVectorMatrix::insertMatrix (LinearDependencyMatrix & mat)
 {
-  for(int i = 0; i < mat.rows; i++)
+  for(unsigned i = 0; i < mat.rows; i++)
   {
     insertRow (mat.matrix[i]);
   }
@@ -343,10 +343,10 @@ int NewVectorMatrix::findSmallestNonpivot ()
   if(rows == n)
     return -1;
 
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
   {
     bool isPivot = false;
-    for(int j = 0; j < rows; j++)
+    for(unsigned j = 0; j < rows; j++)
     {
       if(pivots[j] == i)
       {
@@ -369,10 +369,10 @@ int NewVectorMatrix::findLargestNonpivot ()
   if(rows == n)
     return -1;
 
-  for(int i = n-1; i >= 0; i--)
+  for(unsigned long i = n-1; i >= 0; i--)
   {
     bool isPivot = false;
-    for(int j = 0; j < rows; j++)
+    for(unsigned j = 0; j < rows; j++)
     {
       if(pivots[j] == i)
       {
@@ -396,10 +396,10 @@ void vectorMatrixMult (unsigned long *vec, unsigned long **mat,
 {
   unsigned long tmp;
 
-  for(int i = 0; i < n; i++)
+  for(unsigned long i = 0; i < n; i++)
   {
     result[i] = 0;
-    for(int j = 0; j < nonzeroCounts[i]; j++)
+    for(unsigned j = 0; j < nonzeroCounts[i]; j++)
     {
       tmp = multMod (vec[nonzeroIndices[i][j]], mat[nonzeroIndices[i][j]][i], p);
       result[i] += tmp;
@@ -436,7 +436,7 @@ unsigned long *computeMinimalPolynomial (unsigned long **matrix, unsigned n,
   unsigned long *tmp = new unsigned long[n + 1];
 
   // initialize result = 1
-  for(int i = 0; i <= n; i++)
+  for(unsigned long i = 0; i <= n; i++)
   {
     result[i] = 0;
   }
@@ -449,11 +449,11 @@ unsigned long *computeMinimalPolynomial (unsigned long **matrix, unsigned n,
   // This has a huge impact on spares matrices.
   unsigned* nonzeroCounts = new unsigned[n];
   unsigned** nonzeroIndices = new unsigned*[n];
-  for (int i = 0; i < n; i++)
+  for (unsigned long i = 0; i < n; i++)
   {
     nonzeroIndices[i] = new unsigned[n];
     nonzeroCounts[i] = 0;
-    for (int j = 0; j < n; j++)
+    for (unsigned long j = 0; j < n; j++)
     {
       if (matrix[j][i] != 0)
       {
@@ -471,7 +471,7 @@ unsigned long *computeMinimalPolynomial (unsigned long **matrix, unsigned n,
   unsigned loopsEven = true;
   while(i != -1)
   {
-    for(int j = 0; j < n; j++)
+    for(unsigned long j = 0; j < n; j++)
     {
       vec[j] = 0;
     }
@@ -515,7 +515,7 @@ unsigned long *computeMinimalPolynomial (unsigned long **matrix, unsigned n,
       // otherwise, we have to compute the lcm of mpvec and prior result
 
       // tmp = zeropol
-      for(int j = 0; j <= n; j++)
+      for(unsigned long j = 0; j <= n; j++)
       {
         tmp[j] = 0;
       }
@@ -552,7 +552,7 @@ unsigned long *computeMinimalPolynomial (unsigned long **matrix, unsigned n,
     loopsEven = !loopsEven;
   }
 
-  for (int i = 0; i < n; i++)
+  for (unsigned long i = 0; i < n; i++)
   {
     delete[] nonzeroIndices[i];
   }
@@ -601,7 +601,7 @@ void quo (unsigned long *a, unsigned long *q, unsigned long p, int &dega,
   unsigned long *result = new unsigned long[degres + 1];
 
   // initialize to zero
-  for (int i = 0; i <= degres; i++)
+  for (unsigned i = 0; i <= degres; i++)
   {
     result[i] = 0;
   }
@@ -628,12 +628,12 @@ void quo (unsigned long *a, unsigned long *q, unsigned long p, int &dega,
   }
 
   // copy result into a
-  for(int i = 0; i <= degres; i++)
+  for(unsigned i = 0; i <= degres; i++)
   {
     a[i] = result[i];
   }
   // set all following entries of a to zero
-  for(int i = degres + 1; i <= degq + degres; i++)
+  for(unsigned i = degres + 1; i <= degq + degres; i++)
   {
     a[i] = 0;
   }
