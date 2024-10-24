@@ -3426,6 +3426,7 @@ static void rSetOption(ring r)
   if ( (r->cf->extRing!=NULL)
       || rField_is_Q(r)
       || rField_is_Ring(r)
+      || (((int)getCoeffType(r->cf))>16) /* OSCAR types*/
   )
     r->options |= Sy_bit(OPT_INTSTRATEGY);
   else
