@@ -2428,7 +2428,7 @@ long kHomModDeg(poly p,const ring r)
   return j+(*kModW)[i-1];
 }
 
-static ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
+ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
          int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
   assume(!idIs0(F));
@@ -2616,7 +2616,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
   && (newIdeal==0)
   && (sp==NULL)
   && (IDELEMS(F)>1)
-  && (!TEST_V_NOT_TRICKS)
   && (!TEST_OPT_SB_1)
   && (currRing->ppNoether==NULL)
   && !rIsPluralRing(currRing)  /*!rIsLPRing already tested above*/
@@ -2639,6 +2638,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
     && ((currRing->order[0]==ringorder_M)|| currRing->LexOrder))
     {
       ideal result=kTryHilbstd(F,Q);
+      //ideal result=kTryHilbstd_par(F,Q,h,w);
       if (result!=NULL)
       {
         return result;

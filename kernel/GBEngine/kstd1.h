@@ -42,10 +42,15 @@ ideal kSba(ideal F,ideal Q, tHomog h, intvec ** mw, int incremental=0, int arri=
 ideal kStd(ideal F, ideal Q, tHomog h, intvec ** mw,bigintmat *hilb=NULL,
           int syzComp=0,int newIdeal=0, intvec *vw=NULL, s_poly_proc_t sp=NULL);
 
+ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb=NULL,
+         int syzComp=0, int newIdeal=0, intvec *vw=NULL, s_poly_proc_t sp=NULL);
+
+
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** mw, bigintmat *hilb=NULL,
     int syzComp=0, int newIdeal=0, intvec *vw=NULL, BOOLEAN rightGB=FALSE);
 
 ideal kTryHilbstd(ideal F, ideal Q);
+ideal kTryHilbstd_par(ideal F, ideal Q, tHomog h, intvec ** mw);
 poly kTryHC(ideal F, ideal Q);
 
 ideal rightgb(ideal F,const ideal Q);
