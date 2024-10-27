@@ -1,6 +1,7 @@
 
 #include "config.h"
 
+#include <vector>
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_CSTDIO
@@ -543,12 +544,12 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     result = NN(c);
     return;
   }
-  int L[mv+1];
-  int N[mv+1];
+  std::vector<int> L(mv + 1, 0);
+  std::vector<int> N(mv + 1, 0);
   for(int i=2; i<=mv; i++)
     L[i] = N[i] = 0;
-  leadDeg(f, L);
-  leadDeg(g, N);
+  leadDeg(f, L.data());
+  leadDeg(g, N.data());
   CanonicalForm gamma;
   TIMING_START (alg_euclid_p)
 #ifdef HAVE_NTL
@@ -568,7 +569,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     if(N[i] < L[i])
       L[i] = N[i];
   // L is now upper bound for degrees of gcd
-  int dg_im[mv+1]; // for the degree vector of the image we don't need any entry at i=1
+  std::vector<int> dg_im(mv+1); // for the degree vector of the image we don't need any entry at i=1
   for(int i=2; i<=mv; i++)
     dg_im[i] = 0; // initialize
   CanonicalForm gamma_image, m=1;
@@ -600,8 +601,8 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     }
     for(int i=2; i<=mv; i++)
       dg_im[i] = 0; // reset (this is necessary, because some entries may not be updated by call to leadDeg)
-    leadDeg(g_image, dg_im);
-    if(isEqual(dg_im, L, 2, mv))
+    leadDeg(g_image, dg_im.data());
+    if(isEqual(dg_im.data(), L.data(), 2, mv))
     {
       CanonicalForm inv;
       tryInvert (firstLC (g_image), M, inv, fail);
@@ -654,7 +655,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
       continue;
     }
 
-    if(isLess(L, dg_im, 2, mv)) // dg_im > L --> current point unlucky
+    if(isLess(L.data(), dg_im.data(), 2, mv)) // dg_im > L --> current point unlucky
       continue;
 
     // here: isLess(dg_im, L, 2, mv) --> all previous points were unlucky
