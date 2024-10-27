@@ -3,6 +3,7 @@
 #ifndef INCL_ARRAY_H
 #define INCL_ARRAY_H
 
+#define NOMINMAX
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
