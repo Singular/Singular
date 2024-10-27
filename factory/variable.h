@@ -82,7 +82,7 @@ public:
      *  Use it to define algebraic variables
      *  @note: algebraic variables have a level < 0
     **/
-    friend Variable rootOf( const CanonicalForm &, char name );
+    friend Variable FACTORY_PUBLIC rootOf( const CanonicalForm &, char name );
 };
 
 /** returns a symbolic root of polynomial with name @a name

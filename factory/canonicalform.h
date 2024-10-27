@@ -202,13 +202,13 @@ public:
     friend class CFIterator;
 };
 
-CF_INLINE CanonicalForm
+CF_INLINE FACTORY_PUBLIC CanonicalForm
 operator + ( const CanonicalForm&, const CanonicalForm& );
 
 CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
 operator - ( const CanonicalForm&, const CanonicalForm& );
 
-CF_INLINE CanonicalForm
+CF_INLINE FACTORY_PUBLIC CanonicalForm
 operator * ( const CanonicalForm&, const CanonicalForm& );
 
 CF_NO_INLINE FACTORY_PUBLIC CanonicalForm
