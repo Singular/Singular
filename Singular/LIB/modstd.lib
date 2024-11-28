@@ -43,7 +43,7 @@ NOTE:     The procedure computes a standard basis of I (over the rational
 SEE ALSO: modular
 EXAMPLE:  example modStd; shows an example"
 {
-    if (getcores()<=1) { return groebner(I); }
+    if (getcores()<=1) { return(groebner(I)); }
     /* read optional parameter */
     int exactness = 1;
     if (size(#) > 0)
