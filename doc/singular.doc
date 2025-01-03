@@ -710,7 +710,7 @@ iniD, reslist, sumlist, dividelist, createlist
 * classify_lib:: procedures for the Arnold-classifier of singularities
 * classify2_lib:: Classification of isolated singularties
 * classify_aeq_lib:: Simple Space Curve singularities in characteristic 0
-* classifyceq_lib:: simple hypersurface singularities in charateristic p > 0
+* classifyceq_lib:: simple hypersurface singularities in characteristic p > 0
 * classifyci_lib:: isolated complete intersection singularities in char 0
 * classifyMapGerms_lib:: standard basis of the tangent space at the orbit of an algebraic group action
 * curvepar_lib:: procedures for space curves

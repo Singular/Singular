@@ -522,7 +522,7 @@ current quotient ideal use the command @code{reduce(f,std(0))}
 
 @itemize
 @item @code{degBound}
-@*The exact meaning of "degree" depends on the ring odering and the command:
+@*The exact meaning of "degree" depends on the ring ordering and the command:
 @code{slimgb} uses always the total degree with weights 1,
 @code{std} does so only for block orderings.
 @item @code{hilb}

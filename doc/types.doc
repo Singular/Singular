@@ -2077,7 +2077,7 @@ computers. Ssi tcp links can be opened in four different modes:
 
 @item tcp <host>:<program>
 @sc{Singular} acts as a client, launching an application as server.
-This reuires @code{ssh}/@code{sshd} to be installed an the computers
+This requires @code{ssh}/@code{sshd} to be installed an the computers
 (and preferably an automatic login via @code{.ssh/authorized_keys}).
 
 @item fork
@@ -2173,7 +2173,7 @@ Pipe links provide access to stdin and stdout of any program.
 Pipe links are bidirectional.
 @strong{Syntax:} @code{"|: "} + string_for_system
 
-The string_for system will be passed to @code{system} after conneting
+The string_for system will be passed to @code{system} after connecting
 the input and output to the corresponding stdout and stdin.
 
 @strong{Example:}

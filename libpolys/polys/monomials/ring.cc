@@ -3929,7 +3929,7 @@ BOOLEAN rComplete(ring r, int force)
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_ProcsSet(r, r->p_Procs);
 
-  // use totaldegree on crazy oderings:
+  // use totaldegree on crazy orderings:
   if ((r->pFDeg==p_WTotaldegree) && rOrd_is_MixedDegree_Ordering(r))
     r->pFDeg = p_Totaldegree;
   return FALSE;

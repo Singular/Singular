@@ -1650,7 +1650,7 @@ ideal idElimination2 (ideal h1,poly delVar,bigintmat *hilb, GbVariant alg)
   h3=idInit(16,h1->rank);
   ordersize=rBlocks(origR)+1;
 #if 0
-  if (rIsPluralRing(origR)) // we have too keep the odering: it may be needed
+  if (rIsPluralRing(origR)) // we have too keep the ordering: it may be needed
                             // for G-algebra
   {
     for (k=0;k<ordersize-1; k++)

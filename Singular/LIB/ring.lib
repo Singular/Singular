@@ -1244,7 +1244,7 @@ example
 
 proc changeordTo(def r,string o)
 "USAGE:  changeordTo(ring, string s);
-RETURN:  a ring with the oderinging changed to the (simple) ordering s
+RETURN:  a ring with the ordering changed to the (simple) ordering s
 EXAMPLE: example changeordTo(); shows an example
 "
 {

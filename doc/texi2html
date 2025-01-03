@@ -695,7 +695,7 @@ $MONTH_NAMES =
 # FastForward -- if leave node, up and next, else next node
 # FastBackward-- if leave node, up and prev, else prev node
 #
-# Furthermore, the following global variabels are set:
+# Furthermore, the following global variables are set:
 # $T2H_THISDOC{title}     -- title as set by @setttile
 # $T2H_THISDOC{fulltitle} -- full title as set by @title...
 # $T2H_THISDOC{subtitle}  -- subtitle as set by @subtitle
