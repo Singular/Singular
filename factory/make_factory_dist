@@ -7,5 +7,5 @@ mv c.ac configure.ac
 sed -e 's:ACLOCAL_AMFLAGS.*:ACLOCAL_AMFLAGS = -I m4:' <Makefile.am >m.am
 mv m.am Makefile.am
 autoreconf  -v -f -i
+./configure
 make dist
-
