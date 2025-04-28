@@ -1040,7 +1040,7 @@ EXAMPLE: example AssEHV; shows an example"
               list l2;
               for (int ii = 1; ii <= n; ii++)
               {
-                l2[i] = "x("+string(ii)+")";
+                l2[ii] = "x("+string(ii)+")";
               }
               l2[size(l2)+1] = "t";
               ring newR = create_ring(ring_list(base)[1], l2, "dp", "no_minpoly");
