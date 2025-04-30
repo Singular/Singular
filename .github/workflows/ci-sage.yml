@@ -55,15 +55,6 @@ env:
   DIST_PREREQ: libcdd-dev
   # Name of this project in the Sage distribution
   SPKG:        singular
-  # Sage distribution packages to build
-  TARGETS_PRE: build/make/Makefile
-  TARGETS:     SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular singular
-  TARGETS_OPTIONAL: SAGE_CHECK=no SAGE_CHECK_pysingular=warn pysingular
-  # Need texinfo for building the Singular documentation
-  EXTRA_SAGE_PACKAGES: info
-  # Standard setting: Test the current beta release of Sage:
-  SAGE_REPO:   sagemath/sage
-  SAGE_REF:    develop
   REMOVE_PATCHES: "*"
 
 jobs:
@@ -72,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out ${{ env.SPKG }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: build/pkgs/${{ env.SPKG }}/src
       - name: Install prerequisites
@@ -87,13 +78,13 @@ jobs:
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
           && echo 'echo ntl flint readline mpfr cddlib 4ti2 info > ../build/pkgs/singular/dependencies' >> upstream/update-pkgs.sh \
           && ls -l upstream/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: upstream
           name: upstream
 
   kanarienvogel:
-    uses: sagemath/sage/.github/workflows/docker.yml@develop
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
     with:
       tox_system_factors: >-
         ["ubuntu-jammy"]
@@ -107,9 +98,9 @@ jobs:
       targets: GITHUB_ACTIONS=1 SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular V=1 singular
       targets_optional: SAGE_CHECK=no SAGE_CHECK_pysingular=warn pysingular
       timeout: 5000
-      # Standard setting: Test the current beta release of Sage:
-      sage_repo: sagemath/sage
-      sage_ref: develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
       # Docker targets (stages) to tag
       docker_targets: "with-targets"
@@ -119,7 +110,7 @@ jobs:
     needs: [dist]
 
   docker:
-    uses: sagemath/sage/.github/workflows/docker.yml@develop
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
     with:
       # Extra system packages to install. See available packages at
       # https://github.com/sagemath/sage/tree/develop/build/pkgs
@@ -129,9 +120,9 @@ jobs:
       targets: GITHUB_ACTIONS=1 SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular V=1 singular
       targets_optional: SAGE_CHECK=no SAGE_CHECK_pysingular=warn pysingular
       timeout: 5000
-      # Standard setting: Test the current beta release of Sage:
-      sage_repo: sagemath/sage
-      sage_ref: develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
       # Docker targets (stages) to tag
       docker_targets: "with-targets"
@@ -141,13 +132,14 @@ jobs:
     needs: [dist, kanarienvogel]
 
   macos:
-    uses: sagemath/sage/.github/workflows/macos.yml@develop
+    uses: passagemath/passagemath/.github/workflows/macos.yml@main
     with:
       targets_pre: SAGE_CHECK=no singular-build-deps
       targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=singular V=1 singular
       targets_optional: SAGE_CHECK=no SAGE_CHECK_pysingular=warn pysingular
       timeout: 5000
-      sage_repo:         sagemath/sage
-      sage_ref:          develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
     needs: [dist, kanarienvogel]
