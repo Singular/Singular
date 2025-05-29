@@ -67,5 +67,8 @@ jobs:
 
       #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Long/ok_l.lst
       #  if: ${{ always() }}
+      - name: Setup tmate session for debugging
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
 
 # TODO: code coverage?
