@@ -17,6 +17,7 @@ fi
 ])
 
 BACKUP_CFLAGS=${CFLAGS}
+BACKUP_CXXFLAGS=${CXXFLAGS}
 BACKUP_LIBS=${LIBS}
 
 gmp_found=no
@@ -30,6 +31,7 @@ do
       GMP_LIBS="-lgmp"
     fi
     CFLAGS="${GMP_CPPFLAGS} ${BACKUP_CFLAGS}"
+    CXXFLAGS="${GMP_CPPFLAGS} ${BACKUP_CXXFLAGS}"
     LIBS=" ${GMP_LIBS} ${BACKUP_LIBS}"
     AC_LINK_IFELSE(
       [AC_LANG_PROGRAM([[#include <gmp.h>]],
