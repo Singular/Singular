@@ -76,7 +76,7 @@ jobs:
       #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Long/ok_l.lst
       #  if: ${{ always() }}
       - name: Create ssh target on test runner for debugging
-        if: ${{ github.event.inputs.tmate == 'true' }}
+        if: "${{ !cancelled() && github.event.inputs.tmate == 'true' }}"
         uses: mxschmitt/action-tmate@v3
 
 # TODO: code coverage?
