@@ -652,7 +652,7 @@ convertFacCFMatrix2Fq_nmod_mat_t (fq_nmod_mat_t M,
   {
     for(j=m.columns();j>0;j--)
     {
-      convertFacCF2nmod_poly_t (M->rows[i-1]+j-1, m (i,j));
+      convertFacCF2nmod_poly_t (fq_nmod_mat_entry(M, i-1, j-1), m (i,j));
     }
   }
 }
