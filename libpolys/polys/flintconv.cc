@@ -331,7 +331,7 @@ void convSingMFlintFq_nmod_mat(matrix m, fq_nmod_mat_t M, const fq_nmod_ctx_t fq
   {
     for(j=MATCOLS(m);j>0;j--)
     {
-      convSingPFlintnmod_poly_t (M->rows[i-1]+j-1, MATELEM(m,i,j),r);
+      convSingPFlintnmod_poly_t (fq_nmod_mat_entry(M, i-1, j-1), MATELEM(m,i,j),r);
     }
   }
 }
