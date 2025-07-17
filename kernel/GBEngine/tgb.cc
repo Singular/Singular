@@ -4546,7 +4546,7 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
     }
     else /*if(j < 0)*/
     {
-      //not reduceable, try to use this for reducing higher terms
+      //not reducible, try to use this for reducing higher terms
       int i2 = fwbw (los, i);
       assume (pLmEqual (los[i].p, los[i2].p));
       assume ((i2 == 0) || (!pLmEqual (los[i2].p, los[i2 - 1].p)));

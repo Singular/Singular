@@ -992,7 +992,7 @@ static BOOLEAN redPairs(SSet resPairs,int l_pairs, ideal syzygies,
 /*3
 * extends the standard basis old_generators with new_generators;
 * returns the syzygies which involve the new elements;
-* assumes that the components of the new_generators are sperated
+* assumes that the components of the new_generators are separated
 * from those of old_generators, i.e. whenever the leading term
 * of a syzygy lies in the part of the old_generators, the syzygy
 * lie just in the module old_generators

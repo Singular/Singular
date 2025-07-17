@@ -781,10 +781,10 @@ void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
 }
 
 /*2
-* computes the betti numbers from a given resolution
-* of length 'length' (0..length-1), not necessairily minimal,
+* computes the Betti numbers from a given resolution
+* of length 'length' (0..length-1), not necessarily minimal,
 * (if weights are given, they are used)
-* returns the int matrix of betti numbers
+* returns the int matrix of Betti numbers
 * and the regularity
 */
 intvec * syBetti(resolvente res,int length, int * regularity,

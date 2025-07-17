@@ -7528,7 +7528,7 @@ void messageStatSBA (int hilbcount,kStrategy strat)
 #ifdef KDEBUG
 /*2
 *debugging output: all internal sets, if changed
-*for testing purpuse only/has to be changed for later use
+*for testing purpose only/has to be changed for later use
 */
 void messageSets (kStrategy strat)
 {

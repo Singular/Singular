@@ -207,7 +207,7 @@ poly singclap_gcd ( poly f, poly g, const ring r );
 #define pPlus_mm_Mult_qq(p, m, q)   p_Plus_mm_Mult_qq(p, m, q, currRing)
 #define pMult(p, q)                 p_Mult_q(p, q, currRing)
 #define ppMult_qq(p, q)             pp_Mult_qq(p, q, currRing)
-// p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
+// p*Coeff(m) for such monomials pm of p, for which m is divisible by pm
 #define ppMult_Coeff_mm_DivSelect(p, m)   pp_Mult_Coeff_mm_DivSelect(p, m, currRing)
 /*************************************************************************
  *

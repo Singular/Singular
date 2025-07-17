@@ -3245,7 +3245,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 */
           // TODO: needs some masking
           // TODO: masking needs to vanish once the signature
-          //       sutff is completely implemented
+          //       stuff is completely implemented
           strat->P.p = NULL;
         poly m1 = NULL, m2 = NULL;
 
@@ -3436,7 +3436,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
       }
       // It may happen that we have lost the sig in redtailsba
       // It cannot reduce to 0 since here we are doing just tail reduction.
-      // Best case scenerio: remains the leading term
+      // Best case scenario: remains the leading term
       if(rField_is_Ring(currRing) && strat->sigdrop)
       {
         strat->enterS(strat->P, 0, strat, strat->tl);
@@ -4363,7 +4363,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
       // TODO: needs some masking
       // TODO: masking needs to vanish once the signature
-      //       sutff is completely implemented
+      //       stuff is completely implemented
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
 

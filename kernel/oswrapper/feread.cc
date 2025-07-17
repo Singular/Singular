@@ -35,7 +35,7 @@ char * (*fe_fgets_stdin)(const char *pr,char *s, int size)
 extern char *iiArithGetCmd(int);
 
 /* ===================================================================*/
-/* =                   static/dymanic readline                      = */
+/* =                   static/dynamic readline                      = */
 /* ===================================================================*/
 #if defined(HAVE_READLINE) || defined(HAVE_DYN_RL) || defined(HAVE_LIBREADLINE)
 

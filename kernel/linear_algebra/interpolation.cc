@@ -1012,7 +1012,7 @@ static void MultGenerators () // before reconstructing, all denominators must be
      }
 #endif
 }
-#if 0 /* only debbuging */
+#if 0 /* only debugging */
 void PresentGenerator (int i)  // only for debugging, writes a generator in its form in program
 {
      int j;
@@ -1589,7 +1589,7 @@ ideal interpolation(const std::vector<ideal>& L, intvec *v)
   if (!only_modp) mpq_clear(divisor);
   // data from ideal read *******************************************************
 
-  // ckecking if all coordinates are initialized
+  // checking if all coordinates are initialized
   for (i=0;i<n_points;i++)
   {
       for (j=0;j<variables;j++)
