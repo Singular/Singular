@@ -1108,10 +1108,12 @@ EXAMPLE: example primdecGTZ_wrapper; shows an example
    }
 
    i=simplify(i,2); // erase 0-generators
-   if ((i[1]==0)||(i[1]==1))
-   {
-     list L = list(ideal(i[1]), ideal(i[1]) );
-     return(list(L));
+   if (ncols(i) >= 1) {
+       if ((i[1]==0)||(i[1]==1))
+       {
+         list L = list(ideal(i[1]), ideal(i[1]) );
+         return(list(L));
+       }
    }
    if((ncols(i)==1)&&(attrib(basering,"ring_cf")==0)) // handle principal ideal
    {
