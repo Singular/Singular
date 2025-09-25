@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1480936381:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:108752
-1 >> tst_memory_1 :: 1480936381:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:2228224
-1 >> tst_memory_2 :: 1480936381:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:2228224
-1 >> tst_timer_1 :: 1480936381:4100, 64 bit:4.1.0:x86_64-Linux:nepomuck:1
+1 >> tst_memory_0 :: 1758760877:44103, 64 bit:4.4.1:x86_64-Linux:samsung:86064
+1 >> tst_memory_1 :: 1758760877:44103, 64 bit:4.4.1:x86_64-Linux:samsung:2150240
+1 >> tst_memory_2 :: 1758760877:44103, 64 bit:4.4.1:x86_64-Linux:samsung:2191344
+1 >> tst_timer_1 :: 1758760877:44103, 64 bit:4.4.1:x86_64-Linux:samsung:9
