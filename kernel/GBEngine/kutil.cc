@@ -6063,7 +6063,7 @@ int posInL110 (const LSet set, const int length,
 
   if ((op > o)
   || ((op == o) && (set[length].length >p->length))
-  || ((op == o) && (set[length].length <= p->length)
+  || ((op == o) && (set[length].length == p->length)
      && (pLmCmp(set[length].p,p->p) != cmp_int)))
     return length+1;
   int i;
@@ -6076,7 +6076,7 @@ int posInL110 (const LSet set, const int length,
       op = set[an].GetpFDeg();
       if ((op > o)
       || ((op == o) && (set[an].length >p->length))
-      || ((op == o) && (set[an].length <=p->length)
+      || ((op == o) && (set[an].length == p->length)
          && (pLmCmp(set[an].p,p->p) != cmp_int)))
         return en;
       return an;
@@ -6085,7 +6085,7 @@ int posInL110 (const LSet set, const int length,
     op = set[i].GetpFDeg();
     if ((op > o)
     || ((op == o) && (set[i].length > p->length))
-    || ((op == o) && (set[i].length <= p->length)
+    || ((op == o) && (set[i].length == p->length)
        && (pLmCmp(set[i].p,p->p) != cmp_int)))
       an=i;
     else
@@ -6103,7 +6103,7 @@ int posInL110Ring (const LSet set, const int length,
 
   if ((op > o)
   || ((op == o) && (set[length].length >p->length))
-  || ((op == o) && (set[length].length <= p->length)
+  || ((op == o) && (set[length].length == p->length)
      && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
     return length+1;
   int i;
@@ -6116,7 +6116,7 @@ int posInL110Ring (const LSet set, const int length,
       op = set[an].GetpFDeg();
       if ((op > o)
       || ((op == o) && (set[an].length >p->length))
-      || ((op == o) && (set[an].length <=p->length)
+      || ((op == o) && (set[an].length == p->length)
          && (pLtCmpOrdSgnDiffM(set[an].p,p->p))))
         return en;
       return an;
@@ -6125,7 +6125,7 @@ int posInL110Ring (const LSet set, const int length,
     op = set[i].GetpFDeg();
     if ((op > o)
     || ((op == o) && (set[i].length > p->length))
-    || ((op == o) && (set[i].length <= p->length)
+    || ((op == o) && (set[i].length == p->length)
        && (pLtCmpOrdSgnDiffM(set[i].p,p->p))))
       an=i;
     else
