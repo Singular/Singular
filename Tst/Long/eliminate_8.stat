@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1614209188:4201, 64 bit:4.2.0:x86_64-Linux:terra:141208
-1 >> tst_memory_1 :: 1614209188:4201, 64 bit:4.2.0:x86_64-Linux:terra:4571136
-1 >> tst_memory_2 :: 1614209188:4201, 64 bit:4.2.0:x86_64-Linux:terra:5221376
-1 >> tst_timer_1 :: 1614209188:4201, 64 bit:4.2.0:x86_64-Linux:terra:176
+1 >> tst_memory_0 :: 1759445497:44103, 64 bit:4.4.1:x86_64-Linux:samsung:291320
+1 >> tst_memory_1 :: 1759445497:44103, 64 bit:4.4.1:x86_64-Linux:samsung:4521984
+1 >> tst_memory_2 :: 1759445497:44103, 64 bit:4.4.1:x86_64-Linux:samsung:5948040
+1 >> tst_timer_1 :: 1759445497:44103, 64 bit:4.4.1:x86_64-Linux:samsung:188
