@@ -116,25 +116,31 @@ EXAMPLE:   example Vfiltration; shows an example
   list BS = bFactor(bfct);
   dbprint(ppl, "// -2-4- Intersection of Ann f^s + <f> with QQ[s] finished");
 
-  // Shifts feigen = delete(eigen, i); mul = delete(mul, i);or the annihilator of f^s.
-  int m = -p; int k = 1;
-  ideal J = subst(Annfs, s, s+m)+f^(k-m);
+  // Maximum and minimum shifts for the roots of BS(-s);
+  int k = int(1 + BS[1][1] + 1);
+  number mm = number(1 + BS[1][size(BS[2])]);
+  if (denominator(mm) == 1) { int m = int(mm); }
+  else { int m = int(mm-1); }
 
-  // Shift roots of the BS to (0, 1], this avoids having to compute the BS of J.
+  // Compute SHIFTED B-S polynomial of f.
+  str = sprintf("// -2-5- Computing Groebner basis of Ann f^(s+m) + <f^(k-m)>... k = %p, m = %p",
+    k, m); dbprint(ppl, str);
+  I = engine(subst(Annfs, s, s+m)+f^(k-m), eng);
+  dbprint(ppl, "// -2-6- Groebner basis of Ann f^(s+m) + <f^(k-m)> computed");
+  dbprint(ppl, "// -2-7- Intersecting Ann f^(s+m) + <f^(k-m)> with QQ[s]...");
+  bfct = vec2poly(pIntersect(s, I)); BS = bFactor(bfct);
+  dbprint(ppl, "// -2-8- Intersection of Ann f^(s+m) + <f^(k-m)> with QQ[s] finished");
+
+  // Shifted annihilator, we work modulo J form this point onwards.
+  ideal J = subst(Annfs, s, s-p)+f^(k+p);
+
+  // Keep only positive roots of BS(-s)
   list eigen; list mul;
-  for (i = 1; i <= size(BS[1]); i++) {
-    for (j = 0; j <= p; j++) {
-      if (BS[1][i]+j < 0) {
-        eigen = eigen+list(number(-BS[1][i]-j));
-        mul = mul+list(BS[2][i]);
-      }
-    } // Sort shifted eigen.
-  } list S = sort(eigen); eigen = S[1]; mul = mul[S[2]];
-
-  // Remove duplicates & keep max. multiplicity.
-  for (i = 1; i <= size(eigen) - 1; i++) {
-    j = 1; while (eigen[i] == eigen[i+j]) { mul[i] = max(mul[i], mul[i+j]); j++; }
-    while (j != 1) { eigen = delete(eigen, i+j-1); mul = delete(mul, i+j-1); j--; }
+  for (i = 1; i <= size(BS[2]); i++) {
+    if (BS[1][i] < 0) {
+      eigen = eigen+list(number(-BS[1][i]-j));
+      mul = mul+list(BS[2][i]);
+    }
   }
 
   // Compute the kernels of the eigenvalues in 'eigen' in J.
@@ -144,7 +150,7 @@ EXAMPLE:   example Vfiltration; shows an example
   for (i = 1; i <= size(eigen); i++) {
     str = sprintf("// -3-1-%p- Kernel for eigenvalue %p, multiplicity %p... (%p/%p)",
       i, eigen[i], mul[i], i, size(eigen)); dbprint(ppl, str);
-    // *NO* need to add f^(k-m) as Ker[i] contains J = Annf^(s+m) + f^(k-m).
+    // *NO* need to add f^(k-m) as Ker[i] contains J = Annf^(s-p) + f^(k+p).
     Ker[i] = ideal(modulo(s + eigen[i], J));
     // If there are multiplicities, iterate the generalized eigenspaces.
     for (j = 1; j < mul[i]; j++) {
