@@ -62,33 +62,31 @@ static void copyT (kStrategy o,kStrategy n)
 */
 static void copyL (kStrategy o,kStrategy n)
 {
-  int i,j;
-  poly  p;
-  LSet l=(LSet)omAlloc(o->Lmax*sizeof(LObject));
+  n->L = o->L;
 
-  for (j=0; j<=o->Ll; j++)
+  // Update references in the copied LSet to point to new T array
+  for (auto& Lp : n->L)
   {
-    l[j] = o->L[j];
+    poly p;
+    int i;
+
     // copy .p ----------------------------------------------
-    if (pNext(o->L[j].p)!=o->tail)
-      l[j].p=pCopy(o->L[j].p);
+    if (pNext(Lp.p)!=o->tail)
+      Lp.p=pCopy(Lp.p);
     else
     {
-      l[j].p=p_LmInit(o->L[j].p,currRing);
-      if (pGetCoeff(o->L[j].p)!=NULL) pSetCoeff0(l[j].p,nCopy(pGetCoeff(o->L[j].p)));
-      pNext(l[j].p)=n->tail;
+      p = Lp.p;
+      Lp.p=p_LmInit(Lp.p,currRing);
+      if (pGetCoeff(p)!=NULL) pSetCoeff0(Lp.p,nCopy(pGetCoeff(p)));
+      pNext(Lp.p)=n->tail;
     }
     // copy .lcm ----------------------------------------------
-    if (o->L[j].lcm!=NULL)
-      l[j].lcm=pLmInit(o->L[j].lcm);
-    else
-      l[j].lcm=NULL;
-    l[j].p1=NULL;
-    l[j].p2=NULL;
-    l[j].t_p = NULL;
+    if (Lp.lcm!=NULL)
+      Lp.lcm=pLmInit(Lp.lcm);
+    Lp.t_p = NULL;
 
     // copy .p1 , i_r1----------------------------------------------
-    p = o->L[j].p1;
+    p = Lp.p1;
     i = -1;
     loop
     {
@@ -97,20 +95,20 @@ static void copyL (kStrategy o,kStrategy n)
       if(i>o->tl)
       {
         WarnS("poly p1 not found in T:");wrp(p);PrintLn();
-        l[j].p1=pCopy(p);
-        l[j].i_r1=-1;
+        Lp.p1=pCopy(p);
+        Lp.i_r1=-1;
         break;
       }
       if (p == o->T[i].p)
       {
-        l[j].p1=n->T[i].p;
-        l[j].i_r1=n->T[i].i_r;
+        Lp.p1=n->T[i].p;
+        Lp.i_r1=n->T[i].i_r;
         break;
       }
     }
 
     // copy .p2 , i_r2----------------------------------------------
-    p = o->L[j].p2;
+    p = Lp.p2;
     i = -1;
     loop
     {
@@ -119,31 +117,18 @@ static void copyL (kStrategy o,kStrategy n)
       if(i>o->tl)
       {
         WarnS("poly p2 not found in T:");wrp(p);PrintLn();
-        l[j].p2=pCopy(p);
-        l[j].i_r2=-1;
+        Lp.p2=pCopy(p);
+        Lp.i_r2=-1;
         break;
       }
       if (p == o->T[i].p)
       {
-        l[j].p2=n->T[i].p;
-        l[j].i_r2=n->T[i].i_r;
+        Lp.p2=n->T[i].p;
+        Lp.i_r2=n->T[i].i_r;
         break;
       }
     }
-
-    // copy .ecart ---------------------------------------------
-    l[j].ecart=o->L[j].ecart;
-    // copy .length --------------------------------------------
-    l[j].length=o->L[j].length;
-    // copy .pLength -------------------------------------------
-    l[j].pLength=o->L[j].pLength;
-    // copy .sev -----------------------------------------------
-    l[j].sev=o->L[j].sev;
-    l[j].i_r = o->L[j].i_r;
-    //l[j].i_r1 = o->L[j].i_r1;
-    //l[j].i_r2 = o->L[j].i_r2;
   }
-  n->L=l;
 }
 
 kStrategy kStratCopy(kStrategy o)
@@ -155,10 +140,10 @@ kStrategy kStratCopy(kStrategy o)
   s->red=o->red;
   s->initEcart=o->initEcart;
   s->posInT=o->posInT;
-  s->posInL=o->posInL;
+  s->compareL=o->compareL;
   s->enterS=o->enterS;
   s->initEcartPair=o->initEcartPair;
-  s->posInLOld=o->posInLOld;
+  s->compareLOld=o->compareLOld;
   s->enterOnePair=o->enterOnePair;
   s->chainCrit=o->chainCrit;
   s->Shdl=idCopy(o->Shdl);
@@ -184,7 +169,6 @@ kStrategy kStratCopy(kStrategy o)
   copyT(o,s);//s->T=...
   s->tail = pInit();
   copyL(o,s);//s->L=...
-  s->B=initL();
   s->kNoether=pCopy(o->kNoether);
   if (o->NotUsedAxis!=NULL)
   {
@@ -194,7 +178,7 @@ kStrategy kStratCopy(kStrategy o)
   //s->P=s->L[s->Ll+1];
   s->P.Init(o->tailRing);
   s->update=o->update;
-  s->posInLOldFlag=o->posInLOldFlag;
+  s->compareLOldFlag=o->compareLOldFlag;
   s->kModW = o->kModW;
 //   if (o->kModW!=NULL)
 //     s->kModW=ivCopy(o->kModW);
@@ -205,10 +189,6 @@ kStrategy kStratCopy(kStrategy o)
   s->mu=o->mu;
   s->tl=o->tl;
   s->tmax=o->tmax;
-  s->Ll=o->Ll;
-  s->Lmax=o->Lmax;
-  s->Bl=-1;
-  s->Bmax=setmaxL;
   s->ak=o->ak;
   s->syzComp=o->syzComp;
   s->LazyPass=o->LazyPass;
@@ -351,8 +331,8 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
         pWrite(n->P.p);
       }
       enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
-      enterT(&n->P,n);
-      n->enterS(&n->P,pos,n, n->tl);
+      enterT(n->P,n);
+      n->enterS(n->P,pos,n, n->tl);
 
       /* construct D */
       if (IDELEMS(fac)>1)
@@ -397,7 +377,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
                 pWrite(n->D->m[j]);
                 messageSets(n);
               }
-              while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+              while (! n->L.empty()) n->L.pop_and_erase();
               while (n->tl >= 0)
               {
                 int i=n->sl;
@@ -441,7 +421,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
                 Print("empty set because:L[%p]\n",(void *)Lj);
                 iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
               }
-              while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+              while (! n->L.empty()) n->L.pop_and_erase();
               while (n->tl >= 0)
               {
                 int i=n->sl;
@@ -472,42 +452,43 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
     for(i=0;i<IDELEMS(fac);i++) fac->m[i]=NULL;
     idDelete(&fac);
     idDelete(&fac_copy);
-    if ((strat->Ll>=0) && (strat->sl>=0)) break;
+    if (! strat->L.empty() && (strat->sl>=0)) break;
     else si=strat->sl+1;
   }
 }
 
 ideal bbafac (ideal /*F*/, ideal Q,intvec* /*w*/,kStrategy strat, ideal_list FL)
 {
-  int   olddeg,reduc=0;
+  int   olddeg;
+  LSet::size_type reduc;
   int red_result = 1;
   reduc = olddeg = 0;
   /* compute------------------------------------------------------- */
-  if ((strat->Ll==-1) && (strat->sl>=0))
+  if (strat->L.empty() && (strat->sl>=0))
   {
     if (TEST_OPT_REDSB) completeReduceFac(strat,FL);
   }
   kTest_TS(strat);
-  while (strat->Ll >= 0)
+  while (! strat->L.empty())
   {
     if (TEST_OPT_DEBUG) messageSets(strat);
-    if (strat->Ll== 0) strat->interpt=TRUE;
+    if (strat->L.size() == 1) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey
-        && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-      || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+        && (strat->L.top().ecart+currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg))
+      || ((!strat->honey) && (currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg))))
     {
       /*
       *stops computation if
       * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
       *a predefined number Kstd1_deg
       */
-      while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      while (! strat->L.empty()) strat->L.pop_and_erase();
       break;
     }
     /* picks the last element from the lazyset L */
-    strat->P = strat->L[strat->Ll];
-    strat->Ll--;
+    strat->P = strat->L.top();
+    strat->L.pop();
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
@@ -622,21 +603,19 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec* /*w*/,kStrategy strat, ideal_list FL)
           PrintLn();
         }
         enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
-        enterT(&n->P,n);
-        n->enterS(&n->P,pos,n, n->tl);
+        enterT(n->P,n);
+        n->enterS(n->P,pos,n, n->tl);
         {
-          int i=n->Ll;
-          for(;i>=0;i--)
-          {
-            n->L[i].i_r1= -1;
+          for (auto& Lp: n->L) {
+            Lp.i_r1= -1;
             for(ii=0; ii<=n->tl; ii++)
             {
-              if (n->R[ii]->p==n->L[i].p1)  { n->L[i].i_r1=ii;break; }
+              if (n->R[ii]->p==Lp.p1)  { Lp.i_r1=ii;break; }
             }
-            n->L[i].i_r2= -1;
+            Lp.i_r2= -1;
             for(ii=0; ii<=n->tl; ii++)
             {
-              if (n->R[ii]->p==n->L[i].p2)  { n->L[i].i_r2=ii;break; }
+              if (n->R[ii]->p==Lp.p2)  { Lp.i_r2=ii;break; }
             }
           }
         }
@@ -686,7 +665,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec* /*w*/,kStrategy strat, ideal_list FL)
                   messageSets(n);
                 }
                 //if (n->Ll >=0) Print("Ll:%d|",n->Ll);
-                while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+                while (! n->L.empty()) n->L.pop_and_erase();
                 //if (n->tl >=0) Print("tl:%d|",n->tl);
                 while (n->tl >= 0)
                 {
@@ -736,7 +715,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec* /*w*/,kStrategy strat, ideal_list FL)
                   #endif
                   iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
                 }
-                while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+                while (! n->L.empty()) n->L.pop_and_erase();
                 while (n->tl >= 0)
                 {
                   int i=n->sl;
@@ -771,7 +750,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec* /*w*/,kStrategy strat, ideal_list FL)
     strat->P.lcm=NULL;
 #endif
     kTest_TS(strat);
-    if ((strat->Ll==-1) && (strat->sl>=0))
+    if (strat->L.empty() && (strat->sl>=0))
     {
       if (TEST_OPT_REDSB) completeReduceFac(strat,FL);
     }
