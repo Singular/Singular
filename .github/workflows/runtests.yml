@@ -15,26 +15,16 @@ jobs:
         configflags: ["", "--with-ntl --with-flint", "--without-ntl --with-flint"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: "Install dependencies"
         run: |
-               FLINT_JLL="https://github.com/JuliaBinaryWrappers/FLINT_jll.jl/releases/download/FLINT-v300.100.301%2B0/FLINT.v300.100.301"
                if [ "$RUNNER_OS" == "Linux" ]; then
                     # sharutils is for uudecode
-                    sudo apt install sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev 4ti2 normaliz libopenblas-dev
-                    wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-linux-gnu.tar.gz"
-                    sudo tar -C /usr -xvf FLINT.tar.gz
-                    rm -f FLINT.tar.gz
+                    sudo apt install sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev 4ti2 normaliz libopenblas-dev libflint-dev
                elif [ "$RUNNER_OS" == "macOS" ]; then
                     brew install autoconf automake libtool gmp readline mpfr ntl cddlib flint
                     # TODO: 4ti2?
                     # TODO: normaliz?
-                    # install new enough FLINT
-                    #wget -O FLINT.tar.gz "${FLINT_JLL}.x86_64-apple-darwin.tar.gz"
-                    #wget -O FLINT.tar.gz "${FLINT_JLL}.aarch64-apple-darwin.tar.gz"
-                    #sudo mkdir -p /usr/local
-                    #sudo tar -C /usr/local -xvf FLINT.tar.gz
-                    #rm -f FLINT.tar.gz
                else
                     echo "$RUNNER_OS not supported"
                     exit 1
