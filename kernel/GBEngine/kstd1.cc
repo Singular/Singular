@@ -1320,41 +1320,6 @@ static BOOLEAN hasPurePower (LObject *L,int last, int *length,kStrategy strat)
   }
 }
 
-/*2
-* looks up the position of polynomial p in L
-* in the case of looking for the pure powers
-*/
-#if 0
-int posInL10 (const LSet set,const int length, LObject* p,const kStrategy strat)
-{
-  int j,dp,dL;
-
-  if (length<0) return 0;
-  if (hasPurePower(p,strat->lastAxis,&dp,strat))
-  {
-    int op= p->GetpFDeg() +p->ecart;
-    for (j=length; j>=0; j--)
-    {
-      if (!hasPurePower(&(set[j]),strat->lastAxis,&dL,strat))
-        return j+1;
-      if (dp < dL)
-        return j+1;
-      if ((dp == dL)
-          && (set[j].GetpFDeg()+set[j].ecart >= op))
-        return j+1;
-    }
-  }
-  j=length;
-  loop
-  {
-    if (j<0) break;
-    if (!hasPurePower(&(set[j]),strat->lastAxis,&dL,strat)) break;
-    j--;
-  }
-  return strat->posInLOld(set,j,p,strat);
-}
-#endif
-
 /* Ordering procedure:
  *    - objects with pure powers greater than objects without
  *    - objects with pure powers:
