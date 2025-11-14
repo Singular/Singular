@@ -115,7 +115,10 @@ void *VMem::mmap_segment(int seg) {
 
 void VMem::add_segment() {
   int seg = metapage->segment_count++;
-  ftruncate(fd, METABLOCK_SIZE + metapage->segment_count * SEGMENT_SIZE);
+  if (ftruncate(fd, METABLOCK_SIZE + metapage->segment_count * SEGMENT_SIZE) != 0) {
+    perror("ftruncate");
+    abort();
+  }
   void *map_addr = mmap_segment(seg);
   segments[seg] = VSeg(map_addr);
   Block *top = block_ptr(seg * SEGMENT_SIZE);
@@ -323,8 +326,12 @@ void unlock_metapage() {
 }
 
 void init_metapage(bool create) {
-  if (create)
-    ftruncate(vmem.fd, METABLOCK_SIZE);
+  if (create) {
+    if (ftruncate(vmem.fd, METABLOCK_SIZE) != 0) {
+      perror("ftruncate");
+      abort();
+    }
+  }
   vmem.metapage = (MetaPage *) mmap(
       NULL, METABLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, vmem.fd, 0);
   if (create) {
@@ -715,7 +722,10 @@ void *VMem::mmap_segment(int seg) {
 
 void VMem::add_segment() {
   int seg = metapage->segment_count++;
-  ftruncate(fd, METABLOCK_SIZE + metapage->segment_count * SEGMENT_SIZE);
+  if (ftruncate(fd, METABLOCK_SIZE + metapage->segment_count * SEGMENT_SIZE) != 0) {
+    perror("ftruncate");
+    abort();
+  }
   void *map_addr = mmap_segment(seg);
   segments[seg] = VSeg(map_addr);
   Block *top = block_ptr(seg * SEGMENT_SIZE);
@@ -931,8 +941,12 @@ void unlock_metapage() {
 }
 
 void init_metapage(bool create) {
-  if (create)
-    ftruncate(vmem.fd, METABLOCK_SIZE);
+  if (create) {
+    if (ftruncate(vmem.fd, METABLOCK_SIZE) != 0) {
+      perror("ftruncate");
+      abort();
+    }
+  }
   vmem.metapage = (MetaPage *) mmap(
       NULL, METABLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, vmem.fd, 0);
   if (create) {

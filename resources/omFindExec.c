@@ -94,13 +94,15 @@ static char * omFindExec_link (const char *name, char* executable)
         *next = '\0';
 
         if ((tbuf[0] == '.' && tbuf[1] == '\0') || tbuf[0] == '\0') {
-#ifdef HAVE_GETCWD
-          getcwd (tbuf, MAXPATHLEN);
-#else
-# ifdef HAVE_GETWD
-          getwd (tbuf);
-# endif
-#endif
+      #ifdef HAVE_GETCWD
+          if (getcwd (tbuf, MAXPATHLEN) == NULL)
+            goto next_path_entry;
+      #else
+      # ifdef HAVE_GETWD
+          if (getwd (tbuf) == NULL)
+            goto next_path_entry;
+      # endif
+      #endif
         }
 
         if (tbuf[strlen(tbuf)-1] != '/') strcat(tbuf, "/");
@@ -113,6 +115,7 @@ static char * omFindExec_link (const char *name, char* executable)
           return executable;
         }
 
+next_path_entry:
         if (*p != '\0')
         {
           p ++;
