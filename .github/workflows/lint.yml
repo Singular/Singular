@@ -5,11 +5,11 @@ on:
 
 jobs:
   codespell:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-lastest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with: { submodules: recursive }
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3.2
         with: { mamba-version: "*", channels: "conda-forge", channel-priority: true }
       - name: Install dependencies
         shell: bash -l {0}
