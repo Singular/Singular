@@ -333,6 +333,11 @@ SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
 // rearrange shifted components
 long syReorderShiftedComponents(long * sc, int n)
 {
+  if (n <= 0)
+  {
+    assume(n > 0);
+    return 0;
+  }
   long holes = 0;
   int i;
   long new_comps = 0, new_space, max;
@@ -360,7 +365,8 @@ long syReorderShiftedComponents(long * sc, int n)
 
   assume(new_space < SYZ_SHIFT_BASE && new_space >= 4);
 
-  long* tc = ( long*) omAlloc(n*sizeof(long));
+  const size_t buf_size = (size_t)n * sizeof(long);
+  long* tc = ( long*) omAlloc(buf_size);
   tc[0] = sc[0];
   // rearrange things
   for (i=1; i<n; i++)
@@ -385,8 +391,8 @@ long syReorderShiftedComponents(long * sc, int n)
   }
 #endif
 
-  memcpy(sc, tc, n*sizeof(long));
-  omFreeSize(tc, n*sizeof(long));
+  memcpy(sc, tc, buf_size);
+  omFreeSize(tc, buf_size);
   return new_space;
 }
 
