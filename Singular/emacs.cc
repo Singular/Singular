@@ -304,7 +304,7 @@ int main(int argc, char** argv)
     prefix = "-";
   if (getcwd(cwd, MAXPATHLEN) == NULL)
   {
-    error("Error: Cannot determine current working directory.\n");
+    perror("getcwd");
     mainUsage();
     exit(1);
   }

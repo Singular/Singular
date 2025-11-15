@@ -10,6 +10,9 @@
 #endif
 #include <cstddef>
 #include "reporter/si_signals.h"
+#include "resources/feFopen.h"
+#include <errno.h>
+#include <string.h>
 
 #if defined(__GNUC__) && (__GNUC__<9) &&!defined(__clang__)
 
@@ -116,8 +119,11 @@ void *VMem::mmap_segment(int seg) {
 void VMem::add_segment() {
   int seg = metapage->segment_count++;
   if (ftruncate(fd, METABLOCK_SIZE + metapage->segment_count * SEGMENT_SIZE) != 0) {
-    perror("ftruncate");
-    abort();
+    metapage->segment_count--;
+    char err_msg[256];
+    snprintf(err_msg, sizeof(err_msg), "out of memory in vspace:add_segment: %s", strerror(errno));
+    WerrorS(err_msg);
+    return;
   }
   void *map_addr = mmap_segment(seg);
   segments[seg] = VSeg(map_addr);
@@ -328,8 +334,10 @@ void unlock_metapage() {
 void init_metapage(bool create) {
   if (create) {
     if (ftruncate(vmem.fd, METABLOCK_SIZE) != 0) {
-      perror("ftruncate");
-      abort();
+      char err_msg[256];
+      snprintf(err_msg, sizeof(err_msg), "out of memory in vspace:init_metapage: %s", strerror(errno));
+      WerrorS(err_msg);
+      return;
     }
   }
   vmem.metapage = (MetaPage *) mmap(
@@ -723,8 +731,11 @@ void *VMem::mmap_segment(int seg) {
 void VMem::add_segment() {
   int seg = metapage->segment_count++;
   if (ftruncate(fd, METABLOCK_SIZE + metapage->segment_count * SEGMENT_SIZE) != 0) {
-    perror("ftruncate");
-    abort();
+    metapage->segment_count--;
+    char err_msg[256];
+    snprintf(err_msg, sizeof(err_msg), "out of memory in vspace:add_segment: %s", strerror(errno));
+    WerrorS(err_msg);
+    return;
   }
   void *map_addr = mmap_segment(seg);
   segments[seg] = VSeg(map_addr);
@@ -943,8 +954,10 @@ void unlock_metapage() {
 void init_metapage(bool create) {
   if (create) {
     if (ftruncate(vmem.fd, METABLOCK_SIZE) != 0) {
-      perror("ftruncate");
-      abort();
+      char err_msg[256];
+      snprintf(err_msg, sizeof(err_msg), "out of memory in vspace:init_metapage: %s", strerror(errno));
+      WerrorS(err_msg);
+      return;
     }
   }
   vmem.metapage = (MetaPage *) mmap(
