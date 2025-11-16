@@ -13,7 +13,7 @@ intmat C[2][4] =
 1,0,2,0,
 0,1,2,0;
 // should result in a matrix whose
-// colums create the same  lattice as
+// columns create the same  lattice as
 // [-2,-2,1,0], [0,0,0,1]
 intmat D = kernelLattice(C);
 print(D);
