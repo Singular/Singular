@@ -36,6 +36,8 @@
 #include "fac_multivar.h"
 
 #include "int_int.h"
+#include <cstring>
+
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
 #endif
