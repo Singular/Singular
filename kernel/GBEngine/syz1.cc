@@ -331,15 +331,10 @@ SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
 }
 
 // rearrange shifted components
-long syReorderShiftedComponents(long * sc, int n)
+static long syReorderShiftedComponents(long * sc, unsigned int n)
 {
-  if (n <= 0)
-  {
-    assume(n > 0);
-    return 0;
-  }
   long holes = 0;
-  int i;
+  unsigned int i;
   long new_comps = 0, new_space, max;
 
   // count number of holes
@@ -365,8 +360,7 @@ long syReorderShiftedComponents(long * sc, int n)
 
   assume(new_space < SYZ_SHIFT_BASE && new_space >= 4);
 
-  const size_t buf_size = (size_t)n * sizeof(long);
-  long* tc = ( long*) omAlloc(buf_size);
+  long* tc = ( long*) omAlloc(n*sizeof(long));
   tc[0] = sc[0];
   // rearrange things
   for (i=1; i<n; i++)
@@ -391,8 +385,8 @@ long syReorderShiftedComponents(long * sc, int n)
   }
 #endif
 
-  memcpy(sc, tc, buf_size);
-  omFreeSize(tc, buf_size);
+  memcpy(sc, tc, n*sizeof(long));
+  omFreeSize(tc, n*sizeof(long));
   return new_space;
 }
 
@@ -1021,6 +1015,7 @@ void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int /*index*/)
         else
         {
           PrintS("Hier ist was faul!\n");
+	  ll=0; /*avoid compiler warning*/
           break;
         }
       }
@@ -2684,4 +2679,3 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }
-
