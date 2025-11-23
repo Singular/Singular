@@ -128,7 +128,6 @@ void syEnlargeFields(syStrategy syzstr,int index);
 void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index);
 SSet syChosePairs(syStrategy syzstr, int *index, int *howmuch, int * actdeg);
 int syInitSyzMod(syStrategy syzstr, int index, int init=17);
-long syReorderShiftedComponents(long * sc, int n);
 void syGaussForOne(ideal arg,int gen,int ModComp,int from=-1,int till=0);
 void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index);
 void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index);
