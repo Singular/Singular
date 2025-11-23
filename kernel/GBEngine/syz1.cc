@@ -1015,7 +1015,7 @@ void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int /*index*/)
         else
         {
           PrintS("Hier ist was faul!\n");
-	  ll=0; /*avoid compiler warning*/
+	      ll=0;
           break;
         }
       }
