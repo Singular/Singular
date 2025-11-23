@@ -97,9 +97,10 @@ ideal id_Copy (ideal h1,const ring r);
 
   /*adds two ideals without simplifying the result*/
 ideal id_SimpleAdd (ideal h1,ideal h2, const ring r);
-  /*adds the quotient ideal*/
-ideal id_Add (ideal h1,ideal h2,const ring r);
+  /* ads two ideals without simplifying the result, destroys args */
+ideal id_SimpleMove (ideal h1,ideal h2, const ring R);
   /* h1 + h2 */
+ideal id_Add (ideal h1,ideal h2,const ring r);
 
 ideal id_Power(ideal given,int exp, const ring r);
 BOOLEAN idIs0 (ideal h);

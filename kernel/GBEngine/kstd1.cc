@@ -2643,7 +2643,8 @@ ideal kStd2(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
     && (!TEST_OPT_DEGBOUND)
     && (currRing->LexOrder
          || rHasBlockOrder(currRing))
-    && (!idIsMonomial(F)))
+    && (!idIsMonomial(F))
+    && ( rField_is_Q(currRing)|| rField_is_Zp(currRing)))
     {
       ideal result=kTryHilbstd(F,Q);
       //ideal result=kTryHilbstd_par(F,Q,h,w);

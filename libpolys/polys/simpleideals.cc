@@ -827,6 +827,54 @@ ideal id_SimpleAdd (ideal h1,ideal h2, const ring R)
   return result;
 }
 
+/// concat the lists h1 and h2 without zeros, destroys h1,h2
+ideal id_SimpleMove (ideal h1,ideal h2, const ring R)
+{
+  if ( idIs0(h1) )
+  {
+    ideal res=h2;
+    if (res->rank<h1->rank) res->rank=h1->rank;
+    id_Delete(&h1,R);
+    return res;
+  }
+  if ( idIs0(h2) )
+  {
+    ideal res=h1;
+    if (res->rank<h2->rank) res->rank=h2->rank;
+    id_Delete(&h2,R);
+    return res;
+  }
+
+  int j = IDELEMS(h1)-1;
+  while ((j >= 0) && (h1->m[j] == NULL)) j--;
+
+  int i = IDELEMS(h2)-1;
+  while ((i >= 0) && (h2->m[i] == NULL)) i--;
+
+  const int r = si_max(h1->rank, h2->rank);
+
+  ideal result = idInit(i+j+2,r);
+
+  int l;
+
+  for (l=j; l>=0; l--)
+  {
+    result->m[l] = h1->m[l];
+    h1->m[l] = NULL;
+  }
+
+  j = i+j+1;
+  for (l=i; l>=0; l--, j--)
+  {
+    result->m[j] = h2->m[l];
+    h2->m[l] = NULL;
+  }
+
+  id_Delete(&h1,R);
+  id_Delete(&h2,R);
+  return result;
+}
+
 /// insert h2 into h1 (if h2 is not the zero polynomial)
 /// return TRUE iff h2 was indeed inserted
 BOOLEAN idInsertPoly (ideal h1, poly h2)

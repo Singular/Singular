@@ -3190,7 +3190,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
 
 void p_ProjectiveUnique(poly ph, const ring r)
 {
-  if( ph == NULL )
+  if(UNLIKELY( ph == NULL ))
     return;
 
   const coeffs C = r->cf;
@@ -3206,7 +3206,13 @@ void p_ProjectiveUnique(poly ph, const ring r)
     return;
   }
 
-  if (nCoeff_is_Zp(C) && TEST_OPT_INTSTRATEGY)
+  if(UNLIKELY(pNext(ph)==NULL)) // a monomial
+  {
+    p_SetCoeff(ph, n_Init(1, C), r);
+    return;
+  }
+
+  if (UNLIKELY(nCoeff_is_Zp(C) && TEST_OPT_INTSTRATEGY))
   {
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
     return;
@@ -3214,12 +3220,6 @@ void p_ProjectiveUnique(poly ph, const ring r)
   p = ph;
 
   assume(p != NULL);
-
-  if(pNext(p)==NULL) // a monomial
-  {
-    p_SetCoeff(p, n_Init(1, C), r);
-    return;
-  }
 
   assume(pNext(p)!=NULL);
 
@@ -3852,24 +3852,25 @@ void p_Norm(poly p1, const ring r)
   }
   else //(p1!=NULL)
   {
-    if (!n_IsOne(pGetCoeff(p1),r->cf))
+    const coeffs C=r->cf;
+    if (LIKELY(!n_IsOne(pGetCoeff(p1),C)))
     {
       if (UNLIKELY(pNext(p1)==NULL))
       {
-        p_SetCoeff(p1,n_Init(1,r->cf),r);
+        p_SetCoeff(p1,n_Init(1,C),r);
         return;
       }
       number k = pGetCoeff(p1);
-      pSetCoeff0(p1,n_Init(1,r->cf));
+      pSetCoeff0(p1,n_Init(1,C));
       poly h = pNext(p1);
-      if (LIKELY(rField_is_Zp(r)))
+      if (LIKELY(nCoeff_is_Zp(C)))
       {
-        if (r->cf->ch>32003)
+        if (C->ch>32003)
         {
-          number inv=n_Invers(k,r->cf);
+          number inv=n_Invers(k,C);
           while (h!=NULL)
           {
-            number c=n_Mult(pGetCoeff(h),inv,r->cf);
+            number c=n_Mult(pGetCoeff(h),inv,C);
             // no need to normalize
             p_SetCoeff(h,c,r);
             pIter(h);
@@ -3880,52 +3881,52 @@ void p_Norm(poly p1, const ring r)
         {
           while (h!=NULL)
           {
-            number c=n_Div(pGetCoeff(h),k,r->cf);
+            number c=n_Div(pGetCoeff(h),k,C);
             // no need to normalize
             p_SetCoeff(h,c,r);
             pIter(h);
           }
         }
       }
-      else if(getCoeffType(r->cf)==n_algExt)
+      else if(getCoeffType(C)==n_algExt)
       {
-        n_Normalize(k,r->cf);
-        number inv=n_Invers(k,r->cf);
+        n_Normalize(k,C);
+        number inv=n_Invers(k,C);
         while (h!=NULL)
         {
-          number c=n_Mult(pGetCoeff(h),inv,r->cf);
+          number c=n_Mult(pGetCoeff(h),inv,C);
           // no need to normalize
           // normalize already in nMult: Zp_a, Q_a
           p_SetCoeff(h,c,r);
           pIter(h);
         }
-        n_Delete(&inv,r->cf);
-        n_Delete(&k,r->cf);
+        n_Delete(&inv,C);
+        n_Delete(&k,C);
       }
       else
       {
-        n_Normalize(k,r->cf);
+        n_Normalize(k,C);
         while (h!=NULL)
         {
-          number c=n_Div(pGetCoeff(h),k,r->cf);
+          number c=n_Div(pGetCoeff(h),k,C);
           // no need to normalize: Z/p, R
           // remains: Q
-          if (rField_is_Q(r)) n_Normalize(c,r->cf);
+          if (nCoeff_is_Q(C)) n_Normalize(c,C);
           p_SetCoeff(h,c,r);
           pIter(h);
         }
-        n_Delete(&k,r->cf);
+        n_Delete(&k,C);
       }
     }
     else
     {
-      //if (r->cf->cfNormalize != nDummy2) //TODO: OPTIMIZE
-      if (rField_is_Q(r))
+      //if (C->cfNormalize != nDummy2) //TODO: OPTIMIZE
+      if (nCoeff_is_Q(C))
       {
         poly h = pNext(p1);
         while (h!=NULL)
         {
-          n_Normalize(pGetCoeff(h),r->cf);
+          n_Normalize(pGetCoeff(h),C);
           pIter(h);
         }
       }

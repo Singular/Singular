@@ -60,7 +60,6 @@ char* stringTable(stablerec* t)
         StringAppendS(s);
         omFree(s);
         StringAppendS("\n");
-        telem pp=p;
         p=p->next;
     }
   }
@@ -121,5 +120,5 @@ void htable_Print(stablerec *d)
       while(p!=NULL) { cnt2++;p=p->next;}
     }
   }
-  Print("%d colums, %d entries, size:%d",cnt,cnt2,lt->max);
+  Print("%d columns, %d entries, size:%d",cnt,cnt2,lt->max);
 }

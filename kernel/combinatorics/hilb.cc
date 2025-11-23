@@ -1389,9 +1389,7 @@ poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring
   if (Q!=NULL)
   {
     ideal QQ=id_Head(Q,src);
-    AA=id_SimpleAdd(A,QQ,src);
-    id_Delete(&QQ,src);
-    id_Delete(&A,src);
+    AA=id_SimpleMove(A,QQ,src);
     idSkipZeroes(AA);
     int c=p_GetComp(AA->m[0],src);
     if (c!=0)

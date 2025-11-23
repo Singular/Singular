@@ -11,7 +11,7 @@ intmat C[2][4] =
 1,1,2,0,
 2,3,4,0;
 // should result in a matrix whose
-// colums create the same  lattice as
+// columns create the same  lattice as
 // [0,1],[1,0]
 intmat D = latticeBasis(C);
 print(D);

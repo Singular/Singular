@@ -302,12 +302,17 @@ int main(int argc, char** argv)
   const char* prefix = "--";
   if (strstr(emacs, "xemacs") || strstr(emacs, "Xemacs") || strstr(emacs, "XEMACS"))
     prefix = "-";
-  getcwd(cwd, MAXPATHLEN);
+  if (getcwd(cwd, MAXPATHLEN) == NULL)
+  {
+    perror("getcwd");
+    mainUsage();
+    exit(1);
+  }
   // append / at the end of cwd
   if (cwd[strlen(cwd)-1] != '/') strcat(cwd, "/");
 
   // Note: option -no-init-file should be equivalent to -q. Anyhow,
-  // xemacs-20.4 sometimes crashed on startup when using -q. Don´t know why.
+  // xemacs-20.4 sometimes crashed on startup when using -q. Do not know why.
   snprintf(syscall,len, "%s %sno-init-file %seval '(progn (setq singular-emacs-home-directory \"%s\") (load-file \"%s\") (singular-other \"%s\" \"%s\" (list ",
           emacs, prefix, prefix, emacs_dir, emacs_load,
           singular, cwd);

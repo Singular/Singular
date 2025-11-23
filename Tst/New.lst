@@ -37,6 +37,7 @@ New/newstruct_ssi.tst
 New/nc_algebra_c_poly.tst
 New/ntDiff.tst
 New/oscar3905.tst
+New/oscar5571.tst
 New/print_minpoly.tst
 New/print_nc_relations.tst
 New/print_param_poly_short.tst

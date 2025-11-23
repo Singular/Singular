@@ -95,10 +95,12 @@ static char * omFindExec_link (const char *name, char* executable)
 
         if ((tbuf[0] == '.' && tbuf[1] == '\0') || tbuf[0] == '\0') {
 #ifdef HAVE_GETCWD
-          getcwd (tbuf, MAXPATHLEN);
+   if (getcwd (tbuf, MAXPATHLEN) == NULL)
+      goto next_path_entry;
 #else
 # ifdef HAVE_GETWD
-          getwd (tbuf);
+   if (getwd (tbuf) == NULL)
+      goto next_path_entry;
 # endif
 #endif
         }
@@ -113,6 +115,7 @@ static char * omFindExec_link (const char *name, char* executable)
           return executable;
         }
 
+next_path_entry:
         if (*p != '\0')
         {
           p ++;

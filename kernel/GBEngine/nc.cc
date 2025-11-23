@@ -126,9 +126,7 @@ ideal twostd(ideal I) // works in currRing only!
               K = Q;
             else
             {
-              ideal id_tmp = idSimpleAdd(K, Q); // in currRing
-              id_Delete(&K, currRing);
-              id_Delete(&Q, currRing);
+              ideal id_tmp = id_SimpleMove(K, Q,currRing);
               K = id_tmp; // K += Q
             }
           }
@@ -167,8 +165,7 @@ ideal twostd(ideal I) // works in currRing only!
     int iSize = idElem(J); // ring independent
 
     // J += K:
-    ideal id_tmp = idSimpleAdd(J,K); // in currRing
-    id_Delete(&K, currRing); id_Delete(&J, currRing);
+    ideal id_tmp = id_SimpleMove(J,K,currRing);
 
 #if 1
     BITSET save1;

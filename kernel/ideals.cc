@@ -681,9 +681,7 @@ static ideal idPrepare (ideal  h1, ideal h11, tHomog hom, int syzcomp, intvec **
   }
   if (h11!=NULL)
   {
-    ideal h=id_SimpleAdd(h2,h22,currRing);
-    id_Delete(&h2,currRing);
-    id_Delete(&h22,currRing);
+    ideal h=id_SimpleMove(h2,h22,currRing);
     h2=h;
   }
 
@@ -1409,7 +1407,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,int *w)
 *BEWARE: the returned ideals may contain incorrectly ordered polys !
 *
 */
-static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *addOnlyOne, int *kkmax)
+static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *addOnlyOne, int *kkmax, int *q_len)
 {
   idTest(h1);
   idTest(h2);
@@ -1432,24 +1430,24 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
   else
     temph1 = idCopy(h1);
   if (weights!=NULL) delete weights;
+  *q_len=-1;
   if (currRing->qideal!=NULL)
   {
     int kk=si_max(k1,k2);
     if (kk==0)
     {
-      ideal tmp=id_SimpleAdd(temph1,currRing->qideal,currRing);
-      id_Delete(&temph1,currRing);
+      *q_len=idElem(currRing->qideal);
+      ideal tmp=id_SimpleMove(idCopy(currRing->qideal),temph1,currRing);
       temph1=tmp;
     }
     else
     {
+      *q_len=idElem(currRing->qideal)*kk;
       for(int i=1;i<=kk;i++)
       {
         ideal q=id_Copy(currRing->qideal,currRing);
         id_Shift(q,i,currRing); q->rank=i;
-        ideal tmp=id_SimpleAdd(temph1,q,currRing);
-        id_Delete(&q,currRing);
-        id_Delete(&temph1,currRing);
+        ideal tmp=id_SimpleMove(q,temph1,currRing);
         temph1=tmp;
       }
     }
@@ -1551,12 +1549,12 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
       res = idFreeModule(h1->rank);
     return res;
   }
-  int i, kmax;
+  int i, kmax,q_len;
   BOOLEAN  addOnlyOne=TRUE;
   tHomog   hom=isNotHomog;
   intvec * weights1;
 
-  ideal s_h4 = idInitializeQuot (h1,h2,h1IsStb,&addOnlyOne,&kmax);
+  ideal s_h4 = idInitializeQuot (h1,h2,h1IsStb,&addOnlyOne,&kmax,&q_len);
 
   hom = (tHomog)idHomModule(s_h4,currRing->qideal,&weights1);
 
@@ -1590,7 +1588,16 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   {
     //s_h3 = kStd2(s_h4,currRing->qideal,hom,&weights1,(bigintmat*)NULL,kmax-1);
     // qideal added in idInitializeQuotient
-    s_h3 = kStd2(s_h4,NULL,hom,&weights1,(bigintmat*)NULL,kmax-1);
+    if (q_len>0)
+    {
+      BITSET save1;
+      SI_SAVE_OPT1(save1);
+      si_opt_1|=Sy_bit(OPT_SB_1);
+      s_h3 = kStd2(s_h4,NULL,hom,&weights1,(bigintmat*)NULL,kmax-1,q_len);
+      SI_RESTORE_OPT1(save1);
+    }
+    else
+      s_h3 = kStd2(s_h4,NULL,hom,&weights1,(bigintmat*)NULL,kmax-1);
   }
   SI_RESTORE_OPT1(old_test1);
 
@@ -1834,9 +1841,7 @@ ideal idElimination2 (ideal h1,poly delVar,bigintmat *hilb, GbVariant alg)
   {
     WarnS("eliminate in q-ring: experimental");
     ideal q=idrCopyR(origR->qideal,origR,currRing);
-    ideal s=idSimpleAdd(h,q);
-    idDelete(&h);
-    idDelete(&q);
+    ideal s=id_SimpleMove(h,q,currRing);
     h=s;
   }
   // compute GB
@@ -3465,10 +3470,8 @@ ideal id_Sat_principal(ideal I, ideal J, const ring origR)
   p=p_Mult_q(p,t,tmpR);
   p=p_Sub(p,pOne(),tmpR);
   JJ->m[0]=p;
-  ideal T=id_SimpleAdd(II,JJ,tmpR);
+  ideal T=id_SimpleMove(II,JJ,tmpR);
   idTest(T);
-  id_Delete(&II,tmpR);
-  id_Delete(&JJ,tmpR);
   // elimination
   t=pOne();
   p_SetExp(t,rVar(tmpR),1,tmpR);

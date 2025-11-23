@@ -163,8 +163,19 @@ void feInitResources(const char* argv0)
   {
     //WarnS("illegal argv[0]==NULL");
     feArgv0 = (char*)malloc(MAXPATHLEN+strlen("/Singular"));
-    getcwd(feArgv0, MAXPATHLEN);
-    strcat(feArgv0,"/Singular");
+    if (feArgv0 == NULL)
+    {
+      fprintf(stderr, "out of memory in initialization\n");
+      abort();
+    }
+    if (getcwd(feArgv0, MAXPATHLEN) == NULL)
+    {
+      strcpy(feArgv0, "Singular");
+    }
+    else
+    {
+      strcat(feArgv0,"/Singular");
+    }
   }
   else
     feArgv0 = strdup(argv0);
