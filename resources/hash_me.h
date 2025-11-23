@@ -1,5 +1,5 @@
 #ifndef HASH_ME_H
-#define AHSH_ME_H
+#define HASH_ME_H
 #include <stdint.h>     /* defines uint32_t etc */
 #include <stddef.h>     /* size_t */
 #ifdef __cplusplus
