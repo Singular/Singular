@@ -331,10 +331,10 @@ SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
 }
 
 // rearrange shifted components
-static long syReorderShiftedComponents(long * sc, unsigned int n)
+static long syReorderShiftedComponents(long * sc, size_t n)
 {
   long holes = 0;
-  unsigned int i;
+  size_t i;
   long new_comps = 0, new_space, max;
 
   // count number of holes
