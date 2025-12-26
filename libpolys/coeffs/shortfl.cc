@@ -50,6 +50,11 @@ SI_FLOAT nrFloat(number n)
   return nf(n).F();
 }
 
+number nrFromFloat(SI_FLOAT f)
+{
+  return nf(f).N();
+}
+
 static BOOLEAN nrGreaterZero (number k, const coeffs r)
 {
   assume( getCoeffType(r) == n_R );

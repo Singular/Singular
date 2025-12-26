@@ -26,5 +26,8 @@ BOOLEAN nrInitChar(coeffs r, void*);
 /// Converts a n_R number into a float. Needed by Maps
 SI_FLOAT  nrFloat(number n);
 
+/// Converts a float into a n_R number. Needed by simplex
+number nrFromFloat(SI_FLOAT f);
+
 #endif
 

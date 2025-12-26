@@ -16,8 +16,10 @@
 
 #include "coeffs/numbers.h"
 #include "coeffs/mpr_global.h"
+#include "coeffs/shortfl.h"
 
 #include "polys/matpol.h"
+#include "polys/monomials/ring.h"
 
 #include "kernel/polys.h"
 
@@ -1017,6 +1019,7 @@ BOOLEAN simplex::mapFromMatrix( matrix mm )
 //    }
 
   number coef;
+  BOOLEAN isShortReal = rField_is_R(currRing);
   for ( i= 1; i <= MATROWS( mm ); i++ )
   {
      for ( j= 1; j <= MATCOLS( mm ); j++ )
@@ -1025,7 +1028,12 @@ BOOLEAN simplex::mapFromMatrix( matrix mm )
         {
            coef= pGetCoeff( MATELEM(mm,i,j) );
            if ( coef != NULL && !nIsZero(coef) )
-              LiPM[i][j]= (double)(*(gmp_float*)coef);
+           {
+              if (isShortReal)
+                LiPM[i][j]= (double)nrFloat(coef);
+              else
+                LiPM[i][j]= (double)(*(gmp_float*)coef);
+           }
            //#ifdef mpr_DEBUG_PROT
            //Print("%f ",LiPM[i][j]);
            //#endif
@@ -1048,7 +1056,7 @@ matrix simplex::mapToMatrix( matrix mm )
 //Print(" %d x %d\n",MATROWS( mm ),MATCOLS( mm ));
 
   number coef;
-  gmp_float * bla;
+  BOOLEAN isShortReal = rField_is_R(currRing);
   for ( i= 1; i <= MATROWS( mm ); i++ )
   {
     for ( j= 1; j <= MATCOLS( mm ); j++ )
@@ -1058,8 +1066,15 @@ matrix simplex::mapToMatrix( matrix mm )
 //Print(" %3.0f ",LiPM[i][j]);
        if ( LiPM[i][j] != 0.0 )
        {
-          bla= new gmp_float(LiPM[i][j]);
-          coef= (number)bla;
+          if (isShortReal)
+          {
+            coef= nrFromFloat((SI_FLOAT)LiPM[i][j]);
+          }
+          else
+          {
+            gmp_float * bla= new gmp_float(LiPM[i][j]);
+            coef= (number)bla;
+          }
           MATELEM(mm,i,j)= pOne();
           pSetCoeff( MATELEM(mm,i,j), coef );
        }

@@ -4571,7 +4571,7 @@ BOOLEAN loNewtonP( leftv res, leftv arg1 )
 
 BOOLEAN loSimplex( leftv res, leftv args )
 {
-  if ( !(rField_is_long_R(currRing)) )
+  if ( !(rField_is_long_R(currRing)) && !(rField_is_R(currRing)) )
   {
     WerrorS("Ground field not implemented!");
     return TRUE;
@@ -5775,8 +5775,7 @@ ring rInit(leftv pn, leftv rv, leftv ord)
 
     if (!complex_flag)
       complex_flag= (pnn!=NULL) && (pnn->name!=NULL);
-    if( !complex_flag && (float_len <= (short)SHORT_REAL_LENGTH)
-                      && (float_len2 <= (short)SHORT_REAL_LENGTH))
+    if( !complex_flag && (float_len <= (short)SHORT_REAL_LENGTH))
        cf=nInitChar(n_R, NULL);
     else // longR or longC?
     {
