@@ -557,16 +557,14 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   if( parameter != NULL)
   {
     LongComplexInfo* p = (LongComplexInfo*)parameter;
-
-    n->float_len = p->float_len;
-    n->float_len2 = p->float_len2;
+    // Use user-specified precision if > 0, otherwise use default SHORT_REAL_LENGTH
+    n->float_len = (p->float_len > 0) ? p->float_len : SHORT_REAL_LENGTH;
+    n->float_len2 = (p->float_len2 > 0) ? p->float_len2 : SHORT_REAL_LENGTH;
   } else // default values, just for testing!
   {
     n->float_len = SHORT_REAL_LENGTH;
     n->float_len2 = SHORT_REAL_LENGTH;
   }
-
-  assume( n->float_len2 >= SHORT_REAL_LENGTH );
 
   assume( n_NumberOfParameters(n) == 0 );
   assume( n_ParameterNames(n) == NULL );

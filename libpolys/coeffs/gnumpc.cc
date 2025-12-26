@@ -671,10 +671,9 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   {
     LongComplexInfo* p = (LongComplexInfo*)parameter;
     pParameterNames[0] = omStrDup(p->par_name);
-    // fix wrong parameters:
-    if (p->float_len<SHORT_REAL_LENGTH) p->float_len=SHORT_REAL_LENGTH;
-    n->float_len = p->float_len;
-    n->float_len2 = p->float_len2;
+    // Use user-specified precision if > 0, otherwise use default SHORT_REAL_LENGTH
+    n->float_len = (p->float_len > 0) ? p->float_len : SHORT_REAL_LENGTH;
+    n->float_len2 = (p->float_len2 > 0) ? p->float_len2 : SHORT_REAL_LENGTH;
 
   } else // default values, just for testing!
   {

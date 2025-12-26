@@ -344,7 +344,7 @@ void killlocals_rec(idhdl *root,int v, ring r)
     {
  //     Print("into pack %s, lev %d for lev %d\n",IDID(h),IDLEV(h),v);
       if (IDPACKAGE(h)!=basePack)
-        killlocals_rec(&(IDRING(h)->idroot),v,r);
+        killlocals_rec(&(IDPACKAGE(h)->idroot),v,r);
       h=IDNEXT(h);
     }
     else if (IDTYP(h)==RING_CMD)
@@ -1836,9 +1836,9 @@ static void rDecomposeC_41(leftv h,const coeffs C)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
     LL->m[0].rtyp=INT_CMD;
-    LL->m[0].data=(void *)(long)si_max(C->float_len,SHORT_REAL_LENGTH/2);
+    LL->m[0].data=(void *)(long)C->float_len;
     LL->m[1].rtyp=INT_CMD;
-    LL->m[1].data=(void *)(long)si_max(C->float_len2,SHORT_REAL_LENGTH);
+    LL->m[1].data=(void *)(long)C->float_len2;
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
   // ----------------------------------------
@@ -1870,9 +1870,9 @@ static void rDecomposeC(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
     LL->m[0].rtyp=INT_CMD;
-    LL->m[0].data=(void *)(long)si_max(R->cf->float_len,SHORT_REAL_LENGTH/2);
+    LL->m[0].data=(void *)(long)R->cf->float_len;
     LL->m[1].rtyp=INT_CMD;
-    LL->m[1].data=(void *)(long)si_max(R->cf->float_len2,SHORT_REAL_LENGTH);
+    LL->m[1].data=(void *)(long)R->cf->float_len2;
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
   // ----------------------------------------
@@ -5775,7 +5775,8 @@ ring rInit(leftv pn, leftv rv, leftv ord)
 
     if (!complex_flag)
       complex_flag= (pnn!=NULL) && (pnn->name!=NULL);
-    if( !complex_flag && (float_len <= (short)SHORT_REAL_LENGTH))
+    if( !complex_flag && (float_len <= (short)SHORT_REAL_LENGTH)
+                      && (float_len2 <= (short)SHORT_REAL_LENGTH))
        cf=nInitChar(n_R, NULL);
     else // longR or longC?
     {
@@ -5787,11 +5788,6 @@ ring rInit(leftv pn, leftv rv, leftv ord)
        // set the parameter name
        if (complex_flag)
        {
-         if (param.float_len < SHORT_REAL_LENGTH)
-         {
-           param.float_len= SHORT_REAL_LENGTH;
-           param.float_len2= SHORT_REAL_LENGTH;
-         }
          if ((pnn == NULL) || (pnn->name == NULL))
            param.par_name=(const char*)"i"; //default to i
          else

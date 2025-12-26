@@ -480,7 +480,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
         currPack=basePack;
         currPackHdl=NULL;
       }
-      idhdl * hd = &IDRING(h)->idroot;
+      idhdl * hd = &IDPACKAGE(h)->idroot;
       idhdl  hdh = IDNEXT(*hd);
       idhdl  temp;
       while (hdh!=NULL)

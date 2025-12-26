@@ -51,7 +51,7 @@
 // --------------------------------------------------------------
 // internal to coeffs, but public for all realizations
 
-#if SIZEOF_DOUBE == SIZEOF_LONG
+#if SIZEOF_DOUBLE == SIZEOF_LONG
 #define SHORT_REAL_LENGTH 16 // use double for real <= 15 digits
 #else
 #define SHORT_REAL_LENGTH 6 // use float for real <= 6 digits
