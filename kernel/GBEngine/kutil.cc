@@ -3979,6 +3979,8 @@ void chainCritRing (poly p,int, kStrategy strat)
           }
 #endif
         }
+        else
+          ++jt;
       }
       else
         ++jt;
