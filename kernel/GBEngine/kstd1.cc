@@ -464,6 +464,13 @@ int redRiloc (LObject* h,kStrategy strat)
         h->SetLmCurrRing();
         if (strat->honey && strat->compareLDependsOnLength)
           h->SetLength(strat->length_pLength);
+        if (rField_is_Ring(currRing)
+            && !nGreaterZero(pGetCoeff(h->p)))
+        {
+            h->p = p_Neg(h->p, currRing);
+            if (h->t_p != NULL)
+                pSetCoeff0(h->t_p, pGetCoeff(h->p));
+        }
         assume(h->FDeg == h->pFDeg());
         if (! strat->L.would_be_top(*h) && pLmCmp(h->p, strat->L.top().p) != 0 && !nEqual(h->p->coef, strat->L.top().p->coef))
         {
@@ -520,6 +527,16 @@ int redRiloc (LObject* h,kStrategy strat)
       h->SetLmCurrRing();
       if (strat->honey && strat->compareLDependsOnLength)
         h->SetLength(strat->length_pLength);
+      /* Normalize leading coefficient to positive (matching
+       * spielwiese posInL11Ringls side effect) so that the
+       * would_be_top check below compares consistently. */
+      if (rField_is_Ring(currRing)
+          && !nGreaterZero(pGetCoeff(h->p)))
+      {
+        h->p = p_Neg(h->p, currRing);
+        if (h->t_p != NULL)
+          pSetCoeff0(h->t_p, pGetCoeff(h->p));
+      }
       assume(h->FDeg == h->pFDeg());
       if (! strat->L.would_be_top(*h))
       {
@@ -685,6 +702,16 @@ int redRiloc_Z (LObject* h,kStrategy strat)
                 h->SetLmCurrRing();
                 if (strat->honey && strat->compareLDependsOnLength)
                     h->SetLength(strat->length_pLength);
+                /* Normalize leading coefficient to positive (matching
+                 * spielwiese posInL11Ringls side effect) so that the
+                 * nEqual check below compares consistently. */
+                if (rField_is_Ring(currRing)
+                    && !nGreaterZero(pGetCoeff(h->p)))
+                {
+                    h->p = p_Neg(h->p, currRing);
+                    if (h->t_p != NULL)
+                        pSetCoeff0(h->t_p, pGetCoeff(h->p));
+                }
                 assume(h->FDeg == h->pFDeg());
                 if (! strat->L.would_be_top(*h) && pLmCmp(h->p, strat->L.top().p) != 0 && !nEqual(h->p->coef, strat->L.top().p->coef))
                 {
@@ -741,6 +768,13 @@ int redRiloc_Z (LObject* h,kStrategy strat)
             h->SetLmCurrRing();
             if (strat->honey && strat->compareLDependsOnLength)
                 h->SetLength(strat->length_pLength);
+            if (rField_is_Ring(currRing)
+                && !nGreaterZero(pGetCoeff(h->p)))
+            {
+                h->p = p_Neg(h->p, currRing);
+                if (h->t_p != NULL)
+                    pSetCoeff0(h->t_p, pGetCoeff(h->p));
+            }
             assume(h->FDeg == h->pFDeg());
             if (! strat->L.would_be_top(*h))
             {
@@ -1365,8 +1399,9 @@ static void updateL(BOOLEAN searchPP, kStrategy strat)
     {
       if (hasPurePower(&(*it), strat->lastAxis, &dL, strat))
       {
-        // Move this element to the top by swapping with last element
-        std::iter_swap(it, strat->L.begin());
+        // compareL10 comparator gives pure-power elements priority,
+        // so just record that one was found.  Do NOT use iter_swap here:
+        // it corrupts the writable_set (multiset) sorted invariant.
         lastPPfound = TRUE;
         break;
       }
@@ -1412,7 +1447,8 @@ static void updateL(BOOLEAN searchPP, kStrategy strat)
 
       if (pp)
       {
-        std::iter_swap(it, strat->L.begin());
+        // Pure power found after computing lazy S-poly.
+        // compareL10 handles priority; just break.
         break;
       }
     }
@@ -1622,7 +1658,10 @@ void enterSMora (LObject &p,int atS,kStrategy strat, int atR)
       }
     }
     else if (strat->lastAxis)
+    {
       updateL(TRUE,strat);
+      strat->L.reorder();
+    }
   }
 }
 

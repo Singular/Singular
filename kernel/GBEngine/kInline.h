@@ -993,6 +993,22 @@ KINLINE void LSet::push(LObject& lobject) {
   /* We track a sequence number to allow FIFO or LIFO ordering to be selected for equal objects */
   lobject.seq = seq;
   seq ++;
+  /* Normalize leading coefficient to be positive (matching spielwiese
+   * posInL11Ringls behavior).  Over Z with local/mixed orderings, the
+   * original posInL function negated polynomials with negative leading
+   * coefficients as a side effect of the binary search.  Without this
+   * normalization, the nEqual() checks in the Mora reduction functions
+   * (redRiloc_Z, redRiloc) evaluate differently, causing the algorithm
+   * to make wrong lazy-reinsertion decisions and hang.
+   * Only apply for non-global orderings (where posInL11Ringls was used). */
+  if (lobject.p != NULL && rField_is_Ring(currRing)
+      && !rHasGlobalOrdering(currRing)
+      && !nGreaterZero(pGetCoeff(lobject.p)))
+  {
+    lobject.p = p_Neg(lobject.p, currRing);
+    if (lobject.t_p != NULL)
+      pSetCoeff0(lobject.t_p, pGetCoeff(lobject.p));
+  }
   insert(lobject);
 }
 
