@@ -52,56 +52,27 @@ void omUpdateInfo()
   om_Info.MaxBytesMmap += OM_MALLOC_MAX_BYTES_MMAP;
 #endif
 
-  /*
-   * Compute CurrentBytesAlloc / MaxBytesAlloc.
-   *
-   * Historically these were derived from sbrk(0), but sbrk() is deprecated
-   * on macOS and only tracks brk-based heap on Linux (missing mmap'd
-   * allocations).  Since omalloc already precisely tracks every byte it
-   * allocates/frees via CurrentBytesFromMalloc and CurrentBytesFromValloc,
-   * we derive these stats from those counters instead.  This gives
-   * more accurate results on all platforms.
-   *
-   * When OM_MALLOC_CURRENT_BYTES_SBRK is defined, the malloc library
-   * provides its own value and we use that (unchanged from before).
-   */
-#ifndef OM_MALLOC_CURRENT_BYTES_SBRK
+  /* CurrentBytesAlloc / MaxBytesAlloc: total bytes currently held by
+     omalloc from the OS (malloc + valloc).  Replaces the old sbrk(0)-based
+     counters which were inaccurate on macOS (always 0) and on Linux
+     (missed mmap'd allocations). */
   om_Info.CurrentBytesAlloc = om_Info.CurrentBytesFromMalloc
                              + om_Info.CurrentBytesFromValloc;
   if (om_Info.CurrentBytesAlloc > om_Info.MaxBytesAlloc)
     om_Info.MaxBytesAlloc = om_Info.CurrentBytesAlloc;
-#else
-  om_Info.CurrentBytesAlloc = OM_MALLOC_CURRENT_BYTES_SBRK;
-#ifdef OM_MALLOC_MAX_BYTES_SBRK
-  om_Info.MaxBytesAlloc = OM_MALLOC_MAX_BYTES_SBRK;
-#else
-    if (om_Info.CurrentBytesAlloc > om_Info.MaxBytesAlloc)
-      om_Info.MaxBytesAlloc = om_Info.CurrentBytesAlloc;
-#endif
-#endif
 
-#ifdef OM_MALLOC_CURRENT_BYTES_SYSTEM
-  om_Info.CurrentBytesSystem = OM_MALLOC_CURRENT_BYTES_SYSTEM;
-#else
+  /* CurrentBytesAlloc already includes both FromMalloc and FromValloc,
+     so no separate valloc addition is needed */
   om_Info.CurrentBytesSystem =
-    (om_Info.CurrentBytesAlloc > om_Info.UsedBytesMalloc ?
-     om_Info.CurrentBytesAlloc : om_Info.UsedBytesMalloc);
-#endif
-#ifdef OM_HAVE_VALLOC_MMAP
-  om_Info.CurrentBytesSystem += om_Info.CurrentBytesFromValloc;
-#endif
+    (om_Info.CurrentBytesAlloc > om_Info.UsedBytesMalloc + om_Info.CurrentBytesFromValloc ?
+     om_Info.CurrentBytesAlloc : om_Info.UsedBytesMalloc + om_Info.CurrentBytesFromValloc);
 
-#if ! (defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM))
-#ifdef OM_MALLOC_MAX_BYTES_SYSTEM
-  om_Info.MaxBytesSystem = OM_MALLOC_MAX_BYTES_SYSTEM;
-#else
+  /* MaxBytesAlloc already includes FromValloc; use it directly */
   om_Info.MaxBytesSystem =
-    (om_Info.MaxBytesAlloc + om_Info.MaxBytesMmap >
+    (om_Info.MaxBytesAlloc >
      om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc ?
-     om_Info.MaxBytesAlloc + om_Info.MaxBytesMmap :
+     om_Info.MaxBytesAlloc :
      om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc);
-#endif
-#endif
 }
 
 omInfo_t omGetInfo()
