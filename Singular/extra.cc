@@ -2571,8 +2571,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #define OM_PRINT(name) Print(" %-22s : %10ld \n", #name, om_Info . name)
         OM_PRINT(MaxBytesSystem);
         OM_PRINT(CurrentBytesSystem);
-        OM_PRINT(MaxBytesSbrk);
-        OM_PRINT(CurrentBytesSbrk);
+        OM_PRINT(MaxBytesAlloc);
+        OM_PRINT(CurrentBytesAlloc);
         OM_PRINT(MaxBytesMmap);
         OM_PRINT(CurrentBytesMmap);
         OM_PRINT(UsedBytes);

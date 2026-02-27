@@ -53,30 +53,30 @@ void omUpdateInfo()
 #endif
 
   /*
-   * Compute CurrentBytesSbrk / MaxBytesSbrk.
+   * Compute CurrentBytesAlloc / MaxBytesAlloc.
    *
    * Historically these were derived from sbrk(0), but sbrk() is deprecated
    * on macOS and only tracks brk-based heap on Linux (missing mmap'd
    * allocations).  Since omalloc already precisely tracks every byte it
    * allocates/frees via CurrentBytesFromMalloc and CurrentBytesFromValloc,
-   * we derive the "sbrk" stats from those counters instead.  This gives
+   * we derive these stats from those counters instead.  This gives
    * more accurate results on all platforms.
    *
    * When OM_MALLOC_CURRENT_BYTES_SBRK is defined, the malloc library
    * provides its own value and we use that (unchanged from before).
    */
 #ifndef OM_MALLOC_CURRENT_BYTES_SBRK
-  om_Info.CurrentBytesSbrk = om_Info.CurrentBytesFromMalloc
+  om_Info.CurrentBytesAlloc = om_Info.CurrentBytesFromMalloc
                              + om_Info.CurrentBytesFromValloc;
-  if (om_Info.CurrentBytesSbrk > om_Info.MaxBytesSbrk)
-    om_Info.MaxBytesSbrk = om_Info.CurrentBytesSbrk;
+  if (om_Info.CurrentBytesAlloc > om_Info.MaxBytesAlloc)
+    om_Info.MaxBytesAlloc = om_Info.CurrentBytesAlloc;
 #else
-  om_Info.CurrentBytesSbrk = OM_MALLOC_CURRENT_BYTES_SBRK;
+  om_Info.CurrentBytesAlloc = OM_MALLOC_CURRENT_BYTES_SBRK;
 #ifdef OM_MALLOC_MAX_BYTES_SBRK
-  om_Info.MaxBytesSbrk = OM_MALLOC_MAX_BYTES_SBRK;
+  om_Info.MaxBytesAlloc = OM_MALLOC_MAX_BYTES_SBRK;
 #else
-    if (om_Info.CurrentBytesSbrk > om_Info.MaxBytesSbrk)
-      om_Info.MaxBytesSbrk = om_Info.CurrentBytesSbrk;
+    if (om_Info.CurrentBytesAlloc > om_Info.MaxBytesAlloc)
+      om_Info.MaxBytesAlloc = om_Info.CurrentBytesAlloc;
 #endif
 #endif
 
@@ -84,8 +84,8 @@ void omUpdateInfo()
   om_Info.CurrentBytesSystem = OM_MALLOC_CURRENT_BYTES_SYSTEM;
 #else
   om_Info.CurrentBytesSystem =
-    (om_Info.CurrentBytesSbrk > om_Info.UsedBytesMalloc ?
-     om_Info.CurrentBytesSbrk : om_Info.UsedBytesMalloc);
+    (om_Info.CurrentBytesAlloc > om_Info.UsedBytesMalloc ?
+     om_Info.CurrentBytesAlloc : om_Info.UsedBytesMalloc);
 #endif
 #ifdef OM_HAVE_VALLOC_MMAP
   om_Info.CurrentBytesSystem += om_Info.CurrentBytesFromValloc;
@@ -96,9 +96,9 @@ void omUpdateInfo()
   om_Info.MaxBytesSystem = OM_MALLOC_MAX_BYTES_SYSTEM;
 #else
   om_Info.MaxBytesSystem =
-    (om_Info.MaxBytesSbrk + om_Info.MaxBytesMmap >
+    (om_Info.MaxBytesAlloc + om_Info.MaxBytesMmap >
      om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc ?
-     om_Info.MaxBytesSbrk + om_Info.MaxBytesMmap :
+     om_Info.MaxBytesAlloc + om_Info.MaxBytesMmap :
      om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc);
 #endif
 #endif
@@ -129,7 +129,7 @@ void omPrintInfo(FILE* fd)
   omUpdateInfo();
   fputs("                  Current:       Max:\n",fd);
   fprintf(fd, "BytesSystem:     %8ldk  %8ldk\n", om_Info.CurrentBytesSystem/1024, om_Info.MaxBytesSystem/1024);
-  fprintf(fd, "BytesSbrk:       %8ldk  %8ldk\n", om_Info.CurrentBytesSbrk/1024, om_Info.MaxBytesSbrk/1024);
+  fprintf(fd, "BytesAlloc:      %8ldk  %8ldk\n", om_Info.CurrentBytesAlloc/1024, om_Info.MaxBytesAlloc/1024);
   fprintf(fd, "BytesMmap:       %8ldk  %8ldk\n", om_Info.CurrentBytesMmap/1024, om_Info.MaxBytesMmap/1024);
   fprintf(fd, "BytesFromMalloc: %8ldk  %8ldk\n", om_Info.CurrentBytesFromMalloc/1024, om_Info.MaxBytesFromMalloc/1024);
   fprintf(fd, "BytesFromValloc: %8ldk  %8ldk\n", om_Info.CurrentBytesFromValloc/1024, om_Info.MaxBytesFromValloc/1024);
