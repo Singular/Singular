@@ -226,17 +226,6 @@ void* omAllocFromSystem(size_t size)
     if (om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
       om_Info.MaxBytesSystem = om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
 #endif
-#if defined(HAVE_SBRK) && !defined(OM_MALLOC_MAX_BYTES_SBRK)
-    if (! om_SbrkInit) om_SbrkInit = (unsigned long) sbrk(0) - size;
-    if (om_Info.MaxBytesFromMalloc
-#ifndef OM_HAVE_VALLOC_MMAP
-        + om_Info.CurrentBytesFromValloc
-#endif
-        > om_Info.MaxBytesSbrk)
-    {
-      om_Info.MaxBytesSbrk = (unsigned long) sbrk(0) - om_SbrkInit;
-    }
-#endif
   }
   OM_MALLOC_HOOK(size);
   return ptr;
@@ -286,16 +275,6 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
 #if defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM)
     if (om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
       om_Info.MaxBytesSystem = om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
-#endif
-#if defined(HAVE_SBRK) && !defined(OM_MALLOC_MAX_BYTES_SBRK)
-    if (om_Info.MaxBytesFromMalloc
-#ifndef OM_HAVE_VALLOC_MMAP
-        + om_Info.CurrentBytesFromValloc
-#endif
-        > om_Info.MaxBytesSbrk)
-    {
-      om_Info.MaxBytesSbrk = (unsigned long) sbrk(0) - om_SbrkInit;
-    }
 #endif
   }
 
@@ -350,15 +329,6 @@ void* _omVallocFromSystem(size_t size, int fail)
 #if defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM)
     if (om_Info.MaxBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
       om_Info.MaxBytesSystem = om_Info.MaxBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
-#endif
-#if defined(HAVE_SBRK) && !defined(OM_HAVE_VALLOC_MMAP) && !defined(OM_MALLOC_MAX_BYTES_SBRK)
-    if (! om_SbrkInit) om_SbrkInit = (unsigned long) sbrk(0) - size;
-    if (om_Info.CurrentBytesFromMalloc + om_Info.CurrentBytesFromValloc > om_Info.MaxBytesSbrk)
-    {
-      om_Info.MaxBytesSbrk = (unsigned long) sbrk(0) - om_SbrkInit;
-      omAssume(om_Info.MaxBytesSbrk >= om_Info.CurrentBytesFromMalloc
-               + om_Info.CurrentBytesFromValloc);
-    }
 #endif
   }
   OM_VALLOC_HOOK(size);

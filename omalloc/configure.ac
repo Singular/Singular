@@ -159,7 +159,7 @@ AC_CHECK_HEADERS(limits.h,,
 
 AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h malloc.h malloc/malloc.h)
 
-AC_CHECK_FUNCS(popen mmap sbrk random malloc_usable_size malloc_size)
+AC_CHECK_FUNCS(popen mmap random malloc_usable_size malloc_size)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
@@ -570,17 +570,6 @@ else
   with_track_custom=no
 fi
 AC_MSG_RESULT($with_track_custom)
-
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl figure out the return type of sbrk
-dnl
-
-AC_MSG_CHECKING(return type of sbrk)
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[#define __USE_MISC
-#include <unistd.h>
-]], [[void *sbrk();
-]])],[AC_DEFINE(Void_t,void,"Type of void")],[AC_DEFINE(Void_t,char,"Type of void")])
-AC_MSG_RESULT(Void_t)
 
 
 AC_DEFINE(OM_PROVIDE_MALLOC,0,[Provide NO standard routines!])

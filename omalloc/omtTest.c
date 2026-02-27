@@ -349,7 +349,6 @@ int main(int argc, char* argv[])
 
   omInitRet_2_Info(argv[0]);
   omInitGetBackTrace();
-  omInitInfo();
   om_Opts.PagesPerRegion = PAGES_PER_REGION;
 
   if (argc > 1) sscanf(argv[1], "%d", &error_test);

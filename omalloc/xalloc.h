@@ -225,7 +225,6 @@ enum omError_e
 #define omTypeAlloc(T,P,S)       P=(T)omAlloc(S)
 #define omAlloc0Aligned(S)       omAlloc0(S)
 #define omAllocAligned(S)        omAlloc(S)
-#define omInitInfo()
 #define omInitGetBackTrace()
 #define omUpdateInfo()
 #define omPrintStats(F)

@@ -12,17 +12,7 @@
 #include "omMalloc.h"
 #include "omalloc.h"
 
-
 omInfo_t om_Info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-unsigned long om_SbrkInit = 0;
-
-void omInitInfo()
-{
-#ifdef HAVE_SBRK
-  om_SbrkInit = (unsigned long) sbrk(0);
-#endif
-}
 
 void omUpdateInfo()
 {
@@ -62,19 +52,24 @@ void omUpdateInfo()
   om_Info.MaxBytesMmap += OM_MALLOC_MAX_BYTES_MMAP;
 #endif
 
+  /*
+   * Compute CurrentBytesSbrk / MaxBytesSbrk.
+   *
+   * Historically these were derived from sbrk(0), but sbrk() is deprecated
+   * on macOS and only tracks brk-based heap on Linux (missing mmap'd
+   * allocations).  Since omalloc already precisely tracks every byte it
+   * allocates/frees via CurrentBytesFromMalloc and CurrentBytesFromValloc,
+   * we derive the "sbrk" stats from those counters instead.  This gives
+   * more accurate results on all platforms.
+   *
+   * When OM_MALLOC_CURRENT_BYTES_SBRK is defined, the malloc library
+   * provides its own value and we use that (unchanged from before).
+   */
 #ifndef OM_MALLOC_CURRENT_BYTES_SBRK
-#ifdef HAVE_SBRK
-  if (om_SbrkInit)
-  {
-    om_Info.CurrentBytesSbrk = (unsigned long) sbrk(0) - om_SbrkInit;
-    if (om_Info.CurrentBytesSbrk > om_Info.MaxBytesSbrk)
-      om_Info.MaxBytesSbrk = om_Info.CurrentBytesSbrk;
-  }
-  else
-  {
-    om_SbrkInit = (unsigned long) sbrk(0);
-  }
-#endif
+  om_Info.CurrentBytesSbrk = om_Info.CurrentBytesFromMalloc
+                             + om_Info.CurrentBytesFromValloc;
+  if (om_Info.CurrentBytesSbrk > om_Info.MaxBytesSbrk)
+    om_Info.MaxBytesSbrk = om_Info.CurrentBytesSbrk;
 #else
   om_Info.CurrentBytesSbrk = OM_MALLOC_CURRENT_BYTES_SBRK;
 #ifdef OM_MALLOC_MAX_BYTES_SBRK

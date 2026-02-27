@@ -1379,7 +1379,6 @@ void siInit(char *name)
 #else
     om_Opts.Keep = 0; /* OM_NDEBUG */
 #endif
-    omInitInfo();
 #endif    
 // factory
 #ifndef HAVE_NTL
