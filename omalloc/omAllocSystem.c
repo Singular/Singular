@@ -222,10 +222,6 @@ void* omAllocFromSystem(size_t size)
   if (om_Info.CurrentBytesFromMalloc > om_Info.MaxBytesFromMalloc)
   {
     om_Info.MaxBytesFromMalloc = om_Info.CurrentBytesFromMalloc;
-#if defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM)
-    if (om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
-      om_Info.MaxBytesSystem = om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
-#endif
   }
   OM_MALLOC_HOOK(size);
   return ptr;
@@ -272,10 +268,6 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
   if (om_Info.CurrentBytesFromMalloc > om_Info.MaxBytesFromMalloc)
   {
     om_Info.MaxBytesFromMalloc = om_Info.CurrentBytesFromMalloc;
-#if defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM)
-    if (om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
-      om_Info.MaxBytesSystem = om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
-#endif
   }
 
   OM_REALLOC_HOOK(oldsize, newsize);
@@ -326,10 +318,6 @@ void* _omVallocFromSystem(size_t size, int fail)
   if (om_Info.CurrentBytesFromValloc > om_Info.MaxBytesFromValloc)
   {
     om_Info.MaxBytesFromValloc = om_Info.CurrentBytesFromValloc;
-#if defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM)
-    if (om_Info.MaxBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
-      om_Info.MaxBytesSystem = om_Info.MaxBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
-#endif
   }
   OM_VALLOC_HOOK(size);
   return page;

@@ -61,18 +61,19 @@ void omUpdateInfo()
   if (om_Info.CurrentBytesAlloc > om_Info.MaxBytesAlloc)
     om_Info.MaxBytesAlloc = om_Info.CurrentBytesAlloc;
 
-  /* CurrentBytesAlloc already includes both FromMalloc and FromValloc,
-     so no separate valloc addition is needed */
+  /* CurrentBytesSystem: the larger of what we actually hold from the OS
+     (CurrentBytesAlloc) and what the application is using (UsedBytesMalloc
+     + FromValloc).  The old code double-counted FromValloc when
+     OM_HAVE_VALLOC_MMAP was defined; this version fixes that. */
   om_Info.CurrentBytesSystem =
     (om_Info.CurrentBytesAlloc > om_Info.UsedBytesMalloc + om_Info.CurrentBytesFromValloc ?
      om_Info.CurrentBytesAlloc : om_Info.UsedBytesMalloc + om_Info.CurrentBytesFromValloc);
 
-  /* MaxBytesAlloc already includes FromValloc; use it directly */
-  om_Info.MaxBytesSystem =
-    (om_Info.MaxBytesAlloc >
-     om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc ?
-     om_Info.MaxBytesAlloc :
-     om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc);
+  /* MaxBytesSystem: sum of individual peak values is an upper bound since
+     FromMalloc and FromValloc may not peak simultaneously.  MaxBytesAlloc
+     tracks max(FromMalloc + FromValloc) which is <= sum of individual
+     maxes, so the RHS always wins. */
+  om_Info.MaxBytesSystem = om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc;
 }
 
 omInfo_t omGetInfo()
