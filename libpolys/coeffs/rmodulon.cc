@@ -809,7 +809,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
   {
     return nrnMapZ;
   }
-  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Z(src)*/)
+  if (src->rep==n_rep_gap_gmp /*&& nCoeff_is_Z(src)*/)
   {
     return nrnMapZ;
   }
