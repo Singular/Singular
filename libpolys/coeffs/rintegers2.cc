@@ -414,7 +414,8 @@ static nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   {
     return ndCopyMap; //nrzCopyMap;
   }
-  if (src->rep==n_rep_gap_gmp /*&& nCoeff_is_Z(src)*/)
+  // Historically: && nCoeff_is_Z(src)
+  if (src->rep==n_rep_gap_gmp)
   {
     return ndCopyMap; //nrzCopyMap;
   }

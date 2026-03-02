@@ -700,7 +700,8 @@ static nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
   {
     return nr2mMapGMP;
   }
-  if (src->rep==n_rep_gap_gmp /*&& nCoeff_is_Z(src)*/)
+  // Historically: && nCoeff_is_Z(src)
+  if (src->rep==n_rep_gap_gmp)
   {
     return nr2mMapZ;
   }
