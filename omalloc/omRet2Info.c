@@ -65,14 +65,19 @@ int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
   {
     char command[2*MAXPATHLEN + 15 + OM_MAX_BACKTRACE_DEPTH*(2*SIZEOF_VOIDP + 4)];
     FILE *pipe;
-    int l;
-    l = snprintf(command,2*MAXPATHLEN + 15 + OM_MAX_BACKTRACE_DEPTH*(2*SIZEOF_VOIDP + 4),
+    int l, n;
+    l = snprintf(command, sizeof(command),
                 "%s -s -C -f -e %s",
                 OM_PROG_ADDR2LINE, om_this_prog);
+    if (l < 0 || (size_t)l >= sizeof(command))
+      return 0;
     i=0;
     while (i<j)
     {
-      l+=snprintf(&command[l], sizeof(command)-l, " %p", info[i].addr);
+      n = snprintf(&command[l], sizeof(command) - l, " %p", info[i].addr);
+      if (n < 0 || (size_t)n >= sizeof(command) - l)
+        break;
+      l += n;
       i++;
     }
     fflush(NULL);
