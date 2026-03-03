@@ -26,9 +26,9 @@
 #define GET_PREDICTION		"get_prediction"
 #define READ_DICTIONARY		"read_dictionary"
 #define CREATE_TABLE		"create_table"
-#define PYTPATH(B)		sprintf(B, "%s/ml_python", DATA_PATH)
-#define SING_BIN(B)		sprintf(B, "%s/Singular", BIN_PATH)
-#define SING_EXT_SCRIPT(B)	sprintf(B, "%s/ml_singular/extract.lib", \
+#define PYTPATH(B)		snprintf(B, sizeof(B), "%s/ml_python", DATA_PATH)
+#define SING_BIN(B)		snprintf(B, sizeof(B), "%s/Singular", BIN_PATH)
+#define SING_EXT_SCRIPT(B)	snprintf(B, sizeof(B), "%s/ml_singular/extract.lib", \
 					DATA_PATH)
 
 /**** Local Function Declarations ****************************************/

@@ -72,7 +72,7 @@ int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
     i=0;
     while (i<j)
     {
-      l+=sprintf(&command[l], " %p", info[i].addr);
+      l+=snprintf(&command[l], sizeof(command)-l, " %p", info[i].addr);
       i++;
     }
     fflush(NULL);

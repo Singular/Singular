@@ -381,7 +381,7 @@ namespace amp
         iexpval = expval;
         if( iexpval!=expval )
             throw internalError();
-        sprintf(buf_e, "%ld", long(iexpval));
+        snprintf(buf_e, sizeof(buf_e), "%ld", long(iexpval));
         if( *ptr=='-' )
         {
             r = "-";
@@ -428,7 +428,7 @@ namespace amp
         iexpval = expval;
         if( iexpval!=expval )
             throw internalError();
-        sprintf(buf_e, "%ld", long(iexpval));
+        snprintf(buf_e, sizeof(buf_e), "%ld", long(iexpval));
         if( *ptr=='-' )
         {
             r = "-";
@@ -472,14 +472,14 @@ namespace amp
         iexpval = expval;
         if( iexpval!=expval )
             throw internalError();
-        sprintf(buf_e, "%ld", long(iexpval));
+        snprintf(buf_e, sizeof(buf_e), "%ld", long(iexpval));
         if( *ptr=='-' )
         {
             ptr++;
-           sprintf(toString_Block,"-0.%sE%s",ptr,buf_e);
+           snprintf(toString_Block,256,"-0.%sE%s",ptr,buf_e);
         }
         else
-          sprintf(toString_Block,"0.%sE%s",ptr,buf_e);
+          snprintf(toString_Block,256,"0.%sE%s",ptr,buf_e);
         mpfr_free_str(ptr2);
         return toString_Block;
     }
