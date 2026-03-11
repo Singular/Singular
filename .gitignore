@@ -1,3 +1,4 @@
+build*/
 _config.h
 _config.h.in
 .deps
