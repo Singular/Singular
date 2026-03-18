@@ -119,7 +119,7 @@ EXAMPLE:   example Vfiltration; shows an example
   list eigen; list mul;
   for (i = 1; i <= size(BS[2]); i++) {
     if (BS[1][i] < 0) {
-      eigen = eigen+list(number(-BS[1][i]-j));
+      eigen = eigen+list(number(-BS[1][i]));
       mul = mul+list(BS[2][i]);
     }
   }
@@ -131,7 +131,7 @@ EXAMPLE:   example Vfiltration; shows an example
   for (i = 1; i <= size(eigen); i++) {
     str = sprintf("// -3-1-%p- Kernel for eigenvalue %p, multiplicity %p... (%p/%p)",
       i, eigen[i], mul[i], i, size(eigen)); dbprint(ppl, str);
-    // *NO* need to add f^(k-m) as Ker[i] contains I = Annf^(s-p) + f^(p+1).
+    // *NO* need to add f^(p + 1) as Ker[i] contains I = Annf^(s-p) + f^(p+1).
     Ker[i] = ideal(modulo(s + eigen[i], I));
     // If there are multiplicities, iterate the generalized eigenspaces.
     for (j = 1; j < mul[i]; j++) {
