@@ -8117,7 +8117,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
         omFree((ADDRESS)nn);
         return TRUE;
       }
-      snprintf(s,len-(nn-s),",%d",(int)(long)v->Data());
+      snprintf(s,len-(s-nn),",%d",(int)(long)v->Data());
     } while (v->next!=NULL);
     while (*s!='\0') s++;
     nn=strcat(nn,")");
