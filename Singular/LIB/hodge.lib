@@ -106,46 +106,33 @@ EXAMPLE:   example Vfiltration; shows an example
   ideal Annfs = imap(@Ds, LD); poly f = imap(@R, f);
 
   // Compute the B-S polynomial of f.
-  dbprint(ppl, "// -2-1- Computing Groebner basis of Ann f^s + <f>...");
-  // The partial derivatives trick might make everything run a bit faster.
-  ideal I = engine(Annfs+f+jacob(f), eng);
-  dbprint(ppl, "// -2-2- Groebner basis of Ann f^s + <f> computed");
-  dbprint(ppl, "// -2-3- Intersecting Ann f^s + <f> with QQ[s]...");
-  // Add the missing s = -1 root.
-  poly bfct = vec2poly(pIntersect(s, I))*(var(1)+1);
+  dbprint(ppl, "// -2-1- Computing Groebner basis of Ann f^{s-p} + <f^{p+1}>...");
+  ideal I = engine(subst(Annfs, s, s-p)+f^(p+1), eng);
+  dbprint(ppl, "// -2-2- Groebner basis of Ann f^{s-p} + <f^{p+1}> computed");
+  dbprint(ppl, "// -2-3- Intersecting Ann f^{s-p} + <f^{p+1}> with QQ[s]...");
+
+  poly bfct = vec2poly(pIntersect(s, I));
   list BS = bFactor(bfct);
-  dbprint(ppl, "// -2-4- Intersection of Ann f^s + <f> with QQ[s] finished");
+  dbprint(ppl, "// -2-4- Intersection of Ann f^{s-p} + <f^{p+1}> with QQ[s] finished");
 
-  // Shifts feigen = delete(eigen, i); mul = delete(mul, i);or the annihilator of f^s.
-  int m = -p; int k = 1;
-  ideal J = subst(Annfs, s, s+m)+f^(k-m);
-
-  // Shift roots of the BS to (0, 1], this avoids having to compute the BS of J.
+  // Keep only positive roots of BS(-s)
   list eigen; list mul;
-  for (i = 1; i <= size(BS[1]); i++) {
-    for (j = 0; j <= p; j++) {
-      if (BS[1][i]+j < 0) {
-        eigen = eigen+list(number(-BS[1][i]-j));
-        mul = mul+list(BS[2][i]);
-      }
-    } // Sort shifted eigen.
-  } list S = sort(eigen); eigen = S[1]; mul = mul[S[2]];
-
-  // Remove duplicates & keep max. multiplicity.
-  for (i = 1; i <= size(eigen) - 1; i++) {
-    j = 1; while (eigen[i] == eigen[i+j]) { mul[i] = max(mul[i], mul[i+j]); j++; }
-    while (j != 1) { eigen = delete(eigen, i+j-1); mul = delete(mul, i+j-1); j--; }
+  for (i = 1; i <= size(BS[2]); i++) {
+    if (BS[1][i] < 0) {
+      eigen = eigen+list(number(-BS[1][i]));
+      mul = mul+list(BS[2][i]);
+    }
   }
 
-  // Compute the kernels of the eigenvalues in 'eigen' in J.
+  // Compute the kernels of the eigenvalues in 'eigen' in I.
   str = sprintf("// -3-1- Computing the kernels of the eigenvalues of Dt*t... (p = %p)",
     p); dbprint(ppl, str);
   list Ker; ideal K;
   for (i = 1; i <= size(eigen); i++) {
     str = sprintf("// -3-1-%p- Kernel for eigenvalue %p, multiplicity %p... (%p/%p)",
       i, eigen[i], mul[i], i, size(eigen)); dbprint(ppl, str);
-    // *NO* need to add f^(k-m) as Ker[i] contains J = Annf^(s+m) + f^(k-m).
-    Ker[i] = ideal(modulo(s + eigen[i], J));
+    // *NO* need to add f^(p + 1) as Ker[i] contains I = Annf^(s-p) + f^(p+1).
+    Ker[i] = ideal(modulo(s + eigen[i], I));
     // If there are multiplicities, iterate the generalized eigenspaces.
     for (j = 1; j < mul[i]; j++) {
       // Reduce the number of generators before calling modulo.

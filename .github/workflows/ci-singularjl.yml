@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         singularjl-version:
-          # - 'latest-release'  # TODO: re-enable after the next release of Singular.jl
+          - 'latest-release'
           - 'master'
         julia-version:
           - '1.10'
@@ -33,14 +33,14 @@ jobs:
           - 'nightly'
         os:
           - ubuntu-latest
-        # include:
+        include:
           # Add a few macOS jobs (the number we can run in parallel is limited)
-          # - singularjl-version: 'latest-release' # TODO: re-enable after the next release of Singular.jl
-          #   julia-version: '1'
-          #   os: macOS-latest
-          # - singularjl-version: 'master'  # TODO: re-enable once https://github.com/JuliaPackaging/JLLPrefixes.jl/pull/37 is merged and a new release of JLLPrefixes.jl is tagged
-          #   julia-version: '1'
-          #   os: macOS-latest
+          - singularjl-version: 'latest-release'
+            julia-version: '1'
+            os: macOS-latest
+          - singularjl-version: 'master'
+            julia-version: '1'
+            os: macOS-latest
 
     steps:
       - name: Checkout Singular
