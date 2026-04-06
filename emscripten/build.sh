@@ -89,31 +89,150 @@ fi
 )
 
 # --- CDDLIB ---
-#(
-#    mkdir -p "$AUX_BUILD/cddlib"
-#    cd "$AUX_BUILD/cddlib"
-#    if [[ ! -d "$EXTERN_DIR/cddlib" ]]; then
-#        echo "Cloning cddlib..."
-#        git clone https://github.com/cddlib/cddlib.git "$EXTERN_DIR/cddlib"
-#        cd "$EXTERN_DIR/cddlib" && ./bootstrap && cd -
-#    fi
-#    if [[ ! -f Makefile ]]; then
-#        emconfigure "$EXTERN_DIR/cddlib/configure" \
-#        --build=i686-pc-linux-gnu \
-#        --host=wasm32-unknown-emscripten \
-#        --with-gmp="$AUX_PREFIX" \
-#        --disable-shared \
-#        --prefix="$AUX_PREFIX"
-#    fi
-#    
-#    emmake make -j8
-#    emmake make install
-#)
+(
+    mkdir -p "$AUX_BUILD/cddlib"
+    cd "$AUX_BUILD/cddlib"
+    if [[ ! -d "$EXTERN_DIR/cddlib" ]]; then
+        echo "Cloning cddlib..."
+        git clone https://github.com/cddlib/cddlib.git "$EXTERN_DIR/cddlib"
+        cd "$EXTERN_DIR/cddlib" && ./bootstrap && cd -
+    fi
+    if [[ ! -f Makefile ]]; then
+        emconfigure "$EXTERN_DIR/cddlib/configure" \
+        --build=i686-pc-linux-gnu \
+        --host=wasm32-unknown-emscripten \
+        --with-gmp="$AUX_PREFIX" \
+        --disable-shared \
+        --prefix="$AUX_PREFIX"
+    fi
+    
+    emmake make -j8
+    emmake make install
 
+    cd "$AUX_PREFIX/include/cddlib"
+    
+    generate_f_header() {
+        local in_file="$1"
+        local out_file="$2"
+        sed -e 's/dd_/ddf_/g' \
+            -e 's/cddf_/cdd_/g' \
+            -e 's/mytype/myfloat/g' \
+            -e 's/#include "cdd.h"/#include "cdd_f.h"/' \
+            -e 's/#include "cddtypes.h"/#include "cddtypes_f.h"/' \
+            -e 's/#include "cddmp.h"/#include "cddmp_f.h"/' \
+            -e 's/__CDD_H/__CDD_HF/' \
+            -e 's/__CDD_HFF/__CDD_HF/' \
+            -e 's/__CDDMP_H/_CDDMP_HF/' \
+            -e 's/__CDDTYPES_H/_CDDTYPES_HF/' \
+            -e 's/GMPRATIONAL/ddf_GMPRATIONAL/g' \
+            -e 's/ARITHMETIC/ddf_ARITHMETIC/g' \
+            -e 's/CDOUBLE/ddf_CDOUBLE/g' \
+            "$in_file" | awk -v name="$in_file" 'BEGIN{print "/* generated automatically from " name " */"}1' > "$out_file"
+    }
+
+    generate_f_header cdd.h cdd_f.h
+    generate_f_header cddmp.h cddmp_f.h
+    generate_f_header cddtypes.h cddtypes_f.h
+
+    cd "$AUX_PREFIX/include"
+    ln -sf cddlib/*.h .
+    
+    ln -sf cddmp.h cdd_mp.h
+)
+
+# --- NTL ---
+(
+    mkdir -p "$AUX_BUILD/ntl"
+    cd "$AUX_BUILD/ntl"
+    if [[ ! -d "$EXTERN_DIR/ntl" ]]; then
+        echo "Cloning NTL..."
+        git clone https://github.com/libntl/ntl.git "$EXTERN_DIR/ntl"
+    fi
+    cd "$EXTERN_DIR/ntl/src"
+    if [[ ! -f makefile ]]; then
+        emconfigure ./configure \
+        CXX="em++" \
+        CXXFLAGS="-O2 -s WASM=1 -s NODERAWFS=1" \
+        PREFIX="$AUX_PREFIX" \
+        GMP_PREFIX="$AUX_PREFIX" \
+        NTL_STD_CXX14=on \
+        SHARED=off \
+        NATIVE=off \
+        TUNE=generic \
+        NTL_THREADS=off
+
+        NODE_BIN=$(command -v node || echo "node")
+        
+        em++ -I../include -I. -O2 -s WASM=1 -s NODERAWFS=1 -c MakeDescAux.cpp
+        em++ -I../include -I. -O2 -s WASM=1 -s NODERAWFS=1 -o MakeDesc.js MakeDesc.cpp MakeDescAux.o -lm
+        $NODE_BIN ./MakeDesc.js
+        
+        cp mach_desc.h ../include/NTL/mach_desc.h
+        cp mach_desc.h mach_desc_safe.h
+
+        em++ -I../include -I. -O2 -s WASM=1 -s NODERAWFS=1 -I"$AUX_PREFIX/include" -o gen_gmp_aux.js gen_gmp_aux.cpp -L"$AUX_PREFIX/lib" -lgmp
+        $NODE_BIN ./gen_gmp_aux.js > ../include/NTL/gmp_aux_safe.h
+
+        cp "$BASEDIR/emscripten/GetTime.cpp" .
+        cp "$BASEDIR/emscripten/GetPID.cpp" .
+        cat "$BASEDIR/emscripten/ntl_config_append.h" >> ../include/NTL/config.h
+
+        sed -e 's|^\t\./MakeDesc|\tcp mach_desc_safe.h mach_desc.h|g' \
+            -e 's|^\t\./gen_gmp_aux.*|\tcp ../include/NTL/gmp_aux_safe.h ../include/NTL/gmp_aux.h|g' \
+            -e 's|^\t\./TestGetTime|\ttrue|g' \
+            -e 's|^\t\./TestGetPID|\ttrue|g' \
+            -e 's|^\tsh MakeCheckFeatures.*|\ttrue|g' \
+            -e 's|^\t\./CheckFeatures|\ttrue|g' \
+            -e 's|^\t\./CheckThreads|\ttrue|g' \
+            makefile > makefile.patched
+        
+        mv makefile.patched makefile
+    fi
+    
+    emmake make -j8
+    emmake make install
+    emranlib "$AUX_PREFIX/lib/libntl.a"
+)
+
+# --- NORMALIZ ---
+(
+    mkdir -p "$AUX_BUILD/normaliz"
+    cd "$AUX_BUILD/normaliz"
+    
+    if [[ ! -d "$EXTERN_DIR/normaliz" ]]; then
+        echo "Cloning Normaliz..."
+        git clone https://github.com/Normaliz/Normaliz.git "$EXTERN_DIR/normaliz"
+    fi
+
+    if [[ ! -f "$EXTERN_DIR/normaliz/configure" ]]; then
+        echo "Bootstrapping Normaliz..."
+        cd "$EXTERN_DIR/normaliz"
+        chmod +x bootstrap.sh
+        ./bootstrap.sh
+        cd -
+    fi
+
+    if [[ ! -f Makefile ]]; then
+        emconfigure "$EXTERN_DIR/normaliz/configure" \
+        --build=i686-pc-linux-gnu \
+        --host=wasm32-unknown-emscripten \
+        --with-gmp="$AUX_PREFIX" \
+        --with-flint="$AUX_PREFIX" \
+        --disable-shared \
+        --disable-openmp \
+        --prefix="$AUX_PREFIX" \
+        CPPFLAGS="-I$AUX_PREFIX/include" \
+        LDFLAGS="-L$AUX_PREFIX/lib"
+    fi
+    
+    emmake make -j8
+    emmake make install
+)
 
 cd "$BASEDIR"
-#    cddlib does not work for unkonw issue reason
-#    to enable gfanlib, you need to add the flag --with-cdd="$AUX_PREFIX" \
+
+emcc -c "$BASEDIR/emscripten/wasm_patch.c" -o "$BASEDIR/wasm_patch.o"
+emar rcs "$BASEDIR/libwasm_patch.a" "$BASEDIR/wasm_patch.o"
 
 if [[ ! -f Makefile ]] || ! grep 'emcc' Makefile > /dev/null; then
     emconfigure ./configure \
@@ -122,20 +241,23 @@ if [[ ! -f Makefile ]] || ! grep 'emcc' Makefile > /dev/null; then
     --with-gmp="$AUX_PREFIX" \
     --with-mpfr="$AUX_PREFIX" \
     --with-flint="$AUX_PREFIX" \
+    --with-cdd="$AUX_PREFIX" \
+    --with-ntl="$AUX_PREFIX" \
+    --with-normaliz="$AUX_PREFIX" \
     --disable-shared \
     --without-readline \
-    --disable-gfanlib \
+    --enable-gfanlib \
     --disable-polymake \
     --disable-pthreads \
     --disable-omalloc \
-    CXXFLAGS="-O2 -D_GNU_SOURCE" \
-    CFLAGS="-O2 -D_GNU_SOURCE" \
-    LDFLAGS="-s ASYNCIFY=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -O2"
+    CXXFLAGS="-O2 -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
+    CFLAGS="-O2 -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
+    LDFLAGS="-L$AUX_PREFIX/lib -L$BASEDIR -lwasm_patch -s ASYNCIFY=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -O2"
 fi
 
 emmake make -j8
 
-cp "$BASEDIR/emscripten/dummy.c" "$BASEDIR/Singular"
+cp "$BASEDIR/emscripten/wasm_patch.c" "$BASEDIR/Singular"
 cd Singular
 
 # ERROR_ON_UNDEFINED_SYMBOLS=0, ASSERTIONS=1, fexceptions and -g is an attempt to make lib loading works. It failed though.
@@ -144,12 +266,12 @@ em++ wasm_patch.c tesths.o utils.o \
     ../libpolys/polys/.libs/libpolys.a \
     ../factory/.libs/libfactory.a \
     ../resources/.libs/libsingular_resources.a \
-    -L"$AUX_PREFIX/lib" -lflint -lmpfr -lgmp \
+    -L"$AUX_PREFIX/lib" -lnormaliz -lflint -lmpfr -lcdd -lntl -lgmp \
     -s ASYNCIFY=1 \
     -s TOTAL_STACK=32MB \
     -s INITIAL_MEMORY=1024MB \
     -s ALLOW_MEMORY_GROWTH=1 \
-    -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+    -s ERROR_ON_UNDEFINED_SYMBOLS=1 \
     -s ASSERTIONS=1 \
     -fexceptions \
     -g \

@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 
 int sem_unlink() { return 0; }
@@ -11,3 +15,7 @@ __attribute__((constructor)) void fix_env() {
     setenv("SINGULAR_EXECUTABLE", "/Singular", 1);
     setenv("SINGULAR_BIN_DIR", "/", 1);
 }
+
+#ifdef __cplusplus
+}
+#endif
