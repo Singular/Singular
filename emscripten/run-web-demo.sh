@@ -3,7 +3,7 @@
 set -eux
 
 mkdir -p web-example
-cp etc/emscripten/web-template/* web-example
+cp emscripten/web-template/* web-example
 cp Singular/Singular.wasm Singular/Singular.js Singular/Singular.data web-example
 
 cd web-example
