@@ -14,6 +14,8 @@ Issue:
 
 - Loading libs like `LIB "matrix.lib";` does not work.
 
-- gfanlib is diabled, due to unclear issue in cddlib.
+- gfanlib not working.
 
+Todo:
 
+- Add 4ti2, polymake, TOPCOM.
