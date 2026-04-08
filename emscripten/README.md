@@ -6,7 +6,7 @@ Files:
 
 - `web-template`: Web template with 'xterm-pty'.
 
-- `wasm_patch.c`: Patch script.
+- `wasm_patch.c` and `GetPID.cpp` and `GetTime.cpp` and `ntl_config_append.h`: Patch script.
 
 After executing `build.sh`, use `run-web-demo` to setup a working website.
 
