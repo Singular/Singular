@@ -11,6 +11,7 @@ int pthread_getaffinity_np() { return 0; }
 int pthread_setaffinity_np() { return 0; }
 
 __attribute__((constructor)) void fix_env() {
+    setenv("TMPDIR", "/tmp", 1);
     setenv("SINGULAR_DEFAULT_DIR", "/", 1);
     setenv("SINGULAR_EXECUTABLE", "/Singular", 1);
     setenv("SINGULAR_BIN_DIR", "/", 1);
