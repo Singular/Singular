@@ -89,6 +89,7 @@ fi
 )
 
 # --- CDDLIB ---
+# Emscripten compilation of cddlib does not produce cdd_f.h, this ugly patch script generate it manually.  
 (
     mkdir -p "$AUX_BUILD/cddlib"
     cd "$AUX_BUILD/cddlib"
@@ -97,20 +98,7 @@ fi
         git clone https://github.com/cddlib/cddlib.git "$EXTERN_DIR/cddlib"
         cd "$EXTERN_DIR/cddlib" && ./bootstrap && cd -
     fi
-    if [[ ! -f Makefile ]]; then
-        emconfigure "$EXTERN_DIR/cddlib/configure" \
-        --build=i686-pc-linux-gnu \
-        --host=wasm32-unknown-emscripten \
-        --with-gmp="$AUX_PREFIX" \
-        --disable-shared \
-        --prefix="$AUX_PREFIX"
-    fi
-    
-    emmake make -j8
-    emmake make install
 
-    cd "$AUX_PREFIX/include/cddlib"
-    
     generate_f_header() {
         local in_file="$1"
         local out_file="$2"
@@ -130,9 +118,29 @@ fi
             "$in_file" | awk -v name="$in_file" 'BEGIN{print "/* generated automatically from " name " */"}1' > "$out_file"
     }
 
+    cd "$EXTERN_DIR/cddlib/lib-src"
     generate_f_header cdd.h cdd_f.h
     generate_f_header cddmp.h cddmp_f.h
     generate_f_header cddtypes.h cddtypes_f.h
+    cd "$AUX_BUILD/cddlib"
+
+    if [[ ! -f Makefile ]]; then
+        export CPPFLAGS="-I$AUX_PREFIX/include"
+        export LDFLAGS="-L$AUX_PREFIX/lib"
+        export CFLAGS="-O2"
+        export CXXFLAGS="-O2"
+        emconfigure "$EXTERN_DIR/cddlib/configure" \
+        --build=i686-pc-linux-gnu \
+        --host=wasm32-unknown-emscripten \
+        --with-gmp="$AUX_PREFIX" \
+        --disable-shared \
+        --prefix="$AUX_PREFIX"
+    fi
+    
+    emmake make -j8
+    emmake make install
+
+    cp "$EXTERN_DIR/cddlib/lib-src"/*_f.h "$AUX_PREFIX/include/cddlib/"
 
     cd "$AUX_PREFIX/include"
     ln -sf cddlib/*.h .
@@ -141,6 +149,7 @@ fi
 )
 
 # --- NTL ---
+# This ugly patch script is intended to fix the cross-compilation issue of ntl.
 (
     mkdir -p "$AUX_BUILD/ntl"
     cd "$AUX_BUILD/ntl"
@@ -155,6 +164,7 @@ fi
         CXXFLAGS="-O2 -s WASM=1 -s NODERAWFS=1" \
         PREFIX="$AUX_PREFIX" \
         GMP_PREFIX="$AUX_PREFIX" \
+        NTL_GMP_LIP=on \
         NTL_STD_CXX14=on \
         SHARED=off \
         NATIVE=off \
@@ -250,6 +260,7 @@ if [[ ! -f Makefile ]] || ! grep 'emcc' Makefile > /dev/null; then
     --disable-polymake \
     --disable-pthreads \
     --disable-omalloc \
+    --with-builtinmodules=syzextra,gfanlib \
     CXXFLAGS="-O2 -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
     CFLAGS="-O2 -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
     LDFLAGS="-L$AUX_PREFIX/lib -L$BASEDIR -lwasm_patch -s ASYNCIFY=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -O2"
@@ -266,7 +277,7 @@ em++ wasm_patch.c tesths.o utils.o \
     ../libpolys/polys/.libs/libpolys.a \
     ../factory/.libs/libfactory.a \
     ../resources/.libs/libsingular_resources.a \
-    -L"$AUX_PREFIX/lib" -lnormaliz -lflint -lmpfr -lcdd -lntl -lgmp \
+    -L"$AUX_PREFIX/lib" -lnormaliz -lflint -lmpfr -lcddgmp -lntl -lgmp \
     -s ASYNCIFY=1 \
     -s TOTAL_STACK=32MB \
     -s INITIAL_MEMORY=1024MB \
