@@ -256,11 +256,15 @@ emconfigure ./configure \
     --with-ntl="$AUX_PREFIX" \
     --with-normaliz="$AUX_PREFIX" \
     --disable-shared \
+    --enable-static \
+    --without-pic \
     --without-readline \
     --enable-gfanlib \
     --disable-polymake \
     --disable-pthreads \
     --disable-omalloc \
+    --enable-p-procs-static \
+    --disable-p-procs-dynamic \
     --with-builtinmodules=syzextra,gfanlib \
     CXX="em++ -fexceptions" \
     CC="emcc -fexceptions" \
