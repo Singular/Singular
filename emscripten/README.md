@@ -12,14 +12,10 @@ After executing `build.sh`, use `run-web-demo` to setup a working website.
 
 Issue:
 
-- Loading libs like `LIB "matrix.lib";` does not work.
+- Loading some libs like `LIB "matrix.lib";` does not work.
+  
+- gfanlib and normaliz does not work.
 
 Todo:
 
-- Add cddlib(required by gfanlib), ntl, normaliz, 4ti2, polymake, TOPCOM.
-
-Remark:
-
-- compilation of cddlib does not produce cdd_f.h.
-
-- cross-compilation of ntl failed.
+- Add cddlib(required by gfanlib) (done), ntl (done), normaliz, 4ti2, polymake, TOPCOM.
