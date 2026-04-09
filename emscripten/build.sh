@@ -161,7 +161,7 @@ fi
     if [[ ! -f makefile ]]; then
         emconfigure ./configure \
         CXX="em++" \
-        CXXFLAGS="-O2 -s WASM=1 -s NODERAWFS=1" \
+        CXXFLAGS="-O2 -fexceptions -s WASM=1 -s NODERAWFS=1" \
         PREFIX="$AUX_PREFIX" \
         GMP_PREFIX="$AUX_PREFIX" \
         NTL_GMP_LIP=on \
@@ -173,14 +173,14 @@ fi
 
         NODE_BIN=$(command -v node || echo "node")
         
-        em++ -I../include -I. -O2 -s WASM=1 -s NODERAWFS=1 -c MakeDescAux.cpp
-        em++ -I../include -I. -O2 -s WASM=1 -s NODERAWFS=1 -o MakeDesc.js MakeDesc.cpp MakeDescAux.o -lm
+        em++ -I../include -I. -O2 -fexceptions -s WASM=1 -s NODERAWFS=1 -c MakeDescAux.cpp
+        em++ -I../include -I. -O2 -fexceptions -s WASM=1 -s NODERAWFS=1 -o MakeDesc.js MakeDesc.cpp MakeDescAux.o -lm
         $NODE_BIN ./MakeDesc.js
         
         cp mach_desc.h ../include/NTL/mach_desc.h
         cp mach_desc.h mach_desc_safe.h
 
-        em++ -I../include -I. -O2 -s WASM=1 -s NODERAWFS=1 -I"$AUX_PREFIX/include" -o gen_gmp_aux.js gen_gmp_aux.cpp -L"$AUX_PREFIX/lib" -lgmp
+        em++ -I../include -I. -O2 -fexceptions -s WASM=1 -s NODERAWFS=1 -I"$AUX_PREFIX/include" -o gen_gmp_aux.js gen_gmp_aux.cpp -L"$AUX_PREFIX/lib" -lgmp
         $NODE_BIN ./gen_gmp_aux.js > ../include/NTL/gmp_aux_safe.h
 
         cp "$BASEDIR/emscripten/GetTime.cpp" .
@@ -244,8 +244,7 @@ cd "$BASEDIR"
 emcc -c "$BASEDIR/emscripten/wasm_patch.c" -o "$BASEDIR/wasm_patch.o"
 emar rcs "$BASEDIR/libwasm_patch.a" "$BASEDIR/wasm_patch.o"
 
-if [[ ! -f Makefile ]] || ! grep 'emcc' Makefile > /dev/null; then
-    emconfigure ./configure \
+emconfigure ./configure \
     ac_cv_func_qsort_r=no \
     --host=wasm32-unknown-emscripten \
     --with-gmp="$AUX_PREFIX" \
@@ -261,17 +260,16 @@ if [[ ! -f Makefile ]] || ! grep 'emcc' Makefile > /dev/null; then
     --disable-pthreads \
     --disable-omalloc \
     --with-builtinmodules=syzextra,gfanlib \
-    CXXFLAGS="-O2 -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
-    CFLAGS="-O2 -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
-    LDFLAGS="-L$AUX_PREFIX/lib -L$BASEDIR -lwasm_patch -s ASYNCIFY=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -O2"
-fi
+    CXXFLAGS="-O2 -fexceptions -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
+    CFLAGS="-O2 -fexceptions -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
+    LDFLAGS="-L$AUX_PREFIX/lib -L$BASEDIR -lwasm_patch -fexceptions -s ASYNCIFY=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -O2"
+
 
 emmake make -j8
 
 cp "$BASEDIR/emscripten/wasm_patch.c" "$BASEDIR/Singular"
 cd Singular
 
-# ERROR_ON_UNDEFINED_SYMBOLS=0, ASSERTIONS=1, fexceptions and -g is an attempt to make lib loading works. It failed though.
 em++ wasm_patch.c tesths.o utils.o \
     ./.libs/libSingular.a \
     ../libpolys/polys/.libs/libpolys.a \
@@ -282,10 +280,7 @@ em++ wasm_patch.c tesths.o utils.o \
     -s TOTAL_STACK=32MB \
     -s INITIAL_MEMORY=1024MB \
     -s ALLOW_MEMORY_GROWTH=1 \
-    -s ERROR_ON_UNDEFINED_SYMBOLS=1 \
-    -s ASSERTIONS=1 \
     -fexceptions \
-    -g \
     -O2 \
     --preload-file LIB@/LIB \
     --preload-file ../doc@/info \
