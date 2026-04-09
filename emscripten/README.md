@@ -6,7 +6,7 @@ Files:
 
 - `web-template`: Web template with 'xterm-pty'.
 
-- `wasm_patch.c` and `GetPID.cpp` and `GetTime.cpp` and `ntl_config_append.h`: Patch script.
+- `wasm_patch.c`: Patch script.
 
 After executing `build.sh`, use `run-web-demo` to setup a working website.
 
@@ -14,8 +14,12 @@ Issue:
 
 - Loading libs like `LIB "matrix.lib";` does not work.
 
-- gfanlib not working.
-
 Todo:
 
-- Add 4ti2, polymake, TOPCOM.
+- Add cddlib(required by gfanlib), ntl, normaliz, 4ti2, polymake, TOPCOM.
+
+Remark:
+
+- compilation of cddlib does not produce cdd_f.h.
+
+- cross-compilation of ntl failed.
