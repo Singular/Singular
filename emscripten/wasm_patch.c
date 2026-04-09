@@ -4,11 +4,11 @@ extern "C" {
 
 #include <stdlib.h>
 
-int sem_unlink() { return 0; }
-void* sem_open() { return 0; }
-int sem_getvalue() { return 0; }
-int pthread_getaffinity_np() { return 0; }
-int pthread_setaffinity_np() { return 0; }
+int sem_unlink(void* name) { return 0; }
+int sem_open(void* name, int oflag, int mode) { return 0; }
+int sem_getvalue(void* sem, int* sval) { return 0; }
+int pthread_getaffinity_np(int thread, int cpusetsize, void* cpuset) { return 0; }
+int pthread_setaffinity_np(int thread, int cpusetsize, void* cpuset) { return 0; }
 
 __attribute__((constructor)) void fix_env() {
     setenv("TMPDIR", "/tmp", 1);

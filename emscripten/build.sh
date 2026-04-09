@@ -241,6 +241,8 @@ fi
 
 cd "$BASEDIR"
 
+export EMCC_CFLAGS="-fexceptions"
+
 emcc -c "$BASEDIR/emscripten/wasm_patch.c" -o "$BASEDIR/wasm_patch.o"
 emar rcs "$BASEDIR/libwasm_patch.a" "$BASEDIR/wasm_patch.o"
 
@@ -260,6 +262,8 @@ emconfigure ./configure \
     --disable-pthreads \
     --disable-omalloc \
     --with-builtinmodules=syzextra,gfanlib \
+    CXX="em++ -fexceptions" \
+    CC="emcc -fexceptions" \
     CXXFLAGS="-O2 -fexceptions -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
     CFLAGS="-O2 -fexceptions -D_GNU_SOURCE -I$AUX_PREFIX/include -I$AUX_PREFIX/include/cddlib" \
     LDFLAGS="-L$AUX_PREFIX/lib -L$BASEDIR -lwasm_patch -fexceptions -s ASYNCIFY=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=0 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -O2"
