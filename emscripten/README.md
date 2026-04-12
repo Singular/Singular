@@ -11,11 +11,9 @@ Files:
 After executing `build.sh`, use `run-web-demo` to setup a working website.
 
 Issue:
-
-- Loading some libs like `LIB "matrix.lib";` does not work.
   
-- gfanlib and normaliz does not work.
+- LIBS like gfanlib, normaliz and freealgebra do not work.
 
 Todo:
 
-- Add cddlib(required by gfanlib) (done), ntl (done), normaliz, 4ti2, polymake, TOPCOM.
+- Add cddlib (done), ntl (done), normaliz, 4ti2, polymake, TOPCOM.

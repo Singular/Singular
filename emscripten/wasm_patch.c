@@ -3,12 +3,31 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
+#include <semaphore.h>
+#include <pthread.h>
+#include <stddef.h>
 
-int sem_unlink(void* name) { return 0; }
-int sem_open(void* name, int oflag, int mode) { return 0; }
-int sem_getvalue(void* sem, int* sval) { return 0; }
-int pthread_getaffinity_np(int thread, int cpusetsize, void* cpuset) { return 0; }
-int pthread_setaffinity_np(int thread, int cpusetsize, void* cpuset) { return 0; }
+struct cpu_set_t;
+
+int sem_unlink(const char *name) { 
+    return -1; 
+}
+
+sem_t *sem_open(const char *name, int oflag, ...) { 
+    return SEM_FAILED; 
+}
+
+int sem_getvalue(sem_t *sem, int *sval) { 
+    return -1; 
+}
+
+int pthread_getaffinity_np(pthread_t thread, size_t cpusetsize, struct cpu_set_t *cpuset) { 
+    return 0; 
+}
+
+int pthread_setaffinity_np(pthread_t thread, size_t cpusetsize, const struct cpu_set_t *cpuset) { 
+    return 0; 
+}
 
 __attribute__((constructor)) void fix_env() {
     setenv("TMPDIR", "/tmp", 1);
