@@ -7,10 +7,15 @@ on:
   workflow_dispatch:
     inputs:
       tmate:
-        description: 'At the end, create an ssh target on test runner and pause ten minutes waiting for ssh'
+        description: 'At the end, create an ssh target on the test runner and wait for ssh'
         required: false
         type: 'boolean'
         default: 'false'
+      tmate_timeout_minutes:
+        description: 'Minutes to wait for an ssh connection before giving up'
+        required: false
+        type: 'number'
+        default: 10
 env:
   prefix: "/tmp/prefix"
 
@@ -78,5 +83,6 @@ jobs:
       - name: Create ssh target on test runner for debugging
         if: "${{ !cancelled() && github.event.inputs.tmate == 'true' }}"
         uses: mxschmitt/action-tmate@v3
+        timeout-minutes: ${{ fromJSON(github.event.inputs.tmate_timeout_minutes) }}
 
 # TODO: code coverage?
