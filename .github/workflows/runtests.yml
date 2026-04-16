@@ -1,5 +1,8 @@
 name: Run tests
 
+# For how to use the workflow_dispatch inputs below (including the
+# interactive-ssh debugging mode), see doc/Debugging-CI.md.
+
 # Trigger the workflow on push or pull request or manual invocation
 on:
   push:
