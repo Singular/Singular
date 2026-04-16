@@ -49,6 +49,24 @@ Available inputs
   the only credential, and anyone with a GitHub account who can read
   the log can connect.
 
+Why `nyc1.tmate.io`?
+--------------------
+
+GitHub-hosted runners sit behind NAT with no inbound connectivity, so
+you cannot ssh to them directly. `tmate` solves this by having the
+runner make an **outbound** connection to a public relay server
+(`*.tmate.io`, operated by the tmate project) and register a session
+there. Your ssh client then connects to the relay, which proxies the
+bytes back down the runner's pre-established connection. The relay is
+a third-party rendezvous point; the session contents pass through it.
+
+If the tmate project's relay is not an acceptable trust dependency,
+`mxschmitt/action-tmate` supports pointing at a self-hosted
+[`tmate-ssh-server`](https://github.com/tmate-io/tmate-ssh-server)
+instance via its `tmate-server-host`, `tmate-server-port`, and
+fingerprint inputs. This workflow does not expose those inputs
+currently; add them to `runtests.yml` if needed.
+
 Connecting to a tmate session
 -----------------------------
 
