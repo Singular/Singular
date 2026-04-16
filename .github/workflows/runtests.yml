@@ -6,6 +6,16 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      repo:
+        description: 'Repository to check out (owner/name); defaults to this repo'
+        required: false
+        type: 'string'
+        default: ''
+      ref:
+        description: 'Branch, tag, or SHA to check out; defaults to the dispatch ref'
+        required: false
+        type: 'string'
+        default: ''
       tmate:
         description: 'At the end, create an ssh target on the test runner and wait for ssh'
         required: false
@@ -30,6 +40,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          repository: ${{ github.event.inputs.repo || github.repository }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
 
       - name: Install dependencies
         run: |
