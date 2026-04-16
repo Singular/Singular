@@ -26,6 +26,11 @@ on:
         required: false
         type: 'number'
         default: 10
+      tmate_limit_access_to_actor:
+        description: "Only accept ssh keys from the dispatching user's github.com profile"
+        required: false
+        type: 'boolean'
+        default: true
 env:
   prefix: "/tmp/prefix"
 
@@ -97,5 +102,7 @@ jobs:
         if: "${{ !cancelled() && github.event.inputs.tmate == 'true' }}"
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: ${{ fromJSON(github.event.inputs.tmate_timeout_minutes) }}
+        with:
+          limit-access-to-actor: ${{ github.event.inputs.tmate_limit_access_to_actor }}
 
 # TODO: code coverage?
