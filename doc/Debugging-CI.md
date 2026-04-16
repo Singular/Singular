@@ -74,6 +74,10 @@ The ssh connection string (`ssh <token>@nyc1.tmate.io` or similar) is
 printed every 5 seconds in the live log of the `Create ssh target on
 test runner for debugging` step. Copy it from there.
 
+On first connect, tmate shows a read-only info window with the session
+addresses. Press `q` (or `Ctrl-c`) to dismiss it and drop into the
+shell.
+
 When you are done:
 
 * `touch /continue && exit` — lets the remaining workflow steps run
