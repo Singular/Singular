@@ -20,6 +20,7 @@ PROCEDURES:
  sheafCoh(M,l,h);        cohomology of sheaf associated to coker(M)
  sheafCoh_w(M,l,h);      cohomology of coker(M) with given module weights
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
+ dimH_w(i,M,d,w);        compute h^i(F(d)), F sheaf associated to coker(M)
  dimGradedPart()
 
  displayCohom(B,l,h,n);  display intmat as Betti diagram (with zero rows)
@@ -1218,6 +1219,38 @@ example
   dimH(1,M,0);
   dimH(2,M,1);
   dimH(3,M,-5);
+}
+
+
+proc dimH_w(int i,module M,int d, intvec w)
+"USAGE:   dimH_w(i,M,d,w);    M module, i,d int, w intvec
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute, @code{h>=l}, and the basering @code{S} has
+         @code{n+1} variables.
+RETURN:  int,  vector space dimension of @math{H^i(F(d))} for F the coherent
+         sheaf on P^n associated to coker(M).
+NOTE:    The procedure is based on local duality as described in [Eisenbud:
+         Computing cohomology. In Vasconcelos: Computational methods in
+         commutative algebra and algebraic geometry. Springer (1998)].
+SEE ALSO: sheafCoh, sheafCohBGG
+EXAMPLE: example dimH_w; shows an example
+"
+{
+
+  attrib(M,"isHomog",w);
+  return(dimH(i,M,d));
+}
+example
+{"EXAMPLE:";
+  echo = 2;
+  ring R=0,(x,y,z,u),dp;
+  resolution T1=mres(maxideal(1),0);
+  module M=T1[3];
+  intvec v=2,2,2,2,2,2;
+  dimH_w(0,M,2,v);
+  dimH_w(1,M,0,v);
+  dimH_w(2,M,1,v);
+  dimH_w(3,M,-5,v);
 }
 
 
