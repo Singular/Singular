@@ -21,7 +21,8 @@ PROCEDURES:
  sheafCoh_w(M,l,h);      cohomology of coker(M) with given module weights
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
  dimH_w(i,M,d,w);        compute h^i(F(d)), F sheaf associated to coker(M)
- dimGradedPart()
+ dimGradedPart(phi,d);
+ dimGradedPart_w(M,d,w);
 
  displayCohom(B,l,h,n);  display intmat as Betti diagram (with zero rows)
 
@@ -433,6 +434,32 @@ example
    // shift grading:
    attrib(M,"isHomog",intvec(2));
    dimGradedPart(M,2);
+}
+
+proc dimGradedPart_w(module M, int d, intvec w)
+"USAGE:   dimGradedPart_w(M,d,w);  M module, d int, w intvec
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute
+RETURN:  int
+NOTE:    Output is the vector space dimension of the graded part of degree d
+         of coker(M).
+EXAMPLE: example dimGradedPart; shows an example
+KEYWORDS: graded module, graded piece
+"
+{
+  attrib(M,"isHomog",w);
+  return(dimGradedPart(M,d));
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   module M=maxideal(3);
+   // assign compatible weight vector (here: 0)
+   homog(M);
+   // compute dimension of graded pieces of R/<x,y,z>^3 :
+   // shift grading:
+   dimGradedPart_w(M,2, intvec(2));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
