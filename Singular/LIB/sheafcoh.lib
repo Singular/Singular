@@ -443,7 +443,7 @@ ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
 RETURN:  int
 NOTE:    Output is the vector space dimension of the graded part of degree d
          of coker(M).
-EXAMPLE: example dimGradedPart; shows an example
+EXAMPLE: example dimGradedPart_w; shows an example
 KEYWORDS: graded module, graded piece
 "
 {
