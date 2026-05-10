@@ -10,10 +10,7 @@ Files:
 
 After executing `build.sh`, use `run-web-demo` to setup a working website.
 
-Issue:
-  
-- LIBS like gfanlib, normaliz and freealgebra do not work.
-
 Todo:
 
-- Add cddlib (done), ntl (done), normaliz, 4ti2, polymake, TOPCOM.
+- Add cddlib (done), ntl (done), normaliz (done), 4ti2, polymake, TOPCOM.
+- "normaliz.lib", "gfan.lib", "tropical.lib" are working. Most libraries should work but this requires testing.
