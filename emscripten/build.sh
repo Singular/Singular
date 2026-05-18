@@ -203,6 +203,41 @@ fi
     emmake make install
 )
 
+# --- TOPCOM ---
+(
+    mkdir -p "$AUX_BUILD/topcom"
+    cd "$AUX_BUILD/topcom"
+    
+    if [[ ! -d "$EXTERN_DIR/topcom" ]]; then
+        echo "Downloading TOPCOM source..."
+        mkdir -p "$EXTERN_DIR/topcom"
+        curl -sL "https://www.wm.uni-bayreuth.de/de/team/rambau_joerg/TOPCOM-Downloads/TOPCOM-1_2_0_eta.tgz" | tar -xz -C "$EXTERN_DIR/topcom" --strip-components=1
+    fi
+
+    if [[ ! -f Makefile ]]; then
+        CPPFLAGS="-I$AUX_PREFIX/include" \
+        LDFLAGS="-L$AUX_PREFIX/lib -static -s USE_PTHREADS=0" \
+        CFLAGS="-O2 -fexceptions -s USE_PTHREADS=0" \
+        CXXFLAGS="-O2 -fexceptions -std=c++17 -s USE_PTHREADS=0" \
+        emconfigure "$EXTERN_DIR/topcom/configure" \
+            --build=i686-pc-linux-gnu \
+            --host=wasm32-unknown-emscripten \
+            --disable-shared \
+            --enable-static \
+            --prefix="$AUX_PREFIX"
+            
+        find . -type f -name "Makefile" -exec sed -i 's/ -pthread / /g; s/ -pthread$/ /g' {} +
+        if [ -f libtool ]; then 
+            sed -i 's/ -pthread / /g' libtool
+            sed -i 's/"-pthread /"/g' libtool
+            sed -i 's/ -pthread"/"/g' libtool
+        fi
+    fi
+    
+    emmake make -j8
+    emmake make install
+)
+
 cd "$BASEDIR"
 
 export EMCC_CFLAGS="-fexceptions"
@@ -219,6 +254,7 @@ emconfigure ./configure \
     --with-cdd="$AUX_PREFIX" \
     --with-ntl="$AUX_PREFIX" \
     --with-normaliz="$AUX_PREFIX" \
+    --with-topcom="$AUX_PREFIX" \
     --disable-shared \
     --enable-static \
     --without-pic \
@@ -268,7 +304,7 @@ em++ wasm_patch.c tesths.o utils.o \
     $MODULE_LIBS \
     -Wl,--end-group \
     -L"$AUX_PREFIX/lib" \
-    -lnormaliz -lflint -lmpfr -lcddgmp -lntl -lgmp \
+    -lTOPCOM -lnormaliz -lflint -lmpfr -lcddgmp -lntl -lgmp\
     -s ASYNCIFY=1 \
     -s TOTAL_STACK=64MB \
     -s INITIAL_MEMORY=1024MB \

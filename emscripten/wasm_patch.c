@@ -9,16 +9,23 @@ extern "C" {
 
 struct cpu_set_t;
 
+static sem_t fake_sem;
+
 int sem_unlink(const char *name) { 
-    return -1; 
+    return 0; 
 }
 
 sem_t *sem_open(const char *name, int oflag, ...) { 
-    return SEM_FAILED; 
+    return &fake_sem; /* Pretend it opened successfully */
 }
 
 int sem_getvalue(sem_t *sem, int *sval) { 
-    return -1; 
+    if (sval) *sval = 1; /* Fake that 1 core/resource is available */
+    return 0; 
+}
+
+int sem_close(sem_t *sem) {
+    return 0; 
 }
 
 int pthread_getaffinity_np(pthread_t thread, size_t cpusetsize, struct cpu_set_t *cpuset) { 
@@ -34,6 +41,7 @@ __attribute__((constructor)) void fix_env() {
     setenv("SINGULAR_DEFAULT_DIR", "/", 1);
     setenv("SINGULAR_EXECUTABLE", "/Singular", 1);
     setenv("SINGULAR_BIN_DIR", "/", 1);
+    setenv("SINGULARPATH", "/LIB", 1);
 }
 
 #ifdef __cplusplus
