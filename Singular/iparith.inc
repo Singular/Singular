@@ -1668,5 +1668,7 @@ void iiInitCmdName()
   iiArithAddCmd("while",               0,  -1, 0, 244);
 /* end of list marker */
   sArithBase.nLastIdentifier = 237;
+  iiArithAddCmd("lift_sparse",        0, LIFT_SPARSE_CMD, CMD_M, -1);
+  iiArithAddCmd("liftstd_sparse",     0, LIFTSTD_SPARSE_CMD, CMD_M, -1);
 }
 #define LAST_IDENTIFIER 237

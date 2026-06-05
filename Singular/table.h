@@ -976,10 +976,17 @@ const struct sValCmdM dArithM[]=
 ,{D(jjCALL2ARG),  LIFT_CMD,        MATRIX_CMD,          2  , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  LIFT_CMD,        MATRIX_CMD,          3  , ALLOW_NC |ALLOW_RING}
 ,{D(jjLIFT_4),    LIFT_CMD,        MATRIX_CMD,          4  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjLIFT_SPARSE_M), LIFT_SPARSE_CMD, MODUL_CMD,       2  , ALLOW_NC |ALLOW_RING}
+,{D(jjLIFT_SPARSE_M), LIFT_SPARSE_CMD, MODUL_CMD,       3  , ALLOW_NC |ALLOW_RING}
+,{D(jjLIFT_SPARSE_M), LIFT_SPARSE_CMD, MODUL_CMD,       4  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/2  , ALLOW_NC |ALLOW_RING}
 ,{D(jjCALL3ARG),  LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/3  , ALLOW_NC |ALLOW_RING}
 ,{D(jjLIFTSTD_M), LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/4  , ALLOW_NC |ALLOW_RING}
 ,{D(jjLIFTSTD_M), LIFTSTD_CMD,     IDEAL_CMD,/*or MODUL*/5  , ALLOW_NC |ALLOW_RING}
+,{D(jjLIFTSTD_SPARSE_M), LIFTSTD_SPARSE_CMD, IDEAL_CMD,/*or MODUL*/2  , ALLOW_NC |ALLOW_RING}
+,{D(jjLIFTSTD_SPARSE_M), LIFTSTD_SPARSE_CMD, IDEAL_CMD,/*or MODUL*/3  , ALLOW_NC |ALLOW_RING}
+,{D(jjLIFTSTD_SPARSE_M), LIFTSTD_SPARSE_CMD, IDEAL_CMD,/*or MODUL*/4  , ALLOW_NC |ALLOW_RING}
+,{D(jjLIFTSTD_SPARSE_M), LIFTSTD_SPARSE_CMD, IDEAL_CMD,/*or MODUL*/5  , ALLOW_NC |ALLOW_RING}
 ,{D(jjLIST_PL),   LIST_CMD,        LIST_CMD,           -1      , ALLOW_NC |ALLOW_RING}
 ,{D(jjLU_INVERSE),LUI_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
 ,{D(jjLU_SOLVE),  LUS_CMD,         LIST_CMD,           -2      , NO_NC |NO_RING}
@@ -1139,7 +1146,9 @@ VAR cmdnames cmds[] =
   { "leadexp",     0, LEADEXP_CMD ,       CMD_1},
   { "leadmonom",   0, LEADMONOM_CMD ,     CMD_1},
   { "lift",        0, LIFT_CMD ,          CMD_M},
+  { "lift_sparse", 0, LIFT_SPARSE_CMD ,   CMD_M},
   { "liftstd",     0, LIFTSTD_CMD ,       CMD_M},
+  { "liftstd_sparse",0,LIFTSTD_SPARSE_CMD,CMD_M},
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},

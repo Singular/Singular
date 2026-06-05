@@ -216,6 +216,8 @@ enum {
   VSHORTOUT,
   VPRINTLEVEL,
   /* end system var section: VPRINTLEVEL */
+  LIFTSTD_SPARSE_CMD,
+  LIFT_SPARSE_CMD,
 
   MAX_TOK /* must be the last, biggest token number */
 };

@@ -825,6 +825,99 @@ ideal idExtractG_T_S(ideal s_h3,matrix *T,ideal *S,long syzComp,
   return s_h3;
 }
 
+ideal idExtractG_T_S(ideal s_h3, ideal *T, ideal *S, long syzComp,
+    int h1_size, BOOLEAN inputIsIdeal, const ring oring, const ring sring)
+{
+  // now sort the result, SB : leave in s_h3
+  //                      T:  put in s_h2 (*T as a sparse module)
+  //                      syz: put in *S
+  idSkipZeroes(s_h3);
+  ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank); // will become T
+
+  int j, i = 0;
+  for (j = 0; j < IDELEMS(s_h3); j++)
+  {
+    if (s_h3->m[j] != NULL)
+    {
+      if (pGetComp(s_h3->m[j]) <= syzComp) // syz_ring == currRing
+      {
+        i++;
+        poly q = s_h3->m[j];
+        while (pNext(q) != NULL)
+        {
+          if (pGetComp(pNext(q)) > syzComp)
+          {
+            s_h2->m[i - 1] = pNext(q);
+            pNext(q) = NULL;
+          }
+          else
+          {
+            pIter(q);
+          }
+        }
+        if (!inputIsIdeal) p_Shift(&(s_h3->m[j]), -1, currRing);
+      }
+      else
+      {
+        // we have a syzygy here:
+        if (S != NULL)
+        {
+          p_Shift(&s_h3->m[j], -syzComp, currRing);
+          (*S)->m[j] = s_h3->m[j];
+          s_h3->m[j] = NULL;
+        }
+        else
+        {
+          p_Delete(&(s_h3->m[j]), currRing);
+        }
+      }
+    }
+  }
+  idSkipZeroes(s_h3);
+
+  if (S != NULL) idSkipZeroes(*S);
+
+  if (sring != oring)
+  {
+    rChangeCurrRing(oring);
+  }
+
+  if (T != NULL)
+  {
+    for (j = 0; j < i; j++)
+    {
+      if (s_h2->m[j] != NULL)
+      {
+        p_Shift(&(s_h2->m[j]), -syzComp, sring);
+      }
+    }
+
+    s_h2 = id_ResizeModule(s_h2, h1_size, i, sring);
+
+    if (sring != oring)
+      *T = idrMoveR_NoSort(s_h2, sring, oring);
+    else
+      *T = s_h2;
+  }
+  else
+  {
+    id_Delete(&s_h2, sring);
+  }
+
+  for (i = 0; i < IDELEMS(s_h3); i++)
+  {
+    s_h3->m[i] = prMoveR_NoSort(s_h3->m[i], sring, oring);
+  }
+  if (S != NULL)
+  {
+    for (i = 0; i < IDELEMS(*S); i++)
+    {
+      (*S)->m[i] = prMoveR_NoSort((*S)->m[i], sring, oring);
+    }
+  }
+  return s_h3;
+}
+
 /*2
 * compute the syzygies of h1 in R/quot,
 * weights of components are in w
@@ -1039,6 +1132,69 @@ ideal idLiftStd (ideal  h1, matrix* T, tHomog hi, ideal * S, GbVariant alg,
   if (syz_ring!=orig_ring) rDelete(syz_ring);
   s_h3->rank=h1->rank;
   SI_RESTORE_OPT(saveOpt1,saveOpt2);
+  return s_h3;
+}
+
+ideal idLiftStd (ideal h1, ideal *T, tHomog hi, ideal *S, GbVariant alg,
+  ideal h11)
+{
+  int inputIsIdeal = id_RankFreeModule(h1, currRing);
+  long k;
+  intvec *w = NULL;
+
+  idDelete(T);
+  BOOLEAN lift3 = FALSE;
+  if (S != NULL) { lift3 = TRUE; idDelete(S); }
+  if (idIs0(h1))
+  {
+    *T = idInit(IDELEMS(h1), 1);
+    if (lift3)
+    {
+      *S = idFreeModule(IDELEMS(h1));
+    }
+    return idInit(1, h1->rank);
+  }
+
+  BITSET saveOpt1, saveOpt2;
+  SI_SAVE_OPT(saveOpt1, saveOpt2);
+  si_opt_2 |= Sy_bit(V_PURE_GB);
+  k = si_max(1, inputIsIdeal);
+
+  if ((!lift3) && (!TEST_OPT_RETURN_SB)) si_opt_2 |= Sy_bit(V_IDLIFT);
+
+  ring orig_ring = currRing;
+  ring syz_ring = rAssure_SyzOrder(orig_ring, TRUE);
+  rSetSyzComp(k, syz_ring);
+  rChangeCurrRing(syz_ring);
+
+  ideal s_h1;
+
+  if (orig_ring != syz_ring)
+    s_h1 = idrCopyR_NoSort(h1, orig_ring, syz_ring);
+  else
+    s_h1 = h1;
+  ideal s_h11 = NULL;
+  if (h11 != NULL)
+  {
+    s_h11 = idrCopyR_NoSort(h11, orig_ring, syz_ring);
+  }
+
+  ideal s_h3 = idPrepare(s_h1, s_h11, hi, k, &w, alg); // main (syz) GB computation
+
+  if (w != NULL) delete w;
+  if (syz_ring != orig_ring)
+  {
+    idDelete(&s_h1);
+    if (s_h11 != NULL) idDelete(&s_h11);
+  }
+
+  if (S != NULL) (*S) = idInit(IDELEMS(s_h3), IDELEMS(h1));
+
+  s_h3 = idExtractG_T_S(s_h3, T, S, k, IDELEMS(h1), inputIsIdeal, orig_ring, syz_ring);
+
+  if (syz_ring != orig_ring) rDelete(syz_ring);
+  s_h3->rank = h1->rank;
+  SI_RESTORE_OPT(saveOpt1, saveOpt2);
   return s_h3;
 }
 

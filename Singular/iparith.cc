@@ -8159,6 +8159,218 @@ static BOOLEAN jjLIFT_4(leftv res, leftv U)
     return TRUE;
   }
 }
+static BOOLEAN jjLIFT_SPARSE_M(leftv res, leftv U)
+{
+  const short t1[]={2,IDEAL_CMD,IDEAL_CMD};
+  const short t2[]={2,MODUL_CMD,MODUL_CMD};
+  const short t3[]={3,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD};
+  const short t4[]={3,MODUL_CMD,MODUL_CMD,MATRIX_CMD};
+  const short t5[]={4,IDEAL_CMD,IDEAL_CMD,MATRIX_CMD,STRING_CMD};
+  const short t6[]={4,MODUL_CMD,MODUL_CMD,MATRIX_CMD,STRING_CMD};
+
+  leftv u=U;
+  leftv v=u->next;
+  leftv w=v->next;
+  leftv u4=(w!=NULL) ? w->next : NULL;
+
+  if ((u4==NULL) && (iiCheckTypes(U,t1)||iiCheckTypes(U,t2)))
+  {
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+      {
+        Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+        return TRUE;
+      }
+    }
+#endif
+    ideal m = idLift((ideal)u->Data(), (ideal)v->Data(), NULL, FALSE,
+                     hasFlag(u, FLAG_STD));
+    if ((m==NULL) || (errorreported)) return TRUE;
+    m = id_ResizeModule(m, IDELEMS((ideal)u->Data()),
+                        IDELEMS((ideal)v->Data()), currRing);
+    res->data = (char *)m;
+    return FALSE;
+  }
+  else if ((u4==NULL) && (iiCheckTypes(U,t3)||iiCheckTypes(U,t4)))
+  {
+    if (w->rtyp!=IDHDL) return TRUE;
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+      {
+        Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+        return TRUE;
+      }
+    }
+#endif
+    ideal m = idLift((ideal)u->Data(), (ideal)v->Data(), NULL, FALSE,
+                     hasFlag(u, FLAG_STD), FALSE,
+                     (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
+    if (m==NULL) return TRUE;
+    m = id_ResizeModule(m, IDELEMS((ideal)u->Data()),
+                        IDELEMS((ideal)v->Data()), currRing);
+    res->data = (char *)m;
+    return FALSE;
+  }
+  else if ((u4!=NULL) && (iiCheckTypes(U,t5)||iiCheckTypes(U,t6)))
+  {
+    if (w->rtyp!=IDHDL) return TRUE;
+#ifdef HAVE_SHIFTBBA
+    if (rIsLPRing(currRing))
+    {
+      if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+      {
+        Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+        return TRUE;
+      }
+    }
+#endif
+    ideal I=(ideal)u->Data();
+    GbVariant alg=syGetAlgorithm((char*)u4->Data(),currRing,I);
+    ideal m = idLift(I, (ideal)v->Data(), NULL, FALSE, hasFlag(u, FLAG_STD),
+                     FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))), alg);
+    if (m==NULL) return TRUE;
+    m = id_ResizeModule(m, IDELEMS((ideal)u->Data()),
+                        IDELEMS((ideal)v->Data()), currRing);
+    res->data = (char *)m;
+    return FALSE;
+  }
+
+  Werror("%s(`ideal`,`ideal`[,`matrix`][,`string`])\n"
+         "or (`module`,`module`[,`matrix`][,`string`]) expected",
+         Tok2Cmdname(iiOp));
+  return TRUE;
+}
+static BOOLEAN jjLIFTSTD_SPARSE_M(leftv res, leftv U)
+{
+  leftv u=U;
+  leftv v=u->next;
+  leftv u3=v->next;
+  leftv u4=(u3!=NULL) ? u3->next : NULL;
+  leftv u5=(u4!=NULL) ? u4->next : NULL;
+
+  ideal *syz=NULL;
+  leftv syz_arg=NULL;
+  GbVariant alg=GbDefault;
+  ideal h11=NULL;
+
+  if (u3==NULL)
+  {
+    const short t1[]={2,IDEAL_CMD,MODUL_CMD};
+    const short t2[]={2,MODUL_CMD,MODUL_CMD};
+
+    if (!(iiCheckTypes(U,t1)||iiCheckTypes(U,t2)))
+    {
+      Werror("%s(`ideal/module`,`module`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
+  }
+  else if (u4==NULL)
+  {
+    const short t1[]={3,IDEAL_CMD,MODUL_CMD,MODUL_CMD};
+    const short t2[]={3,MODUL_CMD,MODUL_CMD,MODUL_CMD};
+    const short t3[]={3,IDEAL_CMD,MODUL_CMD,STRING_CMD};
+    const short t4[]={3,MODUL_CMD,MODUL_CMD,STRING_CMD};
+
+    if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+    {
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      syz_arg=u3;
+    }
+    else if(iiCheckTypes(U,t3)||iiCheckTypes(U,t4))
+    {
+      alg=syGetAlgorithm((char*)u3->Data(),currRing,(ideal)u->Data());
+    }
+    else
+    {
+      Werror("%s(`ideal/module`,`module`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
+  }
+  else if (u5==NULL)
+  {
+    const short t1[]={4,IDEAL_CMD,MODUL_CMD,MODUL_CMD,STRING_CMD};
+    const short t2[]={4,MODUL_CMD,MODUL_CMD,MODUL_CMD,STRING_CMD};
+    const short t3[]={4,IDEAL_CMD,MODUL_CMD,MODUL_CMD,IDEAL_CMD};
+    const short t4[]={4,MODUL_CMD,MODUL_CMD,MODUL_CMD,MODUL_CMD};
+    const short t5[]={4,IDEAL_CMD,MODUL_CMD,STRING_CMD,IDEAL_CMD};
+    const short t6[]={4,MODUL_CMD,MODUL_CMD,STRING_CMD,MODUL_CMD};
+
+    if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+    {
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      syz_arg=u3;
+      alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
+    }
+    else if(iiCheckTypes(U,t3)||iiCheckTypes(U,t4))
+    {
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      syz_arg=u3;
+      h11=(ideal)u4->Data();
+    }
+    else if(iiCheckTypes(U,t5)||iiCheckTypes(U,t6))
+    {
+      alg=syGetAlgorithm((char*)u3->Data(),currRing,(ideal)u->Data());
+      h11=(ideal)u4->Data();
+    }
+    else
+    {
+      Werror("%s(`ideal/module`,`module`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
+  }
+  else
+  {
+    const short t1[]={5,IDEAL_CMD,MODUL_CMD,MODUL_CMD,STRING_CMD,IDEAL_CMD};
+    const short t2[]={5,MODUL_CMD,MODUL_CMD,MODUL_CMD,STRING_CMD,MODUL_CMD};
+
+    if(iiCheckTypes(U,t1)||iiCheckTypes(U,t2))
+    {
+      if ((u3->rtyp!=IDHDL)||(u3->e!=NULL)) return TRUE;
+      idhdl hw=(idhdl)u3->data;
+      syz=&(hw->data.uideal);
+      syz_arg=u3;
+      alg=syGetAlgorithm((char*)u4->Data(),currRing,(ideal)u->Data());
+      h11=(ideal)u5->Data();
+    }
+    else
+    {
+      Werror("%s(`ideal/module`,`module`[,`module`][,`string`][,`ideal/module`]) expected",Tok2Cmdname(iiOp));
+      return TRUE;
+    }
+  }
+
+#ifdef HAVE_SHIFTBBA
+  if (rIsLPRing(currRing))
+  {
+    if (currRing->LPncGenCount < IDELEMS((ideal)u->Data()))
+    {
+      Werror("At least %d ncgen variables are needed for this computation.", IDELEMS((ideal)u->Data()));
+      return TRUE;
+    }
+  }
+#endif
+
+  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
+  idhdl hv=(idhdl)v->data;
+  res->rtyp = u->Typ();
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                              &(hv->data.uideal),testHomog,
+                              syz,alg,h11);
+  setFlag(res,FLAG_STD); v->flag=0;
+  if(syz_arg!=NULL)
+    syz_arg->flag=0;
+  return FALSE;
+}
 static BOOLEAN jjLIFTSTD_M(leftv res, leftv U)
 {
   // we have 4 or 5 arguments
