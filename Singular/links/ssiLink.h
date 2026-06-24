@@ -18,6 +18,10 @@ leftv ssiRead2(si_link l, leftv key);
 BOOLEAN ssiClose(si_link l);
 const char* slStatusSsi(si_link l, const char* request);
 si_link_extension slInitSsiExtension(si_link_extension s);
+si_link_extension slInitSsi2Extension(si_link_extension s);
+si_link_extension slInitSsi2zExtension(si_link_extension s);
+si_link_extension slInitSsi2zstdExtension(si_link_extension s);
+si_link_extension slInitSsi2lz4Extension(si_link_extension s);
 
 si_link ssiCommandLink();
 
