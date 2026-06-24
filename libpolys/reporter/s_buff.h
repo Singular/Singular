@@ -27,6 +27,13 @@ typedef struct
   char level;
   char send_quit_at_exit;
   char quit_sent;
+  char *write_buff;
+  int write_buff_pos;
+  int write_buff_size;
+  const char *compressor_name;
+  char ssi2_format;
+  #define SSI_SCHEMA_VERSION_COUNT 32
+  unsigned short schema_versions[SSI_SCHEMA_VERSION_COUNT];
   #define SI_RING_CACHE 20
   ring rings[SI_RING_CACHE];
 } ssiInfo;
