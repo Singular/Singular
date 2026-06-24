@@ -419,6 +419,14 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
 #if 1
   else if (strcmp(type, "ssi") == 0)
     s->next = slInitSsiExtension(ns);
+  else if (strcmp(type, "ssi2") == 0)
+    s->next = slInitSsi2Extension(ns);
+  else if (strcmp(type, "ssi2z") == 0)
+    s->next = slInitSsi2zExtension(ns);
+  else if (strcmp(type, "ssi2zstd") == 0)
+    s->next = slInitSsi2zstdExtension(ns);
+  else if (strcmp(type, "ssi2lz4") == 0)
+    s->next = slInitSsi2lz4Extension(ns);
 #endif
 #if 1
   else if (strcmp(type, "|") == 0)
@@ -440,4 +448,3 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   }
   return s->next;
 }
-

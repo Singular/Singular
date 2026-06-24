@@ -2179,6 +2179,54 @@ The ssi file link describing string has to be one of the following:
 @*opens the file for appending.
 @end enumerate
 
+Binary SSI2 file links use the same @code{read}, @code{write}, and
+@code{close} commands, but store data in a compact binary format:
+
+@enumerate
+@item @code{"ssi2:r "} + filename
+@*opens an SSI2 file for reading.
+@item @code{"ssi2:w "} + filename
+@*opens an SSI2 file for overwriting.
+@item @code{"ssi2:a "} + filename
+@*opens an SSI2 file for appending.
+@end enumerate
+
+The @code{ssi} and @code{ssi2} link types select different file
+formats.  The link type is not inferred from the filename: use
+@code{ssi} for the old SSI format and @code{ssi2} for the binary SSI2
+format.
+
+Both formats carry an internal schema table with subversions for
+individual serialized data families, such as rings, coefficients,
+polynomials, ideals, modules, and lists.  This metadata is used by the
+reader to dispatch future compatibility code for only the affected data
+families.  It is not a user-visible mode option.
+
+SSI2 file links can optionally compress the byte stream using an
+external compressor process connected by a pipe.  The compression mode
+is selected by a mode option, or inferred from the filename suffix:
+
+@enumerate
+@item @code{"ssi2:w,zstd "} + filename
+@*writes compressed SSI2 data using @code{zstd}.
+@item @code{"ssi2:w,zstd,long=23 "} + filename
+@*uses @code{zstd --long=23}, i.e. an 8 MiB compression window.
+@item @code{"ssi2:w,gzip "} + filename
+@*writes compressed SSI2 data using @code{gzip}.
+@item @code{"ssi2:w,lz4 "} + filename
+@*writes compressed SSI2 data using @code{lz4}.
+@item @code{"ssi2:w,plain "} + filename
+@*forces an uncompressed SSI2 stream, even if the filename has a
+compressed suffix.
+@end enumerate
+
+For reading and writing with @code{ssi2}, the compression option can
+usually be omitted and is inferred from suffixes @code{.gz},
+@code{.gzip}, @code{.zst}, @code{.zstd}, and @code{.lz4}.  Compressed
+SSI2 links require the corresponding command line tool (@code{gzip},
+@code{zstd}, or @code{lz4}) to be installed and available in the search
+path.
+
 Note that the filename may contain a path. An ssi file link can be used
 either for reading or for writing, but not for both at the same time. A
 @code{close} command must be used before a change of I/O direction.
