@@ -2111,22 +2111,31 @@ static BOOLEAN jjFAC_P2(leftv res, leftv u,leftv dummy)
 }
 static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
 {
-  ideal_list p,h;
-  h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL,(ideal)w->Data());
-  p=h;
-  int l=0;
-  while (p!=NULL) { p=p->next;l++; }
   lists L=(lists)omAllocBin(slists_bin);
-  L->Init(l);
-  l=0;
-  while(h!=NULL)
+  if (singclap_factorize_is_supported(currRing))
   {
-    L->m[l].data=(char *)h->d;
-    L->m[l].rtyp=IDEAL_CMD;
-    p=h->next;
-    omFreeSize(h,sizeof(*h));
-    h=p;
-    l++;
+    ideal_list p,h;
+    h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL,(ideal)w->Data());
+    p=h;
+    int l=0;
+    while (p!=NULL) { p=p->next;l++; }
+    L->Init(l);
+    l=0;
+    while(h!=NULL)
+    {
+      L->m[l].data=(char *)h->d;
+      L->m[l].rtyp=IDEAL_CMD;
+      p=h->next;
+      omFreeSize(h,sizeof(*h));
+      h=p;
+      l++;
+    }
+  }
+  else
+  {
+    WarnS("facstd: no factorization implemented for this coefficient domain; returning std(...) as one component");
+    L->Init(1);
+    iiExprArith2(&(L->m[0]),v,STD_CMD,w);
   }
   res->data=(void *)L;
   return FALSE;
@@ -4525,7 +4534,7 @@ static BOOLEAN jjEXECUTE(leftv, leftv v)
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   lists L=(lists)omAllocBin(slists_bin);
-  if (currRing->cf->convSingNFactoryN!=ndConvSingNFactoryN) /* conversion to factory*/
+  if (singclap_factorize_is_supported(currRing))
   {
     ideal_list p,h;
     h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
@@ -4555,7 +4564,7 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
   }
   else
   {
-    WarnS("no factorization implemented");
+    WarnS("facstd: no factorization implemented for this coefficient domain; returning std(...) as one component");
     L->Init(1);
     iiExprArith1(&(L->m[0]),v,STD_CMD);
   }
