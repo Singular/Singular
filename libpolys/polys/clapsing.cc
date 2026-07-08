@@ -65,6 +65,30 @@ NTL_CLIENT
 
 #define MAX_CHAR_FACTORY 536870909
 
+static BOOLEAN singclap_factory_char_is_too_large(const coeffs cf)
+{
+  if (cf == NULL) return FALSE;
+
+  if ((cf->modNumber != NULL)
+  && (mpz_cmp_ui(cf->modNumber, MAX_CHAR_FACTORY) > 0))
+  {
+    return TRUE;
+  }
+
+  if (cf->extRing != NULL)
+  {
+    return singclap_factory_char_is_too_large(cf->extRing->cf);
+  }
+
+  return (cf->ch > MAX_CHAR_FACTORY);
+}
+
+static BOOLEAN singclap_factory_char_is_too_large(const ring r)
+{
+  if (r == NULL) return FALSE;
+  return singclap_factory_char_is_too_large(r->cf);
+}
+
 BOOLEAN singclap_factorize_is_supported(const ring r)
 {
   if ((r == NULL) || (r->cf == NULL)) return FALSE;
@@ -78,7 +102,7 @@ BOOLEAN singclap_factorize_is_supported(const ring r)
 
   if (r->cf->convSingNFactoryN == ndConvSingNFactoryN) return FALSE;
 
-  if (rInternalChar(r) > MAX_CHAR_FACTORY) return FALSE;
+  if (singclap_factory_char_is_too_large(r)) return FALSE;
 
   return TRUE;
 }
@@ -1108,7 +1132,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         errorreported=save_errorreported;
         return res;
       }
+      WerrorS("FLINT factorization failed for this large prime coefficient domain");
+      p_Delete(&f,r);
+      return NULL;
     }
+    WerrorS("could not initialize FLINT factorization for this large prime coefficient domain");
+    p_Delete(&f,r);
+    return NULL;
   }
   if (Flint_Factorize_TransExt_MP_is_supported(r))
   {
@@ -1145,6 +1175,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     }
     if (flint_N!=NULL) n_Delete(&flint_N,r->cf);
     if (flint_NN!=NULL) n_Delete(&flint_NN,r->cf);
+    WerrorS("FLINT factorization failed for this large prime coefficient domain");
+    p_Delete(&f,r);
+    return NULL;
   }
 #endif
 #endif
@@ -1202,9 +1235,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Zp_long(r)
     || rField_is_Z(r) || rField_is_Zn(r))
     {
+      if (singclap_factory_char_is_too_large(r))
+      {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
       setCharacteristic( rInternalChar(r) );
-      if (rInternalChar(r)>MAX_CHAR_FACTORY)
-      {setCharacteristic(0);Off(SW_RATIONAL);return NULL;}
       if (errorreported) goto notImpl; // char too large
       CanonicalForm F( convSingPFactoryP( f,r ) );
       L = factorize( F );
@@ -1212,10 +1245,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     // and over Q(a) / Fp(a)
     else if (r->cf->extRing!=NULL)
     {
+      if (!rField_is_Q_a(r) && singclap_factory_char_is_too_large(r))
+      {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
       if (rField_is_Q_a (r)) setCharacteristic (0);
       else                   setCharacteristic( rInternalChar(r) );
-      if (rInternalChar(r)>MAX_CHAR_FACTORY)
-      {setCharacteristic(0);Off(SW_RATIONAL);return NULL;}
       if (errorreported) goto notImpl; // char too large
       if (r->cf->extRing->qideal!=NULL) /*algebraic extension */
       {
@@ -1548,7 +1581,13 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
         errorreported=save_errorreported;
         return res;
       }
+      WerrorS("FLINT squarefree factorization failed for this large prime coefficient domain");
+      p_Delete(&f,r);
+      return NULL;
     }
+    WerrorS("could not initialize FLINT factorization for this large prime coefficient domain");
+    p_Delete(&f,r);
+    return NULL;
   }
   if (Flint_Factorize_TransExt_MP_is_supported(r))
   {
@@ -1585,6 +1624,9 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     }
     if (flint_N!=NULL) n_Delete(&flint_N,r->cf);
     if (flint_NN!=NULL) n_Delete(&flint_NN,r->cf);
+    WerrorS("FLINT squarefree factorization failed for this large prime coefficient domain");
+    p_Delete(&f,r);
+    return NULL;
   }
 #endif
 #endif
@@ -1636,18 +1678,18 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   if (rField_is_Q(r) || rField_is_Zp(r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
+    if (singclap_factory_char_is_too_large(r))
+    {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
     setCharacteristic( rInternalChar(r) );
-    if (rInternalChar(r)>MAX_CHAR_FACTORY)
-    {setCharacteristic(0);Off(SW_RATIONAL);return NULL;}
     CanonicalForm F( convSingPFactoryP( f,r ) );
     L = sqrFree( F );
   }
   else if (r->cf->extRing!=NULL)
   {
+    if (!rField_is_Q_a(r) && singclap_factory_char_is_too_large(r))
+    {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
     if (rField_is_Q_a (r)) setCharacteristic (0);
     else                   setCharacteristic( rInternalChar(r) );
-    if (rInternalChar(r)>MAX_CHAR_FACTORY)
-    {setCharacteristic(0);Off(SW_RATIONAL);return NULL;}
     if (r->cf->extRing->qideal!=NULL)
     {
       CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
