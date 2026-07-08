@@ -123,6 +123,7 @@ conv_bi
 ; divrem2
 enumnf
 facstd
+factorize_largeprime_s
 fermat_gcd_1var
 fermat_gcd_2var
 fermat_gcd_3var
