@@ -65,6 +65,24 @@ NTL_CLIENT
 
 #define MAX_CHAR_FACTORY 536870909
 
+BOOLEAN singclap_factorize_is_supported(const ring r)
+{
+  if ((r == NULL) || (r->cf == NULL)) return FALSE;
+
+#ifdef HAVE_FLINT
+#if __FLINT_RELEASE >= 20800
+  if (Flint_Factorize_MP_is_supported(r)) return TRUE;
+  if (Flint_Factorize_TransExt_MP_is_supported(r)) return TRUE;
+#endif
+#endif
+
+  if (r->cf->convSingNFactoryN == ndConvSingNFactoryN) return FALSE;
+
+  if (rInternalChar(r) > MAX_CHAR_FACTORY) return FALSE;
+
+  return TRUE;
+}
+
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 poly singclap_gcd_r ( poly f, poly g, const ring r )
@@ -84,6 +102,16 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   }
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
+  #if __FLINT_RELEASE >= 20800
+  if (Flint_Factorize_MP_is_supported(r))
+  {
+    fmpz_mod_mpoly_ctx_t ctx;
+    if (!convSingRFlintR(ctx,r))
+    {
+      return Flint_GCD_MP(f,pLength(f),g,pLength(g),ctx,r);
+    }
+  }
+  #endif
   if (rField_is_Zp(r) && (r->cf->ch>10))
   {
     nmod_mpoly_ctx_t ctx;
@@ -657,6 +685,18 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
     If the division is not exact, control will pass to factory where the
     polynomials can be divided using the ordering that factory chooses.
   */
+  #if __FLINT_RELEASE >= 20800
+  if (Flint_Factorize_MP_is_supported(r))
+  {
+    fmpz_mod_mpoly_ctx_t ctx;
+    if (!convSingRFlintR(ctx,r))
+    {
+      res = Flint_Divide_MP(f,0,g,0,ctx,r);
+      if (res != NULL)
+        return res;
+    }
+  }
+  #endif
   if (rField_is_Zp(r))
   {
     nmod_mpoly_ctx_t ctx;
@@ -1054,6 +1094,60 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     return res;
   }
   //PrintS("S:");p_Write(f,r);PrintLn();
+#ifdef HAVE_FLINT
+#if __FLINT_RELEASE >= 20800
+  if (Flint_Factorize_MP_is_supported(r))
+  {
+    fmpz_mod_mpoly_ctx_t ctx;
+    if (!convSingRFlintR(ctx, r))
+    {
+      res=Flint_Factorize_MP(f, pLength(f), v, with_exps, ctx, r);
+      if (res!=NULL)
+      {
+        p_Delete(&f,r);
+        errorreported=save_errorreported;
+        return res;
+      }
+    }
+  }
+  if (Flint_Factorize_TransExt_MP_is_supported(r))
+  {
+    number flint_N=NULL;
+    number flint_NN=NULL;
+    if (singclap_factorize_retry==0)
+    {
+      number n0=n_Copy(pGetCoeff(f),r->cf);
+      if (with_exps==0)
+        flint_N=n_Copy(n0,r->cf);
+      p_Norm(f,r);
+      p_Cleardenom(f,r);
+      flint_NN=n_Div(n0,pGetCoeff(f),r->cf);
+      n_Delete(&n0,r->cf);
+      if (with_exps==0)
+      {
+        n_Delete(&flint_N,r->cf);
+        flint_N=n_Copy(flint_NN,r->cf);
+      }
+    }
+
+    res=Flint_Factorize_TransExt_MP(f, v, with_exps, r);
+    if (res!=NULL)
+    {
+      if (flint_N!=NULL)
+      {
+        __p_Mult_nn(res->m[0], flint_N, r);
+        n_Delete(&flint_N,r->cf);
+      }
+      if (flint_NN!=NULL) n_Delete(&flint_NN,r->cf);
+      p_Delete(&f,r);
+      errorreported=save_errorreported;
+      return res;
+    }
+    if (flint_N!=NULL) n_Delete(&flint_N,r->cf);
+    if (flint_NN!=NULL) n_Delete(&flint_NN,r->cf);
+  }
+#endif
+#endif
   // use factory/libfac in general ==============================
   Variable dummy(-1); prune(dummy); // remove all (tmp.) extensions
   Off(SW_RATIONAL);
@@ -1440,6 +1534,60 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     return res;
   }
   //PrintS("S:");pWrite(f);PrintLn();
+#ifdef HAVE_FLINT
+#if __FLINT_RELEASE >= 20800
+  if (Flint_Factorize_MP_is_supported(r))
+  {
+    fmpz_mod_mpoly_ctx_t ctx;
+    if (!convSingRFlintR(ctx, r))
+    {
+      res=Flint_Sqrfree_MP(f, pLength(f), v, with_exps, ctx, r);
+      if (res!=NULL)
+      {
+        p_Delete(&f,r);
+        errorreported=save_errorreported;
+        return res;
+      }
+    }
+  }
+  if (Flint_Factorize_TransExt_MP_is_supported(r))
+  {
+    number flint_N=NULL;
+    number flint_NN=NULL;
+    if (singclap_factorize_retry==0)
+    {
+      number n0=n_Copy(pGetCoeff(f),r->cf);
+      if (with_exps==0 || with_exps==3)
+        flint_N=n_Copy(n0,r->cf);
+      p_Norm(f,r);
+      p_Cleardenom(f,r);
+      flint_NN=n_Div(n0,pGetCoeff(f),r->cf);
+      n_Delete(&n0,r->cf);
+      if (with_exps==0 || with_exps==3)
+      {
+        n_Delete(&flint_N,r->cf);
+        flint_N=n_Copy(flint_NN,r->cf);
+      }
+    }
+
+    res=Flint_Sqrfree_TransExt_MP(f, v, with_exps, r);
+    if (res!=NULL)
+    {
+      if (flint_N!=NULL)
+      {
+        __p_Mult_nn(res->m[0], flint_N, r);
+        n_Delete(&flint_N,r->cf);
+      }
+      if (flint_NN!=NULL) n_Delete(&flint_NN,r->cf);
+      p_Delete(&f,r);
+      errorreported=save_errorreported;
+      return res;
+    }
+    if (flint_N!=NULL) n_Delete(&flint_N,r->cf);
+    if (flint_NN!=NULL) n_Delete(&flint_NN,r->cf);
+  }
+#endif
+#endif
   // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);

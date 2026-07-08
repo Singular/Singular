@@ -35,6 +35,9 @@ poly singclap_pmod ( poly f, poly g, const ring r );
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r);
 
+/// TRUE if singclap_factorize has a native or Factory backend for r.
+BOOLEAN singclap_factorize_is_supported(const ring r);
+
 ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r );
 
 matrix  singntl_HNF(matrix A, const ring r);

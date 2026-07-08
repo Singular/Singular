@@ -235,7 +235,26 @@ kStrategy kStratCopy(kStrategy o)
 BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
 {
   int facdeg=currRing->pFDeg(p,currRing);
+
+  if (!singclap_factorize_is_supported(currRing))
+  {
+    rfac=idInit(1,1);
+    rfac->m[0]=pCopy(p);
+    fac_copy=idInit(1,1);
+    return FALSE;
+  }
+
+  BOOLEAN save_errorreported=errorreported;
   ideal fac=singclap_factorize(pCopy(p),NULL,1,currRing);
+  if ((fac==NULL) || (errorreported!=save_errorreported))
+  {
+    errorreported=save_errorreported;
+    if (fac!=NULL) idDelete(&fac);
+    rfac=idInit(1,1);
+    rfac->m[0]=pCopy(p);
+    fac_copy=idInit(1,1);
+    return FALSE;
+  }
   int fac_elems;
   fac_elems=IDELEMS(fac);
   rfac=fac;
