@@ -86,7 +86,13 @@ static BOOLEAN singclap_factory_char_is_too_large(const coeffs cf)
 static BOOLEAN singclap_factory_char_is_too_large(const ring r)
 {
   if (r == NULL) return FALSE;
-  return singclap_factory_char_is_too_large(r->cf);
+  if (singclap_factory_char_is_too_large(r->cf)) return TRUE;
+  return (rInternalChar(r) > MAX_CHAR_FACTORY);
+}
+
+static void singclap_report_factory_char_too_large()
+{
+  WerrorS("characteristic is too large(max is 2^29)");
 }
 
 BOOLEAN singclap_factorize_is_supported(const ring r)
@@ -1236,7 +1242,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     || rField_is_Z(r) || rField_is_Zn(r))
     {
       if (singclap_factory_char_is_too_large(r))
-      {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
+      {singclap_report_factory_char_too_large();setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
       setCharacteristic( rInternalChar(r) );
       if (errorreported) goto notImpl; // char too large
       CanonicalForm F( convSingPFactoryP( f,r ) );
@@ -1246,7 +1252,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     else if (r->cf->extRing!=NULL)
     {
       if (!rField_is_Q_a(r) && singclap_factory_char_is_too_large(r))
-      {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
+      {singclap_report_factory_char_too_large();setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
       if (rField_is_Q_a (r)) setCharacteristic (0);
       else                   setCharacteristic( rInternalChar(r) );
       if (errorreported) goto notImpl; // char too large
@@ -1272,6 +1278,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   }
   else
   {
+    if (singclap_factory_char_is_too_large(r))
+      singclap_report_factory_char_too_large();
     goto notImpl;
   }
   if (errorreported)
@@ -1481,7 +1489,7 @@ notImpl:
   prune(a);
   if (res==NULL)
   {
-    WerrorS( feNotImplemented );
+    if (!errorreported) WerrorS( feNotImplemented );
     if ((v!=NULL) && ((*v)!=NULL) &&(with_exps==2))
     {
        *v = new intvec( 1 );
@@ -1679,7 +1687,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
   {
     if (singclap_factory_char_is_too_large(r))
-    {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
+    {singclap_report_factory_char_too_large();setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
     setCharacteristic( rInternalChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) );
     L = sqrFree( F );
@@ -1687,7 +1695,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   else if (r->cf->extRing!=NULL)
   {
     if (!rField_is_Q_a(r) && singclap_factory_char_is_too_large(r))
-    {setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
+    {singclap_report_factory_char_too_large();setCharacteristic(0);Off(SW_RATIONAL);goto notImpl;}
     if (rField_is_Q_a (r)) setCharacteristic (0);
     else                   setCharacteristic( rInternalChar(r) );
     if (r->cf->extRing->qideal!=NULL)
@@ -1722,6 +1730,8 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   #endif
   else
   {
+    if (singclap_factory_char_is_too_large(r))
+      singclap_report_factory_char_too_large();
     goto notImpl;
   }
   {
@@ -1791,7 +1801,9 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   errorreported=save_errorreported;
 notImpl:
   if (res==NULL)
-    WerrorS( feNotImplemented );
+  {
+    if (!errorreported) WerrorS( feNotImplemented );
+  }
   if (NN!=NULL)
   {
     n_Delete(&NN,r->cf);
