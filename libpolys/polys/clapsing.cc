@@ -975,6 +975,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
     On(SW_RATIONAL);
     CanonicalForm F, FAC,Q,R;
     Variable a;
+    BOOLEAN used_algext = FALSE;
     if (rField_is_Zp(r) || rField_is_Q(r)
     || (rField_is_Zn(r)&&(r->cf->convSingNFactoryN!=ndConvSingNFactoryN)))
     {
@@ -988,13 +989,28 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
         CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                     r->cf->extRing);
         a=rootOf(mipo);
+        used_algext = TRUE;
         F=convSingAPFactoryAP( f,a,r );
         FAC=convSingAPFactoryAP( fac,a,r );
       }
       else
       {
-        F=convSingTrPFactoryP( f,r );
-        FAC=convSingTrPFactoryP( fac,r );
+        const ring er = r->cf->extRing;
+        if ((er != NULL) && (er->cf != NULL) &&
+            (er->cf->extRing != NULL) && (er->cf->extRing->qideal != NULL))
+        {
+          CanonicalForm mipo=convSingPFactoryP(er->cf->extRing->qideal->m[0],
+                                      er->cf->extRing);
+          a=rootOf(mipo);
+          used_algext = TRUE;
+          F=convSingTrPAlgExtFactoryP( f,a,r );
+          FAC=convSingTrPAlgExtFactoryP( fac,a,r );
+        }
+        else
+        {
+          F=convSingTrPFactoryP( f,r );
+          FAC=convSingTrPFactoryP( fac,r );
+        }
       }
     }
     else
@@ -1023,7 +1039,12 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
           }
           else
           {
-            q= convFactoryPSingTrP( Q,r );
+            const ring er = r->cf->extRing;
+            if ((er != NULL) && (er->cf != NULL) &&
+                (er->cf->extRing != NULL) && (er->cf->extRing->qideal != NULL))
+              q= convFactoryAPSingTrP( Q,r );
+            else
+              q= convFactoryPSingTrP( Q,r );
           }
         }
         e++; p_Delete(&f,r); f=q; q=NULL; F=Q;
@@ -1033,9 +1054,8 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
         break;
       }
     }
-    if (r->cf->extRing!=NULL)
-      if (r->cf->extRing->qideal!=NULL)
-        prune (a);
+    if (used_algext)
+      prune (a);
     if (e==0)
     {
       Off(SW_RATIONAL);
@@ -1197,6 +1217,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   number old_lead_coeff=n_Copy(pGetCoeff(f), r->cf);
 
   Variable a;
+  BOOLEAN trans_algext = FALSE;
   if (r->cf->convSingNFactoryN!=ndConvSingNFactoryN)
   {
     if (rField_is_Q(r) || rField_is_Q_a(r) || rField_is_Z(r)) /* Q, Q(a), Z */
@@ -1267,8 +1288,23 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       }
       else /* rational functions */
       {
-        CanonicalForm F( convSingTrPFactoryP( f,r ) );
-        L = factorize( F );
+        const ring er = r->cf->extRing;
+        if ((er != NULL) && (er->cf != NULL) &&
+            (er->cf->extRing != NULL) && (er->cf->extRing->qideal != NULL))
+        {
+          CanonicalForm mipo=convSingPFactoryP(er->cf->extRing->qideal->m[0],
+                                               er->cf->extRing);
+          a=rootOf(mipo);
+          CanonicalForm F( convSingTrPAlgExtFactoryP( f, a, r ) );
+          L = factorize( F, a );
+          prune(a);
+          trans_algext = TRUE;
+        }
+        else
+        {
+          CanonicalForm F( convSingTrPFactoryP( f,r ) );
+          L = factorize( F );
+        }
       }
     }
     else
@@ -1327,10 +1363,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
 #endif
         if (r->cf->extRing->qideal==NULL)
         {
+          poly converted_factor = trans_algext
+            ? convFactoryAPSingTrP(J.getItem().factor(), r)
+            : convFactoryPSingTrP(J.getItem().factor(), r);
 #ifdef SING_NDEBUG
-          res->m[j]= convFactoryPSingTrP( J.getItem().factor(),r );
+          res->m[j]= converted_factor;
 #else
-          if(!count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor(),r ),r))
+          if(!count_Factors(res,w,j,ff,converted_factor,r))
           {
             if (w!=NULL)
               (*w)[j]=1;
