@@ -124,6 +124,7 @@ conv_bi
 enumnf
 facstd
 factorize_largeprime_s
+factorize_transext_alg_s
 fermat_gcd_1var
 fermat_gcd_2var
 fermat_gcd_3var

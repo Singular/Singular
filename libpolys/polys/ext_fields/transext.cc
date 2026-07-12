@@ -1964,6 +1964,21 @@ static number ntMapZ0(number a, const coeffs src, const coeffs dst)
   return res;
 }
 
+/* assumes that src = K, dst = K(t_1, ..., t_s) */
+static number ntMapK0(number a, const coeffs src, const coeffs dst)
+{
+  n_Test(a, src);
+  if (n_IsZero(a, src)) return NULL;
+  assume(src == dst->extRing->cf);
+
+  poly p = p_One(dst->extRing);
+  p_SetCoeff(p, n_Copy(a, src), dst->extRing);
+  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(f) = p;
+  n_Test((number)f, dst);
+  return (number)f;
+}
+
 /* assumes that src = Z/p, dst = Q(t_1, ..., t_s) */
 static number ntMapP0(number a, const coeffs src, const coeffs dst)
 {
@@ -2171,6 +2186,9 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be a rational function field */
   assume(getCoeffType(dst) == n_transExt);
+
+  if (src == dst->extRing->cf)
+    return ntMapK0;                                 /// K       --> K(T)
 
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
