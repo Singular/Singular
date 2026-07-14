@@ -95,6 +95,33 @@ static void singclap_report_factory_char_too_large()
   WerrorS("characteristic is too large(max is 2^29)");
 }
 
+static BOOLEAN singclap_factory_factorize_is_supported(const ring r)
+{
+  if ((r == NULL) || (r->cf == NULL)) return FALSE;
+
+  if (r->cf->convSingNFactoryN == ndConvSingNFactoryN) return FALSE;
+
+  if (singclap_factory_char_is_too_large(r)) return FALSE;
+
+  if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Zp_long(r)
+  || rField_is_Z(r) || rField_is_Zn(r))
+    return TRUE;
+
+  return (r->cf->extRing != NULL);
+}
+
+static BOOLEAN singclap_coeff_factorize_is_available(const ring r)
+{
+  return (r != NULL) && (r->cf != NULL) && (r->cf->cfFactorize != NULL);
+}
+
+static ideal singclap_try_coeff_factorize(poly f, intvec **v, int with_exps, const ring r)
+{
+  if (!singclap_coeff_factorize_is_available(r)) return NULL;
+
+  return r->cf->cfFactorize(f, v, with_exps, r);
+}
+
 BOOLEAN singclap_factorize_is_supported(const ring r)
 {
   if ((r == NULL) || (r->cf == NULL)) return FALSE;
@@ -106,11 +133,9 @@ BOOLEAN singclap_factorize_is_supported(const ring r)
 #endif
 #endif
 
-  if (r->cf->convSingNFactoryN == ndConvSingNFactoryN) return FALSE;
+  if (singclap_factory_factorize_is_supported(r)) return TRUE;
 
-  if (singclap_factory_char_is_too_large(r)) return FALSE;
-
-  return TRUE;
+  return singclap_coeff_factorize_is_available(r);
 }
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
@@ -1207,6 +1232,17 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   }
 #endif
 #endif
+  if (!singclap_factory_factorize_is_supported(r))
+  {
+    res = singclap_try_coeff_factorize(f, v, with_exps, r);
+    if (res != NULL)
+    {
+      p_Delete(&f,r);
+      errorreported=save_errorreported;
+      return res;
+    }
+    errorreported=save_errorreported;
+  }
   // use factory/libfac in general ==============================
   Variable dummy(-1); prune(dummy); // remove all (tmp.) extensions
   Off(SW_RATIONAL);
@@ -1677,6 +1713,17 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   }
 #endif
 #endif
+  if (!singclap_factory_factorize_is_supported(r))
+  {
+    res = singclap_try_coeff_factorize(f, v, with_exps, r);
+    if (res != NULL)
+    {
+      p_Delete(&f,r);
+      errorreported=save_errorreported;
+      return res;
+    }
+    errorreported=save_errorreported;
+  }
   // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
