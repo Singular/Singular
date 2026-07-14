@@ -483,6 +483,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
     n->convSingNFactoryN=ndConvSingNFactoryN;
     n->convFactoryNSingN=ndConvFactoryNSingN;
+    n->cfFactorize=NULL;
 
     BOOLEAN nOK=TRUE;
     // init
@@ -729,4 +730,3 @@ char * nEatLong(char *s, mpz_ptr i)
   }
   return s;
 }
-

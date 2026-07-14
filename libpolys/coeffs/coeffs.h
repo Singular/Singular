@@ -63,6 +63,11 @@ typedef struct snumber *   number;
 /* standard types */
 //struct ip_sring;
 //typedef struct ip_sring *         ring; /* already needed in s_buff.h*/
+struct spolyrec;
+typedef struct spolyrec *          poly;
+struct sip_sideal;
+typedef struct sip_sideal *        ideal;
+class intvec;
 
 /// @class coeffs coeffs.h coeffs/coeffs.h
 ///
@@ -78,6 +83,13 @@ typedef number (*numberfunc)(number a, number b, const coeffs r);
 
 /// maps "a", which lives in src, into dst
 typedef number (*nMapFunc)(number a, const coeffs src, const coeffs dst);
+
+/// Optional polynomial factorization hook for coefficient domains that cannot
+/// be converted to Factory.  The polynomial f is borrowed/read-only and lives
+/// in r.  The returned ideal and optional exponent vector must be freshly
+/// allocated in r and follow the same with_exps convention as
+/// singclap_factorize.  Return NULL to let Singular use its built-in fallback.
+typedef ideal (*nFactorizeFunc)(poly f, intvec **v, int with_exps, const ring r);
 
 
 /// Abstract interface for an enumerator of number coefficients for an
@@ -321,6 +333,9 @@ struct n_Procs_s
    /// conversion to CanonicalForm(factory) to number
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
+
+   /// Optional polynomial factorization hook for user/external coefficient domains.
+   nFactorizeFunc cfFactorize;
 
    /// Number of Parameters in the coeffs (default 0)
    int iNumberOfParameters;
@@ -993,4 +1008,3 @@ static FORCE_INLINE CanonicalForm n_convSingNFactoryN( number n, BOOLEAN setChar
 static FORCE_INLINE void number2mpz(number n, coeffs c, mpz_t m){ n_MPZ(m, n, c); }
 static FORCE_INLINE number mpz2number(mpz_t m, coeffs c){ return n_InitMPZ(m, c); }
 #endif
-
