@@ -1353,6 +1353,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     BITSET save2=si_opt_2;
     newBuffer( omStrDup(pi->data.s.body), BT_proc,
                pi, pi->data.s.body_lineno-(iiCurrArgs==NULL) );
+    VoiceSetProcHandle(currProc);
     BOOLEAN err=yyparse();
     iiCurrProc=NULL;
     si_opt_1=save1;

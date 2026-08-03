@@ -319,6 +319,7 @@ BOOLEAN iiAllStart(procinfov pi, const char *p, feBufferTypes t, int l)
   BITSET save2=si_opt_2;
   newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
                pi, l );
+  if (t==BT_proc) VoiceSetProcHandle(iiCurrProc);
   BOOLEAN err=yyparse();
 
   if (sLastPrinted.rtyp!=0)

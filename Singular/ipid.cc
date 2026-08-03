@@ -292,6 +292,26 @@ BOOLEAN piIsActive(procinfov pi)
   return FALSE;
 }
 
+static BOOLEAN piIsActiveHandle(idhdl h)
+{
+  procinfov pi=IDPROC(h);
+  Voice *p=currentVoice;
+  while (p!=NULL)
+  {
+    if (p->pi==pi)
+    {
+      idhdl active_handle=VoiceGetProcHandle(p);
+      if (active_handle==h) return TRUE;
+      // Unknown procedure handles and examples retain the conservative
+      // behaviour for every handle which references their procedure.
+      if ((active_handle==NULL)
+      && ((p->typ==BT_proc) || (p->typ==BT_example))) return TRUE;
+    }
+    p=p->prev;
+  }
+  return FALSE;
+}
+
 struct piContainerStack
 {
   void *data;
@@ -654,7 +674,7 @@ BOOLEAN killhdl2(idhdl h, idhdl * ih, ring r)
   }
   // Refuse before changing the handle, its attributes, or its references.
   if ((IDTYP(h)==PROC_CMD) && (IDDATA(h)!=NULL)
-  && piIsActive(IDPROC(h)))
+  && piIsActiveHandle(h))
   {
     Warn("`%s` in use, can not be killed",IDPROC(h)->procname);
     return TRUE;

@@ -49,6 +49,64 @@ VAR int    yy_blocklineno; // to get the lineno of the block start from scanner
 VAR Voice  *currentVoice = NULL;
 // FILE   *feFilePending; /*temp. storage for grammar.y */
 
+struct feProcHandleEntry
+{
+  Voice *voice;
+  idhdl handle;
+  feProcHandleEntry *next;
+};
+
+// Voice is part of the installed interface, so keep this association outside
+// the class to preserve its layout.
+static feProcHandleEntry *feProcHandles=NULL;
+
+void VoiceSetProcHandle(idhdl h)
+{
+  assume(currentVoice!=NULL);
+  feProcHandleEntry *entry=feProcHandles;
+  while (entry!=NULL)
+  {
+    if (entry->voice==currentVoice)
+    {
+      entry->handle=h;
+      return;
+    }
+    entry=entry->next;
+  }
+  entry=new feProcHandleEntry;
+  entry->voice=currentVoice;
+  entry->handle=h;
+  entry->next=feProcHandles;
+  feProcHandles=entry;
+}
+
+idhdl VoiceGetProcHandle(const Voice *voice)
+{
+  feProcHandleEntry *entry=feProcHandles;
+  while (entry!=NULL)
+  {
+    if (entry->voice==voice) return entry->handle;
+    entry=entry->next;
+  }
+  return NULL;
+}
+
+static void VoiceClearProcHandle(const Voice *voice)
+{
+  feProcHandleEntry **entry=&feProcHandles;
+  while (*entry!=NULL)
+  {
+    if ((*entry)->voice==voice)
+    {
+      feProcHandleEntry *old=*entry;
+      *entry=old->next;
+      delete old;
+      return;
+    }
+    entry=&((*entry)->next);
+  }
+}
+
 //static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
 //                               "BT_file","BT_execute","BT_if","BT_else"};
 /*2
@@ -397,6 +455,7 @@ BOOLEAN exitVoice()
       currentVoice->prev->next=NULL;
     }
     Voice *p=currentVoice->prev;
+    VoiceClearProcHandle(currentVoice);
     delete currentVoice;
     currentVoice=p;
   }

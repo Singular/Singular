@@ -213,4 +213,32 @@ defined(OuterPack::InnerPack);
 kill OuterPack;
 defined(OuterPack);
 
+proc alias_delete_target()
+{
+  kill alias_delete_copy;
+  defined(alias_delete_copy);
+  return(12);
+}
+
+proc alias_delete_copy = alias_delete_target;
+alias_delete_target();
+defined(alias_delete_target);
+kill alias_delete_target;
+defined(alias_delete_target);
+
+proc alias_call_target()
+{
+  kill alias_call_copy;
+  defined(alias_call_copy);
+  kill alias_call_target;
+  defined(alias_call_target);
+  return(13);
+}
+
+proc alias_call_copy = alias_call_target;
+alias_call_copy();
+defined(alias_call_copy);
+kill alias_call_copy;
+defined(alias_call_copy);
+
 tst_status(1);$

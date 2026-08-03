@@ -96,6 +96,8 @@ Voice * feInitStdin(Voice *pp);
 const  char * VoiceName();
 int VoiceLine();
 void    VoiceBackTrack();
+void    VoiceSetProcHandle(idhdl h);
+idhdl   VoiceGetProcHandle(const Voice *voice);
 BOOLEAN contBuffer(feBufferTypes typ);
 BOOLEAN exitBuffer(feBufferTypes typ);
 BOOLEAN exitVoice();
