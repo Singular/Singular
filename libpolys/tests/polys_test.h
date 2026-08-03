@@ -8,6 +8,7 @@ using namespace std;
 #include "polys/monomials/p_polys.h"
 #include "polys/PolyEnumerator.h"
 #include "polys/clapconv.h"
+#include "polys/matpol.h"
 
 #include "polys/simpleideals.h"
 
@@ -1831,6 +1832,42 @@ private:
 
   }
 public:
+  void test_mp_Copy_reorders_for_destination_ring()
+  {
+    char* names[] = {(char*)"x", (char*)"y"};
+    ring src = rDefault(nInitChar(n_Q, NULL), 2, names, ringorder_lp);
+    ring dst = rDefault(nInitChar(n_Q, NULL), 2, names, ringorder_dp);
+
+    matrix input = mpNew(1, 1);
+    poly x2 = p_ISet(1, src);
+    p_SetExp(x2, 1, 2, src);
+    p_Setm(x2, src);
+    poly y3 = p_ISet(1, src);
+    p_SetExp(y3, 2, 3, src);
+    p_Setm(y3, src);
+    MATELEM(input, 1, 1) = p_Add_q(x2, y3, src);
+
+    TS_ASSERT_EQUALS(p_GetExp(MATELEM(input, 1, 1), 1, src), 2);
+    TS_ASSERT_EQUALS(p_GetExp(MATELEM(input, 1, 1), 2, src), 0);
+
+    matrix copied = mp_Copy(input, src, dst);
+    poly head = MATELEM(copied, 1, 1);
+    TS_ASSERT_DIFFERS(head, NULLp);
+    TS_ASSERT_EQUALS(p_GetExp(head, 1, dst), 0);
+    TS_ASSERT_EQUALS(p_GetExp(head, 2, dst), 3);
+
+    poly tail = pNext(head);
+    TS_ASSERT_DIFFERS(tail, NULLp);
+    TS_ASSERT_EQUALS(p_GetExp(tail, 1, dst), 2);
+    TS_ASSERT_EQUALS(p_GetExp(tail, 2, dst), 0);
+    TS_ASSERT_EQUALS(pNext(tail), NULLp);
+
+    mp_Delete(&input, src);
+    mp_Delete(&copied, dst);
+    rDelete(src);
+    rDelete(dst);
+  }
+
   void test_Z13_t()
   {
     clog << "Creating  Z/13[t]: " << endl;

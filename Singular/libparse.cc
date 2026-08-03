@@ -1077,7 +1077,7 @@ VAR char *yytext;
 
 #ifdef HAVE_LIBPARSER
 #define YY_SKIP_YYWRAP
-
+#define YY_NO_UNPUT
 typedef enum { LP_NONE, LP_INFO, LP_CATEGORY, LP_URL, LP_VERSION} lib_cmds;
 
 int libread(FILE* f, char* buf, int max_size);
@@ -1208,7 +1208,7 @@ while(0)
                 YY_FATAL_ERROR( "read in flex scanner failed" );
 
 #define YY_USER_INIT { \
-       BEGIN(header); \
+       (void)libfile; (void)pl; (void)autoexport; BEGIN(header); \
        yylplineno = 1; \
        yylp_errno = 0; \
        *lib_style = OLD_LIBSTYLE; \
@@ -1635,9 +1635,14 @@ YY_RULE_SETUP
                                 yylplineno, current_pos(0),p_static);
                  if ((!p_static) && (h_top != NULL) && autoexport)
                  {
-                   if(IDPROC(h_top)!=NULL) piKill((procinfo *)IDPROC(h_top));
-                   IDPROC(h_top)=IDPROC(h0);
-                   IDPROC(h_top)->ref++;
+                   if ((IDPROC(h_top)!=NULL) && piIsActive(IDPROC(h_top)))
+                     Warn("`%s` in use, can not be killed",IDPROC(h_top)->procname);
+                   else
+                   {
+                     if(IDPROC(h_top)!=NULL) piKill((procinfo *)IDPROC(h_top));
+                     IDPROC(h_top)=IDPROC(h0);
+                     IDPROC(h_top)->ref++;
+                   }
                  }
                  IDPROC(h0)->pack=IDPACKAGE(pl);
                  if (BVERBOSE(V_LOAD_PROC))
@@ -1662,7 +1667,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 361 "libparse.l"
+#line 366 "libparse.l"
 {
              BEGIN(pexample);
              SET_EXAMPLE_START(mode, pi, yylplineno, current_pos(0));
@@ -1677,21 +1682,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 373 "libparse.l"
+#line 378 "libparse.l"
 { quote++;
              BEGIN(libcmd);
            }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 377 "libparse.l"
+#line 382 "libparse.l"
 { quote++; brace2++;
              BEGIN(libcmd2);
            }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 381 "libparse.l"
+#line 386 "libparse.l"
 {
              make_version(yytext, 0);
              #if YYLPDEBUG > 1
@@ -1701,7 +1706,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 387 "libparse.l"
+#line 392 "libparse.l"
 {
              #if YYLPDEBUG
              printf("+(cmt)HEAD:%s\n", yytext);
@@ -1710,7 +1715,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 392 "libparse.l"
+#line 397 "libparse.l"
 {
              #if YYLPDEBUG > 1
              printf("-HEAD:%s\n", yytext);
@@ -1719,7 +1724,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 397 "libparse.l"
+#line 402 "libparse.l"
 { yyless(0);
              BEGIN(INITIAL);
              yymore();
@@ -1727,7 +1732,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 401 "libparse.l"
+#line 406 "libparse.l"
 {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
@@ -1737,26 +1742,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 408 "libparse.l"
+#line 413 "libparse.l"
 { quote++;
              BEGIN(libcmd);
            }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 411 "libparse.l"
+#line 416 "libparse.l"
 { quote++; brace2++;
              BEGIN(libcmd2);
            }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 414 "libparse.l"
+#line 419 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 415 "libparse.l"
+#line 420 "libparse.l"
 {
              #if YYLPDEBUG > 1
              printf(" HEAD:%s\n", yytext);
@@ -1767,7 +1772,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 422 "libparse.l"
+#line 427 "libparse.l"
 {
              #if YYLPDEBUG > 1
              printf(" HELP:%s\n", yytext);
@@ -1776,7 +1781,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 427 "libparse.l"
+#line 432 "libparse.l"
 {
              #if YYLPDEBUG > 1
              printf(" HELP:%s\n", yytext);
@@ -1786,7 +1791,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 433 "libparse.l"
+#line 438 "libparse.l"
 {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
@@ -1796,7 +1801,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 439 "libparse.l"
+#line 444 "libparse.l"
 {
              yyless(0);
              //printf("2) proc found.\n");
@@ -1806,26 +1811,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 445 "libparse.l"
+#line 450 "libparse.l"
 { quote++;
              BEGIN(libcmd);
            }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 448 "libparse.l"
+#line 453 "libparse.l"
 { quote++; brace2++;
              BEGIN(libcmd2);
            }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 452 "libparse.l"
+#line 457 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 453 "libparse.l"
+#line 458 "libparse.l"
 {
              #if YYLPDEBUG
              if(lpverbose>2) printf("--->%s<---\n", yytext);
@@ -1834,7 +1839,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 458 "libparse.l"
+#line 463 "libparse.l"
 {
              found_oldhelp=1;
              #if YYLPDEBUG > 1
@@ -1844,7 +1849,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 466 "libparse.l"
+#line 471 "libparse.l"
 { quote--;
              yytext[yyleng-1] = '\0';
              #ifndef STANDALONE_PARSER
@@ -1861,7 +1866,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 479 "libparse.l"
+#line 484 "libparse.l"
 { quote--; brace2--;
              yytext[yyleng-1] = '\0';
              #ifndef STANDALONE_PARSER
@@ -1878,12 +1883,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 493 "libparse.l"
+#line 498 "libparse.l"
 { }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 494 "libparse.l"
+#line 499 "libparse.l"
 {
              brace2++;
              #if YYLPDEBUG > 1
@@ -1893,7 +1898,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 500 "libparse.l"
+#line 505 "libparse.l"
 {
              brace2--;
              #if YYLPDEBUG > 1
@@ -1912,7 +1917,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 515 "libparse.l"
+#line 520 "libparse.l"
 {
              if(brace2>0)
              {
@@ -1934,7 +1939,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 533 "libparse.l"
+#line 538 "libparse.l"
 { yylplineno++;
               if(brace2<=0)
               {
@@ -1947,17 +1952,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 542 "libparse.l"
+#line 547 "libparse.l"
 { }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 543 "libparse.l"
+#line 548 "libparse.l"
 { old_state = YYSTATE; BEGIN(comment); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 544 "libparse.l"
+#line 549 "libparse.l"
 {
              if(brace2<=0)
              {
@@ -1968,7 +1973,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 552 "libparse.l"
+#line 557 "libparse.l"
 {
               #if YYLPDEBUG
               if(lpverbose>2)printf("0-Len=%d;\n", yyleng);
@@ -1985,7 +1990,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 565 "libparse.l"
+#line 570 "libparse.l"
 {
               #if YYLPDEBUG
               if(lpverbose>2)printf("1-Len=%d;\n", yyleng);
@@ -1996,7 +2001,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 572 "libparse.l"
+#line 577 "libparse.l"
 {
               if(check && yyleng>2)
               {
@@ -2014,17 +2019,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 586 "libparse.l"
+#line 591 "libparse.l"
 { printf("[%s]", yytext); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 588 "libparse.l"
+#line 593 "libparse.l"
 { }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 589 "libparse.l"
+#line 594 "libparse.l"
 {
                 SET_HELP_END(mode, pi, current_pos(0));
                 brace1++; BEGIN(pbody);
@@ -2046,17 +2051,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 607 "libparse.l"
+#line 612 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 608 "libparse.l"
+#line 613 "libparse.l"
 { }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 610 "libparse.l"
+#line 615 "libparse.l"
 {
              old_state = YYSTATE;
              BEGIN(string);
@@ -2065,12 +2070,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 615 "libparse.l"
+#line 620 "libparse.l"
 {}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 616 "libparse.l"
+#line 621 "libparse.l"
 {
              brace1++; BEGIN(pbody);
              if(lpverbose)
@@ -2091,24 +2096,24 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 633 "libparse.l"
+#line 638 "libparse.l"
 { yylplineno++;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 635 "libparse.l"
+#line 640 "libparse.l"
 { }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 636 "libparse.l"
+#line 641 "libparse.l"
 { quote++; old_state = YYSTATE;
                  BEGIN(string); /* printf("%s", yytext); */
                }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 640 "libparse.l"
+#line 645 "libparse.l"
 {
              if(check) printf("*** found 2 proc whithin procedure '%s'.\n",
                           pi->procname);
@@ -2117,7 +2122,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 645 "libparse.l"
+#line 650 "libparse.l"
 {
              if(check) printf("*** found 1 proc whithin procedure '%s'.\n",
                           pi->procname);
@@ -2126,7 +2131,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 650 "libparse.l"
+#line 655 "libparse.l"
 {
                  brace1++;
                  #if YYLPDEBUG > 1
@@ -2136,7 +2141,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 656 "libparse.l"
+#line 661 "libparse.l"
 {
                            #if YYLPDEBUG > 1
                            printf("line: %d, (%d)%s\n",
@@ -2166,14 +2171,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 682 "libparse.l"
+#line 687 "libparse.l"
 {
                            brace2++; /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 685 "libparse.l"
+#line 690 "libparse.l"
 {
                            brace2--; /* printf("%s", yytext); */
                            if(brace2<0) {
@@ -2184,14 +2189,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 692 "libparse.l"
+#line 697 "libparse.l"
 {
                            brace3++; /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 695 "libparse.l"
+#line 700 "libparse.l"
 {
                            brace3--; /* printf("%s", yytext); */
                            if(brace3<0) {
@@ -2202,17 +2207,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 702 "libparse.l"
+#line 707 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 703 "libparse.l"
+#line 708 "libparse.l"
 { }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 705 "libparse.l"
+#line 710 "libparse.l"
 {
              quote++; BEGIN(string);
              found_info++;
@@ -2223,17 +2228,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 712 "libparse.l"
+#line 717 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 713 "libparse.l"
+#line 718 "libparse.l"
 { }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 715 "libparse.l"
+#line 720 "libparse.l"
 {
              quote++; BEGIN(string);
              found_cat++;
@@ -2244,17 +2249,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 722 "libparse.l"
+#line 727 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 723 "libparse.l"
+#line 728 "libparse.l"
 { }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 726 "libparse.l"
+#line 731 "libparse.l"
 { quote--;
                            copy_string(mode);
                            last_cmd = LP_NONE;
@@ -2267,41 +2272,41 @@ YY_RULE_SETUP
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 735 "libparse.l"
+#line 740 "libparse.l"
 { if (old_state == phelp) IncrCheckSum(*yytext);}
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 736 "libparse.l"
+#line 741 "libparse.l"
 { yylplineno++; if (old_state == phelp) IncrCheckSum('\n');}
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 737 "libparse.l"
+#line 742 "libparse.l"
 { if (old_state == phelp) IncrCheckSum(*yytext);}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 739 "libparse.l"
+#line 744 "libparse.l"
 { }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 740 "libparse.l"
+#line 745 "libparse.l"
 { quote++; old_state = YYSTATE;
                            BEGIN(string); /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 743 "libparse.l"
+#line 748 "libparse.l"
 {
                            brace1++; /* printf("(%d)%s", brace1, yytext); */
                          }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 746 "libparse.l"
+#line 751 "libparse.l"
 {
                            brace1--; /* printf("(%d)%s", brace1, yytext); */
                            if(brace1<=0) {
@@ -2314,97 +2319,97 @@ YY_RULE_SETUP
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 755 "libparse.l"
+#line 760 "libparse.l"
 {
                            brace2++; /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 758 "libparse.l"
+#line 763 "libparse.l"
 {
                            brace2--; /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 761 "libparse.l"
+#line 766 "libparse.l"
 {
                            brace3++; /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 764 "libparse.l"
+#line 769 "libparse.l"
 {
                            brace3--; /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 767 "libparse.l"
+#line 772 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 768 "libparse.l"
+#line 773 "libparse.l"
 { }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 770 "libparse.l"
+#line 775 "libparse.l"
 { quote--;
                            BEGIN(pexample); /* printf("%s", yytext); */
                          }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 773 "libparse.l"
+#line 778 "libparse.l"
 { }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 774 "libparse.l"
+#line 779 "libparse.l"
 { }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 775 "libparse.l"
+#line 780 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 776 "libparse.l"
+#line 781 "libparse.l"
 { }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 778 "libparse.l"
+#line 783 "libparse.l"
 { BEGIN(old_state); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 779 "libparse.l"
+#line 784 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 780 "libparse.l"
+#line 785 "libparse.l"
 { }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 782 "libparse.l"
+#line 787 "libparse.l"
 { yylplineno++; }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 783 "libparse.l"
+#line 788 "libparse.l"
 { }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 784 "libparse.l"
+#line 789 "libparse.l"
 { p_static = FALSE;
                             #if YYLPDEBUG > 1
                             printf("%s", yytext);
@@ -2413,7 +2418,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 789 "libparse.l"
+#line 794 "libparse.l"
 { p_static = FALSE;
                            yylp_errno = YYLP_BAD_CHAR;
                            #ifdef STANDALONE_PARSER
@@ -2431,7 +2436,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 804 "libparse.l"
+#line 809 "libparse.l"
 ECHO;
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
@@ -3340,7 +3345,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 804 "libparse.l"
+#line 809 "libparse.l"
 
 
 int current_pos(int i)
@@ -3406,6 +3411,7 @@ void make_version(char *p,int what)
 void copy_string(lp_modes mode)
 {
 #ifdef STANDALONE_PARSER
+  (void)mode;
   if ((texinfo_out
      && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY || last_cmd == LP_URL))
   || (category_out && last_cmd == LP_CATEGORY)
@@ -3487,6 +3493,7 @@ void print_init()
 void print_version(lp_modes mode, char *p)
 {
 #ifdef STANDALONE_PARSER
+  (void)mode; (void)p;
   //printf("loading %s%s", p, libnamebuf);
 #else
   if ( mode == LOAD_LIB )

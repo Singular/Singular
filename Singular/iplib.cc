@@ -520,6 +520,8 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv args)
            pi->libname, pi->procname);
     return TRUE;
   }
+  char *procName=omStrDup(IDID(pn));
+  piCopy(pi);
   iiCheckNest();
   iiLocalRing[myynest]=currRing;
   //Print("currRing(%d):%s(%x) in %s\n",myynest,IDID(currRingHdl),currRing,IDID(pn));
@@ -529,7 +531,7 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv args)
   || (pi->trace_flag&TRACE_SHOW_PROC))
   {
     if (traceit&TRACE_SHOW_LINENO) PrintLn();
-    Print("entering%-*.*s %s (level %d)\n",myynest*2,myynest*2," ",IDID(pn),myynest);
+    Print("entering%-*.*s %s (level %d)\n",myynest*2,myynest*2," ",procName,myynest);
   }
 #ifdef RDEBUG
   if (traceit&TRACE_SHOW_RINGS) iiShowLevRings();
@@ -570,7 +572,7 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv args)
   || (pi->trace_flag&TRACE_SHOW_PROC))
   {
     if (traceit&TRACE_SHOW_LINENO) PrintLn();
-    Print("leaving %-*.*s %s (level %d)\n",myynest*2,myynest*2," ",IDID(pn),myynest);
+    Print("leaving %-*.*s %s (level %d)\n",myynest*2,myynest*2," ",procName,myynest);
   }
   //const char *n="NULL";
   //if (currRingHdl!=NULL) n=IDID(currRingHdl);
@@ -585,15 +587,15 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, leftv args)
   }
   if (iiCurrArgs!=NULL)
   {
-    if (!err) Warn("too many arguments for %s",IDID(pn));
+    if (!err) Warn("too many arguments for %s",procName);
     iiCurrArgs->CleanUp();
     omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
     iiCurrArgs=NULL;
   }
   procstack->pop();
-  if (err)
-    return TRUE;
-  return FALSE;
+  piKill(pi);
+  omFreeBinAddr((ADDRESS)procName);
+  return err ? TRUE : FALSE;
 }
 static void iiCallLibProcBegin()
 {
@@ -775,6 +777,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   }
   myynest++;
 
+  if (pi!=NULL) piCopy(pi);
   err=iiAllStart(pi,example,BT_example,(pi != NULL ? pi->data.s.example_lineno: 0));
 
   killlocals(myynest);
@@ -799,6 +802,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     }
   }
   procstack->pop();
+  if (pi!=NULL) piKill(pi);
   return err;
 }
 
@@ -815,6 +819,7 @@ extern "C" int flint_mod_init(SModulFunctions* psModulFunctions);
 SModulFunc_t
 iiGetBuiltinModInit(const char* libname)
 {
+  (void)libname;
 #ifdef HAVE_FLINT
   if (strcmp(libname,"flint.so")==0) return SI_MOD_INIT0(flint);
 #endif

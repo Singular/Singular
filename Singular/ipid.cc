@@ -63,8 +63,10 @@ void paCleanUp(package pack);
 
 static inline long iiS2I(const char *s)
 {
-  long l;
-  strncpy((char*)&l,s,SIZEOF_LONG);
+  long l=0;
+  size_t n=strlen(s);
+  if (n>sizeof(l)) n=sizeof(l);
+  memcpy((char*)&l,s,n);
   return l;
 }
 
@@ -279,6 +281,198 @@ char * idrec::String(BOOLEAN typed)
   return tmp.String(NULL, typed);
 }
 
+BOOLEAN piIsActive(procinfov pi)
+{
+  Voice *p=currentVoice;
+  while (p!=NULL)
+  {
+    if (p->pi==pi) return TRUE;
+    p=p->prev;
+  }
+  return FALSE;
+}
+
+struct piContainerStack
+{
+  void *data;
+  int typ;
+  const piContainerStack *next;
+};
+
+static BOOLEAN piContainerSeen(void *data, int typ,
+                               const piContainerStack *stack)
+{
+  while (stack!=NULL)
+  {
+    if ((stack->data==data) && (stack->typ==typ)) return TRUE;
+    stack=stack->next;
+  }
+  return FALSE;
+}
+
+static procinfov piActiveInRoot(idhdl h, const piContainerStack *stack);
+static procinfov piActiveInData(int typ, void *data,
+                               const piContainerStack *stack);
+static procinfov piActiveInAttributes(attr a,
+                                     const piContainerStack *stack);
+
+static procinfov piActiveInLeftv(leftv v, const piContainerStack *stack)
+{
+  while (v!=NULL)
+  {
+    procinfov active=piActiveInData(v->rtyp,v->data,stack);
+    if (active!=NULL) return active;
+    active=piActiveInAttributes(v->attribute,stack);
+    if (active!=NULL) return active;
+    v=v->next;
+  }
+  return NULL;
+}
+
+static procinfov piActiveInData(int typ, void *data,
+                               const piContainerStack *stack)
+{
+  if (data==NULL) return NULL;
+  if (typ==PROC_CMD)
+  {
+    procinfov pi=(procinfov)data;
+    return piIsActive(pi) ? pi : NULL;
+  }
+  if ((typ==LIST_CMD) || (typ==HTABLE_CMD)
+  || (typ==PACKAGE_CMD) || (typ==RING_CMD))
+  {
+    if (piContainerSeen(data,typ,stack)) return NULL;
+    piContainerStack current;
+    current.data=data;
+    current.typ=typ;
+    current.next=stack;
+    if (typ==LIST_CMD)
+    {
+      lists l=(lists)data;
+      for (int i=0; i<=l->nr; i++)
+      {
+        procinfov active=piActiveInLeftv(&(l->m[i]),&current);
+        if (active!=NULL) return active;
+      }
+    }
+    else if (typ==HTABLE_CMD)
+    {
+      stablerec *t=(stablerec *)data;
+      for (int i=0; i<t->max; i++)
+        for (telem p=t->t[i]; p!=NULL; p=p->next)
+        {
+          procinfov active=piActiveInLeftv(&(p->val),&current);
+          if (active!=NULL) return active;
+        }
+    }
+    else if (typ==PACKAGE_CMD)
+    {
+      package pack=(package)data;
+      if ((pack->ref<=0) && (pack->idroot!=NULL))
+        return piActiveInRoot(pack->idroot,&current);
+    }
+    else
+    {
+      ring R=(ring)data;
+      if ((R->ref<=0) && (R->idroot!=NULL))
+        return piActiveInRoot(R->idroot,&current);
+    }
+  }
+  return NULL;
+}
+
+static procinfov piActiveInAttributes(attr a,
+                                     const piContainerStack *stack)
+{
+  while (a!=NULL)
+  {
+    procinfov active=piActiveInData(a->atyp,a->data,stack);
+    if (active!=NULL) return active;
+    a=a->next;
+  }
+  return NULL;
+}
+
+static procinfov piActiveInRoot(idhdl h, const piContainerStack *stack)
+{
+  while (h!=NULL)
+  {
+    procinfov active=piActiveInData(IDTYP(h),IDDATA(h),stack);
+    if (active!=NULL) return active;
+    active=piActiveInAttributes(h->attribute,stack);
+    if (active!=NULL) return active;
+    h=IDNEXT(h);
+  }
+  return NULL;
+}
+
+static BOOLEAN piPackageCannotBeKilled(idhdl h)
+{
+  return ((((IDPACKAGE(h)->language==LANG_C)
+          || (IDPACKAGE(h)->language==LANG_MIX))
+          && (IDPACKAGE(h)->idroot!=NULL))
+          || ((IDID(h)!=NULL) && (strcmp(IDID(h),"Top")==0)));
+}
+
+static idhdl piUnkillableInRoot(idhdl h, const piContainerStack *stack)
+{
+  while (h!=NULL)
+  {
+    if (IDTYP(h)==PACKAGE_CMD)
+    {
+      if (piPackageCannotBeKilled(h)) return h;
+      package pack=IDPACKAGE(h);
+      if ((pack->ref<=0) && (pack->idroot!=NULL)
+      && !piContainerSeen(pack,PACKAGE_CMD,stack))
+      {
+        piContainerStack current;
+        current.data=pack;
+        current.typ=PACKAGE_CMD;
+        current.next=stack;
+        idhdl blocked=piUnkillableInRoot(pack->idroot,&current);
+        if (blocked!=NULL) return blocked;
+      }
+    }
+    else if (IDTYP(h)==RING_CMD)
+    {
+      ring R=IDRING(h);
+      if ((R!=NULL) && (R->ref<=0) && (R->idroot!=NULL)
+      && !piContainerSeen(R,RING_CMD,stack))
+      {
+        piContainerStack current;
+        current.data=R;
+        current.typ=RING_CMD;
+        current.next=stack;
+        idhdl blocked=piUnkillableInRoot(R->idroot,&current);
+        if (blocked!=NULL) return blocked;
+      }
+    }
+    h=IDNEXT(h);
+  }
+  return NULL;
+}
+
+static BOOLEAN piRootKillRefused(idhdl root, void *owner, int ownerTyp)
+{
+  piContainerStack stack;
+  stack.data=owner;
+  stack.typ=ownerTyp;
+  stack.next=NULL;
+  idhdl blocked=piUnkillableInRoot(root,&stack);
+  if (blocked!=NULL)
+  {
+    Warn("cannot kill `%s`",IDID(blocked));
+    return TRUE;
+  }
+  procinfov active=piActiveInRoot(root,&stack);
+  if (active!=NULL)
+  {
+    Warn("`%s` in use, can not be killed",active->procname);
+    return TRUE;
+  }
+  return FALSE;
+}
+
 idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN search)
 {
   if (s==NULL) return NULL;
@@ -319,7 +513,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         if (s==IDID(h)) IDID(h)=NULL;
         if((t!=PROC_CMD)||(IDPROC(h)->language!=LANG_C))
         {
-          killhdl2(h,root,currRing);
+          if (killhdl2(h,root,currRing)) goto errlabel;
         }
       }
     }
@@ -343,7 +537,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         }
         if (s==IDID(h)) IDID(h)=NULL;
         //  proc is not ring-dep, no need to check for type "proc":
-        killhdl2(h,&currRing->idroot,currRing);
+        if (killhdl2(h,&currRing->idroot,currRing)) goto errlabel;
       }
       else
         goto errlabel;
@@ -367,7 +561,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         if (s==IDID(h)) IDID(h)=NULL;
         if((t!=PROC_CMD)||(IDPROC(h)->language!=LANG_C))
         {
-          killhdl2(h,&IDROOT,NULL);
+          if (killhdl2(h,&IDROOT,NULL)) goto errlabel;
         }
       }
       else
@@ -445,7 +639,7 @@ void killhdl(idhdl h, package proot)
   }
 }
 
-void killhdl2(idhdl h, idhdl * ih, ring r)
+BOOLEAN killhdl2(idhdl h, idhdl * ih, ring r)
 {
   //printf("kill %s, id %x, typ %d lev: %d\n",IDID(h),(int)IDID(h),IDTYP(h),IDLEV(h));
   idhdl hh;
@@ -458,7 +652,36 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     || ((currRing!=NULL)&&((*ih)==currRing->idroot)))
       Warn("kill global `%s` at line >>%s<<\n",IDID(h),my_yylinebuf);
   }
-  if ((IDTYP(h)!=PROC_CMD) && (h->attribute!=NULL))
+  // Refuse before changing the handle, its attributes, or its references.
+  if ((IDTYP(h)==PROC_CMD) && (IDDATA(h)!=NULL)
+  && piIsActive(IDPROC(h)))
+  {
+    Warn("`%s` in use, can not be killed",IDPROC(h)->procname);
+    return TRUE;
+  }
+  if (IDTYP(h)==PACKAGE_CMD)
+  {
+    if (piPackageCannotBeKilled(h))
+    {
+      Warn("cannot kill `%s`",IDID(h));
+      return TRUE;
+    }
+    if ((IDPACKAGE(h)->ref<=0) && (IDPACKAGE(h)->idroot!=NULL))
+      if (piRootKillRefused(IDPACKAGE(h)->idroot,IDPACKAGE(h),PACKAGE_CMD))
+        return TRUE;
+  }
+  else if ((IDTYP(h)==RING_CMD) && (IDDATA(h)!=NULL)
+       && (IDRING(h)->ref<=0) && (IDRING(h)->idroot!=NULL))
+  {
+    if (piRootKillRefused(IDRING(h)->idroot,IDRING(h),RING_CMD))
+      return TRUE;
+  }
+  if ((IDTYP(h)==PROC_CMD) && (IDDATA(h)!=NULL))
+  {
+    if (piKill(IDPROC(h))) return TRUE;
+    IDDATA(h)=NULL;
+  }
+  if (h->attribute!=NULL)
   {
     if ((IDTYP(h)==RING_CMD)&&(IDRING(h)!=r))
        h->attribute->killAll(IDRING(h));
@@ -468,13 +691,6 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
   if (IDTYP(h) == PACKAGE_CMD)
   {
-    if ((((IDPACKAGE(h)->language==LANG_C) ||(IDPACKAGE(h)->language==LANG_MIX))
-      &&(IDPACKAGE(h)->idroot!=NULL))
-    || (strcmp(IDID(h),"Top")==0))
-    {
-      Warn("cannot kill `%s`",IDID(h));
-      return;
-    }
     // any objects defined for this package ?
     if ((IDPACKAGE(h)->ref<=0)  &&  (IDPACKAGE(h)->idroot!=NULL))
     {
@@ -489,10 +705,10 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
       while (hdh!=NULL)
       {
         temp = IDNEXT(hdh);
-        killhdl2(hdh,&(IDPACKAGE(h)->idroot),NULL);
+        if (killhdl2(hdh,&(IDPACKAGE(h)->idroot),NULL)) return TRUE;
         hdh = temp;
       }
-      killhdl2(*hd,hd,NULL);
+      if (killhdl2(*hd,hd,NULL)) return TRUE;
       if (IDPACKAGE(h)->libname!=NULL) omFreeBinAddr((ADDRESS)(IDPACKAGE(h)->libname));
     }
     paKill(IDPACKAGE(h));
@@ -524,7 +740,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
       if (hh==NULL)
       {
         PrintS(">>?<< not found for kill\n");
-        return;
+        return TRUE;
       }
       idhdl hhh = IDNEXT(hh);
       if (hhh == h)
@@ -536,6 +752,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     }
   }
   omFreeBin((ADDRESS)h, idrec_bin);
+  return FALSE;
 }
 
 #if 0
@@ -749,21 +966,18 @@ const char * piProcinfo(procinfov pi, const char *request)
 
 BOOLEAN piKill(procinfov pi)
 {
+  // Do not consume the last reference while a procedure is still executing.
+  if ((pi->language==LANG_SINGULAR) && (pi->ref<=1)
+  && piIsActive(pi))
+  {
+    Warn("`%s` in use, can not be killed",pi->procname);
+    return TRUE;
+  }
   (pi->ref)--;
   if (pi->ref == 0)
   {
     if (pi->language==LANG_SINGULAR)
     {
-      Voice *p=currentVoice;
-      while (p!=NULL)
-      {
-        if (p->pi==pi && pi->ref <= 1)
-        {
-          Warn("`%s` in use, can not be killed",pi->procname);
-          return TRUE;
-        }
-        p=p->next;
-      }
       if (pi->data.s.body != NULL) // OB: ????
         omFree((ADDRESS)pi->data.s.body);
       if (pi->libname != NULL) // OB: ????
@@ -887,9 +1101,9 @@ BOOLEAN iiAlias(leftv p)
          {
            map im = IDMAP(pp);
            omFreeBinAddr((ADDRESS)im->preimage);
-           im->preimage=NULL;// and continue
+           im->preimage=NULL;
          }
-         // continue as ideal:
+         // fall through
       case IDEAL_CMD:
       case MODUL_CMD:
       case MATRIX_CMD:

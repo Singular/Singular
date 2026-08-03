@@ -178,7 +178,8 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                       }
                     }
                     break;
-    case MODUL_CMD: Print(", rk %d", (int)(IDIDEAL(h)->rank));// and continue
+    case MODUL_CMD: Print(", rk %d", (int)(IDIDEAL(h)->rank));
+                    // fall through
     case IDEAL_CMD: Print(", %u generator(s)",
                     IDELEMS(IDIDEAL(h))); break;
     case MAP_CMD:
@@ -1337,6 +1338,8 @@ BOOLEAN iiBranchTo(leftv, leftv args)
       iiGetLibProcBuffer(pi);
       if (pi->data.s.body==NULL) return TRUE;
     }
+    char *procName=omStrDup(IDID(currProc));
+    piCopy(pi);
     // set currPackHdl/currPack
     if ((pi->pack!=NULL)&&(currPack!=pi->pack))
     {
@@ -1361,7 +1364,7 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     // warning about args.:
     if (iiCurrArgs!=NULL)
     {
-      if (err==0) Warn("too many arguments for %s",IDID(currProc));
+      if (err==0) Warn("too many arguments for %s",procName);
       iiCurrArgs->CleanUp();
       omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
       iiCurrArgs=NULL;
@@ -1375,6 +1378,8 @@ BOOLEAN iiBranchTo(leftv, leftv args)
     currentVoice->fptr=strlen(currentVoice->buffer);
     // - kill local vars
     killlocals(myynest);
+    piKill(pi);
+    omFreeBinAddr((ADDRESS)procName);
     // - return
     newBuffer(omStrDup("\n;return(_);\n"),BT_execute);
     return (err!=0);
@@ -1444,7 +1449,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
           Warn("redefining %s (%s)",IDID(h),my_yylinebuf);
         }
         if (iiLocalRing[0]==IDRING(h) && (!keepring)) iiLocalRing[0]=NULL;
-        killhdl2(h,root,currRing);
+        if (killhdl2(h,root,currRing)) return FALSE;
       }
       else
       {
@@ -1561,7 +1566,11 @@ BOOLEAN iiExport (leftv v, int toLev, package pack)
             Warn("redefining %s (%s)",IDID(old),my_yylinebuf);
           }
           v->name=omStrDup(v->name);
-          killhdl2(old,&(pack->idroot),currRing);
+          if (killhdl2(old,&(pack->idroot),currRing))
+          {
+            rv->CleanUp();
+            return FALSE;
+          }
         }
         else
         {
@@ -2619,7 +2628,8 @@ static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ri
         {
            case ringorder_ws:
            case ringorder_Ws:
-              R->OrdSgn=-1; // and continue
+              R->OrdSgn=-1;
+              // fall through
            case ringorder_aa:
            case ringorder_a:
            case ringorder_wp:
@@ -5380,7 +5390,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       {
           case ringorder_ws:
           case ringorder_Ws:
-            typ=-1; // and continue
+            typ=-1;
+            // fall through
           case ringorder_wp:
           case ringorder_Wp:
             R->wvhdl[n]=(int*)omAlloc((iv->length()-1)*sizeof(int));
@@ -5397,7 +5408,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_ds:
           case ringorder_Ds:
           case ringorder_rs:
-            typ=-1; // and continue
+            typ=-1;
+            // fall through
           case ringorder_lp:
           case ringorder_dp:
           case ringorder_Dp:

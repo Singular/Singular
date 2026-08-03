@@ -26,7 +26,7 @@
 
 #ifdef HAVE_LIBPARSER
 #define YY_SKIP_YYWRAP
-
+#define YY_NO_UNPUT
 typedef enum { LP_NONE, LP_INFO, LP_CATEGORY, LP_URL, LP_VERSION} lib_cmds;
 
 int libread(FILE* f, char* buf, int max_size);
@@ -157,7 +157,7 @@ while(0)
                 YY_FATAL_ERROR( "read in flex scanner failed" );
 
 #define YY_USER_INIT { \
-       BEGIN(header); \
+       (void)libfile; (void)pl; (void)autoexport; BEGIN(header); \
        yylplineno = 1; \
        yylp_errno = 0; \
        *lib_style = OLD_LIBSTYLE; \
@@ -334,9 +334,14 @@ static     { p_static=TRUE; }
                                 yylplineno, current_pos(0),p_static);
                  if ((!p_static) && (h_top != NULL) && autoexport)
                  {
-                   if(IDPROC(h_top)!=NULL) piKill((procinfo *)IDPROC(h_top));
-                   IDPROC(h_top)=IDPROC(h0);
-                   IDPROC(h_top)->ref++;
+                   if ((IDPROC(h_top)!=NULL) && piIsActive(IDPROC(h_top)))
+                     Warn("`%s` in use, can not be killed",IDPROC(h_top)->procname);
+                   else
+                   {
+                     if(IDPROC(h_top)!=NULL) piKill((procinfo *)IDPROC(h_top));
+                     IDPROC(h_top)=IDPROC(h0);
+                     IDPROC(h_top)->ref++;
+                   }
                  }
                  IDPROC(h0)->pack=IDPACKAGE(pl);
                  if (BVERBOSE(V_LOAD_PROC))
@@ -866,6 +871,7 @@ void make_version(char *p,int what)
 void copy_string(lp_modes mode)
 {
 #ifdef STANDALONE_PARSER
+  (void)mode;
   if ((texinfo_out
      && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY || last_cmd == LP_URL))
   || (category_out && last_cmd == LP_CATEGORY)
@@ -947,6 +953,7 @@ void print_init()
 void print_version(lp_modes mode, char *p)
 {
 #ifdef STANDALONE_PARSER
+  (void)mode; (void)p;
   //printf("loading %s%s", p, libnamebuf);
 #else
   if ( mode == LOAD_LIB )

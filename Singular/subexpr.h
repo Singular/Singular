@@ -151,6 +151,7 @@ inline procinfov piCopy(procinfov pi)
   pi->ref++;
   return pi;
 }
+BOOLEAN piIsActive(procinfov pi);
 BOOLEAN piKill(procinfov l);
 const char *piProcinfo(procinfov pi, const char *request);
 void piShowProcinfo(procinfov pi, char *txt);

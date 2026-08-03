@@ -83,13 +83,17 @@ matrix mp_Copy(const matrix a, const ring rSrc, const ring rDst)
   int i, m=MATROWS(a), n=MATCOLS(a);
 
   matrix b = mpNew(m, n);
+  const BOOLEAN samePolyRep = rSamePolyRep(rSrc, rDst);
 
   for (i=m*n-1; i>=0; i--)
   {
     t = a->m[i];
     if (t!=NULL)
     {
-      b->m[i] = prCopyR_NoSort(t, rSrc, rDst);
+      if (samePolyRep)
+        b->m[i] = prCopyR_NoSort(t, rSrc, rDst);
+      else
+        b->m[i] = prCopyR(t, rSrc, rDst);
       p_Normalize(b->m[i], rDst);
     }
   }

@@ -100,7 +100,7 @@ namespace CxxTest
     { \
         ValueTraits< CXXTEST_OLD_CLASS > _old; \
     public: \
-        ValueTraits( CXXTEST_NEW_CLASS n ) : _old( (CXXTEST_OLD_CLASS)n ) {} \
+        ValueTraits( CXXTEST_NEW_CLASS n ) : _old( n ) {} \
         const char *asString( void ) const { return _old.asString(); } \
     }
 

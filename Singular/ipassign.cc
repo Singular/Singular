@@ -934,7 +934,16 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr)
   extern procinfo *iiInitSingularProcinfo(procinfo *pi, const char *libname,
                                           const char *procname, int line,
                                           long pos, BOOLEAN pstatic=FALSE);
-  if(res->data!=NULL) piKill((procinfo *)res->data);
+  if(res->data!=NULL)
+  {
+    procinfo *old=(procinfo *)res->data;
+    if (piIsActive(old))
+    {
+      Warn("`%s` in use, can not be killed",old->procname);
+      return FALSE;
+    }
+    if (piKill(old)) return FALSE;
+  }
   if(a->Typ()==STRING_CMD)
   {
     res->data = (void *)omAlloc0Bin(procinfo_bin);
@@ -969,20 +978,6 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr)
     return FALSE; //(r->length()< s->length());
   }
 #endif
-}
-static BOOLEAN jiA_INTVEC_BI(leftv res, leftv a, Subexpr)
-{
-  //Warn("bigintvec -> intvec in >>%s<<",my_yylinebuf);
-  if (res->data!=NULL) delete ((intvec *)res->data);
-  bigintmat *b=(bigintmat*)a->Data();
-  intvec *iv=new intvec(1,b->cols());
-  for(int i=0;i<b->cols();i++)
-  {
-    (*iv)[i]=n_Int(BIMATELEM(*b,1,i+1),coeffs_BIGINT);
-  }
-   res->data=(void *)iv;
-  jiAssignAttr(res,a);
-  return FALSE;
 }
 static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr)
 {
@@ -2336,9 +2331,10 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         omFreeBin(hh,sleftv_bin);
         return b;
       }
-      //no break, handle the rest like an ideal:
-      map_assign=TRUE; // and continue
+      // Handle the rest like an ideal.
+      map_assign=TRUE;
     }
+    // fall through
     case MATRIX_CMD:
     case IDEAL_CMD:
     case MODUL_CMD:
