@@ -144,7 +144,7 @@ static proc lead_syz_(module m)
   int n = nvars(basering);
   module M = std(freemodule(r));
   vector pi, pj, t, s;
-  poly Li, Lj, mji;
+  poly Li, Lj, mij;
   int i, j, k, expi, expj;
   module temp_mod_1, temp_mod_2;
   module lead_mod; //this is what we will return
@@ -158,8 +158,8 @@ static proc lead_syz_(module m)
       if(expi == expj){
         Li = leadmonomial_nc(pi);
         Lj = leadmonomial_nc(pj);
-        mji = lcm_(Lj,Li)/leadterm(pi);
-        t = mji*M[i];
+        mij = lcm_(Lj,Li)/leadterm(pj);
+        t = mij*M[j];
         for (k=1;k<=size(lead_mod);k++){
           temp_mod_1 = lead_mod[k];
           attrib(temp_mod_1, "isSB", 1);
@@ -198,7 +198,7 @@ static proc lift_tree_(vector s, module M)
 
   while (T != 0){
     L = lead(T);
-    for(i=1; i<=size(M); i++){
+    for(i=size(M); i>=1; i--){
       temp_I = leadmonom(M[i]);
       attrib(temp_I, "isSB", 1);
       if(NF(L, temp_I)==0){
@@ -233,7 +233,7 @@ static proc lift_subtree_(vector s, module M)
     if (leadexp(T)[nvars(basering)+1] > 15){
     }
     L = lead(T);
-    for(i=1; i<=size(M); i++){
+    for(i=size(M); i>=1; i--){
       temp_I = leadmonom(M[i]);
       attrib(temp_I, "isSB", 1);
       if(NF(L, temp_I)==0){
@@ -293,7 +293,7 @@ static proc greater_than_(vector s, vector v, module M)
     return(1);
   }
   else{
-    if(leadmonom(mi*M[i]) == leadmonom(mj*M[j]) && i>j){
+    if(leadmonom(mi*M[i]) == leadmonom(mj*M[j]) && i<j){
       return(1);
     }
     return(0);
@@ -304,16 +304,12 @@ static proc add_ideal_gens_(module m)
 {
   int n = nvars(basering);
   int i,j;
-  module ans;
   for (i = 1; i<= n; i++){
     for (j = 1; j<=nrows(matrix(m)); j++){
-      ans[size(ans)+1] = var(i)^2 * gen(j);
+      m[size(m)+1] = var(i)^2 * gen(j);
     }
   }
-  for (i = 1; i<=size(m); i++){
-    ans[size(ans)+1] = m[i];
-  }
-  return(ans);
+  return(m);
 }
 
 static proc ext_elimination_(module m, module syz_mod)
@@ -321,14 +317,12 @@ static proc ext_elimination_(module m, module syz_mod)
   //note m is NOT lifted.
   int r = size(m);
   int n = nvars(basering);
-  int offset = n*nrows(matrix(m));
   module ans_mod, temp_I;
 
   if(r == 0 || size(syz_mod) == 0){
     return(ans_mod);
   }
-  matrix needed_mat = submat(matrix(syz_mod),
-                             (offset+1)..(offset+r), 1..size(syz_mod));
+  matrix needed_mat = submat(matrix(syz_mod), 1..r, 1..size(syz_mod));
   int i,j,k;
   ideal square_ideal;
 
@@ -403,7 +397,7 @@ static proc sres_ext_(module m, int p)
 {
   int i,j;
   list res_list, lead_terms_list;
-  lead_terms_list[1] = lead(m);
+  lead_terms_list[1] = m;
 
   res_list[1] = m;
   for (i = 1; i<p; i++){
@@ -575,7 +569,7 @@ static proc lift_tree_with_order(vector s, module M, list LL)
   ideal im, iF_, imif, iL;
   while (T != 0){
     L = lead_with_order_(T,target_L);
-    for(i=1; i<=size(M); i++){
+    for(i=size(M); i>=1; i--){
       temp_I = leadmonom(lead_M[i]);
       attrib(temp_I, "isSB", 1);
       if(NF(L, temp_I)==0){
@@ -615,11 +609,14 @@ static proc lift_subtree_with_order_(vector s, module M, list LL)
 
   while(T != 0){
     L = lead_with_order_(T,target_L);
-    for(i=1; i<=size(M); i++){
+    for(i=size(M); i>=1; i--){
       temp_I = leadmonom(lead_M[i]);
       attrib(temp_I,"isSB",1);
       if(NF(L,temp_I) == 0){
         m = leadterm(L)/leadterm(lead_M[i]);
+        if(m*leadterm(lead_M[i]) != leadterm(L)){
+          m = -m;
+        }
         ans = ans-lift_subtree_with_order_(m*gen(i),M,LL);
         break;
       }
@@ -644,7 +641,7 @@ static proc gr_than_for_res(vector s, vector v, list L)
   }
   s = m1*L[size(L)][e1]; v = m2*L[size(L)][e2];
   if (leadmonom(s) == leadmonom(v)){
-    if(e1 > e2){
+    if(e1 < e2){
       return(1);
     }
     else{

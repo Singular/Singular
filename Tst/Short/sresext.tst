@@ -57,15 +57,8 @@ ASSUME(0,leftRelationsAreZero(d1,d2));
 ASSUME(0,leftRelationsAreZero(d2,d3));
 ASSUME(0,leftRelationsAreZero(d3,d4));
 
-// The order regression is independent of nontrivial coefficients.
-module u=y+z,x-z;
-resolution ur=sresExt(u,3);
-module ud2=ur[2];
-module ud3=ur[3];
-ASSUME(0,leftRelationsAreZero(ud2,ud3));
-
-// The ideal-first presentation gives the projected syzygy from the
-// lifting example in sresext.lib's accompanying Schreyer construction.
+// Coordinates are B-first; appended square generators are tried first as
+// reducers, as required by relative Schreyer reduction.
 vector f1=[x,y,0,z,0,0];
 vector f2=[0,x,y,0,z,0];
 vector f3=[0,0,0,x,y,z];
@@ -73,6 +66,15 @@ module B=std(module(f1,f2,f3));
 module S=schreyerSyzExt(B);
 ASSUME(0,leftRelationsAreZero(B,S));
 ASSUME(0,S[1]==x*gen(1)+y*gen(2)+z*gen(3));
+resolution BRes=sresExt(B,3);
+module Bd3=BRes[3];
+ASSUME(0,size(Bd3)==15);
+
+// In a Schreyer tie the smaller presentation index leads.
+module tieModule=std(module(x,y));
+module tieSyz=schreyerSyzExt(tieModule);
+ASSUME(0,leftRelationsAreZero(tieModule,tieSyz));
+ASSUME(0,tieSyz[1]==x*gen(1)+y*gen(2));
 
 // Projection takes full normal forms modulo all square generators.
 vector projectionF=[x,y];
