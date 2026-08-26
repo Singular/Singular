@@ -185,6 +185,8 @@ methods
 sagbi2
 sets
 ssi_Z
+ssi2_options
+ssi2_types
 ssi_ringref
 puiseuxexpansion
 vdim_overflow
