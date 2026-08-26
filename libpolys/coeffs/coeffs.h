@@ -334,9 +334,6 @@ struct n_Procs_s
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
 
-   /// Optional polynomial factorization hook for user/external coefficient domains.
-   nFactorizeFunc cfFactorize;
-
    /// Number of Parameters in the coeffs (default 0)
    int iNumberOfParameters;
 
@@ -433,6 +430,9 @@ struct n_Procs_s
   void * data;
   number  (*cfReadFd_S)(char**s, const coeffs r);
   void    (*cfWriteFd_S)(number a, const coeffs r);
+
+  /// Optional polynomial factorization hook for user/external coefficient domains.
+  nFactorizeFunc cfFactorize;
 #ifdef LDEBUG
    // must be last entry:
    /// Test: is "a" a correct number?
