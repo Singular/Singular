@@ -32,6 +32,16 @@ Changed libraries:
 
 Changes in the kernel/build system:
 @itemize
+@item new algorithmic @code{option(stdhilb)} for @code{std}; it is also
+activated by @code{option(probabilistic)}. This shortcut is unchecked and an
+unlucky prime may lead to an incorrect result over @code{QQ}
+@item new global @code{option(probabilistic)}. It enables probabilistic
+Groebner-basis shortcuts and omits final exact verification, but not
+stabilization, in modular algorithms
+@item the modular Hilbert-driven block-ordering shortcut for @code{std} is now
+disabled by default and enabled by @code{option(probabilistic)}
+@item verify the colength used by the modular highest-corner shortcut for local
+standard bases and fall back to an untruncated computation if it differs
 @item changes for gcc 15
 @item changes for FLINT 3.3
 @item changes for normaliz 3.10.5
@@ -579,4 +589,3 @@ Availability
 
 @sc{Singular} is available as source code and for Linux, Mac OS X, Windows, FreeBSD and
 SunOS-5.
-

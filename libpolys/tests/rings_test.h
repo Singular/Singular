@@ -1,3 +1,5 @@
+#include <limits.h>
+
 #include "common.h"
 using namespace std;
 
@@ -194,6 +196,25 @@ public:
      rDelete(r); // kills 'cf' as well!
    }
 
+  void test_rDefault_rejects_too_many_variables()
+  {
+    const int N = SHRT_MAX + 1;
+    rRingOrder_t order[] = {ringorder_dp, ringorder_no};
+    int block0[] = {1, 0};
+    int block1[] = {N, 0};
+    coeffs cf = nInitChar(n_Q, NULL);
+    const short saved_errorreported = errorreported;
+
+    errorreported = FALSE;
+    ring r = rDefault(cf, N, NULL, 2, order, block0, block1);
+
+    TS_ASSERT(r == NULL);
+    TS_ASSERT(errorreported);
+
+    errorreported = saved_errorreported;
+    nKillChar(cf);
+  }
+
 
 
 
@@ -236,4 +257,3 @@ public:
      rDelete(r);
    }
 };
-

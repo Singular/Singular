@@ -1,4 +1,4 @@
-option(prot,sugarCrit);
+option(prot,sugarCrit,stdhilb);
 " ============= cyclic_roots_5(isol) + ==========================";
 ring r4 = 0,(a,b,c,d,e),dp;
 r4;

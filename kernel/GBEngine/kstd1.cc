@@ -2632,16 +2632,22 @@ ideal kStd2(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
     && (rOrd_is_ds(currRing)||rOrd_is_Ds(currRing))
     && (!idIsSimpleGB(F,Q)))
     {
-      currRing->ppNoether=kTryHC(F,Q);
+      long modular_colength=-1;
+      currRing->ppNoether=kTryHC(F,Q,&modular_colength);
+      const BOOLEAN used_hc=(currRing->ppNoether!=NULL);
       ideal res=kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
       if (currRing->ppNoether!=NULL) pLmDelete(currRing->ppNoether);
       currRing->ppNoether=NULL;
-      return res;
+      if ((!used_hc)||(res==NULL)||(scMult0Int(res,Q)==modular_colength)) return res;
+      if (TEST_OPT_PROT) PrintS("HC colength check failed, retry without HC\n");
+      idDelete(&res);
+      return kStd_internal(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
     }
     /* test hilbstd */
     if ( rHasGlobalOrdering(currRing)
     && (!TEST_OPT_RETURN_SB)
     && (!TEST_OPT_DEGBOUND)
+    && (TEST_V_STDHILB || TEST_V_PROBABILISTIC)
     && (currRing->LexOrder
          || rHasBlockOrder(currRing))
     && (!idIsSimpleGB(F,Q))

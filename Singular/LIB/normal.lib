@@ -7358,6 +7358,7 @@ EXAMPLE: example modNormal; shows an example
       ncores = #[i];
     }
   }
+  if(find(option(), "probabilistic") > 0) { noVerif = 1; }
 
 
   int totalTime = timer;

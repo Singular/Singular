@@ -37,8 +37,10 @@ static int kFindLuckyPrime(ideal F, ideal Q) // TODO
   return prim;
 }
 
-poly kTryHC(ideal F, ideal Q)
+poly kTryHC(ideal F, ideal Q, long* colength)
 {
+  assume(colength!=NULL);
+  *colength=-1;
   if (Q!=NULL)
     return NULL;
   int prim=kFindLuckyPrime(F,Q);
@@ -67,7 +69,11 @@ poly kTryHC(ideal F, ideal Q)
   // clean
   idDelete(&FF);
   poly HC=NULL;
-  if (strat->kNoether!=NULL) scComputeHC(res,QQ,0,HC);
+  if (strat->kNoether!=NULL)
+  {
+    scComputeHC(res,QQ,0,HC);
+    *colength=scMult0Int(res,QQ);
+  }
   delete strat;
   if (QQ!=NULL) idDelete(&QQ);
   idDelete(&res);
@@ -467,6 +473,7 @@ ideal kTryHilbstd(ideal F, ideal Q)
 {
  if (rField_is_Ring(currRing)) return NULL;
  if (!rHasGlobalOrdering(currRing)) return NULL;
+ if ((!TEST_V_STDHILB) && (!TEST_V_PROBABILISTIC)) return NULL;
  if(TEST_V_PURE_GB) return NULL;
 
  intvec* fdegree=kHilbstdPositiveFDegWeights(currRing);

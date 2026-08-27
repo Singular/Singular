@@ -67,6 +67,7 @@ NOTE:     For the general algorithm and the role of the optional arguments
           @ref{modStd} and the reference given in @ref{modular_lib}. The
           default for these arguments is that all tests succeed and that all
           primes are assumed to be lucky.
+       @* If @code{option(probabilistic)} is set, finalTest is omitted.
        @* The type of the result when @code{command} is applied to
           @code{arguments} must be either @code{bigint}, @code{ideal},
           @code{module}, or @code{matrix}.
@@ -84,6 +85,7 @@ EXAMPLE:  example modular; shows an example"
 
     /* auxiliary variables */
     int i;
+    int probabilistic = find(option(), "probabilistic") > 0;
 
     /* set maximal prime number */
     int pmax = 2147483647;
@@ -211,7 +213,8 @@ EXAMPLE:  example modular; shows an example"
         }
         if (!pTest(Command, Arguments, result, p)) { continue; }
 
-        // finalTest
+        // finalTest (stabilization via pTest is retained in probabilistic mode)
+        if (probabilistic) break;
         if (finalTest(Command, Arguments, result)) break;
       }
       else
@@ -272,7 +275,8 @@ EXAMPLE:  example modular; shows an example"
         }
         if (!pTest(Command, Arguments, result, p)) { continue; }
 
-        // finalTest
+        // finalTest (stabilization via pTest is retained in probabilistic mode)
+        if (probabilistic) break;
         if (finalTest(Command, Arguments, result)) break;
       }
     }
@@ -542,4 +546,3 @@ static proc NbModProcs()
     }
     return(nb);
 }
-

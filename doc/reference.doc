@@ -5526,6 +5526,14 @@ tries to find the highest corner of the staircase (HC) as fast as
 possible during a standard basis computation (only used for local
 orderings).
 @c ---------
+@item @code{stdhilb}
+@cindex stdhilb, option
+@cindex hilbert driven Groebner basis, option
+activates the Hilbert-driven algorithm in @code{std} for difficult global
+orderings. This shortcut is unchecked and an unlucky prime may lead to an
+incorrect result over @code{QQ}. It is also activated by
+@code{option(probabilistic)}.
+@c ---------
 @c @item @code{interrupt}
 @c allows fast interruption of standard basis computation
 @c ---------
@@ -5564,6 +5572,16 @@ disables the regularity bound for @code{res} and @code{mres} (see
 turns off meta-Groebner stuff (for commutative rings)
 (searching HC in characteristic p during standard basis computation,
 hilbert driven Groebner basis for difficult orderings during Groebner basis computation)
+@c ---------
+@item @code{probabilistic}
+@cindex probabilistic, option
+@cindex modular algorithms, probabilistic option
+@cindex verification, modular algorithms
+allows probabilistic shortcuts. For Groebner basis computations this enables
+the @code{stdhilb} branch of @code{std}. This shortcut is unchecked and an
+unlucky prime may lead to an incorrect result over @code{QQ}. For modular
+algorithms, the probabilistic stabilization test is still performed, but the
+final exact verification is omitted. This option is off by default.
 @c ---------
 @item @code{notSugar}
 @cindex notSugar, option
@@ -7777,13 +7795,20 @@ characteristic 0, we recommend std with ordering ds (or Ds), due to
 the implementation of the new algorithm described in ‘Using
 Semicontinuity for Standard Bases Computations’ (arXiv:2108.09735), as
 of Singular 4.4.0 (Sept 2024).
+@*The colength obtained with the modular highest corner is checked against
+the modular colength. If the check fails, the standard basis is recomputed
+without the modular highest corner.
 @*The new algorithm can be switched off by @code{option(pure_gb);}.
 See @ref{option}.
 
 @item @strong{Note:}
-Uses a hilbert driven Groebner algorithm in the case of a block ordering
-      and ideal over @code{QQ}.
-@*The new algorithm can be switched off by @code{option(pure_gb);}.
+The algorithmic option @code{stdhilb} activates a modular Hilbert-driven
+Groebner algorithm in the case of a block ordering and an ideal over
+@code{QQ}. It is also activated by @code{option(probabilistic)}. This shortcut
+is unchecked and an unlucky prime may lead to an incorrect result over
+@code{QQ}.
+@*The algorithm can be switched off again by
+@code{option(nostdhilb,noprobabilistic)} or @code{option(pure_gb)}.
 See @ref{option}.
 
 @item @strong{Example:}

@@ -38,6 +38,7 @@
 #include "Singular/cntrlc.h"
 #include "Singular/feOpt.h"
 #include "Singular/lists.h"
+#include "Singular/htable.h"
 #include "Singular/blackbox.h"
 #include "Singular/links/ssiLink.h"
 
@@ -52,7 +53,7 @@
 #include <netinet/in.h> /* for htons etc.*/
 
 
-#define SSI_VERSION 15
+#define SSI_VERSION 16
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
@@ -63,6 +64,7 @@
 // 12->13: NC rings
 // 13->14: ring references
 // 14->15: bigintvec, prune_map, mres_map
+// 15->16: htable
 
 EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 VAR link_list ssiToBeClosed=NULL;
@@ -685,6 +687,52 @@ static void ssiWriteList_S(lists dd, const ring R)
     ssiWrite_S(&(dd->m[i]),R);
   }
 }
+static void ssiRestoreCurrRing(ring save_ring, idhdl save_hdl)
+{
+  if (save_ring!=currRing) rChangeCurrRing(save_ring);
+  if (save_hdl!=NULL) rSetHdl(save_hdl);
+  else currRingHdl=NULL;
+}
+
+static BOOLEAN ssiWriteHTable(si_link l, stablerec *t)
+{
+  ssiInfo *d=(ssiInfo*)l->data;
+  fprintf(d->f_write,"%d ",t_countTable(t));
+  if (t==NULL) return FALSE;
+
+  ring save_ring=currRing;
+  idhdl save_hdl=currRingHdl;
+  for (int i=t->max-1; i>=0; i--)
+  {
+    telem p=t->t[i];
+    while (p!=NULL)
+    {
+      ssiWriteString(d,p->key);
+      if (p->val_ring!=NULL)
+      {
+        if (l->m->SetRing(l,p->val_ring,TRUE))
+        {
+          ssiRestoreCurrRing(save_ring,save_hdl);
+          return TRUE;
+        }
+      }
+      else if ((p->val.Typ()!=HTABLE_CMD) && p->val.RingDependend())
+      {
+        Werror("object `%s' in htable has no parent ring",p->key);
+        ssiRestoreCurrRing(save_ring,save_hdl);
+        return TRUE;
+      }
+      if (ssiWrite(l,&(p->val)))
+      {
+        ssiRestoreCurrRing(save_ring,save_hdl);
+        return TRUE;
+      }
+      p=p->next;
+    }
+  }
+  ssiRestoreCurrRing(save_ring,save_hdl);
+  return FALSE;
+}
 static void ssiWriteIntvec(const ssiInfo *d,intvec * v)
 {
   fprintf(d->f_write,"%d ",v->length());
@@ -760,7 +808,7 @@ static void ssiWriteBigintvec_S(bigintmat * v)
   }
 }
 
-static char *ssiReadString(const ssiInfo *d)
+char *ssiReadString(const ssiInfo *d)
 {
   char *buf;
   int l;
@@ -1444,6 +1492,45 @@ static lists ssiReadList(si_link l)
     omFreeBin(v,sleftv_bin);
   }
   return L;
+}
+static stablerec* ssiReadHTable(si_link l)
+{
+  ssiInfo *d=(ssiInfo*)l->data;
+  int nr=ssiReadInt(d);
+  if (nr<0)
+  {
+    Werror("invalid htable size %d in ssi stream",nr);
+    return NULL;
+  }
+
+  stablerec *t=t_createTable(nr*2+3);
+  ring save_ring=currRing;
+  idhdl save_hdl=currRingHdl;
+
+  for (int i=0; i<nr; i++)
+  {
+    char *key=ssiReadString(d);
+    leftv val=ssiRead1(l);
+    if (val==NULL)
+    {
+      omFree(key);
+      t_destroyTable(t);
+      ssiRestoreCurrRing(save_ring,save_hdl);
+      return NULL;
+    }
+    BOOLEAN failed=t_addTable(t,key,val);
+    val->CleanUp();
+    omFreeBin(val,sleftv_bin);
+    if (failed || errorreported)
+    {
+      t_destroyTable(t);
+      ssiRestoreCurrRing(save_ring,save_hdl);
+      return NULL;
+    }
+  }
+
+  ssiRestoreCurrRing(save_ring,save_hdl);
+  return t;
 }
 static lists ssiReadList_S(char**s, const ring R)
 {
@@ -2331,6 +2418,14 @@ leftv ssiRead1(si_link l)
     case 24: res->rtyp=BIGINTVEC_CMD;
              res->data=ssiReadBigintvec(d);
              break;
+    case 25: res->rtyp=HTABLE_CMD;
+             res->data=ssiReadHTable(l);
+             if (res->data==NULL)
+             {
+               omFreeBin(res,sleftv_bin);
+               return NULL;
+             }
+             break;
     // ------------
     case 98: // version
              {
@@ -2371,6 +2466,7 @@ leftv ssiRead1(si_link l)
   // define "ssiRing%d" as currRing:
   if ((d->r!=NULL)
   && (currRing!=d->r)
+  && (res->Typ()!=HTABLE_CMD)
   && (res->RingDependend()))
   {
     if(ssiSetCurrRing(d->r)) { d->r=currRing; }
@@ -2650,6 +2746,14 @@ BOOLEAN ssiWrite(si_link l, leftv data)
           case LIST_CMD:
                    fputs("14 ",d->f_write);
                    ssiWriteList(l,(lists)dd);
+                   break;
+          case HTABLE_CMD:
+                   fputs("25 ",d->f_write);
+                   if (ssiWriteHTable(l,(stablerec*)dd))
+                   {
+                     d->level=0;
+                     return TRUE;
+                   }
                    break;
           case INTVEC_CMD:
                    fputs("17 ",d->f_write);
@@ -3523,6 +3627,7 @@ leftv ssiRead2(si_link l, leftv u)
 // 23 1 <log(bitmask)> <r->IsLPRing> ring properties:LPRing
 // 23 2 <matrix C> <matrix D> ring properties: PLuralRing
 // 24 bigintvec <c>
+// 25 htable <len> <key1> <value1> ...
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular

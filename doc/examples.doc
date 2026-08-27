@@ -901,8 +901,12 @@ basering with 6 variables (see @ref{Cyclic roots}). We set
 the performed computations (see @ref{option} for an interpretation of
 the displayed symbols). For long running computations, it is always
 recommended to set this option.
-The @code{option(pure_gb)} avoids the otherwise automatic swich to
-@code{stdhilb} in the @code{std} calls.
+The @code{stdhilb} algorithm for the @code{std} command can be enabled by setting
+@code{option(stdhilb)}. The algorithm is also activated by the more general switch
+@code{option(probabilistic)}.
+The @code{stdhilb} algorithm does not include a verification and an unlucky prime
+may lead to an incorrect result over @code{QQ}.
+Setting @code{option(pure_gb)} suppresses the switch to the @code{stdhilb} algorithm.
 
 
 @smallexample
@@ -920,9 +924,9 @@ t=timer;
 sI=groebner(I);
 timer-t;                                // used time (in 1/100 secs)
 size(sI);
-option(nopure_gb);
+option(nopure_gb,probabilistic);
 sI=std(I);
-option(noprot);
+option(noprot,noprobabilistic);
 @c example
 @end smallexample
 
@@ -971,8 +975,12 @@ algorithm is accessible via the @code{stdhilb} command (see also @ref{std}).
 
 For the ideal below, @code{stdfglm} is more than 100 times
 and @code{stdhilb} about 10 times faster than @code{std}.
-The @code{option(pure_gb)} avoids the otherwise automatic swich to
-@code{stdhilb} in the @code{std} calls.
+The @code{stdhilb} algorithm for the @code{std} command can be enabled by setting
+@code{option(stdhilb)}. The algorithm is also activated by the more general switch
+@code{option(probabilistic)}.
+The @code{stdhilb} algorithm does not include a verification and an unlucky prime
+may lead to an incorrect result over @code{QQ}.
+Setting @code{option(pure_gb)} suppresses the switch to the @code{stdhilb} algorithm.
 
 @smallexample
 @c example
@@ -992,11 +1000,11 @@ The @code{option(pure_gb)} avoids the otherwise automatic swich to
   t=timer;
   ideal j0 =std(i);
   timer-t;
-  option(nopure_gb);
+  option(nopure_gb,probabilistic);
   t=timer;
   ideal j0 =std(i);
   timer-t;
-  option(noprot);
+  option(noprot,noprobabilistic);
 @c example
 @end smallexample
 

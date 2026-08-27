@@ -75,6 +75,10 @@ EXAMPLE: example ncmodslimgb; shows an example
     }
     sz = sz-1;
   }
+  if(find(option(), "probabilistic") > 0)
+  {
+    exactness = 0;
+  }
 
   def R0 = basering;
   list rl = ringlist(R0);

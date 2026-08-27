@@ -1824,6 +1824,11 @@ EXAMPLE: example ffmodStd; shows an example
     {
         // if the current ring has one parameter
         def GF = ffmodStdOne(I);
+        if(find(option(), "probabilistic") > 0)
+        {
+            attrib(GF[1], "isSB", 1);
+            return(GF[1]);
+        }
         if(finalTest(I,GF[1]))
         {
             attrib(GF[1], "isSB", 1);
@@ -1947,6 +1952,12 @@ EXAMPLE: example ffmodStd; shows an example
     setring G_t;
     list rJ = imap(St,Jr);
     ideal J = rJ[1];
+    if(find(option(), "probabilistic") > 0)
+    {
+        attrib(J, "isSB", 1);
+        option(set, opt);
+        return(J);
+    }
     if(finalTest(I,J))
     {
         attrib(J, "isSB", 1);
@@ -2381,4 +2392,3 @@ static proc fareypoly_naive(poly g, poly f, list #)
         return(list(r_m/ut,t_m/ut));
     }
 }
-

@@ -762,6 +762,10 @@ EXAMPLE:  example modVStd; shows an example"
       if(pTestSBM(M0,N0,I,M,L,P,bound))
       {
          //int bb=timer;
+         if(find(option(), "probabilistic") > 0)
+         {
+            return(list(M,L));
+         }
          if(finalTestM(M0,N0,I,M,L,bound))
          {
           // "time for final test";timer-bb;
@@ -1512,4 +1516,3 @@ module M=jacob(I);
 module N=freemodule(ncols(I));
 list Re=modVStd(M,N,I,350);
 */
-

@@ -105,6 +105,7 @@ Short/bug_napMultT.tst
 Short/bug_newstruct2.tst
 Short/bug_pd.tst
 Short/bug_presolve.tst
+Short/bug_probabilistic_gb.tst
 Short/bug_primdec.tst
 Short/bug_qring.tst
 Short/bug_qslimgb.tst

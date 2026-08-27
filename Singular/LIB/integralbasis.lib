@@ -1316,7 +1316,7 @@ proc getSegments(poly f, list classes, list slopes, int globOrder)
         // puiseux(poly f, int maxDeg, int atOrigin)
         pExpRecomputed = puiseux(fSegment[i], globOrder, 1);
         debug_log_intbas(3, "------Puiseux expansions recomputed: ");
-        classesNew = getClasses(pExpRecomputed);
+        classesNew = getClassesFromPuiseux(pExpRecomputed);
       }
 
       // We put everything together
@@ -1688,7 +1688,7 @@ static proc ibAt0(poly f, int locBasis, int optimize)
   tt = timer;
 
   int totDeg = getTotalDeg(pExp);
-  list classes = getClasses(pExp);
+  list classes = getClassesFromPuiseux(pExp);
 
   // We compute the building blocks of the basis elements
   dbprint(dbg, "--Building factors of different degrees...");
@@ -1799,7 +1799,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
       // (or even better, dont recompute but correct blocks in the correct order!)
       //l = puiseux(I2Lifted[i+1], degExpand, 1);
       pExp = puiseux(I2Lifted[i+1], -1, 1);
-      classesTemp = getClasses(pExp);
+      classesTemp = getClassesFromPuiseux(pExp);
       for(j = clInd; j <= clInd + size(classesTemp) - 1; j++)
       {
         blocks[j] = i;
@@ -1951,7 +1951,7 @@ static proc chineseRemainderSteps(poly f, int n, int d0, list classes, int degEx
   if(ifOut[3] == 0)
   {
     dbprint(dbg, "// Classes are wrongly computed. We need to recompute!");
-    list mergeCl = mergeClassesIF(f, classes, ifOut, mdm);
+    list mergeCl = mergeClassesIF(f, classes, blocks, ifOut, mdm);
     classes = mergeCl[1];
     ifOut = mergeCl[2];
 
@@ -3674,12 +3674,23 @@ static proc explodeRings(list l)
   return(rings);
 }
 
+// The top-level puiseux() interface returns one representative for each
+// conjugacy class. Use this wrapper for direct puiseux() output so these
+// representatives are not grouped again merely because they share a class code.
+static proc getClassesFromPuiseux(list l)
+{
+  return(getClasses(l, 1));
+}
+
 // Input:  a list l, whose elements are either Puiseux expansions over the
 //         base ring or rings containing a list PE of Puiseux expansions.
+//         If the optional argument is 1, l is the output of puiseux(), hence
+//         already contains one representative of each conjugacy class.
+//         Internal callers should prefer getClassesFromPuiseux(l) for this case.
 // Output: a list classes, where each element is a list of conjugate
 //         Puiseux expansions (given also either as expansions over the base
 //         rings or defined in extension rings).
-proc getClasses(list l)
+proc getClasses(list l, list #)
 {
   int i;
   int j;
@@ -3688,6 +3699,14 @@ proc getClasses(list l)
   list code;
   list classCode;
   list classes;
+
+  // Distinct representatives returned by puiseux() can have the same code,
+  // so they must not be grouped again.
+  int alreadyRepresentatives = 0;
+  if(size(#) > 0)
+  {
+    alreadyRepresentatives = #[1];
+  }
 
   list l2;
   for(i = 1; i <= size(l); i++)
@@ -3699,6 +3718,15 @@ proc getClasses(list l)
     {
       l2 = l2 + list(l[i]);
     }
+  }
+
+  if(alreadyRepresentatives == 1)
+  {
+    for(i = 1; i <= size(l2); i++)
+    {
+      classes[i] = list(l2[i]);
+    }
+    return(classes);
   }
 
   int k = 1;
@@ -3975,7 +4003,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
       // We replace the classes with the new classes so that they are ordered in the same way as the irreducible factors
 
       newL = puiseux(I2Lifted[i], -1, 1);
-      classes2 = getClasses(newL);
+      classes2 = getClassesFromPuiseux(newL);
 
       blInd = 1;
       for(j =1; j <= size(classes); j++)
@@ -3998,7 +4026,7 @@ static proc irreducibleFactors(poly f, list classes, list blocks, int degExpand)
         newL = puiseux(I2Red, degExpand, 1);
         dbprint(dbg, "Puiseux expansions finished");
 
-        classes2 = getClasses(newL);
+        classes2 = getClassesFromPuiseux(newL);
         dbprint(dbg, "getClasses finished");
 
         for(j = 1; j <= size(classes2); j++)
@@ -5691,7 +5719,7 @@ static proc equalLists(list l1, list l2)
 // Merge classes if the corresponding factors are not over the ground field
 // Takes as input the output of proc irreducibleFactors
 
-static proc mergeClassesIF(poly f, list classes, list ifOut, int mdm)
+static proc mergeClassesIF(poly f, list classes, list blocks, list ifOut, int mdm)
 {
   int h, i, j;
 
@@ -5733,10 +5761,12 @@ static proc mergeClassesIF(poly f, list classes, list ifOut, int mdm)
 
   if(rep == 1)
   {
-    ifOut = irreducibleFactors(f, classes, mdm);
+    ifOut = irreducibleFactors(f, classes, blocks, mdm);
     if(ifOut[3] == 0)
     {
-      classes = mergeClassesIF(f, classes, ifOut, mdm);
+      list mergeCl = mergeClassesIF(f, classes, blocks, ifOut, mdm);
+      classes = mergeCl[1];
+      ifOut = mergeCl[2];
     }
   }
   return(list(classes, ifOut));
