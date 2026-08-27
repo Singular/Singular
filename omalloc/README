@@ -1,0 +1,628 @@
+OMALLOC -- Memory Allocator for Singular
+========================================
+
+Author: Olaf Bachmann (obachman@mathematik.uni-kl.de), 1999
+This file documents the design and usage of omalloc.
+
+
+OVERVIEW
+========
+
+omalloc is a custom memory allocator designed for the Singular computer
+algebra system.  It is a bin-based allocator: instead of calling the
+system malloc for every allocation, omalloc pre-allocates pages of
+memory and carves them into fixed-size blocks.  All blocks of the same
+size share a common "bin," which maintains a free list of available
+blocks.  This makes allocation and deallocation O(1) in the common
+case -- just pop from or push to a free list.
+
+omalloc was designed for a workload where millions of small objects of
+a few distinct sizes (polynomials, monomials, coefficients) are
+allocated and freed rapidly during Groebner basis computation.  The
+bin-based design eliminates per-allocation overhead and reduces
+fragmentation for these patterns.
+
+
+CORE CONCEPTS
+=============
+
+Bins
+----
+
+A bin (struct omBin_s, typedef omBin) is the central abstraction.
+Each bin manages blocks of a single fixed size.  The structure is:
+
+    struct omBin_s
+    {
+      omBinPage     current_page;   /* page of current freelist */
+      omBinPage     last_page;      /* pointer to last page */
+      omBin         next;           /* linked list of sticky variants */
+      size_t        sizeW;          /* block size in words (not bytes) */
+      long          max_blocks;     /* blocks per page (or neg for multi-page) */
+      unsigned long sticky;         /* sticky tag */
+    };
+
+The field sizeW stores the block size in units of sizeof(long), not
+bytes.  So a bin with sizeW=4 on a 64-bit system manages 32-byte
+blocks.
+
+If max_blocks > 0, each page holds that many blocks.  If max_blocks < 0,
+a single block spans (-max_blocks) pages.  This handles allocations
+larger than a single page.
+
+Allocation from a bin works as follows:
+
+    1. Check current_page->current (the free list head).
+    2. If non-NULL, pop the first block off the free list.
+       Increment used_blocks.  Return the block.
+    3. If NULL (page is full), call omAllocBinFromFullPage(bin),
+       which either advances to the next page in the bin's page list
+       or allocates a brand-new page from the page region system.
+
+Deallocation pushes the block back onto the page's free list:
+
+    1. Determine which page the address belongs to (mask off low bits).
+    2. If used_blocks > 0, push addr onto page->current free list,
+       decrement used_blocks.
+    3. If used_blocks == 0 (last block freed), the page is completely
+       free and can be returned to the page region system.
+    4. If used_blocks == 0 but the page was previously full (current
+       was NULL), the page transitions from "full" to "has free blocks"
+       and is re-linked into the bin's page list.
+
+Pages
+-----
+
+A page (struct omBinPage_s) corresponds to one system page (typically
+4096 bytes).  Its header occupies the first 48 bytes (on 64-bit):
+
+    struct omBinPage_s
+    {
+      long          used_blocks;    /* count of blocks in use */
+      void*         current;        /* head of free list within page */
+      omBinPage     next;           /* doubly-linked list of pages */
+      omBinPage     prev;
+      void*         bin_sticky;     /* bin pointer + sticky tag */
+      omBinPageRegion region;       /* which region this page came from */
+    };
+
+The usable area of a page (SIZEOF_OM_BIN_PAGE) is:
+
+    SIZEOF_SYSTEM_PAGE - SIZEOF_OM_BIN_PAGE_HEADER
+
+On a system with 4096-byte pages and 64-bit pointers, this is
+4096 - 48 = 4048 bytes.
+
+Pages are always aligned to SIZEOF_SYSTEM_PAGE boundaries.  This
+allows omalloc to find the page header for any address with a simple
+bitmask:
+
+    omGetBinPageOfAddr(addr) = addr & ~(SIZEOF_SYSTEM_PAGE - 1)
+
+The bin_sticky field encodes both the owning bin pointer and a small
+sticky tag in the low bits of the pointer.  Since bin pointers are
+word-aligned, the low bits (up to SIZEOF_VOIDP - 1) are available for
+the sticky tag.  Macros omGetTopBinOfPage and omGetStickyOfPage
+extract each part.
+
+Each bin maintains a doubly-linked list of its pages, ordered so that
+pages with free blocks come before the current_page, and full pages
+come after.  The current_page is the page from which allocations are
+served.  When current_page fills up, the allocator either advances to
+the next page or allocates a new one.
+
+Page Regions
+------------
+
+Pages are not allocated individually from the OS.  Instead, omalloc
+allocates large regions (typically 512 pages = 2 MB) using
+mmap/valloc, then hands out individual pages from these regions.
+
+A region (struct omBinPageRegion_s) tracks:
+
+    - current: free list of recycled pages within the region
+    - init_addr / init_pages: uninitialized portion of the region
+    - used_pages: count of pages currently in use
+    - pages: total pages in the region
+
+When a region's used_pages drops to zero, the entire region is
+returned to the OS.  Regions are linked in a list; the allocator
+rotates through them looking for free pages.
+
+Page Registration (omIsBinPageAddr)
+-----------------------------------
+
+omalloc needs to distinguish bin-managed addresses from addresses
+returned by system malloc (for "large" allocations).  It does this
+with a bitmap indexed by page address.
+
+An address is split into three bit fields:
+
+    PAGE_INDEX  |  PAGE_SHIFT  |  PAGE_OFFSET
+    (high bits)    (mid bits)     (low 12 bits for 4K pages)
+
+PAGE_OFFSET identifies a byte within a page.  PAGE_INDEX selects an
+entry in the om_BinPageIndicies array.  PAGE_SHIFT selects a bit
+within that entry.  If the bit is set, the address is on a bin page.
+
+This bitmap is maintained by omRegisterBinPages (called when a region
+is allocated) and omUnregisterBinPages (called when a region is
+freed).  The array grows dynamically as new address ranges are
+encountered.
+
+
+TYPES OF BINS
+=============
+
+Static Bins
+-----------
+
+omalloc pre-creates an array of bins for common allocation sizes.
+These are the "static bins" stored in the global array om_StaticBin[].
+The sizes are chosen to cover the range from SIZEOF_OM_ALIGNMENT up to
+OM_MAX_BLOCK_SIZE with reasonable granularity.  Typical sizes on a
+64-bit system with 4-byte alignment:
+
+    8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 112, 128,
+    160, 192, 224, ...up to OM_MAX_BLOCK_SIZE
+
+The om_Size2Bin[] lookup table maps any size (rounded up to alignment)
+to the appropriate static bin:
+
+    omSmallSize2Bin(size) = om_Size2Bin[(size - 1) >> LOG_SIZEOF_OM_ALIGNMENT]
+
+This is a constant-time lookup.  Static bins are never freed.  Their
+index range is 0 through OM_MAX_BIN_INDEX.
+
+Spec Bins (Special Bins)
+------------------------
+
+When a caller requests a bin for a size that does not match any static
+bin well enough (i.e., a static bin would waste too many blocks per
+page), omGetSpecBin(size) creates a "spec bin."  Spec bins are
+dynamically allocated and reference-counted.  They are stored in the
+global linked list om_SpecBin, sorted by max_blocks.
+
+    omBin my_bin = omGetSpecBin(size);
+    // ... use my_bin ...
+    omUnGetSpecBin(&my_bin);    // decrement refcount, maybe free
+
+The omSpecBin_s wrapper holds:
+
+    struct omSpecBin_s
+    {
+      omSpecBin   next;           /* linked list of all spec bins */
+      omBin       bin;            /* the actual bin */
+      long        max_blocks;     /* blocks per page */
+      long        ref;            /* reference count */
+    };
+
+If two callers request the same size, they share the same spec bin
+(ref count incremented).  When the last reference is dropped and all
+pages have been freed, the spec bin is deallocated.
+
+This is how Singular's ring system works: each ring creates a bin for
+its monomial size via omGetSpecBin(monomial_byte_size), stored in
+ring->PolyBin.  Rings with identical monomial sizes share the same
+underlying bin.
+
+Sticky Bins (omGetStickyBinOfBin)
+---------------------------------
+
+A sticky bin is an independent copy of a bin with its own page pool.
+This is the sticky mechanism actually used by Singular:
+
+    omBin sticky = omGetStickyBinOfBin(original_bin);
+
+The new bin copies sizeW and max_blocks from the original, but has
+its own current_page and last_page (initially empty).  Its sticky
+field is set to SIZEOF_VOIDP (8 on 64-bit), which makes
+omIsStickyBin(bin) true.  It is linked into the global om_StickyBins
+list (not into the original bin's next chain).
+
+Pages allocated from a sticky bin store the sticky bin itself as
+their top bin pointer.  When omGetBinOfPage resolves such a page,
+it sees omIsStickyBin is true and returns the bin directly -- no
+chain-walking needed.
+
+Later, all pages from the sticky bin are merged back:
+
+    omMergeStickyBinIntoBin(sticky, original_bin);
+
+This walks every page in the sticky bin, rewrites each page header
+to point to original_bin, splices the page lists together, and
+frees the sticky bin structure.
+
+The purpose: the Groebner basis engine uses this to manage polynomial
+tail lifetimes across tailRing changes (see INTEGRATION WITH SINGULAR
+below).
+
+Sticky Tags (Tag-Based Sub-Bins)
+---------------------------------
+
+NOTE: This mechanism is implemented in omalloc but is NOT used
+anywhere in Singular.  It is described here for completeness.
+
+omalloc also supports "sticky tags" within a single bin.  A tag is
+a small integer associated with a sub-bin.  Sub-bins share the same
+sizeW and max_blocks as the parent but have different sticky values.
+They are linked through the bin->next pointer.
+
+The tag is stored in the low bits of each page's bin_sticky field
+(the same field that stores the bin pointer).  Since bin pointers
+are word-aligned, SIZEOF_VOIDP - 1 low bits are available -- giving
+3 usable bits on 64-bit (tags 0 through 7).  omGetBinOfPage walks
+the bin->next chain to find the sub-bin whose sticky matches the
+page's tag.
+
+The API:
+
+    tag = omGetNewStickyBinTag(bin);   // create new tag, add sub-bin
+    omSetStickyBinTag(bin, tag);       // swap tag's sub-bin to front
+    // ... allocations go to the tagged sub-bin ...
+    omUnSetStickyBinTag(bin, tag);     // swap original (tag=0) back
+    omDeleteStickyBinTag(bin, tag);    // merge tagged pages into tag=0
+
+There is also an "all bins" variant (omGetNewStickyAllBinTag etc.)
+that applies a tag across every static and spec bin simultaneously.
+
+
+API LAYERS
+==========
+
+Public Allocation API (omAllocDecl.h)
+-------------------------------------
+
+The public API provides several calling conventions:
+
+  Bin-based (caller knows the bin):
+
+    void* omAllocBin(omBin bin)         -- allocate from bin
+    void* omAlloc0Bin(omBin bin)        -- allocate zeroed
+    void  omFreeBin(void* addr, bin)    -- free to bin
+    void  omFreeBinAddr(void* addr)     -- free (bin found from addr)
+
+  Size-based (caller knows the size):
+
+    void* omAlloc(size_t size)          -- allocate by size
+    void* omAlloc0(size_t size)         -- allocate zeroed
+    void  omFreeSize(void* addr, size)  -- free with known size
+    void  omFree(void* addr)            -- free (size found from addr)
+
+  Typed variants (cast result to type, assign to variable):
+
+    omTypeAllocBin(type, addr, bin)     -- addr = (type) omAllocBin(bin)
+    omTypeAlloc(type, addr, size)       -- addr = (type) omAlloc(size)
+
+  Realloc:
+
+    void* omRealloc(void* addr, size_t new_size)
+    void* omReallocSize(void* addr, size_t old_size, size_t new_size)
+    void* omReallocBin(void* addr, omBin old_bin, omBin new_bin)
+
+  Sloppy variants (lowercase letter after 'om'):
+
+    omalloc(size)      -- allows size=0 (allocates 1 byte)
+    omfree(addr)       -- allows addr=NULL (no-op)
+    omrealloc(addr, s) -- allows addr=NULL (acts as alloc)
+
+The size-based functions look up the appropriate bin from the size
+via omSmallSize2Bin().  For sizes larger than OM_MAX_BLOCK_SIZE,
+they fall through to omAllocLarge(), which calls the system malloc
+with a size header prepended.
+
+Bin-based allocation is fastest because it skips the size-to-bin
+lookup.  This is why Singular caches ring->PolyBin and uses
+omAllocBin/omFreeBin for polynomial allocation in hot loops.
+
+Bin Management API (omBin.h)
+-----------------------------
+
+    omBin omGetSpecBin(size_t size)
+        Obtain a bin for the given size.  Returns a static bin if one
+        fits well, or creates/reuses a spec bin.
+
+    void omUnGetSpecBin(omBin* bin_ptr)
+        Release a spec bin reference.  Sets *bin_ptr to NULL.
+
+    omBin omGetStickyBinOfBin(omBin bin)
+        Create an independent sticky bin copy (see above).
+
+    void omMergeStickyBinIntoBin(omBin sticky, omBin into)
+        Merge all pages from sticky into into_bin and free sticky.
+
+    unsigned long omGetNewStickyBinTag(omBin bin)
+    void omSetStickyBinTag(omBin bin, unsigned long tag)
+    void omUnSetStickyBinTag(omBin bin, unsigned long tag)
+    void omDeleteStickyBinTag(omBin bin, unsigned long tag)
+        Tag-based sticky sub-bin management.
+
+    void omPrintBinStats(FILE* fd)
+        Print allocation statistics for all bins.
+
+Debug/Check API (omDebug.h)
+----------------------------
+
+When compiled without OM_NDEBUG, omalloc provides extensive checking:
+
+    omDebugAddr(addr)           -- check addr validity
+    omDebugAddrBin(addr, bin)   -- check addr belongs to bin
+    omDebugAddrSize(addr, size) -- check addr has given size
+    omDebugBin(bin)             -- check bin consistency
+    omDebugMemory()             -- check all memory
+
+    omCheckAddr(addr)           -- same, but only if OM_CHECK > 0
+    omTestAddr(addr, level)     -- check at given level
+
+The omCheck* macros are no-ops in release builds.  The omDebug*
+macros are always active in debug builds.
+
+Debug mode also supports:
+  - Tracking: record allocation site (file/line) and backtrace
+  - Keeping: delay actual frees to detect use-after-free
+  - Patterns: fill memory with 0xfe (init), 0xfb (freed), etc.
+
+
+CONFIGURATION AND BUILD MODES
+==============================
+
+--disable-omalloc (xalloc mode)
+--------------------------------
+
+When Singular is configured with --disable-omalloc, the preprocessor
+macro HAVE_OMALLOC is NOT defined.  The master header omalloc.h then
+includes xalloc.h instead of the real omalloc implementation:
+
+    #ifndef HAVE_OMALLOC
+    #include "omalloc/xalloc.h"
+    #else
+    // ... real omalloc includes ...
+    #endif
+
+xalloc.h is a compatibility shim that maps all omalloc functions to
+system malloc/free:
+
+    #define omAlloc(s)          malloc(s)
+    #define omFree(d)           free(d)
+    #define omRealloc(A,B)      realloc(A,B)
+    #define omStrDup(s)         strdup(s)
+    #define omFreeBinAddr(P)    free(P)
+    // etc.
+
+Within xalloc.h, the XALLOC_BIN macro (defined by default) controls
+whether bin operations get per-bin free lists or map straight to
+malloc.  XALLOC_BIN is only relevant in xalloc mode; it has no
+effect when omalloc is enabled.
+
+With XALLOC_BIN defined (the default), omAllocBin/omFreeBin maintain
+a simple per-bin free list on top of system malloc.  An omBin in
+this mode is just:
+
+    struct omBin_s
+    {
+      omBin_next  curr;     /* free list */
+      size_t      size;     /* block size in bytes */
+    };
+
+omAllocBin checks curr first (O(1) free list pop), falling back to
+malloc if the list is empty.  omFreeBin pushes the block onto curr
+(O(1)).  This preserves most of the free-list performance benefit
+without page management overhead.
+
+There is no configure option to disable XALLOC_BIN; you must edit
+xalloc.h directly to comment out "#define XALLOC_BIN 1".  The
+source comment says "undef for valgrind."  With XALLOC_BIN undefined,
+bins are eliminated entirely:
+
+    typedef size_t omBin;
+    #define omAllocBin(B)   omAlloc(B)
+    #define omFreeBin(P,B)  omFree(P)
+
+Every allocation goes directly to system malloc.
+
+Performance comparison (from xalloc.h comments, omalloc = 100%):
+  - xalloc + XALLOC_BIN:  ~133% (6% overhead from lost page management)
+  - xalloc without XALLOC_BIN: ~141% (no free lists at all)
+
+OM_NDEBUG (--enable-debug)
+--------------------------
+
+OM_NDEBUG is defined by default (debug OFF).  Passing --enable-debug
+to configure leaves OM_NDEBUG undefined and enables debug checking,
+allocation tracking, and delayed frees.
+
+With OM_NDEBUG defined (the default), all debug checking, tracking,
+and keep functionality is compiled out.  The allocation macros expand
+to thin inline code that directly manipulates free lists.
+
+With --enable-debug (OM_NDEBUG undefined), allocations go through
+_omDebugAlloc / _omDebugFree, which perform validity checks, track
+allocation sites, and optionally delay frees.
+
+HAVE_OMALLOC
+-------------
+
+This macro gates the inclusion of real omalloc code throughout
+Singular.  Files that need to work with both omalloc and xalloc
+typically have:
+
+    #ifdef HAVE_OMALLOC
+    // omalloc-specific code (e.g., bin page checks)
+    #endif
+
+The entire implementation in omBin.c, omBinPage.c, and om_Alloc.c is
+wrapped in #ifdef HAVE_OMALLOC.
+
+
+THREAD SAFETY
+=============
+
+omalloc is NOT thread-safe.
+
+The fundamental reason is that all bin operations -- allocation,
+deallocation, page management -- manipulate shared data structures
+(free lists, page lists, the global om_SpecBin list, om_StickyBins
+list, page region ring, om_BinPageIndicies bitmap) without any
+locking or atomic operations.
+
+Specifically:
+
+  - Allocation from a bin reads and writes current_page->current
+    (the free list head) and current_page->used_blocks without
+    synchronization.
+
+  - The page list (doubly-linked through next/prev) and the
+    current_page/last_page pointers in omBin_s are modified during
+    allocation and deallocation.
+
+  - The om_CurrentBinPageRegion pointer and region free lists are
+    global shared state.
+
+  - Static bins (om_StaticBin[]) are globals shared by all code.
+
+Two threads allocating from the same bin simultaneously will corrupt
+the free list.  Two threads allocating from different bins can still
+collide on the page region system.
+
+xalloc.h with XALLOC_BIN is also NOT thread-safe.  The per-bin free
+list (bin->curr) is manipulated without locking:
+
+    // omAllocBin:
+    p = b->curr;
+    b->curr = p->next;    // race condition if two threads do this
+
+    // omFreeBin:
+    *((void**) p) = b->curr;
+    b->curr = (omBin_next)p;  // race condition
+
+Thread-safe configuration:  --disable-omalloc with XALLOC_BIN
+undefined (edit xalloc.h to comment out "#define XALLOC_BIN 1").
+In this mode, all bin operations map directly to system malloc/free,
+which are thread-safe in modern C libraries.  This is the configuration
+used when Singular needs thread safety, at the cost of allocation
+performance.
+
+
+INTEGRATION WITH SINGULAR
+=========================
+
+r->PolyBin
+-----------
+
+Every Singular ring (struct ip_sring) has a field:
+
+    omBin PolyBin;
+
+This is the bin used to allocate monomials for that ring.  The bin
+size equals the monomial size, which depends on the number of
+variables, coefficient type, and ordering.  It is set up by
+omGetSpecBin() during ring initialization (rComplete).
+
+All polynomial operations in a ring use omAllocBin(r->PolyBin) to
+allocate monomials and omFreeBin(p, r->PolyBin) to free them.  This
+is critical for performance: in Groebner basis computation, millions
+of monomials are allocated and freed per second.
+
+strat->tailBin (sticky bin for T-entry tails)
+----------------------------------------------
+
+During Groebner basis computation, the strategy object (skStrategy)
+maintains:
+
+    omBin tailBin;    // sticky bin for polynomial tails
+    omBin lmBin;      // sticky bin for leading monomials
+    ring  tailRing;   // possibly different ring for tails
+
+The tailBin is created at strategy initialization:
+
+    tailBin = omGetStickyBinOfBin(tailRing->PolyBin);
+
+All polynomial tails (everything after the leading monomial) in the
+T set are allocated from this sticky bin rather than directly from
+tailRing->PolyBin.
+
+Why?  The Groebner basis engine may change the tail ring during
+computation (kStratChangeTailRing) to use a more compact exponent
+representation.  When this happens:
+
+    1. A new tailRing is created with a smaller monomial size.
+    2. A new sticky bin is created from the new ring's PolyBin:
+         new_tailBin = omGetStickyBinOfBin(new_tailRing->PolyBin)
+    3. All T-entries are shallow-copied to the new tailRing,
+       allocating from new_tailBin.
+    4. The OLD tailBin is merged back into the old tailRing's PolyBin:
+         omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin)
+    5. The old tailRing is destroyed.
+    6. strat->tailBin and strat->tailRing are updated.
+
+The sticky bin mechanism ensures that pages allocated for the old
+tail ring's monomials are properly tracked and can be merged back.
+Without sticky bins, the pages would be interleaved with other
+allocations in tailRing->PolyBin, making it impossible to cleanly
+transfer ownership when the tail ring changes.
+
+At strategy destruction (~skStrategy), any remaining sticky bins are
+merged back:
+
+    if (lmBin != NULL)
+        omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
+    if (tailBin != NULL)
+        omMergeStickyBinIntoBin(tailBin, tailRing->PolyBin);
+
+strat->lmBin (sticky bin for leading monomials)
+-------------------------------------------------
+
+Similarly, lmBin is a sticky bin for leading monomials:
+
+    lmBin = omGetStickyBinOfBin(currRing->PolyBin);
+
+Leading monomials are sometimes allocated separately when the
+Groebner basis engine needs to attach a leading monomial from the
+current ring to a tail in the tail ring.  The GetP() method uses
+lmBin when combining a leading monomial with a tail polynomial.
+
+Having a separate sticky bin for leading monomials allows the engine
+to track their pages independently, which is needed for clean memory
+accounting during the strategy's lifetime.
+
+
+SOURCE FILE GUIDE
+=================
+
+Core implementation:
+    om_Alloc.c          Main allocation/free (omAllocBinFromFullPage,
+                        omFreeToPageFault, page list management)
+    omBin.c             Bin management (spec bins, sticky bins, stats)
+    omBinPage.c         Page region management (page alloc/free,
+                        registration bitmap)
+    omAllocSystem.c     System malloc/valloc wrappers, large allocations
+
+Headers:
+    omalloc.h           Master header (includes everything)
+    omAllocDecl.h       Public alloc/free macro definitions
+    omAllocPrivate.h    Struct definitions, low-level macros
+    omBin.h             Bin management API
+    omBinPage.h         Page management API and omIsBinPageAddr
+    omDebug.h           Debug/check/track API
+    omStructs.h         Forward declarations of all types
+    omDerivedConfig.h   Computed constants (alignment, sizes)
+    omDefaultConfig.h   Tunable parameters (pages per region, etc.)
+    omInline.h          Inline function implementations
+    omAllocSystem.h     System allocator interface
+    xalloc.h            Replacement shim when omalloc is disabled
+
+Generated:
+    omTables.c          Program that generates omTables.inc
+    omTables.inc        (generated) Static bin arrays, size-to-bin
+                        lookup tables
+
+Build configuration:
+    configure.ac        --disable-omalloc flag
+    omConfig.h          (generated) HAVE_OMALLOC, SIZEOF_SYSTEM_PAGE,
+                        SIZEOF_LONG, etc.
+
+
+---
+This documentation was researched and written by an AI assistant
+(Claude) on behalf of Brent Baccala (cosine@freesoft.org), based on
+source code analysis of the omalloc implementation.
