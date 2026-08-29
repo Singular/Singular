@@ -1,0 +1,14 @@
+matrix Js[1][
+6
+]=
+-X4+W3;matrix Ms[
+2
+][
+2
+]=
+X3+X2x+Xx2+x3,-W2+Wy-y2;matrix Ls[
+2
+][
+2
+]=
+-X+x,W2-Wy+y2;

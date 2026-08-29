@@ -100,7 +100,6 @@ poly kTryHC(ideal F, ideal Q, long* colength)
 }
 
 // --------------------------------------------------------
-#if 0
 static number nMapQa2Zp(number a, const coeffs src, const coeffs dst)
 {
   if (a==NULL) return a;
@@ -118,7 +117,6 @@ static number nMapZpa2Zp(number a, const coeffs src, const coeffs dst)
   while(pNext(p)!=NULL) pIter(p);
   return pGetCoeff(p);
 }
-#endif
 
 static intvec* kHilbstdDeleteWeights(intvec* w)
 {
@@ -259,7 +257,6 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q, intvec* hdegree)
   nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
   if (nMap==NULL)
   {
-    /*
     if (nCoeff_is_transExt(save_ring->cf))
     {
       if (nCoeff_is_Q(save_ring->cf->extRing->cf))
@@ -274,9 +271,9 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q, intvec* hdegree)
     }
     else
     {
-    */
       SI_RESTORE_OPT1(save_opt);
       return NULL;
+    }
   }
   rChangeCurrRing(Zp_ring);
   ideal FF=id_PermIdeal(F,1,IDELEMS(F),NULL,save_ring,Zp_ring,nMap,NULL,0,0);

@@ -82,8 +82,8 @@ void addLObject(LObject& h, kStrategy& strat)
     pos=0;
 
     if (strat->sl!=-1) pos = posInS(strat, strat->sl, h.p, h.ecart);
-    strat->enterS(&h, pos, strat, -1);
-//    enterT(&h, strat); // ?!
+    strat->enterS(h, pos, strat, -1);
+//    enterT(h, strat); // ?!
 
     kDeleteLcm(&h);
   }
@@ -151,7 +151,8 @@ ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat
   }
 #endif
 
-  int olddeg, reduc;
+  int olddeg;
+  LSet::size_type reduc;
   int red_result = 1;
 //  int hilbeledeg = 1, minimcnt = 0;
   int hilbcount = 0;
@@ -173,7 +174,7 @@ ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat
 
 
   // compute-------------------------------------------------------
-  for(; strat->Ll >= 0;
+  for(; ! strat->L.empty();
 #ifdef KDEBUG
     strat->P.lcm = NULL,
 #endif
@@ -184,23 +185,23 @@ ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
 
-    if (strat->Ll== 0) strat->interpt=TRUE;
+    if (strat->L.size() == 1) strat->interpt=TRUE;
 
     if (TEST_OPT_DEGBOUND
     && ((strat->honey
-    && (strat->L[strat->Ll].ecart+ currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-       || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+    && (strat->L.top().ecart+ currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg))
+       || ((!strat->honey) && (currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg))))
     {
       // stops computation if
       // 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
       // a predefined number Kstd1_deg
-      while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      while (! strat->L.empty()) strat->L.pop_and_erase();
       break;
     }
 
     // picks the last element from the lazyset L
-    strat->P = strat->L[strat->Ll];
-    strat->Ll--;
+    strat->P = strat->L.top();
+    strat->L.pop();
 
     //kTest(strat);
 
@@ -290,15 +291,8 @@ ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat
 
 //         poly save = p_Copy(h.p, currRing);
 
-        int pos;
-
-        if (strat->Ll==-1)
-          pos =0;
-        else
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
         h.sev = pGetShortExpVector(h.p);
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        strat->L.push(h);
 
   //       h.p = save;
   //       addLObject(h, strat);
@@ -427,7 +421,8 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
 //  strat->homog = strat->homog && strat->z2homog; // ?
 
   int   red_result = 1;
-  int   olddeg, reduc;
+  int   olddeg;
+  LSet::size_type reduc;
 
 //  int hilbeledeg = 1, minimcnt = 0;
   int hilbcount = 0;
@@ -435,7 +430,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
   BOOLEAN withT = FALSE;
 
   initBuchMoraCrit(strat); // sets Gebauer, honey, sugarCrit // sca - ok???
-  initBuchMoraPos(strat); // sets strat->posInL, strat->posInT // check!! (Plural's: )
+  initBuchMoraPos(strat); // sets strat->compareL, strat->posInT // check!! (Plural's: )
 
 //   initHilbCrit(F, Q, &hilb, strat);
 
@@ -516,29 +511,24 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
               strat->initEcart(&h);
               h.sev = pGetShortExpVector(h.p);
 
-              int pos = 0;
-
-              if (strat->Ll != -1)
-                pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
-              enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+              strat->L.push(h);
             }
       }
     }
   }
 
   // compute-------------------------------------------------------
-  while (strat->Ll >= 0)
+  while (! strat->L.empty())
   {
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
 
-    if (strat->Ll== 0) strat->interpt=TRUE;
+    if (strat->L.size() == 1) strat->interpt=TRUE;
 
     if (TEST_OPT_DEGBOUND
-        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+        && ((strat->honey && (strat->L.top().ecart+currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg))))
     {
 
 #ifdef KDEBUG
@@ -548,25 +538,25 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
       // *stops computation if
       // * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
       // *a predefined number Kstd1_deg
-      while ((strat->Ll >= 0)
-        && ( (strat->homog==isHomog) || strat->L[strat->Ll].is_special || ((strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)) )
-        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
+      while (! strat->L.empty()
+        && ( (strat->homog==isHomog) || strat->L.top().is_special || ((strat->L.top().p1!=NULL) && (strat->L.top().p2!=NULL)) )
+        && ((strat->honey && (strat->L.top().ecart+currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L.top().p,currRing)>Kstd1_deg)))
             )
       {
 #ifdef KDEBUG
 //        if (TEST_OPT_DEBUG){PrintS("^^^^^^^^^^^^!!!!");}
 #endif
-        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+        strat->L.pop_and_erase();
 //        if (TEST_OPT_PROT) PrintS("^!");
       }
-      if (strat->Ll<0) break;
+      if (strat->L.empty()) break;
       else strat->noClearS=TRUE;
     }
 
     // picks the last element from the lazyset L
-    strat->P = strat->L[strat->Ll];
-    strat->Ll--;
+    strat->P = strat->L.top();
+    strat->L.pop();
 
 
 //    assume(pNext(strat->P.p) != strat->tail);
@@ -661,14 +651,14 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
       //if(withT)
       {
         strat->P.SetpFDeg();
-        enterT(&strat->P, strat);
+        enterT(strat->P, strat);
       }
 
       // L
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
 
       // posInS only depends on the leading term
-      strat->enterS(&strat->P, pos, strat, strat->tl);
+      strat->enterS(strat->P, pos, strat, strat->tl);
 
 //       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 
@@ -710,12 +700,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
         strat->initEcart(&h);
         h.sev = pGetShortExpVector(h.p);
 
-        int pos = 0;
-
-        if (strat->Ll != -1)
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        strat->L.push(h);
 
 
 
@@ -761,12 +746,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
         h.sev = pGetShortExpVector(h.p);
         strat->initEcart(&h);
 
-        if (strat->Ll==-1)
-          pos = 0;
-        else
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
-         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        strat->L.push(h);
 // the end of "#if 0" (comment)
 #endif
 
@@ -919,7 +899,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigint
 
 
   int olddeg = 0;
-  int reduc = 0;
+  LSet::size_type reduc = 0;
   int red_result = 1;
 //  int hilbeledeg=1;
   int hilbcount=0;
@@ -977,47 +957,42 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigint
               strat->initEcart(&h);
               h.sev = pGetShortExpVector(h.p);
 
-              int pos = 0;
-
-              if (strat->Ll != -1)
-                pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
-              enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+              strat->L.push(h);
             }
       }
 
     }
   }
 
-  while (strat->Ll >= 0)
+  while (! strat->L.empty())
   {
     //test_int_std(strat->kIdeal);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
     if (TEST_OPT_DEGBOUND
-    && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg))
+    && (strat->L.top().ecart+strat->L.top().GetpFDeg()> Kstd1_deg))
     {
       // * stops computation if
       // * - 24 (degBound)
       // *   && upper degree is bigger than Kstd1_deg
-      while ((strat->Ll >= 0)
-        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
-        && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg)
+      while (!strat->L.empty()
+        && (strat->L.top().p1!=NULL) && (strat->L.top().p2!=NULL)
+        && (strat->L.top().ecart+strat->L.top().GetpFDeg()> Kstd1_deg)
       )
       {
-        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+        strat->L.pop_and_erase();
         //if (TEST_OPT_PROT)
         //{
         //   PrintS("D"); mflush();
         //}
       }
-      if (strat->Ll<0) break;
+      if (strat->L.empty()) break;
       else strat->noClearS=TRUE;
     }
-    strat->P = strat->L[strat->Ll];// - picks the last element from the lazyset L -
-    if (strat->Ll==0) strat->interpt=TRUE;
-    strat->Ll--;
+    strat->P = strat->L.top();
+    if (strat->L.size() == 1) strat->interpt=TRUE;
+    strat->L.pop();
 
     // create the real Spoly
 //    assume(pNext(strat->P.p) != strat->tail);
@@ -1070,11 +1045,11 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigint
         strat->P.pCleardenom();
 
       // put in T
-      enterT(&strat->P,strat);
+      enterT(strat->P,strat);
       // build new pairs
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
-      strat->enterS(&strat->P,
+      strat->enterS(strat->P,
                     posInS(strat,strat->sl,strat->P.p, strat->P.ecart),
                     strat, strat->tl);
 
@@ -1112,12 +1087,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigint
         strat->initEcart(&h);
         h.sev = pGetShortExpVector(h.p);
 
-        int pos = 0;
-
-        if (strat->Ll != -1)
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        strat->L.push(h);
       }
 
 #ifdef KDEBUG
@@ -1138,7 +1108,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigint
         // * - 23
         // *   (multBound)
         // *   && multiplicity of the ideal is smaller then a predefined number mu
-        while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+        while (! strat->L.empty()) strat->L.pop_and_erase();
       }
     }
 #endif

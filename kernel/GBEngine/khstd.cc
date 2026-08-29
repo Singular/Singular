@@ -99,7 +99,7 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
           eledeg = -n_Int(BIMATELEM(*hilb,1,deg+1),coeffs_BIGINT);
         else // we have newhilb = hilb
         {
-          while (strat->Ll>=0)
+          while (! strat->L.empty())
           {
             count++;
             if(TEST_OPT_PROT)
@@ -107,7 +107,7 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
               PrintS("h");
               mflush();
             }
-            deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+            strat->L.pop_and_erase();
           }
           delete newhilb;
           return;
@@ -120,7 +120,7 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
       deg++;
     } /* loop */
     delete newhilb;
-    while ((strat->Ll>=0) && (degp(strat->L[strat->Ll].p,currRing)-mw < deg)) // the essential step
+    while (! strat->L.empty() && (degp(strat->L.top().p,currRing)-mw < deg)) // the essential step
     {
       count++;
       if(TEST_OPT_PROT)
@@ -128,7 +128,7 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
         PrintS("h");
         mflush();
       }
-      deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      strat->L.pop_and_erase();
     }
   }
 }
@@ -210,7 +210,7 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
           eledeg = -(*hilb)[deg];
         else // we have newhilb = hilb
         {
-          while (strat->Ll>=0)
+          while (! strat->L.empty())
           {
             count++;
             if(TEST_OPT_PROT)
@@ -218,7 +218,7 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
               PrintS("h");
               mflush();
             }
-            deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+            strat->L.pop_and_erase();
           }
           delete newhilb;
           return;
@@ -231,7 +231,7 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
       deg++;
     } /* loop */
     delete newhilb;
-    while ((strat->Ll>=0) && (degp(strat->L[strat->Ll].p,currRing)-mw < deg)) // the essential step
+    while (!strat->L.empty() && (degp(strat->L.top().p,currRing)-mw < deg)) // the essential step
     {
       count++;
       if(TEST_OPT_PROT)
@@ -239,7 +239,7 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
         PrintS("h");
         mflush();
       }
-      deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      strat->L.pop_and_erase();
     }
   }
 }
@@ -266,7 +266,7 @@ so delete all the remaining pairs
 
   if(newhilb->compare(hilb) == 0)
   {
-    while (strat->Ll>=0)
+    while (! strat->L.empty())
     {
       count++;
       if(TEST_OPT_PROT)
@@ -274,7 +274,7 @@ so delete all the remaining pairs
         PrintS("h");
         mflush();
       }
-      deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      strat->L.pop_and_erase();
     }
     delete newhilb;
     return;

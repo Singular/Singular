@@ -10,6 +10,9 @@
 
 #include <string.h>
 
+#include "writable_set.h"
+#include <vector>
+
 #include "omalloc/omalloc.h"
 #ifdef HAVE_OMALLOC
 #include "omalloc/omallocClass.h"
@@ -28,9 +31,6 @@
 #define HAVE_TAIL_RING
 
 #define setmax 128
-#define setmaxL ((int)((4096-12)/sizeof(LObject)))
-#define setmaxLinc ((int)((4096)/sizeof(LObject)))
-
 #define setmaxT ((int)((4096-12)/sizeof(TObject)))
 #define setmaxTinc ((int)((4096)/sizeof(TObject)))
 
@@ -58,7 +58,6 @@ typedef wlen_type* wlen_set;
 typedef class sTObject TObject;
 typedef class sLObject LObject;
 typedef TObject * TSet;
-typedef LObject * LSet;
 
 typedef struct denominator_list_s denominator_list_s;
 typedef denominator_list_s *denominator_list;
@@ -192,6 +191,8 @@ public:
   poly  lcm;   /*- the lcm of p1,p2 -*/
   kBucket_pt bucket;
   int   i_r1, i_r2;
+  unsigned seq;       // the sequence number of the LSet when this LObject was inserted
+                      // used to determine LSet ordering for equal LObjects
   unsigned checked; // this is the index of S up to which
                       // the corresponding LObject was already checked in
                       // critical pair creation => when entering the
@@ -269,136 +270,172 @@ public:
 
 EXTERN_VAR int HCord;
 
+/** @class LSet
+ *
+ * "L" is the sorted set of critical pairs, and we wish to regularly
+ * pop the top item from the queue.  However, we also wish to iterate
+ * over the entire set in order, which precludes organizing it as a
+ * heap.  Also, our legacy C code modifies the objects once they're in
+ * the queue, which precludes using std::map or std::multimap, since
+ * their objects are immutable.  We use a custom class writable_set,
+ * which is derived from std::multimap, but stores pointers in the
+ * tree and therefore allows the objects themselves to be modified.
+ */
+
+class CompareLObject {
+public:
+  skStrategy * strat = NULL;
+  int (*compareL) (const LObject &lhs, const LObject &rhs, const kStrategy strat) = NULL;
+  KINLINE bool operator() (const LObject &lhs, const LObject &rhs) const;
+};
+
+class LSet : public writable_set<LObject, CompareLObject> {
+private:
+  unsigned seq = 0;   // increments by one on every insertion; used to determine ordering
+public:
+  using writable_set<LObject, CompareLObject>::iterator;
+  using writable_set<LObject, CompareLObject>::begin;
+  using writable_set<LObject, CompareLObject>::end;
+  using writable_set<LObject, CompareLObject>::rbegin;
+  using writable_set<LObject, CompareLObject>::rend;
+  using writable_set<LObject, CompareLObject>::key_comp;
+  using writable_set<LObject, CompareLObject>::empty;
+  using writable_set<LObject, CompareLObject>::size;
+  using writable_set<LObject, CompareLObject>::size_type;
+  using writable_set<LObject, CompareLObject>::reorder;
+  KINLINE void push(LObject& lobject);
+  KINLINE bool would_be_top(LObject& lobject);
+  KINLINE void pop(void);
+  KINLINE void pop_and_erase(void);
+  KINLINE const LObject& top(void);
+  iterator erase(iterator it);
+};
+
 class skStrategy
 #ifdef HAVE_OMALLOC
                  : public omallocClass
 #endif
 {
 public:
-  kStrategy next;
-  int (*red)(LObject * L,kStrategy strat);
-  int (*red2)(LObject * L,kStrategy strat);
-  void (*initEcart)(TObject * L);
-  int (*posInT)(const TSet T,const int tl,LObject &h);
-  int (*posInL)(const LSet set, const int length,
-                LObject* L,const kStrategy strat);
-  void (*enterS)(LObject* h, int pos,kStrategy strat, int atR/* =-1*/ );
-  void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
-  int (*posInLOld)(const LSet Ls,const int Ll,
-                   LObject* Lo,const kStrategy strat);
-  void (*enterOnePair) (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR /*= -1*/);
-  void (*chainCrit) (poly p,int ecart,kStrategy strat);
-  BOOLEAN (*syzCrit) (poly sig, unsigned long not_sevSig, kStrategy strat);
-  BOOLEAN (*rewCrit1) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/);
-  BOOLEAN (*rewCrit2) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/);
-  BOOLEAN (*rewCrit3) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/);
-  pFDegProc pOrigFDeg;
-  pLDegProc pOrigLDeg;
-  pFDegProc pOrigFDeg_TailRing;
-  pLDegProc pOrigLDeg_TailRing;
-  s_poly_proc_t s_poly;
+  kStrategy next = NULL;
+  int (*red)(LObject * L,kStrategy strat) = NULL;
+  int (*red2)(LObject * L,kStrategy strat) = NULL;
+  void (*initEcart)(TObject * L) = NULL;
+  int (*posInT)(const TSet T,const int tl,LObject &h) = NULL;
+  int (*compareL) (const LObject &lhs, const LObject &rhs, const kStrategy strat) = NULL;
+  int (*compareLOld) (const LObject &lhs, const LObject &rhs, const kStrategy strat) = NULL;
+  void (*enterS)(LObject &h, int pos,kStrategy strat, int atR/* =-1*/ ) = NULL;
+  void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG) = NULL;
+  void (*enterOnePair) (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR /*= -1*/) = NULL;
+  void (*chainCrit) (poly p,int ecart,kStrategy strat) = NULL;
+  BOOLEAN (*syzCrit) (poly sig, unsigned long not_sevSig, kStrategy strat) = NULL;
+  BOOLEAN (*rewCrit1) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/) = NULL;
+  BOOLEAN (*rewCrit2) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/) = NULL;
+  BOOLEAN (*rewCrit3) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/) = NULL;
+  pFDegProc pOrigFDeg = NULL;
+  pLDegProc pOrigLDeg = NULL;
+  pFDegProc pOrigFDeg_TailRing = NULL;
+  pLDegProc pOrigLDeg_TailRing = NULL;
+  s_poly_proc_t s_poly = NULL;
 
   LObject P;
-  ideal Shdl;
-  ideal D; /*V(S) is in D(D)*/
-  ideal M; /*set of minimal generators*/
-  polyset S;
-  polyset syz;
-  polyset sig;
-  intset ecartS;
-  intset fromS; // from which S[i] S[j] comes from
-                // this is important for signature-based
-                // algorithms
-  intset syzIdx;// index in the syz array at which the first
-                // syzygy of component i comes up
-                // important for signature-based algorithms
-  unsigned sbaOrder;
-  int currIdx;
-  int max_lower_index;
-  intset lenS;
-  wlen_set lenSw; /* for tgb.ccc */
-  intset fromQ;
-  unsigned long* sevS;
-  unsigned long* sevSyz;
-  unsigned long* sevSig;
-  unsigned long* sevT;
-  TSet T;
+  ideal Shdl = NULL;
+  ideal D = NULL; /*V(S) is in D(D)*/
+  ideal M = NULL; /*set of minimal generators*/
+  polyset S = NULL;
+  polyset syz = NULL;
+  polyset sig = NULL;
+  intset ecartS = NULL;
+  intset fromS = NULL; // from which S[i] S[j] comes from
+                       // this is important for signature-based
+                       // algorithms
+  intset syzIdx = NULL;// index in the syz array at which the first
+                       // syzygy of component i comes up
+                       // important for signature-based algorithms
+  unsigned sbaOrder = 0;
+  int currIdx = 0;
+  int max_lower_index = 0;
+  intset lenS = NULL;
+  wlen_set lenSw = NULL; /* for tgb.ccc */
+  intset fromQ = NULL;
+  unsigned long* sevS = NULL;
+  unsigned long* sevSyz = NULL;
+  unsigned long* sevSig = NULL;
+  unsigned long* sevT = NULL;
+  TSet T = NULL;
   LSet L;
   LSet    B;
-  poly    kNoether;
-  poly    t_kNoether; // same polys in tailring
+  poly    kNoether = NULL;
+  poly    t_kNoether = NULL; // same polys in tailring
   KINLINE poly    kNoetherTail();
-  BOOLEAN * NotUsedAxis;
-  BOOLEAN * pairtest;/*used for enterOnePair*/
-  poly tail;
-  intvec * kModW;
-  intvec * kHomW;
+  BOOLEAN * NotUsedAxis = NULL;
+  BOOLEAN * pairtest = NULL;/*used for enterOnePair*/
+  poly tail = NULL;
+  intvec * kModW = NULL;
+  intvec * kHomW = NULL;
   // procedure for ShalloCopy from tailRing  to currRing
-  pShallowCopyDeleteProc p_shallow_copy_delete;
+  pShallowCopyDeleteProc p_shallow_copy_delete = NULL;
   // pointers to Tobjects R[i] is ith Tobject which is generated
-  TObject**  R;
+  TObject**  R = NULL;
   // S_2_R[i] yields Tobject which corresponds to S[i]
-  int*      S_2_R;
-  ring tailRing;
-  omBin lmBin;
-  omBin tailBin;
-  int nr;
-  int cp,c3;
-  int sl,mu;
-  int syzl,syzmax,syzidxmax;
-  int tl,tmax;
-  int Ll,Lmax;
-  int Bl,Bmax;
-  int ak,LazyDegree,LazyPass;
-  int syzComp;
-  int lastAxis;
-  int newIdeal;
-  int minim;
-  bool sigdrop; //This is used to check sigdrop in sba over Z
-  int nrsyzcrit; // counts how many pairs are deleted by SyzCrit
-  int nrrewcrit; // counts how many pairs are deleted by FaugereRewCrit
-  int sbaEnterS; // sba over Z strategy: if sigdrop element has _*gen(sbaEnterS+1), then
-                 // add directly sbaEnterS elements into S
-  int blockred;  // counter for blocked reductions in redSig
-  int blockredmax;
+  int*      S_2_R = NULL;
+  ring tailRing = NULL;
+  omBin lmBin = NULL;
+  omBin tailBin = NULL;
+  int nr = 0;
+  int cp = 0,c3 = 0;
+  int sl = 0,mu = 0;
+  int syzl = 0,syzmax = 0,syzidxmax = 0;
+  int tl = 0,tmax = 0;
+  int ak = 0,LazyDegree = 0,LazyPass = 0;
+  int syzComp = 0;
+  int lastAxis = 0;
+  int newIdeal = 0;
+  int minim = 0;
+  bool sigdrop = false; //This is used to check sigdrop in sba over Z
+  int nrsyzcrit = 0; // counts how many pairs are deleted by SyzCrit
+  int nrrewcrit = 0; // counts how many pairs are deleted by FaugereRewCrit
+  int sbaEnterS = 0; // sba over Z strategy: if sigdrop element has _*gen(sbaEnterS+1), then
+                     // add directly sbaEnterS elements into S
+  int blockred = 0;  // counter for blocked reductions in redSig
+  int blockredmax = 0;
   #ifdef HAVE_SHIFTBBA
-  int cv; // in shift bases: counting V criterion
-  /*BOOLEAN*/ char rightGB;
+  int cv = 0; // in shift bases: counting V criterion
+  /*BOOLEAN*/ char rightGB = FALSE;
   #endif
-  /*BOOLEAN*/ char interpt;
-  /*BOOLEAN*/ char homog;
+  /*BOOLEAN*/ char interpt = FALSE;
+  /*BOOLEAN*/ char homog = FALSE;
 #ifdef HAVE_PLURAL
-  /*BOOLEAN*/ char z2homog; // Z_2 - homogeneous input allows product criterion in commutative and SCA cases!
+  /*BOOLEAN*/ char z2homog = FALSE; // Z_2 - homogeneous input allows product criterion in commutative and SCA cases!
 #endif
-  /*BOOLEAN*/ char kAllAxis; // all axis are used -> (re)compute noether
-  /*BOOLEAN*/ char honey,sugarCrit;
-  /*BOOLEAN*/ char Gebauer,noTailReduction;
-  /*BOOLEAN*/ char fromT;
-  /*BOOLEAN*/ char noetherSet;
-  /*BOOLEAN*/ char update;
-  /*BOOLEAN*/ char posInLOldFlag;
-  /*BOOLEAN*/ char use_buckets;
+  /*BOOLEAN*/ char kAllAxis = FALSE; // all axis are used -> (re)compute noether
+  /*BOOLEAN*/ char honey = FALSE,sugarCrit = FALSE;
+  /*BOOLEAN*/ char Gebauer = FALSE,noTailReduction = FALSE;
+  /*BOOLEAN*/ char fromT = FALSE;
+  /*BOOLEAN*/ char noetherSet = FALSE;
+  /*BOOLEAN*/ char update = FALSE;
+  /*BOOLEAN*/ char compareLOldFlag = FALSE;
+  /*BOOLEAN*/ char use_buckets = FALSE;
   // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
-  /*BOOLEAN*/ char LDegLast;
+  /*BOOLEAN*/ char LDegLast = FALSE;
   // if set, then L.length == L.pLength
-  /*BOOLEAN*/ char length_pLength;
-  // if set, then posInL does not depend on L.length
-  /*BOOLEAN*/ char posInLDependsOnLength;
-  /*FALSE, if posInL == posInL10*/
+  /*BOOLEAN*/ char length_pLength = FALSE;
+  // if set, then compareInL does not depend on L.length
+  /*BOOLEAN*/ char compareLDependsOnLength = FALSE;
 #ifdef HAVE_PLURAL
   // set this flag to 1 to stop the product criteria
   // use ALLOW_PROD_CRIT(strat) to test
-  /*BOOLEAN*/ char no_prod_crit;
+  /*BOOLEAN*/ char no_prod_crit = FALSE;
 #define ALLOW_PROD_CRIT(A) (!(A)->no_prod_crit)
 #else
 #define ALLOW_PROD_CRIT(A) (1)
 #endif
-  char    redTailChange;
-  char    news;
-  char    newt;/*used for messageSets*/
-  char    noClearS;
-  char    completeReduce_retry;
-  char    overflow;
+  char    redTailChange = FALSE;
+  char    news = FALSE;
+  char    newt = FALSE;/*used for messageSets*/
+  char    noClearS = FALSE;
+  char    completeReduce_retry = FALSE;
+  char    overflow = FALSE;
 
   skStrategy();
   ~skStrategy();
@@ -410,17 +447,34 @@ public:
   KINLINE TObject* s_2_t(int i);
 };
 
+int compareL0 (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL0Ring (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareLSig (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareLSigRing (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL10 (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL11 (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL11Ring (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareLF5C (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareLF5CRing (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL11Ringls (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL110 (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL110Ring (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL13 (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL15 (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL15Ring (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL17 (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL17Ring (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL17_c (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareL17_cRing (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+int compareLSpecial (const LObject &lhs, const LObject &rhs, const kStrategy strat);
+
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
 void deleteHC(LObject* L, kStrategy strat, BOOLEAN fromNext = FALSE);
 void deleteInS (int i,kStrategy strat);
 void cleanT (kStrategy strat);
-static inline LSet initL (int nr=setmaxL)
-{ return (LSet)omAlloc(nr*sizeof(LObject)); }
-void deleteInL(LSet set, int *length, int j,kStrategy strat);
-void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
-void enterSBba (LObject* p,int atS,kStrategy strat, int atR = -1);
-void enterSBbaShift (LObject* p,int atS,kStrategy strat, int atR = -1);
-void enterSSba (LObject* p,int atS,kStrategy strat, int atR = -1);
+void enterSBba (LObject &p,int atS,kStrategy strat, int atR = -1);
+void enterSBbaShift (LObject &p,int atS,kStrategy strat, int atR = -1);
+void enterSSba (LObject &p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (const kStrategy strat, const int length, const poly p,
@@ -451,37 +505,7 @@ int posInT_pLength(const TSet set,const int length,LObject &p);
 
 
 void reorderS (int* suc,kStrategy strat);
-//int posInLF5C (const LSet set, const int length,
-//               LObject* L,const kStrategy strat);
-int posInLSig (const LSet set, const int length,
-               LObject* L,const kStrategy strat);
-int posInLSigRing (const LSet set, const int length,
-               LObject* L,const kStrategy strat);
 int posInSyz (const kStrategy strat, const poly sig);
-int posInL0 (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL11 (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL11Ring (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInLF5CRing (const LSet set, int start , const int length,
-             LObject* L,const kStrategy strat);
-int posInL11Ringls (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL13 (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL15 (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL15Ring (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL17 (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL10 (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL10Ring (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
-int posInL110 (const LSet set, const int length,
-             LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int end_pos,kStrategy strat,BOOLEAN normalize=FALSE);
 KINLINE poly redtailBbaBound (poly p,int end_pos,kStrategy strat,int bound,BOOLEAN normalize=FALSE);
 KINLINE poly redtailBba_Ring (poly p,int end_pos,kStrategy strat);
@@ -522,7 +546,7 @@ void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat);
-void message (int i,int* olddeg,int* reduc,kStrategy strat,int red_result);
+void message (int i,int* olddeg,LSet::size_type* reduc,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);
 void messageStatSBA (int hilbcount,kStrategy strat);
 #ifdef KDEBUG
@@ -548,11 +572,9 @@ void initSLSba (ideal F, ideal Q,kStrategy strat);
 void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
-void enterT (LObject* p,kStrategy strat, int atT = -1);
-#if STDZ_EXCHANGE_DURING_REDUCTIO
-void replaceInLAndSAndT(LObject* p, int tj, kStrategy strat);
-#endif
-void enterT_strong (LObject* p,kStrategy strat, int atT = -1);
+void enterT (LObject &p,kStrategy strat, int atT = -1);
+void replaceInLAndSAndT(LObject &p, int tj, kStrategy strat);
+void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);
@@ -660,8 +682,8 @@ BOOLEAN kTest_S(kStrategy strat);
  ***************************************************************/
 int redFirst (LObject* h,kStrategy strat);
 int redEcart (LObject* h,kStrategy strat);
-void enterSMora (LObject* p,int atS,kStrategy strat, int atR=-1);
-void enterSMoraNF (LObject* p,int atS,kStrategy strat, int atR=-1);
+void enterSMora (LObject &p,int atS,kStrategy strat, int atR=-1);
+void enterSMoraNF (LObject &p,int atS,kStrategy strat, int atR=-1);
 
 
 /***************************************************************
@@ -679,7 +701,7 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound, kStrategy strat, int lazyRed
 void initBba(kStrategy strat);
 void initSba(ideal F,kStrategy strat);
 void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
-          int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
+          int& hilbcount, int& srmax, LSet::size_type& reduc, ideal Q,
           intvec *w,bigintmat *hilb );
 
 /***************************************************************
@@ -849,16 +871,16 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 #include "kernel/GBEngine/shiftgb.h"
 
 #ifdef HAVE_SHIFTBBA
-static inline int kFindInL1(const poly p, const kStrategy strat)
+static inline BOOLEAN kExistsInL1(const poly p, const kStrategy strat)
 {
-  for(int i=strat->Ll;i>=0;i--)
+  for(auto it = strat->L.begin(); it != strat->L.end(); ++it)
   {
-    if (p==strat->L[i].p1) return i;
+    if (p == it->p1) return TRUE;
   }
-  return -1;
+  return FALSE;
 }
 
-void enterTShift(LObject* p, kStrategy strat, int atT = -1);
+void enterTShift(LObject p, kStrategy strat, int atT = -1);
 
 BOOLEAN enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS);
 
