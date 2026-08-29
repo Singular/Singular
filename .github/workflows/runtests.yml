@@ -1,8 +1,39 @@
 name: Run tests
 
-# Trigger the workflow on push or pull request
-on: [push, pull_request]
+# For how to use the workflow_dispatch inputs below (including the
+# interactive-ssh debugging mode), see doc/Debugging-CI.md.
 
+# Trigger the workflow on push or pull request or manual invocation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Repository to check out (owner/name); defaults to this repo'
+        required: false
+        type: 'string'
+        default: ''
+      ref:
+        description: 'Branch, tag, or SHA to check out; defaults to the dispatch ref'
+        required: false
+        type: 'string'
+        default: ''
+      tmate:
+        description: 'At the end, create an ssh target on the test runner and wait for ssh'
+        required: false
+        type: 'boolean'
+        default: 'false'
+      tmate_timeout_minutes:
+        description: 'Minutes to wait for an ssh connection before giving up'
+        required: false
+        type: 'number'
+        default: 10
+      tmate_limit_access_to_actor:
+        description: "Only accept ssh keys from the dispatching user's github.com profile"
+        required: false
+        type: 'boolean'
+        default: true
 env:
   prefix: "/tmp/prefix"
 
@@ -22,6 +53,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          repository: ${{ github.event.inputs.repo || github.repository }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
 
       - name: Show runner info
         run: |
@@ -82,6 +116,12 @@ jobs:
 
       #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Long/ok_l.lst
       #  if: ${{ always() }}
+      - name: Create ssh target on test runner for debugging
+        if: "${{ !cancelled() && github.event.inputs.tmate == 'true' }}"
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: ${{ fromJSON(github.event.inputs.tmate_timeout_minutes) }}
+        with:
+          limit-access-to-actor: ${{ github.event.inputs.tmate_limit_access_to_actor }}
 
   extra:
 
