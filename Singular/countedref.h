@@ -224,7 +224,7 @@ public:
 
     STATIC_VAR unsigned int counter = 0;
     char* name = (char*) omAlloc0(512);
-    sprintf(name, " :%u:%p:_shared_: ", ++counter, head->data);
+    snprintf(name, 512, " :%u:%p:_shared_: ", ++counter, head->data);
     if ((*root) == NULL )
       enterid(name, 0, head->rtyp, root, TRUE, FALSE);
     else
