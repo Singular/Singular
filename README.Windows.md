@@ -105,18 +105,13 @@ small Singular calculation from PowerShell.
 
 ## Signing and Windows warnings
 
-A portable ZIP or unpackaged Win32 executable does not require an Apple-style
+A portable ZIP or unpackaged Win32 executable does not require a
 notarization step.  An unsigned public download can nevertheless trigger
 Microsoft Defender SmartScreen's "unrecognized app" warning, and managed
 enterprise systems may refuse to run it.  For public releases, Authenticode-
 sign the executable and any installer with one consistent, trusted publisher
 identity and timestamp the signatures.  Signing improves publisher identity,
 although new binaries can still need time to acquire SmartScreen reputation.
-
-An MSIX package is different: it must be signed to install.  Microsoft Store
-distribution performs certification and signs an uploaded MSIX package.  The
-portable CI artifact remains unsigned and is intended for testing until a
-release-signing identity and distribution channel are selected.
 
 The packaged dependency licenses must also be preserved.  In particular,
 readline and NTL's GF2X dependency are GPL-3.0-or-later, so public Windows

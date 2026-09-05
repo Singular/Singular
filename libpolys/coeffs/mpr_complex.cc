@@ -42,7 +42,7 @@
 VAR size_t gmp_output_digits= DEFPREC;
 
 STATIC_VAR gmp_float *gmpRel=NULL;
-STATIC_VAR gmp_float *diff=NULL;
+STATIC_VAR gmp_float *gmpDiff=NULL;
 
 
 /** Set size of mantissa
@@ -64,9 +64,9 @@ void setGMPFloatDigits( size_t digits, size_t rest )
   size_t db = bits+rb;
   gmp_output_digits= digits;
   mpf_set_default_prec( db );
-  if (diff!=NULL) delete diff;
-  diff=new gmp_float(0.0);
-  mpf_set_prec(*diff->_mpfp(),32);
+  if (gmpDiff!=NULL) delete gmpDiff;
+  gmpDiff=new gmp_float(0.0);
+  mpf_set_prec(*gmpDiff->_mpfp(),32);
   if (gmpRel!=NULL) delete gmpRel;
   gmpRel=new gmp_float(0.0);
   mpf_set_prec(*gmpRel->_mpfp(),32);
@@ -203,11 +203,11 @@ gmp_float & gmp_float::operator += ( const gmp_float & a )
     return *this;
   }
   mpf_add( t, t, a.t );
-  mpf_set(diff->t, t);
-  mpf_set_prec(diff->t, 32);
-  mpf_div(diff->t, diff->t, a.t);
-  mpf_abs(diff->t, diff->t);
-  if(mpf_cmp(diff->t, gmpRel->t) < 0)
+  mpf_set(gmpDiff->t, t);
+  mpf_set_prec(gmpDiff->t, 32);
+  mpf_div(gmpDiff->t, gmpDiff->t, a.t);
+  mpf_abs(gmpDiff->t, gmpDiff->t);
+  if(mpf_cmp(gmpDiff->t, gmpRel->t) < 0)
     mpf_set_d( t, 0.0);
   return *this;
 }
@@ -224,11 +224,11 @@ gmp_float & gmp_float::operator -= ( const gmp_float & a )
     return *this;
   }
   mpf_sub( t, t, a.t );
-  mpf_set(diff->t, t);
-  mpf_set_prec(diff->t, 32);
-  mpf_div(diff->t, diff->t, a.t);
-  mpf_abs(diff->t, diff->t);
-  if(mpf_cmp(diff->t, gmpRel->t) < 0)
+  mpf_set(gmpDiff->t, t);
+  mpf_set_prec(gmpDiff->t, 32);
+  mpf_div(gmpDiff->t, gmpDiff->t, a.t);
+  mpf_abs(gmpDiff->t, gmpDiff->t);
+  if(mpf_cmp(gmpDiff->t, gmpRel->t) < 0)
     mpf_set_d( t, 0.0);
   return *this;
 }
@@ -240,10 +240,10 @@ bool operator == ( const gmp_float & a, const gmp_float & b )
     return false;
   if((mpf_sgn(a.t)==0) && (mpf_sgn(b.t)==0))
     return true;
-  mpf_sub(diff->t, a.t, b.t);
-  mpf_div(diff->t, diff->t, a.t);
-  mpf_abs(diff->t, diff->t);
-  if(mpf_cmp(diff->t, gmpRel->t) < 0)
+  mpf_sub(gmpDiff->t, a.t, b.t);
+  mpf_div(gmpDiff->t, gmpDiff->t, a.t);
+  mpf_abs(gmpDiff->t, gmpDiff->t);
+  if(mpf_cmp(gmpDiff->t, gmpRel->t) < 0)
     return true;
   else
     return false;
@@ -261,9 +261,9 @@ bool gmp_float::isOne() const
 #else
   if (mpf_sgn(t) <= 0)
     return false;
-  mpf_sub_ui(diff->t, t, 1);
-  mpf_abs(diff->t, diff->t);
-  if(mpf_cmp(diff->t, gmpRel->t) < 0)
+  mpf_sub_ui(gmpDiff->t, t, 1);
+  mpf_abs(gmpDiff->t, gmpDiff->t);
+  if(mpf_cmp(gmpDiff->t, gmpRel->t) < 0)
     return true;
   else
     return false;
@@ -277,9 +277,9 @@ bool gmp_float::isMOne() const
 #else
   if (mpf_sgn(t) >= 0)
     return false;
-  mpf_add_ui(diff->t, t, 1);
-  mpf_abs(diff->t, diff->t);
-  if(mpf_cmp(diff->t, gmpRel->t) < 0)
+  mpf_add_ui(gmpDiff->t, t, 1);
+  mpf_abs(gmpDiff->t, gmpDiff->t);
+  if(mpf_cmp(gmpDiff->t, gmpRel->t) < 0)
     return true;
   else
     return false;
