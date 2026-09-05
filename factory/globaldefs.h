@@ -15,7 +15,7 @@
 #define THREAD_VAR __thread
 #endif
 
-#if (defined _WIN32 || (defined(__CYGWIN__) && defined(DLL_EXPORT)))
+#if (defined _WIN32 || (defined(__CYGWIN__) && defined(DLL_EXPORT))) && !defined(FACTORY_STATIC)
   #ifdef FACTORY_BUILDING_DLL
     #define FACTORY_PUBLIC __declspec(dllexport)
   #else

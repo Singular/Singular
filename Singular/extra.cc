@@ -276,6 +276,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
         if ((h!=NULL) &&(h->Typ()==INT_CMD))
         {
+#ifdef _WIN32
+          WerrorS("system(\"alarm\") is not supported on native Windows");
+          return TRUE;
+#else
           // standard variant -> SIGALARM (standard: abort)
           //alarm((unsigned)h->next->Data());
           // process time (user +system): SIGVTALARM
@@ -284,6 +288,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           t.it_value.tv_sec     =(unsigned)((unsigned long)h->Data());
           setitimer(ITIMER_VIRTUAL,&t,&o);
           return FALSE;
+#endif
         }
         else
           WerrorS("int expected");

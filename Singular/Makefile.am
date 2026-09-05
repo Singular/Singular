@@ -4,7 +4,13 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_b
 
 AM_CXXFLAGS=$(NTL_CPPFLAGS) -fno-delete-null-pointer-checks
 
-all-local: all.lib gftables MOD ${abs_builddir}/LIB Singular$(EXEEXT) ESingular$(EXEEXT) TSingular$(EXEEXT)
+if SING_NATIVE_WIN
+singular_frontends = Singular$(EXEEXT)
+else
+singular_frontends = Singular$(EXEEXT) ESingular$(EXEEXT) TSingular$(EXEEXT)
+endif
+
+all-local: all.lib gftables MOD ${abs_builddir}/LIB $(singular_frontends)
 
 if SING_WIN
 SUBDIRS = ${BUILTIN_MODULES} . dyn_modules
@@ -142,14 +148,22 @@ libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 
 ########################### Singular* #########################
+if SING_NATIVE_WIN
+dist_man1_MANS = Singular.man
+else
 dist_man1_MANS = Singular.man ESingular.man TSingular.man
+endif
 
 EXTRA_PROGRAMS =  libparse
 
 # the "optional_Singular_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
 
+if SING_NATIVE_WIN
+bin_PROGRAMS = Singular $(optional_Singular_programs)
+else
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
+endif
 
 Singular_SOURCES = tesths.cc utils.cc  utils.h
 
@@ -158,7 +172,11 @@ Singular_LDADD = libSingular.la ${OMALLOC_LIBS} ${BUILTIN_FLAGS} $(FACTORY_LIBS)
 Singular_LDFLAGS = ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
+if SING_NATIVE_WIN
+dist_script_SCRIPTS =
+else
 dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win surfex
+endif
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
@@ -244,4 +262,3 @@ MOD:
 
 echoLIBS:
 	@echo ${SLIB0} ${SLIB1} ${SLIB2} ${PLIBS}
-

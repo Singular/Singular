@@ -49,8 +49,10 @@
 #include <errno.h>
 #include <sys/types.h>          /* for portability */
 #include <ctype.h>   /*for isdigit*/
+#ifndef _WIN32
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
+#endif
 
 
 #define SSI_VERSION 16
@@ -1762,6 +1764,16 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
     else if (strcmp(l->mode, "connect") == 0) mode = "connect";
     else mode = "a";
 
+#ifdef _WIN32
+    if ((strcmp(mode,"fork")==0)
+    || (strcmp(mode,"tcp")==0)
+    || (strcmp(mode,"connect")==0))
+    {
+      WerrorS("ssi process and socket links are not supported on native Windows");
+      l->flags=0;
+      return TRUE;
+    }
+#endif
 
     SI_LINK_SET_OPEN_P(l, flag);
     if(l->data!=NULL) omFreeSize(l->data,sizeof(ssiInfo));
@@ -1772,6 +1784,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
     l->data=d;
     if (l->name[0] == '\0')
     {
+#ifndef _WIN32
       if (strcmp(mode,"fork")==0)
       {
         int cpus = (long) feOptValue(FE_OPT_CPUS);
@@ -1954,7 +1967,9 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         si_close(sockfd);
       }
       // no ssi-Link on stdin or stdout
-      else if (strcmp(mode,"string")==0)
+      else
+#endif
+      if (strcmp(mode,"string")==0)
       {
         SI_LINK_SET_RW_OPEN_P(l);
       }
@@ -1971,6 +1986,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
     else /*now l->name!=NULL*/
     {
       // tcp mode
+#ifndef _WIN32
       if(strcmp(mode,"tcp")==0)
       {
         int sockfd, newsockfd, portno, clilen;
@@ -2135,6 +2151,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       }
       // ======================================================================
       else
+#endif
       {
         // normal link to a file
         if (FE_OPT_NO_SHELL_FLAG) {WerrorS("no links allowed");return TRUE;}
@@ -2229,6 +2246,7 @@ BOOLEAN ssiClose(si_link l)
       }
       if (d->f_read!=NULL) { s_close(d->f_read);d->f_read=NULL;}
       if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
+#ifndef _WIN32
       if (((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
       && (d->pid>1))
@@ -2285,6 +2303,7 @@ BOOLEAN ssiClose(si_link l)
           }
         }
       }
+#endif
       omFreeSize((ADDRESS)d,(sizeof *d));
     }
     l->data=NULL;
@@ -2945,6 +2964,7 @@ const char* slStatusSsi(si_link l, const char* request)
   ssiInfo *d=(ssiInfo*)l->data;
   if (d==NULL)
     return "no";
+#ifndef _WIN32
   if (((strcmp(l->mode,"fork")==0)
   ||(strcmp(l->mode,"tcp")==0)
   ||(strcmp(l->mode,"connect")==0))
@@ -3007,7 +3027,9 @@ const char* slStatusSsi(si_link l, const char* request)
       /* else: next char */
     }
   }
-  else if (strcmp(request, "read") == 0)
+  else
+#endif
+  if (strcmp(request, "read") == 0)
   {
     if (SI_LINK_R_OPEN_P(l) && (!s_iseof(d->f_read)) && (s_isready(d->f_read))) return "ready";
     else return "not ready";
@@ -3022,6 +3044,13 @@ const char* slStatusSsi(si_link l, const char* request)
 
 int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
 {
+#ifdef _WIN32
+  (void)L;
+  (void)timeout;
+  (void)ignore;
+  WerrorS("waiting for ssi process and socket links is not supported on native Windows");
+  return -2;
+#else
 // input: L: a list with links of type
 //           ssi-connect, ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
 //           Note: Not every entry in L must be set.
@@ -3222,11 +3251,18 @@ int slStatusSsiL(lists L, int timeout, BOOLEAN *ignore)
   }
   return 0;
 #endif
+#endif
 }
 
 int ssiBatch(const char *host, const char * port)
 /* return 0 on success, >0 else*/
 {
+#ifdef _WIN32
+  (void)host;
+  (void)port;
+  WerrorS("ssi socket links are not supported on native Windows");
+  return 1;
+#else
   si_link l=(si_link) omAlloc0Bin(sip_link_bin);
   char *buf=(char*)omAlloc(256);
   snprintf(buf,256,"ssi:connect %s:%s",host,port);
@@ -3253,8 +3289,23 @@ int ssiBatch(const char *host, const char * port)
   }
   /* never reached*/
   _exit(0);
+#endif
 }
 
+#ifdef _WIN32
+int ssiReservePort(int clients)
+{
+  (void)clients;
+  WerrorS("ssi socket links are not supported on native Windows");
+  return 0;
+}
+
+si_link ssiCommandLink()
+{
+  WerrorS("ssi socket links are not supported on native Windows");
+  return NULL;
+}
+#else
 STATIC_VAR int ssiReserved_P=0;
 STATIC_VAR int ssiReserved_sockfd;
 STATIC_VAR struct sockaddr_in ssiResverd_serv_addr;
@@ -3352,6 +3403,7 @@ si_link ssiCommandLink()
   }
   return l;
 }
+#endif
 /*---------------------------------------------------------------------*/
 /**
  * @brief additional default signal handler

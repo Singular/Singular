@@ -1,0 +1,239 @@
+name: Windows native build (UCRT64) - windows-latest
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ucrt64:
+    runs-on: windows-latest
+    timeout-minutes: 120
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Install MSYS2 UCRT64 toolchain
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            base-devel
+            autoconf
+            automake
+            bison
+            flex
+            libtool
+            perl
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-autotools
+            mingw-w64-ucrt-x86_64-flint
+            mingw-w64-ucrt-x86_64-gmp
+            mingw-w64-ucrt-x86_64-ntl
+            mingw-w64-ucrt-x86_64-ntldd
+            mingw-w64-ucrt-x86_64-readline
+
+      - name: Generate the build system
+        run: ./autogen.sh
+
+      - name: Configure the native build
+        run: |
+          mkdir build-windows
+          cd build-windows
+          ../configure \
+            --prefix="$PWD/../install-windows" \
+            --disable-shared \
+            --enable-static \
+            --disable-gfanlib \
+            --with-ntl=yes \
+            --with-flint=yes \
+            --with-readline=static \
+            --without-python \
+            --disable-python
+
+      - name: Build and install
+        run: |
+          make -C build-windows -j2
+          make -C build-windows install
+
+      - name: Verify the native executable and installation
+        run: |
+          set -eu
+          test -x install-windows/bin/Singular.exe
+          test -f install-windows/share/singular/LIB/standard.lib
+          test -n "$(find install-windows/share/factory/gftables -type f -print -quit)"
+          test -x install-windows/libexec/singular/MOD/change_cost.exe
+          test -x install-windows/libexec/singular/MOD/solve_IP.exe
+          test -x install-windows/libexec/singular/MOD/toric_ideal.exe
+          test ! -e install-windows/bin/ESingular.exe
+          grep -q '^#define HAVE_FLINT 1' build-windows/_config.h
+          grep -q '^#define HAVE_NTL 1' build-windows/_config.h
+          grep -q '^#define HAVE_READLINE 1' build-windows/_config.h
+
+          file install-windows/bin/Singular.exe
+          objdump -p install-windows/bin/Singular.exe \
+            | sed -n 's/^[[:space:]]*DLL Name: /DLL: /p'
+
+          if objdump -p install-windows/bin/Singular.exe \
+              | grep -Eqi 'DLL Name: (msys-2\.0|cygwin1)\.dll'; then
+            echo 'Singular.exe unexpectedly depends on MSYS or Cygwin' >&2
+            exit 1
+          fi
+
+          smoke_output="$(printf '%s\n' \
+            'LIB "general.lib";' \
+            'ring r=0,(x,y),dp;' \
+            'ideal i=x^2,y^2;' \
+            'std(i);' \
+            'factorize(x^6-y^6);' \
+            'print("WINDOWS_NATIVE_SMOKE_OK");' \
+            'quit;' \
+            | install-windows/bin/Singular.exe -q 2>&1)"
+          printf '%s\n' "$smoke_output"
+          grep -q 'WINDOWS_NATIVE_SMOKE_OK' <<< "$smoke_output"
+          if grep -Eqi 'cannot open|not found|error occurred' <<< "$smoke_output"; then
+            echo 'Native Windows smoke test reported an error' >&2
+            exit 1
+          fi
+
+      - name: Assemble a portable runtime bundle
+        run: |
+          set -eu
+          runtime_dir="$PWD/install-windows/bin"
+          license_dir="$PWD/install-windows/THIRD_PARTY_LICENSES"
+          package_manifest="$license_dir/runtime-packages.txt"
+          mkdir -p "$license_dir"
+          cp COPYING README.Windows.md install-windows/
+          printf '%s\n' \
+            "Singular source commit: $GITHUB_SHA" \
+            "Source: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA" \
+            > install-windows/SOURCE.txt
+
+          declare -a queue=()
+          declare -A inspected=()
+          declare -A documented_packages=()
+
+          while IFS= read -r -d '' binary; do
+            queue+=("$(dirname "$binary")"$'\t'"$binary")
+          done < <(find install-windows -type f -iname '*.exe' -print0)
+
+          while ((${#queue[@]})); do
+            entry="${queue[0]}"
+            queue=("${queue[@]:1}")
+            destination_dir="${entry%%$'\t'*}"
+            binary="${entry#*$'\t'}"
+            key="${destination_dir,,}|$(basename "${binary,,}")"
+            if [[ -n "${inspected[$key]:-}" ]]; then
+              continue
+            fi
+            inspected[$key]=1
+
+            while IFS= read -r dll; do
+              source="$(find "$MINGW_PREFIX/bin" -maxdepth 1 -type f \
+                -iname "$dll" -print -quit)"
+              if [[ -z "$source" ]]; then
+                continue
+              fi
+
+              destination="$destination_dir/$(basename "$source")"
+              if [[ ! -f "$destination" ]]; then
+                cp "$source" "$destination"
+                queue+=("$destination_dir"$'\t'"$destination")
+              fi
+
+              package="$(pacman -Qoq "$source")"
+              if [[ -n "$package" && -z "${documented_packages[$package]:-}" ]]; then
+                documented_packages[$package]=1
+                pacman -Q "$package" >> "$package_manifest"
+
+                while IFS= read -r license; do
+                  [[ "$license" = /* ]] || license="/$license"
+                  if [[ -f "$license" ]]; then
+                    relative="${license#${MINGW_PREFIX}/share/licenses/}"
+                    if [[ "$relative" != "$license" ]]; then
+                      mkdir -p "$license_dir/$(dirname "$relative")"
+                      cp "$license" "$license_dir/$relative"
+                    fi
+                  fi
+                done < <(pacman -Qlq "$package" \
+                  | sed -n '\|/share/licenses/|p')
+              fi
+            done < <(objdump -p "$binary" \
+              | sed -n 's/^[[:space:]]*DLL Name: //p')
+          done
+
+          LC_ALL=C sort -u -o "$package_manifest" "$package_manifest"
+
+          if find install-windows -type f \
+              \( -iname 'msys-2.0.dll' -o -iname 'cygwin1.dll' \) \
+              | grep -q .; then
+            echo 'Portable bundle unexpectedly contains MSYS or Cygwin' >&2
+            exit 1
+          fi
+
+          while IFS= read -r -d '' binary; do
+            binary_dir="$(dirname "$binary")"
+            if ! dependency_report="$(PATH="$binary_dir:/c/Windows/System32:/c/Windows" \
+                "$MINGW_PREFIX/bin/ntldd.exe" -R "$binary" 2>&1)"; then
+              printf '%s\n' "$dependency_report" >&2
+              echo "Portable binary has an unresolved dependency: $binary" >&2
+              exit 1
+            fi
+            printf '%s\n' "$binary"
+            printf '%s\n' "$dependency_report"
+            if grep -Eqi 'msys-2\.0\.dll|cygwin1\.dll|=> not found' \
+                <<< "$dependency_report"; then
+              echo "Portable binary has an invalid dependency: $binary" >&2
+              exit 1
+            fi
+          done < <(find install-windows -type f -iname '*.exe' -print0)
+
+          objdump -p "$runtime_dir/Singular.exe" \
+            | sed -n 's/^[[:space:]]*DLL Name: /DLL: /p'
+          find install-windows -type f -iname '*.dll' -print \
+            | LC_ALL=C sort
+
+      - name: Test the portable bundle without MSYS2 on PATH
+        shell: pwsh
+        run: |
+          $testBundle = Join-Path $PWD "portable test ü"
+          New-Item -ItemType Directory -Path $testBundle | Out-Null
+          Copy-Item "install-windows\*" $testBundle -Recurse
+          $bundle = (Resolve-Path $testBundle).Path
+          $env:Path = "$bundle\bin;$env:SystemRoot\System32;$env:SystemRoot"
+          $inputScript = @(
+            'LIB "general.lib";'
+            'ring r=0,(x,y),dp;'
+            'ideal i=x^2,y^2;'
+            'std(i);'
+            'factorize(x^6-y^6);'
+            'print("WINDOWS_PORTABLE_SMOKE_OK");'
+            'quit;'
+          ) -join "`n"
+
+          $output = $inputScript | & "$bundle\bin\Singular.exe" -q 2>&1
+          $singularExit = $LASTEXITCODE
+          $outputText = $output | Out-String
+          Write-Host $outputText
+          if ($singularExit -ne 0) {
+            throw "Portable Singular exited with status $singularExit"
+          }
+          if (-not $outputText.Contains("WINDOWS_PORTABLE_SMOKE_OK")) {
+            throw "Portable Singular smoke-test marker is missing"
+          }
+
+      - name: Upload the portable Windows bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-windows-ucrt64
+          path: install-windows/
+          if-no-files-found: error

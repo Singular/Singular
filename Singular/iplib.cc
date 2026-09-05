@@ -25,7 +25,7 @@
 
 #if SIZEOF_LONG == 8
 #define SI_MAX_NEST 500
-#elif defined(__CYGWIN__)
+#elif defined(_WIN32)
 #define SI_MAX_NEST 480
 #else
 #define SI_MAX_NEST 1000
@@ -33,7 +33,7 @@
 
 #if defined(ix86Mac_darwin) || defined(x86_64Mac_darwin) || defined(ppcMac_darwin)
 #  define MODULE_SUFFIX bundle
-#elif defined(__CYGWIN__)
+#elif defined(_WIN32)
 #  define MODULE_SUFFIX dll
 #else
 #  define MODULE_SUFFIX so
