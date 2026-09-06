@@ -121,7 +121,7 @@ int64 getInvEps64(ideal G,intvec *targm,int pertdeg)
 
   //overflow test
   if( sum64!=0 && (((inveps64-1)/sum64)!=getMaxTdeg(G)) )
-    overflow_error=11;
+    ::overflow_error=11;
 
   return(inveps64);
 }
@@ -224,7 +224,7 @@ void getTaun64(ideal G,intvec* targm,int pertdeg, int64vec** v64, int64 & i64)
       for(int i=0; i<rVar(currRing);i++)
       {
         if((*temp64)[i]!=0 && (((*taun64)[i])/((*temp64)[i]))!=inveps64)
-        overflow_error=12;
+        ::overflow_error=12;
       }
       delete temp64;
     }
@@ -236,12 +236,12 @@ void getTaun64(ideal G,intvec* targm,int pertdeg, int64vec** v64, int64 & i64)
       if( ( ((*temp64)[i]) > 0 ) && ( ((*add64)[i]) > 0 ) )
       {
         if( ((*taun64)[i]) < ((*temp64)[i])  )
-          overflow_error=13;
+          ::overflow_error=13;
       }
       if( ( ((*temp64)[i]) < 0 ) && ( ((*add64)[i]) < 0 ) )
       {
         if( ((*taun64)[i]) > ((*temp64)[i])  )
-          overflow_error=13;
+          ::overflow_error=13;
       }
     }
     delete temp64;
@@ -272,14 +272,14 @@ static inline int64  scalarProduct64(int64vec* a, int64vec* b)
   for(i=n-1; i>=0; i--)
   {
     temp1=(*a)[i] * (*b)[i];
-    if((*a)[i]!=0 && (temp1/(*a)[i])!=(*b)[i]) overflow_error=1;
+    if((*a)[i]!=0 && (temp1/(*a)[i])!=(*b)[i]) ::overflow_error=1;
 
     temp2=result;
     result += temp1;
 
     //since both vectors always have nonnegative entries in init64
     //result should be >=temp2
-    if(temp2>result) overflow_error=2;
+    if(temp2>result) ::overflow_error=2;
   }
 
   return result;
@@ -495,12 +495,12 @@ void gett64(intvec* listw, int64vec* currw64, int64vec* targw64, int64 &tvec0, i
     zaehler64=temp3-temp4;
 
     //overflow test
-    if(temp1!=0 && (temp4/temp1)!=temp2) overflow_error=3;
+    if(temp1!=0 && (temp4/temp1)!=temp2) ::overflow_error=3;
 
     if( ( temp3<0 && temp4>0 ) || ( temp3>0 && temp4<0 ) )
     {
       int64 abs_t3=abs64(temp3);
-      if( (abs_t3+abs64(temp4))<abs_t3 ) overflow_error=4;
+      if( (abs_t3+abs64(temp4))<abs_t3 ) ::overflow_error=4;
     }
 
     //overflow test
@@ -513,7 +513,7 @@ void gett64(intvec* listw, int64vec* currw64, int64vec* targw64, int64 &tvec0, i
     nenner64=temp3+temp4;
 
     //overflow test
-    if(temp1!=0 && ((temp1*temp2)/temp1)!=temp2) overflow_error=5;
+    if(temp1!=0 && ((temp1*temp2)/temp1)!=temp2) ::overflow_error=5;
 
     if( (temp3>0 && temp4>0) ||
       (temp3<0 && temp4<0)    )
@@ -521,7 +521,7 @@ void gett64(intvec* listw, int64vec* currw64, int64vec* targw64, int64 &tvec0, i
       int64 abs_t3=abs64(temp3);
       if( (abs_t3+abs64(temp4))<abs_t3 )
       {
-        overflow_error=6;
+        ::overflow_error=6;
       }
     }
   }
@@ -618,7 +618,7 @@ int64vec* nextw64(int64vec* currw, int64vec* targw,
     if( (nexttvec0) !=0 &&
         (((*a)[i])/(nexttvec0))!=((*tempv)[i]) )
     {
-      overflow_error=7;
+      ::overflow_error=7;
       break;
     }
   }
@@ -631,7 +631,7 @@ int64vec* nextw64(int64vec* currw, int64vec* targw,
     if( (nexttvec1) !=0 &&
         (((*b)[i])/(nexttvec1))!=((*tempv)[i]) )
     {
-      overflow_error=8;
+      ::overflow_error=8;
       break;
     }
   }
@@ -647,7 +647,7 @@ int64vec* nextw64(int64vec* currw, int64vec* targw,
           (abs64((*b)[i]))>abs64((*nextweight)[i])
         )
       {
-        overflow_error=9;
+        ::overflow_error=9;
         break;
       }
     }
