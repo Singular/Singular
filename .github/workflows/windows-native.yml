@@ -36,6 +36,7 @@ jobs:
             perl
             mingw-w64-ucrt-x86_64-toolchain
             mingw-w64-ucrt-x86_64-autotools
+            mingw-w64-ucrt-x86_64-cddlib
             mingw-w64-ucrt-x86_64-flint
             mingw-w64-ucrt-x86_64-gmp
             mingw-w64-ucrt-x86_64-ntl
@@ -53,7 +54,8 @@ jobs:
             --prefix="$PWD/../install-windows" \
             --disable-shared \
             --enable-static \
-            --disable-gfanlib \
+            --enable-gfanlib \
+            --with-builtinmodules=gfanlib \
             --with-ntl=yes \
             --with-flint=yes \
             --with-readline=static \
@@ -76,8 +78,11 @@ jobs:
           test -x install-windows/libexec/singular/MOD/toric_ideal.exe
           test ! -e install-windows/bin/ESingular.exe
           grep -q '^#define HAVE_FLINT 1' build-windows/_config.h
+          grep -q '^#define HAVE_GFANLIB 1' build-windows/_config.h
           grep -q '^#define HAVE_NTL 1' build-windows/_config.h
           grep -q '^#define HAVE_READLINE 1' build-windows/_config.h
+          grep -Eq '^#define SI_BUILTINMODULES_ADD\(add\).*add\(gfanlib\)' \
+            build-windows/_config.h
 
           file install-windows/bin/Singular.exe
           objdump -p install-windows/bin/Singular.exe \
@@ -91,6 +96,10 @@ jobs:
 
           smoke_output="$(printf '%s\n' \
             'LIB "general.lib";' \
+            'LIB "gfan.lib";' \
+            'intmat rays[2][2]=1,0,0,1;' \
+            'cone c=coneViaPoints(rays);' \
+            'print("GFANLIB_DIM="+string(dimension(c)));' \
             'ring r=0,(x,y),dp;' \
             'ideal i=x^2,y^2;' \
             'std(i);' \
@@ -99,6 +108,7 @@ jobs:
             'quit;' \
             | install-windows/bin/Singular.exe -q 2>&1)"
           printf '%s\n' "$smoke_output"
+          grep -q 'GFANLIB_DIM=2' <<< "$smoke_output"
           grep -q 'WINDOWS_NATIVE_SMOKE_OK' <<< "$smoke_output"
           if grep -Eqi 'cannot open|not found|error occurred' <<< "$smoke_output"; then
             echo 'Native Windows smoke test reported an error' >&2
@@ -212,6 +222,10 @@ jobs:
           $env:Path = "$bundle\bin;$env:SystemRoot\System32;$env:SystemRoot"
           $inputScript = @(
             'LIB "general.lib";'
+            'LIB "gfan.lib";'
+            'intmat rays[2][2]=1,0,0,1;'
+            'cone c=coneViaPoints(rays);'
+            'print("GFANLIB_DIM="+string(dimension(c)));'
             'ring r=0,(x,y),dp;'
             'ideal i=x^2,y^2;'
             'std(i);'
@@ -229,6 +243,9 @@ jobs:
           }
           if (-not $outputText.Contains("WINDOWS_PORTABLE_SMOKE_OK")) {
             throw "Portable Singular smoke-test marker is missing"
+          }
+          if (-not $outputText.Contains("GFANLIB_DIM=2")) {
+            throw "Portable Singular gfanlib smoke test failed"
           }
 
       - name: Upload the portable Windows bundle
