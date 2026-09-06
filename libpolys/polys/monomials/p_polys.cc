@@ -47,6 +47,7 @@
 #endif
 
 #include "clapsing.h"
+#include "polys/flint_mpoly.h"
 
 /*
  * lift ideal with coeffs over Z (mod N) to Q via Farey
@@ -2200,7 +2201,7 @@ static poly p_Pow(poly p, int i, const ring r)
       return pres;
     }
   }
-  else if ((>17) && rField_is_Zp(r))
+  else if ((i>17) && rField_is_Zp(r))
   {
     nmod_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
@@ -2208,7 +2209,7 @@ static poly p_Pow(poly p, int i, const ring r)
       nmod_mpoly_t pp,res;
       convSingPFlintMP(pp,ctx,p,pLength(p),r);
       nmod_mpoly_init(res,ctx);
-      fq_nmod_mpoly_pow_ui(res,pp,i,ctx);
+      nmod_mpoly_pow_ui(res,pp,i,ctx);
       poly pres=convFlintMPSingP(res,ctx,r);
       nmod_mpoly_clear(res,ctx);
       nmod_mpoly_clear(pp,ctx);
