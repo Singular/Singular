@@ -1,0 +1,74 @@
+diff --git a/src/spasm_compat.h b/src/spasm_compat.h
+new file mode 100644
+index 0000000..04c85bc
+--- /dev/null
++++ b/src/spasm_compat.h
+@@ -0,0 +1,39 @@
++#ifndef SPASM_COMPAT_H
++#define SPASM_COMPAT_H
++
++#ifdef _WIN32
++#include <errno.h>
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++static inline void spasm_compat_err(int status, const char *format, ...)
++{
++	int saved_errno = errno;
++	va_list arguments;
++	va_start(arguments, format);
++	vfprintf(stderr, format, arguments);
++	va_end(arguments);
++	fprintf(stderr, ": %s", strerror(saved_errno));
++	fputc('\n', stderr);
++	exit(status);
++}
++
++static inline void spasm_compat_errx(int status, const char *format, ...)
++{
++	va_list arguments;
++	va_start(arguments, format);
++	vfprintf(stderr, format, arguments);
++	va_end(arguments);
++	fputc('\n', stderr);
++	exit(status);
++}
++
++#define err spasm_compat_err
++#define errx spasm_compat_errx
++#else
++#include <err.h>
++#endif
++
++#endif
+diff --git a/src/spasm_io.c b/src/spasm_io.c
+index 033b946..45c93e4 100644
+--- a/src/spasm_io.c
++++ b/src/spasm_io.c
+@@ -3 +3 @@
+-#include <err.h>
++#include "spasm_compat.h"
+diff --git a/src/spasm_util.c b/src/spasm_util.c
+index 6de3c94..971e1e0 100644
+--- a/src/spasm_util.c
++++ b/src/spasm_util.c
+@@ -0,0 +1,3 @@
++#ifdef _WIN32
++#include <windows.h>
++#else
+@@ -2 +5,2 @@
+-#include <err.h>
++#endif
++#include "spasm_compat.h"
+@@ -22,0 +27,7 @@ double spasm_wtime() {
++#ifdef _WIN32
++	LARGE_INTEGER frequency;
++	LARGE_INTEGER counter;
++	QueryPerformanceFrequency(&frequency);
++	QueryPerformanceCounter(&counter);
++	return (double)counter.QuadPart / (double)frequency.QuadPart;
++#else
+@@ -25,0 +37 @@ double spasm_wtime() {
++#endif

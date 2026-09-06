@@ -105,6 +105,14 @@ installed executable has no `msys-2.0.dll` or `cygwin1.dll` dependency,
 assembles the portable runtime bundle, removes MSYS2 from `PATH`, and runs a
 small Singular calculation from PowerShell.
 
+A separate
+`Windows native build with SpaSM (UCRT64) - windows-latest` workflow runs for
+pushes, pull requests, and published GitHub Releases, and can also be started
+manually.  It builds SpaSM 1.2 as a patched native static library, links
+`sispasm` into Singular, tests a SpaSM matrix conversion under MSYS2 and from
+the portable PowerShell environment, and uploads the result as the
+`singular-windows-ucrt64` workflow artifact.
+
 ## Signing and Windows warnings
 
 A portable ZIP or unpackaged Win32 executable does not require a
@@ -116,10 +124,10 @@ identity and timestamp the signatures.  Signing improves publisher identity,
 although new binaries can still need time to acquire SmartScreen reputation.
 
 The packaged dependency licenses must also be preserved.  In particular,
-cddlib is GPL-2.0-or-later, while readline and NTL's GF2X dependency are
-GPL-3.0-or-later, so public Windows bundles should use Singular's GPL version 3
-licensing option.  The workflow records exact package versions and collects
-the installed runtime license files into `THIRD_PARTY_LICENSES`.  A public
-binary release must also make the corresponding source for that exact Singular
-build and its bundled GPL/LGPL dependencies available in the manner required
-by those licenses.
+cddlib and SpaSM 1.2 are GPL-2.0-or-later, while readline and NTL's GF2X
+dependency are GPL-3.0-or-later, so public Windows bundles should use
+Singular's GPL version 3 licensing option.  The workflow records exact package
+versions and collects the installed runtime license files into
+`THIRD_PARTY_LICENSES`.  A public binary release must also make the
+corresponding source for that exact Singular build and its bundled GPL/LGPL
+dependencies available in the manner required by those licenses.
