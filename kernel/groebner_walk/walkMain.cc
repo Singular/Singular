@@ -228,7 +228,7 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
   SI_SAVE_OPT1(save1);
 
   si_opt_1|=Sy_bit(OPT_REDTAIL);
-  overflow_error=FALSE;
+  ::overflow_error=FALSE;
   int step=0;
   ideal G=I;
 
@@ -246,7 +246,7 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
   state=firstWalkStep64(G,currw64,destRing);
   nextG=G;
 
-  if(overflow_error)
+  if(::overflow_error)
   {
     state=WalkOverFlowError;
     return(state);
@@ -274,7 +274,7 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
     state=walkStep64(nextG,currw64);
     //uppdates nextG if all is OK
 
-    if(overflow_error)
+    if(::overflow_error)
       return(WalkOverFlowError);
 
     //delete nexttvec64;
@@ -460,7 +460,7 @@ while(1){
   int64 tvec0,tvec1;
   nextt64(G,w,w2,tvec0,tvec1);
 
-  if(overflow_error){
+  if(::overflow_error){
     return WalkOverFlowError;
   }
 
@@ -482,7 +482,7 @@ while(1){
       //tvec64=nextt64(G,w,w2);
       nextt64(G,w,w2,tvec0,tvec1);
 
-      if(overflow_error){
+      if(::overflow_error){
         return WalkOverFlowError;
       }
 
@@ -616,7 +616,7 @@ ideal & destIdeal,BOOLEAN sourceIsSB,
 BOOLEAN unperturbedStartVectorStrategy)
 {
 
-  overflow_error=FALSE; //global
+  ::overflow_error=FALSE; //global
   WalkState state=WalkOk;
   BITSET save1;
   SI_SAVE_OPT1(save1);
@@ -650,7 +650,7 @@ BOOLEAN unperturbedStartVectorStrategy)
   if(state==WalkOk)
     destIdeal=G;
 
-  if(overflow_error)
+  if(::overflow_error)
     state=WalkOverFlowError;
 
   delete currw64;
