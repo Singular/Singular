@@ -2181,18 +2181,87 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   return res;
 }
 
+#ifdef HAVE_FLINT
+#if __FLINT_RELEASE >= 20503
+/*
+ * Estimate the affine dimension d of the exponent support from the number of
+ * varying variables.  Ordinary homogeneous support satisfies one additional
+ * affine relation.  This is an upper bound when the support satisfies further
+ * relations, so an inexact estimate only delays switching to FLINT.
+ *
+ * Singular's generic p_Pow performs i - 1 polynomial multiplications, whereas
+ * FLINT's sparse FPS powering has leading work proportional to 2*t*length(p^i),
+ * where t = length(p).  With length(p^k) growing like k^d, the asymptotic
+ * crossover is i = 2*(d + 1).  The additive 20/t term accounts for conversion
+ * and setup costs observed in small examples.
+ */
+static BOOLEAN p_UseFlintPowerQ(poly p, const int i, int &length,
+                                const ring r)
+{
+  unsigned char *varies =
+    (unsigned char *)omAlloc0(r->N * sizeof(unsigned char));
+  const poly first = p;
+  unsigned long long first_degree = 0;
+
+  for (int v = 1; v <= r->N; v++)
+    first_degree += (unsigned long long)p_GetExp(first, v, r);
+
+  int varying_variables = 0;
+  BOOLEAN homogeneous = TRUE;
+  length = 1;
+  pIter(p);
+  while (p != NULL)
+  {
+    unsigned long long degree = 0;
+    length++;
+    for (int v = 1; v <= r->N; v++)
+    {
+      const long e = p_GetExp(p, v, r);
+      degree += (unsigned long long)e;
+      if ((varies[v - 1] == 0) && (e != p_GetExp(first, v, r)))
+      {
+        varies[v - 1] = 1;
+        varying_variables++;
+      }
+    }
+    if (degree != first_degree)
+      homogeneous = FALSE;
+    pIter(p);
+  }
+  omFreeSize((ADDRESS)varies, r->N * sizeof(unsigned char));
+
+  int support_dimension = varying_variables;
+  if (homogeneous && (support_dimension > 0))
+    support_dimension--;
+  if (support_dimension >= length)
+    support_dimension = length - 1;
+
+  return ((long long)i * length
+          > (long long)(2 * (support_dimension + 1)) * length + 20);
+}
+#endif
+#endif
+
 static poly p_Pow(poly p, int i, const ring r)
 {
   #ifdef HAVE_FLINT
   #if __FLINT_RELEASE >= 20503
-  if ((i>16) && rField_is_Q(r))
+  int flint_length = 0;
+  // Previous fixed-exponent selector conditions:
+  // if ((i>16) && rField_is_Q(r))
+  // else if ((i>17) && rField_is_Zp(r))
+  if ((i > 4) && rField_is_Q(r)
+      && (rRing_ord_pure_dp(r) || rRing_ord_pure_Dp(r)
+          || rRing_ord_pure_lp(r))
+      && p_UseFlintPowerQ(p, i, flint_length, r))
   {
     fmpq_mpoly_ctx_t ctx;
     if (!convSingRFlintR(ctx,r))
     {
       fmpq_mpoly_t pp,res;
       fmpq_mpoly_init(res,ctx);
-      convSingPFlintMP(pp,ctx,p,pLength(p),r);
+      convSingPFlintMP(pp,ctx,p,flint_length,r);
+      p_Delete(&p,r);
       fmpq_mpoly_pow_ui(res,pp,i,ctx);
       poly pres=convFlintMPSingP(res,ctx,r);
       fmpq_mpoly_clear(res,ctx);
@@ -2208,6 +2277,7 @@ static poly p_Pow(poly p, int i, const ring r)
     {
       nmod_mpoly_t pp,res;
       convSingPFlintMP(pp,ctx,p,pLength(p),r);
+      p_Delete(&p,r);
       nmod_mpoly_init(res,ctx);
       nmod_mpoly_pow_ui(res,pp,i,ctx);
       poly pres=convFlintMPSingP(res,ctx,r);
