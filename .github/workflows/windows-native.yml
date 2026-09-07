@@ -77,7 +77,7 @@ jobs:
       - name: Test CRLF library loading
         run: |
           cd Tst
-          ./regress.cmd -s ../install-windows/bin/Singular.exe Short/crlf_lib.tst
+          perl ./regress.cmd -s ../install-windows/bin/Singular.exe Short/crlf_lib.tst
 
       - name: Verify the native executable and installation
         run: |
