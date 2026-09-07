@@ -18,6 +18,7 @@
 #include "Singular/sdb.h"
 
 #include "misc/mylimits.h"
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef HAVE_PWD_H
@@ -695,6 +696,13 @@ Voice * feInitStdin(Voice *pp)
     }
     else
       p->sw = BI_stdin;
+  }
+  if (p->sw==BI_file)
+  {
+    struct stat statbuf;
+    if ((fstat(STDIN_FILENO,&statbuf)!=0)
+    ||  (!S_ISREG(statbuf.st_mode)))
+      p->ftellptr=-1;
   }
   p->filename   = omStrDup("STDIN");
   p->start_lineno   = 1;
