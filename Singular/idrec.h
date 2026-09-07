@@ -20,7 +20,7 @@ union uutypes
   poly          p;
   number        n;
   ideal         uideal;
-  ::map         umap;
+  map           umap;
   matrix        umatrix;
   char *        ustring;
   intvec *      iv;

@@ -64,6 +64,13 @@ jobs:
 
       - name: Build and install
         run: |
+          make -C build-windows/factory factory.h
+          grep -q '^extgcd (' build-windows/factory/factory.h
+          if grep -q '^#include "cfUnivarGcd.h"' \
+              build-windows/factory/factory.h; then
+            echo 'Factory public header generation retained a private include' >&2
+            exit 1
+          fi
           make -C build-windows -j2
           make -C build-windows install
 
