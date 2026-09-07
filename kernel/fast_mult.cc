@@ -320,7 +320,7 @@ poly multifastmult(poly f, poly g, ring r)
         dg=max(dg,p_GetExp(p,i,r));
         p=pNext(p);
       }
-      int crit=min(df,dg);
+      int crit=::min(df,dg);
       if (crit>can_crit)
       {
         can_crit=crit;
