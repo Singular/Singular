@@ -1,3 +1,11 @@
 *.gz.uu diff=gz.uu
 .git* export-ignore
 /Tst/ export-ignore
+
+# factory/bin/makeheader matches marker lines literally.  Keep both the
+# generator inputs and the headers containing its public-section markers in
+# Unix format, including in native Windows checkouts.
+/factory/factory.template text eol=lf
+/factory/factoryconf.template text eol=lf
+/factory/*.h text eol=lf
+/factory/bin/makeheader text eol=lf
