@@ -11787,7 +11787,15 @@ static BOOLEAN enterOneStrongPolyShift (poly q, poly p, int /*ecart*/, int /*isF
 * put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i] (ring case)
 */
 #ifdef HAVE_SHIFTBBA
-static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, kStrategy strat, int atR, int /*ecartq*/, int qisFromQ, int shiftcount, int ifromS)
+static BOOLEAN canUseProductCriterionRingShift(poly p, poly q)
+{
+  // Disjoint reductions commute after unit normalization, but not for modules.
+  return pGetComp(p) == 0 && pGetComp(q) == 0
+    && n_IsUnit(pGetCoeff(p), currRing->cf)
+    && n_IsUnit(pGetCoeff(q), currRing->cf);
+}
+
+static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int /*isFromQ*/, kStrategy strat, int atR, int /*ecartq*/, int /*qisFromQ*/, int shiftcount, int ifromS)
 {
   /* assume(atR >= 0); */
   /* assume(i<=strat->sl); */
@@ -11813,14 +11821,13 @@ static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, k
     nDelete(&t);
   }
   #endif
-  int      j,compare,compareCoeff;
   LObject  h;
 
 #ifdef KDEBUG
   h.ecart=0; h.length=0;
 #endif
-  /*- computes the lcm(s[i],p) -*/
-  if(pHasNotCFRing(p,q))
+  if ((canUseProductCriterionRingShift(p,q) && pHasNotCF(p,q))
+      || pHasNotCFRing(p,q))
   {
       strat->cp++;
       return;
@@ -11841,66 +11848,9 @@ static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, k
     pLmDelete(h.lcm);
     return;
   }
-  // basic chain criterion
-  /*
-  *the set B collects the pairs of type (S[j],p)
-  *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
-  *if the leading term of s divides lcm(r,p) then (r,p) will be canceled
-  *if the leading term of r divides lcm(s,p) then (s,p) will not enter B
-  */
-
-  for(j = strat->Bl;j>=0;j--)
-  {
-    compare=pDivCompRing(strat->B[j].lcm,h.lcm);
-    compareCoeff = n_DivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(h.lcm), currRing->cf);
-    if(compare == pDivComp_EQUAL)
-    {
-      //They have the same LM
-      if(compareCoeff == pDivComp_LESS)
-      {
-        if ((strat->fromQ==NULL) || (isFromQ==0) || (qisFromQ==0))
-        {
-          strat->c3++;
-          pLmDelete(h.lcm);
-          return;
-        }
-        break;
-      }
-      if(compareCoeff == pDivComp_GREATER)
-      {
-        deleteInL(strat->B,&strat->Bl,j,strat);
-        strat->c3++;
-      }
-      if(compareCoeff == pDivComp_EQUAL)
-      {
-        if ((strat->fromQ==NULL) || (isFromQ==0) || (qisFromQ==0))
-        {
-          strat->c3++;
-          pLmDelete(h.lcm);
-          return;
-        }
-        break;
-      }
-    }
-    if(compareCoeff == compare || compareCoeff == pDivComp_EQUAL)
-    {
-      if(compare == pDivComp_LESS)
-      {
-        if ((strat->fromQ==NULL) || (isFromQ==0) || (qisFromQ==0))
-        {
-          strat->c3++;
-          pLmDelete(h.lcm);
-          return;
-        }
-        break;
-      }
-      if(compare == pDivComp_GREATER)
-      {
-        deleteInL(strat->B,&strat->Bl,j,strat);
-        strat->c3++;
-      }
-    }
-  }
+  // B contains pairs with different shifts of the new polynomial. LCM
+  // divisibility alone does not justify the commutative chain criterion here:
+  // it can discard every overlap needed to preserve the input ideal (#1263).
   number s, t;
   poly m1, m2, gcd = NULL;
   s = pGetCoeff(q);
@@ -11980,6 +11930,7 @@ static void enterOnePairRingShift (poly q, poly p, int /*ecart*/, int isFromQ, k
   h.i_r = -1;
   if(h.p == NULL)
   {
+    pLmDelete(h.lcm);
     /* TEMPORARILY DISABLED FOR SHIFTS because there is no i*/
     /* if (strat->pairtest==NULL) initPairtest(strat); */
     /* strat->pairtest[i] = TRUE; */
@@ -12081,7 +12032,8 @@ static BOOLEAN enterOnePairWithShifts (int q_inS /*also i*/, poly q, poly p, int
       delete_pair=FALSE;
   }
 
-  if (rField_is_Ring(currRing) && p_lastVblock >= firstShift && p_lastVblock <= maxPossibleShift)
+  if (rField_is_Ring(currRing) && !canUseProductCriterionRingShift(p,q)
+      && p_lastVblock >= firstShift && p_lastVblock <= maxPossibleShift)
   {
     // add pairs (m*shifts(q), p) where m is a monomial and the pair has no overlap
     for (int j = p_lastVblock; j <= maxPossibleShift; j++)
@@ -12574,7 +12526,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
                   if(!enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i))
                     delete_hh=FALSE;
                 }
-                else if (rField_is_Ring(currRing))
+                else if (rField_is_Ring(currRing)
+                         && !canUseProductCriterionRingShift(h,s))
                 {
                   assume(i >= s_lastVblock); // this is always the case, but just to be very sure
                   ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
@@ -12612,7 +12565,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
             if (i < s_lastVblock || (pGetComp(s) > 0 && i == s_lastVblock)) // in the module case, product criterion does not hold (note: comp h is always zero here)
               delete_hh=enterOnePairWithoutShifts(j, hh, s, ecart, isFromQ, strat, atR, s_lastVblock, i)
                 && delete_hh;
-            else if (rField_is_Ring(currRing))
+            else if (rField_is_Ring(currRing)
+                     && !canUseProductCriterionRingShift(h,s))
             {
               assume(i >= s_lastVblock); // this is always the case, but just to be very sure
               ideal fillers = id_MaxIdeal(i - s_lastVblock, currRing);
@@ -12627,7 +12581,8 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
           if (i < h_lastVblock) // in the module case, product criterion does not hold (note: comp h is always zero here)
             delete_hh=enterOnePairWithoutShifts(-1, hh, h, ecart, isFromQ, strat, atR, h_lastVblock, i)
               && delete_hh;
-          else if (rField_is_Ring(currRing))
+          else if (rField_is_Ring(currRing)
+                   && !canUseProductCriterionRingShift(h,h))
           {
             assume(i >= h_lastVblock); // this is always the case, but just to be very sure
             ideal fillers = id_MaxIdeal(i - h_lastVblock, currRing);
