@@ -34,6 +34,7 @@ jobs:
             flex
             libtool
             perl
+            sharutils
             mingw-w64-ucrt-x86_64-toolchain
             mingw-w64-ucrt-x86_64-autotools
             mingw-w64-ucrt-x86_64-cddlib
