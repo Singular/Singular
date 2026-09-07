@@ -120,6 +120,7 @@ bug_tr873
 bug_tr874
 bug_genus_etc
 conv_bi
+crlf_lib
 ; divrem2
 enumnf
 facstd
