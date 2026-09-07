@@ -897,7 +897,11 @@ BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOO
   char libnamebuf[1024];
   idhdl pl;
   char *plib = iiConvName(newlib);
-  FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
+  // Procedure offsets are later used with a binary stream in
+  // iiGetLibProcBuffer.  Scan in binary mode as well, otherwise the Windows
+  // CRT's CRLF translation makes the recorded offsets point into the wrong
+  // parts of the library file.
+  FILE * fp = feFopen( newlib, "rb", libnamebuf, tellerror );
   // int lines = 1;
   BOOLEAN LoadResult = TRUE;
 

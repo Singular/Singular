@@ -121,6 +121,11 @@ jobs:
           make -C build-windows -j2
           make -C build-windows install
 
+      - name: Test CRLF library loading
+        run: |
+          cd Tst
+          ./regress.cmd -s ../install-windows/bin/Singular.exe Short/crlf_lib.tst
+
       - name: Verify the native executable and installation
         run: |
           set -eu
