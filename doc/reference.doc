@@ -85,6 +85,7 @@ and @code{LIB} no brackets are allowed.
 * ERROR::
 * example::
 * execute::
+* Experimental kernel interfaces::
 * extgcd::
 * facstd::
 * factmodd::
@@ -1865,7 +1866,7 @@ example intvec_declarations;
 @ref{help}
 @c ref
 @c ---------------------------------------
-@node execute, extgcd, example, Functions
+@node execute, Experimental kernel interfaces, example, Functions
 @subsection execute
 @cindex execute
 @table @code
@@ -1896,7 +1897,492 @@ provide in the future).
 @end smallexample
 @end table
 @c ---------------------------------------
-@node extgcd, facstd, execute, Functions
+@node Experimental kernel interfaces, extgcd, execute, Functions
+@subsection Experimental kernel interfaces
+@cindex experimental kernel interfaces
+
+The commands in this subsection provide explicit access to selected kernel
+algorithms.  They are never selected implicitly by the corresponding standard
+operations.
+
+@menu
+* bitSubst::
+* ccluster::
+* coeffTerm::
+* divrem::
+* evaluateAt::
+* fastMult::
+* fglmCombination::
+* HNF::
+* idealDivRem::
+* intvecMatchingSegments::
+* intvecOverlap::
+* loadBigint::
+* locNF::
+* matrixMinpoly::
+* minresWithMap::
+* powerWithAlgorithm::
+* probIrredTest::
+* subring::
+@end menu
+
+@c ---------------------------------------
+@node bitSubst, ccluster, , Experimental kernel interfaces
+@subsubsection bitSubst
+@cindex bitSubst
+@table @code
+@item @strong{Syntax:}
+@code{bitSubst (} poly_expression@code{,} poly_expression @code{)}
+@item @strong{Type:}
+poly
+@item @strong{Purpose:}
+substitutes the second polynomial for the first ring variable in the first
+polynomial.  After each intermediate multiplication, every positive exponent
+of a monomial is replaced by one.  The first polynomial must involve only the
+first ring variable, and the basering must have a global ordering.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  bitSubst(x3+x+1,x+y);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node ccluster, coeffTerm, bitSubst, Experimental kernel interfaces
+@subsubsection ccluster
+@cindex ccluster
+@table @code
+@item @strong{Syntax:}
+@code{ccluster (} poly_expression@code{,} number_expression@code{,}
+number_expression@code{,} number_expression@code{,} number_expression @code{)}
+@*@code{ccluster (} poly_expression@code{,} poly_expression@code{,}
+number_expression@code{,} number_expression@code{,} number_expression@code{,}
+number_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+computes certified clusters of complex roots in a square box.  In the first
+form the polynomial has real coefficients.  In the second form, the first two
+polynomials are its real and imaginary parts.  The four numbers specify the
+real and imaginary parts of the box center, the box width, and the target
+precision.  Each returned list contains the real center, imaginary center,
+and multiplicity of one cluster.  Polynomial arguments must involve only the
+first ring variable.  This command is available only in builds with FLINT and
+ccluster support.
+@*This is experimental.
+@end table
+
+@c ---------------------------------------
+@node coeffTerm, divrem, ccluster, Experimental kernel interfaces
+@subsubsection coeffTerm
+@cindex coeffTerm
+@table @code
+@item @strong{Syntax:}
+@code{coeffTerm (} poly_expression@code{,} poly_expression @code{)}
+@*@code{coeffTerm (} vector_expression@code{,} vector_expression @code{)}
+@*@code{coeffTerm (} ideal_expression@code{,} poly_expression @code{)}
+@*@code{coeffTerm (} module_expression@code{,} vector_expression @code{)}
+@*@code{coeffTerm (} vector_expression@code{,} poly_expression @code{)}
+@*@code{coeffTerm (} module_expression@code{,} poly_expression @code{)}
+@*@code{coeffTerm (} vector_expression@code{,} ideal_expression @code{)}
+@*@code{coeffTerm (} vector_expression@code{,} module_expression @code{)}
+@item @strong{Type:}
+number for two polynomial or two vector arguments; otherwise ideal, module,
+or vector according to the first argument
+@item @strong{Purpose:}
+extracts the coefficient or coefficients belonging to the term or collection
+of terms in the second argument.  For an ideal or module, extraction is
+performed in every generator.  For a vector with a polynomial second
+argument, one coefficient is returned in each vector component.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  coeffTerm(x2+3xy+2,xy);
+  vector v=[x2+2xy,xy+3];
+  coeffTerm(v,xy);
+  ideal I=x2+3xy+2,xy+1;
+  coeffTerm(I,xy);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node divrem, evaluateAt, coeffTerm, Experimental kernel interfaces
+@subsubsection divrem
+@cindex divrem
+@table @code
+@item @strong{Syntax:}
+@code{divrem (} poly_expression@code{,} poly_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+returns a list @code{q,r} such that @code{f=g*q+r}, where @code{f} and
+@code{g} are the first and second arguments.  Division by zero is an error.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  poly f=(x+1)*(x+y)+1;
+  list qr=divrem(f,x+1);
+  qr;
+  f==(x+1)*qr[1]+qr[2];
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node evaluateAt, fastMult, divrem, Experimental kernel interfaces
+@subsubsection evaluateAt
+@cindex evaluateAt
+@table @code
+@item @strong{Syntax:}
+@code{evaluateAt (} poly_expression@code{,} number_expression@code{,...)}
+@item @strong{Type:}
+number
+@item @strong{Purpose:}
+evaluates a polynomial at a point.  Exactly one coordinate for every ring
+variable must be supplied; integer coordinates are converted to coefficients
+of the basering.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  evaluateAt(x3+xy+1,2,3);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node fastMult, fglmCombination, evaluateAt, Experimental kernel interfaces
+@subsubsection fastMult
+@cindex fastMult
+@table @code
+@item @strong{Syntax:}
+@code{fastMult (} poly_expression@code{,} poly_expression@code{,}
+@code{"univariate"} @code{)}
+@item @strong{Type:}
+poly
+@item @strong{Purpose:}
+multiplies two polynomials using the divide-and-conquer univariate kernel
+algorithm.  Both polynomials must involve only the first ring variable.  This
+algorithm is used only when explicitly requested; ordinary multiplication is
+unchanged.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=32003,x,dp;
+  fastMult(x80+x10+1,x70+x20+2,"univariate");
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node fglmCombination, HNF, fastMult, Experimental kernel interfaces
+@subsubsection fglmCombination
+@cindex fglmCombination
+@table @code
+@item @strong{Syntax:}
+@code{fglmCombination (} ideal_expression@code{,} poly_expression @code{)}
+@item @strong{Type:}
+poly
+@item @strong{Purpose:}
+finds a linear dependence between the normal forms, modulo the standard basis
+in the first argument, of the monomials occurring in the second argument.
+It returns the corresponding polynomial, or zero when no dependence is found.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=32003,(x,y),dp;
+  ideal G=std(x2+y,x+y2);
+  attrib(G,"isSB",1);
+  fglmCombination(G,x2+xy+y2+x+y+1);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node HNF, idealDivRem, fglmCombination, Experimental kernel interfaces
+@subsubsection HNF
+@cindex HNF
+@table @code
+@item @strong{Syntax:}
+@code{HNF (} matrix_expression @code{)}
+@*@code{HNF (} intmat_expression @code{)}
+@*@code{HNF (} bigintmat_expression @code{)}
+@item @strong{Type:}
+the type of the argument
+@item @strong{Purpose:}
+computes the Hermite normal form of a square matrix.  A polynomial matrix must
+have constant entries over @math{Q}.  This command is available only in builds
+with NTL or FLINT support.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  if (defined(HNF))
+  {
+    intmat A[2][2]=2,4,6,8;
+    HNF(A);
+  }
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node idealDivRem, intvecMatchingSegments, HNF, Experimental kernel interfaces
+@subsubsection idealDivRem
+@cindex idealDivRem
+@table @code
+@item @strong{Syntax:}
+@code{idealDivRem (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{idealDivRem (} ideal_expression@code{,} ideal_expression@code{,}
+@code{"withUnit"} @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+For ideals @code{A,B}, the first form returns @code{R,Q} satisfying
+@code{matrix(A)=matrix(B)*Q+matrix(R)}.  The second form returns @code{R,Q,U}
+satisfying @code{matrix(A)*matrix(U)=matrix(B)*matrix(Q)+matrix(R)}.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  ideal A=x3+y3+xy,x2y+y;
+  ideal B=std(x,y2);
+  list d=idealDivRem(A,B);
+  matrix(A)==matrix(B)*d[2]+matrix(d[1]);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node intvecMatchingSegments, intvecOverlap, idealDivRem, Experimental kernel interfaces
+@subsubsection intvecMatchingSegments
+@cindex intvecMatchingSegments
+@table @code
+@item @strong{Syntax:}
+@code{intvecMatchingSegments (} intvec_expression@code{,} intvec_expression @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+returns all one-based positions at which the second non-empty intvec occurs as
+a consecutive segment of the first.  It returns @code{0} when there is no
+match.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  intvecMatchingSegments(intvec(1,2,1,2,1),intvec(1,2));
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node intvecOverlap, loadBigint, intvecMatchingSegments, Experimental kernel interfaces
+@subsubsection intvecOverlap
+@cindex intvecOverlap
+@table @code
+@item @strong{Syntax:}
+@code{intvecOverlap (} intvec_expression@code{,} intvec_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+returns the length of the longest suffix of the first non-empty intvec which
+is also a prefix of the second.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  intvecOverlap(intvec(1,2,3,4),intvec(3,4,5));
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node loadBigint, locNF, intvecOverlap, Experimental kernel interfaces
+@subsubsection loadBigint
+@cindex loadBigint
+@table @code
+@item @strong{Syntax:}
+@code{loadBigint (} string_expression @code{)}
+@item @strong{Type:}
+bigint
+@item @strong{Purpose:}
+reads a base-10 integer from the named file and returns it as a bigint.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+  loadBigint("integer.txt");
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node locNF, matrixMinpoly, loadBigint, Experimental kernel interfaces
+@subsubsection locNF
+@cindex locNF
+@table @code
+@item @strong{Syntax:}
+@code{locNF (} vector_expression@code{,} module_expression@code{,}
+int_expression@code{,} intvec_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+performs the weighted, degree-truncated local reduction used by
+@code{KVequiv.lib}.  The module must be a standard basis.  The degree must be
+non-negative, and the intvec must contain one weight for every ring variable.
+The result consists of the normal-form matrix and the transformation matrix.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),ds;
+  vector f=[x2+y,xy+1];
+  module M=std([x,0],[0,y]);
+  attrib(M,"isSB",1);
+  locNF(f,M,10,intvec(1,1));
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node matrixMinpoly, minresWithMap, locNF, Experimental kernel interfaces
+@subsubsection matrixMinpoly
+@cindex matrixMinpoly
+@table @code
+@item @strong{Syntax:}
+@code{matrixMinpoly (} matrix_expression @code{)}
+@item @strong{Type:}
+poly
+@item @strong{Purpose:}
+computes the minimal polynomial of a non-empty square matrix with constant
+entries over a prime field.  The result is expressed in the first ring
+variable.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=32003,x,dp;
+  matrix M[2][2]=1,1,0,1;
+  matrixMinpoly(M);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node minresWithMap, powerWithAlgorithm, matrixMinpoly, Experimental kernel interfaces
+@subsubsection minresWithMap
+@cindex minresWithMap
+@table @code
+@item @strong{Syntax:}
+@code{resolution_expression, module_expression = minresWithMap (}
+resolution_expression @code{)}
+@item @strong{Type:}
+resolution, module
+@item @strong{Purpose:}
+minimizes a copy of a resolution and also returns the transformation computed
+by the minimization kernel.  The input resolution is not modified.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  ideal I=x2,xy,y2;
+  resolution R=mres(I,0);
+  resolution M; module T;
+  M,T=minresWithMap(R);
+  betti(M);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node powerWithAlgorithm, probIrredTest, minresWithMap, Experimental kernel interfaces
+@subsubsection powerWithAlgorithm
+@cindex powerWithAlgorithm
+@table @code
+@item @strong{Syntax:}
+@code{powerWithAlgorithm (} poly_expression@code{,} int_expression@code{,}
+string_expression @code{)}
+@item @strong{Type:}
+poly
+@item @strong{Purpose:}
+raises a polynomial to a non-negative power using the explicitly selected
+algorithm.  The algorithm may be @code{"fast"}, @code{"standard"}, or
+@code{"multinomial"}.  The multinomial algorithm requires characteristic
+zero, an exponent of at least two, and a polynomial with at least two terms.
+The ordinary power operator is unchanged.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  powerWithAlgorithm(x+y+1,5,"fast")==((x+y+1)^5);
+  powerWithAlgorithm(x+y+1,5,"multinomial")==((x+y+1)^5);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node probIrredTest, subring, powerWithAlgorithm, Experimental kernel interfaces
+@subsubsection probIrredTest
+@cindex probIrredTest
+@table @code
+@item @strong{Syntax:}
+@code{probIrredTest (} poly_expression@code{,} string_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+performs a probabilistic irreducibility test over a prime field with the error
+probability specified by a string between @code{"0"} and @code{"1"}.  It
+returns @code{1} for irreducible, @code{-1} for reducible, and @code{0} when
+the test is not applicable.  The underlying algorithm is intended for small
+characteristics.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=3,(x,y),dp;
+  probIrredTest(x2+xy+y2+1,"0.1");
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node subring, , probIrredTest, Experimental kernel interfaces
+@subsubsection subring
+@cindex subring
+@table @code
+@item @strong{Syntax:}
+@code{subring (} ring_variable@code{,...)}
+@item @strong{Type:}
+ring
+@item @strong{Purpose:}
+constructs a ring with the coefficient domain and ordering induced by the
+current basering and with the listed ring variables.
+@*This is experimental.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  def s=subring(x,z);
+  setring s;
+  basering;
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node extgcd, facstd, Experimental kernel interfaces, Functions
 @subsection extgcd
 @cindex extgcd
 
@@ -7926,6 +8412,66 @@ argument depends on the command. See below for a list of all possible
 commands.
 @item @strong{Note:}
 Not all functions work on every platform.
+@item @strong{Experimental system functions:}
+The following system functions expose experimental settings and diagnostics.
+They use the same one-level calling convention as the other system functions.
+@table @asis
+@c ..........................
+@item @code{system("setsyzcomp",} int @code{)}
+@cindex system, setsyzcomp
+sets the syzygy component of the current ring, which must use an
+@code{s}-ordering.  This is experimental.
+@c ..........................
+@item @code{system("gcd")}
+@itemx @code{system("gcd",} string@code{,} int @code{)}
+@cindex system, gcd
+prints the states of the experimental GCD algorithm flags, or sets one of
+them.  The supported strings are @code{"EZGCD"}, @code{"EZGCD_P"},
+@code{"CRGCD"}, and, except on Cygwin, @code{"homog"}.  A zero integer
+disables the flag; any other integer enables it.  This is experimental.
+@c ..........................
+@item @code{system("NCUseExtensions")}
+@itemx @code{system("NCUseExtensions",} int @code{)}
+@cindex system, NCUseExtensions
+returns the noncommutative extension mask, or sets it and returns its previous
+value.  This is available only in builds with noncommutative support.  This is
+experimental.
+@c ..........................
+@item @code{system("NCGetType")}
+@cindex system, NCGetType
+returns the internal type of the current noncommutative ring, or @code{-1} for
+a commutative ring.  This is available only in builds with noncommutative
+support.  This is experimental.
+@c ..........................
+@item @code{system("ForceSCA",} int@code{,} int @code{)}
+@cindex system, ForceSCA
+sets the exterior-variable range of the current noncommutative ring.  This is
+available only in builds with noncommutative support.  This is experimental.
+@c ..........................
+@item @code{system("ForceNewNCMultiplication")}
+@cindex system, ForceNewNCMultiplication
+selects the special-pair multiplication implementation for an eligible
+noncommutative ring.  This is available only in builds with noncommutative
+support.  This is experimental.
+@c ..........................
+@item @code{system("ForceNewOldNCMultiplication")}
+@cindex system, ForceNewOldNCMultiplication
+selects the special-powers multiplication implementation for an eligible
+noncommutative ring.  This is available only in builds with noncommutative
+support.  This is experimental.
+@c ..........................
+@item @code{system("cache_chinrem")}
+@itemx @code{system("cache_chinrem",} int @code{)}
+@cindex system, cache_chinrem
+prints the current setting for caching inverses during Chinese remaindering.
+With an integer argument, it subsequently sets the new value.  This is
+experimental.
+@c ..........................
+@item @code{system("mults")}
+@cindex system, mults
+returns the diagnostic counter maintained by the fast multiplication kernel.
+This is experimental.
+@end table
 @item @strong{Functions:}
 @table @asis
 @c ..........................

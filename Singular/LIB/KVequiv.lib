@@ -620,8 +620,8 @@ EXAMPLE:@code{example lft_vf;} gives an example
     {
       "reducing mt[i], i="+string(i);
     }
-   mt[i]=system("locNF",vector(mt[i]),mmx,
-                        (b+1)*(b+2)*counter,riv)[1][1,1];
+   mt[i]=locNF(vector(mt[i]),mmx,
+               (b+1)*(b+2)*counter,riv)[1][1,1];
   }
   mt=simplify(mt,10);
 //----------------------------------------------------------------------------

@@ -1427,6 +1427,7 @@ void siInit(char *name)
   basePackHdl=h;
 
   coeffs_BIGINT = nInitChar(n_Q,(void*)1);
+  iiInitExtraCprocs();
 
 #if 1
    // def HAVE_POLYEXTENSIONS

@@ -163,6 +163,8 @@
 #ifndef MAKE_DISTRIBUTION
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
+static BOOLEAN jjEXPERIMENTAL_SYSTEM(leftv res, leftv h,
+                                     BOOLEAN *handled);
 EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 
 /* expects a SINGULAR square matrix with number entries
@@ -2361,10 +2363,15 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #endif
   /*================= Extended system call ========================*/
     {
+       BOOLEAN handled;
+       const BOOLEAN error =
+         jjEXPERIMENTAL_SYSTEM(res, args, &handled);
+       if (handled) return error;
        #ifndef MAKE_DISTRIBUTION
        return(jjEXTENDED_SYSTEM(res, args));
        #else
        Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
+       return TRUE;
        #endif
     }
   } /* typ==string */
@@ -2471,18 +2478,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           return FALSE;
         }
         else
+  /* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
   /*==================== setsyzcomp ==================================*/
-      if(strcmp(sys_cmd,"setsyzcomp")==0)
-      {
-        if ((h!=NULL) && (h->Typ()==INT_CMD))
-        {
-          int k = (int)(long)h->Data();
-          if ( currRing->order[0] == ringorder_s )
-          {
-            rSetSyzComp(k, currRing);
-          }
-        }
-      }
+//      if(strcmp(sys_cmd,"setsyzcomp")==0)
+//      {
+//        if ((h!=NULL) && (h->Typ()==INT_CMD))
+//        {
+//          int k = (int)(long)h->Data();
+//          if ( currRing->order[0] == ringorder_s )
+//          {
+//            rSetSyzComp(k, currRing);
+//            return FALSE;
+//          }
+//        }
+//      }
   /*==================== ring debug ==================================*/
         if(strcmp(sys_cmd,"r")==0)
         {
@@ -3144,13 +3153,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
-      if (strcmp(sys_cmd, "mults")==0)
-      {
-        res->rtyp=INT_CMD ;
-        res->data=(void*)(long) Mults();
-        return(FALSE);
-      }
-      else
+  /* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
+//      if (strcmp(sys_cmd, "mults")==0)
+//      {
+//        res->rtyp=INT_CMD ;
+//        res->data=(void*)(long) Mults();
+//        return(FALSE);
+//      }
+//      else
       if (strcmp(sys_cmd, "fastpower")==0)
       {
         ring r = currRing;
@@ -3194,45 +3204,46 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
+  /* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
   /*==================== gcd-varianten =================*/
-      if (strcmp(sys_cmd, "gcd") == 0)
-      {
-        if (h==NULL)
-        {
-        #if 0
-          Print("FLINT_P:%d (use Flints gcd for polynomials in char p)\n",isOn(SW_USE_FL_GCD_P));
-          Print("FLINT_0:%d (use Flints gcd for polynomials in char 0)\n",isOn(SW_USE_FL_GCD_0));
-        #endif
-          Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
-          Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
-          Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
-          #ifndef __CYGWIN__
-          Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
-          #endif
-          return FALSE;
-        }
-        else
-        if ((h!=NULL) && (h->Typ()==STRING_CMD)
-        && (h->next!=NULL) && (h->next->Typ()==INT_CMD))
-        {
-          int d=(int)(long)h->next->Data();
-          char *s=(char *)h->Data();
-        #if 0
-          if (strcmp(s,"FLINT_P")==0) { if (d) On(SW_USE_FL_GCD_P); else Off(SW_USE_FL_GCD_P); } else
-          if (strcmp(s,"FLINT_0")==0) { if (d) On(SW_USE_FL_GCD_0); else Off(SW_USE_FL_GCD_0); } else
-        #endif
-          if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
-          if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
-          if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
-          #ifndef __CYGWIN__
-          if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
-          #endif
-          return TRUE;
-          return FALSE;
-        }
-        else return TRUE;
-      }
-      else
+//      if (strcmp(sys_cmd, "gcd") == 0)
+//      {
+//        if (h==NULL)
+//        {
+//        #if 0
+//          Print("FLINT_P:%d (use Flints gcd for polynomials in char p)\n",isOn(SW_USE_FL_GCD_P));
+//          Print("FLINT_0:%d (use Flints gcd for polynomials in char 0)\n",isOn(SW_USE_FL_GCD_0));
+//        #endif
+//          Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
+//          Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
+//          Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
+//          #ifndef __CYGWIN__
+//          Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
+//          #endif
+//          return FALSE;
+//        }
+//        else
+//        if ((h!=NULL) && (h->Typ()==STRING_CMD)
+//        && (h->next!=NULL) && (h->next->Typ()==INT_CMD))
+//        {
+//          int d=(int)(long)h->next->Data();
+//          char *s=(char *)h->Data();
+//        #if 0
+//          if (strcmp(s,"FLINT_P")==0) { if (d) On(SW_USE_FL_GCD_P); else Off(SW_USE_FL_GCD_P); } else
+//          if (strcmp(s,"FLINT_0")==0) { if (d) On(SW_USE_FL_GCD_0); else Off(SW_USE_FL_GCD_0); } else
+//        #endif
+//          if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
+//          if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
+//          if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
+//          #ifndef __CYGWIN__
+//          if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
+//          #endif
+//          return TRUE;
+//          return FALSE;
+//        }
+//        else return TRUE;
+//      }
+//      else
   /*==================== subring =================*/
       if (strcmp(sys_cmd, "subring") == 0)
       {
@@ -3490,80 +3501,85 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
+/* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
 /* ============ NCUseExtensions ======================== */
-  #ifdef HAVE_PLURAL
-    if(strcmp(sys_cmd,"NCUseExtensions")==0)
-    {
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-        res->data=(void *)(long)setNCExtensions( (int)((long)(h->Data())) );
-      else
-        res->data=(void *)(long)getNCExtensions();
-      res->rtyp=INT_CMD;
-      return FALSE;
-    }
-    else
-  #endif
+//  #ifdef HAVE_PLURAL
+//    if(strcmp(sys_cmd,"NCUseExtensions")==0)
+//    {
+//      if ((h!=NULL) && (h->Typ()==INT_CMD))
+//        res->data=(void *)(long)setNCExtensions( (int)((long)(h->Data())) );
+//      else
+//        res->data=(void *)(long)getNCExtensions();
+//      res->rtyp=INT_CMD;
+//      return FALSE;
+//    }
+//    else
+//  #endif
 /* ============ NCGetType ======================== */
-  #ifdef HAVE_PLURAL
-    if(strcmp(sys_cmd,"NCGetType")==0)
-    {
-      res->rtyp=INT_CMD;
-      if( rIsPluralRing(currRing) )
-        res->data=(void *)(long)ncRingType(currRing);
-      else
-        res->data=(void *)(-1L);
-      return FALSE;
-    }
-    else
-  #endif
+/* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
+//  #ifdef HAVE_PLURAL
+//    if(strcmp(sys_cmd,"NCGetType")==0)
+//    {
+//      res->rtyp=INT_CMD;
+//      if( rIsPluralRing(currRing) )
+//        res->data=(void *)(long)ncRingType(currRing);
+//      else
+//        res->data=(void *)(-1L);
+//      return FALSE;
+//    }
+//    else
+//  #endif
 /* ============ ForceSCA ======================== */
-  #ifdef HAVE_PLURAL
-    if(strcmp(sys_cmd,"ForceSCA")==0)
-    {
-      if( !rIsPluralRing(currRing) )
-        return TRUE;
-      int b, e;
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-        b = (int)((long)(h->Data()));
-        h=h->next;
-      }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-        e = (int)((long)(h->Data()));
-      }
-      else return TRUE;
-      if( !sca_Force(currRing, b, e) )
-        return TRUE;
-      return FALSE;
-    }
-    else
-  #endif
+/* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
+//  #ifdef HAVE_PLURAL
+//    if(strcmp(sys_cmd,"ForceSCA")==0)
+//    {
+//      if( !rIsPluralRing(currRing) )
+//        return TRUE;
+//      int b, e;
+//      if ((h!=NULL) && (h->Typ()==INT_CMD))
+//      {
+//        b = (int)((long)(h->Data()));
+//        h=h->next;
+//      }
+//      else return TRUE;
+//      if ((h!=NULL) && (h->Typ()==INT_CMD))
+//      {
+//        e = (int)((long)(h->Data()));
+//      }
+//      else return TRUE;
+//      if( !sca_Force(currRing, b, e) )
+//        return TRUE;
+//      return FALSE;
+//    }
+//    else
+//  #endif
 /* ============ ForceNewNCMultiplication ======================== */
-  #ifdef HAVE_PLURAL
-    if(strcmp(sys_cmd,"ForceNewNCMultiplication")==0)
-    {
-      if( !rIsPluralRing(currRing) )
-        return TRUE;
-      if( !ncInitSpecialPairMultiplication(currRing) ) // No Plural!
-        return TRUE;
-      return FALSE;
-    }
-    else
-  #endif
+/* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
+//  #ifdef HAVE_PLURAL
+//    if(strcmp(sys_cmd,"ForceNewNCMultiplication")==0)
+//    {
+//      if( !rIsPluralRing(currRing) )
+//        return TRUE;
+//      if( ncInitSpecialPairMultiplication(currRing) ) // No Plural!
+//        return TRUE;
+//      return FALSE;
+//    }
+//    else
+//  #endif
 /* ============ ForceNewOldNCMultiplication ======================== */
-  #ifdef HAVE_PLURAL
-    if(strcmp(sys_cmd,"ForceNewOldNCMultiplication")==0)
-    {
-      if( !rIsPluralRing(currRing) )
-        return TRUE;
-      if( !ncInitSpecialPowersMultiplication(currRing) ) // Enable Formula for Plural (depends on swiches)!
-        return TRUE;
-      return FALSE;
-    }
-    else
-  #endif
+/* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
+//  #ifdef HAVE_PLURAL
+//    if(strcmp(sys_cmd,"ForceNewOldNCMultiplication")==0)
+//    {
+//      if( !rIsPluralRing(currRing) )
+//        return TRUE;
+//      if( !ncInitSpecialPowersMultiplication(currRing) ) // Enable Formula for Plural (depends on swiches)!
+//        return TRUE;
+//      return FALSE;
+//    }
+//    else
+//  #endif
 /*==================== test64 =================*/
   #if 0
     if(strcmp(sys_cmd,"test64")==0)
@@ -3587,16 +3603,17 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
    #endif
+/* Handled by jjEXPERIMENTAL_SYSTEM in all builds. */
 /*==================== n_SwitchChinRem =================*/
-    if(strcmp(sys_cmd,"cache_chinrem")==0)
-    {
-      EXTERN_VAR int n_SwitchChinRem;
-      Print("caching inverse in chines remainder:%d\n",n_SwitchChinRem);
-      if ((h!=NULL)&&(h->Typ()==INT_CMD))
-        n_SwitchChinRem=(int)(long)h->Data();
-      return FALSE;
-    }
-    else
+//    if(strcmp(sys_cmd,"cache_chinrem")==0)
+//    {
+//      EXTERN_VAR int n_SwitchChinRem;
+//      Print("caching inverse in chines remainder:%d\n",n_SwitchChinRem);
+//      if ((h!=NULL)&&(h->Typ()==INT_CMD))
+//        n_SwitchChinRem=(int)(long)h->Data();
+//      return FALSE;
+//    }
+//    else
 /*==================== LU for bigintmat =================*/
 #ifdef SINGULAR_4_2
     if(strcmp(sys_cmd,"LU")==0)
@@ -4069,3 +4086,1075 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 }
 
 #endif // HAVE_EXTENDED_SYSTEM
+
+/* Release-visible interfaces for selected algorithms which used to be
+ * reachable only through jjEXTENDED_SYSTEM.  Keep this section independent
+ * of that dispatcher so distribution and development builds use the same
+ * public implementation. */
+#include "kernel/fglm/fglm.h"
+#include "kernel/maps/gen_maps.h"
+
+static BOOLEAN jjExtraRequireRing(const char *name)
+{
+  if (currRing != NULL) return FALSE;
+  Werror("%s requires a basering", name);
+  return TRUE;
+}
+
+static BOOLEAN jjExtraIsPoly(leftv value)
+{
+  if (value == NULL) return FALSE;
+  if (value->Typ() == POLY_CMD) return TRUE;
+  if (value->Typ() != BUCKET_CMD) return FALSE;
+  return p_MaxComp(sBucketPeek((sBucket_pt)value->Data()), currRing) == 0;
+}
+
+static poly jjExtraPoly(leftv value)
+{
+  if (value->Typ() == BUCKET_CMD)
+    return sBucketPeek((sBucket_pt)value->Data());
+  return (poly)value->Data();
+}
+
+static BOOLEAN jjExtraIsVector(leftv value)
+{
+  if (value == NULL) return FALSE;
+  if (value->Typ() == VECTOR_CMD) return TRUE;
+  if (value->Typ() != BUCKET_CMD) return FALSE;
+  return p_MaxComp(sBucketPeek((sBucket_pt)value->Data()), currRing) > 0;
+}
+
+static BOOLEAN jjExtraIsUnivariateInFirst(poly p)
+{
+  while (p != NULL)
+  {
+    if (p_GetComp(p, currRing) != 0) return FALSE;
+    for (int i = 2; i <= currRing->N; i++)
+      if (p_GetExp(p, i, currRing) != 0) return FALSE;
+    pIter(p);
+  }
+  return TRUE;
+}
+
+static BOOLEAN jjExtraLocNF(leftv res, leftv h)
+{
+  const short t[] = {4, VECTOR_CMD, MODUL_CMD, INT_CMD, INTVEC_CMD};
+  if (jjExtraRequireRing("locNF") || !iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected `locNF(vector,module,int,intvec)`");
+    return TRUE;
+  }
+
+  poly f = (poly)h->Data();
+  ideal m = (ideal)h->next->Data();
+  const int degree = (int)(long)h->next->next->Data();
+  intvec *weights = (intvec*)h->next->next->next->Data();
+  const int generators = IDELEMS(m);
+  if ((degree < 0) || (weights->length() != currRing->N))
+  {
+    Werror("locNF requires a non-negative degree and %d weights",
+           currRing->N);
+    return TRUE;
+  }
+  if (generators == 0)
+  {
+    WerrorS("locNF requires a non-empty module");
+    return TRUE;
+  }
+  assumeStdFlag(h->next);
+
+  int *weightArray = iv2array(weights, currRing);
+  poly remainder = NULL;
+  poly work = ppJetW(f, degree, weightArray);
+  int j = 0;
+  matrix transformation = mp_InitI(generators, 1, 0, currRing);
+
+  while (work != NULL)
+  {
+    if ((m->m[j] != NULL) && pDivisibleBy(m->m[j], work))
+    {
+      poly factor = pDivideM(pHead(work), pHead(m->m[j]));
+      MATELEM(transformation, j + 1, 1) =
+        pAdd(MATELEM(transformation, j + 1, 1), factor);
+      work = ppJetW(ksOldSpolyRed(m->m[j], work, 0), degree, weightArray);
+      j = 0;
+    }
+    else if (j == generators - 1)
+    {
+      remainder = pAdd(remainder, pHead(work));
+      work = pLmDeleteAndNext(work);
+      j = 0;
+    }
+    else
+      j++;
+  }
+
+  ideal remainderIdeal = id_Vec2Ideal(remainder, currRing);
+  matrix temp = mp_Transp((matrix)remainderIdeal, currRing);
+  id_Delete(&remainderIdeal, currRing);
+  ideal inputIdeal = id_Vec2Ideal(f, currRing);
+  matrix normalForm = mpNew(IDELEMS(inputIdeal), 1);
+  id_Delete(&inputIdeal, currRing);
+  for (int k = 1; k <= MATROWS(temp); k++)
+  {
+    MATELEM(normalForm, k, 1) = MATELEM(temp, k, 1);
+    MATELEM(temp, k, 1) = NULL;
+  }
+  id_Delete((ideal*)&temp, currRing);
+  p_Delete(&remainder, currRing);
+  omFree(weightArray);
+
+  lists result = (lists)omAllocBin(slists_bin);
+  result->Init(2);
+  result->m[0].rtyp = MATRIX_CMD;
+  result->m[0].data = (void*)normalForm;
+  result->m[1].rtyp = MATRIX_CMD;
+  result->m[1].data = (void*)transformation;
+  res->rtyp = LIST_CMD;
+  res->data = result;
+  return FALSE;
+}
+
+static BOOLEAN jjExtraFglmCombination(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("fglmCombination") || (h == NULL) ||
+      (h->Typ() != IDEAL_CMD) || !jjExtraIsPoly(h->next) ||
+      (h->next->next != NULL))
+  {
+    WerrorS("expected `fglmCombination(ideal,poly)`");
+    return TRUE;
+  }
+  if (jjExtraPoly(h->next) == NULL)
+  {
+    WerrorS("fglmCombination requires a non-zero polynomial");
+    return TRUE;
+  }
+
+  ideal source = (ideal)h->Data();
+  poly monomials = jjExtraPoly(h->next);
+  assumeStdFlag(h);
+  res->rtyp = POLY_CMD;
+  res->data = (void*)fglmLinearCombination(source, monomials);
+  return FALSE;
+}
+
+static BOOLEAN jjExtraMatrixMinpoly(leftv res, leftv h)
+{
+  const short t[] = {1, MATRIX_CMD};
+  if (jjExtraRequireRing("matrixMinpoly") || !iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected `matrixMinpoly(matrix)`");
+    return TRUE;
+  }
+  if (!rField_is_Zp(currRing))
+  {
+    WerrorS("matrixMinpoly requires a prime field as coefficient field");
+    return TRUE;
+  }
+
+  matrix m = (matrix)h->Data();
+  const int n = MATROWS(m);
+  if ((n == 0) || (n != MATCOLS(m)))
+  {
+    WerrorS("matrixMinpoly requires a non-empty square matrix");
+    return TRUE;
+  }
+  for (int i = n * n - 1; i >= 0; i--)
+    if (!p_IsConstant(m->m[i], currRing))
+    {
+      WerrorS("matrixMinpoly requires a matrix with constant entries");
+      return TRUE;
+    }
+
+  const unsigned long p = (unsigned long)n_GetChar(currRing->cf);
+  unsigned long **longMatrix = singularMatrixToLongMatrix(m);
+  unsigned long *coefficients = computeMinimalPolynomial(longMatrix, n, p);
+  res->rtyp = POLY_CMD;
+  res->data = (void*)longCoeffsToSingularPoly(coefficients, n);
+  for (int i = 0; i < n; i++) delete[] longMatrix[i];
+  delete[] longMatrix;
+  delete[] coefficients;
+  return FALSE;
+}
+
+static BOOLEAN jjExtraFastMult(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("fastMult") || !jjExtraIsPoly(h) ||
+      !jjExtraIsPoly(h->next) || (h->next->next == NULL) ||
+      (h->next->next->Typ() != STRING_CMD) ||
+      (h->next->next->next != NULL))
+  {
+    WerrorS("expected `fastMult(poly,poly,string)`");
+    return TRUE;
+  }
+
+  poly f = jjExtraPoly(h);
+  poly g = jjExtraPoly(h->next);
+  const char *algorithm = (const char*)h->next->next->Data();
+  res->rtyp = POLY_CMD;
+  if (strcmp(algorithm, "univariate") == 0)
+  {
+    if (!jjExtraIsUnivariateInFirst(f) || !jjExtraIsUnivariateInFirst(g))
+    {
+      WerrorS("fastMult with `univariate` requires polynomials in the first variable");
+      return TRUE;
+    }
+    res->data = (void*)unifastmult(f, g, currRing);
+  }
+  else
+  {
+    WerrorS("fastMult: algorithm must be `univariate`");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN jjExtraPower(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("powerWithAlgorithm") || !jjExtraIsPoly(h) ||
+      (h->next == NULL) || (h->next->Typ() != INT_CMD) ||
+      (h->next->next == NULL) ||
+      (h->next->next->Typ() != STRING_CMD) ||
+      (h->next->next->next != NULL))
+  {
+    WerrorS("expected `powerWithAlgorithm(poly,int,string)`");
+    return TRUE;
+  }
+
+  poly f = jjExtraPoly(h);
+  const int exponent = (int)(long)h->next->Data();
+  const char *algorithm = (const char*)h->next->next->Data();
+  if (exponent < 0)
+  {
+    WerrorS("powerWithAlgorithm requires a non-negative exponent");
+    return TRUE;
+  }
+  if ((f != NULL) && (exponent != 0) &&
+      ((long)pTotaldegree(f) > (signed long)currRing->bitmask /
+       (signed long)exponent / 2))
+  {
+    Werror("OVERFLOW in power(d=%ld, e=%d, max=%ld)",
+           pTotaldegree(f), exponent, currRing->bitmask / 2);
+    return TRUE;
+  }
+
+  res->rtyp = POLY_CMD;
+  if (strcmp(algorithm, "fast") == 0)
+  {
+    if (exponent == 1)
+      res->data = (void*)p_Copy(f, currRing);
+    else
+      res->data = (void*)pFastPower(f, exponent, currRing);
+  }
+  else if (strcmp(algorithm, "standard") == 0)
+    res->data = (void*)pPower(p_Copy(f, currRing), exponent);
+  else if (strcmp(algorithm, "multinomial") == 0)
+  {
+    if ((rChar(currRing) != 0) || (exponent <= 1) || (pLength(f) <= 1))
+    {
+      WerrorS("the multinomial algorithm requires characteristic 0, exponent at least 2, and at least two terms");
+      return TRUE;
+    }
+    res->data = (void*)pFastPowerMC(f, exponent, currRing);
+  }
+  else
+  {
+    WerrorS("powerWithAlgorithm: algorithm must be `fast`, `standard`, or `multinomial`");
+    return TRUE;
+  }
+  return errorreported;
+}
+
+static BOOLEAN jjExtraBitSubst(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("bitSubst") || !jjExtraIsPoly(h) ||
+      !jjExtraIsPoly(h->next) || (h->next->next != NULL))
+  {
+    WerrorS("expected `bitSubst(poly,poly)`");
+    return TRUE;
+  }
+  poly outer = jjExtraPoly(h);
+  if ((outer != NULL) &&
+      (!rHasGlobalOrdering(currRing) || !jjExtraIsUnivariateInFirst(outer)))
+  {
+    WerrorS("bitSubst requires a global ordering and an outer polynomial in the first variable");
+    return TRUE;
+  }
+  res->rtyp = POLY_CMD;
+  res->data = (outer == NULL)
+    ? NULL : (void*)uni_subst_bits(outer, jjExtraPoly(h->next), currRing);
+  return FALSE;
+}
+
+static BOOLEAN jjExtraSubring(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("subring") || (h == NULL))
+  {
+    WerrorS("expected `subring(variable,...)`");
+    return TRUE;
+  }
+  extern ring rSubring(ring r, leftv v);
+  res->rtyp = RING_CMD;
+  res->data = (void*)rSubring(currRing, h);
+  return res->data == NULL;
+}
+
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
+static BOOLEAN jjExtraHNF(leftv res, leftv h)
+{
+  if ((h == NULL) || (h->next != NULL))
+  {
+    WerrorS("expected `HNF(matrix|intmat|bigintmat)`");
+    return TRUE;
+  }
+  res->rtyp = h->Typ();
+  if (h->Typ() == MATRIX_CMD)
+  {
+    if (jjExtraRequireRing("HNF") || !rField_is_Q(currRing))
+    {
+      WerrorS("HNF of a matrix requires coefficient field QQ");
+      return TRUE;
+    }
+    res->data = (void*)singntl_HNF((matrix)h->Data(), currRing);
+  }
+  else if (h->Typ() == INTMAT_CMD)
+    res->data = (void*)singntl_HNF((intvec*)h->Data());
+  else if (h->Typ() == BIGINTMAT_CMD)
+    res->data = (void*)singntl_HNF((bigintmat*)h->Data());
+  else
+  {
+    WerrorS("expected `HNF(matrix|intmat|bigintmat)`");
+    return TRUE;
+  }
+  return res->data == NULL;
+}
+#endif
+
+static BOOLEAN jjExtraProbIrredTest(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("probIrredTest") || !jjExtraIsPoly(h) ||
+      (h->next == NULL) || (h->next->Typ() != STRING_CMD) ||
+      (h->next->next != NULL))
+  {
+    WerrorS("expected `probIrredTest(poly,string)`");
+    return TRUE;
+  }
+  if (!rField_is_Zp(currRing))
+  {
+    WerrorS("probIrredTest requires a prime field as coefficient field");
+    return TRUE;
+  }
+
+  const char *errorString = (const char*)h->next->Data();
+  char *end = NULL;
+  errno = 0;
+  const double error = strtod(errorString, &end);
+  if ((errno == ERANGE) || (end == errorString) || (*end != '\0') ||
+      (error <= 0.0) || (error >= 1.0))
+  {
+    WerrorS("probIrredTest requires an error probability between 0 and 1");
+    return TRUE;
+  }
+
+  CanonicalForm f = convSingPFactoryP(jjExtraPoly(h), currRing);
+  res->rtyp = INT_CMD;
+  res->data = (void*)(long)probIrredTest(f, error);
+  return FALSE;
+}
+
+static BOOLEAN jjExtraLoadBigint(leftv res, leftv h)
+{
+  const short t[] = {1, STRING_CMD};
+  if (!iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected `loadBigint(string)`");
+    return TRUE;
+  }
+  FILE *file = fopen((const char*)h->Data(), "r");
+  if (file == NULL)
+  {
+    Werror("cannot open `%s`", (const char*)h->Data());
+    return TRUE;
+  }
+
+  mpz_t value;
+  mpz_init(value);
+  const size_t read = mpz_inp_str(value, file, 10);
+  fclose(file);
+  if (read == 0)
+  {
+    mpz_clear(value);
+    WerrorS("loadBigint could not read a base-10 integer");
+    return TRUE;
+  }
+  res->rtyp = BIGINT_CMD;
+  res->data = (void*)n_InitMPZ(value, coeffs_BIGINT);
+  mpz_clear(value);
+  return FALSE;
+}
+
+static BOOLEAN jjExtraIntvecMatchingSegments(leftv res, leftv h)
+{
+  const short t[] = {2, INTVEC_CMD, INTVEC_CMD};
+  if (!iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected `intvecMatchingSegments(intvec,intvec)`");
+    return TRUE;
+  }
+  intvec *first = (intvec*)h->Data();
+  intvec *second = (intvec*)h->next->Data();
+  if ((first->length() == 0) || (second->length() == 0))
+  {
+    WerrorS("intvecMatchingSegments requires two non-empty intvecs");
+    return TRUE;
+  }
+
+  intvec *result = new intvec(1);
+  (*result)[0] = 0;
+  int matches = 0;
+  for (int k = 0; k <= first->length() - second->length(); k++)
+  {
+    if (memcmp(&(*first)[k], &(*second)[0],
+               sizeof(int) * second->length()) == 0)
+    {
+      if (matches == 0)
+        (*result)[0] = k + 1;
+      else
+      {
+        result->resize(matches + 1);
+        (*result)[matches] = k + 1;
+      }
+      matches++;
+    }
+  }
+  res->rtyp = INTVEC_CMD;
+  res->data = (void*)result;
+  return FALSE;
+}
+
+static BOOLEAN jjExtraIntvecOverlap(leftv res, leftv h)
+{
+  const short t[] = {2, INTVEC_CMD, INTVEC_CMD};
+  if (!iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected `intvecOverlap(intvec,intvec)`");
+    return TRUE;
+  }
+  intvec *first = (intvec*)h->Data();
+  intvec *second = (intvec*)h->next->Data();
+  if ((first->length() == 0) || (second->length() == 0))
+  {
+    WerrorS("intvecOverlap requires two non-empty intvecs");
+    return TRUE;
+  }
+
+  const int firstLength = first->length();
+  int overlap = si_min(firstLength, second->length());
+  while ((overlap >= 1) &&
+         (memcmp(&(*first)[firstLength - overlap], &(*second)[0],
+                 sizeof(int) * overlap) != 0))
+    overlap--;
+  res->rtyp = INT_CMD;
+  res->data = (void*)(long)overlap;
+  return FALSE;
+}
+
+#if defined(HAVE_CCLUSTER) && defined(HAVE_FLINT)
+static BOOLEAN jjExtraCcluster(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("ccluster") || !jjExtraIsPoly(h))
+  {
+    WerrorS("expected `ccluster(poly[,poly],number,number,number,number)`");
+    return TRUE;
+  }
+  if (!rField_is_Q(currRing) && !rField_is_R(currRing) &&
+      !rField_is_long_R(currRing))
+  {
+    WerrorS("ccluster requires rational or real coefficients");
+    return TRUE;
+  }
+
+  const BOOLEAN complexCoefficients =
+    jjExtraIsPoly(h->next);
+  leftv values = complexCoefficients ? h->next->next : h->next;
+  leftv check = values;
+  int numberArguments = 0;
+  while ((check != NULL) && (check->Typ() == NUMBER_CMD))
+  {
+    numberArguments++;
+    check = check->next;
+  }
+  if ((numberArguments != 4) || (check != NULL))
+  {
+    WerrorS("expected `ccluster(poly[,poly],number,number,number,number)`");
+    return TRUE;
+  }
+  if ((jjExtraPoly(h) == NULL) ||
+      !jjExtraIsUnivariateInFirst(jjExtraPoly(h)) ||
+      (complexCoefficients &&
+       !jjExtraIsUnivariateInFirst(jjExtraPoly(h->next))))
+  {
+    WerrorS("ccluster requires non-zero univariate polynomial data");
+    return TRUE;
+  }
+
+  fmpq_poly_t realPart, imaginaryPart;
+  convSingPFlintP(realPart, jjExtraPoly(h), currRing);
+  h = h->next;
+  if (complexCoefficients)
+  {
+    convSingPFlintP(imaginaryPart, jjExtraPoly(h), currRing);
+    h = h->next;
+  }
+
+  fmpq_t centerReal, centerImaginary, boxSize, epsilon;
+  convSingNFlintN(centerReal, (number)h->Data(), currRing->cf);
+  h = h->next;
+  convSingNFlintN(centerImaginary, (number)h->Data(), currRing->cf);
+  h = h->next;
+  convSingNFlintN(boxSize, (number)h->Data(), currRing->cf);
+  h = h->next;
+  convSingNFlintN(epsilon, (number)h->Data(), currRing->cf);
+
+  const int degreeBound = complexCoefficients
+    ? si_max(fmpq_poly_length(realPart), fmpq_poly_length(imaginaryPart))
+    : fmpq_poly_length(realPart);
+  fmpq_t *realCenters =
+    (fmpq_t*)omAlloc(degreeBound * sizeof(fmpq_t));
+  fmpq_t *imaginaryCenters =
+    (fmpq_t*)omAlloc(degreeBound * sizeof(fmpq_t));
+  int *multiplicities = (int*)omAlloc(degreeBound * sizeof(int));
+  for (int i = 0; i < degreeBound; i++)
+  {
+    fmpq_init(realCenters[i]);
+    fmpq_init(imaginaryCenters[i]);
+  }
+
+  const int verbosity = 0;
+  long threads = (long)feOptValue(FE_OPT_CPUS);
+  if (threads < 1) threads = 1;
+  const int strategy = 23 + (threads << 6);
+  int count;
+  if (complexCoefficients)
+    count = ccluster_interface_poly_real_imag(
+      realCenters, imaginaryCenters, multiplicities, realPart, imaginaryPart,
+      centerReal, centerImaginary, boxSize, epsilon, strategy, verbosity);
+  else
+    count = ccluster_interface_poly_real(
+      realCenters, imaginaryCenters, multiplicities, realPart,
+      centerReal, centerImaginary, boxSize, epsilon, strategy, verbosity);
+
+  lists result = (lists)omAlloc0Bin(slists_bin);
+  result->Init(count);
+  for (int i = 0; i < count; i++)
+  {
+    lists cluster = (lists)omAlloc0Bin(slists_bin);
+    cluster->Init(3);
+    cluster->m[0].rtyp = NUMBER_CMD;
+    cluster->m[0].data = convFlintNSingN(realCenters[i], currRing->cf);
+    cluster->m[1].rtyp = NUMBER_CMD;
+    cluster->m[1].data = convFlintNSingN(imaginaryCenters[i], currRing->cf);
+    cluster->m[2].rtyp = INT_CMD;
+    cluster->m[2].data = (void*)(long)multiplicities[i];
+    result->m[i].rtyp = LIST_CMD;
+    result->m[i].data = cluster;
+  }
+
+  for (int i = degreeBound - 1; i >= 0; i--)
+  {
+    fmpq_clear(realCenters[i]);
+    fmpq_clear(imaginaryCenters[i]);
+  }
+  omFree(realCenters);
+  omFree(imaginaryCenters);
+  omFree(multiplicities);
+  fmpq_clear(centerReal);
+  fmpq_clear(centerImaginary);
+  fmpq_clear(boxSize);
+  fmpq_clear(epsilon);
+  fmpq_poly_clear(realPart);
+  if (complexCoefficients) fmpq_poly_clear(imaginaryPart);
+
+  res->rtyp = LIST_CMD;
+  res->data = result;
+  return FALSE;
+}
+#endif
+
+static BOOLEAN jjExtraEvaluateAt(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("evaluateAt") || !jjExtraIsPoly(h))
+  {
+    WerrorS("expected `evaluateAt(poly,number,...)`");
+    return TRUE;
+  }
+  poly p = jjExtraPoly(h);
+  h = h->next;
+  number *point = (number*)omAlloc0(sizeof(number) * currRing->N);
+  int initialized = 0;
+  for (int i = 0; i < currRing->N; i++)
+  {
+    if ((h == NULL) ||
+        ((h->Typ() != NUMBER_CMD) && (h->Typ() != INT_CMD)))
+    {
+      for (int j = 0; j < initialized; j++)
+        n_Delete(&point[j], currRing->cf);
+      omFree(point);
+      Werror("evaluateAt requires exactly %d coordinates", currRing->N);
+      return TRUE;
+    }
+    if (h->Typ() == NUMBER_CMD)
+      point[i] = n_Copy((number)h->Data(), currRing->cf);
+    else
+      point[i] = n_Init((long)h->Data(), currRing->cf);
+    initialized++;
+    h = h->next;
+  }
+  if (h != NULL)
+  {
+    for (int j = 0; j < initialized; j++)
+      n_Delete(&point[j], currRing->cf);
+    omFree(point);
+    Werror("evaluateAt requires exactly %d coordinates", currRing->N);
+    return TRUE;
+  }
+
+  res->rtyp = NUMBER_CMD;
+  res->data = (void*)maEvalAt(p, point, currRing);
+  for (int i = 0; i < initialized; i++)
+    n_Delete(&point[i], currRing->cf);
+  omFree(point);
+  return FALSE;
+}
+
+static BOOLEAN jjExtraDivrem(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("divrem") || !jjExtraIsPoly(h) ||
+      !jjExtraIsPoly(h->next) || (h->next->next != NULL))
+  {
+    WerrorS("expected `divrem(poly,poly)`");
+    return TRUE;
+  }
+  if (jjExtraPoly(h->next) == NULL)
+  {
+    WerrorS("division by zero");
+    return TRUE;
+  }
+
+  poly remainder = NULL;
+  poly dividend = jjExtraPoly(h);
+  poly divisor = jjExtraPoly(h->next);
+  poly quotient = p_DivRem(p_Copy(dividend, currRing),
+                           p_Copy(divisor, currRing),
+                           remainder, currRing);
+  if (errorreported)
+  {
+    p_Delete(&quotient, currRing);
+    p_Delete(&remainder, currRing);
+    return TRUE;
+  }
+
+  // Some p_DivRem backends do not preserve their remainder input.  Derive
+  // the public result from the defining identity without changing them.
+  p_Delete(&remainder, currRing);
+  remainder = p_Sub(p_Copy(dividend, currRing),
+                    pp_Mult_qq(divisor, quotient, currRing), currRing);
+
+  lists result = (lists)omAllocBin(slists_bin);
+  result->Init(2);
+  result->m[0].rtyp = POLY_CMD;
+  result->m[0].data = (void*)quotient;
+  result->m[1].rtyp = POLY_CMD;
+  result->m[1].data = (void*)remainder;
+  res->rtyp = LIST_CMD;
+  res->data = result;
+  return FALSE;
+}
+
+static BOOLEAN jjExtraIdealDivrem(leftv res, leftv h)
+{
+  const short ideals[] = {2, IDEAL_CMD, IDEAL_CMD};
+  const BOOLEAN withUnit =
+    (h != NULL) && (h->next != NULL) && (h->next->next != NULL);
+  if (jjExtraRequireRing("idealDivRem") ||
+      (!withUnit && !iiCheckTypes(h, ideals, 0)))
+  {
+    WerrorS("expected `idealDivRem(ideal,ideal[,\"withUnit\"])`");
+    return TRUE;
+  }
+  if (withUnit)
+  {
+    const short idealsWithUnit[] =
+      {3, IDEAL_CMD, IDEAL_CMD, STRING_CMD};
+    if (!iiCheckTypes(h, idealsWithUnit, 0) ||
+        (strcmp((const char*)h->next->next->Data(), "withUnit") != 0))
+    {
+      WerrorS("expected `idealDivRem(ideal,ideal[,\"withUnit\"])`");
+      return TRUE;
+    }
+  }
+
+  ideal factors = NULL;
+  ideal unit = NULL;
+  ideal remainder = idDivRem((ideal)h->Data(), (ideal)h->next->Data(),
+                             factors, withUnit ? &unit : NULL, 0);
+  if (errorreported)
+  {
+    id_Delete(&remainder, currRing);
+    id_Delete(&factors, currRing);
+    id_Delete(&unit, currRing);
+    return TRUE;
+  }
+
+  lists result = (lists)omAllocBin(slists_bin);
+  if (withUnit)
+  {
+    result->Init(3);
+    result->m[0].rtyp = MODUL_CMD;
+    result->m[0].data = (void*)remainder;
+    result->m[1].rtyp = MODUL_CMD;
+    result->m[1].data = (void*)factors;
+    result->m[2].rtyp = MODUL_CMD;
+    result->m[2].data = (void*)unit;
+  }
+  else
+  {
+    result->Init(2);
+    result->m[0].rtyp = h->Typ();
+    result->m[0].data = (void*)remainder;
+    result->m[1].rtyp = MATRIX_CMD;
+    result->m[1].data = (void*)id_Module2Matrix(factors, currRing);
+  }
+  res->rtyp = LIST_CMD;
+  res->data = result;
+  return FALSE;
+}
+
+static BOOLEAN jjExtraCoeffTerm(leftv res, leftv h)
+{
+  if (jjExtraRequireRing("coeffTerm")) return TRUE;
+  if ((h == NULL) || (h->next == NULL) || (h->next->next != NULL))
+  {
+    WerrorS("expected `coeffTerm(poly|vector|ideal|module,poly|vector|ideal|module)`");
+    return TRUE;
+  }
+  leftv first = h;
+  leftv second = h->next;
+
+  if ((jjExtraIsPoly(first) && jjExtraIsPoly(second)) ||
+      (jjExtraIsVector(first) && jjExtraIsVector(second)))
+  {
+    res->rtyp = NUMBER_CMD;
+    res->data = (void*)p_CoeffTerm(jjExtraPoly(first),
+                                   jjExtraPoly(second), currRing);
+  }
+  else if (((first->Typ() == IDEAL_CMD) && jjExtraIsPoly(second)) ||
+           ((first->Typ() == MODUL_CMD) && jjExtraIsVector(second)))
+  {
+    res->rtyp = first->Typ();
+    res->data = (void*)id_CoeffTerm((ideal)first->Data(),
+                                    jjExtraPoly(second), currRing);
+  }
+  else if (jjExtraIsVector(first) && jjExtraIsPoly(second))
+  {
+    poly monomial = p_Copy(jjExtraPoly(second), currRing);
+    res->rtyp = VECTOR_CMD;
+    res->data = (void*)p_CoeffTermV(jjExtraPoly(first), monomial, currRing);
+    p_Delete(&monomial, currRing);
+  }
+  else if ((first->Typ() == MODUL_CMD) && jjExtraIsPoly(second))
+  {
+    poly monomial = p_Copy(jjExtraPoly(second), currRing);
+    res->rtyp = MODUL_CMD;
+    res->data = (void*)id_CoeffTermV((ideal)first->Data(), monomial, currRing);
+    p_Delete(&monomial, currRing);
+  }
+  else if (jjExtraIsVector(first) && (second->Typ() == IDEAL_CMD))
+  {
+    poly vector = jjExtraPoly(first);
+    res->rtyp = VECTOR_CMD;
+    res->data = (void*)p_CoeffTermId(vector, (ideal)second->Data(),
+                                     p_MaxComp(vector, currRing), currRing);
+  }
+  else if (jjExtraIsVector(first) && (second->Typ() == MODUL_CMD))
+  {
+    res->rtyp = VECTOR_CMD;
+    res->data = (void*)p_CoeffTermMo(jjExtraPoly(first),
+                                     (ideal)second->Data(), currRing);
+  }
+  else
+  {
+    WerrorS("expected `coeffTerm(poly|vector|ideal|module,poly|vector|ideal|module)`");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN jjExtraSatPrincipal(leftv res, leftv h)
+{
+  const short t[] = {2, IDEAL_CMD, IDEAL_CMD};
+  if (jjExtraRequireRing("sat") || !iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected two ideals");
+    return TRUE;
+  }
+  ideal divisor = (ideal)h->next->Data();
+  if ((IDELEMS(divisor) != 1) || (divisor->m[0] == NULL))
+  {
+    WerrorS("the principal saturation algorithm requires exactly one non-zero generator");
+    return TRUE;
+  }
+  res->rtyp = IDEAL_CMD;
+  res->data = (void*)id_Sat_principal((ideal)h->Data(), divisor, currRing);
+  return errorreported;
+}
+
+static BOOLEAN jjExtraMinresWithMap(leftv res, leftv h)
+{
+  const short t[] = {1, RESOLUTION_CMD};
+  if (jjExtraRequireRing("minresWithMap") || !iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected `minresWithMap(resolution)`");
+    return TRUE;
+  }
+  syStrategy resolution = syCopy((syStrategy)h->Data());
+  ideal transformation = NULL;
+  syMinimize_with_map(resolution, transformation);
+  if (errorreported)
+  {
+    syKillComputation(resolution, currRing);
+    id_Delete(&transformation, currRing);
+    return TRUE;
+  }
+  res->rtyp = RESOLUTION_CMD;
+  res->data = (void*)resolution;
+  res->next = (leftv)omAlloc0Bin(sleftv_bin);
+  res->next->rtyp = MODUL_CMD;
+  res->next->data = (void*)transformation;
+  return FALSE;
+}
+
+static BOOLEAN jjExtraSsiWriteToString(leftv res, leftv h)
+{
+  if ((h == NULL) || (h->next != NULL))
+  {
+    WerrorS("expected one argument");
+    return TRUE;
+  }
+  StringSetS("");
+  ssiWrite_S(h, currRing);
+  res->rtyp = STRING_CMD;
+  res->data = (void*)StringEndS();
+  return (res->data == NULL) || errorreported;
+}
+
+static BOOLEAN jjExtraSsiReadFromString(leftv res, leftv h)
+{
+  const short t[] = {1, STRING_CMD};
+  if (!iiCheckTypes(h, t, 0))
+  {
+    WerrorS("expected one string argument");
+    return TRUE;
+  }
+  char *input = (char*)h->Data();
+  leftv value = ssiRead1_S(&input, currRing);
+  if (value == NULL) return TRUE;
+  memcpy(res, value, sizeof(*value));
+  omFreeBin(value, sleftv_bin);
+  return FALSE;
+}
+
+static BOOLEAN jjEXPERIMENTAL_SYSTEM(leftv res, leftv h,
+                                     BOOLEAN *handled)
+{
+  *handled = TRUE;
+  if ((h == NULL) || (h->Typ() != STRING_CMD))
+  {
+    *handled = FALSE;
+    return TRUE;
+  }
+  char *sys_cmd=(char *)(h->Data());
+  h=h->next;
+
+  if(strcmp(sys_cmd,"setsyzcomp")==0)
+  {
+    if ((h!=NULL) && (h->Typ()==INT_CMD))
+    {
+      int k = (int)(long)h->Data();
+      if ( currRing->order[0] == ringorder_s )
+      {
+        rSetSyzComp(k, currRing);
+        return FALSE;
+      }
+    }
+  }
+
+  if (strcmp(sys_cmd, "mults")==0)
+  {
+    res->rtyp=INT_CMD ;
+    res->data=(void*)(long) Mults();
+    return(FALSE);
+  }
+  else
+
+  if (strcmp(sys_cmd, "gcd") == 0)
+  {
+    if (h==NULL)
+    {
+    #if 0
+      Print("FLINT_P:%d (use Flints gcd for polynomials in char p)\n",isOn(SW_USE_FL_GCD_P));
+      Print("FLINT_0:%d (use Flints gcd for polynomials in char 0)\n",isOn(SW_USE_FL_GCD_0));
+    #endif
+      Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
+      Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
+      Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
+      #ifndef __CYGWIN__
+      Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
+      #endif
+      return FALSE;
+    }
+    else
+    if ((h!=NULL) && (h->Typ()==STRING_CMD)
+    && (h->next!=NULL) && (h->next->Typ()==INT_CMD))
+    {
+      int d=(int)(long)h->next->Data();
+      char *s=(char *)h->Data();
+    #if 0
+      if (strcmp(s,"FLINT_P")==0) { if (d) On(SW_USE_FL_GCD_P); else Off(SW_USE_FL_GCD_P); } else
+      if (strcmp(s,"FLINT_0")==0) { if (d) On(SW_USE_FL_GCD_0); else Off(SW_USE_FL_GCD_0); } else
+    #endif
+      if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
+      if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
+      if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
+      #ifndef __CYGWIN__
+      if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
+      #endif
+      return TRUE;
+      return FALSE;
+    }
+    else return TRUE;
+  }
+  else
+
+/* ============ NCUseExtensions ======================== */
+  #ifdef HAVE_PLURAL
+  if(strcmp(sys_cmd,"NCUseExtensions")==0)
+  {
+    if ((h!=NULL) && (h->Typ()==INT_CMD))
+      res->data=(void *)(long)setNCExtensions( (int)((long)(h->Data())) );
+    else
+      res->data=(void *)(long)getNCExtensions();
+    res->rtyp=INT_CMD;
+    return FALSE;
+  }
+  else
+  #endif
+/* ============ NCGetType ======================== */
+  #ifdef HAVE_PLURAL
+  if(strcmp(sys_cmd,"NCGetType")==0)
+  {
+    res->rtyp=INT_CMD;
+    if( rIsPluralRing(currRing) )
+      res->data=(void *)(long)ncRingType(currRing);
+    else
+      res->data=(void *)(-1L);
+    return FALSE;
+  }
+  else
+  #endif
+/* ============ ForceSCA ======================== */
+  #ifdef HAVE_PLURAL
+  if(strcmp(sys_cmd,"ForceSCA")==0)
+  {
+    if( !rIsPluralRing(currRing) )
+      return TRUE;
+    int b, e;
+    if ((h!=NULL) && (h->Typ()==INT_CMD))
+    {
+      b = (int)((long)(h->Data()));
+      h=h->next;
+    }
+    else return TRUE;
+    if ((h!=NULL) && (h->Typ()==INT_CMD))
+    {
+      e = (int)((long)(h->Data()));
+    }
+    else return TRUE;
+    if( !sca_Force(currRing, b, e) )
+      return TRUE;
+    return FALSE;
+  }
+  else
+  #endif
+/* ============ ForceNewNCMultiplication ======================== */
+  #ifdef HAVE_PLURAL
+  if(strcmp(sys_cmd,"ForceNewNCMultiplication")==0)
+  {
+    if( !rIsPluralRing(currRing) )
+      return TRUE;
+    if( ncInitSpecialPairMultiplication(currRing) ) // No Plural!
+      return TRUE;
+    return FALSE;
+  }
+  else
+  #endif
+/* ============ ForceNewOldNCMultiplication ======================== */
+  #ifdef HAVE_PLURAL
+  if(strcmp(sys_cmd,"ForceNewOldNCMultiplication")==0)
+  {
+    if( !rIsPluralRing(currRing) )
+      return TRUE;
+    if( !ncInitSpecialPowersMultiplication(currRing) ) // Enable Formula for Plural (depends on swiches)!
+      return TRUE;
+    return FALSE;
+  }
+  else
+  #endif
+
+  if(strcmp(sys_cmd,"cache_chinrem")==0)
+  {
+    EXTERN_VAR int n_SwitchChinRem;
+    Print("caching inverse in chines remainder:%d\n",n_SwitchChinRem);
+    if ((h!=NULL)&&(h->Typ()==INT_CMD))
+      n_SwitchChinRem=(int)(long)h->Data();
+    return FALSE;
+  }
+  else
+  {
+    *handled = FALSE;
+    return TRUE;
+  }
+}
+
+void iiInitExtraCprocs()
+{
+  iiAddCproc("kernel", "locNF", FALSE, jjExtraLocNF);
+  iiAddCproc("kernel", "fglmCombination", FALSE, jjExtraFglmCombination);
+  iiAddCproc("kernel", "matrixMinpoly", FALSE, jjExtraMatrixMinpoly);
+  iiAddCproc("kernel", "fastMult", FALSE, jjExtraFastMult);
+  iiAddCproc("kernel", "powerWithAlgorithm", FALSE, jjExtraPower);
+  iiAddCproc("kernel", "bitSubst", FALSE, jjExtraBitSubst);
+  iiAddCproc("kernel", "subring", FALSE, jjExtraSubring);
+#if defined(HAVE_NTL) || defined(HAVE_FLINT)
+  iiAddCproc("kernel", "HNF", FALSE, jjExtraHNF);
+#endif
+  iiAddCproc("kernel", "probIrredTest", FALSE, jjExtraProbIrredTest);
+  iiAddCproc("kernel", "loadBigint", FALSE, jjExtraLoadBigint);
+  iiAddCproc("kernel", "intvecMatchingSegments", FALSE,
+             jjExtraIntvecMatchingSegments);
+  iiAddCproc("kernel", "intvecOverlap", FALSE, jjExtraIntvecOverlap);
+#if defined(HAVE_CCLUSTER) && defined(HAVE_FLINT)
+  iiAddCproc("kernel", "ccluster", FALSE, jjExtraCcluster);
+#endif
+  iiAddCproc("kernel", "evaluateAt", FALSE, jjExtraEvaluateAt);
+  iiAddCproc("kernel", "divrem", FALSE, jjExtraDivrem);
+  iiAddCproc("kernel", "idealDivRem", FALSE, jjExtraIdealDivrem);
+  iiAddCproc("kernel", "coeffTerm", FALSE, jjExtraCoeffTerm);
+  iiAddCproc("kernel", "minresWithMap", FALSE, jjExtraMinresWithMap);
+  iiAddCproc("kernel", "satPrincipalInternal", FALSE,
+             jjExtraSatPrincipal);
+  iiAddCproc("kernel", "ssiWriteToStringInternal", FALSE,
+             jjExtraSsiWriteToString);
+  iiAddCproc("kernel", "ssiReadFromStringInternal", FALSE,
+             jjExtraSsiReadFromString);
+}

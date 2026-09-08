@@ -92,6 +92,7 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u);
 int     iiRegularity(lists L);
 leftv   singular_system(sleftv h);
 BOOLEAN jjSYSTEM(leftv res, leftv v);
+void    iiInitExtraCprocs();
 void    iiDebug();
 BOOLEAN iiCheckRing(int i);
 poly    iiHighCorner(ideal i, int ak);
