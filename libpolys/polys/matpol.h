@@ -116,6 +116,7 @@ poly sm_Trace ( ideal a, const ring R);
 int sm_Compare(ideal a, ideal b, const ring R);
 BOOLEAN sm_Equal(ideal a, ideal b, const ring R);
 ideal sm_Tensor(ideal A, ideal B, const ring r);
+ideal sm_FastTensorMod(ideal Phi, ideal Psi, const ring r);
 poly sm_Det(ideal I, const ring, DetVariant d=DetDefault);
 DetVariant mp_GetAlgorithmDet(matrix m, const ring r);
 DetVariant mp_GetAlgorithmDet(const char *s);

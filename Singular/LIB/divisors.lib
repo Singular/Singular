@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version divisors.lib 4.2.0.1 Jan_2021 "; // $Id$
+version="version divisors.lib 4.4.1.0 Aug_2026 "; // $Id$
 category = "Commutative Algebra";
 info="
 LIBRARY:  divisors.lib      Divisors and P-Divisors
@@ -43,6 +43,11 @@ negativedivisor(divisor)                        compute the negative of the divi
 normalFormDivisor(divisor)                      normal form of a divisor
 isEqualDivisor(divisor,divisor)                 test whether two divisors are equal
 globalSections(divisor)                         compute the global sections of a divisor
+globalSectionsIdeal(divisor)                    fractional ideal representing the divisor sheaf
+rankOneSheafFromDivisor(divisor)                cached rank-one sheaf with its fractional frame
+lineBundleFromDivisor(divisor)                  line-bundle alias for the cached divisor sheaf
+globalSectionsMultTable(divisor,int[,int,poly,int]) sections from multiplication tables
+globalSectionsBGG(divisor,int[,int,poly])            sections from a genuine BGG/Tate tail
 degreeDivisor(divisor)                          degree of a divisor
 linearlyEquivalent(divisor,divisor)             test whether two divisors a linearly equivalent
 effective(divisor)                              compute an effective divisor
@@ -64,6 +69,7 @@ makePDivisor(List)                              make a formal polyhedral sum of 
 ////////////////////////////////////////////////////////////////////////////////
 
 LIB "primdec.lib";
+LIB "sheafcoh.lib";
 
 static proc mod_init()
 {
@@ -321,10 +327,133 @@ return(minbase(quotient(f,quotient(f,I))));
 
 static proc basis(ideal I,int d)
 {
-I=simplify(jet(intersect(I,maxideal(d)),d),2);
+I=jet(intersect(I,maxideal(d)),d);
+// In a qring, ambient representatives of the defining equations are zero.
+// Reduce them before simplification and discard dependent degree-d entries.
+I=reduce(I,std(ideal(0)));
+I=simplify(I,2);
+I=minbase(I);
 return(I)}
 
 //basis(ideal(x,y^3),2);
+
+proc globalSectionsIdeal(divisor D)
+"USAGE:  globalSectionsIdeal(D); D divisor
+ASSUME:  D is a divisor on a smooth irreducible variety X whose qring has
+         the S2 property, as required by makeDivisor.
+RETURN:  a list L. L[1] is a fractional-ideal numerator N and L[2] is a
+         polynomial f such that N/f represents O_X(D).
+THEORY:  If D=(I)-(J), choose a nonzero f in I and compute the purified
+         quotient N=(fJ:I). Unlike globalSections, this procedure keeps the
+         complete graded fractional ideal rather than extracting one degree.
+SEE ALSO: globalSections, globalSectionsMultTable, globalSectionsBGG
+KEYWORDS: divisors, fractional ideals
+EXAMPLE: example globalSectionsIdeal; shows an example
+"
+{
+poly f=(simplify(D.num,2))[1];
+ideal N=purify1(quotient(f*D.den,D.num));
+return(list(simplify(N,2),f));
+}
+example
+{ "EXAMPLE:";
+ring r=0,(x,y,z),dp;
+divisor D=makeDivisor(ideal(x2),ideal(y));
+globalSectionsIdeal(D);
+}
+
+
+proc rankOneSheafFromDivisor(divisor D)
+"USAGE:  rankOneSheafFromDivisor(D); D divisor
+ASSUME:  D is a homogeneous divisor on a smooth irreducible projective
+         variety X in P^n whose homogeneous qring has the S2 property.
+RETURN:  a RankOneSheaf F representing O_X(D). F retains both a graded
+         presentation and the canonical fractional-ideal frame N/f obtained
+         from D, so repeated section computations do not rediscover a
+         rational functional.
+NOTE:    The presentation is constructed in the current coordinate ring as
+         modulo(N,0), with generator degree deg(N[i])-deg(f). In a qring,
+         sheafSectionBasis performs its standard lift to the ambient
+         polynomial ring when sections are requested. Since the presentation
+         and N/f are constructed together here, the frame is recorded as
+         validated without repeating the generic user-supplied-frame checks.
+SEE ALSO: lineBundleFromDivisor, rankOneSheaf, rankOneSheafSectionBasis,
+          rankOneSheafSectionBasisBGG, globalSectionsIdeal,
+          globalSectionsMultTable, globalSectionsBGG
+KEYWORDS: divisors, rank-one sheaves, line bundles, global sections
+EXAMPLE: example rankOneSheafFromDivisor; shows an example
+"
+{
+  if ((!homog(D.num)) || (!homog(D.den)))
+  {
+    ERROR("rankOneSheafFromDivisor requires homogeneous divisor ideals");
+  }
+
+  list fractional=globalSectionsIdeal(D);
+  ideal N=fractional[1];
+  poly f=fractional[2];
+  if ((size(N)==0) || (f==0) || (!homog(N)) || (!homog(f)))
+  {
+    ERROR("the divisor did not produce a nonzero homogeneous fractional ideal");
+  }
+
+  module M=modulo(N,ideal(0));
+  intvec weights;
+  weights[size(N)]=0;
+  int i;
+  for (i=1; i<=size(N); i++)
+  {
+    weights[i]=deg(N[i])-deg(f);
+  }
+  attrib(M,"isHomog",weights);
+
+  RankOneSheaf F;
+  F.over=basering;
+  F.presentation=M;
+  F.supportIdeal=ideal(0);
+  F.trivializationImages=N;
+  F.trivializationDenom=f;
+  F.trivializationShift=0;
+  F.frameValidated=1;
+  return(F);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I=y2*z-x*(x-z)*(x+3*z);
+qring Q=std(I);
+divisor P=makeDivisor(ideal(x,z),ideal(1));
+RankOneSheaf F=rankOneSheafFromDivisor(multdivisor(4,P));
+SectionSpace V=rankOneSheafSectionBasis(F,0);
+V;
+}
+
+
+proc lineBundleFromDivisor(divisor D)
+"USAGE:  lineBundleFromDivisor(D); D divisor
+ASSUME:  D is a homogeneous divisor whose associated divisorial sheaf is a
+         line bundle, under the hypotheses of rankOneSheafFromDivisor.
+RETURN:  a RankOneSheaf representing O_X(D), with its canonical fractional
+         frame cached.
+NOTE:    This is the line-bundle name for rankOneSheafFromDivisor and has the
+         same implementation. The distinction records the intended use; the
+         returned data type is the same.
+SEE ALSO: rankOneSheafFromDivisor, lineBundle, lineBundleSectionBasis
+KEYWORDS: divisors, line bundles, global sections
+EXAMPLE: example lineBundleFromDivisor; shows an example
+"
+{
+  RankOneSheaf F=rankOneSheafFromDivisor(D);
+  return(F);
+}
+example
+{ "EXAMPLE:";
+ring r=0,(x,y,z),dp;
+divisor D=makeDivisor(ideal(x2),ideal(y));
+RankOneSheaf L=lineBundleFromDivisor(D);
+SectionSpace V=lineBundleSectionBasis(L,0);
+rationalMapFromSections(V);
+}
 
 
 proc globalSections(divisor D)
@@ -337,9 +466,9 @@ KEYWORDS: divisors
 EXAMPLE: example globalSections; shows an example
 "
 {
-poly f =(simplify(D.num,2))[1];
-ideal LD = basis(purify1(quotient(f*D.den,D.num)),deg(f));
-list L = simplify(LD,2),f;
+list F=globalSectionsIdeal(D);
+ideal LD=basis(F[1],deg(F[2]));
+list L=simplify(LD,2),F[2];
 return(L);
 }
 example
@@ -350,6 +479,233 @@ qring Q = std(I);
 divisor P = makeDivisor(ideal(x,z),ideal(1));
 divisor D = multdivisor(4,P);
 globalSections(D);
+}
+
+// Scalarize a multiplication-table basis using the canonical fractional-ideal
+// frame built by globalSectionsMultTable.  That construction already knows
+// that M presents (N+IX)/IX and that its i-th generator maps to N[i]/f.
+// Keep this shortcut private: arbitrary user-supplied frames must continue to
+// go through all checks in trivializedSectionBasis.
+static proc globalSectionsTrustedTrivializedBasis(module M,int d,
+                                                   ideal N,poly f,list #)
+{
+  list B;
+  if (size(#)==0) { B=sheafSectionBasis(M,d); }
+  if (size(#)==1) { B=sheafSectionBasis(M,d,#[1]); }
+  if (size(#)==2) { B=sheafSectionBasis(M,d,#[1],#[2]); }
+  if (size(#)==3) { B=sheafSectionBasis(M,d,#[1],#[2],#[3]); }
+
+  ideal H;
+  if (size(B[1])>0)
+  {
+    // Perform all scalar products in one kernel matrix multiplication rather
+    // than scanning the vector basis entry by entry in the interpreter.
+    matrix sectionVectors=matrix(B[1]);
+    if (nrows(sectionVectors)>size(N))
+    {
+      ERROR("internal error: section vectors exceed the trusted frame rank");
+    }
+    // A module drops trailing rows which are identically zero. Restore them
+    // so the matrix dimensions agree with all generators of the frame N/f.
+    matrix paddedVectors[size(N)][size(B[1])];
+    paddedVectors[1..nrows(sectionVectors),1..ncols(sectionVectors)]=
+      sectionVectors;
+    H=ideal(matrix(N)*paddedVectors);
+  }
+  return(list(H,f*B[2],B[3]));
+}
+
+proc globalSectionsMultTable(divisor D,int d,list #)
+"USAGE:  globalSectionsMultTable(D,d[,s,g,v]); D divisor, d,s int, g poly,
+        v int
+ASSUME:  D is a homogeneous divisor on a smooth irreducible projective
+        variety X in P^n whose qring has the S2 property. The basering is
+        the homogeneous qring of X (or a polynomial ring when X=P^n).
+RETURN:  a list L. L[1] is an ideal of homogeneous scalar numerators,
+        L[2] is their common denominator, and L[3] is the tail degree.
+        The fractions L[1][i]/L[2] form a basis of
+        H^0(X,O_X(D)(d)). The ordered entries of L[1] are coordinates for
+        the associated rational map; the denominator cancels projectively.
+NOTE:    The fractional ideal N/f from globalSectionsIdeal is lifted from
+        the qring to its ambient polynomial ring S. The procedure presents
+        (N+I_X)/I_X over S with generator degrees deg(N[i])-deg(f), applies
+        sheafSectionBasis there, scalarizes the vector representatives, and
+        maps the result back to the original qring.
+        Since N/f and its presentation are constructed together internally,
+        scalarization uses this canonical frame directly. It does not repeat
+        the generic frame and scalar-independence checks required for an
+        arbitrary frame passed to public trivializedSectionBasis.
+        The optional s, g, and v are the multiplication-table degree,
+        evaluation denominator, and verification flag used by
+        sheafSectionBasis. Independent dimension verification with
+        sheafCohBGG is disabled by default; pass v=1 to enable one dimension
+        comparison. Verification never changes or retries the tail.
+THEORY:  This forms the degree-s and degree-(s+1) multiplication tables and
+        their compatibility kernel. It computes
+        Hom(m^(s-d),(N+I_X)/I_X)_d, which in the stable range is the degree-d
+        part of the ideal transform and therefore the required H^0.
+SEE ALSO: globalSectionsIdeal, sheafSectionBasis, trivializedSectionBasis,
+          rationalMapFromSections, sheafCohBGG
+KEYWORDS: divisors, sheaf cohomology, rational maps, multiplication tables, Hom
+EXAMPLE: example globalSectionsMultTable; shows an example
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most tail degree, denominator, and verification flag");
+  }
+  if ((!homog(D.num)) || (!homog(D.den)))
+  {
+    ERROR("globalSectionsMultTable requires homogeneous divisor ideals");
+  }
+
+  int haveTail=(size(#)>=1);
+  int haveDenominator=(size(#)>=2);
+  int verify=0;
+  int tail;
+  poly denominatorQ;
+  if (haveTail)
+  {
+    if (typeof(#[1])!="int") { ERROR("tail degree must be an integer"); }
+    tail=#[1];
+  }
+  if (haveDenominator)
+  {
+    if (typeof(#[2])!="poly")
+    {
+      ERROR("evaluation denominator must be a polynomial");
+    }
+    denominatorQ=#[2];
+  }
+  if (size(#)==3)
+  {
+    if (typeof(#[3])!="int")
+    {
+      ERROR("verification flag must be an integer");
+    }
+    verify=#[3];
+  }
+
+  list fractional=globalSectionsIdeal(D);
+  ideal numeratorQ=fractional[1];
+  poly fractionalDenominatorQ=fractional[2];
+
+  def Q=basering;
+  list RL=ringlist(Q);
+  ideal coordinateIdealQ=RL[4];
+  RL[4]=ideal(0);
+  def S=ring(RL);
+  setring S;
+
+  ideal N=imap(Q,numeratorQ);
+  poly f=imap(Q,fractionalDenominatorQ);
+  ideal IX=imap(Q,coordinateIdealQ);
+  if ((!homog(N)) || (!homog(IX)) || (!homog(f)))
+  {
+    ERROR("the embedded divisor data must be homogeneous");
+  }
+
+  module M=modulo(N,IX);
+  intvec weights;
+  weights[size(N)]=0;
+  int i;
+  for (i=1; i<=size(N); i++)
+  {
+    weights[i]=deg(N[i])-deg(f);
+  }
+  attrib(M,"isHomog",weights);
+
+  list result;
+  if (!haveTail)
+  {
+    result=globalSectionsTrustedTrivializedBasis(M,d,N,f);
+  }
+  if (haveTail && (!haveDenominator))
+  {
+    result=globalSectionsTrustedTrivializedBasis(M,d,N,f,tail);
+  }
+  if (haveTail && haveDenominator)
+  {
+    poly g=imap(Q,denominatorQ);
+    result=globalSectionsTrustedTrivializedBasis(M,d,N,f,tail,g,verify);
+  }
+
+  setring Q;
+  def result=imap(S,result);
+  return(result);
+}
+example
+{ "EXAMPLE:";
+ring r=0,(x,y,z),dp;
+// D=2(x=0)-(y=0), hence O(D)=O(1):
+divisor D=makeDivisor(ideal(x2),ideal(y));
+list L=globalSectionsMultTable(D,0);
+L;
+// Singular represents the associated rational map by its homogeneous
+// coordinate ideal; the common denominator L[2] cancels projectively:
+ideal phi=rationalMapFromSections(L);
+phi;
+// Force one more multiplication-table step and request the independent
+// BGG dimension check:
+L=globalSectionsMultTable(D,0,1,z,1);
+L;
+}
+
+
+proc globalSectionsBGG(divisor D,int d,list #)
+"USAGE:  globalSectionsBGG(D,d[,s,g]); D divisor, d,s int, g poly
+ASSUME:  D is a homogeneous divisor on a smooth irreducible projective
+        variety X in P^n whose homogeneous qring has the S2 property.
+RETURN:  a list L. L[1] is an ideal of homogeneous scalar numerators,
+        L[2] is their common denominator, and L[3] is the BGG tail degree.
+        The fractions L[1][i]/L[2] form a basis of H^0(X,O_X(D)(d)).
+NOTE:    The canonical fractional-ideal frame of D is cached in a
+        RankOneSheaf and passed to rankOneSheafSectionBasisBGG. Thus this is
+        one complete divisor-to-sections command: it constructs the graded
+        presentation, computes actual representatives from a Tate resolution,
+        and scalarizes them without rediscovering or revalidating its trusted
+        divisor frame. If supplied, s must satisfy s>=d and be strictly larger
+        than the module regularity; g must be regular of degree s-d.
+        This is a genuine BGG representative algorithm. It neither calls the
+        multiplication-table algorithm nor uses sheafCohBGG as verification.
+THEORY:  The degree-s multiplication map gives the right BGG tail. Exterior
+        source generators of weight -d are H^0, and their linear Tate strand
+        decodes the rational representatives.
+SEE ALSO: globalSectionsMultTable, globalSectionsIdeal,
+          rankOneSheafFromDivisor, rankOneSheafSectionBasisBGG,
+          rationalMapFromSections
+KEYWORDS: divisors, sheaf cohomology, rational maps, BGG, Tate resolution
+EXAMPLE: example globalSectionsBGG; shows an example
+"
+{
+  if (size(#)>2)
+  {
+    ERROR("expected at most a BGG tail degree and denominator");
+  }
+  RankOneSheaf F=rankOneSheafFromDivisor(D);
+  SectionSpace V;
+  if (size(#)==0)
+  {
+    V=rankOneSheafSectionBasisBGG(F,d);
+  }
+  if (size(#)==1)
+  {
+    V=rankOneSheafSectionBasisBGG(F,d,#[1]);
+  }
+  if (size(#)==2)
+  {
+    V=rankOneSheafSectionBasisBGG(F,d,#[1],#[2]);
+  }
+  return(list(V.basis,V.denom,V.tailDegree));
+}
+example
+{ "EXAMPLE:";
+ring r=0,(x,y,z),dp;
+// D=2(x=0)-(y=0), hence O(D)=O(1):
+divisor D=makeDivisor(ideal(x2),ideal(y));
+list L=globalSectionsBGG(D,0,1,z);
+L;
+rationalMapFromSections(L);
 }
 
 

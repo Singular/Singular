@@ -206,6 +206,7 @@ enum {
   WEDGE_CMD,
   WEIGHT_CMD,
   WRITE_CMD,
+  FASTTENSOR_CMD,
   /* start system var section: VECHO */
   VECHO,
   VCOLMAX,

@@ -1,0 +1,1936 @@
+///////////////////////////////////////////////////////////////////////////////
+version="version surface_type_generics.lib 0.1.2 Aug_2026";
+category="Algebraic Geometry";
+info="
+LIBRARY:  surface_type_generics.lib
+AUTHOR:   GPT-5.5 Pro, generated for stand-alone generic surface constructions.
+
+PURPOSE:
+  Build generic representatives of the surface types appearing in a fixed
+  catalogue of smooth algebraic surfaces: rational, ruled over an elliptic
+  curve, K3 type, Enriques type, abelian type, bielliptic / hyperelliptic
+  type, and properly elliptic type.
+
+  This file deliberately does not deform hard-coded ideals.  Each constructor
+  starts from a geometric parameter space: determinantal scrolls, projected
+  Veronese maps, complete intersections, Segre products of curves, finite
+  quotient data, liaison chains, or Rao-module/syzygy data.  The returned
+  surface is therefore a generic member of the chosen construction family,
+  not a coordinate change of a stored example.
+
+WHAT \"GENERIC\" MEANS HERE:
+  The procedures choose random coefficients in an explicitly described family.
+  Smoothness and the asserted surface type hold on a non-empty Zariski open
+  subset of the parameter space.  A random specialization over a sufficiently
+  large field is expected to land in this open subset.  For serious use, run a
+  smoothness check afterwards, or use the classification library on the output.
+
+  For old degree/sectional-genus labels, surface_generic_catalogueType records the
+  birational/Kodaira type.  Call one of the direct constructors below for a
+  generic representative of that type.  Exact embedded parameter spaces for
+  most high-degree P^4 models are much more specialized and are usually built
+  by liaison or syzygy constructions.  Two related degree-11 Enriques
+  constructors are implemented here.  surface_generic_enriques_d11_pi10_DES_dim34 uses
+  Popescu's liaison completion of the older 34-dimensional
+  Decker--Ein--Schreyer family.
+  surface_generic_enriques_d11_pi10_MB_dim31 retains the normalized Moore/Bring syzygy
+  specialization, whose construction image has dimension at most 31.
+  For the actual stored examples use the separate nonGeneralTypeSurfacesP4.lib,
+  with nonGeneralTypeSurfaceP4(name); the generic constructors here are distinct.
+
+CHARACTERISTIC WARNINGS:
+  * Enriques quotients by an involution are implemented for characteristic not 2.
+  * The 34-dimensional degree-11 Enriques liaison constructor is implemented
+    over prime fields of characteristic greater than 3.  The separate
+    Moore/Bring specialization requires a finite field of characteristic
+    different from 2 and 5.  Both need a field large enough for the randomized
+    open conditions to be met.
+  * The Hesse order-3 bielliptic construction is for characteristic not 3 and,
+    for an explicit quotient by invariant sections, over a field containing a
+    primitive cube root of unity.  The default routine returns the cover and the
+    group action as quotient data.
+  * Product, scroll and complete-intersection constructors are characteristic
+    independent apart from the usual smoothness discriminants.
+
+REFERENCES, NOT DEPENDENCIES:
+  - W. Decker, L. Ein, F.-O. Schreyer, Construction of surfaces in P^4,
+    J. Algebraic Geometry 2 (1993), 185-237.
+  - S. Popescu, On smooth surfaces of degree >= 11 in P^4, PhD thesis,
+    Saarbruecken, 1993, Sections 3.7--3.8.
+  - F.-O. Schreyer, Small fields in constructive algebraic geometry,
+    Moduli of Vector Bundles, LNPAM 179 (1996), 221-228.
+  - H. Abo, K. Ranestad, F.-O. Schreyer,
+    NongeneralTypeSurfacesInP4.m2 (2026), especially the procedures
+    specialEnriquesSchreyerSurface and schreyerSurfaceFromModule.
+  - S. Popescu, Examples of smooth non-general type surfaces in P^4,
+    Proc. London Math. Soc. 76 (1998), 257-275.
+  - W. Decker, F.-O. Schreyer, Non-general type surfaces in P^4: some remarks
+    on bounds and constructions, J. Symbolic Computation 29 (2000), 545-582.
+  - W. Barth, K. Hulek, C. Peters, A. Van de Ven, Compact Complex Surfaces,
+    2nd enlarged ed., Springer, 2004.
+  - F. Cossec, I. Dolgachev, Enriques Surfaces I, Birkhaeuser, 1989.
+  - R. Miranda, Persson-type constructions and the standard quotient picture
+    for bielliptic surfaces; equivalently, every bielliptic surface is a finite
+    free quotient of a product of elliptic curves.
+  - M. Artebani, I. Dolgachev, The Hesse pencil of plane cubic curves,
+    Enseign. Math. 55 (2009), 235-273.
+
+RETURN CONVENTION:
+  Most constructors return a list [R, I, type, description].  The ideal I lives
+  in the returned ring R.  Use setring on the first entry before working with I.
+
+EXAMPLE:
+  LIB \"surface_type_generics.lib\";
+  ring r=31991,(dummy),dp;
+  list K=surface_generic_K3();
+  setring K[1];
+  ideal IK3=K[2];
+  IK3;
+";
+
+LIB "matrix.lib";
+LIB "elim.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+// Internal utility functions
+///////////////////////////////////////////////////////////////////////////////
+
+static proc surface_generic_default_bound(list #)
+"USAGE:   surface_generic_default_bound([bound]);
+RETURN:  an integer coefficient bound.
+PURPOSE: Internal helper.  All random constructors use a small integer bound by
+         default.  Over a finite field, the integers are interpreted in the
+         coefficient field.  Over characteristic zero, they are rational integers.
+EXAMPLE: ring r=0,(x),dp; surface_generic_default_bound();
+"
+{
+  int bound=20;
+  if(size(#)>0) { bound=#[1]; }
+  if(bound<1) { bound=20; }
+  return(bound);
+}
+
+static proc surface_generic_coeff(int bound)
+"USAGE:   surface_generic_coeff(bound);
+RETURN:  a non-zero random scalar represented by an integer.
+PURPOSE: Internal helper for random forms.  Avoiding zero coefficients reduces
+         the chance of accidentally leaving the intended open subset.
+EXAMPLE: ring r=31991,(x),dp; surface_generic_coeff(10);
+"
+{
+  int c=random(-bound,bound);
+  if(c==0) { c=1; }
+  return(c);
+}
+
+static proc surface_generic_unique_suffix()
+"USAGE:   surface_generic_unique_suffix();
+RETURN:  a short suffix for dynamically created ring names.
+PURPOSE: Internal helper.  Constructors may be called several times in the same
+         second, so timer alone is not enough to avoid redefinition warnings.
+EXAMPLE: ring r=0,(x),dp; surface_generic_unique_suffix();
+"
+{
+  return("_"+string(timer)+"_"+string(random(1,1000000000)));
+}
+
+static proc surface_generic_random_homogeneous(int d, int bound)
+"USAGE:   surface_generic_random_homogeneous(d,bound); d>=0
+RETURN:  a random homogeneous polynomial of degree d in all variables of the
+         current ring.
+MATHEMATICS:
+         Smooth complete intersections and 1-generic determinantal models are
+         open conditions on coefficients.  This helper samples the coefficient
+         space of forms of a fixed degree.
+EXAMPLE: ring r=31991,(x0,x1,x2,x3,x4),dp; surface_generic_random_homogeneous(2,10);
+"
+{
+  ideal mons=maxideal(d);
+  poly f=0;
+  int i;
+  for(i=1;i<=size(mons);i=i+1)
+  {
+    f=f+surface_generic_coeff(bound)*mons[i];
+  }
+  if(f==0) { f=mons[1]; }
+  return(f);
+}
+
+static proc surface_generic_form3(poly A, poly B, poly C, int d, int bound)
+"USAGE:   surface_generic_form3(A,B,C,d,bound);
+RETURN:  a random homogeneous expression of degree d in A,B,C.
+MATHEMATICS:
+         Used for curves pulled back from the two factors of a Segre product.
+         For example, f(column_j)=0 for every column cuts E x P^1 or E x F on
+         a rank-one matrix parameterizing P^2 x P^1 or P^2 x P^2.
+EXAMPLE: ring r=31991,(a,b,c),dp; surface_generic_form3(a,b,c,3,10);
+"
+{
+  int i;
+  int j;
+  int k;
+  poly f=0;
+  for(i=0;i<=d;i=i+1)
+  {
+    for(j=0;j<=d-i;j=j+1)
+    {
+      k=d-i-j;
+      f=f+surface_generic_coeff(bound)*A^i*B^j*C^k;
+    }
+  }
+  return(f);
+}
+
+static proc surface_generic_hesse(poly A, poly B, poly C, number lam)
+"USAGE:   surface_generic_hesse(A,B,C,lambda);
+RETURN:  A^3+B^3+C^3-3*lambda*A*B*C.
+MATHEMATICS:
+         This is the Hesse pencil of plane cubic curves.  Away from the
+         discriminant lambda^3=1, and in characteristic not 3 in this simple
+         presentation, it gives a smooth elliptic curve.  The Hesse pencil is
+         convenient because some torsion translations are linear projective
+         transformations.
+EXAMPLE: ring r=31991,(x,y,z),dp; surface_generic_hesse(x,y,z,2);
+"
+{
+  poly f=A^3+B^3+C^3-3*lam*A*B*C;
+  return(f);
+}
+
+static proc surface_generic_quartic3(poly A, poly B, poly C, int bound)
+"USAGE:   surface_generic_quartic3(A,B,C,bound);
+RETURN:  a random plane quartic expression in A,B,C.
+MATHEMATICS:
+         A smooth plane quartic has genus 3.  The product of such a curve with
+         an elliptic curve is a smooth elliptic surface of Kodaira dimension 1.
+         Smoothness is open in the quartic coefficient space.
+EXAMPLE: ring r=31991,(x,y,z),dp; surface_generic_quartic3(x,y,z,10);
+"
+{
+  return(surface_generic_form3(A,B,C,4,bound));
+}
+
+
+static proc surface_generic_quartic3_special(poly A, poly B, poly C, number a, number b, number c, number d)
+"USAGE:   surface_generic_quartic3_special(A,B,C,a,b,c,d);
+RETURN:  a four-parameter plane quartic in A,B,C.
+MATHEMATICS:
+         The same coefficients can be reused on all rows of a Segre matrix, so
+         the equations really cut one plane quartic factor rather than three
+         unrelated quartics.  Smoothness holds away from the discriminant.
+EXAMPLE: ring r=31991,(x,y,z),dp; surface_generic_quartic3_special(x,y,z,1,2,3,4);
+"
+{
+  poly f=A^4+B^4+C^4+a*A^2*B^2+b*A^2*C^2+c*B^2*C^2+d*A*B*C*(A+B+C);
+  return(f);
+}
+
+static proc surface_generic_product_eliminate_vars(int n)
+"USAGE:   surface_generic_product_eliminate_vars(n);
+RETURN:  product var(1)*...*var(n) in the current ring.
+PURPOSE: Internal helper for eliminate(..., product).  In the image-kernel
+         computations, the first n variables are source variables to eliminate.
+EXAMPLE: ring r=0,(a,b,c,x,y),dp; surface_generic_product_eliminate_vars(3);
+"
+{
+  int i;
+  poly p=1;
+  for(i=1;i<=n;i=i+1)
+  {
+    p=p*var(i);
+  }
+  return(p);
+}
+
+static proc surface_generic_image_of_forms_mod_ideal(ideal Base, ideal Forms, string prefix)
+"USAGE:   surface_generic_image_of_forms_mod_ideal(Base,Forms,prefix);
+RETURN:  list [Rbig, J, FormsBig, description].  J is the kernel of the map
+         k[prefix_i] -> k[source]/Base, prefix_i |-> Forms[i], represented in
+         a ring containing both source and target variables.
+MATHEMATICS:
+         If Forms are homogeneous of the same degree and have no common base
+         point on the relevant source after resolving the stated construction,
+         Proj(k[Forms]) is the projective image.  For quotient constructions,
+         Forms are invariant sections and Proj(k[Forms]) is a projective model
+         of the quotient by the finite group action.
+EXAMPLE: ring r=0,(s,t,u),dp; ideal B=0; ideal F=s2,t2,u2,s*t,s*u;
+         list L=surface_generic_image_of_forms_mod_ideal(B,F,\"y\");
+"
+{
+  def oldring=basering;
+  ideal Bold=Base;
+  ideal Fold=Forms;
+  int n0=nvars(oldring);
+  int m=size(Forms);
+  string vars=varstr(oldring)+","+prefix+"(1.."+string(m)+")";
+  string ringOrder="(dp("+string(n0)+"),dp("+string(m)+"))";
+  string rname="surface_generic_image"+surface_generic_unique_suffix()+"_"+string(m);
+  execute("ring "+rname+"="+charstr(oldring)+",("+vars+"),"+ringOrder+";");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def Rbig=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring Rbig;
+  ideal B=imap(oldring,Bold);
+  ideal F=imap(oldring,Fold);
+  ideal E=B;
+  int i;
+  for(i=1;i<=m;i=i+1)
+  {
+    E[size(E)+1]=var(n0+i)-F[i];
+  }
+  poly src=surface_generic_product_eliminate_vars(n0);
+  ideal J=eliminate(E,src);
+  list Out=Rbig,J,F,"image ideal by elimination; target variables are the last variables";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+static proc surface_generic_segre_2x2_minors(matrix Z)
+"USAGE:   surface_generic_segre_2x2_minors(Z); Z a matrix of variables
+RETURN:  ideal of all 2x2 minors of Z.
+MATHEMATICS:
+         The 2x2 minors of a matrix of homogeneous coordinates cut out the
+         Segre variety of rank-one matrices, such as P^2 x P^1 or P^2 x P^2.
+EXAMPLE: ring r=0,(a,b,c,d,e,f),dp; matrix Z[3][2]=a,b,c,d,e,f;
+         surface_generic_segre_2x2_minors(Z);
+"
+{
+  return(minor(Z,2));
+}
+
+static proc surface_generic_same_type_note(string requested, string returned)
+"USAGE:   surface_generic_same_type_note(requested,returned);
+RETURN:  explanatory string for catalogue wrappers.
+PURPOSE: Internal helper.  Some catalogue labels include embedded invariants;
+         the wrappers in this library preserve the surface type, not necessarily
+         the special P^4 Hilbert polynomial.
+EXAMPLE: ring r=0,(x),dp; surface_generic_same_type_note(\"k3_d7_pi5\",\"K3\");
+"
+{
+  string s="requested label: "+requested+"; returned a generic "+returned;
+  s=s+" construction of the same Kodaira/minimal type; embedded degree and";
+  s=s+" sectional genus are preserved only by the named direct constructors.";
+  return(s);
+}
+
+static proc surface_generic_generators_of_degree(ideal I, int d)
+"USAGE:   surface_generic_generators_of_degree(I,d);
+RETURN:  the minimal generators of I having degree d.
+PURPOSE: Internal helper for the graded pieces used in liaison constructions.
+"
+{
+  ideal B=minbase(I);
+  ideal D=ideal();
+  int i;
+  for(i=1;i<=size(B);i=i+1)
+  {
+    if(deg(B[i])==d) { D[size(D)+1]=B[i]; }
+  }
+  return(D);
+}
+
+static proc surface_generic_has_generator_below(ideal I, int d)
+"USAGE:   surface_generic_has_generator_below(I,d);
+RETURN:  1 if a minimal generator of I has degree less than d, and 0 otherwise.
+PURPOSE: Internal guard ensuring that minimal degree-d generators span the full
+         homogeneous component I_d used in a liaison step.
+"
+{
+  ideal B=minbase(I);
+  int i;
+  for(i=1;i<=size(B);i=i+1)
+  {
+    if((B[i]!=0) and (deg(B[i])<d)) { return(1); }
+  }
+  return(0);
+}
+
+static proc surface_generic_same_ideal(ideal I, ideal J)
+"USAGE:   surface_generic_same_ideal(I,J);
+RETURN:  1 if I and J define the same ideal, and 0 otherwise.
+PURPOSE: Internal two-sided standard-basis containment check.
+"
+{
+  ideal GI=std(I);
+  ideal GJ=std(J);
+  int i;
+  for(i=1;i<=size(GI);i=i+1)
+  {
+    if(reduce(GI[i],GJ)!=0) { return(0); }
+  }
+  for(i=1;i<=size(GJ);i=i+1)
+  {
+    if(reduce(GJ[i],GI)!=0) { return(0); }
+  }
+  return(1);
+}
+
+static proc surface_generic_saturated_ideal(ideal I)
+"USAGE:   surface_generic_saturated_ideal(I);
+RETURN:  the saturation of I by the irrelevant ideal.
+PURPOSE: Internal helper for projective residual intersections.
+"
+{
+  list L=sat(std(I),maxideal(1));
+  return(std(L[1]));
+}
+
+static proc surface_generic_link(ideal completeIntersection, ideal component)
+"USAGE:   surface_generic_link(completeIntersection,component);
+RETURN:  the saturated ideal quotient defining the projective residual scheme.
+PURPOSE: Internal helper for the Popescu--DES liaison construction.
+"
+{
+  return(surface_generic_saturated_ideal(quotient(completeIntersection,component)));
+}
+
+static proc surface_generic_random_combination(ideal V, int bound)
+"USAGE:   surface_generic_random_combination(V,bound);
+RETURN:  a random scalar linear combination of the generators of V.
+PURPOSE: Internal helper for choosing general members of a linear system.
+"
+{
+  poly f=0;
+  int i;
+  for(i=1;i<=size(V);i=i+1)
+  {
+    f=f+surface_generic_coeff(bound)*V[i];
+  }
+  return(f);
+}
+
+static proc surface_generic_projectively_smooth(ideal I, int codimension)
+"USAGE:   surface_generic_projectively_smooth(I,codimension);
+RETURN:  1 if the Jacobian rank-drop locus is supported only at the vertex of
+         the affine cone, and 0 otherwise.
+PURPOSE: Internal projective Jacobian-criterion check.
+"
+{
+  ideal B=minbase(I);
+  ideal singularCone=std(I+minor(jacob(B),codimension));
+  return(dim(singularCone)==0);
+}
+
+static proc surface_generic_prime_field_sqrt(number a, int p)
+"USAGE:   surface_generic_prime_field_sqrt(a,p);
+RETURN:  list [found,root] with root^2=a when found=1.
+PURPOSE: Internal Tonelli--Shanks square root over the prime field F_p.
+FIELD:   p must be an odd prime.
+"
+{
+  if(a==0) { return(list(1,number(0))); }
+  if(a^((p-1) div 2)!=1) { return(list(0,number(0))); }
+  if((p%4)==3) { return(list(1,a^((p+1) div 4))); }
+
+  int q=p-1;
+  int s;
+  while((q%2)==0)
+  {
+    q=q div 2;
+    s++;
+  }
+  number z=2;
+  while(z^((p-1) div 2)!=-1) { z=z+1; }
+  number c=z^q;
+  number x=a^((q+1) div 2);
+  number t=a^q;
+  int m=s;
+  int i;
+  int j;
+  int exponent;
+  number tt;
+  number b;
+  while(t!=1)
+  {
+    i=1;
+    tt=t^2;
+    while((i<m) and (tt!=1))
+    {
+      tt=tt^2;
+      i++;
+    }
+    if(i==m) { return(list(0,number(0))); }
+    exponent=1;
+    for(j=1;j<=m-i-1;j=j+1) { exponent=2*exponent; }
+    b=c^exponent;
+    x=x*b;
+    t=t*b^2;
+    c=b^2;
+    m=i;
+  }
+  return(list(1,x));
+}
+
+static proc surface_generic_elliptic_add(list P, list Q, number A)
+"USAGE:   surface_generic_elliptic_add(P,Q,A);
+RETURN:  P+Q on y^2=x^3+A*x+B.  A point is [infinity,x,y], with
+         infinity=1 for the identity.
+PURPOSE: Internal affine group law for choosing the five points in the
+         Popescu--DES construction.
+FIELD:   characteristic different from 2 and 3.
+"
+{
+  if(P[1]!=0) { return(Q); }
+  if(Q[1]!=0) { return(P); }
+  number x1=P[2];
+  number y1=P[3];
+  number x2=Q[2];
+  number y2=Q[3];
+  if((x1==x2) and (y1+y2==0))
+  {
+    return(list(1,number(0),number(0)));
+  }
+  number lambda;
+  if(x1==x2) { lambda=(3*x1^2+A)/(2*y1); }
+  else { lambda=(y2-y1)/(x2-x1); }
+  number x3=lambda^2-x1-x2;
+  number y3=lambda*(x1-x3)-y1;
+  return(list(0,x3,y3));
+}
+
+static proc surface_generic_same_elliptic_point(list P, list Q)
+"USAGE:   surface_generic_same_elliptic_point(P,Q);
+RETURN:  1 if the two internal elliptic-curve point records agree.
+"
+{
+  if((P[1]!=0) or (Q[1]!=0)) { return((P[1]!=0) and (Q[1]!=0)); }
+  return((P[2]==Q[2]) and (P[3]==Q[3]));
+}
+
+static proc surface_generic_random_elliptic_point(int p, number A, number B)
+"USAGE:   surface_generic_random_elliptic_point(p,A,B);
+RETURN:  an affine point on y^2=x^3+A*x+B over F_p.
+PURPOSE: Internal bounded sampler used by the Popescu--DES construction.
+FIELD:   the coefficient field must be the prime field F_p, p>3.
+"
+{
+  int attempts;
+  number x;
+  number rhs;
+  list root;
+  number y;
+  while(attempts<1000)
+  {
+    attempts++;
+    x=random(0,p-1);
+    rhs=x^3+A*x+B;
+    root=surface_generic_prime_field_sqrt(rhs,p);
+    if(root[1]==0) { continue; }
+    y=root[2];
+    if(random(0,1)==1) { y=-y; }
+    return(list(0,x,y));
+  }
+  return(list(1,number(0),number(0)));
+}
+
+static proc surface_generic_DES_five_points(int p, number A, number B, number r)
+"USAGE:   surface_generic_DES_five_points(p,A,B,r);
+RETURN:  list [found,points], where points consists of five distinct affine
+         points p_i on E with p_1+...+p_5=(r,0).
+PURPOSE: Internal realization of the divisor condition in Popescu Section 3.8.
+"
+{
+  list tau=0,r,number(0);
+  int attempts;
+  int i;
+  int j;
+  int duplicate;
+  int valid;
+  list points;
+  list sum;
+  list candidate;
+  list negativeSum;
+  while(attempts<100)
+  {
+    attempts++;
+    points=list();
+    sum=list(1,number(0),number(0));
+    valid=1;
+    for(i=1;i<=4;i=i+1)
+    {
+      candidate=surface_generic_random_elliptic_point(p,A,B);
+      if((candidate[1]!=0) or surface_generic_same_elliptic_point(candidate,tau))
+      {
+        valid=0;
+        break;
+      }
+      duplicate=0;
+      for(j=1;j<i;j=j+1)
+      {
+        if(surface_generic_same_elliptic_point(candidate,points[j])) { duplicate=1; }
+      }
+      if(duplicate!=0)
+      {
+        valid=0;
+        break;
+      }
+      points[i]=candidate;
+      sum=surface_generic_elliptic_add(sum,candidate,A);
+    }
+    if(valid==0) { continue; }
+    if(sum[1]!=0) { negativeSum=sum; }
+    else { negativeSum=list(0,sum[2],-sum[3]); }
+    points[5]=surface_generic_elliptic_add(tau,negativeSum,A);
+    if((points[5][1]!=0) or surface_generic_same_elliptic_point(points[5],tau))
+    {
+      continue;
+    }
+    duplicate=0;
+    for(j=1;j<=4;j=j+1)
+    {
+      if(surface_generic_same_elliptic_point(points[5],points[j])) { duplicate=1; }
+    }
+    if(duplicate==0) { return(list(1,points)); }
+  }
+  return(list(0,list()));
+}
+
+static proc surface_generic_DES_point_ideal(list points)
+"USAGE:   surface_generic_DES_point_ideal(points);
+RETURN:  the homogeneous ideal of five points [1:x:y:x^2:x*y] in P^4.
+PURPOSE: Internal helper for the first (2,2) link in Popescu Section 3.8.
+"
+{
+  if(nvars(basering)!=5)
+  {
+    ERROR("surface_generic_DES_point_ideal requires a five-variable ring");
+  }
+  ideal pointUnion=ideal(1);
+  int i;
+  matrix P[2][5];
+  for(i=1;i<=5;i=i+1)
+  {
+    P[1,1]=var(1); P[1,2]=var(2); P[1,3]=var(3);
+    P[1,4]=var(4); P[1,5]=var(5);
+    P[2,1]=1;
+    P[2,2]=points[i][2];
+    P[2,3]=points[i][3];
+    P[2,4]=points[i][2]^2;
+    P[2,5]=points[i][2]*points[i][3];
+    pointUnion=intersect(pointUnion,minor(P,2));
+  }
+  return(std(pointUnion));
+}
+
+static proc surface_generic_DES_translation_scroll(number A, number r)
+"USAGE:   surface_generic_DES_translation_scroll(A,r);
+RETURN:  the elliptic quintic translation scroll Q in the current P^4.
+MATHEMATICS:
+         E is y^2=x^3+A*x+B with B=-r^3-A*r and tau=(r,0).  The procedure
+         eliminates x,y and the two line parameters from the span of P and
+         P+tau.  Thus Q is the union of the corresponding secant lines.
+FIELD:   a prime field of characteristic greater than 3.
+"
+{
+  def targetRing=basering;
+  string rname="surface_generic_DES_scroll"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(targetRing)+",(stgx,stgy,stgu,stgv,stgz0,stgz1,stgz2,stgz3,stgz4),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def scrollRing=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring scrollRing;
+  number AA=imap(targetRing,A);
+  number rr=imap(targetRing,r);
+  number BB=-rr^3-AA*rr;
+  poly D=var(1)-rr;
+  poly N=rr*var(1)+2*rr^2+AA;
+  number c=AA+3*rr^2;
+  ideal graph=
+    var(2)^2-var(1)^3-AA*var(1)-BB,
+    var(5)-(var(3)+var(4)*D^3),
+    var(6)-(var(3)*var(1)+var(4)*N*D^2),
+    var(7)-(var(3)*var(2)-var(4)*c*var(2)*D),
+    var(8)-(var(3)*var(1)^2+var(4)*N^2*D),
+    var(9)-(var(3)*var(1)*var(2)-var(4)*c*N*var(2));
+  ideal Qbig=minbase(eliminate(graph,surface_generic_product_eliminate_vars(4)));
+  setring targetRing;
+  map projectScroll=scrollRing,0,0,0,0,var(1),var(2),var(3),var(4),var(5);
+  ideal Q=surface_generic_saturated_ideal(projectScroll(Qbig));
+  return(Q);
+}
+
+static proc surface_generic_MB_raomodule(number a, number b)
+"USAGE:   surface_generic_MB_raomodule(a,b);
+RETURN:  the sum of the ideals of two elliptic normal quintics in the current
+         five-variable ring.
+PURPOSE: Internal helper for surface_generic_enriques_d11_pi10_MB_dim31.  The parameters a
+         and b are the two points on the polar conic in the Moore normal form.
+"
+{
+  if(nvars(basering)!=5)
+  {
+    ERROR("surface_generic_MB_raomodule requires a ring with five variables");
+  }
+
+  map sigma=basering,var(5),var(1),var(2),var(3),var(4);
+  ideal M=ideal();
+  poly q=var(3)*var(4)+a*var(1)^2-a^2*var(2)*var(5);
+  int i;
+  for(i=1;i<=5;i=i+1)
+  {
+    q=sigma(q);
+    M[size(M)+1]=q;
+  }
+  q=var(3)*var(4)+b*var(1)^2-b^2*var(2)*var(5);
+  for(i=1;i<=5;i=i+1)
+  {
+    q=sigma(q);
+    M[size(M)+1]=q;
+  }
+  return(minbase(M));
+}
+
+static proc surface_generic_MB_split_polar_point(def rootRing, number bringA)
+"USAGE:   surface_generic_MB_split_polar_point(rootRing,bringA);
+RETURN:  list [found,bringC,polarA,polarB].  If found=1, (bringA:1:bringC)
+         lies on the Bring curve and polarA,polarB are the two distinct roots
+         of the corresponding polar quadratic.
+PURPOSE: Internal univariate finite-field root extraction for the normalized
+         Moore/Bring construction.  rootRing is a reusable one-variable ring;
+         factoring there avoids multivariate factorization in the ambient P^4
+         ring and avoids rebuilding a coefficient ring for every trial.
+FIELD:   a prime field of characteristic different from 2 and 5.
+"
+{
+  def targetRing=basering;
+  setring rootRing;
+
+  number a=imap(targetRing,bringA);
+  poly bringPolynomial=a^4*var(1)-a^2*var(1)^2
+                       -a*(1+var(1)^5)+2*var(1)^3;
+  ideal bringFactors=factorize(bringPolynomial,1);
+  poly polarPolynomial;
+  ideal polarFactors;
+  poly currentFactor;
+  number bringC;
+  number polarDiscriminant;
+  number polarA;
+  number polarB;
+  int bringFactorIndex;
+  int currentFactorIndex;
+  int polarFactorIndex;
+  int currentPolarFactorIndex;
+  int rootCount;
+  bringFactorIndex=1;
+  while(bringFactorIndex<=size(bringFactors))
+  {
+    currentFactorIndex=bringFactorIndex;
+    bringFactorIndex++;
+    if(deg(bringFactors[currentFactorIndex])!=1) { continue; }
+    bringC=-leadcoef(subst(bringFactors[currentFactorIndex],var(1),0))
+           /leadcoef(bringFactors[currentFactorIndex]);
+    if(bringC==0) { continue; }
+
+    polarDiscriminant=a^2+4*bringC;
+    if(polarDiscriminant==0) { continue; }
+
+    polarPolynomial=-bringC*var(1)^2+a*var(1)+1;
+    polarFactors=factorize(polarPolynomial,1);
+    polarFactorIndex=1;
+    rootCount=0;
+    while(polarFactorIndex<=size(polarFactors))
+    {
+      currentPolarFactorIndex=polarFactorIndex;
+      polarFactorIndex++;
+      currentFactor=polarFactors[currentPolarFactorIndex];
+      if(deg(currentFactor)==1)
+      {
+        rootCount++;
+        if(rootCount==1)
+        {
+          polarA=-leadcoef(subst(currentFactor,var(1),0))
+                 /leadcoef(currentFactor);
+        }
+        if(rootCount==2)
+        {
+          polarB=-leadcoef(subst(currentFactor,var(1),0))
+                 /leadcoef(currentFactor);
+        }
+      }
+    }
+    if((rootCount<2) or (polarA==polarB)) { continue; }
+
+    setring targetRing;
+    number outputBringC=imap(rootRing,bringC);
+    number outputPolarA=imap(rootRing,polarA);
+    number outputPolarB=imap(rootRing,polarB);
+    return(list(1,outputBringC,outputPolarA,outputPolarB));
+  }
+
+  setring targetRing;
+  return(list(0,number(0),number(0),number(0)));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Direct generic surface-type constructors
+///////////////////////////////////////////////////////////////////////////////
+
+proc surface_generic_info()
+"USAGE:   surface_generic_info();
+RETURN:  a short string describing the library.
+MATHEMATICS:
+         The library constructs generic representatives by geometric recipes:
+         determinantal scrolls for rational ruled surfaces, complete
+         intersections for K3 surfaces, products of curves for abelian/elliptic
+         surfaces, free quotient data for Enriques and bielliptic surfaces, the
+         full older 34-dimensional Decker--Ein--Schreyer degree-11 Enriques
+         family, and its separate normalized Moore/Bring specialization.
+EXAMPLE: surface_generic_info();
+"
+{
+  string s="surface_type_generics.lib: stand-alone generic constructions for ";
+  s=s+"rational, elliptic ruled, K3, Enriques, abelian, bielliptic, and ";
+  s=s+"properly elliptic surface types.  Constructors return [ring,ideal,type,notes], ";
+  s=s+"or quotient-cover data for finite quotient types.  The full older ";
+  s=s+"34-dimensional degree-11 Enriques liaison family in P^4 and a separate ";
+  s=s+"Moore/Bring specialization are included.";
+  return(s);
+}
+
+proc surface_generic_surface_types()
+"USAGE:   surface_generic_surface_types();
+RETURN:  list of supported type names.
+MATHEMATICS:
+         These names correspond to the surface types in the Enriques-Kodaira
+         classification which occur in the catalogue for non-general-type
+         surfaces: rational/ruled, Kodaira dimension 0 types, and properly
+         elliptic types.
+EXAMPLE: list T=surface_generic_surface_types(); T;
+"
+{
+  list T="rational","rational_scroll","projected_veronese","elliptic_ruled","K3","Enriques","abelian","bielliptic","elliptic";
+  return(T);
+}
+
+proc surface_generic_cubic_scroll(list #)
+"USAGE:   surface_generic_cubic_scroll([bound]);
+RETURN:  list [R,I,\"rational\",description], where I is generated by the 2x2
+         minors of a generic 2x3 matrix of linear forms in P^4.
+MATHEMATICS:
+         A 1-generic 2x3 matrix of linear forms on P^4 has rank-one locus a
+         smooth cubic rational normal scroll.  The 1-generic condition is open;
+         random coefficients give a generic member of this determinantal family.
+EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_cubic_scroll(); setring S[1]; S[2];
+"
+{
+  int bound=surface_generic_default_bound(#);
+  def oldring=basering;
+  string rname="surface_generic_cubic_scroll_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(x0,x1,x2,x3,x4),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+
+  matrix M[2][3];
+  int i;
+  int j;
+  for(i=1;i<=2;i=i+1)
+  {
+    for(j=1;j<=3;j=j+1)
+    {
+      M[i,j]=surface_generic_random_homogeneous(1,bound);
+    }
+  }
+  ideal I=minor(M,2);
+  list Out=R,I,"rational","generic cubic rational normal scroll in P^4 from 2x2 minors of a 1-generic 2x3 linear matrix";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_projected_veronese(list #)
+"USAGE:   surface_generic_projected_veronese([bound]);
+RETURN:  list [Rbig,J,\"rational\",description].  J is an elimination ideal for
+         the image of P^2 by five random conics.
+MATHEMATICS:
+         The complete conic system embeds P^2 as the Veronese surface in P^5.
+         A general five-dimensional subsystem is projection from a point outside
+         the secant hypersurface, hence gives a smooth projected Veronese surface
+         in P^4.  Smoothness is an open condition on the chosen subsystem.
+EXAMPLE: ring r=31991,(dummy),dp; list V=surface_generic_projected_veronese(); setring V[1]; V[2];
+"
+{
+  int bound=surface_generic_default_bound(#);
+  def oldring=basering;
+  string rname="surface_generic_projected_veronese_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(s,t,u,y1,y2,y3,y4,y5),(dp(3),dp(5));");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def Rbig=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring Rbig;
+  ideal F;
+  F[1]=s^2+surface_generic_coeff(bound)*t*u;
+  F[2]=t^2+surface_generic_coeff(bound)*s*u;
+  F[3]=u^2+surface_generic_coeff(bound)*s*t;
+  F[4]=s*t+surface_generic_coeff(bound)*s*u;
+  F[5]=t*u+surface_generic_coeff(bound)*s*u+surface_generic_coeff(bound)*s*t;
+  ideal E;
+  int i;
+  for(i=1;i<=5;i=i+1)
+  {
+    E[i]=var(3+i)-F[i];
+  }
+  poly src=s*t*u;
+  ideal J=eliminate(E,src);
+  string tname="surface_generic_projected_veronese_target_R"+surface_generic_unique_suffix();
+  execute("ring "+tname+"="+charstr(oldring)+",(y1,y2,y3,y4,y5),dp;");
+  execute("def surface_generic_CREATED_RING="+tname+";");
+  def Rt=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring Rt;
+  ideal Jt=imap(Rbig,J);
+  list Out=Rt,Jt,"rational","generic projected Veronese surface: image of P^2 by a general 5-dimensional subsystem of conics";
+  execute("keepring "+tname+";");
+  return(Out);
+}
+
+proc surface_generic_K3(list #)
+"USAGE:   surface_generic_K3([bound]);
+RETURN:  list [R,I,\"K3\",description], where I=(quadric,cubic) in P^4.
+MATHEMATICS:
+         A smooth complete intersection of type (2,3) in P^4 has trivial
+         canonical bundle by adjunction, H^1(O)=0 by the Lefschetz/complete
+         intersection cohomology calculation, and is a K3 surface.  Smoothness
+         is open in the space of pairs (Q,C).
+EXAMPLE: ring r=31991,(dummy),dp; list K=surface_generic_K3(); setring K[1]; K[2];
+"
+{
+  int bound=surface_generic_default_bound(#);
+  def oldring=basering;
+  string rname="surface_generic_K3_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(x0,x1,x2,x3,x4),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+  poly Q=surface_generic_random_homogeneous(2,bound);
+  poly C=surface_generic_random_homogeneous(3,bound);
+  ideal I=Q,C;
+  list Out=R,I,"K3","generic smooth complete intersection of a quadric and a cubic in P^4";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_abelian_product(list #)
+"USAGE:   surface_generic_abelian_product([lambda,mu]);
+RETURN:  list [R,I,\"abelian\",description], where I defines E_lambda x E_mu
+         in the Segre P^2 x P^2 subset P^8.
+MATHEMATICS:
+         A smooth plane cubic is an elliptic curve.  The product of two elliptic
+         curves is an abelian surface.  The Segre equations impose rank one on a
+         3x3 coordinate matrix; the column equations cut the first cubic and the
+         row equations cut the second cubic.
+EXAMPLE: ring r=31991,(dummy),dp; list A=surface_generic_abelian_product(2,5); setring A[1]; A[2];
+"
+{
+  string lambdaString="2";
+  string muString="5";
+  if(size(#)>0) { lambdaString=string(#[1]); }
+  if(size(#)>1) { muString=string(#[2]); }
+  def oldring=basering;
+  string rname="surface_generic_abelian_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(z00,z01,z02,z10,z11,z12,z20,z21,z22),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+  execute("number lambdaCoeff="+lambdaString+";");
+  execute("number muCoeff="+muString+";");
+  matrix Z[3][3]=z00,z01,z02,z10,z11,z12,z20,z21,z22;
+  ideal I=surface_generic_segre_2x2_minors(Z);
+  int j;
+  for(j=1;j<=3;j=j+1)
+  {
+    I[size(I)+1]=surface_generic_hesse(Z[1,j],Z[2,j],Z[3,j],lambdaCoeff);
+  }
+  int i;
+  for(i=1;i<=3;i=i+1)
+  {
+    I[size(I)+1]=surface_generic_hesse(Z[i,1],Z[i,2],Z[i,3],muCoeff);
+  }
+  list Out=R,I,"abelian","generic product abelian surface E_lambda x E_mu in the Segre embedding P^2 x P^2 -> P^8; choose lambda^3 and mu^3 different from 1";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_elliptic_ruled(list #)
+"USAGE:   surface_generic_elliptic_ruled([lambda]);
+RETURN:  list [R,I,\"ruled\",description], defining E_lambda x P^1 in the
+         Segre P^2 x P^1 subset P^5.
+MATHEMATICS:
+         The product E x P^1 is a geometrically ruled surface over an elliptic
+         curve.  It has Kodaira dimension -infinity and irregularity 1.  The
+         Segre rank-one equations give P^2 x P^1, and the cubic equation in
+         every column cuts the elliptic curve factor.
+EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_ruled(2); setring S[1]; S[2];
+"
+{
+  string lambdaString="2";
+  if(size(#)>0) { lambdaString=string(#[1]); }
+  def oldring=basering;
+  string rname="surface_generic_elliptic_ruled_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(z00,z01,z10,z11,z20,z21),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+  execute("number lambdaCoeff="+lambdaString+";");
+  matrix Z[3][2]=z00,z01,z10,z11,z20,z21;
+  ideal I=surface_generic_segre_2x2_minors(Z);
+  I[size(I)+1]=surface_generic_hesse(Z[1,1],Z[2,1],Z[3,1],lambdaCoeff);
+  I[size(I)+1]=surface_generic_hesse(Z[1,2],Z[2,2],Z[3,2],lambdaCoeff);
+  list Out=R,I,"ruled","generic ruled surface E x P^1 over a smooth Hesse cubic E; same Kodaira type as elliptic scroll examples, not the special quintic P^4 embedding";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_elliptic_surface(list #)
+"USAGE:   surface_generic_elliptic_surface([lambda,bound]);
+RETURN:  list [R,I,\"elliptic\",description], defining E_lambda x C where C is
+         a random smooth plane quartic, inside the Segre P^2 x P^2 subset P^8.
+MATHEMATICS:
+         Projection to the genus-3 curve C gives an isotrivial elliptic fibration
+         with fibre E.  Since kappa(E)=0 and kappa(C)=1, the product surface has
+         Kodaira dimension 1.  Smoothness of the quartic is open.
+EXAMPLE: ring r=31991,(dummy),dp; list E=surface_generic_elliptic_surface(2,10); setring E[1]; E[2];
+"
+{
+  string lambdaString="2";
+  int bound=20;
+  if(size(#)>0) { lambdaString=string(#[1]); }
+  if(size(#)>1) { bound=#[2]; }
+  def oldring=basering;
+  string rname="surface_generic_elliptic_surface_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(z00,z01,z02,z10,z11,z12,z20,z21,z22),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+  execute("number lambdaCoeff="+lambdaString+";");
+  matrix Z[3][3]=z00,z01,z02,z10,z11,z12,z20,z21,z22;
+  ideal I=surface_generic_segre_2x2_minors(Z);
+  int j;
+  for(j=1;j<=3;j=j+1)
+  {
+    I[size(I)+1]=surface_generic_hesse(Z[1,j],Z[2,j],Z[3,j],lambdaCoeff);
+  }
+  number a=surface_generic_coeff(bound);
+  number b=surface_generic_coeff(bound);
+  number c=surface_generic_coeff(bound);
+  number d=surface_generic_coeff(bound);
+  poly Q1=surface_generic_quartic3_special(Z[1,1],Z[1,2],Z[1,3],a,b,c,d);
+  poly Q2=surface_generic_quartic3_special(Z[2,1],Z[2,2],Z[2,3],a,b,c,d);
+  poly Q3=surface_generic_quartic3_special(Z[3,1],Z[3,2],Z[3,3],a,b,c,d);
+  I[size(I)+1]=Q1;
+  I[size(I)+1]=Q2;
+  I[size(I)+1]=Q3;
+  list Out=R,I,"elliptic","generic isotrivial properly elliptic surface E x C, with E a Hesse cubic and C a random smooth plane quartic";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_enriques_d11_pi10_DES_dim34(list #)
+"USAGE:   surface_generic_enriques_d11_pi10_DES_dim34([bound,checkSmooth,maxTries]);
+RETURN:  list [R,I,\"Enriques\",description].  The ideal I defines a member
+         of the 34-dimensional Decker--Ein--Schreyer family in P^4, of degree
+         11 and sectional genus 10.
+PARAMETERS:
+         bound is the coefficient bound for random choices (default 20);
+         checkSmooth asks for Jacobian certificates for every smooth variety
+         used in the linkage chain (default 1); maxTries bounds the number of
+         complete random liaison attempts (default 20).  Failure is an error;
+         the routine never substitutes a stored surface or another family.
+MATHEMATICS:
+         This implements Popescu's liaison completion of the original
+         Decker--Ein--Schreyer construction.  Start with an elliptic normal
+         quintic E and a nonzero two-torsion point tau.  Five distinct points
+         p_i with sum tau and a general plane determine the chain
+
+           plane <-(2,2)-> cubic scroll T <-(3,3)-> Bordiga surface B.
+
+         The union of the lines <p,p+tau> is an elliptic quintic scroll Q.
+         There is a unique quintic V through B union Q.  Linking B by (3,5)
+         gives a degree-nine surface Z; linking Q union Z by (5,5) gives I.
+         The output has five quintic and ten sextic minimal generators.  The
+         quintics link it back to Q, whose ruling is the one-dimensional
+         family of six-secant lines.  Popescu proves that a general smooth
+         output is an Enriques surface blown up in six points and that this
+         DES family is irreducible, unirational, and 34-dimensional.
+FIELD:   The automatic point sampler is implemented over a prime field F_p
+         with p>3.  It uses a short Weierstrass model and Tonelli--Shanks.
+         The characteristic-zero family is obtained by the lifting argument
+         in the references; this finite-field routine does not perform that
+         lift.
+REFERENCES:
+         W. Decker, L. Ein, F.-O. Schreyer, Construction of surfaces in P^4,
+         J. Algebraic Geometry 2 (1993), 185-237;
+         S. Popescu, On smooth surfaces of degree >= 11 in P^4, thesis,
+         Sections 3.7--3.8 and Appendix 11.A.
+EXAMPLE:
+  ring r=1019,(dummy),dp;
+  list E=surface_generic_enriques_d11_pi10_DES_dim34(20,1,20);
+  setring E[1];
+  ideal I=E[2];
+  dim(std(I)),mult(std(I)),hilbPoly(std(I));
+"
+{
+  int bound=surface_generic_default_bound(#);
+  int checkSmooth=1;
+  int maxTries=20;
+  if(size(#)>1) { checkSmooth=#[2]; }
+  if(size(#)>2) { maxTries=#[3]; }
+  if(maxTries<1) { maxTries=20; }
+
+  int characteristic=char(basering);
+  if(characteristic==0)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_DES_dim34: the automatic liaison sampler requires a finite prime field");
+  }
+  if(npars(basering)!=0)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_DES_dim34: the automatic liaison sampler requires a prime coefficient field");
+  }
+  if(characteristic<=3)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_DES_dim34: the short Weierstrass construction requires characteristic greater than 3");
+  }
+
+  def oldring=basering;
+  string rname="surface_generic_enriques_d11_pi10_DES_dim34_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(x0,x1,x2,x3,x4),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+
+  intvec hpTExpected=2,5,3;
+  intvec hpBExpected=2,2,6;
+  intvec hpQExpected=0,5,5;
+  intvec hpZExpected=8,-7,9;
+  intvec hpYExpected=8,-22,14;
+  intvec hpSExpected=2,-7,11;
+  int constructionFound;
+  int constructionAttempts;
+  int i;
+  int quinticCount;
+  int sexticCount;
+  number A;
+  number r;
+  number WeierstrassB;
+  number discriminant;
+  list pointData;
+  list points;
+  ideal ellipticCurve;
+  ideal pointIdeal;
+  poly planeEquation1;
+  poly planeEquation2;
+  ideal plane;
+  ideal planeAndPoints;
+  ideal quadrics;
+  poly quadric1;
+  poly quadric2;
+  ideal cubicScroll;
+  ideal scrollCurveUnion;
+  ideal cubicsThroughScrollCurve;
+  poly cubic1;
+  poly cubic2;
+  ideal Bordiga;
+  ideal ellipticScroll;
+  ideal BordigaScrollUnion;
+  ideal commonQuintics;
+  poly uniqueQuintic;
+  ideal BordigaCubics;
+  poly BordigaCubic;
+  ideal degreeNineSurface;
+  ideal intersectionCurve;
+  ideal linkageUnion;
+  ideal unionQuintics;
+  ideal surfaceIdeal;
+  ideal minimalSurfaceIdeal;
+  ideal surfaceQuintics;
+  ideal residualScroll;
+  ideal residualIntersection;
+
+  while((constructionFound==0) and (constructionAttempts<maxTries))
+  {
+    constructionAttempts++;
+    A=surface_generic_coeff(bound);
+    r=surface_generic_coeff(bound);
+    WeierstrassB=-r^3-A*r;
+    discriminant=4*A^3+27*WeierstrassB^2;
+    if(discriminant==0) { continue; }
+
+    ellipticCurve=
+      var(2)^2-var(1)*var(4),
+      var(2)*var(3)-var(1)*var(5),
+      var(3)*var(4)-var(2)*var(5),
+      var(3)^2-var(2)*var(4)-A*var(1)*var(2)-WeierstrassB*var(1)^2,
+      var(3)*var(5)-var(4)^2-A*var(1)*var(4)-WeierstrassB*var(1)*var(2);
+    ellipticCurve=surface_generic_saturated_ideal(ellipticCurve);
+    if(dim(ellipticCurve)!=2) { continue; }
+    if(mult(ellipticCurve)!=5) { continue; }
+    if(checkSmooth!=0)
+    {
+      if(surface_generic_projectively_smooth(ellipticCurve,3)==0) { continue; }
+    }
+
+    pointData=surface_generic_DES_five_points(characteristic,A,WeierstrassB,r);
+    if(pointData[1]==0) { continue; }
+    points=pointData[2];
+    pointIdeal=surface_generic_DES_point_ideal(points);
+    if((dim(pointIdeal)!=1) or (mult(pointIdeal)!=5)) { continue; }
+
+    planeEquation1=surface_generic_random_homogeneous(1,bound);
+    planeEquation2=surface_generic_random_homogeneous(1,bound);
+    plane=std(ideal(planeEquation1,planeEquation2));
+    if(dim(plane)!=3) { continue; }
+    planeAndPoints=intersect(plane,pointIdeal);
+    if(surface_generic_has_generator_below(planeAndPoints,2)!=0) { continue; }
+    quadrics=surface_generic_generators_of_degree(planeAndPoints,2);
+    if(size(quadrics)!=4) { continue; }
+    quadric1=surface_generic_random_combination(quadrics,bound);
+    quadric2=surface_generic_random_combination(quadrics,bound);
+    cubicScroll=surface_generic_link(ideal(quadric1,quadric2),plane);
+    if((dim(cubicScroll)!=3) or (mult(cubicScroll)!=3)) { continue; }
+    if(hilbPoly(cubicScroll)!=hpTExpected) { continue; }
+    if(checkSmooth!=0)
+    {
+      if(surface_generic_projectively_smooth(cubicScroll,2)==0) { continue; }
+    }
+    if((dim(std(cubicScroll+ellipticCurve))!=1)
+       or (mult(std(cubicScroll+ellipticCurve))!=5)) { continue; }
+
+    scrollCurveUnion=intersect(cubicScroll,ellipticCurve);
+    if(surface_generic_has_generator_below(scrollCurveUnion,3)!=0) { continue; }
+    cubicsThroughScrollCurve=surface_generic_generators_of_degree(scrollCurveUnion,3);
+    if(size(cubicsThroughScrollCurve)!=3) { continue; }
+    cubic1=surface_generic_random_combination(cubicsThroughScrollCurve,bound);
+    cubic2=surface_generic_random_combination(cubicsThroughScrollCurve,bound);
+    Bordiga=surface_generic_link(ideal(cubic1,cubic2),cubicScroll);
+    if((dim(Bordiga)!=3) or (mult(Bordiga)!=6)) { continue; }
+    if(hilbPoly(Bordiga)!=hpBExpected) { continue; }
+    if(surface_generic_has_generator_below(Bordiga,3)!=0) { continue; }
+    if(size(surface_generic_generators_of_degree(Bordiga,3))!=4) { continue; }
+    if(checkSmooth!=0)
+    {
+      if(surface_generic_projectively_smooth(Bordiga,2)==0) { continue; }
+    }
+    if((dim(std(Bordiga+ellipticCurve))!=2)
+       or (mult(std(Bordiga+ellipticCurve))!=5)) { continue; }
+
+    ellipticScroll=surface_generic_DES_translation_scroll(A,r);
+    if((dim(ellipticScroll)!=3) or (mult(ellipticScroll)!=5)) { continue; }
+    if(hilbPoly(ellipticScroll)!=hpQExpected) { continue; }
+    if(surface_generic_has_generator_below(ellipticScroll,3)!=0) { continue; }
+    if(size(surface_generic_generators_of_degree(ellipticScroll,3))!=5) { continue; }
+    if(checkSmooth!=0)
+    {
+      if(surface_generic_projectively_smooth(ellipticScroll,2)==0) { continue; }
+    }
+    if((dim(std(ellipticScroll+ellipticCurve))!=2)
+       or (mult(std(ellipticScroll+ellipticCurve))!=5)) { continue; }
+
+    BordigaScrollUnion=intersect(Bordiga,ellipticScroll);
+    if(surface_generic_has_generator_below(BordigaScrollUnion,5)!=0) { continue; }
+    commonQuintics=surface_generic_generators_of_degree(BordigaScrollUnion,5);
+    if(size(commonQuintics)!=1) { continue; }
+    uniqueQuintic=commonQuintics[1];
+    BordigaCubics=surface_generic_generators_of_degree(Bordiga,3);
+    if(size(BordigaCubics)!=4) { continue; }
+    BordigaCubic=surface_generic_random_combination(BordigaCubics,bound);
+    degreeNineSurface=surface_generic_link(ideal(uniqueQuintic,BordigaCubic),Bordiga);
+    if((dim(degreeNineSurface)!=3) or (mult(degreeNineSurface)!=9)) { continue; }
+    if(hilbPoly(degreeNineSurface)!=hpZExpected) { continue; }
+    if(checkSmooth!=0)
+    {
+      if(surface_generic_projectively_smooth(degreeNineSurface,2)==0) { continue; }
+    }
+
+    intersectionCurve=std(degreeNineSurface+ellipticScroll);
+    if((dim(intersectionCurve)!=2) or (mult(intersectionCurve)!=10)) { continue; }
+    if(checkSmooth!=0)
+    {
+      if(surface_generic_projectively_smooth(intersectionCurve,3)==0) { continue; }
+    }
+    linkageUnion=intersect(ellipticScroll,degreeNineSurface);
+    if((dim(std(linkageUnion))!=3) or (mult(std(linkageUnion))!=14)) { continue; }
+    if(hilbPoly(std(linkageUnion))!=hpYExpected) { continue; }
+    if(surface_generic_has_generator_below(linkageUnion,5)!=0) { continue; }
+    unionQuintics=surface_generic_generators_of_degree(linkageUnion,5);
+    if(size(unionQuintics)!=2) { continue; }
+    surfaceIdeal=surface_generic_link(ideal(unionQuintics[1],unionQuintics[2]),linkageUnion);
+    if((dim(surfaceIdeal)!=3) or (mult(surfaceIdeal)!=11)) { continue; }
+    if(hilbPoly(surfaceIdeal)!=hpSExpected) { continue; }
+
+    minimalSurfaceIdeal=minbase(surfaceIdeal);
+    if((size(minimalSurfaceIdeal)!=15)
+       or (surface_generic_has_generator_below(minimalSurfaceIdeal,5)!=0)) { continue; }
+    quinticCount=0;
+    sexticCount=0;
+    surfaceQuintics=ideal();
+    for(i=1;i<=size(minimalSurfaceIdeal);i=i+1)
+    {
+      if(deg(minimalSurfaceIdeal[i])==5)
+      {
+        quinticCount++;
+        surfaceQuintics[size(surfaceQuintics)+1]=minimalSurfaceIdeal[i];
+      }
+      if(deg(minimalSurfaceIdeal[i])==6) { sexticCount++; }
+    }
+    if((quinticCount!=5) or (sexticCount!=10)) { continue; }
+    residualScroll=surface_generic_saturated_ideal(quotient(surfaceQuintics,surfaceIdeal));
+    if((dim(residualScroll)!=3) or (mult(residualScroll)!=5)) { continue; }
+    if(hilbPoly(residualScroll)!=hpQExpected) { continue; }
+    if(surface_generic_same_ideal(residualScroll,ellipticScroll)==0) { continue; }
+    residualIntersection=std(residualScroll+surfaceIdeal);
+    if((dim(residualIntersection)!=2) or (mult(residualIntersection)!=20)) { continue; }
+    if(checkSmooth!=0)
+    {
+      if(surface_generic_projectively_smooth(surfaceIdeal,2)==0) { continue; }
+    }
+    constructionFound=1;
+  }
+  if(constructionFound==0)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_DES_dim34: no valid Popescu--DES liaison member found within maxTries");
+  }
+
+  attrib(surfaceIdeal,"construction","Popescu liaison completion of the Decker--Ein--Schreyer Enriques family");
+  attrib(surfaceIdeal,"familyDimension",34);
+  attrib(surfaceIdeal,"degree",11);
+  attrib(surfaceIdeal,"sectionalGenus",10);
+  attrib(surfaceIdeal,"constructionAttempts",constructionAttempts);
+  attrib(surfaceIdeal,"smoothnessChecked",checkSmooth!=0);
+  attrib(surfaceIdeal,"residualScrollDegree",5);
+  string description="random member of the irreducible unirational 34-dimensional Decker--Ein--Schreyer family in P^4, constructed by Popescu's liaison chain; degree 11, sectional genus 10, five quintic and ten sextic minimal generators, with an elliptic quintic scroll residual to the quintics";
+  if(checkSmooth!=0)
+  {
+    description=description+"; all smoothness hypotheses and the final surface were certified by the Jacobian criterion";
+  }
+  else
+  {
+    description=description+"; smoothness was not checked";
+  }
+  list Out=R,surfaceIdeal,"Enriques",description;
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_enriques_d11_pi10_MB_dim31(list #)
+"USAGE:   surface_generic_enriques_d11_pi10_MB_dim31([bound,checkSmooth,maxTries]);
+RETURN:  list [R,I,\"Enriques\",description].  The ideal I defines a surface
+         in P^4 of degree 11 and sectional genus 10.
+PARAMETERS:
+         bound is the coefficient bound for the random constant 5x2 matrix
+         (default 20); checkSmooth asks the constructor to certify projective
+         smoothness and retry if necessary (default 1); maxTries bounds the
+         random determinantal-map trials (default 20).
+MATHEMATICS:
+         This is a normalized Moore/Bring specialization inside the older DES
+         construction, not a parametrization of its full 34-dimensional family.
+         A point on the Bring curve determines a polar line to the Moore conic;
+         its two intersection points parameterize two elliptic normal quintics
+         on a common elliptic quintic scroll.  Their ideal sum presents the
+         finite-length Rao module S/M with Hilbert function (1,5,5).  The
+         procedure extracts its five extra degree-four third syzygies and
+         performs Schreyer's double-syzygy construction.  Equivalently, it uses
+             2*Omega^3_P4(3) -> ker(10*O_P4 -> O_P4(2)).
+         The resulting ideal has five quintic and ten sextic minimal generators.
+         A smooth member is an Enriques surface blown up in six points.  The
+         tangent computation for this normalized module locus gives dimension
+         25; the choice Gr(2,5) adds 6, so this construction is locally
+         incomplete and has image dimension at most 31.  Use
+         surface_generic_enriques_d11_pi10_DES_dim34 for the full older 34-dimensional liaison
+         family.
+FIELD:   The implemented random parameter search is for prime fields of
+         characteristic different from 2 and 5.  Very small fields may not
+         contain a usable split-polar specialization within the bounded point
+         search.
+REFERENCES:
+         W. Decker, L. Ein, F.-O. Schreyer, Construction of surfaces in P^4,
+         J. Algebraic Geometry 2 (1993), 185-237;
+         S. Popescu, On smooth surfaces of degree >= 11 in P^4, thesis,
+         Sections 3.7--3.8;
+         H. Abo, K. Ranestad, F.-O. Schreyer,
+         NongeneralTypeSurfacesInP4.m2 (2026), procedures
+         specialEnriquesSchreyerSurface and schreyerSurfaceFromModule.
+EXAMPLE:
+  ring r=1009,(dummy),dp;
+  list E=surface_generic_enriques_d11_pi10_MB_dim31(20,0);
+  setring E[1];
+  ideal I=E[2];
+  dim(std(I)),mult(std(I)),hilbPoly(std(I));
+"
+{
+  int bound=surface_generic_default_bound(#);
+  int checkSmooth=1;
+  int maxTries=20;
+  if(size(#)>1) { checkSmooth=#[2]; }
+  if(size(#)>2) { maxTries=#[3]; }
+  if(maxTries<1) { maxTries=20; }
+
+  int characteristic=char(basering);
+  if(characteristic==0)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_MB_dim31: the automatic Bring-curve search requires a finite coefficient field");
+  }
+  if(npars(basering)!=0)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_MB_dim31: the automatic Bring-curve search requires a prime coefficient field");
+  }
+  if((characteristic==2) or (characteristic==5))
+  {
+    ERROR("surface_generic_enriques_d11_pi10_MB_dim31: characteristics 2 and 5 are not supported by this Moore/Bring-curve construction");
+  }
+
+  def oldring=basering;
+  string rname="surface_generic_enriques_d11_pi10_MB_dim31_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(x0,x1,x2,x3,x4),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+
+  string rootRingName=rname+"_roots";
+  execute("ring "+rootRingName+"="+charstr(R)+",(t),dp;");
+  execute("def surface_generic_CREATED_RING="+rootRingName+";");
+  def rootRing=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+
+  // A point (bringA:1:bringC) on the Bring sextic determines a polar
+  // line to u0^2+4*u1*u2.  Its two intersection points with that conic
+  // are the Moore parameters polarA and polarB for the elliptic quintics.
+  number bringA;
+  number bringC;
+  number polarA;
+  number polarB;
+  list polarPointData;
+  ideal M=ideal();
+  ideal GM;
+  int pointFound;
+  int pointAttempts;
+  int pointLimit=10*maxTries;
+  if(pointLimit<100) { pointLimit=100; }
+  int i;
+
+  while((pointFound==0) and (pointAttempts<pointLimit))
+  {
+    pointAttempts++;
+    bringA=random(1,characteristic-1);
+    polarPointData=surface_generic_MB_split_polar_point(rootRing,bringA);
+    if(polarPointData[1]==0) { continue; }
+    bringC=polarPointData[2];
+    polarA=polarPointData[3];
+    polarB=polarPointData[4];
+
+    M=surface_generic_MB_raomodule(polarA,polarB);
+    GM=std(M);
+    if((size(M)==10) and (dim(GM)==0) and (vdim(GM)==11))
+    {
+      pointFound=1;
+    }
+  }
+  if(pointFound==0)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_MB_dim31: no usable split-polar Bring-curve point found; use a larger finite field or increase maxTries");
+  }
+
+  // The resolution of S/M has Betti totals 1,10,25,31,20,5.  Select
+  // summands by their homogeneous shifts, never by accidental column order.
+  resolution FM=mres(M,0);
+  if(size(FM)<4)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_MB_dim31: the sampled Rao module has the wrong resolution length");
+  }
+  matrix d2=FM[2];
+  matrix d3=FM[3];
+  intvec shiftsF2=attrib(FM[3],"isHomog");
+  intvec shiftsF3=attrib(FM[4],"isHomog");
+  intvec degreeThreeRows;
+  intvec degreeFourColumns;
+  int numberDegreeThree;
+  int numberDegreeFour;
+  for(i=1;i<=size(shiftsF2);i=i+1)
+  {
+    if(shiftsF2[i]==3)
+    {
+      numberDegreeThree++;
+      degreeThreeRows[numberDegreeThree]=i;
+    }
+  }
+  for(i=1;i<=size(shiftsF3);i=i+1)
+  {
+    if(shiftsF3[i]==4)
+    {
+      numberDegreeFour++;
+      degreeFourColumns[numberDegreeFour]=i;
+    }
+  }
+  if((numberDegreeThree!=15) or (numberDegreeFour!=5))
+  {
+    ERROR("surface_generic_enriques_d11_pi10_MB_dim31: the sampled Rao module does not have the required 15-by-5 linear syzygy block");
+  }
+
+  matrix N=submat(d3,degreeThreeRows,degreeFourColumns);
+  matrix d2Linear=submat(d2,1..nrows(d2),degreeThreeRows);
+  matrix C[ncols(N)][2];
+  matrix N2;
+  matrix m10;
+  matrix equations;
+  module imageN2;
+  module relationsN2;
+  module constantRelations;
+  module doubleRelations;
+  module finalRelations;
+  ideal X=ideal();
+  ideal GX;
+  ideal singularCone;
+  intvec hp;
+  intvec expectedHP=2,-7,11;
+  int surfaceFound;
+  int surfaceAttempts;
+  int constantCount;
+  int quintics;
+  int sextics;
+
+  while((surfaceFound==0) and (surfaceAttempts<maxTries))
+  {
+    surfaceAttempts++;
+    for(i=1;i<=nrows(C);i=i+1)
+    {
+      C[i,1]=surface_generic_coeff(bound);
+      C[i,2]=surface_generic_coeff(bound);
+    }
+    N2=N*C;
+    imageN2=std(module(transpose(N2)));
+    if(dim(imageN2)!=0) { continue; }
+
+    relationsN2=syz(module(transpose(N2)));
+    constantRelations=module();
+    constantCount=0;
+    for(i=1;i<=size(relationsN2);i=i+1)
+    {
+      if(deg(relationsN2[i])==0)
+      {
+        constantCount++;
+        constantRelations[constantCount]=relationsN2[i];
+      }
+    }
+    if(constantCount!=5) { continue; }
+
+    doubleRelations=syz(module(transpose(matrix(constantRelations))));
+    if((nrows(matrix(doubleRelations))!=15)
+       or (ncols(matrix(doubleRelations))!=10)) { continue; }
+    m10=d2Linear*matrix(doubleRelations);
+    if((nrows(m10)!=10) or (ncols(m10)!=10)) { continue; }
+
+    finalRelations=syz(module(transpose(m10)));
+    if((nrows(matrix(finalRelations))!=10)
+       or (ncols(matrix(finalRelations))!=2)) { continue; }
+    equations=transpose(matrix(finalRelations))*d2;
+    X=minbase(ideal(equations));
+    if(size(X)!=15) { continue; }
+
+    quintics=0;
+    sextics=0;
+    for(i=1;i<=size(X);i=i+1)
+    {
+      if(deg(X[i])==5) { quintics++; }
+      if(deg(X[i])==6) { sextics++; }
+    }
+    if((quintics!=5) or (sextics!=10)) { continue; }
+
+    GX=std(X);
+    if((dim(GX)!=3) or (mult(GX)!=11)) { continue; }
+    hp=hilbPoly(GX);
+    if(hp!=expectedHP) { continue; }
+
+    if(checkSmooth!=0)
+    {
+      singularCone=std(X+minor(jacob(X),2));
+      if(dim(singularCone)!=0) { continue; }
+    }
+    surfaceFound=1;
+  }
+  if(surfaceFound==0)
+  {
+    ERROR("surface_generic_enriques_d11_pi10_MB_dim31: no valid determinantal map found within maxTries");
+  }
+
+  attrib(X,"construction","Moore--Bring specialization of the Decker--Ein--Schreyer Enriques construction");
+  attrib(X,"constructionDimensionUpperBound",31);
+  attrib(X,"ambientDESFamilyDimension",34);
+  attrib(X,"degree",11);
+  attrib(X,"sectionalGenus",10);
+  attrib(X,"smoothnessChecked",checkSmooth!=0);
+  string description="random member of the locally incomplete Moore/Bring specialization of the Decker--Ein--Schreyer construction in P^4 (construction image of dimension at most 31 inside the older 34-dimensional family); degree 11, sectional genus 10, and five quintic plus ten sextic minimal generators";
+  if(checkSmooth!=0)
+  {
+    description=description+"; projective smoothness certified by the Jacobian criterion";
+  }
+  else
+  {
+    description=description+"; projective smoothness was not checked";
+  }
+  list Out=R,X,"Enriques",description;
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_Enriques_cover(list #)
+"USAGE:   surface_generic_Enriques_cover([bound]);
+RETURN:  list [R,I,\"Enriques-cover\",involution,description].  I is a K3 cover
+         in P^5 cut out by three invariant quadrics.
+MATHEMATICS:
+         Let P^5 have coordinates x0,x1,x2,y0,y1,y2 and let iota fix the x's
+         and negate the y's.  Three general invariant quadrics q_i(x)+r_i(y)
+         cut out a smooth K3 complete intersection.  For a non-empty open set of
+         such triples, the cover avoids the two fixed P^2's of iota, so iota is
+         fixed-point-free on the K3 surface.  The quotient is then an Enriques
+         surface in characteristic not 2.
+EXAMPLE: ring r=31991,(dummy),dp; list C=surface_generic_Enriques_cover(); setring C[1]; C[2];
+"
+{
+  int bound=surface_generic_default_bound(#);
+  def oldring=basering;
+  string rname="surface_generic_Enriques_cover_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(x0,x1,x2,y0,y1,y2),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+  poly q1=surface_generic_form3(x0,x1,x2,2,bound)+surface_generic_form3(y0,y1,y2,2,bound);
+  poly q2=surface_generic_form3(x0,x1,x2,2,bound)+surface_generic_form3(y0,y1,y2,2,bound);
+  poly q3=surface_generic_form3(x0,x1,x2,2,bound)+surface_generic_form3(y0,y1,y2,2,bound);
+  ideal I=q1,q2,q3;
+  string inv="iota: (x0,x1,x2,y0,y1,y2) -> (x0,x1,x2,-y0,-y1,-y2)";
+  list Out=R,I,"Enriques-cover",inv,"quotient of this K3 cover by the displayed fixed-point-free involution is a generic Enriques-type surface, in characteristic not 2";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_Enriques_quotient_image(list #)
+"USAGE:   surface_generic_Enriques_quotient_image([bound]);
+RETURN:  list [Rbig,J,\"Enriques\",description].  J is an elimination ideal for
+         an invariant-quadratic projective model of the quotient.
+MATHEMATICS:
+         This refines surface_generic_Enriques_cover.  The quotient by y -> -y is mapped by
+         the invariant quadrics x_i x_j and y_i y_j.  Eliminating the K3-cover
+         variables gives the ideal of the image of the quotient under this
+         invariant linear system.  The computation is slower than returning the
+         cover data but is a genuine projective quotient model.
+EXAMPLE: ring r=31991,(dummy),dp; list E=surface_generic_Enriques_quotient_image(5); setring E[1]; E[2];
+"
+{
+  int bound=surface_generic_default_bound(#);
+  def oldring=basering;
+  string rname="surface_generic_Enriques_quotient_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(x0,x1,x2,y0,y1,y2,u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12),(dp(6),dp(12));");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def Rbig=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring Rbig;
+  poly q1=surface_generic_form3(x0,x1,x2,2,bound)+surface_generic_form3(y0,y1,y2,2,bound);
+  poly q2=surface_generic_form3(x0,x1,x2,2,bound)+surface_generic_form3(y0,y1,y2,2,bound);
+  poly q3=surface_generic_form3(x0,x1,x2,2,bound)+surface_generic_form3(y0,y1,y2,2,bound);
+  ideal I=q1,q2,q3;
+  ideal F;
+  F[1]=x0^2; F[2]=x0*x1; F[3]=x0*x2; F[4]=x1^2; F[5]=x1*x2; F[6]=x2^2;
+  F[7]=y0^2; F[8]=y0*y1; F[9]=y0*y2; F[10]=y1^2; F[11]=y1*y2; F[12]=y2^2;
+  ideal E=I;
+  int i;
+  for(i=1;i<=12;i=i+1)
+  {
+    E[size(E)+1]=var(6+i)-F[i];
+  }
+  poly src=x0*x1*x2*y0*y1*y2;
+  ideal J=eliminate(E,src);
+  string tname="surface_generic_Enriques_quotient_target_R"+surface_generic_unique_suffix();
+  execute("ring "+tname+"="+charstr(oldring)+",(u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12),dp;");
+  execute("def surface_generic_CREATED_RING="+tname+";");
+  def Rt=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring Rt;
+  ideal Jt=imap(Rbig,J);
+  list Out=Rt,Jt,"Enriques","projective quotient image of a generic Enriques K3 cover by invariant quadrics; characteristic not 2";
+  execute("keepring "+tname+";");
+  return(Out);
+}
+
+proc surface_generic_bielliptic_cover_data(list #)
+"USAGE:   surface_generic_bielliptic_cover_data([lambda,mu]);
+RETURN:  list [R,I,\"bielliptic-cover\",action,description], where I defines
+         E_lambda x F_mu in P^8 and action describes a free cyclic quotient.
+MATHEMATICS:
+         A bielliptic, also called hyperelliptic in the surface-classification
+         literature, surface is a free finite quotient of a product of elliptic
+         curves.  In the Hesse pencil, the cyclic permutation of coordinates is
+         a translation by a 3-torsion point on a smooth member, hence has no
+         fixed points.  Combining this free translation on the first factor with
+         an order-3 automorphism of the second factor gives a free diagonal
+         action on the product.  The quotient is bielliptic in characteristic
+         not 3; for explicit invariant equations one should work over a field
+         containing a primitive cube root of unity.
+EXAMPLE: ring r=31991,(dummy),dp; list B=surface_generic_bielliptic_cover_data(2,5); setring B[1]; B[2];
+"
+{
+  string lambdaString="2";
+  string muString="5";
+  if(size(#)>0) { lambdaString=string(#[1]); }
+  if(size(#)>1) { muString=string(#[2]); }
+  def oldring=basering;
+  string rname="surface_generic_bielliptic_cover_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(z00,z01,z02,z10,z11,z12,z20,z21,z22),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+  execute("number lambdaCoeff="+lambdaString+";");
+  execute("number muCoeff="+muString+";");
+  matrix Z[3][3]=z00,z01,z02,z10,z11,z12,z20,z21,z22;
+  ideal I=surface_generic_segre_2x2_minors(Z);
+  int j;
+  for(j=1;j<=3;j=j+1)
+  {
+    I[size(I)+1]=surface_generic_hesse(Z[1,j],Z[2,j],Z[3,j],lambdaCoeff);
+  }
+  int i;
+  for(i=1;i<=3;i=i+1)
+  {
+    I[size(I)+1]=surface_generic_hesse(Z[i,1],Z[i,2],Z[i,3],muCoeff);
+  }
+  string action="g: first Hesse factor (x0,x1,x2)->(x1,x2,x0); second factor an order-3 automorphism with quotient P^1, e.g. diagonal (u0,u1,u2)->(u0,omega*u1,omega^2*u2) over a field with omega^2+omega+1=0";
+  list Out=R,I,"bielliptic-cover",action,"the quotient of this product of elliptic curves by the displayed free cyclic action is a generic bielliptic/hyperelliptic-type surface; characteristic not 3";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_rational_surface(list #)
+"USAGE:   surface_generic_rational_surface([bound]);
+RETURN:  list [R,I,\"rational\",description].
+MATHEMATICS:
+         This is the default generic rational representative: a cubic scroll in
+         P^4.  Many rational examples in special catalogues are blow-ups of P^2
+         embedded by special linear systems; the minimal Kodaira type is already
+         represented by this generic scroll family.
+EXAMPLE: ring r=31991,(dummy),dp; list R=surface_generic_rational_surface(); setring R[1]; R[2];
+"
+{
+  int bound=surface_generic_default_bound(#);
+  def oldring=basering;
+  string rname="surface_generic_rational_R"+surface_generic_unique_suffix();
+  execute("ring "+rname+"="+charstr(oldring)+",(x0,x1,x2,x3,x4),dp;");
+  execute("def surface_generic_CREATED_RING="+rname+";");
+  def R=surface_generic_CREATED_RING;
+  kill surface_generic_CREATED_RING;
+  setring R;
+  matrix M[2][3];
+  int i;
+  int j;
+  for(i=1;i<=2;i=i+1)
+  {
+    for(j=1;j<=3;j=j+1)
+    {
+      M[i,j]=surface_generic_random_homogeneous(1,bound);
+    }
+  }
+  ideal I=minor(M,2);
+  list Out=R,I,"rational","generic rational representative: a cubic rational normal scroll in P^4";
+  execute("keepring "+rname+";");
+  return(Out);
+}
+
+proc surface_generic_genericSurface(string surfaceType, list #)
+"USAGE:   surface_generic_genericSurface(type[,parameters]);
+RETURN:  no return; use a direct constructor instead.
+MATHEMATICS:
+         This legacy dispatcher for constructors returning [ring,ideal,...]
+         lists is disabled. Use
+         surface_generic_K3, surface_generic_cubic_scroll, surface_generic_abelian_product, and the other direct
+         constructors instead.
+EXAMPLE: surface_generic_surface_types();
+"
+{
+  ERROR("surface_generic_genericSurface cannot safely dispatch ring-returning constructors; use the direct surface_generic_* constructor for the requested type");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Catalogue wrappers.  They preserve surface type, not necessarily embedded
+// degree and sectional genus.  Direct constructors preserve the standard simple
+// model: cubic scroll, projected Veronese, K3 (2,3), product models, and quotient
+// data.  The degree-11, genus-10 Enriques label has its full older
+// 34-dimensional liaison construction above, together with a separate
+// Moore/Bring syzygy specialization; most other high-degree P^4 labels are
+// represented here only by generic models of the same Kodaira type.
+///////////////////////////////////////////////////////////////////////////////
+
+proc surface_generic_catalogueNames()
+"USAGE:   surface_generic_catalogueNames();
+RETURN:  list of supported catalogue labels.
+MATHEMATICS:
+         The labels are grouped by surface type. Use a direct generic constructor
+         for a random representative of that type. For the actual stored ideal,
+         load nonGeneralTypeSurfacesP4.lib and call nonGeneralTypeSurfaceP4(name).
+EXAMPLE: list N=surface_generic_catalogueNames(); N[1];
+"
+{
+  list L="cubic_scroll","veronese","castelnuovo","bordiga","rational_d7_pi4","rational_d8_pi5","rational_d8_pi6","rational_d9_pi6","rational_d9_pi7","rational_d10_pi8","rational_d10_pi9_quart_1","rational_d10_pi9_quart_2","rational_d11_pi11_ss_0","rational_d11_pi11_ss_1","rational_d11_pi11_ss_inf","quintic_elliptic_scroll","enriques_d9_pi6","enriques_d10_pi8","enriques_d11_pi10","enriques_d13_pi16","enriques_d13_pi16_two","k3_d7_pi5","k3_d8_pi6","k3_d9_pi8","k3_d10_pi9_quart_1","k3_d10_pi9_quart_2","k3_d11_pi11_ss_0","k3_d11_pi11_ss_1","k3_d11_pi11_ss_2","k3_d11_pi11_ss_3","k3_d11_pi12","k3_d12_pi14","k3_d13_pi16","k3_d14_pi19","bielliptic_d10_pi6","bielliptic_d15_pi21","abelian_d10_pi6","abelian_d15_pi21_quintic_3","abelian_d15_pi21_quintic_1","elliptic_d7_pi6","elliptic_d8_pi7","elliptic_d9_pi7","elliptic_d10_pi9","elliptic_d10_pi10","elliptic_d11_pi12","elliptic_d12_pi13","elliptic_d12_pi14_ss_0","elliptic_d12_pi14_ss_inf";
+  return(L);
+}
+
+proc surface_generic_catalogueType(string name)
+"USAGE:   surface_generic_catalogueType(name);
+RETURN:  one of rational, elliptic_ruled, Enriques, K3, bielliptic, abelian,
+         elliptic, or unknown.
+MATHEMATICS:
+         This only records the surface type associated with a label; it is not
+         an embedded Hilbert-polynomial classifier.
+EXAMPLE: surface_generic_catalogueType(\"k3_d12_pi14\");
+"
+{
+  if(name=="cubic_scroll") { return("rational_scroll"); }
+  if(name=="veronese") { return("projected_veronese"); }
+  if(name=="castelnuovo") { return("rational"); }
+  if(name=="bordiga") { return("rational"); }
+  if(name=="rational_d7_pi4") { return("rational"); }
+  if(name=="rational_d8_pi5") { return("rational"); }
+  if(name=="rational_d8_pi6") { return("rational"); }
+  if(name=="rational_d9_pi6") { return("rational"); }
+  if(name=="rational_d9_pi7") { return("rational"); }
+  if(name=="rational_d10_pi8") { return("rational"); }
+  if(name=="rational_d10_pi9_quart_1") { return("rational"); }
+  if(name=="rational_d10_pi9_quart_2") { return("rational"); }
+  if(name=="rational_d11_pi11_ss_0") { return("rational"); }
+  if(name=="rational_d11_pi11_ss_1") { return("rational"); }
+  if(name=="rational_d11_pi11_ss_inf") { return("rational"); }
+  if(name=="quintic_elliptic_scroll") { return("elliptic_ruled"); }
+  if(name=="enriques_d9_pi6") { return("Enriques"); }
+  if(name=="enriques_d10_pi8") { return("Enriques"); }
+  if(name=="enriques_d11_pi10") { return("Enriques"); }
+  if(name=="enriques_d13_pi16") { return("Enriques"); }
+  if(name=="enriques_d13_pi16_two") { return("Enriques"); }
+  if(name=="k3_d7_pi5") { return("K3"); }
+  if(name=="k3_d8_pi6") { return("K3"); }
+  if(name=="k3_d9_pi8") { return("K3"); }
+  if(name=="k3_d10_pi9_quart_1") { return("K3"); }
+  if(name=="k3_d10_pi9_quart_2") { return("K3"); }
+  if(name=="k3_d11_pi11_ss_0") { return("K3"); }
+  if(name=="k3_d11_pi11_ss_1") { return("K3"); }
+  if(name=="k3_d11_pi11_ss_2") { return("K3"); }
+  if(name=="k3_d11_pi11_ss_3") { return("K3"); }
+  if(name=="k3_d11_pi12") { return("K3"); }
+  if(name=="k3_d12_pi14") { return("K3"); }
+  if(name=="k3_d13_pi16") { return("K3"); }
+  if(name=="k3_d14_pi19") { return("K3"); }
+  if(name=="bielliptic_d10_pi6") { return("bielliptic"); }
+  if(name=="bielliptic_d15_pi21") { return("bielliptic"); }
+  if(name=="abelian_d10_pi6") { return("abelian"); }
+  if(name=="abelian_d15_pi21_quintic_3") { return("abelian"); }
+  if(name=="abelian_d15_pi21_quintic_1") { return("abelian"); }
+  if(name=="elliptic_d7_pi6") { return("elliptic"); }
+  if(name=="elliptic_d8_pi7") { return("elliptic"); }
+  if(name=="elliptic_d9_pi7") { return("elliptic"); }
+  if(name=="elliptic_d10_pi9") { return("elliptic"); }
+  if(name=="elliptic_d10_pi10") { return("elliptic"); }
+  if(name=="elliptic_d11_pi12") { return("elliptic"); }
+  if(name=="elliptic_d12_pi13") { return("elliptic"); }
+  if(name=="elliptic_d12_pi14_ss_0") { return("elliptic"); }
+  if(name=="elliptic_d12_pi14_ss_inf") { return("elliptic"); }
+  return("unknown");
+}
+
+proc surface_generic_catalogueSurface(string name, list #)
+"USAGE:   surface_generic_catalogueSurface(name[,parameters]);
+RETURN:  no return; use surface_generic_catalogueType and a direct constructor instead.
+MATHEMATICS:
+         This legacy generic dispatcher is disabled. Choose the direct
+         constructor corresponding to surface_generic_catalogueType(name). For a fixed
+         example, nonGeneralTypeSurfacesP4.lib provides nonGeneralTypeSurfaceP4.
+EXAMPLE: surface_generic_catalogueType(\"abelian_d10_pi6\");
+"
+{
+  string t=surface_generic_catalogueType(name);
+  if(t=="unknown") { ERROR("surface_generic_catalogueSurface: unknown label"); }
+  ERROR("surface_generic_catalogueSurface cannot safely dispatch ring-returning constructors; call surface_generic_catalogueType(name) and then a direct surface_generic_* constructor");
+}
+
+// Short aliases for the catalogue labels.  Each alias has its own doc string,
+// so help output remains meaningful even when the function is not the preferred
+// public entry point.
+
+proc surface_generic_veronese(list #)
+"USAGE: surface_generic_veronese([bound]); RETURN: generic projected Veronese rational surface. MATHEMATICS: image of P^2 by a general subsystem of conics. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_veronese();
+"
+{ return(surface_generic_projected_veronese(#)); }
+
+proc surface_generic_castelnuovo(list #)
+"USAGE: surface_generic_castelnuovo([bound]); RETURN: generic rational surface model. MATHEMATICS: returns a generic rational representative of the Castelnuovo-type rational class; exact P^4 Hilbert data require a specialized plane blow-up parameter space. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_castelnuovo();
+"
+{ return(surface_generic_rational_surface(#)); }
+
+proc surface_generic_bordiga(list #)
+"USAGE: surface_generic_bordiga([bound]); RETURN: generic rational surface model. MATHEMATICS: returns a generic rational representative of the Bordiga-type rational class; exact Bordiga embeddings are quartic plane blow-up models through ten points. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_bordiga();
+"
+{ return(surface_generic_rational_surface(#)); }
+
+proc surface_generic_quintic_elliptic_scroll(list #)
+"USAGE: surface_generic_quintic_elliptic_scroll([lambda]); RETURN: generic ruled surface over an elliptic curve. MATHEMATICS: E x P^1 has the same ruled-over-elliptic Kodaira type; the special quintic P^4 scroll embedding is not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_quintic_elliptic_scroll();
+"
+{ return(surface_generic_elliptic_ruled(#)); }
+
+// Rational labels
+proc surface_generic_rational_d7_pi4(list #) "USAGE: surface_generic_rational_d7_pi4([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; special P^4 invariants not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d7_pi4();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d8_pi5(list #) "USAGE: surface_generic_rational_d8_pi5([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; special P^4 invariants not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d8_pi5();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d8_pi6(list #) "USAGE: surface_generic_rational_d8_pi6([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; special P^4 invariants not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d8_pi6();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d9_pi6(list #) "USAGE: surface_generic_rational_d9_pi6([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; special P^4 invariants not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d9_pi6();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d9_pi7(list #) "USAGE: surface_generic_rational_d9_pi7([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; special P^4 invariants not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d9_pi7();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d10_pi8(list #) "USAGE: surface_generic_rational_d10_pi8([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; special P^4 invariants not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d10_pi8();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d10_pi9_quart_1(list #) "USAGE: surface_generic_rational_d10_pi9_quart_1([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; quartic-containment condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d10_pi9_quart_1();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d10_pi9_quart_2(list #) "USAGE: surface_generic_rational_d10_pi9_quart_2([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; quartic-pencil condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d10_pi9_quart_2();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d11_pi11_ss_0(list #) "USAGE: surface_generic_rational_d11_pi11_ss_0([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; secant condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d11_pi11_ss_0();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d11_pi11_ss_1(list #) "USAGE: surface_generic_rational_d11_pi11_ss_1([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; secant condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d11_pi11_ss_1();" { return(surface_generic_rational_surface(#)); }
+proc surface_generic_rational_d11_pi11_ss_inf(list #) "USAGE: surface_generic_rational_d11_pi11_ss_inf([bound]); RETURN: generic rational representative. MATHEMATICS: same rational surface type; secant condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_rational_d11_pi11_ss_inf();" { return(surface_generic_rational_surface(#)); }
+
+// Enriques labels
+proc surface_generic_enriques_d9_pi6(list #) "USAGE: surface_generic_enriques_d9_pi6([bound]); RETURN: generic Enriques quotient-cover data. MATHEMATICS: K3 complete intersection with fixed-point-free involution; quotient is Enriques in char not 2. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_enriques_d9_pi6();" { return(surface_generic_Enriques_cover(#)); }
+proc surface_generic_enriques_d10_pi8(list #) "USAGE: surface_generic_enriques_d10_pi8([bound]); RETURN: generic Enriques quotient-cover data. MATHEMATICS: K3 complete intersection with fixed-point-free involution; quotient is Enriques in char not 2. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_enriques_d10_pi8();" { return(surface_generic_Enriques_cover(#)); }
+proc surface_generic_enriques_d13_pi16(list #) "USAGE: surface_generic_enriques_d13_pi16([bound]); RETURN: generic Enriques quotient-cover data. MATHEMATICS: K3 complete intersection with fixed-point-free involution; quotient is Enriques in char not 2. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_enriques_d13_pi16();" { return(surface_generic_Enriques_cover(#)); }
+proc surface_generic_enriques_d13_pi16_two(list #) "USAGE: surface_generic_enriques_d13_pi16_two([bound]); RETURN: generic Enriques quotient-cover data. MATHEMATICS: K3 complete intersection with fixed-point-free involution; quotient is Enriques in char not 2. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_enriques_d13_pi16_two();" { return(surface_generic_Enriques_cover(#)); }
+
+// K3 labels
+proc surface_generic_k3_d7_pi5(list #) "USAGE: surface_generic_k3_d7_pi5([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d7_pi5();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d8_pi6(list #) "USAGE: surface_generic_k3_d8_pi6([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d8_pi6();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d9_pi8(list #) "USAGE: surface_generic_k3_d9_pi8([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d9_pi8();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d10_pi9_quart_1(list #) "USAGE: surface_generic_k3_d10_pi9_quart_1([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type; quartic condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d10_pi9_quart_1();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d10_pi9_quart_2(list #) "USAGE: surface_generic_k3_d10_pi9_quart_2([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type; quartic-pencil condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d10_pi9_quart_2();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d11_pi11_ss_0(list #) "USAGE: surface_generic_k3_d11_pi11_ss_0([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d11_pi11_ss_0();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d11_pi11_ss_1(list #) "USAGE: surface_generic_k3_d11_pi11_ss_1([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d11_pi11_ss_1();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d11_pi11_ss_2(list #) "USAGE: surface_generic_k3_d11_pi11_ss_2([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d11_pi11_ss_2();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d11_pi11_ss_3(list #) "USAGE: surface_generic_k3_d11_pi11_ss_3([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d11_pi11_ss_3();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d11_pi12(list #) "USAGE: surface_generic_k3_d11_pi12([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d11_pi12();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d12_pi14(list #) "USAGE: surface_generic_k3_d12_pi14([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d12_pi14();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d13_pi16(list #) "USAGE: surface_generic_k3_d13_pi16([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d13_pi16();" { return(surface_generic_K3(#)); }
+proc surface_generic_k3_d14_pi19(list #) "USAGE: surface_generic_k3_d14_pi19([bound]); RETURN: generic K3 surface. MATHEMATICS: smooth (2,3) complete intersection in P^4; same K3 type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_k3_d14_pi19();" { return(surface_generic_K3(#)); }
+
+// Irregular labels
+proc surface_generic_bielliptic_d10_pi6(list #) "USAGE: surface_generic_bielliptic_d10_pi6([lambda,mu]); RETURN: generic bielliptic quotient-cover data. MATHEMATICS: finite free quotient of product of elliptic curves. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_bielliptic_d10_pi6();" { return(surface_generic_bielliptic_cover_data(#)); }
+proc surface_generic_bielliptic_d15_pi21(list #) "USAGE: surface_generic_bielliptic_d15_pi21([lambda,mu]); RETURN: generic bielliptic quotient-cover data. MATHEMATICS: finite free quotient of product of elliptic curves. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_bielliptic_d15_pi21();" { return(surface_generic_bielliptic_cover_data(#)); }
+proc surface_generic_abelian_d10_pi6(list #) "USAGE: surface_generic_abelian_d10_pi6([lambda,mu]); RETURN: generic abelian product surface. MATHEMATICS: product of two smooth Hesse cubics; same abelian type. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_abelian_d10_pi6();" { return(surface_generic_abelian_product(#)); }
+proc surface_generic_abelian_d15_pi21_quintic_3(list #) "USAGE: surface_generic_abelian_d15_pi21_quintic_3([lambda,mu]); RETURN: generic abelian product surface. MATHEMATICS: product of two smooth Hesse cubics; same abelian type; quintic condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_abelian_d15_pi21_quintic_3();" { return(surface_generic_abelian_product(#)); }
+proc surface_generic_abelian_d15_pi21_quintic_1(list #) "USAGE: surface_generic_abelian_d15_pi21_quintic_1([lambda,mu]); RETURN: generic abelian product surface. MATHEMATICS: product of two smooth Hesse cubics; same abelian type; quintic condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_abelian_d15_pi21_quintic_1();" { return(surface_generic_abelian_product(#)); }
+
+// Properly elliptic labels
+proc surface_generic_elliptic_d7_pi6(list #) "USAGE: surface_generic_elliptic_d7_pi6([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d7_pi6();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d8_pi7(list #) "USAGE: surface_generic_elliptic_d8_pi7([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d8_pi7();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d9_pi7(list #) "USAGE: surface_generic_elliptic_d9_pi7([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d9_pi7();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d10_pi9(list #) "USAGE: surface_generic_elliptic_d10_pi9([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d10_pi9();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d10_pi10(list #) "USAGE: surface_generic_elliptic_d10_pi10([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d10_pi10();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d11_pi12(list #) "USAGE: surface_generic_elliptic_d11_pi12([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d11_pi12();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d12_pi13(list #) "USAGE: surface_generic_elliptic_d12_pi13([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d12_pi13();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d12_pi14_ss_0(list #) "USAGE: surface_generic_elliptic_d12_pi14_ss_0([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1; secant condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d12_pi14_ss_0();" { return(surface_generic_elliptic_surface(#)); }
+proc surface_generic_elliptic_d12_pi14_ss_inf(list #) "USAGE: surface_generic_elliptic_d12_pi14_ss_inf([lambda,bound]); RETURN: generic properly elliptic surface. MATHEMATICS: E x C with C a smooth plane quartic; Kodaira dimension 1; secant condition not imposed. EXAMPLE: ring r=31991,(dummy),dp; list S=surface_generic_elliptic_d12_pi14_ss_inf();" { return(surface_generic_elliptic_surface(#)); }
+
+///////////////////////////////////////////////////////////////////////////////
+// End of library
+///////////////////////////////////////////////////////////////////////////////
