@@ -123,9 +123,38 @@ jobs:
           make -C build-windows install
 
       - name: Test CRLF library loading
+        env:
+          TEMP: ${{ runner.temp }}
+          TMP: ${{ runner.temp }}
         run: |
           cd Tst
           perl ./regress.cmd -s ../install-windows/bin/Singular.exe Short/crlf_lib.tst
+
+      - name: Test Windows runtime and SSI compatibility
+        env:
+          TEMP: ${{ runner.temp }}
+          TMP: ${{ runner.temp }}
+        run: bash .github/scripts/windows-ssi-compat.sh install-windows/bin/Singular.exe
+
+      - name: Run existing SSI file tests
+        env:
+          TEMP: ${{ runner.temp }}
+          TMP: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          singular="$PWD/install-windows/bin/Singular.exe"
+          for test in \
+            Manual/Ssi_file_links.tst \
+            New/newstruct_ssi.tst \
+            Short/bug_ssi_algring.tst \
+            Short/bug_ssi_attr.tst \
+            Short/htable.tst \
+            Short/ssi_Z.tst \
+            Short/ssi_ringref.tst
+          do
+            (cd Tst && perl ./regress.cmd -s "$singular" "$test")
+          done
+          git diff --exit-code -- Tst
 
       - name: Verify the native executable and installation
         run: |
