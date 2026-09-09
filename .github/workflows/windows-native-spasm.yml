@@ -187,11 +187,10 @@ jobs:
           fi
 
           smoke_output="$(printf '%s\n' \
-            'LIB "general.lib";' \
-            'LIB "gfan.lib";' \
-            'intmat rays[2][2]=1,0,0,1;' \
-            'cone c=coneViaPoints(rays);' \
-            'print("GFANLIB_DIM="+string(dimension(c)));' \
+            'LIB "gfanlib.so";' \
+            'intmat gfanPoints[2][2]=1,0,0,1;' \
+            'cone c=coneViaPointsInternal(gfanPoints);' \
+            'print("GFANLIB_DIM="+string(dimensionInternal(c)));' \
             'ring s=32003,(z),dp;' \
             'load("sispasm.so","try");' \
             'matrix M[2][3]=1,2,3,2,4,6;' \
@@ -307,10 +306,13 @@ jobs:
             exit 1
           fi
 
+          # Check each bundled PE file separately.  Recursive ntldd output also
+          # traverses optional Windows system components and reports API-set
+          # entries which are not runtime dependencies of the bundle itself.
           while IFS= read -r -d '' binary; do
             binary_dir="$(dirname "$binary")"
             if ! dependency_report="$(PATH="$binary_dir:/c/Windows/System32:/c/Windows" \
-                "$MINGW_PREFIX/bin/ntldd.exe" -R "$binary" 2>&1)"; then
+                "$MINGW_PREFIX/bin/ntldd.exe" "$binary" 2>&1)"; then
               printf '%s\n' "$dependency_report" >&2
               echo "Portable binary has an unresolved dependency: $binary" >&2
               exit 1
@@ -322,7 +324,8 @@ jobs:
               echo "Portable binary has an invalid dependency: $binary" >&2
               exit 1
             fi
-          done < <(find install-windows -type f -iname '*.exe' -print0)
+          done < <(find install-windows -type f \
+            \( -iname '*.exe' -o -iname '*.dll' \) -print0)
 
           objdump -p "$runtime_dir/Singular.exe" \
             | sed -n 's/^[[:space:]]*DLL Name: /DLL: /p'
@@ -338,11 +341,10 @@ jobs:
           $bundle = (Resolve-Path $testBundle).Path
           $env:Path = "$bundle\bin;$env:SystemRoot\System32;$env:SystemRoot"
           $inputScript = @(
-            'LIB "general.lib";'
-            'LIB "gfan.lib";'
-            'intmat rays[2][2]=1,0,0,1;'
-            'cone c=coneViaPoints(rays);'
-            'print("GFANLIB_DIM="+string(dimension(c)));'
+            'LIB "gfanlib.so";'
+            'intmat gfanPoints[2][2]=1,0,0,1;'
+            'cone c=coneViaPointsInternal(gfanPoints);'
+            'print("GFANLIB_DIM="+string(dimensionInternal(c)));'
             'ring s=32003,(z),dp;'
             'load("sispasm.so","try");'
             'matrix M[2][3]=1,2,3,2,4,6;'
