@@ -2171,7 +2171,16 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
             mode="w";
           }
         }
+#ifdef _WIN32
+        // Native Windows: SSI files use the Unix byte format.
+        const char *file_mode = mode;
+        if (strcmp(mode,"r")==0) file_mode="rb";
+        else if (strcmp(mode,"w")==0) file_mode="wb";
+        else if (strcmp(mode,"a")==0) file_mode="ab";
+        outfile=myfopen(filename,file_mode);
+#else
         outfile=myfopen(filename,mode);
+#endif
         if (outfile!=NULL)
         {
           if (strcmp(l->mode,"r")==0)
