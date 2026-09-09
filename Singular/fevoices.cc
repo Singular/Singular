@@ -149,6 +149,10 @@ BOOLEAN newFile(char *fname)
       exitVoice();
       return TRUE;
     }
+#ifdef _WIN32
+    // Native Windows: text-mode ftell/fseek is not reliable for LF-only lines.
+    currentVoice->ftellptr=-1;
+#endif
     currentVoice->start_lineno = 0;
   }
   yylineno=currentVoice->start_lineno;
@@ -711,4 +715,3 @@ Voice * feInitStdin(Voice *pp)
   return p;
 }
 #endif
-
