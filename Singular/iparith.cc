@@ -5015,6 +5015,13 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   case 2:
     res->data = (char *)n_Init(om_Info.MaxBytesSystem,coeffs_BIGINT);
     break;
+  #elif defined(_WIN32)
+  // Native Windows uses xalloc, which has no memory statistics.
+  case 0:
+  case 1:
+  case 2:
+    res->data=(char *)n_Init(0,coeffs_BIGINT);
+    break;
   #endif  
   default:
     omPrintStats(stdout);

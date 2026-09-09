@@ -4971,6 +4971,8 @@ operating system,
 @item @code{memory(2)} is the maximal number of bytes ever allocated from the
 operating system during the current @sc{Singular} session.
 @end itemize
+Native Windows builds use the system allocator and return @code{0} when these
+allocator statistics are unavailable.
 @item @strong{Note:}
 To monitor the memory usage during ongoing computations the option
 @code{mem} should be set (using the command @code{option(mem);}, see
