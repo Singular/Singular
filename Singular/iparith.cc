@@ -5901,7 +5901,12 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
         currPack=IDPACKAGE(pl);
         IDPACKAGE(pl)->loaded=TRUE;
         char libnamebuf[1024];
+#ifdef _WIN32
+        // Native Windows: keep lazy procedure offsets physical.
+        FILE * fp = feFopen( s, "rb", libnamebuf, TRUE );
+#else
         FILE * fp = feFopen( s, "r", libnamebuf, TRUE );
+#endif
         BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, autoexport, TRUE);
         currPack=savepack;
         IDPACKAGE(pl)->loaded=(!bo);
