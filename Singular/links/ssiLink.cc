@@ -4138,6 +4138,11 @@ static BOOLEAN ssi2zOpen(si_link l, short flag, leftv u)
   return ssi2CompressedOpenByCompression(l, flag, SSI2_COMP_GZIP, NULL);
 }
 
+static BOOLEAN ssi2cOpen(si_link l, short flag, leftv u)
+{
+  return ssi2CompressedOpenByCompression(l, flag, SSI2_COMP_ZSTD, "--long=23");
+}
+
 static BOOLEAN ssi2zstdOpen(si_link l, short flag, leftv u)
 {
   return ssi2CompressedOpenByCompression(l, flag, SSI2_COMP_ZSTD, "--long=23");
@@ -4980,6 +4985,22 @@ si_link_extension slInitSsi2Extension(si_link_extension s)
   s->Status=slStatusSsi2;
   s->SetRing=NULL;
   s->type="ssi2";
+  return s;
+}
+
+si_link_extension slInitSsi2cExtension(si_link_extension s)
+{
+  s->Open=ssi2cOpen;
+  s->Close=ssi2zClose;
+  s->Kill=ssi2zClose;
+  s->Read=ssi2Read1;
+  s->Read2=NULL;
+  s->Write=ssi2Write;
+  s->Dump=NULL;
+  s->GetDump=NULL;
+  s->Status=slStatusSsi2;
+  s->SetRing=NULL;
+  s->type="ssi2c";
   return s;
 }
 
