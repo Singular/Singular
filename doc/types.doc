@@ -2191,6 +2191,20 @@ Binary SSI2 file links use the same @code{read}, @code{write}, and
 @*opens an SSI2 file for appending.
 @end enumerate
 
+The compressed SSI2 wrapper @code{ssi2c} selects the recommended
+@code{zstd} compression setup:
+
+@enumerate
+@item @code{"ssi2c:r "} + filename
+@*opens a compressed SSI2 file for reading using @code{zstd}.
+@item @code{"ssi2c:w "} + filename
+@*opens a compressed SSI2 file for overwriting using @code{zstd}.
+@item @code{"ssi2c:a "} + filename
+@*opens a compressed SSI2 file for appending using @code{zstd}.
+@end enumerate
+
+The wrapper is equivalent to @code{ssi2} with @code{zstd,long=23}.
+
 The @code{ssi} and @code{ssi2} link types select different file
 formats.  The link type is not inferred from the filename: use
 @code{ssi} for the old SSI format and @code{ssi2} for the binary SSI2
