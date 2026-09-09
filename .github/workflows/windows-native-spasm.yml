@@ -154,7 +154,10 @@ jobs:
           do
             (cd Tst && perl ./regress.cmd -s "$singular" "$test")
           done
-          git diff --exit-code -- Tst
+
+      - name: Verify tests did not update references
+        shell: pwsh
+        run: git diff --exit-code -- Tst
 
       - name: Verify the native executable and installation
         run: |
