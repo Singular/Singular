@@ -27,6 +27,20 @@ kill l;
 s == string(G);
 kill G;
 
+if (size(system("executable","zstd"))>0)
+{
+  link l = "ssi2c:w ssi2_options_c.ssi2c";
+  write(l,I);
+  close(l);
+  kill l;
+  link l = "ssi2c:r ssi2_options_c.ssi2c";
+  def C = read(l);
+  close(l);
+  kill l;
+  s == string(C);
+  kill C;
+}
+
 link l = "ssi2:w,plain ssi2_options_plain_suffix.ssi2.gz";
 write(l,I);
 close(l);

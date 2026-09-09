@@ -421,6 +421,8 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
     s->next = slInitSsiExtension(ns);
   else if (strcmp(type, "ssi2") == 0)
     s->next = slInitSsi2Extension(ns);
+  else if (strcmp(type, "ssi2c") == 0)
+    s->next = slInitSsi2cExtension(ns);
   else if (strcmp(type, "ssi2z") == 0)
     s->next = slInitSsi2zExtension(ns);
   else if (strcmp(type, "ssi2zstd") == 0)
