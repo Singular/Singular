@@ -27,13 +27,29 @@ run_compat_test()
   "$singular" "$input" -q 2>&1
 }
 
-lf_output="$(run_compat_test "$compat_dir/lf.ssi")"
-test "$lf_output" = 'SSI_TYPES_OK'
+run_and_check()
+{
+  local label="$1"
+  local target="$2"
+  local output
+  local status=0
+
+  output="$(run_compat_test "$target")" || status=$?
+  if ((status != 0)) || test "$output" != 'SSI_TYPES_OK'; then
+    printf '%s test failed (exit %d)\n' "$label" "$status" >&2
+    if test -n "$output"; then
+      printf '%s\n' "$output" >&2
+    fi
+    return 1
+  fi
+  printf '%s' "$output"
+}
+
+lf_output="$(run_and_check LF "$compat_dir/lf.ssi")"
 
 awk '{ printf "%s\r\n", $0 }' "$compat_lib" > "$compat_lib.tmp"
 mv "$compat_lib.tmp" "$compat_lib"
-crlf_output="$(run_compat_test "$compat_dir/crlf.ssi")"
-test "$crlf_output" = 'SSI_TYPES_OK'
+crlf_output="$(run_and_check CRLF "$compat_dir/crlf.ssi")"
 
 cmp "$compat_dir/lf.ssi" "$compat_dir/crlf.ssi"
 if LC_ALL=C grep -q $'\r' "$compat_dir/crlf.ssi"; then
