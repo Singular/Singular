@@ -11,6 +11,9 @@
 #define HAVE_WALK 1
 
 #include <errno.h>
+#ifdef _WIN32
+#include <process.h>
+#endif
 #include "kernel/mod2.h"
 #include "misc/sirandom.h"
 #include "resources/omFindExec.h"
@@ -222,6 +225,44 @@ poly longCoeffsToSingularPoly(unsigned long *polyCoeffs, const int degree)
   }
   return result;
 }
+
+#ifdef _WIN32
+static char *iiQuoteWindowsArg(const char *arg)
+{
+  const size_t arg_len=strlen(arg);
+  char *quoted=(char *)omAlloc(2*arg_len+3);
+  char *q=quoted;
+  *q++='"';
+  while (*arg!='\0')
+  {
+    size_t backslashes=0;
+    while (*arg=='\\')
+    {
+      backslashes++;
+      arg++;
+    }
+    if (*arg=='"')
+    {
+      for (size_t i=0; i<2*backslashes+1; i++) *q++='\\';
+      *q++=*arg++;
+    }
+    else
+    {
+      for (size_t i=0; i<backslashes; i++) *q++='\\';
+      if (*arg!='\0')
+        *q++=*arg++;
+      else
+      {
+        for (size_t i=0; i<backslashes; i++) *q++='\\';
+        break;
+      }
+    }
+  }
+  *q++='"';
+  *q='\0';
+  return quoted;
+}
+#endif
 
 /*2
 *  the "system" command
@@ -483,7 +524,25 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       res->rtyp=INT_CMD;
       if (h==NULL) res->data = (void *)(long) system("sh");
       else if (h->Typ()==STRING_CMD)
+#ifdef _WIN32
+      {
+        // Native Windows uses sh when available.
+        char sh_path[MAXPATHLEN];
+        const char *command=(char *)(h->Data());
+        if (omFindExec("sh", sh_path)!=NULL)
+        {
+          char *quoted_command=iiQuoteWindowsArg(command);
+          const char *sh_args[]={sh_path,"-c",quoted_command,NULL};
+          const intptr_t status=_spawnv(_P_WAIT,sh_path,sh_args);
+          omFree(quoted_command);
+          res->data=(void *)(long)status;
+        }
+        else
+          res->data=(void *)(long)system(command);
+      }
+#else
         res->data = (void*)(long) system((char*)(h->Data()));
+#endif
       else
         WerrorS("string expected");
       if (errno==ECHILD) res->data=NULL;
@@ -594,6 +653,27 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp=INT_CMD;
       res->data=(void *)(long) getpid();
+      return FALSE;
+    }
+    else
+  /*==================== tmpdir ==================================*/
+    if (strcmp(sys_cmd,"tmpdir")==0)
+    {
+      res->rtyp=STRING_CMD;
+#ifdef _WIN32
+      // Native Windows uses its configured temporary directory.
+      const char *tmpdir=getenv("TEMP");
+      if ((tmpdir==NULL)||(*tmpdir=='\0')) tmpdir=getenv("TMP");
+      if ((tmpdir==NULL)||(*tmpdir=='\0')) tmpdir=".";
+      char *path=omStrDup(tmpdir);
+      for (char *p=path; *p!='\0'; p++)
+        if (*p=='\\') *p='/';
+      size_t len=strlen(path);
+      while ((len>3)&&(path[len-1]=='/')) path[--len]='\0';
+      res->data=(void *)path;
+#else
+      res->data=(void *)omStrDup("/tmp");
+#endif
       return FALSE;
     }
     else
