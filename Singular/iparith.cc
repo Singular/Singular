@@ -5016,7 +5016,7 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     res->data = (char *)n_Init(om_Info.MaxBytesSystem,coeffs_BIGINT);
     break;
   #elif defined(_WIN32)
-  // Native Windows uses xalloc, which has no memory statistics.
+  // Windows --disable-omalloc has no allocator statistics.
   case 0:
   case 1:
   case 2:
