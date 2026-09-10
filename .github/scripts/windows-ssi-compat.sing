@@ -15,9 +15,17 @@ compatCheck(system("sh","rm -f \""+tmpProbe+"\"")==0,"tmpdir cleanup");
 def memory0=memory(0);
 def memory1=memory(1);
 def memory2=memory(2);
-compatCheck(typeof(memory0)=="bigint" && memory0==0,"memory(0)");
-compatCheck(typeof(memory1)=="bigint" && memory1==0,"memory(1)");
-compatCheck(typeof(memory2)=="bigint" && memory2==0,"memory(2)");
+compatCheck(typeof(memory0)=="bigint" && typeof(memory1)=="bigint"
+            && typeof(memory2)=="bigint","memory types");
+if (memory0==0)
+{
+  compatCheck(memory1==0 && memory2==0,"xalloc memory");
+}
+else
+{
+  compatCheck(memory0>0 && memory1>=memory0 && memory2>=memory1,
+              "omalloc memory");
+}
 
 LIB(compatLib);
 
