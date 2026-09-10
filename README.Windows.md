@@ -90,8 +90,10 @@ and interactive dependencies:
 - Bundled gfanlib and polynomial procedure modules are linked statically.
 - cddlib, FLINT, NTL, and readline are required; configure fails rather than
   silently producing a reduced native Windows build when any of them is absent.
-- `omalloc` is disabled because Win64 uses 32-bit `long` values and 64-bit
-  pointers; the regular allocator is used instead.
+- The default build uses the regular allocator.  `--enable-omalloc` selects a
+  separate Win64 backend based on the Windows process heap.  Its public
+  allocation, bin, and statistics interfaces match Singular's existing use of
+  omalloc; Unix builds continue to use the existing backend.
 - Other optional dynamic modules default to disabled on MinGW.  They can be
   enabled individually while their dependencies and Windows behavior are
   validated.
@@ -100,10 +102,13 @@ and interactive dependencies:
   unsupported-operation error.
 
 The repository's `Windows native build (UCRT64) - windows-latest` GitHub
-Actions workflow repeats this build on a `windows-latest` host, checks that the
-installed executable has no `msys-2.0.dll` or `cygwin1.dll` dependency,
-assembles the portable runtime bundle, removes MSYS2 from `PATH`, and runs a
-small Singular calculation from PowerShell.
+Actions workflow repeats the default `--disable-omalloc` build on a
+`windows-latest` host.  The additional `Windows native build with omalloc
+(UCRT64) - windows-latest` workflow runs the same checks with
+`--enable-omalloc` and also tests the Win64 allocator and its memory accounting.
+Both workflows check that the installed executable has no `msys-2.0.dll` or
+`cygwin1.dll` dependency, assemble portable runtime bundles, remove MSYS2 from
+`PATH`, and run a small Singular calculation from PowerShell.
 
 A separate
 `Windows native build with SpaSM (UCRT64) - windows-latest` workflow runs for
@@ -111,7 +116,9 @@ pushes, pull requests, and published GitHub Releases, and can also be started
 manually.  It builds SpaSM 1.2 as a patched native static library, links
 `sispasm` into Singular, tests a SpaSM matrix conversion under MSYS2 and from
 the portable PowerShell environment, and uploads the result as the
-`singular-windows-ucrt64` workflow artifact.
+`singular-windows-ucrt64` workflow artifact.  A matching
+`Windows native build with SpaSM and omalloc (UCRT64) - windows-latest`
+workflow performs the same build and tests with the Win64 omalloc backend.
 
 ## Signing and Windows warnings
 
