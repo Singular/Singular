@@ -111,6 +111,18 @@ AC_ARG_ENABLE(omalloc,
      AH_TEMPLATE([HAVE_OMALLOC], [define if build with OMALLOC])
      AC_DEFINE([HAVE_OMALLOC],[1])
    ])
+
+OMALLOC_WIN64_BACKEND=no
+AS_IF([test "x$ENABLE_OMALLOC" = xyes], [
+  AS_CASE([$host_os], [*mingw*], [
+    OMALLOC_WIN64_BACKEND=yes
+    AH_TEMPLATE([OMALLOC_USE_WIN64_BACKEND],
+      [define to use the native Win64 omalloc backend])
+    AC_DEFINE([OMALLOC_USE_WIN64_BACKEND],[1])
+  ])
+])
+AM_CONDITIONAL([OMALLOC_WIN64_BACKEND],
+  [test "x$OMALLOC_WIN64_BACKEND" = xyes])
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler/make  config
 dnl
@@ -171,7 +183,9 @@ AC_CHECK_SIZEOF(void*,4)
 AC_CHECK_SIZEOF(double, 8)
 AC_CHECK_SIZEOF(size_t, 4)
 
-if test "x$ENABLE_OMALLOC" = xyes && test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
+if test "x$ENABLE_OMALLOC" = xyes &&
+   test "x$OMALLOC_WIN64_BACKEND" != xyes &&
+   test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
   AC_MSG_ERROR(need equal sizes for long and void*)
 fi
 if test "$ac_cv_sizeof_voidp" != 4 && test "$ac_cv_sizeof_voidp" != 8; then
