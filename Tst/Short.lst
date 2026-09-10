@@ -227,6 +227,7 @@ Short/ncfactor_inhomog_s.tst
 Short/ncfactor_koepfShift_s.tst
 Short/ncfactor_koepf_s.tst
 Short/ncfactor_tsai_s.tst
+Short/ncmodslimgb.tst
 Short/normal.tst
 Short/pAddManyVarsManyL_s.tst
 Short/pAddManyVars_s.tst
