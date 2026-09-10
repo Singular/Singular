@@ -4,6 +4,11 @@ lib_LTLIBRARIES=libomalloc.la
 
 libomalloc_includedir=$(includedir)/omalloc
 
+AM_CPPFLAGS = -I${top_srcdir}/.. -I${top_builddir}/..
+libomalloc_la_CPPFLAGS = ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL
+libomalloc_la_LDFLAGS = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
+EXTRA_DIST = omalloc_debug.c omalloc.c omtTestAlloc.c omtTest.h omMmap.c
+
 libomalloc_include_HEADERS = \
 omalloc.h		omallocClass.h          omDerivedConfig.h	\
 omError.h		omStructs.h		omAllocDecl.h		\
@@ -14,28 +19,53 @@ omBinPage.h		omAllocSystem.h		\
 omAllocPrivate.h	omDebug.h		omInline.h		\
 omAllocFunc.h
 
+if OMALLOC_WIN64_BACKEND
+
+libomalloc_win64_includedir = $(includedir)/omalloc/win64
+libomalloc_win64_include_HEADERS = win64/omalloc_win64.h
+
+libomalloc_la_SOURCES = win64/omalloc_win64.c omallocClass.cc
+
+nodist_libomalloc_include_HEADERS = omConfig.h omTables.h
+
+BUILT_SOURCES = omTables.h
+
+omTables.h:
+	$(MAKE) $(AM_MAKEFLAGS) \
+	CPPFLAGS="-I${abs_top_srcdir}/.. -I${abs_top_builddir}/.. $(CPPFLAGS_FOR_BUILD)" \
+	CC="${CC_FOR_BUILD}" \
+	CFLAGS="${CFLAGS_FOR_BUILD}" \
+	LDFLAGS="$(LDFLAGS_FOR_BUILD)" omTables1
+	./omTables1$(BUILD_EXEEXT) >omTables.yy && mv omTables.yy omTables.h
+
+noinst_PROGRAMS = omTables1
+omTables1_SOURCES = omAllocPrivate.h omTables1.c
+nodist_omTables1_SOURCES = omConfig.h
+omTables1_CPPFLAGS = ${AM_CPPFLAGS} -DOM_GENERATE_INC
+
+CLEANFILES = $(BUILT_SOURCES) omTables1
+
+TESTS = omtWin64
+check_PROGRAMS = $(TESTS)
+omtWin64_SOURCES = win64/omtWin64.c
+omtWin64_LDADD = libomalloc.la
+
+else
+
 noinst_HEADERS= omPage.h omDefaultConfig.h omReturn.h omGetPageSize.h \
   omMalloc.h omMallocSystem.h
 
-SOURCES=\
+OMALLOC_SOURCES=\
 omBinPage.c       omList.c         omDebug.c        \
 om_Alloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c \
 omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
 omBin.c           omDebugTrack.c   		     \
 omalloc_provide.c omAllocFunc.c    omallocClass.cc
 
-EXTRA_DIST = omalloc_debug.c omalloc.c omtTestAlloc.c omtTest.h omMmap.c
-
-AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..
-
-libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
-
-libomalloc_la_LDFLAGS    = $(SINGULAR_LDFLAGS) -release ${PACKAGE_VERSION}
+libomalloc_la_SOURCES=$(OMALLOC_SOURCES) $(noinst_HEADERS)
 
 nodist_libomalloc_la_SOURCES = omTables.inc omTables.h
 nodist_libomalloc_include_HEADERS = omConfig.h omTables.h
-
-libomalloc_la_CPPFLAGS  = ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL
 
 BUILT_SOURCES = omTables.inc omTables.h
 
@@ -64,7 +94,6 @@ omTables_CPPFLAGS = ${AM_CPPFLAGS} -DOM_GENERATE_INC
 omTables1_CPPFLAGS = ${AM_CPPFLAGS} -DOM_GENERATE_INC
 
 CLEANFILES = $(BUILT_SOURCES) omTables omTables1
-DISTCLEANFILES = omConfig.h
 ####################################################
 ## Test program
 
@@ -79,6 +108,9 @@ OMTTESTSSOURCES = omtTestReal.c omtTestDebug.c omtTestKeep.c omtTestError.c omtT
 omtTest_r_SOURCES  = $(OMTTESTSSOURCES)
 omtTest_r_LDADD    = libomalloc.la
 
+endif
+
+DISTCLEANFILES = omConfig.h
+
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = omalloc.pc
-
