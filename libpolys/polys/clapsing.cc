@@ -95,6 +95,22 @@ static void singclap_report_factory_char_too_large()
   WerrorS("characteristic is too large(max is 2^29)");
 }
 
+static void singclap_report_factorization_not_implemented(BOOLEAN has_callback)
+{
+  if (has_callback)
+    WerrorS("coefficient factorization callback is not implemented for this polynomial");
+  else
+    WerrorS("factorization is not implemented for this coefficient domain");
+}
+
+static void singclap_report_sqrfree_not_implemented(BOOLEAN has_callback)
+{
+  if (has_callback)
+    WerrorS("coefficient squarefree factorization callback is not implemented for this polynomial");
+  else
+    WerrorS("squarefree factorization is not implemented for this coefficient domain");
+}
+
 static BOOLEAN singclap_factory_factorize_is_supported(const ring r)
 {
   if ((r == NULL) || (r->cf == NULL)) return FALSE;
@@ -107,7 +123,7 @@ static BOOLEAN singclap_factory_factorize_is_supported(const ring r)
   || rField_is_Z(r) || rField_is_Zn(r))
     return TRUE;
 
-  return (r->cf->extRing != NULL);
+  return (r->cf->extRing != NULL) && (rField_is_Q_a(r) || rField_is_Zp_a(r));
 }
 
 static BOOLEAN singclap_coeff_factorize_is_available(const ring r)
@@ -1234,6 +1250,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
 #endif
   if (!singclap_factory_factorize_is_supported(r))
   {
+    const BOOLEAN has_callback = singclap_coeff_factorize_is_available(r);
     res = singclap_try_coeff_factorize(f, v, with_exps, r);
     if (res != NULL)
     {
@@ -1242,6 +1259,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       return res;
     }
     errorreported=save_errorreported;
+    singclap_report_factorization_not_implemented(has_callback);
+    res=idInit(2,1);
+    res->m[0]=p_One(r);
+    res->m[1]=f;
+    return res;
   }
   // use factory/libfac in general ==============================
   Variable dummy(-1); prune(dummy); // remove all (tmp.) extensions
@@ -1715,6 +1737,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
 #endif
   if (!singclap_factory_factorize_is_supported(r))
   {
+    const BOOLEAN has_callback = singclap_coeff_factorize_is_available(r);
     res = singclap_try_coeff_factorize(f, v, with_exps, r);
     if (res != NULL)
     {
@@ -1723,6 +1746,9 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
       return res;
     }
     errorreported=save_errorreported;
+    singclap_report_sqrfree_not_implemented(has_callback);
+    p_Delete(&f,r);
+    return NULL;
   }
   // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
