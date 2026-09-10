@@ -1726,7 +1726,8 @@ static void ssiReadRingProperties(si_link l)
     {
       matrix C=ssiReadMatrix(d);
       matrix D=ssiReadMatrix(d);
-      nc_CallPlural(C,D,NULL,NULL,d->r,true,true,false,d->r,false);
+      nc_CallPlural(C,D,NULL,NULL,d->r,true,true,
+                    !BVERBOSE(V_REDEFINE),d->r,false);
       break;
     }
   }
