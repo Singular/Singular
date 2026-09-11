@@ -20,7 +20,7 @@ jobs:
     name: Julia ${{ matrix.julia-version }} - Singular.jl ${{ matrix.singularjl-version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
-    continue-on-error: ${{ matrix.julia-version == 'nightly' }}
+    continue-on-error: ${{ matrix.julia-version == '1' || matrix.julia-version == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
@@ -29,12 +29,19 @@ jobs:
           - 'master'
         julia-version:
           - '1.10'
-          - '1'         # latest stable release
+          - '1.12'      # pinned stable release
+          - '1'         # latest stable release (non-required)
           - 'nightly'
         os:
           - ubuntu-latest
         include:
           # Add a few macOS jobs (the number we can run in parallel is limited)
+          - singularjl-version: 'latest-release'
+            julia-version: '1.12'
+            os: macOS-latest
+          - singularjl-version: 'master'
+            julia-version: '1.12'
+            os: macOS-latest
           - singularjl-version: 'latest-release'
             julia-version: '1'
             os: macOS-latest
