@@ -95,35 +95,52 @@ static void singclap_report_factory_char_too_large()
   WerrorS("characteristic is too large(max is 2^29)");
 }
 
-static void singclap_report_factorization_not_implemented(BOOLEAN has_callback)
+static BOOLEAN singclap_factory_factorize_domain_is_supported(const ring r)
+{
+  if ((r == NULL) || (r->cf == NULL)) return FALSE;
+
+  if (r->cf->convSingNFactoryN == ndConvSingNFactoryN) return FALSE;
+
+  if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Zp_long(r)
+  || rField_is_Z(r) || rField_is_Zn(r))
+    return TRUE;
+
+  // Factory needs a coefficient domain its conversion code understands.  An
+  // extRing alone is not enough; domains outside this set can use cfFactorize.
+  return (r->cf->extRing != NULL) && (rField_is_Q_a(r) || rField_is_Zp_a(r));
+}
+
+static void singclap_report_factorization_not_implemented(const ring r,
+                                                          BOOLEAN has_callback)
 {
   if (has_callback)
     WerrorS("coefficient factorization callback is not implemented for this polynomial");
+  else if (singclap_factory_factorize_domain_is_supported(r)
+        && singclap_factory_char_is_too_large(r))
+    singclap_report_factory_char_too_large();
   else
     WerrorS("factorization is not implemented for this coefficient domain");
 }
 
-static void singclap_report_sqrfree_not_implemented(BOOLEAN has_callback)
+static void singclap_report_sqrfree_not_implemented(const ring r,
+                                                    BOOLEAN has_callback)
 {
   if (has_callback)
     WerrorS("coefficient squarefree factorization callback is not implemented for this polynomial");
+  else if (singclap_factory_factorize_domain_is_supported(r)
+        && singclap_factory_char_is_too_large(r))
+    singclap_report_factory_char_too_large();
   else
     WerrorS("squarefree factorization is not implemented for this coefficient domain");
 }
 
 static BOOLEAN singclap_factory_factorize_is_supported(const ring r)
 {
-  if ((r == NULL) || (r->cf == NULL)) return FALSE;
-
-  if (r->cf->convSingNFactoryN == ndConvSingNFactoryN) return FALSE;
+  if (!singclap_factory_factorize_domain_is_supported(r)) return FALSE;
 
   if (singclap_factory_char_is_too_large(r)) return FALSE;
 
-  if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Zp_long(r)
-  || rField_is_Z(r) || rField_is_Zn(r))
-    return TRUE;
-
-  return (r->cf->extRing != NULL) && (rField_is_Q_a(r) || rField_is_Zp_a(r));
+  return TRUE;
 }
 
 static BOOLEAN singclap_coeff_factorize_is_available(const ring r)
@@ -1250,6 +1267,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
 #endif
   if (!singclap_factory_factorize_is_supported(r))
   {
+    // Generic coefficient-domain fallback.  A NULL result means that no
+    // callback exists or that the callback does not implement this case.
     const BOOLEAN has_callback = singclap_coeff_factorize_is_available(r);
     res = singclap_try_coeff_factorize(f, v, with_exps, r);
     if (res != NULL)
@@ -1259,7 +1278,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       return res;
     }
     errorreported=save_errorreported;
-    singclap_report_factorization_not_implemented(has_callback);
+    singclap_report_factorization_not_implemented(r, has_callback);
     res=idInit(2,1);
     res->m[0]=p_One(r);
     res->m[1]=f;
@@ -1737,6 +1756,8 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
 #endif
   if (!singclap_factory_factorize_is_supported(r))
   {
+    // Generic coefficient-domain fallback.  A NULL result means that no
+    // callback exists or that the callback does not implement this case.
     const BOOLEAN has_callback = singclap_coeff_factorize_is_available(r);
     res = singclap_try_coeff_factorize(f, v, with_exps, r);
     if (res != NULL)
@@ -1746,7 +1767,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
       return res;
     }
     errorreported=save_errorreported;
-    singclap_report_sqrfree_not_implemented(has_callback);
+    singclap_report_sqrfree_not_implemented(r, has_callback);
     p_Delete(&f,r);
     return NULL;
   }

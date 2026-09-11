@@ -15,6 +15,7 @@
 #if __FLINT_RELEASE >= 20503
 #include "coeffs/coeffs.h"
 #include "coeffs/longrat.h"
+#include "coeffs/modulop.h"
 #include "polys/monomials/p_polys.h"
 #define TRANSEXT_PRIVATES
 #include "polys/ext_fields/transext.h"
@@ -87,8 +88,14 @@ BOOLEAN convSingRFlintR(fmpz_mpoly_ctx_t ctx, const ring r)
 BOOLEAN Flint_Factorize_MP_is_supported(const ring r)
 {
   if ((r == NULL) || (r->cf == NULL)) return FALSE;
-  if (!rField_is_Zp_long(r)) return FALSE;
-  if ((r->cf->modExponent != 1) || (r->cf->modNumber == NULL)) return FALSE;
+  if (rField_is_Zp_long(r))
+  {
+    if ((r->cf->modExponent != 1) || (r->cf->modNumber == NULL)) return FALSE;
+  }
+  else if (!rField_is_Zp(r) || (r->cf->ch <= FACTORY_MAX_PRIME))
+  {
+    return FALSE;
+  }
   return (r->OrdSgn == 1);
 }
 
@@ -98,7 +105,10 @@ BOOLEAN convSingRFlintR(fmpz_mod_mpoly_ctx_t ctx, const ring r)
 
   fmpz_t p;
   fmpz_init(p);
-  fmpz_set_mpz(p, r->cf->modNumber);
+  if (rField_is_Zp_long(r))
+    fmpz_set_mpz(p, r->cf->modNumber);
+  else
+    fmpz_set_ui(p, (ulong)r->cf->ch);
 
   if (rRing_ord_pure_dp(r))
   {
@@ -307,7 +317,10 @@ void convSingPFlintMP(fmpz_mod_mpoly_t res, fmpz_mod_mpoly_ctx_t ctx, poly p, in
   while(p!=NULL)
   {
     number n=pGetCoeff(p);
-    fmpz_set_mpz(c, (mpz_ptr)n);
+    if (rField_is_Zp_long(r))
+      fmpz_set_mpz(c, (mpz_ptr)n);
+    else
+      fmpz_set_ui(c, (ulong)(long)n);
     #if SIZEOF_LONG==8
     p_GetExpVL(p,(int64*)exp,r);
     fmpz_mod_mpoly_push_term_fmpz_ui(res, c, exp, ctx);

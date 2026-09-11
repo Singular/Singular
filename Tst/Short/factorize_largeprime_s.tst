@@ -48,4 +48,11 @@ factorize(ft);
 poly fs=(x+y+1)^2*(x*z+3)^3;
 sqrfree(fs);
 
+ring rz=1000000007,(x,y),dp;
+poly fz=(x+2*y+3)*(x*y+5)*(x2+y+7);
+factorize(fz);
+
+poly gz=(x+y+1)^2*(x*y+3)^3;
+sqrfree(gz);
+
 tst_status(1);$
