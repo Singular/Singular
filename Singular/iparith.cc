@@ -2133,9 +2133,9 @@ static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
   }
   else
   {
-    WarnS("facstd: no factorization implemented for this coefficient domain; returning std(...) as one component");
-    L->Init(1);
-    iiExprArith2(&(L->m[0]),v,STD_CMD,w);
+    WerrorS("facstd: factorization is not implemented for this coefficient domain");
+    omFreeBin((ADDRESS)L, slists_bin);
+    return TRUE;
   }
   res->data=(void *)L;
   return FALSE;
@@ -4564,9 +4564,9 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
   }
   else
   {
-    WarnS("facstd: no factorization implemented for this coefficient domain; returning std(...) as one component");
-    L->Init(1);
-    iiExprArith1(&(L->m[0]),v,STD_CMD);
+    WerrorS("facstd: factorization is not implemented for this coefficient domain");
+    omFreeBin((ADDRESS)L, slists_bin);
+    return TRUE;
   }
   res->data=(void *)L;
   return FALSE;
