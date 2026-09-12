@@ -3,14 +3,6 @@ name: CI with Singular.jl under LLDB
 on:
   workflow_dispatch:
     inputs:
-      singularjl-version:
-        description: Singular.jl version to test
-        required: true
-        default: master
-        type: choice
-        options:
-          - master
-          - latest-release
       pull-request-number:
         description: Pull request number to test (leave empty to test the selected branch)
         required: false
@@ -29,11 +21,17 @@ concurrency:
 
 jobs:
   debug:
-    name: Julia 1.13 - Singular.jl ${{ inputs.singularjl-version || 'master' }} - macOS ARM64
+    name: Julia latest - Singular.jl ${{ matrix.singularjl-version }} - macOS ARM64
     runs-on: macOS-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        singularjl-version:
+          - latest-release
+          - master
     env:
-      SINGULARJL_VERSION: ${{ inputs.singularjl-version || 'master' }}
+      SINGULARJL_VERSION: ${{ matrix.singularjl-version }}
 
     steps:
       - name: Checkout debugger support
@@ -50,10 +48,16 @@ jobs:
           ref: ${{ inputs.pull-request-number && format('refs/pull/{0}/merge', inputs.pull-request-number) || github.sha }}
           persist-credentials: false
 
+      - name: Verify ARM64 runner
+        shell: bash
+        run: |
+          test "$(uname -m)" = arm64
+          sw_vers
+
       - name: Set up Julia
         uses: julia-actions/setup-julia@v2
         with:
-          version: '1.13'
+          version: '1'
 
       - name: Install Singular.jl
         shell: julia --color=yes {0}
@@ -117,6 +121,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: singularjl-lldb-${{ github.run_id }}
+          name: singularjl-lldb-${{ matrix.singularjl-version }}-${{ github.run_id }}
           path: ${{ runner.temp }}/singularjl-lldb
           if-no-files-found: warn
