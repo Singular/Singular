@@ -55,13 +55,27 @@ try
         "DYLD_FALLBACK_LIBRARY_PATH" => dyld_fallback,
     ) do
         julia = `$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`
-        run(`lldb --batch --no-lldbinit
-                  -o run
-                  -k "process status"
-                  -k "thread backtrace all"
-                  -k "register read"
-                  -k "image list"
-                  -- $julia`)
+        status_file = tempname()
+        write(status_file, "1\n")
+        status_command = "script import lldb; p = lldb.debugger.GetSelectedTarget().GetProcess(); open($(repr(status_file)), 'w').write(str(p.GetExitStatus() if p.GetState() == lldb.eStateExited else 1))"
+
+        try
+            lldb = run(ignorestatus(`lldb --batch --no-lldbinit
+                                         -o run
+                                         -o $status_command
+                                         -k "process status"
+                                         -k "thread backtrace all"
+                                         -k "register read"
+                                         -k "image list"
+                                         -k "quit 1"
+                                         -- $julia`))
+            success(lldb) || error("LLDB failed with status $(lldb.exitcode)")
+
+            julia_status = tryparse(Int, strip(read(status_file, String)))
+            julia_status == 0 || error("debugged Julia failed with status $(something(julia_status, "unknown"))")
+        finally
+            rm(status_file; force=true)
+        end
     end
 finally
     rm(marker; force=true)
