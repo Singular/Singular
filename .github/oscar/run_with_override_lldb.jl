@@ -11,7 +11,7 @@ using Pkg
 
 Pkg.activate(; temp=true)
 Pkg.develop(path=singularjl_path)
-Pkg.add(Pkg.PackageSpec(name="Aqua", version="0.8.2"))
+Pkg.add("Aqua")
 Pkg.add("Singular_jll")
 Pkg.instantiate()
 
