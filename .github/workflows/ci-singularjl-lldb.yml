@@ -1,0 +1,122 @@
+name: CI with Singular.jl under LLDB
+
+on:
+  workflow_dispatch:
+    inputs:
+      singularjl-version:
+        description: Singular.jl version to test
+        required: true
+        default: master
+        type: choice
+        options:
+          - master
+          - latest-release
+      pull-request-number:
+        description: Pull request number to test (leave empty to test the selected branch)
+        required: false
+        type: string
+  push:
+    paths:
+      - '.github/workflows/ci-singularjl-lldb.yml'
+      - '.github/oscar/run_with_override_lldb.jl'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.pull-request-number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  debug:
+    name: Julia 1.13 - Singular.jl ${{ inputs.singularjl-version || 'master' }} - macOS ARM64
+    runs-on: macOS-latest
+    timeout-minutes: 60
+    env:
+      SINGULARJL_VERSION: ${{ inputs.singularjl-version || 'master' }}
+
+    steps:
+      - name: Checkout debugger support
+        uses: actions/checkout@v6
+        with:
+          path: DEBUGTOOLS
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Checkout Singular
+        uses: actions/checkout@v6
+        with:
+          path: SINGULARROOT
+          ref: ${{ inputs.pull-request-number && format('refs/pull/{0}/merge', inputs.pull-request-number) || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.13'
+
+      - name: Install Singular.jl
+        shell: julia --color=yes {0}
+        run: |
+          using Pkg
+          if ENV["SINGULARJL_VERSION"] == "latest-release"
+            Pkg.add("Singular")
+          else
+            Pkg.add(; name="Singular", rev=ENV["SINGULARJL_VERSION"])
+          end
+          path = dirname(dirname(Base.find_package("Singular")))
+          open(ENV["GITHUB_ENV"], "a") do io
+              println(io, "SINGULARJL_PATH=$path")
+          end
+
+      - name: Install build dependencies
+        run: brew install autoconf automake libtool
+
+      - name: Run autogen.sh
+        run: |
+          mv SINGULARROOT /tmp/SINGULARROOT
+          cd /tmp/SINGULARROOT
+          ./autogen.sh
+
+      - name: Override bundled Singular
+        run: |
+          julia --project=override \
+            "$SINGULARJL_PATH/etc/setup_override_dir.jl" \
+            /tmp/SINGULARROOT \
+            /tmp/singular_jll_override
+
+      - name: Run Singular.jl tests under LLDB
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p "$RUNNER_TEMP/singularjl-lldb"
+          uname -a
+          julia --version
+          lldb --version
+          julia --project=override \
+            "$GITHUB_WORKSPACE/DEBUGTOOLS/.github/oscar/run_with_override_lldb.jl" \
+            /tmp/singular_jll_override \
+            --startup-file=no \
+            --check-bounds=yes \
+            --depwarn=error \
+            -e 'include(joinpath(ENV["SINGULARJL_PATH"], "test", "runtests.jl"))' \
+            2>&1 | tee "$RUNNER_TEMP/singularjl-lldb/lldb.log"
+
+      - name: Collect macOS crash reports
+        if: always()
+        shell: bash
+        run: |
+          sleep 5
+          report_dir="$HOME/Library/Logs/DiagnosticReports"
+          if [[ -d "$report_dir" ]]; then
+            find "$report_dir" -type f \( -name '*.crash' -o -name '*.ips' \) \
+              -exec cp '{}' "$RUNNER_TEMP/singularjl-lldb/" \; || true
+          fi
+
+      - name: Upload LLDB diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: singularjl-lldb-${{ github.run_id }}
+          path: ${{ runner.temp }}/singularjl-lldb
+          if-no-files-found: warn
