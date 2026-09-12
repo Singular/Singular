@@ -26,7 +26,7 @@ function add_jll_override(depot, pkgname, newdir)
     end
 
     # Force libsingular_julia to be rebuilt with the overridden Singular.
-    touch(Base.locate_package(pkgid))
+    run(`touch $(Base.locate_package(pkgid))`)
 end
 
 tmpdepot = mktempdir(; cleanup=true)
