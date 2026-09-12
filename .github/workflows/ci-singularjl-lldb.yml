@@ -7,7 +7,7 @@ on:
         description: Pull request number to test (leave empty to test the selected branch)
         required: false
         type: string
-  push:
+  pull_request:
     paths:
       - '.github/workflows/ci-singularjl-lldb.yml'
       - '.github/oscar/run_with_override_lldb.jl'
