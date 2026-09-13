@@ -50,7 +50,14 @@ sqrfree(fs);
 
 ring rz=1000000007,(x,y),dp;
 poly fz=(x+2*y+3)*(x*y+5)*(x2+y+7);
-factorize(fz);
+list Fz=factorize(fz);
+poly fz_check=1;
+for (int i=1; i<=size(Fz[1]); i++)
+{
+  fz_check=fz_check*Fz[1][i]^Fz[2][i];
+}
+fz_check==fz;
+size(Fz[1])==4;
 
 poly gz=(x+y+1)^2*(x*y+3)^3;
 sqrfree(gz);
