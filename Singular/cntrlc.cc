@@ -30,6 +30,9 @@
 #if defined(__OPTIMIZE__) && defined(CALL_GDB)
 #undef CALL_GDB
 #endif
+#if defined(_WIN32) && defined(CALL_GDB)
+# undef CALL_GDB
+#endif
 
  #ifdef TIME_WITH_SYS_TIME
    #include <time.h>
@@ -120,16 +123,12 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 /*---------------------------------------------------------------------*/
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
 {
-#if 0
+#ifdef _WIN32
   si_hdl_typ retval=signal (sig, (si_hdl_typ)signal_handler);
   if (retval == SIG_ERR)
   {
      fprintf(stderr, "Unable to init signal %d ... exiting...\n", sig);
   }
-  si_siginterrupt(sig, 0);
-  /*system calls will be restarted if interrupted by  the  specified
-   * signal sig.  This is the default behavior in Linux.
-   */
 #else
   struct sigaction new_action,old_action;
   memset(&new_action, 0, sizeof(struct sigaction));
@@ -360,7 +359,7 @@ void sigint_handler(int /*sig*/)
 //  }
 //}
 
-#  ifndef __OPTIMIZE__
+#  if !defined(__OPTIMIZE__) && !defined(_WIN32)
 VAR volatile int si_stop_stack_trace_x;
 #    ifdef CALL_GDB
 static void debug (int method)
@@ -524,7 +523,7 @@ static void stack_trace (char *const*args)
   m2_end(1);
 }
 
-#  endif /* !__OPTIMIZE__ */
+#  endif /* !__OPTIMIZE__ && !_WIN32 */
 
 /// init signal handlers and error handling for libraries: NTL, factory
 void init_signals()
@@ -546,8 +545,12 @@ void init_signals()
   si_set_signal(SIGIOT, (si_hdl_typ)sigsegv_handler);
   #endif
   si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
+  #ifdef SIGCHLD
   si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
+  #endif
+  #ifdef SIGPIPE
   si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
+  #endif
   si_set_signal(SIGTERM, (si_hdl_typ)sig_term_hdl);
 }
 
@@ -560,7 +563,9 @@ VAR si_hdl_typ si_sig_term_hdl;
 void si_set_signals()
 {
   //si_sigint_handler=si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
+  #ifdef SIGCHLD
   old_sig_chld_hdl=si_sig_chld_hdl=si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
+  #endif
   //si_sig_pipe_hdl=si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
   si_sig_term_hdl=si_set_signal(SIGTERM, (si_hdl_typ)sig_term_hdl);
 }
@@ -569,8 +574,9 @@ void si_reset_signals()
 {
 // signal handler -------------------------------------------------------
   //si_set_signal(SIGINT ,si_sigint_handler);
+  #ifdef SIGCHLD
   si_set_signal(SIGCHLD, old_sig_chld_hdl);
+  #endif
   //si_set_signal(SIGPIPE, si_sig_pipe_hdl);
   si_set_signal(SIGTERM, si_sig_term_hdl);
 }
-

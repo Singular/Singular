@@ -17,7 +17,9 @@
 #include "Singular/sdb.h"
 
 #include <unistd.h>   // for unlink,fork,execlp,getpid
+#ifndef _WIN32
 #include <sys/wait.h> // for wait
+#endif
 
 
 #ifdef HAVE_SDB
@@ -108,6 +110,10 @@ BOOLEAN sdb_set_breakpoint(const char *pp, int given_lineno)
 
 void sdb_edit(procinfo *pi)
 {
+#ifdef _WIN32
+  (void)pi;
+  WerrorS("editing procedures from the debugger is not supported on native Windows");
+#else
   char * filename = omStrDup("/tmp/sdXXXXXX");
   int f=mkstemp(filename);
   if (f==-1)
@@ -203,6 +209,7 @@ void sdb_edit(procinfo *pi)
   }
   si_unlink(filename);
   omFree(filename);
+#endif
 }
 
 STATIC_VAR char sdb_lastcmd='c';
