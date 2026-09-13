@@ -112,7 +112,11 @@ jobs:
           echo "getconf PAGESIZE=$page_size"; test "$page_size" = 65536'
 
       - name: Generate build system
-        run: bash --login -eo pipefail -c './autogen.sh'
+        run: >-
+          bash --login -eo pipefail -c
+          'mkdir -p /tmp/singular-autoconf-bin;
+          ln -sf /usr/bin/autoreconf-2.73 /tmp/singular-autoconf-bin/autoreconf;
+          PATH=/tmp/singular-autoconf-bin:$PATH ./autogen.sh'
 
       - name: Configure
         run: >-
