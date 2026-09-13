@@ -120,6 +120,7 @@ bug_tr873
 bug_tr874
 bug_genus_etc
 conv_bi
+crlf_lib
 ; divrem2
 enumnf
 facstd
@@ -131,6 +132,8 @@ fermat_gcd_mod_1var
 fermat_gcd_mod_2var
 fermat_gcd_mod_3var
 fermat_gcd_mod_4var
+flint_mult
+flint_power
 fres_s
 gcd2test
 gcd3primtest
@@ -169,6 +172,7 @@ ncfactor_facSubWeyl4_s
 ncfactor_nthweylringalt2_s
 ncfactor_usl2_reducible_bug_s
 ncfactor_usl2_s
+ncmodslimgb
 polyclass
 primdec3
 ../Manual/equidimZ

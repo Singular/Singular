@@ -154,6 +154,7 @@ Short/bug_x_i_j.tst
 Short/charseries.tst
 Short/charseries_p.tst
 Short/classify_s.tst
+Short/crlf_lib.tst
 Short/conway.tst
 Short/cyc5_lp.tst
 Short/dbm_s.tst
@@ -183,6 +184,8 @@ Short/fglmquot1_s.tst
 Short/finduni_s.tst
 Short/finvar_s.tst
 Short/finvarlb.tst
+Short/flint_mult.tst
+Short/flint_power.tst
 Short/gaussm_ex.tst
 Short/gcd0_s.tst
 Short/gcdp_s.tst
@@ -225,6 +228,7 @@ Short/ncfactor_inhomog_s.tst
 Short/ncfactor_koepfShift_s.tst
 Short/ncfactor_koepf_s.tst
 Short/ncfactor_tsai_s.tst
+Short/ncmodslimgb.tst
 Short/normal.tst
 Short/pAddManyVarsManyL_s.tst
 Short/pAddManyVars_s.tst

@@ -20,10 +20,21 @@
 #include "Singular/blackbox.h"
 #include "Singular/mod_lib.h"
 #ifdef HAVE_SPASM_H
+// SpaSM <= 1.2 exposes its bundled cycleclock.h from the public header.  That
+// header defines an unsigned global int64 typedef which conflicts with
+// Singular's signed int64.  This wrapper does not use the timing helpers.
+#if !defined(GOOGLE_BASE_CYCLECLOCK_H_)
+#define GOOGLE_BASE_CYCLECLOCK_H_
+#define SINGULAR_SUPPRESSED_SPASM_CYCLECLOCK
+#endif
 extern "C"
 {
 #include "spasm.h"
 }
+#ifdef SINGULAR_SUPPRESSED_SPASM_CYCLECLOCK
+#undef SINGULAR_SUPPRESSED_SPASM_CYCLECLOCK
+#undef GOOGLE_BASE_CYCLECLOCK_H_
+#endif
 
 static spasm* conv_matrix2spasm(matrix M, const ring R)
 {
@@ -351,10 +362,10 @@ extern "C" int SI_MOD_INIT(sispasm)(SModulFunctions* p)
   b->blackbox_Op1=sp_Op1;
   b->blackbox_Op3=sp_Op3;
   SPASM_CMD=setBlackboxStuff(b,"spasm");
-  p->iiAddCproc("spasm.so","spasm_kernel",FALSE,kernel);
-  p->iiAddCproc("spasm.so","spasm_rref",FALSE,rref);
-  p->iiAddCproc("spasm.so","to_smatrix",FALSE,to_smatrix);
-  p->iiAddCproc("spasm.so","to_matrix",FALSE,to_matrix);
+  p->iiAddCproc("sispasm.so","spasm_kernel",FALSE,kernel);
+  p->iiAddCproc("sispasm.so","spasm_rref",FALSE,rref);
+  p->iiAddCproc("sispasm.so","to_smatrix",FALSE,to_smatrix);
+  p->iiAddCproc("sispasm.so","to_matrix",FALSE,to_matrix);
   return (MAX_TOK);
 }
 #else
