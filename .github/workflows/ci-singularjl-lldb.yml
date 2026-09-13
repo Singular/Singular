@@ -7,10 +7,6 @@ on:
         description: Pull request number to test (leave empty to test the selected branch)
         required: false
         type: string
-  pull_request:
-    paths:
-      - '.github/workflows/ci-singularjl-lldb.yml'
-      - '.github/oscar/run_with_override_lldb.jl'
 
 permissions:
   contents: read
@@ -84,6 +80,8 @@ jobs:
 
       - name: Override bundled Singular
         run: |
+          # Match the 4 KiB omalloc ABI used by the published macOS ARM64 JLLs.
+          export ac_cv_pagesize=4096
           julia --project=override \
             "$SINGULARJL_PATH/etc/setup_override_dir.jl" \
             /tmp/SINGULARROOT \

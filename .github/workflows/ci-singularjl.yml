@@ -20,7 +20,7 @@ jobs:
     name: Julia ${{ matrix.julia-version }} - Singular.jl ${{ matrix.singularjl-version }} - ${{ matrix.os }}${{ matrix.omalloc-config != 'default' && format(' - {0}', matrix.omalloc-config) || '' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
-    continue-on-error: ${{ matrix.julia-version == '1' || matrix.julia-version == 'nightly' }}
+    continue-on-error: ${{ matrix.julia-version == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
@@ -29,8 +29,7 @@ jobs:
           - 'master'
         julia-version:
           - '1.10'
-          - '1.12'      # pinned stable release
-          - '1'         # latest stable release (non-required)
+          - '1'         # latest stable release
           - 'nightly'
         os:
           - ubuntu-latest
@@ -38,12 +37,6 @@ jobs:
           - 'default'
         include:
           # Match the current macOS ARM JLL ABI for release and master.
-          - singularjl-version: 'latest-release'
-            julia-version: '1.12'
-            os: macOS-latest
-          - singularjl-version: 'master'
-            julia-version: '1.12'
-            os: macOS-latest
           - singularjl-version: 'latest-release'
             julia-version: '1'
             os: macOS-latest

@@ -90,7 +90,6 @@ jobs:
       #  if: ${{ always() }}
 
   cygwin:
-    name: Windows (Cygwin) - windows-latest
     runs-on: windows-latest
     timeout-minutes: 120
     env:
