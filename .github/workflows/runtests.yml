@@ -100,7 +100,7 @@ jobs:
         uses: cygwin/cygwin-install-action@v6
         with:
           packages: >-
-            autoconf automake binutils cddlib-devel cygwin-devel gcc-core
+            autoconf2.7 automake1.18 binutils cddlib-devel cygwin-devel gcc-core
             gcc-g++ git libflint-devel libgmp-devel libmpfr-devel
             libntl-devel libreadline-devel libtool m4 make perl pkg-config
             texinfo
@@ -114,9 +114,14 @@ jobs:
       - name: Generate build system
         run: >-
           bash --login -eo pipefail -c
-          'mkdir -p /tmp/singular-autoconf-bin;
-          ln -sf /usr/bin/autoreconf-2.73 /tmp/singular-autoconf-bin/autoreconf;
-          PATH=/tmp/singular-autoconf-bin:$PATH ./autogen.sh'
+          'mkdir -p /tmp/singular-autotools-bin;
+          ln -sf /usr/bin/autoconf-2.73 /tmp/singular-autotools-bin/autoconf;
+          ln -sf /usr/bin/autoheader-2.73 /tmp/singular-autotools-bin/autoheader;
+          ln -sf /usr/bin/autom4te-2.73 /tmp/singular-autotools-bin/autom4te;
+          ln -sf /usr/bin/autoreconf-2.73 /tmp/singular-autotools-bin/autoreconf;
+          ln -sf /usr/bin/aclocal-1.18 /tmp/singular-autotools-bin/aclocal;
+          ln -sf /usr/bin/automake-1.18 /tmp/singular-autotools-bin/automake;
+          PATH=/tmp/singular-autotools-bin:$PATH ./autogen.sh'
 
       - name: Configure
         run: >-
