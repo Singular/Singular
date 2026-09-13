@@ -98,12 +98,10 @@ jobs:
           julia --version
           lldb --version
           julia --project=override \
-            "$GITHUB_WORKSPACE/DEBUGTOOLS/.github/oscar/run_with_override_lldb.jl" \
+            "$SINGULARJL_PATH/etc/run_with_override.jl" \
             /tmp/singular_jll_override \
-            --startup-file=no \
-            --check-bounds=yes \
             --depwarn=error \
-            -e 'include(joinpath(ENV["SINGULARJL_PATH"], "test", "runtests.jl"))' \
+            "$GITHUB_WORKSPACE/DEBUGTOOLS/.github/oscar/run_with_override_lldb.jl" \
             2>&1 | tee "$RUNNER_TEMP/singularjl-lldb/lldb.log"
 
       - name: Collect macOS crash reports
