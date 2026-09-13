@@ -5015,6 +5015,13 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   case 2:
     res->data = (char *)n_Init(om_Info.MaxBytesSystem,coeffs_BIGINT);
     break;
+  #elif defined(_WIN32)
+  // Windows --disable-omalloc has no allocator statistics.
+  case 0:
+  case 1:
+  case 2:
+    res->data=(char *)n_Init(0,coeffs_BIGINT);
+    break;
   #endif  
   default:
     omPrintStats(stdout);
@@ -5901,7 +5908,12 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
         currPack=IDPACKAGE(pl);
         IDPACKAGE(pl)->loaded=TRUE;
         char libnamebuf[1024];
+#ifdef _WIN32
+        // Native Windows: keep lazy procedure offsets physical.
+        FILE * fp = feFopen( s, "rb", libnamebuf, TRUE );
+#else
         FILE * fp = feFopen( s, "r", libnamebuf, TRUE );
+#endif
         BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, autoexport, TRUE);
         currPack=savepack;
         IDPACKAGE(pl)->loaded=(!bo);
