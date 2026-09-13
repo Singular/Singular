@@ -117,6 +117,11 @@ jobs:
           ./autogen.sh
       - name: "Override bundled Singular"
         run: |
+          # The macOS ARM64 JLLs use a 4 KiB omalloc ABI even though the host
+          # page size is 16 KiB. Keep the native override ABI-compatible.
+          if [[ "$RUNNER_OS" == "macOS" && "$RUNNER_ARCH" == "ARM64" ]]; then
+            export ac_cv_pagesize=4096
+          fi
           julia --proj=override $SINGULARJL_PATH/etc/setup_override_dir.jl /tmp/SINGULARROOT /tmp/singular_jll_override
       - name: "Verify omalloc page size"
         if: matrix.omalloc-config != 'default'
