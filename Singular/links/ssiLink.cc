@@ -55,7 +55,7 @@
 #include <netinet/in.h> /* for htons etc.*/
 
 
-#define SSI_VERSION 17
+#define SSI_VERSION 16
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
@@ -67,112 +67,6 @@
 // 13->14: ring references
 // 14->15: bigintvec, prune_map, mres_map
 // 15->16: htable
-// 16->17: schema subversion table
-
-#define SSI_SCHEMA_TOKEN 26
-#define SSI_SCHEMA_TABLE_VERSION 1
-
-enum ssiSchemaId
-{
-  SSI_SCHEMA_NUMBER=1,
-  SSI_SCHEMA_RING,
-  SSI_SCHEMA_POLY,
-  SSI_SCHEMA_IDEAL,
-  SSI_SCHEMA_MATRIX,
-  SSI_SCHEMA_MODULE,
-  SSI_SCHEMA_LIST,
-  SSI_SCHEMA_PROC,
-  SSI_SCHEMA_INTVEC,
-  SSI_SCHEMA_BIGINTMAT,
-  SSI_SCHEMA_ATTRIBUTES,
-  SSI_SCHEMA_COMMAND,
-  SSI_SCHEMA_RING_PROPERTIES,
-  SSI_SCHEMA_BLACKBOX,
-  SSI_SCHEMA_HTABLE
-};
-
-struct ssiSchemaVersionEntry
-{
-  int id;
-  int version;
-  const char *name;
-};
-
-static const ssiSchemaVersionEntry ssiSchemaVersions[] =
-{
-  { SSI_SCHEMA_NUMBER,          1, "number" },
-  { SSI_SCHEMA_RING,            1, "ring" },
-  { SSI_SCHEMA_POLY,            1, "polynomial" },
-  { SSI_SCHEMA_IDEAL,           1, "ideal" },
-  { SSI_SCHEMA_MATRIX,          1, "matrix" },
-  { SSI_SCHEMA_MODULE,          1, "module" },
-  { SSI_SCHEMA_LIST,            1, "list" },
-  { SSI_SCHEMA_PROC,            1, "proc" },
-  { SSI_SCHEMA_INTVEC,          1, "intvec" },
-  { SSI_SCHEMA_BIGINTMAT,       1, "bigintmat" },
-  { SSI_SCHEMA_ATTRIBUTES,      1, "attributes" },
-  { SSI_SCHEMA_COMMAND,         1, "command" },
-  { SSI_SCHEMA_RING_PROPERTIES, 1, "ring-properties" },
-  { SSI_SCHEMA_BLACKBOX,        1, "blackbox" },
-  { SSI_SCHEMA_HTABLE,          1, "htable" }
-};
-
-static const int ssiSchemaVersionCount =
-  (int)(sizeof(ssiSchemaVersions)/sizeof(ssiSchemaVersions[0]));
-
-static int ssiCurrentSchemaVersion(int id)
-{
-  for (int i=0; i<ssiSchemaVersionCount; i++)
-    if (ssiSchemaVersions[i].id==id) return ssiSchemaVersions[i].version;
-  return 0;
-}
-
-static const char *ssiSchemaName(int id)
-{
-  for (int i=0; i<ssiSchemaVersionCount; i++)
-    if (ssiSchemaVersions[i].id==id) return ssiSchemaVersions[i].name;
-  return "unknown";
-}
-
-static void ssiInitSchemaVersions(ssiInfo *d)
-{
-  if (d==NULL) return;
-  memset(d->schema_versions, 0, sizeof(d->schema_versions));
-  for (int i=0; i<ssiSchemaVersionCount; i++)
-  {
-    int id=ssiSchemaVersions[i].id;
-    if ((id>0) && (id<SSI_SCHEMA_VERSION_COUNT))
-      d->schema_versions[id]=(unsigned short)ssiSchemaVersions[i].version;
-  }
-}
-
-static int ssiSchemaVersion(const ssiInfo *d, int id)
-{
-  if ((d!=NULL) && (id>0) && (id<SSI_SCHEMA_VERSION_COUNT)
-  && (d->schema_versions[id]!=0))
-    return d->schema_versions[id];
-  return ssiCurrentSchemaVersion(id);
-}
-
-static void ssiSetSchemaVersion(ssiInfo *d, int id, int version)
-{
-  if ((d!=NULL) && (id>0) && (id<SSI_SCHEMA_VERSION_COUNT) && (version>0))
-    d->schema_versions[id]=(unsigned short)version;
-}
-
-static BOOLEAN ssiRequireSchemaVersion(const ssiInfo *d, int id,
-                                       const char *format)
-{
-  int have=ssiSchemaVersion(d, id);
-  int current=ssiCurrentSchemaVersion(id);
-  if ((current>0) && (have>current))
-  {
-    Werror("%s: %s schema version %d is newer than supported version %d",
-           format, ssiSchemaName(id), have, current);
-    return TRUE;
-  }
-  return FALSE;
-}
 
 EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 VAR link_list ssiToBeClosed=NULL;
@@ -279,35 +173,6 @@ static void ssiWriteString(const ssiInfo *d,const char *s)
 static void ssiWriteString_S(const char *s)
 {
   StringAppend("%d %s ",(int)strlen(s),s);
-}
-
-static void ssiWriteSchemaTable(const ssiInfo *d)
-{
-  fprintf(d->f_write, "%d %d %d ",
-          SSI_SCHEMA_TOKEN, SSI_SCHEMA_TABLE_VERSION, ssiSchemaVersionCount);
-  for (int i=0; i<ssiSchemaVersionCount; i++)
-  {
-    int id=ssiSchemaVersions[i].id;
-    fprintf(d->f_write, "%d %d ", id, ssiSchemaVersion(d, id));
-  }
-  fputc('\n', d->f_write);
-}
-
-static void ssiReadSchemaTable(ssiInfo *d)
-{
-  int table_version=s_readint(d->f_read);
-  int count=s_readint(d->f_read);
-  if (table_version>SSI_SCHEMA_TABLE_VERSION)
-  {
-    Print("ssi: schema table version %d is newer than supported version %d\n",
-          table_version, SSI_SCHEMA_TABLE_VERSION);
-  }
-  for (int i=0; i<count; i++)
-  {
-    int id=s_readint(d->f_read);
-    int version=s_readint(d->f_read);
-    ssiSetSchemaVersion(d, id, version);
-  }
 }
 
 static void ssiWriteBigInt(const ssiInfo *d, const number n)
@@ -980,7 +845,6 @@ int ssiReadInt_S(char **s)
 
 static number ssiReadNumber_CF(const ssiInfo *d, const coeffs cf)
 {
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_NUMBER, "ssi")) return NULL;
   if (cf->cfReadFd!=ndReadFd)
   {
      return n_ReadFd(d,cf);
@@ -1030,7 +894,6 @@ static number ssiReadNumber_CF_S(char **s, const coeffs cf)
 static number ssiReadBigInt(const ssiInfo *d)
 {
   number n=ssiReadNumber_CF(d,coeffs_BIGINT);
-  if (n==NULL) return n;
   if ((SR_HDL(n) & SR_INT)==0)
   {
     if (n->s!=3) Werror("invalid sub type in bigint:%d",n->s);
@@ -1055,7 +918,6 @@ static number ssiReadNumber(ssiInfo *d)
 static ring ssiReadRing(ssiInfo *d)
 {
 /* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_RING, "ssi")) return NULL;
   int ch;
   int new_ref=-1;
   ch=s_readint(d->f_read);
@@ -1407,7 +1269,6 @@ ring ssiReadRing_S(char *s)
 static poly ssiReadPoly_R(const ssiInfo *d, const ring r)
 {
 // < # of terms> < term1> < .....
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_POLY, "ssi")) return NULL;
   int n,i,l;
   n=ssiReadInt(d); // # of terms
   //Print("poly: terms:%d\n",n);
@@ -1481,7 +1342,6 @@ poly ssiReadPoly_S(char *s, const ring r)
 static ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
 {
 // < # of terms> < term1> < .....
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_IDEAL, "ssi")) return NULL;
   int n,i;
   ideal I;
   n=s_readint(d->f_read);
@@ -1518,7 +1378,6 @@ ideal ssiReadIdeal_S(char *s, const ring R)
 
 static matrix ssiReadMatrix(ssiInfo *d)
 {
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_MATRIX, "ssi")) return NULL;
   int n,m;
   m=s_readint(d->f_read);
   n=s_readint(d->f_read);
@@ -1555,7 +1414,6 @@ matrix ssiReadMatrix_R_S(char* s, const ring R)
 static command ssiReadCommand(si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_COMMAND, "ssi")) return NULL;
   // syntax: <num ops> <operation> <op1> <op2> ....
   command D=(command)omAlloc0(sizeof(*D));
   int argc,op;
@@ -1601,7 +1459,6 @@ static command ssiReadCommand(si_link l)
 
 static procinfov ssiReadProc(const ssiInfo *d)
 {
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_PROC, "ssi")) return NULL;
   char *s=ssiReadString(d);
   procinfov p=(procinfov)omAlloc0Bin(procinfo_bin);
   p->language=LANG_SINGULAR;
@@ -1623,7 +1480,6 @@ static procinfov ssiReadProc_S(char**s)
 static lists ssiReadList(si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_LIST, "ssi")) return NULL;
   int nr;
   nr=s_readint(d->f_read);
   lists L=(lists)omAlloc0Bin(slists_bin);
@@ -1642,7 +1498,6 @@ static lists ssiReadList(si_link l)
 static stablerec* ssiReadHTable(si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_HTABLE, "ssi")) return NULL;
   int nr=ssiReadInt(d);
   if (nr<0)
   {
@@ -1698,7 +1553,6 @@ static lists ssiReadList_S(char**s, const ring R)
 }
 static intvec* ssiReadIntvec(const ssiInfo *d)
 {
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_INTVEC, "ssi")) return NULL;
   int nr;
   nr=s_readint(d->f_read);
   intvec *v=new intvec(nr);
@@ -1721,7 +1575,6 @@ static intvec* ssiReadIntvec_S(char**s)
 }
 static intvec* ssiReadIntmat(const ssiInfo *d)
 {
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_INTVEC, "ssi")) return NULL;
   int r,c;
   r=s_readint(d->f_read);
   c=s_readint(d->f_read);
@@ -1746,7 +1599,6 @@ static intvec* ssiReadIntmat_S(char**s)
 }
 static bigintmat* ssiReadBigintmat(const ssiInfo *d)
 {
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_BIGINTMAT, "ssi")) return NULL;
   int r,c;
   r=s_readint(d->f_read);
   c=s_readint(d->f_read);
@@ -1771,7 +1623,6 @@ static bigintmat* ssiReadBigintmat_S(char**s)
 }
 static bigintmat* ssiReadBigintvec(const ssiInfo *d)
 {
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_BIGINTMAT, "ssi")) return NULL;
   int c;
   c=s_readint(d->f_read);
   bigintmat *v=new bigintmat(1,c,coeffs_BIGINT);
@@ -1795,8 +1646,6 @@ static bigintmat* ssiReadBigintvec_S(char**s)
 
 static void ssiReadBlackbox(leftv res, si_link l)
 {
-  ssiInfo *d=(ssiInfo*)l->data;
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_BLACKBOX, "ssi")) return;
   leftv lv=ssiRead1(l);
   char *name=(char*)lv->data;
   omFreeBin(lv,sleftv_bin);
@@ -1826,7 +1675,6 @@ static void ssiReadBlackbox(leftv res, si_link l)
 static void ssiReadAttrib(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_ATTRIBUTES, "ssi")) return;
   BITSET fl=(BITSET)s_readint(d->f_read);
   int nr_of_attr=s_readint(d->f_read);
   if (nr_of_attr>0)
@@ -1847,7 +1695,6 @@ static void ssiReadAttrib(leftv res, si_link l)
 static void ssiReadRingProperties(si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_RING_PROPERTIES, "ssi")) return;
   int what=s_readint(d->f_read);
   switch(what)
   {
@@ -1887,6 +1734,123 @@ static void ssiReadRingProperties(si_link l)
 
 /* #ssi2 start */
 #define SSI2_VERSION 1
+#define SSI_SCHEMA_TOKEN 26
+#define SSI_SCHEMA_TABLE_VERSION 1
+#define SSI2_SCHEMA_VERSION_COUNT 32
+
+struct ssi2Info : public ssiInfo
+{
+  char *write_buff;
+  int write_buff_pos;
+  int write_buff_size;
+  const char *compressor_name;
+  unsigned short schema_versions[SSI2_SCHEMA_VERSION_COUNT];
+};
+
+enum ssiSchemaId
+{
+  SSI_SCHEMA_NUMBER=1,
+  SSI_SCHEMA_RING,
+  SSI_SCHEMA_POLY,
+  SSI_SCHEMA_IDEAL,
+  SSI_SCHEMA_MATRIX,
+  SSI_SCHEMA_MODULE,
+  SSI_SCHEMA_LIST,
+  SSI_SCHEMA_PROC,
+  SSI_SCHEMA_INTVEC,
+  SSI_SCHEMA_BIGINTMAT,
+  SSI_SCHEMA_ATTRIBUTES,
+  SSI_SCHEMA_COMMAND,
+  SSI_SCHEMA_RING_PROPERTIES,
+  SSI_SCHEMA_BLACKBOX,
+  SSI_SCHEMA_HTABLE
+};
+
+struct ssiSchemaVersionEntry
+{
+  int id;
+  int version;
+  const char *name;
+};
+
+static const ssiSchemaVersionEntry ssiSchemaVersions[] =
+{
+  { SSI_SCHEMA_NUMBER,          1, "number" },
+  { SSI_SCHEMA_RING,            1, "ring" },
+  { SSI_SCHEMA_POLY,            1, "polynomial" },
+  { SSI_SCHEMA_IDEAL,           1, "ideal" },
+  { SSI_SCHEMA_MATRIX,          1, "matrix" },
+  { SSI_SCHEMA_MODULE,          1, "module" },
+  { SSI_SCHEMA_LIST,            1, "list" },
+  { SSI_SCHEMA_PROC,            1, "proc" },
+  { SSI_SCHEMA_INTVEC,          1, "intvec" },
+  { SSI_SCHEMA_BIGINTMAT,       1, "bigintmat" },
+  { SSI_SCHEMA_ATTRIBUTES,      1, "attributes" },
+  { SSI_SCHEMA_COMMAND,         1, "command" },
+  { SSI_SCHEMA_RING_PROPERTIES, 1, "ring-properties" },
+  { SSI_SCHEMA_BLACKBOX,        1, "blackbox" },
+  { SSI_SCHEMA_HTABLE,          1, "htable" }
+};
+
+static const int ssiSchemaVersionCount =
+  (int)(sizeof(ssiSchemaVersions)/sizeof(ssiSchemaVersions[0]));
+
+static int ssiCurrentSchemaVersion(int id)
+{
+  for (int i=0; i<ssiSchemaVersionCount; i++)
+    if (ssiSchemaVersions[i].id==id) return ssiSchemaVersions[i].version;
+  return 0;
+}
+
+static const char *ssiSchemaName(int id)
+{
+  for (int i=0; i<ssiSchemaVersionCount; i++)
+    if (ssiSchemaVersions[i].id==id) return ssiSchemaVersions[i].name;
+  return "unknown";
+}
+
+static void ssiInitSchemaVersions(ssiInfo *d)
+{
+  if (d==NULL) return;
+  ssi2Info *dd=(ssi2Info*)d;
+  memset(dd->schema_versions, 0, sizeof(dd->schema_versions));
+  for (int i=0; i<ssiSchemaVersionCount; i++)
+  {
+    int id=ssiSchemaVersions[i].id;
+    if ((id>0) && (id<SSI2_SCHEMA_VERSION_COUNT))
+      dd->schema_versions[id]=(unsigned short)ssiSchemaVersions[i].version;
+  }
+}
+
+static int ssiSchemaVersion(const ssiInfo *d, int id)
+{
+  const ssi2Info *dd=(const ssi2Info*)d;
+  if ((dd!=NULL) && (id>0) && (id<SSI2_SCHEMA_VERSION_COUNT)
+  && (dd->schema_versions[id]!=0))
+    return dd->schema_versions[id];
+  return ssiCurrentSchemaVersion(id);
+}
+
+static void ssiSetSchemaVersion(ssiInfo *d, int id, int version)
+{
+  ssi2Info *dd=(ssi2Info*)d;
+  if ((dd!=NULL) && (id>0) && (id<SSI2_SCHEMA_VERSION_COUNT) && (version>0))
+    dd->schema_versions[id]=(unsigned short)version;
+}
+
+static BOOLEAN ssiRequireSchemaVersion(const ssiInfo *d, int id,
+                                       const char *format)
+{
+  int have=ssiSchemaVersion(d, id);
+  int current=ssiCurrentSchemaVersion(id);
+  if ((current>0) && (have>current))
+  {
+    Werror("%s: %s schema version %d is newer than supported version %d",
+           format, ssiSchemaName(id), have, current);
+    return TRUE;
+  }
+  return FALSE;
+}
 
 static BOOLEAN ssi2Write(si_link l, leftv data);
 static leftv ssi2Read1(si_link l);
@@ -2023,7 +1987,7 @@ static BOOLEAN ssi2CompressedOpenByCompression(si_link l, short flag,
 
 static void ssi2FlushWriteBuffer(const ssiInfo *d)
 {
-  ssiInfo *dd=(ssiInfo*)d;
+  ssi2Info *dd=(ssi2Info*)d;
   if ((dd==NULL) || (dd->f_write==NULL) || (dd->write_buff_pos<=0)) return;
   if (fwrite(dd->write_buff, 1, dd->write_buff_pos, dd->f_write)!=(size_t)dd->write_buff_pos)
     WerrorS("ssi2: write failed");
@@ -2032,20 +1996,21 @@ static void ssi2FlushWriteBuffer(const ssiInfo *d)
 
 static void ssi2FreeWriteBuffer(ssiInfo *d)
 {
-  if ((d!=NULL) && (d->write_buff!=NULL))
+  ssi2Info *dd=(ssi2Info*)d;
+  if ((dd!=NULL) && (dd->write_buff!=NULL))
   {
     ssi2FlushWriteBuffer(d);
-    omFreeSize(d->write_buff, d->write_buff_size);
-    d->write_buff=NULL;
-    d->write_buff_pos=0;
-    d->write_buff_size=0;
+    omFreeSize(dd->write_buff, dd->write_buff_size);
+    dd->write_buff=NULL;
+    dd->write_buff_pos=0;
+    dd->write_buff_size=0;
   }
 }
 
 static void ssi2WriteRaw(const ssiInfo *d, const void *buf, size_t len)
 {
   if (len==0) return;
-  ssiInfo *dd=(ssiInfo*)d;
+  ssi2Info *dd=(ssi2Info*)d;
   if (dd->write_buff==NULL)
   {
     dd->write_buff_size=1<<20;
@@ -3444,7 +3409,6 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 
     ssiInfo *d=(ssiInfo*)omAlloc0(sizeof(ssiInfo));
     l->data=d;
-    ssiInitSchemaVersions(d);
     if (l->name[0] == '\0')
     {
       if (strcmp(mode,"fork")==0)
@@ -3747,7 +3711,6 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         newlink->next=(void *)ssiToBeClosed;
         ssiToBeClosed=newlink;
         fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,si_opt_1,si_opt_2);
-        ssiWriteSchemaTable(d);
       }
       // ----------------------------------------------------------------------
       else if(strcmp(mode,"connect")==0)
@@ -3842,7 +3805,6 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           {
             d->f_write = outfile;
             fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,si_opt_1,si_opt_2);
-            ssiWriteSchemaTable(d);
           }
         }
         else
@@ -3896,20 +3858,19 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
   else mode="w";
 
   SI_LINK_SET_OPEN_P(l, flag);
-  if (l->data!=NULL) omFreeSize(l->data, sizeof(ssiInfo));
+  if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
   omFreeBinAddr(l->mode);
   l->mode=omStrDup(mode);
 
-  ssiInfo *d=(ssiInfo*)omAlloc0(sizeof(ssiInfo));
+  ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
   l->data=d;
   ssiInitSchemaVersions(d);
-  d->ssi2_format=1;
   if ((l->name==NULL) || (l->name[0]=='\0'))
   {
     WerrorS("ssi2: file name required");
     l->data=NULL;
     l->flags=0;
-    omFreeSize(d, sizeof(ssiInfo));
+    omFreeSize(d, sizeof(ssi2Info));
     return TRUE;
   }
 
@@ -3920,7 +3881,7 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
     {
       l->data=NULL;
       l->flags=0;
-      omFreeSize(d, sizeof(ssiInfo));
+      omFreeSize(d, sizeof(ssi2Info));
       return TRUE;
     }
     SI_LINK_SET_R_OPEN_P(l);
@@ -3946,7 +3907,7 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
     {
       l->data=NULL;
       l->flags=0;
-      omFreeSize(d, sizeof(ssiInfo));
+      omFreeSize(d, sizeof(ssi2Info));
       return TRUE;
     }
     ssi2WriteHeader(d);
@@ -3981,21 +3942,20 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
   else mode="w";
 
   SI_LINK_SET_OPEN_P(l, flag);
-  if (l->data!=NULL) omFreeSize(l->data, sizeof(ssiInfo));
+  if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
   omFreeBinAddr(l->mode);
   l->mode=omStrDup(mode);
 
-  ssiInfo *d=(ssiInfo*)omAlloc0(sizeof(ssiInfo));
+  ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
   l->data=d;
   ssiInitSchemaVersions(d);
-  d->ssi2_format=1;
   d->compressor_name=link_type;
   if ((l->name==NULL) || (l->name[0]=='\0'))
   {
     Werror("%s: file name required", link_type);
     l->data=NULL;
     l->flags=0;
-    omFreeSize(d, sizeof(ssiInfo));
+    omFreeSize(d, sizeof(ssi2Info));
     return TRUE;
   }
 
@@ -4020,7 +3980,7 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
     Werror("%s: pipe failed with %d", link_type, errno);
     l->data=NULL;
     l->flags=0;
-    omFreeSize(d, sizeof(ssiInfo));
+    omFreeSize(d, sizeof(ssi2Info));
     return TRUE;
   }
 
@@ -4037,7 +3997,7 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
     si_close(pc[1]);
     l->data=NULL;
     l->flags=0;
-    omFreeSize(d, sizeof(ssiInfo));
+    omFreeSize(d, sizeof(ssi2Info));
     return TRUE;
   }
 
@@ -4091,7 +4051,7 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
       si_waitpid(pid, NULL, 0);
       l->data=NULL;
       l->flags=0;
-      omFreeSize(d, sizeof(ssiInfo));
+      omFreeSize(d, sizeof(ssi2Info));
       return TRUE;
     }
     ssi2WriteHeader(d);
@@ -4159,7 +4119,7 @@ static BOOLEAN ssi2zClose(si_link l)
   if (l!=NULL)
   {
     SI_LINK_SET_CLOSE_P(l);
-    ssiInfo *d=(ssiInfo*)l->data;
+    ssi2Info *d=(ssi2Info*)l->data;
     if (d!=NULL)
     {
       if (d->r!=NULL) rKill(d->r);
@@ -4186,7 +4146,7 @@ static BOOLEAN ssi2zClose(si_link l)
         }
       }
       l->data=NULL;
-      omFreeSize(d, sizeof(ssiInfo));
+      omFreeSize(d, sizeof(ssi2Info));
     }
   }
   return res;
@@ -4223,8 +4183,6 @@ BOOLEAN ssiClose(si_link l)
     ssiInfo *d = (ssiInfo *)l->data;
     if (d!=NULL)
     {
-      if ((d->ssi2_format) && (d->compressor_name!=NULL))
-        return ssi2zClose(l);
       // send quit signal
       if ((d->send_quit_at_exit)
       && (d->quit_sent==0))
@@ -4241,7 +4199,6 @@ BOOLEAN ssiClose(si_link l)
         d->rings[i]=NULL;
       }
       if (d->f_read!=NULL) { s_close(d->f_read);d->f_read=NULL;}
-      ssi2FreeWriteBuffer(d);
       if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
       if (((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
@@ -4380,11 +4337,6 @@ leftv ssiRead1(si_link l)
            //Print("module/smatrix %d\n",t);
            if (d->r==NULL) goto no_ring;
            ssiCheckCurrRing(d->r);
-           if (ssiRequireSchemaVersion(d, SSI_SCHEMA_MODULE, "ssi"))
-           {
-             omFreeBin(res,sleftv_bin);
-             return NULL;
-           }
            {
              int rk=s_readint(d->f_read);
              ideal M=ssiReadIdeal(d);
@@ -4397,11 +4349,6 @@ leftv ssiRead1(si_link l)
            //Print("cmd\n",t);
              res->rtyp=COMMAND;
              res->data=ssiReadCommand(l);
-             if (res->data==NULL)
-             {
-               omFreeBin(res,sleftv_bin);
-               return NULL;
-             }
              int nok=res->Eval();
              if (nok) WerrorS("error in eval");
              break;
@@ -4450,10 +4397,6 @@ leftv ssiRead1(si_link l)
                return NULL;
              }
              break;
-    case SSI_SCHEMA_TOKEN:
-             ssiReadSchemaTable(d);
-             omFreeBin(res,sleftv_bin);
-             return ssiRead1(l);
     // ------------
     case 98: // version
              {
@@ -4463,7 +4406,7 @@ leftv ssiRead1(si_link l)
                 n98_m=s_readint(d->f_read);
                 n98_o1=s_readint(d->f_read);
                 n98_o2=s_readint(d->f_read);
-                if ((n98_v>SSI_VERSION) ||(n98_m!=MAX_TOK))
+                if ((n98_v!=SSI_VERSION) ||(n98_m!=MAX_TOK))
                 {
                   Print("incompatible versions of ssi: %d/%d vs %d/%d\n",
                                   SSI_VERSION,MAX_TOK,n98_v,n98_m);
@@ -4975,8 +4918,8 @@ static const char* slStatusSsi2(si_link l, const char* request)
 si_link_extension slInitSsi2Extension(si_link_extension s)
 {
   s->Open=ssi2Open;
-  s->Close=ssiClose;
-  s->Kill=ssiClose;
+  s->Close=ssi2zClose;
+  s->Kill=ssi2zClose;
   s->Read=ssi2Read1;
   s->Read2=NULL;
   s->Write=ssi2Write;
@@ -5466,7 +5409,6 @@ si_link ssiCommandLink()
   l->ref=1;
   ssiInfo *d=(ssiInfo*)omAlloc0(sizeof(ssiInfo));
   l->data=d;
-  ssiInitSchemaVersions(d);
   d->fd_read = newsockfd;
   d->fd_write = newsockfd;
   d->f_read = s_open(newsockfd);
@@ -5756,7 +5698,6 @@ leftv ssiRead2(si_link l, leftv u)
 // 23 2 <matrix C> <matrix D> ring properties: PLuralRing
 // 24 bigintvec <c>
 // 25 htable <len> <key1> <value1> ...
-// 26 schema table: <table-version> <count> (<schema-id> <schema-version>)...
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular
