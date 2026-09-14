@@ -45,7 +45,11 @@ jobs:
             julia-version: '1'
             os: macOS-latest
             omalloc-config: 'jll-4k'
-          # Also exercise a fully native macOS ARM stack.
+          # Also exercise the other supported macOS ARM page sizes.
+          - singularjl-version: 'master'
+            julia-version: '1'
+            os: macOS-latest
+            omalloc-config: 'omalloc-8k'
           - singularjl-version: 'master'
             julia-version: '1'
             os: macOS-latest
@@ -80,15 +84,25 @@ jobs:
       - name: "Select omalloc page size"
         if: matrix.omalloc-config != 'default'
         run: |
-          if [[ "${{ matrix.omalloc-config }}" == "jll-4k" ]]; then
-            echo "ac_cv_pagesize=4096" >> "$GITHUB_ENV"
-          else
-            if [[ "$(getconf PAGESIZE)" != "16384" ]]; then
-              echo "native-16k requires a host with 16 KiB pages" >&2
+          case "${{ matrix.omalloc-config }}" in
+            jll-4k)
+              echo "ac_cv_pagesize=4096" >> "$GITHUB_ENV"
+              ;;
+            omalloc-8k)
+              echo "ac_cv_pagesize=8192" >> "$GITHUB_ENV"
+              ;;
+            native-16k)
+              if [[ "$(getconf PAGESIZE)" != "16384" ]]; then
+                echo "native-16k requires a host with 16 KiB pages" >&2
+                exit 1
+              fi
+              echo "ac_cv_pagesize=16384" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "unknown omalloc configuration: ${{ matrix.omalloc-config }}" >&2
               exit 1
-            fi
-            echo "ac_cv_pagesize=16384" >> "$GITHUB_ENV"
-          fi
+              ;;
+          esac
       - name: "Run autogen.sh in SINGULARROOT"
         run: |
           mv SINGULARROOT /tmp/SINGULARROOT
@@ -100,16 +114,16 @@ jobs:
       - name: "Verify omalloc page size"
         if: matrix.omalloc-config != 'default'
         run: |
-          if [[ "${{ matrix.omalloc-config }}" == "jll-4k" ]]; then
-            expected=4096
-          else
-            expected=16384
-          fi
+          case "${{ matrix.omalloc-config }}" in
+            jll-4k) expected=4096 ;;
+            omalloc-8k) expected=8192 ;;
+            native-16k) expected=16384 ;;
+          esac
           grep -F "#define SIZEOF_SYSTEM_PAGE $expected" /tmp/singular_jll_override/include/omalloc/omConfig.h
       - name: "Run tests"
         env:
           # Singular.jl releases before its override cache-invalidation fix need
-          # a fresh package-image configuration for a native 16 KiB override.
-          OVERRIDE_JULIA_ARGS: ${{ matrix.omalloc-config == 'native-16k' && '--check-bounds=yes' || '' }}
+          # a fresh package-image configuration for a non-JLL page-size override.
+          OVERRIDE_JULIA_ARGS: ${{ (matrix.omalloc-config == 'omalloc-8k' || matrix.omalloc-config == 'native-16k') && '--check-bounds=yes' || '' }}
         run: |
           julia --proj=override $SINGULARJL_PATH/etc/run_with_override.jl /tmp/singular_jll_override $OVERRIDE_JULIA_ARGS --depwarn=error -e "using Pkg; Pkg.test(\"Singular\")"
