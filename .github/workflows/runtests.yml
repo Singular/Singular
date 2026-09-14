@@ -19,6 +19,8 @@ jobs:
             configflags: "--with-ntl --with-flint"
           - os: macos-26
             configflags: "--with-ntl --with-flint"
+          - os: macos-26-intel
+            configflags: "--with-ntl --with-flint"
 
     steps:
       - uses: actions/checkout@v5
@@ -30,6 +32,10 @@ jobs:
           if command -v getconf >/dev/null 2>&1; then
             echo "getconf PAGESIZE=$(getconf PAGESIZE)"
           fi
+
+      - name: Verify Intel macOS page size
+        if: matrix.os == 'macos-26-intel'
+        run: test "$(getconf PAGESIZE)" = 4096
 
       - name: Install dependencies
         run: |
