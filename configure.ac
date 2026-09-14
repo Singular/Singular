@@ -95,6 +95,53 @@ AC_CHECK_LIB(rt,clock_gettime)
 AC_CHECK_LIB(spasm,spasm_csr_free,SPASM_LIB="-lspasm",SPASM_LIB="")
 AC_SUBST(SPASM_LIB)
 
+dnl libsodium is optional and enables authenticated SSI2 envelopes (ssi2e).
+AC_ARG_WITH([libsodium],
+  [AS_HELP_STRING([--with-libsodium@<:@=PREFIX@:>@],
+    [enable authenticated SSI2 encryption with libsodium (default: auto)])],
+  [], [with_libsodium=auto])
+
+SODIUM_CFLAGS=""
+SODIUM_LIBS=""
+have_libsodium=no
+AS_IF([test "x$with_libsodium" != xno], [
+  save_CPPFLAGS="$CPPFLAGS"
+  save_LDFLAGS="$LDFLAGS"
+  save_LIBS="$LIBS"
+  AS_IF([test "x$with_libsodium" != xyes && test "x$with_libsodium" != xauto], [
+    SODIUM_CFLAGS="-I$with_libsodium/include"
+    SODIUM_LIBS="-L$with_libsodium/lib -lsodium"
+    CPPFLAGS="$CPPFLAGS $SODIUM_CFLAGS"
+    LDFLAGS="$LDFLAGS -L$with_libsodium/lib"
+  ], [
+    SODIUM_LIBS="-lsodium"
+  ])
+  AC_CHECK_HEADER([sodium.h], [have_sodium_header=yes], [have_sodium_header=no])
+  AS_IF([test "x$have_sodium_header" = xyes], [
+    AC_CHECK_LIB([sodium], [crypto_secretstream_xchacha20poly1305_init_push],
+      [have_libsodium=yes], [have_libsodium=no])
+  ])
+  CPPFLAGS="$save_CPPFLAGS"
+  LDFLAGS="$save_LDFLAGS"
+  LIBS="$save_LIBS"
+])
+
+AS_IF([test "x$have_libsodium" = xyes], [
+  AC_DEFINE([HAVE_LIBSODIUM], [1],
+    [Define to 1 when libsodium is available for authenticated SSI2 encryption])
+], [
+  SODIUM_CFLAGS=""
+  SODIUM_LIBS=""
+  AS_IF([test "x$with_libsodium" = xyes ||
+         { test "x$with_libsodium" != xauto && test "x$with_libsodium" != xno; }], [
+    AC_MSG_ERROR([libsodium was requested but its headers and library were not found])
+  ], [
+    AC_MSG_WARN([libsodium not found; the ssi2e link type will report that encryption is unavailable])
+  ])
+])
+AC_SUBST([SODIUM_CFLAGS])
+AC_SUBST([SODIUM_LIBS])
+
 SING_CHECK_GMP
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_FLINT(3.0,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
