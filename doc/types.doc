@@ -2242,6 +2242,46 @@ SSI2 links require the corresponding command line tool (@code{gzip},
 @code{zstd}, or @code{lz4}) to be installed and available in the search
 path.
 
+The optional @code{ssi2e} link type protects an SSI2 byte stream with
+authenticated encryption.  It uses the XChaCha20-Poly1305 secret-stream
+construction provided by libsodium.  Confidentiality and authentication
+are applied by a versioned, chunked envelope around the canonical SSI2
+stream; the SSI2 type and schema representation itself is unchanged.
+
+@code{ssi2e} requires a symmetric key file.  The file must contain exactly
+64 hexadecimal characters (32 bytes), with optional whitespace.  Pass its
+name with the mandatory @code{keyfile=} mode option:
+
+@enumerate
+@item @code{"ssi2e:w,keyfile=/secure/path/workflow.key "} + filename
+@*creates or overwrites an authenticated encrypted SSI2 file.
+@item @code{"ssi2e:r,keyfile=/secure/path/workflow.key "} + filename
+@*authenticates and decrypts an SSI2 file while reading it.
+@end enumerate
+
+For example, a new key file can be generated outside @sc{Singular} with
+@code{(umask 077 && openssl rand -hex 32 > workflow.key)}.  Keep access to
+that file restricted, distribute it independently of encrypted data, and
+never commit it to a source repository.  Key generation, rotation, storage,
+and authorization remain the responsibility of the surrounding workflow
+system.
+
+Every encrypted frame authenticates the envelope header, its position, and
+its encoded length.  The reader rejects a wrong key, modified frames,
+truncation, an absent final frame, and trailing bytes.  A successful
+@code{close} after reading is therefore required: it consumes and verifies
+the remainder of the envelope, including the authenticated final frame.
+Append mode is deliberately unsupported because appending would violate
+the single authenticated-stream boundary.  @code{ssi2e} currently wraps
+plain SSI2 and does not combine encryption with the external SSI2
+compression modes.
+
+Support is enabled automatically when a suitable libsodium installation is
+found at build time.  Use @code{--with-libsodium=PREFIX} for a nonstandard
+installation, or @code{--without-libsodium} to disable it explicitly.  A
+build without libsodium retains the @code{ssi2e} link name but reports a
+clear error when it is opened.
+
 Note that the filename may contain a path. An ssi file link can be used
 either for reading or for writing, but not for both at the same time. A
 @code{close} command must be used before a change of I/O direction.

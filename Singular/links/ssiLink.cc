@@ -54,6 +54,10 @@
 #include <netdb.h>
 #include <netinet/in.h> /* for htons etc.*/
 
+#ifdef HAVE_LIBSODIUM
+#include <sodium.h>
+#endif
+
 
 #define SSI_VERSION 16
 // 5->6: changed newstruct representation
@@ -1745,6 +1749,20 @@ struct ssi2Info : public ssiInfo
   int write_buff_size;
   const char *compressor_name;
   unsigned short schema_versions[SSI2_SCHEMA_VERSION_COUNT];
+#ifdef HAVE_LIBSODIUM
+  BOOLEAN encrypted;
+  BOOLEAN encryption_reading;
+  BOOLEAN encryption_failed;
+  BOOLEAN encryption_final_seen;
+  BOOLEAN encryption_final_written;
+  FILE *encryption_input;
+  crypto_secretstream_xchacha20poly1305_state encryption_state;
+  unsigned char encryption_header[12 + crypto_secretstream_xchacha20poly1305_HEADERBYTES];
+  uint64_t encryption_frame;
+  unsigned char *encryption_read_buff;
+  size_t encryption_read_pos;
+  size_t encryption_read_len;
+#endif
 };
 
 enum ssiSchemaId
@@ -1862,6 +1880,7 @@ static poly ssi2ReadPoly_R(const ssiInfo *d, const ring r);
 static void ssi2WriteIdeal_R(const ssiInfo *d, int typ, const ideal I, const ring r);
 static ideal ssi2ReadIdeal_R(const ssiInfo *d, const ring r);
 static matrix ssi2ReadMatrix(ssiInfo *d);
+static BOOLEAN ssi2zClose(si_link l);
 
 enum ssi2Compression
 {
@@ -1985,10 +2004,330 @@ static BOOLEAN ssi2CompressedOpenByCompression(si_link l, short flag,
                                                ssi2Compression comp,
                                                const char *zstd_long);
 
+#ifdef HAVE_LIBSODIUM
+#define SSI2E_FIXED_HEADER_SIZE 12
+#define SSI2E_FRAME_AD_SIZE \
+  (SSI2E_FIXED_HEADER_SIZE + crypto_secretstream_xchacha20poly1305_HEADERBYTES + 8 + 4)
+#define SSI2E_PLAINTEXT_CHUNK_SIZE (1U << 20)
+
+static const unsigned char ssi2eFixedHeader[SSI2E_FIXED_HEADER_SIZE] =
+{
+  'S', 'S', 'I', '2', 'E', 'N', 'C', 0,
+  1, /* envelope version */
+  1, /* XChaCha20-Poly1305 secretstream */
+  0, 0
+};
+
+static void ssi2eStoreU32(unsigned char *p, uint32_t v)
+{
+  p[0]=(unsigned char)(v >> 24);
+  p[1]=(unsigned char)(v >> 16);
+  p[2]=(unsigned char)(v >> 8);
+  p[3]=(unsigned char)v;
+}
+
+static uint32_t ssi2eLoadU32(const unsigned char *p)
+{
+  return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
+       | ((uint32_t)p[2] << 8) | (uint32_t)p[3];
+}
+
+static void ssi2eStoreU64(unsigned char *p, uint64_t v)
+{
+  for (int i=7; i>=0; i--)
+  {
+    p[i]=(unsigned char)v;
+    v >>= 8;
+  }
+}
+
+static void ssi2eFrameAssociatedData(const ssi2Info *d, uint32_t frame_len,
+                                    unsigned char *ad)
+{
+  memcpy(ad, d->encryption_header,
+         SSI2E_FIXED_HEADER_SIZE + crypto_secretstream_xchacha20poly1305_HEADERBYTES);
+  unsigned char *p=ad + SSI2E_FIXED_HEADER_SIZE
+                    + crypto_secretstream_xchacha20poly1305_HEADERBYTES;
+  ssi2eStoreU64(p, d->encryption_frame);
+  ssi2eStoreU32(p+8, frame_len);
+}
+
+static BOOLEAN ssi2eReadKeyFile(const char *keyfile,
+                                unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES])
+{
+  FILE *f=fopen(keyfile, "rb");
+  if (f==NULL)
+  {
+    WerrorS("ssi2e: cannot open key file");
+    return TRUE;
+  }
+
+  char hex[crypto_secretstream_xchacha20poly1305_KEYBYTES*2 + 1];
+  size_t n=0;
+  int c;
+  BOOLEAN invalid=FALSE;
+  while ((c=fgetc(f))!=EOF)
+  {
+    if (isspace((unsigned char)c)) continue;
+    if ((!isxdigit((unsigned char)c)) || (n>=sizeof(hex)-1))
+    {
+      invalid=TRUE;
+      break;
+    }
+    hex[n++]=(char)c;
+  }
+  if (ferror(f)) invalid=TRUE;
+  if (fclose(f)!=0) invalid=TRUE;
+  hex[n]='\0';
+
+  size_t key_len=0;
+  if (invalid || (n!=sizeof(hex)-1)
+  || (sodium_hex2bin(key, crypto_secretstream_xchacha20poly1305_KEYBYTES,
+                     hex, n, NULL, &key_len, NULL)!=0)
+  || (key_len!=crypto_secretstream_xchacha20poly1305_KEYBYTES))
+  {
+    sodium_memzero(hex, sizeof(hex));
+    sodium_memzero(key, crypto_secretstream_xchacha20poly1305_KEYBYTES);
+    WerrorS("ssi2e: key file must contain exactly 64 hexadecimal characters");
+    return TRUE;
+  }
+  sodium_memzero(hex, sizeof(hex));
+  return FALSE;
+}
+
+static BOOLEAN ssi2eParseModeOptions(const char *mode, char **keyfile)
+{
+  *keyfile=NULL;
+  char base=ssi2ModeBase(mode);
+  if (base=='?')
+  {
+    Werror("ssi2e: invalid mode `%s'", mode);
+    return TRUE;
+  }
+  if ((mode==NULL) || (mode[0]=='\0'))
+  {
+    WerrorS("ssi2e: keyfile= mode option is required");
+    return TRUE;
+  }
+
+  const char *p=strchr(mode, ',');
+  while (p!=NULL)
+  {
+    const char *start=p+1;
+    const char *end=strchr(start, ',');
+    int len=(end==NULL) ? (int)strlen(start) : (int)(end-start);
+    if ((len>8) && (strncmp(start, "keyfile=", 8)==0))
+    {
+      if (*keyfile!=NULL)
+      {
+        WerrorS("ssi2e: keyfile= may only be specified once");
+        omFree(*keyfile);
+        *keyfile=NULL;
+        return TRUE;
+      }
+      *keyfile=(char*)omAlloc((size_t)len-7);
+      memcpy(*keyfile, start+8, (size_t)len-8);
+      (*keyfile)[len-8]='\0';
+    }
+    else
+    {
+      Werror("ssi2e: unknown or empty mode option `%.*s'", len, start);
+      if (*keyfile!=NULL) omFree(*keyfile);
+      *keyfile=NULL;
+      return TRUE;
+    }
+    p=end;
+  }
+  if (*keyfile==NULL)
+  {
+    WerrorS("ssi2e: keyfile= mode option is required");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN ssi2eWriteFrame(ssi2Info *d, const unsigned char *plain,
+                               size_t plain_len, unsigned char tag)
+{
+  if (d->encryption_failed) return TRUE;
+  if (d->encryption_frame==UINT64_MAX)
+  {
+    WerrorS("ssi2e: encrypted stream has too many frames");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+  if ((plain_len>SSI2E_PLAINTEXT_CHUNK_SIZE)
+  || (plain_len>UINT32_MAX-crypto_secretstream_xchacha20poly1305_ABYTES))
+  {
+    WerrorS("ssi2e: internal frame size error");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+
+  uint32_t frame_len=(uint32_t)plain_len
+                   + crypto_secretstream_xchacha20poly1305_ABYTES;
+  unsigned char prefix[4];
+  unsigned char ad[SSI2E_FRAME_AD_SIZE];
+  ssi2eStoreU32(prefix, frame_len);
+  ssi2eFrameAssociatedData(d, frame_len, ad);
+
+  unsigned char *cipher=(unsigned char*)omAlloc(frame_len);
+  unsigned long long cipher_len=0;
+  int crypto_result=crypto_secretstream_xchacha20poly1305_push(
+    &d->encryption_state, cipher, &cipher_len, plain, plain_len,
+    ad, sizeof(ad), tag);
+  if ((crypto_result!=0) || (cipher_len!=frame_len)
+  || (fwrite(prefix, 1, sizeof(prefix), d->f_write)!=sizeof(prefix))
+  || (fwrite(cipher, 1, frame_len, d->f_write)!=frame_len))
+  {
+    sodium_memzero(cipher, frame_len);
+    omFreeSize(cipher, frame_len);
+    WerrorS("ssi2e: encrypted write failed");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+  sodium_memzero(cipher, frame_len);
+  omFreeSize(cipher, frame_len);
+  d->encryption_frame++;
+  return FALSE;
+}
+
+static BOOLEAN ssi2eReadFrame(ssi2Info *d)
+{
+  if (d->encryption_failed || d->encryption_final_seen) return TRUE;
+  if (d->encryption_frame==UINT64_MAX)
+  {
+    WerrorS("ssi2e: encrypted stream has too many frames");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+
+  unsigned char prefix[4];
+  if (fread(prefix, 1, sizeof(prefix), d->encryption_input)!=sizeof(prefix))
+  {
+    WerrorS("ssi2e: truncated encrypted stream (missing final frame)");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+  uint32_t frame_len=ssi2eLoadU32(prefix);
+  if ((frame_len<crypto_secretstream_xchacha20poly1305_ABYTES)
+  || (frame_len>SSI2E_PLAINTEXT_CHUNK_SIZE
+                 + crypto_secretstream_xchacha20poly1305_ABYTES))
+  {
+    WerrorS("ssi2e: invalid encrypted frame length");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+
+  unsigned char *cipher=(unsigned char*)omAlloc(frame_len);
+  if (fread(cipher, 1, frame_len, d->encryption_input)!=frame_len)
+  {
+    sodium_memzero(cipher, frame_len);
+    omFreeSize(cipher, frame_len);
+    WerrorS("ssi2e: truncated encrypted frame");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+
+  unsigned char ad[SSI2E_FRAME_AD_SIZE];
+  ssi2eFrameAssociatedData(d, frame_len, ad);
+  unsigned long long plain_len=0;
+  unsigned char tag=0;
+  int crypto_result=crypto_secretstream_xchacha20poly1305_pull(
+    &d->encryption_state, d->encryption_read_buff, &plain_len, &tag,
+    cipher, frame_len, ad, sizeof(ad));
+  sodium_memzero(cipher, frame_len);
+  omFreeSize(cipher, frame_len);
+  if (crypto_result!=0)
+  {
+    WerrorS("ssi2e: authentication failed (wrong key or modified data)");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+  d->encryption_frame++;
+
+  if (tag==crypto_secretstream_xchacha20poly1305_TAG_FINAL)
+  {
+    if (plain_len!=0)
+    {
+      WerrorS("ssi2e: invalid final frame");
+      d->encryption_failed=TRUE;
+      return TRUE;
+    }
+    int trailing=fgetc(d->encryption_input);
+    if ((trailing!=EOF) || ferror(d->encryption_input))
+    {
+      WerrorS("ssi2e: trailing data after final frame");
+      d->encryption_failed=TRUE;
+      return TRUE;
+    }
+    d->encryption_final_seen=TRUE;
+    d->encryption_read_pos=0;
+    d->encryption_read_len=0;
+    return FALSE;
+  }
+  if ((tag!=crypto_secretstream_xchacha20poly1305_TAG_MESSAGE)
+  || (plain_len==0) || (plain_len>SSI2E_PLAINTEXT_CHUNK_SIZE))
+  {
+    WerrorS("ssi2e: unsupported encrypted frame tag");
+    d->encryption_failed=TRUE;
+    return TRUE;
+  }
+  d->encryption_read_pos=0;
+  d->encryption_read_len=(size_t)plain_len;
+  return FALSE;
+}
+
+static BOOLEAN ssi2eReadRaw(ssi2Info *d, void *buf, size_t len)
+{
+  unsigned char *p=(unsigned char*)buf;
+  while (len>0)
+  {
+    if (d->encryption_read_pos<d->encryption_read_len)
+    {
+      size_t available=d->encryption_read_len-d->encryption_read_pos;
+      size_t take=(len<available) ? len : available;
+      memcpy(p, d->encryption_read_buff+d->encryption_read_pos, take);
+      d->encryption_read_pos+=take;
+      p+=take;
+      len-=take;
+      continue;
+    }
+    if (d->encryption_final_seen)
+    {
+      WerrorS("ssi2: unexpected end of input");
+      return TRUE;
+    }
+    if (ssi2eReadFrame(d)) return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN ssi2eDrain(ssi2Info *d)
+{
+  while ((!d->encryption_final_seen) && (!d->encryption_failed))
+  {
+    d->encryption_read_pos=d->encryption_read_len;
+    if (ssi2eReadFrame(d)) break;
+  }
+  return d->encryption_failed;
+}
+#endif
+
 static void ssi2FlushWriteBuffer(const ssiInfo *d)
 {
   ssi2Info *dd=(ssi2Info*)d;
   if ((dd==NULL) || (dd->f_write==NULL) || (dd->write_buff_pos<=0)) return;
+#ifdef HAVE_LIBSODIUM
+  if (dd->encrypted)
+  {
+    ssi2eWriteFrame(dd, (const unsigned char*)dd->write_buff,
+                    (size_t)dd->write_buff_pos,
+                    crypto_secretstream_xchacha20poly1305_TAG_MESSAGE);
+    dd->write_buff_pos=0;
+    return;
+  }
+#endif
   if (fwrite(dd->write_buff, 1, dd->write_buff_pos, dd->f_write)!=(size_t)dd->write_buff_pos)
     WerrorS("ssi2: write failed");
   dd->write_buff_pos=0;
@@ -2000,6 +2339,10 @@ static void ssi2FreeWriteBuffer(ssiInfo *d)
   if ((dd!=NULL) && (dd->write_buff!=NULL))
   {
     ssi2FlushWriteBuffer(d);
+#ifdef HAVE_LIBSODIUM
+    if (dd->encrypted)
+      sodium_memzero(dd->write_buff, dd->write_buff_size);
+#endif
     omFreeSize(dd->write_buff, dd->write_buff_size);
     dd->write_buff=NULL;
     dd->write_buff_pos=0;
@@ -2017,6 +2360,25 @@ static void ssi2WriteRaw(const ssiInfo *d, const void *buf, size_t len)
     dd->write_buff=(char*)omAlloc(dd->write_buff_size);
     dd->write_buff_pos=0;
   }
+#ifdef HAVE_LIBSODIUM
+  if (dd->encrypted)
+  {
+    const unsigned char *p=(const unsigned char*)buf;
+    while (len>0)
+    {
+      size_t available=(size_t)(dd->write_buff_size-dd->write_buff_pos);
+      size_t take=(len<available) ? len : available;
+      memcpy(dd->write_buff+dd->write_buff_pos, p, take);
+      dd->write_buff_pos+=(int)take;
+      p+=take;
+      len-=take;
+      if (dd->write_buff_pos==dd->write_buff_size)
+        ssi2FlushWriteBuffer(d);
+      if (dd->encryption_failed) return;
+    }
+    return;
+  }
+#endif
   if (len>=(size_t)dd->write_buff_size)
   {
     ssi2FlushWriteBuffer(d);
@@ -2041,6 +2403,11 @@ static void ssi2Fflush(const ssiInfo *d)
 
 static BOOLEAN ssi2ReadRaw(const ssiInfo *d, void *buf, size_t len)
 {
+#ifdef HAVE_LIBSODIUM
+  ssi2Info *dd=(ssi2Info*)d;
+  if ((dd!=NULL) && dd->encrypted)
+    return ssi2eReadRaw(dd, buf, len);
+#endif
   char *p=(char*)buf;
   while (len>0)
   {
@@ -2060,11 +2427,7 @@ static BOOLEAN ssi2ReadRaw(const ssiInfo *d, void *buf, size_t len)
 static int ssi2ReadByte(const ssiInfo *d)
 {
   unsigned char b=0;
-  if (s_readbytes((char*)&b, 1, d->f_read)!=1)
-  {
-    WerrorS("ssi2: unexpected end of input");
-    return -1;
-  }
+  if (ssi2ReadRaw(d, &b, 1)) return -1;
   return (int)b;
 }
 
@@ -3201,13 +3564,13 @@ static leftv ssi2Read1(si_link l)
     }
     case 99:
       omFreeBin(res, sleftv_bin);
-      ssiClose(l);
+      ssi2zClose(l);
       m2_end(-1);
       break;
     case -1:
-      ssiClose(l);
+      ssi2zClose(l);
       res->rtyp=DEF_CMD;
-      break;
+      return res;
     default:
       Werror("ssi2: not implemented (t:%d)", t);
       omFreeBin(res, sleftv_bin);
@@ -3918,6 +4281,180 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
   return FALSE;
 }
 
+static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
+{
+#ifndef HAVE_LIBSODIUM
+  WerrorS("ssi2e: authenticated encryption is unavailable; rebuild Singular with libsodium");
+  return TRUE;
+#else
+  if (l==NULL) return TRUE;
+  if (sodium_init()<0)
+  {
+    WerrorS("ssi2e: libsodium initialization failed");
+    return TRUE;
+  }
+
+  const char *link_mode=(l->mode!=NULL) ? l->mode : "";
+  char base=ssi2ModeBase(link_mode);
+  char *keyfile=NULL;
+  if (ssi2eParseModeOptions(link_mode, &keyfile)) return TRUE;
+  if (base=='a')
+  {
+    WerrorS("ssi2e: append mode is not supported");
+    omFree(keyfile);
+    return TRUE;
+  }
+  if (flag & SI_LINK_OPEN)
+  {
+    if (base=='r') flag=SI_LINK_READ;
+    else flag=SI_LINK_WRITE;
+  }
+  if ((l->name==NULL) || (l->name[0]=='\0'))
+  {
+    WerrorS("ssi2e: file name required");
+    omFree(keyfile);
+    return TRUE;
+  }
+  if ((flag!=SI_LINK_READ) && (l->name[0]=='>') && (l->name[1]=='>'))
+  {
+    WerrorS("ssi2e: append redirection is not supported");
+    omFree(keyfile);
+    return TRUE;
+  }
+
+  unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
+  if (ssi2eReadKeyFile(keyfile, key))
+  {
+    omFree(keyfile);
+    return TRUE;
+  }
+  omFree(keyfile);
+
+  char *reopen_mode=omStrDup(link_mode);
+  reopen_mode[0]=(flag==SI_LINK_READ) ? 'r' : 'w';
+  SI_LINK_SET_OPEN_P(l, flag);
+  if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
+  omFreeBinAddr(l->mode);
+  l->mode=reopen_mode;
+
+  ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
+  l->data=d;
+  ssiInitSchemaVersions(d);
+  d->encrypted=TRUE;
+  d->encryption_reading=(flag==SI_LINK_READ);
+  d->compressor_name="ssi2e";
+  memcpy(d->encryption_header, ssi2eFixedHeader, SSI2E_FIXED_HEADER_SIZE);
+
+  BOOLEAN failed=FALSE;
+  const char *filename=l->name;
+  if ((flag!=SI_LINK_READ) && (filename[0]=='>')) filename++;
+  if (flag==SI_LINK_READ)
+  {
+    d->encryption_input=myfopen(filename, "rb");
+    if (d->encryption_input==NULL)
+    {
+      WerrorS("ssi2e: cannot open encrypted input");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (fread(d->encryption_header, 1, SSI2E_FIXED_HEADER_SIZE,
+              d->encryption_input)!=SSI2E_FIXED_HEADER_SIZE))
+    {
+      WerrorS("ssi2e: truncated encrypted envelope header");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (memcmp(d->encryption_header, ssi2eFixedHeader,
+               SSI2E_FIXED_HEADER_SIZE)!=0))
+    {
+      WerrorS("ssi2e: unsupported or invalid encrypted envelope header");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (fread(d->encryption_header+SSI2E_FIXED_HEADER_SIZE, 1,
+              crypto_secretstream_xchacha20poly1305_HEADERBYTES,
+              d->encryption_input)
+        !=crypto_secretstream_xchacha20poly1305_HEADERBYTES))
+    {
+      WerrorS("ssi2e: truncated cryptographic stream header");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (crypto_secretstream_xchacha20poly1305_init_pull(
+          &d->encryption_state,
+          d->encryption_header+SSI2E_FIXED_HEADER_SIZE, key)!=0))
+    {
+      WerrorS("ssi2e: encrypted stream initialization failed");
+      failed=TRUE;
+    }
+    sodium_memzero(key, sizeof(key));
+    if (!failed)
+    {
+      d->encryption_read_buff=(unsigned char*)omAlloc(SSI2E_PLAINTEXT_CHUNK_SIZE);
+      if (ssi2eReadFrame(d)) failed=TRUE;
+      else if (d->encryption_final_seen)
+      {
+        WerrorS("ssi2e: encrypted envelope contains no SSI2 payload");
+        failed=TRUE;
+      }
+    }
+    if (!failed) SI_LINK_SET_R_OPEN_P(l);
+  }
+  else
+  {
+    d->f_write=myfopen(filename, "wb");
+    if (d->f_write==NULL)
+    {
+      WerrorS("ssi2e: cannot open encrypted output");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (crypto_secretstream_xchacha20poly1305_init_push(
+          &d->encryption_state,
+          d->encryption_header+SSI2E_FIXED_HEADER_SIZE, key)!=0))
+    {
+      WerrorS("ssi2e: encrypted stream initialization failed");
+      failed=TRUE;
+    }
+    sodium_memzero(key, sizeof(key));
+    if ((!failed)
+    && ((fwrite(d->encryption_header, 1, sizeof(d->encryption_header),
+                d->f_write)!=sizeof(d->encryption_header))
+      || (fflush(d->f_write)!=0)))
+    {
+      WerrorS("ssi2e: encrypted envelope header write failed");
+      failed=TRUE;
+    }
+    if (!failed)
+    {
+      ssi2WriteHeader(d);
+      ssi2WriteSchemaTable(d);
+      ssi2Fflush(d);
+      if (d->encryption_failed) failed=TRUE;
+    }
+    if (!failed) SI_LINK_SET_W_OPEN_P(l);
+  }
+
+  if (failed)
+  {
+    sodium_memzero(key, sizeof(key));
+    sodium_memzero(&d->encryption_state, sizeof(d->encryption_state));
+    if (d->encryption_read_buff!=NULL)
+    {
+      sodium_memzero(d->encryption_read_buff, SSI2E_PLAINTEXT_CHUNK_SIZE);
+      omFreeSize(d->encryption_read_buff, SSI2E_PLAINTEXT_CHUNK_SIZE);
+    }
+    if (d->encryption_input!=NULL) fclose(d->encryption_input);
+    if (d->f_write!=NULL) fclose(d->f_write);
+    l->data=NULL;
+    l->flags=0;
+    omFreeSize(d, sizeof(ssi2Info));
+    return TRUE;
+  }
+  return FALSE;
+#endif
+}
+
 static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
                                   const char *link_type,
                                   const char *program,
@@ -4129,9 +4666,45 @@ static BOOLEAN ssi2zClose(si_link l)
         d->rings[i]=NULL;
       }
       BOOLEAN was_read=(d->f_read!=NULL);
+#ifdef HAVE_LIBSODIUM
+      if (d->encrypted && d->encryption_reading)
+      {
+        was_read=TRUE;
+        if (ssi2eDrain(d)) res=TRUE;
+      }
+#endif
       if (d->f_read!=NULL) { s_close(d->f_read); d->f_read=NULL; }
       ssi2FreeWriteBuffer(d);
+#ifdef HAVE_LIBSODIUM
+      if (d->encrypted && (!d->encryption_reading)
+      && (!d->encryption_final_written) && (!d->encryption_failed))
+      {
+        if (ssi2eWriteFrame(d, NULL, 0,
+              crypto_secretstream_xchacha20poly1305_TAG_FINAL))
+          res=TRUE;
+        else
+          d->encryption_final_written=TRUE;
+      }
+#endif
       if (d->f_write!=NULL) { if (fclose(d->f_write)!=0) res=TRUE; d->f_write=NULL; }
+#ifdef HAVE_LIBSODIUM
+      if (d->encrypted)
+      {
+        if (d->encryption_input!=NULL)
+        {
+          if (fclose(d->encryption_input)!=0) res=TRUE;
+          d->encryption_input=NULL;
+        }
+        if (d->encryption_read_buff!=NULL)
+        {
+          sodium_memzero(d->encryption_read_buff, SSI2E_PLAINTEXT_CHUNK_SIZE);
+          omFreeSize(d->encryption_read_buff, SSI2E_PLAINTEXT_CHUNK_SIZE);
+          d->encryption_read_buff=NULL;
+        }
+        sodium_memzero(&d->encryption_state, sizeof(d->encryption_state));
+        if (d->encryption_failed) res=TRUE;
+      }
+#endif
       if (d->pid>1)
       {
         const char *compressor_name=(d->compressor_name!=NULL) ? d->compressor_name : "ssi2z";
@@ -4901,8 +5474,24 @@ si_link_extension slInitSsiExtension(si_link_extension s)
 static const char* slStatusSsi2(si_link l, const char* request)
 {
   ssiInfo *d=(ssiInfo*)l->data;
+  if (strcmp(request, "encryption")==0)
+  {
+    if ((l->m==NULL) || (strcmp(l->m->type, "ssi2e")!=0))
+      return "none";
+#ifdef HAVE_LIBSODIUM
+    return "xchacha20poly1305";
+#else
+    return "unavailable";
+#endif
+  }
   if (strcmp(request, "read")==0)
   {
+#ifdef HAVE_LIBSODIUM
+    ssi2Info *dd=(ssi2Info*)d;
+    if (SI_LINK_R_OPEN_P(l) && (dd!=NULL) && dd->encrypted
+    && (!dd->encryption_failed) && (!dd->encryption_final_seen))
+      return "ready";
+#endif
     if (SI_LINK_R_OPEN_P(l) && (d!=NULL) && (d->f_read!=NULL) && (!s_iseof(d->f_read)))
       return "ready";
     return "not ready";
@@ -4992,6 +5581,22 @@ si_link_extension slInitSsi2lz4Extension(si_link_extension s)
   s->Status=slStatusSsi2;
   s->SetRing=NULL;
   s->type="ssi2lz4";
+  return s;
+}
+
+si_link_extension slInitSsi2eExtension(si_link_extension s)
+{
+  s->Open=ssi2eOpen;
+  s->Close=ssi2zClose;
+  s->Kill=ssi2zClose;
+  s->Read=ssi2Read1;
+  s->Read2=NULL;
+  s->Write=ssi2Write;
+  s->Dump=NULL;
+  s->GetDump=NULL;
+  s->Status=slStatusSsi2;
+  s->SetRing=NULL;
+  s->type="ssi2e";
   return s;
 }
 /* #ssi2 end */
