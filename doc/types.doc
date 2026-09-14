@@ -2210,11 +2210,12 @@ formats.  The link type is not inferred from the filename: use
 @code{ssi} for the old SSI format and @code{ssi2} for the binary SSI2
 format.
 
-Both formats carry an internal schema table with subversions for
-individual serialized data families, such as rings, coefficients,
-polynomials, ideals, modules, and lists.  This metadata is used by the
-reader to dispatch future compatibility code for only the affected data
-families.  It is not a user-visible mode option.
+SSI2 carries an internal schema table with subversions for individual
+serialized data families, such as rings, coefficients, polynomials,
+ideals, modules, and lists.  This metadata is used by the reader to
+dispatch future compatibility code for only the affected data families.
+It is not a user-visible mode option.  The legacy SSI format remains
+unchanged.
 
 SSI2 file links can optionally compress the byte stream using an
 external compressor process connected by a pipe.  The compression mode
