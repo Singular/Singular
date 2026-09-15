@@ -13,4 +13,4 @@ Conflicts:
 
 Cflags: -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@
 Libs: -L${libdir} -lSingular @USEPPROCSDYNAMICLD@
-Libs.private: @SODIUM_LIBS@
+Libs.private: @SODIUM_LIBS@ @OPENSSL_FIPS_LIBS@

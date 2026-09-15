@@ -130,5 +130,70 @@ if (encryption=="xchacha20poly1305")
     "rm -f ssi2_encryption.key ssi2_encryption_wrong.key ssi2_encryption.ssi2e ssi2_encryption_second.ssi2e ssi2_encryption_tampered.ssi2e ssi2_encryption_truncated.ssi2e ssi2_encryption_trailing.ssi2e")==0,
     "remove encryption test files");
 }
+else
+{
+  check(encryption=="unavailable","disabled encryption status");
+  string unavailable_output=child_rejects(
+    "link out=\"ssi2e:w disabled.ssi2e\"; write(out,1); quit;",
+    "authenticated encryption is unavailable","disabled encryption rejection");
+}
+
+link fips_feature="ssi2f: ";
+string fips_encryption=status(fips_feature,"encryption");
+kill fips_feature;
+
+if (fips_encryption=="aes-256-gcm-fips")
+{
+  string fips_key=
+    "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f";
+  string fips_wrong_key=
+    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
+  link fips_key_out="ASCII:w ssi2_encryption_fips.key";
+  write(fips_key_out,fips_key);
+  close(fips_key_out);
+  kill fips_key_out;
+  link fips_wrong_key_out="ASCII:w ssi2_encryption_fips_wrong.key";
+  write(fips_wrong_key_out,fips_wrong_key);
+  close(fips_wrong_key_out);
+  kill fips_wrong_key_out;
+
+  ring RF=0,(a,b,c),dp;
+  ideal FI=a^2+2*b+1/5,a*b-c^4,7*a^3*b+11/13;
+  string fips_secret="SSI2F-CONFIDENTIAL-MARKER";
+  string fips_expected=string(FI);
+
+  link fips_encrypted=
+    "ssi2f:w,keyfile=ssi2_encryption_fips.key ssi2_encryption.ssi2f";
+  write(fips_encrypted,fips_secret);
+  write(fips_encrypted,FI);
+  close(fips_encrypted);
+  def fips_recovered_secret=read(fips_encrypted);
+  def fips_recovered_ideal=read(fips_encrypted);
+  close(fips_encrypted);
+  check(typeof(fips_recovered_secret)=="string","fips encrypted string type");
+  check(fips_recovered_secret==fips_secret,"fips encrypted string value");
+  check(typeof(fips_recovered_ideal)=="ideal","fips encrypted ideal type");
+  check(string(fips_recovered_ideal)==fips_expected,"fips encrypted ideal value");
+  kill fips_encrypted;
+  kill fips_recovered_secret;
+  kill fips_recovered_ideal;
+
+  string fips_output=child_rejects(
+    "link in=\"ssi2f:r,keyfile=ssi2_encryption_fips_wrong.key ssi2_encryption.ssi2f\"; def value=read(in); close(in); quit;",
+    "authentication failed","fips wrong key rejection");
+  check(find(fips_output,fips_wrong_key)==0,"fips key material is not logged");
+
+  check(system("sh",
+    "rm -f ssi2_encryption_fips.key ssi2_encryption_fips_wrong.key ssi2_encryption.ssi2f")==0,
+    "remove fips encryption test files");
+}
+else
+{
+  check(fips_encryption=="unavailable","disabled fips encryption status");
+  string fips_unavailable_output=child_rejects(
+    "link out=\"ssi2f:w disabled.ssi2f\"; write(out,1); quit;",
+    "AES-256-GCM FIPS encryption is unavailable","disabled fips encryption rejection");
+}
 
 tst_status(1);$
