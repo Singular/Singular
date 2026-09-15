@@ -2276,10 +2276,45 @@ the single authenticated-stream boundary.  @code{ssi2e} currently wraps
 plain SSI2 and does not combine encryption with the external SSI2
 compression modes.
 
-Support is enabled automatically when a suitable libsodium installation is
-found at build time.  Use @code{--with-libsodium=PREFIX} for a nonstandard
-installation, or @code{--without-libsodium} to disable it explicitly.  A
-build without libsodium retains the @code{ssi2e} link name but reports a
+Support is disabled by default.  Enable it explicitly with
+@code{--with-libsodium=PREFIX}, where @code{PREFIX} is the libsodium
+installation prefix.  A build without libsodium retains the @code{ssi2e}
+link name but reports a clear error when it is opened.
+
+The optional @code{ssi2f} link type is an alternative encrypted SSI2
+wrapper using AES-256-GCM through an OpenSSL 3 FIPS provider.  It has the
+same single-file envelope structure as @code{ssi2e}, but the cryptographic
+implementation is selected for deployments which require a FIPS provider.
+
+@code{ssi2f} also requires a 64 hexadecimal character key file and the
+mandatory @code{keyfile=} mode option:
+
+@enumerate
+@item @code{"ssi2f:w,keyfile=/secure/path/object.key "} + filename
+@*creates or overwrites an AES-256-GCM encrypted SSI2 file.
+@item @code{"ssi2f:r,keyfile=/secure/path/object.key "} + filename
+@*authenticates and decrypts an AES-256-GCM encrypted SSI2 file.
+@end enumerate
+
+Each encrypted file should use its own fresh random data-encryption key.
+In a Singular/GPI-Space workflow, the natural model is that the token
+which represents a data object carries the file name and the corresponding
+one-time key, or a wrapped form of that key.  A global reusable key file is
+only a manual or local testing interface.
+
+Support is disabled by default.  Enable it explicitly with all of the
+following options:
+
+@smallexample
+--with-openssl-fips=PREFIX
+--with-openssl-fips-provider-dir=DIR
+--with-openssl-fips-config=FILE
+@end smallexample
+
+Here @code{PREFIX} is the OpenSSL 3 installation prefix, @code{DIR}
+contains the FIPS provider module, and @code{FILE} is the OpenSSL
+configuration file which activates the validated FIPS provider.  A build
+without this support retains the @code{ssi2f} link name but reports a
 clear error when it is opened.
 
 Note that the filename may contain a path. An ssi file link can be used

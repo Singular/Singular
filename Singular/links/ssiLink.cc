@@ -58,6 +58,14 @@
 #include <sodium.h>
 #endif
 
+#ifdef HAVE_OPENSSL_FIPS
+#include <openssl/crypto.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/provider.h>
+#include <openssl/rand.h>
+#endif
+
 
 #define SSI_VERSION 16
 // 5->6: changed newstruct representation
@@ -1763,6 +1771,24 @@ struct ssi2Info : public ssiInfo
   size_t encryption_read_pos;
   size_t encryption_read_len;
 #endif
+#ifdef HAVE_OPENSSL_FIPS
+  BOOLEAN openssl_encrypted;
+  BOOLEAN openssl_reading;
+  BOOLEAN openssl_failed;
+  BOOLEAN openssl_final_seen;
+  BOOLEAN openssl_final_written;
+  FILE *openssl_input;
+  OSSL_LIB_CTX *openssl_libctx;
+  OSSL_PROVIDER *openssl_base_provider;
+  OSSL_PROVIDER *openssl_fips_provider;
+  EVP_CIPHER *openssl_cipher;
+  unsigned char openssl_key[32];
+  unsigned char openssl_header[24];
+  uint64_t openssl_frame;
+  unsigned char *openssl_read_buff;
+  size_t openssl_read_pos;
+  size_t openssl_read_len;
+#endif
 };
 
 enum ssiSchemaId
@@ -2314,6 +2340,502 @@ static BOOLEAN ssi2eDrain(ssi2Info *d)
 }
 #endif
 
+#ifdef HAVE_OPENSSL_FIPS
+#define SSI2F_FIXED_HEADER_SIZE 16
+#define SSI2F_NONCE_PREFIX_SIZE 8
+#define SSI2F_HEADER_SIZE (SSI2F_FIXED_HEADER_SIZE + SSI2F_NONCE_PREFIX_SIZE)
+#define SSI2F_NONCE_SIZE 12
+#define SSI2F_TAG_SIZE 16
+#define SSI2F_KEY_SIZE 32
+#define SSI2F_FRAME_AD_SIZE (SSI2F_HEADER_SIZE + 8 + 4 + 1)
+#define SSI2F_PLAINTEXT_CHUNK_SIZE (1U << 20)
+
+static const unsigned char ssi2fFixedHeader[SSI2F_FIXED_HEADER_SIZE] =
+{
+  'S', 'S', 'I', '2', 'F', 'I', 'P', 'S',
+  1, /* envelope version */
+  1, /* AES-256-GCM */
+  SSI2F_NONCE_SIZE,
+  SSI2F_TAG_SIZE,
+  0, 0, 0, 0
+};
+
+static void ssi2fStoreU32(unsigned char *p, uint32_t v)
+{
+  p[0]=(unsigned char)(v >> 24);
+  p[1]=(unsigned char)(v >> 16);
+  p[2]=(unsigned char)(v >> 8);
+  p[3]=(unsigned char)v;
+}
+
+static uint32_t ssi2fLoadU32(const unsigned char *p)
+{
+  return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
+       | ((uint32_t)p[2] << 8) | (uint32_t)p[3];
+}
+
+static void ssi2fStoreU64(unsigned char *p, uint64_t v)
+{
+  for (int i=7; i>=0; i--)
+  {
+    p[i]=(unsigned char)v;
+    v >>= 8;
+  }
+}
+
+static int ssi2fHexValue(int c)
+{
+  if ((c>='0') && (c<='9')) return c-'0';
+  if ((c>='a') && (c<='f')) return c-'a'+10;
+  if ((c>='A') && (c<='F')) return c-'A'+10;
+  return -1;
+}
+
+static BOOLEAN ssi2fReadKeyFile(const char *keyfile,
+                                unsigned char key[SSI2F_KEY_SIZE])
+{
+  FILE *f=fopen(keyfile, "rb");
+  if (f==NULL)
+  {
+    WerrorS("ssi2f: cannot open key file");
+    return TRUE;
+  }
+
+  char hex[SSI2F_KEY_SIZE*2 + 1];
+  size_t n=0;
+  int c;
+  BOOLEAN invalid=FALSE;
+  while ((c=fgetc(f))!=EOF)
+  {
+    if (isspace((unsigned char)c)) continue;
+    if ((!isxdigit((unsigned char)c)) || (n>=sizeof(hex)-1))
+    {
+      invalid=TRUE;
+      break;
+    }
+    hex[n++]=(char)c;
+  }
+  if (ferror(f)) invalid=TRUE;
+  if (fclose(f)!=0) invalid=TRUE;
+  hex[n]='\0';
+
+  if ((!invalid) && (n==SSI2F_KEY_SIZE*2))
+  {
+    for (size_t i=0; i<SSI2F_KEY_SIZE; i++)
+    {
+      int hi=ssi2fHexValue(hex[2*i]);
+      int lo=ssi2fHexValue(hex[2*i+1]);
+      if ((hi<0) || (lo<0))
+      {
+        invalid=TRUE;
+        break;
+      }
+      key[i]=(unsigned char)((hi << 4) | lo);
+    }
+  }
+  else invalid=TRUE;
+
+  OPENSSL_cleanse(hex, sizeof(hex));
+  if (invalid)
+  {
+    OPENSSL_cleanse(key, SSI2F_KEY_SIZE);
+    WerrorS("ssi2f: key file must contain exactly 64 hexadecimal characters");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN ssi2fParseModeOptions(const char *mode, char **keyfile)
+{
+  *keyfile=NULL;
+  char base=ssi2ModeBase(mode);
+  if (base=='?')
+  {
+    Werror("ssi2f: invalid mode `%s'", mode);
+    return TRUE;
+  }
+  if ((mode==NULL) || (mode[0]=='\0'))
+  {
+    WerrorS("ssi2f: keyfile= mode option is required");
+    return TRUE;
+  }
+
+  const char *p=strchr(mode, ',');
+  while (p!=NULL)
+  {
+    const char *start=p+1;
+    const char *end=strchr(start, ',');
+    int len=(end==NULL) ? (int)strlen(start) : (int)(end-start);
+    if ((len>8) && (strncmp(start, "keyfile=", 8)==0))
+    {
+      if (*keyfile!=NULL)
+      {
+        WerrorS("ssi2f: keyfile= may only be specified once");
+        omFree(*keyfile);
+        *keyfile=NULL;
+        return TRUE;
+      }
+      *keyfile=(char*)omAlloc((size_t)len-7);
+      memcpy(*keyfile, start+8, (size_t)len-8);
+      (*keyfile)[len-8]='\0';
+    }
+    else
+    {
+      Werror("ssi2f: unknown or empty mode option `%.*s'", len, start);
+      if (*keyfile!=NULL) omFree(*keyfile);
+      *keyfile=NULL;
+      return TRUE;
+    }
+    p=end;
+  }
+  if (*keyfile==NULL)
+  {
+    WerrorS("ssi2f: keyfile= mode option is required");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN ssi2fInitOpenSSL(ssi2Info *d)
+{
+  d->openssl_libctx=OSSL_LIB_CTX_new();
+  if (d->openssl_libctx==NULL)
+  {
+    WerrorS("ssi2f: cannot create OpenSSL library context");
+    return TRUE;
+  }
+  if (OSSL_PROVIDER_set_default_search_path(d->openssl_libctx,
+                                            SSI2_OPENSSL_FIPS_PROVIDER_DIR)!=1)
+  {
+    WerrorS("ssi2f: cannot set OpenSSL FIPS provider path");
+    return TRUE;
+  }
+  if (OSSL_LIB_CTX_load_config(d->openssl_libctx, SSI2_OPENSSL_FIPS_CONFIG)!=1)
+  {
+    WerrorS("ssi2f: cannot load OpenSSL FIPS configuration");
+    return TRUE;
+  }
+  d->openssl_base_provider=OSSL_PROVIDER_load(d->openssl_libctx, "base");
+  if (d->openssl_base_provider==NULL)
+  {
+    WerrorS("ssi2f: cannot load OpenSSL base provider");
+    return TRUE;
+  }
+  d->openssl_fips_provider=OSSL_PROVIDER_load(d->openssl_libctx, "fips");
+  if (d->openssl_fips_provider==NULL)
+  {
+    WerrorS("ssi2f: cannot load OpenSSL FIPS provider");
+    return TRUE;
+  }
+  if (EVP_set_default_properties(d->openssl_libctx, "fips=yes")!=1)
+  {
+    WerrorS("ssi2f: cannot enable OpenSSL FIPS properties");
+    return TRUE;
+  }
+  d->openssl_cipher=EVP_CIPHER_fetch(d->openssl_libctx, "AES-256-GCM", "fips=yes");
+  if (d->openssl_cipher==NULL)
+  {
+    WerrorS("ssi2f: AES-256-GCM is not available from the OpenSSL FIPS provider");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static void ssi2fCleanupOpenSSL(ssi2Info *d)
+{
+  if (d==NULL) return;
+  if (d->openssl_cipher!=NULL)
+  {
+    EVP_CIPHER_free(d->openssl_cipher);
+    d->openssl_cipher=NULL;
+  }
+  if (d->openssl_fips_provider!=NULL)
+  {
+    OSSL_PROVIDER_unload(d->openssl_fips_provider);
+    d->openssl_fips_provider=NULL;
+  }
+  if (d->openssl_base_provider!=NULL)
+  {
+    OSSL_PROVIDER_unload(d->openssl_base_provider);
+    d->openssl_base_provider=NULL;
+  }
+  if (d->openssl_libctx!=NULL)
+  {
+    OSSL_LIB_CTX_free(d->openssl_libctx);
+    d->openssl_libctx=NULL;
+  }
+  ERR_clear_error();
+}
+
+static void ssi2fFrameAssociatedData(const ssi2Info *d, uint32_t frame_len,
+                                     BOOLEAN final_frame, unsigned char *ad)
+{
+  memcpy(ad, d->openssl_header, SSI2F_HEADER_SIZE);
+  unsigned char *p=ad + SSI2F_HEADER_SIZE;
+  ssi2fStoreU64(p, d->openssl_frame);
+  ssi2fStoreU32(p+8, frame_len);
+  p[12]=final_frame ? 1 : 0;
+}
+
+static void ssi2fFrameNonce(const ssi2Info *d, unsigned char *nonce)
+{
+  memcpy(nonce, d->openssl_header + SSI2F_FIXED_HEADER_SIZE,
+         SSI2F_NONCE_PREFIX_SIZE);
+  ssi2fStoreU32(nonce + SSI2F_NONCE_PREFIX_SIZE,
+                (uint32_t)d->openssl_frame);
+}
+
+static BOOLEAN ssi2fWriteFrame(ssi2Info *d, const unsigned char *plain,
+                               size_t plain_len, BOOLEAN final_frame)
+{
+  if (d->openssl_failed) return TRUE;
+  if (d->openssl_frame>UINT32_MAX)
+  {
+    WerrorS("ssi2f: encrypted stream has too many frames");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+  if (plain_len>SSI2F_PLAINTEXT_CHUNK_SIZE)
+  {
+    WerrorS("ssi2f: internal frame size error");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+
+  uint32_t frame_len=(uint32_t)plain_len;
+  unsigned char prefix[4];
+  unsigned char tag[SSI2F_TAG_SIZE];
+  unsigned char ad[SSI2F_FRAME_AD_SIZE];
+  unsigned char nonce[SSI2F_NONCE_SIZE];
+  ssi2fStoreU32(prefix, frame_len | (final_frame ? 0x80000000U : 0));
+  ssi2fFrameAssociatedData(d, frame_len, final_frame, ad);
+  ssi2fFrameNonce(d, nonce);
+
+  unsigned char *cipher=NULL;
+  if (frame_len>0) cipher=(unsigned char*)omAlloc(frame_len);
+  EVP_CIPHER_CTX *ctx=EVP_CIPHER_CTX_new();
+  unsigned char final_buf[16];
+  int out_len=0;
+  int total_len=0;
+  BOOLEAN failed=FALSE;
+  if ((ctx==NULL)
+  || (EVP_EncryptInit_ex(ctx, d->openssl_cipher, NULL, NULL, NULL)!=1)
+  || (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN,
+                          SSI2F_NONCE_SIZE, NULL)!=1)
+  || (EVP_EncryptInit_ex(ctx, NULL, NULL, d->openssl_key, nonce)!=1)
+  || (EVP_EncryptUpdate(ctx, NULL, &out_len, ad, sizeof(ad))!=1))
+  {
+    failed=TRUE;
+  }
+  if ((!failed) && (frame_len>0)
+  && (EVP_EncryptUpdate(ctx, cipher, &out_len, plain, frame_len)!=1))
+  {
+    failed=TRUE;
+  }
+  total_len=out_len;
+  if ((!failed)
+  && ((EVP_EncryptFinal_ex(ctx, (frame_len>0) ? cipher+total_len : final_buf,
+                           &out_len)!=1)
+    || (total_len+out_len!=(int)frame_len)
+    || (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG,
+                            SSI2F_TAG_SIZE, tag)!=1)))
+  {
+    failed=TRUE;
+  }
+  if (ctx!=NULL) EVP_CIPHER_CTX_free(ctx);
+
+  if ((!failed)
+  && ((fwrite(prefix, 1, sizeof(prefix), d->f_write)!=sizeof(prefix))
+    || ((frame_len>0) && (fwrite(cipher, 1, frame_len, d->f_write)!=frame_len))
+    || (fwrite(tag, 1, sizeof(tag), d->f_write)!=sizeof(tag))))
+  {
+    failed=TRUE;
+  }
+  if (cipher!=NULL)
+  {
+    OPENSSL_cleanse(cipher, frame_len);
+    omFreeSize(cipher, frame_len);
+  }
+  OPENSSL_cleanse(tag, sizeof(tag));
+  if (failed)
+  {
+    WerrorS("ssi2f: encrypted write failed");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+  d->openssl_frame++;
+  return FALSE;
+}
+
+static BOOLEAN ssi2fReadFrame(ssi2Info *d)
+{
+  if (d->openssl_failed || d->openssl_final_seen) return TRUE;
+  if (d->openssl_frame>UINT32_MAX)
+  {
+    WerrorS("ssi2f: encrypted stream has too many frames");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+
+  unsigned char prefix[4];
+  if (fread(prefix, 1, sizeof(prefix), d->openssl_input)!=sizeof(prefix))
+  {
+    WerrorS("ssi2f: truncated encrypted stream (missing final frame)");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+  uint32_t frame_info=ssi2fLoadU32(prefix);
+  BOOLEAN final_frame=((frame_info & 0x80000000U)!=0);
+  uint32_t frame_len=(frame_info & 0x7fffffffU);
+  if (frame_len>SSI2F_PLAINTEXT_CHUNK_SIZE)
+  {
+    WerrorS("ssi2f: invalid encrypted frame length");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+  if (final_frame && (frame_len!=0))
+  {
+    WerrorS("ssi2f: invalid encrypted final frame");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+  if ((!final_frame) && (frame_len==0))
+  {
+    WerrorS("ssi2f: invalid empty encrypted frame");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+
+  unsigned char *cipher=NULL;
+  if (frame_len>0) cipher=(unsigned char*)omAlloc(frame_len);
+  if ((frame_len>0)
+  && (fread(cipher, 1, frame_len, d->openssl_input)!=frame_len))
+  {
+    OPENSSL_cleanse(cipher, frame_len);
+    omFreeSize(cipher, frame_len);
+    WerrorS("ssi2f: truncated encrypted frame");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+  unsigned char tag[SSI2F_TAG_SIZE];
+  if (fread(tag, 1, sizeof(tag), d->openssl_input)!=sizeof(tag))
+  {
+    if (cipher!=NULL)
+    {
+      OPENSSL_cleanse(cipher, frame_len);
+      omFreeSize(cipher, frame_len);
+    }
+    WerrorS("ssi2f: truncated encrypted frame tag");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+
+  unsigned char ad[SSI2F_FRAME_AD_SIZE];
+  unsigned char nonce[SSI2F_NONCE_SIZE];
+  ssi2fFrameAssociatedData(d, frame_len, final_frame, ad);
+  ssi2fFrameNonce(d, nonce);
+
+  EVP_CIPHER_CTX *ctx=EVP_CIPHER_CTX_new();
+  unsigned char final_buf[16];
+  int out_len=0;
+  int total_len=0;
+  BOOLEAN failed=FALSE;
+  if ((ctx==NULL)
+  || (EVP_DecryptInit_ex(ctx, d->openssl_cipher, NULL, NULL, NULL)!=1)
+  || (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN,
+                          SSI2F_NONCE_SIZE, NULL)!=1)
+  || (EVP_DecryptInit_ex(ctx, NULL, NULL, d->openssl_key, nonce)!=1)
+  || (EVP_DecryptUpdate(ctx, NULL, &out_len, ad, sizeof(ad))!=1))
+  {
+    failed=TRUE;
+  }
+  if ((!failed) && (frame_len>0)
+  && (EVP_DecryptUpdate(ctx, d->openssl_read_buff, &out_len,
+                        cipher, frame_len)!=1))
+  {
+    failed=TRUE;
+  }
+  total_len=out_len;
+  if ((!failed)
+  && ((EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG,
+                           SSI2F_TAG_SIZE, tag)!=1)
+    || (EVP_DecryptFinal_ex(ctx,
+                            (frame_len>0) ? d->openssl_read_buff+total_len : final_buf,
+                            &out_len)!=1)
+    || (total_len+out_len!=(int)frame_len)))
+  {
+    failed=TRUE;
+  }
+  if (ctx!=NULL) EVP_CIPHER_CTX_free(ctx);
+  if (cipher!=NULL)
+  {
+    OPENSSL_cleanse(cipher, frame_len);
+    omFreeSize(cipher, frame_len);
+  }
+  OPENSSL_cleanse(tag, sizeof(tag));
+  if (failed)
+  {
+    WerrorS("ssi2f: authentication failed (wrong key or modified data)");
+    d->openssl_failed=TRUE;
+    return TRUE;
+  }
+  d->openssl_frame++;
+
+  if (final_frame)
+  {
+    int trailing=fgetc(d->openssl_input);
+    if ((trailing!=EOF) || ferror(d->openssl_input))
+    {
+      WerrorS("ssi2f: trailing data after final frame");
+      d->openssl_failed=TRUE;
+      return TRUE;
+    }
+    d->openssl_final_seen=TRUE;
+    d->openssl_read_pos=0;
+    d->openssl_read_len=0;
+    return FALSE;
+  }
+  d->openssl_read_pos=0;
+  d->openssl_read_len=(size_t)frame_len;
+  return FALSE;
+}
+
+static BOOLEAN ssi2fReadRaw(ssi2Info *d, void *buf, size_t len)
+{
+  unsigned char *p=(unsigned char*)buf;
+  while (len>0)
+  {
+    if (d->openssl_read_pos<d->openssl_read_len)
+    {
+      size_t available=d->openssl_read_len-d->openssl_read_pos;
+      size_t take=(len<available) ? len : available;
+      memcpy(p, d->openssl_read_buff+d->openssl_read_pos, take);
+      d->openssl_read_pos+=take;
+      p+=take;
+      len-=take;
+      continue;
+    }
+    if (d->openssl_final_seen)
+    {
+      WerrorS("ssi2: unexpected end of input");
+      return TRUE;
+    }
+    if (ssi2fReadFrame(d)) return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN ssi2fDrain(ssi2Info *d)
+{
+  while ((!d->openssl_final_seen) && (!d->openssl_failed))
+  {
+    d->openssl_read_pos=d->openssl_read_len;
+    if (ssi2fReadFrame(d)) break;
+  }
+  return d->openssl_failed;
+}
+#endif
+
 static void ssi2FlushWriteBuffer(const ssiInfo *d)
 {
   ssi2Info *dd=(ssi2Info*)d;
@@ -2324,6 +2846,15 @@ static void ssi2FlushWriteBuffer(const ssiInfo *d)
     ssi2eWriteFrame(dd, (const unsigned char*)dd->write_buff,
                     (size_t)dd->write_buff_pos,
                     crypto_secretstream_xchacha20poly1305_TAG_MESSAGE);
+    dd->write_buff_pos=0;
+    return;
+  }
+#endif
+#ifdef HAVE_OPENSSL_FIPS
+  if (dd->openssl_encrypted)
+  {
+    ssi2fWriteFrame(dd, (const unsigned char*)dd->write_buff,
+                    (size_t)dd->write_buff_pos, FALSE);
     dd->write_buff_pos=0;
     return;
   }
@@ -2342,6 +2873,10 @@ static void ssi2FreeWriteBuffer(ssiInfo *d)
 #ifdef HAVE_LIBSODIUM
     if (dd->encrypted)
       sodium_memzero(dd->write_buff, dd->write_buff_size);
+#endif
+#ifdef HAVE_OPENSSL_FIPS
+    if (dd->openssl_encrypted)
+      OPENSSL_cleanse(dd->write_buff, dd->write_buff_size);
 #endif
     omFreeSize(dd->write_buff, dd->write_buff_size);
     dd->write_buff=NULL;
@@ -2379,6 +2914,25 @@ static void ssi2WriteRaw(const ssiInfo *d, const void *buf, size_t len)
     return;
   }
 #endif
+#ifdef HAVE_OPENSSL_FIPS
+  if (dd->openssl_encrypted)
+  {
+    const unsigned char *p=(const unsigned char*)buf;
+    while (len>0)
+    {
+      size_t available=(size_t)(dd->write_buff_size-dd->write_buff_pos);
+      size_t take=(len<available) ? len : available;
+      memcpy(dd->write_buff+dd->write_buff_pos, p, take);
+      dd->write_buff_pos+=(int)take;
+      p+=take;
+      len-=take;
+      if (dd->write_buff_pos==dd->write_buff_size)
+        ssi2FlushWriteBuffer(d);
+      if (dd->openssl_failed) return;
+    }
+    return;
+  }
+#endif
   if (len>=(size_t)dd->write_buff_size)
   {
     ssi2FlushWriteBuffer(d);
@@ -2407,6 +2961,11 @@ static BOOLEAN ssi2ReadRaw(const ssiInfo *d, void *buf, size_t len)
   ssi2Info *dd=(ssi2Info*)d;
   if ((dd!=NULL) && dd->encrypted)
     return ssi2eReadRaw(dd, buf, len);
+#endif
+#ifdef HAVE_OPENSSL_FIPS
+  ssi2Info *dd_open_ssl=(ssi2Info*)d;
+  if ((dd_open_ssl!=NULL) && dd_open_ssl->openssl_encrypted)
+    return ssi2fReadRaw(dd_open_ssl, buf, len);
 #endif
   char *p=(char*)buf;
   while (len>0)
@@ -4439,6 +4998,11 @@ static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
   {
     sodium_memzero(key, sizeof(key));
     sodium_memzero(&d->encryption_state, sizeof(d->encryption_state));
+    if (d->write_buff!=NULL)
+    {
+      sodium_memzero(d->write_buff, d->write_buff_size);
+      omFreeSize(d->write_buff, d->write_buff_size);
+    }
     if (d->encryption_read_buff!=NULL)
     {
       sodium_memzero(d->encryption_read_buff, SSI2E_PLAINTEXT_CHUNK_SIZE);
@@ -4446,6 +5010,165 @@ static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
     }
     if (d->encryption_input!=NULL) fclose(d->encryption_input);
     if (d->f_write!=NULL) fclose(d->f_write);
+    l->data=NULL;
+    l->flags=0;
+    omFreeSize(d, sizeof(ssi2Info));
+    return TRUE;
+  }
+  return FALSE;
+#endif
+}
+
+static BOOLEAN ssi2fOpen(si_link l, short flag, leftv)
+{
+#ifndef HAVE_OPENSSL_FIPS
+  WerrorS("ssi2f: AES-256-GCM FIPS encryption is unavailable; rebuild Singular with --with-openssl-fips=PREFIX --with-openssl-fips-provider-dir=DIR --with-openssl-fips-config=FILE");
+  return TRUE;
+#else
+  if (l==NULL) return TRUE;
+
+  const char *link_mode=(l->mode!=NULL) ? l->mode : "";
+  char base=ssi2ModeBase(link_mode);
+  char *keyfile=NULL;
+  if (ssi2fParseModeOptions(link_mode, &keyfile)) return TRUE;
+  if (base=='a')
+  {
+    WerrorS("ssi2f: append mode is not supported");
+    omFree(keyfile);
+    return TRUE;
+  }
+  if (flag & SI_LINK_OPEN)
+  {
+    if (base=='r') flag=SI_LINK_READ;
+    else flag=SI_LINK_WRITE;
+  }
+  if ((l->name==NULL) || (l->name[0]=='\0'))
+  {
+    WerrorS("ssi2f: file name required");
+    omFree(keyfile);
+    return TRUE;
+  }
+  if ((flag!=SI_LINK_READ) && (l->name[0]=='>') && (l->name[1]=='>'))
+  {
+    WerrorS("ssi2f: append redirection is not supported");
+    omFree(keyfile);
+    return TRUE;
+  }
+
+  unsigned char key[SSI2F_KEY_SIZE];
+  if (ssi2fReadKeyFile(keyfile, key))
+  {
+    omFree(keyfile);
+    return TRUE;
+  }
+  omFree(keyfile);
+
+  char *reopen_mode=omStrDup(link_mode);
+  reopen_mode[0]=(flag==SI_LINK_READ) ? 'r' : 'w';
+  SI_LINK_SET_OPEN_P(l, flag);
+  if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
+  omFreeBinAddr(l->mode);
+  l->mode=reopen_mode;
+
+  ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
+  l->data=d;
+  ssiInitSchemaVersions(d);
+  d->openssl_encrypted=TRUE;
+  d->openssl_reading=(flag==SI_LINK_READ);
+  d->compressor_name="ssi2f";
+  memcpy(d->openssl_key, key, SSI2F_KEY_SIZE);
+  OPENSSL_cleanse(key, sizeof(key));
+  memcpy(d->openssl_header, ssi2fFixedHeader, SSI2F_FIXED_HEADER_SIZE);
+
+  BOOLEAN failed=FALSE;
+  if (ssi2fInitOpenSSL(d)) failed=TRUE;
+
+  const char *filename=l->name;
+  if ((flag!=SI_LINK_READ) && (filename[0]=='>')) filename++;
+  if ((!failed) && (flag==SI_LINK_READ))
+  {
+    d->openssl_input=myfopen(filename, "rb");
+    if (d->openssl_input==NULL)
+    {
+      WerrorS("ssi2f: cannot open encrypted input");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (fread(d->openssl_header, 1, SSI2F_HEADER_SIZE,
+              d->openssl_input)!=SSI2F_HEADER_SIZE))
+    {
+      WerrorS("ssi2f: truncated encrypted envelope header");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (memcmp(d->openssl_header, ssi2fFixedHeader,
+               SSI2F_FIXED_HEADER_SIZE)!=0))
+    {
+      WerrorS("ssi2f: unsupported or invalid encrypted envelope header");
+      failed=TRUE;
+    }
+    if (!failed)
+    {
+      d->openssl_read_buff=(unsigned char*)omAlloc(SSI2F_PLAINTEXT_CHUNK_SIZE);
+      if (ssi2fReadFrame(d)) failed=TRUE;
+      else if (d->openssl_final_seen)
+      {
+        WerrorS("ssi2f: encrypted envelope contains no SSI2 payload");
+        failed=TRUE;
+      }
+    }
+    if (!failed) SI_LINK_SET_R_OPEN_P(l);
+  }
+  else if (!failed)
+  {
+    d->f_write=myfopen(filename, "wb");
+    if (d->f_write==NULL)
+    {
+      WerrorS("ssi2f: cannot open encrypted output");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && (RAND_bytes_ex(d->openssl_libctx,
+                      d->openssl_header+SSI2F_FIXED_HEADER_SIZE,
+                      SSI2F_NONCE_PREFIX_SIZE, 256)!=1))
+    {
+      WerrorS("ssi2f: cannot generate encrypted stream nonce");
+      failed=TRUE;
+    }
+    if ((!failed)
+    && ((fwrite(d->openssl_header, 1, SSI2F_HEADER_SIZE, d->f_write)
+          !=SSI2F_HEADER_SIZE)
+      || (fflush(d->f_write)!=0)))
+    {
+      WerrorS("ssi2f: encrypted envelope header write failed");
+      failed=TRUE;
+    }
+    if (!failed)
+    {
+      ssi2WriteHeader(d);
+      ssi2WriteSchemaTable(d);
+      ssi2Fflush(d);
+      if (d->openssl_failed) failed=TRUE;
+    }
+    if (!failed) SI_LINK_SET_W_OPEN_P(l);
+  }
+
+  if (failed)
+  {
+    OPENSSL_cleanse(d->openssl_key, sizeof(d->openssl_key));
+    if (d->write_buff!=NULL)
+    {
+      OPENSSL_cleanse(d->write_buff, d->write_buff_size);
+      omFreeSize(d->write_buff, d->write_buff_size);
+    }
+    if (d->openssl_read_buff!=NULL)
+    {
+      OPENSSL_cleanse(d->openssl_read_buff, SSI2F_PLAINTEXT_CHUNK_SIZE);
+      omFreeSize(d->openssl_read_buff, SSI2F_PLAINTEXT_CHUNK_SIZE);
+    }
+    if (d->openssl_input!=NULL) fclose(d->openssl_input);
+    if (d->f_write!=NULL) fclose(d->f_write);
+    ssi2fCleanupOpenSSL(d);
     l->data=NULL;
     l->flags=0;
     omFreeSize(d, sizeof(ssi2Info));
@@ -4673,6 +5396,13 @@ static BOOLEAN ssi2zClose(si_link l)
         if (ssi2eDrain(d)) res=TRUE;
       }
 #endif
+#ifdef HAVE_OPENSSL_FIPS
+      if (d->openssl_encrypted && d->openssl_reading)
+      {
+        was_read=TRUE;
+        if (ssi2fDrain(d)) res=TRUE;
+      }
+#endif
       if (d->f_read!=NULL) { s_close(d->f_read); d->f_read=NULL; }
       ssi2FreeWriteBuffer(d);
 #ifdef HAVE_LIBSODIUM
@@ -4684,6 +5414,16 @@ static BOOLEAN ssi2zClose(si_link l)
           res=TRUE;
         else
           d->encryption_final_written=TRUE;
+      }
+#endif
+#ifdef HAVE_OPENSSL_FIPS
+      if (d->openssl_encrypted && (!d->openssl_reading)
+      && (!d->openssl_final_written) && (!d->openssl_failed))
+      {
+        if (ssi2fWriteFrame(d, NULL, 0, TRUE))
+          res=TRUE;
+        else
+          d->openssl_final_written=TRUE;
       }
 #endif
       if (d->f_write!=NULL) { if (fclose(d->f_write)!=0) res=TRUE; d->f_write=NULL; }
@@ -4703,6 +5443,25 @@ static BOOLEAN ssi2zClose(si_link l)
         }
         sodium_memzero(&d->encryption_state, sizeof(d->encryption_state));
         if (d->encryption_failed) res=TRUE;
+      }
+#endif
+#ifdef HAVE_OPENSSL_FIPS
+      if (d->openssl_encrypted)
+      {
+        if (d->openssl_input!=NULL)
+        {
+          if (fclose(d->openssl_input)!=0) res=TRUE;
+          d->openssl_input=NULL;
+        }
+        if (d->openssl_read_buff!=NULL)
+        {
+          OPENSSL_cleanse(d->openssl_read_buff, SSI2F_PLAINTEXT_CHUNK_SIZE);
+          omFreeSize(d->openssl_read_buff, SSI2F_PLAINTEXT_CHUNK_SIZE);
+          d->openssl_read_buff=NULL;
+        }
+        OPENSSL_cleanse(d->openssl_key, sizeof(d->openssl_key));
+        ssi2fCleanupOpenSSL(d);
+        if (d->openssl_failed) res=TRUE;
       }
 #endif
       if (d->pid>1)
@@ -5476,13 +6235,25 @@ static const char* slStatusSsi2(si_link l, const char* request)
   ssiInfo *d=(ssiInfo*)l->data;
   if (strcmp(request, "encryption")==0)
   {
-    if ((l->m==NULL) || (strcmp(l->m->type, "ssi2e")!=0))
+    if (l->m==NULL)
       return "none";
+    if (strcmp(l->m->type, "ssi2e")==0)
+    {
 #ifdef HAVE_LIBSODIUM
-    return "xchacha20poly1305";
+      return "xchacha20poly1305";
 #else
-    return "unavailable";
+      return "unavailable";
 #endif
+    }
+    if (strcmp(l->m->type, "ssi2f")==0)
+    {
+#ifdef HAVE_OPENSSL_FIPS
+      return "aes-256-gcm-fips";
+#else
+      return "unavailable";
+#endif
+    }
+    return "none";
   }
   if (strcmp(request, "read")==0)
   {
@@ -5490,6 +6261,12 @@ static const char* slStatusSsi2(si_link l, const char* request)
     ssi2Info *dd=(ssi2Info*)d;
     if (SI_LINK_R_OPEN_P(l) && (dd!=NULL) && dd->encrypted
     && (!dd->encryption_failed) && (!dd->encryption_final_seen))
+      return "ready";
+#endif
+#ifdef HAVE_OPENSSL_FIPS
+    ssi2Info *dd_open_ssl=(ssi2Info*)d;
+    if (SI_LINK_R_OPEN_P(l) && (dd_open_ssl!=NULL) && dd_open_ssl->openssl_encrypted
+    && (!dd_open_ssl->openssl_failed) && (!dd_open_ssl->openssl_final_seen))
       return "ready";
 #endif
     if (SI_LINK_R_OPEN_P(l) && (d!=NULL) && (d->f_read!=NULL) && (!s_iseof(d->f_read)))
@@ -5597,6 +6374,22 @@ si_link_extension slInitSsi2eExtension(si_link_extension s)
   s->Status=slStatusSsi2;
   s->SetRing=NULL;
   s->type="ssi2e";
+  return s;
+}
+
+si_link_extension slInitSsi2fExtension(si_link_extension s)
+{
+  s->Open=ssi2fOpen;
+  s->Close=ssi2zClose;
+  s->Kill=ssi2zClose;
+  s->Read=ssi2Read1;
+  s->Read2=NULL;
+  s->Write=ssi2Write;
+  s->Dump=NULL;
+  s->GetDump=NULL;
+  s->Status=slStatusSsi2;
+  s->SetRing=NULL;
+  s->type="ssi2f";
   return s;
 }
 /* #ssi2 end */

@@ -56,7 +56,9 @@ jobs:
           fi
 
       - run: ./autogen.sh
-      - run: ./configure --prefix=$prefix --enable-gfanlib ${{ matrix.configflags }}
+      - name: Configure
+        run: |
+          ./configure --prefix=$prefix --enable-gfanlib ${{ matrix.configflags }}
       - run: make -j3
       - run: make check
       - run: make install
@@ -88,6 +90,114 @@ jobs:
 
       #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Long/ok_l.lst
       #  if: ${{ always() }}
+
+  ssi2:
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 120
+
+    env:
+      OPENSSL_VERSION: 3.1.2
+      OPENSSL_FIPS_PREFIX: /tmp/openssl-fips
+
+    steps:
+
+      - uses: actions/checkout@v5
+
+      - name: Install dependencies
+
+        run: |
+
+          sudo apt-get update
+          sudo apt-get install -y \
+            sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev \
+            4ti2 normaliz gfan libopenblas-dev libflint-dev libsodium-dev \
+            build-essential ca-certificates cmake curl perl pkg-config
+
+      - name: Show system crypto versions
+
+        run: |
+
+          openssl version -a
+          pkg-config --modversion libsodium
+
+      - name: Build OpenSSL FIPS provider
+
+        run: |
+
+          set -euo pipefail
+          curl -fsSL "https://www.openssl.org/source/old/3.1/openssl-${OPENSSL_VERSION}.tar.gz" \
+            -o /tmp/openssl.tar.gz
+          tar -C /tmp -xzf /tmp/openssl.tar.gz
+          cd "/tmp/openssl-${OPENSSL_VERSION}"
+          ./Configure enable-fips --prefix="$OPENSSL_FIPS_PREFIX" \
+            --openssldir="$OPENSSL_FIPS_PREFIX/ssl"
+          make -j"$(nproc)"
+          make install_sw install_fips
+          export LD_LIBRARY_PATH="$OPENSSL_FIPS_PREFIX/lib64:$OPENSSL_FIPS_PREFIX/lib:${LD_LIBRARY_PATH:-}"
+
+          fips_module="$(find "$OPENSSL_FIPS_PREFIX" -path '*/ossl-modules/fips.so' -print -quit)"
+          test -n "$fips_module"
+          fips_provider_dir="$(dirname "$fips_module")"
+          fips_config="$OPENSSL_FIPS_PREFIX/ssl/openssl-fips.cnf"
+
+          "$OPENSSL_FIPS_PREFIX/bin/openssl" fipsinstall \
+            -module "$fips_module" \
+            -out "$OPENSSL_FIPS_PREFIX/ssl/fipsmodule.cnf" \
+            -provider_name fips
+
+          {
+            echo "openssl_conf = openssl_init"
+            echo ".include $OPENSSL_FIPS_PREFIX/ssl/fipsmodule.cnf"
+            echo
+            echo "[openssl_init]"
+            echo "providers = provider_sect"
+            echo "alg_section = algorithm_sect"
+            echo
+            echo "[provider_sect]"
+            echo "fips = fips_sect"
+            echo "base = base_sect"
+            echo
+            echo "[base_sect]"
+            echo "activate = 1"
+            echo
+            echo "[algorithm_sect]"
+            echo "default_properties = fips=yes"
+          } > "$fips_config"
+
+          echo "$OPENSSL_FIPS_PREFIX/bin" >> "$GITHUB_PATH"
+          echo "SSI2_FIPS_PROVIDER_DIR=$fips_provider_dir" >> "$GITHUB_ENV"
+          echo "SSI2_FIPS_CONFIG=$fips_config" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$OPENSSL_FIPS_PREFIX/lib64:$OPENSSL_FIPS_PREFIX/lib:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
+
+          OPENSSL_CONF="$fips_config" \
+          OPENSSL_MODULES="$fips_provider_dir" \
+          "$OPENSSL_FIPS_PREFIX/bin/openssl" version -a
+
+          OPENSSL_CONF="$fips_config" \
+          OPENSSL_MODULES="$fips_provider_dir" \
+          "$OPENSSL_FIPS_PREFIX/bin/openssl" list -providers
+
+      - run: ./autogen.sh
+
+      - name: Configure
+
+        run: |
+
+          ./configure --prefix=$prefix --enable-gfanlib --with-ntl --with-flint \
+            --with-libsodium=/usr \
+            --with-openssl-fips="$OPENSSL_FIPS_PREFIX" \
+            --with-openssl-fips-provider-dir="$SSI2_FIPS_PROVIDER_DIR" \
+            --with-openssl-fips-config="$SSI2_FIPS_CONFIG"
+
+      - run: make -j"$(nproc)"
+
+      - run: make install
+
+      - name: Run SSI2 encryption tests
+
+        run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Short/ssi2_encryption.tst
 
   cygwin:
     runs-on: windows-latest
