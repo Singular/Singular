@@ -24,6 +24,7 @@ si_link_extension slInitSsi2zExtension(si_link_extension s);
 si_link_extension slInitSsi2zstdExtension(si_link_extension s);
 si_link_extension slInitSsi2lz4Extension(si_link_extension s);
 si_link_extension slInitSsi2eExtension(si_link_extension s);
+si_link_extension slInitSsi2fExtension(si_link_extension s);
 
 si_link ssiCommandLink();
 
