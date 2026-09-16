@@ -1,0 +1,186 @@
+name: Cygwin overlay package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      package_release:
+        description: Cygwin package release number for a tag build
+        required: true
+        default: "1"
+        type: string
+      attach_to_release:
+        description: Attach the overlay archive to an existing release for the selected tag
+        required: true
+        default: false
+        type: boolean
+  pull_request:
+    paths:
+      - .github/workflows/release-cygwin.yml
+      - .github/scripts/collect-binary-notices.sh
+      - .github/scripts/package-cygwin.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Singular-owned Cygwin overlay
+    runs-on: windows-latest
+    timeout-minutes: 180
+    steps:
+      - name: Preserve Unix line endings
+        run: git config --global core.autocrlf input
+
+      - name: Check out source
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name || github.sha }}
+          fetch-depth: 0
+
+      - name: Resolve package version
+        id: settings
+        shell: bash
+        env:
+          INPUT_PACKAGE_RELEASE: ${{ inputs.package_release }}
+          INPUT_ATTACH_TO_RELEASE: ${{ inputs.attach_to_release }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && \
+                "$INPUT_ATTACH_TO_RELEASE" == true && "$GITHUB_REF_TYPE" != tag ]]; then
+            echo "::error::Release attachment requires selecting a tag"
+            exit 1
+          fi
+
+          source_version="$(sed -n \
+            's/^AC_INIT(\[singular\], \[\([^]]*\)\],.*/\1/p' configure.ac)"
+          if [[ -z "$source_version" ]]; then
+            echo "::error::Could not read the Singular version from configure.ac"
+            exit 1
+          fi
+
+          release_tag_version() {
+            local release_tag="$1"
+            if [[ "$release_tag" =~ ^Release-([0-9]+)-([0-9]+)-([0-9]+)(p[0-9]+)?$ ]]; then
+              printf '%s.%s.%s%s\n' \
+                "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+                "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
+            elif [[ "$release_tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)(p[0-9]+)?$ ]]; then
+              printf '%s.%s.%s%s\n' \
+                "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+                "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
+            else
+              return 1
+            fi
+          }
+
+          short_sha="$(git rev-parse --short=10 HEAD)"
+          if [[ "$GITHUB_REF_TYPE" == tag || "$GITHUB_EVENT_NAME" == release ]]; then
+            if ! artifact_version="$(release_tag_version "$GITHUB_REF_NAME")"; then
+              echo "::error::Unsupported release tag: $GITHUB_REF_NAME"
+              exit 1
+            fi
+            if [[ "${artifact_version%%p*}" != "$source_version" ]]; then
+              echo "::error::Tag version $artifact_version does not match configure.ac version $source_version"
+              exit 1
+            fi
+            package_version="$artifact_version"
+            package_release="${INPUT_PACKAGE_RELEASE:-1}"
+            if [[ ! "$package_release" =~ ^[1-9][0-9]*$ ]]; then
+              echo "::error::The package release must be a positive integer"
+              exit 1
+            fi
+          else
+            artifact_version="$source_version-git$short_sha"
+            package_version="$source_version"
+            package_release="0.${GITHUB_RUN_NUMBER}.git$short_sha"
+          fi
+
+          {
+            echo "artifact_version=$artifact_version"
+            echo "package_version=$package_version"
+            echo "package_release=$package_release"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Install Cygwin and build dependencies
+        uses: cygwin/cygwin-install-action@v6
+        with:
+          packages: >-
+            autoconf2.7 automake1.18 binutils bzip2 calm cddlib-devel
+            cygwin-devel file gcc-core gcc-g++ git libflint-devel libgmp-devel
+            libmpfr-devel libntl-devel libreadline-devel libtool m4 make perl
+            pkg-config sharutils tar texinfo xz
+
+      - name: Build and package Cygwin overlay
+        env:
+          CHERE_INVOKING: 1
+          CYGWIN_NOWINPATH: 1
+          BUILD_JOBS: 2
+        run: >-
+          bash --login -eo pipefail -c
+          '.github/scripts/package-cygwin.sh
+          "$PWD"
+          "${{ steps.settings.outputs.artifact_version }}"
+          "${{ steps.settings.outputs.package_version }}"
+          "${{ steps.settings.outputs.package_release }}"
+          "$PWD/dist"'
+
+      - name: Inspect Cygwin repository artifact
+        env:
+          CHERE_INVOKING: 1
+          CYGWIN_NOWINPATH: 1
+        run: >-
+          bash --login -eo pipefail -c
+          'test -s dist/cygwin-overlay/x86_64/setup.ini;
+          test -s dist/cygwin-overlay/x86_64/setup.xz;
+          test -s dist/cygwin-overlay/SHA512SUMS;
+          grep -q "@ singular-upstream" dist/cygwin-overlay/x86_64/setup.ini;
+          grep -q "category: Math" dist/cygwin-overlay/x86_64/setup.ini;
+          (cd dist/cygwin-overlay && sha512sum -c SHA512SUMS);
+          find dist/cygwin-overlay -maxdepth 5 -type f -print | sort'
+
+      - name: Upload Cygwin overlay repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-cygwin-x86_64-overlay
+          path: |
+            dist/cygwin-overlay/
+            dist/Singular-*-cygwin-x86_64-overlay.tar.xz
+          if-no-files-found: error
+
+  publish:
+    name: Attach Cygwin overlay to release
+    needs: build
+    if: >-
+      github.event_name == 'release' ||
+      (github.event_name == 'workflow_dispatch' &&
+       inputs.attach_to_release == true && github.ref_type == 'tag')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Cygwin overlay artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: singular-cygwin-x86_64-overlay
+          path: release-assets
+
+      - name: Verify the manually selected release exists
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG_NAME" > /dev/null
+
+      - name: Attach Cygwin overlay to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name || github.ref_name }}
+          files: release-assets/Singular-*-cygwin-x86_64-overlay.tar.xz
+          fail_on_unmatched_files: true
