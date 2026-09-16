@@ -19,6 +19,8 @@ jobs:
             configflags: "--with-ntl --with-flint"
           - os: macos-26
             configflags: "--with-ntl --with-flint"
+          - os: macos-26-intel
+            configflags: "--with-ntl --with-flint"
 
     steps:
       - uses: actions/checkout@v5
@@ -30,6 +32,10 @@ jobs:
           if command -v getconf >/dev/null 2>&1; then
             echo "getconf PAGESIZE=$(getconf PAGESIZE)"
           fi
+
+      - name: Verify Intel macOS page size
+        if: matrix.os == 'macos-26-intel'
+        run: test "$(getconf PAGESIZE)" = 4096
 
       - name: Install dependencies
         run: |
@@ -100,7 +106,7 @@ jobs:
         uses: cygwin/cygwin-install-action@v6
         with:
           packages: >-
-            autoconf automake binutils cddlib-devel cygwin-devel gcc-core
+            autoconf2.7 automake1.18 binutils cddlib-devel cygwin-devel gcc-core
             gcc-g++ git libflint-devel libgmp-devel libmpfr-devel
             libntl-devel libreadline-devel libtool m4 make perl pkg-config
             texinfo
@@ -112,7 +118,16 @@ jobs:
           echo "getconf PAGESIZE=$page_size"; test "$page_size" = 65536'
 
       - name: Generate build system
-        run: bash --login -eo pipefail -c './autogen.sh'
+        run: >-
+          bash --login -eo pipefail -c
+          'mkdir -p /usr/local/bin;
+          ln -sf /usr/bin/autoconf-2.73 /usr/local/bin/autoconf;
+          ln -sf /usr/bin/autoheader-2.73 /usr/local/bin/autoheader;
+          ln -sf /usr/bin/autom4te-2.73 /usr/local/bin/autom4te;
+          ln -sf /usr/bin/autoreconf-2.73 /usr/local/bin/autoreconf;
+          ln -sf /usr/bin/aclocal-1.18 /usr/local/bin/aclocal;
+          ln -sf /usr/bin/automake-1.18 /usr/local/bin/automake;
+          ./autogen.sh'
 
       - name: Configure
         run: >-
