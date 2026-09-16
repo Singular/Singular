@@ -313,7 +313,7 @@ jobs:
       - name: Inspect and install RPM
         run: |
           rpm -qip dist/*.rpm
-          rpm -qlp dist/*.rpm | grep THIRD_PARTY_LICENSES
+          rpm -qlp dist/*.rpm | grep /usr/share/licenses/singular/
           dnf install -y dist/*.rpm
           printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
             | /usr/bin/Singular -q \

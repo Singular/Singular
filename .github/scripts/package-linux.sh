@@ -153,13 +153,26 @@ EOF
 else
   rpm_top="$RUNNER_TEMP/rpmbuild"
   mkdir -p "$rpm_top"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+  find "$stage" -type f -name '*.la' -delete
   tar -C "$stage" -czf "$rpm_top/SOURCES/singular-payload.tar.gz" .
   (
     cd "$stage"
     find . \( -type f -o -type l \) -print \
       | LC_ALL=C sort \
       | sed 's|^\.||' \
-      | awk '{ if ($0 ~ /^\/usr\/share\/licenses\/singular\//) print "%license " $0; else print $0 }' \
+      | awk '
+          /^\/usr\/share\/licenses\/singular\// {
+            print "%license " $0
+            next
+          }
+          /^\/usr\/share\/man\/man[^/]+\// {
+            directory = $0
+            sub("/[^/]+$", "/*", directory)
+            if (!seen[directory]++) print directory
+            next
+          }
+          { print }
+        ' \
       > "$rpm_top/SOURCES/files.list"
   )
 
@@ -188,7 +201,7 @@ tar -C %{buildroot} -xzf %{SOURCE0}
 %files -f %{SOURCE1}
 
 %changelog
-* Thu Jan 01 1970 Singular Team <singular@mathematik.uni-kl.de> - $version-$package_release
+* Mon Jan 01 2024 Singular Team <singular@mathematik.uni-kl.de> - $version-$package_release
 - Automated binary package
 EOF
 
