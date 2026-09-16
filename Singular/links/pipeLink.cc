@@ -23,6 +23,24 @@
 
 EXTERN_VAR BOOLEAN FE_OPT_NO_SHELL_FLAG;
 
+#ifdef _WIN32
+
+static BOOLEAN pipeOpen(si_link l, short /*flag*/, leftv /*u*/)
+{
+  WerrorS("pipe links are not supported on native Windows");
+  l->flags=0;
+  return TRUE;
+}
+
+si_link_extension slInitPipeExtension(si_link_extension s)
+{
+  s->Open=pipeOpen;
+  s->type="pipe";
+  return s;
+}
+
+#else
+
 typedef struct
 {
   FILE *f_read;
@@ -235,3 +253,5 @@ si_link_extension slInitPipeExtension(si_link_extension s)
   s->type="pipe";
   return s;
 }
+
+#endif
