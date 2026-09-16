@@ -1,0 +1,362 @@
+name: Binary packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      macos_intel:
+        description: Build the Intel macOS DMG
+        required: true
+        default: true
+        type: boolean
+      macos_apple_silicon:
+        description: Build the Apple Silicon DMG
+        required: true
+        default: true
+        type: boolean
+      rpm:
+        description: Build the Fedora/RHEL RPM
+        required: true
+        default: true
+        type: boolean
+      ubuntu:
+        description: Build the Ubuntu 24.04 package
+        required: true
+        default: true
+        type: boolean
+      attach_to_release:
+        description: Attach artifacts to an existing release for the selected tag
+        required: true
+        default: false
+        type: boolean
+  pull_request:
+    paths:
+      - .github/workflows/release-binaries.yml
+      - .github/scripts/bundle-macos-runtime.py
+      - .github/scripts/collect-binary-notices.sh
+      - .github/scripts/package-linux.sh
+      - .github/scripts/package-macos-dmg.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    name: Select binary packages
+    runs-on: ubuntu-latest
+    outputs:
+      macos_intel: ${{ steps.settings.outputs.macos_intel }}
+      macos_arm64: ${{ steps.settings.outputs.macos_arm64 }}
+      rpm: ${{ steps.settings.outputs.rpm }}
+      ubuntu: ${{ steps.settings.outputs.ubuntu }}
+      artifact_version: ${{ steps.settings.outputs.artifact_version }}
+      bundle_version: ${{ steps.settings.outputs.bundle_version }}
+      deb_version: ${{ steps.settings.outputs.deb_version }}
+      rpm_version: ${{ steps.settings.outputs.rpm_version }}
+      package_release: ${{ steps.settings.outputs.package_release }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
+          fetch-depth: 0
+
+      - name: Resolve targets and versions
+        id: settings
+        env:
+          INPUT_MACOS_INTEL: ${{ inputs.macos_intel }}
+          INPUT_MACOS_ARM64: ${{ inputs.macos_apple_silicon }}
+          INPUT_RPM: ${{ inputs.rpm }}
+          INPUT_UBUNTU: ${{ inputs.ubuntu }}
+          INPUT_ATTACH_TO_RELEASE: ${{ inputs.attach_to_release }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            macos_intel="$INPUT_MACOS_INTEL"
+            macos_arm64="$INPUT_MACOS_ARM64"
+            rpm="$INPUT_RPM"
+            ubuntu="$INPUT_UBUNTU"
+          else
+            macos_intel=true
+            macos_arm64=true
+            rpm=true
+            ubuntu=true
+          fi
+
+          if [[ "$macos_intel" != true && "$macos_arm64" != true && \
+                "$rpm" != true && "$ubuntu" != true ]]; then
+            echo "::error::Select at least one binary package"
+            exit 1
+          fi
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && \
+                "$INPUT_ATTACH_TO_RELEASE" == true && "$GITHUB_REF_TYPE" != tag ]]; then
+            echo "::error::Release attachment requires selecting a tag"
+            exit 1
+          fi
+
+          source_version="$(sed -n \
+            's/^AC_INIT(\[singular\], \[\([^]]*\)\],.*/\1/p' configure.ac)"
+          if [[ -z "$source_version" ]]; then
+            echo "::error::Could not read the Singular version from configure.ac"
+            exit 1
+          fi
+
+          release_tag_version() {
+            local release_tag="$1"
+            if [[ "$release_tag" =~ ^Release-([0-9]+)-([0-9]+)-([0-9]+)(p[0-9]+)?$ ]]; then
+              printf '%s.%s.%s%s\n' \
+                "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+                "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
+            elif [[ "$release_tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)(p[0-9]+)?$ ]]; then
+              printf '%s.%s.%s%s\n' \
+                "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+                "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
+            else
+              return 1
+            fi
+          }
+
+          short_sha="$(git rev-parse --short=10 HEAD)"
+          if [[ "$GITHUB_REF_TYPE" == tag || "$GITHUB_EVENT_NAME" == release ]]; then
+            if ! artifact_version="$(release_tag_version "$GITHUB_REF_NAME")"; then
+              echo "::error::Unsupported release tag: $GITHUB_REF_NAME"
+              exit 1
+            fi
+            if [[ "${artifact_version%%p*}" != "$source_version" ]]; then
+              echo "::error::Tag version $artifact_version does not match configure.ac version $source_version"
+              exit 1
+            fi
+            deb_version="$artifact_version"
+            rpm_version="$artifact_version"
+            package_release=1
+          else
+            artifact_version="$source_version-git$short_sha"
+            deb_version="$source_version+git${GITHUB_RUN_NUMBER}.$short_sha"
+            rpm_version="$source_version"
+            package_release="0.${GITHUB_RUN_NUMBER}.git$short_sha"
+          fi
+          bundle_version="$source_version.$GITHUB_RUN_NUMBER"
+
+          {
+            echo "macos_intel=$macos_intel"
+            echo "macos_arm64=$macos_arm64"
+            echo "rpm=$rpm"
+            echo "ubuntu=$ubuntu"
+            echo "artifact_version=$artifact_version"
+            echo "bundle_version=$bundle_version"
+            echo "deb_version=$deb_version"
+            echo "rpm_version=$rpm_version"
+            echo "package_release=$package_release"
+          } >> "$GITHUB_OUTPUT"
+
+  macos-intel:
+    name: macOS Intel
+    needs: prepare
+    if: needs.prepare.outputs.macos_intel == 'true'
+    runs-on: macos-15-intel
+    timeout-minutes: 180
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      BUILD_JOBS: 4
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: brew install autoconf automake libtool gmp readline mpfr ntl cddlib flint
+
+      - name: Build Intel DMG
+        run: |
+          output="dist/Singular-${{ needs.prepare.outputs.artifact_version }}-macos-x86_64.dmg"
+          .github/scripts/package-macos-dmg.sh \
+            "$GITHUB_WORKSPACE" \
+            "${{ needs.prepare.outputs.artifact_version }}" \
+            "${{ needs.prepare.outputs.bundle_version }}" \
+            x86_64 \
+            "$output"
+
+      - name: Upload Intel DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-binary-macos-x86_64
+          path: dist/*.dmg
+          if-no-files-found: error
+
+  macos-arm64:
+    name: macOS Apple Silicon
+    needs: prepare
+    if: needs.prepare.outputs.macos_arm64 == 'true'
+    runs-on: macos-15
+    timeout-minutes: 180
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      BUILD_JOBS: 3
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: brew install autoconf automake libtool gmp readline mpfr ntl cddlib flint
+
+      - name: Build Apple Silicon DMG
+        run: |
+          output="dist/Singular-${{ needs.prepare.outputs.artifact_version }}-macos-arm64.dmg"
+          .github/scripts/package-macos-dmg.sh \
+            "$GITHUB_WORKSPACE" \
+            "${{ needs.prepare.outputs.artifact_version }}" \
+            "${{ needs.prepare.outputs.bundle_version }}" \
+            arm64 \
+            "$output"
+
+      - name: Upload Apple Silicon DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-binary-macos-arm64
+          path: dist/*.dmg
+          if-no-files-found: error
+
+  ubuntu:
+    name: Ubuntu 24.04
+    needs: prepare
+    if: needs.prepare.outputs.ubuntu == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      BUILD_JOBS: 4
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
+          fetch-depth: 0
+
+      - name: Install build and packaging dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            autoconf automake bison build-essential curl dpkg-dev file flex \
+            libtool libgmp-dev libmpfr-dev libreadline-dev libntl-dev \
+            libflint-dev libcdd-dev libzstd-dev perl sharutils
+
+      - name: Build Ubuntu package
+        run: |
+          basename="singular_${{ needs.prepare.outputs.deb_version }}-1_amd64"
+          .github/scripts/package-linux.sh \
+            "$GITHUB_WORKSPACE" \
+            "${{ needs.prepare.outputs.deb_version }}" \
+            1 deb dist "$basename"
+
+      - name: Inspect and install Ubuntu package
+        run: |
+          dpkg-deb --info dist/*.deb
+          sudo apt-get install -y ./dist/*.deb
+          printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
+            | /usr/bin/Singular -q \
+            | grep -q INSTALLED_PACKAGE_OK
+
+      - name: Upload Ubuntu package
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-binary-ubuntu-24.04-amd64
+          path: dist/*.deb
+          if-no-files-found: error
+
+  rpm:
+    name: Fedora RPM
+    needs: prepare
+    if: needs.prepare.outputs.rpm == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    container: fedora:latest
+    env:
+      BUILD_JOBS: 4
+    steps:
+      - name: Install checkout prerequisites
+        run: dnf install -y git tar gzip
+
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
+          fetch-depth: 0
+
+      - name: Install build and packaging dependencies
+        run: |
+          dnf install -y \
+            autoconf automake bison cddlib-devel curl diffutils file findutils \
+            flex gcc gcc-c++ gmp-devel libtool make mpfr-devel ntl-devel \
+            flint-devel readline-devel libzstd-devel perl-core rpm-build \
+            sharutils which
+
+      - name: Build RPM
+        run: |
+          basename="singular-${{ needs.prepare.outputs.rpm_version }}-${{ needs.prepare.outputs.package_release }}.x86_64"
+          .github/scripts/package-linux.sh \
+            "$GITHUB_WORKSPACE" \
+            "${{ needs.prepare.outputs.rpm_version }}" \
+            "${{ needs.prepare.outputs.package_release }}" \
+            rpm dist "$basename"
+
+      - name: Inspect and install RPM
+        run: |
+          rpm -qip dist/*.rpm
+          rpm -qlp dist/*.rpm | grep THIRD_PARTY_LICENSES
+          dnf install -y dist/*.rpm
+          printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
+            | /usr/bin/Singular -q \
+            | grep -q INSTALLED_PACKAGE_OK
+
+      - name: Upload RPM
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-binary-fedora-x86_64
+          path: dist/*.rpm
+          if-no-files-found: error
+
+  publish:
+    name: Attach binary packages to release
+    needs: [prepare, macos-intel, macos-arm64, ubuntu, rpm]
+    if: >-
+      always() &&
+      (github.event_name == 'release' ||
+       (github.event_name == 'workflow_dispatch' &&
+        inputs.attach_to_release == true && github.ref_type == 'tag')) &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: singular-binary-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Verify the manually selected release exists
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG_NAME" > /dev/null
+
+      - name: Attach packages to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name || github.ref_name }}
+          files: release-assets/*
+          fail_on_unmatched_files: true
