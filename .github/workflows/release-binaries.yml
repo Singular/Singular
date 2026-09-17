@@ -30,6 +30,10 @@ on:
         required: true
         default: false
         type: boolean
+      documentation_run_id:
+        description: Reuse old docu from this Release Tarball workflow run ID
+        required: false
+        type: string
       attach_to_release:
         description: Attach artifacts to an existing release for the selected tag
         required: true
@@ -45,6 +49,7 @@ on:
       - .github/scripts/package-macos-dmg.sh
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -67,6 +72,7 @@ jobs:
       rpm_version: ${{ steps.settings.outputs.rpm_version }}
       package_release: ${{ steps.settings.outputs.package_release }}
       bundle_old_docs: ${{ steps.settings.outputs.bundle_old_docs }}
+      documentation_run_id: ${{ steps.settings.outputs.documentation_run_id }}
       artifact_suffix: ${{ steps.settings.outputs.artifact_suffix }}
     steps:
       - name: Check out source
@@ -83,6 +89,7 @@ jobs:
           INPUT_RPM: ${{ inputs.rpm }}
           INPUT_UBUNTU: ${{ inputs.ubuntu }}
           INPUT_OLD_DOCU: ${{ inputs.old_docu }}
+          INPUT_DOCUMENTATION_RUN_ID: ${{ inputs.documentation_run_id }}
           INPUT_ATTACH_TO_RELEASE: ${{ inputs.attach_to_release }}
         shell: bash
         run: |
@@ -94,12 +101,14 @@ jobs:
             rpm="$INPUT_RPM"
             ubuntu="$INPUT_UBUNTU"
             bundle_old_docs="$INPUT_OLD_DOCU"
+            documentation_run_id="$INPUT_DOCUMENTATION_RUN_ID"
           else
             macos_intel=true
             macos_arm64=true
             rpm=true
             ubuntu=true
             bundle_old_docs=false
+            documentation_run_id=
           fi
 
           case "$bundle_old_docs" in
@@ -110,6 +119,20 @@ jobs:
               exit 1
               ;;
           esac
+
+          if [[ "$bundle_old_docs" == true ]]; then
+            if [[ -z "$documentation_run_id" ]]; then
+              echo "::error::old_docu=true requires a Release Tarball documentation_run_id"
+              exit 1
+            fi
+            if [[ ! "$documentation_run_id" =~ ^[1-9][0-9]*$ ]]; then
+              echo "::error::documentation_run_id must be a workflow run ID"
+              exit 1
+            fi
+          elif [[ -n "$documentation_run_id" ]]; then
+            echo "::error::documentation_run_id requires old_docu=true"
+            exit 1
+          fi
 
           if [[ "$macos_intel" != true && "$macos_arm64" != true && \
                 "$rpm" != true && "$ubuntu" != true ]]; then
@@ -176,40 +199,48 @@ jobs:
             echo "rpm_version=$rpm_version"
             echo "package_release=$package_release"
             echo "bundle_old_docs=$bundle_old_docs"
+            echo "documentation_run_id=$documentation_run_id"
             echo "artifact_suffix=$artifact_suffix"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Install old docu dependencies
+      - name: Download prebuilt old docu
         if: steps.settings.outputs.bundle_old_docs == 'true'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            autoconf automake libtool libgmp-dev libmpfr-dev libreadline-dev \
-            libcdd-dev libntl-dev libflint-dev libopenblas-dev \
-            4ti2 normaliz cmake texinfo perl \
-            texlive texlive-latex-extra texlive-plain-generic \
-            latex2html sharutils
+        uses: actions/download-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.settings.outputs.documentation_run_id }}
 
-      - name: Build old docu
+      - name: Verify old docu source
         if: steps.settings.outputs.bundle_old_docs == 'true'
         shell: bash
+        env:
+          DOCUMENTATION_RUN_ID: ${{ steps.settings.outputs.documentation_run_id }}
         run: |
           set -euo pipefail
-          ./autogen.sh
-          ./configure \
-            --with-libparse \
-            --enable-gfanlib \
-            --with-ntl \
-            --with-flint
-          make -j"$(nproc)"
-          .github/scripts/build-old-documentation.sh --build
+          source_version="$(sed -n \
+            's/^AC_INIT(\[singular\], \[\([^]]*\)\],.*/\1/p' configure.ac)"
+          source_commit="$(git rev-parse HEAD)"
+          test -n "$source_version"
+          test -s doc/doc.tbz2
+
+          metadata=doc/documentation-source.txt
+          test -s "$metadata"
+          grep -Fxq "repository=$GITHUB_REPOSITORY" "$metadata"
+          grep -Fxq "commit=$source_commit" "$metadata"
+          grep -Fxq "version=$source_version" "$metadata"
+          grep -Fxq "workflow_run_id=$DOCUMENTATION_RUN_ID" "$metadata"
 
       - name: Upload old docu for packaging
         if: steps.settings.outputs.bundle_old_docs == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: singular-old-docu
-          path: doc/doc.tbz2
+          path: |
+            doc/doc.tbz2
+            doc/documentation-source.txt
           if-no-files-found: error
 
   macos-intel:
