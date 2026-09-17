@@ -34,6 +34,8 @@ link feature="ssi2e: ";
 string encryption=status(feature,"encryption");
 kill feature;
 
+proc test_ssi2e_encryption(string encryption)
+{
 if (encryption=="xchacha20poly1305")
 {
   string good_key=
@@ -137,11 +139,15 @@ else
     "link out=\"ssi2e:w disabled.ssi2e\"; write(out,1); quit;",
     "authenticated encryption is unavailable","disabled encryption rejection");
 }
+}
+test_ssi2e_encryption(encryption);
 
 link fips_feature="ssi2f: ";
 string fips_encryption=status(fips_feature,"encryption");
 kill fips_feature;
 
+proc test_ssi2f_encryption(string fips_encryption)
+{
 if (fips_encryption=="aes-256-gcm-fips")
 {
   string fips_key=
@@ -195,5 +201,7 @@ else
     "link out=\"ssi2f:w disabled.ssi2f\"; write(out,1); quit;",
     "AES-256-GCM FIPS encryption is unavailable","disabled fips encryption rejection");
 }
+}
+test_ssi2f_encryption(fips_encryption);
 
 tst_status(1);$
