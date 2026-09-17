@@ -109,7 +109,7 @@ if [[ -f "$manual_desktop" ]]; then
   if [[ "$bundle_old_docs" == true ]]; then
     manual_url=file:///usr/share/doc/singular/index.htm
   else
-    manual_url=https://www.singular.uni-kl.de/Manual/latest
+    manual_url=https://www.singular.uni-kl.de/web/
   fi
   sed -i "s|^URL=.*|URL=$manual_url|" "$manual_desktop"
   grep -Fxq "URL=$manual_url" "$manual_desktop"

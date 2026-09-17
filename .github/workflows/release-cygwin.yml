@@ -23,6 +23,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/release-cygwin.yml
+      - .github/scripts/build-old-documentation.sh
       - .github/scripts/collect-binary-notices.sh
       - .github/scripts/package-cygwin.sh
 
@@ -64,19 +65,12 @@ jobs:
           set -euo pipefail
           ./autogen.sh
           ./configure \
-            --enable-doc-build \
+            --with-libparse \
             --enable-gfanlib \
             --with-ntl \
             --with-flint
           make -j"$(nproc)"
-          (
-            cd doc
-            make -j1 -f Makefile-docbuild singular.info html
-            chmod -R a+rX singular.info html
-            cp singular.info singular.idx html
-            (cd html && tar jcf ../doc.tbz2 *)
-          )
-          test -s doc/doc.tbz2
+          .github/scripts/build-old-documentation.sh --build
 
       - name: Upload old docu for packaging
         if: github.event_name == 'workflow_dispatch' && inputs.old_docu == true
