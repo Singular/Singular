@@ -2179,6 +2179,144 @@ The ssi file link describing string has to be one of the following:
 @*opens the file for appending.
 @end enumerate
 
+Binary SSI2 file links use the same @code{read}, @code{write}, and
+@code{close} commands, but store data in a compact binary format:
+
+@enumerate
+@item @code{"ssi2:r "} + filename
+@*opens an SSI2 file for reading.
+@item @code{"ssi2:w "} + filename
+@*opens an SSI2 file for overwriting.
+@item @code{"ssi2:a "} + filename
+@*opens an SSI2 file for appending.
+@end enumerate
+
+The compressed SSI2 wrapper @code{ssi2c} selects the recommended
+@code{zstd} compression setup:
+
+@enumerate
+@item @code{"ssi2c:r "} + filename
+@*opens a compressed SSI2 file for reading using @code{zstd}.
+@item @code{"ssi2c:w "} + filename
+@*opens a compressed SSI2 file for overwriting using @code{zstd}.
+@item @code{"ssi2c:a "} + filename
+@*opens a compressed SSI2 file for appending using @code{zstd}.
+@end enumerate
+
+The wrapper is equivalent to @code{ssi2} with @code{zstd,long=23}.
+
+The @code{ssi} and @code{ssi2} link types select different file
+formats.  The link type is not inferred from the filename: use
+@code{ssi} for the old SSI format and @code{ssi2} for the binary SSI2
+format.
+
+SSI2 carries an internal schema table with subversions for individual
+serialized data families, such as rings, coefficients, polynomials,
+ideals, modules, and lists.  This metadata is used by the reader to
+dispatch future compatibility code for only the affected data families.
+It is not a user-visible mode option.  The legacy SSI format remains
+unchanged.
+
+SSI2 file links can optionally compress the byte stream using an
+external compressor process connected by a pipe.  The compression mode
+is selected by a mode option, or inferred from the filename suffix:
+
+@enumerate
+@item @code{"ssi2:w,zstd "} + filename
+@*writes compressed SSI2 data using @code{zstd}.
+@item @code{"ssi2:w,zstd,long=23 "} + filename
+@*uses @code{zstd --long=23}, i.e. an 8 MiB compression window.
+@item @code{"ssi2:w,gzip "} + filename
+@*writes compressed SSI2 data using @code{gzip}.
+@item @code{"ssi2:w,lz4 "} + filename
+@*writes compressed SSI2 data using @code{lz4}.
+@item @code{"ssi2:w,plain "} + filename
+@*forces an uncompressed SSI2 stream, even if the filename has a
+compressed suffix.
+@end enumerate
+
+For reading and writing with @code{ssi2}, the compression option can
+usually be omitted and is inferred from suffixes @code{.gz},
+@code{.gzip}, @code{.zst}, @code{.zstd}, and @code{.lz4}.  Compressed
+SSI2 links require the corresponding command line tool (@code{gzip},
+@code{zstd}, or @code{lz4}) to be installed and available in the search
+path.
+
+The optional @code{ssi2e} link type protects an SSI2 byte stream with
+authenticated encryption.  It uses the XChaCha20-Poly1305 secret-stream
+construction provided by libsodium.  Confidentiality and authentication
+are applied by a versioned, chunked envelope around the canonical SSI2
+stream; the SSI2 type and schema representation itself is unchanged.
+
+@code{ssi2e} requires a symmetric key file.  The file must contain exactly
+64 hexadecimal characters (32 bytes), with optional whitespace.  Pass its
+name with the mandatory @code{keyfile=} mode option:
+
+@enumerate
+@item @code{"ssi2e:w,keyfile=/secure/path/workflow.key "} + filename
+@*creates or overwrites an authenticated encrypted SSI2 file.
+@item @code{"ssi2e:r,keyfile=/secure/path/workflow.key "} + filename
+@*authenticates and decrypts an SSI2 file while reading it.
+@end enumerate
+
+For example, a new key file can be generated outside @sc{Singular} with
+@code{(umask 077 && openssl rand -hex 32 > workflow.key)}.  Keep access to
+that file restricted, distribute it independently of encrypted data, and
+never commit it to a source repository.  Key generation, rotation, storage,
+and authorization remain the responsibility of the surrounding workflow
+system.
+
+Every encrypted frame authenticates the envelope header, its position, and
+its encoded length.  The reader rejects a wrong key, modified frames,
+truncation, an absent final frame, and trailing bytes.  A successful
+@code{close} after reading is therefore required: it consumes and verifies
+the remainder of the envelope, including the authenticated final frame.
+Append mode is deliberately unsupported because appending would violate
+the single authenticated-stream boundary.  @code{ssi2e} currently wraps
+plain SSI2 and does not combine encryption with the external SSI2
+compression modes.
+
+Support is disabled by default.  Enable it explicitly with
+@code{--with-libsodium=PREFIX}, where @code{PREFIX} is the libsodium
+installation prefix.  A build without libsodium retains the @code{ssi2e}
+link name but reports a clear error when it is opened.
+
+The optional @code{ssi2f} link type is an alternative encrypted SSI2
+wrapper using AES-256-GCM through an OpenSSL 3 FIPS provider.  It has the
+same single-file envelope structure as @code{ssi2e}, but the cryptographic
+implementation is selected for deployments which require a FIPS provider.
+
+@code{ssi2f} also requires a 64 hexadecimal character key file and the
+mandatory @code{keyfile=} mode option:
+
+@enumerate
+@item @code{"ssi2f:w,keyfile=/secure/path/object.key "} + filename
+@*creates or overwrites an AES-256-GCM encrypted SSI2 file.
+@item @code{"ssi2f:r,keyfile=/secure/path/object.key "} + filename
+@*authenticates and decrypts an AES-256-GCM encrypted SSI2 file.
+@end enumerate
+
+Each encrypted file should use its own fresh random data-encryption key.
+In a Singular/GPI-Space workflow, the natural model is that the token
+which represents a data object carries the file name and the corresponding
+one-time key, or a wrapped form of that key.  A global reusable key file is
+only a manual or local testing interface.
+
+Support is disabled by default.  Enable it explicitly with all of the
+following options:
+
+@smallexample
+--with-openssl-fips=PREFIX
+--with-openssl-fips-provider-dir=DIR
+--with-openssl-fips-config=FILE
+@end smallexample
+
+Here @code{PREFIX} is the OpenSSL 3 installation prefix, @code{DIR}
+contains the FIPS provider module, and @code{FILE} is the OpenSSL
+configuration file which activates the validated FIPS provider.  A build
+without this support retains the @code{ssi2f} link name but reports a
+clear error when it is opened.
+
 Note that the filename may contain a path. An ssi file link can be used
 either for reading or for writing, but not for both at the same time. A
 @code{close} command must be used before a change of I/O direction.
