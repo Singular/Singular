@@ -33,9 +33,9 @@ AC_ARG_WITH(flint,
              [FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"])
 
 min_flint_version=ifelse([$1], ,2.3,$1)
-min_flint_version_major=`echo "$min_flint_version" | sed 's/\..*$//'`
-min_flint_version_minor=`echo "$min_flint_version.0" | sed 's/^[^.]*\.//; s/\..*$//'`
-min_flint_version_patch=`echo "$min_flint_version.0.0" | sed 's/^[^.]*\.[^.]*\.//; s/\..*$//'`
+min_flint_version_major=`echo "$min_flint_version.0.0" | cut -d. -f1`
+min_flint_version_minor=`echo "$min_flint_version.0.0" | cut -d. -f2`
+min_flint_version_patch=`echo "$min_flint_version.0.0" | cut -d. -f3`
 min_flint_release=`expr "$min_flint_version_major" \* 10000 + "$min_flint_version_minor" \* 100 + "$min_flint_version_patch"`
 
 dnl Check for existence
