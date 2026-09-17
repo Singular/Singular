@@ -12,6 +12,8 @@ artifact_version="$2"
 package_version="$3"
 package_release="$4"
 output_dir="$5"
+bundle_old_docs="${BUNDLE_OLD_DOCS:-false}"
+artifact_suffix="${ARTIFACT_SUFFIX:-}"
 package_name=singular-upstream
 install_prefix="/opt/$package_name/$artifact_version"
 runner_temp="${RUNNER_TEMP:-/tmp}"
@@ -22,6 +24,18 @@ build_dir="$runner_temp/singular-build-cygwin"
 stage="$runner_temp/singular-stage-cygwin"
 repository="$output_dir/cygwin-overlay"
 package_dir="$repository/x86_64/release/$package_name"
+
+case "$bundle_old_docs" in
+  true|false) ;;
+  *)
+    echo "BUNDLE_OLD_DOCS must be true or false" >&2
+    exit 2
+    ;;
+esac
+if [[ "$bundle_old_docs" == true && ! -s "$source_root/doc/doc.tbz2" ]]; then
+  echo "BUNDLE_OLD_DOCS=true, but doc/doc.tbz2 is missing" >&2
+  exit 1
+fi
 
 rm -rf "$build_dir" "$stage" "$repository"
 mkdir -p "$build_dir" "$stage" "$package_dir"
@@ -54,6 +68,26 @@ mkdir -p "$build_dir" "$stage" "$package_dir"
   make -C omalloc check
   make install DESTDIR="$stage"
 )
+
+if [[ "$bundle_old_docs" == true ]]; then
+  test -s "$stage$install_prefix/share/info/singular.info"
+  test -s "$stage$install_prefix/share/singular/singular.idx"
+  html_manual="$stage$install_prefix/share/doc/singular"
+  if [[ ! -d "$html_manual" || \
+        -z "$(find "$html_manual" -type f -print -quit)" ]]; then
+    echo "The legacy HTML manual was not installed" >&2
+    exit 1
+  fi
+else
+  # Standard binary packages use the online manual. Do not retain legacy
+  # documentation if the source tree happened to contain doc.tbz2.
+  rm -rf "$stage$install_prefix/share/doc/singular"
+  rm -f \
+    "$stage$install_prefix/share/info/singular.info" \
+    "$stage$install_prefix/share/singular/singular.idx"
+  test ! -e "$stage$install_prefix/share/info/singular.info"
+  test ! -e "$stage$install_prefix/share/singular/singular.idx"
+fi
 
 singular="$stage$install_prefix/bin/Singular.exe"
 if [[ ! -x "$singular" ]]; then
@@ -213,7 +247,7 @@ EOF
     | xargs -0 sha512sum > SHA512SUMS
 )
 
-archive="$output_dir/Singular-$artifact_version-cygwin-x86_64-overlay.tar.xz"
+archive="$output_dir/Singular-$artifact_version-cygwin-x86_64${artifact_suffix}-overlay.tar.xz"
 tar -C "$output_dir" -cJf "$archive" "$(basename "$repository")"
 
 printf 'Cygwin package: %s\n' "$binary_package"

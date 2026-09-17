@@ -25,6 +25,11 @@ on:
         required: true
         default: true
         type: boolean
+      old_docu:
+        description: Bundle the legacy generated manual
+        required: true
+        default: false
+        type: boolean
       attach_to_release:
         description: Attach artifacts to an existing release for the selected tag
         required: true
@@ -49,6 +54,7 @@ jobs:
   prepare:
     name: Select binary packages
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     outputs:
       macos_intel: ${{ steps.settings.outputs.macos_intel }}
       macos_arm64: ${{ steps.settings.outputs.macos_arm64 }}
@@ -59,6 +65,8 @@ jobs:
       deb_version: ${{ steps.settings.outputs.deb_version }}
       rpm_version: ${{ steps.settings.outputs.rpm_version }}
       package_release: ${{ steps.settings.outputs.package_release }}
+      bundle_old_docs: ${{ steps.settings.outputs.bundle_old_docs }}
+      artifact_suffix: ${{ steps.settings.outputs.artifact_suffix }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -73,6 +81,7 @@ jobs:
           INPUT_MACOS_ARM64: ${{ inputs.macos_apple_silicon }}
           INPUT_RPM: ${{ inputs.rpm }}
           INPUT_UBUNTU: ${{ inputs.ubuntu }}
+          INPUT_OLD_DOCU: ${{ inputs.old_docu }}
           INPUT_ATTACH_TO_RELEASE: ${{ inputs.attach_to_release }}
         shell: bash
         run: |
@@ -83,12 +92,23 @@ jobs:
             macos_arm64="$INPUT_MACOS_ARM64"
             rpm="$INPUT_RPM"
             ubuntu="$INPUT_UBUNTU"
+            bundle_old_docs="$INPUT_OLD_DOCU"
           else
             macos_intel=true
             macos_arm64=true
             rpm=true
             ubuntu=true
+            bundle_old_docs=false
           fi
+
+          case "$bundle_old_docs" in
+            true) artifact_suffix=-old-docu ;;
+            false) artifact_suffix= ;;
+            *)
+              echo "::error::old_docu must be true or false"
+              exit 1
+              ;;
+          esac
 
           if [[ "$macos_intel" != true && "$macos_arm64" != true && \
                 "$rpm" != true && "$ubuntu" != true ]]; then
@@ -154,7 +174,49 @@ jobs:
             echo "deb_version=$deb_version"
             echo "rpm_version=$rpm_version"
             echo "package_release=$package_release"
+            echo "bundle_old_docs=$bundle_old_docs"
+            echo "artifact_suffix=$artifact_suffix"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Install old docu dependencies
+        if: steps.settings.outputs.bundle_old_docs == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            autoconf automake libtool libgmp-dev libmpfr-dev libreadline-dev \
+            libcdd-dev libntl-dev libflint-dev libopenblas-dev \
+            4ti2 normaliz cmake texinfo perl \
+            texlive texlive-latex-extra texlive-plain-generic \
+            latex2html sharutils
+
+      - name: Build old docu
+        if: steps.settings.outputs.bundle_old_docs == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./autogen.sh
+          ./configure \
+            --enable-doc-build \
+            --enable-gfanlib \
+            --with-ntl \
+            --with-flint
+          make -j"$(nproc)"
+          (
+            cd doc
+            make -j1 -f Makefile-docbuild singular.info html
+            chmod -R a+rX singular.info html
+            cp singular.info singular.idx html
+            (cd html && tar jcf ../doc.tbz2 *)
+          )
+          test -s doc/doc.tbz2
+
+      - name: Upload old docu for packaging
+        if: steps.settings.outputs.bundle_old_docs == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc/doc.tbz2
+          if-no-files-found: error
 
   macos-intel:
     name: macOS Intel
@@ -165,6 +227,7 @@ jobs:
     env:
       HOMEBREW_NO_AUTO_UPDATE: 1
       BUILD_JOBS: 4
+      BUNDLE_OLD_DOCS: ${{ needs.prepare.outputs.bundle_old_docs }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -172,12 +235,19 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
           fetch-depth: 0
 
+      - name: Download old docu
+        if: needs.prepare.outputs.bundle_old_docs == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc
+
       - name: Install build dependencies
         run: brew install autoconf automake libtool gmp readline mpfr ntl cddlib flint
 
       - name: Build Intel DMG
         run: |
-          output="dist/Singular-${{ needs.prepare.outputs.artifact_version }}-macos-x86_64.dmg"
+          output="dist/Singular-${{ needs.prepare.outputs.artifact_version }}-macos-x86_64${{ needs.prepare.outputs.artifact_suffix }}.dmg"
           .github/scripts/package-macos-dmg.sh \
             "$GITHUB_WORKSPACE" \
             "${{ needs.prepare.outputs.artifact_version }}" \
@@ -188,7 +258,7 @@ jobs:
       - name: Upload Intel DMG
         uses: actions/upload-artifact@v4
         with:
-          name: singular-binary-macos-x86_64
+          name: singular-binary-macos-x86_64${{ needs.prepare.outputs.artifact_suffix }}
           path: dist/*.dmg
           if-no-files-found: error
 
@@ -201,6 +271,7 @@ jobs:
     env:
       HOMEBREW_NO_AUTO_UPDATE: 1
       BUILD_JOBS: 3
+      BUNDLE_OLD_DOCS: ${{ needs.prepare.outputs.bundle_old_docs }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -208,12 +279,19 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
           fetch-depth: 0
 
+      - name: Download old docu
+        if: needs.prepare.outputs.bundle_old_docs == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc
+
       - name: Install build dependencies
         run: brew install autoconf automake libtool gmp readline mpfr ntl cddlib flint
 
       - name: Build Apple Silicon DMG
         run: |
-          output="dist/Singular-${{ needs.prepare.outputs.artifact_version }}-macos-arm64.dmg"
+          output="dist/Singular-${{ needs.prepare.outputs.artifact_version }}-macos-arm64${{ needs.prepare.outputs.artifact_suffix }}.dmg"
           .github/scripts/package-macos-dmg.sh \
             "$GITHUB_WORKSPACE" \
             "${{ needs.prepare.outputs.artifact_version }}" \
@@ -224,7 +302,7 @@ jobs:
       - name: Upload Apple Silicon DMG
         uses: actions/upload-artifact@v4
         with:
-          name: singular-binary-macos-arm64
+          name: singular-binary-macos-arm64${{ needs.prepare.outputs.artifact_suffix }}
           path: dist/*.dmg
           if-no-files-found: error
 
@@ -236,12 +314,20 @@ jobs:
     timeout-minutes: 180
     env:
       BUILD_JOBS: 4
+      BUNDLE_OLD_DOCS: ${{ needs.prepare.outputs.bundle_old_docs }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
           fetch-depth: 0
+
+      - name: Download old docu
+        if: needs.prepare.outputs.bundle_old_docs == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc
 
       - name: Install build and packaging dependencies
         run: |
@@ -253,7 +339,7 @@ jobs:
 
       - name: Build Ubuntu package
         run: |
-          basename="singular_${{ needs.prepare.outputs.deb_version }}-1_amd64"
+          basename="singular_${{ needs.prepare.outputs.deb_version }}-1${{ needs.prepare.outputs.artifact_suffix }}_amd64"
           .github/scripts/package-linux.sh \
             "$GITHUB_WORKSPACE" \
             "${{ needs.prepare.outputs.deb_version }}" \
@@ -263,6 +349,17 @@ jobs:
         run: |
           dpkg-deb --info dist/*.deb
           sudo apt-get install -y ./dist/*.deb
+          if [[ "$BUNDLE_OLD_DOCS" == true ]]; then
+            test -s /usr/share/info/singular.info
+            test -s /usr/share/singular/singular.idx
+            grep -Fxq 'URL=file:///usr/share/doc/singular/index.htm' \
+              /usr/share/applications/Singular-manual.desktop
+          else
+            test ! -e /usr/share/info/singular.info
+            test ! -e /usr/share/singular/singular.idx
+            grep -Fxq 'URL=https://www.singular.uni-kl.de/Manual/latest' \
+              /usr/share/applications/Singular-manual.desktop
+          fi
           printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
             | /usr/bin/Singular -q \
             | grep -q INSTALLED_PACKAGE_OK
@@ -270,7 +367,7 @@ jobs:
       - name: Upload Ubuntu package
         uses: actions/upload-artifact@v4
         with:
-          name: singular-binary-ubuntu-24.04-amd64
+          name: singular-binary-ubuntu-24.04-amd64${{ needs.prepare.outputs.artifact_suffix }}
           path: dist/*.deb
           if-no-files-found: error
 
@@ -283,6 +380,7 @@ jobs:
     container: fedora:latest
     env:
       BUILD_JOBS: 4
+      BUNDLE_OLD_DOCS: ${{ needs.prepare.outputs.bundle_old_docs }}
     steps:
       - name: Install checkout prerequisites
         run: dnf install -y git tar gzip
@@ -292,6 +390,13 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
           fetch-depth: 0
+
+      - name: Download old docu
+        if: needs.prepare.outputs.bundle_old_docs == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc
 
       - name: Install build and packaging dependencies
         run: |
@@ -303,7 +408,7 @@ jobs:
 
       - name: Build RPM
         run: |
-          basename="singular-${{ needs.prepare.outputs.rpm_version }}-${{ needs.prepare.outputs.package_release }}.x86_64"
+          basename="singular-${{ needs.prepare.outputs.rpm_version }}-${{ needs.prepare.outputs.package_release }}${{ needs.prepare.outputs.artifact_suffix }}.x86_64"
           .github/scripts/package-linux.sh \
             "$GITHUB_WORKSPACE" \
             "${{ needs.prepare.outputs.rpm_version }}" \
@@ -315,6 +420,17 @@ jobs:
           rpm -qip dist/*.rpm
           rpm -qlp dist/*.rpm | grep /usr/share/licenses/singular/
           dnf install -y dist/*.rpm
+          if [[ "$BUNDLE_OLD_DOCS" == true ]]; then
+            test -s /usr/share/info/singular.info
+            test -s /usr/share/singular/singular.idx
+            grep -Fxq 'URL=file:///usr/share/doc/singular/index.htm' \
+              /usr/share/applications/Singular-manual.desktop
+          else
+            test ! -e /usr/share/info/singular.info
+            test ! -e /usr/share/singular/singular.idx
+            grep -Fxq 'URL=https://www.singular.uni-kl.de/Manual/latest' \
+              /usr/share/applications/Singular-manual.desktop
+          fi
           printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
             | /usr/bin/Singular -q \
             | grep -q INSTALLED_PACKAGE_OK
@@ -322,7 +438,7 @@ jobs:
       - name: Upload RPM
         uses: actions/upload-artifact@v4
         with:
-          name: singular-binary-fedora-x86_64
+          name: singular-binary-fedora-x86_64${{ needs.prepare.outputs.artifact_suffix }}
           path: dist/*.rpm
           if-no-files-found: error
 

@@ -10,6 +10,11 @@ on:
         required: true
         default: "1"
         type: string
+      old_docu:
+        description: Bundle the legacy generated manual
+        required: true
+        default: false
+        type: boolean
       attach_to_release:
         description: Attach the overlay archive to an existing release for the selected tag
         required: true
@@ -29,10 +34,65 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare-old-docu:
+    name: Prepare optional old docu
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Check out source
+        if: github.event_name == 'workflow_dispatch' && inputs.old_docu == true
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.release.tag_name || github.sha }}
+          fetch-depth: 0
+
+      - name: Install old docu dependencies
+        if: github.event_name == 'workflow_dispatch' && inputs.old_docu == true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            autoconf automake libtool libgmp-dev libmpfr-dev libreadline-dev \
+            libcdd-dev libntl-dev libflint-dev libopenblas-dev \
+            4ti2 normaliz cmake texinfo perl \
+            texlive texlive-latex-extra texlive-plain-generic \
+            latex2html sharutils
+
+      - name: Build old docu
+        if: github.event_name == 'workflow_dispatch' && inputs.old_docu == true
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./autogen.sh
+          ./configure \
+            --enable-doc-build \
+            --enable-gfanlib \
+            --with-ntl \
+            --with-flint
+          make -j"$(nproc)"
+          (
+            cd doc
+            make -j1 -f Makefile-docbuild singular.info html
+            chmod -R a+rX singular.info html
+            cp singular.info singular.idx html
+            (cd html && tar jcf ../doc.tbz2 *)
+          )
+          test -s doc/doc.tbz2
+
+      - name: Upload old docu for packaging
+        if: github.event_name == 'workflow_dispatch' && inputs.old_docu == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc/doc.tbz2
+          if-no-files-found: error
+
   build:
     name: Build Singular-owned Cygwin overlay
+    needs: prepare-old-docu
     runs-on: windows-latest
     timeout-minutes: 180
+    outputs:
+      artifact_suffix: ${{ steps.settings.outputs.artifact_suffix }}
     steps:
       - name: Preserve Unix line endings
         run: git config --global core.autocrlf input
@@ -48,6 +108,7 @@ jobs:
         shell: bash
         env:
           INPUT_PACKAGE_RELEASE: ${{ inputs.package_release }}
+          INPUT_OLD_DOCU: ${{ inputs.old_docu }}
           INPUT_ATTACH_TO_RELEASE: ${{ inputs.attach_to_release }}
         run: |
           set -euo pipefail
@@ -57,6 +118,20 @@ jobs:
             echo "::error::Release attachment requires selecting a tag"
             exit 1
           fi
+
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            bundle_old_docs="$INPUT_OLD_DOCU"
+          else
+            bundle_old_docs=false
+          fi
+          case "$bundle_old_docs" in
+            true) artifact_suffix=-old-docu ;;
+            false) artifact_suffix= ;;
+            *)
+              echo "::error::old_docu must be true or false"
+              exit 1
+              ;;
+          esac
 
           source_version="$(sed -n \
             's/^AC_INIT(\[singular\], \[\([^]]*\)\],.*/\1/p' configure.ac)"
@@ -106,7 +181,16 @@ jobs:
             echo "artifact_version=$artifact_version"
             echo "package_version=$package_version"
             echo "package_release=$package_release"
+            echo "bundle_old_docs=$bundle_old_docs"
+            echo "artifact_suffix=$artifact_suffix"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Download old docu
+        if: steps.settings.outputs.bundle_old_docs == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: singular-old-docu
+          path: doc
 
       - name: Install Cygwin and build dependencies
         uses: cygwin/cygwin-install-action@v6
@@ -122,6 +206,8 @@ jobs:
           CHERE_INVOKING: 1
           CYGWIN_NOWINPATH: 1
           BUILD_JOBS: 2
+          BUNDLE_OLD_DOCS: ${{ steps.settings.outputs.bundle_old_docs }}
+          ARTIFACT_SUFFIX: ${{ steps.settings.outputs.artifact_suffix }}
         run: >-
           bash --login -eo pipefail -c
           '.github/scripts/package-cygwin.sh
@@ -148,10 +234,10 @@ jobs:
       - name: Upload Cygwin overlay repository
         uses: actions/upload-artifact@v4
         with:
-          name: singular-cygwin-x86_64-overlay
+          name: singular-cygwin-x86_64${{ steps.settings.outputs.artifact_suffix }}-overlay
           path: |
             dist/cygwin-overlay/
-            dist/Singular-*-cygwin-x86_64-overlay.tar.xz
+            dist/Singular-*-cygwin-x86_64*-overlay.tar.xz
           if-no-files-found: error
 
   publish:
@@ -168,7 +254,7 @@ jobs:
       - name: Download Cygwin overlay artifact
         uses: actions/download-artifact@v4
         with:
-          name: singular-cygwin-x86_64-overlay
+          name: singular-cygwin-x86_64${{ needs.build.outputs.artifact_suffix }}-overlay
           path: release-assets
 
       - name: Verify the manually selected release exists
@@ -182,5 +268,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name || github.ref_name }}
-          files: release-assets/Singular-*-cygwin-x86_64-overlay.tar.xz
+          files: release-assets/Singular-*-cygwin-x86_64*-overlay.tar.xz
           fail_on_unmatched_files: true

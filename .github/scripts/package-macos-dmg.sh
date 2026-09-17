@@ -12,10 +12,23 @@ display_version="$2"
 bundle_version="$3"
 arch_label="$4"
 output_dmg="$5"
+bundle_old_docs="${BUNDLE_OLD_DOCS:-false}"
 short_version="${display_version%%p*}"
 short_version="${short_version%%-*}"
 app="/Applications/Singular.app"
 contents="$app/Contents"
+
+case "$bundle_old_docs" in
+  true|false) ;;
+  *)
+    echo "BUNDLE_OLD_DOCS must be true or false" >&2
+    exit 2
+    ;;
+esac
+if [[ "$bundle_old_docs" == true && ! -s "$source_root/doc/doc.tbz2" ]]; then
+  echo "BUNDLE_OLD_DOCS=true, but doc/doc.tbz2 is missing" >&2
+  exit 1
+fi
 
 if [[ "${CI:-false}" != true ]]; then
   echo "Refusing to stage a package below /Applications outside CI" >&2
@@ -50,6 +63,26 @@ mkdir -p "$build_dir"
   make -j"${BUILD_JOBS:-3}"
   make install
 )
+
+if [[ "$bundle_old_docs" == true ]]; then
+  test -s "$contents/share/info/singular.info"
+  test -s "$contents/share/singular/singular.idx"
+  html_manual="$contents/share/doc/singular"
+  if [[ ! -d "$html_manual" || \
+        -z "$(find "$html_manual" -type f -print -quit)" ]]; then
+    echo "The legacy HTML manual was not installed" >&2
+    exit 1
+  fi
+else
+  # Standard binary packages use the online manual. Do not retain legacy
+  # documentation if the source tree happened to contain doc.tbz2.
+  rm -rf "$contents/share/doc/singular"
+  rm -f \
+    "$contents/share/info/singular.info" \
+    "$contents/share/singular/singular.idx"
+  test ! -e "$contents/share/info/singular.info"
+  test ! -e "$contents/share/singular/singular.idx"
+fi
 
 mkdir -p "$contents/MacOS" "$contents/Resources"
 cat > "$contents/Info.plist" <<EOF
