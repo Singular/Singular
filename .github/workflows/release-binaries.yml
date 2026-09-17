@@ -38,6 +38,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/release-binaries.yml
+      - .github/scripts/build-old-documentation.sh
       - .github/scripts/bundle-macos-runtime.py
       - .github/scripts/collect-binary-notices.sh
       - .github/scripts/package-linux.sh
@@ -196,19 +197,12 @@ jobs:
           set -euo pipefail
           ./autogen.sh
           ./configure \
-            --enable-doc-build \
+            --with-libparse \
             --enable-gfanlib \
             --with-ntl \
             --with-flint
           make -j"$(nproc)"
-          (
-            cd doc
-            make -j1 -f Makefile-docbuild singular.info html
-            chmod -R a+rX singular.info html
-            cp singular.info singular.idx html
-            (cd html && tar jcf ../doc.tbz2 *)
-          )
-          test -s doc/doc.tbz2
+          .github/scripts/build-old-documentation.sh --build
 
       - name: Upload old docu for packaging
         if: steps.settings.outputs.bundle_old_docs == 'true'
@@ -357,7 +351,7 @@ jobs:
           else
             test ! -e /usr/share/info/singular.info
             test ! -e /usr/share/singular/singular.idx
-            grep -Fxq 'URL=https://www.singular.uni-kl.de/Manual/latest' \
+            grep -Fxq 'URL=https://www.singular.uni-kl.de/web/' \
               /usr/share/applications/Singular-manual.desktop
           fi
           printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
@@ -428,7 +422,7 @@ jobs:
           else
             test ! -e /usr/share/info/singular.info
             test ! -e /usr/share/singular/singular.idx
-            grep -Fxq 'URL=https://www.singular.uni-kl.de/Manual/latest' \
+            grep -Fxq 'URL=https://www.singular.uni-kl.de/web/' \
               /usr/share/applications/Singular-manual.desktop
           fi
           printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
