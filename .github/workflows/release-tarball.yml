@@ -301,6 +301,22 @@ jobs:
         run: |
           .github/scripts/build-old-documentation.sh --build
 
+      - name: Record old docu source
+        if: steps.settings.outputs.BUILD_DOCS == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_version="$(sed -n \
+            's/^AC_INIT(\[singular\], \[\([^]]*\)\],.*/\1/p' configure.ac)"
+          test -n "$source_version"
+          test -s doc/doc.tbz2
+          {
+            echo "repository=$GITHUB_REPOSITORY"
+            echo "commit=$(git rev-parse HEAD)"
+            echo "version=$source_version"
+            echo "workflow_run_id=$GITHUB_RUN_ID"
+          } > doc/documentation-source.txt
+
       # ── 7. Upload old documentation artifact ─────────────────────
       - name: Upload old docu artifact
         if: steps.settings.outputs.BUILD_DOCS == 'true'
@@ -309,9 +325,20 @@ jobs:
           name: singular-old-docu
           path: |
             doc/doc.tbz2
+            doc/documentation-source.txt
             doc/singular.info
             doc/singular.idx
             doc/html
+
+      - name: Show old docu reuse instructions
+        if: steps.settings.outputs.BUILD_DOCS == 'true'
+        shell: bash
+        run: |
+          {
+            echo "## Legacy documentation"
+            echo
+            echo "Use workflow run ID \`$GITHUB_RUN_ID\` in the Binary packages workflow."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # ── 8. Generate spec file ─────────────────────────────────────
       # configure already expanded redhat/singular.spec from
