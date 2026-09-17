@@ -13,8 +13,21 @@ package_release="$3"
 format="$4"
 output_dir="$5"
 artifact_basename="$6"
+bundle_old_docs="${BUNDLE_OLD_DOCS:-false}"
 build_dir="$RUNNER_TEMP/singular-build-linux"
 stage="$RUNNER_TEMP/singular-stage"
+
+case "$bundle_old_docs" in
+  true|false) ;;
+  *)
+    echo "BUNDLE_OLD_DOCS must be true or false" >&2
+    exit 2
+    ;;
+esac
+if [[ "$bundle_old_docs" == true && ! -s "$source_root/doc/doc.tbz2" ]]; then
+  echo "BUNDLE_OLD_DOCS=true, but doc/doc.tbz2 is missing" >&2
+  exit 1
+fi
 
 case "$format" in
   deb)
@@ -70,6 +83,37 @@ fi
   make -j"${BUILD_JOBS:-2}"
   make install DESTDIR="$stage"
 )
+
+if [[ "$bundle_old_docs" == true ]]; then
+  test -s "$stage/usr/share/info/singular.info"
+  test -s "$stage/usr/share/singular/singular.idx"
+  html_manual="$stage/usr/share/doc/singular"
+  if [[ ! -d "$html_manual" || \
+        -z "$(find "$html_manual" -type f -print -quit)" ]]; then
+    echo "The legacy HTML manual was not installed" >&2
+    exit 1
+  fi
+else
+  # Standard binary packages use the online manual. Do not retain legacy
+  # documentation if the source tree happened to contain doc.tbz2.
+  rm -rf "$stage/usr/share/doc/singular"
+  rm -f \
+    "$stage/usr/share/info/singular.info" \
+    "$stage/usr/share/singular/singular.idx"
+  test ! -e "$stage/usr/share/info/singular.info"
+  test ! -e "$stage/usr/share/singular/singular.idx"
+fi
+
+manual_desktop="$stage/usr/share/applications/Singular-manual.desktop"
+if [[ -f "$manual_desktop" ]]; then
+  if [[ "$bundle_old_docs" == true ]]; then
+    manual_url=file:///usr/share/doc/singular/index.htm
+  else
+    manual_url=https://www.singular.uni-kl.de/Manual/latest
+  fi
+  sed -i "s|^URL=.*|URL=$manual_url|" "$manual_desktop"
+  grep -Fxq "URL=$manual_url" "$manual_desktop"
+fi
 
 export RUNTIME_PACKAGE_MANIFEST="$runtime_manifest"
 "$source_root/.github/scripts/collect-binary-notices.sh" \
