@@ -2496,6 +2496,21 @@ static BOOLEAN ssi2fParseModeOptions(const char *mode, char **keyfile)
   return FALSE;
 }
 
+static void ssi2fReportOpenSSLError(const char *operation)
+{
+  unsigned long err=ERR_get_error();
+  if (err==0)
+  {
+    Werror("ssi2f: %s failed", operation);
+    return;
+  }
+
+  char buf[256];
+  ERR_error_string_n(err, buf, sizeof(buf));
+  Werror("ssi2f: %s failed: %s", operation, buf);
+  ERR_clear_error();
+}
+
 static BOOLEAN ssi2fInitOpenSSL(ssi2Info *d)
 {
   d->openssl_libctx=OSSL_LIB_CTX_new();
@@ -2618,29 +2633,54 @@ static BOOLEAN ssi2fWriteFrame(ssi2Info *d, const unsigned char *plain,
   int out_len=0;
   int total_len=0;
   BOOLEAN failed=FALSE;
-  if ((ctx==NULL)
-  || (EVP_EncryptInit_ex(ctx, d->openssl_cipher, NULL, NULL, NULL)!=1)
-  || (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN,
-                          SSI2F_NONCE_SIZE, NULL)!=1)
-  || (EVP_EncryptInit_ex(ctx, NULL, NULL, d->openssl_key, nonce)!=1)
-  || (EVP_EncryptUpdate(ctx, NULL, &out_len, ad, sizeof(ad))!=1))
+  const char *openssl_failure=NULL;
+  ERR_clear_error();
+  if (ctx==NULL)
+    openssl_failure="create cipher context";
+  else if (EVP_EncryptInit_ex(ctx, d->openssl_cipher, NULL, NULL, NULL)!=1)
+    openssl_failure="initialize AES-256-GCM encryption";
+  else if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN,
+                               SSI2F_NONCE_SIZE, NULL)!=1)
+    openssl_failure="set AES-256-GCM nonce length";
+  else if (EVP_EncryptInit_ex(ctx, NULL, NULL, d->openssl_key, nonce)!=1)
+    openssl_failure="set AES-256-GCM encryption key and nonce";
+  else if (EVP_EncryptUpdate(ctx, NULL, &out_len, ad, sizeof(ad))!=1)
+    openssl_failure="authenticate AES-256-GCM frame metadata";
+
+  if (openssl_failure!=NULL)
   {
     failed=TRUE;
   }
-  if ((!failed) && (frame_len>0)
-  && (EVP_EncryptUpdate(ctx, cipher, &out_len, plain, frame_len)!=1))
+  if ((!failed) && (frame_len>0))
   {
-    failed=TRUE;
+    out_len=0;
+    if (EVP_EncryptUpdate(ctx, cipher, &out_len, plain, frame_len)!=1)
+    {
+      failed=TRUE;
+      openssl_failure="encrypt AES-256-GCM frame payload";
+    }
+    total_len=out_len;
   }
-  total_len=out_len;
-  if ((!failed)
-  && ((EVP_EncryptFinal_ex(ctx, (frame_len>0) ? cipher+total_len : final_buf,
-                           &out_len)!=1)
-    || (total_len+out_len!=(int)frame_len)
-    || (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG,
-                            SSI2F_TAG_SIZE, tag)!=1)))
+  if (!failed)
   {
-    failed=TRUE;
+    out_len=0;
+    if (EVP_EncryptFinal_ex(ctx, (frame_len>0) ? cipher+total_len : final_buf,
+                            &out_len)!=1)
+    {
+      failed=TRUE;
+      openssl_failure="finalize AES-256-GCM frame encryption";
+    }
+    else if (total_len+out_len!=(int)frame_len)
+    {
+      failed=TRUE;
+      openssl_failure="validate AES-256-GCM encrypted frame length";
+    }
+    else if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG,
+                                 SSI2F_TAG_SIZE, tag)!=1)
+    {
+      failed=TRUE;
+      openssl_failure="get AES-256-GCM authentication tag";
+    }
   }
   if (ctx!=NULL) EVP_CIPHER_CTX_free(ctx);
 
@@ -2659,7 +2699,10 @@ static BOOLEAN ssi2fWriteFrame(ssi2Info *d, const unsigned char *plain,
   OPENSSL_cleanse(tag, sizeof(tag));
   if (failed)
   {
-    WerrorS("ssi2f: encrypted write failed");
+    if (openssl_failure!=NULL)
+      ssi2fReportOpenSSLError(openssl_failure);
+    else
+      WerrorS("ssi2f: encrypted write failed");
     d->openssl_failed=TRUE;
     return TRUE;
   }
@@ -2740,31 +2783,58 @@ static BOOLEAN ssi2fReadFrame(ssi2Info *d)
   int out_len=0;
   int total_len=0;
   BOOLEAN failed=FALSE;
-  if ((ctx==NULL)
-  || (EVP_DecryptInit_ex(ctx, d->openssl_cipher, NULL, NULL, NULL)!=1)
-  || (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN,
-                          SSI2F_NONCE_SIZE, NULL)!=1)
-  || (EVP_DecryptInit_ex(ctx, NULL, NULL, d->openssl_key, nonce)!=1)
-  || (EVP_DecryptUpdate(ctx, NULL, &out_len, ad, sizeof(ad))!=1))
+  const char *openssl_failure=NULL;
+  ERR_clear_error();
+  if (ctx==NULL)
+    openssl_failure="create cipher context";
+  else if (EVP_DecryptInit_ex(ctx, d->openssl_cipher, NULL, NULL, NULL)!=1)
+    openssl_failure="initialize AES-256-GCM decryption";
+  else if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN,
+                               SSI2F_NONCE_SIZE, NULL)!=1)
+    openssl_failure="set AES-256-GCM nonce length";
+  else if (EVP_DecryptInit_ex(ctx, NULL, NULL, d->openssl_key, nonce)!=1)
+    openssl_failure="set AES-256-GCM decryption key and nonce";
+  else if (EVP_DecryptUpdate(ctx, NULL, &out_len, ad, sizeof(ad))!=1)
+    openssl_failure="authenticate AES-256-GCM frame metadata";
+
+  if (openssl_failure!=NULL)
   {
     failed=TRUE;
   }
-  if ((!failed) && (frame_len>0)
-  && (EVP_DecryptUpdate(ctx, d->openssl_read_buff, &out_len,
-                        cipher, frame_len)!=1))
+  if ((!failed) && (frame_len>0))
   {
-    failed=TRUE;
+    out_len=0;
+    if (EVP_DecryptUpdate(ctx, d->openssl_read_buff, &out_len,
+                          cipher, frame_len)!=1)
+    {
+      failed=TRUE;
+      openssl_failure="decrypt AES-256-GCM frame payload";
+    }
+    total_len=out_len;
   }
-  total_len=out_len;
-  if ((!failed)
-  && ((EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG,
-                           SSI2F_TAG_SIZE, tag)!=1)
-    || (EVP_DecryptFinal_ex(ctx,
-                            (frame_len>0) ? d->openssl_read_buff+total_len : final_buf,
-                            &out_len)!=1)
-    || (total_len+out_len!=(int)frame_len)))
+  if (!failed)
   {
-    failed=TRUE;
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG,
+                            SSI2F_TAG_SIZE, tag)!=1)
+    {
+      failed=TRUE;
+      openssl_failure="set AES-256-GCM authentication tag";
+    }
+    else
+    {
+      out_len=0;
+      if (EVP_DecryptFinal_ex(ctx,
+                              (frame_len>0) ? d->openssl_read_buff+total_len : final_buf,
+                              &out_len)!=1)
+      {
+        failed=TRUE;
+      }
+      else if (total_len+out_len!=(int)frame_len)
+      {
+        failed=TRUE;
+        openssl_failure="validate AES-256-GCM decrypted frame length";
+      }
+    }
   }
   if (ctx!=NULL) EVP_CIPHER_CTX_free(ctx);
   if (cipher!=NULL)
@@ -2775,7 +2845,10 @@ static BOOLEAN ssi2fReadFrame(ssi2Info *d)
   OPENSSL_cleanse(tag, sizeof(tag));
   if (failed)
   {
-    WerrorS("ssi2f: authentication failed (wrong key or modified data)");
+    if (openssl_failure!=NULL)
+      ssi2fReportOpenSSLError(openssl_failure);
+    else
+      WerrorS("ssi2f: authentication failed (wrong key or modified data)");
     d->openssl_failed=TRUE;
     return TRUE;
   }
