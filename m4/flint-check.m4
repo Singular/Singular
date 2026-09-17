@@ -8,7 +8,7 @@
 # stolen from Manish Singh
 # Shamelessly stolen from Owen Taylor
 
-dnl Test for FLINT and define
+dnl Test for FLINT >= MINIMUM-VERSION and define
 dnl FLINT_CFLAGS and FLINT_LIBS
 
 AC_DEFUN([LB_CHECK_FLINT],
@@ -32,6 +32,12 @@ AC_ARG_WITH(flint,
              fi],
              [FLINT_HOME_PATH="DEFAULTS ${DEFAULT_CHECKING_PATH}"])
 
+min_flint_version=ifelse([$1], ,2.3,$1)
+min_flint_version_major=`echo "$min_flint_version" | sed 's/\..*$//'`
+min_flint_version_minor=`echo "$min_flint_version.0" | sed 's/^[^.]*\.//; s/\..*$//'`
+min_flint_version_patch=`echo "$min_flint_version.0.0" | sed 's/^[^.]*\.[^.]*\.//; s/\..*$//'`
+min_flint_release=`expr "$min_flint_version_major" \* 10000 + "$min_flint_version_minor" \* 100 + "$min_flint_version_patch"`
+
 dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}
 BACKUP_LIBS=${LIBS}
@@ -39,6 +45,7 @@ BACKUP_LIBS=${LIBS}
 AC_LANG_PUSH([C])
 
 flint_found="no"
+flint_too_old="no"
 dnl if flint was not previously found, search FLINT_HOME_PATH
 for FLINT_HOME in ${FLINT_HOME_PATH}
 do
@@ -57,8 +64,15 @@ do
                 AC_LINK_IFELSE(
                 [AC_LANG_PROGRAM([[#include <flint/fmpz.h>]],
                             [[fmpz_t x; fmpz_init(x);]])],
-                        [flint_found="yes"
-                        break],)
+                        [AC_COMPILE_IFELSE(
+                                 [AC_LANG_PROGRAM([[#include <flint/flint.h>
+#if !defined(__FLINT_RELEASE) || __FLINT_RELEASE < $min_flint_release
+#error FLINT is too old
+#endif
+                                                  ]], [[]])],
+                                 [flint_found="yes"
+                                  break],
+                                 [flint_too_old="yes"])],)
 done
 
 AC_LANG_POP([C])
@@ -67,22 +81,29 @@ CFLAGS=${BACKUP_CFLAGS}
 LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH
 
-AC_MSG_CHECKING(for FLINT)
+AC_MSG_CHECKING(for FLINT >= $min_flint_version)
 
 if test "x$flint_found" = "xyes" ; then
         AC_DEFINE(HAVE_FLINT,1,[Define if FLINT is installed])
         HAVE_FLINT=yes
         AC_MSG_RESULT(found)
 else
-        AC_MSG_RESULT(not found)
+        if test "x$flint_too_old" = "xyes" ; then
+                AC_MSG_RESULT(too old)
+        else
+                AC_MSG_RESULT(not found)
+        fi
         FLINT_CFLAGS=""
         FLINT_LIBS=""
         FLINT_HOME=""
         if test "x$flint_requested" = "xyes" ; then
-            AC_MSG_FAILURE([Configure error: FLINT requested, but not found])
+                if test "x$flint_too_old" = "xyes" ; then
+                        AC_MSG_FAILURE([Configure error: FLINT >= $min_flint_version requested, but only an older version was found])
+                else
+                        AC_MSG_FAILURE([Configure error: FLINT requested, but not found])
+                fi
         fi
 fi
 AC_SUBST(FLINT_CFLAGS)
 AC_SUBST(FLINT_LIBS)
 ])
-
