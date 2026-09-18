@@ -263,10 +263,17 @@ def main() -> int:
                 str(binary),
             )
 
+        # All non-system dependencies now use @loader_path, so inherited
+        # Homebrew and build-tree search paths are neither needed nor safe.
+        for search_path in dict.fromkeys(rpaths(binary)):
+            run("install_name_tool", "-delete_rpath", search_path, str(binary))
+
     # Re-scan after rewriting and reject any dependency on the CI Homebrew tree.
     unresolved = []
     macho_files = [path for path in contents.rglob("*") if is_macho(path)]
     for binary in macho_files:
+        for search_path in rpaths(binary):
+            unresolved.append(f"{binary}: retained rpath {search_path}")
         for dependency in dependencies(binary):
             if dependency.startswith(SYSTEM_PREFIXES):
                 continue
