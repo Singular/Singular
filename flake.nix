@@ -16,7 +16,7 @@
         nixpkgs.lib.splitString "\n" (builtins.readFile ./configure.ac)
       );
       versionMatch = builtins.match
-        "AC_INIT\\(\\[singular\\], \\[([^]]+)\\],.*"
+        "AC_INIT[(][[]singular[]], [[]([0-9A-Za-z.p]+)[]],.*"
         configureLine;
       sourceVersion = builtins.elemAt versionMatch 0;
       sourceRevision = if self ? shortRev then self.shortRev else "dirty";

@@ -37,7 +37,7 @@ class Singular(AutotoolsPackage):
     depends_on("flint")
     depends_on("gmp")
     depends_on("mpfr")
-    depends_on("ntl+gmp")
+    depends_on("ntl+shared")
     depends_on("readline")
 
     def autoreconf(self, spec, prefix):
