@@ -16,6 +16,11 @@ on:
         description: Bottle download root; empty uses the Singular tap release URL
         required: false
         type: string
+      build_missing_dependency_bottles:
+        description: Bottle runtime dependencies that Homebrew had to build from source
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -113,6 +118,7 @@ jobs:
           SOURCE_SHA256: ${{ needs.prepare.outputs.source_sha256 }}
           BOTTLE_ROOT_URL: ${{ needs.prepare.outputs.bottle_root_url }}
           ARCHITECTURE: ${{ matrix.architecture }}
+          BUILD_MISSING_DEPENDENCY_BOTTLES: ${{ inputs.build_missing_dependency_bottles }}
         run: |
           .github/scripts/package-homebrew.sh \
             "$PWD" "$VERSION" "$SOURCE_URL" "$SOURCE_SHA256" \
