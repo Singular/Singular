@@ -1,0 +1,165 @@
+name: Nix packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      linux_x86_64:
+        description: Build x86-64 Linux
+        required: true
+        default: true
+        type: boolean
+      linux_aarch64:
+        description: Build ARM64 Linux
+        required: true
+        default: true
+        type: boolean
+      macos_intel:
+        description: Build Intel macOS
+        required: true
+        default: true
+        type: boolean
+      macos_apple_silicon:
+        description: Build Apple Silicon macOS
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Select Nix packages
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - name: Build target matrix
+        id: matrix
+        env:
+          LINUX_X86_64: ${{ inputs.linux_x86_64 }}
+          LINUX_AARCH64: ${{ inputs.linux_aarch64 }}
+          MACOS_INTEL: ${{ inputs.macos_intel }}
+          MACOS_ARM64: ${{ inputs.macos_apple_silicon }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          entries=()
+          [[ "$LINUX_X86_64" == true ]] && entries+=('{"runner":"ubuntu-24.04","system":"x86_64-linux"}')
+          [[ "$LINUX_AARCH64" == true ]] && entries+=('{"runner":"ubuntu-24.04-arm","system":"aarch64-linux"}')
+          [[ "$MACOS_INTEL" == true ]] && entries+=('{"runner":"macos-15-intel","system":"x86_64-darwin"}')
+          [[ "$MACOS_ARM64" == true ]] && entries+=('{"runner":"macos-15","system":"aarch64-darwin"}')
+          if [[ ${#entries[@]} -eq 0 ]]; then
+            echo "::error::Select at least one target"
+            exit 1
+          fi
+          matrix="$(printf '%s\n' "${entries[@]}" | jq -cs '{include: .}')"
+          echo "value=$matrix" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Nix ${{ matrix.system }}
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 240
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate locked flake
+        shell: bash
+        run: nix flake metadata --no-update-lock-file
+
+      - name: Build Singular
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
+          test "$current_system" = "${{ matrix.system }}"
+          store_path="$(nix build --no-update-lock-file --print-out-paths .#singular)"
+          test -x "$store_path/bin/Singular"
+          echo "store_path=$store_path" >> "$GITHUB_OUTPUT"
+
+      - name: Test Singular
+        env:
+          STORE_PATH: ${{ steps.build.outputs.store_path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(printf '%s\n' \
+            'ring r=0,(x,y),dp;' \
+            'ideal i=x^2,y^2;' \
+            'size(std(i));' \
+            'print("NIX_PACKAGE_SMOKE_OK");' \
+            'quit;' | "$STORE_PATH/bin/Singular" -q 2>&1)"
+          printf '%s\n' "$output"
+          grep -q NIX_PACKAGE_SMOKE_OK <<< "$output"
+
+      - name: Export binary cache
+        env:
+          NIX_CACHE_PRIVATE_KEY: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
+          STORE_PATH: ${{ steps.build.outputs.store_path }}
+          SYSTEM: ${{ matrix.system }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          output_dir="$RUNNER_TEMP/nix-package"
+          cache_dir="$output_dir/nix-cache"
+          mkdir -p "$cache_dir"
+          signed=false
+
+          if [[ -n "$NIX_CACHE_PRIVATE_KEY" ]]; then
+            private_key="$RUNNER_TEMP/nix-cache-private-key"
+            printf '%s\n' "$NIX_CACHE_PRIVATE_KEY" > "$private_key"
+            chmod 600 "$private_key"
+            nix key convert-secret-to-public < "$private_key" \
+              > "$output_dir/singular-nix-public-key.txt"
+            nix store sign --recursive --key-file "$private_key" "$STORE_PATH"
+            rm -f "$private_key"
+            signed=true
+          fi
+
+          nix copy --to "file://$cache_dir" "$STORE_PATH"
+          test -s "$cache_dir/nix-cache-info"
+          narinfo_count="$(find "$cache_dir" -maxdepth 1 -name '*.narinfo' | wc -l | tr -d ' ')"
+          test "$narinfo_count" -gt 0
+
+          if [[ "$signed" == true ]]; then
+            key_name="$(cut -d: -f1 "$output_dir/singular-nix-public-key.txt")"
+            grep -l "^Sig: $key_name:" "$cache_dir"/*.narinfo > /dev/null
+          fi
+
+          cat > "$output_dir/package-source.txt" <<EOF
+          repository=$GITHUB_REPOSITORY
+          commit=$GITHUB_SHA
+          system=$SYSTEM
+          store_path=$STORE_PATH
+          signed=$signed
+          narinfo_count=$narinfo_count
+          EOF
+
+          archive_contents=(nix-cache package-source.txt)
+          if [[ -f "$output_dir/singular-nix-public-key.txt" ]]; then
+            archive_contents+=(singular-nix-public-key.txt)
+          fi
+          tar -C "$output_dir" -czf \
+            "$output_dir/singular-nix-cache-$SYSTEM.tar.gz" \
+            "${archive_contents[@]}"
+
+      - name: Upload Nix package
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-nix-${{ matrix.system }}
+          path: |
+            ${{ runner.temp }}/nix-package/*.tar.gz
+            ${{ runner.temp }}/nix-package/package-source.txt
+            ${{ runner.temp }}/nix-package/singular-nix-public-key.txt
+          if-no-files-found: error
