@@ -10,7 +10,6 @@ import sys
 import tempfile
 
 
-FINAL_APP = Path("/Applications/Singular.app")
 SYSTEM_PREFIXES = ("/System/Library/", "/usr/lib/")
 LICENSE_NAMES = re.compile(r"^(copying|licen[cs]e|notice|copyright)", re.I)
 
@@ -97,6 +96,11 @@ def dependency_candidates(dependency: str, binary: Path, app: Path) -> list[Path
 
 def first_existing(paths: list[Path]) -> Path | None:
     return next((path for path in paths if path.exists()), None)
+
+
+def loader_reference(binary: Path, target: Path) -> str:
+    relative = os.path.relpath(target, binary.parent)
+    return "@loader_path" if relative == "." else f"@loader_path/{relative}"
 
 
 def formula_for(path: Path, cellar: Path) -> tuple[str, str] | None:
@@ -196,13 +200,6 @@ def main() -> int:
         for dependency in dependencies(binary):
             if dependency.startswith(SYSTEM_PREFIXES):
                 continue
-            if dependency.startswith(str(FINAL_APP) + "/"):
-                relative = Path(dependency).relative_to(FINAL_APP)
-                target = app / relative
-                if target.exists() and is_macho(target):
-                    queue.append(target)
-                continue
-
             source = first_existing(dependency_candidates(dependency, binary, app))
             if source is None:
                 raise RuntimeError(f"unresolved dependency {dependency} required by {binary}")
@@ -230,23 +227,41 @@ def main() -> int:
             copied_sources[destination] = source
             queue.append(destination)
 
-    bundled_names = {path.name for path in copied_sources}
+    copied_targets = {
+        source.resolve(): destination
+        for destination, source in copied_sources.items()
+    }
     macho_files = [path for path in contents.rglob("*") if is_macho(path)]
 
     for binary in macho_files:
         for dependency in dependencies(binary):
             if dependency.startswith(SYSTEM_PREFIXES):
                 continue
-            name = Path(dependency).name
-            if name not in bundled_names:
-                continue
-            replacement = str(FINAL_APP / "Contents" / "lib" / name)
+            source = first_existing(dependency_candidates(dependency, binary, app))
+            if source is None:
+                raise RuntimeError(
+                    f"unresolved dependency {dependency} required by {binary}"
+                )
+            source = source.resolve()
+            target = copied_targets.get(source, source).resolve()
+            try:
+                target.relative_to(app)
+            except ValueError as error:
+                raise RuntimeError(
+                    f"external dependency was not bundled: {dependency}"
+                ) from error
+
+            replacement = loader_reference(binary, target)
             if dependency != replacement:
                 run("install_name_tool", "-change", dependency, replacement, str(binary))
 
         if install_name(binary) is not None:
-            relative = binary.relative_to(app)
-            run("install_name_tool", "-id", str(FINAL_APP / relative), str(binary))
+            run(
+                "install_name_tool",
+                "-id",
+                f"@loader_path/{binary.name}",
+                str(binary),
+            )
 
     # Re-scan after rewriting and reject any dependency on the CI Homebrew tree.
     unresolved = []
@@ -254,11 +269,6 @@ def main() -> int:
     for binary in macho_files:
         for dependency in dependencies(binary):
             if dependency.startswith(SYSTEM_PREFIXES):
-                continue
-            if dependency.startswith(str(FINAL_APP) + "/"):
-                relative = Path(dependency).relative_to(FINAL_APP)
-                if not (app / relative).exists():
-                    unresolved.append(f"{binary}: missing {dependency}")
                 continue
             if dependency.startswith(("@loader_path/", "@executable_path/", "@rpath/")):
                 candidates = dependency_candidates(dependency, binary, app)

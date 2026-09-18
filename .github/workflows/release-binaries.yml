@@ -45,6 +45,7 @@ on:
       - .github/scripts/build-old-documentation.sh
       - .github/scripts/bundle-macos-runtime.py
       - .github/scripts/collect-binary-notices.sh
+      - .github/scripts/macos-app-launcher.c
       - .github/scripts/package-linux.sh
       - .github/scripts/package-macos-dmg.sh
 

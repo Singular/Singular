@@ -15,7 +15,8 @@ output_dmg="$5"
 bundle_old_docs="${BUNDLE_OLD_DOCS:-false}"
 short_version="${display_version%%p*}"
 short_version="${short_version%%-*}"
-app="/Applications/Singular.app"
+app_name="Singular-$display_version.app"
+app="$RUNNER_TEMP/singular-app/$app_name"
 contents="$app/Contents"
 
 case "$bundle_old_docs" in
@@ -30,17 +31,12 @@ if [[ "$bundle_old_docs" == true && ! -s "$source_root/doc/doc.tbz2" ]]; then
   exit 1
 fi
 
-if [[ "${CI:-false}" != true ]]; then
-  echo "Refusing to stage a package below /Applications outside CI" >&2
-  exit 1
-fi
 if [[ -e "$app" ]]; then
   echo "$app already exists on this runner" >&2
   exit 1
 fi
 
-sudo mkdir -p "$contents"
-sudo chown -R "$(id -u):$(id -g)" "$app"
+mkdir -p "$contents"
 
 configure_flags=(
   "--prefix=$contents"
@@ -90,7 +86,7 @@ cat > "$contents/Info.plist" <<EOF
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleDisplayName</key><string>Singular</string>
+  <key>CFBundleDisplayName</key><string>Singular $display_version</string>
   <key>CFBundleExecutable</key><string>Singular</string>
   <key>CFBundleIdentifier</key><string>org.singular.singular</string>
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
@@ -103,23 +99,11 @@ cat > "$contents/Info.plist" <<EOF
 </plist>
 EOF
 printf 'APPL????' > "$contents/PkgInfo"
-cat > "$contents/MacOS/Singular" <<'EOF'
-#!/bin/sh
-contents="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-singular="$contents/bin/Singular"
-if [ -t 0 ] || [ -t 1 ]; then
-  exec "$singular" "$@"
-fi
-exec osascript - "$singular" <<'APPLESCRIPT'
-on run argv
-  tell application "Terminal"
-    activate
-    do script quoted form of item 1 of argv
-  end tell
-end run
-APPLESCRIPT
-EOF
-chmod 0755 "$contents/MacOS/Singular"
+xcrun clang \
+  -std=c11 -Wall -Wextra -Werror \
+  -mmacosx-version-min=12.0 \
+  "$source_root/.github/scripts/macos-app-launcher.c" \
+  -o "$contents/MacOS/Singular"
 
 notice_dir="$contents/Resources/THIRD_PARTY_LICENSES"
 "$source_root/.github/scripts/bundle-macos-runtime.py" \
@@ -141,6 +125,11 @@ if [[ "$arch_label" == arm64 && "$actual_arch" != *arm64* ]]; then
   echo "Apple Silicon package contains $actual_arch Singular" >&2
   exit 1
 fi
+launcher_arch="$(lipo -archs "$contents/MacOS/Singular")"
+if [[ "$launcher_arch" != *"$arch_label"* ]]; then
+  echo "$arch_label package contains $launcher_arch launcher" >&2
+  exit 1
+fi
 
 smoke_output="$(printf '%s\n' \
   'ring r=0,(x,y),dp;' \
@@ -153,16 +142,16 @@ grep -q BINARY_PACKAGE_SMOKE_OK <<< "$smoke_output"
 
 dmg_root="$RUNNER_TEMP/singular-dmg-root"
 mkdir -p "$dmg_root"
-ditto "$app" "$dmg_root/Singular.app"
+ditto "$app" "$dmg_root/$app_name"
 ln -s /Applications "$dmg_root/Applications"
 cat > "$dmg_root/README.txt" <<EOF
-Drag Singular.app to Applications.
+Drag $app_name to Applications.
 
 Command-line executable:
-  /Applications/Singular.app/Contents/bin/Singular
+  /Applications/$app_name/Contents/bin/Singular
 
 Third-party notices:
-  /Applications/Singular.app/Contents/Resources/THIRD_PARTY_LICENSES
+  /Applications/$app_name/Contents/Resources/THIRD_PARTY_LICENSES
 EOF
 
 mkdir -p "$(dirname "$output_dmg")"
