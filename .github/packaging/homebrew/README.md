@@ -20,7 +20,7 @@ brew bottle --merge --write --no-commit /path/to/singular--*.bottle.json
 The generated dependency bottles can be installed directly before Singular:
 
 ```sh
-brew install /path/to/dependency--*.bottle.tar.gz
+HOMEBREW_DEVELOPER=1 brew install /path/to/dependency--*.bottle.tar.gz
 brew install Singular/singular/singular
 ```
 
