@@ -1,0 +1,199 @@
+name: Spack packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      linux_x86_64:
+        description: Build x86-64 Linux
+        required: true
+        default: true
+        type: boolean
+      linux_aarch64:
+        description: Build ARM64 Linux
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Select Spack packages
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - name: Build target matrix
+        id: matrix
+        env:
+          LINUX_X86_64: ${{ inputs.linux_x86_64 }}
+          LINUX_AARCH64: ${{ inputs.linux_aarch64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          entries=()
+          [[ "$LINUX_X86_64" == true ]] && entries+=('{"runner":"ubuntu-24.04","architecture":"linux-x86_64","target":"x86_64"}')
+          [[ "$LINUX_AARCH64" == true ]] && entries+=('{"runner":"ubuntu-24.04-arm","architecture":"linux-aarch64","target":"aarch64"}')
+          if [[ ${#entries[@]} -eq 0 ]]; then
+            echo "::error::Select at least one target"
+            exit 1
+          fi
+          matrix="$(printf '%s\n' "${entries[@]}" | jq -cs '{include: .}')"
+          echo "value=$matrix" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Spack ${{ matrix.architecture }}
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 360
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Spack
+        uses: spack/setup-spack@v3
+        with:
+          spack_ref: v1.2.2
+          packages_ref: v2026.06.0
+          buildcache: true
+          color: true
+
+      - name: Prepare package repository and environment
+        env:
+          TARGET: ${{ matrix.target }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_tree="$RUNNER_TEMP/singular-spack-packaging"
+          repository="$package_tree/repos/spack_repo/singular"
+          environment="$RUNNER_TEMP/singular-spack-environment"
+          install_tree="$RUNNER_TEMP/singular-spack-install"
+          cp -R packaging/spack "$package_tree"
+
+          source_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          sed -i \
+            "s|https://github.com/Singular/Singular.git|$source_url|" \
+            "$repository/packages/singular/package.py"
+
+          mkdir -p "$environment"
+          cat > "$environment/spack.yaml" <<EOF
+          spack:
+            specs:
+              - singular@git.$GITHUB_SHA=develop
+            view: false
+            concretizer:
+              reuse: true
+              unify: true
+            config:
+              install_tree:
+                root: $install_tree
+                padded_length: 256
+            packages:
+              all:
+                require:
+                  - target=$TARGET
+            repos:
+              - $repository
+          EOF
+
+          spack -e "$environment" repo list
+          spack -e "$environment" compiler find
+          spack -e "$environment" concretize -f
+          cp "$environment/spack.lock" "$RUNNER_TEMP/spack.lock"
+
+      - name: Build Singular and cache misses
+        shell: bash
+        run: |
+          set -euo pipefail
+          environment="$RUNNER_TEMP/singular-spack-environment"
+          spack -e "$environment" install \
+            --fail-fast --show-log-on-error
+
+      - name: Test Singular
+        shell: bash
+        run: |
+          set -euo pipefail
+          environment="$RUNNER_TEMP/singular-spack-environment"
+          prefix="$(spack -e "$environment" location -i singular)"
+          test -x "$prefix/bin/Singular"
+          output="$(printf '%s\n' \
+            'ring r=0,(x,y),dp;' \
+            'ideal i=x^2,y^2;' \
+            'size(std(i));' \
+            'print("SPACK_PACKAGE_SMOKE_OK");' \
+            'quit;' | "$prefix/bin/Singular" -q 2>&1)"
+          printf '%s\n' "$output"
+          grep -q SPACK_PACKAGE_SMOKE_OK <<< "$output"
+
+      - name: Export build cache
+        env:
+          ARCHITECTURE: ${{ matrix.architecture }}
+          SPACK_SIGNING_KEY: ${{ secrets.SPACK_SIGNING_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          environment="$RUNNER_TEMP/singular-spack-environment"
+          output_dir="$RUNNER_TEMP/spack-package"
+          cache_dir="$output_dir/spack-cache"
+          mkdir -p "$cache_dir"
+          signed=false
+
+          if [[ -n "$SPACK_SIGNING_KEY" ]]; then
+            private_key="$RUNNER_TEMP/spack-signing-key.gpg"
+            printf '%s' "$SPACK_SIGNING_KEY" | base64 --decode > "$private_key"
+            spack gpg trust -y "$private_key"
+            rm -f "$private_key"
+            spack gpg list --signing
+            signed=true
+          fi
+
+          if [[ "$signed" == true ]]; then
+            spack -e "$environment" buildcache push --update-index "$cache_dir"
+            spack gpg export "$output_dir/singular-spack-public-key.gpg"
+            spack gpg publish -d "$cache_dir" --update-index
+          else
+            spack -e "$environment" buildcache push \
+              --unsigned --update-index "$cache_dir"
+          fi
+
+          test -n "$(find "$cache_dir" -type f -print -quit)"
+          cp "$environment/spack.yaml" "$output_dir/spack.yaml"
+          cp "$environment/spack.lock" "$output_dir/spack.lock"
+          spack -e "$environment" find --json > "$output_dir/installed-specs.json"
+
+          cat > "$output_dir/package-source.txt" <<EOF
+          repository=$GITHUB_REPOSITORY
+          commit=$GITHUB_SHA
+          architecture=$ARCHITECTURE
+          signed=$signed
+          spack_version=$(spack --version)
+          packages_ref=v2026.06.0
+          EOF
+
+          archive_contents=(
+            spack-cache
+            spack.yaml
+            spack.lock
+            installed-specs.json
+            package-source.txt
+          )
+          if [[ -f "$output_dir/singular-spack-public-key.gpg" ]]; then
+            archive_contents+=(singular-spack-public-key.gpg)
+          fi
+          tar -C "$output_dir" -czf \
+            "$output_dir/singular-spack-cache-$ARCHITECTURE.tar.gz" \
+            "${archive_contents[@]}"
+
+      - name: Upload Spack package
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-spack-${{ matrix.architecture }}
+          path: |
+            ${{ runner.temp }}/spack-package/*.tar.gz
+            ${{ runner.temp }}/spack-package/package-source.txt
+            ${{ runner.temp }}/spack-package/singular-spack-public-key.gpg
+          if-no-files-found: error
