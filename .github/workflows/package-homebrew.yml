@@ -1,0 +1,126 @@
+name: Homebrew bottles
+
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: macOS architectures to build
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - macos-intel
+          - macos-apple-silicon
+      bottle_root_url:
+        description: Bottle download root; empty uses the Singular tap release URL
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Select Homebrew bottles
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.settings.outputs.matrix }}
+      version: ${{ steps.settings.outputs.version }}
+      source_url: ${{ steps.settings.outputs.source_url }}
+      source_sha256: ${{ steps.settings.outputs.source_sha256 }}
+      bottle_root_url: ${{ steps.settings.outputs.bottle_root_url }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve source and targets
+        id: settings
+        env:
+          TARGETS: ${{ inputs.targets }}
+          INPUT_BOTTLE_ROOT_URL: ${{ inputs.bottle_root_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$TARGETS" in
+            both)
+              matrix='{"include":[{"runner":"macos-15-intel","architecture":"intel"},{"runner":"macos-15","architecture":"apple-silicon"}]}'
+              ;;
+            macos-intel)
+              matrix='{"include":[{"runner":"macos-15-intel","architecture":"intel"}]}'
+              ;;
+            macos-apple-silicon)
+              matrix='{"include":[{"runner":"macos-15","architecture":"apple-silicon"}]}'
+              ;;
+            *)
+              echo "::error::Unsupported target selection: $TARGETS"
+              exit 1
+              ;;
+          esac
+
+          source_version="$(sed -n \
+            's/^AC_INIT(\[singular\], \[\([^]]*\)\],.*/\1/p' configure.ac)"
+          test -n "$source_version"
+          short_sha="$(git rev-parse --short=10 HEAD)"
+          exact_tag="$(git tag --points-at HEAD | sed -n '1p')"
+          if [[ "$exact_tag" =~ ^Release-([0-9]+)-([0-9]+)-([0-9]+)(p[0-9]+)?$ ]]; then
+            version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}${BASH_REMATCH[4]}"
+          elif [[ "$exact_tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)(p[0-9]+)?$ ]]; then
+            version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}${BASH_REMATCH[4]}"
+          else
+            version="$source_version-git.$short_sha"
+          fi
+
+          source_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/archive/$GITHUB_SHA.tar.gz"
+          curl --fail --location --retry 3 --output source.tar.gz "$source_url"
+          source_sha256="$(shasum -a 256 source.tar.gz | awk '{print $1}')"
+          bottle_root_url="$INPUT_BOTTLE_ROOT_URL"
+          if [[ -z "$bottle_root_url" ]]; then
+            bottle_root_url="https://github.com/Singular/homebrew-singular/releases/download/singular-$version"
+          fi
+
+          {
+            echo "matrix=$matrix"
+            echo "version=$version"
+            echo "source_url=$source_url"
+            echo "source_sha256=$source_sha256"
+            echo "bottle_root_url=$bottle_root_url"
+          } >> "$GITHUB_OUTPUT"
+
+  bottle:
+    name: Homebrew ${{ matrix.architecture }}
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_FROM_API: 1
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build and test bottle
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          SOURCE_URL: ${{ needs.prepare.outputs.source_url }}
+          SOURCE_SHA256: ${{ needs.prepare.outputs.source_sha256 }}
+          BOTTLE_ROOT_URL: ${{ needs.prepare.outputs.bottle_root_url }}
+          ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          .github/scripts/package-homebrew.sh \
+            "$PWD" "$VERSION" "$SOURCE_URL" "$SOURCE_SHA256" \
+            "$BOTTLE_ROOT_URL" "$RUNNER_TEMP/homebrew-package" "$ARCHITECTURE"
+
+      - name: Upload bottle
+        uses: actions/upload-artifact@v4
+        with:
+          name: singular-homebrew-${{ needs.prepare.outputs.version }}-${{ matrix.architecture }}
+          path: ${{ runner.temp }}/homebrew-package
+          if-no-files-found: error
