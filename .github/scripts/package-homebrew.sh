@@ -47,6 +47,10 @@ tap_root="$(brew --repository "$tap")"
 mkdir -p "$tap_root/Formula"
 cp "$formula" "$tap_root/Formula/singular.rb"
 
+# Homebrew refuses --build-bottle if a dependency still needs to be built from
+# source. Install dependencies first so Intel runners can use source-only
+# formulae such as current Automake and Readline.
+brew install --only-dependencies "$tap/singular"
 brew install --build-bottle "$tap/singular"
 brew test "$tap/singular"
 
@@ -100,7 +104,7 @@ if [[ "$build_dependency_bottles" == true && \
     brew install --build-bottle --as-dependency "$dependency"
     (
       cd "$dependency_dir"
-      brew bottle --force-core-tap --keep-old --json \
+      brew bottle --force-core-tap --json \
         --root-url="$root_url" "$dependency"
     )
   done < "$output_dir/source-built-dependencies.txt"
