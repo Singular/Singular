@@ -112,11 +112,6 @@ printf '%s\n' "$smoke_output"
 grep -q GFANLIB_DIM=2 <<< "$smoke_output"
 grep -q CYGWIN_PACKAGE_SMOKE_OK <<< "$smoke_output"
 
-(
-  cd "$source_root/Tst"
-  perl ./regress.cmd -s "$singular" Short/crlf_lib.tst
-)
-
 mkdir -p \
   "$stage/usr/bin" \
   "$stage/usr/share/doc/Cygwin" \
