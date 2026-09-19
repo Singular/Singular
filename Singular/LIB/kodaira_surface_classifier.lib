@@ -1,0 +1,4536 @@
+///////////////////////////////////////////////////////////////////////////////
+// kodaira_surface_classifier.lib
+//
+// Economical-first Enriques--Kodaira classification helpers
+// for smooth projective algebraic surfaces given by homogeneous equations in
+// projective space.
+//
+// This library separates a demand-driven, mathematically complete P_<=8 +
+// exact-map classifier from an optional P_12 certificate section.  It stops as
+// soon as a theorem-level certificate is available; in particular rational,
+// K3, and Riemann--Roch-separated kappa-one cases need only P_2, Enriques
+// cases need only P_3, and in characteristic zero or greater than three the
+// abelian branch needs only P_4 and the canonical-order-three bielliptic
+// branch needs only P_5.  The classifiers assume smoothness by default; an explicit Jacobian check can be
+// requested.
+//
+// Mathematical references used in the comments below:
+//   [CL]  F. Catanese and B. Li, Enriques classification in characteristic
+//         p > 0: the P12-theorem, Nagoya Math. J. 235 (2019), 201-226.
+//   [Bom] E. Bombieri, Canonical models of surfaces of general type,
+//         Publ. Math. IHES 42 (1973), 171-219.
+//   [Eke] T. Ekedahl, Canonical models of surfaces of general type in positive
+//         characteristic, Publ. Math. IHES 67 (1988), 97-144.
+//   [Zar] O. Zariski, On Castelnuovo's criterion of rationality
+//         p_a=P_2=0 of an algebraic surface, Illinois J. Math. 2 (1958),
+//         303-315.
+//   [Enr] F. Enriques, Sopra le superficie algebriche di bigenere uno,
+//         Mem. Soc. Ital. Sci. (3) 14 (1906), 327-352.
+//   [Fer] E. Ferrari, An Enriques classification theorem for surfaces in
+//         positive characteristic, Manuscripta Math. 160 (2019), 173-185;
+//         arXiv:1803.02164, doi:10.1007/s00229-018-1043-y.
+//   [Cha] M. Chardin, Applications of some properties of the canonical module
+//         in computational projective algebraic geometry, J. Symbolic Comput.
+//         preprint version 1999.
+//   [Som] A. J. Sommese, Hyperplane sections of projective surfaces, I:
+//         The adjunction mapping, Duke Math. J. 46 (1979), 377-401.
+//   [SV]  A. J. Sommese and A. Van de Ven, On the adjunction mapping,
+//         Math. Ann. 278 (1987), 593-603.
+//   [Ion] P. Ionescu, Generalized adjunction and applications,
+//         Math. Proc. Cambridge Philos. Soc. 99 (1986), 457-472.
+//
+// Implementation note:
+//   The code uses standard library interfaces: Ext_R from homolog.lib, dimH and
+//   dimGradedPart from sheafcoh.lib, and sat from elim.lib.
+///////////////////////////////////////////////////////////////////////////////
+
+version="version kodaira_surface_classifier.lib 0.11 Sep_2026";
+category="Algebraic Geometry";
+
+info="
+LIBRARY: kodaira_surface_classifier.lib
+
+PURPOSE:
+  Classify a homogeneous ideal I defining a smooth projective surface X.
+  The automatic routines compute h^1(O_X) and plurigenera on demand.  Exact
+  rational and K3 certificates stop at P_2.  At the same point,
+  Riemann--Roch separates kappa one whenever
+  2<=P_2<chi(O_X)+1.  Enriques' bigenus criterion stops at P_3, and the
+  classical/Ferrari abelian criterion stops at P_4 in
+  characteristic zero or greater than three.  At P_5 the classical
+  kappa-zero list eliminates every remaining branch except the four
+  bielliptic prefixes when it applies.  The order-three prefix is already
+  certified at P_5 by the elliptic canonical-bundle formula; only the other
+  three prefixes, and the conservative characteristic-2/3 path, can continue
+  to P_6, P_7, and P_8.
+  An exact |5K| image is constructed only when P_5>=3.
+  No |6K| or |8K| map is needed.  P_12 is kept as a separate optional
+  certificate and is never called by the standard automatic classifier.
+
+MAIN ONE-CALL ROUTINES:
+  KSCauto(I);
+      Fully automatic classifier.  It follows the demand-driven order above
+      and reuses every canonical power.  When SpaSM is applicable, one
+      canonical rational frame is cached and all powers are compact exact
+      fractional-ideal products.  Otherwise, in particular in characteristic
+      zero, the requested original classifier module path is retained.  At an
+      exact |5K| stage the same selected route is reused.  Public strict SpaSM
+      section commands remain strict and contain no fallback.
+
+CANONICAL TORSION:
+  KSCminimalCanonicalTorsionOrder(C);
+      Return the exact order of the canonical bundle on the minimal model
+      when kappa=0, 0 when no positive power can be trivial, and -1 when the
+      classification is inconclusive.
+
+  KSCminimalCanonicalPowerIsTrivial(C,m);
+      Decide whether the m-th canonical power of the minimal model is
+      trivial.  This errors when the classification is inconclusive.
+
+  KSChybrid(I);
+      Hybrid classifier.  It first runs the same standard classifier as
+      KSCauto.  If that is conclusive, it returns immediately and does not
+      compute adjunction data.  Only after an unexpected inconclusive standard
+      result does it run the adjunction diagnostic |K_X+H|.  It never calls the
+      P_12 routines unless the user invokes those optional routines directly.
+
+TYPICAL CALLS:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCcanonicalModule(X);          // omega_X, with certified method attribute
+  KSCauto(X);                     // standard classifier, no P_12
+  KSChybrid(X);                   // same, with adjunction only if needed
+  KSCauto(X,4,1,1);               // same, but turn on smoothness check
+  KSCautoEconomical(X,4,1);       // stop before P_8 standard completion
+  KSCautoEconomical(X,4,1,1);     // also retain ideals/diagnostics
+
+RETURN FORMAT:
+  The automatic classifiers return a ClassifiedSurface.  By default this keeps
+  only numerical/string classification data: class label, Kodaira dimension,
+  plurigenera, the cohomological irregularity h^1(O_X), tested pluricanonical
+  image dimensions, embedding
+  dimension/codimension/degree, smoothness status, the canonical torsion order
+  on the minimal model, subcanonical certificate status, algorithm flags,
+  characteristic context, and a certificate string.
+  Pass keep=1 in the documented optional-argument position to retain the input ideal,
+  saturated ideal, base ring, and diagnostic lists already computed along the
+  way.  No additional geometry is computed just because keep=1.
+
+  KSCasList(C) converts a ClassifiedSurface C to the historical seven-entry
+  list [class,kappa,P,q,phi5,phi6,certificate].
+
+  The plurigenus vector contains every value actually computed on the chosen
+  path.  A terminal theorem may append later values that it forces (all zero
+  for rational surfaces, all one for K3 or abelian surfaces, and the
+  alternating pattern for Enriques surfaces).  fallbackMaxPlurigenus records
+  the highest P_m that was actually computed, despite its compatibility name.
+
+HYPOTHESES:
+  The intended mathematical setting is a smooth geometrically integral
+  projective surface over an algebraically closed field, supplied as an ideal
+  in a polynomial ring.  For a quotient-ring encoding, lift its relations into
+  that polynomial-ring ideal.  The classifiers
+  assume smoothness unless
+  the optional smoothness flag is turned on.  In characteristic 2 or 3, kappa=1
+  is labelled elliptic-or-quasi-elliptic, and kappa=0 subtype labels are
+  deliberately broader when non-classical Enriques or quasi-hyperelliptic
+  variants can have the same low cohomological invariants.
+
+REFERENCES ENCODED IN THE DECISION TREE:
+  * The canonical module is computed as Ext^c_S(S/I,S)(-N-1); see [Cha].
+  * [Zar] gives the characteristic-free criterion h^1(O_X)=P_2=0 for
+    rationality.  Enriques' bigenus criterion [Enr] identifies the Enriques
+    branch from h^1(O_X)=0, P_2=1, P_3=0.
+  * The classical Enriques criterion in characteristic zero, and [Fer,
+    Theorem 1.1] over an algebraically closed field of characteristic p>3,
+    identify the abelian branch from h^1(O_X)=2 and P_1=P_4=1.
+  * P_12 is not used by the standard path.  The standard route uses an exact
+    |5K| test when necessary and reaches P_8 only on the genuine low-growth
+    boundary.
+  * The low-order elliptic/quasi-elliptic bounds in [CL] are stronger than what
+    the algorithm needs: [CL] gives low nonvanishing and a sharp n<=8 bound,
+    while the code only needs the weaker test \"some P_n>=2\" to distinguish
+    kappa=1 from kappa=0 because kappa=0 plurigenera are bounded by 1.
+    The sharp examples in [CL] show why P_1,...,P_6 are not enough.
+    On the q=1 prefix 00100, the canonical-bundle formula and the
+    Katsura--Ueno multiplicity conditions used in [CL, Section 4] exclude
+    kappa=1 already at P_5; this is the exact canonical-order-three branch.
+  * Once kappa=0 is certified, the first positive P_m is the exact canonical
+    torsion order on the minimal model.  For kappa=-infinity, 1, or 2 no
+    positive canonical tensor power is trivial.
+  * The use of |5K| to detect general type comes from [Bom] in characteristic
+    zero and [Eke] in positive characteristic.
+  * The adjunction prepass uses the adjoint system |K_X+H| and is conservative
+    about the exceptional cases described in [Som], [SV], and [Ion].
+  * The optional P_12 routines are deliberately not called by KSCauto,
+    KSCcomplete, or KSChybrid; use them only as an independent check or when a
+    user explicitly wants the classical P_12 theorem certificate.
+";
+
+LIB "homolog.lib";
+LIB "sheafcoh.lib";
+LIB "elim.lib";
+
+static proc mod_init()
+{
+  newstruct("ClassifiedSurface",
+    "ring baseRing, ideal inputIdeal, ideal saturatedIdeal, int keepData, int projectiveDimension, int codimension, int surfaceDegree, int smoothness, int smoothnessChecked, string classification, string kodairaDimension, intvec plurigenera, int irregularity, int minimalCanonicalTorsionOrder, int phi5Dimension, int phi6Dimension, int phiTestOrder, int phiTestDimension, int phiExactDimension, int subcanonical, int subcanonicalIndex, int ell, int fallbackMaxPlurigenus, string algorithm, int characteristic, string characteristicContext, string certificate, list diagnostics");
+  system("install","ClassifiedSurface","print",KSCprintClassifiedSurface,1);
+  system("install","ClassifiedSurface","string",KSCstringClassifiedSurface,4);
+}
+
+proc KSCstringClassifiedSurface(ClassifiedSurface C)
+{
+  return("ClassifiedSurface("+C.classification+", kappa="+C.kodairaDimension+", P="+string(C.plurigenera)+", q="+string(C.irregularity)+")");
+}
+
+proc KSCprintClassifiedSurface(ClassifiedSurface C)
+{
+  "ClassifiedSurface";
+  "  classification        : "+C.classification;
+  "  Kodaira dimension     : "+C.kodairaDimension;
+  "  plurigenera           : "+string(C.plurigenera);
+  "  cohomological h^1(O_X): "+string(C.irregularity);
+  if (C.minimalCanonicalTorsionOrder>0)
+  {
+    "  minimal-model K order: "+string(C.minimalCanonicalTorsionOrder);
+  }
+  else
+  {
+    if (C.minimalCanonicalTorsionOrder==0)
+    {
+      "  minimal-model K order: no finite order";
+    }
+    else
+    {
+      "  minimal-model K order: unknown";
+    }
+  }
+  "  characteristic        : "+C.characteristicContext;
+  "  projective dimension  : "+string(C.projectiveDimension);
+  "  codimension           : "+string(C.codimension);
+  "  degree                : "+string(C.surfaceDegree);
+  if (C.smoothnessChecked==0)
+  {
+    "  smoothness           : assumed";
+  }
+  else
+  {
+    "  smoothness           : "+string(C.smoothness);
+  }
+  if (C.subcanonical==1)
+  {
+    "  subcanonical         : yes, omega_X = O_X("+string(C.subcanonicalIndex)+")";
+  }
+  if (C.subcanonical==0)
+  {
+    "  subcanonical         : no certificate";
+  }
+  if (C.phi5Dimension>=0)
+  {
+    "  dim image |5K|       : "+string(C.phi5Dimension);
+  }
+  if (C.phi6Dimension>=0)
+  {
+    "  dim image |6K|       : "+string(C.phi6Dimension);
+  }
+  if (C.phiTestOrder>0)
+  {
+    "  dim image |"+string(C.phiTestOrder)+"K|      : "+string(C.phiTestDimension);
+  }
+  if (C.phiExactDimension>=0)
+  {
+    "  exact image dim      : "+string(C.phiExactDimension);
+  }
+  if (C.algorithm!="")
+  {
+    "  algorithm            : "+C.algorithm;
+  }
+  if (C.fallbackMaxPlurigenus>0)
+  {
+    "  max plurigenus used  : "+string(C.fallbackMaxPlurigenus);
+  }
+  if (C.keepData!=0)
+  {
+    "  input ideal           : "+string(C.inputIdeal);
+    "  saturated ideal       : "+string(C.saturatedIdeal);
+    if (size(C.diagnostics)>0)
+    {
+      "  diagnostics          : "+string(C.diagnostics);
+    }
+  }
+  else
+  {
+    "  kept data            : no";
+  }
+  "  certificate";
+  "    "+C.certificate;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Small integer, vector, ideal, and result utilities.
+///////////////////////////////////////////////////////////////////////////////
+
+static proc KSCmax(int a, int b)
+"USAGE:  KSCmax(a,b);  two integers.
+RETURN: The larger of a and b.
+MATH:   No geometry is involved.  This helper only keeps later bounds readable.
+EXAMPLE:
+  KSCmax(2,5);
+"
+{
+  if (a>b) { return(a); }
+  return(b);
+}
+
+static proc KSCmin(int a, int b)
+"USAGE:  KSCmin(a,b);  two integers.
+RETURN: The smaller of a and b.
+MATH:   No geometry is involved.  This helper prevents out-of-range access to
+        vectors of plurigenera.
+EXAMPLE:
+  KSCmin(2,5);
+"
+{
+  if (a<b) { return(a); }
+  return(b);
+}
+
+static proc KSCallZero(intvec v)
+"USAGE:  KSCallZero(v);  integer vector.
+RETURN: 1 if every entry of v is zero, otherwise 0.
+MATH:   For a surface, vanishing of all plurigenera means kappa=-infinity only
+        when enough plurigenera are known.  In the standard classifier,
+        P_1,...,P_6 all zero excludes kappa=1 by the Catanese--Li n<=4
+        non-vanishing theorem and excludes kappa=0 by the usual torsion
+        possibilities visible by order 6.
+EXAMPLE:
+  intvec v=0,0,0; KSCallZero(v);
+"
+{
+  int i;
+  for (i=1; i<=size(v); i++)
+  {
+    if (v[i]!=0) { return(0); }
+  }
+  return(1);
+}
+
+static proc KSCmaxEntry(intvec v)
+"USAGE:  KSCmaxEntry(v);  integer vector.
+RETURN: The maximum entry of v, or 0 for an empty vector.
+MATH:   The growth of plurigenera is the definition of Kodaira dimension.  This
+        helper is used only after the mathematical step has decided which finite
+        list is enough for the current branch.
+EXAMPLE:
+  intvec v=0,1,2; KSCmaxEntry(v);
+"
+{
+  int i; int m=0;
+  for (i=1; i<=size(v); i++)
+  {
+    if (v[i]>m) { m=v[i]; }
+  }
+  return(m);
+}
+
+static proc KSCexistsGE(intvec v, int a, int b, int bound)
+"USAGE:  KSCexistsGE(v,a,b,bound);  integer vector and bounds.
+RETURN: 1 if some entry v[i] with a<=i<=b is at least bound.
+MATH:   Used to read finite plurigenus tests such as the Catanese--Li n<=8
+        bound for low-plurigenus kappa=1.  The standard classifier uses the
+        threshold P_n>=2, because kappa=0 plurigenera are bounded by 1.  The
+        function itself does not make the classification decision.
+EXAMPLE:
+  intvec v=0,1,2,1; KSCexistsGE(v,1,4,2);
+"
+{
+  int i;
+  if (a<1) { a=1; }
+  if (b>size(v)) { b=size(v); }
+  for (i=a; i<=b; i++)
+  {
+    if (v[i]>=bound) { return(1); }
+  }
+  return(0);
+}
+
+static proc KSCfirstPositiveIndex(intvec v)
+"USAGE:  KSCfirstPositiveIndex(v);  integer vector.
+RETURN: The first index i with v[i]>0, or 0 if there is none.
+MATH:   After kappa=0 has been certified, the first nonzero P_i is the exact
+        torsion order of the canonical bundle on the minimal model.  It may be
+        read after an early subtype theorem, the P_8 branch, or the optional
+        P_12 certificate; it is never used to certify kappa by itself.
+EXAMPLE:
+  intvec v=0,0,1,1; KSCfirstPositiveIndex(v);
+"
+{
+  int i;
+  for (i=1; i<=size(v); i++)
+  {
+    if (v[i]>0) { return(i); }
+  }
+  return(0);
+}
+
+static proc KSCcanonicalTorsionOrderFromResult(string kappa,intvec P)
+"USAGE:  KSCcanonicalTorsionOrderFromResult(kappa,P);  internal classification label and plurigenera.
+RETURN: The canonical torsion order on the minimal model, 0 if no positive
+        canonical power is trivial, or -1 if kappa is unknown.
+MATH:   For kappa=0, K is torsion and a nonzero section of mK has a
+        numerically trivial effective zero divisor.  It therefore trivializes
+        mK.  Thus the first positive P_m is exactly the order.  For every
+        other finite or negative Kodaira dimension K is not torsion.
+EXAMPLE:
+  // internal: populated by KSCresult.
+"
+{
+  if (kappa=="0")
+  {
+    int order=KSCfirstPositiveIndex(P);
+    if (order==0)
+    {
+      ERROR("internal error: certified kappa zero without a positive computed plurigenus");
+    }
+    return(order);
+  }
+  if ((kappa=="-infinity") or (kappa=="1") or (kappa=="2"))
+  {
+    return(0);
+  }
+  return(-1);
+}
+
+static proc KSCidealIsUnit(ideal J)
+"USAGE:  KSCidealIsUnit(J);  ideal J.
+RETURN: 1 if J is the unit ideal, otherwise 0.
+MATH:   In the projective Jacobian test, the singular locus is empty exactly
+        when the saturated Jacobian ideal is the unit ideal.
+EXAMPLE:
+  ring R=0,(x,y),dp; ideal J=1; KSCidealIsUnit(J);
+"
+{
+  J=std(J);
+  if ((size(J)>0) and (reduce(1,J)==0)) { return(1); }
+  return(0);
+}
+
+static proc KSCidealContained(ideal A, ideal B)
+"USAGE:  KSCidealContained(A,B);  ideals A and B.
+RETURN: 1 if every generator of A reduces to zero modulo std(B), otherwise 0.
+MATH:   Equality of saturated ideals is checked by two containments.  This is
+        used to verify cyclic subcanonical presentations rather than guessing
+        from the number of rows of a module presentation.
+EXAMPLE:
+  ring R=0,(x,y),dp; ideal A=x2,xy; ideal B=x; KSCidealContained(A,B);
+"
+{
+  ideal G=std(B);
+  int i;
+  for (i=1; i<=size(A); i++)
+  {
+    if (reduce(A[i],G)!=0) { return(0); }
+  }
+  return(1);
+}
+
+static proc KSCsameSaturatedIdeal(ideal A, ideal B)
+"USAGE:  KSCsameSaturatedIdeal(A,B);  homogeneous ideals.
+RETURN: 1 if sat(A)=sat(B) with respect to the irrelevant ideal, otherwise 0.
+MATH:   Projective schemes are insensitive to irrelevant embedded components.
+        Saturation is therefore used before comparing ideals defining sheaves.
+EXAMPLE:
+  ring R=0,(x0,x1),dp; ideal A=x0; ideal B=x0*x1; KSCsameSaturatedIdeal(A,B);
+"
+{
+  ideal As=KSCsatIdeal(A);
+  ideal Bs=KSCsatIdeal(B);
+  if (KSCidealContained(As,Bs)==0) { return(0); }
+  if (KSCidealContained(Bs,As)==0) { return(0); }
+  return(1);
+}
+
+static proc KSCsatIdeal(ideal I)
+"USAGE:  KSCsatIdeal(I);  homogeneous ideal I.
+RETURN: The saturation of I with respect to the irrelevant ideal.
+ASSUME: The basering is a polynomial ring S.  For a quotient-ring presentation
+        S/Q, lift I to S and pass Q+I instead.
+MATH:   The input is a projective scheme Proj(S/I), so irrelevant embedded
+        components must be removed before dimension, smoothness, and Ext tests.
+        In particular, the canonical module is Ext over S, not over S/Q.
+        Saturation and its final standard basis are computed after temporarily
+        clearing degBound; the caller's value is restored before return.
+EXAMPLE:
+  ring R=0,(x0,x1,x2),dp; ideal I=x0*x1,x1*x2; KSCsatIdeal(I);
+"
+{
+  list ringData=ringlist(basering);
+  if (size(ringData[4])>0)
+  {
+    ERROR("the surface classifier requires an ideal in a polynomial ring; lift the quotient-ring relations and include them in the input ideal");
+  }
+  int savedDegBound=degBound;
+  degBound=0;
+  list L=sat(std(I),maxideal(1));
+  ideal J=std(L[1]);
+  degBound=savedDegBound;
+  return(J);
+}
+
+static proc KSCrelationIdealOneRow(module M)
+"USAGE:  KSCrelationIdealOneRow(M);  a one-row presented module.
+RETURN: The ideal generated by the entries in the single row.
+MATH:   If a presented module has one ambient generator, then it is a quotient
+        S/R up to grading shift.  To certify omega_X is O_X(k), R must define
+        the same saturated projective scheme as I.
+EXAMPLE:
+  ring R=0,(x,y),dp; module M=[x2,xy]; KSCrelationIdealOneRow(M);
+"
+{
+  ideal R;
+  int j;
+  if (nrows(M)!=1) { return(R); }
+  for (j=1; j<=ncols(M); j++)
+  {
+    R=R,M[1,j];
+  }
+  return(std(R));
+}
+
+static proc KSCresult(string klass, string kappa, intvec P, int q, int phi5, int phi6, string notes, list #)
+"USAGE:  KSCresult(klass,kappa,P,q,phi5,phi6,notes[,I,chk,checkSmooth,ell,maxm,algorithm,subcan,subidx,phiOrder,phiDim,phiExact,keep,diagnostics]);  internal constructor.
+RETURN: A ClassifiedSurface object.
+MATH:   The result format separates the class label from the certificate notes.
+        This avoids hiding heuristic or fallback assumptions in the class name.
+EXAMPLE:
+  intvec P=1,1; KSCresult(\"test\",\"unknown\",P,-1,-1,-1,\"example\");
+"
+{
+  ideal inputIdeal;
+  ideal saturatedIdeal;
+  int pdim=-2;
+  int codim=-1;
+  int degX=-1;
+  int smooth=-1;
+  int checkSmooth=0;
+  int ell=-1;
+  int maxm=size(P);
+  string algorithm="";
+  int subcan=-1;
+  int subidx=0;
+  int phiOrder=0;
+  int phiDim=-1;
+  int phiExact=-1;
+  int keep=0;
+  list diagnostics;
+
+  if (size(#)>0) { inputIdeal=#[1]; }
+  if (size(#)>1)
+  {
+    list chk=#[2];
+    if (size(chk)>=5)
+    {
+      saturatedIdeal=chk[1];
+      pdim=chk[2];
+      codim=chk[3];
+      degX=chk[4];
+      smooth=chk[5];
+    }
+  }
+  if (size(#)>2) { checkSmooth=#[3]; }
+  if (size(#)>3) { ell=#[4]; }
+  if (size(#)>4) { maxm=#[5]; }
+  if (size(#)>5) { algorithm=#[6]; }
+  if (size(#)>6) { subcan=#[7]; }
+  if (size(#)>7) { subidx=#[8]; }
+  if (size(#)>8) { phiOrder=#[9]; }
+  if (size(#)>9) { phiDim=#[10]; }
+  if (size(#)>10) { phiExact=#[11]; }
+  if (size(#)>11) { keep=#[12]; }
+  if (size(#)>12) { diagnostics=#[13]; }
+
+  ClassifiedSurface C;
+  if (keep!=0)
+  {
+    C.baseRing=basering;
+    C.inputIdeal=inputIdeal;
+    C.saturatedIdeal=saturatedIdeal;
+    C.diagnostics=diagnostics;
+  }
+  C.keepData=keep;
+  C.projectiveDimension=pdim;
+  C.codimension=codim;
+  C.surfaceDegree=degX;
+  C.smoothness=smooth;
+  C.smoothnessChecked=checkSmooth;
+  C.classification=klass;
+  C.kodairaDimension=kappa;
+  C.plurigenera=P;
+  C.irregularity=q;
+  C.minimalCanonicalTorsionOrder=
+    KSCcanonicalTorsionOrderFromResult(kappa,P);
+  C.phi5Dimension=phi5;
+  C.phi6Dimension=phi6;
+  C.phiTestOrder=phiOrder;
+  C.phiTestDimension=phiDim;
+  C.phiExactDimension=phiExact;
+  C.subcanonical=subcan;
+  C.subcanonicalIndex=subidx;
+  C.ell=ell;
+  C.fallbackMaxPlurigenus=maxm;
+  C.algorithm=algorithm;
+  C.characteristic=KSCbaseCharacteristic();
+  C.characteristicContext=KSCcharContext();
+  C.certificate=notes;
+  return(C);
+}
+
+static proc KSCappendNotes(ClassifiedSurface A, string more)
+"USAGE:  KSCappendNotes(A,more);  ClassifiedSurface and string.
+RETURN: The same ClassifiedSurface with more appended to its certificate.
+MATH:   The automatic and hybrid algorithms share the same numerical core but
+        add different certificates and warnings.
+EXAMPLE:
+  intvec P=0; ClassifiedSurface A=KSCresult(\"x\",\"unknown\",P,-1,-1,-1,\"a\"); KSCappendNotes(A,\" b\");
+"
+{
+  A.certificate=A.certificate+more;
+  return(A);
+}
+
+static proc KSCisInconclusive(ClassifiedSurface A)
+"USAGE:  KSCisInconclusive(A);  ClassifiedSurface.
+RETURN: 1 if the class label is inconclusive or the kappa label is unknown.
+MATH:   A conservative classifier needs a visible branch where the available
+        finite data are insufficient or the computation is too expensive.
+EXAMPLE:
+  intvec P=0; ClassifiedSurface A=KSCresult(\"inconclusive\",\"unknown\",P,-1,-1,-1,\"a\"); KSCisInconclusive(A);
+"
+{
+  if (A.classification=="inconclusive") { return(1); }
+  if (A.kodairaDimension=="unknown") { return(1); }
+  return(0);
+}
+
+proc KSCasList(ClassifiedSurface C)
+"USAGE:  KSCasList(C);  C ClassifiedSurface.
+RETURN: The historical seven-entry list [class,kappa,P,q,phi5,phi6,notes].
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4; KSCasList(KSCauto(X));
+"
+{
+  return(list(C.classification,C.kodairaDimension,C.plurigenera,C.irregularity,C.phi5Dimension,C.phi6Dimension,C.certificate));
+}
+
+proc KSCminimalCanonicalTorsionOrder(ClassifiedSurface C)
+"USAGE:  KSCminimalCanonicalTorsionOrder(C);  C ClassifiedSurface.
+RETURN: The exact order m>0 of the canonical bundle on the minimal model when
+        kappa=0; 0 when no positive canonical power is trivial; -1 when the
+        classification is inconclusive.
+NOTE:   This is a birational/minimal-model statement.  If the embedded input
+        is a blow-up of a kappa-zero surface, its literal canonical bundle has
+        exceptional components and no positive tensor power is trivial.
+MATH:   On a minimal kappa-zero surface K is torsion.  The first m with
+        P_m>0 is its exact order, since a section of a torsion line bundle has
+        numerically trivial effective zero divisor and hence no zeros.
+SEE ALSO: KSCminimalCanonicalPowerIsTrivial, KSCauto, KSCcomplete
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCminimalCanonicalTorsionOrder(KSCauto(X));
+"
+{
+  return(C.minimalCanonicalTorsionOrder);
+}
+
+proc KSCminimalCanonicalPowerIsTrivial(ClassifiedSurface C,int m)
+"USAGE:  KSCminimalCanonicalPowerIsTrivial(C,m);  C ClassifiedSurface, m>0.
+RETURN: 1 exactly when omega^m is trivial on the minimal model; otherwise 0.
+NOTE:   This procedure errors when C is inconclusive.  It never guesses from
+        an incomplete plurigenus prefix.  As above, the answer concerns the
+        minimal model, not the literal canonical bundle on a possible blow-up.
+SEE ALSO: KSCminimalCanonicalTorsionOrder
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  ClassifiedSurface C=KSCauto(X);
+  KSCminimalCanonicalPowerIsTrivial(C,3);
+"
+{
+  if (m<=0) { ERROR("the canonical tensor power must be positive"); }
+  int order=C.minimalCanonicalTorsionOrder;
+  if (order<0)
+  {
+    ERROR("the minimal-model canonical torsion order is unknown because the classification is inconclusive");
+  }
+  if (order==0) { return(0); }
+  if ((m % order)==0) { return(1); }
+  return(0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Grading, saturation, and canonical module helpers.
+///////////////////////////////////////////////////////////////////////////////
+
+static proc KSCshift(module M, int s)
+"USAGE:  KSCshift(M,s);  graded presented module M and integer s.
+RETURN: The same presentation with all row degree shifts increased by s.
+MATH:   For X in P^N with S=k[x_0,...,x_N], the canonical module is
+        Ext^c_S(S/I,S)(-N-1).  Since nvars(S)=N+1, this procedure applies the
+        grading shift needed after Ext_R; see [Cha].
+EXAMPLE:
+  ring R=0,(x0,x1),dp; module M=[x0]; intvec w; w[1]=0; attrib(M,\"isHomog\",w); KSCshift(M,2);
+"
+{
+  module N=M;
+  intvec w;
+  int i;
+  if (typeof(attrib(M,"isHomog"))!="string")
+  {
+    w=attrib(M,"isHomog");
+    for (i=1; i<=size(w); i++) { w[i]=w[i]+s; }
+  }
+  else
+  {
+    for (i=1; i<=nrows(M); i++) { w[i]=s; }
+  }
+  attrib(N,"isHomog",w);
+  return(N);
+}
+
+static proc KSCsetWeights(module M, intvec w)
+"USAGE:  KSCsetWeights(M,w);  module M and row-degree vector w.
+RETURN: M with homogeneous row weights w.
+MATH:   Sheaf cohomology and graded-part computations need degree data.  This
+        helper is only a safe wrapper around the Singular isHomog attribute.
+EXAMPLE:
+  ring R=0,(x0,x1),dp; module M=[x0]; intvec w; w[1]=0; KSCsetWeights(M,w);
+"
+{
+  module N=M;
+  attrib(N,"isHomog",w);
+  return(N);
+}
+
+static proc KSCsatModule(module M)
+"USAGE:  KSCsatModule(M);  homogeneous presented module.
+RETURN: The saturation of M, preserving row-degree attributes when present.
+MATH:   Coherent sheaves on Proj are obtained from saturated graded modules.
+        Saturating tensor powers removes irrelevant torsion created by module
+        presentations.  The computation clears and then restores degBound so
+        a caller's unrelated bounded-standard-basis setting cannot truncate
+        the saturated sheaf presentation.
+EXAMPLE:
+  ring R=0,(x0,x1),dp; module M=[x0*x1]; intvec w; w[1]=0; attrib(M,\"isHomog\",w); KSCsatModule(M);
+"
+{
+  intvec w;
+  if (typeof(attrib(M,"isHomog"))!="string") { w=attrib(M,"isHomog"); }
+  int savedDegBound=degBound;
+  degBound=0;
+  list L=sat(std(M),maxideal(1));
+  module N=std(L[1]);
+  degBound=savedDegBound;
+  if (size(w)>0) { attrib(N,"isHomog",w); }
+  return(N);
+}
+
+static proc KSCstructureModule(ideal I)
+"USAGE:  KSCstructureModule(I);  homogeneous ideal I.
+RETURN: A one-row presentation for the structure sheaf module S/I.
+MATH:   In the Singular sheafcoh convention used here, the ideal I is treated
+        as the relation module for the quotient S/I with one ambient generator.
+EXAMPLE:
+  ring R=0,(x0,x1,x2),dp; ideal I=x0; KSCstructureModule(I);
+"
+{
+  module M=I;
+  intvec w; w[1]=0;
+  attrib(M,"isHomog",w);
+  return(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Geometry checks and canonical module.
+///////////////////////////////////////////////////////////////////////////////
+
+proc KSCsurfaceData(ideal I, list #)
+"USAGE:  KSCsurfaceData(I[,checkSmooth]);  homogeneous ideal I.
+RETURN: list [J,pdim,codim,degree,smooth], where J=sat(I), pdim=dim Proj(S/J),
+        codim is the affine codimension in Spec(S), degree is the projective
+        degree, and smooth is -1 if the Jacobian test was not requested, 0 if
+        requested and failed, and 1 if requested and successful.
+MATH:   The classification routines assume that X is a smooth geometrically integral
+        projective surface.  Saturation and the dimension/degree calculation are
+        cheap enough to do always.  The projective Jacobian criterion can be
+        expensive because it forms codimension-size minors and saturates the
+        singular-locus ideal, so it is optional and off by default in the
+        classifiers.  Turning it on gives a direct smoothness certificate for
+        the embedded surface.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCsurfaceData(X);     // assume smooth: smooth=-1
+  KSCsurfaceData(X,1);   // run the Jacobian smoothness test
+"
+{
+  int checkSmooth=0;
+  if (size(#)>0) { checkSmooth=#[1]; }
+  ideal J=KSCsatIdeal(I);
+  int ringdim=nvars(basering);
+  int affdim=dim(std(J));
+  int pdim=affdim-1;
+  int codim=ringdim-affdim;
+  int degX=mult(std(J));
+  int smooth=-1;
+
+  if (checkSmooth!=0)
+  {
+    smooth=0;
+    if ((pdim==2) and (codim>=1))
+    {
+      matrix Jac=jacob(J);
+      ideal Min=minor(Jac,codim);
+      ideal Sing=J+Min;
+      ideal Ssat=KSCsatIdeal(Sing);
+      smooth=KSCidealIsUnit(Ssat);
+    }
+    if ((pdim==2) and (codim==0))
+    {
+      // This is the case X=P^2 in its own projective plane.  There are no
+      // defining equations and the Jacobian test is vacuous.
+      smooth=1;
+    }
+  }
+  return(list(J,pdim,codim,degX,smooth));
+}
+
+proc KSCcheckSurface(ideal I)
+"USAGE:  KSCcheckSurface(I);  homogeneous ideal I.
+RETURN: list [J,pdim,codim,degree,smooth], where J=sat(I), pdim=dim Proj(S/J),
+        codim is the affine codimension in Spec(S), and smooth is 1 exactly
+        when the projective Jacobian criterion proves smoothness.
+MATH:   This is the explicit smoothness-checking wrapper.  The automatic
+        classifiers no longer call it by default, because the user may assume
+        smoothness and the Jacobian-minor saturation can dominate the runtime.
+        Use this routine, or pass checkSmooth=1 to KSCauto/KSChybrid, when a
+        smoothness certificate is desired.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCcheckSurface(X);
+"
+{
+  return(KSCsurfaceData(I,1));
+}
+
+static proc KSCresolutionWeightedDegree(vector v, intvec rowWeights)
+"USAGE:  KSCresolutionWeightedDegree(v,w);  internal homogeneous resolution column and row weights.
+RETURN: The homogeneous degree of v with the supplied row weights.
+EXAMPLE:
+  // internal: used to dualize the terminal codimension differential.
+"
+{
+  int i;
+  for (i=1; i<=nrows(v); i++)
+  {
+    if (v[i]!=0) { return(deg(v[i])+rowWeights[i]); }
+  }
+  return(-1);
+}
+
+static proc KSCresolutionColumnWeights(module M)
+"USAGE:  KSCresolutionColumnWeights(M);  internal homogeneous resolution differential.
+RETURN: The homogeneous degree of every column of M.
+EXAMPLE:
+  // internal: used to reconstruct the grading on a dual differential.
+"
+{
+  intvec rowWeights=attrib(M,"isHomog");
+  intvec result;
+  int i;
+  for (i=1; i<=ncols(M); i++)
+  {
+    result[i]=KSCresolutionWeightedDegree(M[i],rowWeights);
+  }
+  return(result);
+}
+
+static proc KSCcanonicalModuleFromTerminalResolution(module A,
+                                                      int codimensionValue)
+"USAGE:  KSCcanonicalModuleFromTerminalResolution(A,c);  internal structure module and codimension.
+RETURN: list [flag,W].  flag=1 certifies that the computed free resolution stops
+        in codimension c and W is the canonical-module presentation, already
+        irrelevant-saturated by the theorem below.
+        flag=0 means that the computed minimal resolution segment still has a
+        nonzero higher differential.
+MATH:   If a graded free resolution of S/J stops at F_c, then
+          Ext^c_S(S/J,S)=coker(transpose(d_c)).
+        The procedure uses this cokernel only after checking that F_{c+1}=0.
+        This is the arithmetically Cohen--Macaulay case.  Without that check,
+        coker(transpose(d_c)) generally has positive ambient rank (equivalently,
+        an additional positive-rank quotient) and is not the canonical module.
+        In the certified terminal case the canonical module is maximal
+        Cohen--Macaulay, hence has no irrelevant torsion.  Saturating this exact
+        cokernel again would only repeat a costly standard-basis computation.
+EXAMPLE:
+  // internal: complete intersections usually terminate in this branch.
+"
+{
+  if (codimensionValue<1) { return(list(0)); }
+
+  intvec inputWeights=attrib(A,"isHomog");
+  // fres requires a standard-basis input.  A zero raw F_(c+1) already proves
+  // that this free resolution stops in codimension c; minimality is not needed
+  // to compute Ext^c as coker(transpose(d_c)).  If a raw higher term remains,
+  // conservatively decline this shortcut and let the exact linkage or Ext
+  // branch take over.  Minimizing merely to recognize additional terminal
+  // cases can be vastly more expensive than those exact branches.
+  module standardA=std(A);
+  attrib(standardA,"isHomog",inputWeights);
+  resolution F=fres(standardA,codimensionValue+1);
+  if (size(F[codimensionValue+1])!=0) { return(list(0)); }
+
+  // fres does not attach the graded free-basis weights which mres supplied.
+  // Propagate them from the target of d_1: the source weights of d_i are the
+  // homogeneous column degrees of d_i, hence the target weights of d_(i+1).
+  intvec targetWeights=inputWeights;
+  module dc;
+  int step;
+  for (step=1; step<=codimensionValue; step++)
+  {
+    dc=F[step];
+    attrib(dc,"isHomog",targetWeights);
+    if (step<codimensionValue)
+    {
+      targetWeights=KSCresolutionColumnWeights(dc);
+    }
+  }
+
+  int i;
+  module W=transpose(dc);
+  intvec dualWeights;
+  for (i=1; i<=nrows(W); i++)
+  {
+    dualWeights[i]=-KSCresolutionWeightedDegree(dc[i],targetWeights)
+                   +nvars(basering);
+  }
+  attrib(W,"isHomog",dualWeights);
+  return(list(1,W));
+}
+
+static proc KSCcanonicalModuleFromCodimTwoLinkage(ideal J)
+"USAGE:  KSCcanonicalModuleFromCodimTwoLinkage(J);  internal saturated codimension-two surface ideal in five variables.
+RETURN: list [flag,W].  flag=1 and W is an exact saturated canonical-sheaf
+        presentation when a certified complete-intersection pair was found;
+        flag=0 means that no such pair occurred among the supplied generators.
+        On success W also retains the theorem-certified fractional-ideal frame
+        used by the classifier's trusted internal rank-one path.
+MATH:   Choose a homogeneous regular sequence C=(f,g) inside J and put
+        L=C:J.  Since the classifier assumes a smooth integral surface, J is
+        unmixed of height two.  Complete-intersection liaison gives
+          omega_{S/J} = (L/C)(deg(f)+deg(g)-5).
+        More generally the final shift is deg(f)+deg(g)-nvars(S).  The height
+        of C is checked before this formula is used; otherwise the procedure
+        declines and the caller retains the Ext computation.  Moreover
+        L/C embeds in the Cohen--Macaulay module S/C, so it has no irrelevant
+        torsion: the liaison presentation is already saturated and must not be
+        saturated a second time.
+EXAMPLE:
+  // internal: non-ACM surfaces in projective four-space use this branch.
+"
+{
+  if (nvars(basering)!=5) { return(list(0)); }
+
+  int found=0;
+  poly f;
+  poly g;
+  int i;
+  int j;
+  for (i=1; (i<=size(J)-1) && (found==0); i++)
+  {
+    for (j=i+1; (j<=size(J)) && (found==0); j++)
+    {
+      if ((J[i]!=0) && (J[j]!=0))
+      {
+        ideal candidate=J[i],J[j];
+        if (dim(std(candidate))==nvars(basering)-2)
+        {
+          f=J[i];
+          g=J[j];
+          found=1;
+        }
+      }
+    }
+  }
+  if (found==0) { return(list(0)); }
+
+  ideal completeIntersection=f,g;
+  ideal residual=quotient(completeIntersection,J);
+  residual=minbase(std(residual));
+  if (size(residual)==0) { return(list(0)); }
+
+  module W=modulo(residual,completeIntersection);
+  int canonicalShift=deg(f)+deg(g)-nvars(basering);
+  intvec weights;
+  for (i=1; i<=size(residual); i++)
+  {
+    weights[i]=deg(residual[i])-canonicalShift;
+  }
+  attrib(W,"isHomog",weights);
+  if (!homog(W))
+  {
+    ERROR("internal error: the linkage canonical presentation is not homogeneous");
+  }
+  // The liaison formula proves more than the presentation: it supplies the
+  // canonical fractional-ideal frame itself.  Retain this trusted internal
+  // certificate so the classifier does not later rediscover the same rank-one
+  // functional by generic saturation and linear algebra.  Public rank-one
+  // sheaf constructors continue to validate arbitrary user-supplied data.
+  attrib(W,"KSCtrustedLinkageFrame",1);
+  attrib(W,"KSCtrustedFrameImages",residual);
+  attrib(W,"KSCtrustedFrameShift",canonicalShift);
+  return(list(1,W));
+}
+
+static proc KSCcanonicalModuleFromSatIdeal(ideal J)
+"USAGE:  KSCcanonicalModuleFromSatIdeal(J);  saturated homogeneous surface ideal.
+RETURN: A saturated graded presentation of the canonical module omega_X.
+MATH:   Let S=k[x_0,...,x_N] and c=codim X.  The dualizing module of S/J is
+        Ext^c_S(S/J,S)(-N-1).  For smooth X this sheaf is the canonical sheaf.
+        The implementation first reads this cokernel directly from a terminal
+        codimension differential when the resolution certifies F_{c+1}=0.
+        For a non-ACM codimension-two surface in projective four-space it next
+        uses the exact complete-intersection liaison formula.  Only when
+        neither theorem applies does it form the generic Ext homology.  All
+        three branches return the same saturated canonical module without a
+        posterior saturation: the terminal module is maximal Cohen--Macaulay,
+        L/C embeds in S/C in the liaison branch, and the generic canonical
+        module of the documented integral surface is torsion-free.  The whole
+        dispatch temporarily clears degBound: otherwise a bounded resolution
+        computation can suppress F_{c+1} and create a false terminal
+        certificate, and the liaison or Ext standard-basis computations can
+        also be truncated.  The caller's bound is restored before every normal
+        return.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4;
+  ideal J=KSCsatIdeal(X); KSCcanonicalModuleFromSatIdeal(J);
+"
+{
+  int savedDegBound=degBound;
+  degBound=0;
+
+  int ringdim=nvars(basering);        // N+1
+  int affdim=dim(std(J));
+  int codim=ringdim-affdim;
+
+  module A=KSCstructureModule(J);     // presentation of S/J
+  list direct=KSCcanonicalModuleFromTerminalResolution(A,codim);
+  if (direct[1]==1)
+  {
+    module terminalCanonical=direct[2];
+    attrib(terminalCanonical,"KSCcanonicalMethod","terminal");
+    degBound=savedDegBound;
+    return(terminalCanonical);
+  }
+
+  if ((codim==2) && (ringdim==5))
+  {
+    list linked=KSCcanonicalModuleFromCodimTwoLinkage(J);
+    if (linked[1]==1)
+    {
+      module linkageCanonical=linked[2];
+      attrib(linkageCanonical,"KSCcanonicalMethod","linkage");
+      degBound=savedDegBound;
+      return(linkageCanonical);
+    }
+  }
+
+  module W0=Ext_R(codim,A);           // Ext^c_S(S/J,S)
+
+  // omega_X = Ext^c_S(S/J,S)(-N-1) = Ext^c_S(S/J,S)(-ringdim).
+  // In the degree-vector convention used by sheafcoh this is represented by
+  // adding ringdim to the row weights.
+  module W=KSCshift(W0,ringdim);
+  attrib(W,"KSCcanonicalMethod","Ext");
+  degBound=savedDegBound;
+  return(W);
+}
+
+proc KSCcanonicalModule(ideal I)
+"USAGE:  KSCcanonicalModule(I);  homogeneous surface ideal.
+RETURN: A saturated graded presentation of omega_X.
+ATTRIB: attrib(result,"KSCcanonicalMethod") is "terminal", "linkage", or
+        "Ext" and records the exact construction that returned the module.
+MATH:   This public-safe wrapper first saturates the projective ideal.  It then
+        uses a certified terminal resolution, the codimension-two P4 liaison
+        theorem, or the general Ext formula, in that order.  The shared ideal
+        saturation and the certified dispatch each preserve degBound.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4;
+  module W=KSCcanonicalModule(X); attrib(W,"KSCcanonicalMethod");
+"
+{
+  ideal J=KSCsatIdeal(I);
+  return(KSCcanonicalModuleFromSatIdeal(J));
+}
+
+static proc KSCsubcanonicalIndexFromCanonical(ideal J, module W)
+"USAGE:  KSCsubcanonicalIndexFromCanonical(J,W);  saturated support J and its canonical module W.
+RETURN: list [flag,k], with the same certificate as KSCsubcanonicalIndex.
+NOTE:   This internal form reuses a canonical module already computed by the
+        classifier instead of repeating its certified construction.
+EXAMPLE:
+  // internal: used by KSCsubcanonicalIndex and KSCclassify.
+"
+{
+  if (nrows(W)==1)
+  {
+    ideal R=KSCrelationIdealOneRow(W);
+    if (KSCsameSaturatedIdeal(R,J)==1)
+    {
+      intvec w=attrib(W,"isHomog");
+      return(list(1,-w[1]));
+    }
+  }
+  return(list(0,0));
+}
+
+proc KSCsubcanonicalIndex(ideal I)
+"USAGE:  KSCsubcanonicalIndex(I);  homogeneous ideal of a smooth surface.
+RETURN: list [flag,k].  flag=1 means the canonical module is certified to be
+        O_X(k) in the given embedding.  flag=0 means no such certificate was
+        obtained.
+MATH:   If omega_X is O_X(k), then k<0 gives kappa=-infinity, k=0 gives
+        kappa=0, and k>0 gives general type.  This is exact and very cheap for
+        hypersurfaces, complete intersections, and other subcanonical surfaces.
+        The code does not merely test that the module has one row: it also
+        checks that the one-row relation ideal has the same saturation as I.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCsubcanonicalIndex(X);     // expects O_X(1) for a smooth quintic in P^3
+"
+{
+  ideal J=KSCsatIdeal(I);
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  return(KSCsubcanonicalIndexFromCanonical(J,W));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Tensor powers of presented sheaves/modules.
+///////////////////////////////////////////////////////////////////////////////
+
+static proc KSCtensorWeights(module A, module B)
+"USAGE:  KSCtensorWeights(A,B);  homogeneous presented modules.
+RETURN: Row-degree vector for the tensor-product presentation.
+MATH:   A generator of A tensor B has degree equal to the sum of the two row
+        degrees.  This bookkeeping is essential for extracting degree-zero
+        sections of mK and degree-one sections of K+H.
+EXAMPLE:
+  // internal: called by KSCtensorPres during omega^m computations.
+"
+{
+  intvec wa=attrib(A,"isHomog");
+  intvec wb=attrib(B,"isHomog");
+  int sa=nrows(A); int sb=nrows(B);
+  intvec w;
+  int i; int j; int k=1;
+  for (i=1; i<=sa; i++)
+  {
+    for (j=1; j<=sb; j++)
+    {
+      w[k]=wa[i]+wb[j];
+      k++;
+    }
+  }
+  return(w);
+}
+
+static proc KSCtensorPres(module A, module B)
+"USAGE:  KSCtensorPres(A,B);  homogeneous presented modules.
+RETURN: A saturated presentation for the tensor product sheaf A tensor B.
+MATH:   Plurigenera require omega_X^{tensor m}.  Tensoring presentations can
+        introduce irrelevant torsion, so the result is saturated before taking
+        global sections on Proj.
+EXAMPLE:
+  // internal: if W=omega_X, KSCtensorPres(W,W) represents 2K_X.
+"
+{
+  matrix T=fastTensorMod(A,B);
+  module M=T;
+  intvec w=KSCtensorWeights(A,B);
+  attrib(M,"isHomog",w);
+  M=KSCsatModule(M);
+  return(M);
+}
+
+static proc KSCtensorPowerPresentation(module W, int m)
+"USAGE:  KSCtensorPowerPresentation(W,m);  homogeneous presentation, m>=1.
+RETURN: Saturated presentation of W^m built successively.
+NOTE:   The original exact-map command uses this module-only tensor path.
+EXAMPLE:
+  // internal: KSCphiDimExactOriginal applies it to omega_X.
+"
+{
+  if (m<1) { ERROR("a positive tensor power is required"); }
+  module power=W;
+  int i;
+  for (i=2; i<=m; i++) { power=KSCtensorPres(power,W); }
+  return(power);
+}
+
+static proc KSCsectionBackendCheck(string backend)
+"USAGE:  KSCsectionBackendCheck(backend);  internal backend validator.
+RETURN: The validated scalar-frame backend name, linear or spasm.
+NOTE:   This low-level checker remains strict.  Classifier-only automatic and
+        original choices are validated separately and never enter a public
+        section command.
+EXAMPLE:
+  // internal: called before constructing a cached canonical frame.
+"
+{
+  if (backend=="linear") { return(backend); }
+  if (backend=="spasm") { return(backend); }
+  ERROR("section backend must be linear or spasm");
+}
+
+static proc KSCclassifierBackendCheck(string backend)
+"USAGE:  KSCclassifierBackendCheck(backend);  internal classifier validator.
+RETURN: The validated classifier backend: auto, original, linear, or spasm.
+NOTE:   auto and original are classifier policies, not section backends.
+EXAMPLE:
+  // internal: used by classifier entry points.
+"
+{
+  if (backend=="auto") { return(backend); }
+  if (backend=="original") { return(backend); }
+  if (backend=="linear") { return(backend); }
+  if (backend=="spasm") { return(backend); }
+  ERROR("classifier backend must be auto, original, linear, or spasm");
+}
+
+static proc KSCresolveClassifierSectionBackend(string backend)
+"USAGE:  KSCresolveClassifierSectionBackend(backend);  internal selector.
+RETURN: original, linear, or spasm.
+NOTE:   Explicit backend choices are returned unchanged.  auto probes the
+        optional SpaSM module when a non-subcanonical classifier first needs
+        a canonical power.  A supported SpaSM backend enables exact
+        fractional-ideal powers and, if reached, the corresponding map;
+        otherwise the original presented-module implementation is selected.
+        A missing module or unsupported coefficient field, including
+        characteristic zero, therefore selects the original implementation.
+        Once SpaSM passes this capability check, internal computation errors
+        remain errors; Singular procedures cannot catch and retry them.  No
+        fallback is installed in any public section command.
+EXAMPLE:
+  // internal: called immediately before a pluricanonical or adjunction map.
+"
+{
+  backend=KSCclassifierBackendCheck(backend);
+  if (backend!="auto") { return(backend); }
+
+  // SpaSM is a prime-field backend.  In characteristic zero the original
+  // classifier path is selected without even attempting to load the module.
+  int coefficientCharacteristic=KSCbaseCharacteristic();
+  if (coefficientCharacteristic==0) { return("original"); }
+  if (coefficientCharacteristic==2) { return("original"); }
+
+  if (!defined(spasm_first_kernel_vector))
+  {
+    // Do not gate this on system("with","spasm"): a compatible developer
+    // module in SINGULARPATH can be usable even when the executable was
+    // configured without an installed SpaSM module.
+    load("sispasm.so","try");
+  }
+  // Singular evaluates Boolean operators eagerly, so keep all probes apart.
+  if (!defined(spasm_supports_current_ring)) { return("original"); }
+  if (!defined(spasm_first_kernel_vector)) { return("original"); }
+  if (!spasm_supports_current_ring()) { return("original"); }
+  return("spasm");
+}
+
+static proc KSCgrowthBoundCheck(int ell)
+"USAGE:  KSCgrowthBoundCheck(ell);  internal product-growth validator.
+RETURN: ell when ell>=3.
+MATH:   Three consecutive Hilbert-function values are the minimum needed for
+        the second-difference estimate.  This remains a heuristic at every
+        finite ell: an initial Hilbert function can imitate another dimension.
+        Use KSCphiDimExact for a theorem-certified answer.
+EXAMPLE:
+  // internal: used by every approximate image-growth entry point.
+"
+{
+  if (ell<3)
+  {
+    ERROR("product-growth image dimension requires ell at least 3");
+  }
+  return(ell);
+}
+
+static proc KSCrelationStartCheck(int startDegree)
+"USAGE:  KSCrelationStartCheck(startDegree);  internal exact-relation validator.
+RETURN: startDegree when startDegree>=1.
+MATH:   An exact relation scan may start in any positive degree.  A relation
+        of smaller degree persists after multiplication by a nonzero map
+        coordinate, while the theorem bound remains the terminating degree.
+EXAMPLE:
+  // internal: used by exact classifier entry points.
+"
+{
+  if (startDegree<1)
+  {
+    ERROR("the initial exact-relation degree must be positive");
+  }
+  return(startDegree);
+}
+
+static proc KSCrankOneSheafWithBackend(module M, ideal J, string backend)
+"USAGE:  KSCrankOneSheafWithBackend(M,J,backend);  internal constructor.
+RETURN: A RankOneSheaf with a cached frame, either retained from the exact
+        linkage construction or recovered by the requested linear-algebra
+        backend.
+NOTE:   A trusted linkage frame is reused without repeating generic
+        trivialization checks.  Otherwise linear uses Singular's generic
+        kernel; spasm is strict and has no fallback.  The classifier's smooth
+        geometrically integral surface hypothesis makes the canonical sheaf
+        and its tensor powers line bundles on the support.  Public rank-one
+        sheaf constructors retain their full validation.
+EXAMPLE:
+  // internal: used by pluricanonical and adjunction maps.
+"
+{
+  backend=KSCsectionBackendCheck(backend);
+
+  // A codimension-two liaison construction has already proved and recorded
+  // the canonical fractional-ideal frame.  Reuse that certificate instead of
+  // applying the generic rank-one trivialization algorithm to its own output.
+  // Keep the checks structural: only the private linkage constructor sets the
+  // marker, and every public constructor still takes the fully validated path.
+  if (typeof(attrib(M,"KSCtrustedLinkageFrame"))=="int")
+  {
+    if (attrib(M,"KSCtrustedLinkageFrame")==1)
+    {
+      ideal trustedImages=attrib(M,"KSCtrustedFrameImages");
+      if (size(trustedImages)!=nrows(M))
+      {
+        ERROR("internal error: a trusted linkage frame has the wrong number of images");
+      }
+      RankOneSheaf trustedCanonical;
+      trustedCanonical.over=basering;
+      trustedCanonical.presentation=M;
+      trustedCanonical.supportIdeal=J;
+      trustedCanonical.trivializationImages=trustedImages;
+      trustedCanonical.trivializationDenom=1;
+      trustedCanonical.trivializationShift=
+        attrib(M,"KSCtrustedFrameShift");
+      trustedCanonical.frameValidated=1;
+      return(trustedCanonical);
+    }
+  }
+
+  if (backend=="linear") { return(rankOneSheafLinear(M,J)); }
+  return(rankOneSheafSpaSM(M,J));
+}
+
+static proc KSCtensorFrameImages(ideal leftImages, ideal rightImages,
+                                 int nrLeft, int nrRight)
+"USAGE:  KSCtensorFrameImages(h,k,r,s);  internal frame tensor product.
+RETURN: The rs pairwise products in the same row order as fastTensorMod.
+EXAMPLE:
+  // internal: cached frames are propagated through canonical tensor powers.
+"
+{
+  ideal images;
+  int i; int j; int k=1;
+  for (i=1; i<=nrLeft; i++)
+  {
+    for (j=1; j<=nrRight; j++)
+    {
+      images[k]=leftImages[i]*rightImages[j];
+      k++;
+    }
+  }
+  return(images);
+}
+
+static proc KSCtensorRankOneSheaves(RankOneSheaf A, RankOneSheaf B)
+"USAGE:  KSCtensorRankOneSheaves(A,B);  cached rank-one sheaves on one support.
+RETURN: A RankOneSheaf presenting A tensor B with the tensor-product rational
+        frame.  The input frames have already been validated or constructed
+        under the classifier hypotheses, so no frame is rediscovered.
+EXAMPLE:
+  // internal: used by KSCtensorPowerRankOneSheaf.
+"
+{
+  if ((A.over!=basering) || (B.over!=basering))
+  {
+    ERROR("set the basering to the coordinate ring of the cached sheaves");
+  }
+  if ((A.frameValidated!=1) || (B.frameValidated!=1))
+  {
+    ERROR("cannot tensor an unvalidated cached frame");
+  }
+  int nrA=nrows(A.presentation);
+  int nrB=nrows(B.presentation);
+  module M=KSCtensorPres(A.presentation,B.presentation);
+  if (nrows(M)!=nrA*nrB)
+  {
+    ERROR("internal error: tensor presentation changed the free-generator count");
+  }
+  ideal images=KSCtensorFrameImages(A.trivializationImages,
+                                    B.trivializationImages,nrA,nrB);
+  RankOneSheaf F;
+  F.over=basering;
+  F.presentation=M;
+  F.supportIdeal=A.supportIdeal;
+  F.trivializationImages=images;
+  F.trivializationDenom=A.trivializationDenom*B.trivializationDenom;
+  F.trivializationShift=A.trivializationShift+B.trivializationShift;
+  F.frameValidated=1;
+  return(F);
+}
+
+static proc KSCtensorPowerRankOneSheaf(RankOneSheaf F, int m)
+"USAGE:  KSCtensorPowerRankOneSheaf(F,m);  cached rank-one sheaf and m>=1.
+RETURN: F^m with a propagated cached frame.
+NOTE:   Only the first frame is recovered by the selected backend.  Every
+        tensor power reuses it, avoiding generic frame rediscovery.
+EXAMPLE:
+  // internal: used for pluricanonical maps.
+"
+{
+  if (m<1) { ERROR("a positive tensor power is required"); }
+  RankOneSheaf T=F;
+  int i;
+  for (i=2; i<=m; i++) { T=KSCtensorRankOneSheaves(T,F); }
+  return(T);
+}
+
+// Multiply two trusted line-bundle images inside the homogeneous coordinate
+// ring and retain a compact set of representatives modulo the support.  No
+// irrelevant saturation is needed: the following section-module computation
+// depends only on the sheafification, and standardization does not change the
+// quotient ideal on X.
+static proc KSCfractionalImageProduct(ideal leftImages, ideal rightImages,
+                                      ideal J)
+"USAGE:  KSCfractionalImageProduct(h,k,J);  internal homogeneous fractional-image numerators and saturated support.
+RETURN: Homogeneous generators modulo J for the product of the two image
+        ideals.
+MATH:   On the smooth integral classifier input, every canonical power is a
+        line bundle.  Hence multiplication identifies the tensor product of
+        two fractional image ideals with the product ideal sheaf.  Terms in J
+        and irrelevant torsion do not affect its sheafification.
+EXAMPLE:
+  // internal: used by KSCfractionalTensorRankOneSheaves.
+"
+{
+  ideal GJ=std(J);
+  ideal images=std(leftImages*rightImages+J);
+  images=minbase(images);
+  images=reduce(images,GJ);
+  images=simplify(images,2);
+  if (size(images)==0)
+  {
+    ERROR("internal error: a product of nonzero line-bundle frames vanished on the integral support");
+  }
+  if (!homog(images))
+  {
+    ERROR("internal error: fractional line-bundle products must remain homogeneous");
+  }
+  return(images);
+}
+
+static proc KSCfractionalPresentation(ideal images, poly frameDenom,
+                                      int shift, ideal J)
+"USAGE:  KSCfractionalPresentation(h,f,t,J);  internal homogeneous fractional image h/f of grading shift t.
+RETURN: A graded presentation of the image ideal sheaf on Proj(S/J).
+MATH:   A numerator g represents a generator of degree
+          deg(g)-deg(f)-t.
+        The resulting coker(modulo(h,J)) is the supplied fractional ideal
+        sheaf with precisely that grading.
+EXAMPLE:
+  // internal: used by KSCfractionalTensorRankOneSheaves.
+"
+{
+  if ((frameDenom==0) || (!homog(frameDenom)))
+  {
+    ERROR("internal error: a fractional line-bundle denominator must be nonzero and homogeneous");
+  }
+  module M=modulo(images,J);
+  intvec weights;
+  weights[size(images)]=0;
+  int i;
+  for (i=1; i<=size(images); i++)
+  {
+    weights[i]=deg(images[i])-deg(frameDenom)-shift;
+  }
+  attrib(M,"isHomog",weights);
+  if (!homog(M))
+  {
+    ERROR("internal error: fractional line-bundle presentation has inconsistent grading");
+  }
+  return(M);
+}
+
+static proc KSCfractionalTensorRankOneSheaves(RankOneSheaf A,
+                                              RankOneSheaf B)
+"USAGE:  KSCfractionalTensorRankOneSheaves(A,B);  trusted line bundles on the same smooth integral support.
+RETURN: A RankOneSheaf for A tensor B, represented by the product of their
+        fractional image ideals rather than by fastTensorMod.
+NOTE:   This classifier-only operation is exact under the line-bundle input
+        hypothesis.  It is deliberately not a generic tensor operation for
+        non-locally-free rank-one torsion-free sheaves.  The product
+        presentation is not saturated; sheafSectionModule computes from its
+        sheafification directly.
+EXAMPLE:
+  // internal: successive canonical powers use this operation.
+"
+{
+  if ((A.over!=basering) || (B.over!=basering))
+  {
+    ERROR("set the basering to the coordinate ring of the cached sheaves");
+  }
+  if ((A.frameValidated!=1) || (B.frameValidated!=1))
+  {
+    ERROR("cannot multiply unvalidated fractional frames");
+  }
+  ideal images=KSCfractionalImageProduct(A.trivializationImages,
+                                         B.trivializationImages,
+                                         A.supportIdeal);
+  poly frameDenom=A.trivializationDenom*B.trivializationDenom;
+  int shift=A.trivializationShift+B.trivializationShift;
+  module M=KSCfractionalPresentation(images,frameDenom,shift,
+                                     A.supportIdeal);
+
+  RankOneSheaf F;
+  F.over=basering;
+  F.presentation=M;
+  F.supportIdeal=A.supportIdeal;
+  F.trivializationImages=images;
+  F.trivializationDenom=frameDenom;
+  F.trivializationShift=shift;
+  F.frameValidated=1;
+  return(F);
+}
+
+static proc KSCsupportRegularityUpperBound(ideal J)
+"USAGE:  KSCsupportRegularityUpperBound(J);  internal saturated homogeneous support ideal.
+RETURN: A certified upper bound for reg(S/J).
+MATH:   If
+          ... -> direct_sum_j S(-b_i_j) -> ... -> S -> S/J -> 0
+        is any complete homogeneous free resolution, not necessarily minimal,
+        then
+          reg(S/J) <= max_(i,j)(b_i_j-i).
+        The procedure reads this bound from a complete raw Schreyer resolution.
+        It deliberately does not minimize the resolution: cancellation can
+        sharpen the bound but is unnecessary for the vanishing certificate
+        used below.  Since
+          end(H^1_m(S/J)) <= reg(S/J)-1,
+        every e at least this returned bound satisfies
+          (S/J)_e = H^0(X,O_X(e)).
+NOTE:   fres does not retain all free-basis degrees, so they are propagated
+        successively from each homogeneous differential.  degBound is cleared
+        for the complete resolution and restored before return.
+EXAMPLE:
+  // internal: certifies the direct Hilbert slice in the abelian P_4 branch.
+"
+{
+  module A=KSCstructureModule(J);
+  intvec targetWeights=attrib(A,"isHomog");
+  module standardA=std(A);
+  attrib(standardA,"isHomog",targetWeights);
+
+  int savedDegBound=degBound;
+  degBound=0;
+  resolution F=fres(standardA,0);
+  degBound=savedDegBound;
+
+  int regularityBound=targetWeights[1];
+  int generatorIndex;
+  for (generatorIndex=2; generatorIndex<=size(targetWeights);
+       generatorIndex++)
+  {
+    regularityBound=max(regularityBound,
+                         targetWeights[generatorIndex]);
+  }
+
+  int step;
+  module differential;
+  intvec sourceWeights;
+  for (step=1; step<=nvars(basering); step++)
+  {
+    differential=F[step];
+    if (size(differential)==0) { break; }
+    attrib(differential,"isHomog",targetWeights);
+    if (!homog(differential))
+    {
+      ERROR("internal error: the support resolution is not homogeneous");
+    }
+    sourceWeights=KSCresolutionColumnWeights(differential);
+    for (generatorIndex=1; generatorIndex<=size(sourceWeights);
+         generatorIndex++)
+    {
+      regularityBound=max(regularityBound,
+                           sourceWeights[generatorIndex]-step);
+    }
+    targetWeights=sourceWeights;
+  }
+  return(regularityBound);
+}
+
+static proc KSCidealQuotientHilbertFunctionAtDegree(ideal G, int e)
+"USAGE:  KSCidealQuotientHilbertFunctionAtDegree(G,e);  internal homogeneous ideal and degree.
+RETURN: The Hilbert function dim_k(S/G)_e.
+MATH:   Singular's hilb(std(G),1) returns the numerator
+          q(z)=sum_i q_i z^i
+        of the first Hilbert series with ambient denominator
+          (1-z)^n,  n=nvars(S).
+        Since the degree-r coefficient of (1-z)^(-n) is
+          binomial(n-1+r,n-1),
+        the requested value is
+          sum_{0<=i<=e} q_i binomial(n-1+e-i,n-1).
+        The coefficients are accumulated as bigint values before the final
+        conversion.  The standard basis and Hilbert numerator are computed
+        with degBound cleared so an unrelated caller bound cannot truncate
+        this exact dimension.
+EXAMPLE:
+  // internal: consumed by KSCfractionalDirectSectionDimension.
+"
+{
+  if (e<0) { return(0); }
+  int savedDegBound=degBound;
+  degBound=0;
+  bigintvec hilbertNumerator=hilb(std(G),1);
+  degBound=savedDegBound;
+
+  int denominatorDegree=nvars(basering)-1;
+  int i;
+  bigint value=0;
+  for (i=1; i<=size(hilbertNumerator); i++)
+  {
+    // hilbertNumerator[i] is the coefficient of z^(i-1).
+    if (e-i+1>=0)
+    {
+      value=value+hilbertNumerator[i]
+        *binomial(denominatorDegree+e-i+1,denominatorDegree);
+    }
+  }
+  return(int(value));
+}
+
+static proc KSCfractionalDirectSectionDimensionIfCertified(RankOneSheaf F,
+                                                            int d)
+"USAGE:  KSCfractionalDirectSectionDimensionIfCertified(F,d);  internal cached fractional line bundle and twist.
+RETURN: A list [available,value,bound,e].  If available=1, value is the exact
+        dimension of H^0(X,F(d)); if available=0, no dimension was computed.
+        bound is a certified upper bound for reg(S/J), and e is the scalar
+        slice degree.
+ASSUME: F is a classifier-owned line bundle with a validated fractional frame
+        I/f of grading shift t on the saturated homogeneous support J.
+MATH:   Put e=deg(f)+d+t and K=sat(J+I,irrelevant).  When
+          e >= reg(S/J),
+        the natural map (S/J)_e -> H^0(X,O_X(e)) is onto.  Since K is
+        saturated, (S/K)_e injects into H^0(Proj(S/K),O(e)); hence every
+        sheaf section of the fractional ideal lifts to K_e/J_e.  Therefore
+          h^0(X,F(d)) = HF(S/J,e)-HF(S/K,e).
+        The raw-resolution upper bound certifies e>=reg(S/J) without assuming
+        projective normality.  If it does not certify the requested degree,
+        available=0 tells the classifier to select its general exact section
+        algorithm instead.  No candidate result is computed and checked
+        twice.  When certified, taking the Hilbert-function difference avoids
+        both a multiplication tail and the costly explicit basis construction
+        intersect(K,maxideal(e)).
+EXAMPLE:
+  // internal: the q=2, P_1=1 branch computes P_4 from its cached frame.
+"
+{
+  if (F.over!=basering)
+  {
+    ERROR("set the basering to the coordinate ring of the cached sheaf");
+  }
+  if (F.frameValidated!=1)
+  {
+    ERROR("cannot use an unvalidated fractional frame");
+  }
+  int e=deg(F.trivializationDenom)+d+F.trivializationShift;
+  if (e<0) { return(list(1,0,0,e)); }
+
+  ideal J=std(F.supportIdeal);
+  int regularityBound=KSCsupportRegularityUpperBound(J);
+  if (e<regularityBound)
+  {
+    return(list(0,0,regularityBound,e));
+  }
+  ideal saturatedImages=KSCsatIdeal(J+F.trivializationImages);
+  int supportDimension=KSCidealQuotientHilbertFunctionAtDegree(J,e);
+  int imageQuotientDimension=
+    KSCidealQuotientHilbertFunctionAtDegree(saturatedImages,e);
+  int result=supportDimension-imageQuotientDimension;
+  if (result<0)
+  {
+    ERROR("internal error: a saturated fractional image has negative section dimension");
+  }
+  return(list(1,result,regularityBound,e));
+}
+
+static proc KSCpowerFrameOnPresentation(RankOneSheaf F, module M, int m)
+"USAGE:  KSCpowerFrameOnPresentation(F,M,m);  cached rank-one sheaf F and a previously computed presentation M of F^m.
+RETURN: A RankOneSheaf using M and the m-th tensor power of F's cached frame.
+NOTE:   This reuses a tensor-power presentation retained by a preceding
+        plurigenus computation.  It propagates only the inexpensive frame data
+        and does not recompute or resaturate the presentation.
+EXAMPLE:
+  // internal: the classifier reuses its cached omega_X^5 or omega_X^6.
+"
+{
+  if (m<1) { ERROR("a positive tensor power is required"); }
+  if (F.over!=basering)
+  {
+    ERROR("set the basering to the coordinate ring of the cached sheaf");
+  }
+  if (F.frameValidated!=1)
+  {
+    ERROR("cannot propagate an unvalidated cached frame");
+  }
+  ideal images=F.trivializationImages;
+  int nrFactor=nrows(F.presentation);
+  int nrPower=nrFactor;
+  int i;
+  for (i=2; i<=m; i++)
+  {
+    images=KSCtensorFrameImages(images,F.trivializationImages,
+                                nrPower,nrFactor);
+    nrPower=nrPower*nrFactor;
+  }
+  if (nrows(M)!=nrPower)
+  {
+    ERROR("cached tensor-power presentation and propagated frame are incompatible");
+  }
+  RankOneSheaf T;
+  T.over=basering;
+  T.presentation=M;
+  T.supportIdeal=F.supportIdeal;
+  T.trivializationImages=images;
+  T.trivializationDenom=F.trivializationDenom^m;
+  T.trivializationShift=m*F.trivializationShift;
+  T.frameValidated=1;
+  return(T);
+}
+
+static proc KSCcertifiedSectionSpace(RankOneSheaf F, int d)
+"USAGE:  KSCcertifiedSectionSpace(F,d);  cached line bundle and twist.
+RETURN: A SectionSpace obtained from the bulk degree-d slice.
+MATH:   KSCsectionBasis first certifies with dimH that the saturated degree
+        slice is all of H^0.  The cached rational frame then scalarizes that
+        same slice.  A mismatch is an error; there is no BGG or other fallback.
+EXAMPLE:
+  // internal: consumed by scalar image-growth and exact relation algorithms.
+"
+{
+  module B=KSCsectionBasis(F.presentation,d);
+  int h=size(B);
+  ideal coordinates;
+  if (h>0)
+  {
+    int presentationRank=nrows(F.presentation);
+    matrix frame=matrix(F.trivializationImages);
+    matrix BM=matrix(B);
+    if (ncols(frame)!=presentationRank)
+    {
+      ERROR("internal error: cached frame and sheaf presentation have incompatible ranks");
+    }
+    if ((ncols(BM)!=h) || (nrows(BM)>presentationRank))
+    {
+      ERROR("internal error: cached frame and certified section basis are incompatible");
+    }
+    // Modules omit identically zero trailing coordinates unless their ambient
+    // rank attribute is retained.  Pad defensively as this boundary also
+    // accepts section modules produced by older library versions.
+    matrix paddedBasis[presentationRank][h];
+    if (nrows(BM)>0)
+    {
+      paddedBasis[1..nrows(BM),1..ncols(BM)]=BM;
+    }
+    matrix scalarCoordinates=frame*paddedBasis;
+    int j;
+    poly p;
+    for (j=1; j<=h; j++)
+    {
+      p=scalarCoordinates[1,j];
+      if (p==0)
+      {
+        ERROR("internal error: cached frame killed a certified basis section");
+      }
+      coordinates[j]=p;
+    }
+  }
+  SectionSpace V;
+  V.over=basering;
+  V.presentation=F.presentation;
+  V.supportIdeal=F.supportIdeal;
+  V.basis=coordinates;
+  V.denom=F.trivializationDenom;
+  V.trivializationImages=F.trivializationImages;
+  V.trivializationDenom=F.trivializationDenom;
+  V.twist=d;
+  V.trivializationShift=F.trivializationShift;
+  V.tailDegree=d;
+  return(V);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Degree-d global sections and multiplication growth.
+///////////////////////////////////////////////////////////////////////////////
+
+static proc KSCsectionBasis(module M, int d)
+"USAGE:  KSCsectionBasis(M,d);  homogeneous module M and integer d.
+RETURN: A module whose nonzero columns represent a certified basis of
+        H^0(Proj,M~(d)).
+MATH:   Plurigenera are dimensions of such spaces for M=omega_X^m and d=0;
+        adjunction uses M=omega_X and d=1, corresponding to K_X+H.  The
+        saturated degree-d slice injects into H^0.  Equality of its dimension
+        with dimH(0,M,d) certifies that no H^1_m deficiency sections are
+        missing.  Once certified, sheafSectionBasis at tail d is a bulk
+        linear-algebra construction of that slice; no BGG computation or
+        fallback is used.
+EXAMPLE:
+  // internal: if W=omega_X, KSCsectionBasis(W,0) gives canonical sections.
+"
+{
+  module Ms=KSCsatModule(M);
+  int gradedDimension=dimGradedPart(Ms,d);
+  int sheafDimension=dimH(0,Ms,d);
+  if (gradedDimension!=sheafDimension)
+  {
+    ERROR("certified section slice failed at twist "+string(d)
+          +": saturated graded-piece dimension "+string(gradedDimension)
+          +" differs from h^0 "+string(sheafDimension));
+  }
+  poly one=1;
+  list S=sheafSectionBasis(Ms,d,d,one,0);
+  module B=S[1];
+  if (size(B)!=sheafDimension)
+  {
+    ERROR("internal error: certified bulk section basis has dimension "
+          +string(size(B))+" instead of "+string(sheafDimension));
+  }
+  return(B);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Original classifier section and graph implementation.
+//
+// These routines preserve the module-vector path used by the
+// enriqueskodaira classifier before the cached rational-frame implementation
+// was added.  The exact graph algorithm now obtains the same module-vector
+// degree slice with the current certified bulk extractor instead of the old
+// repeated-saturation greedy scan; it still does not recover a rational frame
+// or invoke BGG.  These routines deliberately live here, at the classifier
+// call site; the public section commands in sheafcoh.lib remain strict and
+// contain no backend fallback.
+///////////////////////////////////////////////////////////////////////////////
+
+static proc KSCoriginalSpanRank(module M, module U, int d)
+"USAGE:  KSCoriginalSpanRank(M,U,d);  internal original classifier helper.
+RETURN: Dimension of the degree-d subspace represented by U in coker(M).
+NOTE:   This is the span computation used by the earlier enriqueskodaira
+        classifier.  It is retained for its module-product adjunction path.
+EXAMPLE:
+  // internal: used by KSCoriginalProductBasisAtDegree.
+"
+{
+  module Ms=KSCsatModule(M);
+  intvec w=attrib(Ms,"isHomog");
+  int h=dimGradedPart(Ms,d);
+  if (size(U)==0) { return(0); }
+  module Q=Ms,U;
+  attrib(Q,"isHomog",w);
+  int hq=dimGradedPart(Q,d);
+  return(h-hq);
+}
+
+static proc KSCoriginalIndependentFromCandidates(module M,
+                                                  module candidates,
+                                                  int d)
+"USAGE:  KSCoriginalIndependentFromCandidates(M,C,d);  internal helper.
+RETURN: Independent degree-d representatives selected from C.
+NOTE:   The former implementation could retain a leading zero column because
+        an empty Singular module has one display column.  This preserved
+        implementation uses size(U), so the fallback returns actual sections.
+EXAMPLE:
+  // internal: used by KSCoriginalProductBasisAtDegree.
+"
+{
+  module U;
+  int currentRank=0;
+  int candidateRank;
+  int j;
+  module oneCandidate;
+  module trial;
+  for (j=1; j<=ncols(candidates); j++)
+  {
+    oneCandidate=candidates[j];
+    if (oneCandidate!=0)
+    {
+      if (size(U)==0) { trial=oneCandidate; }
+      else { trial=U,oneCandidate; }
+      candidateRank=KSCoriginalSpanRank(M,trial,d);
+      if (candidateRank>currentRank)
+      {
+        U=trial;
+        currentRank=candidateRank;
+      }
+    }
+  }
+  return(U);
+}
+
+static proc KSCoriginalSectionBasis(module M, int d)
+"USAGE:  KSCoriginalSectionBasis(M,d);  internal original classifier path.
+RETURN: Module-vector representatives of H^0(Proj,M~(d)).
+MATH:   The original classifier graph algorithm consumes module-vector
+        sections.  Use the current certified bulk degree-slice construction
+        for those representatives: this neither recovers a rational frame nor
+        invokes BGG.  The older repeated-saturation candidate scan remains
+        only where the original adjunction product algorithm needs it.
+EXAMPLE:
+  // internal: consumed by the original graph and product-growth paths.
+"
+{
+  return(KSCsectionBasis(M,d));
+}
+
+static proc KSCoriginalTensorVector(vector v, vector w,
+                                    int nrV, int nrW)
+"USAGE:  KSCoriginalTensorVector(v,w,nrV,nrW);  internal helper.
+RETURN: Kronecker-style tensor product of two section vectors.
+EXAMPLE:
+  // internal: used by KSCoriginalProductBasisAtDegree.
+"
+{
+  vector z;
+  int i; int j; int k=1;
+  for (i=1; i<=nrV; i++)
+  {
+    for (j=1; j<=nrW; j++)
+    {
+      z=z+v[i]*w[j]*gen(k);
+      k++;
+    }
+  }
+  return(z);
+}
+
+static proc KSCoriginalProductBasisAtDegree(module target,
+                                            module leftBasis,
+                                            module rightBasis,
+                                            int nrLeft, int nrRight, int d)
+"USAGE:  KSCoriginalProductBasisAtDegree(T,L,R,nrL,nrR,d);  internal.
+RETURN: Independent products in degree d of the target tensor product.
+EXAMPLE:
+  // internal: used by KSCoriginalLinearSystemImageDim.
+"
+{
+  module candidates;
+  int i; int j;
+  vector z;
+  module oneCandidate;
+  for (i=1; i<=size(leftBasis); i++)
+  {
+    for (j=1; j<=size(rightBasis); j++)
+    {
+      z=KSCoriginalTensorVector(leftBasis[i],rightBasis[j],nrLeft,nrRight);
+      oneCandidate=z;
+      if (size(candidates)==0) { candidates=oneCandidate; }
+      else { candidates=candidates,oneCandidate; }
+    }
+  }
+  return(KSCoriginalIndependentFromCandidates(target,candidates,d));
+}
+
+static proc KSCoriginalLinearSystemImageDim(module L, int d, int ell)
+"USAGE:  KSCoriginalLinearSystemImageDim(L,d,ell);  internal original path.
+RETURN: Estimated image dimension -1,0,1,2 from module-section products.
+NOTE:   This is used only by the optional adjunction diagnostic.  Exact
+        pluricanonical classification uses KSCoriginalExactImageDimFromModule.
+EXAMPLE:
+  // internal: classifier-level fallback for the adjunction diagnostic.
+"
+{
+  ell=KSCgrowthBoundCheck(ell);
+  module B=KSCoriginalSectionBasis(L,d);
+  int h1=size(B);
+  if (h1==0) { return(-1); }
+  if (h1==1) { return(0); }
+  if (h1==2) { return(1); }
+
+  intvec h; h[1]=h1;
+  module currentTarget=L;
+  module currentBasis=B;
+  int currentRows=nrows(currentTarget);
+  int rowsL=nrows(L);
+  int a;
+  module nextTarget;
+  module nextBasis;
+  for (a=2; a<=ell; a++)
+  {
+    nextTarget=KSCtensorPres(currentTarget,L);
+    nextBasis=KSCoriginalProductBasisAtDegree(nextTarget,currentBasis,B,
+                                              currentRows,rowsL,a*d);
+    h[a]=size(nextBasis);
+    currentTarget=nextTarget;
+    currentBasis=nextBasis;
+    currentRows=nrows(currentTarget);
+  }
+
+  int secondDifference=h[ell]-2*h[ell-1]+h[ell-2];
+  if (secondDifference>0) { return(2); }
+  if (h[ell]>h[ell-1]) { return(1); }
+  return(0);
+}
+
+static proc KSCoriginalSectionVanishingIdeal(module M, vector v)
+"USAGE:  KSCoriginalSectionVanishingIdeal(M,v);  internal helper.
+RETURN: Maximal-minor ideal for the zero locus of v in coker(M).
+EXAMPLE:
+  // internal: used by KSCoriginalExactImageDimFromModule.
+"
+{
+  module N=M,v;
+  matrix A=N;
+  return(std(minor(A,nrows(M))));
+}
+
+static proc KSCoriginalExactImageDimFromModule(ideal J, module L, int d)
+"USAGE:  KSCoriginalExactImageDimFromModule(J,L,d);  internal fallback.
+RETURN: Exact image dimension -1,0,1,2 using the graph-elimination algorithm
+        from the previous enriqueskodaira classifier.
+MATH:   Module-vector sections define graph rank conditions
+        y_i*s_1-y_1*s_i in coker(L).  Saturating away the zero locus of s_1
+        and eliminating the source variables gives the image closure.  This
+        path neither constructs a rational frame nor calls a SpaSM section
+        command.
+EXAMPLE:
+  // internal: used when the automatic classifier cannot use SpaSM.
+"
+{
+  module B=KSCoriginalSectionBasis(L,d);
+  int h=size(B);
+  if (h==0) { return(-1); }
+  if (h==1) { return(0); }
+  if (h==2) { return(1); }
+  matrix originalBasisMatrix=matrix(B);
+  if (ncols(originalBasisMatrix)!=h)
+  {
+    ERROR("internal error: original classifier basis contains zero display columns");
+  }
+
+  def originalRing=basering;
+  int sourceVariableCount=nvars(originalRing);
+  list originalRingData=ring_list(originalRing);
+  list graphVariables=originalRingData[2];
+  int sourceNameIndex;
+  int imageNameConflict;
+  int i;
+  string imageVariableName;
+  for (i=1; i<=h; i++)
+  {
+    imageVariableName="@KSCoriginalY"+string(i);
+    imageNameConflict=1;
+    while (imageNameConflict)
+    {
+      imageNameConflict=0;
+      for (sourceNameIndex=1;
+           sourceNameIndex<=sourceVariableCount;
+           sourceNameIndex++)
+      {
+        if (graphVariables[sourceNameIndex]==imageVariableName)
+        {
+          imageNameConflict=1;
+        }
+      }
+      // create_ring warns when a new variable repeats a coefficient parameter.
+      // A substring match can only make the generated name longer, never alter
+      // the graph; it is therefore a safe conservative collision test.
+      if (find(string(originalRingData[1]),imageVariableName)>0)
+      {
+        imageNameConflict=1;
+      }
+      if (imageNameConflict) { imageVariableName=imageVariableName+"_"; }
+    }
+    graphVariables[size(graphVariables)+1]=imageVariableName;
+  }
+  int answer=-2;
+
+  ring KSC_original_image_ring=
+    create_ring(originalRingData[1],graphVariables,
+                "(dp("+string(sourceVariableCount)+"),dp("+string(h)+"))");
+  setring KSC_original_image_ring;
+
+  ideal imageSupport=imap(originalRing,J);
+  module imagePresentation=imap(originalRing,L);
+  module imageBasis=imap(originalRing,B);
+  int presentationRows=nrows(imagePresentation);
+  ideal graphIdeal=imageSupport;
+  vector firstSection=imageBasis[1];
+  ideal firstZeroLocus=
+    KSCoriginalSectionVanishingIdeal(imagePresentation,firstSection);
+  if (size(firstZeroLocus)==0)
+  {
+    setring originalRing;
+    ERROR("internal error: a nonzero original-classifier basis section has zero vanishing ideal");
+  }
+
+  vector graphRelation;
+  module augmented;
+  matrix augmentedMatrix;
+  for (i=2; i<=h; i++)
+  {
+    graphRelation=
+      var(sourceVariableCount+i)*imageBasis[1]
+      -var(sourceVariableCount+1)*imageBasis[i];
+    augmented=imagePresentation,graphRelation;
+    augmentedMatrix=augmented;
+    graphIdeal=graphIdeal+minor(augmentedMatrix,presentationRows);
+  }
+
+  list saturatedGraph=sat(std(graphIdeal),firstZeroLocus);
+  graphIdeal=saturatedGraph[1];
+  ideal sourceIrrelevant;
+  for (i=1; i<=sourceVariableCount; i++)
+  {
+    sourceIrrelevant[i]=var(i);
+  }
+  saturatedGraph=sat(std(graphIdeal),sourceIrrelevant);
+  graphIdeal=saturatedGraph[1];
+  poly sourceProduct=1;
+  for (i=1; i<=sourceVariableCount; i++)
+  {
+    sourceProduct=sourceProduct*var(i);
+  }
+  ideal imageIdeal=eliminate(std(graphIdeal),sourceProduct);
+  answer=dim(std(imageIdeal))-sourceVariableCount-1;
+  if ((answer<0) or (answer>2))
+  {
+    int impossibleAnswer=answer;
+    setring originalRing;
+    ERROR("original classifier graph elimination returned impossible image dimension "+string(impossibleAnswer));
+  }
+
+  setring originalRing;
+  return(answer);
+}
+
+static proc KSCscalarProductOfVariables()
+"USAGE:  KSCscalarProductOfVariables();  internal coefficient helper.
+RETURN: The product of all variables of the current ring.
+EXAMPLE:
+  // internal: passed to coeffs for scalar section products.
+"
+{
+  poly p=1;
+  int i;
+  for (i=1; i<=nvars(basering); i++) { p=p*var(i); }
+  return(p);
+}
+
+static proc KSCindependentScalarProducts(module G, ideal candidates, int d)
+"USAGE:  KSCindependentScalarProducts(G,C,d);  support relations and products.
+RETURN: A vector-space basis modulo G for the homogeneous scalar candidates.
+MATH:   All candidates have the same degree.  One bulk normal-form and
+        coefficient-matrix computation replaces the former repeated greedy
+        quotient and tensor-module calculations.
+EXAMPLE:
+  // internal: used by KSClinearSystemImageDim.
+"
+{
+  ideal clean;
+  ideal result;
+  int i; int j;
+  for (i=1; i<=size(candidates); i++)
+  {
+    if (candidates[i]!=0)
+    {
+      if ((!homog(candidates[i])) || (deg(candidates[i])!=d))
+      {
+        ERROR("scalar section products have inconsistent degree");
+      }
+      clean[size(clean)+1]=candidates[i];
+    }
+  }
+  if (size(clean)==0) { return(result); }
+
+  module degreeBasis;
+  if (size(G)==0) { degreeBasis=maxideal(d)*gen(1); }
+  else { degreeBasis=kbase(G,d); }
+  if (size(degreeBasis)==0) { return(result); }
+
+  module normalProducts=reduce(module(clean),G);
+  matrix coefficients=coeffs(normalProducts,degreeBasis,
+                              KSCscalarProductOfVariables());
+  if (deg(coefficients)>0)
+  {
+    ERROR("internal error: scalar product coordinates are not constant");
+  }
+  matrix independentCoordinates=gauss_col(coefficients);
+  if (deg(independentCoordinates)>0)
+  {
+    ERROR("internal error: scalar product reduction left the coefficient field");
+  }
+  matrix independentProducts=matrix(degreeBasis)*independentCoordinates;
+  for (j=1; j<=ncols(independentProducts); j++)
+  {
+    if (independentProducts[1,j]!=0)
+    {
+      result[size(result)+1]=independentProducts[1,j];
+    }
+  }
+  return(result);
+}
+
+static proc KSClinearSystemImageDim(RankOneSheaf L, int d, int ell)
+"USAGE:  KSClinearSystemImageDim(L,d,ell);  cached rank-one sheaf L,
+        section degree d, ell>=3.
+RETURN: Estimated image dimension -1,0,1,2 for the linear system H^0(L(d)).
+MATH:   Let V be the chosen section space.  The dimension of the image of the
+        rational map X --> P(V*) is the Krull dimension of the section algebra
+        generated by V minus 1.  For surfaces, the Hilbert function of that
+        algebra is eventually constant, linear, or quadratic; the first few
+        scalar products give a practical image-dimension estimate.  A common
+        rational-frame denominator cancels projectively.  Increasing ell samples
+        later growth, but no finite ell is a correctness certificate.
+EXAMPLE:
+  // internal: KSCphiDim calls this with L=omega^m,d=0.
+"
+{
+  ell=KSCgrowthBoundCheck(ell);
+  SectionSpace V=KSCcertifiedSectionSpace(L,d);
+  int h1=size(V);
+  if (h1==0) { return(-1); }
+  if (h1==1) { return(0); }
+  if (h1==2) { return(1); }
+
+  // V was built internally from a certified basis and a cached injective
+  // frame, so use its trusted coordinates without repeating public checks.
+  ideal coordinates=V.basis;
+  int coordinateDegree=deg(coordinates[1]);
+  module supportRelations=L.supportIdeal;
+  attrib(supportRelations,"isHomog",intvec(0));
+  supportRelations=std(supportRelations);
+  intvec h; h[1]=h1;
+  ideal independentProducts=coordinates;
+  ideal candidates;
+  int a;
+  int i; int j;
+  for (a=2; a<=ell; a++)
+  {
+    candidates=ideal();
+    for (i=1; i<=size(independentProducts); i++)
+    {
+      for (j=1; j<=size(coordinates); j++)
+      {
+        candidates[size(candidates)+1]=independentProducts[i]*coordinates[j];
+      }
+    }
+    independentProducts=KSCindependentScalarProducts(
+                          supportRelations,candidates,a*coordinateDegree);
+    h[a]=size(independentProducts);
+  }
+
+  int dd=h[ell]-2*h[ell-1]+h[ell-2];
+  if (dd>0) { return(2); }
+  if (h[ell]>h[ell-1]) { return(1); }
+  return(0);
+}
+
+static proc KSCphiDimWithBackend(ideal I, int m, int ell, string backend)
+"USAGE:  KSCphiDimWithBackend(I,m,ell,backend);  internal map computation.
+RETURN: Estimated m-canonical image dimension using the explicit frame backend.
+NOTE:   The initial canonical frame is recovered once and propagated through
+        tensor powers.  spasm is strict and never falls back.
+EXAMPLE:
+  // internal: called by KSCphiDim and KSCphiDimSpaSM.
+"
+{
+  if (m<1) { ERROR("the canonical tensor power must be positive"); }
+  ell=KSCgrowthBoundCheck(ell);
+  ideal J=KSCsatIdeal(I);
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  RankOneSheaf canonical=KSCrankOneSheafWithBackend(W,J,backend);
+  RankOneSheaf pluricanonical=KSCtensorPowerRankOneSheaf(canonical,m);
+  return(KSClinearSystemImageDim(pluricanonical,0,ell));
+}
+
+proc KSCphiDim(ideal I, int m, list #)
+"USAGE:  KSCphiDim(I,m[,ell]);  homogeneous surface ideal I and m>0.
+RETURN: Estimated dimension of the image of the m-canonical map: -1 no map,
+        0 point, 1 curve, 2 surface.
+MATH:   The Kodaira dimension is the maximum dimension of pluricanonical images.
+        For general type, Bombieri's theorem makes low m, especially m=5, a
+        powerful test; for kappa=1 a pluricanonical map has curve image.  The
+        canonical frame uses Singular's generic exact linear algebra, and the
+        degree slice is independently certified by dimH.  Here ell is only the
+        largest product degree sampled by the Hilbert-function heuristic; use
+        KSCphiDimExact for a theorem-certified image dimension.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCphiDim(X,5);
+"
+{
+  if (size(#)>1) { ERROR("expected at most the product truncation degree ell"); }
+  int ell=3;
+  if (size(#)>0) { ell=#[1]; }
+  return(KSCphiDimWithBackend(I,m,ell,"linear"));
+}
+
+proc KSCphiDimSpaSM(ideal I, int m, list #)
+"USAGE:  KSCphiDimSpaSM(I,m[,ell]);  homogeneous surface ideal I and m>0.
+RETURN: Estimated m-canonical image dimension using strict exact SpaSM frame
+        recovery and the same dimH section certificate as KSCphiDim.
+NOTE:   The procedure errors if SpaSM is unavailable or the coefficient field
+        is unsupported.  It never substitutes the generic backend.  The
+        ell-truncated product growth remains an estimate; use
+        KSCphiDimExactSpaSM for a theorem-certified answer.
+SEE ALSO: KSCphiDim, KSCphiDimExactSpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCphiDimSpaSM(X,1);
+"
+{
+  if (size(#)>1) { ERROR("expected at most the product truncation degree ell"); }
+  int ell=3;
+  if (size(#)>0) { ell=#[1]; }
+  return(KSCphiDimWithBackend(I,m,ell,"spasm"));
+}
+
+
+static proc KSCconstantRelationExists(matrix A, string backend)
+"USAGE:  KSCconstantRelationExists(A,backend);  internal constant matrix.
+RETURN: 1 if A has a nonzero right-kernel vector, and 0 otherwise.
+NOTE:   linear uses Singular's generic exact module kernel.  spasm uses the
+        explicitly requested sparse exact kernel and errors if it is not
+        available or supported; it never falls back.
+EXAMPLE:
+  // internal: used by the bounded relation certificate.
+"
+{
+  backend=KSCsectionBackendCheck(backend);
+  module kernelModule;
+  if (backend=="spasm")
+  {
+    if (!defined(spasm_supports_current_ring))
+    {
+      ERROR("SpaSM kernel requested, but the sispasm module is not available");
+    }
+    if (!defined(spasm_first_kernel_vector))
+    {
+      ERROR("SpaSM kernel requested, but the sispasm module is not available");
+    }
+    if (!spasm_supports_current_ring())
+    {
+      ERROR("SpaSM kernel requested, but the current coefficient field is unsupported");
+    }
+    kernelModule=spasm_first_kernel_vector(module(A));
+  }
+  else
+  {
+    module zeroModule=0;
+    kernelModule=modulo(module(A),std(zeroModule));
+  }
+  return(size(kernelModule)>0);
+}
+
+static proc KSCtripleRelationAtDegree(module supportRelations,
+                                      poly c0, poly c1, poly c2,
+                                      int coordinateDegree,
+                                      int relationDegree,
+                                      string backend)
+"USAGE:  KSCtripleRelationAtDegree(J,c0,c1,c2,d,a,backend);  internal.
+RETURN: 1 exactly when a nonzero homogeneous relation of degree a exists
+        among c0,c1,c2 modulo the homogeneous support relations J.
+MATH:   All degree-a monomials in the three coordinates are reduced modulo J
+        and scalarized in one homogeneous piece.  A constant right-kernel
+        vector is precisely a homogeneous polynomial relation of degree a.
+EXAMPLE:
+  // internal: used by KSCratioPairIndependent.
+"
+{
+  ideal candidates;
+  int firstExponent;
+  int secondExponent;
+  int thirdExponent;
+  for (firstExponent=0; firstExponent<=relationDegree; firstExponent++)
+  {
+    for (secondExponent=0;
+         secondExponent<=relationDegree-firstExponent;
+         secondExponent++)
+    {
+      thirdExponent=relationDegree-firstExponent-secondExponent;
+      candidates[size(candidates)+1]=c0^firstExponent
+                                      *c1^secondExponent
+                                      *c2^thirdExponent;
+    }
+  }
+  int expectedCount=((relationDegree+1)*(relationDegree+2)) div 2;
+  if (size(candidates)!=expectedCount)
+  {
+    ERROR("internal error: incomplete triple-product list");
+  }
+
+  module normalProducts=reduce(module(candidates),supportRelations);
+  if (size(normalProducts)!=expectedCount)
+  {
+    return(1);
+  }
+  module degreeBasis=kbase(supportRelations,
+                           relationDegree*coordinateDegree);
+  if (size(degreeBasis)==0) { return(1); }
+  matrix coefficients=coeffs(normalProducts,degreeBasis,
+                              KSCscalarProductOfVariables());
+  if (deg(coefficients)>0)
+  {
+    ERROR("internal error: exact image-relation coordinates are not constant");
+  }
+  if (ncols(coefficients)!=expectedCount) { return(1); }
+  return(KSCconstantRelationExists(coefficients,backend));
+}
+
+static proc KSCratioPairIndependent(module supportRelations,
+                                    poly baseCoordinate,
+                                    poly firstNumerator,
+                                    poly secondNumerator,
+                                    int coordinateDegree,
+                                    int relationBound,
+                                    int initialRelationDegree,
+                                    string backend)
+"USAGE:  KSCratioPairIndependent(J,c0,c1,c2,d,b,a,backend);  internal exact dependence test.
+RETURN: 1 if c1/c0 and c2/c0 are algebraically independent in the function
+        field of the geometrically integral support J, and 0 otherwise.
+MATH:   A homogeneous relation among c0,c1,c2 is the same as an algebraic
+        relation between c1/c0 and c2/c0.  If the image is a plane curve C,
+        restricting the degree-d system to a general hyperplane section gives
+          deg(C) <= d*deg(X).
+        The caller supplies this theorem bound b.  The scan starts in degree a
+        and continues through b.  A relation in a lower degree also occurs in
+        degree a after multiplication by a coordinate, so skipping lower
+        degrees cannot lose it.  Therefore finding no relation through b proves
+        algebraic independence; this is a finite exact certificate in every
+        characteristic.
+EXAMPLE:
+  // internal: used by KSCexactImageDimFromSheaf.
+"
+{
+  if (relationBound<1) { ERROR("the relation bound must be positive"); }
+  if (initialRelationDegree<1)
+  {
+    ERROR("the initial relation degree must be positive");
+  }
+  int relationDegree=initialRelationDegree;
+  if (relationDegree>relationBound) { relationDegree=relationBound; }
+  for (; relationDegree<=relationBound; relationDegree++)
+  {
+    if (KSCtripleRelationAtDegree(supportRelations,baseCoordinate,
+                                  firstNumerator,secondNumerator,
+                                  coordinateDegree,relationDegree,backend))
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+
+static proc KSCexactImageDimFromSheaf(RankOneSheaf L, int d,
+                                      int initialRelationDegree,
+                                      string backend)
+"USAGE:  KSCexactImageDimFromSheaf(L,d,a,backend);  cached rank-one sheaf L,
+        section degree d, initial relation degree a, and exact kernel backend.
+RETURN: Exact dimension -1,0,1,2 of the image of the linear system H^0(L(d)).
+        Returns -1 if there are no sections.
+MATH:   The certified SectionSpace gives linearly independent scalar rational
+        coordinates c_i with a common denominator, which cancels projectively.
+        On geometrically integral support, h=1 gives a point and h>=2 makes c_2/c_1
+        nonconstant.  The image is a surface exactly when one further ratio
+        c_j/c_1 is algebraically independent from c_2/c_1.  The degree bound
+        deg(C)<=deg(c_i)*deg(X) makes the homogeneous relation search finite
+        and exact.  The selected generic or SpaSM kernel computes each
+        dependence certificate; there is no heuristic verification pass.
+EXAMPLE:
+  // internal: KSCphiDimExact applies this to L=omega_X^m and d=0.
+"
+{
+  SectionSpace V=KSCcertifiedSectionSpace(L,d);
+  int h=size(V);
+  if (h==0) { return(-1); }
+  if (h==1) { return(0); }
+  if (h==2) { return(1); }
+
+  ideal J=KSCsatIdeal(L.supportIdeal);
+  ideal coordinates=V.basis;
+  int coordinateDegree=deg(coordinates[1]);
+  if (coordinateDegree<1)
+  {
+    ERROR("an integral support cannot have three independent constant section coordinates");
+  }
+  int i;
+  for (i=2; i<=h; i++)
+  {
+    if ((!homog(coordinates[i])) || (deg(coordinates[i])!=coordinateDegree))
+    {
+      ERROR("exact image coordinates must be homogeneous of one degree");
+    }
+  }
+  int supportDegree=mult(std(J));
+  if (supportDegree<1) { ERROR("the projective support must have positive degree"); }
+  int relationBound=coordinateDegree*supportDegree;
+  module supportRelations=J;
+  attrib(supportRelations,"isHomog",intvec(0));
+  supportRelations=std(supportRelations);
+  int j;
+  for (j=3; j<=h; j++)
+  {
+    if (KSCratioPairIndependent(supportRelations,coordinates[1],
+                                coordinates[2],coordinates[j],
+                                coordinateDegree,relationBound,
+                                initialRelationDegree,backend))
+    {
+      return(2);
+    }
+  }
+  return(1);
+}
+
+static proc KSCphiDimExactWithBackend(ideal I, int m,
+                                      int initialRelationDegree,
+                                      string backend)
+"USAGE:  KSCphiDimExactWithBackend(I,m,a,backend);  internal exact map.
+RETURN: Exact m-canonical image dimension using the requested strict backend.
+EXAMPLE:
+  // internal: called by the public exact map routines and classifiers.
+"
+{
+  if (m<1) { ERROR("the canonical tensor power must be positive"); }
+  ideal J=KSCsatIdeal(I);
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  RankOneSheaf canonical=KSCrankOneSheafWithBackend(W,J,backend);
+  RankOneSheaf pluricanonical=KSCtensorPowerRankOneSheaf(canonical,m);
+  return(KSCexactImageDimFromSheaf(pluricanonical,0,
+                                   initialRelationDegree,backend));
+}
+
+static proc KSCphiDimExactFromPowerWithBackend(RankOneSheaf canonical,
+                                               module pluricanonicalModule,
+                                               int m,
+                                               int initialRelationDegree,
+                                               string backend)
+"USAGE:  KSCphiDimExactFromPowerWithBackend(K,Wm,m,a,backend);  internal cached exact map.
+RETURN: Exact m-canonical image dimension, reusing the already computed
+        presentation Wm and the cached frame of K=omega_X.
+NOTE:   The backend still selects every required exact constant-kernel
+        computation.  No generic fallback or duplicate tensor-power
+        construction is performed.
+EXAMPLE:
+  // internal: used by KSCclassify after its plurigenus pass.
+"
+{
+  RankOneSheaf pluricanonical=
+    KSCpowerFrameOnPresentation(canonical,pluricanonicalModule,m);
+  return(KSCexactImageDimFromSheaf(pluricanonical,0,
+                                   initialRelationDegree,backend));
+}
+
+proc KSCphiDimExact(ideal I, int m)
+"USAGE:  KSCphiDimExact(I,m);  homogeneous surface ideal I and m>0.
+RETURN: Exact dimension of the m-canonical image: -1 no map, 0 point, 1 curve,
+        or 2 surface.
+MATH:   This is the expensive but exact image certificate.  The standard
+        classifier uses the same bounded-relation algorithm for |5K| only when
+        P_5>=3.  Its automatic route normally uses SpaSM when supported,
+        and the optional P_12 certificate follows the same backend policy.  The
+        routine computes omega_X^m, chooses a
+        dimH-certified basis of H^0(mK_X), and searches for homogeneous
+        relations through the theorem bound deg(c_i)*deg(X).  Constant kernels
+        are computed by Singular's generic exact linear algebra.
+SEE ALSO: KSCphiDimExactOriginal, KSCphiDimExactSpaSM
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCphiDimExact(X,6);
+"
+{
+  return(KSCphiDimExactWithBackend(I,m,1,"linear"));
+}
+
+proc KSCphiDimExactOriginal(ideal I, int m)
+"USAGE:  KSCphiDimExactOriginal(I,m);  homogeneous surface ideal I and m>0.
+RETURN: Exact m-canonical image dimension -1,0,1,2 using the module-section
+        and graph-elimination implementation from the previous state of the
+        enriqueskodaira classifier.
+NOTE:   This command exists both for direct comparison and as the automatic
+        classifier path when SpaSM is missing or unsupported, including
+        characteristic zero.  It does not call a SpaSM or generic-frame
+        section command.  It preserves the former module-vector graph
+        algorithm while using the certified bulk module-vector degree slice
+        in place of the former greedy candidate scan.
+SEE ALSO: KSCphiDimExact, KSCphiDimExactSpaSM, KSCauto
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCphiDimExactOriginal(X,1);
+"
+{
+  if (m<1) { ERROR("the canonical tensor power must be positive"); }
+  ideal J=KSCsatIdeal(I);
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  module Wm=KSCtensorPowerPresentation(W,m);
+  return(KSCoriginalExactImageDimFromModule(J,Wm,0));
+}
+
+proc KSCphiDimExactSpaSM(ideal I, int m)
+"USAGE:  KSCphiDimExactSpaSM(I,m);  homogeneous surface ideal I and m>0.
+RETURN: Exact m-canonical image dimension using strict SpaSM frame recovery
+        and the same dimH-certified bounded relation test as KSCphiDimExact.
+NOTE:   Absence of SpaSM or an unsupported coefficient field is an error; no
+        generic fallback is attempted.
+SEE ALSO: KSCphiDimExact, KSCphiDimExactOriginal, KSCphiDimSpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCphiDimExactSpaSM(X,1);
+"
+{
+  return(KSCphiDimExactWithBackend(I,m,1,"spasm"));
+}
+
+static proc KSCadjointDimWithBackend(ideal I, int ell, string backend)
+"USAGE:  KSCadjointDimWithBackend(I,ell,backend);  internal adjunction map.
+RETURN: Estimated image dimension of |K_X+H| using the requested backend.
+EXAMPLE:
+  // internal: called by KSCadjointDim and KSCadjointDimSpaSM.
+"
+{
+  ideal J=KSCsatIdeal(I);
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  RankOneSheaf canonical=KSCrankOneSheafWithBackend(W,J,backend);
+  return(KSClinearSystemImageDim(canonical,1,ell));
+}
+
+proc KSCadjointDim(ideal I, list #)
+"USAGE:  KSCadjointDim(I[,ell]);  homogeneous surface ideal I.
+RETURN: Estimated image dimension of the adjoint system |K_X+H|.
+MATH:   If H is the hyperplane class of the given embedding, then
+        H^0(K_X+H) is the degree-one part of the canonical module.  The
+        adjunction mapping is central in the work of Sommese, Van de Ven, and
+        Ionescu.  This routine samples scalar products only through ell and is
+        therefore a diagnostic estimate, not a certificate.  It does not
+        perform the full adjunction reduction.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^3+x1^3+x2^3+x3^3;
+  KSCadjointDim(X);
+"
+{
+  if (size(#)>1) { ERROR("expected at most the product truncation degree ell"); }
+  int ell=3;
+  if (size(#)>0) { ell=#[1]; }
+  return(KSCadjointDimWithBackend(I,ell,"linear"));
+}
+
+proc KSCadjointDimSpaSM(ideal I, list #)
+"USAGE:  KSCadjointDimSpaSM(I[,ell]);  homogeneous surface ideal I.
+RETURN: Estimated adjunction-map image dimension using strict SpaSM frame
+        recovery and a dimH-certified section basis.
+NOTE:   SpaSM absence or unsupported coefficients are errors; no fallback.
+        The truncated product-growth result is still only an estimate.
+SEE ALSO: KSCadjointDim, KSCphiDimSpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^3+x1^3+x2^3+x3^3;
+  KSCadjointDimSpaSM(X);
+"
+{
+  if (size(#)>1) { ERROR("expected at most the product truncation degree ell"); }
+  int ell=3;
+  if (size(#)>0) { ell=#[1]; }
+  return(KSCadjointDimWithBackend(I,ell,"spasm"));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Plurigenera and irregularity.
+///////////////////////////////////////////////////////////////////////////////
+
+static proc KSCglobalSectionDimension(module M, int d)
+"USAGE:  KSCglobalSectionDimension(M,d);  graded presentation M and twist d.
+RETURN: h^0(Proj,M~(d)).
+MATH:   The classifier needs one dimension, not a presentation of the whole
+        section module in every degree >=d.  The canonical module, original
+        presented-module powers, and standalone plurigenus routines use the
+        exact local-duality computation dimH.  Compact fractional powers use
+        KSCglobalSectionDimensionWithBackend instead.
+EXAMPLE:
+  // internal: used by canonical and original-module H^0 dimensions.
+"
+{
+  return(dimH(0,M,d));
+}
+
+static proc KSCglobalSectionDimensionWithBackend(module M, int d,
+                                                  string backend)
+"USAGE:  KSCglobalSectionDimensionWithBackend(M,d,b);  internal fractional-power presentation, twist, and linear or spasm.
+RETURN: h^0(Proj,M~(d)), computed by the exact section-tail linear algebra of
+        the already selected fractional-frame backend.
+MATH:   The dimension-only section command starts in the certified regular
+        tail and descends by exact Koszul compatibility.  It needs neither an
+        irrelevant saturation nor the local-duality resolution used by dimH.
+        This helper is used only for compact fractional-power presentations;
+        the original presented-module classifier path retains dimH.
+EXAMPLE:
+  // internal: canonical fractional powers use the selected linear algebra.
+"
+{
+  backend=KSCsectionBackendCheck(backend);
+  if (backend=="linear") { return(sheafSectionDimensionLinear(M,d)); }
+  return(sheafSectionDimensionSpaSM(M,d));
+}
+
+static proc KSCplurigeneraFromCanonical(module W, int maxm)
+"USAGE:  KSCplurigeneraFromCanonical(W,maxm);  W=omega_X and maxm>=1.
+RETURN: intvec P with P[m]=h^0(X,mK_X) for 1<=m<=maxm.
+MATH:   This is the numerical heart of the classifier.  Each P_m is computed
+        as dimH(0,omega_X^m,0), not merely as the degree-zero piece of a chosen
+        saturated presentation.  Tensor powers are built successively and
+        reused, so omega^i is not recomputed from omega for every later i.
+        P_12 is available only through the explicit certificate routine.
+EXAMPLE:
+  // internal: KSCplurigenera calls this after computing omega_X.
+"
+{
+  intvec P;
+  int m;
+  module Wm=W;
+  for (m=1; m<=maxm; m++)
+  {
+    if (m>1) { Wm=KSCtensorPres(Wm,W); }
+    P[m]=KSCglobalSectionDimension(Wm,0);
+  }
+  return(P);
+}
+
+static proc KSCplurigeneraWithLastPower(module W, int maxm)
+"USAGE:  KSCplurigeneraWithLastPower(W,maxm);  W=omega_X, maxm>=1.
+RETURN: list(P,Wm), where P contains P_1,...,P_maxm and Wm is the exact
+        successively constructed presentation used for the last value.
+NOTE:   The optional P_12 certificate retains W12 so an original-backend map
+        does not repeat eleven tensor-product and saturation computations.
+EXAMPLE:
+  // internal: used by KSCclassifyP12Certificate.
+"
+{
+  if (maxm<1) { ERROR("the plurigenus bound must be positive"); }
+  intvec P;
+  module Wm=W;
+  int m;
+  for (m=1; m<=maxm; m++)
+  {
+    if (m>1) { Wm=KSCtensorPres(Wm,W); }
+    P[m]=KSCglobalSectionDimension(Wm,0);
+  }
+  return(list(P,Wm));
+}
+
+proc KSCplurigenera(ideal I, int maxm)
+"USAGE:  KSCplurigenera(I,maxm);  homogeneous ideal of a smooth surface.
+RETURN: intvec P[1..maxm], where P[m]=h^0(X,mK_X).
+MATH:   Plurigenera are birational invariants and their growth defines Kodaira
+        dimension.  The computation uses the canonical module and local-duality
+        cohomology dimensions h^0 of its successively reused tensor powers.
+        The whole command temporarily clears degBound so no tensor,
+        saturation, or cohomology computation can be truncated; the caller's
+        value is restored before a normal return.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCplurigenera(X,6);
+"
+{
+  int savedDegBound=degBound;
+  degBound=0;
+  ideal J=KSCsatIdeal(I);
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  intvec P=KSCplurigeneraFromCanonical(W,maxm);
+  degBound=savedDegBound;
+  return(P);
+}
+
+static proc KSCirregularityFromSatIdeal(ideal J)
+"USAGE:  KSCirregularityFromSatIdeal(J);  saturated homogeneous surface ideal.
+RETURN: q=h^1(X,O_X).
+MATH:   q distinguishes rational from ruled when kappa=-infinity and separates
+        the classical kappa=0 classes together with p_g=P_1.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4;
+  ideal J=KSCsatIdeal(X); KSCirregularityFromSatIdeal(J);
+"
+{
+  module O=KSCstructureModule(J);
+  return(dimH(1,O,0));
+}
+
+static proc KSCbaseCharacteristic()
+"USAGE:  KSCbaseCharacteristic();  no arguments.
+RETURN: The characteristic of the coefficient field when Singular exposes it as
+        an integer through ringlist(basering); returns -1 if it cannot be read.
+MATH:   The Kodaira labels have characteristic-dependent interpretations.
+        Quasi-elliptic fibrations occur only in characteristics 2 and 3, and
+        positive-characteristic kappa=0 subtypes may require Picard-scheme,
+        Albanese, and canonical-torsion data beyond p_g and h^1(O_X).  Singular
+        documents ringlist as decomposing a ring into components whose first
+        entry records the coefficient field, including the characteristic for
+        Q and Z/p and as the first entry for algebraic/function-field extensions.
+EXAMPLE:
+  ring R=0,(x0,x1,x2),dp; KSCbaseCharacteristic();
+"
+{
+  list RL=ringlist(basering);
+  if (typeof(RL[1])=="int") { return(RL[1]); }
+  if (typeof(RL[1])=="list")
+  {
+    list CF=RL[1];
+    if (size(CF)>0)
+    {
+      if (typeof(CF[1])=="int") { return(CF[1]); }
+    }
+  }
+  return(-1);
+}
+
+static proc KSCclassicalKappaZeroCriteriaAvailable()
+"USAGE:  KSCclassicalKappaZeroCriteriaAvailable();  no arguments.
+RETURN: 1 in characteristic zero or characteristic greater than three, and 0
+        otherwise.
+MATH:   In these characteristics the classical kappa-zero list applies, and
+        the Enriques--Ferrari criterion h^1(O_X)=2, P_1=P_4=1 characterizes
+        surfaces birational to abelian surfaces.  Characteristics 2 and 3 are
+        intentionally left on the conservative path because of non-classical
+        and quasi-hyperelliptic phenomena.
+EXAMPLE:
+  ring R=5,(x0,x1,x2),dp; KSCclassicalKappaZeroCriteriaAvailable();
+"
+{
+  int ch=KSCbaseCharacteristic();
+  if (ch==0) { return(1); }
+  if (ch>3) { return(1); }
+  return(0);
+}
+
+static proc KSCcharContext()
+"USAGE:  KSCcharContext();  no arguments.
+RETURN: Human-readable characteristic context string.
+MATH:   This helper is used only for certificate text.  The algorithms compute
+        the same plurigenera in every characteristic, but the names attached to
+        kappa=1 and refined kappa=0 cases depend on the characteristic.
+EXAMPLE:
+  ring R=0,(x0,x1,x2),dp; KSCcharContext();
+"
+{
+  int ch=KSCbaseCharacteristic();
+  if (ch==0) { return("characteristic zero"); }
+  if (ch>0) { return("positive characteristic "+string(ch)); }
+  return("unknown characteristic");
+}
+
+static proc KSCkappaOneLabel()
+"USAGE:  KSCkappaOneLabel();  no arguments.
+RETURN: Characteristic-aware label for Kodaira dimension 1.
+MATH:   In characteristic zero, and in positive characteristic different from 2
+        and 3, the genus-one Iitaka fibration is elliptic.  In characteristics
+        2 and 3 the Bombieri--Mumford classification also allows quasi-elliptic
+        fibrations, whose general fibre is a cuspidal rational curve of
+        arithmetic genus one.  Plurigenera alone do not separate elliptic from
+        quasi-elliptic, so the small-characteristic label keeps both.
+EXAMPLE:
+  ring R=3,(x0,x1,x2),dp; KSCkappaOneLabel();
+"
+{
+  int ch=KSCbaseCharacteristic();
+  if ((ch==2) or (ch==3)) { return("properly elliptic or quasi-elliptic surface"); }
+  if (ch<0) { return("properly elliptic surface, with quasi-elliptic caveat if the characteristic is 2 or 3"); }
+  return("properly elliptic surface");
+}
+
+static proc KSCkappaOneNote()
+"USAGE:  KSCkappaOneNote();  no arguments.
+RETURN: Characteristic-aware explanatory note for Kodaira dimension 1 outputs.
+MATH:   The pluricanonical map gives the Iitaka fibration.  In characteristic 2
+        or 3 the general fibre may be quasi-elliptic, so an extra generic-fibre
+        check is needed to use the word elliptic without the quasi-elliptic
+        alternative.
+EXAMPLE:
+  ring R=3,(x0,x1,x2),dp; KSCkappaOneNote();
+"
+{
+  int ch=KSCbaseCharacteristic();
+  if ((ch==2) or (ch==3))
+  {
+    return(" In characteristic "+string(ch)+" this means elliptic or quasi-elliptic; inspect the generic fibre to separate them.");
+  }
+  if (ch==0) { return(" In characteristic zero this is the properly elliptic case."); }
+  if (ch>0) { return(" In this characteristic quasi-elliptic fibrations do not occur, so this is the elliptic case."); }
+  return(" If the characteristic is 2 or 3, read elliptic as elliptic or quasi-elliptic.");
+}
+
+static proc KSCbiellipticPrefixThroughFive(intvec P)
+"USAGE:  KSCbiellipticPrefixThroughFive(P);  plurigenus vector through P_5.
+RETURN: 1 exactly for one of the four possible P_1,...,P_5 prefixes of a
+        classical bielliptic surface, and 0 otherwise.
+MATH:   According to the order 2, 3, 4, or 6 of the canonical bundle, these
+        prefixes are 01010, 00100, 00010, and 00000.  The caller applies this
+        list only in characteristic zero or greater than three and only after
+        q=1 is known.
+EXAMPLE:
+  // internal: the economical classifier filters the residual P_6/P_8 branch.
+"
+{
+  if (size(P)<5) { ERROR("five plurigenera are required"); }
+  if ((P[1]==0) and (P[2]==1) and (P[3]==0)
+      and (P[4]==1) and (P[5]==0)) { return(1); }
+  if ((P[1]==0) and (P[2]==0) and (P[3]==1)
+      and (P[4]==0) and (P[5]==0)) { return(1); }
+  if ((P[1]==0) and (P[2]==0) and (P[3]==0)
+      and (P[4]==1) and (P[5]==0)) { return(1); }
+  if ((P[1]==0) and (P[2]==0) and (P[3]==0)
+      and (P[4]==0) and (P[5]==0)) { return(1); }
+  return(0);
+}
+
+static proc KSCkappaZeroSubtype(intvec P, int q)
+"USAGE:  KSCkappaZeroSubtype(P,q);  plurigenera vector and irregularity.
+RETURN: A characteristic-aware string for the kappa=0 subtype suggested by
+        p_g=P_1 and q=h^1(O_X).
+MATH:   In characteristic zero the minimal algebraic kappa=0 classes are K3,
+        Enriques, abelian, and hyperelliptic/bielliptic, separated by (p_g,q)
+        once kappa=0 is known.  In positive characteristic, the same low
+        invariants do not always separate classical from non-classical
+        variants: characteristic 2 has non-classical Enriques behavior, and
+        characteristics 2 and 3 have hyperelliptic/quasi-hyperelliptic
+        variants.  Therefore this routine gives exact classical labels in
+        characteristic zero and broader labels in positive characteristic unless
+        extra torsion, Picard-scheme, or Albanese checks are added.
+EXAMPLE:
+  intvec P=1,1,1,1,1,1,1,1,1,1,1,1; KSCkappaZeroSubtype(P,0);
+"
+{
+  int ch=KSCbaseCharacteristic();
+
+  if (ch==0)
+  {
+    if ((P[1]==1) and (q==0)) { return("K3 surface"); }
+    if ((P[1]==1) and (q==2)) { return("abelian surface"); }
+    if ((P[1]==0) and (q==0)) { return("Enriques surface"); }
+    if ((P[1]==0) and (q==1)) { return("hyperelliptic/bielliptic surface"); }
+    return("Kodaira dimension 0 surface; subtype not recognized from p_g and q");
+  }
+
+  if ((P[1]==1) and (q==0))
+  {
+    return("K3-type kappa 0 surface in positive characteristic; verify canonical triviality/geometric connectedness if a fine subtype certificate is needed");
+  }
+  if ((P[1]==1) and (q==2))
+  {
+    return("abelian-type kappa 0 surface in positive characteristic; verify the Albanese/Picard-scheme certificate if needed");
+  }
+  if ((P[1]==0) and (q==0))
+  {
+    if (ch==2)
+    {
+      return("Enriques-type kappa 0 surface in characteristic 2; distinguish classical, singular, and supersingular cases separately");
+    }
+    return("Enriques-type kappa 0 surface in positive characteristic; verify canonical torsion for the fine subtype");
+  }
+  if ((P[1]==0) and (q==1))
+  {
+    if ((ch==2) or (ch==3))
+    {
+      return("hyperelliptic/quasi-hyperelliptic-type kappa 0 surface in small positive characteristic; verify canonical torsion and Picard-scheme data");
+    }
+    return("hyperelliptic-type kappa 0 surface in positive characteristic; verify canonical torsion for the fine subtype");
+  }
+  return("Kodaira dimension 0 surface in positive characteristic; subtype needs additional torsion/Picard-scheme checks");
+}
+
+static proc KSCkappaZeroSubtypeNote()
+"USAGE:  KSCkappaZeroSubtypeNote();  no arguments.
+RETURN: Characteristic-aware explanatory note for Kodaira dimension 0 outputs.
+MATH:   In characteristic zero, the usual p_g and q split the classical minimal
+        kappa=0 classes once kappa=0 is certified.  In positive characteristic,
+        non-classical Enriques and quasi-hyperelliptic variants may require
+        extra torsion or Picard-scheme data.
+EXAMPLE:
+  ring R=0,(x0,x1,x2),dp; KSCkappaZeroSubtypeNote();
+"
+{
+  int ch=KSCbaseCharacteristic();
+  if (ch==0)
+  {
+    return(" In characteristic zero, p_g and q identify the classical kappa=0 subtype once kappa=0 is certified.");
+  }
+  if (ch>0)
+  {
+    return(" In positive characteristic, the label records the subtype suggested by p_g and q; fine distinctions may require torsion, Picard-scheme, or Albanese checks.");
+  }
+  return(" The subtype label is based on p_g and q; in characteristics 2 and 3, extra torsion or Picard-scheme checks may be needed.");
+}
+
+static proc KSCsmoothnessAssumptionNote(int checkSmooth, int smooth)
+"USAGE:  KSCsmoothnessAssumptionNote(checkSmooth,smooth);  integers.
+RETURN: Short note explaining whether smoothness was assumed, proved, or failed.
+MATH:   Enriques--Kodaira classification is a classification of smooth
+        projective surfaces up to birational equivalence.  The automatic
+        routines assume smoothness by default for speed; setting checkSmooth=1
+        runs the projective Jacobian criterion in KSCsurfaceData.
+EXAMPLE:
+  KSCsmoothnessAssumptionNote(0,-1);
+"
+{
+  if (checkSmooth==0)
+  {
+    return("Smoothness test not run; the classifier assumes the input is smooth. ");
+  }
+  if (smooth==1) { return("Projective Jacobian test proves smoothness. "); }
+  return("Projective Jacobian smoothness test failed or was inconclusive; smooth-surface classification labels are not certified. ");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Conservative classifiers.
+///////////////////////////////////////////////////////////////////////////////
+
+proc KSCclassifyNoMaps(ideal I, list #)
+"USAGE: KSCclassifyNoMaps(I[,checkSmooth,keep]);  homogeneous ideal of a smooth projective surface.
+RETURN: ClassifiedSurface with P_1,...,P_6 and q, but no image computation.
+MATH:   This is the cheapest diagnostic pass.  It computes the birational
+        invariants P_m and h^1(O_X), but it deliberately avoids deciding kappa
+        in borderline cases because separating kappa=0,1,2 can require exact
+        image dimensions or the P_8 boundary test.  P_12 is optional and not
+        part of the standard path.  Smoothness is assumed unless checkSmooth=1
+        is supplied.  If keep=1, ideals already computed during the pass are
+        kept in the result; otherwise the result stores only numeric/string
+        summary data.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCclassifyNoMaps(X);     // assume smooth
+  KSCclassifyNoMaps(X,1);   // also run Jacobian smoothness test
+"
+{
+  int checkSmooth=0;
+  if (size(#)>0) { checkSmooth=#[1]; }
+  int keep=0;
+  if (size(#)>1) { keep=#[2]; }
+
+  list chk=KSCsurfaceData(I,checkSmooth);
+  ideal J=chk[1];
+  int pdim=chk[2];
+  int smooth=chk[5];
+  intvec zbad; zbad[1]=0;
+  if (pdim!=2)
+  {
+    return(KSCresult("input is not a projective surface","unknown",zbad,-1,-1,-1,
+                "dim(S/I)-1 is not 2.",I,chk,checkSmooth,-1,0,"no-maps",-1,0,0,-1,-1,keep));
+  }
+  if ((checkSmooth!=0) and (smooth==0))
+  {
+    return(KSCresult("smoothness check failed","unknown",zbad,-1,-1,-1,
+                KSCsmoothnessAssumptionNote(checkSmooth,smooth),I,chk,checkSmooth,-1,0,"no-maps",-1,0,0,-1,-1,keep));
+  }
+
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  intvec P=KSCplurigeneraFromCanonical(W,6);
+  int q=KSCirregularityFromSatIdeal(J);
+  string notes=KSCsmoothnessAssumptionNote(checkSmooth,smooth)+"Base field context: "+KSCcharContext()+". No pluricanonical image-growth test performed; this routine is diagnostic, not a full classifier.";
+  return(KSCresult("not classified","unknown",P,q,-1,-1,notes,I,chk,checkSmooth,-1,6,"no-maps",-1,0,0,-1,-1,keep));
+}
+
+static proc KSCclassifyEconomicalState(ideal I, int ell, int checkSmooth, int keep, string backend)
+"USAGE:  KSCclassifyEconomicalState(I,ell,checkSmooth,keep,backend);  internal, with validated options.
+RETURN: list [A,ready] on a conclusive path.  On the unresolved low-growth
+        boundary it returns either [A,1,chk,W,W6] for the original module
+        path, or [A,1,chk,K,F6] for the fractional path, where K is the cached
+        canonical RankOneSheaf and F6 its sixth power.  This is the exact state
+        needed to extend through P_8 without repeating Ext, frame recovery, or
+        canonical powers.
+NOTE:   This private worker is shared by KSCclassify and the standard
+        completion.  It computes invariants on demand and returns immediately
+        after the first theorem-level certificate.  In particular, rational
+        and K3 cases stop at P_2, Enriques cases stop at P_3, and in
+        characteristic zero or greater than three the abelian criterion stops
+        at P_4.  Riemann--Roch also stops a kappa-one branch at P_2 whenever
+        2<=P_2<chi(O_X)+1.  In those characteristics the exact P_1,...,P_5
+        prefix also stops every residual branch except the four bielliptic
+        prefixes, and the order-three prefix 00100 is itself conclusive at
+        P_5.
+EXAMPLE:
+  // internal: called by KSCclassify and KSCclassifyWithFallback.
+"
+{
+  list chk=KSCsurfaceData(I,checkSmooth);
+  ideal J=chk[1];
+  int pdim=chk[2];
+  int smooth=chk[5];
+  string notes=KSCsmoothnessAssumptionNote(checkSmooth,smooth)+"Base field context: "+KSCcharContext()+". ";
+
+  intvec zbad; zbad[1]=0;
+  if (pdim!=2)
+  {
+    return(list(KSCresult("input is not a projective surface","unknown",zbad,-1,-1,-1,
+                "dim(S/I)-1 is not 2.",I,chk,checkSmooth,ell,0,"economical",-1,0,0,-1,-1,keep),0));
+  }
+  if ((checkSmooth!=0) and (smooth==0))
+  {
+    return(list(KSCresult("smoothness check failed","unknown",zbad,-1,-1,-1,notes,I,chk,checkSmooth,ell,0,"economical",-1,0,0,-1,-1,keep),0));
+  }
+
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  intvec P;
+  int phi5=-1;
+  int phi6=-1;
+  int q=KSCirregularityFromSatIdeal(J);
+  int m;
+
+  // A certified subcanonical index already decides kappa.  Values forced by
+  // K=0 or by anti-canonical positivity are recorded without recomputation.
+  list sc=KSCsubcanonicalIndexFromCanonical(J,W);
+  int subcan=sc[1];
+  int subidx=0;
+  if (subcan==1) { subidx=sc[2]; }
+  if (subcan==1)
+  {
+    int k=sc[2];
+    notes=notes+"Subcanonical certificate: omega_X is O_X("+string(k)+"). ";
+    if (k>0)
+    {
+      P[1]=KSCglobalSectionDimension(W,0);
+      return(list(KSCresult("general type","2",P,q,2,phi6,
+                  notes+"K is a positive multiple of the hyperplane class and is therefore big. Only P_1 was needed.",I,chk,checkSmooth,ell,1,"economical",subcan,subidx,0,-1,-1,keep),0));
+    }
+    if (k==0)
+    {
+      for (m=1; m<=6; m++) { P[m]=1; }
+      string klass0=KSCkappaZeroSubtype(P,q);
+      return(list(KSCresult(klass0,"0",P,q,phi5,phi6,
+                  notes+"K is trivial, so all displayed plurigenera are inferred to be 1 and kappa=0."+KSCkappaZeroSubtypeNote(),I,chk,checkSmooth,ell,0,"economical",subcan,subidx,0,-1,-1,keep),0));
+    }
+    for (m=1; m<=6; m++) { P[m]=0; }
+    if (q==0)
+    {
+      return(list(KSCresult("rational surface","-infinity",P,q,phi5,phi6,
+                  notes+"Anti-canonical positivity gives kappa=-infinity; h^1(O_X)=0 gives the rational branch. The displayed plurigenera are inferred to vanish.",I,chk,checkSmooth,ell,0,"economical",subcan,subidx,0,-1,-1,keep),0));
+    }
+    return(list(KSCresult("ruled surface over a curve of genus h^1(O_X)","-infinity",P,q,phi5,phi6,
+                notes+"Anti-canonical positivity gives kappa=-infinity; h^1(O_X)>0 gives the ruled branch. The displayed plurigenera are inferred to vanish.",I,chk,checkSmooth,ell,0,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  // Compute only the next invariant needed by the decision tree.  When an
+  // exact scalar-frame backend is available, recover the canonical frame once
+  // and form every later power as a fractional ideal product.  The original
+  // backend retains the previous presented-module tensor path.  Both are
+  // exact sheaf computations; the choice affects only their representation.
+  module Wm=W;
+  P[1]=KSCglobalSectionDimension(Wm,0);
+  string powerBackend=KSCresolveClassifierSectionBackend(backend);
+  int useFractionalPowers=(powerBackend!="original");
+  int fourthPowerReady=0;
+  int tryAbelianAtFour=0;
+  if ((q==2) and (P[1]==1)
+      and KSCclassicalKappaZeroCriteriaAvailable())
+  {
+    tryAbelianAtFour=1;
+  }
+  RankOneSheaf canonical;
+  RankOneSheaf fractionalPower;
+  RankOneSheaf fractionalPower2;
+  RankOneSheaf fractionalPower3;
+  RankOneSheaf fractionalPower5;
+  RankOneSheaf fractionalPower6;
+  module W2;
+  module W3;
+  if (useFractionalPowers)
+  {
+    canonical=KSCrankOneSheafWithBackend(W,J,powerBackend);
+    notes=notes+"Canonical powers use one cached "+powerBackend+" rational frame and exact fractional-ideal products. ";
+    fractionalPower=KSCfractionalTensorRankOneSheaves(canonical,canonical);
+    if (tryAbelianAtFour)
+    {
+      fractionalPower2=fractionalPower;
+      fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower,
+                                                         canonical);
+      fractionalPower3=fractionalPower;
+      fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower,
+                                                         canonical);
+      // This branch needs only P_4, not section representatives.  When a raw
+      // support resolution certifies that the requested scalar degree is at
+      // least reg(S/J), read the exact saturated fractional-ideal slice from
+      // its Hilbert functions.  Otherwise select the general exact section
+      // computation; this is an applicability decision, not a posteriori
+      // verification of a candidate dimension.
+      list directP4=
+        KSCfractionalDirectSectionDimensionIfCertified(fractionalPower,0);
+      if (directP4[1])
+      {
+        P[4]=directP4[2];
+        notes=notes+"The abelian P_4 test uses the exact Hilbert-function dimension of the saturated fractional-ideal slice; a raw support resolution certifies slice degree "+string(directP4[4])+" >= regularity bound "+string(directP4[3])+". ";
+      }
+      else
+      {
+        P[4]=KSCglobalSectionDimensionWithBackend(
+               fractionalPower.presentation,0,powerBackend);
+        notes=notes+"The support regularity bound does not certify the direct P_4 slice, so the abelian test uses the general exact section computation. ";
+      }
+      fourthPowerReady=1;
+    }
+    else
+    {
+      P[2]=KSCglobalSectionDimensionWithBackend(fractionalPower.presentation,
+                                                 0,powerBackend);
+    }
+  }
+  else
+  {
+    Wm=KSCtensorPres(Wm,W);
+    if (tryAbelianAtFour)
+    {
+      W2=Wm;
+      Wm=KSCtensorPres(Wm,W);
+      W3=Wm;
+      Wm=KSCtensorPres(Wm,W);
+      P[4]=KSCglobalSectionDimension(Wm,0);
+      fourthPowerReady=1;
+    }
+    else
+    {
+      P[2]=KSCglobalSectionDimension(Wm,0);
+    }
+  }
+
+  // Enriques' classical abelian criterion in characteristic zero and
+  // Ferrari's extension to algebraically closed fields of characteristic
+  // greater than three.  Forming the fourth power needs the intermediate
+  // powers but not their section dimensions, so P2 and P3 are deliberately
+  // postponed.  If the test fails, they are recovered below from the retained
+  // exact powers before the ordinary decision tree resumes.
+  if (tryAbelianAtFour)
+  {
+    if (P[4]==1)
+    {
+      for (m=1; m<=6; m++) { P[m]=1; }
+      string abelianCriterion="the classical Enriques criterion";
+      if (KSCbaseCharacteristic()>3)
+      {
+        abelianCriterion="Ferrari's positive-characteristic Enriques criterion";
+      }
+      return(list(KSCresult("abelian surface","0",P,q,phi5,phi6,
+                  notes+abelianCriterion+" h^1(O_X)=2 and P_1=P_4=1 proves that X is birational to an abelian surface. P_2,P_3,P_5,P_6 are inferred to be 1; their section dimensions were not computed.",I,chk,checkSmooth,ell,4,"economical",subcan,subidx,0,-1,-1,keep),0));
+    }
+    if (useFractionalPowers)
+    {
+      P[2]=KSCglobalSectionDimensionWithBackend(fractionalPower2.presentation,
+                                                 0,powerBackend);
+      P[3]=KSCglobalSectionDimensionWithBackend(fractionalPower3.presentation,
+                                                 0,powerBackend);
+    }
+    else
+    {
+      P[2]=KSCglobalSectionDimension(W2,0);
+      P[3]=KSCglobalSectionDimension(W3,0);
+    }
+  }
+
+  // Castelnuovo--Zariski rationality criterion, valid in every characteristic.
+  if ((q==0) and (P[2]==0))
+  {
+    for (m=3; m<=6; m++) { P[m]=0; }
+    return(list(KSCresult("rational surface","-infinity",P,q,phi5,phi6,
+                notes+"The exact Castelnuovo--Zariski criterion h^1(O_X)=P_2=0 proves rationality. Later plurigenera are inferred to vanish; no higher canonical power was built.",I,chk,checkSmooth,ell,2,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  // On the minimal model of a general-type surface, Riemann--Roch and Serre
+  // duality give
+  //   P_2 = chi(O_X) + K^2 + h^1(2K) >= chi(O_X)+1,
+  // since H^0(-K)=0 and K^2>=1.  Conversely P_2>=2 gives a nonconstant
+  // bicanonical pencil, hence positive Kodaira dimension.  The strict gap
+  // below therefore proves kappa=1 in every characteristic without forming
+  // a third canonical power or a rational map.
+  int holomorphicEuler=1-q+P[1];
+  if ((P[2]>=2) and (P[2]<holomorphicEuler+1))
+  {
+    return(list(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"P_2="+string(P[2])+" gives a nonconstant bicanonical pencil, while chi(O_X)="+string(holomorphicEuler)+" and surface Riemann--Roch force P_2>=chi(O_X)+1 for general type. Thus kappa=1; no higher canonical power or rational map was constructed."+KSCkappaOneNote(),I,chk,checkSmooth,ell,2,"economical",subcan,subidx,2,1,-1,keep),0));
+  }
+
+  // If h^1=0 and P1=P2=1, Riemann--Roch on the minimal model forces a
+  // section of -K; together with a section of K this proves K=0 there.
+  if ((q==0) and (P[1]==1) and (P[2]==1))
+  {
+    for (m=3; m<=6; m++) { P[m]=1; }
+    return(list(KSCresult("K3 surface","0",P,q,phi5,phi6,
+                notes+"h^1(O_X)=0 and P_1=P_2=1 force the canonical bundle of the minimal model to be trivial by surface Riemann--Roch. Thus X is birational to a K3 surface. Later plurigenera are inferred to be 1; no higher canonical power was built.",I,chk,checkSmooth,ell,2,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  if (!fourthPowerReady and useFractionalPowers)
+  {
+    fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower,
+                                                       canonical);
+    P[3]=KSCglobalSectionDimensionWithBackend(fractionalPower.presentation,
+                                               0,powerBackend);
+  }
+  if (!fourthPowerReady and !useFractionalPowers)
+  {
+    Wm=KSCtensorPres(Wm,W);
+    P[3]=KSCglobalSectionDimension(Wm,0);
+  }
+
+  // Enriques' bigenus criterion.  P3=0 also forces P1=0, but retaining P1 in
+  // the guard makes the certificate and any inconsistent input visible.
+  if ((q==0) and (P[1]==0) and (P[2]==1) and (P[3]==0))
+  {
+    P[4]=1; P[5]=0; P[6]=1;
+    return(list(KSCresult("Enriques surface","0",P,q,phi5,phi6,
+                notes+"Enriques' exact criterion h^1(O_X)=0, P_2=1, P_3=0 proves that X is birational to an Enriques surface: the minimal model has nontrivial 2-torsion canonical bundle. P_4,P_5,P_6 are inferred birationally; no fourth or higher canonical power was built.",I,chk,checkSmooth,ell,3,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  module W5;
+  if (useFractionalPowers)
+  {
+    if (!fourthPowerReady)
+    {
+      fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower,
+                                                         canonical);
+      P[4]=KSCglobalSectionDimensionWithBackend(fractionalPower.presentation,
+                                                 0,powerBackend);
+    }
+    fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower,
+                                                       canonical);
+    fractionalPower5=fractionalPower;
+    P[5]=KSCglobalSectionDimensionWithBackend(fractionalPower5.presentation,
+                                               0,powerBackend);
+  }
+  else
+  {
+    if (!fourthPowerReady)
+    {
+      Wm=KSCtensorPres(Wm,W);
+      P[4]=KSCglobalSectionDimension(Wm,0);
+    }
+    Wm=KSCtensorPres(Wm,W);
+    W5=Wm;
+    P[5]=KSCglobalSectionDimension(W5,0);
+  }
+
+  // Every general-type surface has a birational 5-canonical map.  Hence two
+  // 5-canonical sections give a kappa-one pencil, while at least three require
+  // one exact image-dimension computation.
+  if (P[5]==2)
+  {
+    phi5=1;
+    return(list(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"P_5=2 makes |5K| a nonconstant pencil. Since |5K| is birational for every general-type surface, kappa=1; no rational map was constructed."+KSCkappaOneNote(),I,chk,checkSmooth,ell,5,"economical",subcan,subidx,5,1,-1,keep),0));
+  }
+
+  if (P[5]>=3)
+  {
+    string mapBackend=powerBackend;
+    if (mapBackend=="original")
+    {
+      notes=notes+"The exact |5K| map uses the original classifier module-section and graph-elimination implementation. ";
+      phi5=KSCoriginalExactImageDimFromModule(J,W5,0);
+    }
+    else
+    {
+      if (mapBackend=="spasm")
+      {
+        notes=notes+"The exact |5K| map uses SpaSM scalar sections and bounded homogeneous relations. ";
+      }
+      if (mapBackend=="linear")
+      {
+        notes=notes+"The exact |5K| map uses generic-linear scalar sections and bounded homogeneous relations. ";
+      }
+      // fractionalPower5 already carries the compressed fifth-power
+      // presentation and its exact scalar frame, so the map stage consumes
+      // it directly and reconstructs neither W^5 nor a canonical frame.
+      phi5=KSCexactImageDimFromSheaf(fractionalPower5,0,ell,mapBackend);
+    }
+    if (phi5==2)
+    {
+      return(list(KSCresult("general type","2",P,q,phi5,phi6,
+                  notes+"The exact |5K| image is a surface.",I,chk,checkSmooth,ell,5,"economical",subcan,subidx,5,phi5,phi5,keep),0));
+    }
+    if (phi5==1)
+    {
+      return(list(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                  notes+"The exact |5K| image is a curve."+KSCkappaOneNote(),I,chk,checkSmooth,ell,5,"economical",subcan,subidx,5,phi5,phi5,keep),0));
+    }
+    ERROR("internal error: an exact 5-canonical map with at least three independent sections must have image dimension 1 or 2");
+  }
+
+  // P5<=1 excludes general type.  If an earlier system already has at least
+  // two sections, kappa is positive and therefore equals one.
+  int maxThroughFive=KSCmaxEntry(P);
+  if (maxThroughFive>=2)
+  {
+    return(list(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"Some P_n with n<=4 is at least 2, while P_5<=1 excludes general type by 5-canonical birationality. Hence kappa=1 without a map computation."+KSCkappaOneNote(),I,chk,checkSmooth,ell,5,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  // In characteristic zero or greater than three, the classical kappa-zero
+  // list makes most remaining 0/1 prefixes conclusive already at P5.  The q=0
+  // K3 and Enriques prefixes and the q=2 abelian prefix were caught above.
+  // For q=1 only the four canonical-torsion prefixes of bielliptic surfaces
+  // remain candidates.  The order-three prefix 00100 is already conclusive:
+  // h^1(O)=1 and P1=0 give chi(O)=0.  If kappa were one, the elliptic
+  // canonical-bundle formula ([CL, Theorem 1.6 and Section 4]) and P2=0,
+  // P3=1 would force exactly three multiple fibres, all of multiplicity at
+  // least three.  P4=0 forces at least two multiplicities to equal three.
+  // The Katsura--Ueno divisibility condition ([CL, Theorem 3.12]) then forces
+  // the third to divide lcm(3,3), hence it too equals three; the orbifold
+  // canonical degree is zero, contradicting kappa=1.  In characteristic
+  // p>3, [CL, Proposition 3.5 and Corollary 3.6] also exclude the sole wild
+  // fibre case: P2=0 would require floor(2a/m)=0, whereas
+  // a/m=(m-1-nu)/m >= 1-2/p >=3/5.  Thus 00100 has kappa zero, and P3=1
+  // proves exact canonical order three on the minimal model.  The other
+  // three candidate prefixes may continue to P6/P8.  Every other positive
+  // prefix has kappa one:
+  // P5<=1 excludes general type, positivity excludes kappa=-infinity, and the
+  // list excludes kappa zero.  For a zero prefix, Catanese--Li low-order
+  // nonvanishing also excludes kappa one, so q=0 is rational and q>0 ruled.
+  if (KSCclassicalKappaZeroCriteriaAvailable())
+  {
+    if ((q==1) and (P[1]==0) and (P[2]==0) and (P[3]==1)
+        and (P[4]==0) and (P[5]==0))
+    {
+      P[6]=1;
+      return(list(KSCresult(KSCkappaZeroSubtype(P,q),"0",P,q,phi5,phi6,
+                  notes+"The exact prefix (P_1,...,P_5)=(0,0,1,0,0) has P_5<=1, so it is not of general type, and P_3=1 excludes kappa=-infinity. The elliptic canonical-bundle formula together with the Katsura--Ueno multiplicity conditions excludes kappa=1 for this prefix in characteristic zero or greater than three. Hence the minimal model has canonical bundle of exact order 3; P_6=1 is inferred and no sixth canonical power was built."+KSCkappaZeroSubtypeNote(),I,chk,checkSmooth,ell,5,"economical",subcan,subidx,0,-1,-1,keep),0));
+    }
+    int residualBiellipticPrefix=0;
+    if ((q==1) and KSCbiellipticPrefixThroughFive(P))
+    {
+      residualBiellipticPrefix=1;
+    }
+    if (!residualBiellipticPrefix)
+    {
+      if (maxThroughFive>0)
+      {
+        return(list(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                    notes+"P_5<=1 excludes general type. The positive P_1,...,P_5 prefix excludes kappa=-infinity and is not one of the classical kappa-zero prefixes allowed by h^1(O_X); therefore kappa=1. No sixth canonical power was built."+KSCkappaOneNote(),I,chk,checkSmooth,ell,5,"economical",subcan,subidx,0,-1,-1,keep),0));
+      }
+      if (q==0)
+      {
+        return(list(KSCresult("rational surface","-infinity",P,q,phi5,phi6,
+                    notes+"P_1,...,P_5 vanish. P_5<=1 excludes general type, low-order nonvanishing excludes kappa=1, and the classical kappa-zero cases were already excluded; h^1(O_X)=0 gives the rational branch. No sixth canonical power was built.",I,chk,checkSmooth,ell,5,"economical",subcan,subidx,0,-1,-1,keep),0));
+      }
+      return(list(KSCresult("ruled surface over a curve of genus h^1(O_X)","-infinity",P,q,phi5,phi6,
+                  notes+"P_1,...,P_5 vanish. P_5<=1 excludes general type, low-order nonvanishing excludes kappa=1, and the classical kappa-zero list has no remaining subtype with this h^1(O_X); hence kappa=-infinity and h^1(O_X)>0 gives the ruled branch. No sixth canonical power was built.",I,chk,checkSmooth,ell,5,"economical",subcan,subidx,0,-1,-1,keep),0));
+    }
+  }
+
+  module W6;
+  if (useFractionalPowers)
+  {
+    fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower5,
+                                                       canonical);
+    fractionalPower6=fractionalPower;
+    P[6]=KSCglobalSectionDimensionWithBackend(fractionalPower6.presentation,
+                                               0,powerBackend);
+  }
+  else
+  {
+    Wm=KSCtensorPres(W5,W);
+    W6=Wm;
+    P[6]=KSCglobalSectionDimension(W6,0);
+  }
+
+  if (P[6]>=2)
+  {
+    return(list(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"P_6>=2 proves positive Kodaira dimension, while P_5<=1 excludes general type. Hence kappa=1."+KSCkappaOneNote(),I,chk,checkSmooth,ell,6,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  // P4=P6=0 excludes every kappa-zero torsion order and, by Catanese--Li,
+  // every kappa-one surface; P5<=1 already excluded general type.
+  if ((P[4]==0) and (P[6]==0))
+  {
+    if (q==0)
+    {
+      return(list(KSCresult("rational surface","-infinity",P,q,phi5,phi6,
+                  notes+"P_4=P_6=0 excludes kappa 0 and 1, and P_5<=1 excludes general type. Thus kappa=-infinity; h^1(O_X)=0 gives the rational branch.",I,chk,checkSmooth,ell,6,"economical",subcan,subidx,0,-1,-1,keep),0));
+    }
+    return(list(KSCresult("ruled surface over a curve of genus h^1(O_X)","-infinity",P,q,phi5,phi6,
+                notes+"P_4=P_6=0 excludes kappa 0 and 1, and P_5<=1 excludes general type. Thus kappa=-infinity; h^1(O_X)>0 gives the ruled branch.",I,chk,checkSmooth,ell,6,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  // If P1,...,P5 vanish, the Catanese--Li n<=4 nonvanishing theorem already
+  // excludes kappa one.  The remaining value P6=1 is a kappa-zero torsion
+  // certificate (P6=0 was handled above).
+  if (maxThroughFive==0)
+  {
+    string klass6=KSCkappaZeroSubtype(P,q);
+    return(list(KSCresult(klass6,"0",P,q,phi5,phi6,
+                notes+"P_1,...,P_5 vanish and P_6=1. Low-order nonvanishing excludes kappa=1, while P_5<=1 excludes general type, so kappa=0."+KSCkappaZeroSubtypeNote(),I,chk,checkSmooth,ell,6,"economical",subcan,subidx,0,-1,-1,keep),0));
+  }
+
+  if (useFractionalPowers)
+  {
+    return(list(KSCresult("inconclusive","unknown",P,q,phi5,phi6,
+                notes+"The exact invariants through P_6 lie in the genuine low-growth kappa=0/1 boundary. The standard completion reuses the cached canonical frame and sixth fractional power, then computes P_7 and P_8 only if needed.",I,chk,checkSmooth,ell,6,"economical",subcan,subidx,0,-1,-1,keep),1,chk,canonical,fractionalPower6));
+  }
+  return(list(KSCresult("inconclusive","unknown",P,q,phi5,phi6,
+              notes+"The exact invariants through P_6 lie in the genuine low-growth kappa=0/1 boundary. The standard completion reuses the sixth canonical power and computes P_7, then P_8 only if still needed.",I,chk,checkSmooth,ell,6,"economical",subcan,subidx,0,-1,-1,keep),1,chk,W,W6));
+}
+
+proc KSCclassify(ideal I, list #)
+"USAGE:  KSCclassify(I[,ell,checkSmooth,keep,backend]);  homogeneous ideal of a smooth projective surface; ell>=1 is the initial exact-relation degree for linear and spasm.
+RETURN: ClassifiedSurface from the demand-driven economical decision tree.
+MATH:   The worker computes h^1(O_X), then only the plurigenera required by
+        the current branch.  Rational and K3 certificates stop at P_2;
+        Enriques' bigenus criterion stops at P_3.  In characteristic zero or
+        greater than three, h^1(O_X)=2 and P_1=P_4=1 stops at P_4 by the
+        classical/Ferrari abelian criterion; P_2 and P_3 are then inferred,
+        not counted.  Otherwise P_5 excludes or detects general type.  Where
+        the classical kappa-zero list applies, its exact prefix filter leaves
+        only the four bielliptic prefixes.  The order-three prefix is certified
+        at P_5, while the other three can enter the P_6 tail; characteristics
+        2 and 3 retain the conservative low-growth path.
+        An exact rational map is constructed only for P_5>=3.  The command
+        intentionally leaves the remaining kappa=0/1 boundary cases to
+        KSCclassifyWithFallback or KSCcomplete: the Catanese--Li low-order
+        theorem makes P_8 the safe and sometimes necessary bound for kappa=1.
+        P_12 is not part of the standard path.  Smoothness is assumed unless
+        checkSmooth=1 is supplied.  If keep=1, ideals already computed during
+        the pass are kept in the result.
+
+        A certified equality omega_X=O_X(k) is tested immediately after the
+        canonical module is constructed.  Values forced by that certificate
+        are inferred rather than recomputed.  On a genuinely unresolved path,
+        the private worker retains the sixth power for standard completion;
+        this public command returns only the ClassifiedSurface.
+
+        backend defaults to auto: supported SpaSM recovers one canonical frame
+        and uses exact fractional-ideal powers, including any map stage that is
+        reached.  Otherwise the original classifier's presented-module tensor
+        and graph implementation is used.  Pass original, linear, or spasm to
+        force a route.  Explicit spasm remains strict.  The original
+        graph-elimination route is not relation-bound based and ignores ell.
+        The whole command temporarily clears degBound so its standard-basis,
+        tensor, cohomology, and map computations cannot be truncated; the
+        caller's value is restored before a normal return.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCclassify(X);       // exact certificates where needed
+  KSCclassify(X,4,1);   // begin relation scans in degree 4; check smoothness
+"
+{
+  if (size(#)>4)
+  {
+    ERROR("expected at most ell, checkSmooth, keep, and a classifier backend");
+  }
+  int ell=3;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { checkSmooth=#[2]; }
+  ell=KSCrelationStartCheck(ell);
+  int keep=0;
+  if (size(#)>2) { keep=#[3]; }
+  string backend="auto";
+  if (size(#)>3)
+  {
+    if (typeof(#[4])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[4]);
+  }
+
+  int savedDegBound=degBound;
+  degBound=0;
+  list state=KSCclassifyEconomicalState(I,ell,checkSmooth,keep,backend);
+  ClassifiedSurface A=state[1];
+  degBound=savedDegBound;
+  return(A);
+}
+
+proc KSCclassifySpaSM(ideal I, list #)
+"USAGE:  KSCclassifySpaSM(I[,ell,checkSmooth,keep]);  homogeneous ideal of a smooth projective surface.
+RETURN: The economical KSCclassify result, with strict exact SpaSM used by
+        every fractional canonical power and pluricanonical-map stage that the
+        decision path reaches.
+NOTE:   The procedure errors if a required power or map stage cannot use
+        SpaSM; it never falls back to the generic backend.  A subcanonical
+        branch terminates before constructing a rational frame.
+SEE ALSO: KSCclassify, KSCautoSpaSM, KSCphiDimExactSpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCclassifySpaSM(X);
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most ell, checkSmooth, and keep");
+  }
+  int ell=3;
+  int checkSmooth=0;
+  int keep=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { checkSmooth=#[2]; }
+  if (size(#)>2) { keep=#[3]; }
+  return(KSCclassify(I,ell,checkSmooth,keep,"spasm"));
+}
+
+static proc KSCclassifyWithFallbackCore(ideal I, int ell, int checkSmooth,
+                                         int keep, string backend)
+"USAGE:  KSCclassifyWithFallbackCore(I,ell,checkSmooth,keep,backend);  internal validated standard classifier.
+RETURN: ClassifiedSurface from the complete demand-driven decision tree.
+NOTE:   The public wrapper runs this many-return theorem worker with degBound
+        cleared and restores the caller's bound after the worker returns.
+EXAMPLE:
+  // internal: called only by KSCclassifyWithFallback.
+"
+{
+  list state=KSCclassifyEconomicalState(I,ell,checkSmooth,keep,backend);
+  ClassifiedSurface A=state[1];
+  if (size(state)<2)
+  {
+    ERROR("internal economical classifier did not return a state marker");
+  }
+  if (state[2]==0)
+  {
+    return(A);
+  }
+  if (KSCisInconclusive(A)==0)
+  {
+    ERROR("internal classifier marked a conclusive result for P_8 completion");
+  }
+  if (size(state)!=5)
+  {
+    ERROR("internal classifier state missing on the unresolved P_8 boundary");
+  }
+  if (state[2]!=1)
+  {
+    ERROR("internal classifier state is not marked ready for P_8 completion");
+  }
+
+  list chk=state[3];
+  int fractionalState=(typeof(state[4])=="RankOneSheaf");
+  module W;
+  module W6;
+  RankOneSheaf canonical;
+  RankOneSheaf fractionalPower;
+  string fractionalSectionBackend;
+  if (fractionalState)
+  {
+    canonical=state[4];
+    fractionalPower=state[5];
+    fractionalSectionBackend=KSCresolveClassifierSectionBackend(backend);
+    if (fractionalSectionBackend=="original")
+    {
+      ERROR("internal error: a fractional classifier state lost its linear-algebra backend");
+    }
+  }
+  else
+  {
+    W=state[4];
+    W6=state[5];
+  }
+  intvec P=A.plurigenera;
+  int q=A.irregularity;
+  int phi5=A.phi5Dimension;
+  int phi6=A.phi6Dimension;
+  int phiM=A.phiExactDimension;
+  int phiOrder=A.phiTestOrder;
+  string notes=A.certificate+" Standard completion entered only on the genuine low-growth boundary and reused the saturated support and cached sixth canonical power. ";
+
+  module Wm;
+  if (fractionalState)
+  {
+    fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower,
+                                                       canonical);
+    P[7]=KSCglobalSectionDimensionWithBackend(fractionalPower.presentation,
+                                               0,fractionalSectionBackend);
+  }
+  else
+  {
+    Wm=KSCtensorPres(W6,W);
+    P[7]=KSCglobalSectionDimension(Wm,0);
+  }
+  if (P[7]>=2)
+  {
+    return(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"P_7>=2 proves positive Kodaira dimension; P_5<=1 had already excluded general type. The classifier stops at P_7 and concludes kappa=1."+KSCkappaOneNote(),I,chk,checkSmooth,ell,7,"standard",A.subcanonical,A.subcanonicalIndex,phiOrder,phiM,phiM,keep));
+  }
+
+  if (fractionalState)
+  {
+    fractionalPower=KSCfractionalTensorRankOneSheaves(fractionalPower,
+                                                       canonical);
+    P[8]=KSCglobalSectionDimensionWithBackend(fractionalPower.presentation,
+                                               0,fractionalSectionBackend);
+  }
+  else
+  {
+    Wm=KSCtensorPres(Wm,W);
+    P[8]=KSCglobalSectionDimension(Wm,0);
+  }
+  if (P[8]>=2)
+  {
+    return(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"P_8>=2 proves positive Kodaira dimension; P_5<=1 had already excluded general type. Thus kappa=1, without computing phi_|8K| or P_12."+KSCkappaOneNote(),I,chk,checkSmooth,ell,8,"standard",A.subcanonical,A.subcanonicalIndex,phiOrder,phiM,phiM,keep));
+  }
+
+  if (KSCmaxEntry(P)<=1)
+  {
+    int first=KSCfirstPositiveIndex(P);
+    if (first==0)
+    {
+      ERROR("internal error: the all-zero branch should have terminated before the P_8 completion");
+    }
+    string klass=KSCkappaZeroSubtype(P,q);
+    return(KSCresult(klass,"0",P,q,phi5,phi6,
+                notes+"All P_1,...,P_8 are at most 1 and P_"+string(first)+" is nonzero. The sharp Catanese--Li n<=8 bound excludes kappa=1, while P_5<=1 excludes general type; hence kappa=0."+KSCkappaZeroSubtypeNote(),I,chk,checkSmooth,ell,8,"standard",A.subcanonical,A.subcanonicalIndex,phiOrder,phiM,phiM,keep));
+  }
+
+  ERROR("internal error: unexpected numerical branch in the standard P_<=8 classifier");
+}
+
+proc KSCclassifyWithFallback(ideal I, list #)
+"USAGE:  KSCclassifyWithFallback(I[,ell,maxm,checkSmooth,keep,backend]);  ell=3 default,
+        maxm=8 default and capped at 8, checkSmooth=0 default, keep=0 default.
+RETURN: ClassifiedSurface.  Its certificate and fallbackMaxPlurigenus record
+        how far the demand-driven computation actually went.
+MATH:   This is the standard mathematically complete route used by KSCauto and
+        KSChybrid.  The name contains \"fallback\" for backwards compatibility,
+        but this procedure no longer enters the optional P_12 certificate.
+
+        (1) It runs the same demand-driven economical worker as KSCclassify.
+        If that is conclusive at P_2, P_3, P_4, P_5, or P_6, it returns
+        immediately.
+
+        (2) KSCclassify computes the exact |5K| image only when P_5>=3.
+        P_5=2 is already a pencil, and P_5<=1 excludes general type.  Thus no
+        |6K| map or verification computation is needed.
+
+        (3) P_7 and then P_8 are computed only in the genuine low-growth
+        boundary branch.  The sixth power and either the canonical module or
+        its cached rational frame are retained, so neither saturation nor
+        frame recovery is repeated.  P_8 is skipped when P_7 already decides.
+        This is exactly the branch where
+        properly elliptic surfaces, and in characteristics 2 and 3
+        quasi-elliptic surfaces, can imitate kappa=0 up to order 6 or even 7.
+        The Catanese--Li n<=8 bound is the reason P_8 is a mathematically
+        necessary numerical test there.
+
+        (4) The procedure never computes phi_|8K|.  Once P_8 shows some
+        P_n>=2, the Kodaira dimension is positive.  Since any applicable exact
+        low pluricanonical map test has already run, the remaining positive
+        non-general-type case is kappa=1.  Thus
+        the 8-canonical image would be expensive but redundant.
+
+        (5) P_12 is not part of this standard path.  The optional P_12 theorem
+        certificate is kept in KSCclassifyP12Certificate at the end of this
+        file and is never called here.  If keep=1, ideals already computed
+        during the pass are kept in the result.  backend defaults to auto;
+        supported SpaSM is preferred, with the original graph implementation
+        used when SpaSM is unavailable or inapplicable.  Pass original,
+        linear, or spasm to force a route.  ell affects only the linear and
+        SpaSM bounded-relation routes.  The whole command temporarily
+        clears degBound across the entire economical and P_8 computation and
+        restores the caller's value before a normal return.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCclassifyWithFallback(X,3,8);       // standard path: no P_12, no phi_|8K|
+  KSCclassifyWithFallback(X,3,12,1);    // maxm is capped at 8; checks smoothness
+"
+{
+  if (size(#)>5)
+  {
+    ERROR("expected at most ell, maxm, checkSmooth, keep, and a classifier backend");
+  }
+  int ell=3;
+  int maxm=8;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { maxm=#[2]; }
+  if (size(#)>2) { checkSmooth=#[3]; }
+  ell=KSCrelationStartCheck(ell);
+  int keep=0;
+  if (size(#)>3) { keep=#[4]; }
+  string backend="auto";
+  if (size(#)>4)
+  {
+    if (typeof(#[5])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[5]);
+  }
+  if (maxm>8) { maxm=8; }
+  if (maxm<8) { maxm=8; }
+
+  int savedDegBound=degBound;
+  degBound=0;
+  ClassifiedSurface A=KSCclassifyWithFallbackCore(I,ell,checkSmooth,keep,
+                                                   backend);
+  degBound=savedDegBound;
+  return(A);
+}
+
+proc KSCcomplete(ideal I, list #)
+"USAGE:  KSCcomplete(I[,ell,checkSmooth,keep,backend]);  homogeneous ideal of a smooth projective surface.
+RETURN: ClassifiedSurface from the mathematically complete standard route.
+MATH:   This routine now means complete for the preferred classifier, not
+        complete via P_12.  It calls KSCclassifyWithFallback, whose standard
+        route is:
+
+          early P_2/P_3/P_4 certificates -> P_5 with an exact map only if needed
+          -> P_6/P_7/P_8 only on the residual low-growth boundary.
+
+        Under the smooth geometrically integral projective-surface hypotheses, and assuming
+        the applicable exact map and P_8 computations succeed, this route is
+        mathematically complete.  The optional P_12 theorem certificate is not
+        called here; it is kept separately at the end of the file.  KSCcomplete
+        defaults to the auto backend: SpaSM when supported and the original
+        classifier implementation otherwise, notably in characteristic zero.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCcomplete(X);       // standard complete classification, no P_12
+  KSCcomplete(X,4,1);   // same, with smoothness test
+"
+{
+  if (size(#)>4)
+  {
+    ERROR("expected at most ell, checkSmooth, keep, and a classifier backend");
+  }
+  int ell=3;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { checkSmooth=#[2]; }
+  int keep=0;
+  if (size(#)>2) { keep=#[3]; }
+  string backend="auto";
+  if (size(#)>3)
+  {
+    if (typeof(#[4])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[4]);
+  }
+
+  ClassifiedSurface A=KSCclassifyWithFallback(I,ell,8,checkSmooth,keep,backend);
+  A=KSCappendNotes(A," Complete mode used the standard P_<=8 + exact-map route; P_12 was not called.");
+  return(A);
+}
+
+proc KSCcompleteSpaSM(ideal I, list #)
+"USAGE:  KSCcompleteSpaSM(I[,ell,checkSmooth,keep]);  homogeneous ideal of a smooth projective surface.
+RETURN: The theorem-complete standard classification, with strict exact SpaSM
+        for the cached canonical frame, fractional powers, section dimensions,
+        and every map stage reached by the classifier.
+NOTE:   SpaSM absence or unsupported coefficients are errors once a
+        non-subcanonical branch needs the frame; no generic fallback is attempted.
+SEE ALSO: KSCcomplete, KSCautoSpaSM, KSCclassifySpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCcompleteSpaSM(X);
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most ell, checkSmooth, and keep");
+  }
+  int ell=3;
+  int checkSmooth=0;
+  int keep=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { checkSmooth=#[2]; }
+  if (size(#)>2) { keep=#[3]; }
+  return(KSCcomplete(I,ell,checkSmooth,keep,"spasm"));
+}
+
+proc KSCclassifyStandard(ideal I, list #)
+"USAGE:  KSCclassifyStandard(I[,ell,checkSmooth,keep,backend]);  alias for KSCcomplete.
+RETURN: Same as KSCcomplete.
+MATH:   This name avoids the old ambiguity of the word fallback.  It is the
+        preferred theorem-complete demand-driven classifier.  It uses an exact
+        |5K| map only when necessary and reaches P_8 only in the low-growth
+        boundary branch.  It never calls P_12 routines.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4; KSCclassifyStandard(X);
+"
+{
+  if (size(#)==0) { return(KSCcomplete(I)); }
+  if (size(#)==1) { return(KSCcomplete(I,#[1])); }
+  if (size(#)==2) { return(KSCcomplete(I,#[1],#[2])); }
+  if (size(#)==3) { return(KSCcomplete(I,#[1],#[2],#[3])); }
+  if (size(#)==4) { return(KSCcomplete(I,#[1],#[2],#[3],#[4])); }
+  ERROR("too many arguments for KSCclassifyStandard");
+}
+
+proc KSCclassifyComplete(ideal I, list #)
+"USAGE:  KSCclassifyComplete(I[,ell,checkSmooth,keep,backend]);  compatibility alias for KSCcomplete.
+RETURN: Same as KSCcomplete.
+MATH:   Kept for older scripts.  Despite the name, this does not invoke P_12;
+        it uses the standard complete route.  Call KSCclassifyP12Certificate
+        explicitly for the optional P_12 theorem check.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4; KSCclassifyComplete(X);
+"
+{
+  if (size(#)==0) { return(KSCcomplete(I)); }
+  if (size(#)==1) { return(KSCcomplete(I,#[1])); }
+  if (size(#)==2) { return(KSCcomplete(I,#[1],#[2])); }
+  if (size(#)==3) { return(KSCcomplete(I,#[1],#[2],#[3])); }
+  if (size(#)==4) { return(KSCcomplete(I,#[1],#[2],#[3],#[4])); }
+  ERROR("too many arguments for KSCclassifyComplete");
+}
+
+proc KSCauto(ideal I, list #)
+"USAGE:  KSCauto(I[,ell,complete,checkSmooth,keep,backend]);  ell=3 default,
+        complete=1 default, checkSmooth=0 default, keep=0 default.
+RETURN: ClassifiedSurface from the fully automatic classifier.
+MATH:   This is the recommended one-call function.  With complete=1 it uses the
+        standard mathematically complete demand-driven route: early P_2/P_3/P_4
+        certificates, P_5 and an exact |5K| test only when necessary, then
+        P_6/P_7/P_8 only in the residual low-growth boundary.  It never computes a
+        |6K| or |8K| map and never calls a P_12 routine.
+
+        With complete=0 it stops after the economical decision tree, at P_6
+        at the latest.  This mode is allowed to return inconclusive; it is for
+        users who explicitly want to avoid the P_8 section count.  If keep=1,
+        ideals and diagnostics already computed along the chosen path are
+        retained in the result.  The keep flag does not trigger extra
+        classification computations.  On a non-subcanonical path the default
+        auto backend selects SpaSM once for the canonical frame and fractional
+        powers, or selects the original classifier path when SpaSM is missing
+        or does not support the coefficient field.  Pass
+        original, linear, or spasm as backend to force that route.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCauto(X);         // standard classifier, no P_12
+  KSCauto(X,4,0);     // economical mode through at most P_6, may be inconclusive
+  KSCauto(X,4,1,1);   // standard classifier with smoothness test
+  KSCauto(X,4,1,1,1); // also retain computed ideals/diagnostics
+"
+{
+  if (size(#)>5)
+  {
+    ERROR("expected at most ell, complete, checkSmooth, keep, and a classifier backend");
+  }
+  int ell=3;
+  int complete=1;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { complete=#[2]; }
+  if (size(#)>2) { checkSmooth=#[3]; }
+  int keep=0;
+  if (size(#)>3) { keep=#[4]; }
+  string backend="auto";
+  if (size(#)>4)
+  {
+    if (typeof(#[5])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[5]);
+  }
+
+  if (complete==0)
+  {
+    ClassifiedSurface E=KSCclassify(I,ell,checkSmooth,keep,backend);
+    E=KSCappendNotes(E," Automatic economical mode stopped before P_8 and never calls P_12.");
+    return(E);
+  }
+
+  ClassifiedSurface A=KSCcomplete(I,ell,checkSmooth,keep,backend);
+  A=KSCappendNotes(A," Automatic mode used the standard classifier; P_12 was not called.");
+  return(A);
+}
+
+proc KSCautoSpaSM(ideal I, list #)
+"USAGE:  KSCautoSpaSM(I[,ell,complete,checkSmooth,keep]);  homogeneous ideal of a smooth projective surface.
+RETURN: The KSCauto result, with strict exact SpaSM at every map stage reached
+        by the selected economical or complete decision path, including the
+        cached frame, fractional powers, and section-dimension kernels.
+NOTE:   This is the explicit no-fallback SpaSM choice.  A subcanonical branch
+        can terminate before constructing a frame; other branches invoke SpaSM.
+SEE ALSO: KSCauto, KSCcompleteSpaSM, KSCclassifySpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCautoSpaSM(X);
+"
+{
+  if (size(#)>4)
+  {
+    ERROR("expected at most ell, complete, checkSmooth, and keep");
+  }
+  int ell=3;
+  int complete=1;
+  int checkSmooth=0;
+  int keep=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { complete=#[2]; }
+  if (size(#)>2) { checkSmooth=#[3]; }
+  if (size(#)>3) { keep=#[4]; }
+  return(KSCauto(I,ell,complete,checkSmooth,keep,"spasm"));
+}
+
+proc KSCautoEconomical(ideal I, list #)
+"USAGE:  KSCautoEconomical(I[,ell,checkSmooth,keep,backend]);  economical-only automatic mode.
+RETURN: ClassifiedSurface.  The result may be inconclusive by design.
+MATH:   This wrapper calls KSCauto with complete=0.  It is useful when one wants
+        only the demand-driven first pass, ending at or before P_6 and using an
+        exact |5K| relation test only when P_5>=3.  It deliberately stops before the
+        standard completion, so it does not compute P_8, phi_|8K|, or P_12.
+        Smoothness is still assumed unless
+        checkSmooth=1 is supplied.  If keep=1, ideals and diagnostics already
+        computed along the path are retained in the result.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^4+x1^4+x2^4+x3^4;
+  KSCautoEconomical(X);       // demand-driven first pass through at most P_6
+  KSCautoEconomical(X,4,1);   // same, smoothness checked
+  KSCautoEconomical(X,4,1,1); // also retain computed ideals/diagnostics
+"
+{
+  if (size(#)>4)
+  {
+    ERROR("expected at most ell, checkSmooth, keep, and a classifier backend");
+  }
+  int ell=3;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { checkSmooth=#[2]; }
+  int keep=0;
+  if (size(#)>2) { keep=#[3]; }
+  string backend="auto";
+  if (size(#)>3)
+  {
+    if (typeof(#[4])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[4]);
+  }
+  return(KSCauto(I,ell,0,checkSmooth,keep,backend));
+}
+
+proc KSCautomatic(ideal I, list #)
+"USAGE:  KSCautomatic(I[,ell,complete,checkSmooth,keep,backend]);  alias for KSCauto.
+RETURN: Same as KSCauto.
+MATH:   This wrapper exists for readability in scripts.  All mathematical work
+        and certificates are produced by KSCauto.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^5+x1^5+x2^5+x3^5; KSCautomatic(X);
+"
+{
+  if (size(#)==0) { return(KSCauto(I)); }
+  if (size(#)==1) { return(KSCauto(I,#[1])); }
+  if (size(#)==2) { return(KSCauto(I,#[1],#[2])); }
+  if (size(#)==3) { return(KSCauto(I,#[1],#[2],#[3])); }
+  if (size(#)==4) { return(KSCauto(I,#[1],#[2],#[3],#[4])); }
+  if (size(#)==5) { return(KSCauto(I,#[1],#[2],#[3],#[4],#[5])); }
+  ERROR("too many arguments for KSCautomatic");
+}
+
+proc KSCclassifyAutomatic(ideal I, list #)
+"USAGE:  KSCclassifyAutomatic(I[,ell,complete,checkSmooth,keep,backend]);  alias for KSCauto.
+RETURN: Same as KSCauto.
+MATH:   Kept as a descriptive one-call entry point for users who prefer a verb
+        name.  It does not change the decision tree.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^3+x1^3+x2^3+x3^3; KSCclassifyAutomatic(X);
+"
+{
+  if (size(#)==0) { return(KSCauto(I)); }
+  if (size(#)==1) { return(KSCauto(I,#[1])); }
+  if (size(#)==2) { return(KSCauto(I,#[1],#[2])); }
+  if (size(#)==3) { return(KSCauto(I,#[1],#[2],#[3])); }
+  if (size(#)==4) { return(KSCauto(I,#[1],#[2],#[3],#[4])); }
+  if (size(#)==5) { return(KSCauto(I,#[1],#[2],#[3],#[4],#[5])); }
+  ERROR("too many arguments for KSCclassifyAutomatic");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Adjunction prepass and hybrid classifier.
+///////////////////////////////////////////////////////////////////////////////
+
+proc KSCadjunctionPrepass(ideal I, list #)
+"USAGE:  KSCadjunctionPrepass(I[,ell,checkSmooth,backend]);  homogeneous surface ideal I.
+RETURN: list [h0Adj,adjDim,label,notes], where h0Adj=h^0(K_X+H) and adjDim is
+        the estimated image dimension of |K_X+H|.
+MATH:   The adjunction mapping is defined by |K_X+H|.  Its empty, point, and
+        curve-image cases are the classical exceptional signals in the
+        adjunction theory of Sommese, Van de Ven, and Ionescu: small embedded
+        planes, scrolls, del Pezzo-type point images, and conic-bundle-type
+        curve images.  This prepass is intentionally only diagnostic; it does
+        not contract curves or replace X by an adjoint image.  Smoothness is
+        assumed unless checkSmooth=1 is supplied.  Its default auto backend
+        follows the same SpaSM-or-original classifier policy as KSCauto; pass
+        original, linear, or spasm to force the corresponding route.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^3+x1^3+x2^3+x3^3;
+  KSCadjunctionPrepass(X);       // assume smooth
+  KSCadjunctionPrepass(X,4,1);   // check smoothness
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most ell, checkSmooth, and a classifier backend");
+  }
+  int ell=3;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { checkSmooth=#[2]; }
+  ell=KSCgrowthBoundCheck(ell);
+  string backend="auto";
+  if (size(#)>2)
+  {
+    if (typeof(#[3])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[3]);
+  }
+
+  list chk=KSCsurfaceData(I,checkSmooth);
+  ideal J=chk[1];
+  int pdim=chk[2];
+  int smooth=chk[5];
+  if (pdim!=2)
+  {
+    return(list(0,-1,"not_a_surface","Adjunction prepass skipped: input is not a projective surface."));
+  }
+
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  module Ws=KSCsatModule(W);
+  int h0Adj=dimH(0,Ws,1);
+  int adjDim=-1;
+  string label="";
+  string notes=KSCsmoothnessAssumptionNote(checkSmooth,smooth);
+
+  if ((checkSmooth!=0) and (smooth==0))
+  {
+    return(list(h0Adj,adjDim,"smoothness_failed",notes+"Adjunction theory assumes smoothness."));
+  }
+
+  if (h0Adj==0)
+  {
+    label="adjoint_empty_exception";
+    notes=notes+"|K+H| is empty. This is an adjunction-exception signal, often plane/scroll/Fano-polarized behavior. The hybrid classifier records it but does not use it alone as a Kodaira certificate.";
+    return(list(h0Adj,adjDim,label,notes));
+  }
+
+  string mapBackend=KSCresolveClassifierSectionBackend(backend);
+  if (mapBackend=="original")
+  {
+    adjDim=KSCoriginalLinearSystemImageDim(W,1,ell);
+    notes=notes+"Adjunction uses the original classifier module-section product implementation. ";
+  }
+  else
+  {
+    RankOneSheaf canonical=KSCrankOneSheafWithBackend(W,J,mapBackend);
+    adjDim=KSClinearSystemImageDim(canonical,1,ell);
+    if (mapBackend=="spasm")
+    {
+      notes=notes+"Adjunction uses the SpaSM scalar-section implementation. ";
+    }
+    else
+    {
+      notes=notes+"Adjunction uses the generic-linear scalar-section implementation. ";
+    }
+  }
+  if (adjDim==0)
+  {
+    label="adjoint_point_exception";
+    notes=notes+"|K+H| has point image. This includes anti-canonical del Pezzo type behavior; plurigenera still determine the Kodaira label.";
+  }
+  if (adjDim==1)
+  {
+    label="adjoint_curve_case";
+    notes=notes+"|K+H| has curve image. This is a conic-bundle/scroll-type adjunction warning, not automatically an elliptic pluricanonical fibration.";
+  }
+  if (adjDim==2)
+  {
+    label="adjoint_surface_case";
+    notes=notes+"|K+H| has surface image. Adjunction is non-exceptional at this diagnostic level; the classifier still uses canonical/pluricanonical certificates.";
+  }
+  if (adjDim<0)
+  {
+    label="adjoint_no_map";
+    notes=notes+"No adjoint map was obtained from the computed sections.";
+  }
+  return(list(h0Adj,adjDim,label,notes));
+}
+
+proc KSCadjunctionPrepassSpaSM(ideal I, list #)
+"USAGE:  KSCadjunctionPrepassSpaSM(I[,ell,checkSmooth]);  homogeneous surface ideal I.
+RETURN: The KSCadjunctionPrepass diagnostic, using strict exact SpaSM frame
+        recovery if the adjunction map must be computed.
+NOTE:   There is no generic fallback.
+SEE ALSO: KSCadjunctionPrepass, KSCadjointDimSpaSM, KSChybridSpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^3+x1^3+x2^3+x3^3;
+  KSCadjunctionPrepassSpaSM(X);
+"
+{
+  if (size(#)>2) { ERROR("expected at most ell and checkSmooth"); }
+  int ell=3;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { checkSmooth=#[2]; }
+  return(KSCadjunctionPrepass(I,ell,checkSmooth,"spasm"));
+}
+
+proc KSChybrid(ideal I, list #)
+"USAGE:  KSChybrid(I[,ell,complete,checkSmooth,keep,backend]);  ell=3 default,
+        complete=1 default, checkSmooth=0 default, keep=0 default.
+RETURN: ClassifiedSurface from the hybrid adjunction/plurigenus classifier.
+MATH:   This routine preserves the performance of the conclusive setting: it
+        first runs the same demand-driven standard classifier as KSCauto:
+        early P_2/P_3/P_4 certificates, an exact |5K| map only when necessary,
+        and P_6/P_7/P_8 only in the residual low-growth boundary.
+        If that path is conclusive, KSChybrid returns immediately and does not
+        compute |K_X+H|.  Only if the chosen classifier remains inconclusive
+        does it compute the adjunction diagnostic |K_X+H| and attach the
+        diagnostic notes.
+
+        With complete=0 it runs only the economical classifier through at most P_6
+        before the adjunction diagnostic.  No branch of KSChybrid calls the
+        optional P_12 routines; invoke KSCclassifyP12Certificate manually for
+        that independent certificate.  If keep=1, ideals and diagnostics
+        already computed along the chosen path are retained in the result.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSChybrid(X);         // standard route first; no P_12
+  KSChybrid(X,4,0);     // economical first pass plus adjunction if needed
+  KSChybrid(X,4,1,1);   // standard hybrid with smoothness test
+  KSChybrid(X,4,1,1,1); // also retain computed ideals/diagnostics
+"
+{
+  if (size(#)>5)
+  {
+    ERROR("expected at most ell, complete, checkSmooth, keep, and a classifier backend");
+  }
+  int ell=3;
+  int complete=1;
+  int checkSmooth=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { complete=#[2]; }
+  if (size(#)>2) { checkSmooth=#[3]; }
+  int keep=0;
+  if (size(#)>3) { keep=#[4]; }
+  string backend="auto";
+  if (size(#)>4)
+  {
+    if (typeof(#[5])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[5]);
+  }
+
+  ClassifiedSurface A;
+  if (complete==0)
+  {
+    A=KSCclassify(I,ell,checkSmooth,keep,backend);
+  }
+  else
+  {
+    A=KSCcomplete(I,ell,checkSmooth,keep,backend);
+  }
+
+  if (KSCisInconclusive(A)==0)
+  {
+    A=KSCappendNotes(A," Hybrid mode returned before adjunction; P_12 was not called.");
+    return(A);
+  }
+
+  list H=KSCadjunctionPrepass(I,ell,checkSmooth,backend);
+  string hnotes="Hybrid adjunction diagnostic after the classifier remained inconclusive: h0(K+H)="+string(H[1])+", imageDim="+string(H[2])+", label="+H[3]+". "+H[4]+" ";
+
+  if (complete==0)
+  {
+    A=KSCappendNotes(A," "+hnotes+"Standard completion was disabled by the caller; no P_12 routine is called automatically.");
+  }
+  else
+  {
+    A=KSCappendNotes(A," "+hnotes+"No P_12 routine is called automatically; run KSCclassifyP12Certificate manually only as an independent check or debugging certificate.");
+  }
+  if (keep!=0) { A.diagnostics=H; }
+  return(A);
+}
+
+proc KSChybridSpaSM(ideal I, list #)
+"USAGE:  KSChybridSpaSM(I[,ell,complete,checkSmooth,keep]);  homogeneous ideal of a smooth projective surface.
+RETURN: The hybrid classification with strict exact SpaSM at every canonical
+        frame, fractional-power, section-dimension, or adjunction-map stage
+        reached by the decision path.
+NOTE:   There is no generic fallback.  A subcanonical path can terminate
+        before SpaSM is invoked.
+SEE ALSO: KSChybrid, KSCautoSpaSM, KSCadjunctionPrepassSpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSChybridSpaSM(X);
+"
+{
+  if (size(#)>4)
+  {
+    ERROR("expected at most ell, complete, checkSmooth, and keep");
+  }
+  int ell=3;
+  int complete=1;
+  int checkSmooth=0;
+  int keep=0;
+  if (size(#)>0) { ell=#[1]; }
+  if (size(#)>1) { complete=#[2]; }
+  if (size(#)>2) { checkSmooth=#[3]; }
+  if (size(#)>3) { keep=#[4]; }
+  return(KSChybrid(I,ell,complete,checkSmooth,keep,"spasm"));
+}
+
+proc KSCautomaticHybrid(ideal I, list #)
+"USAGE:  KSCautomaticHybrid(I[,ell,complete,checkSmooth,keep,backend]);  alias for KSChybrid.
+RETURN: Same as KSChybrid.
+MATH:   This wrapper exposes the complete hybrid strategy under a more explicit
+        name.  All mathematical work is performed by KSChybrid.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4; KSCautomaticHybrid(X);
+"
+{
+  if (size(#)==0) { return(KSChybrid(I)); }
+  if (size(#)==1) { return(KSChybrid(I,#[1])); }
+  if (size(#)==2) { return(KSChybrid(I,#[1],#[2])); }
+  if (size(#)==3) { return(KSChybrid(I,#[1],#[2],#[3])); }
+  if (size(#)==4) { return(KSChybrid(I,#[1],#[2],#[3],#[4])); }
+  if (size(#)==5) { return(KSChybrid(I,#[1],#[2],#[3],#[4],#[5])); }
+  ERROR("too many arguments for KSCautomaticHybrid");
+}
+
+proc KSCclassifyHybrid(ideal I, list #)
+"USAGE:  KSCclassifyHybrid(I[,ell,complete,checkSmooth,keep,backend]);  alias for KSChybrid.
+RETURN: Same as KSChybrid.
+MATH:   Kept for scripts that name classifier routines by the verb classify.
+        It preserves the same economical-first and standard-completion behavior;
+        no P_12 routine is called automatically.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^3+x1^3+x2^3+x3^3; KSCclassifyHybrid(X);
+"
+{
+  if (size(#)==0) { return(KSChybrid(I)); }
+  if (size(#)==1) { return(KSChybrid(I,#[1])); }
+  if (size(#)==2) { return(KSChybrid(I,#[1],#[2])); }
+  if (size(#)==3) { return(KSChybrid(I,#[1],#[2],#[3])); }
+  if (size(#)==4) { return(KSChybrid(I,#[1],#[2],#[3],#[4])); }
+  if (size(#)==5) { return(KSChybrid(I,#[1],#[2],#[3],#[4],#[5])); }
+  ERROR("too many arguments for KSCclassifyHybrid");
+}
+
+proc KSCclassifyHybridAutomatic(ideal I, list #)
+"USAGE:  KSCclassifyHybridAutomatic(I[,ell,complete,checkSmooth,keep,backend]);  alias for KSChybrid.
+RETURN: Same as KSChybrid.
+MATH:   This is a verbose compatibility alias for the fully automatic hybrid
+        routine.  It does not change the decision tree.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^5+x1^5+x2^5+x3^5; KSCclassifyHybridAutomatic(X);
+"
+{
+  if (size(#)==0) { return(KSChybrid(I)); }
+  if (size(#)==1) { return(KSChybrid(I,#[1])); }
+  if (size(#)==2) { return(KSChybrid(I,#[1],#[2])); }
+  if (size(#)==3) { return(KSChybrid(I,#[1],#[2],#[3])); }
+  if (size(#)==4) { return(KSChybrid(I,#[1],#[2],#[3],#[4])); }
+  if (size(#)==5) { return(KSChybrid(I,#[1],#[2],#[3],#[4],#[5])); }
+  ERROR("too many arguments for KSCclassifyHybridAutomatic");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Optional P_12 theorem certificate.
+//
+// This section is intentionally separated from the standard classifier.  No
+// standard entry point above calls these procedures.  They are available only
+// when a user explicitly wants the classical P_12 theorem check, an independent
+// cross-check, or a debugging certificate after unexpected computational
+// behaviour in the P_<=8 + exact-map route.
+///////////////////////////////////////////////////////////////////////////////
+
+proc KSCclassifyP12Certificate(ideal I, list #)
+"USAGE:  KSCclassifyP12Certificate(I[,checkSmooth,keep,backend]);  optional direct P_12 theorem check.
+RETURN: ClassifiedSurface.  P has length 12.  The phi5/phi6 slots are -1
+        because this optional routine does not run the standard lower path.
+MATH:   This is not used by KSCauto, KSCcomplete, or KSChybrid.  It computes
+        P_1,...,P_12 directly and applies the classical P_12 split:
+
+          P_12=0  -> kappa=-infinity,
+          P_12=1  -> kappa=0,
+          P_12>=2 -> positive Kodaira dimension.
+
+        If P_12=2, then |12K| has only two independent sections and maps at
+        most to P^1, so the positive branch cannot be general type; the output
+        is kappa=1.  If P_12>=3, the routine computes the exact |12K| image:
+        surface image gives general type, while non-surface image gives kappa=1.
+        In characteristics 2 and 3 the kappa=1 label includes quasi-elliptic
+        surfaces.  This routine can be very expensive and is deliberately not
+        part of the preferred standard path.  If keep=1, ideals already
+        computed by this explicit pass are retained in the result.  At its
+        optional map stage, auto selects SpaSM when supported and the original
+        module-section graph implementation otherwise.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCclassifyP12Certificate(X);     // explicit optional P_12 certificate
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most checkSmooth, keep, and a classifier backend");
+  }
+  int checkSmooth=0;
+  if (size(#)>0) { checkSmooth=#[1]; }
+  int keep=0;
+  if (size(#)>1) { keep=#[2]; }
+  string backend="auto";
+  if (size(#)>2)
+  {
+    if (typeof(#[3])!="string") { ERROR("classifier backend must be a string"); }
+    backend=KSCclassifierBackendCheck(#[3]);
+  }
+
+  list chk=KSCsurfaceData(I,checkSmooth);
+  ideal J=chk[1];
+  int pdim=chk[2];
+  int smooth=chk[5];
+  intvec zbad; zbad[1]=0;
+  if (pdim!=2)
+  {
+    return(KSCresult("input is not a projective surface","unknown",zbad,-1,-1,-1,
+                "dim(S/I)-1 is not 2.",I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,0,-1,-1,keep));
+  }
+  if ((checkSmooth!=0) and (smooth==0))
+  {
+    return(KSCresult("smoothness check failed","unknown",zbad,-1,-1,-1,
+                KSCsmoothnessAssumptionNote(checkSmooth,smooth),I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,0,-1,-1,keep));
+  }
+
+  module W=KSCcanonicalModuleFromSatIdeal(J);
+  list plurigenusData=KSCplurigeneraWithLastPower(W,12);
+  intvec P=plurigenusData[1];
+  module W12=plurigenusData[2];
+  int q=KSCirregularityFromSatIdeal(J);
+  int phi5=-1;
+  int phi6=-1;
+  int phi12=-1;
+  string notes=KSCsmoothnessAssumptionNote(checkSmooth,smooth)+"Base field context: "+KSCcharContext()+". Optional P_12 certificate was requested explicitly; it is not part of the standard path. ";
+
+  if (P[12]==0)
+  {
+    if (q==0)
+    {
+      return(KSCresult("rational surface","-infinity",P,q,phi5,phi6,
+                  notes+"P_12=0; by the P_12 theorem kappa=-infinity, and h^1(O_X)=0 gives the rational branch.",I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,0,-1,-1,keep));
+    }
+    return(KSCresult("ruled surface over a curve of genus h^1(O_X)","-infinity",P,q,phi5,phi6,
+                notes+"P_12=0; by the P_12 theorem kappa=-infinity, and h^1(O_X)>0 gives the ruled branch.",I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,0,-1,-1,keep));
+  }
+
+  if (P[12]==1)
+  {
+    string klass0=KSCkappaZeroSubtype(P,q);
+    return(KSCresult(klass0,"0",P,q,phi5,phi6,
+                notes+"P_12=1; by the P_12 theorem kappa=0."+KSCkappaZeroSubtypeNote(),I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,0,-1,-1,keep));
+  }
+
+  if (P[12]==2)
+  {
+    return(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"P_12=2 gives positive Kodaira dimension, and |12K| has only two independent sections, so its image is at most a curve. Thus the positive non-general-type branch is kappa=1."+KSCkappaOneNote(),I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,12,1,-1,keep));
+  }
+
+  if (P[12]>=3)
+  {
+    string mapBackend=KSCresolveClassifierSectionBackend(backend);
+    if (mapBackend=="original")
+    {
+      notes=notes+"The |12K| map uses the original classifier module-section and graph-elimination implementation. ";
+      phi12=KSCoriginalExactImageDimFromModule(J,W12,0);
+    }
+    else
+    {
+      notes=notes+"The |12K| map uses the "+mapBackend+" scalar-section and bounded-relation implementation. ";
+      RankOneSheaf canonical=KSCrankOneSheafWithBackend(W,J,mapBackend);
+      phi12=KSCphiDimExactFromPowerWithBackend(canonical,W12,12,1,mapBackend);
+    }
+    if (phi12==2)
+    {
+      return(KSCresult("general type","2",P,q,phi5,phi6,
+                  notes+"P_12>=3 and the exact |12K| image has dimension 2.",I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,12,phi12,phi12,keep));
+    }
+    return(KSCresult(KSCkappaOneLabel(),"1",P,q,phi5,phi6,
+                notes+"P_12>=3 but the exact |12K| image is not a surface, so the positive branch is kappa=1."+KSCkappaOneNote(),I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,12,phi12,phi12,keep));
+  }
+
+  return(KSCresult("inconclusive","unknown",P,q,phi5,phi6,
+              notes+"Unexpected P_12 branch; check input hypotheses and computations.",I,chk,checkSmooth,-1,12,"p12-certificate",-1,0,0,-1,-1,keep));
+}
+
+proc KSCclassifyP12CertificateSpaSM(ideal I, list #)
+"USAGE:  KSCclassifyP12CertificateSpaSM(I[,checkSmooth,keep]);  optional P_12 theorem check.
+RETURN: The explicit P_12 certificate with strict exact SpaSM if the |12K|
+        image must be computed.
+NOTE:   There is no generic fallback.  The P_12=0,1,2 branches need no map and
+        therefore do not invoke SpaSM.
+SEE ALSO: KSCclassifyP12Certificate, KSCphiDimExactSpaSM
+EXAMPLE:
+  ring R=32003,(x0,x1,x2,x3),dp;
+  ideal X=x0^5+x1^5+x2^5+x3^5;
+  KSCclassifyP12CertificateSpaSM(X);
+"
+{
+  if (size(#)>2) { ERROR("expected at most checkSmooth and keep"); }
+  int checkSmooth=0;
+  int keep=0;
+  if (size(#)>0) { checkSmooth=#[1]; }
+  if (size(#)>1) { keep=#[2]; }
+  return(KSCclassifyP12Certificate(I,checkSmooth,keep,"spasm"));
+}
+
+proc KSCp12Certificate(ideal I, list #)
+"USAGE:  KSCp12Certificate(I[,checkSmooth,keep,backend]);  alias for KSCclassifyP12Certificate.
+RETURN: Same as KSCclassifyP12Certificate.
+MATH:   Short explicit name for the optional P_12 theorem certificate.  This is
+        never called by the standard classifier.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^5+x1^5+x2^5+x3^5; KSCp12Certificate(X);
+"
+{
+  if (size(#)==0) { return(KSCclassifyP12Certificate(I)); }
+  if (size(#)==1) { return(KSCclassifyP12Certificate(I,#[1])); }
+  if (size(#)==2) { return(KSCclassifyP12Certificate(I,#[1],#[2])); }
+  if (size(#)==3)
+  {
+    return(KSCclassifyP12Certificate(I,#[1],#[2],#[3]));
+  }
+  ERROR("too many arguments for KSCp12Certificate");
+}
+
+proc KSCclassifyByP12(ideal I, list #)
+"USAGE:  KSCclassifyByP12(I[,checkSmooth,keep,backend]);  alias for KSCclassifyP12Certificate.
+RETURN: Same as KSCclassifyP12Certificate.
+MATH:   Compatibility wrapper for users who explicitly want the P_12 theorem
+        route.  It is separated from, and not used by, KSCauto/KSCcomplete.
+EXAMPLE:
+  ring R=0,(x0,x1,x2,x3),dp; ideal X=x0^4+x1^4+x2^4+x3^4; KSCclassifyByP12(X);
+"
+{
+  if (size(#)==0) { return(KSCclassifyP12Certificate(I)); }
+  if (size(#)==1) { return(KSCclassifyP12Certificate(I,#[1])); }
+  if (size(#)==2) { return(KSCclassifyP12Certificate(I,#[1],#[2])); }
+  if (size(#)==3)
+  {
+    return(KSCclassifyP12Certificate(I,#[1],#[2],#[3]));
+  }
+  ERROR("too many arguments for KSCclassifyByP12");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// End library.
+///////////////////////////////////////////////////////////////////////////////

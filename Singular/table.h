@@ -788,6 +788,7 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjSTD_HILB),  STD_CMD,        MODUL_CMD,      MODUL_CMD,  BIGINTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSYZ_2),     SYZYGY_CMD,     MODUL_CMD,      IDEAL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSYZ_2),     SYZYGY_CMD,     MODUL_CMD,      MODUL_CMD,  STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFASTTENSOR),FASTTENSOR_CMD, MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING|NO_CONVERSION}
 ,{D(jjTENSOR_Ma), TENSOR_CMD,     MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjTENSOR),    TENSOR_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING|NO_CONVERSION}
 ,{D(jjTENSOR),    TENSOR_CMD,     SMATRIX_CMD,    SMATRIX_CMD,SMATRIX_CMD, ALLOW_PLURAL |ALLOW_RING|NO_CONVERSION}
@@ -1092,6 +1093,7 @@ VAR cmdnames cmds[] =
   { "facstd",      0, FACSTD_CMD ,        CMD_12},
   { "factmodd",    0, FMD_CMD ,           CMD_M},
   { "factorize",   0, FAC_CMD ,           CMD_12},
+  { "fasttensor",  0, FASTTENSOR_CMD ,    CMD_2},
   { "farey",       0, FAREY_CMD ,         CMD_2},
   { "fetch",       0, FETCH_CMD ,         CMD_M},
   { "fglm",        0, FGLM_CMD ,          CMD_2},

@@ -11,6 +11,7 @@ SUBDIRS += doc
 endif
 
 EXTRA_DIST = README README.md README.pkg autogen.sh doxy redhat/singular.spec.in GPL2 GPL3
+EXTRA_DIST += misc/import_non_general_type_surfaces_p4.py
 
 bin_SCRIPTS = libsingular-config
 
