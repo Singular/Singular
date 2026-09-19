@@ -195,6 +195,12 @@ jobs:
             libmpfr-devel libntl-devel libreadline-devel libtool m4 make perl
             pkg-config sharutils tar texinfo xz
 
+      - name: Trust checked out source in Cygwin
+        env:
+          CHERE_INVOKING: 1
+          CYGWIN_NOWINPATH: 1
+        run: bash --login -c 'git config --global --add safe.directory "$PWD"'
+
       - name: Build and package Cygwin overlay
         env:
           CHERE_INVOKING: 1
