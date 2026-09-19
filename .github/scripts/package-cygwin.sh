@@ -122,14 +122,13 @@ cat > "$stage/usr/bin/Singular-upstream" <<EOF
 exec "$install_prefix/bin/Singular" "\$@"
 EOF
 chmod 0755 "$stage/usr/bin/Singular-upstream"
-ln -s Singular-upstream "$stage/usr/bin/singular-upstream"
 
 cat > "$stage/usr/share/doc/Cygwin/$package_name.README" <<EOF
 $package_name is the binary distribution produced by the Singular project.
 
 It deliberately uses a distinct package name, command name, and installation
 prefix so that it does not replace or modify any separately maintained Cygwin
-package. Run it as Singular-upstream or singular-upstream.
+package. Run it as Singular-upstream.
 
 Installation prefix: $install_prefix
 Singular source commit: $(git -C "$source_root" rev-parse HEAD)
