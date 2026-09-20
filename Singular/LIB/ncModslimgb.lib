@@ -70,11 +70,12 @@ EXAMPLE: example ncmodslimgb; shows an example
     {
       if(typeof(#[sz]) == "int" && #[sz] > 1)
       {
-        ncores=setcores(#[sz]);
+        ncores=#[sz];
       }
     }
     sz = sz-1;
   }
+  ncores=setcores(ncores);
   if(find(option(), "probabilistic") > 0)
   {
     exactness = 0;
