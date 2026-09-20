@@ -4019,12 +4019,29 @@ See
 @subsection proc expression
 @cindex proc expression
 @cindex ->
+@cindex lambda
 
 @table @strong
 @item Syntax:
-variable_name @code{-> @{} expression(s) @code{@}}
+@code{@{} parameter_name @code{-> @{} expression(s) @code{@}}@}
+@*
+@code{(} parameter_list @code{) -> @{} expression(s) @code{@}}
 @item Purpose:
-Defines a new function, within @code{apply} or for assigning.
+Defines an anonymous function (a @emph{lambda}), to be used within
+@code{apply} or for assigning.
+@*
+In the first form, the lambda takes exactly one argument, which is
+available in the body under @code{parameter_name} (without a type, i.e.@:
+as @code{def}). The value of the last expression of the body is
+returned.
+@*
+In the second form, the lambda takes the arguments described by
+@code{parameter_list}, which has the same syntax as in a @code{proc}
+declaration (@pxref{Parameter list}): a comma-separated list of arguments
+with optional type keywords, e.g.@: @code{int a, list l}. Arguments
+declared with a type are checked at call time. The list may be empty.
+Unlike the first form, the body must use an explicit @code{return}
+(@pxref{return}) to produce a result.
 @item Example:
 @smallexample
 @c example
@@ -4033,6 +4050,19 @@ Defines a new function, within @code{apply} or for assigning.
   t;
   t(23);
   proc p=t;
+  // one argument, untyped: also works for strings
+  proc len=s->{size(s)};
+  len("abcdef");
+  // several typed arguments, explicit return
+  proc add=(int a, int b)->{return(a+b)};
+  add(3,4);
+  // explicit return, also from within a conditional
+  proc first=(list l)->{if(size(l)==0){return(0);} return(l[1]);};
+  first(list(5));
+  first(list());
+  // no arguments
+  proc seven=()->{return(7)};
+  seven();
 @c example
 @end smallexample
 @end table

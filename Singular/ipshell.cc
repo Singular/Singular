@@ -6477,6 +6477,43 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
 
 #include "libparse.h"
 
+BOOLEAN iiARROWparams(leftv r, char* params, char *s)
+{
+  // params: e.g. "int x, def y" (as delivered by the scanner, proc-style)
+  //         or "" for the zero-parameter case () -> { ... }
+  int end_s=strlen(s);
+  while ((end_s>0) && ((s[end_s]<=' ')||(s[end_s]==';'))) end_s--;
+  s[end_s+1]='\0';
+  char *args;
+  if ((params==NULL)||(params[0]=='\0'))
+    args=omStrDup("");
+  else
+    args=iiProcArgs(params,FALSE);
+  size_t len=strlen(args)+strlen(s)+30;
+  char *ss=(char*)omAlloc(len);
+  char *name=(char*)omAlloc(len);
+  if ((params==NULL)||(params[0]=='\0'))
+    snprintf(name,len,"()->%s",s);
+  else
+    snprintf(name,len,"(%s)->%s",params,s);
+  // use the body unchanged and append return();
+  // (like proccmd does; an earlier explicit return(..) wins,
+  //  otherwise the lambda returns NONE)
+  // the return() must start on a new line: the body may end
+  // within a // comment, which would otherwise comment it out
+  snprintf(ss,len,"%s\n%s\n;return();\n",args,s);
+  omFree(args);
+  r->Init();
+  // now produce procinfo for PROC_CMD:
+  r->data = (void *)omAlloc0Bin(procinfo_bin);
+  ((procinfo *)(r->data))->language=LANG_NONE;
+  iiInitSingularProcinfo((procinfo *)r->data,"",name,0,0);
+  ((procinfo *)(r->data))->data.s.body=ss;
+  omFree(name);
+  r->rtyp=PROC_CMD;
+  return FALSE;
+}
+
 BOOLEAN iiARROW(leftv r, char* a, char *s)
 {
   size_t len=strlen(a)+strlen(s)+30; /* max. 27 currently */

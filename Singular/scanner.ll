@@ -343,6 +343,107 @@ newline                  {
 .                       {
                            /*if (*yytext == '\n') REJECT;*/
                            REGISTER char ch= *yytext;
+                           if (ch == '(')
+                           {
+                             /* peek ahead: (args)-> { */
+                             char argbuf[1024];
+                             int arglen = 0;
+                             int nest = 1;
+                             int c2;
+                             int abort_flag = 0;
+                             /* read until matching ')' */
+                             /* abort on '"' or ';': not valid in lambda params
+                                ('#' is allowed: (#) -> {...} is variadic, like proc) */
+                             while (nest > 0)
+                             {
+                               c2 = yyinput();
+                               if (c2 == EOF) { abort_flag = 1; break; }
+                               if ((c2 == '"') || (c2 == ';'))
+                               { abort_flag = 1; break; }
+                               if (c2 == '(') nest++;
+                               else if (c2 == ')')
+                               {
+                                 nest--;
+                                 if (nest == 0) break;
+                               }
+                               if (nest > 0)
+                               {
+                                 if (arglen >= (int)sizeof(argbuf)-1)
+                                 {
+                                   /* param text too long to buffer:
+                                      abort the lambda check; everything
+                                      consumed so far is restored below */
+                                   abort_flag = 1;
+                                   break;
+                                 }
+                                 argbuf[arglen++] = (char)c2;
+                               }
+                             }
+                             argbuf[arglen] = '\0';
+                             if (!abort_flag)
+                             {
+                               /* skip whitespace after ')' and check for "->" */
+                               char buf2[64];
+                               int n2 = 0;
+                               do
+                               {
+                                 c2 = yyinput();
+                                 if (c2 == EOF) break;
+                                 if (n2 >= (int)sizeof(buf2)-1)
+                                 {
+                                   /* whitespace run too long: abort the
+                                      lambda check; everything consumed so
+                                      far is restored below */
+                                   abort_flag = 1;
+                                   break;
+                                 }
+                                 buf2[n2++] = (char)c2;
+                               }
+                               while ((c2 == ' ') || (c2 == '\t') ||
+                                      (c2 == '\r') || (c2 == '\n'));
+                               if (!abort_flag && (c2 == '-'))
+                               {
+                                 c2 = yyinput();
+                                 if (c2 == '>')
+                                 {
+                                   /* found "(args)->":
+                                      return the param list as STRINGTOK and
+                                      re-inject "->" so that the "->" rule
+                                      matches it and returns ARROW
+                                      (unput is LIFO: '>' first, then '-') */
+                                   unput('>');
+                                   unput('-');
+                                   lvalp->name = omStrDup(argbuf);
+                                   return STRINGTOK;
+                                 }
+                                 /* the '-' is already the last char in
+                                    buf2 (the skip loop stored it); only
+                                    the char just read after it (if not
+                                    EOF) must be restored */
+                                 if (c2 != EOF) unput(c2);
+                               }
+                               /* not a lambda: push back all consumed chars
+                                  in reverse order (unput is LIFO);
+                                  buf2 contains everything stored. If the
+                                  whitespace run aborted the check, c2 was
+                                  read but not stored: restore it first */
+                               if (abort_flag && (c2 != EOF)) unput(c2);
+                               while (n2 > 0) unput(buf2[--n2]);
+                               unput(')');
+                               while (arglen > 0) unput(argbuf[--arglen]);
+                             }
+                             else
+                             {
+                               /* aborted inside the args: ')' was never reached,
+                                  push back the abort char (if any) and args */
+                               if (c2 != EOF) unput(c2);
+                               while (arglen > 0) unput(argbuf[--arglen]);
+                             }
+                             /* '(' itself stays consumed: return it as the
+                                normal character token */
+                             lvalp->i = ch;
+                             return ch;
+                           }
                            lvalp->i = ch;
                            switch(ch)
                            {
