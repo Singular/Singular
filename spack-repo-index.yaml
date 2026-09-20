@@ -1,0 +1,3 @@
+repo_index:
+  paths:
+    - packaging/spack/repos/spack_repo/singular
