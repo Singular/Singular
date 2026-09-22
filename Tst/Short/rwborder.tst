@@ -90,9 +90,10 @@ proc testRationalWeylBorderBasis()
   kill Ratgb::Ddim,Ratgb::KXdim;
 
   // The genuine order-ideal construction starts with the two generators of
-  // Example 2.18.  Both order ideals are requested in the same rp1 ring, so
-  // the O2 result cannot have been selected by the ring's leading monomials.
-  setring WP1;
+  // Example 2.18.  Both order ideals are requested in the same plain dp ring,
+  // with no antiblock ordering for the coefficient and operator variables.
+  ring rpo=0,(x,y,Dx,Dy),dp;
+  def WPO=Weyl(); setring WPO;
   ideal J=
     x*Dx^2-y*Dy^2+Dx-Dy,
     x*Dx+y*Dy+1;
