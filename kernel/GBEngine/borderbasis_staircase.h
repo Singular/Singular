@@ -16,6 +16,10 @@ BOOLEAN staircase(const ideal G, int firstVariable, int numberOfVariables,
                   ExponentVectors &standard, ExponentVectors &border,
                   const ring r);
 
+// Compute the first border of a caller-supplied order ideal.  This operation
+// is purely combinatorial and does not inspect a term ordering.
+void border(const ExponentVectors &standard, ExponentVectors &result);
+
 poly makeMonomial(const ExponentVector &a, int firstVariable, const ring r);
 
 ideal makeMonomialIdeal(const ExponentVectors &monomials, int firstVariable,
