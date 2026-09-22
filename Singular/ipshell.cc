@@ -6477,6 +6477,9 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
 
 #include "libparse.h"
 
+// counter for generated lambda names
+static int iiLambdaCount = 0;
+
 BOOLEAN iiARROWparams(leftv r, char* params, char *s)
 {
   // params: e.g. "int x, def y" (as delivered by the scanner, proc-style)
@@ -6492,10 +6495,14 @@ BOOLEAN iiARROWparams(leftv r, char* params, char *s)
   size_t len=strlen(args)+strlen(s)+30;
   char *ss=(char*)omAlloc(len);
   char *name=(char*)omAlloc(len);
+  // use a short generated name: the procname is only used for
+  // diagnostics, and embedding the whole block text made it
+  // arbitrarily large (> OM_MAX_BLOCK_SIZE strings are served by
+  // malloc, not from an omalloc bin page)
   if ((params==NULL)||(params[0]=='\0'))
-    snprintf(name,len,"()->%s",s);
+    snprintf(name,len,"lambda%d(line %d)",++iiLambdaCount,yylineno);
   else
-    snprintf(name,len,"(%s)->%s",params,s);
+    snprintf(name,len,"lambda%d(%s)(line %d)",++iiLambdaCount,params,yylineno);
   // use the body unchanged and append return();
   // (like proccmd does; an earlier explicit return(..) wins,
   //  otherwise the lambda returns NONE)
@@ -6523,7 +6530,8 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
   while ((end_s>0) && ((s[end_s]<=' ')||(s[end_s]==';'))) end_s--;
   s[end_s+1]='\0';
   char *name=(char *)omAlloc(len);
-  snprintf(name,len,"%s->%s",a,s);
+  // see iiARROWparams: short generated name instead of the full text
+  snprintf(name,len,"%s->lambda%d(line %d)",a,++iiLambdaCount,yylineno);
   // find start of last expression
   int start_s=end_s-1;
   while ((start_s>=0) && (s[start_s]!=';')) start_s--;
