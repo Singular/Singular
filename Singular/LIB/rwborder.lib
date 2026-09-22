@@ -157,7 +157,7 @@ example
   }
   else
   {
-    ring r=0,(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,0,1),dp);
+    ring r=0,(x,y,Dx,Dy),dp;
     def W=Weyl(); setring W;
     ideal I=x*Dx^2-y*Dy^2+Dx-Dy,x*Dx+y*Dy+1;
     ideal O=1,Dx;
