@@ -70,6 +70,7 @@
 #include "kernel/GBEngine/borderbasis.h"
 #ifdef HAVE_RATGRING
 #include "kernel/GBEngine/ratborderbasis.h"
+#include "kernel/GBEngine/ratborderbasis_orderideal.h"
 #endif
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kutil.h"
@@ -3037,6 +3038,42 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         result->m[0].data = (void *)borderBasis;
         result->m[1].rtyp = IDEAL_CMD;
         result->m[1].data = (void *)orderIdeal;
+        res->rtyp = LIST_CMD;
+        res->data = (char *)result;
+        return FALSE;
+      }
+      else
+      if (strcmp(sys_cmd, "rationalWeylBorderBasisForOrderIdeal") == 0)
+      {
+        if ((h == NULL) || (h->Typ() != IDEAL_CMD) || (h->next == NULL) ||
+            (h->next->Typ() != IDEAL_CMD) || (h->next->next == NULL) ||
+            (h->next->next->Typ() != INT_CMD) ||
+            (h->next->next->next == NULL) ||
+            (h->next->next->next->Typ() != INT_CMD) ||
+            (h->next->next->next->next != NULL))
+        {
+          WerrorS("expected system(\"rationalWeylBorderBasisForOrderIdeal\", ideal, ideal, int, int)");
+          return TRUE;
+        }
+
+        ideal generators = (ideal)h->Data();
+        ideal orderIdeal = (ideal)h->next->Data();
+        const int coefficientVariables =
+            (int)(long)h->next->next->Data();
+        const int maxProlongation =
+            (int)(long)h->next->next->next->Data();
+        ideal borderBasis = NULL;
+        if (nc_RationalWeylBorderBasisForOrderIdeal(
+                generators, orderIdeal, coefficientVariables,
+                maxProlongation, borderBasis, currRing))
+          return TRUE;
+
+        lists result = (lists)omAllocBin(slists_bin);
+        result->Init(2);
+        result->m[0].rtyp = IDEAL_CMD;
+        result->m[0].data = (void *)borderBasis;
+        result->m[1].rtyp = IDEAL_CMD;
+        result->m[1].data = (void *)id_Copy(orderIdeal, currRing);
         res->rtyp = LIST_CMD;
         res->data = (char *)result;
         return FALSE;

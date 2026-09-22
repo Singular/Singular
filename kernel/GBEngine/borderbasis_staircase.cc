@@ -135,8 +135,11 @@ static BOOLEAN standardMonomials(const ExponentVectors &corners,
   return FALSE;
 }
 
-static void borderMonomials(const ExponentVectors &standard,
-                            ExponentVectors &border)
+}
+
+namespace borderbasis_kernel
+{
+void border(const ExponentVectors &standard, ExponentVectors &result)
 {
   std::set<ExponentVector> orderSet(standard.begin(), standard.end());
   std::set<ExponentVector> borderSet;
@@ -150,12 +153,9 @@ static void borderMonomials(const ExponentVectors &standard,
       if (orderSet.find(b) == orderSet.end()) borderSet.insert(b);
     }
   }
-  border.assign(borderSet.begin(), borderSet.end());
-}
+  result.assign(borderSet.begin(), borderSet.end());
 }
 
-namespace borderbasis_kernel
-{
 poly makeMonomial(const ExponentVector &a, const int firstVariable,
                   const ring r)
 {
@@ -183,7 +183,7 @@ BOOLEAN staircase(const ideal G, const int firstVariable,
   if (leadingExponentVectors(G, firstVariable, numberOfVariables, corners, r))
     return TRUE;
   if (standardMonomials(corners, standard)) return TRUE;
-  borderMonomials(standard, border);
+  borderbasis_kernel::border(standard, border);
   return FALSE;
 }
 }

@@ -14,6 +14,8 @@ PROCEDURES:
       compute a rational Weyl border basis from generators I
   rationalWeylBorderBasisFromGB(G,n);
       compute it from a rational Groebner basis G
+  rationalWeylBorderBasisForOrderIdeal(I,n,O[,d]);
+      compute it for a specified order ideal O without a Groebner basis
   kernelBorderBasis(I);
       kernel reimplementation of the commutative construction
 
@@ -117,6 +119,51 @@ EXAMPLE: example rationalWeylBorderBasis; shows an example
     @presentation=ratstd(I,n);
   }
   return(system("rationalWeylBorderBasis",pGBid,n));
+}
+
+proc rationalWeylBorderBasisForOrderIdeal(ideal I, int n, ideal O, list #)
+"USAGE:   rationalWeylBorderBasisForOrderIdeal(I,n,O[,d]); I an ideal, n the
+         number of coordinate variables, O a differential order ideal, and d
+         an optional maximum Macaulay prolongation degree
+RETURN:  list: [1] the fraction-free O-border basis, [2] the supplied order ideal
+PURPOSE: Compute a rational Weyl border basis for the explicitly supplied
+         order ideal O without computing a Groebner basis or using leading
+         monomials.  Fraction-free Macaulay elimination over K[x] is used.
+ASSUME:  The basering is the n-th polynomial Weyl algebra with variables
+         (x(1..n),D(1..n)).  O consists of distinct, divisor-closed monomials
+         in D(1..n), contains 1, and represents a basis modulo I.
+NOTE:    The default prolongation bound is 2*size(O)+2.  If it is exhausted,
+         increase d.  Supplying an invalid order ideal produces an error as
+         soon as dependence or failure of integrability is certified.
+EXAMPLE: example rationalWeylBorderBasisForOrderIdeal; shows an example
+"
+{
+  requireRationalWeylRing(n);
+  int d=2*size(O)+2;
+  if (size(#)>1 || (size(#)==1 && typeof(#[1])!="int"))
+  {
+    ERROR("expected rationalWeylBorderBasisForOrderIdeal(I,n,O[,d])");
+  }
+  if (size(#)==1) { d=#[1]; }
+  if (d<0) { ERROR("the prolongation bound must be nonnegative"); }
+  return(system("rationalWeylBorderBasisForOrderIdeal",I,O,n,d));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  if (!system("with","ratGB"))
+  {
+    "This example requires a build configured with --with-ratGB.";
+  }
+  else
+  {
+    ring r=0,(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,0,1),dp);
+    def W=Weyl(); setring W;
+    ideal I=x*Dx^2-y*Dy^2+Dx-Dy,x*Dx+y*Dy+1;
+    ideal O=1,Dx;
+    list B=rationalWeylBorderBasisForOrderIdeal(I,2,O);
+    B[1];
+  }
 }
 example
 {

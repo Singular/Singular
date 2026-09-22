@@ -53,7 +53,7 @@ proc testRationalWeylBorderBasis()
   kill Ratgb::Ddim,Ratgb::KXdim;
 
   // Rodriguez--Sattelberger, Border Bases in the Rational Weyl Algebra,
-  // arXiv:2510.23411v2, Example 2.13.  The paper's displayed J_O1 is used
+  // arXiv:2510.23411v2, Example 2.18.  The paper's displayed J_O1 is used
   // as input.  For J_O2, consistency requires a plus sign in front of
   // (3*y-x)/(y*(y-x))*Dy; the preprint currently prints a minus sign.
   ring rp1=0,(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,0,1),dp);
@@ -69,7 +69,7 @@ proc testRationalWeylBorderBasis()
       BP1[1][2]!=(-y*(y-x)*Dx*Dy-(x+y)*Dx-1) ||
       BP1[1][3]!=(x*(x-y)*Dx^2+(3*x-y)*Dx+1))
   {
-    ERROR("paper Example 2.13: O1 border basis mismatch");
+    ERROR("paper Example 2.18: Groebner-derived O1 border basis mismatch");
   }
   kill pGBid;
   kill Ratgb::Ddim,Ratgb::KXdim;
@@ -84,12 +84,44 @@ proc testRationalWeylBorderBasis()
       BP2[1][2]!=(x*Dx+y*Dy+1) ||
       BP2[1][3]!=(x*(x-y)*Dx*Dy+(x+y)*Dy+1))
   {
-    ERROR("paper Example 2.13: O2 border basis mismatch");
+    ERROR("paper Example 2.18: Groebner-derived O2 border basis mismatch");
   }
   kill pGBid;
   kill Ratgb::Ddim,Ratgb::KXdim;
 
-  // Rodriguez--Sattelberger, Example 2.5.  The ideal is symmetric, but
+  // The genuine order-ideal construction starts with the two generators of
+  // Example 2.18.  Both order ideals are requested in the same rp1 ring, so
+  // the O2 result cannot have been selected by the ring's leading monomials.
+  setring WP1;
+  ideal J=
+    x*Dx^2-y*Dy^2+Dx-Dy,
+    x*Dx+y*Dy+1;
+  ideal O1=1,Dx;
+  list BO1=rationalWeylBorderBasisForOrderIdeal(J,2,O1,3);
+  if (size(BO1[1])!=3 || size(BO1[2])!=2 ||
+      BO1[2][1]!=1 || BO1[2][2]!=Dx ||
+      BO1[1][1]!=(y*Dy+x*Dx+1) ||
+      BO1[1][2]!=(x*y*Dx*Dy-y^2*Dx*Dy-x*Dx-y*Dx-1) ||
+      BO1[1][3]!=(x^2*Dx^2-x*y*Dx^2+3*x*Dx-y*Dx+1))
+  {
+    ERROR("paper Example 2.18: specified O1 border basis mismatch");
+  }
+  ideal O2=1,Dy;
+  list BO2=rationalWeylBorderBasisForOrderIdeal(J,2,O2,3);
+  if (size(BO2[1])!=3 || size(BO2[2])!=2 ||
+      BO2[2][1]!=1 || BO2[2][2]!=Dy ||
+      BO2[1][1]!=(x*y*Dy^2-y^2*Dy^2+x*Dy-3*y*Dy-1) ||
+      BO2[1][2]!=(x*Dx+y*Dy+1) ||
+      BO2[1][3]!=(x^2*Dx*Dy-x*y*Dx*Dy+x*Dy+y*Dy+1))
+  {
+    ERROR("paper Example 2.18: specified O2 border basis mismatch");
+  }
+  if (defined(pGBid))
+  {
+    ERROR("specified-order-ideal construction unexpectedly called ratstd");
+  }
+
+  // Rodriguez--Sattelberger, Example 2.6.  The ideal is symmetric, but
   // {1,Dx,Dy,Dx*Dy} cannot be a quotient basis since Dx*Dy=1 modulo I.
   // The term order instead yields the valid nonsymmetric order ideal below.
   ring rp3=0,(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,1,0),dp);
@@ -104,7 +136,7 @@ proc testRationalWeylBorderBasis()
       BP3[1][3]!=(Dx*Dy^2-Dy) ||
       BP3[1][4]!=(Dx^2+Dy^2-2))
   {
-    ERROR("paper Example 2.5 border basis mismatch");
+    ERROR("paper Example 2.6 border basis mismatch");
   }
   kill pGBid;
   kill Ratgb::Ddim,Ratgb::KXdim;
