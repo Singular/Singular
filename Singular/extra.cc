@@ -67,6 +67,10 @@
 #include "kernel/combinatorics/stairc.h"
 #include "kernel/ideals.h"
 #include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/borderbasis.h"
+#ifdef HAVE_RATGRING
+#include "kernel/GBEngine/ratborderbasis.h"
+#endif
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kutil.h"
 #include "kernel/GBEngine/kverify.h"
@@ -558,6 +562,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #endif
         #ifdef HAVE_GMS
           TEST_FOR("gms")
+        #endif
+        #ifdef HAVE_RATGRING
+          TEST_FOR("ratGB")
         #endif
         #ifdef OM_NDEBUG
           TEST_FOR("om_ndebug")
@@ -2952,6 +2959,31 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
+      if (strcmp(sys_cmd, "kernelBorderBasis")==0)
+      {
+        if ((h == NULL) || (h->Typ() != IDEAL_CMD) || (h->next != NULL))
+        {
+          WerrorS("expected system(\"kernelBorderBasis\", ideal)");
+          return TRUE;
+        }
+
+        ideal orderIdeal = NULL;
+        ideal borderBasis = NULL;
+        if (kBorderBasisFromStandardBasis((ideal)h->Data(), orderIdeal,
+                                          borderBasis, currRing))
+          return TRUE;
+
+        lists result = (lists)omAllocBin(slists_bin);
+        result->Init(2);
+        result->m[0].rtyp = IDEAL_CMD;
+        result->m[0].data = (void *)borderBasis;
+        result->m[1].rtyp = IDEAL_CMD;
+        result->m[1].data = (void *)orderIdeal;
+        res->rtyp = LIST_CMD;
+        res->data = (char *)result;
+        return FALSE;
+      }
+      else
     /*==================== sca:AltVar ==================================*/
   #ifdef HAVE_PLURAL
       if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
@@ -2982,6 +3014,34 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #endif
   /*==================== RatNF, noncomm rational coeffs =================*/
   #ifdef HAVE_RATGRING
+      if (strcmp(sys_cmd, "rationalWeylBorderBasis") == 0)
+      {
+        if ((h == NULL) || (h->Typ() != IDEAL_CMD) || (h->next == NULL) ||
+            (h->next->Typ() != INT_CMD) || (h->next->next != NULL))
+        {
+          WerrorS("expected system(\"rationalWeylBorderBasis\", ideal, int)");
+          return TRUE;
+        }
+
+        ideal orderIdeal = NULL;
+        ideal borderBasis = NULL;
+        const int coefficientVariables = (int)(long)h->next->Data();
+        if (nc_RationalWeylBorderBasis((ideal)h->Data(),
+                                       coefficientVariables, orderIdeal,
+                                       borderBasis, currRing))
+          return TRUE;
+
+        lists result = (lists)omAllocBin(slists_bin);
+        result->Init(2);
+        result->m[0].rtyp = IDEAL_CMD;
+        result->m[0].data = (void *)borderBasis;
+        result->m[1].rtyp = IDEAL_CMD;
+        result->m[1].data = (void *)orderIdeal;
+        res->rtyp = LIST_CMD;
+        res->data = (char *)result;
+        return FALSE;
+      }
+      else
       if (strcmp(sys_cmd, "intratNF") == 0)
       {
         poly p;
@@ -3017,9 +3077,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             {
               pl[k] = pLength(I->m[k]);
             }
-            PrintS("starting redRat\n");
-            //res->data = (char *)
             redRat(&p, q, pl, (int)IDELEMS(I),is,currRing);
+            omFreeSize((ADDRESS)pl, IDELEMS(I)*sizeof(int));
+            id_Delete(&I, currRing);
             res->data=p;
             res->rtyp=POLY_CMD;
             //        res->data = ncGCD(p,q,currRing);

@@ -139,8 +139,8 @@ ideal ncGCD2(poly p, poly q, const ring r)
   number ck1 = p_GetCoeff(K1,r);
   number ck2 = p_GetCoeff(K2,r);
   BOOLEAN bck1, bck2;
-  bck1 = n_GreaterZero(ck1,r);
-  bck2 = n_GreaterZero(ck2,r);
+  bck1 = n_GreaterZero(ck1,r->cf);
+  bck2 = n_GreaterZero(ck2,r->cf);
   /* K1 <0, K2 <0 (-K1,-K2)    */
 //   if ( !(bck1 && bck2) ) /* - , - */
 //   {
@@ -165,7 +165,7 @@ ideal ncGCD(poly p, poly q, const ring r)
 #ifdef PDEBUG
   PrintS(" GCD_start:");
 #endif
-  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r), r);
+  poly g = singclap_gcd_r(p_Copy(p,r),p_Copy(q,r), r);
 #ifdef PDEBUG
   p_wrp(g,r);
   PrintS(" GCD_end;\n");

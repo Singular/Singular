@@ -72,7 +72,7 @@ PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
 	ncall.lib ncalg.lib ncdecomp.lib ncfactor.lib nchomolog.lib \
         ncModslimgb.lib ncpreim.lib nctools.lib \
 	perron.lib purityfiltration.lib  qmatrix.lib \
-        ratgb.lib
+        ratgb.lib rwborder.lib
 
 # contributed libs, status not yet decided
 SLIB2 = arc.lib KVequiv.lib deflation.lib enumpoints.lib invar.lib lejeune.lib\
