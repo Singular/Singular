@@ -91,6 +91,7 @@ Short/bug_charseries.tst
 Short/bug_charseries2.tst
 Short/bug_chin.tst
 Short/bug_chinrem_mat.tst
+Short/bug_deg_matrix.tst
 Short/bug_diff.tst
 Short/bug_div.tst
 Short/bug_division.tst
@@ -204,6 +205,8 @@ Short/invarlib.tst
 Short/janet.tst
 Short/jmbtest.tst
 Short/kernel_weighted_homog.tst
+Short/kodaira_surface_classifier_s.tst
+Short/surface_type_generics_s.tst
 Short/latex.tst
 Short/lift_s.tst
 Short/liftstd_s.tst

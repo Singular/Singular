@@ -1,17 +1,63 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version sheafcoh.lib 4.3.2.9 Oct_2023 "; // $Id$
+version="version sheafcoh.lib 4.4.1.3 Sep_2026 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
-AUTHORS:  Wolfram Decker, decker@mathematik.uni-kl.de
+AUTHORS:  Janko Boehm, boehm@mathematik.uni-kl.de
+          Wolfram Decker, decker@mathematik.uni-kl.de
           Christoph Lossen,  lossen@mathematik.uni-kl.de
-          Gerhard Pfister,  pfister@mathematik.uni-kl.de
           Oleksandr Motsak, U@D, where U={motsak}, D={mathematik.uni-kl.de}
+          Gerhard Pfister,  pfister@mathematik.uni-kl.de
+
+TYPES:
+ RankOneSheaf; a presented rank-one sheaf with a cached rational frame
+ SectionSpace; a scalar rational basis of H^0 of a rank-one sheaf
+ Section; an individual basis section together with its parent space
 
 PROCEDURES:
  truncate(phi,d);        truncation of coker(phi) at d
  truncateFast(phi,d);    truncation of coker(phi) at d (fast+ experimental)
  CM_regularity(M);       Castelnuovo-Mumford regularity of coker(M)
+ sheafSectionModule(M,d); graded section module in all degrees >=d
+ sheafSectionModuleLinear(M,d); force Singular kernels for the section module
+ sheafSectionModuleSpaSM(M,d); force SpaSM kernels for the section module
+ sheafSectionDimension(M,d); dimension of H^0 of one twist
+ sheafSectionDimensionLinear(M,d); one H^0 dimension via Singular kernels
+ sheafSectionDimensionSpaSM(M,d); one H^0 dimension via SpaSM kernels
+ sheafSectionBasis(M,d[,s,g,v]); representatives for H^0 of the sheaf
+ sheafSectionBasisBGG(M,d[,s,g]); representatives from a genuine BGG/Tate tail
+ trivializedSectionBasis(M,d,h,f,I[,s,g,v]); scalar rational representatives
+ trivializedSectionBasisDirect(M,d,h,f,I); direct scalar rational representatives
+ rankOneSheaf(M,I[,h,f]); cache a frame for a presented rank-one sheaf
+ lineBundle(M,I[,h,f]); line-bundle name for rankOneSheaf
+ rankOneTrivialization(M,I); choose and validate an automatic rational frame
+ rankOneTrivializationLinear(M,I); linear frame via Singular's module kernel
+ rankOneTrivializationSpaSM(M,I); linear frame via strict SpaSM nullspaces
+ rankOneTrivialization(F); return the cached frame of a RankOneSheaf
+ rankOneSheafLinear(M,I); cache a frame found with Singular's module kernel
+ rankOneSheafSpaSM(M,I); cache a frame found with strict SpaSM nullspaces
+ lineBundleLinear(M,I); line-bundle name for rankOneSheafLinear
+ lineBundleSpaSM(M,I); line-bundle name for rankOneSheafSpaSM
+ rankOneSheafSectionBasis(F,d[,s,g,v]); rational representatives for sections
+ lineBundleSectionBasis(F,d[,s,g,v]); the same interface for line bundles
+ rankOneSheafSectionBasisLinear(M,d,I[,s,g,v]); one-call linear-frame sections
+ rankOneSheafSectionBasisSpaSM(M,d,I[,s,g,v]); strict-SpaSM one-call sections
+ lineBundleSectionBasisLinear(M,d,I[,s,g,v]); the line-bundle alias
+ lineBundleSectionBasisSpaSM(M,d,I[,s,g,v]); strict-SpaSM line-bundle alias
+ rankOneSheafSectionBasisBGG(...); BGG/Tate rank-one section space
+ lineBundleSectionBasisBGG(...); the line-bundle alias
+ rankOneSheafSectionBasisBGGLinear(...); one-call BGG with a linear frame
+ rankOneSheafSectionBasisBGGSpaSM(...); one-call BGG with a SpaSM frame
+ lineBundleSectionBasisBGGLinear(...); the line-bundle alias
+ lineBundleSectionBasisBGGSpaSM(...); the strict-SpaSM line-bundle alias
+ rankOneSheafSectionBasisMultTable(...); explicit multiplication-table alias
+ lineBundleSectionBasisMultTable(...); explicit line-bundle alias
+ rankOneSheafSectionBasisDirect(F,d); direct rank-one section space
+ lineBundleSectionBasisDirect(F,d); direct line-bundle section space
+ sectionBasis(V);           list of Section objects in a SectionSpace
+ sectionNumerator(s);       rational numerator of a Section
+ sectionDenominator(s);     rational denominator of a Section
+ rationalMapFromSections(B); homogeneous coordinates of the rational map
  sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
  sheafCohBGGregul(M,l,h,r); cohomology of sheaf associated to coker(M)
                           with given regularity
@@ -33,7 +79,401 @@ KEYWORDS: sheaf cohomology
 LIB "matrix.lib";
 LIB "nctools.lib";
 LIB "homolog.lib";
+LIB "elim.lib";
 
+
+///////////////////////////////////////////////////////////////////////////////
+static proc mod_init()
+{
+  newstruct("RankOneSheaf",
+            "ring over, module presentation, ideal supportIdeal, ideal trivializationImages, poly trivializationDenom, int trivializationShift, int frameValidated");
+  newstruct("SectionSpace",
+            "ring over, module presentation, ideal supportIdeal, ideal basis, poly denom, ideal trivializationImages, poly trivializationDenom, int twist, int trivializationShift, int tailDegree");
+  newstruct("Section","SectionSpace space, poly num");
+  system("install","RankOneSheaf","print",printRankOneSheaf,1);
+  system("install","SectionSpace","print",printSectionSpace,1);
+  system("install","SectionSpace","size",sizeSectionSpace,1);
+  system("install","SectionSpace","[",sectionSpaceGet,2);
+  system("install","Section","print",printSection,1);
+}
+
+static proc printRankOneSheaf(RankOneSheaf F)
+{
+  def currentRing=basering;
+  def R=F.over;
+  setring R;
+  "RankOneSheaf with cached rational frame";
+  "presentation generators = "+string(nrows(F.presentation));
+  "support ideal = "+string(F.supportIdeal);
+  "trivialization images = "+string(F.trivializationImages);
+  "trivialization denominator = "+string(F.trivializationDenom);
+  "trivialization shift = "+string(F.trivializationShift);
+  "frame validated = "+string(F.frameValidated);
+  setring currentRing;
+}
+
+static proc sizeSectionSpace(SectionSpace V)
+{
+  def currentRing=basering;
+  def R=V.over;
+  setring R;
+  int result=size(V.basis);
+  setring currentRing;
+  return(result);
+}
+
+static proc printSectionSpace(SectionSpace V)
+{
+  def currentRing=basering;
+  def R=V.over;
+  setring R;
+  int n=size(V.basis);
+  "SectionSpace of dimension "+string(n);
+  "twist = "+string(V.twist);
+  "rational degree = "+string(V.twist+V.trivializationShift);
+  "common denominator = "+string(V.denom);
+  // This is the stable tail degree for multiplication tables and the slice
+  // degree for the direct saturation algorithm.
+  "computation degree = "+string(V.tailDegree);
+  if (n==0)
+  {
+    "basis = (empty)";
+  }
+  else
+  {
+    "basis:";
+    int i;
+    for (i=1; i<=n; i++)
+    {
+      "  ["+string(i)+"] ("+string(V.basis[i])+")/("+
+        string(V.denom)+")";
+    }
+  }
+  setring currentRing;
+}
+
+static proc printSection(Section s)
+{
+  def currentRing=basering;
+  def R=s.space.over;
+  setring R;
+  "Section of twist "+string(s.space.twist)+": ("+string(s.num)+")/("+
+    string(s.space.denom)+")";
+  setring currentRing;
+}
+
+static proc sectionSpaceGet(SectionSpace V,int i)
+{
+  def currentRing=basering;
+  def R=V.over;
+  setring R;
+  int n=size(V.basis);
+  if ((i<1) || (i>n))
+  {
+    setring currentRing;
+    ERROR("section basis index out of range");
+  }
+  Section s;
+  s.space=V;
+  s.num=V.basis[i];
+  setring currentRing;
+  return(s);
+}
+
+proc sectionBasis(SectionSpace V)
+"USAGE:   sectionBasis(V); V SectionSpace
+RETURN:   list containing the basis elements of V as Section objects.
+NOTE:     The i-th entry is also available directly as V[i]. Each Section
+         retains V, hence its common denominator and sheaf data.
+SEE ALSO: sectionNumerator, sectionDenominator, rationalMapFromSections
+EXAMPLE: example sectionBasis; shows an example
+"
+{
+  list result;
+  int i;
+  for (i=1; i<=size(V); i++) { result[i]=V[i]; }
+  return(result);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  SectionSpace V=lineBundleSectionBasis(O,0,ideal(0));
+  sectionBasis(V);
+}
+
+static proc sectionRequireCurrentRing(Section s)
+{
+  if (s.space.over!=basering)
+  {
+    ERROR("set the basering to the coordinate ring of the Section first");
+  }
+}
+
+proc sectionNumerator(Section s)
+"USAGE:   sectionNumerator(s); s Section
+RETURN:   poly, the numerator of the rational representative of s.
+NOTE:     The current basering must be the coordinate ring of s.
+SEE ALSO: sectionDenominator, sectionBasis
+EXAMPLE: example sectionNumerator; shows an example
+"
+{
+  sectionRequireCurrentRing(s);
+  return(s.num);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  SectionSpace V=lineBundleSectionBasis(O,0,ideal(0));
+  Section s=V[1];
+  sectionNumerator(s);
+}
+
+proc sectionDenominator(Section s)
+"USAGE:   sectionDenominator(s); s Section
+RETURN:   poly, the denominator of the rational representative of s.
+NOTE:     All basis sections in one SectionSpace have this denominator. The
+         current basering must be the coordinate ring of s.
+SEE ALSO: sectionNumerator, sectionBasis
+EXAMPLE: example sectionDenominator; shows an example
+"
+{
+  sectionRequireCurrentRing(s);
+  return(s.space.denom);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  SectionSpace V=lineBundleSectionBasis(O,0,ideal(0));
+  Section s=V[1];
+  sectionDenominator(s);
+}
+
+static proc sectionSpacesCompatibleForMap(SectionSpace A,SectionSpace B)
+{
+  if (A.over!=B.over) { return(0); }
+  if (A.twist!=B.twist) { return(0); }
+  if (A.trivializationShift!=B.trivializationShift) { return(0); }
+  if (A.denom!=B.denom) { return(0); }
+  if (A.trivializationDenom!=B.trivializationDenom) { return(0); }
+  if (!sectionIdealEntriesEqual(A.trivializationImages,
+                                B.trivializationImages)) { return(0); }
+  if (!sectionIdealEqual(A.supportIdeal,B.supportIdeal)) { return(0); }
+  if (nrows(A.presentation)!=nrows(B.presentation)) { return(0); }
+  def gradingA=attrib(A.presentation,"isHomog");
+  def gradingB=attrib(B.presentation,"isHomog");
+  if ((typeof(gradingA)!="intvec") || (typeof(gradingB)!="intvec"))
+  {
+    return(0);
+  }
+  intvec weightsA=gradingA;
+  intvec weightsB=gradingB;
+  if (size(weightsA)!=size(weightsB)) { return(0); }
+  int i;
+  for (i=1; i<=size(weightsA); i++)
+  {
+    if (weightsA[i]!=weightsB[i]) { return(0); }
+  }
+  if (!sectionModuleEqual(A.presentation,B.presentation)) { return(0); }
+  return(1);
+}
+
+static proc sectionIdealEqual(ideal I,ideal J)
+{
+  return((size(NF(I,std(J)))==0) && (size(NF(J,std(I)))==0));
+}
+
+static proc sectionIdealEntriesEqual(ideal I,ideal J)
+{
+  int n=ncols(matrix(I));
+  if (n!=ncols(matrix(J))) { return(0); }
+  int i;
+  for (i=1; i<=n; i++)
+  {
+    if (I[i]!=J[i]) { return(0); }
+  }
+  return(1);
+}
+
+static proc sectionModuleEqual(module M,module N)
+{
+  return((size(NF(M,std(N)))==0) && (size(NF(N,std(M)))==0));
+}
+
+static proc sectionMapCheckCoordinates(ideal coordinates,ideal supportIdeal,
+                                       int checkSupport)
+{
+  int coordinateCount=ncols(matrix(coordinates));
+  int i,hasNonzero,commonDegree,degreeIsSet;
+  for (i=1; i<=coordinateCount; i++)
+  {
+    if (coordinates[i]!=0)
+    {
+      hasNonzero=1;
+      if (!homog(coordinates[i]))
+      {
+        ERROR("rational-map coordinates must be homogeneous");
+      }
+      if (!degreeIsSet)
+      {
+        commonDegree=deg(coordinates[i]);
+        degreeIsSet=1;
+      }
+      else
+      {
+        if (deg(coordinates[i])!=commonDegree)
+        {
+          ERROR("rational-map coordinates must have one common degree");
+        }
+      }
+    }
+  }
+  if (!hasNonzero)
+  {
+    ERROR("an empty or zero section system does not define a rational map");
+  }
+
+  if (checkSupport)
+  {
+    ideal saturatedSupport=sat(supportIdeal,maxideal(1));
+    ideal mapDomainClosure=sat(saturatedSupport,coordinates);
+    if (!sectionIdealEqual(saturatedSupport,mapDomainClosure))
+    {
+      ERROR("the sections do not have a schematically dense domain on the support");
+    }
+  }
+}
+
+proc rationalMapFromSections(def data)
+"USAGE:   rationalMapFromSections(V); V SectionSpace
+         rationalMapFromSections(L); L list of compatible Section objects,
+         a list of polynomial or scalar coordinates, or scalar section data
+         [ideal,poly-or-scalar,int]
+         rationalMapFromSections(I); I ideal
+RETURN:   ideal containing homogeneous coordinates for the associated
+         projective rational map to P^(n-1), where n is the number of
+         coordinate slots.
+NOTE:     Singular conventionally represents a projective rational map by an
+         ideal of homogeneous coordinates. For a SectionSpace or a list of
+         Sections, common denominators cancel projectively. Sections in a list
+         must use the same presented sheaf and rational trivialization.
+         Individual zero coordinate slots are retained; an all-zero system is
+         rejected. Base points are allowed, but the domain of a typed section
+         system must be schematically dense in the support (in particular, it
+         must contain every associated generic point).
+         Module-valued output of sheafSectionBasis must first be scalarized by
+         a rank-one trivialization.
+SEE ALSO: rankOneSheafSectionBasis, lineBundleSectionBasis,
+          trivializedSectionBasis, sheafSectionBasis
+EXAMPLE: example rationalMapFromSections; shows an example
+"
+{
+  ideal coordinates,supportIdeal;
+  int checkSupport=0;
+
+  if (typeof(data)=="SectionSpace")
+  {
+    if (data.over!=basering)
+    {
+      ERROR("set the basering to the coordinate ring of the SectionSpace first");
+    }
+    coordinates=data.basis;
+    supportIdeal=data.supportIdeal;
+    checkSupport=1;
+  }
+  else
+  {
+    if (typeof(data)=="ideal")
+    {
+      coordinates=data;
+    }
+    else
+    {
+      if (typeof(data)!="list")
+      {
+        ERROR("expected a SectionSpace, a list of Sections or polynomial/scalar coordinates, scalar section data, or an ideal");
+      }
+      if (size(data)==0)
+      {
+        ERROR("an empty section system does not define a rational map");
+      }
+
+      if ((size(data)==3) && (typeof(data[1])=="ideal") &&
+          ((typeof(data[2])=="poly") || (typeof(data[2])=="int") ||
+           (typeof(data[2])=="number")) && (typeof(data[3])=="int"))
+      {
+        poly commonDenom=poly(data[2]);
+        if ((commonDenom==0) || (!homog(commonDenom)))
+        {
+          ERROR("the common section denominator must be nonzero and homogeneous");
+        }
+        coordinates=data[1];
+      }
+      else
+      {
+        int i;
+        if (typeof(data[1])=="Section")
+        {
+          Section firstSection=data[1];
+          Section currentSection;
+          if (firstSection.space.over!=basering)
+          {
+            ERROR("set the basering to the coordinate ring of the Sections first");
+          }
+          supportIdeal=firstSection.space.supportIdeal;
+          checkSupport=1;
+          for (i=1; i<=size(data); i++)
+          {
+            if (typeof(data[i])!="Section")
+            {
+              ERROR("a section list must contain only Section objects");
+            }
+            currentSection=data[i];
+            if (!sectionSpacesCompatibleForMap(firstSection.space,
+                                                currentSection.space))
+            {
+              ERROR("the Sections do not belong to compatible section spaces");
+            }
+            coordinates[i]=currentSection.num;
+          }
+        }
+        else
+        {
+          for (i=1; i<=size(data); i++)
+          {
+            if ((typeof(data[i])!="poly") && (typeof(data[i])!="int") &&
+                (typeof(data[i])!="number"))
+            {
+              ERROR("a polynomial section list must contain only polynomials or scalars");
+            }
+            coordinates[i]=poly(data[i]);
+          }
+        }
+      }
+    }
+  }
+
+  sectionMapCheckCoordinates(coordinates,supportIdeal,checkSupport);
+  return(coordinates);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  SectionSpace V=lineBundleSectionBasis(M,0,ideal(0));
+  rationalMapFromSections(V);
+  rationalMapFromSections(list(V[1],V[3]));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc jacobM(matrix M)
@@ -464,12 +904,97 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static proc sheafCohResolutionSourceWeights(module differential,
+                                             intvec targetWeights)
+{
+  intvec sourceWeights;
+  int columnIndex;
+  int rowIndex;
+  int degreeFound;
+  int weightedDegree;
+  int currentDegree;
+  for (columnIndex=1; columnIndex<=ncols(differential); columnIndex++)
+  {
+    degreeFound=0;
+    for (rowIndex=1; rowIndex<=nrows(differential); rowIndex++)
+    {
+      if (differential[columnIndex][rowIndex]!=0)
+      {
+        currentDegree=deg(differential[columnIndex][rowIndex])
+                      +targetWeights[rowIndex];
+        if (!degreeFound)
+        {
+          weightedDegree=currentDegree;
+          degreeFound=1;
+        }
+        else
+        {
+          if (currentDegree!=weightedDegree)
+          {
+            ERROR("internal error: a minimized resolution differential is not homogeneous");
+          }
+        }
+      }
+    }
+    if (!degreeFound)
+    {
+      ERROR("internal error: a minimized resolution contains a zero free generator");
+    }
+    sourceWeights[columnIndex]=weightedDegree;
+  }
+  return(sourceWeights);
+}
+
+static proc sheafCohCMRegularityFres(module M)
+{
+  intvec targetWeights=attrib(M,"isHomog");
+  module standardM=std(M);
+  attrib(standardM,"isHomog",targetWeights);
+  resolution F=fres(standardM,0);
+  F=minres(F);
+
+  int regularityValue=targetWeights[1];
+  int generatorIndex;
+  for (generatorIndex=2; generatorIndex<=size(targetWeights);
+       generatorIndex++)
+  {
+    regularityValue=max(regularityValue,targetWeights[generatorIndex]);
+  }
+
+  int step;
+  intvec sourceWeights;
+  module differential;
+  for (step=1; step<=nvars(basering); step++)
+  {
+    differential=F[step];
+    if (size(differential)==0) { break; }
+    sourceWeights=sheafCohResolutionSourceWeights(differential,
+                                                   targetWeights);
+    for (generatorIndex=1; generatorIndex<=size(sourceWeights);
+         generatorIndex++)
+    {
+      regularityValue=max(regularityValue,
+                           sourceWeights[generatorIndex]-step);
+    }
+    targetWeights=sourceWeights;
+  }
+  return(regularityValue);
+}
+
 proc CM_regularity (module M)
 "USAGE:   CM_regularity(M);    M module
 ASSUME:   @code{M} is graded, and it comes assigned with an admissible degree
          vector as an attribute
 RETURN:  integer, the Castelnuovo-Mumford regularity of coker(M)
-NOTE:    procedure calls mres
+NOTE:    The default algorithm calls mres.  Setting
+         attrib(CM_regularity,\"Algorithm\",\"minres_fres\") minimizes a
+         complete Schreyer resolution and reconstructs the degree of every
+         free generator before reading the regularity.  This explicit grading
+         reconstruction is necessary because fres/minres does not retain
+         isHomog attributes on its differentials.  \"minres_res\" keeps the
+         older alternative.  For a zero presentation, the shifts are read
+         directly, since the regularity of a shifted free direct sum is the
+         maximum generator degree.
 EXAMPLE: example CM_regularity; shows an example
 KEYWORDS: Castelnuovo-Mumford regularity
 "
@@ -489,13 +1014,37 @@ KEYWORDS: Castelnuovo-Mumford regularity
     }
   }
 
-  if( attrib(CM_regularity,"Algorithm") == "minres_res" )
+  // A zero presentation represents a direct sum of shifted free modules.
+  // betti(mres(M,0)) collapses mixed degree-zero shifts into one row, so read
+  // their regularity directly: reg(plus_i R(-w_i))=max_i(w_i).
+  if (size(M)==0)
   {
-    def L = minres( res(M,0) ); // let's try it out!
+    intvec generatorDegrees=attrib(M,"isHomog");
+    int freeRegularity=generatorDegrees[1];
+    int generatorIndex;
+    for (generatorIndex=2; generatorIndex<=size(generatorDegrees);
+         generatorIndex++)
+    {
+      freeRegularity=max(freeRegularity,
+                         generatorDegrees[generatorIndex]);
+    }
+    return(freeRegularity);
+  }
+
+  if( attrib(CM_regularity,"Algorithm") == "minres_fres" )
+  {
+    return(sheafCohCMRegularityFres(M));
   }
   else
   {
-    def L = mres(M,0);
+    if( attrib(CM_regularity,"Algorithm") == "minres_res" )
+    {
+      def L = minres( res(M,0) ); // let's try it out!
+    }
+    else
+    {
+      def L = mres(M,0);
+    }
   }
 
   intmat BeL = betti(L);
@@ -515,6 +1064,3966 @@ example
   intvec v=2,2,2,2,2,2;
   attrib(M,"isHomog",v);
   CM_regularity(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Representatives for H^0 from the regular multiplication tail.
+//
+// At tail degree s and twist d, the finite kernel below is
+// Hom(m^(s-d),coker(M))_d.  In the stable range this is the degree-d
+// component of the ideal transform and hence H^0 of the associated sheaf.
+
+static proc sectionBasisProductOfVariables()
+{
+  poly p=1;
+  for (int i=1; i<=nvars(basering); i++)
+  {
+    p=p*var(i);
+  }
+  return(p);
+}
+
+// Singular normally infers a module's ambient free rank from its last
+// nonzero component.  A section basis can have identically zero trailing
+// components, so retain the presentation rank explicitly on every raw basis
+// returned by the public representative algorithms.
+static proc sectionBasisRememberAmbientRank(module N,int r)
+{
+  if (nrows(N)>r)
+  {
+    ERROR("internal error: section vectors exceed the presentation rank");
+  }
+  attrib(N,"rank",r);
+  return(N);
+}
+
+static proc sectionBasisZeroModule(int r)
+{
+  matrix Z[r][1];
+  module N=Z;
+  return(sectionBasisRememberAmbientRank(N,r));
+}
+
+// Return the canonical standard monomials of degree d in coker(M).
+// Enumerating the ambient monomials avoids a kbase edge case for negatively
+// shifted rows.  Keeping standard monomials (rather than arbitrary quotient
+// representatives) also makes coeffs compute multiplication tables exactly.
+static proc sectionBasisGradedPiece(module G,intvec w,int d)
+{
+  int r=nrows(G);
+  module L;
+  int i;
+  for (i=1; i<=r; i++)
+  {
+    if (d>w[i])
+    {
+      L=L+maxideal(d-w[i])*gen(i);
+    }
+    else
+    {
+      if (d==w[i]) { L=L+gen(i); }
+    }
+  }
+
+  // G is a standard basis, so its leading monomials generate in(G).  Reduce
+  // the whole homogeneous ambient slice once by this monomial module:
+  // standard monomials remain unchanged and every nonstandard monomial goes
+  // to zero.  This is the same canonical quotient basis as the former
+  // interpreted loop of reduce(L[j],G)==L[j], but all divisibility tests now
+  // run in one Singular kernel call and no polynomial tails are computed.
+  module initialG=lead(G);
+  attrib(initialG,"isSB",1);
+  module B=reduce(L,initialG);
+  // Module addition retains zero placeholder columns.  Remove them so the
+  // matrix column count agrees with the vector-space dimension size(B), but
+  // keep the known ambient free rank even when its trailing rows vanish.
+  return(sectionBasisRememberAmbientRank(simplify(B,2),r));
+}
+
+// The columns of the result describe all compatible images of the degree-a
+// monomials in coker(M)_s.  Since the base ring is polynomial, the first
+// syzygies of m^a are linear.
+static proc sectionBasisCompatibilityKernel(module G,module Bs,
+                                            module Bs1,int a)
+{
+  int ds=size(Bs);
+  int ds1=size(Bs1);
+  ideal U=maxideal(a);
+  int nu=size(U);
+  if (a==0)
+  {
+    module KI=unitmat(ds);
+    return(KI);
+  }
+  module SU=syz(U);
+  int nr=size(SU);
+  if ((ds==0) || (nu==0))
+  {
+    module K0;
+    return(K0);
+  }
+  if ((ds1==0) || (nr==0))
+  {
+    module KF=unitmat(ds*nu);
+    return(KF);
+  }
+
+  matrix C[ds1*nr][ds*nu];
+  matrix Sm=matrix(SU);
+  if (deg(Sm)>1)
+  {
+    ERROR("internal error: expected linear syzygies of a power of the irrelevant ideal");
+  }
+  attrib(Bs1,"isSB",1);
+  int ell;
+  module P;
+  matrix T,A;
+  // SU is a matrix whose rows are the monomials in U and whose columns are
+  // its linear syzygies.  Assemble the entire compatibility matrix as a sum
+  // of Kronecker products.  Thus each multiplication-by-variable map is
+  // computed only once and all large matrix work stays in the kernel.
+  for (ell=1; ell<=nvars(basering); ell++)
+  {
+    P=reduce(var(ell)*Bs,G);
+    if ((nrows(P)!=nrows(G)) || (ncols(P)!=ds))
+    {
+      ERROR("internal error: compatibility multiplication by variable "
+            +string(ell)+" changed the ambient "+string(nrows(G))+"x"
+            +string(ds)+" shape to "+string(nrows(P))+"x"
+            +string(ncols(P)));
+    }
+    T=lift(Bs1,P);
+    if ((nrows(T)!=ds1) || (ncols(T)!=ds))
+    {
+      ERROR("internal error while lifting a multiplication map");
+    }
+    // deg(matrix) performs this homogeneous-degree check in the kernel.
+    if (deg(T)>0) { ERROR("multiplication coordinates are not scalar"); }
+    A=transpose(diff(Sm,var(ell)));
+    C=C+tensor(A,T);
+  }
+  module K=modulo(C,std(0));
+  return(K);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// The truncated graded section module
+//
+//   Gamma_>=d(F)=direct sum_(e>=d) H^0(P^n,F(e)).
+//
+// Put N=coker(M), r=reg(N), and q=max(d,r+1).  The local-cohomology
+// definition of regularity implies N_e=H^0(F(e)) for e>=q, and N_>=q has a
+// q-linear resolution.  Its generators, linear relations, and every lower
+// section space down to d can therefore be reconstructed by constant linear
+// algebra.  The dual Koszul complex gives the exact downward step.
+
+static proc sectionModuleSpaSMUsable()
+{
+  // These fields are known to be unsupported, so avoid loading an optional
+  // module which cannot be selected anyway.
+  if (char(basering)==0) { return(0); }
+  if (char(basering)==2) { return(0); }
+  if (!defined(spasm_kernel_basis))
+  {
+    load("sispasm.so","try");
+  }
+  // Singular's Boolean operators are eager, so do not combine these guards.
+  if (!defined(spasm_supports_current_ring)) { return(0); }
+  if (!defined(spasm_kernel_basis)) { return(0); }
+  return(spasm_supports_current_ring());
+}
+
+static proc sectionModuleRequireSpaSM()
+{
+  if (!defined(spasm_kernel_basis))
+  {
+    load("sispasm.so","try");
+  }
+  if (!defined(spasm_supports_current_ring))
+  {
+    ERROR("SpaSM kernel requested, but the sispasm module is not available");
+  }
+  if (!defined(spasm_kernel_basis))
+  {
+    ERROR("SpaSM kernel requested, but the sispasm module is not available");
+  }
+  if (!spasm_supports_current_ring())
+  {
+    ERROR("SpaSM kernel requested, but the current coefficient field is unsupported");
+  }
+}
+
+// Complete right kernel of a constant matrix.  Backend selection is made
+// once before the section-module computation; a SpaSM error is never retried
+// with the generic kernel.
+static proc sectionModuleConstantKernel(matrix A,int useSpaSM)
+{
+  module K;
+  if (useSpaSM)
+  {
+    K=spasm_kernel_basis(module(A));
+  }
+  else
+  {
+    module zeroModule=0;
+    K=modulo(module(A),std(zeroModule));
+  }
+
+  matrix KM=matrix(K);
+  if (nrows(KM)!=ncols(A))
+  {
+    ERROR("internal error: a constant-kernel backend returned the wrong ambient dimension");
+  }
+  if (deg(KM)>0)
+  {
+    ERROR("internal error: a constant-kernel backend returned nonconstant entries");
+  }
+  return(K);
+}
+
+// Bases of coker(M)_e and coker(M)_(e+1), followed by the n+1 scalar
+// multiplication matrices V_e -> V_(e+1).
+static proc sectionModuleMultiplicationData(module G,intvec weights,int e)
+{
+  module B=sectionBasisGradedPiece(G,weights,e);
+  module B1=sectionBasisGradedPiece(G,weights,e+1);
+  list variableMaps;
+  int sourceDimension=size(B);
+  int targetDimension=size(B1);
+  if (sourceDimension==0)
+  {
+    return(list(B,B1,variableMaps));
+  }
+  if (targetDimension==0)
+  {
+    ERROR("internal error: multiplication from a stable nonzero section space has zero target");
+  }
+
+  // B1 consists of distinct standard monomials of one weighted degree.  It is
+  // therefore already a monomial standard basis of the submodule it spans.
+  // Mark this explicitly so lift keeps these columns, and hence the desired
+  // section coordinates, instead of silently recomputing and reordering a
+  // standard basis.
+  attrib(B1,"isSB",1);
+
+  int ell;
+  module P;
+  matrix T;
+  for (ell=1;ell<=nvars(basering);ell++)
+  {
+    P=reduce(var(ell)*B,G);
+    if ((nrows(P)!=nrows(G)) || (ncols(P)!=sourceDimension))
+    {
+      ERROR("internal error: multiplication reduction changed the ambient "
+            +string(nrows(G))+"x"+string(sourceDimension)+" shape to "
+            +string(nrows(P))+"x"+string(ncols(P)));
+    }
+    T=lift(B1,P);
+    if ((nrows(T)!=targetDimension) ||
+        (ncols(T)!=sourceDimension) || (deg(T)>0))
+    {
+      ERROR("internal error while constructing section-module multiplication by variable "
+            +string(ell)+": expected "+string(targetDimension)+"x"
+            +string(sourceDimension)+" constant coordinates, got "
+            +string(nrows(T))+"x"+string(ncols(T))+" of degree "
+            +string(deg(T))+" (basis columns "+string(ncols(B))+", target "
+            +string(ncols(B1))+", reduced products "+string(ncols(P))+")");
+    }
+    variableMaps[ell]=T;
+  }
+  return(list(B,B1,variableMaps));
+}
+
+// Given multiplication V_(e+1)->V_(e+2), recover V_e as the kernel of
+//
+// V_(e+1)^(n+1) -> V_(e+2)^binomial(n+1,2),
+// (s_i) |-> (x_i*s_j-x_j*s_i)_(i<j).
+//
+// The returned list consists of dim(V_e) and the coordinate projections,
+// which are the multiplication matrices V_e->V_(e+1).
+static proc sectionModulePreviousSpace(list variableMaps,int useSpaSM)
+{
+  int nv=size(variableMaps);
+  if (nv==0)
+  {
+    ERROR("internal error: missing section-module multiplication maps");
+  }
+  matrix firstMap=variableMaps[1];
+  int sourceDimension=ncols(firstMap);
+  int targetDimension=nrows(firstMap);
+  int ell;
+  matrix variableMap;
+  for (ell=2;ell<=nv;ell++)
+  {
+    variableMap=variableMaps[ell];
+    if ((ncols(variableMap)!=sourceDimension) ||
+        (nrows(variableMap)!=targetDimension))
+    {
+      ERROR("internal error: incompatible section-module multiplication maps");
+    }
+  }
+
+  // On P^0 the single coordinate is invertible after sheafification.
+  if (nv==1)
+  {
+    list p0Maps=unitmat(sourceDimension);
+    return(list(sourceDimension,p0Maps));
+  }
+
+  int pairCount=nv*(nv-1) div 2;
+  int kernelAmbientDimension=nv*sourceDimension;
+  list projectionMaps;
+  int i,a,b;
+  matrix fullProjection,projection;
+
+  // This branch is mathematically unreachable for genuine consecutive
+  // section spaces with sourceDimension>0, but it also gives the correct
+  // kernel of an empty compatibility matrix.
+  if (targetDimension==0)
+  {
+    for (i=1;i<=nv;i++)
+    {
+      fullProjection=matrix(0,sourceDimension,kernelAmbientDimension);
+      for (a=1;a<=sourceDimension;a++)
+      {
+        fullProjection[a,(i-1)*sourceDimension+a]=1;
+      }
+      projectionMaps[i]=fullProjection;
+    }
+    return(list(kernelAmbientDimension,projectionMaps));
+  }
+
+  // The compatibility map is the Koszul differential tensored with the
+  // variable multiplication maps.  Assemble its blocks by kernel-level
+  // matrix operations instead of scanning every scalar entry in the
+  // interpreter.
+  ideal linearMonomials=maxideal(1);
+  module linearSyzygies=syz(linearMonomials);
+  matrix syzygyMatrix=matrix(linearSyzygies);
+  if ((nrows(syzygyMatrix)!=nv) ||
+      (ncols(syzygyMatrix)!=pairCount) || (deg(syzygyMatrix)>1))
+  {
+    ERROR("internal error: expected the linear Koszul syzygies of the variables");
+  }
+  matrix compatibility[targetDimension*pairCount][kernelAmbientDimension];
+  matrix variableBlocks;
+  for (ell=1;ell<=nv;ell++)
+  {
+    variableBlocks=transpose(diff(syzygyMatrix,var(ell)));
+    compatibility=compatibility+tensor(variableBlocks,variableMaps[ell]);
+  }
+
+  module K=sectionModuleConstantKernel(compatibility,useSpaSM);
+  int previousDimension=size(K);
+  if (previousDimension==0)
+  {
+    return(list(0,projectionMaps));
+  }
+  matrix KM=matrix(K);
+  for (i=1;i<=nv;i++)
+  {
+    projection=matrix(0,sourceDimension,previousDimension);
+    for (a=1;a<=sourceDimension;a++)
+    {
+      for (b=1;b<=previousDimension;b++)
+      {
+        projection[a,b]=KM[(i-1)*sourceDimension+a,b];
+      }
+    }
+    projectionMaps[i]=projection;
+  }
+  return(list(previousDimension,projectionMaps));
+}
+
+// Assemble a presentation from the spaces V_d,...,V_q, their multiplication
+// maps, and the degree-(q+1) relations which generate the q-linear tail.
+static proc sectionModuleAssemble(int d,int q,intvec dimensions,
+                                  list multiplicationMaps,module tailKernel)
+{
+  int spaceCount=q-d+1;
+  int nv=nvars(basering);
+  intvec offsets;
+  int totalRows=0;
+  int index,a,b,ell,columnCount,sourceDimension,targetDimension;
+  list maps;
+  matrix mu;
+  for (index=1;index<=spaceCount;index++)
+  {
+    offsets[index]=totalRows+1;
+    totalRows=totalRows+dimensions[index];
+  }
+  if (totalRows==0)
+  {
+    module zeroPresentation=gen(1);
+    attrib(zeroPresentation,"isHomog",intvec(d));
+    return(zeroPresentation);
+  }
+
+  int totalColumns=size(tailKernel);
+  for (index=1;index<spaceCount;index++)
+  {
+    totalColumns=totalColumns+nv*dimensions[index];
+  }
+  int allocatedColumns=max(1,totalColumns);
+  matrix presentation[totalRows][allocatedColumns];
+  intvec resultWeights;
+  resultWeights[totalRows]=0;
+  for (index=1;index<=spaceCount;index++)
+  {
+    for (a=1;a<=dimensions[index];a++)
+    {
+      resultWeights[offsets[index]+a-1]=d+index-1;
+    }
+  }
+
+  // Relations describing multiplication out of every recovered lower space.
+  columnCount=0;
+  for (index=1;index<spaceCount;index++)
+  {
+    sourceDimension=dimensions[index];
+    targetDimension=dimensions[index+1];
+    // Once a recovered section space vanishes, every lower one vanishes as
+    // well.  Their multiplication-map list entries are intentionally absent.
+    if (sourceDimension>0)
+    {
+      maps=multiplicationMaps[index];
+      for (ell=1;ell<=nv;ell++)
+      {
+        mu=maps[ell];
+        if ((ncols(mu)!=sourceDimension) || (nrows(mu)!=targetDimension))
+        {
+          ERROR("internal error: incompatible multiplication map during section-module assembly");
+        }
+        for (a=1;a<=sourceDimension;a++)
+        {
+          columnCount++;
+          presentation[offsets[index]+a-1,columnCount]=var(ell);
+          for (b=1;b<=targetDimension;b++)
+          {
+            presentation[offsets[index+1]+b-1,columnCount]
+              =presentation[offsets[index+1]+b-1,columnCount]-mu[b,a];
+          }
+        }
+      }
+    }
+  }
+
+  // Since q>reg(coker(M)), the stable tail has a q-linear resolution.
+  // Therefore the kernel of S_1 tensor V_q -> V_(q+1) generates all of its
+  // relations.
+  int tailDimension=dimensions[spaceCount];
+  matrix tailKM=matrix(tailKernel);
+  if (nrows(tailKM)!=nv*tailDimension)
+  {
+    ERROR("internal error: incompatible stable-tail kernel");
+  }
+  int relation;
+  for (relation=1;relation<=size(tailKernel);relation++)
+  {
+    columnCount++;
+    for (a=1;a<=tailDimension;a++)
+    {
+      for (ell=1;ell<=nv;ell++)
+      {
+        presentation[offsets[spaceCount]+a-1,columnCount]
+          =presentation[offsets[spaceCount]+a-1,columnCount]
+           +var(ell)*tailKM[(ell-1)*tailDimension+a,relation];
+      }
+    }
+  }
+  if (columnCount!=totalColumns)
+  {
+    ERROR("internal error: wrong number of section-module relations");
+  }
+
+  module result=presentation;
+  attrib(result,"isHomog",resultWeights);
+  if (!homog(result))
+  {
+    ERROR("internal error: the section-module presentation is not homogeneous");
+  }
+  return(result);
+}
+
+static proc sectionModulePolynomial(module M,int d,int useSpaSM)
+{
+  int regValue=CM_regularity(M);
+  int q=max(d,regValue+1);
+  module G=std(M);
+  intvec weights=attrib(M,"isHomog");
+  list tailData=sectionModuleMultiplicationData(G,weights,q);
+  module Bq=tailData[1];
+  module Bq1=tailData[2];
+  list currentMaps=tailData[3];
+  int tailDimension=size(Bq);
+  if (tailDimension==0)
+  {
+    module zeroPresentation=gen(1);
+    attrib(zeroPresentation,"isHomog",intvec(d));
+    return(zeroPresentation);
+  }
+
+  int nextDimension=size(Bq1);
+  int nv=nvars(basering);
+  matrix tailMultiplication[nextDimension][nv*tailDimension];
+  matrix mu;
+  int ell,a,b;
+  for (ell=1;ell<=nv;ell++)
+  {
+    mu=currentMaps[ell];
+    for (a=1;a<=nextDimension;a++)
+    {
+      for (b=1;b<=tailDimension;b++)
+      {
+        tailMultiplication[a,(ell-1)*tailDimension+b]=mu[a,b];
+      }
+    }
+  }
+  module tailKernel=sectionModuleConstantKernel(tailMultiplication,useSpaSM);
+
+  int spaceCount=q-d+1;
+  intvec dimensions;
+  dimensions[spaceCount]=tailDimension;
+  list multiplicationMaps;
+  int e,index,previousDimension,zeroIndex;
+  list previousData,previousMaps;
+  for (e=q-1;e>=d;e--)
+  {
+    index=e-d+1;
+    previousData=sectionModulePreviousSpace(currentMaps,useSpaSM);
+    previousDimension=previousData[1];
+    dimensions[index]=previousDimension;
+    if (previousDimension==0)
+    {
+      for (zeroIndex=index-1;zeroIndex>=1;zeroIndex--)
+      {
+        dimensions[zeroIndex]=0;
+      }
+      break;
+    }
+    previousMaps=previousData[2];
+    multiplicationMaps[index]=previousMaps;
+    currentMaps=previousMaps;
+  }
+
+  return(sectionModuleAssemble(d,q,dimensions,multiplicationMaps,tailKernel));
+}
+
+// Compute only h^0 at d.  This is the dimension-only specialization of
+// sectionModulePolynomial: the same theorem-certified stable tail and exact
+// Koszul compatibility descent are used, but relations for the stable tail
+// and a presentation of the complete truncated module are not constructed.
+static proc sectionModuleDimensionPolynomial(module M,int d,int useSpaSM)
+{
+  int regValue=CM_regularity(M);
+  int q=max(d,regValue+1);
+  module G=std(M);
+  intvec weights=attrib(M,"isHomog");
+  if (q==d)
+  {
+    module Bd=sectionBasisGradedPiece(G,weights,d);
+    return(size(Bd));
+  }
+  list tailData=sectionModuleMultiplicationData(G,weights,q);
+  module Bq=tailData[1];
+  list currentMaps=tailData[3];
+  int currentDimension=size(Bq);
+  if (currentDimension==0) { return(0); }
+
+  int e;
+  list previousData;
+  for (e=q-1;e>=d;e--)
+  {
+    previousData=sectionModulePreviousSpace(currentMaps,useSpaSM);
+    currentDimension=previousData[1];
+    if (currentDimension==0) { return(0); }
+    currentMaps=previousData[2];
+  }
+  return(currentDimension);
+}
+
+// backend=-1 selects once, backend=0 forces Singular, backend=1 forces SpaSM.
+// The optional fourth argument requests only the dimension in degree d.
+// Keeping both outputs behind this dispatcher makes validation, backend
+// selection, and homogeneous-qring conversion identical.
+static proc sectionModuleDispatch(module M,int d,int backend,list #)
+{
+  if (size(#)>1) { ERROR("internal error: invalid section-module dispatch"); }
+  int dimensionOnly=0;
+  if (size(#)==1) { dimensionOnly=#[1]; }
+
+  if (typeof(attrib(M,"isHomog"))!="intvec")
+  {
+    if (size(M)==0)
+    {
+      intvec zeroWeights;
+      zeroWeights[nrows(M)]=0;
+      attrib(M,"isHomog",zeroWeights);
+    }
+    else
+    {
+      ERROR("No admissible degree vector assigned");
+    }
+  }
+  if (!homog(M))
+  {
+    ERROR("the presentation must be homogeneous for the assigned generator degrees");
+  }
+
+  int useSpaSM=0;
+  if (backend<0)
+  {
+    useSpaSM=sectionModuleSpaSMUsable();
+  }
+  if (backend>0)
+  {
+    sectionModuleRequireSpaSM();
+    useSpaSM=1;
+  }
+
+  list RL=ringlist(basering);
+  if (RL[4]!=0)
+  {
+    intvec qWeights=attrib(M,"isHomog");
+    def Q=basering;
+    ideal coordinateIdealQ=RL[4];
+    RL[4]=ideal(0);
+    def S=ring(RL);
+    setring S;
+    module MS=imap(Q,M);
+    ideal IX=imap(Q,coordinateIdealQ);
+    MS=MS+IX*freemodule(nrows(MS));
+    attrib(MS,"isHomog",qWeights);
+    if (dimensionOnly)
+    {
+      int dimensionS=sectionModuleDimensionPolynomial(MS,d,useSpaSM);
+      setring Q;
+      return(dimensionS);
+    }
+    module resultS=sectionModulePolynomial(MS,d,useSpaSM);
+    intvec resultWeights=attrib(resultS,"isHomog");
+
+    setring Q;
+    module resultQ=imap(S,resultS);
+    attrib(resultQ,"isHomog",resultWeights);
+    return(resultQ);
+  }
+
+  if (dimensionOnly)
+  {
+    return(sectionModuleDimensionPolynomial(M,d,useSpaSM));
+  }
+  return(sectionModulePolynomial(M,d,useSpaSM));
+}
+
+proc sheafSectionModule(module M,int d)
+"USAGE:   sheafSectionModule(M,d); M module, d int
+ASSUME:   M is a graded presentation matrix over a standard graded
+         polynomial ring over a field, or its homogeneous qring, with the row
+         degrees assigned as isHomog.
+RETURN:   module P presenting the direct sum, over all e>=d, of
+         H^0(Proj(basering),sheaf(coker(M))(e)).
+         In particular, dimGradedPart(P,e) is zero for e<d and is the
+         corresponding h^0 for every e>=d.
+NOTE:     The procedure chooses its constant-kernel backend once. It uses
+         SpaSM when the optional module is available and the coefficient
+         field is supported, and otherwise uses Singular's generic exact
+         module kernel. If a selected SpaSM computation fails, it is not
+         retried with another backend.
+         The certified starting degree is max(d,reg(coker(M))+1). The stable
+         linear tail is reconstructed there, and the sheafified dual Koszul
+         complex recovers all requested lower degrees and multiplication
+         maps exactly; no saturation, heuristic stabilization, verification, or
+         BGG computation is used. The returned presentation is generally nonminimal.
+SEE ALSO: sheafSectionModuleLinear, sheafSectionModuleSpaSM,
+          sheafSectionBasis, truncate, CM_regularity
+EXAMPLE: example sheafSectionModule; shows an example
+"
+{
+  return(sectionModuleDispatch(M,d,-1));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module Point=x,y;
+  attrib(Point,"isHomog",intvec(0));
+  // O_Point has one section in every twist, including negative twists.
+  module G=sheafSectionModule(Point,-2);
+  intvec(dimGradedPart(G,-3),dimGradedPart(G,-2),
+         dimGradedPart(G,-1),dimGradedPart(G,0),dimGradedPart(G,1));
+}
+
+proc sheafSectionModuleLinear(module M,int d)
+"USAGE:   sheafSectionModuleLinear(M,d); M module, d int
+RETURN:   A presentation of the same graded section module as
+         sheafSectionModule(M,d), computed with Singular's generic exact
+         module kernels.
+NOTE:     This command never probes or dispatches to SpaSM.
+SEE ALSO: sheafSectionModule, sheafSectionModuleSpaSM
+EXAMPLE: example sheafSectionModuleLinear; shows an example
+"
+{
+  return(sectionModuleDispatch(M,d,0));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module Point=x,y;
+  attrib(Point,"isHomog",intvec(0));
+  module G=sheafSectionModuleLinear(Point,-1);
+  intvec(dimGradedPart(G,-2),dimGradedPart(G,-1),
+         dimGradedPart(G,0),dimGradedPart(G,1));
+}
+
+proc sheafSectionModuleSpaSM(module M,int d)
+"USAGE:   sheafSectionModuleSpaSM(M,d); M module, d int
+ASSUME:   The assumptions of sheafSectionModule hold, the sispasm module is
+         available, and the current coefficient field is supported by SpaSM.
+RETURN:   A presentation of the same graded section module as
+         sheafSectionModule(M,d), with every constant nullspace computed by
+         the strict exact SpaSM backend.
+NOTE:     SpaSM is preflighted before the computation. This command errors if
+         SpaSM is unavailable or inapplicable and never substitutes another
+         backend.
+SEE ALSO: sheafSectionModule, sheafSectionModuleLinear
+EXAMPLE: example sheafSectionModuleSpaSM; shows an example when SpaSM is
+         available
+"
+{
+  return(sectionModuleDispatch(M,d,1));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  load("sispasm.so","try");
+  if (defined(spasm_kernel_basis))
+  {
+    if (spasm_supports_current_ring())
+    {
+      module Point=x,y;
+      attrib(Point,"isHomog",intvec(0));
+      module G=sheafSectionModuleSpaSM(Point,-1);
+      intvec(dimGradedPart(G,-2),dimGradedPart(G,-1),
+             dimGradedPart(G,0),dimGradedPart(G,1));
+    }
+  }
+}
+
+proc sheafSectionDimension(module M,int d)
+"USAGE:   sheafSectionDimension(M,d); M module, d int
+ASSUME:   The assumptions of sheafSectionModule hold.
+RETURN:   The integer h^0(Proj(basering),sheaf(coker(M))(d)).
+NOTE:     This is the dimension-only form of sheafSectionModule. It uses the
+         same certified starting degree max(d,reg(coker(M))+1) and the same
+         exact compatibility descent, but does not compute stable-tail
+         relations or assemble a presentation in all degrees >=d.
+         SpaSM is chosen automatically when available and applicable;
+         otherwise Singular's generic exact kernels are used. A selected
+         backend is never retried with another backend.
+SEE ALSO: sheafSectionDimensionLinear, sheafSectionDimensionSpaSM,
+          sheafSectionModule, dimH
+EXAMPLE: example sheafSectionDimension; shows an example
+"
+{
+  return(sectionModuleDispatch(M,d,-1,1));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module Point=x,y;
+  attrib(Point,"isHomog",intvec(0));
+  intvec(sheafSectionDimension(Point,-2),
+         sheafSectionDimension(Point,0),
+         sheafSectionDimension(Point,2));
+}
+
+proc sheafSectionDimensionLinear(module M,int d)
+"USAGE:   sheafSectionDimensionLinear(M,d); M module, d int
+RETURN:   The same h^0 dimension as sheafSectionDimension(M,d), computed
+         with Singular's generic exact module kernels.
+NOTE:     This command never probes or dispatches to SpaSM.
+SEE ALSO: sheafSectionDimension, sheafSectionDimensionSpaSM,
+          sheafSectionModuleLinear
+EXAMPLE: example sheafSectionDimensionLinear; shows an example
+"
+{
+  return(sectionModuleDispatch(M,d,0,1));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module Point=x,y;
+  attrib(Point,"isHomog",intvec(0));
+  sheafSectionDimensionLinear(Point,-1);
+}
+
+proc sheafSectionDimensionSpaSM(module M,int d)
+"USAGE:   sheafSectionDimensionSpaSM(M,d); M module, d int
+ASSUME:   The assumptions of sheafSectionDimension hold, the sispasm module
+         is available, and the current coefficient field is supported by
+         SpaSM.
+RETURN:   The same h^0 dimension as sheafSectionDimension(M,d), with every
+         constant nullspace computed by the strict exact SpaSM backend.
+NOTE:     SpaSM is preflighted before the computation. This command errors if
+         SpaSM is unavailable or inapplicable and never substitutes another
+         backend.
+SEE ALSO: sheafSectionDimension, sheafSectionDimensionLinear,
+          sheafSectionModuleSpaSM
+EXAMPLE: example sheafSectionDimensionSpaSM; shows an example when SpaSM is
+         available
+"
+{
+  return(sectionModuleDispatch(M,d,1,1));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  load("sispasm.so","try");
+  if (defined(spasm_kernel_basis))
+  {
+    if (spasm_supports_current_ring())
+    {
+      module Point=x,y;
+      attrib(Point,"isHomog",intvec(0));
+      sheafSectionDimensionSpaSM(Point,-1);
+    }
+  }
+}
+
+static proc sectionBasisEvaluation(module K,ideal U,module Bs,poly g)
+{
+  int ds=size(Bs);
+  int nu=size(U);
+  poly pvars=sectionBasisProductOfVariables();
+  matrix cg=coeffs(g,U,pvars);
+  matrix E[ds][ds*nu];
+  int u,k;
+  for (u=1; u<=nu; u++)
+  {
+    for (k=1; k<=ds; k++)
+    {
+      E[k,(u-1)*ds+k]=cg[u,1];
+    }
+  }
+  return(E*matrix(K));
+}
+
+// Multiplication by g is injective after sheafification iff the saturated
+// relation module agrees with its saturated colon by g.
+static proc sectionBasisRegularDenominator(module M,poly g)
+{
+  if (deg(g)==0) { return(1); }
+  module C=quotient(M,ideal(g));
+  module SC=sat(C,maxideal(1));
+  module SM=sat(M,maxideal(1));
+  return((size(NF(SC,std(SM)))==0) &&
+         (size(NF(SM,std(SC)))==0));
+}
+
+static proc sectionBasisValidateDenominator(module M,module K,ideal U,
+                                            module Bs,poly g,int a)
+{
+  if ((g==0) || (!homog(g)) || (deg(g)!=a))
+  {
+    return(list(0));
+  }
+  matrix EK=sectionBasisEvaluation(K,U,Bs,g);
+  if (rank(EK)!=size(K)) { return(list(0)); }
+  if (!sectionBasisRegularDenominator(M,g)) { return(list(0)); }
+  return(list(1,EK));
+}
+
+static proc sectionBasisAutomaticDenominator(module M,module K,ideal U,
+                                             module Bs,int a)
+{
+  int nu=size(U);
+  poly g=U[1];
+  list V=sectionBasisValidateDenominator(M,K,U,Bs,g,a);
+  if (V[1]) { return(list(g,V[2])); }
+
+  int u,t;
+  g=0;
+  for (u=1; u<=nu; u++) { g=g+U[u]; }
+  V=sectionBasisValidateDenominator(M,K,U,Bs,g,a);
+  if (V[1]) { return(list(g,V[2])); }
+
+  // Deterministic points in a coefficient pencil handle reducible support
+  // while keeping the choice reproducible.
+  for (t=1; t<=8; t++)
+  {
+    g=0;
+    for (u=1; u<=nu; u++) { g=g+(1+t*(u-1))*U[u]; }
+    V=sectionBasisValidateDenominator(M,K,U,Bs,g,a);
+    if (V[1]) { return(list(g,V[2])); }
+  }
+
+  g=U[1];
+  for (u=2; u<nu; u++)
+  {
+    g=g+U[u];
+    V=sectionBasisValidateDenominator(M,K,U,Bs,g,a);
+    if (V[1]) { return(list(g,V[2])); }
+  }
+  for (u=2; u<=nu; u++)
+  {
+    g=U[u];
+    V=sectionBasisValidateDenominator(M,K,U,Bs,g,a);
+    if (V[1]) { return(list(g,V[2])); }
+  }
+  return(list(0));
+}
+
+static proc sectionBasisAutomaticRegularDenominator(module M,ideal U)
+{
+  int nu=size(U);
+  int u,t;
+  poly g=U[1];
+  if (sectionBasisRegularDenominator(M,g)) { return(g); }
+
+  g=0;
+  for (u=1; u<=nu; u++) { g=g+U[u]; }
+  if (sectionBasisRegularDenominator(M,g)) { return(g); }
+
+  for (t=1; t<=8; t++)
+  {
+    g=0;
+    for (u=1; u<=nu; u++) { g=g+(1+t*(u-1))*U[u]; }
+    if (sectionBasisRegularDenominator(M,g)) { return(g); }
+  }
+
+  g=U[1];
+  for (u=2; u<nu; u++)
+  {
+    g=g+U[u];
+    if (sectionBasisRegularDenominator(M,g)) { return(g); }
+  }
+  for (u=2; u<=nu; u++)
+  {
+    g=U[u];
+    if (sectionBasisRegularDenominator(M,g)) { return(g); }
+  }
+  return(poly(0));
+}
+
+// Propagate the weights of the target generators through one homogeneous
+// exterior differential.  The resolution maps returned by mres do not
+// always retain isHomog on every term (notably in characteristic two), so
+// derive the source weights from a leading term instead of trusting attrs.
+static proc sectionBasisBGGSourceWeights(module D,intvec targetWeights)
+{
+  if (size(targetWeights)!=nrows(D))
+  {
+    ERROR("internal error: incompatible target weights in the Tate resolution");
+  }
+  attrib(D,"isHomog",targetWeights);
+  if (!homog(D))
+  {
+    ERROR("internal error: a Tate differential is not homogeneous");
+  }
+
+  int nv=nvars(basering);
+  int c,row;
+  vector v;
+  intvec sourceWeights;
+  for (c=1; c<=size(D); c++)
+  {
+    v=D[c];
+    if (v==0)
+    {
+      ERROR("internal error: a Tate differential has a zero source generator");
+    }
+    row=leadexp(v)[nv+1];
+    sourceWeights[c]=targetWeights[row]+deg(v[row]);
+  }
+  return(sourceWeights);
+}
+
+// Resolve the BGG tail over the exterior algebra and evaluate one degree-a
+// form on its H^0 linear strand.  The result is a scalar matrix whose columns
+// give H^0(F(d)) inside the explicit basis of coker(M)_s used to build Delta.
+static proc sectionBasisBGGEvaluation(matrix Delta,int s,int d,
+                                      intmat monomialExponents,
+                                      matrix coefficients)
+{
+  int a=s-d;
+  int ds=ncols(Delta);
+  int ds1=nrows(Delta);
+  int nv=nvars(basering);
+  int nu=nrows(monomialExponents);
+  def R=basering;
+  module deltaModule=Delta;
+  def E=Exterior();
+  setring E;
+
+  module exteriorDelta=imap(R,deltaModule);
+  int i,t,u,repeatCount,row,selectedCount;
+  intvec targetWeights;
+  for (i=1; i<=ds1; i++) { targetWeights[i]=-s-1; }
+  attrib(exteriorDelta,"isHomog",targetWeights);
+
+  intvec saveopt=option(get);
+  option(redSB);
+  option(redTail);
+  resolution RE=mres(exteriorDelta,a+1);
+
+  // mres is allowed to replace the source basis of Delta.  Retain the
+  // constant comparison exteriorDelta*sourceComparison=RE[1], because only
+  // exteriorDelta is tied to the explicit degree-s basis in the input ring.
+  module firstMap=RE[1];
+  matrix sourceComparison=jet(lift(exteriorDelta,firstMap),0);
+  if ((nrows(sourceComparison)!=ds) ||
+      (ncols(sourceComparison)!=ncols(firstMap)))
+  {
+    ERROR("internal error: incompatible BGG source comparison");
+  }
+  module comparisonResidual=
+    module(matrix(exteriorDelta)*sourceComparison-matrix(firstMap));
+  if (size(comparisonResidual)!=0)
+  {
+    ERROR("internal error: could not identify the BGG tail with the explicit graded piece");
+  }
+
+  // Propagate weights independently of resolution attributes.  In the last
+  // source, weight -d is equivalent to cohomological degree zero: a summand
+  // from H^p(F(d-p)) has exterior source weight p-d.
+  intvec sourceWeights;
+  for (t=1; t<=a+1; t++)
+  {
+    if (nrows(RE[t])!=size(targetWeights))
+    {
+      ERROR("internal error: incompatible consecutive Tate differentials");
+    }
+    sourceWeights=sectionBasisBGGSourceWeights(RE[t],targetWeights);
+    targetWeights=sourceWeights;
+  }
+
+  intvec selectedColumns;
+  for (i=1; i<=size(sourceWeights); i++)
+  {
+    if (sourceWeights[i]==-d)
+    {
+      selectedCount++;
+      selectedColumns[selectedCount]=i;
+    }
+  }
+
+  if (selectedCount==0)
+  {
+    matrix exteriorZero[ds][1];
+    list exteriorResult=0,exteriorZero;
+    option(set,saveopt);
+    setring R;
+    def result=imap(E,exteriorResult);
+    return(result);
+  }
+
+  // Cache the linear coefficient matrices.  Higher-degree entries connect
+  // other cohomology strands in the Tate resolution and must not contribute
+  // to multiplication on H^0.
+  list linearMaps,variableMaps;
+  matrix differential,linearPart;
+  for (t=2; t<=a+1; t++)
+  {
+    differential=matrix(RE[t]);
+    variableMaps=list();
+    for (i=1; i<=nv; i++)
+    {
+      linearPart=jet(diff(differential,var(i)),0);
+      variableMaps[i]=linearPart;
+    }
+    linearMaps[t-1]=variableMaps;
+  }
+
+  matrix selector[ncols(RE[a+1])][selectedCount];
+  for (i=1; i<=selectedCount; i++)
+  {
+    selector[selectedColumns[i],i]=1;
+  }
+  matrix exteriorCoefficients=imap(R,coefficients);
+  matrix evaluated[ncols(firstMap)][selectedCount];
+  matrix current,next;
+  int mapIndex;
+  for (u=1; u<=nu; u++)
+  {
+    if (exteriorCoefficients[u,1]!=0)
+    {
+      current=selector;
+      mapIndex=a;
+      for (i=1; i<=nv; i++)
+      {
+        for (repeatCount=1;
+             repeatCount<=monomialExponents[u,i]; repeatCount++)
+        {
+          variableMaps=linearMaps[mapIndex];
+          next=variableMaps[i]*current;
+          current=next;
+          mapIndex--;
+        }
+      }
+      if (mapIndex!=0)
+      {
+        ERROR("internal error: the BGG evaluation monomial has the wrong degree");
+      }
+      evaluated=evaluated+exteriorCoefficients[u,1]*current;
+    }
+  }
+  evaluated=sourceComparison*evaluated;
+
+  list exteriorResult=selectedCount,evaluated;
+  option(set,saveopt);
+  setring R;
+  def result=imap(E,exteriorResult);
+  return(result);
+}
+
+proc sheafSectionBasisBGG(module M,int d,list #)
+"USAGE:   sheafSectionBasisBGG(M,d[,s,g]); M module, d,s int, g poly
+ASSUME:   M is a graded presentation matrix over a standard graded
+         polynomial ring or its homogeneous qring, with the row degrees
+         assigned as isHomog.
+RETURN:   list L. L[1] is a module of homogeneous numerator vectors,
+         L[2] is their common denominator, and L[3] is the BGG tail degree.
+         The fractions L[1][i]/L[2] form a basis of
+         H^0(Proj(basering),sheaf(coker(M))(d)).
+NOTE:     If s is omitted, the procedure uses
+         max(d,reg(coker(M))+1). An explicit s is accepted only when s>=d
+         and s>reg(coker(M)); these are theorem hypotheses, not a heuristic
+         stabilization bound. The optional homogeneous g must have degree
+         s-d and be a non-zero-divisor after sheafification.
+         The procedure constructs the BGG differential from the degree-s
+         and degree-(s+1) multiplication maps, resolves it over the exterior
+         algebra, selects the Tate generators of weight -d, and decodes their
+         linear strand back into the original graded module. It computes
+         representatives directly and does not call sheafCohBGG or compare
+         against the multiplication-table algorithm.
+         For a qring, the presentation is lifted to the ambient polynomial
+         ring and the quotient ideal is added to its relation module.
+         L[1] retains nrows(M) as its ambient free-module rank, including
+         when every returned vector has zero trailing coordinates.
+THEORY:   The construction uses the BGG correspondence and the Tate
+         resolution as in Eisenbud-Floystad-Schreyer, Trans. AMS 355 (2003).
+SEE ALSO: sheafSectionBasis, sheafCohBGG, trivializedSectionBasis
+EXAMPLE: example sheafSectionBasisBGG; shows an example
+"
+{
+  if (typeof(attrib(M,"isHomog"))!="intvec")
+  {
+    if (size(M)==0)
+    {
+      intvec zeroWeights;
+      zeroWeights[nrows(M)]=0;
+      attrib(M,"isHomog",zeroWeights);
+    }
+    else
+    {
+      ERROR("No admissible degree vector assigned");
+    }
+  }
+  if (size(#)>2)
+  {
+    ERROR("expected at most a BGG tail degree and denominator");
+  }
+
+  list RL=ringlist(basering);
+  if (RL[4]!=0)
+  {
+    int argumentCount=size(#);
+    int qTail;
+    poly qDenominator;
+    if (argumentCount>=1)
+    {
+      if (typeof(#[1])!="int") { ERROR("BGG tail degree must be an integer"); }
+      qTail=#[1];
+    }
+    if (argumentCount==2)
+    {
+      if (typeof(#[2])!="poly")
+      {
+        ERROR("evaluation denominator must be a polynomial");
+      }
+      qDenominator=#[2];
+    }
+
+    intvec qWeights=attrib(M,"isHomog");
+    def Q=basering;
+    ideal coordinateIdealQ=RL[4];
+    RL[4]=ideal(0);
+    def S=ring(RL);
+    setring S;
+    module MS=imap(Q,M);
+    ideal IX=imap(Q,coordinateIdealQ);
+    MS=MS+IX*freemodule(nrows(MS));
+    attrib(MS,"isHomog",qWeights);
+
+    list qResult;
+    if (argumentCount==0)
+    {
+      qResult=sheafSectionBasisBGG(MS,d);
+    }
+    if (argumentCount==1)
+    {
+      qResult=sheafSectionBasisBGG(MS,d,qTail);
+    }
+    if (argumentCount==2)
+    {
+      poly g=imap(Q,qDenominator);
+      qResult=sheafSectionBasisBGG(MS,d,qTail,g);
+    }
+
+    setring Q;
+    def qResult=imap(S,qResult);
+    module qBasis=qResult[1];
+    qBasis=sectionBasisRememberAmbientRank(qBasis,nrows(M));
+    return(list(qBasis,qResult[2],qResult[3]));
+  }
+
+  int reg=CM_regularity(M);
+  int s;
+  if (size(#)==0)
+  {
+    s=max(d,reg+1);
+  }
+  else
+  {
+    if (typeof(#[1])!="int") { ERROR("BGG tail degree must be an integer"); }
+    s=#[1];
+  }
+  if ((s<d) || (s<=reg))
+  {
+    ERROR("BGG tail degree must be at least the twist and strictly greater than regularity "+string(reg));
+  }
+
+  int a=s-d;
+  ideal U=maxideal(a);
+  poly g;
+  if (size(#)==2)
+  {
+    g=#[2];
+    if ((g==0) || (!homog(g)) || (deg(g)!=a) ||
+        (!sectionBasisRegularDenominator(M,g)))
+    {
+      ERROR("denominator has the wrong degree or is a zero divisor after sheafification");
+    }
+  }
+  else
+  {
+    g=sectionBasisAutomaticRegularDenominator(M,U);
+    if (g==0)
+    {
+      ERROR("could not choose a regular BGG evaluation denominator");
+    }
+  }
+
+  module G=std(M);
+  intvec weights=attrib(M,"isHomog");
+  module Bs=sectionBasisGradedPiece(G,weights,s);
+  if (size(Bs)==0)
+  {
+    module N=sectionBasisZeroModule(nrows(M));
+    return(list(N,g,s));
+  }
+  if (a==0)
+  {
+    Bs=sectionBasisRememberAmbientRank(Bs,nrows(M));
+    return(list(Bs,g,s));
+  }
+
+  module Bs1=sectionBasisGradedPiece(G,weights,s+1);
+  if (size(Bs1)==0)
+  {
+    ERROR("internal error: the regular BGG tail has no next graded piece");
+  }
+  int ds=size(Bs);
+  int ds1=size(Bs1);
+  attrib(Bs1,"isSB",1);
+  matrix Delta[ds1][ds];
+  int i;
+  module P;
+  matrix T;
+  for (i=1; i<=nvars(basering); i++)
+  {
+    P=reduce(var(i)*Bs,G);
+    if ((nrows(P)!=nrows(G)) || (ncols(P)!=ds))
+    {
+      ERROR("internal error: BGG multiplication by variable "+string(i)
+            +" changed the ambient "+string(nrows(G))+"x"+string(ds)
+            +" shape to "+string(nrows(P))+"x"+string(ncols(P)));
+    }
+    T=lift(Bs1,P);
+    if ((nrows(T)!=ds1) || (ncols(T)!=ds) || (deg(T)>0))
+    {
+      ERROR("internal error while constructing a BGG multiplication map");
+    }
+    Delta=Delta+var(i)*T;
+  }
+
+  int nu=size(U);
+  int nv=nvars(basering);
+  intmat monomialExponents[nu][nv];
+  int u;
+  intvec exponentRow;
+  for (u=1; u<=nu; u++)
+  {
+    exponentRow=leadexp(U[u]);
+    for (i=1; i<=nv; i++)
+    {
+      monomialExponents[u,i]=exponentRow[i];
+    }
+  }
+  matrix coefficients=coeffs(g,U,sectionBasisProductOfVariables());
+  list evaluation=sectionBasisBGGEvaluation(Delta,s,d,
+                                             monomialExponents,coefficients);
+  int h0=evaluation[1];
+  if (h0==0)
+  {
+    module N=sectionBasisZeroModule(nrows(M));
+    return(list(N,g,s));
+  }
+  matrix evaluated=evaluation[2];
+  if ((nrows(evaluated)!=ds) || (ncols(evaluated)!=h0))
+  {
+    ERROR("internal error: BGG evaluation has incompatible dimensions");
+  }
+  module N=module(matrix(Bs)*evaluated);
+  N=sectionBasisRememberAmbientRank(N,nrows(M));
+  return(list(N,g,s));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  // A genuine BGG/Tate computation of H^0(P^2,O):
+  list B=sheafSectionBasisBGG(O,0);
+  B;
+}
+
+static proc sectionBasisBGGDimension(module M,int d)
+{
+  int nv=nvars(basering);
+  int n=nv-1;
+  int low=d-n;
+  int high=d+n;
+  int targetColumn=nv;
+  if (n==0)
+  {
+    // sheafCohBGG needs one term to the right to construct T^d on P^0.
+    high=d+1;
+    targetColumn=1;
+  }
+  // sheafCohBGG documents that enlarging a requested interval by n on both
+  // sides determines it on P^n. For the singleton d this gives d-n..d+n,
+  // with H^0(F(d)) in row and column n+1. This is a Tate-resolution bound,
+  // not a stabilization test between successively enlarged windows.
+  intmat H=sheafCohBGG(M,low,high);
+  int h0=H[nv,targetColumn];
+  if (h0<0)
+  {
+    ERROR("BGG did not determine H^0 at the requested twist");
+  }
+  return(h0);
+}
+
+proc sheafSectionBasis(module M,int d,list #)
+"USAGE:   sheafSectionBasis(M,d[,s,g,v]); M module, d,s int, g poly,
+         v int
+ASSUME:   M is a graded presentation matrix over a standard graded
+         polynomial ring or its homogeneous qring, with the row degrees
+         assigned as isHomog.
+RETURN:   list L. L[1] is a module of homogeneous numerator vectors,
+         L[2] is their common denominator, and L[3] is the tail degree.
+         The fractions L[1][i]/L[2] represent a basis of
+         H^0(Proj(basering),sheaf(coker(M))(d)).
+NOTE:     If s is omitted, the procedure uses the stable bound
+         max(d,reg(coker(M))+1). An explicit s is an expert override.
+         The optional homogeneous g has degree s-d.  Evaluation at g must
+         preserve the tail kernel and g must be a non-zero-divisor after
+         sheafification. BGG dimension verification is disabled by default;
+         pass v=1 to enable one dimension comparison. Verification never
+         changes or retries the requested tail.
+         For a qring, the presentation is lifted to the ambient polynomial
+         ring and the quotient ideal is added to its relation module.
+         L[1] retains nrows(M) as its ambient free-module rank, including
+         when every returned vector has zero trailing coordinates.
+THEORY:   Put a=s-d. The procedure computes
+         Hom(m^a,coker(M))_d from the degree-s and degree-(s+1) pieces and
+         the multiplication maps. In the stable range this finite ideal
+         transform is H^0 of the associated sheaf.
+SEE ALSO: sheafCohBGG, dimH, trivializedSectionBasis
+EXAMPLE: example sheafSectionBasis; shows an example
+"
+{
+  if (typeof(attrib(M,"isHomog"))!="intvec")
+  {
+    if (size(M)==0)
+    {
+      intvec w;
+      w[nrows(M)]=0;
+      attrib(M,"isHomog",w);
+    }
+    else
+    {
+      ERROR("No admissible degree vector assigned");
+    }
+  }
+  if (size(#)>3)
+  {
+    ERROR("expected at most tail degree, denominator, and verification flag");
+  }
+
+  list RL=ringlist(basering);
+  if (RL[4]!=0)
+  {
+    int argumentCount=size(#);
+    int qTail,qVerify;
+    poly qDenominator;
+    if (argumentCount>=1)
+    {
+      if (typeof(#[1])!="int") { ERROR("tail degree must be an integer"); }
+      qTail=#[1];
+    }
+    if (argumentCount>=2)
+    {
+      if (typeof(#[2])!="poly")
+      {
+        ERROR("evaluation denominator must be a polynomial");
+      }
+      qDenominator=#[2];
+    }
+    if (argumentCount==3)
+    {
+      if (typeof(#[3])!="int")
+      {
+        ERROR("verification flag must be an integer");
+      }
+      qVerify=#[3];
+    }
+
+    intvec qWeights=attrib(M,"isHomog");
+    def Q=basering;
+    ideal coordinateIdealQ=RL[4];
+    RL[4]=ideal(0);
+    def S=ring(RL);
+    setring S;
+    module MS=imap(Q,M);
+    ideal IX=imap(Q,coordinateIdealQ);
+    MS=MS+IX*freemodule(nrows(MS));
+    attrib(MS,"isHomog",qWeights);
+
+    list qResult;
+    if (argumentCount==0)
+    {
+      qResult=sheafSectionBasis(MS,d);
+    }
+    if (argumentCount==1)
+    {
+      qResult=sheafSectionBasis(MS,d,qTail);
+    }
+    if (argumentCount>=2)
+    {
+      poly g=imap(Q,qDenominator);
+      if (argumentCount==2)
+      {
+        qResult=sheafSectionBasis(MS,d,qTail,g);
+      }
+      else
+      {
+        qResult=sheafSectionBasis(MS,d,qTail,g,qVerify);
+      }
+    }
+
+    setring Q;
+    def qResult=imap(S,qResult);
+    module qBasis=qResult[1];
+    qBasis=sectionBasisRememberAmbientRank(qBasis,nrows(M));
+    return(list(qBasis,qResult[2],qResult[3]));
+  }
+
+  int automaticTail=(size(#)==0);
+  int verify=0;
+  int s,reg;
+  if (automaticTail)
+  {
+    reg=CM_regularity(M);
+    s=max(d,reg+1);
+  }
+  else
+  {
+    if (typeof(#[1])!="int") { ERROR("tail degree must be an integer"); }
+    s=#[1];
+  }
+  if (s<d) { ERROR("tail degree must be at least the requested twist"); }
+  if (size(#)==3)
+  {
+    if (typeof(#[3])!="int")
+    {
+      ERROR("verification flag must be an integer");
+    }
+    verify=#[3];
+  }
+
+  module G=std(M);
+  intvec weights=attrib(M,"isHomog");
+  module Bs=sectionBasisGradedPiece(G,weights,s);
+  module Bs1;
+  if (s>d)
+  {
+    Bs1=sectionBasisGradedPiece(G,weights,s+1);
+  }
+
+  int tailGap=s-d;
+  ideal U=maxideal(tailGap);
+  module K;
+  if (tailGap==0)
+  {
+    K=unitmat(size(Bs));
+  }
+  else
+  {
+    if (size(Bs1)==0)
+    {
+      Bs1=sectionBasisGradedPiece(G,weights,s+1);
+    }
+    K=sectionBasisCompatibilityKernel(G,Bs,Bs1,tailGap);
+  }
+
+  poly g;
+  matrix EK;
+  int verifiedH0;
+  if (size(K)==0)
+  {
+    if (size(#)>=2)
+    {
+      g=#[2];
+      if ((g==0) || (!homog(g)) || (deg(g)!=tailGap) ||
+          (!sectionBasisRegularDenominator(M,g)))
+      {
+        ERROR("invalid or sheaf-zero-divisor denominator");
+      }
+    }
+    else
+    {
+      g=sectionBasisAutomaticRegularDenominator(M,U);
+      if (g==0)
+      {
+        ERROR("could not choose a regular evaluation denominator");
+      }
+    }
+    module N=sectionBasisZeroModule(nrows(M));
+    // Singular's boolean operators evaluate both operands, so this must be
+    // nested: v=0 and the default path avoid BGG entirely.
+    if (verify)
+    {
+      verifiedH0=sectionBasisBGGDimension(M,d);
+      if (verifiedH0!=0)
+      {
+        ERROR("multiplication-table/BGG dimension mismatch: candidate dimension 0, BGG h0 "
+              +string(verifiedH0)+", tail degree "+string(s));
+      }
+    }
+    return(list(N,g,s));
+  }
+
+  list denominatorResult;
+  if (size(#)>=2)
+  {
+    g=#[2];
+    denominatorResult=sectionBasisValidateDenominator(M,K,U,Bs,g,tailGap);
+    if (size(denominatorResult)<2)
+    {
+      ERROR("denominator has the wrong degree, loses sections, or is a zero divisor after sheafification");
+    }
+    EK=denominatorResult[2];
+  }
+  else
+  {
+    denominatorResult=sectionBasisAutomaticDenominator(M,K,U,Bs,tailGap);
+    if (size(denominatorResult)<2)
+    {
+      ERROR("could not choose a common evaluation denominator; supply one or increase the tail degree");
+    }
+    g=denominatorResult[1];
+    EK=denominatorResult[2];
+  }
+
+  matrix BB=matrix(Bs);
+  module N=module(BB*EK);
+  N=sectionBasisRememberAmbientRank(N,nrows(M));
+  if (verify)
+  {
+    verifiedH0=sectionBasisBGGDimension(M,d);
+    if (verifiedH0!=size(N))
+    {
+      ERROR("multiplication-table/BGG dimension mismatch: candidate dimension "
+            +string(size(N))+", BGG h0 "+string(verifiedH0)
+            +", tail degree "+string(s));
+    }
+  }
+  return(list(N,g,s));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module M=0;
+  attrib(M,"isHomog",intvec(0));
+  // H^0(P^2,O(2)):
+  list B=sheafSectionBasis(M,2,2);
+  B;
+  // The same structure sheaf, evaluated farther out in the tail:
+  B=sheafSectionBasis(M,0,2,x2,1);
+  B;
+}
+
+static proc sectionBasisTrivializationKernelIsM(module M,ideal images,
+                                                 ideal IX)
+{
+  module imageKernel=modulo(images,std(IX));
+  module saturatedImageKernel=sat(imageKernel,maxideal(1));
+  module saturatedM=sat(M,maxideal(1));
+  return((size(NF(saturatedImageKernel,std(saturatedM)))==0) &&
+         (size(NF(saturatedM,std(saturatedImageKernel)))==0));
+}
+
+// Read a weighted-homogeneous functional from a dual-module generator.
+// The returned shift is deg(h_i)-weight(e_i), independent of nonzero i.
+static proc sectionBasisHomogeneousTrivializationCandidate(vector candidate,
+                                                            int r,
+                                                            intvec weights)
+{
+  ideal images;
+  int i,shift,shiftIsSet;
+  for (i=1; i<=r; i++)
+  {
+    images[i]=candidate[i];
+    if (candidate[i]!=0)
+    {
+      if (!homog(candidate[i])) { return(list(0)); }
+      if (!shiftIsSet)
+      {
+        shift=deg(candidate[i])-weights[i];
+        shiftIsSet=1;
+      }
+      else
+      {
+        if (deg(candidate[i])-weights[i]!=shift) { return(list(0)); }
+      }
+    }
+  }
+  if (!shiftIsSet) { return(list(0)); }
+  return(list(1,images,shift));
+}
+
+static proc sectionBasisRegularOnModuleAndSupport(module M,module OX,poly g)
+{
+  return((g!=0) && sectionBasisRegularDenominator(M,g) &&
+         sectionBasisRegularDenominator(OX,g));
+}
+
+// Choose a degree-a form which is regular both on the support and on M.
+static proc sectionBasisTrivializationRegularFactor(module M,module OX,int a)
+{
+  if (a==0) { return(poly(1)); }
+  if (a<0) { return(poly(0)); }
+  ideal U=maxideal(a);
+  int nu=size(U);
+  if (nu==0) { return(poly(0)); }
+
+  int u,t;
+  poly g=U[1];
+  if (sectionBasisRegularOnModuleAndSupport(M,OX,g)) { return(g); }
+
+  g=0;
+  for (u=1; u<=nu; u++) { g=g+U[u]; }
+  if (sectionBasisRegularOnModuleAndSupport(M,OX,g)) { return(g); }
+
+  for (t=1; t<=8; t++)
+  {
+    g=0;
+    for (u=1; u<=nu; u++) { g=g+(1+t*(u-1))*U[u]; }
+    if (sectionBasisRegularOnModuleAndSupport(M,OX,g)) { return(g); }
+  }
+
+  g=U[1];
+  for (u=2; u<nu; u++)
+  {
+    g=g+U[u];
+    if (sectionBasisRegularOnModuleAndSupport(M,OX,g)) { return(g); }
+  }
+  for (u=2; u<=nu; u++)
+  {
+    g=U[u];
+    if (sectionBasisRegularOnModuleAndSupport(M,OX,g)) { return(g); }
+  }
+  return(poly(0));
+}
+
+// Check every frame invariant except generic injectivity.  Call this private
+// body directly only after sectionBasisTrivializationKernelIsM has succeeded.
+static proc sectionBasisCheckTrivializationExceptKernel(module M,
+                                                         ideal images,poly f,
+                                                         ideal IX)
+{
+  int imageCount=ncols(matrix(images));
+  if (imageCount!=nrows(M))
+  {
+    ERROR("one trivialization image is required for each presentation generator");
+  }
+  if ((f==0) || (!homog(f)) || (!homog(IX)))
+  {
+    ERROR("the support ideal and trivialization denominator must be homogeneous, and the denominator nonzero");
+  }
+  if (typeof(attrib(M,"isHomog"))!="intvec")
+  {
+    if (size(M)==0)
+    {
+      intvec zeroWeights;
+      zeroWeights[nrows(M)]=0;
+      attrib(M,"isHomog",zeroWeights);
+    }
+    else
+    {
+      ERROR("No admissible degree vector assigned");
+    }
+  }
+
+  module OX=IX;
+  attrib(OX,"isHomog",intvec(0));
+  if (!sectionBasisRegularDenominator(OX,f))
+  {
+    ERROR("the trivialization denominator is a zero divisor on the support");
+  }
+  if (!sectionBasisRegularDenominator(M,f))
+  {
+    ERROR("the trivialization denominator is a zero divisor on the sheaf");
+  }
+
+  module GM=std(M);
+  module saturatedM=sat(M,maxideal(1));
+  module GsaturatedM=std(saturatedM);
+  ideal GIX=std(IX);
+  intvec weights=attrib(M,"isHomog");
+  int i,j;
+  int shiftIsSet=0;
+  int trivializationShift,currentShift;
+  int nonzeroOnSupport=0;
+  poly h;
+  for (i=1; i<=imageCount; i++)
+  {
+    if (images[i]!=0)
+    {
+      if (!homog(images[i]))
+      {
+        ERROR("the trivialization images must be homogeneous");
+      }
+      currentShift=deg(images[i])-deg(f)-weights[i];
+      if (!shiftIsSet)
+      {
+        trivializationShift=currentShift;
+        shiftIsSet=1;
+      }
+      else
+      {
+        if (currentShift!=trivializationShift)
+        {
+          ERROR("the trivialization images do not have a common grading shift");
+        }
+      }
+      if (reduce(images[i],GIX)!=0) { nonzeroOnSupport=1; }
+    }
+  }
+  if (!nonzeroOnSupport)
+  {
+    ERROR("the trivialization is zero on the support");
+  }
+
+  // The coordinate ideal must annihilate the sheafification of coker(M).
+  // Use the saturated presentation module so irrelevant torsion in the
+  // chosen graded presentation does not cause a false rejection.
+  for (j=1; j<=size(GIX); j++)
+  {
+    if (GIX[j]!=0)
+    {
+      for (i=1; i<=nrows(M); i++)
+      {
+        if (reduce(GIX[j]*gen(i),GsaturatedM)!=0)
+        {
+          ERROR("the module is not supported on the supplied coordinate ideal");
+        }
+      }
+    }
+  }
+
+  // The generator images must respect every presentation relation modulo IX.
+  for (j=1; j<=size(GM); j++)
+  {
+    h=0;
+    for (i=1; i<=nrows(M); i++)
+    {
+      h=h+GM[j][i]*images[i];
+    }
+    if (reduce(h,GIX)!=0)
+    {
+      ERROR("the trivialization images do not satisfy the module relations on the support");
+    }
+  }
+}
+
+// Full checker for every public explicit-frame entry point.
+static proc sectionBasisCheckTrivialization(module M,ideal images,poly f,
+                                            ideal IX)
+{
+  sectionBasisCheckTrivializationExceptKernel(M,images,f,IX);
+
+  // The induced map coker(M) -> (images)/(IX) must have no sheaf kernel.
+  // This rules out a putative trivialization which vanishes generically on
+  // one irreducible component of the support.
+  if (!sectionBasisTrivializationKernelIsM(M,images,IX))
+  {
+    ERROR("the supplied images do not define a generically injective trivialization on every support component");
+  }
+}
+
+// A RankOneSheaf is deliberately a transparent Singular newstruct, so guard
+// both its ring ownership and explicit trust bit on every trusted public
+// entry point. Constructors set the bit only after validating or canonically
+// constructing the frame; users must not mutate cached frame fields.
+static proc sectionBasisRequireCachedFrame(RankOneSheaf F)
+{
+  if (F.over!=basering)
+  {
+    ERROR("set the basering to the coordinate ring of the RankOneSheaf first");
+  }
+  if (F.frameValidated!=1)
+  {
+    ERROR("the RankOneSheaf does not contain a validated rational frame");
+  }
+}
+
+// Automatic frame recovery needs the first-vector entry point, not merely
+// the full-kernel entry point used by sheafSectionModule.  Select a backend
+// before any frame computation; a selected SpaSM failure remains an error.
+static proc sectionBasisSpaSMUsable()
+{
+  if (char(basering)==0) { return(0); }
+  if (char(basering)==2) { return(0); }
+  if (!defined(spasm_first_kernel_vector))
+  {
+    load("sispasm.so","try");
+  }
+  // Singular evaluates Boolean operators eagerly, so keep the guards apart.
+  if (!defined(spasm_supports_current_ring)) { return(0); }
+  if (!defined(spasm_first_kernel_vector)) { return(0); }
+  return(spasm_supports_current_ring());
+}
+
+// The finite first-functional scan requires integral support.  A sole
+// minimal prime is not enough: equality also excludes nilpotent thickening
+// and embedded components.  This helper runs only in a polynomial ring.
+static proc sectionBasisIntegralSupportPolynomial(ideal IX)
+{
+  if (!homog(IX)) { return(0); }
+  ideal G=std(IX);
+  if (size(G)==0) { return(nvars(basering)>0); }
+  if (reduce(poly(1),G)==0) { return(0); }
+  // A zero-dimensional homogeneous cone has empty projective support.
+  if (dim(G)<=0) { return(0); }
+  // Every proper homogeneous ideal generated by linear forms is prime.
+  if (deg(G)<=1) { return(1); }
+
+  list minimalPrimes=minAssGTZ(G);
+  if (size(minimalPrimes)!=1) { return(0); }
+  ideal P=minimalPrimes[1];
+  // G is contained in its minimal prime; check the reverse inclusion.
+  return(size(reduce(P,G))==0);
+}
+
+static proc sectionBasisIntegralSupport(ideal IX)
+{
+  list RL=ringlist(basering);
+  if (RL[4]==0)
+  {
+    return(sectionBasisIntegralSupportPolynomial(IX));
+  }
+
+  // In a qring it is the full ambient support ideal which must be prime.
+  // In particular, IX=0 alone says nothing about integrality of the qring.
+  def Q=basering;
+  ideal quotientIdealQ=RL[4];
+  RL[4]=ideal(0);
+  def S=ring(RL);
+  setring S;
+  ideal IXS=imap(Q,quotientIdealQ)+imap(Q,IX);
+  int result=sectionBasisIntegralSupportPolynomial(IXS);
+  setring Q;
+  return(result);
+}
+
+proc rankOneTrivialization(def data,list #)
+"USAGE:   rankOneTrivialization(M,I); M module, I ideal
+         rankOneTrivialization(F); F RankOneSheaf
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         whose associated sheaf is torsion-free and generically of rank one
+         (in particular, a line bundle), and M has its row degrees assigned
+         as isHomog.
+RETURN:   list T. T[1] is an ideal containing one image for each presentation
+         generator, T[2] is their common denominator (currently 1), and T[3]
+         is the degree shift deg(T[1][i])-deg(T[2])-isHomog[i] for every
+         nonzero image.
+NOTE:     The module form automatically uses exact SpaSM frame recovery when
+         the optional module supports the coefficient field and the ambient
+         support ideal is certified prime. Zero and linear support ideals are
+         recognized directly; otherwise minimal associated primes and ideal
+         equality certify integrality. For a qring, its quotient equations
+         are included in the ambient support ideal.
+         If SpaSM is unavailable or inapplicable, or the support is not
+         integral, the original graded-dual method is selected before frame
+         recovery. A selected SpaSM computation is never retried with another
+         algorithm. Both routes retain the full support, grading, denominator,
+         and saturation-based injectivity checks.
+         The graded-dual method computes Hom(coker(M),basering/I), homogenizes
+         its generators using factors regular on the support and the sheaf,
+         and searches deterministic linear combinations. A result is accepted
+         only when its kernel and M agree after saturation, so the functional
+         is generically injective on every support component. This candidate
+         search is finite; if it misses a suitable functional, pass an explicit
+         trivialization to trivializedSectionBasis.
+         For a RankOneSheaf, the already validated cached frame is returned
+         immediately; no graded dual or saturation is recomputed.
+SEE ALSO: trivializedSectionBasis, rankOneSheafSectionBasis, lineBundleSectionBasis
+EXAMPLE: example rankOneTrivialization; shows an example
+"
+{
+  if (typeof(data)=="RankOneSheaf")
+  {
+    if (size(#)!=0)
+    {
+      ERROR("rankOneTrivialization(F) expects no support ideal");
+    }
+    RankOneSheaf F=data;
+    sectionBasisRequireCachedFrame(F);
+    return(list(F.trivializationImages,F.trivializationDenom,
+                F.trivializationShift));
+  }
+  if (typeof(data)!="module")
+  {
+    ERROR("expected a module or a RankOneSheaf");
+  }
+  if (size(#)!=1)
+  {
+    ERROR("rankOneTrivialization(M,I) expects one support ideal");
+  }
+  module M=data;
+  if (typeof(#[1])!="ideal")
+  {
+    ERROR("the support must be an ideal");
+  }
+  ideal IX=#[1];
+  if (!homog(IX)) { ERROR("the support ideal must be homogeneous"); }
+  if (typeof(attrib(M,"isHomog"))!="intvec")
+  {
+    if (size(M)==0)
+    {
+      intvec zeroWeights;
+      zeroWeights[nrows(M)]=0;
+      attrib(M,"isHomog",zeroWeights);
+    }
+    else
+    {
+      ERROR("No admissible degree vector assigned");
+    }
+  }
+
+  if (sectionBasisSpaSMUsable())
+  {
+    if (sectionBasisIntegralSupport(IX))
+    {
+      list automaticFrame=rankOneTrivializationSpaSM(M,IX);
+      sectionBasisCheckTrivialization(M,automaticFrame[1],automaticFrame[2],IX);
+      return(automaticFrame);
+    }
+  }
+
+  int r=nrows(M);
+  intvec weights=attrib(M,"isHomog");
+  ideal GIX=std(IX);
+  module relationTranspose=transpose(matrix(M));
+  module targetRelations=IX*freemodule(nrows(relationTranspose));
+  module dualGenerators=modulo(relationTranspose,targetRelations);
+  if (size(dualGenerators)==0)
+  {
+    ERROR("the graded dual has no generators; pass an explicit trivialization");
+  }
+
+  list candidateImages,candidateShifts,C;
+  int candidateCount=0;
+  int i,j,nonzeroOnSupport;
+  ideal H,Hj;
+  for (j=1; j<=size(dualGenerators); j++)
+  {
+    C=sectionBasisHomogeneousTrivializationCandidate(dualGenerators[j],r,
+                                                      weights);
+    if (C[1])
+    {
+      H=C[2];
+      nonzeroOnSupport=0;
+      for (i=1; i<=r; i++)
+      {
+        if (reduce(H[i],GIX)!=0) { nonzeroOnSupport=1; }
+      }
+      if (nonzeroOnSupport)
+      {
+        candidateCount++;
+        candidateImages[candidateCount]=H;
+        candidateShifts[candidateCount]=C[3];
+      }
+    }
+  }
+  if (candidateCount==0)
+  {
+    ERROR("the graded dual has no homogeneous generators; pass an explicit trivialization");
+  }
+
+  // Prefer a native dual generator before raising every candidate to a
+  // common shift.  This keeps the trivialization degree small on integral
+  // support and ignores redundant high-degree generators of the dual.
+  for (j=1; j<=candidateCount; j++)
+  {
+    H=candidateImages[j];
+    if (sectionBasisTrivializationKernelIsM(M,H,IX))
+    {
+      sectionBasisCheckTrivializationExceptKernel(M,H,1,IX);
+      return(list(H,poly(1),candidateShifts[j]));
+    }
+  }
+
+  int commonShift=candidateShifts[1];
+  for (j=2; j<=candidateCount; j++)
+  {
+    commonShift=max(commonShift,candidateShifts[j]);
+  }
+
+  module OX=IX;
+  attrib(OX,"isHomog",intvec(0));
+  list normalizedImages;
+  int normalizedCount=0;
+  poly factor;
+  for (j=1; j<=candidateCount; j++)
+  {
+    factor=sectionBasisTrivializationRegularFactor(
+             M,OX,commonShift-candidateShifts[j]);
+    if (factor!=0)
+    {
+      Hj=candidateImages[j];
+      H=ideal(0);
+      for (i=1; i<=r; i++) { H[i]=factor*Hj[i]; }
+      normalizedCount++;
+      normalizedImages[normalizedCount]=H;
+    }
+  }
+  if (normalizedCount==0)
+  {
+    ERROR("could not homogenize the dual generators with regular factors; pass an explicit trivialization");
+  }
+
+  // On reducible support, combine generators which cover different
+  // components.  All summands have the same shift at this point.
+  int t;
+  for (t=0; t<=8; t++)
+  {
+    H=ideal(0);
+    for (i=1; i<=r; i++)
+    {
+      H[i]=0;
+      for (j=1; j<=normalizedCount; j++)
+      {
+        Hj=normalizedImages[j];
+        H[i]=H[i]+(1+t*(j-1))*Hj[i];
+      }
+    }
+    if (sectionBasisTrivializationKernelIsM(M,H,IX))
+    {
+      sectionBasisCheckTrivializationExceptKernel(M,H,1,IX);
+      return(list(H,poly(1),commonShift));
+    }
+  }
+
+  ERROR("could not choose a generically injective homogeneous functional; pass an explicit trivialization");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  rankOneTrivialization(M,ideal(0));
+}
+
+// Return one nonzero vector in the right kernel of a constant matrix using
+// Singular's generic exact module kernel.  This path is deliberately
+// separate from SpaSM: neither backend silently substitutes for the other.
+static proc sectionBasisFirstRightKernelVectorGeneric(matrix A)
+{
+  module zeroModule=0;
+  module kernelModule=modulo(module(A),std(zeroModule));
+  if (size(kernelModule)==0) { return(list(0)); }
+  matrix kernelMatrix=matrix(kernelModule);
+  if ((nrows(kernelMatrix)!=ncols(A)) || (ncols(kernelMatrix)<1))
+  {
+    ERROR("internal error: the generic constant-kernel backend returned an incompatible vector");
+  }
+  matrix kernelVector[ncols(A)][1];
+  kernelVector[1..ncols(A),1]=kernelMatrix[1..ncols(A),1];
+  if (deg(kernelVector)>0)
+  {
+    ERROR("internal error: a constant relation matrix has a nonconstant kernel vector");
+  }
+  return(list(1,kernelVector));
+}
+
+static proc sectionBasisRequireSpaSM()
+{
+  // Load for an explicit request or a preselected automatic SpaSM route.
+  // The explicit Linear commands never probe the optional module.
+  if (!defined(spasm_first_kernel_vector))
+  {
+    load("sispasm.so","try");
+  }
+  // Keep these guards separate: Boolean operators are eager in Singular.
+  if (!defined(spasm_supports_current_ring))
+  {
+    ERROR("SpaSM kernel requested, but the sispasm module is not available");
+  }
+  if (!defined(spasm_first_kernel_vector))
+  {
+    ERROR("SpaSM kernel requested, but the sispasm module is not available");
+  }
+  if (!spasm_supports_current_ring())
+  {
+    ERROR("SpaSM kernel requested, but the current coefficient field is unsupported");
+  }
+}
+
+// Require, and then use, the sparse SpaSM kernel.  A request for SpaSM is a
+// strict backend choice: absence of the module or an unsupported coefficient
+// field is an error, never a reason to run a different algorithm.
+static proc sectionBasisFirstRightKernelVectorSpaSM(matrix A)
+{
+  sectionBasisRequireSpaSM();
+  module kernelModule=spasm_first_kernel_vector(module(A));
+  if (size(kernelModule)==0) { return(list(0)); }
+  matrix kernelMatrix=matrix(kernelModule);
+  if ((nrows(kernelMatrix)!=ncols(A)) || (ncols(kernelMatrix)<1))
+  {
+    ERROR("internal error: the SpaSM constant-kernel backend returned an incompatible vector");
+  }
+  matrix kernelVector[ncols(A)][1];
+  kernelVector[1..ncols(A),1]=kernelMatrix[1..ncols(A),1];
+  if (deg(kernelVector)>0)
+  {
+    ERROR("internal error: a constant relation matrix has a nonconstant kernel vector");
+  }
+  return(list(1,kernelVector));
+}
+
+// Polynomial-ring core for rankOneTrivializationLinear.  If the generator
+// degrees are w_i and the nonzero relation-column degrees are c_j, a
+// nonzero maximal minor gives a functional in degree
+//   sum(selected c_j)-sum(w_i).
+// Consequently the sum of the largest r-1 relation degrees minus sum(w_i)
+// is a finite upper bound because it is at least the degree of any nonzero
+// maximal-minor functional. Starting at -max(w_i) skips precisely the shifts
+// at which every possible image degree is negative.
+static proc sectionBasisRankOneTrivializationLinearPolynomial(module M,
+                                                               ideal IX,
+                                                               int useSpaSM)
+{
+  int generatorCount=nrows(M);
+  intvec weights=attrib(M,"isHomog");
+  ideal GIX=std(IX);
+  module supportRelations=IX*freemodule(generatorCount);
+  module GsupportRelations=std(supportRelations);
+  module reducedPresentation=reduce(M,GsupportRelations);
+  attrib(reducedPresentation,"isHomog",weights);
+  if (!homog(reducedPresentation))
+  {
+    ERROR("the presentation must be homogeneous for the assigned generator degrees");
+  }
+
+  // Drop relations which vanish on the support and determine the degree of
+  // every remaining homogeneous relation column.
+  module relations;
+  intvec relationDegrees;
+  int relationCount=0;
+  int i,j,relationDegree,leadComponent;
+  vector relation;
+  int presentationColumnCount=ncols(matrix(reducedPresentation));
+  for (j=1; j<=presentationColumnCount; j++)
+  {
+    relation=reducedPresentation[j];
+    if (relation!=0)
+    {
+      leadComponent=leadexp(relation)[nvars(basering)+1];
+      relationDegree=deg(lead(relation))+weights[leadComponent];
+      relationCount++;
+      relations[relationCount]=relation;
+      relationDegrees[relationCount]=relationDegree;
+    }
+  }
+
+  // Over an integral support, a one-generator generically rank-one sheaf has
+  // no generically nonzero relation. Its unit functional is homogeneous.
+  if (generatorCount==1)
+  {
+    if (relationCount!=0)
+    {
+      ERROR("the presentation is not generically of rank one on the integral support");
+    }
+    return(list(ideal(1),poly(1),-weights[1]));
+  }
+  if (relationCount<generatorCount-1)
+  {
+    ERROR("too few nonzero relations for a generically rank-one presentation");
+  }
+
+  int weightSum=0;
+  int maxWeight=weights[1];
+  for (i=1; i<=generatorCount; i++)
+  {
+    weightSum=weightSum+weights[i];
+    maxWeight=max(maxWeight,weights[i]);
+  }
+  int firstShift=-maxWeight;
+
+  // Select the largest r-1 relation degrees without invoking polynomial
+  // sorting.  This is only the theorem-backed termination bound; the linear
+  // systems are tried from the smallest possible shift upwards.
+  intvec degreeUsed;
+  degreeUsed[relationCount]=0;
+  int selected,bestIndex,bestDegree,found;
+  int lastShift=-weightSum;
+  for (selected=1; selected<=generatorCount-1; selected++)
+  {
+    found=0;
+    bestIndex=0;
+    for (j=1; j<=relationCount; j++)
+    {
+      if (!degreeUsed[j])
+      {
+        if (!found)
+        {
+          bestIndex=j;
+          bestDegree=relationDegrees[j];
+          found=1;
+        }
+        else
+        {
+          if (relationDegrees[j]>bestDegree)
+          {
+            bestIndex=j;
+            bestDegree=relationDegrees[j];
+          }
+        }
+      }
+    }
+    if (!found)
+    {
+      ERROR("could not form the determinantal degree bound");
+    }
+    degreeUsed[bestIndex]=1;
+    lastShift=lastShift+bestDegree;
+  }
+  if (lastShift<firstShift)
+  {
+    ERROR("the determinantal degree bound is incompatible with a rank-one presentation");
+  }
+
+  module targetRelations=IX*freemodule(relationCount);
+  module GtargetRelations=std(targetRelations);
+  poly allVariables=sectionBasisProductOfVariables();
+  matrix relationMatrix[generatorCount][relationCount];
+  matrix compactRelationMatrix=matrix(relations);
+  relationMatrix[1..nrows(compactRelationMatrix),
+                 1..ncols(compactRelationMatrix)]=compactRelationMatrix;
+
+  // Quotient bases persist across shifts: each degree of A=R/IX is computed
+  // by kbase at most once.
+  list quotientPieceCache;
+  intvec quotientPieceKnown;
+  int shift,pieceDegree,cacheIndex;
+  ideal degreeBasis;
+  module domainBasis,targetBasis,products,dualImage;
+  matrix productMatrix,equations,kernelVector,compactDomainMatrix,
+         domainMatrix,firstCoordinate,trailingProductRows;
+  list kernelResult;
+  int targetRowCount;
+  ideal images;
+  for (shift=firstShift; shift<=lastShift; shift++)
+  {
+    domainBasis=0;
+    for (i=1; i<=generatorCount; i++)
+    {
+      pieceDegree=shift+weights[i];
+      if (pieceDegree>=0)
+      {
+        cacheIndex=pieceDegree+1;
+        if (size(quotientPieceKnown)<cacheIndex)
+        {
+          quotientPieceKnown[cacheIndex]=0;
+        }
+        if (!quotientPieceKnown[cacheIndex])
+        {
+          quotientPieceCache[cacheIndex]=kbase(GIX,pieceDegree);
+          quotientPieceKnown[cacheIndex]=1;
+        }
+        degreeBasis=quotientPieceCache[cacheIndex];
+        domainBasis=domainBasis+degreeBasis*gen(i);
+      }
+    }
+    if (size(domainBasis)==0) { continue; }
+
+    targetBasis=0;
+    for (j=1; j<=relationCount; j++)
+    {
+      pieceDegree=shift+relationDegrees[j];
+      if (pieceDegree>=0)
+      {
+        cacheIndex=pieceDegree+1;
+        if (size(quotientPieceKnown)<cacheIndex)
+        {
+          quotientPieceKnown[cacheIndex]=0;
+        }
+        if (!quotientPieceKnown[cacheIndex])
+        {
+          quotientPieceCache[cacheIndex]=kbase(GIX,pieceDegree);
+          quotientPieceKnown[cacheIndex]=1;
+        }
+        degreeBasis=quotientPieceCache[cacheIndex];
+        targetBasis=targetBasis+degreeBasis*gen(j);
+      }
+    }
+
+    domainMatrix=matrix(0,generatorCount,size(domainBasis));
+    compactDomainMatrix=matrix(domainBasis);
+    domainMatrix[1..nrows(compactDomainMatrix),
+                 1..ncols(compactDomainMatrix)]=compactDomainMatrix;
+    products=module(transpose(relationMatrix)*domainMatrix);
+    products=reduce(products,GtargetRelations);
+    if (size(targetBasis)==0)
+    {
+      if (size(products)!=0)
+      {
+        ERROR("internal error: the relation image has an unexpected degree");
+      }
+      firstCoordinate=matrix(0,size(domainBasis),1);
+      firstCoordinate[1,1]=1;
+      kernelResult=list(1,firstCoordinate);
+    }
+    else
+    {
+      // targetBasis can omit trailing zero rows belonging to negative graded
+      // pieces.  Their product rows must be zero; trim them before coeffs.
+      targetRowCount=nrows(targetBasis);
+      productMatrix=matrix(products);
+      if (nrows(productMatrix)>targetRowCount)
+      {
+        trailingProductRows=
+          productMatrix[targetRowCount+1..nrows(productMatrix),
+                        1..ncols(productMatrix)];
+        if (deg(trailingProductRows)>=0)
+        {
+          ERROR("internal error: a relation product lies outside its homogeneous target piece");
+        }
+        productMatrix=productMatrix[1..targetRowCount,
+                                    1..ncols(productMatrix)];
+        products=module(productMatrix);
+      }
+      equations=coeffs(products,targetBasis,allVariables);
+      if (deg(equations)>0)
+      {
+        ERROR("internal error: the homogeneous relation matrix is not constant");
+      }
+      if (useSpaSM)
+      {
+        kernelResult=sectionBasisFirstRightKernelVectorSpaSM(equations);
+      }
+      else
+      {
+        kernelResult=sectionBasisFirstRightKernelVectorGeneric(equations);
+      }
+    }
+
+    if (kernelResult[1])
+    {
+      kernelVector=kernelResult[2];
+      dualImage=module(domainMatrix*kernelVector);
+      images=ideal(0);
+      for (i=1; i<=generatorCount; i++)
+      {
+        images[i]=dualImage[1][i];
+      }
+      return(list(images,poly(1),shift));
+    }
+  }
+
+  ERROR("no homogeneous functional was found by the determinantal degree bound; check the integral rank-one assumptions");
+}
+
+static proc sectionBasisRankOneTrivializationLinear(module M,ideal IX,
+                                                     int useSpaSM)
+{
+  if (!homog(IX)) { ERROR("the support ideal must be homogeneous"); }
+  if (typeof(attrib(M,"isHomog"))!="intvec")
+  {
+    if (size(M)==0)
+    {
+      intvec zeroWeights;
+      zeroWeights[nrows(M)]=0;
+      attrib(M,"isHomog",zeroWeights);
+    }
+    else
+    {
+      ERROR("No admissible degree vector assigned");
+    }
+  }
+  int generatorCount=nrows(M);
+  intvec weights=attrib(M,"isHomog");
+  if (size(weights)!=generatorCount)
+  {
+    ERROR("the degree vector must have one entry per presentation generator");
+  }
+  if (size(M)==0)
+  {
+    if (generatorCount!=1)
+    {
+      ERROR("a free presentation is generically rank one only with one generator");
+    }
+    return(list(ideal(1),poly(1),-weights[1]));
+  }
+
+  // coeffs in a qring can lose ambient monomials when a coordinate variable
+  // is zero.  Lift both the presentation and the supplied support equations
+  // to the ambient polynomial ring, solve there, and map the frame back.
+  list RL=ringlist(basering);
+  if (RL[4]!=0)
+  {
+    def Q=basering;
+    ideal quotientIdealQ=RL[4];
+    RL[4]=ideal(0);
+    def S=ring(RL);
+    setring S;
+    module MS=imap(Q,M);
+    ideal IXS=imap(Q,quotientIdealQ)+imap(Q,IX);
+    attrib(MS,"isHomog",weights);
+    list TS=sectionBasisRankOneTrivializationLinearPolynomial(MS,IXS,
+                                                              useSpaSM);
+    setring Q;
+    def TQ=imap(S,TS);
+    return(TQ);
+  }
+  return(sectionBasisRankOneTrivializationLinearPolynomial(M,IX,useSpaSM));
+}
+
+proc rankOneTrivializationLinear(module M,ideal IX)
+"USAGE:   rankOneTrivializationLinear(M,I); M module, I ideal
+ASSUME:   I defines a nonempty integral homogeneous support in projective
+         space, the sheafification of coker(M) is torsion-free and generically
+         of rank one, and M has its row degrees assigned as isHomog.
+RETURN:   list T. T[1] contains one homogeneous image for each presentation
+         generator, T[2] is the common denominator 1, and T[3] is the common
+         grading shift.
+NOTE:     This alternative to rankOneTrivialization uses only finite linear
+         algebra. At shift t it computes the kernel of the transpose of the
+         presentation on finite homogeneous pieces. Quotient bases are cached
+         by degree, and all products are reduced and scalarized in bulk.
+         Constant nullspaces are computed by Singular's exact generic module
+         kernel. This procedure never dispatches to SpaSM; use
+         rankOneTrivializationSpaSM to request that backend explicitly.
+         The scan stops at its first nonzero kernel and has a finite
+         determinantal upper bound. No Hom module or saturation certificate is
+         computed; the stated input assumptions are not checked.
+SEE ALSO: rankOneTrivializationSpaSM, rankOneTrivialization,
+          rankOneSheafLinear, rankOneSheafSectionBasisLinear
+EXAMPLE: example rankOneTrivializationLinear; shows an example
+"
+{
+  return(sectionBasisRankOneTrivializationLinear(M,IX,0));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  // e2=x*e1 presents O(1). Find its first nonzero dual slice.
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  rankOneTrivializationLinear(M,ideal(0));
+}
+
+proc rankOneTrivializationSpaSM(module M,ideal IX)
+"USAGE:   rankOneTrivializationSpaSM(M,I); M module, I ideal
+ASSUME:   The assumptions of rankOneTrivializationLinear hold, the sispasm
+         module is available, and the coefficient field is supported by SpaSM.
+RETURN:   A homogeneous rational frame in the same format as
+         rankOneTrivializationLinear.
+NOTE:     This is the strict SpaSM backend for the finite graded-slice scan.
+         It errors if SpaSM is unavailable or the coefficient field is
+         unsupported; it never substitutes Singular's generic module kernel.
+SEE ALSO: rankOneTrivializationLinear, rankOneSheafSpaSM,
+          rankOneSheafSectionBasisSpaSM
+EXAMPLE: example rankOneTrivializationSpaSM; shows an example
+"
+{
+  // Preflight before any free or one-generator shortcut.
+  sectionBasisRequireSpaSM();
+  return(sectionBasisRankOneTrivializationLinear(M,IX,1));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  load("sispasm.so","try");
+  if (defined(spasm_first_kernel_vector))
+  {
+    rankOneTrivializationSpaSM(M,ideal(0));
+  }
+}
+
+// Assemble the cache only after the frame has been validated by its
+// constructor.  All trusted section routines require frameValidated=1.
+static proc sectionBasisMakeRankOneSheaf(module M,ideal IX,list T)
+{
+  RankOneSheaf F;
+  F.over=basering;
+  F.presentation=M;
+  F.supportIdeal=IX;
+  F.trivializationImages=T[1];
+  F.trivializationDenom=T[2];
+  F.trivializationShift=T[3];
+  F.frameValidated=1;
+  return(F);
+}
+
+proc rankOneSheaf(def data,list #)
+"USAGE:   rankOneSheaf(M,I); M module, I ideal
+         rankOneSheaf(M,I,h,f); h ideal, f poly
+         rankOneSheaf(D); D divisor (after loading divisors.lib)
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         whose associated sheaf is torsion-free and generically of rank one,
+         and M has its row degrees assigned as isHomog. In the explicit form,
+         h[i]/f is a homogeneous rational trivialization of its generators.
+RETURN:   RankOneSheaf F containing M, I, and one validated rational frame.
+NOTE:     The two-argument module form discovers the frame once with
+         rankOneTrivialization: SpaSM is selected automatically on certified
+         integral support when available and applicable; otherwise the
+         original graded-dual method is selected. All frame checks are kept,
+         and a selected SpaSM computation is never retried with another method.
+         The four-argument form validates the supplied frame once. Section
+         computations from F reuse this cache for every twist and do not
+         repeat frame recovery or the frame saturation checks.
+         Do not modify the frame fields of F after construction.
+         When divisors.lib is loaded, rankOneSheaf(D) delegates to its
+         divisor-to-fractional-ideal constructor and retains the canonical
+         frame produced there.
+SEE ALSO: lineBundle, rankOneTrivialization, rankOneSheafSectionBasis,
+          rankOneSheafSectionBasisDirect
+EXAMPLE: example rankOneSheaf; shows an example
+"
+{
+  if (typeof(data)=="divisor")
+  {
+    if (size(#)!=0) { ERROR("rankOneSheaf(D) expects no further arguments"); }
+    if (!defined(rankOneSheafFromDivisor))
+    {
+      ERROR("load divisors.lib before calling rankOneSheaf(D)");
+    }
+    return(rankOneSheafFromDivisor(data));
+  }
+  if (typeof(data)!="module")
+  {
+    ERROR("expected a module or a divisor");
+  }
+  if ((size(#)!=1) && (size(#)!=3))
+  {
+    ERROR("expected rankOneSheaf(M,I) or rankOneSheaf(M,I,h,f)");
+  }
+  if (typeof(#[1])!="ideal") { ERROR("the support must be an ideal"); }
+  module M=data;
+  ideal IX=#[1];
+  // Preserve the grading normalized by the frame routines in the cached
+  // presentation, including the zero presentation of a free rank-one sheaf.
+  if ((typeof(attrib(M,"isHomog"))!="intvec") && (size(M)==0))
+  {
+    intvec zeroWeights;
+    zeroWeights[nrows(M)]=0;
+    attrib(M,"isHomog",zeroWeights);
+  }
+
+  list T;
+  if (size(#)==1)
+  {
+    T=rankOneTrivialization(M,IX);
+  }
+  else
+  {
+    if (typeof(#[2])!="ideal")
+    {
+      ERROR("the trivialization images must be an ideal");
+    }
+    if ((typeof(#[3])!="poly") && (typeof(#[3])!="int") &&
+        (typeof(#[3])!="number"))
+    {
+      ERROR("the trivialization denominator must be a polynomial");
+    }
+    ideal images=#[2];
+    poly f=#[3];
+    sectionBasisCheckTrivialization(M,images,f,IX);
+    int shift=sectionBasisCheckedTrivializationShift(M,images,f);
+    T=list(images,f,shift);
+  }
+  RankOneSheaf F=sectionBasisMakeRankOneSheaf(M,IX,T);
+  return(F);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  RankOneSheaf F=rankOneSheaf(M,ideal(0));
+  // The cached frame is reused for arbitrary twists:
+  rankOneSheafSectionBasis(F,0);
+  rankOneSheafSectionBasis(F,2);
+}
+
+proc rankOneSheafLinear(module M,ideal IX)
+"USAGE:   rankOneSheafLinear(M,I); M module, I ideal
+ASSUME:   I defines a nonempty integral homogeneous support, the sheafification
+         of coker(M) is torsion-free and generically of rank one, and M has its
+         row degrees assigned as isHomog.
+RETURN:   RankOneSheaf F containing M, I, and a cached homogeneous rational
+         frame found by finite-dimensional linear algebra.
+NOTE:     This constructor calls rankOneTrivializationLinear once. Subsequent
+         section computations from F reuse the frame for every twist. It
+         computes neither a graded Hom module nor a saturation-based
+         injectivity certificate. Unlike the automatic rankOneSheaf(M,I), it
+         never probes SpaSM or tests support integrality. Correctness therefore
+         relies on the integral-support, torsion-free, and rank-one input
+         assumptions, which are not checked by this procedure. Its constant
+         nullspaces always use Singular's generic module kernel; use
+         rankOneSheafSpaSM to request the strict SpaSM backend.
+SEE ALSO: rankOneSheafSpaSM, lineBundleLinear, rankOneSheaf,
+          rankOneTrivializationLinear,
+          rankOneSheafSectionBasisLinear, rankOneSheafSectionBasis,
+          rankOneSheafSectionBasisDirect
+EXAMPLE: example rankOneSheafLinear; shows an example
+"
+{
+  // Keep the normalized grading in the cached copy as rankOneSheaf does.
+  // Attribute changes made in rankOneTrivializationLinear's local argument
+  // would otherwise not be visible on this constructor's presentation.
+  if ((typeof(attrib(M,"isHomog"))!="intvec") && (size(M)==0))
+  {
+    intvec zeroWeights;
+    zeroWeights[nrows(M)]=0;
+    attrib(M,"isHomog",zeroWeights);
+  }
+  list T=rankOneTrivializationLinear(M,IX);
+  RankOneSheaf F=sectionBasisMakeRankOneSheaf(M,IX,T);
+  return(F);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  RankOneSheaf F=rankOneSheafLinear(M,ideal(0));
+  rankOneSheafSectionBasis(F,0);
+  rankOneSheafSectionBasis(F,1);
+}
+
+proc rankOneSheafSpaSM(module M,ideal IX)
+"USAGE:   rankOneSheafSpaSM(M,I); M module, I ideal
+ASSUME:   The assumptions of rankOneSheafLinear hold, the sispasm module is
+         available, and the coefficient field is supported by SpaSM.
+RETURN:   RankOneSheaf containing a frame recovered by strict exact SpaSM
+         nullspaces.
+NOTE:     SpaSM is preflighted before any shortcut. The procedure errors if
+         that backend cannot be used and never substitutes a generic kernel.
+SEE ALSO: lineBundleSpaSM, rankOneSheafLinear,
+          rankOneTrivializationSpaSM, rankOneSheafSectionBasisSpaSM
+EXAMPLE: example rankOneSheafSpaSM; shows an example
+"
+{
+  if ((typeof(attrib(M,"isHomog"))!="intvec") && (size(M)==0))
+  {
+    intvec zeroWeights;
+    zeroWeights[nrows(M)]=0;
+    attrib(M,"isHomog",zeroWeights);
+  }
+  list T=rankOneTrivializationSpaSM(M,IX);
+  RankOneSheaf F=sectionBasisMakeRankOneSheaf(M,IX,T);
+  return(F);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  load("sispasm.so","try");
+  if (defined(spasm_first_kernel_vector))
+  {
+    RankOneSheaf F=rankOneSheafSpaSM(M,ideal(0));
+    rankOneSheafSectionBasis(F,0);
+  }
+}
+
+proc lineBundleLinear(module M,ideal IX)
+"USAGE:   lineBundleLinear(M,I); M module, I ideal
+ASSUME:   I defines a nonempty integral homogeneous support and the
+         sheafification of coker(M) is a line bundle there.
+RETURN:   RankOneSheaf containing the frame computed by
+         rankOneTrivializationLinear.
+NOTE:     This is the line-bundle name for rankOneSheafLinear. Local freeness
+         is an input assumption and is not tested separately.
+SEE ALSO: rankOneSheafLinear, lineBundle, rankOneTrivializationLinear,
+          lineBundleSectionBasisLinear, lineBundleSectionBasis,
+          lineBundleSectionBasisDirect
+EXAMPLE: example lineBundleLinear; shows an example
+"
+{
+  return(rankOneSheafLinear(M,IX));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  RankOneSheaf L=lineBundleLinear(O,ideal(0));
+  lineBundleSectionBasis(L,2);
+}
+
+proc lineBundleSpaSM(module M,ideal IX)
+"USAGE:   lineBundleSpaSM(M,I); M module, I ideal
+RETURN:   The RankOneSheaf returned by rankOneSheafSpaSM(M,I).
+NOTE:     This is the line-bundle name for the strict SpaSM constructor.
+         Local freeness is an input assumption and is not tested separately.
+SEE ALSO: rankOneSheafSpaSM, lineBundleLinear,
+          lineBundleSectionBasisSpaSM
+EXAMPLE: example lineBundleSpaSM; shows an example
+"
+{
+  return(rankOneSheafSpaSM(M,IX));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  load("sispasm.so","try");
+  if (defined(spasm_first_kernel_vector))
+  {
+    RankOneSheaf L=lineBundleSpaSM(O,ideal(0));
+    lineBundleSectionBasis(L,2);
+  }
+}
+
+proc lineBundle(def data,list #)
+"USAGE:   lineBundle(M,I); M module, I ideal
+         lineBundle(M,I,h,f); h ideal, f poly
+         lineBundle(D); D divisor (after loading divisors.lib)
+RETURN:   RankOneSheaf containing a cached validated rational frame.
+NOTE:     This is the line-bundle name for rankOneSheaf. Local freeness is an
+         input assumption and is not tested separately. The returned object
+         can be used for any twist without rediscovering its frame. The
+         two-argument module form uses the same automatic SpaSM-or-graded-dual
+         frame selection and full frame validation as rankOneSheaf.
+SEE ALSO: rankOneSheaf, lineBundleSectionBasis,
+          lineBundleSectionBasisDirect
+EXAMPLE: example lineBundle; shows an example
+"
+{
+  if (typeof(data)=="divisor")
+  {
+    if (size(#)!=0) { ERROR("lineBundle(D) expects no further arguments"); }
+    if (!defined(lineBundleFromDivisor))
+    {
+      ERROR("load divisors.lib before calling lineBundle(D)");
+    }
+    return(lineBundleFromDivisor(data));
+  }
+  if (size(#)==1) { return(rankOneSheaf(data,#[1])); }
+  if (size(#)==3) { return(rankOneSheaf(data,#[1],#[2],#[3])); }
+  ERROR("expected lineBundle(M,I), lineBundle(M,I,h,f), or lineBundle(D)");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  RankOneSheaf L=lineBundle(O,ideal(0));
+  lineBundleSectionBasis(L,2);
+}
+
+// Scalarize a multiplication-table basis after rankOneTrivialization has
+// already checked the frame. Generic injectivity of that frame makes its map
+// on H^0 injective, so do not repeat the public routine's frame checks or
+// scalar-independence computation here.
+static proc sectionBasisTrustedTrivializedBasis(module M,int d,
+                                                 ideal images,poly f,list #)
+{
+  list B;
+  if (size(#)==0) { B=sheafSectionBasis(M,d); }
+  if (size(#)==1) { B=sheafSectionBasis(M,d,#[1]); }
+  if (size(#)==2) { B=sheafSectionBasis(M,d,#[1],#[2]); }
+  if (size(#)==3) { B=sheafSectionBasis(M,d,#[1],#[2],#[3]); }
+
+  ideal H;
+  if (size(B[1])>0)
+  {
+    // A module drops trailing rows which are identically zero. Restore them
+    // before multiplying all section vectors by the checked frame at once.
+    matrix sectionVectors=matrix(B[1]);
+    if (nrows(sectionVectors)>nrows(M))
+    {
+      ERROR("internal error: section vectors exceed the checked frame rank");
+    }
+    matrix paddedVectors[nrows(M)][size(B[1])];
+    paddedVectors[1..nrows(sectionVectors),1..ncols(sectionVectors)]=
+      sectionVectors;
+    H=ideal(matrix(images)*paddedVectors);
+  }
+  return(list(H,f*B[2],B[3]));
+}
+
+proc trivializedSectionBasis(module M,int d,ideal images,poly f,ideal IX,
+                             list #)
+"USAGE:   trivializedSectionBasis(M,d,h,f,I[,s,g,v]); M module, d,s int,
+         h,I ideal, f,g poly, v int
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M).
+         The entries h[i]/f give a homogeneous rational trivialization of
+         its generators, and coker(M) is generically of rank one.
+RETURN:   list L. L[1] is an ideal of scalar section numerators, L[2] is
+         their common denominator f*g, and L[3] is the tail degree.
+         The entries of L[1] are homogeneous coordinates for the associated
+         rational map; the common denominator cancels projectively.
+NOTE:     The procedure verifies support, grading, presentation relations,
+         generic injectivity on every support component, denominator
+         regularity, and independence of the scalarized basis.
+         The optional arguments are passed to sheafSectionBasis.
+SEE ALSO: sheafSectionBasis, rationalMapFromSections
+EXAMPLE: example trivializedSectionBasis; shows an example
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most tail degree, denominator, and verification flag");
+  }
+  sectionBasisCheckTrivialization(M,images,f,IX);
+
+  list B;
+  if (size(#)==0) { B=sheafSectionBasis(M,d); }
+  if (size(#)==1) { B=sheafSectionBasis(M,d,#[1]); }
+  if (size(#)==2) { B=sheafSectionBasis(M,d,#[1],#[2]); }
+  if (size(#)==3) { B=sheafSectionBasis(M,d,#[1],#[2],#[3]); }
+
+  module N=B[1];
+  ideal H;
+  int i,j;
+  int first=1;
+  int commonDegree;
+  poly h;
+  ideal GIX=std(IX);
+  for (j=1; j<=size(N); j++)
+  {
+    h=0;
+    for (i=1; i<=nrows(M); i++)
+    {
+      h=h+N[j][i]*images[i];
+    }
+    if ((h==0) || (!homog(h)) || (reduce(h,GIX)==0))
+    {
+      ERROR("a scalarized section is zero on the support or nonhomogeneous");
+    }
+    if (first)
+    {
+      commonDegree=deg(h);
+      first=0;
+    }
+    else
+    {
+      if (deg(h)!=commonDegree)
+      {
+        ERROR("the scalarized section numerators have different degrees");
+      }
+    }
+    H[j]=h;
+  }
+
+  // A rational trivialization must preserve linear independence of H^0.
+  if (size(H)>0)
+  {
+    module IXmodule=IX;
+    attrib(IXmodule,"isHomog",intvec(0));
+    module GIXmodule=std(IXmodule);
+    module degreeBasis=sectionBasisGradedPiece(GIXmodule,intvec(0),
+                                               commonDegree);
+    module reducedH=reduce(module(H),GIXmodule);
+    matrix coordinates=coeffs(reducedH,degreeBasis,
+                              sectionBasisProductOfVariables());
+    if (rank(coordinates)!=size(H))
+    {
+      ERROR("the supplied trivialization does not inject the computed section space");
+    }
+  }
+  return(list(H,f*B[2],B[3]));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  // e2=x*e1 presents O(1), with generator images 1 and x:
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  trivializedSectionBasis(M,0,ideal(1,x),1,ideal(0));
+}
+
+// Extract the grading shift of a frame which has already passed
+// sectionBasisCheckTrivialization.
+static proc sectionBasisCheckedTrivializationShift(module M,ideal images,
+                                                    poly f)
+{
+  intvec weights=attrib(M,"isHomog");
+  int i;
+  for (i=1; i<=nrows(M); i++)
+  {
+    if (images[i]!=0)
+    {
+      return(deg(images[i])-deg(f)-weights[i]);
+    }
+  }
+  ERROR("internal error: a checked trivialization has no nonzero image");
+}
+
+// Compute one homogeneous piece of the irrelevant saturation of the image
+// ideal.  This saturates the actual image sheaf; it deliberately does not
+// purify the ideal or take a reflexive hull.
+static proc sectionBasisDirectSlice(ideal images,ideal IX,int e)
+{
+  ideal H;
+  if (e<0) { return(H); }
+
+  ideal J=sat(images+IX,maxideal(1));
+  H=jet(intersect(J,maxideal(e)),e);
+  // Over a qring, ambient defining equations are represented by zero.  The
+  // reduction removes those entries before minbase tests linear dependence.
+  H=reduce(H,std(IX));
+  H=simplify(H,2);
+  H=minbase(H);
+  return(H);
+}
+
+// The unchecked body is used only after the public checker, or after
+// rankOneTrivialization has returned a frame which it checked itself.
+static proc sectionBasisTrivializedDirectUnchecked(module M,int d,
+                                                    ideal images,poly f,
+                                                    ideal IX,int shift)
+{
+  int sliceDegree=deg(f)+d+shift;
+  ideal H=sectionBasisDirectSlice(images,IX,sliceDegree);
+  return(list(H,f,sliceDegree));
+}
+
+proc trivializedSectionBasisDirect(module M,int d,ideal images,poly f,
+                                   ideal IX)
+"USAGE:   trivializedSectionBasisDirect(M,d,h,f,I); M module, d int,
+         h,I ideal, f poly
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         which has depth at least two at the irrelevant ideal. The entries
+         h[i]/f give a homogeneous rational trivialization of its generators,
+         and coker(M) is torsion-free and generically of rank one.
+RETURN:   list L. L[1] is an ideal of scalar section numerators, L[2] is
+         their common denominator f, and L[3] is the homogeneous degree used
+         for the direct slice. The fractions L[1][i]/L[2] form a basis of
+         H^0(sheaf(coker(M))(d)).
+NOTE:     The supplied frame is checked for grading, support, presentation
+         relations, denominator regularity, and generic injectivity on every
+         support component. If its grading shift is t, the procedure returns
+         the degree deg(f)+d+t part of
+           sat((h[1],...,h[r])+I, irrelevant ideal) / I.
+         A negative requested degree gives the empty section space. Only
+         irrelevant saturation is used: the sheaf is not purified or
+         replaced by its reflexive hull, so non-locally-free rank-one
+         torsion-free sheaves are preserved.
+SEE ALSO: rankOneSheafSectionBasisDirect, lineBundleSectionBasisDirect,
+          trivializedSectionBasis, rationalMapFromSections
+EXAMPLE: example trivializedSectionBasisDirect; shows an example
+"
+{
+  sectionBasisCheckTrivialization(M,images,f,IX);
+  int shift=sectionBasisCheckedTrivializationShift(M,images,f);
+  list B=sectionBasisTrivializedDirectUnchecked(M,d,images,f,IX,shift);
+  return(B);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  // e2=x*e1 presents O(1); the direct slice is the space of linear forms.
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  trivializedSectionBasisDirect(M,0,ideal(1,x),1,ideal(0));
+}
+
+// Build the typed direct section space after rankOneTrivialization has
+// already validated the chosen frame.  In particular, do not repeat the
+// generic-injectivity and presentation checks here.
+static proc sectionBasisDirectSpace(module M,int d,ideal IX,list T)
+{
+  list B=sectionBasisTrivializedDirectUnchecked(M,d,T[1],T[2],IX,T[3]);
+  SectionSpace V;
+  V.over=basering;
+  V.presentation=M;
+  V.supportIdeal=IX;
+  V.basis=B[1];
+  V.denom=B[2];
+  V.trivializationImages=T[1];
+  V.trivializationDenom=T[2];
+  V.twist=d;
+  V.trivializationShift=T[3];
+  // Direct saturation has no multiplication tail. Retain its slice degree
+  // in the existing diagnostic field so the computation remains inspectable.
+  V.tailDegree=B[3];
+  return(V);
+}
+
+proc rankOneSheafSectionBasisDirect(def data,int d,list #)
+"USAGE:   rankOneSheafSectionBasisDirect(M,d,I); M module, d int, I ideal
+         rankOneSheafSectionBasisDirect(F,d); F RankOneSheaf
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         which has depth at least two at the irrelevant ideal. Its associated
+         sheaf is torsion-free and generically of rank one, and M has its row
+         degrees assigned as isHomog.
+RETURN:   SectionSpace V. The entries V[i] are Section objects forming a
+         basis of global sections of the twist d, represented by
+         V.basis[i]/V.denom. V.tailDegree stores the direct slice degree.
+NOTE:     The procedure chooses and validates a homogeneous rational frame,
+         then computes the required homogeneous piece of its saturated image
+         ideal. It applies to line bundles and also to rank-one torsion-free
+         sheaves which are not locally free. It neither purifies the image
+         ideal nor takes a reflexive hull. Frame recovery for module input
+         follows the automatic backend selection of rankOneTrivialization.
+         For a RankOneSheaf, the cached frame is used directly, so neither
+         frame recovery nor frame validation is repeated. Any integer twist
+         d may be requested from the same F.
+SEE ALSO: lineBundleSectionBasisDirect, trivializedSectionBasisDirect,
+          rankOneTrivialization, rankOneSheafSectionBasis, sectionBasis,
+          rationalMapFromSections
+EXAMPLE: example rankOneSheafSectionBasisDirect; shows an example
+"
+{
+  module M;
+  ideal IX;
+  list T;
+  if (typeof(data)=="RankOneSheaf")
+  {
+    if (size(#)!=0)
+    {
+      ERROR("rankOneSheafSectionBasisDirect(F,d) expects no support ideal");
+    }
+    RankOneSheaf F=data;
+    sectionBasisRequireCachedFrame(F);
+    M=F.presentation;
+    IX=F.supportIdeal;
+    T=list(F.trivializationImages,F.trivializationDenom,
+           F.trivializationShift);
+  }
+  else
+  {
+    if (typeof(data)!="module")
+    {
+      ERROR("expected a module or a RankOneSheaf");
+    }
+    if ((size(#)!=1) || (typeof(#[1])!="ideal"))
+    {
+      ERROR("rankOneSheafSectionBasisDirect(M,d,I) expects one support ideal");
+    }
+    M=data;
+    IX=#[1];
+    T=rankOneTrivialization(M,IX);
+  }
+  SectionSpace V=sectionBasisDirectSpace(M,d,IX,T);
+  return(V);
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(u,v,w),dp;
+  ideal IX=u*v;
+  // A rank-one torsion-free sheaf which is not locally free where the two
+  // components meet is kept unchanged by the direct saturation method.
+  module M=v*gen(1),u*gen(2);
+  attrib(M,"isHomog",intvec(0,0));
+  SectionSpace V=rankOneSheafSectionBasisDirect(M,0,IX);
+  V;
+  sectionBasis(V);
+}
+
+proc lineBundleSectionBasisDirect(def data,int d,list #)
+"USAGE:   lineBundleSectionBasisDirect(M,d,I); M module, d int, I ideal
+         lineBundleSectionBasisDirect(F,d); F RankOneSheaf
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         which has depth at least two at the irrelevant ideal. The associated
+         sheaf is a line bundle and M has its row degrees assigned as isHomog.
+RETURN:   SectionSpace V containing a basis of global sections of the twist d.
+NOTE:     This is the line-bundle name for rankOneSheafSectionBasisDirect and
+         has the same implementation. Local freeness is an input assumption;
+         this alias does not test it separately. A cached F avoids frame
+         rediscovery and can be reused at every twist.
+SEE ALSO: rankOneSheafSectionBasisDirect, trivializedSectionBasisDirect,
+          lineBundleSectionBasis, sectionBasis, rationalMapFromSections
+EXAMPLE: example lineBundleSectionBasisDirect; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasisDirect(data,d)); }
+  if (size(#)==1)
+  {
+    return(rankOneSheafSectionBasisDirect(data,d,#[1]));
+  }
+  ERROR("expected lineBundleSectionBasisDirect(F,d) or lineBundleSectionBasisDirect(M,d,I)");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  SectionSpace V=lineBundleSectionBasisDirect(O,1,ideal(0));
+  V;
+  rationalMapFromSections(V);
+}
+
+// Scalarize a BGG basis after its rational frame has already been checked.
+// Generic injectivity of the frame makes its map on H^0 injective.
+static proc sectionBasisTrustedTrivializedBasisBGG(module M,int d,
+                                                    ideal images,poly f,
+                                                    list #)
+{
+  list B;
+  if (size(#)==0) { B=sheafSectionBasisBGG(M,d); }
+  if (size(#)==1) { B=sheafSectionBasisBGG(M,d,#[1]); }
+  if (size(#)==2) { B=sheafSectionBasisBGG(M,d,#[1],#[2]); }
+
+  ideal H;
+  if (size(B[1])>0)
+  {
+    matrix sectionVectors=matrix(B[1]);
+    if (nrows(sectionVectors)>nrows(M))
+    {
+      ERROR("internal error: BGG section vectors exceed the checked frame rank");
+    }
+    matrix paddedVectors[nrows(M)][size(B[1])];
+    paddedVectors[1..nrows(sectionVectors),1..ncols(sectionVectors)]=
+      sectionVectors;
+    H=ideal(matrix(images)*paddedVectors);
+  }
+  return(list(H,f*B[2],B[3]));
+}
+
+// Run the genuine BGG/Tate representative algorithm and build a typed
+// SectionSpace from a frame which was validated or canonically constructed.
+static proc sectionBasisBGGSpace(module M,int d,ideal IX,list T,list #)
+{
+  if (size(#)>2)
+  {
+    ERROR("expected at most a BGG tail degree and denominator");
+  }
+  list B;
+  if (size(#)==0)
+  {
+    B=sectionBasisTrustedTrivializedBasisBGG(M,d,T[1],T[2]);
+  }
+  if (size(#)==1)
+  {
+    B=sectionBasisTrustedTrivializedBasisBGG(M,d,T[1],T[2],#[1]);
+  }
+  if (size(#)==2)
+  {
+    B=sectionBasisTrustedTrivializedBasisBGG(M,d,T[1],T[2],#[1],#[2]);
+  }
+  if ((B[2]==0) || (!homog(B[2])))
+  {
+    ERROR("internal error: the BGG section denominator is zero or nonhomogeneous");
+  }
+  module supportModule=IX;
+  attrib(supportModule,"isHomog",intvec(0));
+  if (!sectionBasisRegularDenominator(supportModule,B[2]))
+  {
+    ERROR("the scalar BGG section denominator is a zero divisor on the support");
+  }
+  int i;
+  for (i=1; i<=size(B[1]); i++)
+  {
+    if ((B[1][i]==0) || (!homog(B[1][i])) ||
+        (deg(B[1][i])-deg(B[2])!=d+T[3]))
+    {
+      ERROR("internal error: invalid scalar BGG section degree");
+    }
+  }
+  SectionSpace V;
+  V.over=basering;
+  V.presentation=M;
+  V.supportIdeal=IX;
+  V.basis=B[1];
+  V.denom=B[2];
+  V.trivializationImages=T[1];
+  V.trivializationDenom=T[2];
+  V.twist=d;
+  V.trivializationShift=T[3];
+  V.tailDegree=B[3];
+  return(V);
+}
+
+proc rankOneSheafSectionBasisBGG(def data,int d,list #)
+"USAGE:   rankOneSheafSectionBasisBGG(F,d[,s,g]); F RankOneSheaf
+         rankOneSheafSectionBasisBGG(M,d,I[,s,g]); M module, I ideal,
+         d,s int, g poly
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         whose associated sheaf is torsion-free and generically of rank one,
+         and M has its row degrees assigned as isHomog.
+RETURN:   SectionSpace V containing a scalar rational basis of global
+         sections of the twist d, computed from a BGG/Tate resolution.
+NOTE:     This is a genuine representative-producing BGG algorithm, not a
+         multiplication-table computation with BGG dimension verification.
+         It chooses a rational frame for module input and reuses the validated
+         cached frame for F. Frame recovery for module input follows the
+         automatic backend selection of rankOneTrivialization.
+         If supplied, s must satisfy s>=d and
+         s>reg(coker(M)); g must be a regular homogeneous form of degree s-d.
+         The same algorithm also applies to non-invertible rank-one
+         torsion-free and divisorial sheaves.
+SEE ALSO: lineBundleSectionBasisBGG, sheafSectionBasisBGG,
+          rankOneSheafSectionBasisBGGLinear, rankOneSheafSectionBasis,
+          rankOneSheafSectionBasisDirect, rationalMapFromSections
+EXAMPLE: example rankOneSheafSectionBasisBGG; shows an example
+"
+{
+  if (typeof(data)=="RankOneSheaf")
+  {
+    if (size(#)>2)
+    {
+      ERROR("expected at most a BGG tail degree and denominator");
+    }
+    RankOneSheaf F=data;
+    sectionBasisRequireCachedFrame(F);
+    list T=list(F.trivializationImages,F.trivializationDenom,
+                F.trivializationShift);
+    if (size(#)==0)
+    {
+      return(sectionBasisBGGSpace(F.presentation,d,F.supportIdeal,T));
+    }
+    if (size(#)==1)
+    {
+      return(sectionBasisBGGSpace(F.presentation,d,F.supportIdeal,T,#[1]));
+    }
+    return(sectionBasisBGGSpace(F.presentation,d,F.supportIdeal,T,
+                                #[1],#[2]));
+  }
+  if (typeof(data)!="module")
+  {
+    ERROR("expected a module or a RankOneSheaf");
+  }
+  if ((size(#)<1) || (size(#)>3) || (typeof(#[1])!="ideal"))
+  {
+    ERROR("expected M,d,I followed by at most a BGG tail degree and denominator");
+  }
+  module M=data;
+  ideal IX=#[1];
+  list T=rankOneTrivialization(M,IX);
+  if (size(#)==1)
+  {
+    return(sectionBasisBGGSpace(M,d,IX,T));
+  }
+  if (size(#)==2)
+  {
+    return(sectionBasisBGGSpace(M,d,IX,T,#[2]));
+  }
+  return(sectionBasisBGGSpace(M,d,IX,T,#[2],#[3]));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  RankOneSheaf F=rankOneSheaf(O,ideal(0));
+  SectionSpace V=rankOneSheafSectionBasisBGG(F,2);
+  V;
+  rationalMapFromSections(V);
+}
+
+proc lineBundleSectionBasisBGG(def data,int d,list #)
+"USAGE:   lineBundleSectionBasisBGG(F,d[,s,g]); F RankOneSheaf
+         lineBundleSectionBasisBGG(M,d,I[,s,g]); M module, I ideal
+ASSUME:   The sheafification of coker(M) is a line bundle on the support I.
+RETURN:   SectionSpace containing a BGG/Tate basis of global sections.
+NOTE:     This is the line-bundle name for rankOneSheafSectionBasisBGG and
+         has exactly the same implementation. Local freeness is an input
+         assumption and is not tested separately.
+SEE ALSO: rankOneSheafSectionBasisBGG, lineBundleSectionBasisBGGLinear,
+          lineBundleSectionBasis, lineBundleSectionBasisDirect
+EXAMPLE: example lineBundleSectionBasisBGG; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasisBGG(data,d)); }
+  if (size(#)==1)
+  {
+    return(rankOneSheafSectionBasisBGG(data,d,#[1]));
+  }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasisBGG(data,d,#[1],#[2]));
+  }
+  if (size(#)==3)
+  {
+    return(rankOneSheafSectionBasisBGG(data,d,#[1],#[2],#[3]));
+  }
+  ERROR("too many arguments for lineBundleSectionBasisBGG");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  lineBundleSectionBasisBGG(O,1,ideal(0));
+}
+
+proc rankOneSheafSectionBasisBGGLinear(module M,int d,ideal IX,list #)
+"USAGE:   rankOneSheafSectionBasisBGGLinear(M,d,I[,s,g]); M module,
+         d,s int, I ideal, g poly
+ASSUME:   I defines a nonempty integral homogeneous support, the sheafification
+         of coker(M) is torsion-free and generically of rank one, and M has
+         its row degrees assigned as isHomog.
+RETURN:   SectionSpace containing a BGG/Tate basis of global sections.
+NOTE:     This complete one-call variant finds the rational frame by finite
+         linear algebra using Singular's generic exact module kernel, then
+         computes sections by the genuine BGG method. The stated support,
+         torsion-free, and rank-one assumptions are not checked. For several
+         twists, construct F=rankOneSheafLinear(M,I) once and call
+         rankOneSheafSectionBasisBGG(F,d).
+SEE ALSO: rankOneSheafSectionBasisBGGSpaSM,
+          lineBundleSectionBasisBGGLinear, rankOneSheafLinear,
+          rankOneSheafSectionBasisBGG, rankOneSheafSectionBasisLinear
+EXAMPLE: example rankOneSheafSectionBasisBGGLinear; shows an example
+"
+{
+  if (size(#)>2)
+  {
+    ERROR("expected at most a BGG tail degree and denominator");
+  }
+  RankOneSheaf F=rankOneSheafLinear(M,IX);
+  if (size(#)==0) { return(rankOneSheafSectionBasisBGG(F,d)); }
+  if (size(#)==1) { return(rankOneSheafSectionBasisBGG(F,d,#[1])); }
+  return(rankOneSheafSectionBasisBGG(F,d,#[1],#[2]));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  rankOneSheafSectionBasisBGGLinear(M,0,ideal(0));
+}
+
+proc lineBundleSectionBasisBGGLinear(module M,int d,ideal IX,list #)
+"USAGE:   lineBundleSectionBasisBGGLinear(M,d,I[,s,g]); M module,
+         d,s int, I ideal, g poly
+ASSUME:   I defines a nonempty integral homogeneous support and the
+         sheafification of coker(M) is a line bundle there.
+RETURN:   SectionSpace containing a BGG/Tate basis of global sections.
+NOTE:     This is the line-bundle alias of
+         rankOneSheafSectionBasisBGGLinear. Local freeness is assumed.
+SEE ALSO: rankOneSheafSectionBasisBGGLinear, lineBundleLinear,
+          lineBundleSectionBasisBGG, lineBundleSectionBasisLinear
+EXAMPLE: example lineBundleSectionBasisBGGLinear; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasisBGGLinear(M,d,IX)); }
+  if (size(#)==1)
+  {
+    return(rankOneSheafSectionBasisBGGLinear(M,d,IX,#[1]));
+  }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasisBGGLinear(M,d,IX,#[1],#[2]));
+  }
+  ERROR("too many arguments for lineBundleSectionBasisBGGLinear");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  lineBundleSectionBasisBGGLinear(O,2,ideal(0));
+}
+
+proc rankOneSheafSectionBasisBGGSpaSM(module M,int d,ideal IX,list #)
+"USAGE:   rankOneSheafSectionBasisBGGSpaSM(M,d,I[,s,g]); M module,
+         d,s int, I ideal, g poly
+ASSUME:   The assumptions of rankOneSheafSectionBasisBGGLinear hold, the
+         sispasm module is available, and the coefficient field is supported.
+RETURN:   SectionSpace containing a BGG/Tate basis of global sections.
+NOTE:     Frame recovery uses strict exact SpaSM nullspaces. The procedure
+         errors rather than substituting another kernel backend.
+SEE ALSO: lineBundleSectionBasisBGGSpaSM, rankOneSheafSpaSM,
+          rankOneSheafSectionBasisBGGLinear, rankOneSheafSectionBasisBGG
+EXAMPLE: example rankOneSheafSectionBasisBGGSpaSM; shows an example
+"
+{
+  if (size(#)>2)
+  {
+    ERROR("expected at most a BGG tail degree and denominator");
+  }
+  RankOneSheaf F=rankOneSheafSpaSM(M,IX);
+  if (size(#)==0) { return(rankOneSheafSectionBasisBGG(F,d)); }
+  if (size(#)==1) { return(rankOneSheafSectionBasisBGG(F,d,#[1])); }
+  return(rankOneSheafSectionBasisBGG(F,d,#[1],#[2]));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  load("sispasm.so","try");
+  if (defined(spasm_first_kernel_vector))
+  {
+    rankOneSheafSectionBasisBGGSpaSM(M,0,ideal(0));
+  }
+}
+
+proc lineBundleSectionBasisBGGSpaSM(module M,int d,ideal IX,list #)
+"USAGE:   lineBundleSectionBasisBGGSpaSM(M,d,I[,s,g]); M module,
+         d,s int, I ideal, g poly
+RETURN:   The strict-SpaSM BGG SectionSpace for the line bundle.
+NOTE:     This is the line-bundle alias of
+         rankOneSheafSectionBasisBGGSpaSM. Local freeness is assumed.
+SEE ALSO: rankOneSheafSectionBasisBGGSpaSM,
+          lineBundleSectionBasisBGGLinear, lineBundleSpaSM
+EXAMPLE: example lineBundleSectionBasisBGGSpaSM; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasisBGGSpaSM(M,d,IX)); }
+  if (size(#)==1)
+  {
+    return(rankOneSheafSectionBasisBGGSpaSM(M,d,IX,#[1]));
+  }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasisBGGSpaSM(M,d,IX,#[1],#[2]));
+  }
+  ERROR("too many arguments for lineBundleSectionBasisBGGSpaSM");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  load("sispasm.so","try");
+  if (defined(spasm_first_kernel_vector))
+  {
+    lineBundleSectionBasisBGGSpaSM(O,2,ideal(0));
+  }
+}
+
+// Run the multiplication-table algorithm and build its typed result from a
+// frame which has already been validated or canonically constructed.
+static proc sectionBasisMultTableSpace(module M,int d,ideal IX,list T,list #)
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most tail degree, denominator, and verification flag");
+  }
+  list B;
+  if (size(#)==0)
+  {
+    B=sectionBasisTrustedTrivializedBasis(M,d,T[1],T[2]);
+  }
+  if (size(#)==1)
+  {
+    B=sectionBasisTrustedTrivializedBasis(M,d,T[1],T[2],#[1]);
+  }
+  if (size(#)==2)
+  {
+    B=sectionBasisTrustedTrivializedBasis(M,d,T[1],T[2],#[1],#[2]);
+  }
+  if (size(#)==3)
+  {
+    B=sectionBasisTrustedTrivializedBasis(M,d,T[1],T[2],#[1],#[2],#[3]);
+  }
+  if ((B[2]==0) || (!homog(B[2])))
+  {
+    ERROR("internal error: the section denominator is zero or nonhomogeneous");
+  }
+  module supportModule=IX;
+  attrib(supportModule,"isHomog",intvec(0));
+  if (!sectionBasisRegularDenominator(supportModule,B[2]))
+  {
+    ERROR("the scalar section denominator is a zero divisor on the support");
+  }
+  int i;
+  for (i=1; i<=size(B[1]); i++)
+  {
+    if ((B[1][i]==0) || (!homog(B[1][i])) ||
+        (deg(B[1][i])-deg(B[2])!=d+T[3]))
+    {
+      ERROR("internal error: invalid scalar section degree");
+    }
+  }
+  SectionSpace V;
+  V.over=basering;
+  V.presentation=M;
+  V.supportIdeal=IX;
+  V.basis=B[1];
+  V.denom=B[2];
+  V.trivializationImages=T[1];
+  V.trivializationDenom=T[2];
+  V.twist=d;
+  V.trivializationShift=T[3];
+  V.tailDegree=B[3];
+  return(V);
+}
+
+proc rankOneSheafSectionBasis(def data,int d,list #)
+"USAGE:   rankOneSheafSectionBasis(M,d,I[,s,g,v]); M module,
+         d,s int, I ideal, g poly, v int
+         rankOneSheafSectionBasis(F,d[,s,g,v]); F RankOneSheaf
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         whose associated sheaf is torsion-free and generically of rank one,
+         and M has its row degrees assigned as isHomog.
+RETURN:   SectionSpace V. The entries V[i] are Section objects forming a
+         basis of global sections of the twist d. Their rational
+         representatives are V.basis[i]/V.denom; V.tailDegree records the
+         multiplication-tail degree used.
+NOTE:     The procedure chooses a homogeneous rational trivialization and
+         computes the section basis in one call. It applies both to line
+         bundles and to rank-one torsion-free sheaves which are not locally
+         free, including non-invertible divisorial sheaves. To supply a known
+         trivialization instead, call
+         trivializedSectionBasis directly. The optional tail arguments are
+         passed unchanged to sheafSectionBasis.
+         Frame recovery follows rankOneTrivialization: supported SpaSM is
+         selected on certified integral support, and the original graded-dual
+         method otherwise. Full frame validation is retained; a selected
+         SpaSM computation is not retried with another method.
+         For a RankOneSheaf, its cached frame is used directly, with no frame
+         recovery or repeated frame validation. The same F can be used
+         for any integer twist d. Verification is off unless v is explicitly
+         nonzero.
+SEE ALSO: lineBundleSectionBasis, rankOneSheafSectionBasisLinear,
+          sectionBasis, rationalMapFromSections, rankOneTrivialization,
+          trivializedSectionBasis, sheafSectionBasis
+EXAMPLE: example rankOneSheafSectionBasis; shows an example
+"
+{
+  if (typeof(data)=="RankOneSheaf")
+  {
+    if (size(#)>3)
+    {
+      ERROR("expected at most tail degree, denominator, and verification flag");
+    }
+    RankOneSheaf F=data;
+    sectionBasisRequireCachedFrame(F);
+    list T=list(F.trivializationImages,F.trivializationDenom,
+                F.trivializationShift);
+    if (size(#)==0)
+    {
+      return(sectionBasisMultTableSpace(F.presentation,d,F.supportIdeal,T));
+    }
+    if (size(#)==1)
+    {
+      return(sectionBasisMultTableSpace(F.presentation,d,F.supportIdeal,T,
+                                        #[1]));
+    }
+    if (size(#)==2)
+    {
+      return(sectionBasisMultTableSpace(F.presentation,d,F.supportIdeal,T,
+                                        #[1],#[2]));
+    }
+    return(sectionBasisMultTableSpace(F.presentation,d,F.supportIdeal,T,
+                                      #[1],#[2],#[3]));
+  }
+  if (typeof(data)!="module")
+  {
+    ERROR("expected a module or a RankOneSheaf");
+  }
+  if ((size(#)<1) || (size(#)>4) || (typeof(#[1])!="ideal"))
+  {
+    ERROR("expected M,d,I followed by at most tail degree, denominator, and verification flag");
+  }
+  module M=data;
+  ideal IX=#[1];
+  list T=rankOneTrivialization(M,IX);
+  if (size(#)==1)
+  {
+    return(sectionBasisMultTableSpace(M,d,IX,T));
+  }
+  if (size(#)==2)
+  {
+    return(sectionBasisMultTableSpace(M,d,IX,T,#[2]));
+  }
+  if (size(#)==3)
+  {
+    return(sectionBasisMultTableSpace(M,d,IX,T,#[2],#[3]));
+  }
+  return(sectionBasisMultTableSpace(M,d,IX,T,#[2],#[3],#[4]));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(u,v,w),dp;
+  ideal IX=u*v;
+  // This rank-one torsion-free sheaf on Proj(R/IX) is not locally free at
+  // the intersection of its two components:
+  module M=v*gen(1),u*gen(2);
+  attrib(M,"isHomog",intvec(0,0));
+  SectionSpace V=rankOneSheafSectionBasis(M,0,IX);
+  V;
+  V[1];
+}
+
+proc lineBundleSectionBasis(def data,int d,list #)
+"USAGE:   lineBundleSectionBasis(M,d,I[,s,g,v]); M module,
+         d,s int, I ideal, g poly, v int
+         lineBundleSectionBasis(F,d[,s,g,v]); F RankOneSheaf
+ASSUME:   I is the homogeneous coordinate ideal of the support of coker(M),
+         whose associated sheaf is a line bundle, and M has its row degrees
+         assigned as isHomog.
+RETURN:   SectionSpace V containing a basis of global sections of the twist d.
+         The i-th Section is V[i], represented by V.basis[i]/V.denom.
+NOTE:     This is the line-bundle name for rankOneSheafSectionBasis and has
+         the same implementation, automatic frame-backend selection, and
+         optional arguments. Local freeness is an input assumption; this alias
+         does not test it separately. A cached F avoids frame rediscovery and
+         can be reused at every twist.
+SEE ALSO: rankOneSheafSectionBasis, lineBundleSectionBasisLinear,
+          sectionBasis, rationalMapFromSections, sheafSectionBasis,
+          trivializedSectionBasis
+EXAMPLE: example lineBundleSectionBasis; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasis(data,d)); }
+  if (size(#)==1) { return(rankOneSheafSectionBasis(data,d,#[1])); }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasis(data,d,#[1],#[2]));
+  }
+  if (size(#)==3)
+  {
+    return(rankOneSheafSectionBasis(data,d,#[1],#[2],#[3]));
+  }
+  if (size(#)==4)
+  {
+    return(rankOneSheafSectionBasis(data,d,#[1],#[2],#[3],#[4]));
+  }
+  ERROR("too many arguments for lineBundleSectionBasis");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  // e2=x*e1 presents O(1). Compute its sections in one call:
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  SectionSpace V=lineBundleSectionBasis(M,0,ideal(0));
+  V;
+  // Extract one Section, or the whole basis as a list of Sections:
+  Section s=V[1];
+  s;
+  list B=sectionBasis(V);
+  // Singular represents a projective rational map by its homogeneous
+  // coordinate ideal; the common section denominator cancels:
+  ideal phi=rationalMapFromSections(V);
+  phi;
+  // A list of Sections defines the corresponding subsystem:
+  rationalMapFromSections(list(V[1],V[3]));
+}
+
+proc rankOneSheafSectionBasisLinear(module M,int d,ideal IX,list #)
+"USAGE:   rankOneSheafSectionBasisLinear(M,d,I[,s,g,v]); M module,
+         d,s int, I ideal, g poly, v int
+ASSUME:   I defines a nonempty integral homogeneous support, the sheafification
+         of coker(M) is torsion-free and generically of rank one, and M has its
+         row degrees assigned as isHomog.
+RETURN:   SectionSpace V containing a scalar rational basis of global sections
+         of the twist d.
+NOTE:     This is the complete one-call section algorithm using finite linear
+         algebra for frame recovery and multiplication tables for the section
+         computation. Frame nullspaces always use Singular's exact generic
+         module kernel. Use rankOneSheafSectionBasisSpaSM to request strict
+         exact SpaSM nullspaces; no backend substitution occurs.
+         No graded Hom module or saturation-based frame certificate is
+         computed. Unlike the automatic rankOneSheafSectionBasis(M,d,I), this
+         command never probes SpaSM or tests support integrality. Correctness
+         relies on the integral-support, torsion-free, and rank-one assumptions above,
+         which are not checked. Verification is off unless v is explicitly
+         nonzero. For several twists, construct F=rankOneSheafLinear(M,I) once
+         and call rankOneSheafSectionBasis(F,d) repeatedly instead.
+SEE ALSO: rankOneSheafSectionBasisSpaSM, lineBundleSectionBasisLinear,
+          rankOneSheafLinear,
+          rankOneSheafSectionBasis, rankOneTrivializationLinear,
+          rankOneSheafSectionBasisMultTable, rationalMapFromSections
+EXAMPLE: example rankOneSheafSectionBasisLinear; shows an example
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most tail degree, denominator, and verification flag");
+  }
+  RankOneSheaf F=rankOneSheafLinear(M,IX);
+  if (size(#)==0) { return(rankOneSheafSectionBasis(F,d)); }
+  if (size(#)==1) { return(rankOneSheafSectionBasis(F,d,#[1])); }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasis(F,d,#[1],#[2]));
+  }
+  return(rankOneSheafSectionBasis(F,d,#[1],#[2],#[3]));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  // e2=x*e1 presents O(1). Frame recovery uses Singular's module kernel.
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  SectionSpace V=rankOneSheafSectionBasisLinear(M,0,ideal(0));
+  V;
+  rationalMapFromSections(V);
+}
+
+proc lineBundleSectionBasisLinear(module M,int d,ideal IX,list #)
+"USAGE:   lineBundleSectionBasisLinear(M,d,I[,s,g,v]); M module,
+         d,s int, I ideal, g poly, v int
+ASSUME:   I defines a nonempty integral homogeneous support and the
+         sheafification of coker(M) is a line bundle there.
+RETURN:   SectionSpace containing a basis of global sections of the twist d.
+NOTE:     This is the line-bundle name for
+         rankOneSheafSectionBasisLinear. Local freeness is an input assumption
+         and is not tested separately.
+SEE ALSO: rankOneSheafSectionBasisLinear, lineBundleLinear,
+          lineBundleSectionBasis, lineBundleSectionBasisMultTable,
+          lineBundleSectionBasisDirect
+EXAMPLE: example lineBundleSectionBasisLinear; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasisLinear(M,d,IX)); }
+  if (size(#)==1)
+  {
+    return(rankOneSheafSectionBasisLinear(M,d,IX,#[1]));
+  }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasisLinear(M,d,IX,#[1],#[2]));
+  }
+  if (size(#)==3)
+  {
+    return(rankOneSheafSectionBasisLinear(M,d,IX,#[1],#[2],#[3]));
+  }
+  ERROR("too many arguments for lineBundleSectionBasisLinear");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  lineBundleSectionBasisLinear(O,2,ideal(0));
+}
+
+proc rankOneSheafSectionBasisSpaSM(module M,int d,ideal IX,list #)
+"USAGE:   rankOneSheafSectionBasisSpaSM(M,d,I[,s,g,v]); M module,
+         d,s int, I ideal, g poly, v int
+ASSUME:   The assumptions of rankOneSheafSectionBasisLinear hold, the sispasm
+         module is available, and the coefficient field is supported by SpaSM.
+RETURN:   SectionSpace containing a scalar rational basis of global sections.
+NOTE:     This complete one-call command recovers the frame with strict exact
+         SpaSM nullspaces and computes sections by multiplication tables. It
+         errors if SpaSM cannot be used and never substitutes another backend.
+         For several twists, construct F=rankOneSheafSpaSM(M,I) once.
+SEE ALSO: lineBundleSectionBasisSpaSM, rankOneSheafSpaSM,
+          rankOneSheafSectionBasisLinear, rankOneSheafSectionBasis
+EXAMPLE: example rankOneSheafSectionBasisSpaSM; shows an example
+"
+{
+  if (size(#)>3)
+  {
+    ERROR("expected at most tail degree, denominator, and verification flag");
+  }
+  RankOneSheaf F=rankOneSheafSpaSM(M,IX);
+  if (size(#)==0) { return(rankOneSheafSectionBasis(F,d)); }
+  if (size(#)==1) { return(rankOneSheafSectionBasis(F,d,#[1])); }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasis(F,d,#[1],#[2]));
+  }
+  return(rankOneSheafSectionBasis(F,d,#[1],#[2],#[3]));
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module M=-x*gen(1)+gen(2);
+  attrib(M,"isHomog",intvec(-1,0));
+  load("sispasm.so","try");
+  if (defined(spasm_first_kernel_vector))
+  {
+    SectionSpace V=rankOneSheafSectionBasisSpaSM(M,0,ideal(0));
+    V;
+    rationalMapFromSections(V);
+  }
+}
+
+proc lineBundleSectionBasisSpaSM(module M,int d,ideal IX,list #)
+"USAGE:   lineBundleSectionBasisSpaSM(M,d,I[,s,g,v]); M module,
+         d,s int, I ideal, g poly, v int
+RETURN:   The strict-SpaSM SectionSpace for the line bundle.
+NOTE:     This is the line-bundle alias of rankOneSheafSectionBasisSpaSM.
+         Local freeness is an input assumption and is not tested separately.
+SEE ALSO: rankOneSheafSectionBasisSpaSM, lineBundleSpaSM,
+          lineBundleSectionBasisLinear
+EXAMPLE: example lineBundleSectionBasisSpaSM; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasisSpaSM(M,d,IX)); }
+  if (size(#)==1)
+  {
+    return(rankOneSheafSectionBasisSpaSM(M,d,IX,#[1]));
+  }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasisSpaSM(M,d,IX,#[1],#[2]));
+  }
+  if (size(#)==3)
+  {
+    return(rankOneSheafSectionBasisSpaSM(M,d,IX,#[1],#[2],#[3]));
+  }
+  ERROR("too many arguments for lineBundleSectionBasisSpaSM");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=32003,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  load("sispasm.so","try");
+  if (defined(spasm_first_kernel_vector))
+  {
+    lineBundleSectionBasisSpaSM(O,2,ideal(0));
+  }
+}
+
+proc rankOneSheafSectionBasisMultTable(def data,int d,list #)
+"USAGE:   rankOneSheafSectionBasisMultTable(F,d[,s,g,v]); F RankOneSheaf
+         rankOneSheafSectionBasisMultTable(M,d,I[,s,g,v]); M module,
+         I ideal, d,s int, g poly, v int
+RETURN:   SectionSpace containing a scalar rational basis of global sections.
+NOTE:     This is the explicit multiplication-table name for
+         rankOneSheafSectionBasis and has exactly the same implementation.
+         Verification is off unless v is explicitly nonzero. A cached F can
+         be reused at every twist without rediscovering its rational frame.
+SEE ALSO: rankOneSheafSectionBasis, rankOneSheafSectionBasisLinear,
+          lineBundleSectionBasisMultTable,
+          rankOneSheafSectionBasisDirect
+EXAMPLE: example rankOneSheafSectionBasisMultTable; shows an example
+"
+{
+  if (size(#)==0) { return(rankOneSheafSectionBasis(data,d)); }
+  if (size(#)==1) { return(rankOneSheafSectionBasis(data,d,#[1])); }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasis(data,d,#[1],#[2]));
+  }
+  if (size(#)==3)
+  {
+    return(rankOneSheafSectionBasis(data,d,#[1],#[2],#[3]));
+  }
+  if (size(#)==4)
+  {
+    return(rankOneSheafSectionBasis(data,d,#[1],#[2],#[3],#[4]));
+  }
+  ERROR("too many arguments for rankOneSheafSectionBasisMultTable");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  RankOneSheaf F=rankOneSheaf(O,ideal(0));
+  rankOneSheafSectionBasisMultTable(F,1);
+}
+
+proc lineBundleSectionBasisMultTable(def data,int d,list #)
+"USAGE:   lineBundleSectionBasisMultTable(F,d[,s,g,v]); F RankOneSheaf
+         lineBundleSectionBasisMultTable(M,d,I[,s,g,v]); M module,
+         I ideal, d,s int, g poly, v int
+RETURN:   SectionSpace containing a scalar rational basis of global sections.
+NOTE:     This is the line-bundle name for
+         rankOneSheafSectionBasisMultTable. Local freeness is an input
+         assumption and is not tested separately.
+SEE ALSO: rankOneSheafSectionBasisMultTable, lineBundleSectionBasis,
+          lineBundleSectionBasisLinear, lineBundleSectionBasisDirect
+EXAMPLE: example lineBundleSectionBasisMultTable; shows an example
+"
+{
+  if (size(#)==0)
+  {
+    return(rankOneSheafSectionBasisMultTable(data,d));
+  }
+  if (size(#)==1)
+  {
+    return(rankOneSheafSectionBasisMultTable(data,d,#[1]));
+  }
+  if (size(#)==2)
+  {
+    return(rankOneSheafSectionBasisMultTable(data,d,#[1],#[2]));
+  }
+  if (size(#)==3)
+  {
+    return(rankOneSheafSectionBasisMultTable(data,d,#[1],#[2],#[3]));
+  }
+  if (size(#)==4)
+  {
+    return(rankOneSheafSectionBasisMultTable(data,d,#[1],#[2],#[3],#[4]));
+  }
+  ERROR("too many arguments for lineBundleSectionBasisMultTable");
+}
+example
+{"EXAMPLE:";
+  echo=2;
+  ring R=0,(x,y,z),dp;
+  module O=0;
+  attrib(O,"isHomog",intvec(0));
+  RankOneSheaf L=lineBundle(O,ideal(0));
+  lineBundleSectionBasisMultTable(L,2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -710,11 +5219,21 @@ EXAMPLE: example sheafCohBGGregul; shows an example
   {
     for (i=l; i<=h; i++)
     {
-      if ((k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1))
+      // Some exterior Betti rows do not correspond to a cohomology row in
+      // the requested table. Match sheafCohBGG and ignore those entries.
+      if (((n+2-shift-j)>0) && ((n+2-shift-j)<=(n+1)) &&
+          ((i-l+1)>0) && ((i-l+1)<=(h-l+1)))
       {
-        newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
+        if ((k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1))
+        {
+          newBetti[n+2-shift-j,i-l+1]=
+            Betti[j,k+1-j-i+ell-shift];
+        }
+        else
+        {
+          newBetti[n+2-shift-j,i-l+1]=-1;
+        }
       }
-      else { newBetti[n+2-shift-j,i-l+1]=-1; }
     }
   }
   for (j=2; j<=n+1; j++)
@@ -1221,11 +5740,19 @@ EXAMPLE: example dimH; shows an example
   {
     if (i==0)
     {
-      list L=Ext_R(intvec(n+1,n+2),M,1)[2];
-      def N0=L[2];
-      def N1=L[1];
+      // Serre--Grothendieck and graded local duality give
+      //   h^0(F(d)) = dim(M_d) - dim(H^0_m(M)_d) + dim(H^1_m(M)_d),
+      // with H^j_m(M)_d dual to
+      // Ext^(n+1-j)(M,R)_(-n-1-d).  Saturation only kills H^0_m; the
+      // Ext^n term is essential for presentations with a degree deficiency.
+      int savedPrintlevel=printlevel;
+      printlevel=-1;
+      list L=Ext_R(intvec(n,n+1),M,1)[2];
+      printlevel=savedPrintlevel;
+      def N1=L[1]; // Ext^n, dual to H^1_m
+      def N0=L[2]; // Ext^(n+1), dual to H^0_m
       Result=dimGradedPart(M,d) - dimGradedPart(N0,-n-1-d)
-                                - dimGradedPart(N1,-n-1-d);
+                                + dimGradedPart(N1,-n-1-d);
       return(Result);
     }
     else
