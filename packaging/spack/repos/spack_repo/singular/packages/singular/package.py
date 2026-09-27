@@ -24,6 +24,8 @@ class Singular(AutotoolsPackage):
         sha256="bce5a40bd10b6e9fe991de97e6284f62cdb566c8aef4b2836b4d1307eb7d9edf",
     )
 
+    variant("sispasm", default=False, description="Build the SpaSM-backed sispasm module")
+
     depends_on("c", type="build")
     depends_on("cxx", type="build")
     depends_on("autoconf", type="build")
@@ -39,6 +41,7 @@ class Singular(AutotoolsPackage):
     depends_on("mpfr")
     depends_on("ntl+shared")
     depends_on("readline")
+    depends_on("spasm", when="+sispasm")
 
     def autoreconf(self, spec, prefix):
         bash = which("bash", required=True)
@@ -46,7 +49,7 @@ class Singular(AutotoolsPackage):
 
     def configure_args(self):
         spec = self.spec
-        return [
+        args = [
             "--enable-gfanlib",
             "--with-gmp={0}".format(spec["gmp"].prefix),
             "--with-ntl={0}".format(spec["ntl"].prefix),
@@ -55,3 +58,6 @@ class Singular(AutotoolsPackage):
             "--without-python",
             "--disable-python",
         ]
+        if "+sispasm" in spec:
+            args.append("--enable-sispasm-module")
+        return args

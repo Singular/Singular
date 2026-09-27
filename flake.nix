@@ -25,6 +25,42 @@
       packages = forAllSystems (system:
         let
           pkgs = import nixpkgs { inherit system; };
+          spasm = pkgs.stdenv.mkDerivation {
+            pname = "spasm";
+            version = "1.2";
+
+            src = pkgs.fetchurl {
+              url = "https://github.com/cbouilla/spasm/archive/refs/tags/v1.2.tar.gz";
+              sha256 = "e01947316c177ac2084a4fe587e06f33377a196f711613e9d4a7b1b1c7cec000";
+            };
+
+            nativeBuildInputs = [
+              pkgs.autoconf
+              pkgs.automake
+              pkgs.libtool
+            ];
+
+            configurePhase = ''
+              runHook preConfigure
+              autoreconf -fi
+              ./configure --prefix=$out --disable-openmp
+              runHook postConfigure
+            '';
+
+            buildPhase = ''
+              runHook preBuild
+              make -C src
+              runHook postBuild
+            '';
+
+            installPhase = ''
+              runHook preInstall
+              make -C src install
+              runHook postInstall
+            '';
+
+            doCheck = false;
+          };
           singular = (pkgs.singular.override { enableDocs = false; }).overrideAttrs (_: {
             version = "${sourceVersion}-git.${sourceRevision}";
             src = self;
@@ -37,9 +73,15 @@
               "--disable-python"
             ];
           });
+          singular-sispasm = singular.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [ spasm ];
+            configureFlags = (old.configureFlags or [ ]) ++ [
+              "--enable-sispasm-module"
+            ];
+          });
         in
         {
-          inherit singular;
+          inherit singular singular-sispasm spasm;
           default = singular;
         });
 

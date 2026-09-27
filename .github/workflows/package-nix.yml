@@ -23,6 +23,11 @@ on:
         required: true
         default: true
         type: boolean
+      sispasm:
+        description: Build the SpaSM-enabled sispasm package variant
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -80,17 +85,30 @@ jobs:
       - name: Build Singular
         id: build
         shell: bash
+        env:
+          SISPASM: ${{ inputs.sispasm }}
         run: |
           set -euo pipefail
           current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
           test "$current_system" = "${{ matrix.system }}"
-          store_path="$(nix build --no-update-lock-file --print-out-paths .#singular)"
+
+          package_attr=singular
+          artifact_suffix=
+          if [[ "$SISPASM" == true ]]; then
+            package_attr=singular-sispasm
+            artifact_suffix=-sispasm
+          fi
+
+          store_path="$(nix build --no-update-lock-file --print-out-paths ".#$package_attr")"
           test -x "$store_path/bin/Singular"
           echo "store_path=$store_path" >> "$GITHUB_OUTPUT"
+          echo "package_attr=$package_attr" >> "$GITHUB_OUTPUT"
+          echo "artifact_suffix=$artifact_suffix" >> "$GITHUB_OUTPUT"
 
       - name: Test Singular
         env:
           STORE_PATH: ${{ steps.build.outputs.store_path }}
+          SISPASM: ${{ inputs.sispasm }}
         shell: bash
         run: |
           set -euo pipefail
@@ -103,11 +121,29 @@ jobs:
           printf '%s\n' "$output"
           grep -q NIX_PACKAGE_SMOKE_OK <<< "$output"
 
+          if [[ "$SISPASM" == true ]]; then
+            output="$(printf '%s\n' \
+              'LIB "sispasm.so";' \
+              'ring r=32003,(x,y),dp;' \
+              'matrix m[2][2]=1,2,3,4;' \
+              'spasm s=m;' \
+              'nrows(s);' \
+              'ncols(s);' \
+              'matrix n=to_matrix(s);' \
+              'print("NIX_SISPASM_SMOKE_OK");' \
+              'quit;' | "$STORE_PATH/bin/Singular" -q 2>&1)"
+            printf '%s\n' "$output"
+            grep -q NIX_SISPASM_SMOKE_OK <<< "$output"
+          fi
+
       - name: Export binary cache
         env:
           NIX_CACHE_PRIVATE_KEY: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
           STORE_PATH: ${{ steps.build.outputs.store_path }}
           SYSTEM: ${{ matrix.system }}
+          PACKAGE_ATTR: ${{ steps.build.outputs.package_attr }}
+          ARTIFACT_SUFFIX: ${{ steps.build.outputs.artifact_suffix }}
+          SISPASM: ${{ inputs.sispasm }}
         shell: bash
         run: |
           set -euo pipefail
@@ -141,6 +177,8 @@ jobs:
           repository=$GITHUB_REPOSITORY
           commit=$GITHUB_SHA
           system=$SYSTEM
+          package_attr=$PACKAGE_ATTR
+          sispasm=$SISPASM
           store_path=$STORE_PATH
           signed=$signed
           narinfo_count=$narinfo_count
@@ -151,13 +189,13 @@ jobs:
             archive_contents+=(singular-nix-public-key.txt)
           fi
           tar -C "$output_dir" -czf \
-            "$output_dir/singular-nix-cache-$SYSTEM.tar.gz" \
+            "$output_dir/singular-nix-cache-$SYSTEM$ARTIFACT_SUFFIX.tar.gz" \
             "${archive_contents[@]}"
 
       - name: Upload Nix package
         uses: actions/upload-artifact@v4
         with:
-          name: singular-nix-${{ matrix.system }}
+          name: singular-nix-${{ matrix.system }}${{ steps.build.outputs.artifact_suffix }}
           path: |
             ${{ runner.temp }}/nix-package/*.tar.gz
             ${{ runner.temp }}/nix-package/package-source.txt

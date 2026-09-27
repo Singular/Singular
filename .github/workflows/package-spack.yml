@@ -13,6 +13,21 @@ on:
         required: true
         default: true
         type: boolean
+      macos_intel:
+        description: Build Intel macOS
+        required: true
+        default: true
+        type: boolean
+      macos_apple_silicon:
+        description: Build Apple Silicon macOS
+        required: true
+        default: true
+        type: boolean
+      sispasm:
+        description: Build the SpaSM-enabled sispasm package variant
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -23,27 +38,42 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.value }}
+      sispasm: ${{ steps.matrix.outputs.sispasm }}
+      artifact_suffix: ${{ steps.matrix.outputs.artifact_suffix }}
     steps:
       - name: Build target matrix
         id: matrix
         env:
           LINUX_X86_64: ${{ inputs.linux_x86_64 }}
           LINUX_AARCH64: ${{ inputs.linux_aarch64 }}
+          MACOS_INTEL: ${{ inputs.macos_intel }}
+          MACOS_ARM64: ${{ inputs.macos_apple_silicon }}
+          SISPASM: ${{ inputs.sispasm }}
         shell: bash
         run: |
           set -euo pipefail
           entries=()
           [[ "$LINUX_X86_64" == true ]] && entries+=('{"runner":"ubuntu-24.04","architecture":"linux-x86_64","target":"x86_64"}')
           [[ "$LINUX_AARCH64" == true ]] && entries+=('{"runner":"ubuntu-24.04-arm","architecture":"linux-aarch64","target":"aarch64"}')
+          [[ "$MACOS_INTEL" == true ]] && entries+=('{"runner":"macos-15-intel","architecture":"macos-intel","target":""}')
+          [[ "$MACOS_ARM64" == true ]] && entries+=('{"runner":"macos-15","architecture":"macos-apple-silicon","target":""}')
           if [[ ${#entries[@]} -eq 0 ]]; then
             echo "::error::Select at least one target"
             exit 1
           fi
+          if [[ "$SISPASM" != true && "$SISPASM" != false ]]; then
+            echo "::error::sispasm must be true or false"
+            exit 1
+          fi
+          artifact_suffix=
+          [[ "$SISPASM" == true ]] && artifact_suffix=-sispasm
           matrix="$(printf '%s\n' "${entries[@]}" | jq -cs '{include: .}')"
           echo "value=$matrix" >> "$GITHUB_OUTPUT"
+          echo "sispasm=$SISPASM" >> "$GITHUB_OUTPUT"
+          echo "artifact_suffix=$artifact_suffix" >> "$GITHUB_OUTPUT"
 
   build:
-    name: Spack ${{ matrix.architecture }}
+    name: Spack ${{ matrix.architecture }}${{ needs.prepare.outputs.artifact_suffix }}
     needs: prepare
     strategy:
       fail-fast: false
@@ -65,6 +95,7 @@ jobs:
       - name: Prepare package repository and environment
         env:
           TARGET: ${{ matrix.target }}
+          SISPASM: ${{ needs.prepare.outputs.sispasm }}
         shell: bash
         run: |
           set -euo pipefail
@@ -72,6 +103,10 @@ jobs:
           repository="$package_tree/repos/spack_repo/singular"
           environment="$RUNNER_TEMP/singular-spack-environment"
           install_tree="$RUNNER_TEMP/singular-spack-install"
+          singular_spec="singular@git.$GITHUB_SHA=develop"
+          if [[ "$SISPASM" == true ]]; then
+            singular_spec="$singular_spec +sispasm"
+          fi
           cp -R packaging/spack "$package_tree"
 
           source_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
@@ -83,7 +118,7 @@ jobs:
           cat > "$environment/spack.yaml" <<EOF
           spack:
             specs:
-              - singular@git.$GITHUB_SHA=develop
+              - $singular_spec
             view: false
             concretizer:
               reuse: true
@@ -92,13 +127,17 @@ jobs:
               install_tree:
                 root: $install_tree
                 padded_length: 256
+            repos:
+              - $repository
+          EOF
+          if [[ -n "$TARGET" ]]; then
+            cat >> "$environment/spack.yaml" <<EOF
             packages:
               all:
                 require:
                   - target=$TARGET
-            repos:
-              - $repository
           EOF
+          fi
 
           spack -e "$environment" repo list
           spack -e "$environment" compiler find
@@ -114,6 +153,8 @@ jobs:
             --fail-fast --show-log-on-error
 
       - name: Test Singular
+        env:
+          SISPASM: ${{ needs.prepare.outputs.sispasm }}
         shell: bash
         run: |
           set -euo pipefail
@@ -129,10 +170,27 @@ jobs:
           printf '%s\n' "$output"
           grep -q SPACK_PACKAGE_SMOKE_OK <<< "$output"
 
+          if [[ "$SISPASM" == true ]]; then
+            output="$(printf '%s\n' \
+              'LIB "sispasm.so";' \
+              'ring r=32003,(x,y),dp;' \
+              'matrix m[2][2]=1,2,3,4;' \
+              'spasm s=m;' \
+              'nrows(s);' \
+              'ncols(s);' \
+              'matrix n=to_matrix(s);' \
+              'print("SPACK_SISPASM_SMOKE_OK");' \
+              'quit;' | "$prefix/bin/Singular" -q 2>&1)"
+            printf '%s\n' "$output"
+            grep -q SPACK_SISPASM_SMOKE_OK <<< "$output"
+          fi
+
       - name: Export build cache
         env:
           ARCHITECTURE: ${{ matrix.architecture }}
           SPACK_SIGNING_KEY: ${{ secrets.SPACK_SIGNING_KEY }}
+          ARTIFACT_SUFFIX: ${{ needs.prepare.outputs.artifact_suffix }}
+          SISPASM: ${{ needs.prepare.outputs.sispasm }}
         shell: bash
         run: |
           set -euo pipefail
@@ -169,6 +227,7 @@ jobs:
           repository=$GITHUB_REPOSITORY
           commit=$GITHUB_SHA
           architecture=$ARCHITECTURE
+          sispasm=$SISPASM
           signed=$signed
           spack_version=$(spack --version)
           packages_ref=v2026.06.0
@@ -185,13 +244,13 @@ jobs:
             archive_contents+=(singular-spack-public-key.gpg)
           fi
           tar -C "$output_dir" -czf \
-            "$output_dir/singular-spack-cache-$ARCHITECTURE.tar.gz" \
+            "$output_dir/singular-spack-cache-$ARCHITECTURE$ARTIFACT_SUFFIX.tar.gz" \
             "${archive_contents[@]}"
 
       - name: Upload Spack package
         uses: actions/upload-artifact@v4
         with:
-          name: singular-spack-${{ matrix.architecture }}
+          name: singular-spack-${{ matrix.architecture }}${{ needs.prepare.outputs.artifact_suffix }}
           path: |
             ${{ runner.temp }}/spack-package/*.tar.gz
             ${{ runner.temp }}/spack-package/package-source.txt

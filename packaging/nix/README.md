@@ -4,6 +4,10 @@ Run the **Nix packages** workflow on the release tag and select the desired
 systems. The workflow builds and tests the flake, then exports one binary-cache
 archive per system.
 
+The workflow normally builds `.#singular`. Enable the `sispasm` input to build
+the SpaSM-enabled `.#singular-sispasm` variant instead. Those artifacts use the
+`-sispasm` suffix.
+
 ## Signing key
 
 Create the cache key once, off GitHub:

@@ -4,6 +4,11 @@ Run the **Homebrew bottles** workflow on the release tag. It builds Singular on
 each selected architecture and uploads the bottle, its JSON metadata, the
 rendered formula, and an installation-source report.
 
+The workflow normally builds the `singular` formula. Enable the `sispasm`
+input to build the `singular-sispasm` formula instead. In that mode the
+artifact also contains a tap-local `spasm` formula and bottle, because Homebrew
+core does not provide SpaSM.
+
 Homebrew bottles do not contain their dependencies. If a runtime dependency
 has no usable Homebrew bottle, the workflow rebuilds it with `--build-bottle`
 and places its bottle, JSON metadata, and formula snapshot under
@@ -15,6 +20,13 @@ the tap checkout, merge the Singular JSON files into `Formula/singular.rb`:
 
 ```sh
 brew bottle --merge --write --no-commit /path/to/singular--*.bottle.json
+```
+
+For the SpaSM-enabled variant, merge the matching JSON files into both formulae:
+
+```sh
+brew bottle --merge --write --no-commit /path/to/spasm--*.bottle.json
+brew bottle --merge --write --no-commit /path/to/singular-sispasm--*.bottle.json
 ```
 
 The generated dependency bottles can be installed directly before Singular:
