@@ -20,6 +20,11 @@ on:
         required: true
         default: true
         type: boolean
+      rpm_sispasm:
+        description: Build the RPM with the SpaSM-backed sispasm module
+        required: true
+        default: true
+        type: boolean
       ubuntu:
         description: Build the Ubuntu 24.04 package
         required: true
@@ -66,6 +71,7 @@ jobs:
       macos_intel: ${{ steps.settings.outputs.macos_intel }}
       macos_arm64: ${{ steps.settings.outputs.macos_arm64 }}
       rpm: ${{ steps.settings.outputs.rpm }}
+      rpm_sispasm: ${{ steps.settings.outputs.rpm_sispasm }}
       ubuntu: ${{ steps.settings.outputs.ubuntu }}
       artifact_version: ${{ steps.settings.outputs.artifact_version }}
       bundle_version: ${{ steps.settings.outputs.bundle_version }}
@@ -75,6 +81,7 @@ jobs:
       bundle_old_docs: ${{ steps.settings.outputs.bundle_old_docs }}
       documentation_run_id: ${{ steps.settings.outputs.documentation_run_id }}
       artifact_suffix: ${{ steps.settings.outputs.artifact_suffix }}
+      rpm_artifact_suffix: ${{ steps.settings.outputs.rpm_artifact_suffix }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -88,6 +95,7 @@ jobs:
           INPUT_MACOS_INTEL: ${{ inputs.macos_intel }}
           INPUT_MACOS_ARM64: ${{ inputs.macos_apple_silicon }}
           INPUT_RPM: ${{ inputs.rpm }}
+          INPUT_RPM_SISPASM: ${{ inputs.rpm_sispasm }}
           INPUT_UBUNTU: ${{ inputs.ubuntu }}
           INPUT_OLD_DOCU: ${{ inputs.old_docu }}
           INPUT_DOCUMENTATION_RUN_ID: ${{ inputs.documentation_run_id }}
@@ -100,6 +108,7 @@ jobs:
             macos_intel="$INPUT_MACOS_INTEL"
             macos_arm64="$INPUT_MACOS_ARM64"
             rpm="$INPUT_RPM"
+            rpm_sispasm="$INPUT_RPM_SISPASM"
             ubuntu="$INPUT_UBUNTU"
             bundle_old_docs="$INPUT_OLD_DOCU"
             documentation_run_id="$INPUT_DOCUMENTATION_RUN_ID"
@@ -107,6 +116,7 @@ jobs:
             macos_intel=true
             macos_arm64=true
             rpm=true
+            rpm_sispasm=true
             ubuntu=true
             bundle_old_docs=false
             documentation_run_id=
@@ -120,6 +130,17 @@ jobs:
               exit 1
               ;;
           esac
+          case "$rpm_sispasm" in
+            true|false) ;;
+            *)
+              echo "::error::rpm_sispasm must be true or false"
+              exit 1
+              ;;
+          esac
+          rpm_artifact_suffix="$artifact_suffix"
+          if [[ "$rpm_sispasm" == false ]]; then
+            rpm_artifact_suffix="$rpm_artifact_suffix-no-sispasm"
+          fi
 
           if [[ "$bundle_old_docs" == true ]]; then
             if [[ -z "$documentation_run_id" ]]; then
@@ -193,6 +214,7 @@ jobs:
             echo "macos_intel=$macos_intel"
             echo "macos_arm64=$macos_arm64"
             echo "rpm=$rpm"
+            echo "rpm_sispasm=$rpm_sispasm"
             echo "ubuntu=$ubuntu"
             echo "artifact_version=$artifact_version"
             echo "bundle_version=$bundle_version"
@@ -202,6 +224,7 @@ jobs:
             echo "bundle_old_docs=$bundle_old_docs"
             echo "documentation_run_id=$documentation_run_id"
             echo "artifact_suffix=$artifact_suffix"
+            echo "rpm_artifact_suffix=$rpm_artifact_suffix"
           } >> "$GITHUB_OUTPUT"
 
       - name: Download prebuilt old docu
@@ -407,6 +430,7 @@ jobs:
     env:
       BUILD_JOBS: 4
       BUNDLE_OLD_DOCS: ${{ needs.prepare.outputs.bundle_old_docs }}
+      ENABLE_SISPASM: ${{ needs.prepare.outputs.rpm_sispasm }}
     steps:
       - name: Install checkout prerequisites
         run: dnf install -y git tar gzip
@@ -434,10 +458,13 @@ jobs:
             flex gcc gcc-c++ gmp-devel libtool make mpfr-devel ntl-devel \
             flint-devel readline-devel libzstd-devel perl-core rpm-build \
             sharutils which
+          if [[ "$ENABLE_SISPASM" == true ]]; then
+            dnf install -y libspasm-devel
+          fi
 
       - name: Build RPM
         run: |
-          basename="singular-${{ needs.prepare.outputs.rpm_version }}-${{ needs.prepare.outputs.package_release }}${{ needs.prepare.outputs.artifact_suffix }}.x86_64"
+          basename="singular-${{ needs.prepare.outputs.rpm_version }}-${{ needs.prepare.outputs.package_release }}${{ needs.prepare.outputs.rpm_artifact_suffix }}.x86_64"
           .github/scripts/package-linux.sh \
             "$GITHUB_WORKSPACE" \
             "${{ needs.prepare.outputs.rpm_version }}" \
@@ -448,6 +475,9 @@ jobs:
         run: |
           rpm -qip dist/*.rpm
           rpm -qlp dist/*.rpm | grep /usr/share/licenses/singular/
+          if [[ "$ENABLE_SISPASM" == true ]]; then
+            rpm -qp --requires dist/*.rpm | grep -q 'libspasm.so'
+          fi
           dnf install -y dist/*.rpm
           if [[ "$BUNDLE_OLD_DOCS" == true ]]; then
             test -s /usr/share/info/singular.info
@@ -463,11 +493,25 @@ jobs:
           printf 'print("INSTALLED_PACKAGE_OK"); quit;\n' \
             | /usr/bin/Singular -q \
             | grep -q INSTALLED_PACKAGE_OK
+          if [[ "$ENABLE_SISPASM" == true ]]; then
+            printf '%s\n' \
+              'LIB "sispasm.so";' \
+              'ring r=32003,(x,y),dp;' \
+              'matrix m[2][2]=1,2,3,4;' \
+              'spasm s=m;' \
+              'nrows(s);' \
+              'ncols(s);' \
+              'matrix n=to_matrix(s);' \
+              'print("INSTALLED_SISPASM_OK");' \
+              'quit;' \
+              | /usr/bin/Singular -q \
+              | grep -q INSTALLED_SISPASM_OK
+          fi
 
       - name: Upload RPM
         uses: actions/upload-artifact@v4
         with:
-          name: singular-binary-fedora-x86_64${{ needs.prepare.outputs.artifact_suffix }}
+          name: singular-binary-fedora-x86_64${{ needs.prepare.outputs.rpm_artifact_suffix }}
           path: dist/*.rpm
           if-no-files-found: error
 

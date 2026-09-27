@@ -21,6 +21,11 @@ on:
         required: true
         default: true
         type: boolean
+      sispasm:
+        description: Build the SpaSM-enabled singular-sispasm bottle variant
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -35,6 +40,8 @@ jobs:
       source_url: ${{ steps.settings.outputs.source_url }}
       source_sha256: ${{ steps.settings.outputs.source_sha256 }}
       bottle_root_url: ${{ steps.settings.outputs.bottle_root_url }}
+      sispasm: ${{ steps.settings.outputs.sispasm }}
+      artifact_suffix: ${{ steps.settings.outputs.artifact_suffix }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -46,6 +53,7 @@ jobs:
         env:
           TARGETS: ${{ inputs.targets }}
           INPUT_BOTTLE_ROOT_URL: ${{ inputs.bottle_root_url }}
+          SISPASM: ${{ inputs.sispasm }}
         shell: bash
         run: |
           set -euo pipefail
@@ -65,6 +73,12 @@ jobs:
               exit 1
               ;;
           esac
+          if [[ "$SISPASM" != true && "$SISPASM" != false ]]; then
+            echo "::error::sispasm must be true or false"
+            exit 1
+          fi
+          artifact_suffix=
+          [[ "$SISPASM" == true ]] && artifact_suffix=-sispasm
 
           source_version="$(sed -n \
             's/^AC_INIT(\[singular\], \[\([^]]*\)\],.*/\1/p' configure.ac)"
@@ -93,10 +107,12 @@ jobs:
             echo "source_url=$source_url"
             echo "source_sha256=$source_sha256"
             echo "bottle_root_url=$bottle_root_url"
+            echo "sispasm=$SISPASM"
+            echo "artifact_suffix=$artifact_suffix"
           } >> "$GITHUB_OUTPUT"
 
   bottle:
-    name: Homebrew ${{ matrix.architecture }}
+    name: Homebrew ${{ matrix.architecture }}${{ needs.prepare.outputs.artifact_suffix }}
     needs: prepare
     strategy:
       fail-fast: false
@@ -119,6 +135,7 @@ jobs:
           BOTTLE_ROOT_URL: ${{ needs.prepare.outputs.bottle_root_url }}
           ARCHITECTURE: ${{ matrix.architecture }}
           BUILD_MISSING_DEPENDENCY_BOTTLES: ${{ inputs.build_missing_dependency_bottles }}
+          ENABLE_SISPASM: ${{ needs.prepare.outputs.sispasm }}
         run: |
           .github/scripts/package-homebrew.sh \
             "$PWD" "$VERSION" "$SOURCE_URL" "$SOURCE_SHA256" \
@@ -127,6 +144,6 @@ jobs:
       - name: Upload bottle
         uses: actions/upload-artifact@v4
         with:
-          name: singular-homebrew-${{ needs.prepare.outputs.version }}-${{ matrix.architecture }}
+          name: singular-homebrew-${{ needs.prepare.outputs.version }}-${{ matrix.architecture }}${{ needs.prepare.outputs.artifact_suffix }}
           path: ${{ runner.temp }}/homebrew-package
           if-no-files-found: error

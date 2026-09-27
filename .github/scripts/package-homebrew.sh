@@ -14,14 +14,29 @@ source_sha256="$4"
 root_url="$5"
 output_dir="$6"
 architecture="$7"
-template="$source_root/.github/packaging/homebrew/singular.rb.in"
 tap=singular/package-build
 build_dependency_bottles="${BUILD_MISSING_DEPENDENCY_BOTTLES:-true}"
+enable_sispasm="${ENABLE_SISPASM:-false}"
+formula_name=singular
+template="$source_root/.github/packaging/homebrew/singular.rb.in"
+handled_source_dependencies=
 
 case "$build_dependency_bottles" in
   true|false) ;;
   *)
     echo "BUILD_MISSING_DEPENDENCY_BOTTLES must be true or false" >&2
+    exit 2
+    ;;
+esac
+case "$enable_sispasm" in
+  true)
+    formula_name=singular-sispasm
+    template="$source_root/.github/packaging/homebrew/singular-sispasm.rb.in"
+    handled_source_dependencies=spasm
+    ;;
+  false) ;;
+  *)
+    echo "ENABLE_SISPASM must be true or false" >&2
     exit 2
     ;;
 esac
@@ -33,7 +48,7 @@ escape_sed_replacement() {
 rm -rf "$output_dir"
 mkdir -p "$output_dir"
 
-formula="$output_dir/singular.rb"
+formula="$output_dir/$formula_name.rb"
 sed \
   -e "s|@SOURCE_URL@|$(escape_sed_replacement "$source_url")|g" \
   -e "s|@VERSION@|$(escape_sed_replacement "$version")|g" \
@@ -45,29 +60,45 @@ git config --global user.email "singular@mathematik.uni-kl.de"
 brew tap-new "$tap"
 tap_root="$(brew --repository "$tap")"
 mkdir -p "$tap_root/Formula"
-cp "$formula" "$tap_root/Formula/singular.rb"
+cp "$formula" "$tap_root/Formula/$formula_name.rb"
+
+if [[ "$enable_sispasm" == true ]]; then
+  cp "$source_root/.github/packaging/homebrew/spasm.rb.in" "$output_dir/spasm.rb"
+  cp "$output_dir/spasm.rb" "$tap_root/Formula/spasm.rb"
+  brew install --only-dependencies "$tap/spasm"
+  brew install --build-bottle "$tap/spasm"
+  brew test "$tap/spasm"
+  (
+    cd "$output_dir"
+    brew bottle --json --root-url="$root_url" "$tap/spasm"
+  )
+fi
 
 # Homebrew refuses --build-bottle if a dependency still needs to be built from
 # source. Install dependencies first so Intel runners can use source-only
 # formulae such as current Automake and Readline.
-brew install --only-dependencies "$tap/singular"
-brew install --build-bottle "$tap/singular"
-brew test "$tap/singular"
+brew install --only-dependencies "$tap/$formula_name"
+brew install --build-bottle "$tap/$formula_name"
+brew test "$tap/$formula_name"
 
-dependencies="$(brew deps --union "$tap/singular")"
+dependencies="$(brew deps --union "$tap/$formula_name")"
 # Formula names contain no whitespace. Passing the dependency list as separate
 # arguments lets Homebrew emit one installation record for the whole build.
 # shellcheck disable=SC2086
-brew info --json=v2 "$tap/singular" $dependencies \
+brew info --json=v2 "$tap/$formula_name" $dependencies \
   > "$output_dir/homebrew-installations.json"
+FORMULA_NAME="$formula_name" \
+HANDLED_SOURCE_DEPENDENCIES="$handled_source_dependencies" \
 ruby -rjson -e '
+  formula_name = ENV.fetch("FORMULA_NAME")
+  handled = ENV.fetch("HANDLED_SOURCE_DEPENDENCIES", "").split(":")
   data = JSON.parse(File.read(ARGV.fetch(0)))
   source_dependencies = []
   data.fetch("formulae").sort_by { |formula| formula.fetch("name") }.each do |formula|
     installation = formula.fetch("installed").last
     source = installation.fetch("poured_from_bottle", false) ? "bottle" : "source"
     puts "#{formula.fetch("name")}\t#{installation.fetch("version")}\t#{source}"
-    if formula.fetch("name") != "singular" && source == "source"
+    if formula.fetch("name") != formula_name && !handled.include?(formula.fetch("name")) && source == "source"
       source_dependencies << formula.fetch("full_name")
     end
   end
@@ -78,7 +109,7 @@ ruby -rjson -e '
 
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
   {
-    echo "### Homebrew installation sources ($architecture)"
+    echo "### Homebrew installation sources ($formula_name, $architecture)"
     echo
     echo '```text'
     cat "$output_dir/homebrew-installations.txt"
@@ -88,7 +119,7 @@ fi
 
 (
   cd "$output_dir"
-  brew bottle --json --root-url="$root_url" "$tap/singular"
+  brew bottle --json --root-url="$root_url" "$tap/$formula_name"
 )
 
 if [[ "$build_dependency_bottles" == true && \
@@ -108,11 +139,11 @@ if [[ "$build_dependency_bottles" == true && \
         --root-url="$root_url" "$dependency"
     )
   done < "$output_dir/source-built-dependencies.txt"
-  brew test "$tap/singular"
+  brew test "$tap/$formula_name"
 fi
 
-bottle="$(find "$output_dir" -maxdepth 1 -type f -name '*.bottle*.tar.gz' -print -quit)"
-bottle_json="$(find "$output_dir" -maxdepth 1 -type f -name '*.bottle.json' -print -quit)"
+bottle="$(find "$output_dir" -maxdepth 1 -type f -name "$formula_name--*.bottle*.tar.gz" -print -quit)"
+bottle_json="$(find "$output_dir" -maxdepth 1 -type f -name "$formula_name--*.bottle.json" -print -quit)"
 test -n "$bottle"
 test -n "$bottle_json"
 tar -tzf "$bottle" > "$output_dir/bottle-contents.txt"
@@ -123,6 +154,8 @@ repository=$GITHUB_REPOSITORY
 commit=$GITHUB_SHA
 version=$version
 architecture=$architecture
+formula=$formula_name
+sispasm=$enable_sispasm
 source_url=$source_url
 source_sha256=$source_sha256
 bottle_root_url=$root_url

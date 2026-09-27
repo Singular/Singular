@@ -2,8 +2,13 @@
 
 The `spack-repo-index.yaml` file makes this Git repository directly usable as
 a Spack package repository. The **Spack packages** workflow builds the selected
-Linux architectures. It uses Spack's public cache first, builds cache misses
-from source, and exports Singular with its runtime/link dependency closure.
+Linux and macOS architectures. It uses Spack's public cache first, builds cache
+misses from source, and exports Singular with its runtime/link dependency
+closure.
+
+The workflow normally builds `singular`. Enable the `sispasm` input to build
+the `singular +sispasm` variant instead. The local repository also contains the
+SpaSM package needed by that variant. Those artifacts use the `-sispasm` suffix.
 
 ## Signing key
 

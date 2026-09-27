@@ -14,6 +14,7 @@ format="$4"
 output_dir="$5"
 artifact_basename="$6"
 bundle_old_docs="${BUNDLE_OLD_DOCS:-false}"
+enable_sispasm="${ENABLE_SISPASM:-false}"
 build_dir="$RUNNER_TEMP/singular-build-linux"
 stage="$RUNNER_TEMP/singular-stage"
 
@@ -24,6 +25,17 @@ case "$bundle_old_docs" in
     exit 2
     ;;
 esac
+case "$enable_sispasm" in
+  true|false) ;;
+  *)
+    echo "ENABLE_SISPASM must be true or false" >&2
+    exit 2
+    ;;
+esac
+if [[ "$enable_sispasm" == true && "$format" != rpm ]]; then
+  echo "ENABLE_SISPASM is currently supported only for RPM packages" >&2
+  exit 2
+fi
 if [[ "$bundle_old_docs" == true && ! -s "$source_root/doc/doc.tbz2" ]]; then
   echo "BUNDLE_OLD_DOCS=true, but doc/doc.tbz2 is missing" >&2
   exit 1
@@ -58,6 +70,11 @@ configure_flags=(
   --without-python
   --disable-python
 )
+if [[ "$enable_sispasm" == true ]]; then
+  configure_flags+=(--enable-sispasm-module)
+elif [[ "$format" == rpm ]]; then
+  configure_flags+=(--disable-sispasm-module)
+fi
 
 runtime_manifest="$RUNNER_TEMP/runtime-packages.txt"
 : > "$runtime_manifest"
@@ -68,9 +85,15 @@ if [[ "$format" == deb ]]; then
     libc6 libgcc-s1 libstdc++6 libgmp-dev libmpfr-dev libreadline-dev \
     libntl-dev libflint-dev libcdd-dev >> "$runtime_manifest"
 else
+  rpm_runtime_packages=(
+    glibc libgcc libstdc++ gmp-devel mpfr-devel readline-devel
+    ntl-devel flint-devel cddlib-devel
+  )
+  if [[ "$enable_sispasm" == true ]]; then
+    rpm_runtime_packages+=(libspasm)
+  fi
   rpm -q --qf '%{NAME} %{VERSION}-%{RELEASE}\n' \
-    glibc libgcc libstdc++ gmp-devel mpfr-devel readline-devel \
-    ntl-devel flint-devel cddlib-devel >> "$runtime_manifest"
+    "${rpm_runtime_packages[@]}" >> "$runtime_manifest"
 fi
 
 (
@@ -83,6 +106,10 @@ fi
   make -j"${BUILD_JOBS:-2}"
   make install DESTDIR="$stage"
 )
+
+if [[ "$enable_sispasm" == true ]]; then
+  test -s "$stage$libdir/singular/MOD/sispasm.so"
+fi
 
 if [[ "$bundle_old_docs" == true ]]; then
   test -s "$stage/usr/share/info/singular.info"

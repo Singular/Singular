@@ -1,0 +1,22 @@
+class Spasm < Formula
+  desc "Sparse direct Solver Modulo p"
+  homepage "https://github.com/cbouilla/spasm"
+  url "https://github.com/cbouilla/spasm/archive/refs/tags/v1.2.tar.gz"
+  sha256 "e01947316c177ac2084a4fe587e06f33377a196f711613e9d4a7b1b1c7cec000"
+  license "GPL-3.0-or-later"
+
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
+
+  def install
+    system "autoreconf", "-fi"
+    system "./configure", "--disable-openmp", *std_configure_args
+    system "make", "-C", "src", "install"
+  end
+
+  test do
+    assert_path_exists include/"spasm.h"
+    assert_path_exists lib/shared_library("libspasm")
+  end
+end
