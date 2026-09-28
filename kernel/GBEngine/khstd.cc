@@ -46,7 +46,8 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
 */
 {
   bigintmat *newhilb;
-  int deg,l,ln,mw;
+  long deg;
+  int l,ln,mw;
   pFDegProc degp;
 
   eledeg--;
@@ -82,7 +83,7 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
     deg = degp(strat->P.p,currRing);
     loop // compare the series in degree deg, try to increase deg -----------
     {
-      if (deg < ln) // deg may be out of range
+      if ((deg >= 0) && (deg < ln)) // deg may be out of range
       {
         if (deg < l)
         {
@@ -95,7 +96,7 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
       }
       else
       {
-        if (deg < l)
+        if ((deg >= 0) && (deg < l))
           eledeg = -n_Int(BIMATELEM(*hilb,1,deg+1),coeffs_BIGINT);
         else // we have newhilb = hilb
         {
@@ -159,7 +160,8 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
 */
 {
   poly newhilb;
-  int deg,l,ln;
+  long deg;
+  int l,ln;
   mpz_t mw;
   pFDegProc degp;
 

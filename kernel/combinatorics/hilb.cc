@@ -212,6 +212,9 @@ static ring makeQt()
   Qt->order[1]  = ringorder_C;
   /* the last block: everything is 0 */
   Qt->order[2]  = (rRingOrder_t)0;
+  // Weighted degrees are computed in long arithmetic.  Do not truncate them
+  // to the default 16-bit exponent size in the auxiliary univariate ring.
+  Qt->wanted_maxExp=(unsigned long)LONG_MAX;
   rComplete(Qt);
   return Qt;
 }
@@ -1148,13 +1151,13 @@ ideal RightColonOperation(ideal S, poly w, int lV)
 
 #include "kernel/ideals.h"
 
-static BOOLEAN p_Div_hi(poly p, const int* exp_q, const ring src)
+static BOOLEAN p_Div_hi(poly p, const int64* exp_q, const ring src)
 {
   BOOLEAN bad=FALSE;
   // e=max(0,p-q) for all exps
   for(int i=src->N;i>0;i--)
   {
-    int pi=p_GetExp(p,i,src)-exp_q[i];
+    int64 pi=(int64)p_GetExp(p,i,src)-exp_q[i-1];
     if (pi<0)
     {
       pi=0;
@@ -1166,6 +1169,32 @@ static BOOLEAN p_Div_hi(poly p, const int* exp_q, const ring src)
   p_Setm(p,src);
   #endif
   return bad;
+}
+
+static BOOLEAN hWeightedDegree(const poly p, const intvec* wdegree,
+                               const ring src, long* degree)
+{
+  assume(p!=NULL);
+  assume(degree!=NULL);
+
+  *degree=0;
+  for (int j=src->N; j>0; j--)
+  {
+    const long e=p_GetExp(p,j,src);
+    const long w=(wdegree==NULL) ? 1 : (*wdegree)[j-1];
+    if (w<=0)
+    {
+      WerrorS("weights must be positive");
+      return FALSE;
+    }
+    if ((e!=0) && (w>(LONG_MAX-*degree)/e))
+    {
+      WerrorS("weighted degree does not fit into int64");
+      return FALSE;
+    }
+    *degree+=e*w;
+  }
+  return TRUE;
 }
 
 #ifdef HAVE_QSORT_R
@@ -1180,8 +1209,8 @@ static int compare_rp(const void *pp1, const void *pp2, void* arg)
   ring src=(ring)arg;
   for(int i=src->N;i>0;i--)
   {
-    int e1=p_GetExp(p1,i,src);
-    int e2=p_GetExp(p2,i,src);
+    long e1=p_GetExp(p1,i,src);
+    long e2=p_GetExp(p2,i,src);
     if(e1<e2) return -1;
     if(e1>e2) return 1;
   }
@@ -1194,8 +1223,8 @@ static int compare_rp_currRing(const void *pp1, const void *pp2)
   poly p2=*(poly*)pp2;
   for(int i=currRing->N;i>0;i--)
   {
-    int e1=p_GetExp(p1,i,currRing);
-    int e2=p_GetExp(p2,i,currRing);
+    long e1=p_GetExp(p1,i,currRing);
+    long e2=p_GetExp(p2,i,currRing);
     if(e1<e2) return -1;
     if(e1>e2) return 1;
   }
@@ -1296,43 +1325,23 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
   poly h=NULL;
   if (r==0)
     return p_One(Qt);
-  if (wdegree!=NULL)
+  if ((wdegree!=NULL) && (wdegree->length()<src->N))
   {
-    int* exp=(int*)omAlloc((src->N+1)*sizeof(int));
-    for(int i=IDELEMS(A)-1; i>=0;i--)
-    {
-      if (A->m[i]!=NULL)
-      {
-        p_GetExpV(A->m[i],exp,src);
-        for(int j=src->N;j>0;j--)
-        {
-          int w=(*wdegree)[j-1];
-          if (w<=0)
-          {
-            WerrorS("weights must be positive");
-            return NULL;
-          }
-          exp[j]*=w; /* (*wdegree)[j-1] */
-        }
-        p_SetExpV(A->m[i],exp,src);
-        #ifdef PDEBUG
-        p_Setm(A->m[i],src);
-        #endif
-      }
-    }
-    omFreeSize(exp,(src->N+1)*sizeof(int));
+    WerrorS("not enough weights for Hilbert series");
+    return NULL;
   }
+  long first_degree=0;
+  if (!hWeightedDegree(A->m[0],wdegree,src,&first_degree)) return NULL;
   h=p_Init(Qt); pSetCoeff0(h,n_Init(-1,Qt->cf));
-  p_SetExp(h,1,p_Totaldegree(A->m[0],src),Qt);
+  p_SetExp(h,1,first_degree,Qt);
   //p_Setm(h,Qt);
   h=p_Add_q(h,p_One(Qt),Qt); // 1-t
-  int *exp_q=(int*)omAlloc((src->N+1)*sizeof(int));
+  int64 *exp_q=(int64*)omAlloc(src->N*sizeof(int64));
   BOOLEAN *bad=(BOOLEAN*)omAlloc0(r*sizeof(BOOLEAN));
   for (int i=1;i<r;i++)
   {
     ideal J=id_CopyFirstK(A,i,src);
-    for(int ii=src->N;ii>0;ii--)
-      exp_q[ii]=p_GetExp(A->m[i],ii,src);
+    p_GetExpVL(A->m[i],exp_q,src);
     memset(bad,0,i*sizeof(BOOLEAN));
     for(int ii=0;ii<i;ii++)
     {
@@ -1344,14 +1353,34 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
     int k=0;
     for (int ii=IDELEMS(J)-1;ii>=0;ii--)
     {
-      if((J->m[ii]!=NULL) && (bad[ii]) && (p_Totaldegree(J->m[ii],src)==1))
+      long degree=0;
+      if ((J->m[ii]!=NULL) && bad[ii])
+      {
+        if (!hWeightedDegree(J->m[ii],wdegree,src,&degree))
+        {
+          id_Delete0(&J,src);
+          omFreeSize(bad,r*sizeof(BOOLEAN));
+          omFreeSize(exp_q,src->N*sizeof(int64));
+          p_Delete(&h,Qt);
+          return NULL;
+        }
+      }
+      if((J->m[ii]!=NULL) && bad[ii] && (degree==1))
       {
         k++;
         p_LmDelete(&J->m[ii],src);
       }
     }
     IDELEMS(J)=idSkipZeroes0(J);
-    poly h_J=hilbert_series(J,src,NULL,Qt);// J_1
+    poly h_J=hilbert_series(J,src,wdegree,Qt);// J_1
+    if (h_J==NULL)
+    {
+      id_Delete0(&J,src);
+      omFreeSize(bad,r*sizeof(BOOLEAN));
+      omFreeSize(exp_q,src->N*sizeof(int64));
+      p_Delete(&h,Qt);
+      return NULL;
+    }
     poly tmp;
     if (k>0)
     {
@@ -1370,13 +1399,23 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
     id_Delete0(&J,src);
     // t^|A_i|
     tmp=p_Init(Qt); pSetCoeff0(tmp,n_Init(-1,Qt->cf));
-    p_SetExp(tmp,1,p_Totaldegree(A->m[i],src),Qt);
+    long degree=0;
+    if (!hWeightedDegree(A->m[i],wdegree,src,&degree))
+    {
+      p_Delete(&tmp,Qt);
+      p_Delete(&h_J,Qt);
+      omFreeSize(bad,r*sizeof(BOOLEAN));
+      omFreeSize(exp_q,src->N*sizeof(int64));
+      p_Delete(&h,Qt);
+      return NULL;
+    }
+    p_SetExp(tmp,1,degree,Qt);
     //p_Setm(tmp,Qt);
     tmp=p_Mult_q(tmp,h_J,Qt);
     h=p_Add_q(h,tmp,Qt);
   }
   omFreeSize(bad,r*sizeof(BOOLEAN));
-  omFreeSize(exp_q,(src->N+1)*sizeof(int));
+  omFreeSize(exp_q,src->N*sizeof(int64));
   //Print("end hilbert_series, r=%d\n",r);
   return h;
 }

@@ -10,6 +10,7 @@
 
 #include "coeffs/bigintmat.h"
 #include "coeffs/longrat.h"
+#include "misc/int64vec.h"
 #include "misc/options.h"
 #include "misc/intvec.h"
 #include "reporter/si_signals.h"
@@ -120,10 +121,15 @@ static number nMapZpa2Zp(number a, const coeffs src, const coeffs dst)
 }
 #endif
 
-static intvec* kHilbstdDeleteWeights(intvec* w)
+static int64 kHilbstdGcd(int64 a, int64 b)
 {
-  delete w;
-  return NULL;
+  while (b!=0)
+  {
+    const int64 r=a%b;
+    a=b;
+    b=r;
+  }
+  return a;
 }
 
 static intvec* kHilbstdUnitWeights(const int n)
@@ -157,7 +163,8 @@ static intvec* kHilbstdPositiveFDegWeights(const ring r)
 
   if (!kHilbstdSupportedFDeg(r)) return NULL;
 
-  intvec* w = new intvec(rVar(r));
+  int64vec w64(rVar(r));
+  int64 common=0;
   for (int i=1; i<=rVar(r); i++)
   {
     poly x = p_One(r);
@@ -166,11 +173,40 @@ static intvec* kHilbstdPositiveFDegWeights(const ring r)
     const long d = r->pFDeg(x, r);
     p_Delete(&x, r);
 
-    if ((d <= 0) || (d > INT_MAX)) return kHilbstdDeleteWeights(w);
-    (*w)[i-1] = (int)d;
+    if (d <= 0) return NULL;
+    w64[i-1]=(int64)d;
+    common=kHilbstdGcd(common,(int64)d);
   }
 
+  // Scaling every weight by the same positive factor does not change
+  // homogeneity or the degree comparisons used by Hilbert-driven std.  Do
+  // the normalization in int64 so large ring weights can still be reduced to
+  // the intvec representation used by kStd.
+  intvec* w = new intvec(rVar(r));
+  for (int i=0; i<rVar(r); i++)
+  {
+    const int64 d=w64[i]/common;
+    if (d>INT_MAX)
+    {
+      delete w;
+      return NULL;
+    }
+    (*w)[i]=(int)d;
+  }
   return w;
+}
+
+static ring kHilbstdWideDpRing(const coeffs cf, const int n, char** names)
+{
+  rRingOrder_t* order=(rRingOrder_t*)omAlloc(2*sizeof(rRingOrder_t));
+  int* block0=(int*)omAlloc0(2*sizeof(int));
+  int* block1=(int*)omAlloc0(2*sizeof(int));
+  order[0]=ringorder_dp;
+  order[1]=ringorder_no;
+  block0[0]=1;
+  block1[0]=n;
+  return rDefault(cf,n,names,2,order,block0,block1,NULL,
+                  (unsigned long)LONG_MAX);
 }
 
 static intvec* kHilbstdHomogenizingWeights(const intvec* w)
@@ -254,7 +290,7 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q, intvec* hdegree)
   if(nCoeff_is_Zp(save_ring->cf))
     prim=save_ring->cf->ch;
   coeffs cf=nInitChar(n_Zp, (void*)(long)prim);
-  ring Zp_ring=rDefault(cf,save_ring->N,save_ring->names,ringorder_dp);
+  ring Zp_ring=kHilbstdWideDpRing(cf,save_ring->N,save_ring->names);
   // map data
   nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
   if (nMap==NULL)
@@ -325,7 +361,7 @@ static ideal kTryHilbstd_nonhomog(ideal F, ideal Q, intvec* hdegree)
     names[i]=omStrDup(currRing->names[i]);
   }
   names[currRing->N]=omStrDup("@");
-  ring Zp_ring=rDefault(cf,save_ring->N+1,names,ringorder_dp);
+  ring Zp_ring=kHilbstdWideDpRing(cf,save_ring->N+1,names);
   intvec* homDegree=kHilbstdHomogenizingWeights(hdegree);
   // map data
   nMapFunc nMap=n_SetMap(save_ring->cf,Zp_ring->cf);
@@ -404,7 +440,8 @@ static ideal kTryHilbstd_nonhomog(ideal F, ideal Q, intvec* hdegree)
   block0[nblocks-1]=save_ring->N+1;
   block1[nblocks-1]=save_ring->N+1;
 
-  ring Q_ring=rDefault(cf,save_ring->N+1,names,nblocks,order,block0,block1,wvhdl,save_ring->wanted_maxExp);
+  ring Q_ring=rDefault(cf,save_ring->N+1,names,nblocks,order,block0,block1,
+                       wvhdl,(unsigned long)LONG_MAX);
   // map data
   nMap=n_SetMap(save_ring->cf,Q_ring->cf);
   if (nMap==NULL)

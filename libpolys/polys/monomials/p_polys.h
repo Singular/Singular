@@ -593,14 +593,14 @@ static inline long p_SetExp(poly p, const int v, const long e, const ring r)
 static inline  long p_IncrExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  int e = p_GetExp(p,v,r);
+  long e = p_GetExp(p,v,r);
   e++;
   return p_SetExp(p,v,e,r);
 }
 static inline  long p_DecrExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  int e = p_GetExp(p,v,r);
+  long e = p_GetExp(p,v,r);
   pAssume2(e > 0);
   e--;
   return p_SetExp(p,v,e,r);
@@ -608,7 +608,7 @@ static inline  long p_DecrExp(poly p, int v, ring r)
 static inline  long p_AddExp(poly p, int v, long ee, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  int e = p_GetExp(p,v,r);
+  long e = p_GetExp(p,v,r);
   e += ee;
   return p_SetExp(p,v,e,r);
 }
@@ -2144,4 +2144,3 @@ poly p_Div_mm(poly p, const poly m, const ring r);
 /// max exponent of variable x_i in p
 int p_MaxExpPerVar(poly p, int i, const ring r);
 #endif // P_POLYS_H
-
