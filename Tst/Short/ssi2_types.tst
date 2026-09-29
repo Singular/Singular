@@ -127,11 +127,48 @@ proc ssi2_types_roundtrip(string write_link, string read_link)
   kill in;
 }
 
+proc ssi2_coeff_roundtrip(poly value, string filename)
+{
+  string expected=string(value);
+  link out="ssi2:w "+filename;
+  write(out,value);
+  close(out);
+  kill out;
+
+  link in="ssi2:r "+filename;
+  def recovered=read(in);
+  close(in);
+  kill in;
+  check(typeof(recovered)=="poly",filename+" type");
+  check(string(recovered)==expected,filename+" value");
+  kill recovered;
+}
+
 ssi2_types_roundtrip("ssi2:w ssi2_types_plain.ssi2", "ssi2:r ssi2_types_plain.ssi2");
 if (size(system("executable","zstd"))>0)
 {
   ssi2_types_roundtrip("ssi2zstd:w ssi2_types_zstd.ssi2.zst", "ssi2zstd:r ssi2_types_zstd.ssi2.zst");
   ssi2_types_roundtrip("ssi2c:w ssi2_types_c.ssi2c", "ssi2c:r ssi2_types_c.ssi2c");
 }
+
+ring RZZ=integer,(u,v),dp;
+poly zz_value=123456789012345678901234567890*u-17*v+5;
+ssi2_coeff_roundtrip(zz_value,"ssi2_types_ZZ.ssi2");
+
+ring RZn=(integer,10),(u,v),dp;
+poly zn_value=7*u+9*v+3;
+ssi2_coeff_roundtrip(zn_value,"ssi2_types_Zn.ssi2");
+
+ring RZnm=(integer,3,4),(u,v),dp;
+poly znm_value=79*u+65*v+3;
+ssi2_coeff_roundtrip(znm_value,"ssi2_types_Znm.ssi2");
+
+ring RZ2m=(integer,2,8),(u,v),dp;
+poly z2m_value=250*u+129*v+3;
+ssi2_coeff_roundtrip(z2m_value,"ssi2_types_Z2m.ssi2");
+
+check(system("sh",
+  "rm -f ssi2_types_ZZ.ssi2 ssi2_types_Zn.ssi2 ssi2_types_Znm.ssi2 ssi2_types_Z2m.ssi2") == 0,
+  "remove coefficient-ring test files");
 
 tst_status(1);$

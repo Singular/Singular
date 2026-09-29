@@ -1757,6 +1757,11 @@ struct ssi2Info : public ssiInfo
   int write_buff_size;
   const char *compressor_name;
   unsigned short schema_versions[SSI2_SCHEMA_VERSION_COUNT];
+  BOOLEAN read_failed;
+  BOOLEAN write_failed;
+  BOOLEAN header_seen;
+  BOOLEAN schema_table_seen;
+  int read_depth;
 #ifdef HAVE_LIBSODIUM
   BOOLEAN encrypted;
   BOOLEAN encryption_reading;
@@ -1853,11 +1858,12 @@ static const char *ssiSchemaName(int id)
   return "unknown";
 }
 
-static void ssiInitSchemaVersions(ssiInfo *d)
+static void ssiInitSchemaVersions(ssiInfo *d, BOOLEAN for_write)
 {
   if (d==NULL) return;
   ssi2Info *dd=(ssi2Info*)d;
   memset(dd->schema_versions, 0, sizeof(dd->schema_versions));
+  if (!for_write) return;
   for (int i=0; i<ssiSchemaVersionCount; i++)
   {
     int id=ssiSchemaVersions[i].id;
@@ -1872,7 +1878,7 @@ static int ssiSchemaVersion(const ssiInfo *d, int id)
   if ((dd!=NULL) && (id>0) && (id<SSI2_SCHEMA_VERSION_COUNT)
   && (dd->schema_versions[id]!=0))
     return dd->schema_versions[id];
-  return ssiCurrentSchemaVersion(id);
+  return 0;
 }
 
 static void ssiSetSchemaVersion(ssiInfo *d, int id, int version)
@@ -1887,10 +1893,11 @@ static BOOLEAN ssiRequireSchemaVersion(const ssiInfo *d, int id,
 {
   int have=ssiSchemaVersion(d, id);
   int current=ssiCurrentSchemaVersion(id);
-  if ((current>0) && (have>current))
+  if ((current<=0) || (have!=current))
   {
-    Werror("%s: %s schema version %d is newer than supported version %d",
+    Werror("%s: unsupported %s schema version %d (expected %d)",
            format, ssiSchemaName(id), have, current);
+    ((ssi2Info*)d)->read_failed=TRUE;
     return TRUE;
   }
   return FALSE;
@@ -1898,6 +1905,7 @@ static BOOLEAN ssiRequireSchemaVersion(const ssiInfo *d, int id,
 
 static BOOLEAN ssi2Write(si_link l, leftv data);
 static leftv ssi2Read1(si_link l);
+static leftv ssi2Read1Internal(si_link l);
 static void ssi2WriteRing(ssiInfo *d, const ring r);
 static void ssi2WriteRing_R(ssiInfo *d, const ring r);
 static ring ssi2ReadRing(ssiInfo *d);
@@ -1929,6 +1937,18 @@ static char ssi2ModeBase(const char *mode)
   && ((mode[1]=='\0') || (mode[1]==',')))
     return mode[0];
   return '?';
+}
+
+static char *ssi2ReopenMode(const char *mode, char base)
+{
+  if ((mode==NULL) || (mode[0]=='\0'))
+  {
+    char result[2]={base, '\0'};
+    return omStrDup(result);
+  }
+  char *result=omStrDup(mode);
+  result[0]=base;
+  return result;
 }
 
 static BOOLEAN ssi2EndsWith(const char *s, const char *suffix)
@@ -2912,13 +2932,20 @@ static BOOLEAN ssi2fDrain(ssi2Info *d)
 static void ssi2FlushWriteBuffer(const ssiInfo *d)
 {
   ssi2Info *dd=(ssi2Info*)d;
-  if ((dd==NULL) || (dd->f_write==NULL) || (dd->write_buff_pos<=0)) return;
+  if ((dd==NULL) || dd->write_failed || (dd->write_buff_pos<=0)) return;
+  if (dd->f_write==NULL)
+  {
+    WerrorS("ssi2: output is not open");
+    dd->write_failed=TRUE;
+    return;
+  }
 #ifdef HAVE_LIBSODIUM
   if (dd->encrypted)
   {
-    ssi2eWriteFrame(dd, (const unsigned char*)dd->write_buff,
-                    (size_t)dd->write_buff_pos,
-                    crypto_secretstream_xchacha20poly1305_TAG_MESSAGE);
+    if (ssi2eWriteFrame(dd, (const unsigned char*)dd->write_buff,
+                        (size_t)dd->write_buff_pos,
+                        crypto_secretstream_xchacha20poly1305_TAG_MESSAGE))
+      dd->write_failed=TRUE;
     dd->write_buff_pos=0;
     return;
   }
@@ -2926,14 +2953,18 @@ static void ssi2FlushWriteBuffer(const ssiInfo *d)
 #ifdef HAVE_OPENSSL_FIPS
   if (dd->openssl_encrypted)
   {
-    ssi2fWriteFrame(dd, (const unsigned char*)dd->write_buff,
-                    (size_t)dd->write_buff_pos, FALSE);
+    if (ssi2fWriteFrame(dd, (const unsigned char*)dd->write_buff,
+                        (size_t)dd->write_buff_pos, FALSE))
+      dd->write_failed=TRUE;
     dd->write_buff_pos=0;
     return;
   }
 #endif
   if (fwrite(dd->write_buff, 1, dd->write_buff_pos, dd->f_write)!=(size_t)dd->write_buff_pos)
+  {
     WerrorS("ssi2: write failed");
+    dd->write_failed=TRUE;
+  }
   dd->write_buff_pos=0;
 }
 
@@ -2962,6 +2993,7 @@ static void ssi2WriteRaw(const ssiInfo *d, const void *buf, size_t len)
 {
   if (len==0) return;
   ssi2Info *dd=(ssi2Info*)d;
+  if ((dd==NULL) || dd->write_failed) return;
   if (dd->write_buff==NULL)
   {
     dd->write_buff_size=1<<20;
@@ -3009,12 +3041,17 @@ static void ssi2WriteRaw(const ssiInfo *d, const void *buf, size_t len)
   if (len>=(size_t)dd->write_buff_size)
   {
     ssi2FlushWriteBuffer(d);
+    if (dd->write_failed) return;
     if (fwrite(buf, 1, len, dd->f_write)!=len)
+    {
       WerrorS("ssi2: write failed");
+      dd->write_failed=TRUE;
+    }
     return;
   }
   if (dd->write_buff_pos+(int)len>dd->write_buff_size)
     ssi2FlushWriteBuffer(d);
+  if (dd->write_failed) return;
   memcpy(dd->write_buff+dd->write_buff_pos, buf, len);
   dd->write_buff_pos+=(int)len;
 }
@@ -3022,32 +3059,59 @@ static void ssi2WriteRaw(const ssiInfo *d, const void *buf, size_t len)
 static void ssi2Fflush(const ssiInfo *d)
 {
   ssi2FlushWriteBuffer(d);
-  if ((d!=NULL) && (d->f_write!=NULL))
+  ssi2Info *dd=(ssi2Info*)d;
+  if ((dd!=NULL) && (!dd->write_failed) && (dd->f_write!=NULL))
   {
-    fflush(d->f_write);
+    if (fflush(dd->f_write)!=0)
+    {
+      WerrorS("ssi2: flush failed");
+      dd->write_failed=TRUE;
+    }
   }
 }
 
 static BOOLEAN ssi2ReadRaw(const ssiInfo *d, void *buf, size_t len)
 {
-#ifdef HAVE_LIBSODIUM
   ssi2Info *dd=(ssi2Info*)d;
-  if ((dd!=NULL) && dd->encrypted)
-    return ssi2eReadRaw(dd, buf, len);
+  if ((dd==NULL) || dd->read_failed) return TRUE;
+#ifdef HAVE_LIBSODIUM
+  if (dd->encrypted)
+  {
+    if (ssi2eReadRaw(dd, buf, len))
+    {
+      dd->read_failed=TRUE;
+      return TRUE;
+    }
+    return FALSE;
+  }
 #endif
 #ifdef HAVE_OPENSSL_FIPS
-  ssi2Info *dd_open_ssl=(ssi2Info*)d;
-  if ((dd_open_ssl!=NULL) && dd_open_ssl->openssl_encrypted)
-    return ssi2fReadRaw(dd_open_ssl, buf, len);
+  if (dd->openssl_encrypted)
+  {
+    if (ssi2fReadRaw(dd, buf, len))
+    {
+      dd->read_failed=TRUE;
+      return TRUE;
+    }
+    return FALSE;
+  }
 #endif
+  if ((d->f_read==NULL) || (d->f_read->fd<0))
+  {
+    WerrorS("ssi2: input is not open");
+    dd->read_failed=TRUE;
+    return TRUE;
+  }
   char *p=(char*)buf;
   while (len>0)
   {
     int chunk=(len>(size_t)INT_MAX) ? INT_MAX : (int)len;
     int got=s_readbytes(p, chunk, d->f_read);
+    if (d->f_read->is_eof && (got>0)) got--;
     if (got!=chunk)
     {
       WerrorS("ssi2: unexpected end of input");
+      dd->read_failed=TRUE;
       return TRUE;
     }
     p+=chunk;
@@ -3063,6 +3127,51 @@ static int ssi2ReadByte(const ssiInfo *d)
   return (int)b;
 }
 
+static int ssi2ReadTopLevelByte(const ssiInfo *d)
+{
+  ssi2Info *dd=(ssi2Info*)d;
+  if ((dd==NULL) || dd->read_failed) return -2;
+#ifdef HAVE_LIBSODIUM
+  if (dd->encrypted)
+  {
+    while (dd->encryption_read_pos>=dd->encryption_read_len)
+    {
+      if (dd->encryption_final_seen) return -1;
+      if (ssi2eReadFrame(dd))
+      {
+        dd->read_failed=TRUE;
+        return -2;
+      }
+    }
+    return dd->encryption_read_buff[dd->encryption_read_pos++];
+  }
+#endif
+#ifdef HAVE_OPENSSL_FIPS
+  if (dd->openssl_encrypted)
+  {
+    while (dd->openssl_read_pos>=dd->openssl_read_len)
+    {
+      if (dd->openssl_final_seen) return -1;
+      if (ssi2fReadFrame(dd))
+      {
+        dd->read_failed=TRUE;
+        return -2;
+      }
+    }
+    return dd->openssl_read_buff[dd->openssl_read_pos++];
+  }
+#endif
+  if ((d->f_read==NULL) || (d->f_read->fd<0))
+  {
+    WerrorS("ssi2: input is not open");
+    dd->read_failed=TRUE;
+    return -2;
+  }
+  int c=s_getc(d->f_read);
+  if (d->f_read->is_eof) return -1;
+  return (int)(unsigned char)c;
+}
+
 static void ssi2WriteTag(const ssiInfo *d, unsigned char tag)
 {
   ssi2WriteRaw(d, &tag, 1);
@@ -3070,9 +3179,7 @@ static void ssi2WriteTag(const ssiInfo *d, unsigned char tag)
 
 static int ssi2ReadTag(const ssiInfo *d)
 {
-  int c=ssi2ReadByte(d);
-  if (c<0) return -1;
-  return c;
+  return ssi2ReadTopLevelByte(d);
 }
 
 static void ssi2WriteU64(const ssiInfo *d, uint64_t v)
@@ -3093,23 +3200,22 @@ static void ssi2WriteU64(const ssiInfo *d, uint64_t v)
 static uint64_t ssi2ReadU64(const ssiInfo *d)
 {
   uint64_t v=0;
-  int shift=0;
-  loop
+  for (int i=0; i<10; i++)
   {
     int c=ssi2ReadByte(d);
-    if (c<0)
-    {
-      return 0;
-    }
-    v |= ((uint64_t)(c & 0x7f)) << shift;
-    if ((c & 0x80)==0) return v;
-    shift += 7;
-    if (shift>=64)
+    if (c<0) return 0;
+    if ((i==9) && (((c & 0x7f)>1) || ((c & 0x80)!=0)))
     {
       WerrorS("ssi2: integer is too large");
+      ((ssi2Info*)d)->read_failed=TRUE;
       return 0;
     }
+    v |= ((uint64_t)(c & 0x7f)) << (7*i);
+    if ((c & 0x80)==0) return v;
   }
+  WerrorS("ssi2: integer is too large");
+  ((ssi2Info*)d)->read_failed=TRUE;
+  return 0;
 }
 
 static uint64_t ssi2EncodeI64(int64_t v)
@@ -3132,6 +3238,66 @@ static int64_t ssi2ReadI64(const ssiInfo *d)
   return ssi2DecodeI64(ssi2ReadU64(d));
 }
 
+static BOOLEAN ssi2ReadCount(const ssiInfo *d, uint64_t maximum,
+                             const char *what, int *result)
+{
+  uint64_t value=ssi2ReadU64(d);
+  if (((ssi2Info*)d)->read_failed) return TRUE;
+  if ((value>maximum) || (value>(uint64_t)INT_MAX))
+  {
+    Werror("ssi2: %s is too large", what);
+    ((ssi2Info*)d)->read_failed=TRUE;
+    return TRUE;
+  }
+  *result=(int)value;
+  return FALSE;
+}
+
+static BOOLEAN ssi2ReadInt(const ssiInfo *d, const char *what, int *result)
+{
+  int64_t value=ssi2ReadI64(d);
+  if (((ssi2Info*)d)->read_failed) return TRUE;
+  if ((value<INT_MIN) || (value>INT_MAX))
+  {
+    Werror("ssi2: %s is outside the supported range", what);
+    ((ssi2Info*)d)->read_failed=TRUE;
+    return TRUE;
+  }
+  *result=(int)value;
+  return FALSE;
+}
+
+static BOOLEAN ssi2ReadLong(const ssiInfo *d, const char *what, long *result)
+{
+  int64_t value=ssi2ReadI64(d);
+  if (((ssi2Info*)d)->read_failed) return TRUE;
+#if LONG_MAX < INT64_MAX
+  if ((value<LONG_MIN) || (value>LONG_MAX))
+  {
+    Werror("ssi2: %s is outside the supported range", what);
+    ((ssi2Info*)d)->read_failed=TRUE;
+    return TRUE;
+  }
+#endif
+  *result=(long)value;
+  return FALSE;
+}
+
+static BOOLEAN ssi2CheckedProduct(const ssiInfo *d, int a, int b,
+                                  const char *what, int *result)
+{
+  const uint64_t max_entries=SIZE_MAX/sizeof(void*);
+  if ((a<0) || (b<0) || ((a!=0) && (b>INT_MAX/a))
+  || ((uint64_t)a*(uint64_t)b>max_entries))
+  {
+    Werror("ssi2: %s dimensions are too large", what);
+    ((ssi2Info*)d)->read_failed=TRUE;
+    return TRUE;
+  }
+  *result=a*b;
+  return FALSE;
+}
+
 static void ssi2WriteSchemaTable(const ssiInfo *d)
 {
   ssi2WriteTag(d, SSI_SCHEMA_TOKEN);
@@ -3145,21 +3311,51 @@ static void ssi2WriteSchemaTable(const ssiInfo *d)
   }
 }
 
-static void ssi2ReadSchemaTable(ssiInfo *d)
+static BOOLEAN ssi2ReadSchemaTable(ssiInfo *d)
 {
-  int table_version=(int)ssi2ReadU64(d);
-  int count=(int)ssi2ReadU64(d);
-  if (table_version>SSI_SCHEMA_TABLE_VERSION)
+  ssi2Info *dd=(ssi2Info*)d;
+  uint64_t table_version=ssi2ReadU64(d);
+  uint64_t count=ssi2ReadU64(d);
+  if (dd->read_failed) return TRUE;
+  if (table_version!=SSI_SCHEMA_TABLE_VERSION)
   {
-    Print("ssi2: schema table version %d is newer than supported version %d\n",
-          table_version, SSI_SCHEMA_TABLE_VERSION);
+    Werror("ssi2: unsupported schema table version %llu (expected %d)",
+           (unsigned long long)table_version, SSI_SCHEMA_TABLE_VERSION);
+    dd->read_failed=TRUE;
+    return TRUE;
   }
-  for (int i=0; i<count; i++)
+  if (count>1024)
   {
-    int id=(int)ssi2ReadU64(d);
-    int version=(int)ssi2ReadU64(d);
-    ssiSetSchemaVersion(d, id, version);
+    WerrorS("ssi2: schema table has too many entries");
+    dd->read_failed=TRUE;
+    return TRUE;
   }
+  memset(dd->schema_versions, 0, sizeof(dd->schema_versions));
+  for (uint64_t i=0; i<count; i++)
+  {
+    uint64_t id=ssi2ReadU64(d);
+    uint64_t version=ssi2ReadU64(d);
+    if (dd->read_failed) return TRUE;
+    if ((version==0) || (version>USHRT_MAX))
+    {
+      WerrorS("ssi2: invalid schema version in schema table");
+      dd->read_failed=TRUE;
+      return TRUE;
+    }
+    if ((id>0) && (id<SSI2_SCHEMA_VERSION_COUNT))
+    {
+      if (dd->schema_versions[id]!=0)
+      {
+        Werror("ssi2: duplicate schema entry for type %llu",
+               (unsigned long long)id);
+        dd->read_failed=TRUE;
+        return TRUE;
+      }
+      ssiSetSchemaVersion(d, (int)id, (int)version);
+    }
+  }
+  dd->schema_table_seen=TRUE;
+  return FALSE;
 }
 
 static void ssi2WriteString(const ssiInfo *d, const char *s)
@@ -3172,17 +3368,19 @@ static void ssi2WriteString(const ssiInfo *d, const char *s)
 static char *ssi2ReadString(const ssiInfo *d)
 {
   uint64_t l64=ssi2ReadU64(d);
+  if (((ssi2Info*)d)->read_failed) return NULL;
   if (l64>(uint64_t)INT_MAX)
   {
     WerrorS("ssi2: string too large");
-    return omStrDup("");
+    ((ssi2Info*)d)->read_failed=TRUE;
+    return NULL;
   }
   size_t l=(size_t)l64;
   char *buf=(char*)omAlloc0(l+1);
   if (ssi2ReadRaw(d, buf, l))
   {
     omFree(buf);
-    return omStrDup("");
+    return NULL;
   }
   buf[l]='\0';
   return buf;
@@ -3231,17 +3429,47 @@ static void ssi2WriteLongAsMpz(const ssiInfo *d, long v)
 
 static void ssi2ReadMpz(const ssiInfo *d, mpz_t z)
 {
-  int sign=(int)ssi2ReadI64(d);
+  int sign=0;
+  if (ssi2ReadInt(d, "mpz sign", &sign))
+  {
+    mpz_set_ui(z, 0);
+    return;
+  }
+  if ((sign<-1) || (sign>1))
+  {
+    WerrorS("ssi2: invalid mpz sign");
+    ((ssi2Info*)d)->read_failed=TRUE;
+    mpz_set_ui(z, 0);
+    return;
+  }
   uint64_t len64=ssi2ReadU64(d);
+  if (((ssi2Info*)d)->read_failed)
+  {
+    mpz_set_ui(z, 0);
+    return;
+  }
   if (len64>(uint64_t)INT_MAX)
   {
     WerrorS("ssi2: mpz payload too large");
+    ((ssi2Info*)d)->read_failed=TRUE;
     mpz_set_ui(z, 0);
     return;
   }
   size_t len=(size_t)len64;
   if (len==0)
   {
+    if (sign!=0)
+    {
+      WerrorS("ssi2: invalid empty mpz payload");
+      ((ssi2Info*)d)->read_failed=TRUE;
+    }
+    mpz_set_ui(z, 0);
+    return;
+  }
+  if (sign==0)
+  {
+    WerrorS("ssi2: invalid zero mpz sign");
+    ((ssi2Info*)d)->read_failed=TRUE;
     mpz_set_ui(z, 0);
     return;
   }
@@ -3299,6 +3527,7 @@ static void ssi2WriteQQNumber(const ssiInfo *d, number n, const coeffs cf)
 /* #ssi2 start */
 static void ssi2WriteNumber_CF(const ssiInfo *d, number n, const coeffs cf)
 {
+  if (((ssi2Info*)d)->write_failed) return;
   switch (getCoeffType(cf))
   {
     case n_transExt:
@@ -3322,6 +3551,9 @@ static void ssi2WriteNumber_CF(const ssiInfo *d, number n, const coeffs cf)
       }
       break;
     case n_Z:
+    case n_Zn:
+    case n_Znm:
+    case n_Z2m:
       {
         ssi2WriteNumberAsMpz(d, n, cf);
       }
@@ -3335,6 +3567,7 @@ static void ssi2WriteNumber_CF(const ssiInfo *d, number n, const coeffs cf)
       break;
     default:
       Werror("ssi2: coeff type %d not implemented", (int)getCoeffType(cf));
+      ((ssi2Info*)d)->write_failed=TRUE;
       break;
   }
 }
@@ -3350,6 +3583,17 @@ static number ssi2ReadNumber_CF(const ssiInfo *d, const coeffs cf)
       p_Delete(&NUM(f), cf->extRing);
       NUM(f)=ssi2ReadPoly_R(d, cf->extRing);
       DEN(f)=ssi2ReadPoly_R(d, cf->extRing);
+      if (((ssi2Info*)d)->read_failed || (DEN(f)==NULL))
+      {
+        if (!((ssi2Info*)d)->read_failed)
+        {
+          WerrorS("ssi2: extension-field denominator is zero");
+          ((ssi2Info*)d)->read_failed=TRUE;
+        }
+        number failed_fraction=(number)f;
+        n_Delete(&failed_fraction, cf);
+        return NULL;
+      }
       return (number)f;
     }
     case n_algExt:
@@ -3363,6 +3607,17 @@ static number ssi2ReadNumber_CF(const ssiInfo *d, const coeffs cf)
         mpz_init(den);
         ssi2ReadMpz(d, num);
         ssi2ReadMpz(d, den);
+        if (((ssi2Info*)d)->read_failed || (mpz_sgn(den)==0))
+        {
+          if (!((ssi2Info*)d)->read_failed)
+          {
+            WerrorS("ssi2: rational denominator is zero");
+            ((ssi2Info*)d)->read_failed=TRUE;
+          }
+          mpz_clear(den);
+          mpz_clear(num);
+          return NULL;
+        }
         number n=n_InitMPZ(num, cf);
         number dnum=n_InitMPZ(den, cf);
         number res=n_Div(n, dnum, cf);
@@ -3377,25 +3632,43 @@ static number ssi2ReadNumber_CF(const ssiInfo *d, const coeffs cf)
         mpz_t z;
         mpz_init(z);
         ssi2ReadMpz(d, z);
+        if (((ssi2Info*)d)->read_failed)
+        {
+          mpz_clear(z);
+          return NULL;
+        }
         number res=n_InitMPZ(z, cf);
         mpz_clear(z);
         return res;
       }
     case n_Z:
+    case n_Zn:
+    case n_Znm:
+    case n_Z2m:
       {
         mpz_t z;
         mpz_init(z);
         ssi2ReadMpz(d, z);
+        if (((ssi2Info*)d)->read_failed)
+        {
+          mpz_clear(z);
+          return NULL;
+        }
         number res=n_InitMPZ(z, cf);
         mpz_clear(z);
         return res;
       }
     case n_Zp:
     case n_GF:
-      return n_Init((long)ssi2ReadI64(d), cf);
+      {
+        long value=0;
+        if (ssi2ReadLong(d, "coefficient", &value)) return NULL;
+        return n_Init(value, cf);
+      }
     default:
       Werror("ssi2: coeff type %d not implemented", (int)getCoeffType(cf));
-      return n_Init(0, cf);
+      ((ssi2Info*)d)->read_failed=TRUE;
+      return NULL;
   }
 }
 
@@ -3419,6 +3692,11 @@ static number ssi2ReadBigInt(const ssiInfo *d)
   mpz_t z;
   mpz_init(z);
   ssi2ReadMpz(d, z);
+  if (((ssi2Info*)d)->read_failed)
+  {
+    mpz_clear(z);
+    return NULL;
+  }
   number res=n_InitMPZ(z, coeffs_BIGINT);
   mpz_clear(z);
   return res;
@@ -3458,9 +3736,11 @@ static void ssi2WriteRing_R(ssiInfo *d, const ring r)
     else
     {
       ssi2WriteI64(d, -3);
-      ssi2WriteString(d, nCoeffName(r->cf));
     }
     ssi2WriteU64(d, r->N);
+    if ((!rField_is_Q(r)) && (!rField_is_Zp(r))
+    && (rFieldType(r)!=n_transExt) && (rFieldType(r)!=n_algExt))
+      ssi2WriteString(d, nCoeffName(r->cf));
     for (int i=0; i<r->N; i++)
       ssi2WriteString(d, r->names[i]);
     int n_ord=0;
@@ -3494,6 +3774,7 @@ static void ssi2WriteRing_R(ssiInfo *d, const ring r)
         case ringorder_L:
         case ringorder_IS:
           Werror("ring order not implemented for ssi2:%d", r->order[i]);
+          ((ssi2Info*)d)->write_failed=TRUE;
           break;
         default:
           break;
@@ -3560,31 +3841,58 @@ static void ssi2WriteRing(ssiInfo *d, const ring r)
 static ring ssi2ReadRing(ssiInfo *d)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_RING, "ssi2")) return NULL;
-  int ch=(int)ssi2ReadI64(d);
+  ssi2Info *dd=(ssi2Info*)d;
+  int ch=0;
+  if (ssi2ReadInt(d, "coefficient type", &ch)) return NULL;
   int new_ref=-1;
   if (ch==-6)
   {
-    new_ref=(int)ssi2ReadU64(d);
-    ch=(int)ssi2ReadI64(d);
+    if (ssi2ReadCount(d, SI_RING_CACHE-1, "ring cache index", &new_ref))
+      return NULL;
+    if (d->rings[new_ref]!=NULL)
+    {
+      Werror("ssi2: ring cache slot %d is already occupied", new_ref);
+      dd->read_failed=TRUE;
+      return NULL;
+    }
+    if (ssi2ReadInt(d, "coefficient type", &ch)) return NULL;
+    if ((ch==-6) || (ch==-5) || (ch==-4))
+    {
+      WerrorS("ssi2: invalid nested ring cache marker");
+      dd->read_failed=TRUE;
+      return NULL;
+    }
   }
   if (ch==-5)
   {
-    int index=(int)ssi2ReadU64(d);
+    int index=0;
+    if (ssi2ReadCount(d, SI_RING_CACHE-1, "ring cache index", &index))
+      return NULL;
     ring r=d->rings[index];
+    if (r==NULL)
+    {
+      Werror("ssi2: ring cache reference %d is undefined", index);
+      dd->read_failed=TRUE;
+      return NULL;
+    }
     rIncRefCnt(r);
     return r;
   }
   if (ch==-4) return NULL;
-  int N=(int)ssi2ReadU64(d);
+  int N=0;
+  uint64_t max_names=(uint64_t)(SIZE_MAX/sizeof(char*));
+  if (ssi2ReadCount(d, max_names, "ring variable count", &N)) return NULL;
   char **names=NULL;
   coeffs cf=NULL;
   if (ch==-3)
   {
     char *cf_name=ssi2ReadString(d);
+    if (cf_name==NULL) return NULL;
     cf=nFindCoeffByName(cf_name);
     if (cf==NULL)
     {
       Werror("cannot find cf:%s", cf_name);
+      dd->read_failed=TRUE;
       omFree(cf_name);
       return NULL;
     }
@@ -3592,19 +3900,46 @@ static ring ssi2ReadRing(ssiInfo *d)
   }
   if (N!=0)
   {
-    names=(char**)omAlloc(N*sizeof(char*));
-    for (int i=0; i<N; i++) names[i]=ssi2ReadString(d);
+    names=(char**)omAlloc0((size_t)N*sizeof(char*));
+    for (int i=0; i<N; i++)
+    {
+      names[i]=ssi2ReadString(d);
+      if (names[i]==NULL)
+      {
+        for (int j=0; j<i; j++) omFree(names[j]);
+        omFreeSize(names, (size_t)N*sizeof(char*));
+        return NULL;
+      }
+    }
   }
-  int num_ord=(int)ssi2ReadU64(d);
-  rRingOrder_t *ord=(rRingOrder_t*)omAlloc0((num_ord+1)*sizeof(rRingOrder_t));
-  int *block0=(int*)omAlloc0((num_ord+1)*sizeof(int));
-  int *block1=(int*)omAlloc0((num_ord+1)*sizeof(int));
-  int **wvhdl=(int**)omAlloc0((num_ord+1)*sizeof(int*));
+  int num_ord=0;
+  uint64_t max_orders=(uint64_t)(SIZE_MAX/sizeof(int*))-1;
+  if (max_orders>(uint64_t)INT_MAX-1) max_orders=(uint64_t)INT_MAX-1;
+  if (ssi2ReadCount(d, max_orders, "ring ordering count", &num_ord))
+  {
+    for (int i=0; i<N; i++) omFree(names[i]);
+    if (names!=NULL) omFreeSize(names, (size_t)N*sizeof(char*));
+    return NULL;
+  }
+  size_t order_slots=(size_t)num_ord+1;
+  rRingOrder_t *ord=(rRingOrder_t*)omAlloc0(order_slots*sizeof(rRingOrder_t));
+  int *block0=(int*)omAlloc0(order_slots*sizeof(int));
+  int *block1=(int*)omAlloc0(order_slots*sizeof(int));
+  int **wvhdl=(int**)omAlloc0(order_slots*sizeof(int*));
   for (int i=0; i<num_ord; i++)
   {
-    ord[i]=(rRingOrder_t)ssi2ReadI64(d);
-    block0[i]=(int)ssi2ReadI64(d);
-    block1[i]=(int)ssi2ReadI64(d);
+    int order_value=0;
+    if (ssi2ReadInt(d, "ring ordering", &order_value)
+    || ssi2ReadInt(d, "ring ordering block start", &block0[i])
+    || ssi2ReadInt(d, "ring ordering block end", &block1[i]))
+      break;
+    if ((order_value<=ringorder_no) || (order_value>=ringorder_unspec))
+    {
+      Werror("ssi2: invalid ring ordering %d", order_value);
+      dd->read_failed=TRUE;
+      break;
+    }
+    ord[i]=(rRingOrder_t)order_value;
     switch (ord[i])
     {
       case ringorder_a:
@@ -3614,29 +3949,60 @@ static ring ssi2ReadRing(ssiInfo *d)
       case ringorder_Ws:
       case ringorder_aa:
       {
+        if ((block0[i]<1) || (block1[i]<block0[i]) || (block1[i]>N))
+        {
+          WerrorS("ssi2: invalid weighted ordering block");
+          dd->read_failed=TRUE;
+          break;
+        }
         int s=block1[i]-block0[i]+1;
-        wvhdl[i]=(int*)omAlloc(s*sizeof(int));
-        for (int j=0; j<s; j++) wvhdl[i][j]=(int)ssi2ReadI64(d);
+        wvhdl[i]=(int*)omAlloc((size_t)s*sizeof(int));
+        for (int j=0; j<s; j++)
+          if (ssi2ReadInt(d, "ring ordering weight", &wvhdl[i][j])) break;
         break;
       }
       case ringorder_M:
       {
+        if ((block0[i]<1) || (block1[i]<block0[i]) || (block1[i]>N))
+        {
+          WerrorS("ssi2: invalid matrix ordering block");
+          dd->read_failed=TRUE;
+          break;
+        }
         int s=block1[i]-block0[i]+1;
-        wvhdl[i]=(int*)omAlloc(s*s*sizeof(int));
-        for (int j=0; j<s*s; j++) wvhdl[i][j]=(int)ssi2ReadI64(d);
+        int entries=0;
+        if (ssi2CheckedProduct(d, s, s, "matrix ordering", &entries)) break;
+        wvhdl[i]=(int*)omAlloc((size_t)entries*sizeof(int));
+        for (int j=0; j<entries; j++)
+          if (ssi2ReadInt(d, "ring ordering weight", &wvhdl[i][j])) break;
         break;
       }
       case ringorder_a64:
       case ringorder_L:
       case ringorder_IS:
         Werror("ring order not implemented for ssi2:%d", ord[i]);
+        dd->read_failed=TRUE;
         break;
       default:
         break;
     }
+    if (dd->read_failed) break;
+  }
+  if (dd->read_failed)
+  {
+    for (int i=0; i<N; i++) if (names[i]!=NULL) omFree(names[i]);
+    if (names!=NULL) omFreeSize(names, (size_t)N*sizeof(char*));
+    for (int i=0; i<num_ord; i++) if (wvhdl[i]!=NULL) omFree(wvhdl[i]);
+    omFree(ord);
+    omFree(block0);
+    omFree(block1);
+    omFree(wvhdl);
+    return NULL;
   }
   if (N==0)
   {
+    WerrorS("ssi2: ring has no variables");
+    dd->read_failed=TRUE;
     omFree(ord);
     omFree(block0);
     omFree(block1);
@@ -3650,7 +4016,11 @@ static ring ssi2ReadRing(ssiInfo *d)
   {
     TransExtInfo T;
     T.r=ssi2ReadRing(d);
-    if (T.r==NULL) return NULL;
+    if (T.r==NULL)
+    {
+      dd->read_failed=TRUE;
+      return NULL;
+    }
     cf=nInitChar(n_transExt, &T);
     r=rDefault(cf, N, names, num_ord, ord, block0, block1, wvhdl);
   }
@@ -3658,7 +4028,11 @@ static ring ssi2ReadRing(ssiInfo *d)
   {
     TransExtInfo T;
     T.r=ssi2ReadRing(d);
-    if (T.r==NULL) return NULL;
+    if (T.r==NULL)
+    {
+      dd->read_failed=TRUE;
+      return NULL;
+    }
     cf=nInitChar(n_algExt, &T);
     r=rDefault(cf, N, names, num_ord, ord, block0, block1, wvhdl);
   }
@@ -3667,11 +4041,25 @@ static ring ssi2ReadRing(ssiInfo *d)
   else
   {
     Werror("ssi2: read unknown coeffs type (%d)", ch);
+    dd->read_failed=TRUE;
     for (int i=0; i<N; i++) omFree(names[i]);
     omFreeSize(names, N*sizeof(char*));
     return NULL;
   }
+  if (r==NULL)
+  {
+    WerrorS("ssi2: could not construct ring");
+    dd->read_failed=TRUE;
+    for (int i=0; i<N; i++) omFree(names[i]);
+    omFreeSize(names, (size_t)N*sizeof(char*));
+    return NULL;
+  }
   ideal q=ssi2ReadIdeal_R(d, r);
+  if ((q==NULL) || dd->read_failed)
+  {
+    rDelete(r);
+    return NULL;
+  }
   if (IDELEMS(q)==0) omFreeBin(q, sip_sideal_bin);
   else r->qideal=q;
   for (int i=0; i<N; i++) omFree(names[i]);
@@ -3723,16 +4111,46 @@ static void ssi2WritePoly(const ssiInfo *d, poly p)
 static poly ssi2ReadPoly_R(const ssiInfo *d, const ring r)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_POLY, "ssi2")) return NULL;
-  int n=(int)ssi2ReadU64(d);
+  int n=0;
+  if (ssi2ReadCount(d, INT_MAX, "polynomial term count", &n)) return NULL;
   poly ret=NULL;
   poly prev=NULL;
   for (int l=0; l<n; l++)
   {
     poly p=p_Init(r, r->PolyBin);
     pSetCoeff0(p, ssi2ReadNumber_CF(d, r->cf));
-    p_SetComp(p, (int)ssi2ReadI64(d), r);
+    int component=0;
+    if (((ssi2Info*)d)->read_failed
+    || ssi2ReadInt(d, "polynomial component", &component)
+    || (component<0))
+    {
+      if (!((ssi2Info*)d)->read_failed)
+      {
+        WerrorS("ssi2: invalid polynomial component");
+        ((ssi2Info*)d)->read_failed=TRUE;
+      }
+      p_Delete(&p, r);
+      p_Delete(&ret, r);
+      return NULL;
+    }
+    p_SetComp(p, component, r);
     for (int i=1; i<=rVar(r); i++)
-      p_SetExp(p, i, (long)ssi2ReadI64(d), r);
+    {
+      long exponent=0;
+      if (ssi2ReadLong(d, "polynomial exponent", &exponent)
+      || (exponent<0) || ((unsigned long)exponent>r->bitmask))
+      {
+        if (!((ssi2Info*)d)->read_failed)
+        {
+          WerrorS("ssi2: invalid polynomial exponent");
+          ((ssi2Info*)d)->read_failed=TRUE;
+        }
+        p_Delete(&p, r);
+        p_Delete(&ret, r);
+        return NULL;
+      }
+      p_SetExp(p, i, exponent, r);
+    }
     p_Setm(p, r);
     p_Test(p, r);
     if (ret==NULL) ret=p;
@@ -3773,9 +4191,19 @@ static void ssi2WriteIdeal(const ssiInfo *d, int typ, const ideal I)
 static ideal ssi2ReadIdeal_R(const ssiInfo *d, const ring r)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_IDEAL, "ssi2")) return NULL;
-  int n=(int)ssi2ReadU64(d);
+  int n=0;
+  uint64_t maximum=(uint64_t)(SIZE_MAX/sizeof(poly));
+  if (ssi2ReadCount(d, maximum, "ideal generator count", &n)) return NULL;
   ideal I=idInit(n, 1);
-  for (int i=0; i<IDELEMS(I); i++) I->m[i]=ssi2ReadPoly_R(d, r);
+  for (int i=0; i<IDELEMS(I); i++)
+  {
+    I->m[i]=ssi2ReadPoly_R(d, r);
+    if (((ssi2Info*)d)->read_failed)
+    {
+      id_Delete(&I, r);
+      return NULL;
+    }
+  }
   return I;
 }
 
@@ -3787,12 +4215,23 @@ static ideal ssi2ReadIdeal(ssiInfo *d)
 static matrix ssi2ReadMatrix(ssiInfo *d)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_MATRIX, "ssi2")) return NULL;
-  int m=(int)ssi2ReadU64(d);
-  int n=(int)ssi2ReadU64(d);
+  int m=0;
+  int n=0;
+  int entries=0;
+  if (ssi2ReadCount(d, INT_MAX, "matrix row count", &m)
+  || ssi2ReadCount(d, INT_MAX, "matrix column count", &n)
+  || ssi2CheckedProduct(d, m, n, "matrix", &entries)) return NULL;
   matrix M=mpNew(m, n);
   for (int i=1; i<=MATROWS(M); i++)
     for (int j=1; j<=MATCOLS(M); j++)
+    {
       MATELEM(M, i, j)=ssi2ReadPoly(d);
+      if (((ssi2Info*)d)->read_failed)
+      {
+        id_Delete((ideal*)&M, d->r);
+        return NULL;
+      }
+    }
   return M;
 }
 /* #ssi2 end */
@@ -3816,14 +4255,31 @@ static command ssi2ReadCommand(si_link l)
   ssiInfo *d=(ssiInfo*)l->data;
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_COMMAND, "ssi2")) return NULL;
   command D=(command)omAlloc0(sizeof(*D));
-  int argc=(int)ssi2ReadU64(d);
-  int op=(int)ssi2ReadI64(d);
+  int argc=0;
+  int op=0;
+  if (ssi2ReadCount(d, SHRT_MAX, "command argument count", &argc)
+  || ssi2ReadInt(d, "command operation", &op)
+  || (op<SHRT_MIN) || (op>SHRT_MAX))
+  {
+    if (!((ssi2Info*)d)->read_failed)
+    {
+      WerrorS("ssi2: command operation is outside the supported range");
+      ((ssi2Info*)d)->read_failed=TRUE;
+    }
+    omFree(D);
+    return NULL;
+  }
   D->argc=argc;
   D->op=op;
   leftv v;
   if (argc>0)
   {
     v=ssi2Read1(l);
+    if (v==NULL)
+    {
+      omFree(D);
+      return NULL;
+    }
     memcpy(&(D->arg1), v, sizeof(*v));
     omFreeBin(v, sleftv_bin);
   }
@@ -3832,12 +4288,25 @@ static command ssi2ReadCommand(si_link l)
     if (D->argc>1)
     {
       v=ssi2Read1(l);
+      if (v==NULL)
+      {
+        D->arg1.CleanUp(d->r);
+        omFree(D);
+        return NULL;
+      }
       memcpy(&(D->arg2), v, sizeof(*v));
       omFreeBin(v, sleftv_bin);
     }
     if (D->argc>2)
     {
       v=ssi2Read1(l);
+      if (v==NULL)
+      {
+        D->arg1.CleanUp(d->r);
+        D->arg2.CleanUp(d->r);
+        omFree(D);
+        return NULL;
+      }
       memcpy(&(D->arg3), v, sizeof(*v));
       omFreeBin(v, sleftv_bin);
     }
@@ -3849,6 +4318,14 @@ static command ssi2ReadCommand(si_link l)
     while (argc>0)
     {
       v=ssi2Read1(l);
+      if (v==NULL)
+      {
+        D->arg1.CleanUp(d->r);
+        D->arg2.CleanUp(d->r);
+        D->arg3.CleanUp(d->r);
+        omFree(D);
+        return NULL;
+      }
       prev->next=v;
       prev=v;
       argc--;
@@ -3868,6 +4345,7 @@ static procinfov ssi2ReadProc(const ssiInfo *d)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_PROC, "ssi2")) return NULL;
   char *s=ssi2ReadString(d);
+  if (s==NULL) return NULL;
   procinfov p=(procinfov)omAlloc0Bin(procinfo_bin);
   p->language=LANG_SINGULAR;
   p->libname=omStrDup("");
@@ -3888,12 +4366,19 @@ static lists ssi2ReadList(si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_LIST, "ssi2")) return NULL;
-  int nr=(int)ssi2ReadU64(d);
+  int nr=0;
+  uint64_t maximum=(uint64_t)(SIZE_MAX/sizeof(sleftv));
+  if (ssi2ReadCount(d, maximum, "list length", &nr)) return NULL;
   lists L=(lists)omAlloc0Bin(slists_bin);
   L->Init(nr);
   for (int i=0; i<=L->nr; i++)
   {
     leftv v=ssi2Read1(l);
+    if (v==NULL)
+    {
+      L->Clean(d->r);
+      return NULL;
+    }
     memcpy(&(L->m[i]), v, sizeof(*v));
     omFreeBin(v, sleftv_bin);
   }
@@ -3909,9 +4394,17 @@ static void ssi2WriteIntvec(const ssiInfo *d, intvec *v)
 static intvec *ssi2ReadIntvec(const ssiInfo *d)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_INTVEC, "ssi2")) return NULL;
-  int nr=(int)ssi2ReadU64(d);
+  int nr=0;
+  if (ssi2ReadCount(d, SIZE_MAX/sizeof(int), "intvec length", &nr)) return NULL;
   intvec *v=new intvec(nr);
-  for (int i=0; i<nr; i++) (*v)[i]=(int)ssi2ReadI64(d);
+  for (int i=0; i<nr; i++)
+  {
+    if (ssi2ReadInt(d, "intvec entry", &(*v)[i]))
+    {
+      delete v;
+      return NULL;
+    }
+  }
   return v;
 }
 
@@ -3925,10 +4418,21 @@ static void ssi2WriteIntmat(const ssiInfo *d, intvec *v)
 static intvec *ssi2ReadIntmat(const ssiInfo *d)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_INTVEC, "ssi2")) return NULL;
-  int r=(int)ssi2ReadU64(d);
-  int c=(int)ssi2ReadU64(d);
+  int r=0;
+  int c=0;
+  int entries=0;
+  if (ssi2ReadCount(d, INT_MAX, "intmat row count", &r)
+  || ssi2ReadCount(d, INT_MAX, "intmat column count", &c)
+  || ssi2CheckedProduct(d, r, c, "intmat", &entries)) return NULL;
   intvec *v=new intvec(r, c, 0);
-  for (int i=0; i<r*c; i++) (*v)[i]=(int)ssi2ReadI64(d);
+  for (int i=0; i<entries; i++)
+  {
+    if (ssi2ReadInt(d, "intmat entry", &(*v)[i]))
+    {
+      delete v;
+      return NULL;
+    }
+  }
   return v;
 }
 
@@ -3942,10 +4446,22 @@ static void ssi2WriteBigintmat(const ssiInfo *d, bigintmat *v)
 static bigintmat *ssi2ReadBigintmat(const ssiInfo *d)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_BIGINTMAT, "ssi2")) return NULL;
-  int r=(int)ssi2ReadU64(d);
-  int c=(int)ssi2ReadU64(d);
+  int r=0;
+  int c=0;
+  int entries=0;
+  if (ssi2ReadCount(d, INT_MAX, "bigintmat row count", &r)
+  || ssi2ReadCount(d, INT_MAX, "bigintmat column count", &c)
+  || ssi2CheckedProduct(d, r, c, "bigintmat", &entries)) return NULL;
   bigintmat *v=new bigintmat(r, c, coeffs_BIGINT);
-  for (int i=0; i<r*c; i++) (*v)[i]=ssi2ReadBigInt(d);
+  for (int i=0; i<entries; i++)
+  {
+    (*v)[i]=ssi2ReadBigInt(d);
+    if (((ssi2Info*)d)->read_failed)
+    {
+      delete v;
+      return NULL;
+    }
+  }
   return v;
 }
 
@@ -3958,29 +4474,50 @@ static void ssi2WriteBigintvec(const ssiInfo *d, bigintmat *v)
 static bigintmat *ssi2ReadBigintvec(const ssiInfo *d)
 {
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_BIGINTMAT, "ssi2")) return NULL;
-  int c=(int)ssi2ReadU64(d);
+  int c=0;
+  if (ssi2ReadCount(d, INT_MAX, "bigintvec length", &c)) return NULL;
   bigintmat *v=new bigintmat(1, c, coeffs_BIGINT);
-  for (int i=0; i<c; i++) (*v)[i]=ssi2ReadBigInt(d);
+  for (int i=0; i<c; i++)
+  {
+    (*v)[i]=ssi2ReadBigInt(d);
+    if (((ssi2Info*)d)->read_failed)
+    {
+      delete v;
+      return NULL;
+    }
+  }
   return v;
 }
 
-static void ssi2ReadBlackbox(leftv, si_link)
+static void ssi2ReadBlackbox(leftv, si_link l)
 {
   /* If this is implemented later, dispatch by SSI_SCHEMA_BLACKBOX here. */
   WerrorS("ssi2: blackbox serialization is not implemented");
+  ((ssi2Info*)l->data)->read_failed=TRUE;
 }
 
 static void ssi2ReadAttrib(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_ATTRIBUTES, "ssi2")) return;
-  BITSET fl=(BITSET)ssi2ReadU64(d);
-  int nr_of_attr=(int)ssi2ReadU64(d);
+  uint64_t flag_value=ssi2ReadU64(d);
+  if (((ssi2Info*)d)->read_failed) return;
+  if (flag_value>UINT_MAX)
+  {
+    WerrorS("ssi2: attribute flags are outside the supported range");
+    ((ssi2Info*)d)->read_failed=TRUE;
+    return;
+  }
+  BITSET fl=(BITSET)flag_value;
+  int nr_of_attr=0;
+  if (((ssi2Info*)d)->read_failed
+  || ssi2ReadCount(d, INT_MAX, "attribute count", &nr_of_attr)) return;
   if (nr_of_attr>0)
   {
     for (int i=1; i<nr_of_attr; i++) {}
   }
   leftv tmp=ssi2Read1(l);
+  if (tmp==NULL) return;
   memcpy(res, tmp, sizeof(sleftv));
   memset(tmp, 0, sizeof(sleftv));
   omFreeBin(tmp, sleftv_bin);
@@ -3991,12 +4528,27 @@ static void ssi2ReadRingProperties(si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
   if (ssiRequireSchemaVersion(d, SSI_SCHEMA_RING_PROPERTIES, "ssi2")) return;
-  int what=(int)ssi2ReadU64(d);
+  if (d->r==NULL)
+  {
+    WerrorS("ssi2: ring property without a ring");
+    ((ssi2Info*)d)->read_failed=TRUE;
+    return;
+  }
+  int what=0;
+  if (ssi2ReadCount(d, 2, "ring property type", &what)) return;
   switch (what)
   {
     case 0:
     {
-      int lb=(int)ssi2ReadU64(d);
+      int lb=0;
+      if (ssi2ReadCount(d, sizeof(unsigned long)*CHAR_BIT-1,
+                        "ring exponent size", &lb)) return;
+      if (lb==0)
+      {
+        WerrorS("ssi2: invalid ring exponent size");
+        ((ssi2Info*)d)->read_failed=TRUE;
+        return;
+      }
       unsigned long bm=~0L;
       bm=bm<<lb;
       bm=~bm;
@@ -4007,8 +4559,18 @@ static void ssi2ReadRingProperties(si_link l)
     }
     case 1:
     {
-      int lb=(int)ssi2ReadU64(d);
-      int isLPring=(int)ssi2ReadI64(d);
+      int lb=0;
+      int isLPring=0;
+      if (ssi2ReadCount(d, sizeof(unsigned long)*CHAR_BIT-1,
+                        "ring exponent size", &lb)
+      || ssi2ReadInt(d, "localization ring flag", &isLPring)) return;
+      if ((lb==0) || (isLPring<=0) || (isLPring>SHRT_MAX)
+      || ((d->r->N % isLPring)!=0))
+      {
+        WerrorS("ssi2: invalid localization ring properties");
+        ((ssi2Info*)d)->read_failed=TRUE;
+        return;
+      }
       unsigned long bm=~0L;
       bm=bm<<lb;
       bm=~bm;
@@ -4022,9 +4584,19 @@ static void ssi2ReadRingProperties(si_link l)
     {
       matrix C=ssi2ReadMatrix(d);
       matrix D=ssi2ReadMatrix(d);
+      if ((C==NULL) || (D==NULL) || ((ssi2Info*)d)->read_failed)
+      {
+        if (C!=NULL) id_Delete((ideal*)&C, d->r);
+        if (D!=NULL) id_Delete((ideal*)&D, d->r);
+        return;
+      }
       nc_CallPlural(C, D, NULL, NULL, d->r, true, true, false, d->r, false);
       break;
     }
+    default:
+      Werror("ssi2: unknown ring property %d", what);
+      ((ssi2Info*)d)->read_failed=TRUE;
+      break;
   }
 }
 /* #ssi2 end */
@@ -4041,15 +4613,70 @@ static void ssi2WriteHeader(const ssiInfo *d)
 
 static leftv ssi2Read1(si_link l)
 {
+  if ((l==NULL) || (l->data==NULL)) return NULL;
+  ssi2Info *d=(ssi2Info*)l->data;
+  if (d->read_failed) return NULL;
+  d->read_depth++;
+  leftv result=ssi2Read1Internal(l);
+  if (l->data==d) d->read_depth--;
+  return result;
+}
+
+static leftv ssi2Read1Internal(si_link l)
+{
   ssiInfo *d=(ssiInfo*)l->data;
+  ssi2Info *dd=(ssi2Info*)d;
+  if (dd->read_failed) return NULL;
   leftv res=(leftv)omAlloc0Bin(sleftv_bin);
   int t=ssi2ReadTag(d);
+  if (t==-2)
+  {
+    omFreeBin(res, sleftv_bin);
+    return NULL;
+  }
+  if ((t>=0) && (!dd->header_seen) && (t!=98))
+  {
+    WerrorS("ssi2: missing stream header");
+    dd->read_failed=TRUE;
+    omFreeBin(res, sleftv_bin);
+    return NULL;
+  }
+  if ((t>=0) && dd->header_seen && (!dd->schema_table_seen)
+  && (t!=SSI_SCHEMA_TOKEN))
+  {
+    WerrorS("ssi2: missing schema table");
+    dd->read_failed=TRUE;
+    omFreeBin(res, sleftv_bin);
+    return NULL;
+  }
+  if (dd->schema_table_seen && (t==SSI_SCHEMA_TOKEN))
+  {
+    WerrorS("ssi2: duplicate schema table");
+    dd->read_failed=TRUE;
+    omFreeBin(res, sleftv_bin);
+    return NULL;
+  }
+  if (dd->schema_table_seen && (t==98) && (dd->read_depth!=1))
+  {
+    WerrorS("ssi2: stream header inside a nested value");
+    dd->read_failed=TRUE;
+    omFreeBin(res, sleftv_bin);
+    return NULL;
+  }
   switch (t)
   {
     case 1:
+    {
+      long value=0;
+      if (ssi2ReadLong(d, "integer", &value))
+      {
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
       res->rtyp=INT_CMD;
-      res->data=(char*)(long)ssi2ReadI64(d);
+      res->data=(char*)value;
       break;
+    }
     case 2:
       res->rtyp=STRING_CMD;
       res->data=(char*)ssi2ReadString(d);
@@ -4068,7 +4695,11 @@ static leftv ssi2Read1(si_link l)
     case 5:
     {
       d->r=ssi2ReadRing(d);
-      if (errorreported) return NULL;
+      if (dd->read_failed || (d->r==NULL))
+      {
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
       res->data=(char*)d->r;
       if (d->r!=NULL) rIncRefCnt(d->r);
       res->rtyp=RING_CMD;
@@ -4076,7 +4707,7 @@ static leftv ssi2Read1(si_link l)
       {
         if (ssiSetCurrRing(d->r)) d->r=currRing;
         omFreeBin(res, sleftv_bin);
-        return ssi2Read1(l);
+        return ssi2Read1Internal(l);
       }
       break;
     }
@@ -4115,8 +4746,23 @@ static leftv ssi2Read1(si_link l)
         return NULL;
       }
       {
-        int rk=(int)ssi2ReadI64(d);
+        int rk=0;
+        if (ssi2ReadInt(d, "module rank", &rk) || (rk<0))
+        {
+          if (!dd->read_failed)
+          {
+            WerrorS("ssi2: invalid module rank");
+            dd->read_failed=TRUE;
+          }
+          omFreeBin(res, sleftv_bin);
+          return NULL;
+        }
         ideal M=ssi2ReadIdeal(d);
+        if (M==NULL)
+        {
+          omFreeBin(res, sleftv_bin);
+          return NULL;
+        }
         M->rank=rk;
         res->data=(char*)M;
       }
@@ -4134,6 +4780,11 @@ static leftv ssi2Read1(si_link l)
     case 12:
       res->rtyp=0;
       res->name=(char*)ssi2ReadString(d);
+      if (res->name==NULL)
+      {
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
       if (res->Eval()) WerrorS("error in name lookup");
       break;
     case 13:
@@ -4169,30 +4820,67 @@ static leftv ssi2Read1(si_link l)
     case 23:
       ssi2ReadRingProperties(l);
       omFreeBin(res, sleftv_bin);
-      return ssi2Read1(l);
+      if (dd->read_failed) return NULL;
+      return ssi2Read1Internal(l);
     case 24:
       res->rtyp=BIGINTVEC_CMD;
       res->data=ssi2ReadBigintvec(d);
       break;
     case SSI_SCHEMA_TOKEN:
-      ssi2ReadSchemaTable(d);
+      if (ssi2ReadSchemaTable(d))
+      {
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
       omFreeBin(res, sleftv_bin);
-      return ssi2Read1(l);
+      return ssi2Read1Internal(l);
     case 98:
     {
-      int n98_v=(int)ssi2ReadU64(d);
-      int n98_m=(int)ssi2ReadU64(d);
-      BITSET n98_o1=(BITSET)ssi2ReadU64(d);
-      BITSET n98_o2=(BITSET)ssi2ReadU64(d);
-      if ((n98_v>SSI2_VERSION) || (n98_m!=MAX_TOK))
+      uint64_t n98_v=ssi2ReadU64(d);
+      uint64_t n98_m=ssi2ReadU64(d);
+      uint64_t n98_o1_value=ssi2ReadU64(d);
+      uint64_t n98_o2_value=ssi2ReadU64(d);
+      if (dd->read_failed)
       {
-        Print("incompatible versions of ssi2: %d/%d vs %d/%d\n",
-              SSI2_VERSION, MAX_TOK, n98_v, n98_m);
+        omFreeBin(res, sleftv_bin);
+        return NULL;
       }
-      si_opt_1=n98_o1;
-      si_opt_2=n98_o2;
+      if ((n98_v!=SSI2_VERSION) || (n98_m!=MAX_TOK))
+      {
+        Werror("ssi2: incompatible stream version %llu/%llu (expected %d/%d)",
+               (unsigned long long)n98_v, (unsigned long long)n98_m,
+               SSI2_VERSION, MAX_TOK);
+        dd->read_failed=TRUE;
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
+      if (dd->header_seen)
+      {
+        if (d->r!=NULL)
+        {
+          rKill(d->r);
+          d->r=NULL;
+        }
+        for (int i=0; i<SI_RING_CACHE; i++)
+        {
+          if (d->rings[i]!=NULL) rKill(d->rings[i]);
+          d->rings[i]=NULL;
+        }
+      }
+      if ((n98_o1_value>UINT_MAX) || (n98_o2_value>UINT_MAX))
+      {
+        WerrorS("ssi2: option bitset is outside the supported range");
+        dd->read_failed=TRUE;
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
+      dd->header_seen=TRUE;
+      dd->schema_table_seen=FALSE;
+      memset(dd->schema_versions, 0, sizeof(dd->schema_versions));
+      si_opt_1=(BITSET)n98_o1_value;
+      si_opt_2=(BITSET)n98_o2_value;
       omFreeBin(res, sleftv_bin);
-      return ssi2Read1(l);
+      return ssi2Read1Internal(l);
     }
     case 99:
       omFreeBin(res, sleftv_bin);
@@ -4200,14 +4888,32 @@ static leftv ssi2Read1(si_link l)
       m2_end(-1);
       break;
     case -1:
-      ssi2zClose(l);
+      if ((dd->read_depth!=1) || (!dd->header_seen) || (!dd->schema_table_seen))
+      {
+        WerrorS("ssi2: unexpected end of input");
+        dd->read_failed=TRUE;
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
+      if (ssi2zClose(l))
+      {
+        omFreeBin(res, sleftv_bin);
+        return NULL;
+      }
       res->rtyp=DEF_CMD;
       return res;
     default:
       Werror("ssi2: not implemented (t:%d)", t);
+      dd->read_failed=TRUE;
       omFreeBin(res, sleftv_bin);
       res=NULL;
       break;
+  }
+  if (dd->read_failed)
+  {
+    if (res->data!=NULL) res->CleanUp(d->r);
+    omFreeBin(res, sleftv_bin);
+    return NULL;
   }
   if ((d->r!=NULL) && (currRing!=d->r) && (res!=NULL) && (res->RingDependend()))
   {
@@ -4216,6 +4922,7 @@ static leftv ssi2Read1(si_link l)
   return res;
 no_ring:
   WerrorS("no ring");
+  dd->read_failed=TRUE;
   omFreeBin(res, sleftv_bin);
   return NULL;
 }
@@ -4225,6 +4932,8 @@ static BOOLEAN ssi2Write(si_link l, leftv data)
   if (SI_LINK_W_OPEN_P(l)==0)
     if (slOpen(l, SI_LINK_OPEN|SI_LINK_WRITE, NULL)) return TRUE;
   ssiInfo *d=(ssiInfo*)l->data;
+  ssi2Info *sd=(ssi2Info*)d;
+  if ((sd==NULL) || sd->write_failed) return TRUE;
   d->level++;
   while (data!=NULL)
   {
@@ -4353,14 +5062,25 @@ static BOOLEAN ssi2Write(si_link l, leftv data)
         break;
       default:
         Werror("ssi2: not implemented (t:%d, rtyp:%d)", tt, data->rtyp);
-        d->level=0;
+        sd->write_failed=TRUE;
+        d->level--;
         return TRUE;
     }
+    if (sd->write_failed)
+    {
+      d->level--;
+      return TRUE;
+    }
     if (d->level<=1) ssi2Fflush(d);
+    if (sd->write_failed)
+    {
+      d->level--;
+      return TRUE;
+    }
     data=data->next;
   }
   d->level--;
-  return FALSE;
+  return sd->write_failed;
 }
 /* #ssi2 end */
 //**************************************************************************/
@@ -4820,6 +5540,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 BOOLEAN ssi2Open(si_link l, short flag, leftv)
 {
   if (l==NULL) return TRUE;
+  if (FE_OPT_NO_SHELL_FLAG)
+  {
+    WerrorS("no links allowed");
+    return TRUE;
+  }
   const char *link_mode=(l->mode!=NULL) ? l->mode : "";
   char base=ssi2ModeBase(link_mode);
   if (base=='?')
@@ -4854,12 +5579,13 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
 
   SI_LINK_SET_OPEN_P(l, flag);
   if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
+  char *reopen_mode=ssi2ReopenMode(link_mode, mode[0]);
   omFreeBinAddr(l->mode);
-  l->mode=omStrDup(mode);
+  l->mode=reopen_mode;
 
   ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
   l->data=d;
-  ssiInitSchemaVersions(d);
+  ssiInitSchemaVersions(d, flag!=SI_LINK_READ);
   if ((l->name==NULL) || (l->name[0]=='\0'))
   {
     WerrorS("ssi2: file name required");
@@ -4872,8 +5598,10 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
   if (flag==SI_LINK_READ)
   {
     d->f_read=s_open_by_name(l->name);
-    if (d->f_read==NULL)
+    if ((d->f_read==NULL) || (d->f_read->fd<0))
     {
+      Werror("ssi2: cannot open input file `%s'", l->name);
+      if (d->f_read!=NULL) s_close(d->f_read);
       l->data=NULL;
       l->flags=0;
       omFreeSize(d, sizeof(ssi2Info));
@@ -4908,6 +5636,11 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
     ssi2WriteHeader(d);
     ssi2WriteSchemaTable(d);
     ssi2Fflush(d);
+    if (d->write_failed)
+    {
+      ssi2zClose(l);
+      return TRUE;
+    }
     SI_LINK_SET_W_OPEN_P(l);
   }
   return FALSE;
@@ -4915,6 +5648,11 @@ BOOLEAN ssi2Open(si_link l, short flag, leftv)
 
 static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
 {
+  if (FE_OPT_NO_SHELL_FLAG)
+  {
+    WerrorS("no links allowed");
+    return TRUE;
+  }
 #ifndef HAVE_LIBSODIUM
   WerrorS("ssi2e: authenticated encryption is unavailable; rebuild Singular with libsodium");
   return TRUE;
@@ -4962,8 +5700,8 @@ static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
   }
   omFree(keyfile);
 
-  char *reopen_mode=omStrDup(link_mode);
-  reopen_mode[0]=(flag==SI_LINK_READ) ? 'r' : 'w';
+  char *reopen_mode=ssi2ReopenMode(link_mode,
+                                   (flag==SI_LINK_READ) ? 'r' : 'w');
   SI_LINK_SET_OPEN_P(l, flag);
   if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
   omFreeBinAddr(l->mode);
@@ -4971,7 +5709,7 @@ static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
 
   ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
   l->data=d;
-  ssiInitSchemaVersions(d);
+  ssiInitSchemaVersions(d, flag!=SI_LINK_READ);
   d->encrypted=TRUE;
   d->encryption_reading=(flag==SI_LINK_READ);
   d->compressor_name="ssi2e";
@@ -5062,7 +5800,7 @@ static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
       ssi2WriteHeader(d);
       ssi2WriteSchemaTable(d);
       ssi2Fflush(d);
-      if (d->encryption_failed) failed=TRUE;
+      if (d->encryption_failed || d->write_failed) failed=TRUE;
     }
     if (!failed) SI_LINK_SET_W_OPEN_P(l);
   }
@@ -5094,6 +5832,11 @@ static BOOLEAN ssi2eOpen(si_link l, short flag, leftv)
 
 static BOOLEAN ssi2fOpen(si_link l, short flag, leftv)
 {
+  if (FE_OPT_NO_SHELL_FLAG)
+  {
+    WerrorS("no links allowed");
+    return TRUE;
+  }
 #ifndef HAVE_OPENSSL_FIPS
   WerrorS("ssi2f: AES-256-GCM FIPS encryption is unavailable; rebuild Singular with --with-openssl-fips=PREFIX --with-openssl-fips-provider-dir=DIR --with-openssl-fips-config=FILE");
   return TRUE;
@@ -5136,8 +5879,8 @@ static BOOLEAN ssi2fOpen(si_link l, short flag, leftv)
   }
   omFree(keyfile);
 
-  char *reopen_mode=omStrDup(link_mode);
-  reopen_mode[0]=(flag==SI_LINK_READ) ? 'r' : 'w';
+  char *reopen_mode=ssi2ReopenMode(link_mode,
+                                   (flag==SI_LINK_READ) ? 'r' : 'w');
   SI_LINK_SET_OPEN_P(l, flag);
   if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
   omFreeBinAddr(l->mode);
@@ -5145,7 +5888,7 @@ static BOOLEAN ssi2fOpen(si_link l, short flag, leftv)
 
   ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
   l->data=d;
-  ssiInitSchemaVersions(d);
+  ssiInitSchemaVersions(d, flag!=SI_LINK_READ);
   d->openssl_encrypted=TRUE;
   d->openssl_reading=(flag==SI_LINK_READ);
   d->compressor_name="ssi2f";
@@ -5221,7 +5964,7 @@ static BOOLEAN ssi2fOpen(si_link l, short flag, leftv)
       ssi2WriteHeader(d);
       ssi2WriteSchemaTable(d);
       ssi2Fflush(d);
-      if (d->openssl_failed) failed=TRUE;
+      if (d->openssl_failed || d->write_failed) failed=TRUE;
     }
     if (!failed) SI_LINK_SET_W_OPEN_P(l);
   }
@@ -5258,6 +6001,12 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
                                   char *const write_argv[])
 {
   if (l==NULL) return TRUE;
+  if (FE_OPT_NO_SHELL_FLAG)
+  {
+    WerrorS("no links allowed");
+    return TRUE;
+  }
+  const char *link_mode=(l->mode!=NULL) ? l->mode : "";
   char base=ssi2ModeBase(l->mode);
   if (base=='?')
   {
@@ -5276,12 +6025,13 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
 
   SI_LINK_SET_OPEN_P(l, flag);
   if (l->data!=NULL) omFreeSize(l->data, sizeof(ssi2Info));
+  char *reopen_mode=ssi2ReopenMode(link_mode, mode[0]);
   omFreeBinAddr(l->mode);
-  l->mode=omStrDup(mode);
+  l->mode=reopen_mode;
 
   ssi2Info *d=(ssi2Info*)omAlloc0(sizeof(ssi2Info));
   l->data=d;
-  ssiInitSchemaVersions(d);
+  ssiInitSchemaVersions(d, flag!=SI_LINK_READ);
   d->compressor_name=link_type;
   if ((l->name==NULL) || (l->name[0]=='\0'))
   {
@@ -5305,6 +6055,20 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
       filename++;
       mode="w";
     }
+  }
+
+  if (flag==SI_LINK_READ)
+  {
+    int input_fd=si_open(filename, O_RDONLY);
+    if (input_fd<0)
+    {
+      Werror("%s: cannot open input file `%s'", link_type, filename);
+      l->data=NULL;
+      l->flags=0;
+      omFreeSize(d, sizeof(ssi2Info));
+      return TRUE;
+    }
+    si_close(input_fd);
   }
 
   int pc[2];
@@ -5390,6 +6154,11 @@ static BOOLEAN ssi2CompressedOpen(si_link l, short flag,
     ssi2WriteHeader(d);
     ssi2WriteSchemaTable(d);
     ssi2Fflush(d);
+    if (d->write_failed)
+    {
+      ssi2zClose(l);
+      return TRUE;
+    }
     SI_LINK_SET_W_OPEN_P(l);
   }
   return FALSE;
@@ -5455,6 +6224,7 @@ static BOOLEAN ssi2zClose(si_link l)
     ssi2Info *d=(ssi2Info*)l->data;
     if (d!=NULL)
     {
+      if (d->read_failed || d->write_failed) res=TRUE;
       if (d->r!=NULL) rKill(d->r);
       for (int i=0; i<SI_RING_CACHE; i++)
       {
@@ -5478,6 +6248,7 @@ static BOOLEAN ssi2zClose(si_link l)
 #endif
       if (d->f_read!=NULL) { s_close(d->f_read); d->f_read=NULL; }
       ssi2FreeWriteBuffer(d);
+      if (d->write_failed) res=TRUE;
 #ifdef HAVE_LIBSODIUM
       if (d->encrypted && (!d->encryption_reading)
       && (!d->encryption_final_written) && (!d->encryption_failed))
@@ -6330,6 +7101,8 @@ static const char* slStatusSsi2(si_link l, const char* request)
   }
   if (strcmp(request, "read")==0)
   {
+    ssi2Info *state=(ssi2Info*)d;
+    if ((state!=NULL) && state->read_failed) return "not ready";
 #ifdef HAVE_LIBSODIUM
     ssi2Info *dd=(ssi2Info*)d;
     if (SI_LINK_R_OPEN_P(l) && (dd!=NULL) && dd->encrypted
@@ -6348,7 +7121,9 @@ static const char* slStatusSsi2(si_link l, const char* request)
   }
   if (strcmp(request, "write")==0)
   {
-    if (SI_LINK_W_OPEN_P(l)) return "ready";
+    ssi2Info *state=(ssi2Info*)d;
+    if (SI_LINK_W_OPEN_P(l) && ((state==NULL) || (!state->write_failed)))
+      return "ready";
     return "not ready";
   }
   return "unknown status request";
