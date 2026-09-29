@@ -9,6 +9,7 @@
 #include "kernel/structs.h"
 #include "polys/monomials/ring.h"
 #include "coeffs/bigintmat.h"
+#include "misc/int64vec.h"
 
 ideal mora (ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat);
 
@@ -54,6 +55,19 @@ ideal kStd2(ideal F, ideal Q, tHomog h, intvec ** mw,bigintmat *hilb=NULL,
 ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb=NULL,
          int syzComp=0, int newIdeal=0, intvec *vw=NULL, s_poly_proc_t sp=NULL);
 
+/// 64-bit variable-weight interfaces. The module weights remain intvecs,
+/// matching the component indices used by the standard-basis engine.
+ideal kStd64(ideal F, ideal Q, tHomog h, intvec **mw, intvec *hilb=NULL,
+          int syzComp=0, int newIdeal=0, const int64vec *vw=NULL, s_poly_proc_t sp=NULL);
+ideal kStd2_64(ideal F, ideal Q, tHomog h, intvec **mw, bigintmat *hilb=NULL,
+          int syzComp=0, int newIdeal=0, const int64vec *vw=NULL, s_poly_proc_t sp=NULL);
+ideal kStd_internal64(ideal F, ideal Q, tHomog h, intvec **w, bigintmat *hilb=NULL,
+          int syzComp=0, int newIdeal=0, const int64vec *vw=NULL, s_poly_proc_t sp=NULL,
+          poly hilb64=NULL, const ring hilbRing=NULL, int64 hilbShift=0);
+ideal kStdPoly64(ideal F, ideal Q, tHomog h, intvec **mw,
+          poly hilb64, const ring hilbRing, int64 hilbShift=0,
+          int syzComp=0, int newIdeal=0, const int64vec *vw=NULL, s_poly_proc_t sp=NULL);
+
 
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** mw, bigintmat *hilb=NULL,
     int syzComp=0, int newIdeal=0, intvec *vw=NULL, BOOLEAN rightGB=FALSE);
@@ -92,7 +106,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M,
 BOOLEAN kVerify(ideal F,ideal Q);
 
 EXTERN_VAR intvec * kModW;
-EXTERN_VAR intvec * kHomW;
+EXTERN_VAR const int64vec * kHomW;
 
 
 /* options:

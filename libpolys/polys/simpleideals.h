@@ -8,6 +8,7 @@
 */
 #include "polys/monomials/ring.h"
 #include "polys/matpol.h"
+#include "misc/int64vec.h"
 
 /// The following sip_sideal structure has many different uses
 /// throughout Singular. Basic use-cases for it are:
@@ -139,6 +140,8 @@ ideal id_Homogen(ideal h, int varnum,const ring r);
 ideal id_HomogenDP(ideal h, int varnum,const ring r);
 BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r);
 BOOLEAN id_HomIdealDP (ideal id, ideal Q, const ring r);
+BOOLEAN id_HomIdealW64 (ideal id, ideal Q, const int64vec *w, const ring r);
+BOOLEAN id_HomModuleW64 (ideal id, ideal Q, const int64vec *w, const intvec *module_w, const ring r);
 BOOLEAN id_HomIdealW (ideal id, ideal Q,  const intvec *w, const ring r);
 BOOLEAN id_HomModuleW (ideal id, ideal Q,  const intvec *w, const intvec *module_w, const ring r);
 BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R);

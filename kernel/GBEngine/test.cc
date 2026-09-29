@@ -40,6 +40,7 @@
 
 
 #include "kernel/combinatorics/stairc.h"
+#include "kernel/combinatorics/hilb.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/khstd.h"
 #include "kernel/GBEngine/kstd1.h"
@@ -57,6 +58,7 @@
 #include "kernel/GBEngine/tgb.h"
 #include "kernel/GBEngine/units.h"
 #include "kernel/GBEngine/janet.h"
+#include "Singular/ipid.h"
 
 void TestGBEngine()
 {
@@ -466,6 +468,127 @@ void TestSimpleRingArithmetcs()
   rDelete(R); // should cleanup every belonging polynomial, right!?
 }
 
+static poly hilb64Binomial(int aVar, int aExp, int bVar, int bExp,
+                           const ring R)
+{
+  poly a=p_ISet(1,R);
+  p_SetExp(a,aVar,aExp,R);
+  p_Setm(a,R);
+  poly b=p_ISet(-1,R);
+  p_SetExp(b,bVar,bExp,R);
+  p_Setm(b,R);
+  return p_Add_q(a,b,R);
+}
+
+void TestHilbert64()
+{
+  char** names=(char**)omAlloc(3*sizeof(char*));
+  names[0]=omStrDup("x");
+  names[1]=omStrDup("y");
+  names[2]=omStrDup("z");
+  rRingOrder_t* order=(rRingOrder_t*)omAlloc(2*sizeof(rRingOrder_t));
+  int* block0=(int*)omAlloc0(2*sizeof(int));
+  int* block1=(int*)omAlloc0(2*sizeof(int));
+  order[0]=ringorder_dp;
+  order[1]=ringorder_no;
+  block0[0]=1;
+  block1[0]=3;
+  coeffs cf=nInitChar(n_Zp,(void*)(long)32003);
+  ring R=rDefault(cf,3,names,2,order,block0,block1,NULL,
+                  (unsigned long)LONG_MAX);
+  rChangeCurrRing(R);
+
+  ideal I=idInit(2,1);
+  I->m[0]=hilb64Binomial(1,2,2,1,R);
+  I->m[1]=hilb64Binomial(1,1,3,1,R);
+  int64vec weights64(3);
+  weights64[0]=INT64_C(3000000000);
+  weights64[1]=INT64_C(6000000000);
+  weights64[2]=INT64_C(3000000000);
+  assume(id_HomIdealW64(I,NULL,&weights64,R));
+
+  ideal known=kStd_internal64(I,NULL,isHomog,NULL,NULL,0,0,&weights64,NULL);
+  ring Qt=hHilbertSeriesRing();
+  poly hs=hFirstSeries0p64(known,NULL,&weights64,R,Qt);
+  assume((hs!=NULL) && (p_GetExp(hs,1,Qt)>INT_MAX));
+  intvec* moduleWeights=NULL;
+  ideal G64=kStdPoly64(I,NULL,isHomog,&moduleWeights,hs,Qt,0,
+                       0,0,&weights64,NULL);
+  idSkipZeroes(G64);
+  assume(IDELEMS(G64)==2);
+
+  if (coeffs_BIGINT==NULL) coeffs_BIGINT=nInitChar(n_Z,NULL);
+  intvec weights32(3);
+  weights32[0]=1;
+  weights32[1]=2;
+  weights32[2]=1;
+  bigintmat* hdense=hFirstSeries0b(known,NULL,&weights32,NULL,R,coeffs_BIGINT);
+  ideal G32=kStd2(I,NULL,isHomog,&moduleWeights,hdense,0,0,&weights32,NULL);
+  idSkipZeroes(G32);
+  assume(IDELEMS(G32)==IDELEMS(G64));
+
+  int64vec autoWeights(3);
+  autoWeights[0]=INT64_C(3000000000);
+  autoWeights[1]=INT64_C(6000000000);
+  autoWeights[2]=1;
+  ring RA=rCopy0AndAddA(R,&autoWeights,TRUE,TRUE);
+  rComplete(RA);
+  rChangeCurrRing(RA);
+  ideal IA=idInit(2,1);
+  IA->m[0]=hilb64Binomial(1,2,2,1,RA);
+  IA->m[1]=p_ISet(1,RA);
+  p_SetExp(IA->m[1],1,1,RA);
+  p_SetExp(IA->m[1],2,1,RA);
+  p_Setm(IA->m[1],RA);
+  BITSET save1,save2;
+  SI_SAVE_OPT(save1,save2);
+  si_opt_2|=Sy_bit(V_STDHILB);
+  ideal Gauto=kTryHilbstd(IA,NULL);
+  SI_RESTORE_OPT(save1,save2);
+  assume(Gauto!=NULL);
+  idSkipZeroes(Gauto);
+  assume(IDELEMS(Gauto)==3);
+
+  // Exercise the nonhomogeneous route as well: homogenizing the constant in
+  // x^2-y+1 requires an exponent of 6,000,000,000 in the added variable.
+  ideal Inon=idInit(2,1);
+  Inon->m[0]=p_Add_q(hilb64Binomial(1,2,2,1,RA),p_ISet(1,RA),RA);
+  Inon->m[1]=p_ISet(1,RA);
+  p_SetExp(Inon->m[1],1,1,RA);
+  p_SetExp(Inon->m[1],2,1,RA);
+  p_Setm(Inon->m[1],RA);
+  ideal Gplain=kStd_internal64(Inon,NULL,testHomog,NULL,NULL,0,0,NULL,NULL);
+  SI_SAVE_OPT(save1,save2);
+  si_opt_2|=Sy_bit(V_STDHILB);
+  ideal Gnon=kTryHilbstd(Inon,NULL);
+  SI_RESTORE_OPT(save1,save2);
+  assume((Gplain!=NULL) && (Gnon!=NULL));
+  idSkipZeroes(Gplain);
+  idSkipZeroes(Gnon);
+  ideal remainder=kNF(Gnon,NULL,Gplain,0,0);
+  assume(idIs0(remainder));
+  id_Delete(&remainder,RA);
+  remainder=kNF(Gplain,NULL,Gnon,0,0);
+  assume(idIs0(remainder));
+  id_Delete(&remainder,RA);
+
+  id_Delete(&Gnon,RA);
+  id_Delete(&Gplain,RA);
+  id_Delete(&Inon,RA);
+  id_Delete(&Gauto,RA);
+  id_Delete(&IA,RA);
+  rChangeCurrRing(R);
+  rDelete(RA);
+  id_Delete(&G64,R);
+  id_Delete(&G32,R);
+  id_Delete(&known,R);
+  id_Delete(&I,R);
+  p_Delete(&hs,Qt);
+  delete hdense;
+  if (moduleWeights!=NULL) delete moduleWeights;
+  rDelete(R);
+}
+
 
 int main( int, char *argv[] )
 {
@@ -489,6 +612,7 @@ int main( int, char *argv[] )
 
   TestGBEngine();
   TestSimpleRingArithmetcs();
+  TestHilbert64();
 
   return 0;
 }

@@ -21,6 +21,8 @@
 
 #include "kernel/polys.h"
 
+#include <limits>
+
 /*2
 * compare the given hilbert series with the current one,
 * delete not needed pairs (if possible)
@@ -45,6 +47,12 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
 * The weights w are needed in the module case, otherwise NULL.
 */
 {
+  if (strat->kHilb!=NULL)
+  {
+    khCheck64(Q,w,strat->kHilb,strat->kHilbRing,strat->kHilbShift,
+              eledeg,count,strat);
+    return;
+  }
   bigintmat *newhilb;
   long deg;
   int l,ln,mw;
@@ -78,7 +86,8 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
     // degp = pWDegree;
     l = hilb->cols();
     mw = n_Int(BIMATELEM(*hilb,1,l),coeffs_BIGINT);
-    newhilb =hFirstSeries0b(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
+    newhilb =hFirstSeries0b64(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
+    if (newhilb==NULL) return;
     ln = newhilb->cols();
     deg = degp(strat->P.p,currRing);
     loop // compare the series in degree deg, try to increase deg -----------
@@ -247,6 +256,105 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
 }
 #endif
 
+/* Compare sparse Hilbert numerators.  Unlike bigintmat, this representation
+ * is indexed by monomial exponents and therefore remains practical when the
+ * first relevant degree is larger than INT_MAX. */
+void khCheck64(ideal Q, intvec *w, poly hilb, const ring Qt,
+               int64 hilbShift, int &eledeg, int &count, kStrategy strat)
+{
+  eledeg--;
+  if (eledeg!=0) return;
+
+  if (strat->ak>0)
+  {
+    char *used_comp=(char*)omAlloc0(strat->ak+1);
+    int i;
+    for(i=strat->sl;i>0;i--) used_comp[pGetComp(strat->S[i])]='\1';
+    for(i=strat->ak;i>0;i--)
+    {
+      if(used_comp[i]=='\0')
+      {
+        omFree((ADDRESS)used_comp);
+        return;
+      }
+    }
+    omFree((ADDRESS)used_comp);
+  }
+
+  pFDegProc degp=currRing->pFDeg;
+  if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=p_Totaldegree;
+
+  poly newhilb;
+  if (id_IsModule(strat->Shdl,currRing))
+    newhilb=hFirstSeries0m64(strat->Shdl,Q,strat->kHomW,w,currRing,Qt);
+  else
+    newhilb=hFirstSeries0p64(strat->Shdl,Q,strat->kHomW,currRing,Qt);
+  if (errorreported)
+  {
+    p_Delete(&newhilb,Qt);
+    return;
+  }
+
+  poly difference=p_Sub(p_Copy(newhilb,Qt),p_Copy(hilb,Qt),Qt);
+  p_Delete(&newhilb,Qt);
+  const int64 currentDegree=(int64)degp(strat->P.p,currRing);
+  int64 degree=std::numeric_limits<int64>::max();
+  long coefficient=0;
+  for (poly p=difference; p!=NULL; pIter(p))
+  {
+    const int64 d=(int64)p_GetExp(p,1,Qt);
+    if ((d>=currentDegree) && (d<degree))
+    {
+      degree=d;
+      coefficient=n_Int(pGetCoeff(p),Qt->cf);
+    }
+  }
+
+  if (degree==std::numeric_limits<int64>::max())
+  {
+    while (strat->Ll>=0)
+    {
+      count++;
+      if(TEST_OPT_PROT) { PrintS("h"); mflush(); }
+      deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+    }
+    p_Delete(&difference,Qt);
+    return;
+  }
+
+  if (coefficient<0)
+  {
+    p_Delete(&difference,Qt);
+    return;
+  }
+  if (coefficient>INT_MAX)
+  {
+    WerrorS("Hilbert coefficient does not fit into int");
+    p_Delete(&difference,Qt);
+    return;
+  }
+  eledeg=(int)coefficient;
+  p_Delete(&difference,Qt);
+
+  while (strat->Ll>=0)
+  {
+    const int64 pairDegree=(int64)degp(strat->L[strat->Ll].p,currRing);
+    int64 adjustedDegree;
+    if ((hilbShift>0)
+     && (pairDegree<std::numeric_limits<int64>::min()+hilbShift))
+      adjustedDegree=std::numeric_limits<int64>::min();
+    else if ((hilbShift<0)
+          && (pairDegree>std::numeric_limits<int64>::max()+hilbShift))
+      adjustedDegree=std::numeric_limits<int64>::max();
+    else
+      adjustedDegree=pairDegree-hilbShift;
+    if (adjustedDegree>=degree) break;
+    count++;
+    if(TEST_OPT_PROT) { PrintS("h"); mflush(); }
+    deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+  }
+}
+
 void khCheckLocInhom(ideal Q, intvec *w, bigintmat *hilb, int &count,
              kStrategy strat)
 
@@ -264,7 +372,12 @@ so delete all the remaining pairs
 
   Lm = id_Head(strat->Shdl,currRing);
 
-  newhilb =hFirstSeries0b(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
+  newhilb =hFirstSeries0b64(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
+  if (newhilb==NULL)
+  {
+    id_Delete(&Lm,currRing);
+    return;
+  }
 
   if(newhilb->compare(hilb) == 0)
   {
@@ -279,7 +392,9 @@ so delete all the remaining pairs
       deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
     }
     delete newhilb;
+    id_Delete(&Lm,currRing);
     return;
   }
+  delete newhilb;
   id_Delete(&Lm,currRing);
 }

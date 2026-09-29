@@ -17,6 +17,7 @@
 #define P_POLYS_H
 
 #include "misc/mylimits.h"
+#include "misc/int64vec.h"
 #include "misc/intvec.h"
 #include "coeffs/coeffs.h"
 
@@ -228,6 +229,8 @@ poly      p_HomogenDP (poly p, int varnum, const ring r);
 
 BOOLEAN   p_IsHomogeneous (poly p, const ring r);
 BOOLEAN   p_IsHomogeneousDP (poly p, const ring r);
+BOOLEAN   p_IsHomogeneousW64 (poly p, const int64vec *w, const ring r);
+BOOLEAN   p_IsHomogeneousW64 (poly p, const int64vec *w, const intvec *module_w,const ring r);
 BOOLEAN   p_IsHomogeneousW (poly p, const intvec *w, const ring r);
 BOOLEAN   p_IsHomogeneousW (poly p, const intvec *w, const intvec *module_w,const ring r);
 

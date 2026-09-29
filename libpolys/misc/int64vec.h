@@ -37,6 +37,7 @@ public:
   int64vec(int r, int c, int64 init);
   int64vec(int64vec* iv);
   int64vec(intvec* iv);
+  int64vec(const intvec* iv);
   int64& operator[](int i)
     {
 #ifndef SING_NDEBUG

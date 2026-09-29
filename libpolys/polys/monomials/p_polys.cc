@@ -9,6 +9,7 @@
  *******************************************************************/
 
 #include <ctype.h>
+#include <limits>
 
 #include "misc/auxiliary.h"
 
@@ -590,18 +591,43 @@ long p_Deg(poly a, const ring r)
   return p_GetOrder(a, r);
 }
 
+static BOOLEAN p_CheckedDegreeTerm(const long exponent, const int64 weight,
+                                   int64* sum)
+{
+  const int64 e=(int64)exponent;
+  const int64 max=std::numeric_limits<int64>::max();
+  const int64 min=std::numeric_limits<int64>::min();
+  if ((e!=0) && (((weight>0) && (weight>max/e))
+              || ((weight<0) && (weight<min/e)))) return FALSE;
+  const int64 term=e*weight;
+  if (((term>0) && (*sum>max-term)) || ((term<0) && (*sum<min-term)))
+    return FALSE;
+  *sum+=term;
+  return TRUE;
+}
+
 // p_WTotalDegree for weighted orderings
 // whose first block covers all variables
 long p_WFirstTotalDegree(poly p, const ring r)
 {
   int i;
-  long sum = 0;
+  int64 sum = 0;
 
   for (i=1; i<= r->firstBlockEnds; i++)
   {
-    sum += p_GetExp(p, i, r)*r->firstwv[i-1];
+    if (!p_CheckedDegreeTerm(p_GetExp(p,i,r),(int64)r->firstwv[i-1],&sum))
+    {
+      WerrorS("weighted degree does not fit into int64");
+      return 0;
+    }
   }
-  return sum;
+  if ((sum<std::numeric_limits<long>::min())
+   || (sum>std::numeric_limits<long>::max()))
+  {
+    WerrorS("weighted degree does not fit into the degree type");
+    return 0;
+  }
+  return (long)sum;
 }
 
 /*2
@@ -613,7 +639,7 @@ long p_WTotaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   int i, k;
-  long j =0;
+  int64 j =0;
 
   // iterate through each block:
   for (i=0;r->order[i]!=0;i++)
@@ -625,7 +651,8 @@ long p_WTotaldegree(poly p, const ring r)
       case ringorder_M:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         { // in jedem block:
-          j+= p_GetExp(p,k,r)*r->wvhdl[i][k - b0 /*r->block0[i]*/]*r->OrdSgn;
+          if (!p_CheckedDegreeTerm(p_GetExp(p,k,r),
+              (int64)r->wvhdl[i][k-b0]*(int64)r->OrdSgn,&j)) goto degree_overflow;
         }
         break;
       case ringorder_am:
@@ -633,16 +660,23 @@ long p_WTotaldegree(poly p, const ring r)
       case ringorder_a:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         { // only one line
-          j+= p_GetExp(p,k,r)*r->wvhdl[i][k - b0 /*r->block0[i]*/];
+          if (!p_CheckedDegreeTerm(p_GetExp(p,k,r),
+              (int64)r->wvhdl[i][k-b0],&j)) goto degree_overflow;
         }
-        return j*r->OrdSgn;
+        if ((r->OrdSgn<0) && (j==std::numeric_limits<int64>::min()))
+          goto degree_overflow;
+        j*=r->OrdSgn;
+        if ((j<std::numeric_limits<long>::min())
+         || (j>std::numeric_limits<long>::max())) goto degree_type_overflow;
+        return (long)j;
       case ringorder_wp:
       case ringorder_ws:
       case ringorder_Wp:
       case ringorder_Ws:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         { // in jedem block:
-          j+= p_GetExp(p,k,r)*r->wvhdl[i][k - b0 /*r->block0[i]*/];
+          if (!p_CheckedDegreeTerm(p_GetExp(p,k,r),
+              (int64)r->wvhdl[i][k-b0],&j)) goto degree_overflow;
         }
         break;
       case ringorder_lp:
@@ -655,19 +689,21 @@ long p_WTotaldegree(poly p, const ring r)
       case ringorder_rp:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         {
-          j+= p_GetExp(p,k,r);
+          if (!p_CheckedDegreeTerm(p_GetExp(p,k,r),1,&j)) goto degree_overflow;
         }
         break;
       case ringorder_a64:
         {
           int64* w=(int64*)r->wvhdl[i];
-          for (k=0;k<=(b1 /*r->block1[i]*/ - b0 /*r->block0[i]*/);k++)
+          for (k=b0;k<=b1;k++)
           {
-            //there should be added a line which checks if w[k]>2^31
-            j+= p_GetExp(p,k+1, r)*(long)w[k];
+            if (!p_CheckedDegreeTerm(p_GetExp(p,k,r),w[k-b0],&j))
+              goto degree_overflow;
           }
           //break;
-          return j;
+          if ((j<std::numeric_limits<long>::min())
+           || (j>std::numeric_limits<long>::max())) goto degree_type_overflow;
+          return (long)j;
         }
       default:
       #if 0
@@ -685,7 +721,17 @@ long p_WTotaldegree(poly p, const ring r)
     /* no default: all orderings covered */
     }
   }
-  return  j;
+  if ((j<std::numeric_limits<long>::min())
+   || (j>std::numeric_limits<long>::max())) goto degree_type_overflow;
+  return (long)j;
+
+degree_overflow:
+  WerrorS("weighted degree does not fit into int64");
+  return 0;
+
+degree_type_overflow:
+  WerrorS("weighted degree does not fit into the degree type");
+  return 0;
 }
 
 long p_DegW(poly p, const int *w, const ring R)
@@ -3408,7 +3454,7 @@ poly p_HomogenDP (poly p, int varnum, const ring r)
 BOOLEAN p_IsHomogeneous (poly p, const ring r)
 {
   poly qp=p;
-  int o;
+  long o;
 
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
   pFDegProc d;
@@ -3432,7 +3478,7 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
 BOOLEAN p_IsHomogeneousDP (poly p, const ring r)
 {
   poly qp=p;
-  int o;
+  long o;
 
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
   o = p_Totaldegree(p,r);
@@ -3445,16 +3491,47 @@ BOOLEAN p_IsHomogeneousDP (poly p, const ring r)
   return TRUE;
 }
 
-static long p_TotaldegreeWIntvec(poly p, const intvec *w, const ring r)
+static BOOLEAN p_CheckedAddInt64(const int64 a, const int64 b, int64* result)
 {
-  long d = 0;
+  assume(result != NULL);
+  const int64 max = std::numeric_limits<int64>::max();
+  const int64 min = std::numeric_limits<int64>::min();
+  if (((b > 0) && (a > max-b)) || ((b < 0) && (a < min-b))) return FALSE;
+  *result = a+b;
+  return TRUE;
+}
+
+static BOOLEAN p_CheckedWeightedDegree64(poly p, const int64vec *w,
+                                         const ring r, int64* degree)
+{
+  assume(degree != NULL);
+  int64 d = 0;
   const int l = (w == NULL ? 0 : w->length());
+  const int64 max = std::numeric_limits<int64>::max();
+  const int64 min = std::numeric_limits<int64>::min();
 
   for (int i=rVar(r); i>0; i--)
   {
-    if (i <= l) d += (long)p_GetExp(p,i,r) * (long)(*w)[i-1];
+    if (i <= l)
+    {
+      const int64 e = (int64)p_GetExp(p,i,r);
+      const int64 weight = (*w)[i-1];
+      if ((e != 0) && (((weight > 0) && (weight > max/e))
+                    || ((weight < 0) && (weight < min/e))))
+      {
+        WerrorS("weighted degree does not fit into int64");
+        return FALSE;
+      }
+      const int64 term = e*weight;
+      if (!p_CheckedAddInt64(d,term,&d))
+      {
+        WerrorS("weighted degree does not fit into int64");
+        return FALSE;
+      }
+    }
   }
-  return d;
+  *degree=d;
+  return TRUE;
 }
 
 static long p_ComponentWeightIntvec(poly p, const intvec *module_w, const ring r)
@@ -3471,15 +3548,23 @@ static long p_ComponentWeightIntvec(poly p, const intvec *module_w, const ring r
 */
 BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const ring r)
 {
+  if (w==NULL) return p_IsHomogeneousW64(p,NULL,r);
+  int64vec w64(w);
+  return p_IsHomogeneousW64(p,&w64,r);
+}
+
+BOOLEAN p_IsHomogeneousW64 (poly p, const int64vec *w, const ring r)
+{
   poly qp=p;
-  long o;
+  int64 o;
 
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
   pIter(qp);
-  o = p_TotaldegreeWIntvec(p,w,r);
+  if (!p_CheckedWeightedDegree64(p,w,r,&o)) return FALSE;
   do
   {
-    if (p_TotaldegreeWIntvec(qp,w,r) != o) return FALSE;
+    int64 oo;
+    if (!p_CheckedWeightedDegree64(qp,w,r,&oo) || (oo != o)) return FALSE;
     pIter(qp);
   }
   while (qp != NULL);
@@ -3488,15 +3573,33 @@ BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const ring r)
 
 BOOLEAN p_IsHomogeneousW (poly p, const intvec *w, const intvec *module_w, const ring r)
 {
+  if (w==NULL) return p_IsHomogeneousW64(p,NULL,module_w,r);
+  int64vec w64(w);
+  return p_IsHomogeneousW64(p,&w64,module_w,r);
+}
+
+BOOLEAN p_IsHomogeneousW64 (poly p, const int64vec *w, const intvec *module_w, const ring r)
+{
   poly qp=p;
-  long o;
+  int64 o;
 
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
   pIter(qp);
-  o = p_TotaldegreeWIntvec(p,w,r)+p_ComponentWeightIntvec(p,module_w,r);
+  if (!p_CheckedWeightedDegree64(p,w,r,&o)) return FALSE;
+  if (!p_CheckedAddInt64(o,(int64)p_ComponentWeightIntvec(p,module_w,r),&o))
+  {
+    WerrorS("weighted degree does not fit into int64");
+    return FALSE;
+  }
   do
   {
-    long oo=p_TotaldegreeWIntvec(qp,w,r)+p_ComponentWeightIntvec(qp,module_w,r);
+    int64 oo;
+    if (!p_CheckedWeightedDegree64(qp,w,r,&oo)) return FALSE;
+    if (!p_CheckedAddInt64(oo,(int64)p_ComponentWeightIntvec(qp,module_w,r),&oo))
+    {
+      WerrorS("weighted degree does not fit into int64");
+      return FALSE;
+    }
     if (oo != o) return FALSE;
     pIter(qp);
   }

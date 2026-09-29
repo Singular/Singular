@@ -9,10 +9,12 @@
 #define _BSD_SOURCE
 #endif
 #include <stdlib.h>
+#include <limits>
 
 #include "kernel/mod2.h"
 
 #include "misc/mylimits.h"
+#include "misc/int64vec.h"
 #include "misc/intvec.h"
 
 #include "kernel/combinatorics/hilb.h"
@@ -220,6 +222,12 @@ static ring makeQt()
 }
 
 STATIC_VAR ring hilb_Qt=NULL;
+
+ring hHilbertSeriesRing()
+{
+  if (hilb_Qt==NULL) hilb_Qt=makeQt();
+  return hilb_Qt;
+}
 void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
 {
   id_LmTest(S, currRing);
@@ -1171,8 +1179,8 @@ static BOOLEAN p_Div_hi(poly p, const int64* exp_q, const ring src)
   return bad;
 }
 
-static BOOLEAN hWeightedDegree(const poly p, const intvec* wdegree,
-                               const ring src, long* degree)
+static BOOLEAN hWeightedDegree(const poly p, const int64vec* wdegree,
+                               const ring src, int64* degree)
 {
   assume(p!=NULL);
   assume(degree!=NULL);
@@ -1180,20 +1188,31 @@ static BOOLEAN hWeightedDegree(const poly p, const intvec* wdegree,
   *degree=0;
   for (int j=src->N; j>0; j--)
   {
-    const long e=p_GetExp(p,j,src);
-    const long w=(wdegree==NULL) ? 1 : (*wdegree)[j-1];
+    const int64 e=(int64)p_GetExp(p,j,src);
+    const int64 w=(wdegree==NULL) ? 1 : (*wdegree)[j-1];
     if (w<=0)
     {
       WerrorS("weights must be positive");
       return FALSE;
     }
-    if ((e!=0) && (w>(LONG_MAX-*degree)/e))
+    if ((e!=0) && (w>(std::numeric_limits<int64>::max()-*degree)/e))
     {
       WerrorS("weighted degree does not fit into int64");
       return FALSE;
     }
     *degree+=e*w;
   }
+  return TRUE;
+}
+
+static BOOLEAN hSetHilbertDegree(poly p, const int64 degree, const ring Qt)
+{
+  if ((degree<0) || (degree>std::numeric_limits<long>::max()))
+  {
+    WerrorS("Hilbert degree does not fit into the polynomial exponent type");
+    return FALSE;
+  }
+  p_SetExp(p,1,(long)degree,Qt);
   return TRUE;
 }
 
@@ -1315,7 +1334,7 @@ static void id_DelDiv_hi(ideal id, BOOLEAN *bad,const ring r)
   omFreeSize(sev,kk*sizeof(long));
 }
 
-static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const ring Qt)
+static poly hilbert_series(ideal A, const ring src, const int64vec* wdegree, const ring Qt)
 // according to:
 // Algorithm 2.6 of
 // Dave Bayer, Mike Stillman - Computation of Hilbert Function
@@ -1330,10 +1349,14 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
     WerrorS("not enough weights for Hilbert series");
     return NULL;
   }
-  long first_degree=0;
+  int64 first_degree=0;
   if (!hWeightedDegree(A->m[0],wdegree,src,&first_degree)) return NULL;
   h=p_Init(Qt); pSetCoeff0(h,n_Init(-1,Qt->cf));
-  p_SetExp(h,1,first_degree,Qt);
+  if (!hSetHilbertDegree(h,first_degree,Qt))
+  {
+    p_Delete(&h,Qt);
+    return NULL;
+  }
   //p_Setm(h,Qt);
   h=p_Add_q(h,p_One(Qt),Qt); // 1-t
   int64 *exp_q=(int64*)omAlloc(src->N*sizeof(int64));
@@ -1353,7 +1376,7 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
     int k=0;
     for (int ii=IDELEMS(J)-1;ii>=0;ii--)
     {
-      long degree=0;
+      int64 degree=0;
       if ((J->m[ii]!=NULL) && bad[ii])
       {
         if (!hWeightedDegree(J->m[ii],wdegree,src,&degree))
@@ -1399,7 +1422,7 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
     id_Delete0(&J,src);
     // t^|A_i|
     tmp=p_Init(Qt); pSetCoeff0(tmp,n_Init(-1,Qt->cf));
-    long degree=0;
+    int64 degree=0;
     if (!hWeightedDegree(A->m[i],wdegree,src,&degree))
     {
       p_Delete(&tmp,Qt);
@@ -1409,7 +1432,15 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
       p_Delete(&h,Qt);
       return NULL;
     }
-    p_SetExp(tmp,1,degree,Qt);
+    if (!hSetHilbertDegree(tmp,degree,Qt))
+    {
+      p_Delete(&tmp,Qt);
+      p_Delete(&h_J,Qt);
+      omFreeSize(bad,r*sizeof(BOOLEAN));
+      omFreeSize(exp_q,src->N*sizeof(int64));
+      p_Delete(&h,Qt);
+      return NULL;
+    }
     //p_Setm(tmp,Qt);
     tmp=p_Mult_q(tmp,h_J,Qt);
     h=p_Add_q(h,tmp,Qt);
@@ -1420,7 +1451,7 @@ static poly hilbert_series(ideal A, const ring src, const intvec* wdegree, const
   return h;
 }
 
-poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
+poly hFirstSeries0p64(ideal A,ideal Q, const int64vec *wdegree, const ring src, const ring Qt)
 {
   A=id_Head(A,src);
   id_Test(A,src);
@@ -1461,7 +1492,14 @@ poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring
   return s;
 }
 
-poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring src, const ring Qt)
+poly hFirstSeries0p(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
+{
+  if (wdegree==NULL) return hFirstSeries0p64(A,Q,NULL,src,Qt);
+  int64vec w64(wdegree);
+  return hFirstSeries0p64(A,Q,&w64,src,Qt);
+}
+
+poly hFirstSeries0m64(ideal A,ideal Q, const int64vec *wdegree, intvec *shifts, const ring src, const ring Qt)
 {
   int rk=A->rank;
   poly h=NULL;
@@ -1488,7 +1526,13 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
     if (have_terms)
     {
       idSkipZeroes(AA);
-      h_i=hFirstSeries0p(AA,Q,wdegree,src,Qt);
+      h_i=hFirstSeries0p64(AA,Q,wdegree,src,Qt);
+      if (errorreported)
+      {
+        id_Delete(&AA,src);
+        p_Delete(&h,Qt);
+        return NULL;
+      }
     }
     else
     {
@@ -1498,11 +1542,17 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
     poly s=p_One(Qt);
     if (shifts!=NULL)
     {
-      int m=shifts->min_in();
-      int sh=(*shifts)[i-1]-m;
+      const int64 m=(int64)shifts->min_in();
+      const int64 sh=(int64)(*shifts)[i-1]-m;
       if (sh!=0)
       {
-        p_SetExp(s,1,sh,Qt);
+        if (!hSetHilbertDegree(s,sh,Qt))
+        {
+          p_Delete(&s,Qt);
+          p_Delete(&h_i,Qt);
+          p_Delete(&h,Qt);
+          return NULL;
+        }
         p_Setm(s,Qt);
       }
     }
@@ -1510,6 +1560,13 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
     h=p_Add_q(h,h_i,Qt);
   }
   return h;
+}
+
+poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring src, const ring Qt)
+{
+  if (wdegree==NULL) return hFirstSeries0m64(A,Q,NULL,shifts,src,Qt);
+  int64vec w64(wdegree);
+  return hFirstSeries0m64(A,Q,&w64,shifts,src,Qt);
 }
 
 intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
@@ -1520,10 +1577,25 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
     ss=new intvec(2);
   else
   {
-    ss=new intvec(p_Totaldegree(s,Qt)+2);
+    const long max_degree=p_Totaldegree(s,Qt);
+    if ((max_degree<0) || (max_degree>INT_MAX-2))
+    {
+      WerrorS("Hilbert series is too large for the intvec representation");
+      p_Delete(&s,Qt);
+      return NULL;
+    }
+    ss=new intvec((int)max_degree+2);
     while(s!=NULL)
     {
-      int i=p_Totaldegree(s,Qt);
+      const long degree=p_Totaldegree(s,Qt);
+      if ((degree<0) || (degree>max_degree))
+      {
+        WerrorS("invalid degree in Hilbert series");
+        p_Delete(&s,Qt);
+        delete ss;
+        return NULL;
+      }
+      const int i=(int)degree;
       long l=n_Int(pGetCoeff(s),Qt->cf);
       (*ss)[i]=n_Int(pGetCoeff(s),Qt->cf);
       if((l==0)||(l<=-INT_MAX)||(l>INT_MAX))
@@ -2024,14 +2096,28 @@ bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf)
   nMapFunc f;
   if (h!=NULL)
   {
-    td=p_Totaldegree(h,Qt);
+    const long degree=p_Totaldegree(h,Qt);
+    if (degree>INT_MAX-2)
+    {
+      WerrorS("Hilbert series is too large for the dense representation");
+      return NULL;
+    }
+    td=(int)degree;
     h=p_Copy(h,Qt);
     f=n_SetMap(Qt->cf,biv_cf);
   }
   bigintmat* biv=new bigintmat(1,td+2,biv_cf);
   while(h!=NULL)
   {
-    int d=p_Totaldegree(h,Qt);
+    const long degree=p_Totaldegree(h,Qt);
+    if (degree<0 || degree>td)
+    {
+      WerrorS("invalid degree in Hilbert series");
+      p_Delete(&h,Qt);
+      delete biv;
+      return NULL;
+    }
+    const int d=(int)degree;
     n_Delete(&BIMATELEM(*biv,1,d+1),biv_cf);
     BIMATELEM(*biv,1,d+1)=f(pGetCoeff(h),Qt->cf,biv_cf);
     p_LmDelete(&h,Qt);
@@ -2053,20 +2139,25 @@ poly hBIV2Poly(bigintmat* b, const ring Qt, const coeffs biv_cf)
   return p;
 }
 
-bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
+bigintmat* hFirstSeries0b64(ideal I, ideal Q, const int64vec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
 {
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   poly h;
   int m=0;
   if (id_IsModule(I,src))
   {
-    h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
+    h=hFirstSeries0m64(I,Q,wdegree,shifts,src,hilb_Qt);
     if (shifts!=NULL) m=shifts->min_in();
   }
   else
-    h=hFirstSeries0p(I,Q,wdegree,src,hilb_Qt);
+    h=hFirstSeries0p64(I,Q,wdegree,src,hilb_Qt);
+  if (errorreported)
+  {
+    p_Delete(&h,hilb_Qt);
+    return NULL;
+  }
   bigintmat *biv=hPoly2BIV(h,hilb_Qt,biv_cf);
-  if (m!=0)
+  if ((biv!=NULL) && (m!=0))
   {
     n_Delete(&BIMATELEM(*biv,1,biv->cols()),biv_cf);
     BIMATELEM(*biv,1,biv->cols())=n_Init(m,biv_cf);
@@ -2075,20 +2166,39 @@ bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, con
   return biv;
 }
 
-bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
+bigintmat* hFirstSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
+{
+  if (wdegree==NULL) return hFirstSeries0b64(I,Q,NULL,shifts,src,biv_cf);
+  int64vec w64(wdegree);
+  return hFirstSeries0b64(I,Q,&w64,shifts,src,biv_cf);
+}
+
+bigintmat* hSecondSeries0b64(ideal I, ideal Q, const int64vec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
 {
   if (hilb_Qt==NULL) hilb_Qt=makeQt();
   poly h;
   if (id_IsModule(I,src))
-    h=hFirstSeries0m(I,Q,wdegree,shifts,src,hilb_Qt);
+    h=hFirstSeries0m64(I,Q,wdegree,shifts,src,hilb_Qt);
   else
-    h=hFirstSeries0p(I,Q,wdegree,src,hilb_Qt);
+    h=hFirstSeries0p64(I,Q,wdegree,src,hilb_Qt);
+  if (errorreported)
+  {
+    p_Delete(&h,hilb_Qt);
+    return NULL;
+  }
   int co;
   poly h2=hFirst2Second(h,hilb_Qt,co);
   p_Delete(&h,hilb_Qt);
   bigintmat *biv=hPoly2BIV(h2,hilb_Qt,biv_cf);
   p_Delete(&h2,hilb_Qt);
   return biv;
+}
+
+bigintmat* hSecondSeries0b(ideal I, ideal Q, intvec *wdegree, intvec *shifts, const ring src, const coeffs biv_cf)
+{
+  if (wdegree==NULL) return hSecondSeries0b64(I,Q,NULL,shifts,src,biv_cf);
+  int64vec w64(wdegree);
+  return hSecondSeries0b64(I,Q,&w64,shifts,src,biv_cf);
 }
 
 void scDegree(ideal S, intvec *modulweight, ideal Q)

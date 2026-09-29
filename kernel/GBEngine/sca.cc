@@ -151,7 +151,8 @@ ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat
   }
 #endif
 
-  int olddeg, reduc;
+  long olddeg;
+  int reduc;
   int red_result = 1;
 //  int hilbeledeg = 1, minimcnt = 0;
   int hilbcount = 0;
@@ -427,7 +428,8 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const bigint
 //  strat->homog = strat->homog && strat->z2homog; // ?
 
   int   red_result = 1;
-  int   olddeg, reduc;
+  long olddeg;
+  int reduc;
 
 //  int hilbeledeg = 1, minimcnt = 0;
   int hilbcount = 0;
@@ -918,7 +920,7 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigint
   kTest_TS(strat);
 
 
-  int olddeg = 0;
+  long olddeg = 0;
   int reduc = 0;
   int red_result = 1;
 //  int hilbeledeg=1;
@@ -1179,4 +1181,3 @@ ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const bigint
 
   return (strat->Shdl);
 }
-

@@ -234,7 +234,7 @@ kStrategy kStratCopy(kStrategy o)
 
 BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
 {
-  int facdeg=currRing->pFDeg(p,currRing);
+  long facdeg=currRing->pFDeg(p,currRing);
   ideal fac=singclap_factorize(pCopy(p),NULL,1,currRing);
   int fac_elems;
   fac_elems=IDELEMS(fac);
@@ -479,7 +479,8 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
 
 ideal bbafac (ideal /*F*/, ideal Q,intvec* /*w*/,kStrategy strat, ideal_list FL)
 {
-  int   olddeg,reduc=0;
+  long olddeg;
+  int reduc=0;
   int red_result = 1;
   reduc = olddeg = 0;
   /* compute------------------------------------------------------- */

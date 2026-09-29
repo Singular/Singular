@@ -332,7 +332,7 @@ public:
   BOOLEAN * pairtest;/*used for enterOnePair*/
   poly tail;
   intvec * kModW;
-  intvec * kHomW;
+  const int64vec * kHomW;
   // procedure for ShalloCopy from tailRing  to currRing
   pShallowCopyDeleteProc p_shallow_copy_delete;
   // pointers to Tobjects R[i] is ith Tobject which is generated
@@ -399,6 +399,12 @@ public:
   char    noClearS;
   char    completeReduce_retry;
   char    overflow;
+
+  // Sparse Hilbert numerator and its univariate ring.  These are appended to
+  // keep the offsets of the established strategy fields unchanged.
+  poly kHilb;
+  ring kHilbRing;
+  int64 kHilbShift;
 
   skStrategy();
   ~skStrategy();
@@ -522,6 +528,7 @@ void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat);
+void message (long i,long* olddeg,int* reduc,kStrategy strat,int red_result);
 void message (int i,int* olddeg,int* reduc,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);
 void messageStatSBA (int hilbcount,kStrategy strat);
@@ -678,7 +685,7 @@ poly kNF2Bound (ideal F, ideal Q, poly q,int bound, kStrategy strat, int lazyRed
 ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound, kStrategy strat, int lazyReduce);
 void initBba(kStrategy strat);
 void initSba(ideal F,kStrategy strat);
-void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
+void f5c (kStrategy strat, long& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
           intvec *w,bigintmat *hilb );
 

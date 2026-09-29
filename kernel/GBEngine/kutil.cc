@@ -894,9 +894,9 @@ BOOLEAN kTest_T(TObject * T, kStrategy strat, int i, char TN)
     // FDeg has ir element from T of L set
     if (strat->homog && (T->FDeg  != T->pFDeg()))
     {
-      int d=T->FDeg;
+      long d=T->FDeg;
       T->FDeg=T->pFDeg();
-      return dReportError("%c[%d] FDeg error: has %d, specified to have %d",
+      return dReportError("%c[%d] FDeg error: has %ld, specified to have %ld",
                           TN, i , T->pFDeg(), d);
     }
   }
@@ -4678,8 +4678,8 @@ int posInS (const kStrategy strat, const int length,const poly p,
 #endif
   )
   {
-    int o=p_Deg(p,currRing);
-    int oo=p_Deg(set[length],currRing);
+    long o=p_Deg(p,currRing);
+    long oo=p_Deg(set[length],currRing);
 
     if ((oo<o)
     || ((o==oo) && (pLmCmp(set[length],p)!= cmp_int)))
@@ -4773,8 +4773,8 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p)
       if(set[i] != NULL && pNext(set[i]) == NULL)
         mon++;
     }
-    int o = p_Deg(p,currRing);
-    int op = p_Deg(set[mon],currRing);
+    long o = p_Deg(p,currRing);
+    long op = p_Deg(set[mon],currRing);
 
     if ((op < o)
     || ((op == o) && (pLtCmp(set[mon],p) == -1)))
@@ -4803,8 +4803,8 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p)
   }
   else /*if(pNext(p) != NULL)*/
   {
-    int o = p_Deg(p,currRing);
-    int op = p_Deg(set[length],currRing);
+    long o = p_Deg(p,currRing);
+    long op = p_Deg(set[length],currRing);
 
     if ((op < o)
     || ((op == o) && (pLtCmp(set[length],p) == -1)))
@@ -4845,8 +4845,8 @@ int posInIdealMonFirst (const ideal F, const poly p,int start,int end)
   if (end<0) return 0;
   if(pNext(p) == NULL) return start;
   polyset set=F->m;
-  int o = p_Deg(p,currRing);
-  int op;
+  long o = p_Deg(p,currRing);
+  long op;
   int i;
   int an = start;
   for(i=start;i<end;i++)
@@ -4954,8 +4954,8 @@ int posInT11 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  int o = p.GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p.GetpFDeg();
+  long op = set[length].GetpFDeg();
   int cmp_int=currRing->OrdSgn;
 
   if ((op < o)
@@ -4990,8 +4990,8 @@ int posInT11Ring (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  int o = p.GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p.GetpFDeg();
+  long op = set[length].GetpFDeg();
 
   if ((op < o)
   || ((op == o) && (pLtCmpOrdSgnDiffP(set[length].p,p.p))))
@@ -5031,8 +5031,8 @@ int posInT110 (const TSet set,const int length,LObject &p)
   if (length==-1) return 0;
   p.GetpLength();
 
-  int o = p.GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p.GetpFDeg();
+  long op = set[length].GetpFDeg();
   int cmp_int=currRing->OrdSgn;
 
   if (( op < o)
@@ -5073,8 +5073,8 @@ int posInT110Ring (const TSet set,const int length,LObject &p)
   if (length==-1) return 0;
   p.GetpLength();
 
-  int o = p.GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p.GetpFDeg();
+  long op = set[length].GetpFDeg();
 
   if (( op < o)
   || (( op == o) && (set[length].length<p.length))
@@ -5118,7 +5118,7 @@ int posInT13 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  int o = p.GetpFDeg();
+  long o = p.GetpFDeg();
 
   if (set[length].GetpFDeg() <= o)
     return length+1;
@@ -5203,8 +5203,8 @@ int posInT15 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  int o = p.GetpFDeg() + p.ecart;
-  int op = set[length].GetpFDeg()+set[length].ecart;
+  long o = p.GetpFDeg() + p.ecart;
+  long op = set[length].GetpFDeg()+set[length].ecart;
   int cmp_int=currRing->OrdSgn;
 
   if ((op < o)
@@ -5239,8 +5239,8 @@ int posInT15Ring (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  int o = p.GetpFDeg() + p.ecart;
-  int op = set[length].GetpFDeg()+set[length].ecart;
+  long o = p.GetpFDeg() + p.ecart;
+  long op = set[length].GetpFDeg()+set[length].ecart;
 
   if ((op < o)
   || ((op == o)
@@ -5299,8 +5299,8 @@ int posInT17 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  int o = p.GetpFDeg() + p.ecart;
-  int op = set[length].GetpFDeg()+set[length].ecart;
+  long o = p.GetpFDeg() + p.ecart;
+  long op = set[length].GetpFDeg()+set[length].ecart;
   int cmp_int=currRing->OrdSgn;
 
   if ((op < o)
@@ -5340,8 +5340,8 @@ int posInT17Ring (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  int o = p.GetpFDeg() + p.ecart;
-  int op = set[length].GetpFDeg()+set[length].ecart;
+  long o = p.GetpFDeg() + p.ecart;
+  long op = set[length].GetpFDeg()+set[length].ecart;
 
   if ((op < o)
   || (( op == o) && (set[length].ecart > p.ecart))
@@ -5387,7 +5387,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
 
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
-  int o = p.GetpFDeg() + p.ecart;
+  long o = p.GetpFDeg() + p.ecart;
   int c = pGetComp(p.p)*cc;
   int cmp_int=currRing->OrdSgn;
 
@@ -5395,7 +5395,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
     return length+1;
   if (pGetComp(set[length].p)*cc == c)
   {
-    int op = set[length].GetpFDeg()+set[length].ecart;
+    long op = set[length].GetpFDeg()+set[length].ecart;
     if ((op < o)
     || ((op == o) && (set[length].ecart > p.ecart))
     || ((op == o) && (set[length].ecart==p.ecart)
@@ -5414,7 +5414,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
         return en;
       if (pGetComp(set[an].p)*cc == c)
       {
-        int op = set[an].GetpFDeg()+set[an].ecart;
+        long op = set[an].GetpFDeg()+set[an].ecart;
         if ((op > o)
         || ((op == o) && (set[an].ecart < p.ecart))
         || ((op == o) && (set[an].ecart==p.ecart)
@@ -5428,7 +5428,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
       en=i;
     else if (pGetComp(set[i].p)*cc == c)
     {
-      int op = set[i].GetpFDeg()+set[i].ecart;
+      long op = set[i].GetpFDeg()+set[i].ecart;
       if ((op > o)
       || ((op == o) && (set[i].ecart < p.ecart))
       || ((op == o) && (set[i].ecart == p.ecart)
@@ -5448,14 +5448,14 @@ int posInT17_cRing (const TSet set,const int length,LObject &p)
 
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
-  int o = p.GetpFDeg() + p.ecart;
+  long o = p.GetpFDeg() + p.ecart;
   int c = pGetComp(p.p)*cc;
 
   if (pGetComp(set[length].p)*cc < c)
     return length+1;
   if (pGetComp(set[length].p)*cc == c)
   {
-    int op = set[length].GetpFDeg()+set[length].ecart;
+    long op = set[length].GetpFDeg()+set[length].ecart;
     if ((op < o)
     || ((op == o) && (set[length].ecart > p.ecart))
     || ((op == o) && (set[length].ecart==p.ecart)
@@ -5474,7 +5474,7 @@ int posInT17_cRing (const TSet set,const int length,LObject &p)
         return en;
       if (pGetComp(set[an].p)*cc == c)
       {
-        int op = set[an].GetpFDeg()+set[an].ecart;
+        long op = set[an].GetpFDeg()+set[an].ecart;
         if ((op > o)
         || ((op == o) && (set[an].ecart < p.ecart))
         || ((op == o) && (set[an].ecart==p.ecart)
@@ -5488,7 +5488,7 @@ int posInT17_cRing (const TSet set,const int length,LObject &p)
       en=i;
     else if (pGetComp(set[i].p)*cc == c)
     {
-      int op = set[i].GetpFDeg()+set[i].ecart;
+      long op = set[i].GetpFDeg()+set[i].ecart;
       if ((op > o)
       || ((op == o) && (set[i].ecart < p.ecart))
       || ((op == o) && (set[i].ecart == p.ecart)
@@ -5513,13 +5513,13 @@ int posInT19 (const TSet set,const int length,LObject &p)
   if (length==-1) return 0;
 
   int o = p.ecart;
-  int op=p.GetpFDeg();
+  long op=p.GetpFDeg();
 
   if (set[length].ecart < o)
     return length+1;
   if (set[length].ecart == o)
   {
-    int oo=set[length].GetpFDeg();
+    long oo=set[length].GetpFDeg();
     if ((oo < op) || ((oo==op) && (set[length].length < p.length)))
       return length+1;
   }
@@ -5535,7 +5535,7 @@ int posInT19 (const TSet set,const int length,LObject &p)
         return an;
       if (set[an].ecart == o)
       {
-        int oo=set[an].GetpFDeg();
+        long oo=set[an].GetpFDeg();
         if((oo > op)
         || ((oo==op) && (set[an].length > p.length)))
           return an;
@@ -5547,7 +5547,7 @@ int posInT19 (const TSet set,const int length,LObject &p)
       en=i;
     else if (set[i].ecart == o)
     {
-      int oo=set[i].GetpFDeg();
+      long oo=set[i].GetpFDeg();
       if ((oo > op)
       || ((oo == op) && (set[i].length > p.length)))
         en=i;
@@ -5569,8 +5569,8 @@ int posInLSpecial (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int d=p->GetpFDeg();
-  int op=set[length].GetpFDeg();
+  long d=p->GetpFDeg();
+  long op=set[length].GetpFDeg();
   int cmp_int=currRing->OrdSgn;
 
   if ((op > d)
@@ -5804,8 +5804,8 @@ int posInL11 (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p->GetpFDeg();
+  long op = set[length].GetpFDeg();
   int cmp_int= -currRing->OrdSgn;
 
   if ((op > o)
@@ -5846,8 +5846,8 @@ int posInL11Ring (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p->GetpFDeg();
+  long op = set[length].GetpFDeg();
 
   if ((op > o)
   || ((op == o) && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
@@ -5880,8 +5880,8 @@ int posInLF5CRing (const LSet set, int start,const int length,
 {
   if (length<0) return 0;
   if(start == (length +1)) return (length+1);
-  int o = p->GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p->GetpFDeg();
+  long op = set[length].GetpFDeg();
 
   if ((op > o)
   || ((op == o) && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
@@ -6013,8 +6013,8 @@ inline int getIndexRng(long coeff)
 /*{
   if (length < 0) return 0;
 
-  int o = p->GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p->GetpFDeg();
+  long op = set[length].GetpFDeg();
 
   int inde = getIndexRng((unsigned long) pGetCoeff(set[length].p));
   int indp = getIndexRng((unsigned long) pGetCoeff(p->p));
@@ -6060,8 +6060,8 @@ int posInL110 (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p->GetpFDeg();
+  long op = set[length].GetpFDeg();
   int cmp_int= -currRing->OrdSgn;
 
   if ((op > o)
@@ -6101,8 +6101,8 @@ int posInL110Ring (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg();
-  int op = set[length].GetpFDeg();
+  long o = p->GetpFDeg();
+  long op = set[length].GetpFDeg();
 
   if ((op > o)
   || ((op == o) && (set[length].length >p->length))
@@ -6147,7 +6147,7 @@ int posInL13 (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg();
+  long o = p->GetpFDeg();
 
   if (set[length].GetpFDeg() > o)
     return length+1;
@@ -6182,8 +6182,8 @@ int posInL15 (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg() + p->ecart;
-  int op = set[length].GetpFDeg() + set[length].ecart;
+  long o = p->GetpFDeg() + p->ecart;
+  long op = set[length].GetpFDeg() + set[length].ecart;
   int cmp_int= -currRing->OrdSgn;
 
   if ((op > o)
@@ -6217,8 +6217,8 @@ int posInL15Ring (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg() + p->ecart;
-  int op = set[length].GetpFDeg() + set[length].ecart;
+  long o = p->GetpFDeg() + p->ecart;
+  long op = set[length].GetpFDeg() + set[length].ecart;
 
   if ((op > o)
   || ((op == o) && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
@@ -6257,7 +6257,7 @@ int posInL17 (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg() + p->ecart;
+  long o = p->GetpFDeg() + p->ecart;
   int cmp_int= -currRing->OrdSgn;
 
   if ((set[length].GetpFDeg() + set[length].ecart > o)
@@ -6301,7 +6301,7 @@ int posInL17Ring (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  int o = p->GetpFDeg() + p->ecart;
+  long o = p->GetpFDeg() + p->ecart;
 
   if ((set[length].GetpFDeg() + set[length].ecart > o)
   || ((set[length].GetpFDeg() + set[length].ecart == o)
@@ -6353,7 +6353,7 @@ int posInL17_c (const LSet set, const int length,
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
   long c = pGetComp(p->p)*cc;
-  int o = p->GetpFDeg() + p->ecart;
+  long o = p->GetpFDeg() + p->ecart;
   int cmp_int= -currRing->OrdSgn;
 
   if (pGetComp(set[length].p)*cc > c)
@@ -6417,7 +6417,7 @@ int posInL17_cRing (const LSet set, const int length,
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
   long c = pGetComp(p->p)*cc;
-  int o = p->GetpFDeg() + p->ecart;
+  long o = p->GetpFDeg() + p->ecart;
 
   if (pGetComp(set[length].p)*cc > c)
     return length+1;
@@ -7460,11 +7460,11 @@ poly redtailBba_Ring (LObject* L, int end_pos, kStrategy strat )
 /*2
 *checks the change degree and write progress report
 */
-void message (int i,int* olddeg,int* reduc,kStrategy strat, int red_result)
+void message (long i,long* olddeg,int* reduc,kStrategy strat, int red_result)
 {
   if (i != *olddeg)
   {
-    Print("%d",i);
+    Print("%ld",i);
     *olddeg = i;
   }
   if (TEST_OPT_OLDSTD)
@@ -7496,6 +7496,13 @@ void message (int i,int* olddeg,int* reduc,kStrategy strat, int red_result)
       }
     }
   }
+}
+
+void message (int i,int* olddeg,int* reduc,kStrategy strat, int red_result)
+{
+  long old=(long)*olddeg;
+  message((long)i,&old,reduc,strat,red_result);
+  *olddeg=(int)old;
 }
 
 /*2
@@ -9422,13 +9429,17 @@ void initHilbCrit(ideal/*F*/, ideal /*Q*/, bigintmat **hilb,kStrategy strat)
   if((rHasLocalOrMixedOrdering(currRing)) && (rHasMixedOrdering(currRing)==FALSE))
   {
     if(rField_is_Ring(currRing))
+    {
       *hilb=NULL;
+      strat->kHilb=NULL;
+    }
     else
       return;
   }
   if (strat->homog!=isHomog)
   {
     *hilb=NULL;
+    strat->kHilb=NULL;
   }
 }
 
@@ -11361,14 +11372,14 @@ int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p)
   if (length==-1) return 0;
 
   int o = p.ecart;
-  int op=p.GetpFDeg();
+  long op=p.GetpFDeg();
   int ol = p.GetpLength();
 
   if (set[length].ecart < o)
     return length+1;
   if (set[length].ecart == o)
   {
-     int oo=set[length].GetpFDeg();
+     long oo=set[length].GetpFDeg();
      if ((oo < op) || ((oo==op) && (set[length].length < ol)))
        return length+1;
   }
@@ -11384,7 +11395,7 @@ int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p)
         return an;
       if (set[an].ecart == o)
       {
-         int oo=set[an].GetpFDeg();
+         long oo=set[an].GetpFDeg();
          if((oo > op)
          || ((oo==op) && (set[an].pLength > ol)))
            return an;
@@ -11396,7 +11407,7 @@ int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p)
       en=i;
     else if (set[i].ecart == o)
     {
-       int oo=set[i].GetpFDeg();
+       long oo=set[i].GetpFDeg();
        if ((oo > op)
        || ((oo == op) && (set[i].pLength > ol)))
          en=i;
@@ -11414,10 +11425,10 @@ int posInT_FDegpLength(const TSet set,const int length,LObject &p)
 
   if (length==-1) return 0;
 
-  int op=p.GetpFDeg();
+  long op=p.GetpFDeg();
   int ol = p.GetpLength();
 
-  int oo=set[length].GetpFDeg();
+  long oo=set[length].GetpFDeg();
   if ((oo < op) || ((oo==op) && (set[length].length < ol)))
     return length+1;
 
@@ -11428,14 +11439,14 @@ int posInT_FDegpLength(const TSet set,const int length,LObject &p)
   {
     if (an >= en-1)
     {
-      int oo=set[an].GetpFDeg();
+      long oo=set[an].GetpFDeg();
       if((oo > op)
          || ((oo==op) && (set[an].pLength > ol)))
         return an;
       return en;
     }
     i=(an+en) / 2;
-    int oo=set[i].GetpFDeg();
+    long oo=set[i].GetpFDeg();
     if ((oo > op)
         || ((oo == op) && (set[i].pLength > ol)))
       en=i;
