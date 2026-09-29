@@ -39,6 +39,15 @@ if (size(system("executable","zstd"))>0)
   kill l;
   s == string(C);
   kill C;
+
+  link l = "ssi2:w,zstd,long=23 ssi2_options_explicit_zstd";
+  write(l,I);
+  close(l);
+  def CZ = read(l);
+  close(l);
+  s == string(CZ);
+  kill CZ;
+  kill l;
 }
 
 link l = "ssi2:w,plain ssi2_options_plain_suffix.ssi2.gz";
@@ -51,6 +60,33 @@ close(l);
 kill l;
 s == string(P);
 kill P;
+
+link l = "ssi2:w,plain ssi2_options_reopen_plain.ssi2.zst";
+write(l,I);
+close(l);
+def RP = read(l);
+close(l);
+s == string(RP);
+kill RP;
+kill l;
+
+link l = "ssi2:w ssi2_options_append.ssi2";
+write(l,I);
+close(l);
+kill l;
+link l = "ssi2:a ssi2_options_append.ssi2";
+write(l,I);
+close(l);
+kill l;
+link l = "ssi2:r ssi2_options_append.ssi2";
+def A1 = read(l);
+def A2 = read(l);
+close(l);
+kill l;
+s == string(A1);
+s == string(A2);
+kill A1;
+kill A2;
 
 link l = "ssi:w ssi2_options_legacy_named.ssi2";
 write(l,I);
@@ -66,5 +102,11 @@ close(l);
 kill l;
 s == string(O);
 kill O;
+
+if (system("sh",
+  "rm -f ssi2_options_explicit_zstd ssi2_options_reopen_plain.ssi2.zst ssi2_options_append.ssi2") != 0)
+{
+  ERROR("remove reopen and append test files");
+}
 
 tst_status(1);$
