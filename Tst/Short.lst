@@ -192,6 +192,7 @@ Short/groebner_s.tst
 Short/htable.tst
 Short/highcorner_s.tst
 Short/hilb_weights.tst
+Short/hilb_weights64.tst
 Short/hnoether_s.tst
 Short/homolog_s.tst
 Short/hres_s.tst

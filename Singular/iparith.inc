@@ -653,6 +653,8 @@
 // operation: waitfirst (list, int)  ->  int
 // operation: waitall (list, int)  ->  int
 // operation: wedge (matrix, int)  ->  matrix, only commutative rings
+// operation: homog (ideal, bigintvec)  ->  int
+// operation: homog (module, bigintvec)  ->  int
 /*---------------------------------------------*/
 // operation: [ (string, int, int)  ->  string
 // operation: [ (intmat, int, int)  ->  int
@@ -759,6 +761,11 @@
 // operation: subst (matrix, poly, number)  ->  matrix
 // operation: laguerre (poly, int, int)  ->  list, only commutative rings, field coeffs
 // operation: vandermonde (ideal, ideal, int)  ->  poly, only commutative rings, field coeffs
+// operation: hilb (ideal, int, bigintvec)  ->  bigintvec, domain coeffs
+// operation: hilb (module, int, bigintvec)  ->  bigintvec, domain coeffs
+// operation: std (ideal, bigintvec, bigintvec)  ->  ideal, field coeffs
+// operation: std (module, bigintvec, bigintvec)  ->  module, field coeffs
+// operation: homog (module, bigintvec, intvec)  ->  int
 /*---------------------------------------------*/
 // operation: ( (...)  ->  any_type ( number of arguments >0 )
 // operation: [ (...)  ->  ring ( number of arguments >0 )

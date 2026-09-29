@@ -520,7 +520,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
   int at,d,i;
   int j = 0;
   int pass = 0;
-  int reddeg = currRing->pFDeg((*h).p,currRing);
+  long reddeg = currRing->pFDeg((*h).p,currRing);
 
   if (TEST_OPT_DEBUG)
   {
@@ -1054,7 +1054,8 @@ ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const bigintmat
 
   // intvec *w=NULL;
   // intvec *hilb=NULL;
-  int   olddeg,reduc;
+  long olddeg;
+  int reduc;
   int red_result=1;
   int /*hilbeledeg=1,*/hilbcount=0/*,minimcnt=0*/;
 
@@ -1293,4 +1294,3 @@ ideal k_gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const bigintma
 }
 
 #endif
-

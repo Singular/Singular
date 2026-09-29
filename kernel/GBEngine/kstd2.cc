@@ -2614,7 +2614,8 @@ void kDebugPrint(kStrategy strat);
 ideal bba (ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 {
   int   red_result = 1;
-  int   olddeg,reduc;
+  long olddeg;
+  int reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = FALSE;
   BITSET save;
@@ -2844,7 +2845,7 @@ ideal bba (ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
         }
 #endif
       }
-      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      if ((hilb!=NULL)||(strat->kHilb!=NULL)) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       kDeleteLcm(&strat->P);
       if (strat->s_poly!=NULL)
@@ -3108,7 +3109,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
   printf("\n");
 #endif
   int   srmax,lrmax, red_result = 1;
-  int   olddeg,reduc;
+  long olddeg;
+  int reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   LObject L;
   BOOLEAN withT     = TRUE;
@@ -3672,7 +3674,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
         //PrintS("<2>");
       }
 #endif
-      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      if ((hilb!=NULL)||(strat->kHilb!=NULL)) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       kDeleteLcm(&strat->P);
       if (strat->sl>srmax) srmax = strat->sl;
@@ -4263,7 +4265,7 @@ ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound,kStrategy strat, int lazyRedu
 *    safe) reduction process (including tail reductions)
 * 3. strat->S and strat->T are completely new computed in these steps
 ********************************************************************/
-void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
+void f5c (kStrategy strat, long& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
           intvec *w,bigintmat *hilb )
 {
@@ -4481,7 +4483,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
         pWrite(pHead(strat->S[strat->sl]));
         pWrite(strat->sig[strat->sl]);
 #endif
-        if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+        if ((hilb!=NULL)||(strat->kHilb!=NULL)) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
       //      Print("[%d]",hilbeledeg);
       kDeleteLcm(&strat->P);
@@ -4578,7 +4580,8 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 ideal bbaShift(ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
 {
   int   red_result = 1;
-  int   olddeg,reduc;
+  long olddeg;
+  int reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = TRUE; // currently only T contains the shifts
   BITSET save;
@@ -4798,7 +4801,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,bigintmat *hilb,kStrategy strat)
           enterTShift(&strat->P, strat);
       }
 
-      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      if ((hilb!=NULL)||(strat->kHilb!=NULL)) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       kDeleteLcm(&strat->P);
       if (strat->s_poly!=NULL)

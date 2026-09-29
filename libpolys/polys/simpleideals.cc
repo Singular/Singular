@@ -13,6 +13,7 @@
 #include "misc/auxiliary.h"
 
 #include "misc/options.h"
+#include "misc/int64vec.h"
 #include "misc/intvec.h"
 
 #include "matpol.h"
@@ -1162,13 +1163,20 @@ BOOLEAN id_HomIdealDP (ideal id, ideal Q, const ring r)
 
 BOOLEAN id_HomIdealW (ideal id, ideal Q,  const intvec *w, const ring r)
 {
+  if (w==NULL) return id_HomIdealW64(id,Q,NULL,r);
+  int64vec w64(w);
+  return id_HomIdealW64(id,Q,&w64,r);
+}
+
+BOOLEAN id_HomIdealW64 (ideal id, ideal Q, const int64vec *w, const ring r)
+{
   int i;
   BOOLEAN b;
   i = 0;
   b = TRUE;
   while ((i < IDELEMS(id)) && b)
   {
-    b = p_IsHomogeneousW(id->m[i],w,r);
+    b = p_IsHomogeneousW64(id->m[i],w,r);
     i++;
   }
   if ((b) && (Q!=NULL) && (IDELEMS(Q)>0))
@@ -1176,7 +1184,7 @@ BOOLEAN id_HomIdealW (ideal id, ideal Q,  const intvec *w, const ring r)
     i=0;
     while ((i < IDELEMS(Q)) && b)
     {
-      b = p_IsHomogeneousW(Q->m[i],w,r);
+      b = p_IsHomogeneousW64(Q->m[i],w,r);
       i++;
     }
   }
@@ -1185,13 +1193,20 @@ BOOLEAN id_HomIdealW (ideal id, ideal Q,  const intvec *w, const ring r)
 
 BOOLEAN id_HomModuleW (ideal id, ideal Q,  const intvec *w, const intvec *module_w, const ring r)
 {
+  if (w==NULL) return id_HomModuleW64(id,Q,NULL,module_w,r);
+  int64vec w64(w);
+  return id_HomModuleW64(id,Q,&w64,module_w,r);
+}
+
+BOOLEAN id_HomModuleW64 (ideal id, ideal Q, const int64vec *w, const intvec *module_w, const ring r)
+{
   int i;
   BOOLEAN b;
   i = 0;
   b = TRUE;
   while ((i < IDELEMS(id)) && b)
   {
-    b = p_IsHomogeneousW(id->m[i],w,module_w,r);
+    b = p_IsHomogeneousW64(id->m[i],w,module_w,r);
     i++;
   }
   if ((b) && (Q!=NULL) && (IDELEMS(Q)>0))
@@ -1199,7 +1214,7 @@ BOOLEAN id_HomModuleW (ideal id, ideal Q,  const intvec *w, const intvec *module
     i=0;
     while ((i < IDELEMS(Q)) && b)
     {
-      b = p_IsHomogeneousW(Q->m[i],w,r);
+      b = p_IsHomogeneousW64(Q->m[i],w,r);
       i++;
     }
   }

@@ -31,6 +31,14 @@ int64vec::int64vec(intvec* iv)
 {
   row = iv->rows();
   col = iv->cols();
+  v = (int64 *)omAlloc(sizeof(int64)*row*col);
+  for(int i=0;i<row*col;i++) v[i]=(*iv)[i];
+}
+
+int64vec::int64vec(const intvec* iv)
+{
+  row = iv->rows();
+  col = iv->cols();
   v   = (int64 *)omAlloc(sizeof(int64)*row*col);
   for (int i=0; i<row*col; i++)
   {

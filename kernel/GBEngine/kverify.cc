@@ -28,7 +28,10 @@ BOOLEAN kVerify1(ideal F, ideal Q)
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
+  strat->kHomW=NULL;
+  strat->kHomW64=NULL;
+  kHomW=NULL;
+  kHomW64=NULL;
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initBba(strat);
@@ -146,7 +149,10 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
+  strat->kHomW=NULL;
+  strat->kHomW64=NULL;
+  kHomW=NULL;
+  kHomW64=NULL;
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initBba(strat);

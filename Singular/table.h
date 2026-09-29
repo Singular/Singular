@@ -795,8 +795,12 @@ const struct sValCmd2 dArith2[]=
 ,{D(jjWAIT1ST2),  WAIT1ST_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjWAITALL2),  WAITALL_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_NC |ALLOW_RING}
 ,{D(jjWEDGE),     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD, NO_NC |ALLOW_RING}
+// Keep append-only overloads at the end so existing generated indices stay stable.
+,{D(jjHOMOG1_WI), HOMOG_CMD,      INT_CMD,        IDEAL_CMD,  BIGINTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjHOMOG1_W),  HOMOG_CMD,      INT_CMD,        MODUL_CMD,  BIGINTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{NULL_VAL,       0,              0,              0,          0, NO_NC |NO_RING}
 };
+#define DARITH2_APPEND_COUNT 2
 /*=================== operations with 3 args.: table =================*/
 const struct sValCmd3 dArith3[]=
 {
@@ -930,8 +934,15 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjSUBST_Id_N),     SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   NUMBER_CMD , ALLOW_NC |ALLOW_RING}
 ,{D(nuLagSolve),       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  , NO_NC |NO_RING}
 ,{D(nuVanderSys),      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  , NO_NC |NO_RING}
+// Keep append-only overloads at the end so existing table positions stay stable.
+,{D(jjHILBERT3),       HILBERT_CMD,BIGINTVEC_CMD, IDEAL_CMD,  INT_CMD,    BIGINTVEC_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
+,{D(jjHILBERT3),       HILBERT_CMD,BIGINTVEC_CMD, MODUL_CMD,  INT_CMD,    BIGINTVEC_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
+,{D(jjSTD_HILB_W),     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  BIGINTVEC_CMD,BIGINTVEC_CMD, ALLOW_PLURAL |NO_RING}
+,{D(jjSTD_HILB_W),     STD_CMD,    MODUL_CMD,  MODUL_CMD,  BIGINTVEC_CMD,BIGINTVEC_CMD, ALLOW_PLURAL |NO_RING}
+,{D(jjHOMOG_W64_M),    HOMOG_CMD,  INT_CMD,    MODUL_CMD,  BIGINTVEC_CMD,INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{NULL_VAL,            0,          0,          0,          0,          0        , NO_NC |NO_RING}
 };
+#define DARITH3_APPEND_COUNT 5
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, 0: 0, 1: 1, 2: 2, .. */
 const struct sValCmdM dArithM[]=

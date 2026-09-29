@@ -400,6 +400,12 @@ public:
   char    completeReduce_retry;
   char    overflow;
 
+  // Sparse Hilbert and 64-bit weight state is appended so the offsets of the
+  // established strategy fields remain unchanged.
+  poly kHilb;
+  ring kHilbRing;
+  const int64vec * kHomW64;
+
   skStrategy();
   ~skStrategy();
 
@@ -522,6 +528,7 @@ void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat);
+void message (long i,long* olddeg,int* reduc,kStrategy strat,int red_result);
 void message (int i,int* olddeg,int* reduc,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);
 void messageStatSBA (int hilbcount,kStrategy strat);
@@ -678,7 +685,7 @@ poly kNF2Bound (ideal F, ideal Q, poly q,int bound, kStrategy strat, int lazyRed
 ideal kNF2Bound (ideal F,ideal Q,ideal q,int bound, kStrategy strat, int lazyReduce);
 void initBba(kStrategy strat);
 void initSba(ideal F,kStrategy strat);
-void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
+void f5c (kStrategy strat, long& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
           intvec *w,bigintmat *hilb );
 
