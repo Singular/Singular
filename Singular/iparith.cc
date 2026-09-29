@@ -2558,16 +2558,20 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
 static BOOLEAN jjHOMOG1_W(leftv res, leftv v, leftv u)
 {
   intvec *w=new intvec(rVar(currRing));
+  intvec *vw=NULL;
   int64vec *vw64=NULL;
-  if (jjWeightVector64(u,&vw64))
+  if (u->Typ()==INTVEC_CMD)
+    vw=(intvec*)u->Data();
+  else if (jjWeightVector64(u,&vw64))
   {
     delete w;
     return TRUE;
   }
-  if (vw64->length()<rVar(currRing))
+  const int weightCount=(vw!=NULL) ? vw->length() : vw64->length();
+  if (weightCount<rVar(currRing))
   {
     Werror("weight vector must have at least size %d, not %d",
-           rVar(currRing),vw64->length());
+           rVar(currRing),weightCount);
     delete vw64;
     delete w;
     return TRUE;
@@ -2577,12 +2581,14 @@ static BOOLEAN jjHOMOG1_W(leftv res, leftv v, leftv u)
   pLDegProc save_LDeg=currRing->pLDeg;
   BOOLEAN save_pLexOrder=currRing->pLexOrder;
   currRing->pLexOrder=FALSE;
-  kHomW=vw64;
+  kHomW=vw;
+  kHomW64=vw64;
   kModW=w;
   pSetDegProcs(currRing,kHomModDeg);
   res->data=(void *)(long)idHomModule(v_id,currRing->qideal,&w);
   currRing->pLexOrder=save_pLexOrder;
   kHomW=NULL;
+  kHomW64=NULL;
   kModW=NULL;
   pRestoreDegProcs(currRing,save_FDeg,save_LDeg);
   delete vw64;
@@ -2596,9 +2602,15 @@ static BOOLEAN jjHOMOG1_W(leftv res, leftv v, leftv u)
 }
 static BOOLEAN jjHOMOG1_WI(leftv res, leftv v, leftv u)
 {
+  ideal v_id=(ideal)v->Data();
+  if (u->Typ()==INTVEC_CMD)
+  {
+    res->data=(void *)(long)id_HomIdealW(v_id,currRing->qideal,
+                                         (intvec*)u->Data(),currRing);
+    return errorreported;
+  }
   int64vec *vw=NULL;
   if (jjWeightVector64(u,&vw)) return TRUE;
-  ideal v_id=(ideal)v->Data();
   res->data=(void *)(long)id_HomIdealW64(v_id,currRing->qideal,vw,currRing);
   delete vw;
   if (errorreported)
@@ -6583,13 +6595,16 @@ static BOOLEAN jjFWALK3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 {
-  int64vec *wdegree=NULL;
-  if (jjWeightVector64(w,&wdegree)) return TRUE;
-  if (wdegree->length()!=currRing->N)
+  intvec *wdegree=(w->Typ()==INTVEC_CMD) ? (intvec*)w->Data() : NULL;
+  int64vec *wdegree64=NULL;
+  if ((wdegree==NULL) && jjWeightVector64(w,&wdegree64)) return TRUE;
+  const int weightCount=(wdegree!=NULL) ? wdegree->length()
+                                        : wdegree64->length();
+  if (weightCount!=currRing->N)
   {
     Werror("weight vector must have size %d, not %d",
-           currRing->N,wdegree->length());
-    delete wdegree;
+           currRing->N,weightCount);
+    delete wdegree64;
     return TRUE;
   }
   if (rField_is_Z(currRing))
@@ -6601,7 +6616,7 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   if (errorreported)
   {
-    delete wdegree;
+    delete wdegree64;
     return TRUE;
   }
 
@@ -6609,17 +6624,27 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   switch((int)(long)v->Data())
   {
     case 1:
-      series=hFirstSeries0b64((ideal)u->Data(),currRing->qideal,wdegree,module_w,currRing,coeffs_BIGINT);
+      if (wdegree!=NULL)
+        series=hFirstSeries0b((ideal)u->Data(),currRing->qideal,wdegree,
+                              module_w,currRing,coeffs_BIGINT);
+      else
+        series=hFirstSeries0b64((ideal)u->Data(),currRing->qideal,wdegree64,
+                                module_w,currRing,coeffs_BIGINT);
       break;
     case 2:
-      series=hSecondSeries0b64((ideal)u->Data(),currRing->qideal,wdegree,module_w,currRing,coeffs_BIGINT);
+      if (wdegree!=NULL)
+        series=hSecondSeries0b((ideal)u->Data(),currRing->qideal,wdegree,
+                               module_w,currRing,coeffs_BIGINT);
+      else
+        series=hSecondSeries0b64((ideal)u->Data(),currRing->qideal,wdegree64,
+                                 module_w,currRing,coeffs_BIGINT);
       break;
     default:
-      delete wdegree;
+      delete wdegree64;
       WerrorS(feNotImplemented);
       return TRUE;
   }
-  delete wdegree;
+  delete wdegree64;
   if (errorreported)
   {
     delete series;
@@ -6692,6 +6717,29 @@ static BOOLEAN jjHOMOG_W_M(leftv res, leftv v1, leftv v2, leftv v3)
   intvec *vw=(intvec*)v2->Data();
   ideal v_id=(ideal)v1->Data();
   res->data=(void *)(long)id_HomModuleW(v_id,currRing->qideal,vw,w,currRing);
+  return FALSE;
+}
+static BOOLEAN jjHOMOG_W64_M(leftv res, leftv v1, leftv v2, leftv v3)
+{
+  int64vec *vw=NULL;
+  if (jjWeightVector64(v2,&vw)) return TRUE;
+  if (vw->length()<rVar(currRing))
+  {
+    Werror("weight vector must have at least size %d, not %d",
+           rVar(currRing),vw->length());
+    delete vw;
+    return TRUE;
+  }
+  intvec *w=(intvec *)v3->Data();
+  ideal v_id=(ideal)v1->Data();
+  res->data=(void *)(long)id_HomModuleW64(v_id,currRing->qideal,vw,w,
+                                          currRing);
+  delete vw;
+  if (errorreported)
+  {
+    res->data=NULL;
+    return TRUE;
+  }
   return FALSE;
 }
 static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
@@ -7655,12 +7703,14 @@ static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
 {
-  int64vec *vw=NULL; // weights of vars
-  if (jjWeightVector64(w,&vw)) return TRUE;
-  if (vw->length()!=currRing->N)
+  intvec *vw=(w->Typ()==INTVEC_CMD) ? (intvec*)w->Data() : NULL;
+  int64vec *vw64=NULL;
+  if ((vw==NULL) && jjWeightVector64(w,&vw64)) return TRUE;
+  const int weightCount=(vw!=NULL) ? vw->length() : vw64->length();
+  if (weightCount!=currRing->N)
   {
-    Werror("%d weights for %d variables",vw->length(),currRing->N);
-    delete vw;
+    Werror("%d weights for %d variables",weightCount,currRing->N);
+    delete vw64;
     return TRUE;
   }
   ideal result;
@@ -7681,14 +7731,11 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
     }
   }
   bigintmat *vv=(bigintmat*)v->Data();
-  result=kStd2_64(u_id,
-              currRing->qideal,
-              hom,
-              &ww,  // module weights
-              vv,  // hilbert series
-              0,0,  // syzComp, newIdeal
-              vw);  // weights of vars
-  delete vw;
+  if (vw!=NULL)
+    result=kStd2(u_id,currRing->qideal,hom,&ww,vv,0,0,vw);
+  else
+    result=kStd2_64(u_id,currRing->qideal,hom,&ww,vv,0,0,vw64);
+  delete vw64;
   if (errorreported)
   {
     delete ww;
@@ -9253,13 +9300,15 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
     WerrorS("expected `std(`ideal/module`,`poly/vector`,`bigintvec`,`intvec/bigintvec`)");
     return TRUE;
   }
-  int64vec *vw=NULL; // weights of vars
-  if (jjWeightVector64(w,&vw)) return TRUE;
+  intvec *vw=(w->Typ()==INTVEC_CMD) ? (intvec*)w->Data() : NULL;
+  int64vec *vw64=NULL;
+  if ((vw==NULL) && jjWeightVector64(w,&vw64)) return TRUE;
   /* merging std_hilb_w and std_1 */
-  if (vw->length()!=currRing->N)
+  const int weightCount=(vw!=NULL) ? vw->length() : vw64->length();
+  if (weightCount!=currRing->N)
   {
-    Werror("%d weights for %d variables",vw->length(),currRing->N);
-    delete vw;
+    Werror("%d weights for %d variables",weightCount,currRing->N);
+    delete vw64;
     return TRUE;
   }
   int r=v->Typ();
@@ -9277,7 +9326,7 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   else
   {
     WerrorS("expected `std(`ideal/module`,`poly/vector`,`bigintvec`,`intvec/bigintvec`)");
-    delete vw;
+    delete vw64;
     return TRUE;
   }
   int ii0=idElem(i0);
@@ -9306,16 +9355,14 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   BITSET save1;
   SI_SAVE_OPT1(save1);
   si_opt_1|=Sy_bit(OPT_SB_1);
-  result=kStd2_64(i1,
-              currRing->qideal,
-              hom,
-              &ww,                  // module weights
-              (bigintmat *)h->Data(),  // hilbert series
-              0,                    // syzComp, whatever it is...
-              IDELEMS(i1)-ii0,      // new ideal
-              vw);                  // weights of vars
+  if (vw!=NULL)
+    result=kStd2(i1,currRing->qideal,hom,&ww,(bigintmat *)h->Data(),
+                 0,IDELEMS(i1)-ii0,vw);
+  else
+    result=kStd2_64(i1,currRing->qideal,hom,&ww,(bigintmat *)h->Data(),
+                    0,IDELEMS(i1)-ii0,vw64);
   SI_RESTORE_OPT1(save1);
-  delete vw;
+  delete vw64;
   idDelete(&i1);
   if (errorreported)
   {

@@ -332,7 +332,7 @@ public:
   BOOLEAN * pairtest;/*used for enterOnePair*/
   poly tail;
   intvec * kModW;
-  const int64vec * kHomW;
+  intvec * kHomW;
   // procedure for ShalloCopy from tailRing  to currRing
   pShallowCopyDeleteProc p_shallow_copy_delete;
   // pointers to Tobjects R[i] is ith Tobject which is generated
@@ -400,11 +400,11 @@ public:
   char    completeReduce_retry;
   char    overflow;
 
-  // Sparse Hilbert numerator and its univariate ring.  These are appended to
-  // keep the offsets of the established strategy fields unchanged.
+  // Sparse Hilbert and 64-bit weight state is appended so the offsets of the
+  // established strategy fields remain unchanged.
   poly kHilb;
   ring kHilbRing;
-  int64 kHilbShift;
+  const int64vec * kHomW64;
 
   skStrategy();
   ~skStrategy();

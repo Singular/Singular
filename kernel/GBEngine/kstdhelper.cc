@@ -65,7 +65,10 @@ poly kTryHC(ideal F, ideal Q, long* colength)
   strat->LazyPass=20;
   strat->LazyDegree = 1;
   strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
+  strat->kHomW=NULL;
+  strat->kHomW64=NULL;
+  kHomW=NULL;
+  kHomW64=NULL;
   strat->homog = (tHomog)idHomIdeal(F,Q);
   ideal res=mora(FF,QQ,NULL,NULL,strat);
   // clean
@@ -410,7 +413,7 @@ static ideal kTryHilbstd_homog(ideal F, ideal Q, int64vec* hdegree)
   intvec *w=NULL;
   if(TEST_OPT_PROT) PrintS("stdhilb in basering  ------------------\n");
   SI_RESTORE_OPT1(save_opt);
-  ideal result=kStdPoly64(F,Q,(tHomog)TRUE,&w,hilb,hilbRing,0,0,0,hdegree,NULL);
+  ideal result=kStdPoly64(F,Q,(tHomog)TRUE,&w,hilb,hilbRing,0,0,hdegree,NULL);
   if (w!=NULL) delete w;
   p_Delete(&hilb,hilbRing);
   return result;
@@ -599,7 +602,7 @@ static ideal kTryHilbstd_nonhomog(ideal F, ideal Q, int64vec* hdegree)
   }
   // std with hilb
   intvec *w=NULL;
-  tmp=kStdPoly64(FF,QQ,(tHomog)TRUE,&w,hilb,hilbRing,0,0,0,homDegree,NULL);
+  tmp=kStdPoly64(FF,QQ,(tHomog)TRUE,&w,hilb,hilbRing,0,0,homDegree,NULL);
   if (w!=NULL) delete w;
   delete homDegree;
   p_Delete(&hilb,hilbRing);

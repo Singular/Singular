@@ -4678,8 +4678,8 @@ int posInS (const kStrategy strat, const int length,const poly p,
 #endif
   )
   {
-    long o=p_Deg(p,currRing);
-    long oo=p_Deg(set[length],currRing);
+    int o=p_Deg(p,currRing);
+    int oo=p_Deg(set[length],currRing);
 
     if ((oo<o)
     || ((o==oo) && (pLmCmp(set[length],p)!= cmp_int)))
@@ -4773,8 +4773,8 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p)
       if(set[i] != NULL && pNext(set[i]) == NULL)
         mon++;
     }
-    long o = p_Deg(p,currRing);
-    long op = p_Deg(set[mon],currRing);
+    int o = p_Deg(p,currRing);
+    int op = p_Deg(set[mon],currRing);
 
     if ((op < o)
     || ((op == o) && (pLtCmp(set[mon],p) == -1)))
@@ -4803,8 +4803,8 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p)
   }
   else /*if(pNext(p) != NULL)*/
   {
-    long o = p_Deg(p,currRing);
-    long op = p_Deg(set[length],currRing);
+    int o = p_Deg(p,currRing);
+    int op = p_Deg(set[length],currRing);
 
     if ((op < o)
     || ((op == o) && (pLtCmp(set[length],p) == -1)))
@@ -4845,8 +4845,8 @@ int posInIdealMonFirst (const ideal F, const poly p,int start,int end)
   if (end<0) return 0;
   if(pNext(p) == NULL) return start;
   polyset set=F->m;
-  long o = p_Deg(p,currRing);
-  long op;
+  int o = p_Deg(p,currRing);
+  int op;
   int i;
   int an = start;
   for(i=start;i<end;i++)

@@ -63,10 +63,10 @@ ideal kStd2_64(ideal F, ideal Q, tHomog h, intvec **mw, bigintmat *hilb=NULL,
           int syzComp=0, int newIdeal=0, const int64vec *vw=NULL, s_poly_proc_t sp=NULL);
 ideal kStd_internal64(ideal F, ideal Q, tHomog h, intvec **w, bigintmat *hilb=NULL,
           int syzComp=0, int newIdeal=0, const int64vec *vw=NULL, s_poly_proc_t sp=NULL,
-          poly hilb64=NULL, const ring hilbRing=NULL, int64 hilbShift=0);
+          poly hilb64=NULL, const ring hilbRing=NULL);
 ideal kStdPoly64(ideal F, ideal Q, tHomog h, intvec **mw,
-          poly hilb64, const ring hilbRing, int64 hilbShift=0,
-          int syzComp=0, int newIdeal=0, const int64vec *vw=NULL, s_poly_proc_t sp=NULL);
+          poly hilb64, const ring hilbRing, int syzComp=0, int newIdeal=0,
+          const int64vec *vw=NULL, s_poly_proc_t sp=NULL);
 
 
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** mw, bigintmat *hilb=NULL,
@@ -106,7 +106,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M,
 BOOLEAN kVerify(ideal F,ideal Q);
 
 EXTERN_VAR intvec * kModW;
-EXTERN_VAR const int64vec * kHomW;
+EXTERN_VAR intvec * kHomW;
+EXTERN_VAR const int64vec * kHomW64;
 
 
 /* options:

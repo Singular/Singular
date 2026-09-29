@@ -765,6 +765,7 @@
 // operation: hilb (module, int, bigintvec)  ->  bigintvec, domain coeffs
 // operation: std (ideal, bigintvec, bigintvec)  ->  ideal, field coeffs
 // operation: std (module, bigintvec, bigintvec)  ->  module, field coeffs
+// operation: homog (module, bigintvec, intvec)  ->  int
 /*---------------------------------------------*/
 // operation: ( (...)  ->  any_type ( number of arguments >0 )
 // operation: [ (...)  ->  ring ( number of arguments >0 )

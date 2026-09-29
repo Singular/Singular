@@ -939,9 +939,10 @@ const struct sValCmd3 dArith3[]=
 ,{D(jjHILBERT3),       HILBERT_CMD,BIGINTVEC_CMD, MODUL_CMD,  INT_CMD,    BIGINTVEC_CMD, ALLOW_PLURAL | ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjSTD_HILB_W),     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  BIGINTVEC_CMD,BIGINTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSTD_HILB_W),     STD_CMD,    MODUL_CMD,  MODUL_CMD,  BIGINTVEC_CMD,BIGINTVEC_CMD, ALLOW_PLURAL |NO_RING}
+,{D(jjHOMOG_W64_M),    HOMOG_CMD,  INT_CMD,    MODUL_CMD,  BIGINTVEC_CMD,INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{NULL_VAL,            0,          0,          0,          0,          0        , NO_NC |NO_RING}
 };
-#define DARITH3_APPEND_COUNT 4
+#define DARITH3_APPEND_COUNT 5
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, 0: 0, 1: 1, 2: 2, .. */
 const struct sValCmdM dArithM[]=

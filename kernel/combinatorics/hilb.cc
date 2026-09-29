@@ -1569,6 +1569,23 @@ poly hFirstSeries0m(ideal A,ideal Q, intvec *wdegree, intvec *shifts, const ring
   return hFirstSeries0m64(A,Q,&w64,shifts,src,Qt);
 }
 
+static BOOLEAN hDenseMaxDegree(const poly h, const ring Qt, int *maxDegree)
+{
+  assume(maxDegree!=NULL);
+  *maxDegree=0;
+  for (poly p=h; p!=NULL; pIter(p))
+  {
+    const long degree=p_GetExp(p,1,Qt);
+    if ((degree<0) || (degree>INT_MAX-2))
+    {
+      WerrorS("Hilbert series is too large for the dense representation");
+      return FALSE;
+    }
+    if (degree>*maxDegree) *maxDegree=(int)degree;
+  }
+  return TRUE;
+}
+
 intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ring Qt)
 {
   poly s=hFirstSeries0p(A,Q,wdegree,src,Qt);
@@ -1577,17 +1594,16 @@ intvec* hFirstSeries0(ideal A,ideal Q, intvec *wdegree, const ring src, const ri
     ss=new intvec(2);
   else
   {
-    const long max_degree=p_Totaldegree(s,Qt);
-    if ((max_degree<0) || (max_degree>INT_MAX-2))
+    int max_degree;
+    if (!hDenseMaxDegree(s,Qt,&max_degree))
     {
-      WerrorS("Hilbert series is too large for the intvec representation");
       p_Delete(&s,Qt);
       return NULL;
     }
-    ss=new intvec((int)max_degree+2);
+    ss=new intvec(max_degree+2);
     while(s!=NULL)
     {
-      const long degree=p_Totaldegree(s,Qt);
+      const long degree=p_GetExp(s,1,Qt);
       if ((degree<0) || (degree>max_degree))
       {
         WerrorS("invalid degree in Hilbert series");
@@ -1684,6 +1700,11 @@ intvec* hFirstSeries(ideal A,intvec *module_w,ideal Q, intvec *wdegree)
     ideal Ac=getModuleComp(A,c,currRing);
     intvec *res_c=hFirstSeries0(Ac,Q,wdegree,currRing,hilb_Qt);
     id_Delete(&Ac,currRing);
+    if (res_c==NULL)
+    {
+      delete res;
+      return NULL;
+    }
     intvec *tmp=NULL;
     if (res==NULL)
       res=new intvec(res_c->length()+(w_max-w_min));
@@ -2096,20 +2117,14 @@ bigintmat* hPoly2BIV(poly h, const ring Qt, const coeffs biv_cf)
   nMapFunc f;
   if (h!=NULL)
   {
-    const long degree=p_Totaldegree(h,Qt);
-    if (degree>INT_MAX-2)
-    {
-      WerrorS("Hilbert series is too large for the dense representation");
-      return NULL;
-    }
-    td=(int)degree;
+    if (!hDenseMaxDegree(h,Qt,&td)) return NULL;
     h=p_Copy(h,Qt);
     f=n_SetMap(Qt->cf,biv_cf);
   }
   bigintmat* biv=new bigintmat(1,td+2,biv_cf);
   while(h!=NULL)
   {
-    const long degree=p_Totaldegree(h,Qt);
+    const long degree=p_GetExp(h,1,Qt);
     if (degree<0 || degree>td)
     {
       WerrorS("invalid degree in Hilbert series");
@@ -2182,6 +2197,12 @@ bigintmat* hSecondSeries0b64(ideal I, ideal Q, const int64vec *wdegree, intvec *
   else
     h=hFirstSeries0p64(I,Q,wdegree,src,hilb_Qt);
   if (errorreported)
+  {
+    p_Delete(&h,hilb_Qt);
+    return NULL;
+  }
+  int maxDegree;
+  if (!hDenseMaxDegree(h,hilb_Qt,&maxDegree))
   {
     p_Delete(&h,hilb_Qt);
     return NULL;

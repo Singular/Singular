@@ -49,8 +49,7 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
 {
   if (strat->kHilb!=NULL)
   {
-    khCheck64(Q,w,strat->kHilb,strat->kHilbRing,strat->kHilbShift,
-              eledeg,count,strat);
+    khCheck64(Q,w,strat->kHilb,strat->kHilbRing,eledeg,count,strat);
     return;
   }
   bigintmat *newhilb;
@@ -86,7 +85,12 @@ void khCheck( ideal Q, intvec *w, bigintmat *hilb, int &eledeg, int &count,
     // degp = pWDegree;
     l = hilb->cols();
     mw = n_Int(BIMATELEM(*hilb,1,l),coeffs_BIGINT);
-    newhilb =hFirstSeries0b64(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
+    if (strat->kHomW64!=NULL)
+      newhilb=hFirstSeries0b64(strat->Shdl,Q,strat->kHomW64,w,
+                               currRing,coeffs_BIGINT);
+    else
+      newhilb=hFirstSeries0b(strat->Shdl,Q,strat->kHomW,w,
+                             currRing,coeffs_BIGINT);
     if (newhilb==NULL) return;
     ln = newhilb->cols();
     deg = degp(strat->P.p,currRing);
@@ -169,7 +173,7 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
 */
 {
   poly newhilb;
-  long deg;
+  int deg;
   int l,ln;
   mpz_t mw;
   pFDegProc degp;
@@ -260,7 +264,7 @@ void khCheck( ideal Q, intvec *w, poly hilb, const ring Qt, int &eledeg, int &co
  * is indexed by monomial exponents and therefore remains practical when the
  * first relevant degree is larger than INT_MAX. */
 void khCheck64(ideal Q, intvec *w, poly hilb, const ring Qt,
-               int64 hilbShift, int &eledeg, int &count, kStrategy strat)
+               int &eledeg, int &count, kStrategy strat)
 {
   eledeg--;
   if (eledeg!=0) return;
@@ -286,9 +290,19 @@ void khCheck64(ideal Q, intvec *w, poly hilb, const ring Qt,
 
   poly newhilb;
   if (id_IsModule(strat->Shdl,currRing))
-    newhilb=hFirstSeries0m64(strat->Shdl,Q,strat->kHomW,w,currRing,Qt);
+  {
+    if (strat->kHomW64!=NULL)
+      newhilb=hFirstSeries0m64(strat->Shdl,Q,strat->kHomW64,w,currRing,Qt);
+    else
+      newhilb=hFirstSeries0m(strat->Shdl,Q,strat->kHomW,w,currRing,Qt);
+  }
   else
-    newhilb=hFirstSeries0p64(strat->Shdl,Q,strat->kHomW,currRing,Qt);
+  {
+    if (strat->kHomW64!=NULL)
+      newhilb=hFirstSeries0p64(strat->Shdl,Q,strat->kHomW64,currRing,Qt);
+    else
+      newhilb=hFirstSeries0p(strat->Shdl,Q,strat->kHomW,currRing,Qt);
+  }
   if (errorreported)
   {
     p_Delete(&newhilb,Qt);
@@ -339,16 +353,7 @@ void khCheck64(ideal Q, intvec *w, poly hilb, const ring Qt,
   while (strat->Ll>=0)
   {
     const int64 pairDegree=(int64)degp(strat->L[strat->Ll].p,currRing);
-    int64 adjustedDegree;
-    if ((hilbShift>0)
-     && (pairDegree<std::numeric_limits<int64>::min()+hilbShift))
-      adjustedDegree=std::numeric_limits<int64>::min();
-    else if ((hilbShift<0)
-          && (pairDegree>std::numeric_limits<int64>::max()+hilbShift))
-      adjustedDegree=std::numeric_limits<int64>::max();
-    else
-      adjustedDegree=pairDegree-hilbShift;
-    if (adjustedDegree>=degree) break;
+    if (pairDegree>=degree) break;
     count++;
     if(TEST_OPT_PROT) { PrintS("h"); mflush(); }
     deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
@@ -372,7 +377,12 @@ so delete all the remaining pairs
 
   Lm = id_Head(strat->Shdl,currRing);
 
-  newhilb =hFirstSeries0b64(strat->Shdl,Q,strat->kHomW,w,currRing,coeffs_BIGINT);
+  if (strat->kHomW64!=NULL)
+    newhilb=hFirstSeries0b64(strat->Shdl,Q,strat->kHomW64,w,
+                             currRing,coeffs_BIGINT);
+  else
+    newhilb=hFirstSeries0b(strat->Shdl,Q,strat->kHomW,w,
+                           currRing,coeffs_BIGINT);
   if (newhilb==NULL)
   {
     id_Delete(&Lm,currRing);

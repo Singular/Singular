@@ -2409,8 +2409,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   return res;
 }
 
-VAR intvec * kModW;
-VAR const int64vec * kHomW;
+VAR intvec * kModW, * kHomW;
+VAR const int64vec * kHomW64;
 
 long kModDeg(poly p,const ring r)
 {
@@ -2445,10 +2445,14 @@ long kHomModDeg(poly p,const ring r)
   int i;
   int64 j=0;
 
+  assume((kHomW64!=NULL)||(kHomW!=NULL));
+  assume((kHomW64==NULL)||(kHomW==NULL));
+
   for (i=r->N;i>0;i--)
   {
     const int64 e=(int64)p_GetExp(p,i,r);
-    const int64 weight=(*kHomW)[i-1];
+    const int64 weight=(kHomW64!=NULL)
+                       ? (*kHomW64)[i-1] : (int64)(*kHomW)[i-1];
     const int64 max=std::numeric_limits<int64>::max();
     const int64 min=std::numeric_limits<int64>::min();
     if ((e!=0) && (((weight>0) && (weight>max/e))
@@ -2503,12 +2507,65 @@ long kHomModDeg(poly p,const ring r)
   return (long)result;
 }
 
-ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
-         int syzComp, int newIdeal, const int64vec *vw, s_poly_proc_t sp,
-         poly hilb64, const ring hilbRing, int64 hilbShift)
+static BOOLEAN kValidateVariableWeights64(const int64vec *vw)
+{
+  if (vw==NULL) return FALSE;
+  if (vw->length()<rVar(currRing))
+  {
+    WerrorS("not enough variable weights for std");
+    return TRUE;
+  }
+  for (int i=rVar(currRing)-1; i>=0; i--)
+  {
+    if ((*vw)[i]<=0)
+    {
+      WerrorS("weights must be positive");
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+static BOOLEAN kValidateVariableWeights(const intvec *vw)
+{
+  if (vw==NULL) return FALSE;
+  if (vw->length()<rVar(currRing))
+  {
+    WerrorS("not enough variable weights for std");
+    return TRUE;
+  }
+  for (int i=rVar(currRing)-1; i>=0; i--)
+  {
+    if ((*vw)[i]<=0)
+    {
+      WerrorS("weights must be positive");
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+static ideal kStd_internal_common(ideal F, ideal Q, tHomog h,intvec ** w,
+         bigintmat *hilb, int syzComp, int newIdeal, intvec *vw,
+         const int64vec *vw64, s_poly_proc_t sp, poly hilb64,
+         const ring hilbRing)
 {
   assume(!idIs0(F));
   assume((Q==NULL)||(!idIs0(Q)));
+  assume((vw==NULL)||(vw64==NULL));
+  if (kValidateVariableWeights(vw) || kValidateVariableWeights64(vw64))
+    return NULL;
+  const BOOLEAN haveVariableWeights=(vw!=NULL)||(vw64!=NULL);
+  if ((hilb64!=NULL) && (hilbRing==NULL))
+  {
+    WerrorS("a ring is required for a sparse Hilbert series");
+    return NULL;
+  }
+  if ((hilb64!=NULL) && id_IsModule(F,currRing))
+  {
+    WerrorS("sparse 64-bit Hilbert criterion is not supported for modules");
+    return NULL;
+  }
 
   kStrategy strat=new skStrategy;
 
@@ -2531,29 +2588,19 @@ ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
   strat->ak = 0;
   if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
+  strat->kHomW=NULL;
+  strat->kHomW64=NULL;
+  kHomW=NULL;
+  kHomW64=NULL;
   strat->kHilb=hilb64;
   strat->kHilbRing=hilbRing;
-  strat->kHilbShift=hilbShift;
-  if (vw != NULL)
+  if (haveVariableWeights)
   {
-    if (vw->length()<rVar(currRing))
-    {
-      WerrorS("not enough variable weights for std");
-      delete strat;
-      return NULL;
-    }
-    for (int i=rVar(currRing)-1; i>=0; i--)
-    {
-      if ((*vw)[i]<=0)
-      {
-        WerrorS("weights must be positive");
-        delete strat;
-        return NULL;
-      }
-    }
     currRing->pLexOrder=FALSE;
-    strat->kHomW=kHomW=vw;
+    strat->kHomW=vw;
+    strat->kHomW64=vw64;
+    kHomW=vw;
+    kHomW64=vw64;
     strat->pOrigFDeg = currRing->pFDeg;
     strat->pOrigLDeg = currRing->pLDeg;
     pSetDegProcs(currRing,kHomModDeg);
@@ -2580,7 +2627,7 @@ ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
     if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
     {
       strat->kModW = kModW = *w;
-      if (vw == NULL)
+      if (!haveVariableWeights)
       {
         strat->pOrigFDeg = currRing->pFDeg;
         strat->pOrigLDeg = currRing->pLDeg;
@@ -2630,7 +2677,7 @@ ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
           if ((w!=NULL) && (*w!=NULL))
           {
             strat->kModW = kModW = *w;
-            if (vw == NULL)
+            if (!haveVariableWeights)
             {
               strat->pOrigFDeg = currRing->pFDeg;
               strat->pOrigLDeg = currRing->pLDeg;
@@ -2685,6 +2732,7 @@ ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
       pRestoreDegProcs(currRing,strat->pOrigFDeg,strat->pOrigLDeg);
     kModW=NULL;
     kHomW=NULL;
+    kHomW64=NULL;
     currRing->pLexOrder=b;
     if (r!=NULL) id_Delete(&r,currRing);
     delete strat;
@@ -2697,6 +2745,7 @@ ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
   {
     kModW = NULL;
     kHomW = NULL;
+    kHomW64 = NULL;
     pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
   }
   currRing->pLexOrder = b;
@@ -2706,34 +2755,56 @@ ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
   return r;
 }
 
-ideal kStd2_64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
-          int newIdeal, const int64vec *vw, s_poly_proc_t sp)
+ideal kStd_internal64(ideal F, ideal Q, tHomog h,intvec ** w,
+          bigintmat *hilb, int syzComp, int newIdeal, const int64vec *vw,
+          s_poly_proc_t sp, poly hilb64, const ring hilbRing)
+{
+  return kStd_internal_common(F,Q,h,w,hilb,syzComp,newIdeal,NULL,vw,sp,
+                              hilb64,hilbRing);
+}
+
+ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
+         int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
+{
+  return kStd_internal_common(F,Q,h,w,hilb,syzComp,newIdeal,vw,NULL,sp,
+                              NULL,NULL);
+}
+
+static ideal kStd2_common(ideal F, ideal Q, tHomog h,intvec ** w,
+          bigintmat *hilb, int syzComp, int newIdeal, intvec *vw,
+          const int64vec *vw64, s_poly_proc_t sp)
 {
   if(idIs0(F))
     return idInit(1,F->rank);
 
   if(idIs0(Q)) Q=NULL;
+  assume((vw==NULL)||(vw64==NULL));
+  if (kValidateVariableWeights(vw) || kValidateVariableWeights64(vw64))
+    return NULL;
+  const BOOLEAN haveVariableWeights=(vw!=NULL)||(vw64!=NULL);
 #ifdef HAVE_SHIFTBBA
   if(rIsLPRing(currRing))
   {
-    if (vw==NULL)
+    if (vw!=NULL)
+      return kStdShift(F,Q,h,w,hilb,syzComp,newIdeal,vw,FALSE);
+    if (vw64==NULL)
       return kStdShift(F,Q,h,w,hilb,syzComp,newIdeal,NULL,FALSE);
-    intvec vw32(vw->length());
-    for (int i=vw->length()-1; i>=0; i--)
+    intvec vw32(vw64->length());
+    for (int i=vw64->length()-1; i>=0; i--)
     {
-      if (((*vw)[i]<INT_MIN)||((*vw)[i]>INT_MAX))
+      if (((*vw64)[i]<INT_MIN)||((*vw64)[i]>INT_MAX))
       {
         WerrorS("64-bit variable weights are not supported for shift algebras");
         return NULL;
       }
-      vw32[i]=(int)(*vw)[i];
+      vw32[i]=(int)(*vw64)[i];
     }
     return kStdShift(F,Q,h,w,hilb,syzComp,newIdeal,&vw32,FALSE);
   }
 #endif
 
   if ((hilb==NULL)
-  && (vw==NULL)
+  && (!haveVariableWeights)
   && (newIdeal==0)
   && (sp==NULL)
   && (IDELEMS(F)>1)
@@ -2751,13 +2822,15 @@ ideal kStd2_64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzCo
       long modular_colength=-1;
       currRing->ppNoether=kTryHC(F,Q,&modular_colength);
       const BOOLEAN used_hc=(currRing->ppNoether!=NULL);
-      ideal res=kStd_internal64(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
+      ideal res=kStd_internal_common(F,Q,h,w,hilb,syzComp,newIdeal,
+                                     vw,vw64,sp,NULL,NULL);
       if (currRing->ppNoether!=NULL) pLmDelete(currRing->ppNoether);
       currRing->ppNoether=NULL;
       if ((!used_hc)||(res==NULL)||(scMult0Int(res,Q)==modular_colength)) return res;
       if (TEST_OPT_PROT) PrintS("HC colength check failed, retry without HC\n");
       idDelete(&res);
-      return kStd_internal64(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
+      return kStd_internal_common(F,Q,h,w,hilb,syzComp,newIdeal,
+                                  vw,vw64,sp,NULL,NULL);
     }
     /* test hilbstd */
     if ( rHasGlobalOrdering(currRing)
@@ -2777,38 +2850,30 @@ ideal kStd2_64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzCo
       }
     }
   }
-  return kStd_internal64(F,Q,h,w,hilb,syzComp,newIdeal,vw,sp);
+  return kStd_internal_common(F,Q,h,w,hilb,syzComp,newIdeal,
+                              vw,vw64,sp,NULL,NULL);
 }
 
-ideal kStd2(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzComp,
-          int newIdeal, intvec *vw, s_poly_proc_t sp)
+ideal kStd2_64(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
+          int syzComp, int newIdeal, const int64vec *vw, s_poly_proc_t sp)
 {
-  if (vw==NULL) return kStd2_64(F,Q,h,w,hilb,syzComp,newIdeal,NULL,sp);
-  int64vec vw64(vw);
-  return kStd2_64(F,Q,h,w,hilb,syzComp,newIdeal,&vw64,sp);
+  return kStd2_common(F,Q,h,w,hilb,syzComp,newIdeal,NULL,vw,sp);
 }
 
-ideal kStd_internal(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
-         int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
+ideal kStd2(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,
+          int syzComp, int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
-  if (vw==NULL) return kStd_internal64(F,Q,h,w,hilb,syzComp,newIdeal,NULL,sp);
-  int64vec vw64(vw);
-  return kStd_internal64(F,Q,h,w,hilb,syzComp,newIdeal,&vw64,sp);
+  return kStd2_common(F,Q,h,w,hilb,syzComp,newIdeal,vw,NULL,sp);
 }
 
 ideal kStdPoly64(ideal F, ideal Q, tHomog h, intvec **w,
-          poly hilb64, const ring hilbRing, int64 hilbShift,
-          int syzComp, int newIdeal, const int64vec *vw, s_poly_proc_t sp)
+          poly hilb64, const ring hilbRing, int syzComp, int newIdeal,
+          const int64vec *vw, s_poly_proc_t sp)
 {
   if (idIs0(F)) return idInit(1,F->rank);
   if (idIs0(Q)) Q=NULL;
-  if ((hilb64!=NULL) && (hilbRing==NULL))
-  {
-    WerrorS("a ring is required for a sparse Hilbert series");
-    return NULL;
-  }
   return kStd_internal64(F,Q,h,w,NULL,syzComp,newIdeal,vw,sp,
-                         hilb64,hilbRing,hilbShift);
+                         hilb64,hilbRing);
 }
 
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
@@ -2834,10 +2899,6 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, bigin
 {
   if(idIs0(F))
     return idInit(1,F->rank);
-  int64vec vw64((vw==NULL) ? 1 : vw->length());
-  if (vw!=NULL)
-    for (int i=vw->length()-1; i>=0; i--) vw64[i]=(*vw)[i];
-  const int64vec* vw64ptr=(vw==NULL) ? NULL : &vw64;
   if(!rField_is_Ring(currRing))
   {
     ideal r;
@@ -2874,11 +2935,14 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, bigin
     strat->ak = 0;
     if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
     strat->kModW=kModW=NULL;
-    strat->kHomW=kHomW=NULL;
+    strat->kHomW=NULL;
+    strat->kHomW64=NULL;
+    kHomW=NULL;
+    kHomW64=NULL;
     if (vw != NULL)
     {
       currRing->pLexOrder=FALSE;
-      strat->kHomW=kHomW=vw64ptr;
+      strat->kHomW=kHomW=vw;
       strat->pOrigFDeg = currRing->pFDeg;
       strat->pOrigLDeg = currRing->pLDeg;
       pSetDegProcs(currRing,kHomModDeg);
@@ -2958,6 +3022,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, bigin
     {
       kModW = NULL;
       kHomW = NULL;
+      kHomW64 = NULL;
       pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
     }
     currRing->pLexOrder = b;
@@ -3026,11 +3091,14 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, bigin
       strat->ak = 0;
       if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
       strat->kModW=kModW=NULL;
-      strat->kHomW=kHomW=NULL;
+      strat->kHomW=NULL;
+      strat->kHomW64=NULL;
+      kHomW=NULL;
+      kHomW64=NULL;
       if (vw != NULL)
       {
         currRing->pLexOrder=FALSE;
-        strat->kHomW=kHomW=vw64ptr;
+        strat->kHomW=kHomW=vw;
         strat->pOrigFDeg = currRing->pFDeg;
         strat->pOrigLDeg = currRing->pLDeg;
         pSetDegProcs(currRing,kHomModDeg);
@@ -3111,6 +3179,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, bigin
       {
         kModW = NULL;
         kHomW = NULL;
+        kHomW64 = NULL;
         pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
       }
       currRing->pLexOrder = b;
@@ -3142,10 +3211,6 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzC
     WerrorS("No local ordering possible for shift algebra");
     return(NULL);
   }
-  int64vec vw64((vw==NULL) ? 1 : vw->length());
-  if (vw!=NULL)
-    for (int i=vw->length()-1; i>=0; i--) vw64[i]=(*vw)[i];
-  const int64vec* vw64ptr=(vw==NULL) ? NULL : &vw64;
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
@@ -3166,11 +3231,14 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzC
   strat->ak = 0;
   if (id_IsModule(F,currRing)) strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
+  strat->kHomW=NULL;
+  strat->kHomW64=NULL;
+  kHomW=NULL;
+  kHomW64=NULL;
   if (vw != NULL)
   {
     currRing->pLexOrder=FALSE;
-    strat->kHomW=kHomW=vw64ptr;
+    strat->kHomW=kHomW=vw;
     strat->pOrigFDeg = currRing->pFDeg;
     strat->pOrigLDeg = currRing->pLDeg;
     pSetDegProcs(currRing,kHomModDeg);
@@ -3224,6 +3292,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, bigintmat *hilb,int syzC
   {
     kModW = NULL;
     kHomW = NULL;
+    kHomW64 = NULL;
     pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
   }
   currRing->pLexOrder = b;
@@ -3355,6 +3424,7 @@ ideal kMin_std2(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, bigintmat *hil
     pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
     kModW = NULL;
     kHomW = NULL;
+    kHomW64 = NULL;
   }
   currRing->pLexOrder = b;
   if ((delete_w)&&(temp_w!=NULL)) delete temp_w;
@@ -3743,7 +3813,10 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   strat->ak = id_RankFreeModule(F,currRing);
   strat->syzComp = strat->ak;
   strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
+  strat->kHomW=NULL;
+  strat->kHomW64=NULL;
+  kHomW=NULL;
+  kHomW64=NULL;
   if (strat->ak == 0)
   {
     h = (tHomog)idHomIdeal(F,Q);

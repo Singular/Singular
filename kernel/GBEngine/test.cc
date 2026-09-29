@@ -60,6 +60,8 @@
 #include "kernel/GBEngine/janet.h"
 #include "Singular/ipid.h"
 
+#include <stdlib.h>
+
 void TestGBEngine()
 {
 
@@ -480,6 +482,15 @@ static poly hilb64Binomial(int aVar, int aExp, int bVar, int bExp,
   return p_Add_q(a,b,R);
 }
 
+static void testRequire(const BOOLEAN condition, const char* message)
+{
+  if (!condition)
+  {
+    Werror("TestHilbert64 failed: %s",message);
+    exit(1);
+  }
+}
+
 void TestHilbert64()
 {
   char** names=(char**)omAlloc(3*sizeof(char*));
@@ -505,17 +516,21 @@ void TestHilbert64()
   weights64[0]=INT64_C(3000000000);
   weights64[1]=INT64_C(6000000000);
   weights64[2]=INT64_C(3000000000);
-  assume(id_HomIdealW64(I,NULL,&weights64,R));
+  testRequire(id_HomIdealW64(I,NULL,&weights64,R),
+              "active 64-bit weights are homogeneous");
 
   ideal known=kStd_internal64(I,NULL,isHomog,NULL,NULL,0,0,&weights64,NULL);
+  testRequire(known!=NULL,"64-bit weighted standard basis exists");
   ring Qt=hHilbertSeriesRing();
   poly hs=hFirstSeries0p64(known,NULL,&weights64,R,Qt);
-  assume((hs!=NULL) && (p_GetExp(hs,1,Qt)>INT_MAX));
+  testRequire((hs!=NULL) && (p_GetExp(hs,1,Qt)>INT_MAX),
+              "sparse Hilbert numerator has an exponent above INT_MAX");
   intvec* moduleWeights=NULL;
-  ideal G64=kStdPoly64(I,NULL,isHomog,&moduleWeights,hs,Qt,0,
+  ideal G64=kStdPoly64(I,NULL,isHomog,&moduleWeights,hs,Qt,
                        0,0,&weights64,NULL);
+  testRequire(G64!=NULL,"Hilbert-driven 64-bit standard basis exists");
   idSkipZeroes(G64);
-  assume(IDELEMS(G64)==2);
+  testRequire(IDELEMS(G64)==2,"64-bit standard basis has two elements");
 
   if (coeffs_BIGINT==NULL) coeffs_BIGINT=nInitChar(n_Z,NULL);
   intvec weights32(3);
@@ -523,9 +538,18 @@ void TestHilbert64()
   weights32[1]=2;
   weights32[2]=1;
   bigintmat* hdense=hFirstSeries0b(known,NULL,&weights32,NULL,R,coeffs_BIGINT);
+  testRequire(hdense!=NULL,"legacy dense Hilbert series exists");
   ideal G32=kStd2(I,NULL,isHomog,&moduleWeights,hdense,0,0,&weights32,NULL);
+  testRequire(G32!=NULL,"legacy weighted standard basis exists");
   idSkipZeroes(G32);
-  assume(IDELEMS(G32)==IDELEMS(G64));
+  testRequire(IDELEMS(G32)==IDELEMS(G64),
+              "legacy and 64-bit bases have the same size");
+  ideal remainder=kNF(G64,NULL,G32,0,0);
+  testRequire(idIs0(remainder),"64-bit basis reduces by legacy basis");
+  id_Delete(&remainder,R);
+  remainder=kNF(G32,NULL,G64,0,0);
+  testRequire(idIs0(remainder),"legacy basis reduces by 64-bit basis");
+  id_Delete(&remainder,R);
 
   int64vec autoWeights(3);
   autoWeights[0]=INT64_C(3000000000);
@@ -540,14 +564,26 @@ void TestHilbert64()
   p_SetExp(IA->m[1],1,1,RA);
   p_SetExp(IA->m[1],2,1,RA);
   p_Setm(IA->m[1],RA);
+  ideal GautoPlain=kStd_internal64(IA,NULL,testHomog,NULL,NULL,0,0,NULL,NULL);
+  testRequire(GautoPlain!=NULL,"plain homogeneous reference basis exists");
   BITSET save1,save2;
   SI_SAVE_OPT(save1,save2);
   si_opt_2|=Sy_bit(V_STDHILB);
   ideal Gauto=kTryHilbstd(IA,NULL);
   SI_RESTORE_OPT(save1,save2);
-  assume(Gauto!=NULL);
+  testRequire(Gauto!=NULL,"automatic 64-bit Hilbert route returns a basis");
   idSkipZeroes(Gauto);
-  assume(IDELEMS(Gauto)==3);
+  testRequire(IDELEMS(Gauto)==3,
+              "automatic 64-bit Hilbert basis has three elements");
+  idSkipZeroes(GautoPlain);
+  remainder=kNF(Gauto,NULL,GautoPlain,0,0);
+  testRequire(idIs0(remainder),
+              "automatic Hilbert basis reduces by plain basis");
+  id_Delete(&remainder,RA);
+  remainder=kNF(GautoPlain,NULL,Gauto,0,0);
+  testRequire(idIs0(remainder),
+              "plain basis reduces by automatic Hilbert basis");
+  id_Delete(&remainder,RA);
 
   // Exercise the nonhomogeneous route as well: homogenizing the constant in
   // x^2-y+1 requires an exponent of 6,000,000,000 in the added variable.
@@ -562,20 +598,24 @@ void TestHilbert64()
   si_opt_2|=Sy_bit(V_STDHILB);
   ideal Gnon=kTryHilbstd(Inon,NULL);
   SI_RESTORE_OPT(save1,save2);
-  assume((Gplain!=NULL) && (Gnon!=NULL));
+  testRequire((Gplain!=NULL) && (Gnon!=NULL),
+              "plain and Hilbert-driven nonhomogeneous bases exist");
   idSkipZeroes(Gplain);
   idSkipZeroes(Gnon);
-  ideal remainder=kNF(Gnon,NULL,Gplain,0,0);
-  assume(idIs0(remainder));
+  remainder=kNF(Gnon,NULL,Gplain,0,0);
+  testRequire(idIs0(remainder),
+              "Hilbert-driven nonhomogeneous basis reduces by plain basis");
   id_Delete(&remainder,RA);
   remainder=kNF(Gplain,NULL,Gnon,0,0);
-  assume(idIs0(remainder));
+  testRequire(idIs0(remainder),
+              "plain nonhomogeneous basis reduces by Hilbert-driven basis");
   id_Delete(&remainder,RA);
 
   id_Delete(&Gnon,RA);
   id_Delete(&Gplain,RA);
   id_Delete(&Inon,RA);
   id_Delete(&Gauto,RA);
+  id_Delete(&GautoPlain,RA);
   id_Delete(&IA,RA);
   rChangeCurrRing(R);
   rDelete(RA);
