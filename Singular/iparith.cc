@@ -9668,6 +9668,20 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       else
       return TRUE;
     }
+    // Append-only overloads are outside the command-grouped part of dArith2.
+    // Check exact signatures there before using the generated legacy index.
+    const int append_begin = (sizeof(dArith2) / sizeof(dArith2[0]))
+                             - 1 - DARITH2_APPEND_COUNT;
+    for (int j=append_begin; j<append_begin + DARITH2_APPEND_COUNT; j++)
+    {
+      if ((dArith2[j].cmd==op)
+      &&  (dArith2[j].arg1==at)
+      &&  (dArith2[j].arg2==bt))
+      {
+        return iiExprArith2TabIntern(res,a,op,b,proccall,dArith2+j,
+                                    at,bt,dConvertTypes);
+      }
+    }
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
     return iiExprArith2TabIntern(res,a,op,b,proccall,dArith2+i,at,bt,dConvertTypes);
   }
@@ -10068,6 +10082,21 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     int ct=c->Typ();
 
     iiOp=op;
+    // Append-only overloads are outside the command-grouped part of dArith3.
+    // Check exact signatures there before searching the legacy table groups.
+    const int append_begin = (sizeof(dArith3) / sizeof(dArith3[0]))
+                             - 1 - DARITH3_APPEND_COUNT;
+    for (int j=append_begin; j<append_begin + DARITH3_APPEND_COUNT; j++)
+    {
+      if ((dArith3[j].cmd==op)
+      &&  (dArith3[j].arg1==at)
+      &&  (dArith3[j].arg2==bt)
+      &&  (dArith3[j].arg3==ct))
+      {
+        return iiExprArith3TabIntern(res,op,a,b,c,dArith3+j,
+                                    at,bt,ct,dConvertTypes);
+      }
+    }
     int i=0;
     while ((dArith3[i].cmd!=op)&&(dArith3[i].cmd!=0)) i++;
     return iiExprArith3TabIntern(res,op,a,b,c,dArith3+i,at,bt,ct,dConvertTypes);

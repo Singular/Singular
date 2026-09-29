@@ -561,8 +561,6 @@
 // operation: hilb (module, int)  ->  bigintvec, domain coeffs
 // operation: homog (ideal, intvec)  ->  int
 // operation: homog (module, intvec)  ->  int
-// operation: homog (ideal, bigintvec)  ->  int
-// operation: homog (module, bigintvec)  ->  int
 // operation: homog (poly, poly)  ->  poly
 // operation: homog (vector, poly)  ->  vector
 // operation: homog (ideal, poly)  ->  ideal
@@ -655,6 +653,8 @@
 // operation: waitfirst (list, int)  ->  int
 // operation: waitall (list, int)  ->  int
 // operation: wedge (matrix, int)  ->  matrix, only commutative rings
+// operation: homog (ideal, bigintvec)  ->  int
+// operation: homog (module, bigintvec)  ->  int
 /*---------------------------------------------*/
 // operation: [ (string, int, int)  ->  string
 // operation: [ (intmat, int, int)  ->  int
@@ -691,8 +691,6 @@
 // operation: frwalk (ring, def, int)  ->  ideal requires currRing, only commutative rings
 // operation: hilb (ideal, int, intvec)  ->  bigintvec, domain coeffs
 // operation: hilb (module, int, intvec)  ->  bigintvec, domain coeffs
-// operation: hilb (ideal, int, bigintvec)  ->  bigintvec, domain coeffs
-// operation: hilb (module, int, bigintvec)  ->  bigintvec, domain coeffs
 // operation: hilb (ideal, ring, string)  ->  nothing, domain coeffs
 // operation: hilb (module, ring, string)  ->  nothing, domain coeffs
 // operation: homog (poly, poly, intvec)  ->  poly
@@ -753,8 +751,6 @@
 // operation: status (link, string, string)  ->  int
 // operation: std (ideal, bigintvec, intvec)  ->  ideal, field coeffs
 // operation: std (module, bigintvec, intvec)  ->  module, field coeffs
-// operation: std (ideal, bigintvec, bigintvec)  ->  ideal, field coeffs
-// operation: std (module, bigintvec, bigintvec)  ->  module, field coeffs
 // operation: subst (def, poly, polyBucket)  ->  any_type
 // operation: subst (poly, poly, poly)  ->  poly
 // operation: subst (vector, poly, poly)  ->  vector
@@ -765,6 +761,10 @@
 // operation: subst (matrix, poly, number)  ->  matrix
 // operation: laguerre (poly, int, int)  ->  list, only commutative rings, field coeffs
 // operation: vandermonde (ideal, ideal, int)  ->  poly, only commutative rings, field coeffs
+// operation: hilb (ideal, int, bigintvec)  ->  bigintvec, domain coeffs
+// operation: hilb (module, int, bigintvec)  ->  bigintvec, domain coeffs
+// operation: std (ideal, bigintvec, bigintvec)  ->  ideal, field coeffs
+// operation: std (module, bigintvec, bigintvec)  ->  module, field coeffs
 /*---------------------------------------------*/
 // operation: ( (...)  ->  any_type ( number of arguments >0 )
 // operation: [ (...)  ->  ring ( number of arguments >0 )
@@ -1335,8 +1335,8 @@ const struct sValCmdTab dArithTab2[]=
  { 266,0 }, /* :: */
  { 285,236 }, /* betti */
  { 287,290 }, /* fetch */
- { 290,312 }, /* imap */
- { 291,329 }, /* koszul */
+ { 290,310 }, /* imap */
+ { 291,327 }, /* koszul */
  { 359,233 }, /* align */
  { 360,235 }, /* attrib */
  { 364,240 }, /* bracket */
@@ -1364,53 +1364,53 @@ const struct sValCmdTab dArithTab2[]=
  { 410,297 }, /* gcd */
  { 413,301 }, /* hilb */
  { 414,303 }, /* homog */
- { 415,311 }, /* hres */
- { 417,313 }, /* importfrom */
- { 418,314 }, /* indepSet */
- { 419,315 }, /* insert */
+ { 415,309 }, /* hres */
+ { 417,311 }, /* importfrom */
+ { 418,312 }, /* indepSet */
+ { 419,313 }, /* insert */
  { 421,113 }, /* div */
- { 422,316 }, /* interpolation */
- { 424,317 }, /* intersect */
- { 428,319 }, /* janet */
- { 429,320 }, /* jet */
- { 430,325 }, /* kbase */
- { 431,327 }, /* kernel */
- { 432,328 }, /* killattrib */
- { 433,331 }, /* kres */
- { 439,334 }, /* liftstd */
- { 440,332 }, /* lift */
- { 443,336 }, /* load */
- { 444,337 }, /* lres */
- { 452,338 }, /* modulo */
- { 453,340 }, /* monitor */
- { 454,341 }, /* mpresmat */
- { 455,343 }, /* mres */
- { 461,342 }, /* newstruct */
- { 462,347 }, /* ncalgebra */
- { 463,351 }, /* nc_algebra */
- { 470,355 }, /* oppose */
- { 477,356 }, /* parstr */
- { 478,345 }, /* primefactors */
- { 480,357 }, /* print */
- { 482,358 }, /* prune_map */
- { 486,359 }, /* quotient */
- { 487,362 }, /* random */
- { 488,363 }, /* rank */
- { 489,364 }, /* read */
- { 490,365 }, /* reduce */
- { 493,371 }, /* nres */
- { 502,373 }, /* sba */
- { 504,375 }, /* simplify */
- { 507,379 }, /* sqrfree */
- { 508,382 }, /* sres */
- { 509,380 }, /* status */
- { 510,384 }, /* std */
- { 514,390 }, /* syz */
- { 515,392 }, /* tensor */
- { 526,395 }, /* varstr */
- { 528,396 }, /* waitfirst */
- { 529,397 }, /* waitall */
- { 530,398 }, /* wedge */
+ { 422,314 }, /* interpolation */
+ { 424,315 }, /* intersect */
+ { 428,317 }, /* janet */
+ { 429,318 }, /* jet */
+ { 430,323 }, /* kbase */
+ { 431,325 }, /* kernel */
+ { 432,326 }, /* killattrib */
+ { 433,329 }, /* kres */
+ { 439,332 }, /* liftstd */
+ { 440,330 }, /* lift */
+ { 443,334 }, /* load */
+ { 444,335 }, /* lres */
+ { 452,336 }, /* modulo */
+ { 453,338 }, /* monitor */
+ { 454,339 }, /* mpresmat */
+ { 455,341 }, /* mres */
+ { 461,340 }, /* newstruct */
+ { 462,345 }, /* ncalgebra */
+ { 463,349 }, /* nc_algebra */
+ { 470,353 }, /* oppose */
+ { 477,354 }, /* parstr */
+ { 478,343 }, /* primefactors */
+ { 480,355 }, /* print */
+ { 482,356 }, /* prune_map */
+ { 486,357 }, /* quotient */
+ { 487,360 }, /* random */
+ { 488,361 }, /* rank */
+ { 489,362 }, /* read */
+ { 490,363 }, /* reduce */
+ { 493,369 }, /* nres */
+ { 502,371 }, /* sba */
+ { 504,373 }, /* simplify */
+ { 507,377 }, /* sqrfree */
+ { 508,380 }, /* sres */
+ { 509,378 }, /* status */
+ { 510,382 }, /* std */
+ { 514,388 }, /* syz */
+ { 515,390 }, /* tensor */
+ { 526,393 }, /* varstr */
+ { 528,394 }, /* waitfirst */
+ { 529,395 }, /* waitall */
+ { 530,396 }, /* wedge */
  { 10000,0 }
 };
 #define JJTAB2LEN 97
