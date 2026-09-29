@@ -111,6 +111,12 @@ jobs:
             libntl-devel libreadline-devel libtool m4 make perl pkg-config
             texinfo
 
+      - name: Trust checkout for Cygwin Git
+        run: >-
+          bash --login -eo pipefail -c
+          'git config --system --add safe.directory "$(pwd -P)";
+          git status --short >/dev/null'
+
       - name: Verify Cygwin system page size
         run: >-
           bash --login -eo pipefail -c
