@@ -1835,6 +1835,24 @@ void syMake(leftv v,const char * id, package pa)
     }
     /* 7. non-local ring: number/poly */
     {
+      /* an exact ringvar match takes precedence over the monomial string
+       * parser below: otherwise a coefficient parameter whose name is a
+       * prefix of a ringvar name (ring R=(0,c),c@,dp; inside a proc)
+       * shadows that variable (cf. case 4 above) */
+      int vnr=-1;
+      if ((currRing!=NULL)&&(currRingHdl!=NULL))
+        vnr=r_IsRingVar(id, currRing->names,currRing->N);
+      if (vnr>=0)
+      {
+        poly p=pOne();
+        pSetExp(p,vnr+1,1);
+        pSetm(p);
+        v->data = (void *)p;
+        v->name = id;
+        v->rtyp = POLY_CMD;
+        currRingHdl=save_ring;
+        return;
+      }
       BOOLEAN ok=FALSE;
       poly p = ((currRing!=NULL)     /* ring required */
                && (currRingHdl!=NULL)
