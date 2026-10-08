@@ -376,6 +376,73 @@ CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
   return result;
 }
 
+static CanonicalForm convSingPAlgExtFactoryP(poly p, const Variable & a,
+                                             const ring r)
+{
+  CanonicalForm result = 0;
+  int e, n = rVar(r);
+
+  while (p != NULL)
+  {
+    CanonicalForm term =
+      convSingAFactoryA((poly)p_GetCoeff(p, r->cf->extRing), a, r);
+
+    for (int i = n; i > 0; i--)
+    {
+      if ((e = p_GetExp(p, i, r)) != 0)
+        term = term * power(Variable(i), e);
+    }
+    result += term;
+    p = pNext(p);
+  }
+  return result;
+}
+
+CanonicalForm convSingTrPAlgExtFactoryP(poly p, const Variable & a,
+                                        const ring r)
+{
+  CanonicalForm result = 0;
+  int e, n = rVar(r);
+  int offs = rPar(r);
+
+  while (p != NULL)
+  {
+    n_Normalize(p_GetCoeff(p, r), r->cf);
+
+    // test if denominator is constant
+    if (!p_IsConstant(DEN((fraction)p_GetCoeff(p, r)), r->cf->extRing))
+    {
+      if (!errorreported)
+        WerrorS("conversion error: denominator!= 1");
+      return CanonicalForm(0);
+    }
+
+    CanonicalForm term =
+      convSingPAlgExtFactoryP(NUM((fraction)p_GetCoeff(p, r)), a,
+                              r->cf->extRing);
+
+    // if denominator is not NULL it should be a constant at this point
+    if (DEN((fraction)p_GetCoeff(p, r)) != NULL)
+    {
+      CanonicalForm den =
+        convSingPAlgExtFactoryP(DEN((fraction)p_GetCoeff(p, r)), a,
+                                r->cf->extRing);
+      if (rChar(r) == 0)
+        On(SW_RATIONAL);
+      term /= den;
+    }
+
+    for (int i = n; i > 0; i--)
+    {
+      if ((e = p_GetExp(p, i, r)) != 0)
+        term = term * power(Variable(i + offs), e);
+    }
+    result += term;
+    p = pNext(p);
+  }
+  return result;
+}
+
 BOOLEAN convSingTrP(poly p, const ring r )
 {
   while ( p!=NULL )
@@ -398,6 +465,21 @@ poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r )
   poly result = NULL;
   convRecTrP( f, exp, result , rPar(r), r );
   omFreeSize((ADDRESS)exp,n*sizeof(int));
+  return result;
+}
+
+static void
+convRecAPTrP(const CanonicalForm & f, int * exp, poly & result, int offs,
+             const ring r);
+
+poly convFactoryAPSingTrP(const CanonicalForm & f, const ring r)
+{
+  if (f.isZero()) return NULL;
+  int n = rVar(r) + 1;
+  int * exp = (int *)omAlloc0(n * sizeof(int));
+  poly result = NULL;
+  convRecAPTrP(f, exp, result, rPar(r), r);
+  omFreeSize((ADDRESS)exp, n * sizeof(int));
   return result;
 }
 
@@ -425,6 +507,33 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const
     pGetCoeff(term)=ntInit(convFactoryPSingP( f, r->cf->extRing ), r->cf);
     p_Setm( term,r );
     result = p_Add_q( result, term,r );
+  }
+}
+
+static void
+convRecAPTrP(const CanonicalForm & f, int * exp, poly & result, int offs,
+             const ring r)
+{
+  // assume f!= 0
+  if (f.level() > offs)
+  {
+    int l = f.level();
+    for (CFIterator i = f; i.hasTerms(); i++)
+    {
+      exp[l - offs] = i.exp();
+      convRecAPTrP(i.coeff(), exp, result, offs, r);
+    }
+    exp[l - offs] = 0;
+  }
+  else
+  {
+    poly term = p_Init(r);
+    for (int i = rVar(r); i > 0; i--)
+      p_SetExp(term, i, exp[i], r);
+    pGetCoeff(term) =
+      ntInit(convFactoryAPSingAP_R(f, 0, 0, r->cf->extRing), r->cf);
+    p_Setm(term, r);
+    result = p_Add_q(result, term, r);
   }
 }
 
