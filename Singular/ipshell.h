@@ -25,6 +25,7 @@ BOOLEAN    semicProc3   ( leftv,leftv,leftv,leftv );
 BOOLEAN iiAssignCR(leftv, leftv);
 
 BOOLEAN iiARROW (leftv, char*,char *);
+BOOLEAN iiARROWparams (leftv, char*,char *);
 
 EXTERN_VAR leftv iiCurrArgs;
 EXTERN_VAR idhdl iiCurrProc;

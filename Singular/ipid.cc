@@ -766,10 +766,15 @@ BOOLEAN piKill(procinfov pi)
       }
       if (pi->data.s.body != NULL) // OB: ????
         omFree((ADDRESS)pi->data.s.body);
+      // libname/procname are omStrDup'd (iiInitSingularProcinfo) and may be
+      // larger than OM_MAX_BLOCK_SIZE (e.g. lambda procnames embedding the
+      // whole block text): then omalloc serves them via malloc, and
+      // omFreeBinAddr would treat the system heap as an omalloc bin page
+      // (SIGSEGV in omGetBinOfPage). omFree handles both cases.
       if (pi->libname != NULL) // OB: ????
-        omFreeBinAddr((ADDRESS)pi->libname);
+        omFree((ADDRESS)pi->libname);
       if (pi->procname != NULL) // OB: ????
-        omFreeBinAddr((ADDRESS)pi->procname);
+        omFree((ADDRESS)pi->procname);
 
     }
     if( pi->language == LANG_C)
