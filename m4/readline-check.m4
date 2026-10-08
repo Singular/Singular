@@ -105,7 +105,7 @@ AC_LANG_RESTORE
 fi
 
 AC_MSG_CHECKING(which readline to use)
-if test "$ac_cv_with_readline" = dynamic; then
+if test "$with_readline" = dynamic; then
   AC_MSG_RESULT(dynamic)
   AC_DEFINE([HAVE_DYN_RL], [1], [Use dynamic readline])
 elif test "$ac_cv_have_readline" = yes; then

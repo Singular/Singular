@@ -356,7 +356,13 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
   /* set the output stream */
   if(!isatty(STDOUT_FILENO))
   {
-    #ifdef atarist
+    #ifdef _WIN32
+      // ttyname() is a POSIX interface.  CONOUT$ is the native Windows
+      // console output device and keeps readline prompts visible when
+      // stdout has been redirected.
+      FILE *console_out = fopen("CONOUT$", "w");
+      if (console_out != NULL) rl_outstream = console_out;
+    #elif defined(atarist)
       rl_outstream = fopen( "/dev/tty", "w" );
     #else
       char *fn=ttyname(fileno(stdin));//if stdout is not a tty, maybe stdin is?
@@ -422,7 +428,10 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
     /* set the output stream */
     if(!isatty(STDOUT_FILENO))
     {
-      #ifdef atarist
+      #ifdef _WIN32
+        FILE *console_out = fopen("CONOUT$", "w");
+        if (console_out != NULL) *fe_rl_outstream = console_out;
+      #elif defined(atarist)
         *fe_rl_outstream = fopen( "/dev/tty", "w" );
       #else
         char *fn=ttyname(fileno(stdin));//if stdout is not a tty, maybe stdin is?
@@ -456,4 +465,3 @@ char * fe_fgets_dummy(const char */*pr*/,char */*s*/, int /*size*/)
 {
   return NULL;
 }
-

@@ -4971,6 +4971,10 @@ operating system,
 @item @code{memory(2)} is the maximal number of bytes ever allocated from the
 operating system during the current @sc{Singular} session.
 @end itemize
+Native Windows builds configured with @code{--enable-omalloc} use the Win64
+omalloc backend and provide these statistics.  The default Windows build, or
+one explicitly configured with @code{--disable-omalloc}, returns @code{0}
+instead.
 @item @strong{Note:}
 To monitor the memory usage during ongoing computations the option
 @code{mem} should be set (using the command @code{option(mem);}, see
@@ -8747,6 +8751,11 @@ compute a partial groebner base of a module, stop after the given column
 @item @code{system("tensorModuleMult",} int, module @code{)}
 @cindex system, tensorModuleMult
 internal for sheafcoh.lib (see id_TensorModuleMult)
+@c ..........................
+@item @code{system("tmpdir")}
+@cindex system, tmpdir
+returns the temporary directory used by @sc{Singular}. This is @code{/tmp}
+on Unix systems and the configured temporary directory on native Windows.
 @c ..........................
 @item @code{system("twostd",} ideal @code{)}
 @cindex system, twostd

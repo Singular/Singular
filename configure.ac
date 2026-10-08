@@ -125,6 +125,22 @@ SING_USE_FACTORY()
 SING_CHECK_P_PROCS
 SING_CHECK_READLINE
 
+dnl A native Windows distribution is expected to provide the same arithmetic
+dnl and interactive command-line facilities as the other supported builds.
+dnl Do not silently produce a reduced executable when its packaged UCRT64
+dnl dependencies are missing.
+AS_IF([test "x$native_win32" = xyes], [
+  AS_IF([test "x$HAVE_NTL" != xyes], [
+    AC_MSG_ERROR([NTL is required for native Windows builds; install mingw-w64-ucrt-x86_64-ntl])
+  ])
+  AS_IF([test "x$HAVE_FLINT" != xyes], [
+    AC_MSG_ERROR([FLINT is required for native Windows builds; install mingw-w64-ucrt-x86_64-flint])
+  ])
+  AS_IF([test "x$ac_cv_have_readline" != xyes], [
+    AC_MSG_ERROR([readline is required for native Windows builds; install mingw-w64-ucrt-x86_64-readline])
+  ])
+])
+
 SING_CHECK_DBM
 
 SING_CHECK_GFANLIB

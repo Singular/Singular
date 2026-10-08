@@ -111,17 +111,11 @@ AC_DEFUN([SING_USE_OMALLOC],
 [
  AC_ARG_ENABLE(omalloc,
   [AS_HELP_STRING([--disable-omalloc], [do NOT use omalloc within the factory])],
-  [if test "x$enableval"  = "xyes"; then
-    ENABLE_OMALLOC=yes
-   fi],
-    ENABLE_OMALLOC=add)
-
- ENABLE_OMALLOC_ARG=""
-
- if test "x$ENABLE_OMALLOC" = xadd; then
-   ENABLE_OMALLOC=yes
-   ENABLE_OMALLOC_ARG="--enable-omalloc $ENABLE_OMALLOC_ARG"
- fi
+  [ENABLE_OMALLOC="$enableval"],
+  [case $host_os in
+     *mingw*) ENABLE_OMALLOC=no ;;
+     *) ENABLE_OMALLOC=yes ;;
+   esac])
 
  AC_MSG_CHECKING(whether to use omalloc in factory and co.)
 
@@ -138,9 +132,6 @@ AC_DEFUN([SING_USE_OMALLOC],
   AC_SUBST(OMALLOC_INCLUDES)
   AC_SUBST(OMALLOC_LIBS)
 
-  ENABLE_OMALLOC_ARG="$ENABLE_OMALLOC_ARG OMALLOC_LIBS='$OMALLOC_LIBS' OMALLOC_INCLUDES='$OMALLOC_INCLUDES'"
-  ac_configure_args="$ac_configure_args $ENABLE_OMALLOC_ARG"
-
   PKG_REQUIRE="$PKG_REQUIRE omalloc"
   AC_SUBST(PKG_REQUIRE)
  else
@@ -150,6 +141,12 @@ AC_DEFUN([SING_USE_OMALLOC],
   AC_SUBST(OMALLOC_LIBS)
   AC_MSG_RESULT(no)
  fi
+
+ ENABLE_OMALLOC_ARG="--enable-omalloc"
+ if test "x$ENABLE_OMALLOC" != xyes; then
+   ENABLE_OMALLOC_ARG="--disable-omalloc"
+ fi
+ ac_configure_args="$ac_configure_args $ENABLE_OMALLOC_ARG OMALLOC_LIBS='$OMALLOC_LIBS' OMALLOC_INCLUDES='$OMALLOC_INCLUDES'"
 
 ])
 
@@ -289,8 +286,11 @@ AC_DEFUN([SING_DISABLE_MODULES], [dnl
                   AS_HELP_STRING([--disable-]MOD[-module], [Disable building module ]MOD), [dnl
       dnl Nothing to do
     ], [dnl
-      dnl Per default, these modules are enabled
-      AS_VAR_SET([enable_]MOD[_module], [yes])
+      dnl Native Windows initially builds the portable core.  Individual
+      dnl modules can be enabled explicitly as their dependencies are ported.
+      AS_CASE([$host_os],
+              [*mingw*], [AS_VAR_SET([enable_]MOD[_module], [no])],
+              [AS_VAR_SET([enable_]MOD[_module], [yes])])
     ])dnl
     AM_CONDITIONAL([ENABLE_]m4_toupper(MOD)[_MODULE], [test x$enable_]MOD[_module != xno])dnl
   ])dnl

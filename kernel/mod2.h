@@ -27,9 +27,11 @@
  ******************************************************************/
 
 /*defines, which should be set by configure */
-#define HAVE_GETTIMEOFDAY 1
-#define TIME_WITH_SYS_TIME 1
-#define HAVE_SYS_TIME_H 1
+#ifndef _WIN32
+# define HAVE_GETTIMEOFDAY 1
+# define TIME_WITH_SYS_TIME 1
+# define HAVE_SYS_TIME_H 1
+#endif
 /* Default value for timer resolution in ticks per second */
 /* set to 10 for resolution of tenth of a second, etc */
 #define TIMER_RESOLUTION 1
@@ -47,7 +49,9 @@
 #define HAVE_GMS 1
 
 /* include simpleipc/semaphore code, link against librt/libpthread */
-#define HAVE_SIMPLEIPC 1
+#ifndef _WIN32
+# define HAVE_SIMPLEIPC 1
+#endif
 
 
 /* linear algebra extensions from pcv.h/pcv.cc */
@@ -60,8 +64,8 @@
 #define HAVE_LIBPARSER
 
 /* define for parallel processes with shared memory */
-#ifndef __CCYGWIN__
-  #if (!defined(__APPLE__))
+#ifndef _WIN32
+  #if !defined(__APPLE__) && !defined(__CYGWIN__)
     #define HAVE_VSPACE 1
   #endif
 #endif
@@ -80,7 +84,7 @@
 #define HAVE_SPECTRUM 1
 
 #if SIZEOF_VOIDP == 8
-/* SIZEOF_LONG == SIZEOF_VOIDP is guaranteed by configure */
+/* Pointer alignment is independent of sizeof(long) on Win64 (LLP64). */
 #define ALIGN_8
 #endif
 

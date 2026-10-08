@@ -18,6 +18,7 @@
 #include "Singular/sdb.h"
 
 #include "misc/mylimits.h"
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef HAVE_PWD_H
@@ -148,6 +149,10 @@ BOOLEAN newFile(char *fname)
       exitVoice();
       return TRUE;
     }
+#ifdef _WIN32
+    // Native Windows: text-mode ftell/fseek is not reliable for LF-only lines.
+    currentVoice->ftellptr=-1;
+#endif
     currentVoice->start_lineno = 0;
   }
   yylineno=currentVoice->start_lineno;
@@ -597,15 +602,20 @@ int feReadLine(char* b, int l)
     }
     else if (currentVoice->sw==BI_file)
     {
-      fseek(currentVoice->files,currentVoice->ftellptr,SEEK_SET);
+      if ((currentVoice->ftellptr>=0)
+      &&  (fseek(currentVoice->files,currentVoice->ftellptr,SEEK_SET)!=0))
+      {
+        currentVoice->ftellptr=-1;
+        clearerr(currentVoice->files);
+      }
       s=fgets(currentVoice->buffer+offset,(MAX_FILE_BUFFER-1-sizeof(ADDRESS))-offset,
               currentVoice->files);
-      if (s!=NULL)
+      if ((s!=NULL) && (currentVoice->ftellptr>=0))
       {
         currentVoice->ftellptr=ftell(currentVoice->files);
         // ftell returns -1 for non-seekable streams, such as pipes
         if (currentVoice->ftellptr<0)
-          currentVoice->ftellptr=0;
+          clearerr(currentVoice->files);
       }
     }
     //else /* BI_buffer */ s==NULL  => return 0
@@ -691,6 +701,13 @@ Voice * feInitStdin(Voice *pp)
     else
       p->sw = BI_stdin;
   }
+  if (p->sw==BI_file)
+  {
+    struct stat statbuf;
+    if ((fstat(STDIN_FILENO,&statbuf)!=0)
+    ||  (!S_ISREG(statbuf.st_mode)))
+      p->ftellptr=-1;
+  }
   p->filename   = omStrDup("STDIN");
   p->start_lineno   = 1;
   omMarkAsStaticAddr(p);
@@ -698,4 +715,3 @@ Voice * feInitStdin(Voice *pp)
   return p;
 }
 #endif
-
