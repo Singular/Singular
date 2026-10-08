@@ -151,7 +151,12 @@ RETURN:  If \"withRing\" option is set, a list, say nor, of size 2
          If \"withRing\" option is not set, a list of an ideal U and
          a polynomial d such that U/d is the normalization
 THEORY:  We use here a general algorithm described in [G.-M.Greuel, S.Laplagne,
-         F.Seelisch: Normalization of Rings (2009)].@*
+         F.Seelisch: Normalization of Rings (2009)]. This algorithm is an
+         improvement of de Jong's algorithm [T. de Jong: An Algorithm for
+         Computing the Integral Closure, JSC 26 (1998)], which in turn is based
+         on a normality criterion of Grauert and Remmert [H. Grauert,
+         R. Remmert: Analytische Stellenalgebren, 1971] and is implemented in
+         procedure normalC.@*
          The procedure computes the R-module structure, the algebra structure
          and the delta invariant of the normalization of R/id:@*
          The normalization of R/id is the integral closure of R/id in its total
@@ -5950,9 +5955,15 @@ RETURN:  a list, say nor, of size 2 (resp. 3 if option \"withGens\" is set).@*
          g_j/g_k+1 are K-algebra generators  of the integral closure of
          basering/P_i.@*
          * nor[3] shows the delta invariant as above.
-THEORY:  We use the Grauert-Remmert-de Jong algorithm [c.f. G.-M. Greuel,
-         G. Pfister: A SINGULAR Introduction to Commutative Algebra, 2nd Edition.
-         Springer Verlag (2007)].
+THEORY:  We use the de Jong algorithm, see [T. de Jong: An Algorithm for
+         Computing the Integral Closure, JSC 26 (1998)], which is based on a
+         normality criterion of Grauert and Remmert [H. Grauert, R. Remmert:
+         Analytische Stellenalgebren, 1971]. See also [W. Decker, T. de Jong,
+         G.-M. Greuel, G. Pfister: The normalization: a new algorithm,
+         implementation and comparisons, in Computational Methods for
+         Representations of Groups and Algebras, Progress in Mathematics 173,
+         1999], and [G.-M. Greuel, G. Pfister: A SINGULAR Introduction to
+         Commutative Algebra, 2nd Edition. Springer Verlag (2007)].
          The procedure computes the algebra structure and the delta invariant of
          the normalization of R/id:@*
          The normalization is an affine algebra over the ground field K
