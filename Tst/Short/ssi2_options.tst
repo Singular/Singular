@@ -27,6 +27,7 @@ kill l;
 s == string(G);
 kill G;
 
+echo=0;
 if (size(system("executable","zstd"))>0)
 {
   link l = "ssi2c:w ssi2_options_c.ssi2c";
@@ -37,7 +38,7 @@ if (size(system("executable","zstd"))>0)
   def C = read(l);
   close(l);
   kill l;
-  s == string(C);
+  if (s!=string(C)) { ERROR("ssi2c value"); }
   kill C;
 
   link l = "ssi2:w,zstd,long=23 ssi2_options_explicit_zstd";
@@ -45,10 +46,11 @@ if (size(system("executable","zstd"))>0)
   close(l);
   def CZ = read(l);
   close(l);
-  s == string(CZ);
+  if (s!=string(CZ)) { ERROR("explicit zstd value"); }
   kill CZ;
   kill l;
 }
+echo=1;
 
 link l = "ssi2:w,plain ssi2_options_plain_suffix.ssi2.gz";
 write(l,I);

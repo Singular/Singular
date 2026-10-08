@@ -1757,6 +1757,7 @@ struct ssi2Info : public ssiInfo
   int write_buff_size;
   const char *compressor_name;
   unsigned short schema_versions[SSI2_SCHEMA_VERSION_COUNT];
+  uint32_t validated_schema_versions;
   BOOLEAN read_failed;
   BOOLEAN write_failed;
   BOOLEAN header_seen;
@@ -1812,7 +1813,8 @@ enum ssiSchemaId
   SSI_SCHEMA_COMMAND,
   SSI_SCHEMA_RING_PROPERTIES,
   SSI_SCHEMA_BLACKBOX,
-  SSI_SCHEMA_HTABLE
+  SSI_SCHEMA_HTABLE,
+  SSI_SCHEMA_MPZ
 };
 
 struct ssiSchemaVersionEntry
@@ -1835,10 +1837,12 @@ static const ssiSchemaVersionEntry ssiSchemaVersions[] =
   { SSI_SCHEMA_INTVEC,          1, "intvec" },
   { SSI_SCHEMA_BIGINTMAT,       1, "bigintmat" },
   { SSI_SCHEMA_ATTRIBUTES,      1, "attributes" },
+  // Bump this if the serialized command token mapping changes.
   { SSI_SCHEMA_COMMAND,         1, "command" },
   { SSI_SCHEMA_RING_PROPERTIES, 1, "ring-properties" },
   { SSI_SCHEMA_BLACKBOX,        1, "blackbox" },
-  { SSI_SCHEMA_HTABLE,          1, "htable" }
+  { SSI_SCHEMA_HTABLE,          1, "htable" },
+  { SSI_SCHEMA_MPZ,             1, "mpz" }
 };
 
 static const int ssiSchemaVersionCount =
@@ -1863,6 +1867,7 @@ static void ssiInitSchemaVersions(ssiInfo *d, BOOLEAN for_write)
   if (d==NULL) return;
   ssi2Info *dd=(ssi2Info*)d;
   memset(dd->schema_versions, 0, sizeof(dd->schema_versions));
+  dd->validated_schema_versions=0;
   if (!for_write) return;
   for (int i=0; i<ssiSchemaVersionCount; i++)
   {
@@ -1878,6 +1883,9 @@ static int ssiSchemaVersion(const ssiInfo *d, int id)
   if ((dd!=NULL) && (id>0) && (id<SSI2_SCHEMA_VERSION_COUNT)
   && (dd->schema_versions[id]!=0))
     return dd->schema_versions[id];
+
+  // The original SSI2 schema table did not list the MPZ encoding separately.
+  if ((dd!=NULL) && dd->schema_table_seen && (id==SSI_SCHEMA_MPZ)) return 1;
   return 0;
 }
 
@@ -1891,15 +1899,19 @@ static void ssiSetSchemaVersion(ssiInfo *d, int id, int version)
 static BOOLEAN ssiRequireSchemaVersion(const ssiInfo *d, int id,
                                        const char *format)
 {
+  ssi2Info *dd=(ssi2Info*)d;
+  if ((id>0) && (id<SSI2_SCHEMA_VERSION_COUNT)
+  && ((dd->validated_schema_versions & (1U << id))!=0)) return FALSE;
   int have=ssiSchemaVersion(d, id);
   int current=ssiCurrentSchemaVersion(id);
   if ((current<=0) || (have!=current))
   {
     Werror("%s: unsupported %s schema version %d (expected %d)",
            format, ssiSchemaName(id), have, current);
-    ((ssi2Info*)d)->read_failed=TRUE;
+    dd->read_failed=TRUE;
     return TRUE;
   }
+  dd->validated_schema_versions|=(1U << id);
   return FALSE;
 }
 
@@ -3331,6 +3343,7 @@ static BOOLEAN ssi2ReadSchemaTable(ssiInfo *d)
     return TRUE;
   }
   memset(dd->schema_versions, 0, sizeof(dd->schema_versions));
+  dd->validated_schema_versions=0;
   for (uint64_t i=0; i<count; i++)
   {
     uint64_t id=ssi2ReadU64(d);
@@ -3429,6 +3442,11 @@ static void ssi2WriteLongAsMpz(const ssiInfo *d, long v)
 
 static void ssi2ReadMpz(const ssiInfo *d, mpz_t z)
 {
+  if (ssiRequireSchemaVersion(d, SSI_SCHEMA_MPZ, "ssi2"))
+  {
+    mpz_set_ui(z, 0);
+    return;
+  }
   int sign=0;
   if (ssi2ReadInt(d, "mpz sign", &sign))
   {
@@ -4845,7 +4863,9 @@ static leftv ssi2Read1Internal(si_link l)
         omFreeBin(res, sleftv_bin);
         return NULL;
       }
-      if ((n98_v!=SSI2_VERSION) || (n98_m!=MAX_TOK))
+      // MAX_TOK records the writer's token ceiling.  Compatibility is
+      // governed by the stream and per-family schema versions.
+      if (n98_v!=SSI2_VERSION)
       {
         Werror("ssi2: incompatible stream version %llu/%llu (expected %d/%d)",
                (unsigned long long)n98_v, (unsigned long long)n98_m,
@@ -4877,6 +4897,7 @@ static leftv ssi2Read1Internal(si_link l)
       dd->header_seen=TRUE;
       dd->schema_table_seen=FALSE;
       memset(dd->schema_versions, 0, sizeof(dd->schema_versions));
+      dd->validated_schema_versions=0;
       si_opt_1=(BITSET)n98_o1_value;
       si_opt_2=(BITSET)n98_o2_value;
       omFreeBin(res, sleftv_bin);
