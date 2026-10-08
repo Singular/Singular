@@ -145,11 +145,13 @@ proc ssi2_coeff_roundtrip(poly value, string filename)
 }
 
 ssi2_types_roundtrip("ssi2:w ssi2_types_plain.ssi2", "ssi2:r ssi2_types_plain.ssi2");
+echo=0;
 if (size(system("executable","zstd"))>0)
 {
   ssi2_types_roundtrip("ssi2zstd:w ssi2_types_zstd.ssi2.zst", "ssi2zstd:r ssi2_types_zstd.ssi2.zst");
   ssi2_types_roundtrip("ssi2c:w ssi2_types_c.ssi2c", "ssi2c:r ssi2_types_c.ssi2c");
 }
+echo=1;
 
 ring RZZ=integer,(u,v),dp;
 poly zz_value=123456789012345678901234567890*u-17*v+5;

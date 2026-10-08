@@ -113,7 +113,7 @@ jobs:
           sudo apt-get install -y \
             sharutils libgmp-dev libreadline-dev libmpfr-dev libntl-dev libcdd-dev \
             4ti2 normaliz gfan libopenblas-dev libflint-dev libsodium-dev \
-            build-essential ca-certificates cmake curl perl pkg-config
+            build-essential ca-certificates cmake curl perl pkg-config zstd lz4
 
       - name: Show system crypto versions
 
@@ -195,9 +195,19 @@ jobs:
 
       - run: make install
 
-      - name: Run SSI2 encryption tests
+      - name: Run SSI2 tests
 
-        run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Short/ssi2_encryption.tst
+        run: |
+
+          cd Tst
+          ./regress.cmd -s $prefix/bin/Singular \
+            Short/ssi2_types.tst \
+            Short/ssi2_options.tst \
+            Short/ssi2_robustness.tst \
+            Short/ssi2_schema_versions.tst \
+            Short/ssi2_encryption.tst \
+            Short/ssi_Z.tst \
+            Short/ssi_ringref.tst
 
   cygwin:
     runs-on: windows-latest

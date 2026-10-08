@@ -2218,6 +2218,9 @@ rejects a subversion for which it has no explicit decoder; it never applies
 the current decoder to a different subversion.  Thus a future change to one
 data family does not invalidate unchanged families in the same stream.  It
 is not a user-visible mode option.  The legacy SSI format remains unchanged.
+The header's @code{MAX_TOK} value records the writer's token ceiling but is
+not a global compatibility version.  Command nodes and the raw GMP integer
+encoding have their own schema subversions.
 
 SSI2 file links can optionally compress the byte stream using an
 external compressor process connected by a pipe.  The compression mode
