@@ -241,6 +241,7 @@ Short/primdecint_some_special_cases.tst
 Short/primefactors.tst
 Short/primitiv_s.tst
 Short/qhw_s.tst
+Short/qring_power.tst
 Short/quotient_s.tst
 Short/rInit.tst
 Short/rcyclic_13_32003_lp.tst

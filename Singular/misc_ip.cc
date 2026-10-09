@@ -559,6 +559,7 @@ const struct soptionStruct verboseStruct[]=
   {"findMonomials",Sy_bit(V_FINDMONOM),~Sy_bit(V_FINDMONOM)},
   {"coefStrat",Sy_bit(V_COEFSTRAT), ~Sy_bit(V_COEFSTRAT)},
   {"qringNF",  Sy_bit(V_QRING),     ~Sy_bit(V_QRING)},
+  {"noqringPower",Sy_bit(V_NO_QRING_POWER),~Sy_bit(V_NO_QRING_POWER)},
   {"warn",     Sy_bit(V_ALLWARN),   ~Sy_bit(V_ALLWARN)},
   {"intersectSyz",Sy_bit(V_INTERSECT_SYZ), ~Sy_bit(V_INTERSECT_SYZ)},
   {"intersectElim",Sy_bit(V_INTERSECT_ELIM), ~Sy_bit(V_INTERSECT_ELIM)},
@@ -628,6 +629,11 @@ BOOLEAN setOption(leftv res, leftv v)
     {
       si_opt_1=0;
       si_opt_2=0;
+      goto okay;
+    }
+    if(strcmp(n,"qringPower")==0)
+    {
+      si_opt_2 &= ~Sy_bit(V_NO_QRING_POWER);
       goto okay;
     }
     for (i=0; (i==0) || (optionStruct[i-1].setval!=0); i++)

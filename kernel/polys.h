@@ -170,6 +170,11 @@ poly p_Divide(poly a, poly b, const ring r);
 poly pp_Divide(poly a, poly b, const ring r);
 poly p_DivRem(poly a, poly b, poly &rest, const ring r); /*julia*/
 
+/// Return the normal form of a^e modulo the standard basis G.
+/// Intermediate products are reduced to avoid unnecessary growth.
+/// This destroys a and currently supports commutative rings only.
+poly p_PowerMod(poly a, int e, ideal G, const ring r);
+
 /// polynomial gcd
 /// via singclap_gcd_r resp. idSyzygies
 /// destroys f and g
