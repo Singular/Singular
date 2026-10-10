@@ -46,6 +46,7 @@ long farey_cnt=0L;
 #include "kernel/GBEngine/kstdfac.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/qring_power.h"
 #include "kernel/GBEngine/units.h"
 #include "kernel/GBEngine/tgb.h"
 
