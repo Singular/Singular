@@ -39,6 +39,20 @@ int test2 (int p)
   return ret;
 }
 
+#ifndef HAVE_NTL
+int testPrimePowerMap ()
+{
+  setCharacteristic (0);
+  CanonicalForm large ("2305843009213693953"); // 2^61 + 1
+  setCharacteristic (2, 61);
+  bool ok= (large.mapinto() == 1);
+  setCharacteristic (0);
+
+  printf ("map large integer into prime-power domain? %d\n", ok);
+  return ok ? 1 : -1;
+}
+#endif
+
 /*int test5 (int p)
 {
   setCharacteristic (p);
@@ -125,6 +139,12 @@ int main( int, char *argv[] )
   t= test2 (43051);
   if (t < 0)
     ret += t;
+
+#ifndef HAVE_NTL
+  t= testPrimePowerMap();
+  if (t < 0)
+    ret += t;
+#endif
 
   return ret;
 }

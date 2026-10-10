@@ -95,6 +95,7 @@ Short/bug_diff.tst
 Short/bug_div.tst
 Short/bug_division.tst
 Short/bug_factorize.tst
+Short/bug_factorize_univariate_unit.tst
 Short/bug_hilbstd.tst
 Short/bug_hilbstd_mixed_order.tst
 Short/bug_homog.tst

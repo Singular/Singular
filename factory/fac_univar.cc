@@ -455,6 +455,10 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
             setCharacteristic( p[i] );
             fp = mapinto( f );
             F[i] = FpFactorizeUnivariateCZ( fp, true, 0, Variable(), Variable() );
+            // FpFactorizeUnivariateCZ() returns the leading coefficient as
+            // its first entry.  It is a unit, not a factor to Hensel-lift.
+            if ( F[i].getFirst().factor().inCoeffDomain() )
+                F[i].removeFirst();
 //                if ( p[i] < 23 && fp.degree() < 10 )
 //                    F[i] = FpFactorizeUnivariateB( fp, true );
 //                else
