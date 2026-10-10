@@ -95,6 +95,154 @@ AC_CHECK_LIB(rt,clock_gettime)
 AC_CHECK_LIB(spasm,spasm_csr_free,SPASM_LIB="-lspasm",SPASM_LIB="")
 AC_SUBST(SPASM_LIB)
 
+dnl libsodium is optional and enables authenticated SSI2 envelopes (ssi2e).
+AC_ARG_WITH([libsodium],
+  [AS_HELP_STRING([--with-libsodium=PREFIX],
+    [enable authenticated SSI2 encryption with libsodium installed at PREFIX (default: no)])],
+  [], [with_libsodium=no])
+
+SODIUM_CFLAGS=""
+SODIUM_LIBS=""
+have_libsodium=no
+AS_IF([test "x$with_libsodium" != xno], [
+  AS_IF([test "x$with_libsodium" = xyes || test "x$with_libsodium" = x], [
+    AC_MSG_ERROR([--with-libsodium requires an installation prefix])
+  ])
+  save_CPPFLAGS="$CPPFLAGS"
+  save_LDFLAGS="$LDFLAGS"
+  save_LIBS="$LIBS"
+  SODIUM_CFLAGS="-I$with_libsodium/include"
+  SODIUM_LIBS="-L$with_libsodium/lib -lsodium"
+  CPPFLAGS="$CPPFLAGS $SODIUM_CFLAGS"
+  LDFLAGS="$LDFLAGS -L$with_libsodium/lib"
+  AC_CHECK_HEADER([sodium.h], [have_sodium_header=yes], [have_sodium_header=no])
+  AS_IF([test "x$have_sodium_header" = xyes], [
+    AC_CHECK_LIB([sodium], [crypto_secretstream_xchacha20poly1305_init_push],
+      [have_libsodium=yes], [have_libsodium=no])
+  ])
+  CPPFLAGS="$save_CPPFLAGS"
+  LDFLAGS="$save_LDFLAGS"
+  LIBS="$save_LIBS"
+])
+
+AS_IF([test "x$have_libsodium" = xyes], [
+  AC_DEFINE([HAVE_LIBSODIUM], [1],
+    [Define to 1 when libsodium is available for authenticated SSI2 encryption])
+], [
+  SODIUM_CFLAGS=""
+  SODIUM_LIBS=""
+  AS_IF([test "x$with_libsodium" != xno], [
+    AC_MSG_ERROR([libsodium was requested but its headers and library were not found])
+  ])
+])
+AC_SUBST([SODIUM_CFLAGS])
+AC_SUBST([SODIUM_LIBS])
+
+dnl OpenSSL FIPS is optional and enables AES-256-GCM SSI2 envelopes (ssi2f).
+dnl It is deliberately strict: no autodetection and an explicit provider path.
+AC_ARG_WITH([openssl-fips],
+  [AS_HELP_STRING([--with-openssl-fips=PREFIX],
+    [enable SSI2 AES-256-GCM encryption with OpenSSL installed at PREFIX (default: no)])],
+  [], [with_openssl_fips=no])
+AC_ARG_WITH([openssl-fips-provider-dir],
+  [AS_HELP_STRING([--with-openssl-fips-provider-dir=DIR],
+    [directory containing the OpenSSL FIPS provider module])],
+  [], [with_openssl_fips_provider_dir=no])
+AC_ARG_WITH([openssl-fips-config],
+  [AS_HELP_STRING([--with-openssl-fips-config=FILE],
+    [OpenSSL configuration file activating the FIPS provider])],
+  [], [with_openssl_fips_config=no])
+
+OPENSSL_FIPS_CFLAGS=""
+OPENSSL_FIPS_LIBS=""
+have_openssl_fips=no
+AS_IF([test "x$with_openssl_fips" != xno], [
+  AS_IF([test "x$with_openssl_fips" = xyes || test "x$with_openssl_fips" = x], [
+    AC_MSG_ERROR([--with-openssl-fips requires an installation prefix])
+  ])
+  AS_IF([test "x$with_openssl_fips_provider_dir" = xno ||
+         test "x$with_openssl_fips_provider_dir" = xyes ||
+         test "x$with_openssl_fips_provider_dir" = x], [
+    AC_MSG_ERROR([--with-openssl-fips-provider-dir=DIR is required with --with-openssl-fips])
+  ])
+  AS_IF([test "x$with_openssl_fips_config" = xno ||
+         test "x$with_openssl_fips_config" = xyes ||
+         test "x$with_openssl_fips_config" = x], [
+    AC_MSG_ERROR([--with-openssl-fips-config=FILE is required with --with-openssl-fips])
+  ])
+  AS_IF([test ! -d "$with_openssl_fips_provider_dir"], [
+    AC_MSG_ERROR([OpenSSL FIPS provider directory does not exist: $with_openssl_fips_provider_dir])
+  ])
+  AS_IF([test ! -f "$with_openssl_fips_config"], [
+    AC_MSG_ERROR([OpenSSL FIPS configuration file does not exist: $with_openssl_fips_config])
+  ])
+  AS_IF([test ! -f "$with_openssl_fips_provider_dir/fips.so" &&
+         test ! -f "$with_openssl_fips_provider_dir/fips.dylib" &&
+         test ! -f "$with_openssl_fips_provider_dir/fips.dll"], [
+    AC_MSG_ERROR([OpenSSL FIPS provider module not found in $with_openssl_fips_provider_dir])
+  ])
+
+  openssl_fips_libdir="$with_openssl_fips/lib"
+  AS_IF([test ! -d "$openssl_fips_libdir" && test -d "$with_openssl_fips/lib64"], [
+    openssl_fips_libdir="$with_openssl_fips/lib64"
+  ])
+  AS_IF([test ! -d "$openssl_fips_libdir"], [
+    AC_MSG_ERROR([OpenSSL library directory not found below $with_openssl_fips])
+  ])
+
+  save_CPPFLAGS="$CPPFLAGS"
+  save_LDFLAGS="$LDFLAGS"
+  save_LIBS="$LIBS"
+  OPENSSL_FIPS_CFLAGS="-I$with_openssl_fips/include"
+  OPENSSL_FIPS_LIBS="-L$openssl_fips_libdir -lcrypto"
+  CPPFLAGS="$CPPFLAGS $OPENSSL_FIPS_CFLAGS"
+  LDFLAGS="$LDFLAGS -L$openssl_fips_libdir"
+  have_openssl_fips_headers=yes
+  AC_CHECK_HEADER([openssl/evp.h], [], [have_openssl_fips_headers=no])
+  AC_CHECK_HEADER([openssl/provider.h], [], [have_openssl_fips_headers=no])
+  AC_CHECK_HEADER([openssl/rand.h], [], [have_openssl_fips_headers=no])
+  AC_CHECK_HEADER([openssl/err.h], [], [have_openssl_fips_headers=no])
+  AC_CHECK_HEADER([openssl/crypto.h], [], [have_openssl_fips_headers=no])
+  AS_IF([test "x$have_openssl_fips_headers" = xyes], [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <openssl/opensslv.h>
+#if OPENSSL_VERSION_MAJOR < 3
+#error OpenSSL 3 or newer is required
+#endif
+    ]], [[]])],
+      [have_openssl_fips_version=yes],
+      [have_openssl_fips_version=no])
+  ], [
+    have_openssl_fips_version=no
+  ])
+  AS_IF([test "x$have_openssl_fips_version" = xyes], [
+    AC_CHECK_LIB([crypto], [EVP_CIPHER_fetch],
+      [have_openssl_fips=yes], [have_openssl_fips=no])
+  ])
+  CPPFLAGS="$save_CPPFLAGS"
+  LDFLAGS="$save_LDFLAGS"
+  LIBS="$save_LIBS"
+])
+
+AS_IF([test "x$have_openssl_fips" = xyes], [
+  AC_DEFINE([HAVE_OPENSSL_FIPS], [1],
+    [Define to 1 when OpenSSL FIPS support is available for SSI2 encryption])
+  AC_DEFINE_UNQUOTED([SSI2_OPENSSL_FIPS_PROVIDER_DIR],
+    ["$with_openssl_fips_provider_dir"],
+    [Directory containing the OpenSSL FIPS provider module])
+  AC_DEFINE_UNQUOTED([SSI2_OPENSSL_FIPS_CONFIG],
+    ["$with_openssl_fips_config"],
+    [OpenSSL configuration file activating the FIPS provider])
+], [
+  OPENSSL_FIPS_CFLAGS=""
+  OPENSSL_FIPS_LIBS=""
+  AS_IF([test "x$with_openssl_fips" != xno], [
+    AC_MSG_ERROR([OpenSSL FIPS support was requested but suitable OpenSSL 3 headers and libcrypto were not found])
+  ])
+])
+AC_SUBST([OPENSSL_FIPS_CFLAGS])
+AC_SUBST([OPENSSL_FIPS_LIBS])
+
 SING_CHECK_GMP
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_FLINT(3.0,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))

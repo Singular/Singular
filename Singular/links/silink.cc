@@ -21,6 +21,7 @@
 #include "Singular/lists.h"
 #include "Singular/cntrlc.h"
 #include "Singular/links/ssiLink.h"
+#include "Singular/links/ssi2Link.h"
 #include "Singular/links/pipeLink.h"
 #include "Singular/tok.h"
 #include "Singular/subexpr.h"
@@ -419,6 +420,20 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
 #if 1
   else if (strcmp(type, "ssi") == 0)
     s->next = slInitSsiExtension(ns);
+  else if (strcmp(type, "ssi2") == 0)
+    s->next = slInitSsi2Extension(ns);
+  else if (strcmp(type, "ssi2c") == 0)
+    s->next = slInitSsi2cExtension(ns);
+  else if (strcmp(type, "ssi2z") == 0)
+    s->next = slInitSsi2zExtension(ns);
+  else if (strcmp(type, "ssi2zstd") == 0)
+    s->next = slInitSsi2zstdExtension(ns);
+  else if (strcmp(type, "ssi2lz4") == 0)
+    s->next = slInitSsi2lz4Extension(ns);
+  else if (strcmp(type, "ssi2e") == 0)
+    s->next = slInitSsi2eExtension(ns);
+  else if (strcmp(type, "ssi2f") == 0)
+    s->next = slInitSsi2fExtension(ns);
 #endif
 #if 1
   else if (strcmp(type, "|") == 0)
@@ -440,4 +455,3 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   }
   return s->next;
 }
-
