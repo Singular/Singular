@@ -48,6 +48,7 @@ EXTERN_VAR BOOLEAN siCntrlc;
 #define V_DEBUG_LIB     7
 #define V_LOAD_PROC     8
 #define V_DEF_RES       9
+#define V_NO_QRING_POWER 10
 
 #define V_SHOW_USE      11
 #define V_IMAP          12
@@ -132,6 +133,7 @@ EXTERN_VAR BOOLEAN siCntrlc;
 #define TEST_OPT_IDLIFT            BVERBOSE(V_IDLIFT)
 #define TEST_OPT_LENGTH            BVERBOSE(V_LENGTH)
 #define TEST_V_QRING               BVERBOSE(V_QRING)
+#define TEST_V_QRING_POWER         (!BVERBOSE(V_NO_QRING_POWER))
 #define TEST_V_NSB                 BVERBOSE(V_NSB)
 #define TEST_V_QUIET               BVERBOSE(V_QUIET)
 #define TEST_V_ASSIGN_NONE         BVERBOSE(V_ASSIGN_NONE)

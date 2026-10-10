@@ -46,6 +46,7 @@ long farey_cnt=0L;
 #include "kernel/GBEngine/kstdfac.h"
 #include "kernel/GBEngine/syz.h"
 #include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/qring_power.h"
 #include "kernel/GBEngine/units.h"
 #include "kernel/GBEngine/tgb.h"
 
@@ -599,6 +600,7 @@ static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
   if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
+
 static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
 {
   int v_i=(int)(long)v->Data();
@@ -608,6 +610,15 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
     return TRUE;
   }
   poly u_p=(poly)u->CopyD(POLY_CMD);
+  if (TEST_V_QRING_POWER
+  && (currRing->qideal!=NULL) && (!idIs0(currRing->qideal))
+  && (!rIsNCRing(currRing)))
+  {
+    res->data=(char *)p_PowerMod(u_p,v_i,currRing->qideal,currRing);
+    if (!errorreported) setFlag(res,FLAG_QRING);
+    if (u!=NULL) return jjOP_REST(res,u,v);
+    return errorreported;
+  }
   if ((u_p!=NULL)
   && (!rIsLPRing(currRing))
   && ((v_i!=0) &&
