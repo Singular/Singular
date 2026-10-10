@@ -63,6 +63,7 @@ SOURCES = \
    links/sing_dbm.cc\
    links/slInit_Static.cc\
    links/ssiLink.cc\
+   links/ssi2Link.cc\
    links/semaphore.c\
    subexpr.cc\
    pyobject_setup.cc\
@@ -77,6 +78,8 @@ SOURCES = \
 #   links/slInit_Dynamic.cc
 
 libSingular_la_SOURCES   = $(SOURCES)
+
+noinst_HEADERS = links/ssi2Link.h
 
 SingularHEADERS = \
    attrib.h \

@@ -21,6 +21,7 @@
 #include "Singular/lists.h"
 #include "Singular/cntrlc.h"
 #include "Singular/links/ssiLink.h"
+#include "Singular/links/ssi2Link.h"
 #include "Singular/links/pipeLink.h"
 #include "Singular/tok.h"
 #include "Singular/subexpr.h"
