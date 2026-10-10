@@ -26,9 +26,9 @@
 #define GET_PREDICTION		"get_prediction"
 #define READ_DICTIONARY		"read_dictionary"
 #define CREATE_TABLE		"create_table"
-#define PYTPATH(B)		sprintf(B, "%s/ml_python", DATA_PATH)
-#define SING_BIN(B)		sprintf(B, "%s/Singular", BIN_PATH)
-#define SING_EXT_SCRIPT(B)	sprintf(B, "%s/ml_singular/extract.lib", \
+#define PYTPATH(B, N)		snprintf(B, N, "%s/ml_python", DATA_PATH)
+#define SING_BIN(B, N)		snprintf(B, N, "%s/Singular", BIN_PATH)
+#define SING_EXT_SCRIPT(B, N)	snprintf(B, N, "%s/ml_singular/extract.lib", \
 					DATA_PATH)
 
 /**** Local Function Declarations ****************************************/
@@ -141,7 +141,7 @@ int ml_initialise()
 	//pTemp = PyUnicode_AsASCIIString(pString);
 	//spath = PyBytes_AsString(pTemp);
 	/* get the path to be set */
-	PYTPATH(buffer);
+	PYTPATH(buffer, sizeof(buffer));
 	if (!strstr(spath, buffer)) {
 		pMyPath = PyString_FromString(buffer);
 		//pMyPath = PyUnicode_FromString(buffer);
@@ -156,11 +156,11 @@ int ml_initialise()
 
 	/* Setup arguments */
 	pArgs = PyTuple_New(2);
-	SING_EXT_SCRIPT(buffer);
+	SING_EXT_SCRIPT(buffer, sizeof(buffer));
 	pString = PyString_FromString(buffer);
 	PyTuple_SetItem(pArgs, 0, pString);
 
-	SING_BIN(buffer);
+	SING_BIN(buffer, sizeof(buffer));
 	pString = PyString_FromString(buffer);
 	PyTuple_SetItem(pArgs, 1, pString);
 
