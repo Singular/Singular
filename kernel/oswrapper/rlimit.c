@@ -9,7 +9,9 @@
 #include "rlimit.h"
 
 #include <stdint.h>
-#include <sys/resource.h>
+#ifndef _WIN32
+# include <sys/resource.h>
+#endif
 
 /* raise the maximum number of processes (or threads),
  * return  0 on success,

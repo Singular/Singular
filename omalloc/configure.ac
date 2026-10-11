@@ -171,7 +171,7 @@ AC_CHECK_SIZEOF(void*,4)
 AC_CHECK_SIZEOF(double, 8)
 AC_CHECK_SIZEOF(size_t, 4)
 
-if test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
+if test "x$ENABLE_OMALLOC" = xyes && test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
   AC_MSG_ERROR(need equal sizes for long and void*)
 fi
 if test "$ac_cv_sizeof_voidp" != 4 && test "$ac_cv_sizeof_voidp" != 8; then
@@ -592,4 +592,3 @@ dnl wrap it up
 dnl
 AC_CONFIG_FILES([Makefile omalloc.pc])
 AC_OUTPUT
-
