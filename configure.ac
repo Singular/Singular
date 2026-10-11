@@ -92,7 +92,13 @@ AC_SUBST(CC)
 AC_CHECK_LIB(rt,clock_gettime)
 
 
-AC_CHECK_LIB(spasm,spasm_csr_free,SPASM_LIB="-lspasm",SPASM_LIB="")
+AS_IF([test "x$ac_cv_header_spasm_h" = "xyes"],
+  [AC_CHECK_TYPES([struct spasm_csr], [], [], [[#include <spasm.h>]])
+   AC_CHECK_LIB(spasm,spasm_csr_free,
+     [SPASM_LIB="-lspasm"
+      AC_DEFINE([HAVE_SPASM], [1], [Define to 1 if SpaSM is available.])],
+     [SPASM_LIB=""])],
+  [SPASM_LIB=""])
 AC_SUBST(SPASM_LIB)
 
 SING_CHECK_GMP

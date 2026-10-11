@@ -1853,6 +1853,62 @@ ideal sm_Tensor(ideal A, ideal B, const ring r)
   omFreeSize(a,m*sizeof(poly));
   return res;
 }
+
+ideal sm_FastTensorMod(ideal Phi, ideal Psi, const ring r)
+{
+  // If Phi: R^r -> R^s and Psi: R^p -> R^q, assemble the presentation
+  // [I_s tensor Psi | Phi tensor I_q] directly.  This is the same column and
+  // row ordering as concat(tensor(unitmat(s), Psi), tensor(Phi, unitmat(q))),
+  // but avoids constructing identity matrices and intermediate tensor blocks.
+  const int s = Phi->rank;
+  const int rPhi = IDELEMS(Phi);
+  const int q = Psi->rank;
+  const int pPsi = IDELEMS(Psi);
+  ideal res = idInit(s*pPsi + rPhi*q, s*q);
+
+  for (int a = 0; a < s; a++)
+  {
+    const int rowShift = a*q;
+    const int colBase = a*pPsi;
+    for (int b = 0; b < pPsi; b++)
+    {
+      if (Psi->m[b] != NULL)
+      {
+        poly h = p_Copy(Psi->m[b], r);
+        if (rowShift != 0) p_Shift(&h, rowShift, r);
+        res->m[colBase + b] = h;
+      }
+    }
+  }
+
+  if (s == 0) return res;
+  poly *phiRows = (poly*)omAlloc(s*sizeof(poly));
+  for (int col = 0; col < rPhi; col++)
+  {
+    memset(phiRows, 0, s*sizeof(poly));
+    if (Phi->m[col] != NULL) p_Vec2Array(Phi->m[col], phiRows, s, r);
+    for (int beta = 0; beta < q; beta++)
+    {
+      poly h = NULL;
+      for (int a = 0; a < s; a++)
+      {
+        if (phiRows[a] != NULL)
+        {
+          poly shifted = p_Copy(phiRows[a], r);
+          p_Shift(&shifted, a*q + beta + 1, r);
+          h = p_Add_q(h, shifted, r);
+        }
+      }
+      res->m[s*pPsi + col*q + beta] = h;
+    }
+    for (int a = 0; a < s; a++)
+    {
+      if (phiRows[a] != NULL) p_Delete(&phiRows[a], r);
+    }
+  }
+  omFreeSize(phiRows, s*sizeof(poly));
+  return res;
+}
 // --------------------------------------------------------------------------
 /****************************************
 *  Computer Algebra System SINGULAR     *

@@ -1274,6 +1274,32 @@ example
   print(tensorMod(M,N));
 }
 ///////////////////////////////////////////////////////////////////////////////
+proc fastTensorMod(module Phi, module Psi)
+"USAGE:   fastTensorMod(M,N);  M,N modules
+COMPUTE: presentation matrix A of the tensor product T of the modules
+         M'=coker(M), N'=coker(N): if matrix(M) defines a map M: R^r-->R^s and
+         matrix(N) defines a map N: R^p-->R^q, then A defines a presentation
+@example
+         R^(sp+rq) --A-> R^(sq)  --> T --> 0 .
+@end example
+RETURN:  matrix A satisfying coker(A) = tensorprod(coker(M),coker(N)).
+NOTE:    This C++ implementation assembles the presentation directly as
+         [I_s tensor N | M tensor I_q], avoiding the generic intermediate
+         tensor matrices used by tensorMod.
+EXAMPLE: example fastTensorMod; shows an example.
+"
+{
+   module R=fasttensor(Phi,Psi);
+   return(matrix(R));
+}
+example
+{"EXAMPLE:";  echo=2;
+  ring A=0,(x,y,z),dp;
+  matrix M[3][3]=1,2,3,4,5,6,7,8,9;
+  matrix N[2][2]=x,y,0,z;
+  print(fastTensorMod(M,N));
+}
+///////////////////////////////////////////////////////////////////////////////
 proc Tor(intvec v, module M, module N, list #)
 "USAGE:   Tor(v,M,N[,any]);  v int resp. intvec, M,N modules
 COMPUTE: a presentation of Tor_k(M',N'), for k=v[1],v[2],... , where

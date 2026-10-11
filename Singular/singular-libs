@@ -47,11 +47,13 @@ SLIB1 = arr.lib arnold.lib arnoldclassify.lib \
         gfan.lib gitfan.lib gradedModules.lib GND.lib graal.lib goettsche.lib \
 	hess.lib hdepth.lib hodge.lib\
 	JMBTest.lib JMSConst.lib \
+	kodaira_surface_classifier.lib \
 	locnormal.lib \
 	moddiq.lib \
 	methods.lib modules.lib multigrading.lib modwalk.lib\
 	modnormal.lib \
 	nets.lib ncfrac.lib ncloc.lib \
+	nonGeneralTypeSurfacesP4.lib \
 	numerAlg.lib numerDecom.lib \
         olga.lib orbitparam.lib \
 	parallel.lib polyclass.lib polymake.lib polybori.lib \
@@ -61,6 +63,7 @@ SLIB1 = arr.lib arnold.lib arnoldclassify.lib \
 	sagbiNormaliz0.lib\
 	schreyer.lib sets.lib SingularityDBM.lib symodstd.lib schubert.lib swalk.lib \
 	ssi.lib \
+	surface_type_generics.lib \
 	tateProdCplxNegGrad.lib tasks.lib tropical.lib \
 	tropicalEllipticCovers.lib tropicalNewton.lib \
 	transformation.lib

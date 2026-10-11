@@ -561,6 +561,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #ifdef HAVE_GMS
           TEST_FOR("gms")
         #endif
+        #ifdef HAVE_SPASM
+          TEST_FOR("spasm")
+        #endif
         #ifdef OM_NDEBUG
           TEST_FOR("om_ndebug")
         #endif
