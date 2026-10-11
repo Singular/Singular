@@ -9,6 +9,9 @@ GNU General Public Licence (See [COPYING](@ref copying_page)).
 * Installation instructions from source code:
     <https://github.com/Singular/Singular/wiki/Step-by-Step-Installation-Instructions-for-Singular>
 
+* Native Windows build instructions:
+    [README.Windows.md](README.Windows.md)
+
 * Homepage:
     <https://www.singular.uni-kl.de/>
 
@@ -29,4 +32,3 @@ GNU General Public Licence (See [COPYING](@ref copying_page)).
 
 * [Developer and Reference Manual:](@ref main_page)
    <https://www.singular.uni-kl.de/dox/html>
-

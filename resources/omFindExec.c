@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "omFindExec.h"
 
@@ -25,12 +26,24 @@
 #endif
 
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
-#define ABSOLUTE_FILENAME_P(fname)        (fname[0] == '/')
+#ifdef _WIN32
+# define IS_DIR_SEPARATOR(c) ((c) == '/' || (c) == '\\')
+# define PATH_SEPARATOR ';'
+# define ABSOLUTE_FILENAME_P(fname) \
+  (((fname)[0] != '\0' && IS_DIR_SEPARATOR((fname)[0])) || \
+   ((fname)[0] != '\0' && (fname)[1] != '\0' && \
+    isalpha((unsigned char)(fname)[0]) && (fname)[1] == ':' && \
+    IS_DIR_SEPARATOR((fname)[2])))
+#else
+# define IS_DIR_SEPARATOR(c) ((c) == '/')
+# define PATH_SEPARATOR ':'
+# define ABSOLUTE_FILENAME_P(fname) ((fname)[0] == '/')
+#endif
 
 /* Return the absolute name of the program named NAME.  This function
    searches the directories in the PATH environment variable if PROG
    has no directory components. */
-#ifndef HAVE_READLINK
+#if !defined(HAVE_READLINK) && !defined(_WIN32)
 char * omFindExec (const char *name, char* executable)
 #else
 static char * omFindExec_link (const char *name, char* executable)
@@ -52,9 +65,13 @@ static char * omFindExec_link (const char *name, char* executable)
   }
   else
   {
-    if (((name[0] == '.') && (name[1] == '/')) ||
-        ((name[0] == '.') && (name[1] == '.') && (name[2] == '/')) ||
-        strchr(name, '/') != NULL)
+    if (((name[0] == '.') && IS_DIR_SEPARATOR(name[1])) ||
+        ((name[0] == '.') && (name[1] == '.') && IS_DIR_SEPARATOR(name[2])) ||
+        strchr(name, '/') != NULL
+#ifdef _WIN32
+        || strchr(name, '\\') != NULL
+#endif
+       )
     {
       short ok=1;
 
@@ -89,7 +106,7 @@ static char * omFindExec_link (const char *name, char* executable)
         /* Copy directory name into [tbuf]. */
         /* This is somewhat tricky: empty names mean cwd, w.r.t. some
            shell spec */
-        while (*p && *p != ':')
+        while (*p && *p != PATH_SEPARATOR)
           *next ++ = *p ++;
         *next = '\0';
 
@@ -105,7 +122,7 @@ static char * omFindExec_link (const char *name, char* executable)
 #endif
         }
 
-        if (tbuf[strlen(tbuf)-1] != '/') strcat(tbuf, "/");
+        if (!IS_DIR_SEPARATOR(tbuf[strlen(tbuf)-1])) strcat(tbuf, "/");
         strcat (tbuf, name);
 
         /* If the named file exists, then return it. */
@@ -127,6 +144,7 @@ next_path_entry:
       }
     }
     /* try again with LD_LIBRARY_PATH */
+#ifndef _WIN32
     search = getenv("LD_LIBRARY_PATH");
     p = search;
 
@@ -140,7 +158,7 @@ next_path_entry:
         /* Copy directory name into [tbuf]. */
         /* This is somewhat tricky: empty names mean cwd, w.r.t. some
            shell spec */
-        while (*p && *p != ':')
+        while (*p && *p != PATH_SEPARATOR)
           *next ++ = *p ++;
         *next = '\0';
 
@@ -164,6 +182,7 @@ next_path_entry:
         }
       }
     }
+#endif
   }
   /* everything failed, so try the compiled path: */
   strcpy(tbuf,BIN_DIR);
@@ -191,6 +210,21 @@ next_path_entry:
   }
   return NULL;
 }
+
+#if !defined(HAVE_READLINK) && defined(_WIN32)
+char* omFindExec(const char *name, char* exec)
+{
+  if (strstr(name, ".exe") == NULL)
+  {
+    char buf[MAXPATHLEN];
+    strcpy(buf, name);
+    strcat(buf, ".exe");
+    char* ret = omFindExec_link(buf, exec);
+    if (ret != NULL) return ret;
+  }
+  return omFindExec_link(name, exec);
+}
+#endif
 
 #ifdef HAVE_READLINK
 /* similar to readlink, but dont' mess up absolute pathnames */
@@ -257,7 +291,7 @@ static int full_readlink(const char* name, char* buf, size_t bufsize)
   return -1;
 }
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(_WIN32)
 /* for windows, serch first for .exe */
 char * _omFindExec (const char *name, char* exec);
 char* omFindExec(const char *name, char* exec)
