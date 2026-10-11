@@ -957,7 +957,7 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
   }
   wlen_type pq = pQuality (h, c, len);
   i = simple_posInS (c->strat, h, len, pq);
-  c->strat->enterS (&P, i, c->strat, -1);
+  c->strat->enterS (P, i, c->strat, -1);
 
   c->strat->lenS[i] = len;
   assume (pLength (c->strat->S[i]) == c->strat->lenS[i]);

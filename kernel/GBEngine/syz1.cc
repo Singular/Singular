@@ -331,10 +331,10 @@ SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
 }
 
 // rearrange shifted components
-static long syReorderShiftedComponents(long * sc, size_t n)
+long syReorderShiftedComponents(long * sc, int n)
 {
   long holes = 0;
-  size_t i;
+  int i;
   long new_comps = 0, new_space, max;
 
   // count number of holes
@@ -1015,7 +1015,6 @@ void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int /*index*/)
         else
         {
           PrintS("Hier ist was faul!\n");
-          ll=0; /*avoid compiler warning*/
           break;
         }
       }
@@ -2679,3 +2678,4 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }
+

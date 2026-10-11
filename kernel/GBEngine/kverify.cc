@@ -37,14 +37,6 @@ BOOLEAN kVerify1(ideal F, ideal Q)
     strat->tail = pInit();
     /*- set s -*/
     strat->sl = -1;
-    /*- set L -*/
-    strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
-    strat->Ll = -1;
-    strat->L = initL(strat->Lmax);
-    /*- set B -*/
-    strat->Bmax = setmaxL;
-    strat->Bl = -1;
-    strat->B = initL();
     /*- set T -*/
     strat->tl = -1;
     strat->tmax = setmaxT;
@@ -74,16 +66,17 @@ BOOLEAN kVerify1(ideal F, ideal Q)
       initenterpairs(strat->S[i],i-1,0,FALSE,strat);
     }
   }
-  if (TEST_OPT_PROT) printf("%d pairs created\n",strat->Ll+1);
+  if (TEST_OPT_PROT) printf("%d pairs created\n",(int)strat->L.size());
   if (TEST_OPT_DEBUG) messageSets(strat);
   /*---------------------------------------------------------------------*/
   BOOLEAN all_okay=TRUE;
-  for(int i=strat->Ll;i>=0; i--)
+  int i = 0;
+  for(auto it = strat->L.begin(); it != strat->L.end(); ++it, ++i)
   {
   /* spolys */
     int red_result=1;
     /* picks the last element from the lazyset L */
-    strat->P = strat->L[i];
+    strat->P = *it;
     if (pNext(strat->P.p) == strat->tail)
     {
       // deletes the short spoly
@@ -155,14 +148,6 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     strat->tail = pInit();
     /*- set s -*/
     strat->sl = -1;
-    /*- set L -*/
-    strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
-    strat->Ll = -1;
-    strat->L = initL(strat->Lmax);
-    /*- set B -*/
-    strat->Bmax = setmaxL;
-    strat->Bl = -1;
-    strat->B = initL();
     /*- set T -*/
     strat->tl = -1;
     strat->tmax = setmaxT;
@@ -192,20 +177,22 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       initenterpairs(strat->S[i],i-1,0,FALSE,strat);
     }
   }
-  if (TEST_OPT_PROT) printf("%d pairs created\n",strat->Ll+1);
+  if (TEST_OPT_PROT) printf("%d pairs created\n",(int)strat->L.size());
   if (TEST_OPT_DEGBOUND)
   {
-    for(int i=strat->Ll; i>=0; i--)
+    for (auto it = strat->L.begin(); it != strat->L.end(); )
     {
-      if (currRing->pFDeg(strat->L[i].p,currRing)>Kstd1_deg)
+      if (currRing->pFDeg(it->p,currRing)>Kstd1_deg)
       {
         /*
         * omit pairs if 24 IN test and the degree of L[i] is bigger then
         *a predefined number Kstd1_deg
         */
-        deleteInL(strat->L,&strat->Ll,i,strat);
+        it = strat->L.erase(it);
         if (TEST_OPT_PROT) { printf("D"); mflush(); }
       }
+      else
+        it ++;
     }
   }
   if (TEST_OPT_DEBUG) messageSets(strat);
@@ -215,7 +202,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   if (cpus>=vspace::internals::MAX_PROCESS)
     cpus=vspace::internals::MAX_PROCESS-1;
   /* start no more than MAX_PROCESS-1 children */
-  if (cpus>strat->Ll+1) cpus=strat->Ll+1;
+  if (cpus>strat->L.size()) cpus=strat->L.size();
   /* start no more children than elements in L */
   int parent_pid=getpid();
   using namespace vspace;
@@ -223,7 +210,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   // Create a queue of int
   VRef<Queue<int> > queue = vnew<Queue<int> >();
   VRef<Queue<int> > rqueue = vnew<Queue<int> >();
-  for(int i=strat->Ll;i>=0; i--)
+  for(auto i = 0; i < strat->L.size(); ++i)
   {
    queue->enqueue(i); // the tasks: process pair L[i]
   }
@@ -258,7 +245,7 @@ BOOLEAN kVerify2(ideal F, ideal Q)
       int red_result=1;
       /* picks the element from the lazyset L */
       LObject P;
-      P = strat->L[ind];
+      P = *(strat->L.begin() + ind);
       if (TEST_OPT_PROT) { printf("."); mflush();}
       if (pNext(P.p) == strat->tail)
       {
