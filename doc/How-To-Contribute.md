@@ -19,6 +19,10 @@ Before sending a pull request to merge your changes, make sure that
     * consider special cases! Optimally all decision branches of new functions should be covered by tests
  * the Singular test suite passes without failure. [Instructions on running the test suite](Running-test) is available on this wiki.
 
+If a GitHub CI run fails in a way that is hard to reproduce locally,
+see [Debugging GitHub CI runs](@ref debugging_ci_page) for how to
+dispatch a manual run with an interactive ssh session on the runner.
+
 @note Almost everything GitHub-related can be done from command-line with the
 following tool <http://hub.github.com>.
 
