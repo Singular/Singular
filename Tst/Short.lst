@@ -205,6 +205,9 @@ Short/invarlib.tst
 Short/janet.tst
 Short/jmbtest.tst
 Short/kernel_weighted_homog.tst
+Short/lambda.tst
+Short/lambda_compat.tst
+Short/lambda_continuation.tst
 Short/latex.tst
 Short/lift_s.tst
 Short/liftstd_s.tst

@@ -1056,12 +1056,28 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
 
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+static inline char *iiDupProcinfoName(const char *s)
+{
+  size_t length=0;
+  while (s[length]!='\0') length++;
+  length++;
+#ifdef HAVE_OMALLOC
+  if (UNLIKELY(length>OM_MAX_BLOCK_SIZE))
+    return iiDupLongIdentifier(s,length);
+#endif
+  char *copy=(char *)omAlloc(length);
+  memcpy(copy,s,length);
+  return copy;
+}
+
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int, long pos, BOOLEAN pstatic)
 {
   memset(pi,0,sizeof(*pi));
-  pi->libname = omStrDup(libname);
-  pi->procname = omStrDup(procname);
+  // piKill uses the fast bin-only free path for these names.  Keep oversized
+  // library and procedure names in reusable special bins as well.
+  pi->libname = iiDupProcinfoName(libname);
+  pi->procname = iiDupProcinfoName(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
   pi->is_static = pstatic;
