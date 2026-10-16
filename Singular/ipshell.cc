@@ -833,7 +833,7 @@ leftv iiMap(map theMap, const char * what)
       if (save_r!=NULL)
       {
         IDMAP(w)->preimage=save_r;
-        IDMAP((idhdl)v)->preimage=omStrDup(save_r);
+        IDMAP((idhdl)v)->preimage=iiDupIdentifier(save_r);
         v->rtyp=MAP_CMD;
       }
       return v;
@@ -1241,7 +1241,17 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
       currentVoice->filename,yylineno,my_yylinebuf);
     }
     {
-      sy->data = (char *)enterid(id,lev,t,root,init_b);
+      /* New unresolved names own their scanner allocation.  Move that
+         allocation into the identifier record instead of duplicating it;
+         this also preserves the special-bin allocation used for oversized
+         computed identifiers. */
+      if (name->rtyp==UNKNOWN)
+      {
+        name->name=NULL;
+        sy->data = (char *)enteridOwned((char *)id,lev,t,root,init_b);
+      }
+      else
+        sy->data = (char *)enterid(id,lev,t,root,init_b);
     }
     if (sy->data!=NULL)
     {
@@ -1560,7 +1570,7 @@ BOOLEAN iiExport (leftv v, int toLev, package pack)
           {
             Warn("redefining %s (%s)",IDID(old),my_yylinebuf);
           }
-          v->name=omStrDup(v->name);
+          v->name=iiDupIdentifier(v->name);
           killhdl2(old,&(pack->idroot),currRing);
         }
         else
@@ -6477,32 +6487,138 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
 
 #include "libparse.h"
 
-// counter for generated lambda names
-static int iiLambdaCount = 0;
+// counter for generated lambda names; unsigned overflow is defined
+static unsigned long iiLambdaCount = 0;
 
-BOOLEAN iiARROWparams(leftv r, char* params, char *s)
+#if defined(__GNUC__) || defined(__clang__)
+extern char *yyLambdaPendingParams __attribute__((visibility("hidden")));
+#else
+extern char *yyLambdaPendingParams;
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#define II_LAMBDA_OUTLINE __attribute__((section(".lambda_text"),noinline))
+#else
+#define II_LAMBDA_OUTLINE
+#endif
+
+static char * II_LAMBDA_OUTLINE iiLambdaProcArgsGrow(
+  char *argstr, size_t *allocated, const size_t required)
+{
+  size_t new_length=*allocated;
+  while (new_length<required)
+  {
+    if (new_length>((size_t)-1)/2)
+    {
+      new_length=required;
+      break;
+    }
+    new_length*=2;
+  }
+  char *a=(char *)omAlloc(new_length);
+  strcpy(a,argstr);
+  omFree((ADDRESS)argstr);
+  *allocated=new_length;
+  return a;
+}
+
+/* This is deliberately separate from iiProcArgs: typed lambdas need robust
+   handling of arbitrarily long and malformed lists without changing the
+   established procedure parser's common path or layout. */
+static char * II_LAMBDA_OUTLINE iiLambdaProcArgs(char *e)
+{
+  while ((*e==' ') || (*e=='\t') || (*e=='(')) e++;
+  if (*e<' ') return omStrDup("");
+
+  BOOLEAN in_args;
+  BOOLEAN args_found;
+  char *s;
+  size_t argstrlen=127;
+  char *argstr=(char *)omAlloc(argstrlen);
+  *argstr='\0';
+  int par=0;
+  do
+  {
+    args_found=FALSE;
+    s=e;
+    loop
+    {
+      if ((*s==' ')||(*s=='\t'))
+        s++;
+      else if ((*s=='\n')&&(*(s+1)==' '))
+        s+=2;
+      else
+        break;
+    }
+    e=s;
+    while ((*e!=',') && ((par!=0) || (*e!=')')) && (*e!='\0'))
+    {
+      if (*e=='(') par++;
+      else if (*e==')') par--;
+      args_found=args_found || (*e>' ');
+      e++;
+    }
+    in_args=(*e==',');
+    if (args_found)
+    {
+      *e='\0';
+      const size_t used=strlen(argstr);
+      const size_t text_len=strlen(s);
+      if (text_len+13>argstrlen-used)
+        argstr=iiLambdaProcArgsGrow(argstr,&argstrlen,
+                                    used+text_len+13);
+      if (strncmp(s,"alias ",6)!=0) strcat(argstr,"parameter ");
+      strcat(argstr,s);
+      strcat(argstr,"; ");
+    }
+    else if (in_args)
+    {
+      const size_t used=strlen(argstr);
+      const size_t required=used+sizeof("parameter ; ");
+      if (required>argstrlen)
+        argstr=iiLambdaProcArgsGrow(argstr,&argstrlen,required);
+      strcat(argstr,"parameter ; ");
+    }
+    if (in_args) e++;
+  } while (in_args);
+  return argstr;
+}
+
+BOOLEAN II_LAMBDA_OUTLINE iiARROWparams(leftv r, char* params, char *s)
 {
   // params: e.g. "int x, def y" (as delivered by the scanner, proc-style)
   //         or "" for the zero-parameter case () -> { ... }
-  int end_s=strlen(s);
+  const size_t params_len=(params==NULL) ? 0 : strlen(params);
+  const size_t shown_params=(params_len>512) ? 512 : params_len;
+  const size_t name_len=shown_params+80;
+  char *name=(char*)omAlloc(name_len);
+  // Build the diagnostic name before iiProcArgs separates params in-place.
+  if (params_len==0)
+    snprintf(name,name_len,"lambda%lu(line %d)",++iiLambdaCount,yylineno);
+  else
+    snprintf(name,name_len,"lambda%lu(%.*s%s)(line %d)",++iiLambdaCount,
+             (int)shown_params,params,(shown_params<params_len) ? "..." : "",
+             yylineno);
+
+  size_t end_s=strlen(s);
   while ((end_s>0) && ((s[end_s]<=' ')||(s[end_s]==';'))) end_s--;
   s[end_s+1]='\0';
   char *args;
-  if ((params==NULL)||(params[0]=='\0'))
+  if (params_len==0)
     args=omStrDup("");
   else
-    args=iiProcArgs(params,FALSE);
+  {
+    char *args_start=params;
+    // A parameter list may start on the line after the opening parenthesis.
+    while ((*args_start!='\0')&&(*args_start<=' ')) args_start++;
+    args=iiLambdaProcArgs(args_start);
+  }
   size_t len=strlen(args)+strlen(s)+30;
   char *ss=(char*)omAlloc(len);
-  char *name=(char*)omAlloc(len);
   // use a short generated name: the procname is only used for
   // diagnostics, and embedding the whole block text made it
   // arbitrarily large (> OM_MAX_BLOCK_SIZE strings are served by
   // malloc, not from an omalloc bin page)
-  if ((params==NULL)||(params[0]=='\0'))
-    snprintf(name,len,"lambda%d(line %d)",++iiLambdaCount,yylineno);
-  else
-    snprintf(name,len,"lambda%d(%s)(line %d)",++iiLambdaCount,params,yylineno);
   // use the body unchanged and append return();
   // (like proccmd does; an earlier explicit return(..) wins,
   //  otherwise the lambda returns NONE)
@@ -6513,15 +6629,27 @@ BOOLEAN iiARROWparams(leftv r, char* params, char *s)
   r->Init();
   // now produce procinfo for PROC_CMD:
   r->data = (void *)omAlloc0Bin(procinfo_bin);
-  ((procinfo *)(r->data))->language=LANG_NONE;
-  iiInitSingularProcinfo((procinfo *)r->data,"",name,0,0);
-  ((procinfo *)(r->data))->data.s.body=ss;
-  omFree(name);
+  procinfov pi=(procinfo *)r->data;
+  /* The bin allocation is already zeroed.  name_len is capped below
+     OM_MAX_BLOCK_SIZE, so transfer the existing bin allocation instead of
+     duplicating and immediately freeing it. */
+  pi->libname=omStrDup("");
+  pi->procname=name;
+  pi->language=LANG_SINGULAR;
+  pi->ref=1;
+  pi->data.s.body=ss;
+  yyLambdaPendingParams=NULL;
+  omFree((ADDRESS)params);
   r->rtyp=PROC_CMD;
   return FALSE;
 }
 
-BOOLEAN iiARROW(leftv r, char* a, char *s)
+/* Keep the established implementation as a separate ordinary-text function.
+   Its code and the layout of all later hot functions remain unchanged. */
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((visibility("hidden")))
+#endif
+BOOLEAN iiARROWlegacy(leftv r, char* a, char *s)
 {
   size_t len=strlen(a)+strlen(s)+30; /* max. 27 currently */
   char *ss=(char*)omAlloc(len);
@@ -6530,8 +6658,7 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
   while ((end_s>0) && ((s[end_s]<=' ')||(s[end_s]==';'))) end_s--;
   s[end_s+1]='\0';
   char *name=(char *)omAlloc(len);
-  // see iiARROWparams: short generated name instead of the full text
-  snprintf(name,len,"%s->lambda%d(line %d)",a,++iiLambdaCount,yylineno);
+  snprintf(name,len,"%s->%s",a,s);
   // find start of last expression
   int start_s=end_s-1;
   while ((start_s>=0) && (s[start_s]!=';')) start_s--;
@@ -6556,6 +6683,15 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
   //r->data=ss;
   return FALSE;
 }
+
+BOOLEAN II_LAMBDA_OUTLINE iiARROW(leftv r, char* a, char *s)
+{
+  if (UNLIKELY((a!=NULL)&&(a==yyLambdaPendingParams)))
+    return iiARROWparams(r,a,s);
+  return iiARROWlegacy(r,a,s);
+}
+
+#undef II_LAMBDA_OUTLINE
 
 BOOLEAN iiAssignCR(leftv r, leftv arg)
 {
@@ -6713,4 +6849,3 @@ int siSetCpus(int cpu)
   feSetOptValue(FE_OPT_CPUS,cpu);
   return old;
 }
-

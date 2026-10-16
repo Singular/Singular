@@ -8,9 +8,43 @@
 * ABSTRACT: identifier handling
 */
 #include "misc/options.h"
+#include "omalloc/omalloc.h"
+#include <string.h>
 #include "Singular/idrec.h"
 #include "Singular/subexpr.h"
 #include "Singular/lists.h"
+
+/* Identifier names are normally small omalloc-bin objects.  A name larger
+   than OM_MAX_BLOCK_SIZE must still be allocated from a bin because several
+   established parser paths release temporary names with omFreeBinAddr(). */
+#if defined(__GNUC__) || defined(__clang__)
+char *iiDupLongIdentifier(const char *s, size_t length)
+  __attribute__((visibility("hidden"), noinline, section(".lambda_text")));
+char *iiNormalizeIdentifier(char *s)
+  __attribute__((visibility("hidden"), noinline, section(".lambda_text")));
+void iiCopyIdentifier(char *destination, const char *source, size_t length)
+  __attribute__((visibility("hidden"), noinline));
+#else
+char *iiDupLongIdentifier(const char *s, size_t length);
+char *iiNormalizeIdentifier(char *s);
+void iiCopyIdentifier(char *destination, const char *source, size_t length);
+#endif
+
+/* Keep ordinary identifier duplication equivalent to omStrDup's hot path,
+   while sending only oversized names to reusable special bins. */
+static inline char *iiDupIdentifier(const char *s)
+{
+  size_t length=0;
+  while (s[length]!='\0') length++;
+  length++;
+#ifdef HAVE_OMALLOC
+  if (UNLIKELY(length>OM_MAX_BLOCK_SIZE))
+    return iiDupLongIdentifier(s,length);
+#endif
+  char *copy=(char *)omAlloc(length);
+  iiCopyIdentifier(copy,s,length);
+  return copy;
+}
 
 EXTERN_VAR idhdl currPackHdl;
 EXTERN_VAR idhdl basePackHdl;
@@ -88,6 +122,10 @@ void module_help_proc(const char *newlib,const char *p, const char *help);
 /*extern ring     currRing;  in ring.h */
 
 idhdl enterid(const char * a, int lev, int t, idhdl* root, BOOLEAN init=TRUE, BOOLEAN search=TRUE);
+/* Consume a scanner-owned identifier string.  Scanner identifiers, including
+   oversized computed identifiers, are guaranteed to be omalloc-bin objects. */
+idhdl enteridOwned(char *a, int lev, int t, idhdl* root,
+                   BOOLEAN init=TRUE, BOOLEAN search=TRUE);
 idhdl ggetid(const char *n);
 //idhdl ggetid(const char *n, idhdl *packhdl);
 void  killid(const char * a, idhdl * i);
@@ -156,5 +194,3 @@ extern const struct soptionStruct optionStruct[];
 extern const struct soptionStruct verboseStruct[];
 
 #endif
-
-
