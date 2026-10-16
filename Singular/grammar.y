@@ -657,12 +657,6 @@ elemexpr:
             if (iiARROW(&$$,$1,$3)) YYERROR;
             omFree((ADDRESS)$3);
           }
-        | STRINGTOK ARROW BLOCKTOK
-          {
-            if (iiARROWparams(&$$,$1,$3)) YYERROR;
-            omFree((ADDRESS)$1);
-            omFree((ADDRESS)$3);
-          }
         | '(' exprlist ')'    { $$ = $2; }
         ;
 
@@ -879,7 +873,7 @@ extendedid:
             {
               MYYERROR("string expression expected");
             }
-            $$ = (char *)$2.CopyD(STRING_CMD);
+            $$ = iiNormalizeIdentifier((char *)$2.CopyD(STRING_CMD));
             $2.CleanUp();
           }
         ;

@@ -47,6 +47,15 @@ EXTERN_VAR int blocknest; /* scaner.l internal */
 VAR int    yy_noeof=0;     // the scanner "state"
 VAR int    yy_blocklineno; // to get the lineno of the block start from scanner
 VAR Voice  *currentVoice = NULL;
+#if defined(__GNUC__) || defined(__clang__)
+extern void yyLambdaReplayLine(long offset)
+  __attribute__((visibility("hidden")));
+extern void yyLambdaReplayFinishInput()
+  __attribute__((visibility("hidden")));
+#else
+extern void yyLambdaReplayLine(long offset);
+extern void yyLambdaReplayFinishInput();
+#endif
 // FILE   *feFilePending; /*temp. storage for grammar.y */
 
 //static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
@@ -497,6 +506,69 @@ static int fePrintEcho(char *anf, char */*b*/)
   return len_s;
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+#define FE_COLD_OUTLINE __attribute__((section(".lambda_text"),noinline))
+#else
+#define FE_COLD_OUTLINE
+#endif
+
+void FE_COLD_OUTLINE feReportPrematureEof()
+{
+  const char *err;
+  switch(yy_noeof)
+  {
+    case noeof_brace:
+    case noeof_block:
+      err="{...}";
+      break;
+    case noeof_asstring:
+      err="till `.`";
+      break;
+    case noeof_string:
+      err="string";
+      break;
+    case noeof_bracket:
+      err="(...)";
+      break;
+    case noeof_procname:
+      err="proc";
+      break;
+    case noeof_comment:
+      err="/*...*/";
+      break;
+    default:
+      return;
+  }
+  Werror("premature end of file while reading %s",err);
+}
+
+#undef FE_COLD_OUTLINE
+
+#if defined(__GNUC__) || defined(__clang__)
+#define FE_REPLAY_COLD \
+  __attribute__((section(".lambda_text"),noinline,cold))
+#else
+#define FE_REPLAY_COLD
+#endif
+
+int feReadLine(char *b, int l);
+
+static int FE_REPLAY_COLD
+feReplayChunk(const long startfptr, const int count)
+{
+  yyLambdaReplayLine(startfptr);
+  currentVoice->fptr++;
+  return count;
+}
+
+static int FE_REPLAY_COLD feReplayEnd(char *b, const int l)
+{
+  yyLambdaReplayFinishInput();
+  return feReadLine(b,l);
+}
+
+#undef FE_REPLAY_COLD
+
 int feReadLine(char* b, int l)
 {
   char *s=NULL;
@@ -568,12 +640,20 @@ int feReadLine(char* b, int l)
           omFree((ADDRESS)s);
         }
       }
+      else if (UNLIKELY(currentVoice->sw==BI_replay))
+      {
+        return feReplayChunk(startfptr,i);
+      }
       currentVoice->fptr++;
       return i;
     }
     // no buffer there or e-o-buffer or eoln:
     if (currentVoice->sw!=BI_buffer)
     {
+      if (UNLIKELY(currentVoice->sw==BI_replay))
+      {
+        return feReplayEnd(b,l);
+      }
       currentVoice->fptr=0;
       if (currentVoice->buffer==NULL)
       {
@@ -698,4 +778,3 @@ Voice * feInitStdin(Voice *pp)
   return p;
 }
 #endif
-

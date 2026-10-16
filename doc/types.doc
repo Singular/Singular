@@ -4023,7 +4023,7 @@ See
 
 @table @strong
 @item Syntax:
-@code{@{} parameter_name @code{-> @{} expression(s) @code{@}}@}
+parameter_name @code{-> @{} expression(s) @code{@}}
 @*
 @code{(} parameter_list @code{) -> @{} expression(s) @code{@}}
 @item Purpose:
