@@ -18,10 +18,17 @@
    than OM_MAX_BLOCK_SIZE must still be allocated from a bin because several
    established parser paths release temporary names with omFreeBinAddr(). */
 #if defined(__GNUC__) || defined(__clang__)
+/* Mach-O section attributes require both a segment and a section name. */
+#if defined(__APPLE__) && defined(__MACH__)
+#define II_IDENTIFIER_SECTION "__TEXT,__lambda_text"
+#else
+#define II_IDENTIFIER_SECTION ".lambda_text"
+#endif
 char *iiDupLongIdentifier(const char *s, size_t length)
-  __attribute__((visibility("hidden"), noinline, section(".lambda_text")));
+  __attribute__((visibility("hidden"), noinline, section(II_IDENTIFIER_SECTION)));
 char *iiNormalizeIdentifier(char *s)
-  __attribute__((visibility("hidden"), noinline, section(".lambda_text")));
+  __attribute__((visibility("hidden"), noinline, section(II_IDENTIFIER_SECTION)));
+#undef II_IDENTIFIER_SECTION
 void iiCopyIdentifier(char *destination, const char *source, size_t length)
   __attribute__((visibility("hidden"), noinline));
 #else
