@@ -6497,7 +6497,11 @@ extern char *yyLambdaPendingParams;
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
+#if defined(__APPLE__) && defined(__MACH__)
+#define II_LAMBDA_OUTLINE __attribute__((section("__TEXT,__lambda_text"),noinline))
+#else
 #define II_LAMBDA_OUTLINE __attribute__((section(".lambda_text"),noinline))
+#endif
 #else
 #define II_LAMBDA_OUTLINE
 #endif

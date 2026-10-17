@@ -29,7 +29,11 @@ extern int yyleng;
 extern int inerror;
 
 #if defined(__GNUC__) || defined(__clang__)
+#if defined(__APPLE__) && defined(__MACH__)
+#define YY_LAMBDA_OUTLINE __attribute__((section("__TEXT,__lambda_text"),noinline))
+#else
 #define YY_LAMBDA_OUTLINE __attribute__((section(".lambda_text"),noinline))
+#endif
 #define YY_LAMBDA_COLD YY_LAMBDA_OUTLINE
 #define YY_LAMBDA_NOINLINE YY_LAMBDA_OUTLINE
 #if defined(__GNUC__) && !defined(__clang__)
