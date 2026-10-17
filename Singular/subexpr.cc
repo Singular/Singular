@@ -2073,7 +2073,7 @@ int sleftv::Eval()
           omCheckAddr((ADDRESS)d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {
-            n=omStrDup(IDID((idhdl)d->arg1.data));
+            n=iiDupIdentifier(IDID((idhdl)d->arg1.data));
             killhdl((idhdl)d->arg1.data);
             d->arg1.Init();
             //d->arg1.data=NULL;
@@ -2211,4 +2211,3 @@ void * sattr::CopyA()
   omCheckAddrSize(this,sizeof(sattr));
   return s_internalCopy(atyp,data);
 }
-

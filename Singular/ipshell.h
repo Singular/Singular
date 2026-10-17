@@ -25,6 +25,12 @@ BOOLEAN    semicProc3   ( leftv,leftv,leftv,leftv );
 BOOLEAN iiAssignCR(leftv, leftv);
 
 BOOLEAN iiARROW (leftv, char*,char *);
+#if defined(__GNUC__) || defined(__clang__)
+BOOLEAN iiARROWparams (leftv, char*,char *)
+  __attribute__((visibility("hidden")));
+#else
+BOOLEAN iiARROWparams (leftv, char*,char *);
+#endif
 
 EXTERN_VAR leftv iiCurrArgs;
 EXTERN_VAR idhdl iiCurrProc;
@@ -305,4 +311,3 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE, const long bitmask=
 
 void iiSetReturn(const leftv h);
 #endif
-
