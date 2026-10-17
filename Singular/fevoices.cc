@@ -179,13 +179,14 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   //  t,BT_name[t],pname,currentVoice);
   if (pi!=NULL)
   {
-    long l=strlen(pi->procname);
-    if (pi->libname!=NULL) l+=strlen(pi->libname);
-    currentVoice->filename = (char *)omAlloc(l+3);
-    *currentVoice->filename='\0';
-    if (pi->libname!=NULL) strcat(currentVoice->filename,pi->libname);
-    strcat(currentVoice->filename,"::");
-    strcat(currentVoice->filename,pi->procname);
+    const size_t proc_len=strlen(pi->procname);
+    const size_t lib_len=(pi->libname!=NULL) ? strlen(pi->libname) : 0;
+    char *filename=(char *)omAlloc(lib_len+proc_len+3);
+    if (lib_len!=0) memcpy(filename,pi->libname,lib_len);
+    filename[lib_len]=':';
+    filename[lib_len+1]=':';
+    memcpy(filename+lib_len+2,pi->procname,proc_len+1);
+    currentVoice->filename = filename;
     currentVoice->pi       = pi;
   }
   else
@@ -424,23 +425,14 @@ static void feShowPrompt(void)
 /*2
 * print echo (si_echo or TRACE), set my_yylinebuf
 */
-static int fePrintEcho(char *anf, char */*b*/)
+static int fePrintEcho(const char *anf, const int len_s)
 {
-  char *ss=strrchr(anf,'\n');
-  int len_s;
-  if (ss==NULL)
-  {
-    len_s=strlen(anf);
-  }
-  else
-  {
-    len_s=ss-anf+1;
-  }
   // my_yylinebuf:
-  int mrc=si_min(len_s,79)-1;
-  strcpy(my_yylinebuf,anf+(len_s-1)-mrc);
-  if (my_yylinebuf[mrc] == '\n') my_yylinebuf[mrc] = '\0';
-  mrc--;
+  const int count=si_min(len_s,79);
+  memcpy(my_yylinebuf,anf+len_s-count,count);
+  my_yylinebuf[count]='\0';
+  if ((count>0) && (my_yylinebuf[count-1]=='\n'))
+    my_yylinebuf[count-1]='\0';
   // handle echo:
   if (((si_echo>myynest)
     && ((currentVoice->typ==BT_proc)
@@ -633,11 +625,9 @@ int feReadLine(char* b, int l)
         }
         if (show_echo)
         {
-          char *s=(char *)omAlloc(len+2);
-          strncpy(s,anf,len+2);
-          s[len+1]='\0';
-          fePrintEcho(s,b);
-          omFree((ADDRESS)s);
+          // Echo and the debugger consume a length-delimited line.  Keep
+          // diagnostics identical without allocating a temporary string.
+          fePrintEcho(anf,len+(anf[len]=='\n'));
         }
       }
       else if (UNLIKELY(currentVoice->sw==BI_replay))
@@ -703,7 +693,9 @@ int feReadLine(char* b, int l)
       File_Log_written=TRUE;
       fputs(s,File_Log);
     }
-    int rc=fePrintEcho(s,b)+1;
+    const char *last_newline=strrchr(s,'\n');
+    const int line_length=(last_newline==NULL) ? strlen(s) : last_newline-s+1;
+    int rc=fePrintEcho(s,line_length)+1;
     //s[strlen(s)+1]='\0'; add an second \0 at the end of the string
     s[rc]='\0';
     // handel \\ :

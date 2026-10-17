@@ -198,6 +198,7 @@ Short/homolog_s.tst
 Short/hres_s.tst
 Short/imap.tst
 Short/intdet_s.tst
+Short/interpreter_io.tst
 Short/intersect_s.tst
 Short/intersect_q.tst
 Short/invar.tst
