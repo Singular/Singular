@@ -147,6 +147,23 @@ CASES = {
 }
 
 
+# Keep the common one- and two-argument calls comparable: identical iteration
+# counts, int versus def parameters, and used versus unused argument values.
+for arity in (1, 2):
+    for parameter_type in ("int", "def"):
+        for used in (False, True):
+            label = f"proc{arity}_{parameter_type}_{'used' if used else 'unused'}"
+            parameters = ",".join(f"{parameter_type} {name}" for name in ("x", "y")[:arity])
+            expression = ("x" if arity == 1 else "x+y") if used else "1"
+            arguments = "i" if arity == 1 else "i,one"
+            CASES[label] = (
+                f"existing syntax: {arity} {parameter_type} argument(s), "
+                + ("used" if used else "unused"),
+                f"proc f({parameters}){{return({expression});}};int one=1;int s;"
+                f"for(int i=0;i<600000;i++){{s=f({arguments});}}s;quit;\n",
+            )
+
+
 def main() -> None:
     parser = ArgumentParser()
     parser.add_argument(
