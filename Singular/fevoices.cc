@@ -499,7 +499,11 @@ static int fePrintEcho(const char *anf, const int len_s)
 }
 
 #if defined(__GNUC__) || defined(__clang__)
+#if defined(__APPLE__) && defined(__MACH__)
+#define FE_COLD_OUTLINE __attribute__((section("__TEXT,__lambda_text"),noinline))
+#else
 #define FE_COLD_OUTLINE __attribute__((section(".lambda_text"),noinline))
+#endif
 #else
 #define FE_COLD_OUTLINE
 #endif
@@ -537,8 +541,13 @@ void FE_COLD_OUTLINE feReportPrematureEof()
 #undef FE_COLD_OUTLINE
 
 #if defined(__GNUC__) || defined(__clang__)
+#if defined(__APPLE__) && defined(__MACH__)
+#define FE_REPLAY_COLD \
+  __attribute__((section("__TEXT,__lambda_text"),noinline,cold))
+#else
 #define FE_REPLAY_COLD \
   __attribute__((section(".lambda_text"),noinline,cold))
+#endif
 #else
 #define FE_REPLAY_COLD
 #endif
