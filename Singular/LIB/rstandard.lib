@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.1.2.0 Feb_2019 ";
+version="version standard.lib 4.4.1.0 Sep_2026 ";
 category="Commutative Algebra";
 info="
 LIBRARY: rstandard.lib     Computes Janet bases and border bases for ideals
@@ -8,7 +8,10 @@ AUTHORS: Shamsa Kanwal           lotus_zone16@yahoo.com
          Gerhard Pfister         pfister@mathematik.uni-kl.de
 
 OVERVIEW: Computing Janet bases and border bases for any ordering
-          using the idea of r-standard bases (defined by V. Gerdt)
+          using the idea of r-standard bases (defined by V. Gerdt).
+          Rational Weyl border bases are supported when Singular is configured
+          with --with-ratGB, including bases for an explicitly supplied order
+          ideal without choosing it through a monomial ordering.
 
 REFERENCES:
    [1] A. Kehrein, M. Kreuzer, L. Robbiano: An algebrists view on border bases, in:
@@ -22,7 +25,10 @@ REFERENCES:
 
 
 PROCEDURES:
-   borderBasis(I);  computes a border basis of the ideal I
+   borderBasis(I);  computes a border basis of the commutative ideal I
+   borderBasis(I,n[,eng]); computes a rational Weyl border basis
+   rationalWeylBorderBasisForOrderIdeal(I,n,O[,d]); computes a rational Weyl
+                          border basis for the explicitly supplied order ideal O
    modBorder(I);    computes a border basis of the ideal I using modular methods
    rJanet(I);       computes a Janet basis of the ideal I
    modJanet(I);     computes a Janet basis of the ideal I using modular methods
@@ -31,6 +37,7 @@ KEYWORDS: border basis; janet basis
 ";
 LIB "general.lib";
 LIB "modstd.lib";
+LIB "rwborder.lib";
 
 //=================================  procedures  ==============================
 //================================= border bases ==============================
@@ -146,15 +153,45 @@ static proc maxO(ideal O)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-proc borderBasis(ideal I)
-"USAGE:   borderBasis(I); I is an ideal.
+proc borderBasis(ideal I, list #)
+"USAGE:   borderBasis(I); I is a commutative ideal.
+         borderBasis(I,n[,eng]); I is a left ideal in a rational Weyl
+         algebra, n is the number of coordinate variables, and eng is an
+         optional Groebner-basis engine flag.
 RETURN:   ideal, a border basis for I.
 PURPOSE:  Computes a border basis for the ideal given by the generators in I.
-SEE ALSO: modBorder
+NOTE:     In the rational Weyl case, use rationalWeylBorderBasis to obtain
+         both the border basis and its differential order ideal.
+SEE ALSO: modBorder, rationalWeylBorderBasis
 KEYWORDS: order ideal, border basis
 EXAMPLE:  example borderBasis; shows an example
 "
 {
+   if (!isCommutative())
+   {
+      if ((size(#)<1)||(size(#)>2)||(typeof(#[1])!="int"))
+      {
+         ERROR("expected borderBasis(I,n[,eng]) in a rational Weyl algebra");
+      }
+      list @borderData;
+      if (size(#)==2)
+      {
+         if (typeof(#[2])!="int")
+         {
+            ERROR("the optional Groebner-basis engine flag must be an integer");
+         }
+         @borderData=rationalWeylBorderBasis(I,#[1],#[2]);
+      }
+      else
+      {
+         @borderData=rationalWeylBorderBasis(I,#[1]);
+      }
+      return(@borderData[1]);
+   }
+   if (size(#)>0)
+   {
+      ERROR("the commutative call is borderBasis(I)");
+   }
    list L=orderIdeal(I);
    I=L[4];
    ideal B=L[3];
@@ -180,8 +217,11 @@ EXAMPLE:  example borderBasis; shows an example
       }
       else
       {
-         L=division(B[i],I);
-         B[i]=L[3][1,1]*B[i]-L[2][1];
+         for(i=1;i<=size(B);i++)
+         {
+            L=division(B[i],I);
+            B[i]=L[3][1,1]*B[i]-L[2][1];
+         }
       }
    }
    attrib(B,"isSB",1);
