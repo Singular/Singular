@@ -143,6 +143,12 @@ BOOLEAN kVerify2(ideal F, ideal Q)
 {
 #ifdef HAVE_VSPACE
   assume (!rIsNCRing(currRing));
+  int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
+  if (cpus>=vspace::internals::MAX_PROCESS)
+    cpus=vspace::internals::MAX_PROCESS-1;
+  using namespace vspace;
+  if (!vmem_init(cpus + 1).ok())
+    return kVerify1(F,Q);
   kStrategy strat=new skStrategy;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
@@ -211,15 +217,10 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   if (TEST_OPT_DEBUG) messageSets(strat);
   /*---------------------------------------------------------------------*/
   BOOLEAN all_okay=TRUE;
-  int cpus=(int)(long)feOptValue(FE_OPT_CPUS);
-  if (cpus>=vspace::internals::MAX_PROCESS)
-    cpus=vspace::internals::MAX_PROCESS-1;
   /* start no more than MAX_PROCESS-1 children */
   if (cpus>strat->Ll+1) cpus=strat->Ll+1;
   /* start no more children than elements in L */
   int parent_pid=getpid();
-  using namespace vspace;
-  vmem_init();
   // Create a queue of int
   VRef<Queue<int> > queue = vnew<Queue<int> >();
   VRef<Queue<int> > rqueue = vnew<Queue<int> >();
@@ -232,10 +233,13 @@ BOOLEAN kVerify2(ideal F, ideal Q)
     queue->enqueue(-1); // stop sign, one for each child
   }
   int pid;
+  int started=0;
   for (int i=0;i<cpus;i++)
   {
     pid = fork_process();
     if (pid==0) break; //child
+    if (pid<0) break;
+    started++;
   }
   // input queue: queue: <index of L> -1 ...-1
   // output queue: rqueue: pid .. pid 0 pid... pid for failure
@@ -306,6 +310,14 @@ BOOLEAN kVerify2(ideal F, ideal Q)
   }
   else // parent ---------------------------------------------------
   {
+    cpus=started;
+    if (cpus==0)
+    {
+      queue.free();
+      rqueue.free();
+      vmem_deinit();
+      return kVerify1(F,Q);
+    }
     if (TEST_OPT_PROT) printf("%d children created\n",cpus);
     // wait for all process to stop:
     // each process sends 0 for failure and its pid at end

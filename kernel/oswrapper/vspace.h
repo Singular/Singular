@@ -256,6 +256,7 @@ struct VMem {
   int fd;
   FILE *file_handle;
   int current_process; // index into process table
+  int channel_count;
   vaddr_t *freelist; // reference to metapage information
   VSeg segments[MAX_SEGMENTS];
   ProcessChannel channels[MAX_PROCESS];
@@ -291,9 +292,9 @@ struct VMem {
     return segment(vaddr).ptr(segaddr(vaddr));
   }
   size_t filesize();
-  Status init(int fd);
-  Status init();
-  Status init(const char *path);
+  Status init_fd(int fd, int process_count);
+  Status init(int process_count = MAX_PROCESS);
+  Status init(const char *path, int process_count = MAX_PROCESS);
   void deinit();
   void *mmap_segment(int seg);
   void add_segment();
@@ -402,8 +403,9 @@ public:
 
 }; // namespace internals
 
-static inline Status vmem_init() {
-  return internals::vmem.init();
+static inline Status vmem_init(
+    int process_count = internals::MAX_PROCESS) {
+  return internals::vmem.init(process_count);
 }
 
 static inline void vmem_deinit() {
@@ -1590,6 +1592,7 @@ struct VMem {
   int fd;
   std::FILE *file_handle;
   int current_process; // index into process table
+  int channel_count;
   vaddr_t *freelist; // reference to metapage information
   VSeg segments[MAX_SEGMENTS];
   ProcessChannel channels[MAX_PROCESS];
@@ -1624,9 +1627,9 @@ struct VMem {
     return segment(vaddr).ptr(segaddr(vaddr));
   }
   size_t filesize();
-  Status init(int fd);
-  Status init();
-  Status init(const char *path);
+  Status init_fd(int fd, int process_count);
+  Status init(int process_count = MAX_PROCESS);
+  Status init(const char *path, int process_count = MAX_PROCESS);
   void deinit();
   void *mmap_segment(int seg);
   void add_segment();
@@ -1735,8 +1738,9 @@ public:
 
 }; // namespace internals
 
-static inline Status vmem_init() {
-  return internals::vmem.init();
+static inline Status vmem_init(
+    int process_count = internals::MAX_PROCESS) {
+  return internals::vmem.init(process_count);
 }
 
 static inline void vmem_deinit() {
