@@ -74,7 +74,7 @@ static inline long imm2int ( const InternalCF * const imm )
 
 static inline InternalCF * int2imm ( long i )
 {
-    return (InternalCF*)((i << 2) | INTMARK );
+    return (InternalCF*)(((intptr_t)i * 4) | INTMARK );
 }
 
 #else
@@ -100,12 +100,12 @@ static inline InternalCF * int2imm ( long i )
 
 inline InternalCF * int2imm_p ( long i )
 {
-    return (InternalCF*)((i << 2) | FFMARK );
+    return (InternalCF*)(((intptr_t)i * 4) | FFMARK );
 }
 
 inline InternalCF * int2imm_gf ( long i )
 {
-    return (InternalCF*)((i << 2) | GFMARK );
+    return (InternalCF*)(((intptr_t)i * 4) | GFMARK );
 }
 //}}}
 

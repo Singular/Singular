@@ -154,11 +154,15 @@ static void fe_init (void)
     else
     {
       fe_stdout_is_tty=0;
-      char *tty_name=ttyname(fileno(stdin));
-      if (tty_name!=NULL)
-        fe_echo = fopen( tty_name, "w" );
-      else
-        fe_echo = NULL;
+      #ifdef _WIN32
+        fe_echo = fopen("CONOUT$", "w");
+      #else
+        char *tty_name=ttyname(fileno(stdin));
+        if (tty_name!=NULL)
+          fe_echo = fopen( tty_name, "w" );
+        else
+          fe_echo = NULL;
+      #endif
       if (fe_echo==NULL)
       {
         fe_echo=stdout;
@@ -854,4 +858,3 @@ void fe_reset_input_mode (void)
   #endif
 #endif
 }
-

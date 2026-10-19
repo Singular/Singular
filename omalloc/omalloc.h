@@ -12,7 +12,9 @@
 #include <string.h>
 
 #include "omalloc/omConfig.h"
-#ifndef HAVE_OMALLOC
+#ifdef OMALLOC_USE_WIN64_BACKEND
+#include "omalloc/win64/omalloc_win64.h"
+#elif !defined(HAVE_OMALLOC)
 #include "omalloc/xalloc.h"
 #else
 
@@ -67,5 +69,5 @@ extern int om_sing_opt_show_mem;
 }
 #endif
 
-#endif /* HAVE_OMALLOC */
+#endif /* backend selection */
 #endif /* OM_ALLOC_H */

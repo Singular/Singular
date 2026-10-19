@@ -14,6 +14,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/param.h>
+#ifdef _WIN32
+# include <windows.h>
+# define FE_EXEC_ACCESS_MODE F_OK
+# define FE_DIR_ACCESS_MODE F_OK
+#else
+# define FE_EXEC_ACCESS_MODE X_OK
+# define FE_DIR_ACCESS_MODE (X_OK | R_OK)
+#endif
 
 
 VAR char* feArgv0 = NULL;
@@ -80,7 +88,7 @@ VAR feResourceConfig_s feResourceConfigs[] =
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;%P;$PATH",             (char *)""},
 
-#ifdef __CYGWIN__
+#ifdef _WIN32
   {"emacs",     'E',    feResBinary,"ESINGULAR_EMACS",      "%b/emacs.exe",             (char *)""},
   {"xemacs",    'A',    feResBinary,"ESINGULAR_EMACS",      "%b/xemacs.exe",            (char *)""},
   {"SingularEmacs",'M', feResBinary,"ESINGULAR_SINGULAR",   "%b/Singular.exe",          (char *)""},
@@ -317,6 +325,11 @@ static char* feInitResource(feResourceConfig config, int warn)
     {
       strcpy(value, executable);
       executable = strrchr(value, DIR_SEP);
+#ifdef _WIN32
+      char* backslash = strrchr(value, '\\');
+      if (backslash != NULL && (executable == NULL || backslash > executable))
+        executable = backslash;
+#endif
       if (executable != NULL) *executable = '\0';
     }
   }
@@ -383,6 +396,13 @@ static char* feInitResource(feResourceConfig config, int warn)
 
 static char* feGetExpandedExecutable()
 {
+#ifdef _WIN32
+  char module_name[MAXRESOURCELEN];
+  DWORD module_name_length = GetModuleFileNameA(NULL, module_name,
+                                                sizeof(module_name));
+  if (module_name_length > 0 && module_name_length < sizeof(module_name))
+    return strdup(module_name);
+#endif
   if (feArgv0 == NULL || *feArgv0 == '\0')
   {
     if (feArgv0 == NULL)
@@ -391,7 +411,7 @@ static char* feGetExpandedExecutable()
       printf("Bug >>feArgv0 == ''<< at %s:%d\n",__FILE__,__LINE__);
     return NULL;
   }
-#ifdef __CYGWIN__ // stupid WINNT sometimes gives you argv[0] within ""
+#ifdef _WIN32 // Windows sometimes gives argv[0] within ""
   if (*feArgv0 == '"')
   {
     int l = strlen(feArgv0);
@@ -435,8 +455,10 @@ static int feVerifyResourceValue(feResourceType type, char* value)
         return ! access(value, R_OK);
 
       case feResBinary:
+        return ! access(value, FE_EXEC_ACCESS_MODE);
+
       case feResDir:
-        return ! access(value, X_OK);
+        return ! access(value, FE_DIR_ACCESS_MODE);
 
       default:
         return 0;
@@ -455,7 +477,7 @@ static char* feCleanResourceValue(feResourceType type, char* value)
 #ifdef RESOURCE_DEBUG
       printf("Clean value:%s\n", value);
 #endif
-#ifdef __CYGWIN__
+#ifdef _WIN32
 #ifdef RESOURCE_DEBUG
       printf("Clean WINNT value:%s\n", value);
 #endif
@@ -588,7 +610,7 @@ static char* feCleanUpPath(char* path)
     if (access(path_comps[i], X_OK | R_OK))
       printf("feCleanUpPath: remove %d:%s -- can not access\n", i, path_comps[i]);
 #endif
-    if ( ! access(path_comps[i], X_OK | R_OK))
+    if ( ! access(path_comps[i], FE_DIR_ACCESS_MODE))
     {
       // x- permission is granted -- we assume that it is a dir
       for (j=0; j<i; j++)
@@ -706,4 +728,3 @@ static char* feSprintf(char* s, const char* fmt, int warn)
   *s = '\0';
   return s_in;
 }
-
