@@ -7,6 +7,8 @@
  */
 
 #include "kernel/GBEngine/syz.h"
+#include "kernel/GBEngine/kstd1.h"
+#include "kernel/GBEngine/kutil.h"
 #include "coeffs/numbers.h"
 #include "kernel/polys.h"
 #include "kernel/ideals.h"
@@ -802,6 +804,9 @@ syStrategy syFrank(const ideal arg, const int length, const char *method,
     {
         res[0] = id_Head(arg, currRing);
     }
+    if (currRing->qideal != NULL) {
+        res[0] = id_Add(res[0], id_Mult(currRing->qideal, id_FreeModule(res[0]->rank, currRing), currRing), currRing);
+    }
     syzHeadFunction *syzHead;
     bool do_lifting;
     bool single_module;
@@ -816,6 +821,35 @@ syStrategy syFrank(const ideal arg, const int length, const char *method,
     if (strcmp(method, "frame") != 0)
     {
         insert_ext_induced_LTs(res, new_length, single_module);
+    }
+    /* If we are working w.r.t. a quotient, apply a corresponding normal
+     * form computation to get the result in the quotient and not in the
+     * currRing. */
+    if (currRing->qideal != NULL) {
+        for (int i = 0; i < new_length; ++i) {
+            if (res[i] != NULL) {
+                ideal t=kNF(currRing->qideal,NULL,res[i]);
+                idDelete(&res[i]);
+                res[i]=t;
+                if (i<new_length-1)
+                {
+                    for(int j=IDELEMS(t)-1;j>=0; j--)
+                    {
+                        if ((t->m[j]==NULL) && (res[i+1]!=NULL))
+                        {
+                            for(int k=IDELEMS(res[i+1])-1;k>=0; k--)
+                            {
+                                if (res[i+1]->m[k]!=NULL)
+                                {
+                                    pDeleteComp(&(res[i+1]->m[k]),j+1);
+                                }
+                            }
+                        }
+                    }
+                }
+                idSkipZeroes(res[i]);
+            }
+        }
     }
     result->fullres = res;
     result->length = new_length;
