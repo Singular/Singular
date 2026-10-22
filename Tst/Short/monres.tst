@@ -152,6 +152,20 @@ ideal I=x(1)^2*x(2),x(1)*x(3)^3,x(2)^2*x(4)^2,x(1)^3;
 mrCheck(I,0,"rational-nonuniform");
 I=x(1)*x(2),x(1)*x(3),x(3)*x(4);
 mrCheck(I,1,"nonregular-linear-quotients");
+I=x(1)*x(2),x(2)*x(3),x(3)*x(4),x(4)*x(5),x(5)*x(1);
+def sparseCycleBox=squarefreeResolutionBox(I);
+mrAssert(find(string(sparseCycleBox),"squarefree Lyubeznik")>0,
+         "squarefree sparse dispatcher");
+int dispatcherCheck=mrCheckBox(I,sparseCycleBox,"squarefree sparse cycle");
+def fallbackCycleBox=squarefreeResolutionBox(I,52);
+mrAssert(find(string(fallbackCycleBox),"support lattice")>0,
+         "squarefree budget fallback dispatcher");
+dispatcherCheck=mrCheckBox(I,fallbackCycleBox,"squarefree budget fallback");
+I=x(1)*x(2)*x(3),x(4)*x(5)*x(6);
+def disjointBox=squarefreeResolutionBox(I);
+mrAssert(find(string(disjointBox),"squarefree Lyubeznik")>0,
+         "squarefree disjoint-support dispatcher");
+dispatcherCheck=mrCheckBox(I,disjointBox,"squarefree disjoint supports");
 I=x(1)^2,x(1)*x(2),x(2)^3,x(1)*x(3)^2,x(2)^2*x(3),x(2)*x(3)^3,x(3)^5;
 mrCheck(I,0,"stable-mixed-degrees");
 I=x(1)*x(2),x(2)^3;

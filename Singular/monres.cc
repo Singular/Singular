@@ -41,7 +41,7 @@ using Column=std::map<int,Scalar>;
 struct Cell { Degree degree; Column boundary; };
 using Complex=std::vector<std::vector<Cell>>;
 Complex lyubeznik(const std::vector<Degree>&,coeffs,size_t);
-Complex squarefree(const std::vector<Degree>&,coeffs,size_t);
+Complex squarefree(const std::vector<Degree>&,coeffs,size_t,bool&);
 }
 
 // Sparse multigraded Lyubeznik resolution and homogeneous unit cancellation.
@@ -97,6 +97,16 @@ struct FaceHash
 
 typedef std::unordered_map<Face, int, FaceHash> FaceIndices;
 
+// Squarefree dispatch may retry a candidate Lyubeznik construction with the
+// support-lattice algorithm when only its combinatorial budget is exhausted.
+// Other failures, including interruption and arithmetic errors, must escape.
+class LyubeznikBudgetExceeded : public std::runtime_error
+{
+public:
+  explicit LyubeznikBudgetExceeded(const char* message)
+    : std::runtime_error(message) {}
+};
+
 static bool divides(const Degree& divisor, const Degree& multiple)
 {
   for (size_t variable = 0; variable < divisor.size(); ++variable)
@@ -107,7 +117,7 @@ static bool divides(const Degree& divisor, const Degree& multiple)
 static void consume(size_t& count, size_t budget, const char* message)
 {
   if (siCntrlc) throw std::runtime_error("monres interrupted");
-  if (count >= budget) throw std::runtime_error(message);
+  if (count >= budget) throw LyubeznikBudgetExceeded(message);
   ++count;
 }
 
@@ -581,20 +591,67 @@ std::vector<Support> supportLattice(const std::vector<Support>& generators,
   return result;
 }
 
+bool preferLyubeznik(const std::vector<Support>& generators)
+{
+  bool atMostQuadratic = true;
+  bool pairwiseDisjoint = true;
+  Support used(generators[0].size(), 0);
+  for (std::size_t i = 0; i < generators.size(); ++i)
+  {
+    if (cardinality(generators[i]) > 2) atMostQuadratic = false;
+    for (std::size_t word = 0; word < used.size(); ++word)
+    {
+      if ((used[word] & generators[i][word]) != 0) pairwiseDisjoint = false;
+      used[word] |= generators[i][word];
+    }
+  }
+  return atMostQuadratic || pairwiseDisjoint;
+}
+
 } // namespace squarefree_detail
 
 Complex squarefree(const std::vector<Degree>& generators,
-                   coeffs field, std::size_t budget)
+                   coeffs field, std::size_t budget,
+                   bool& usedSupportLattice)
 {
   using namespace squarefree_detail;
+  usedSupportLattice = true;
   const std::size_t variables = generators.empty() ? 0 : generators[0].size();
-  const Scalar zero(0, field);
-  const Scalar one(1, field);
   if (budget == 0 || generators.size() >= budget)
     throw std::runtime_error("squarefree resolution cells exceed budget");
   if (generators.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
     throw std::runtime_error("squarefree resolution has too many generators");
 
+  std::vector<Support> generatorSupports;
+  generatorSupports.reserve(generators.size());
+  for (std::size_t i = 0; i < generators.size(); ++i)
+  {
+    if (generators[i].size() != variables)
+      throw std::runtime_error("inconsistent generator degree vectors");
+    generatorSupports.push_back(supportOf(generators[i]));
+  }
+
+  // Quadratic squarefree ideals are much cheaper as Lyubeznik faces and
+  // cancellation than as repeated support-homology problems.  The same holds
+  // for disjoint supports, where the Lyubeznik/Taylor complex is already
+  // minimal.  If that construction reaches the caller's budget, retain the
+  // support algorithm so dispatch does not turn a formerly successful input
+  // into a budget failure.
+  if (generators.size() > 1 && preferLyubeznik(generatorSupports))
+  {
+    try
+    {
+      Complex candidate = lyubeznik(generators, field, budget);
+      usedSupportLattice = false;
+      return candidate;
+    }
+    catch (const LyubeznikBudgetExceeded&)
+    {
+    }
+  }
+
+  const Scalar zero(0, field);
+  const Scalar one(1, field);
   Complex result(1);
   Cell ringCell;
   ringCell.degree = Degree(variables, 0);
@@ -602,12 +659,8 @@ Complex squarefree(const std::vector<Degree>& generators,
   if (generators.empty()) return result;
 
   result.push_back(std::vector<Cell>());
-  std::vector<Support> generatorSupports;
   for (std::size_t i = 0; i < generators.size(); ++i)
   {
-    if (generators[i].size() != variables)
-      throw std::runtime_error("inconsistent generator degree vectors");
-    generatorSupports.push_back(supportOf(generators[i]));
     Cell generator;
     generator.degree = generators[i];
     generator.boundary.insert(std::make_pair(0, one));
@@ -1308,8 +1361,11 @@ static Box build(leftv args,bool sf) {
     regular_detail::Data regular;
     if(regularQuotientData(gens,budget,regular))
       return packRegular(gens,regular,currRing,sf);
-    c=sf ? squarefree(gens,currRing->cf,budget)
-         : lyubeznik(gens,currRing->cf,budget);
+    if(sf) {
+      bool usedSupportLattice=true;
+      c=squarefree(gens,currRing->cf,budget,usedSupportLattice);
+      method=usedSupportLattice?"support lattice":"squarefree Lyubeznik";
+    } else c=lyubeznik(gens,currRing->cf,budget);
   }
   return pack(c,currRing,sf,method);
 }

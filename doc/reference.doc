@@ -5357,7 +5357,8 @@ commands, and resolution, intvec, intmat, matrix, or vector for the accessors
 @code{monomialResolution} computes a minimal free resolution of
 @code{basering/I} for a proper monomial ideal @code{I}.
 @code{squarefreeResolution} likewise computes a minimal free resolution,
-using a specialized algorithm for squarefree monomial ideals.
+using the Herzog--Takayama formula, Lyubeznik cancellation, or support-lattice
+homology as appropriate for the input.
 @*
 The @code{Box} variants return a compact object of type @code{monres}.
 @code{monresExplicit} converts it to a resolution.
