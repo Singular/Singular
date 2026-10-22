@@ -157,7 +157,7 @@ def sparseCycleBox=squarefreeResolutionBox(I);
 mrAssert(find(string(sparseCycleBox),"squarefree Lyubeznik")>0,
          "squarefree sparse dispatcher");
 int dispatcherCheck=mrCheckBox(I,sparseCycleBox,"squarefree sparse cycle");
-def fallbackCycleBox=squarefreeResolutionBox(I,52);
+def fallbackCycleBox=squarefreeResolutionBox(I,45);
 mrAssert(find(string(fallbackCycleBox),"support lattice")>0,
          "squarefree budget fallback dispatcher");
 dispatcherCheck=mrCheckBox(I,fallbackCycleBox,"squarefree budget fallback");
@@ -199,12 +199,30 @@ mrCheck(I,1,"RP2-binary");
 intmat characteristicBetti=betti(squarefreeResolution(I));
 mrAssert(ncols(characteristicBetti)==5,"RP2 characteristic two torsion");
 
+ring promotionRationalRing=0,(x(1..7)),dp;
+// Cancellation creates a coefficient 2 internally on this graph.
+ideal I=x(1)*x(2),x(1)*x(5),x(1)*x(7),x(2)*x(4),x(2)*x(6),x(2)*x(7),x(3)*x(4),x(3)*x(5),x(3)*x(6),x(3)*x(7),x(4)*x(5),x(5)*x(7),x(6)*x(7);
+def promotionBox=squarefreeResolutionBox(I);
+mrAssert(find(string(promotionBox),"squarefree Lyubeznik")>0,
+         "squarefree coefficient-promotion dispatcher");
+int promotionCheck=mrCheckBox(I,promotionBox,"squarefree coefficient promotion");
+
+ring promotionBinaryRing=2,(x(1..7)),dp;
+ideal I=imap(promotionRationalRing,I);
+def binaryPromotionBox=squarefreeResolutionBox(I);
+mrAssert(find(string(binaryPromotionBox),"squarefree Lyubeznik")>0,
+         "squarefree characteristic-two dispatcher");
+int binaryPromotionCheck=mrCheckBox(I,binaryPromotionBox,"squarefree characteristic two");
+
 ring smallPrimeRing=3,(x(1..4)),lp;
 ideal I=x(1)^3,x(1)*x(2),x(2)*x(3)^2,x(4)^2;
 mrCheck(I,0,"prime-lex-order");
 
 ring wideRing=32003,(x(1..70)),dp;
-ideal I=x(1)*x(65),x(2)*x(66),x(65)*x(70);
+ideal I=x(1)*x(2),x(2)*x(64),x(64)*x(65),x(65)*x(3),x(3)*x(1);
+def wideNativeBox=squarefreeResolutionBox(I);
+mrAssert(find(string(wideNativeBox),"squarefree Lyubeznik")>0,
+         "squarefree two-word support dispatcher");
 mrCheck(I,1,"more-than-64-variables");
 I=x(70),x(1)*x(2);
 mrCheck(I,1,"formula-second-support-word");
@@ -225,5 +243,24 @@ monomialResolution(ideal(x(1)+x(2)));
 squarefreeResolution(ideal(x(1)^2));
 "reject an invalid construction budget";
 monomialResolution(I,0);
+
+ring manyGeneratorRing=32003,(x(1..13)),dp;
+ideal I;
+int firstVariable; int secondVariable; int generatorIndex=1;
+for (firstVariable=1;firstVariable<=13;firstVariable++)
+{
+  for (secondVariable=firstVariable+1;secondVariable<=13;secondVariable++)
+  {
+    if (secondVariable!=firstVariable+1
+        && !(firstVariable==1 && secondVariable==13))
+    {
+      I[generatorIndex]=var(firstVariable)*var(secondVariable);
+      generatorIndex++;
+    }
+  }
+}
+mrAssert(size(I)==65,"two-word generator-face input size");
+"exercise a two-word generator-face mask under a tight budget";
+squarefreeResolutionBox(I,66);
 
 tst_status(1);$

@@ -454,6 +454,569 @@ struct SupportOrder
   }
 };
 
+// The squarefree Lyubeznik path uses one machine word whenever possible and
+// arbitrary-length word arrays otherwise.  Generator faces and monomial
+// supports use the same operations but have independent word counts.
+template <typename Mask> struct NativeMaskOps;
+
+template <> struct NativeMaskOps<std::uint64_t>
+{
+  static std::uint64_t zero(std::size_t) { return 0; }
+  static bool empty(std::uint64_t value) { return value == 0; }
+  static std::size_t first(std::uint64_t value)
+  {
+#if defined(__GNUC__) || defined(__clang__)
+    return static_cast<std::size_t>(__builtin_ctzll(value));
+#else
+    std::size_t bit = 0;
+    while (((value >> bit) & 1) == 0) ++bit;
+    return bit;
+#endif
+  }
+  static std::uint64_t joined(std::uint64_t left, std::uint64_t right)
+  {
+    return left | right;
+  }
+  static bool contains(std::uint64_t small, std::uint64_t large)
+  {
+    return (small & ~large) == 0;
+  }
+  static void set(std::uint64_t& value, std::size_t bit)
+  {
+    value |= std::uint64_t(1) << bit;
+  }
+  static void clear(std::uint64_t& value, std::size_t bit)
+  {
+    value &= ~(std::uint64_t(1) << bit);
+  }
+  static bool popFirst(std::uint64_t& value, std::size_t& bit)
+  {
+    if (value == 0) return false;
+    bit = first(value);
+    value &= value - 1;
+    return true;
+  }
+  static Degree degree(std::uint64_t value, std::size_t variables)
+  {
+    Degree result(variables, 0);
+    while (value != 0)
+    {
+      const std::size_t bit = first(value);
+      if (bit < variables) result[bit] = 1;
+      value &= value - 1;
+    }
+    return result;
+  }
+};
+
+template <> struct NativeMaskOps<Support>
+{
+  static Support zero(std::size_t words) { return Support(words, 0); }
+  static bool empty(const Support& value)
+  {
+    for (std::size_t i = 0; i < value.size(); ++i)
+      if (value[i] != 0) return false;
+    return true;
+  }
+  static std::size_t first(const Support& value)
+  {
+    for (std::size_t word = 0; word < value.size(); ++word)
+      if (value[word] != 0)
+        return 64 * word + NativeMaskOps<std::uint64_t>::first(value[word]);
+    return value.size() * 64;
+  }
+  static Support joined(const Support& left, const Support& right)
+  {
+    Support result(left);
+    for (std::size_t word = 0; word < result.size(); ++word)
+      result[word] |= right[word];
+    return result;
+  }
+  static bool contains(const Support& small, const Support& large)
+  {
+    for (std::size_t word = 0; word < small.size(); ++word)
+      if ((small[word] & ~large[word]) != 0) return false;
+    return true;
+  }
+  static void set(Support& value, std::size_t bit)
+  {
+    value[bit / 64] |= std::uint64_t(1) << (bit % 64);
+  }
+  static void clear(Support& value, std::size_t bit)
+  {
+    value[bit / 64] &= ~(std::uint64_t(1) << (bit % 64));
+  }
+  static bool popFirst(Support& value, std::size_t& bit)
+  {
+    for (std::size_t word = 0; word < value.size(); ++word)
+      if (value[word] != 0)
+      {
+        const std::size_t local =
+          NativeMaskOps<std::uint64_t>::first(value[word]);
+        bit = 64 * word + local;
+        value[word] &= value[word] - 1;
+        return true;
+      }
+    return false;
+  }
+  static Degree degree(const Support& value, std::size_t variables)
+  {
+    return degreeOf(value, variables);
+  }
+};
+
+template <typename Mask> struct NativeMaskHash;
+
+template <> struct NativeMaskHash<std::uint64_t>
+{
+  std::size_t operator()(std::uint64_t value) const
+  {
+    value ^= value >> 33;
+    value *= UINT64_C(0xff51afd7ed558ccd);
+    value ^= value >> 33;
+    return static_cast<std::size_t>(value);
+  }
+};
+
+template <> struct NativeMaskHash<Support>
+{
+  std::size_t operator()(const Support& value) const
+  {
+    std::size_t result = value.size();
+    for (std::size_t word = 0; word < value.size(); ++word)
+      result ^= NativeMaskHash<std::uint64_t>()(value[word])
+                + static_cast<std::size_t>(0x9e3779b9U)
+                + (result << 6) + (result >> 2);
+    return result;
+  }
+};
+
+struct NativeTerm
+{
+  int row;
+  Scalar coefficient;
+
+  NativeTerm(int r, long value, coeffs field)
+    : row(r), coefficient(value, field) {}
+  NativeTerm(int r, const Scalar& value) : row(r), coefficient(value) {}
+  NativeTerm(int r, Scalar&& value)
+    : row(r), coefficient(std::move(value)) {}
+};
+
+typedef std::vector<NativeTerm> NativeColumn;
+
+template <typename Mask> struct NativeCell
+{
+  Mask support;
+  NativeColumn boundary;
+
+  explicit NativeCell(const Mask& value) : support(value) {}
+  explicit NativeCell(Mask&& value) : support(std::move(value)) {}
+};
+
+NativeColumn::iterator nativeFind(NativeColumn& column, int row)
+{
+  NativeColumn::iterator result = std::lower_bound(
+    column.begin(), column.end(), row,
+    [](const NativeTerm& term, int value) { return term.row < value; });
+  return result != column.end() && result->row == row ? result : column.end();
+}
+
+NativeColumn::const_iterator nativeFind(const NativeColumn& column, int row)
+{
+  NativeColumn::const_iterator result = std::lower_bound(
+    column.begin(), column.end(), row,
+    [](const NativeTerm& term, int value) { return term.row < value; });
+  return result != column.end() && result->row == row ? result : column.end();
+}
+
+void nativeAdjustEntryCount(std::size_t oldSize, std::size_t newSize,
+                            std::size_t budget, std::size_t& entryCount)
+{
+  if (newSize > oldSize)
+  {
+    const std::size_t growth = newSize - oldSize;
+    if (growth > budget - entryCount)
+      throw LyubeznikBudgetExceeded(
+        "monomial resolution exceeded its sparse entry budget during cancellation");
+    entryCount += growth;
+  }
+  else entryCount -= oldSize - newSize;
+}
+
+// target <- target - factor*pivot.  Sorted flat columns avoid one allocation
+// per coefficient; stale incidence entries are filtered by nativeFind.
+void nativeSubtract(NativeColumn& target, const NativeColumn& pivot,
+                    const Scalar& factor, int column,
+                    std::vector<std::vector<int> >& incidence,
+                    coeffs field, std::size_t budget,
+                    std::size_t& entryCount)
+{
+  NativeColumn merged;
+  merged.reserve(target.size());
+  std::size_t left = 0;
+  std::size_t right = 0;
+  const auto ensureRoom = [&]()
+  {
+    if (merged.size() >= target.size()
+        && merged.size() - target.size() >= budget - entryCount)
+      throw LyubeznikBudgetExceeded(
+        "monomial resolution exceeded its sparse entry budget during cancellation");
+  };
+  while (left < target.size() || right < pivot.size())
+  {
+    if (((left + right) & 0x3fffU) == 0 && siCntrlc)
+      throw std::runtime_error("monres interrupted");
+    if (right == pivot.size()
+        || (left < target.size() && target[left].row < pivot[right].row))
+    {
+      ensureRoom();
+      merged.push_back(std::move(target[left]));
+      ++left;
+    }
+    else if (left == target.size() || pivot[right].row < target[left].row)
+    {
+      const Scalar correction = factor * pivot[right].coefficient;
+      Scalar value = Scalar(0, field) - correction;
+      if (!value.isZero())
+      {
+        ensureRoom();
+        merged.push_back(NativeTerm(pivot[right].row, std::move(value)));
+      }
+      ++right;
+    }
+    else
+    {
+      const Scalar correction = factor * pivot[right].coefficient;
+      Scalar value = target[left].coefficient - correction;
+      if (!value.isZero())
+      {
+        ensureRoom();
+        merged.push_back(NativeTerm(target[left].row, std::move(value)));
+      }
+      ++left;
+      ++right;
+    }
+  }
+
+  nativeAdjustEntryCount(target.size(), merged.size(), budget, entryCount);
+  left = 0;
+  right = 0;
+  while (right < merged.size())
+  {
+    while (left < target.size() && target[left].row < merged[right].row) ++left;
+    if (left == target.size() || merged[right].row < target[left].row)
+      incidence[merged[right].row].push_back(column);
+    ++right;
+  }
+  target.swap(merged);
+}
+
+template <typename Mask>
+bool nativeHasUnit(const NativeCell<Mask>& column,
+                   const std::vector<NativeCell<Mask> >& rows,
+                   const std::vector<unsigned char>& rowAlive)
+{
+  for (NativeColumn::const_iterator term = column.boundary.begin();
+       term != column.boundary.end(); ++term)
+    if (rowAlive[term->row] && column.support == rows[term->row].support)
+      return true;
+  return false;
+}
+
+// Minimize one differential, compact both adjacent modules, and return the
+// old-column to surviving-column map.  Incidence lists allow stale entries;
+// exact membership is checked before every use, avoiding tree nodes entirely.
+template <typename Mask>
+std::vector<int> nativeCancelLayer(std::vector<NativeCell<Mask> >& rows,
+                                   std::vector<NativeCell<Mask> >& columns,
+                                   coeffs field, std::size_t budget,
+                                   std::size_t& entryCount)
+{
+  std::vector<std::vector<int> > incidence(rows.size());
+  std::deque<int> candidates;
+  std::vector<unsigned char> queued(columns.size(), 0);
+  std::vector<unsigned char> rowAlive(rows.size(), 1);
+  std::vector<unsigned char> columnAlive(columns.size(), 1);
+
+  for (std::size_t column = 0; column < columns.size(); ++column)
+  {
+    for (NativeColumn::const_iterator term = columns[column].boundary.begin();
+         term != columns[column].boundary.end(); ++term)
+      incidence[term->row].push_back(static_cast<int>(column));
+    if (nativeHasUnit(columns[column], rows, rowAlive))
+      enqueue(static_cast<int>(column), candidates, queued);
+  }
+
+  std::vector<unsigned int> visited(columns.size(), 0);
+  unsigned int visit = 0;
+  while (!candidates.empty())
+  {
+    if (siCntrlc) throw std::runtime_error("monres interrupted");
+    const int pivotColumn = candidates.front();
+    candidates.pop_front();
+    queued[pivotColumn] = 0;
+    if (!columnAlive[pivotColumn]) continue;
+
+    NativeCell<Mask>& pivotCell = columns[pivotColumn];
+    int pivotRow = -1;
+    std::size_t smallestIncidence =
+      std::numeric_limits<std::size_t>::max();
+    for (NativeColumn::const_iterator term = pivotCell.boundary.begin();
+         term != pivotCell.boundary.end(); ++term)
+      if (rowAlive[term->row]
+          && pivotCell.support == rows[term->row].support
+          && incidence[term->row].size() < smallestIncidence)
+      {
+        pivotRow = term->row;
+        smallestIncidence = incidence[term->row].size();
+      }
+    if (pivotRow < 0) continue;
+
+    const Scalar unit = nativeFind(pivotCell.boundary, pivotRow)->coefficient;
+    if (++visit == 0)
+    {
+      std::fill(visited.begin(), visited.end(), 0);
+      ++visit;
+    }
+    std::vector<int> targets;
+    targets.reserve(incidence[pivotRow].size());
+    for (std::size_t i = 0; i < incidence[pivotRow].size(); ++i)
+    {
+      const int target = incidence[pivotRow][i];
+      if (!columnAlive[target] || visited[target] == visit) continue;
+      if (nativeFind(columns[target].boundary, pivotRow)
+          == columns[target].boundary.end()) continue;
+      visited[target] = visit;
+      targets.push_back(target);
+    }
+
+    for (std::size_t i = 0; i < targets.size(); ++i)
+    {
+      const int targetColumn = targets[i];
+      if (targetColumn == pivotColumn) continue;
+      NativeColumn& target = columns[targetColumn].boundary;
+      const Scalar factor = nativeFind(target, pivotRow)->coefficient / unit;
+      nativeSubtract(target, pivotCell.boundary, factor, targetColumn,
+                     incidence, field, budget, entryCount);
+      if (nativeHasUnit(columns[targetColumn], rows, rowAlive))
+        enqueue(targetColumn, candidates, queued);
+    }
+
+    entryCount -= pivotCell.boundary.size();
+    pivotCell.boundary.clear();
+    columnAlive[pivotColumn] = 0;
+    rowAlive[pivotRow] = 0;
+    entryCount -= rows[pivotRow].boundary.size();
+    rows[pivotRow].boundary.clear();
+  }
+
+  std::vector<int> rowNumber(rows.size(), -1);
+  std::vector<NativeCell<Mask> > compactRows;
+  compactRows.reserve(rows.size());
+  for (std::size_t row = 0; row < rows.size(); ++row)
+    if (rowAlive[row])
+    {
+      rowNumber[row] = static_cast<int>(compactRows.size());
+      compactRows.push_back(std::move(rows[row]));
+    }
+
+  std::vector<int> columnNumber(columns.size(), -1);
+  std::vector<NativeCell<Mask> > compactColumns;
+  compactColumns.reserve(columns.size());
+  for (std::size_t column = 0; column < columns.size(); ++column)
+    if (columnAlive[column])
+    {
+      NativeCell<Mask> next(std::move(columns[column].support));
+      next.boundary.reserve(columns[column].boundary.size());
+      for (NativeColumn::iterator term = columns[column].boundary.begin();
+           term != columns[column].boundary.end(); ++term)
+      {
+        const int row = rowNumber[term->row];
+        if (row < 0)
+        {
+          --entryCount;
+          continue;
+        }
+        next.boundary.push_back(NativeTerm(row, std::move(term->coefficient)));
+      }
+      columnNumber[column] = static_cast<int>(compactColumns.size());
+      compactColumns.push_back(std::move(next));
+    }
+
+  rows.swap(compactRows);
+  columns.swap(compactColumns);
+  return columnNumber;
+}
+
+template <typename VariableMask, typename FaceMask>
+Complex nativeSquarefreeLyubeznik(
+  const std::vector<VariableMask>& generatorSupports,
+  std::size_t variables, std::size_t variableWords,
+  std::size_t faceWords, coeffs field, std::size_t budget)
+{
+  typedef std::unordered_map<FaceMask, int, NativeMaskHash<FaceMask> >
+    FaceIndices;
+  typedef NativeCell<VariableMask> MaskCell;
+  typedef std::vector<MaskCell> MaskLayer;
+
+  const std::size_t generators = generatorSupports.size();
+  std::size_t cellCount = 1;
+  std::size_t entryCount = 0;
+  std::vector<MaskLayer> finished;
+  MaskLayer pending;
+  pending.push_back(MaskCell(NativeMaskOps<VariableMask>::zero(variableWords)));
+
+  std::vector<FaceMask> previousFaces(
+    1, NativeMaskOps<FaceMask>::zero(faceWords));
+  std::vector<VariableMask> previousSupports(
+    1, NativeMaskOps<VariableMask>::zero(variableWords));
+  std::vector<int> previousToPending(1, 0);
+
+  for (std::size_t layer = 1; !previousFaces.empty(); ++layer)
+  {
+    FaceIndices previousIndices;
+    previousIndices.reserve(previousFaces.size());
+    for (std::size_t index = 0; index < previousFaces.size(); ++index)
+      previousIndices.insert(std::make_pair(
+        previousFaces[index], static_cast<int>(index)));
+
+    std::vector<FaceMask> nextFaces;
+    std::vector<VariableMask> nextSupports;
+    MaskLayer nextCells;
+    for (std::size_t suffix = 0; suffix < previousFaces.size(); ++suffix)
+    {
+      const std::size_t first = NativeMaskOps<FaceMask>::empty(
+        previousFaces[suffix]) ? generators
+                               : NativeMaskOps<FaceMask>::first(previousFaces[suffix]);
+      for (std::size_t generator = 0; generator < first; ++generator)
+      {
+        VariableMask support = NativeMaskOps<VariableMask>::joined(
+          previousSupports[suffix], generatorSupports[generator]);
+        bool admissible = true;
+        for (std::size_t earlier = 0; earlier < generator; ++earlier)
+          if (NativeMaskOps<VariableMask>::contains(
+                generatorSupports[earlier], support))
+          {
+            admissible = false;
+            break;
+          }
+        if (!admissible) continue;
+
+        consume(cellCount, budget,
+                "monomial resolution exceeded its cell budget");
+        if (nextCells.size() >= static_cast<std::size_t>(INT_MAX))
+          throw std::runtime_error(
+            "too many cells for monomial resolution indices");
+
+        FaceMask face(previousFaces[suffix]);
+        NativeMaskOps<FaceMask>::set(face, generator);
+        MaskCell cell(support);
+        FaceMask remaining(face);
+        std::size_t removed = 0;
+        std::size_t position = 0;
+        while (NativeMaskOps<FaceMask>::popFirst(remaining, removed))
+        {
+          FaceMask facet(face);
+          NativeMaskOps<FaceMask>::clear(facet, removed);
+          typename FaceIndices::const_iterator row = previousIndices.find(facet);
+          if (row == previousIndices.end())
+            throw std::runtime_error(
+              "internal error: missing admissible squarefree Lyubeznik facet");
+          const int activeRow = previousToPending[row->second];
+          if (activeRow >= 0)
+          {
+            consume(entryCount, budget,
+                    "monomial resolution exceeded its sparse entry budget");
+            cell.boundary.push_back(NativeTerm(
+              activeRow, (position % 2 == 0) ? 1 : -1, field));
+          }
+          ++position;
+        }
+        std::sort(cell.boundary.begin(), cell.boundary.end(),
+          [](const NativeTerm& left, const NativeTerm& right)
+          { return left.row < right.row; });
+        nextFaces.push_back(std::move(face));
+        nextSupports.push_back(std::move(support));
+        nextCells.push_back(std::move(cell));
+      }
+    }
+
+    if (nextCells.empty())
+    {
+      finished.push_back(std::move(pending));
+      break;
+    }
+
+    std::vector<int> nextToPending(nextCells.size());
+    if (layer == 1)
+    {
+      finished.push_back(std::move(pending));
+      for (std::size_t i = 0; i < nextToPending.size(); ++i)
+        nextToPending[i] = static_cast<int>(i);
+    }
+    else
+    {
+      nextToPending = nativeCancelLayer(
+        pending, nextCells, field, budget, entryCount);
+      finished.push_back(std::move(pending));
+    }
+    pending.swap(nextCells);
+    previousFaces.swap(nextFaces);
+    previousSupports.swap(nextSupports);
+    previousToPending.swap(nextToPending);
+  }
+
+  while (finished.size() > 1 && finished.back().empty())
+    finished.pop_back();
+  Complex result;
+  result.reserve(finished.size());
+  for (std::size_t layer = 0; layer < finished.size(); ++layer)
+  {
+    result.push_back(std::vector<Cell>());
+    result.back().reserve(finished[layer].size());
+    for (std::size_t column = 0; column < finished[layer].size(); ++column)
+    {
+      Cell cell;
+      cell.degree = NativeMaskOps<VariableMask>::degree(
+        finished[layer][column].support, variables);
+      for (NativeColumn::iterator term =
+             finished[layer][column].boundary.begin();
+           term != finished[layer][column].boundary.end(); ++term)
+        cell.boundary.insert(std::make_pair(
+          term->row, std::move(term->coefficient)));
+      result.back().push_back(std::move(cell));
+    }
+    MaskLayer().swap(finished[layer]);
+  }
+  return result;
+}
+
+Complex squarefreeLyubeznik(const std::vector<Support>& generators,
+                            std::size_t variables, coeffs field,
+                            std::size_t budget)
+{
+  const std::size_t variableWords = (variables + 63) / 64;
+  const std::size_t faceWords = (generators.size() + 63) / 64;
+  if (variables <= 64)
+  {
+    std::vector<std::uint64_t> compact;
+    compact.reserve(generators.size());
+    for (std::size_t i = 0; i < generators.size(); ++i)
+      compact.push_back(generators[i].empty() ? 0 : generators[i][0]);
+    if (generators.size() <= 64)
+      return nativeSquarefreeLyubeznik<std::uint64_t, std::uint64_t>(
+        compact, variables, variableWords, faceWords, field, budget);
+    return nativeSquarefreeLyubeznik<std::uint64_t, Support>(
+      compact, variables, variableWords, faceWords, field, budget);
+  }
+  if (generators.size() <= 64)
+    return nativeSquarefreeLyubeznik<Support, std::uint64_t>(
+      generators, variables, variableWords, faceWords, field, budget);
+  return nativeSquarefreeLyubeznik<Support, Support>(
+    generators, variables, variableWords, faceWords, field, budget);
+}
+
 // Account for simultaneously stored coefficients, including copies used by
 // echelon bases and lifted columns.  Scalar arithmetic itself has O(1) live
 // temporaries; large coefficient bit sizes are controlled by the coefficient
@@ -641,7 +1204,8 @@ Complex squarefree(const std::vector<Degree>& generators,
   {
     try
     {
-      Complex candidate = lyubeznik(generators, field, budget);
+      Complex candidate = squarefreeLyubeznik(
+        generatorSupports, variables, field, budget);
       usedSupportLattice = false;
       return candidate;
     }
@@ -1364,7 +1928,7 @@ static Box build(leftv args,bool sf) {
     if(sf) {
       bool usedSupportLattice=true;
       c=squarefree(gens,currRing->cf,budget,usedSupportLattice);
-      method=usedSupportLattice?"support lattice":"squarefree Lyubeznik";
+      method=usedSupportLattice?"support lattice":"squarefree Lyubeznik bitmasks";
     } else c=lyubeznik(gens,currRing->cf,budget);
   }
   return pack(c,currRing,sf,method);
