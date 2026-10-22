@@ -5128,6 +5128,8 @@ static BOOLEAN jjEXPERIMENTAL_SYSTEM(leftv res, leftv h,
 
 void iiInitExtraCprocs()
 {
+  extern void iiInitMonres();
+  iiInitMonres();
   iiAddCproc("kernel", "locNF", FALSE, jjExtraLocNF);
   iiAddCproc("kernel", "fglmCombination", FALSE, jjExtraFglmCombination);
   iiAddCproc("kernel", "matrixMinpoly", FALSE, jjExtraMatrixMinpoly);
