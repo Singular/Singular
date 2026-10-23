@@ -848,6 +848,9 @@ BOOLEAN piKill(procinfov pi)
     }
     if( pi->language == LANG_C)
     {
+      procinfov source=pi->data.o.singular_source;
+      pi->data.o.singular_source=NULL;
+      if ((source!=NULL)&&(source!=pi)) piKill(source);
     }
     memset((void *) pi, 0, sizeof(procinfo));
     //pi->language=LANG_NONE;

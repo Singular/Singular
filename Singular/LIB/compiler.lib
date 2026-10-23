@@ -1,0 +1,107 @@
+/////////////////////////////////////////////////////////////////////////////
+version="version compiler.lib 0.2 Oct_2026";
+category="Miscellaneous";
+info="
+LIBRARY: compiler.lib  Opt-in native C++ library compiler (experimental)
+PROCEDURES:
+ compilerSetup(driver,cache); configure an uninstalled translator and cache
+ compileLib(library[,load]); compile supported public procedures, optionally load
+ compileProc(library,procedure[,load]); compile one transitive closure
+ loadCompiled(artifact); load a previously built dynamic module
+NOTE: Originals are never replaced. Native names have prefix c_. Compilation
+requires Linux, Python 3, a C++ compiler and installed libSingular development
+files. Unsupported public procedures become c_ aliases with a warning.
+";
+
+proc compilerSetup(string driver, string cache)
+"USAGE: compilerSetup(driver,cache); driver and cache are absolute paths
+NOTE: Needed for a source-checkout translator; installed builds discover it
+automatically. Changes only compiler-specific environment settings."
+{
+  if(size(driver)==0 or size(cache)==0) { ERROR("driver and cache must be nonempty"); }
+  string ignored=system("setenv","SINGULAR_NATIVE_DRIVER",driver);
+  ignored=system("setenv","SINGULAR_NATIVE_CACHE",cache);
+}
+
+static proc shellQuote(string value)
+{
+  // POSIX single-quote escaping; never interpolate paths into shell syntax.
+  string quoted="'";
+  int i;
+  for(i=1;i<=size(value);i++)
+  {
+    if(value[i]=="'") { quoted=quoted+"'\\''"; }
+    else { quoted=quoted+value[i]; }
+  }
+  return(quoted+"'");
+}
+
+static proc nativeCompile(string library, string procedure, list options)
+{
+  if(size(options)>1) { ERROR("expected at most one load flag (0 or 1)"); }
+  int doLoad=0;
+  if(size(options)==1)
+  {
+    if(typeof(options[1])!="int") { ERROR("load flag must be 0 or 1"); }
+    doLoad=options[1];
+    if(doLoad!=0 and doLoad!=1) { ERROR("load flag must be 0 or 1"); }
+  }
+  string binary=system("Singular");
+  string driver=system("getenv","SINGULAR_NATIVE_DRIVER");
+  if(driver=="")
+  {
+    // The installed executable is <prefix>/bin/Singular.
+    int i=size(binary);
+    while(i>0 and binary[i]!="/") { i--; }
+    if(i<=4) { ERROR("use compilerSetup to locate singular2cpp.py"); }
+    driver=binary[1,i-4]+"share/singular/compiler/singular2cpp.py";
+  }
+  string cache=system("getenv","SINGULAR_NATIVE_CACHE");
+  if(cache=="")
+  {
+    cache=system("getenv","XDG_CACHE_HOME");
+    if(cache=="") { cache=system("getenv","HOME")+"/.cache"; }
+    cache=cache+"/singular/native";
+  }
+  string receipt=cache+"/ui-result-"+string(system("pid"))+".txt";
+  string command="python3 "+shellQuote(driver)+" "+shellQuote(library);
+  command=command+" --singular-binary "+shellQuote(binary);
+  command=command+" --library-search "+shellQuote(system("SingularLib"));
+  command=command+" --cache-dir "+shellQuote(cache)+" --receipt "+shellQuote(receipt);
+  if(procedure!="") { command=command+" --entry "+shellQuote(procedure); }
+  command=command+" 2>&1";
+  int exitCode=system("sh",command);
+  if(exitCode!=0) { ERROR("native compilation failed; no module was loaded"); }
+  string artifact=read(receipt);
+  if(doLoad) { loadCompiled(artifact); }
+  return(artifact);
+}
+
+proc compileLib(string library, list #)
+"USAGE: compileLib(library[,load]); library string, load 0 (default) or 1
+RETURN: string, path of the compiled dynamic module
+NOTE: Attempts every public procedure. The printed JSON report lists exports,
+interpreted aliases and cache statistics. Static dependencies stay private.
+Original procedures are never replaced; loaded exports have prefix c_."
+{
+  return(nativeCompile(library,"",#));
+}
+
+proc compileProc(string library, string procedure, list #)
+"USAGE: compileProc(library,procedure[,load]); strings, optional load flag
+RETURN: string, path of the compiled dynamic module
+NOTE: Compiles the entire reachable closure, or aliases an unsupported public
+root with a warning. Public compiled helpers are also exported with c_. An
+explicitly selected static root must compile completely."
+{
+  if(procedure=="") { ERROR("procedure name must be nonempty"); }
+  return(nativeCompile(library,procedure,#));
+}
+
+proc loadCompiled(string artifact)
+"USAGE: loadCompiled(artifact); artifact is a path returned by compileLib/compileProc
+NOTE: Load only trusted native modules. This adds c_ entries but does not patch
+original library procedures. Use LIB(artifact) equivalently."
+{
+  LIB(artifact);
+}
