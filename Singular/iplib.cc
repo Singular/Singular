@@ -196,6 +196,11 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
 */
 char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
+  // Every offset below belongs to the proc_singular arm of procinfo::data.
+  // A C procedure may retain a separate Singular source procinfo, but callers
+  // must resolve that source before asking for a library buffer.
+  if ((pi==NULL)||(pi->language!=LANG_SINGULAR)) return NULL;
+
   char buf[SINGULAR_PATH_LENGTH], *s = NULL, *p;
   long procbuflen;
 
@@ -1130,6 +1135,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
       pi->ref = 1;
       pi->is_static = pstatic;
       pi->data.o.function = func;
+      pi->data.o.singular_source = NULL;
     }
     else if(pi->language == LANG_C)
     {
@@ -1139,6 +1145,9 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
       }
       else
       {
+        procinfov old_source=pi->data.o.singular_source;
+        pi->data.o.singular_source=NULL;
+        if ((old_source!=NULL)&&(old_source!=pi)) piKill(old_source);
         omfree(pi->libname);
         pi->libname = omStrDup(libname);
         omfree(pi->procname);
@@ -1147,6 +1156,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
         pi->ref = 1;
         pi->is_static = pstatic;
         pi->data.o.function = func;
+        pi->data.o.singular_source = NULL;
       }
     }
     else

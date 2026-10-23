@@ -61,8 +61,7 @@ For an additional differential check of standard syntax and old lambdas:
 
 New syntax and oversized legacy bodies that exceed the old allocator's
 limit are excluded from the reference comparison, but still checked against
-explicit expected results on the candidate. These are correctness tests,
-not the repeated performance cases in VeryLong/pr1404_performance_cases.py.
+explicit expected results on the candidate. These are correctness tests.
 Automatic CI runs this script alongside Short/ok_s.lst; the manual all/Short
 workflows do so as well.
 
@@ -175,4 +174,3 @@ To add a new test for a library/commando to the test-suite:
 
 * The command for generating xx.res.gz.uu and xx.stat is:
   cd <directopry where xx.tst resides>; perl ../regress.cmd -g xx.tst
-

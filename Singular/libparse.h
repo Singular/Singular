@@ -41,11 +41,21 @@ public:
   long help_chksum;
 };
 
+class procinfo;
+typedef procinfo *         procinfov;
+
 struct proc_object
 {
 //public:
   BOOLEAN (*function)(leftv res, leftv v);
+  procinfov singular_source;
 };
+
+static_assert(sizeof(proc_object) <= sizeof(proc_singular),
+              "proc_object must fit in the existing procinfo union");
+static_assert(alignof(proc_object) <= alignof(proc_singular),
+              "proc_object must not increase procinfo alignment");
+
 union uprocinfodata
 {
 public:
@@ -54,9 +64,6 @@ public:
 };
 
 typedef union uprocinfodata procinfodata;
-
-class procinfo;
-typedef procinfo *         procinfov;
 
 class procinfo
 {
@@ -102,5 +109,4 @@ EXTERN_VAR char * text_buffer;
 #  endif
 
 #endif /* LIBPARSE_H */
-
 

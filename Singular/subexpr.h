@@ -36,11 +36,23 @@ public:
   char   *body;
   long help_chksum;
 };
+
+class procinfo;
+typedef procinfo *         procinfov;
+
 struct proc_object
 {
 //public:
   BOOLEAN (*function)(leftv res, leftv v);
+  procinfov singular_source;
 };
+
+// Keep the long-standing procinfo/module ABI: proc_object is the small arm of
+// this union and its function pointer remains its first member.
+static_assert(sizeof(proc_object) <= sizeof(proc_singular),
+              "proc_object must fit in the existing procinfo union");
+static_assert(alignof(proc_object) <= alignof(proc_singular),
+              "proc_object must not increase procinfo alignment");
 
 union uprocinfodata
 {
@@ -62,8 +74,6 @@ public:
   char          trace_flag;
   procinfodata  data;
 };
-
-typedef procinfo *         procinfov;
 
 struct _ssubexpr
 {
