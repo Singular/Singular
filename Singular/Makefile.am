@@ -195,9 +195,12 @@ include ${srcdir}/singular-libs
 singularlibrarydir = ${datadir}/singular
 singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%) $(SLIB2:%=LIB/%)
 nobase_dist_singularlibrary_DATA = LIB/tst.lib LIB/help.cnf ${singularlibrary}
+nativecompilerdir = ${datadir}/singular/compiler
+dist_nativecompiler_DATA = compiler/singular2cpp.py compiler/native_runtime.h table.h
 EXTRA_DIST = grammar.y libparse.ll make_alllib.sh make_grammar make_table \
              LIB/all.lib.tmpl singular-libs LIB/help.cnf LIB/.singularrc \
-	     LIB/COPYING links/slInit_Dynamic.cc gentable.cc
+	     LIB/COPYING links/slInit_Dynamic.cc gentable.cc \
+             compiler/singular2cpp.py compiler/native_runtime.h
 
 singularalllibrarydir = ${datadir}/singular/LIB
 singularalllibrary = all.lib
@@ -244,4 +247,3 @@ MOD:
 
 echoLIBS:
 	@echo ${SLIB0} ${SLIB1} ${SLIB2} ${PLIBS}
-

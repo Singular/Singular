@@ -196,6 +196,11 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
 */
 char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
+  // Every offset below belongs to the proc_singular arm of procinfo::data.
+  // A C procedure may retain a separate Singular source procinfo, but callers
+  // must resolve that source before asking for a library buffer.
+  if ((pi==NULL)||(pi->language!=LANG_SINGULAR)) return NULL;
+
   char buf[SINGULAR_PATH_LENGTH], *s = NULL, *p;
   long procbuflen;
 
@@ -1056,12 +1061,28 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
 
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+static inline char *iiDupProcinfoName(const char *s)
+{
+  size_t length=0;
+  while (s[length]!='\0') length++;
+  length++;
+#ifdef HAVE_OMALLOC
+  if (UNLIKELY(length>OM_MAX_BLOCK_SIZE))
+    return iiDupLongIdentifier(s,length);
+#endif
+  char *copy=(char *)omAlloc(length);
+  memcpy(copy,s,length);
+  return copy;
+}
+
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int, long pos, BOOLEAN pstatic)
 {
   memset(pi,0,sizeof(*pi));
-  pi->libname = omStrDup(libname);
-  pi->procname = omStrDup(procname);
+  // piKill uses the fast bin-only free path for these names.  Keep oversized
+  // library and procedure names in reusable special bins as well.
+  pi->libname = iiDupProcinfoName(libname);
+  pi->procname = iiDupProcinfoName(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
   pi->is_static = pstatic;
@@ -1114,6 +1135,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
       pi->ref = 1;
       pi->is_static = pstatic;
       pi->data.o.function = func;
+      pi->data.o.singular_source = NULL;
     }
     else if(pi->language == LANG_C)
     {
@@ -1123,6 +1145,9 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
       }
       else
       {
+        procinfov old_source=pi->data.o.singular_source;
+        pi->data.o.singular_source=NULL;
+        if ((old_source!=NULL)&&(old_source!=pi)) piKill(old_source);
         omfree(pi->libname);
         pi->libname = omStrDup(libname);
         omfree(pi->procname);
@@ -1131,6 +1156,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
         pi->ref = 1;
         pi->is_static = pstatic;
         pi->data.o.function = func;
+        pi->data.o.singular_source = NULL;
       }
     }
     else

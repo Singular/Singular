@@ -647,11 +647,19 @@ static BOOLEAN heOnlineHelp(char* s)
   {
     if  (IDTYP(h)==PROC_CMD)
     {
-      char *lib=iiGetLibName(IDPROC(h));
+      procinfov pi=IDPROC(h);
+      BOOLEAN release_pi=FALSE;
+      if ((pi->language==LANG_C)
+      && (pi->data.o.singular_source!=NULL)
+      && (pi->data.o.singular_source->language==LANG_SINGULAR))
+      {
+        pi=piCopy(pi->data.o.singular_source);
+        release_pi=TRUE;
+      }
+      char *lib=iiGetLibName(pi);
       if((lib!=NULL)&&(*lib!='\0'))
       {
         Print("// proc %s from lib %s\n",s,lib);
-        procinfov pi=IDPROC(h);
         if (pi->language==LANG_SINGULAR)
         {
           s=iiGetLibProcBuffer(pi, 0);
@@ -660,9 +668,11 @@ static BOOLEAN heOnlineHelp(char* s)
             PrintS(s);
             omFree((ADDRESS)s);
           }
+          if (release_pi) piKill(pi);
           return TRUE;
         }
       }
+      if (release_pi) piKill(pi);
     }
     else if (IDTYP(h)==PACKAGE_CMD)
     {
