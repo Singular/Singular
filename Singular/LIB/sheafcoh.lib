@@ -13,6 +13,7 @@ PROCEDURES:
  truncateFast(phi,d);    truncation of coker(phi) at d (fast+ experimental)
  CM_regularity(M);       Castelnuovo-Mumford regularity of coker(M)
  sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
+ globalSectionsBLH(M,l,r,w);     global sections of the sheaf associated  to coker(M)
  sheafCohBGGregul(M,l,h,r); cohomology of sheaf associated to coker(M)
                           with given regularity
  sheafCohBGGregul_w(M,l,h,r,w); cohomology with given module weights
@@ -1721,3 +1722,317 @@ Examples:
  def A2=sheafCohBGG(F,-5,7);
 
 */
+      
+///////////////////////////////////////////////////////////////////////////////
+// Compute global sections of the sheaf associated to the graded module 
+// `N = S^r/M` using the "linear regularity" via the modified algorithm 
+// of Eisenbud-Floystad-Schreyer given by Barakat-Lange-Hegermann.
+// 
+// Input: 
+//   - the modulus `M` for the presentation of the module `N`
+//   - the linear regularity `lin_reg` which we assume to already be computed
+//   - a minimal degree `max_length` up to which the free resolution over 
+//     the exterior algebra should be computed; the command does not accept 
+//     infinite resolutions over such rings 
+//   - a degree vector `gen_degs` for the degrees of the free module `S^n` in 
+//     which `M` lives; this is to be able to pass such information 
+//     from Oscar.
+proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
+{
+  print("juhu");
+  print(w);
+  // `min_deg` is required because Singular does not compute
+  // potentially infinite resolutions over quotient rings. 
+  // It automatically sets the maximum length to `5` in that case. 
+  int i,j,k,row,col;
+  // check whether degrees for this module are known and it is
+  // homogeneous
+  if( typeof(attrib(M,"isHomog"))=="intvec" )
+  {
+    print("Warning: Overwriting the degree vector for the given module");
+  }
+  // Set the degrees for `M` to the given degree vector.
+  // The vector `w` contains the degrees of the generators 
+  // of the free module in which `M` lives as a submodule. 
+  attrib(M, "isHomog", gen_degs);
+  // The dimension of the imagined projective space
+  int n=nvars(basering)-1;
+  def R=basering;
+  // build the truncated module `N_{>=d}`, i.e. return a modulus `MT`
+  // presenting such a module, given the modulus `M` for `N`. 
+  module MT =truncate(M, lin_reg);
+  module MT_orig = MT;
+  print("modulus for the truncated module");
+  print(MT);
+  print("degrees of the truncated module");
+  if(typeof(attrib(MT, "isHomog")) != "intvec"){
+    ERROR("Degrees for the truncated module could not be inferred");
+  }
+  print(attrib(MT, "isHomog"));
+  print("end of degrees of the truncated module");
+  // Compile a matrix for the morphism Hom(E, M_d) -> Hom(E, M_{d+1})
+  int m=nrows(MT);
+  MT=transpose(jacobM(MT));
+  MT=syz(MT);
+  matrix ML[n+1][1]=maxideal(1);
+  matrix S=transpose(outer(ML,unitmat(m)));
+  matrix SS=transpose(S*MT);
+  //--- to the exterior algebra
+  def AR = Exterior();
+  setring AR;
+  intvec saveopt=option(get);
+  option(redSB);
+  option(redTail);
+  module EM=imap(R,SS);
+  //--- here we are with our matrix
+  // We need to adjust the degrees with the used regularity
+  // In theory the variables of `E` have negative degree. 
+  // But here in Singular they do not. Therefore we have a sign
+  // change for everything that happens over `E`.
+  intvec w;
+  for (i=1; i<=nrows(EM); i++)
+  {
+    // `lin_reg` is where we cut off and the (internal) degree 
+    // of all elements in `N` used in the domain of `EM`.
+    // The additional shift by `n+1` comes from the tensor 
+    // product with the dual of the exterior algebra `E`. 
+     w[i]=-lin_reg-n-1;
+  }
+  attrib(EM,"isHomog",w);
+  print("the module over the exterior algebra:");
+  print(matrix(EM));
+  print("degrees of the module EM");
+  print(attrib(EM, "isHomog"));
+  print("end of degrees of the module EM");
+  print("exterior algebra:");
+  print(basering);
+  print("end of exterior algebra:");
+  print("syzygies of EM");
+  print(syz(EM));
+  print("end of syzygies of EM");
+  // the hacky move to get only syzygies up to degree 1
+  def oldbound=degBound;
+  degBound=1;
+  // Warning: The resolution could be infinite! 
+  // The user has to take care of sanity of the input!
+  resolution RE=mres(EM, max_length+1);
+  // restore the old degBound
+  degBound=oldbound;
+  print("linear resolution of the module");
+  print(RE);
+  print("end of linear resolution of the module");
+  // Explore the resolution a bit and collect data
+  intvec ranks;
+  def EMM = matrix(EM);
+  intvec new_degs;
+  int offset = 0; 
+  list inclusions;
+  module inc_mod;
+  list horizontal_img_gens;
+  list loc_img_gens;
+
+  // The idea is to construct H^0(N~) as follows. 
+  // From degree d onwards we have the global sections. 
+  // This part is quasi-isomorphic to L(R(N_{>=d})) 
+  // by [Theorem 2.6, Eisenbud-Floystad-Schreyer '03: Sheaf cohomology and free resolutions over exterior algebras]. 
+  // Let P* be the "new part" of the Tate resolution, i.e. 
+  // the mapping cone of P* -> R(N_{>=d}) is the Tate resolution T(N). 
+  // We get an exact triangle 
+  //   L(P*) -> L(R(N_{>=d})) -> L(T(N)) --[1]-> L(P*)
+  // and from that a short exact sequence 
+  //   0 -> H^0(L(R(N_{>=d}))) -> H^0(L(T(N))) -> H^0(L(P*))[1] -> 0
+  // with the middle term the sought for module of global sections and 
+  // the left hand side essentially N_{>=d}. A closer inspection reveals 
+  // that we may actually splice the latter with H^0(L(P*))[1]. 
+  // 
+  // The following diagram is the double complex underlying L(T(N)). 
+  //                                                           
+  //                                                                   \mu
+  //                                                  S x E*_{2} x N_d ---> S x E*_{1} x N_{d+1}
+  //                                                          |                        |
+  //                                                          V        \mu             V
+  //                         S x P^{d-1}_{d+1} --->   S x E*_{1} x N_d ---> S x E*_{0} x N_{d+1}
+  //                                  |                       |
+  //                                  V                       V
+  //     S x P^{d-2}_d --->  S x P^{d-1}_{d}   --->   S x E*_{0} x N_d 
+  //             |                    |
+  //             V                    V
+  //  S x P^{d-2}_{d-1} ---> S x P^{d-1}_{d-1}        \_____________  _________________________/
+  //             |                                                  \/
+  //             V                                          coming from R(N_{>=d})
+  //  S x P^{d-2}_{d-2}
+  //
+  // The horizontal maps are induced from the maps in the Tate resolution 
+  // and the vertical ones are the differentials in the complexes L(P^k). 
+  // Note that there can not be non-trivial contributions below the antidiagonal 
+  // of degree zero and all contributions to this diagonal necessarily stem 
+  // from the linear part of the Tate resolution. TODO: Really???
+  //   The homology in degree zero is what we are looking for. We do not need to 
+  // compute a kernel, because this is everything. The important bit comes from 
+  // the incoming map. The Tate resolution has been computed up to some homological 
+  // degree d_min. That means we add a generator for the S-module for every element 
+  // in a vector space basis for P^j_j. Since P^j is of the form E*(-j)^r for some 
+  // rank r, this vector space basis is just a collection of generators for the 
+  // socles of the summands E*(-j). Let w be an element in P^j_{j+1}. The horizontal 
+  // map takes it to \phi(w) with \phi the differential in T(N). But \phi(w) comes 
+  // to lay in the socle of the module to the right and can be written as a linear 
+  // combination of socle elements there. The vertical map takes w to 
+  //   \theta(w) = \sum_{i=0}^n x_i \otimes e_i \wedge w
+  // with e_i \wedge w again in the socle. Thus, relations given by the incoming 
+  // map of the total complex put a generator w' from the socle of P^j_j into place 
+  // w.r.t the global section module already constructed for higher twists: 
+  //   x_i * w' = v' 
+  // with v' an global section in a higher twist and x_i * w' the image of the 
+  // horizontal map for an appropriate choice of w. These are the relations we need 
+  // to add as we go through the double complex. 
+
+  matrix Mj;
+  // We pre-build generators for the socle and the graded part before that. 
+  // For the latter we choose the signs so that the map in the L-complexes 
+  // (the columns above) map each one of them to the chosen generator of 
+  // the socle. 
+  module domain_socle;
+  module codomain_socle;
+  module domain_pre_socle;
+  poly omega = 1;
+  int l;
+  ideal eta;
+  int ll;
+  int kk;
+  poly g;
+  vector ww;
+  for(l=1; l<=nvars(basering); l++){
+    omega = omega*var(l);
+    g = 1;
+    for(ll=1; ll<l; ll++){
+      g = g*var(ll);
+    }
+    for(ll=l+1; ll<=nvars(basering); ll++){
+      g = g*var(ll);
+    }
+    g = -g * (-1)^l;
+    eta = eta + g;
+  }
+  print(omega);
+  print(eta);
+  print("lifts of the pre-socle multiplied with variables:");
+  for(l=1; l<=nvars(basering); l++){
+    g = var(l)*eta[l];
+    if(lift(ideal(omega), ideal(g))[1, 1] != 1){
+      ERROR("something went wrong with the construction of generators for socles etc.");
+    }
+  }
+  module img_mod;
+  for(j=1; j<=max_length && RE[j] != 0; j++){
+    img_mod = RE[j];
+    print("index in the loop:");
+    print(j);
+    print("the module for this index:");
+    print(img_mod);
+    print("is it homogeneous?");
+    // collect the number of generators
+    Mj = matrix(img_mod);
+    ranks[j] = ncols(Mj);
+    domain_socle = 0;
+    domain_pre_socle = 0;
+    for(l=1; l<=ncols(Mj); l++){
+      domain_socle = domain_socle + omega*gen(l);
+      domain_pre_socle = domain_pre_socle + eta*gen(l);
+    }
+    print("socle of domain:");
+    print(domain_socle);
+    print("presocle of domain:");
+    print(domain_pre_socle);
+    codomain_socle = 0;
+    for(l=1; l<=nrows(Mj); l++){
+      codomain_socle = codomain_socle + omega*gen(l);
+    }
+    print("socle of codomain:");
+    print(codomain_socle);
+    print("ranks collected so far");
+    print(ranks);
+    print("last rank");
+    print(ranks[j]);
+    print("no more ranks");
+    inc_mod = 0;
+    loc_img_gens = list(); // empty the list of images of generators for the horizontal map
+    for(k=1; k<=ranks[j]; k++){
+      print("collecting degrees");
+      print(k);
+      new_degs[offset+k] = lin_reg - j + 1;
+      inc_mod = inc_mod + gen(k+offset);
+
+      // Construct the images of the pre-socle under the horizontal map
+      for(kk=1; kk<=n+1; kk++){
+        print("monomial index");
+        print(kk);
+        print(eta[kk]);
+        ww = eta[kk]*img_mod[k];
+        print(ww);
+        loc_img_gens[kk+(k-1)*(n+1)] = lift(codomain_socle, module(ww));
+      }
+    }
+    print("images of generators of the horizontal map");
+    print(loc_img_gens);
+    horizontal_img_gens[j] = loc_img_gens;
+    inclusions[j] = matrix(inc_mod);
+    offset = offset + ranks[j];
+  }
+  print("rank of the full module:");
+  int full_rank = sum(ranks);
+  print(full_rank);
+  print("ranks of the individual summands, going down from the linear regularity:");
+  print(ranks);
+  print("degrees of the generators as S-modules:");
+  print(new_degs);
+  print("inclusion matrices for the blocks, going down from the linear regularity:");
+  print(inclusions);
+
+  print("going back to the other ring");
+  setring(R);
+  list horizontal_img_gens = imap(AR, horizontal_img_gens);
+  print(horizontal_img_gens);
+  print(ranks);
+  list inclusions_R;
+  offset = ranks[1];
+  int rj;
+  int a;
+  matrix mm;
+  module full_relations = MT_orig; // This will be extended to the full global section module
+  // Now we need to assemble the additional relations for the S-module on this side.
+  vector www;
+  for(j=2; j<=size(ranks); j++){ // going through the direct summands 
+    print("j:");
+    print(j);
+    rj = ranks[j];
+    for(kk=1; kk<=rj; kk++){ // going through the generators 
+      print("kk");
+      print(kk);
+      for(ll=1; ll<=n+1; ll++){ // going through the monomials coming in
+        print("ll");
+        print(ll);
+        www = -var(ll)*gen(kk+offset);
+        print(www);
+        mm = horizontal_img_gens[j][(kk-1)*(n+1)+ll];
+        print("horizontal image of this generator:");
+        print(mm);
+        for(a=1; a<=size(mm); a++){
+          print("inner loop");
+          print(a);
+          print(offset);
+          print(ranks[j]);
+          www = www + mm[a, 1]*gen(a+offset-ranks[j-1]);
+          print(www);
+        }
+        print("total outcome:");
+        print(www);
+        full_relations = full_relations + www;
+      }
+    }
+    offset = offset + rj;
+  }
+  attrib(full_relations, "isHomog", new_degs);
+  return(full_relations);
+}
+
+
