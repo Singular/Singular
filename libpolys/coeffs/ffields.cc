@@ -526,7 +526,7 @@ static const char * nfRead (const char *s, number *a, const coeffs r)
     if ((*s >= '0') && (*s <= '9'))
     {
       s=eati(s,&i);
-      while (i>=r->m_nfCharQ1) i-=r->m_nfCharQ1;
+      i%=r->m_nfCharQ1;
     }
     else
       i=1;

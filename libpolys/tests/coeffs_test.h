@@ -464,6 +464,64 @@ class CoeffsTestSuite : public CxxTest::TestSuite
      nKillChar(cf);
    }
 
+   void test_GF_ReadLargeExponent()
+   {
+     GFInfo param;
+
+     param.GFChar= 5;
+     param.GFDegree= 2;
+     param.GFPar_name= (const char*)"Q";
+
+     const coeffs cf = nInitChar(n_GF, &param);
+     TS_ASSERT_DIFFERS(cf, NULLp);
+
+     const int e = 1000000000;
+     number a;
+     n_Read("Q1000000000", &a, cf);
+
+     number b;
+     number z = n_Param(1, cf);
+     n_Power(z, e % (n_GetChar(cf) * n_GetChar(cf) - 1), &b, cf);
+     TS_ASSERT(n_Equal(a, b, cf));
+
+     n_Delete(&a, cf);
+     n_Delete(&b, cf);
+     n_Delete(&z, cf);
+     nKillChar(cf);
+   }
+
+   void test_Zp_MapLargeToSmall()
+   {
+     const long p = FACTORY_MAX_PRIME;
+     const coeffs src = nInitChar(n_Zp, (void*) p);
+     TS_ASSERT_DIFFERS(src, NULLp);
+
+     const long values[] = { 1, 2, p / 2, p / 2 + 1, p - 2, p - 1 };
+
+     for (long q : { 2L, 3L })
+     {
+       const coeffs dst = nInitChar(n_Zp, (void*) q);
+       TS_ASSERT_DIFFERS(dst, NULLp);
+
+       nMapFunc map = n_SetMap(src, dst);
+       for (long i : values)
+       {
+         // the map lifts to the symmetric residue in (-p/2, p/2]
+         const long lift = (i > p / 2) ? i - p : i;
+         number a = n_Init(i, src);
+         number b = map(a, src, dst);
+         number c = n_Init(lift, dst);
+         TS_ASSERT(n_Equal(b, c, dst));
+         n_Delete(&a, src);
+         n_Delete(&b, dst);
+         n_Delete(&c, dst);
+       }
+
+       nKillChar(dst);
+     }
+
+     nKillChar(src);
+   }
 
 
    void test_Zn3()
