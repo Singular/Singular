@@ -437,6 +437,34 @@ class CoeffsTestSuite : public CxxTest::TestSuite
       // TODO: what is our policy wrt param-pointer-ownership?
    }
 
+   void test_GF_InitLarge()
+   {
+     GFInfo param;
+
+     param.GFChar= 5;
+     param.GFDegree= 2;
+     param.GFPar_name= (const char*)"Q";
+
+     const coeffs cf = nInitChar(n_GF, &param);
+     TS_ASSERT_DIFFERS(cf, NULLp);
+
+     const long p = n_GetChar(cf);
+     const long values[] = { LONG_MIN, LONG_MIN + 1, -1000000000003L,
+                             1000000000003L, LONG_MAX - 1, LONG_MAX };
+
+     for (long i : values)
+     {
+       number a = n_Init(i, cf);
+       number b = n_Init((i % p + p) % p, cf);
+       TS_ASSERT(n_Equal(a, b, cf));
+       n_Delete(&a, cf);
+       n_Delete(&b, cf);
+     }
+
+     nKillChar(cf);
+   }
+
+
 
    void test_Zn3()
    {
