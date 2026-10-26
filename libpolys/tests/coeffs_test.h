@@ -449,11 +449,13 @@ class CoeffsTestSuite : public CxxTest::TestSuite
      TS_ASSERT_DIFFERS(cf, NULLp);
 
      const long p = n_GetChar(cf);
-     const long values[] = { LONG_MIN, LONG_MIN + 1, -1000000000003L,
-                             1000000000003L, LONG_MAX - 1, LONG_MAX };
+     const long values[] = { LONG_MIN, LONG_MIN + 1, -p, -1, 0, 1,
+                             p - 1, p, p + 1, LONG_MAX - 1, LONG_MAX };
+     const unsigned long valuesCount = sizeof(values) / sizeof(values[0]);
 
-     for (long i : values)
+     for (unsigned long valueIndex = 0; valueIndex < valuesCount; valueIndex++)
      {
+       const long i = values[valueIndex];
        number a = n_Init(i, cf);
        number b = n_Init((i % p + p) % p, cf);
        TS_ASSERT(n_Equal(a, b, cf));
@@ -496,16 +498,24 @@ class CoeffsTestSuite : public CxxTest::TestSuite
      const coeffs src = nInitChar(n_Zp, (void*) p);
      TS_ASSERT_DIFFERS(src, NULLp);
 
-     const long values[] = { 1, 2, p / 2, p / 2 + 1, p - 2, p - 1 };
+     const long targets[] = { 2, 3 };
+     const unsigned long targetsCount = sizeof(targets) / sizeof(targets[0]);
 
-     for (long q : { 2L, 3L })
+     for (unsigned long targetIndex = 0;
+          targetIndex < targetsCount; targetIndex++)
      {
+       const long q = targets[targetIndex];
        const coeffs dst = nInitChar(n_Zp, (void*) q);
        TS_ASSERT_DIFFERS(dst, NULLp);
 
        nMapFunc map = n_SetMap(src, dst);
-       for (long i : values)
+       const long values[] = { 0, 1, q, q + 1, p / 2, p / 2 + 1,
+                               p - q - 1, p - q, p - q + 1, p - 1 };
+       const unsigned long valuesCount = sizeof(values) / sizeof(values[0]);
+       for (unsigned long valueIndex = 0;
+            valueIndex < valuesCount; valueIndex++)
        {
+         const long i = values[valueIndex];
          // the map lifts to the symmetric residue in (-p/2, p/2]
          const long lift = (i > p / 2) ? i - p : i;
          number a = n_Init(i, src);
