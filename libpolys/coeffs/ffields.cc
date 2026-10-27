@@ -190,8 +190,8 @@ static number nfInit (long i, const coeffs r)
   // Hmm .. this is just to prevent initialization
   // from nfInitChar to go into an infinite loop
   if (i==0) return (number)(long)r->m_nfCharQ;
-  while (i <  0)    i += r->m_nfCharP;
-  while (i >= r->m_nfCharP) i -= r->m_nfCharP;
+  i %= (long)r->m_nfCharP;
+  if (i < 0) i += r->m_nfCharP;
   if (i==0) return (number)(long)r->m_nfCharQ;
   unsigned short c=0;
   while (i>1)
@@ -526,7 +526,7 @@ static const char * nfRead (const char *s, number *a, const coeffs r)
     if ((*s >= '0') && (*s <= '9'))
     {
       s=eati(s,&i);
-      while (i>=r->m_nfCharQ1) i-=r->m_nfCharQ1;
+      i%=r->m_nfCharQ1;
     }
     else
       i=1;

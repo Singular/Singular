@@ -2631,9 +2631,11 @@ static number ntFarey(number p, number n, const coeffs cf)
 
 static number ntInitMPZ(mpz_t m, const coeffs r)
 {
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   number n=n_InitMPZ(m,r->extRing->cf);
-  NUM(result)=p_NSet(n,r->extRing);
+  poly p=p_NSet(n,r->extRing);
+  if (p==NULL) return NULL;
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(result)=p;
   return ((number)result);
 }
 

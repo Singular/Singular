@@ -2482,6 +2482,53 @@ public:
     p_Delete(&common, parameterRing);
     rDelete(r); // kills cf and parameterRing as well
   }
+
+  // n_InitMPZ must return the canonical zero (NULL) when the value
+  // vanishes in the ground field
+  void TestTransExtInitMPZ(const int ch, const char* const value,
+                           const long expected)
+  {
+    char* parameterNames[] = {(char*)"t"};
+    ring parameterRing = rDefault(ch, 1, parameterNames);
+    TS_ASSERT_DIFFERS(parameterRing, NULLp);
+
+    n_coeffType type = nRegister(n_transExt, ntInitChar);
+    TS_ASSERT_EQUALS(type, n_transExt);
+
+    TransExtInfo extParam;
+    extParam.r = parameterRing;
+    const coeffs cf = nInitChar(type, &extParam);
+    TS_ASSERT_DIFFERS(cf, NULLp);
+
+    mpz_t m;
+    mpz_init_set_str(m, value, 10);
+    number a = n_InitMPZ(m, cf);
+    mpz_clear(m);
+    number b = n_Init(expected, cf);
+
+    TS_ASSERT_EQUALS((bool)n_IsZero(a, cf), expected == 0);
+    TS_ASSERT(n_Equal(a, b, cf));
+
+    n_Delete(&a, cf);
+    n_Delete(&b, cf);
+    nKillChar(cf); // kills parameterRing as well
+  }
+
+  void test_Q_Ext_InitMPZ()
+  {
+    TestTransExtInitMPZ(0, "0", 0);
+    TestTransExtInitMPZ(0, "5", 5);
+  }
+
+  void test_Zp_Ext_InitMPZ()
+  {
+    TestTransExtInitMPZ(7, "0", 0);
+    TestTransExtInitMPZ(7, "-7", 0);
+    TestTransExtInitMPZ(7, "49", 0);
+    TestTransExtInitMPZ(7, "9223372036854775807", 0); // 2^63-1
+    TestTransExtInitMPZ(7, "12", 5);
+  }
+
   void test_Q_Ext_Performance()
   {
     clog << "Start by creating Q[q]..." << endl;

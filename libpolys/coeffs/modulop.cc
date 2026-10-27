@@ -500,12 +500,9 @@ static BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
 static number npMapP(number from, const coeffs src, const coeffs dst_r)
 {
   long i = (long)from;
-  if (i>src->ch/2)
-  {
-    i-=src->ch;
-    while (i < 0) i+=dst_r->ch;
-  }
+  if (i>src->ch/2) i-=src->ch;
   i%=dst_r->ch;
+  if (i<0) i+=dst_r->ch;
   return (number)i;
 }
 
