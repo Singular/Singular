@@ -1411,6 +1411,84 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
+/*==================== pruneGraded ============================== */
+    if(strcmp(sys_cmd,"pruneGraded")==0)
+    {
+      const short t[]={1,MODUL_CMD};
+      if (iiCheckTypes(h,t,1))
+      {
+        ideal input=(ideal)h->Data();
+        intvec *weights=(intvec *)atGet(h,"isHomog",INTVEC_CMD);
+        // For modules, ideal::rank is the ambient free-module rank, including
+        // unused rows of a zero matrix; it is not the language-level rank().
+        const int input_rank=input->rank;
+        const bool valid_weight_count=
+          ((input_rank>0) && (weights!=NULL)
+            && (weights->length()==input_rank))
+          || ((input_rank==0) && (weights!=NULL)
+            && ((weights->length()==0)
+              || ((weights->length()==1) && ((*weights)[0]==0))));
+        if ((!valid_weight_count)
+        || (!idTestHomModule(input,currRing->qideal,weights)))
+        {
+          WerrorS("system(\"pruneGraded\"): homogeneous module with valid weights expected");
+          return TRUE;
+        }
+
+        ideal pruned;
+        intvec *pruned_weights;
+        if (idIs0(input))
+        {
+          // idMinEmbedding_v aliases a zero input even when asked not to
+          // modify it, so make independently owned result and attribute data.
+          pruned=idCopy(input);
+          if (input_rank==0)
+            pruned_weights=new intvec(1);
+          else
+            pruned_weights=ivCopy(weights);
+        }
+        else
+        {
+          const int input_map_size=si_max(input_rank,1);
+          int *component_map=(int *)omAlloc(input_map_size*sizeof(int));
+          // Keep the legacy prune implementation untouched.  Its component
+          // map records the final component number for every original row.
+          // Each nonterminal deleted run maps to its next surviving row;
+          // trailing deleted rows map beyond the output rank.  Thus the last
+          // in-range original row for each output component is its survivor.
+          pruned=idMinEmbedding_v(input,FALSE,NULL,component_map);
+          const int output_rank=pruned->rank;
+          // Singular uses one zero weight for the rank-zero presentation;
+          // several graded library routines rely on that convention.
+          const int output_weight_count=si_max(output_rank,1);
+          pruned_weights=new intvec(output_weight_count);
+          bool *weight_set=NULL;
+          if (output_rank>0)
+            weight_set=(bool *)omAlloc0(output_rank*sizeof(bool));
+          for (int i=0;i<input_rank;i++)
+          {
+            const int component=component_map[i];
+            if ((component>0) && (component<=output_rank))
+            {
+              (*pruned_weights)[component-1]=(*weights)[i];
+              weight_set[component-1]=true;
+            }
+          }
+          for (int i=0;i<output_rank;i++) assume(weight_set[i]);
+          if (weight_set!=NULL)
+            omFreeSize(weight_set,output_rank*sizeof(bool));
+          omFreeSize(component_map,input_map_size*sizeof(int));
+          assume(idTestHomModule(pruned,currRing->qideal,pruned_weights));
+        }
+
+        res->rtyp=MODUL_CMD;
+        res->data=(void *)pruned;
+        atSet(res,omStrDup("isHomog"),pruned_weights,INTVEC_CMD);
+        return FALSE;
+      }
+      return TRUE;
+    }
+    else
 /*==================== tensorModuleMult ========================= */
   #define HAVE_SHEAFCOH_TRICKS 1
 

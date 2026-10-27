@@ -9,11 +9,12 @@ AUTHORS:  Wolfram Decker, decker@mathematik.uni-kl.de
           Oleksandr Motsak, U@D, where U={motsak}, D={mathematik.uni-kl.de}
 
 PROCEDURES:
+ pruneGraded(M);          minimally embed a graded module, preserving weights
  truncate(phi,d);        truncation of coker(phi) at d
  truncateFast(phi,d);    truncation of coker(phi) at d (fast+ experimental)
  CM_regularity(M);       Castelnuovo-Mumford regularity of coker(M)
  sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
- globalSectionsBLH(M,l,r,w);     global sections of the sheaf associated  to coker(M)
+ globalSectionsBLH(M,r,d0,w); global sections in all degrees >= d0
  sheafCohBGGregul(M,l,h,r); cohomology of sheaf associated to coker(M)
                           with given regularity
  sheafCohBGGregul_w(M,l,h,r,w); cohomology with given module weights
@@ -119,6 +120,42 @@ static proc TensorModuleMult(int m, module M)
   Temp = transpose(Temp);
 
   return(Temp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc pruneGraded(module M)
+"USAGE:   pruneGraded(M); M module
+ASSUME:  M is homogeneous over a graded commutative polynomial ring over
+         a field and has a compatible intvec attribute isHomog
+RETURN:  module, a minimally embedded graded presentation P such that
+         coker(P) and coker(M) are isomorphic as graded modules
+NOTE:    The degrees and order of surviving ambient generators are preserved.
+         Only homogeneous unit cancellations are performed.  This does not
+         truncate or saturate the module and does not remove finite-length
+         summands.  Missing or inconsistent grading data is an error.
+EXAMPLE: example pruneGraded; shows an example
+SEE ALSO: prune, truncate, minbase
+KEYWORDS: graded module, minimal embedding, presentation
+"
+{
+  if(typeof(attrib(M,"isHomog"))!="intvec")
+  {
+    ERROR("an admissible degree vector is required");
+  }
+  return(system("pruneGraded",M));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0,(x,y),dp;
+  matrix A[3][2]=1,0,
+                   0,1,
+                   0,0;
+  module M=A;
+  attrib(M,"isHomog",intvec(3,3,2));
+  module P=pruneGraded(M);
+  P;
+  attrib(P,"isHomog");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1725,34 +1762,59 @@ Examples:
       
 ///////////////////////////////////////////////////////////////////////////////
 // Compute global sections of the sheaf associated to the graded module 
-// `N = S^r/M` using the "linear regularity" via the modified algorithm 
+// `N = S^r/M` using an upper bound for the linear regularity via the modified
+// algorithm
 // of Eisenbud-Floystad-Schreyer given by Barakat-Lange-Hegermann.
 // 
 // Input: 
 //   - the modulus `M` for the presentation of the module `N`
-//   - the linear regularity `lin_reg` which we assume to already be computed
-//   - a minimal degree `max_length` up to which the free resolution over 
-//     the exterior algebra should be computed; the command does not accept 
-//     infinite resolutions over such rings 
+//   - an upper bound `reg_bound` for the linear regularity; the
+//     Castelnuovo-Mumford regularity is such a bound
+//   - the lower degree bound `d0`; global sections are reconstructed in
+//     degrees greater than or equal to `d0`
 //   - a degree vector `gen_degs` for the degrees of the free module `S^n` in 
 //     which `M` lives; this is to be able to pass such information 
 //     from Oscar.
+// Output:
+//   - a presentation of the section module
+//       direct_sum_{d>=d0} H^0(P^n, sheaf(N)(d)).
+//     Every higher truncation is obtained from this presentation with
+//     `truncate(result,d)`.  The corresponding truncation of `N` itself is
+//     obtained independently as `truncate(M,d)`.
 // Debug output follows the convention used throughout this library:
 // `printlevel >= 2` shows progress and `printlevel >= 3` intermediate data.
-proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
+proc globalSectionsBLH(module M, int reg_bound, int d0, intvec gen_degs)
+"USAGE:   globalSectionsBLH(M,r,d0,w); M module, r,d0 int, w intvec
+ASSUME:   M is a homogeneous presentation matrix over a standard graded
+         polynomial ring, w contains the degrees of the generators of its
+         ambient free module, and r is an upper bound for the linear
+         regularity of coker(M). In particular, CM_regularity(M) is a valid
+         choice for r.
+RETURN:   module P presenting the graded section module
+           direct_sum_(d>=d0) H^0(Proj(basering),sheaf(coker(M))(d)).
+         Thus dimGradedPart(P,d) is h^0(sheaf(coker(M))(d)) for d>=d0.
+NOTE:     The third argument is a degree bound, not a resolution length.
+         For every e>=d0, truncate(P,e) presents the corresponding higher
+         truncation of the section module. The truncation of coker(M) itself
+         is obtained independently with truncate(M,e).
+         A free resolution mres(P,0) describes the section module; its Betti
+         table is not a cohomology table.
+SEE ALSO: truncate, dimGradedPart, CM_regularity, sheafCohBGG
+"
 {
   int PL = printlevel - voice + 2;
   if(PL > 1)
   {
     dbprint(1, "juhu");
+    dbprint(1, "regularity bound: "+string(reg_bound));
+    dbprint(1, "lower degree bound: "+string(d0));
     dbprint(1, "input module:");
     if(PL > 2) { dbprint(1, M); }
     dbprint(1, "input degree vector:");
     if(PL > 2) { dbprint(1, gen_degs); }
   }
-  // `min_deg` is required because Singular does not compute
-  // potentially infinite resolutions over quotient rings. 
-  // It automatically sets the maximum length to `5` in that case. 
+  // A finite bound is required because resolutions over the exterior
+  // algebra can be infinite.
   int i,j,k,row,col;
   // check whether degrees for this module are known and it is
   // homogeneous
@@ -1767,12 +1829,35 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
   // The vector `w` contains the degrees of the generators 
   // of the free module in which `M` lives as a submodule. 
   attrib(M, "isHomog", gen_degs);
+  // The purely linear saturation agrees with the input complex strictly
+  // above a linear-regularity bound.
+  int stable_degree = reg_bound+1;
+  if(PL > 1)
+  {
+    dbprint(1, "stable starting degree: "+string(stable_degree));
+  }
+  if(d0 >= stable_degree)
+  {
+    return(truncate(M,d0));
+  }
+  // The map at resolution index j contributes generators of degree
+  // stable_degree-j+1.  Hence this is the number of maps needed through d0.
+  int max_length = stable_degree-d0+1;
   // The dimension of the imagined projective space
   int n=nvars(basering)-1;
   def R=basering;
   // build the truncated module `N_{>=d}`, i.e. return a modulus `MT`
   // presenting such a module, given the modulus `M` for `N`. 
-  module MT =truncate(M, lin_reg);
+  module MT =truncate(M, stable_degree);
+  // A zero stable tail implies that the associated coherent sheaf is zero.
+  // `truncate` represents this case by a module with zero ambient rank and
+  // without a degree attribute, so handle it before inspecting that attribute.
+  if(nrows(MT)==0)
+  {
+    module zero_section_module=gen(1);
+    attrib(zero_section_module,"isHomog",intvec(d0));
+    return(zero_section_module);
+  }
   module MT_orig = MT;
   if(typeof(attrib(MT, "isHomog")) != "intvec"){
     ERROR("Degrees for the truncated module could not be inferred");
@@ -1797,6 +1882,10 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
   option(redSB);
   option(redTail);
   module EM=imap(R,SS);
+  if(ncols(EM)!=m)
+  {
+    ERROR("internal error: the exterior module does not preserve the stable-tail generators");
+  }
   //--- here we are with our matrix
   // We need to adjust the degrees with the used regularity
   // In theory the variables of `E` have negative degree. 
@@ -1805,11 +1894,11 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
   intvec w;
   for (i=1; i<=nrows(EM); i++)
   {
-    // `lin_reg` is where we cut off and the (internal) degree 
+    // `stable_degree` is where we cut off and the (internal) degree
     // of all elements in `N` used in the domain of `EM`.
     // The additional shift by `n+1` comes from the tensor 
     // product with the dual of the exterior algebra `E`. 
-     w[i]=-lin_reg-n-1;
+     w[i]=-stable_degree-n-1;
   }
   attrib(EM,"isHomog",w);
   if(PL > 1)
@@ -1834,7 +1923,11 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
   degBound=1;
   // Warning: The resolution could be infinite! 
   // The user has to take care of sanity of the input!
-  resolution RE=mres(EM, max_length+1);
+  // mres may replace the generators of EM by another minimal basis.  Ask for
+  // the accompanying map so that the first recovered differential can be
+  // expressed in the original basis used by MT_orig.
+  smatrix first_map_to_input_sparse;
+  resolution RE=mres_map(EM, max_length, first_map_to_input_sparse);
   // restore the old degBound
   degBound=oldbound;
   if(PL > 1)
@@ -1912,9 +2005,49 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
   int exterior_sign = (-1)^(n+2);
   int ll;
   int kk;
+  int resolution_length = min(max_length,size(RE));
+  // Indexing a resolution implicitly converts it to a padded list.  Convert
+  // only once, after recording the true internal length above.
+  list RE_list = RE;
+  // MT_orig is expressed in the original input basis, whereas RE[1] uses
+  // the minimal basis chosen by mres_map.  Its third argument gives the
+  // change of basis exactly: EM*first_map_to_input = RE[1].  Both are
+  // minimal generating sets of the same exterior module, so this change of
+  // basis must be square; fail rather than silently omit relations if that
+  // invariant is ever violated.
+  matrix first_map_to_input;
+  if(resolution_length>1)
+  {
+    module first_resolution_map=RE_list[1];
+    first_map_to_input=matrix(first_map_to_input_sparse);
+    if((ncols(first_resolution_map)!=m) ||
+       (nrows(first_map_to_input)!=ncols(EM)) ||
+       (ncols(first_map_to_input)!=ncols(first_resolution_map)) ||
+       (deg(first_map_to_input)>0))
+    {
+      ERROR("internal error while aligning the first exterior resolution map");
+    }
+    if(matrix(EM)*first_map_to_input!=matrix(first_resolution_map))
+    {
+      ERROR("the first exterior resolution map could not be aligned with the input basis");
+    }
+  }
   module img_mod;
-  for(j=1; j<=max_length && RE[j] != 0; j++){
-    img_mod = RE[j];
+  for(j=1; j<=resolution_length; j++){
+    img_mod = RE_list[j];
+    // A zero map can retain a nonzero matrix shape, e.g. a 6 x 1 zero
+    // column.  Thus `img_mod != 0` tests the representation rather than
+    // its entries.  `size(RE)` gives the actual resolution length rather
+    // than the padded list length; this additional guard also handles an
+    // unexpected zero entry inside that range.
+    if(size(img_mod)==0)
+    {
+      if(PL > 1)
+      {
+        dbprint(1, "zero map at resolution index "+string(j)+"; stopping");
+      }
+      break;
+    }
     if(PL > 1)
     {
       dbprint(1, "index in the loop: "+string(j));
@@ -1925,7 +2058,26 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
     }
     // collect the number of generators
     Mj = matrix(img_mod);
-    ranks[j] = ncols(Mj);
+    if(j==1)
+    {
+      // These are the generators of MT_orig, equivalently the original
+      // columns of EM.  RE[1] may use another minimal basis; the map returned
+      // by mres_map accounts for that below.
+      ranks[j] = m;
+    }
+    else
+    {
+      if(j==2)
+      {
+        Mj=first_map_to_input*Mj;
+        if(PL > 2)
+        {
+          dbprint(1,"first recovered map in the input basis:");
+          dbprint(1,Mj);
+        }
+      }
+      ranks[j] = ncols(Mj);
+    }
     if(PL > 1)
     {
       dbprint(1, "ranks collected so far");
@@ -1939,7 +2091,7 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
       {
         dbprint(1, "collecting degree for generator "+string(k));
       }
-      new_degs[offset+k] = lin_reg - j + 1;
+      new_degs[offset+k] = stable_degree - j + 1;
     }
     if(j>1){
       for(kk=1; kk<=n+1; kk++){
@@ -1972,6 +2124,18 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
   option(set,saveopt);
   if(PL > 1) { dbprint(1, "going back to the other ring"); }
   setring(R);
+  module full_relations = MT_orig; // This will be extended below if necessary.
+  // There are no horizontal maps to transfer when the exterior resolution
+  // stops after its first nonzero map.  In particular, imap cannot map a
+  // list whose only entry is the empty list.
+  if(size(ranks)<=1)
+  {
+    if(size(ranks)==1)
+    {
+      attrib(full_relations, "isHomog", new_degs);
+    }
+    return(full_relations);
+  }
   list horizontal_matrices = imap(AR, horizontal_matrices);
   if(PL > 1)
   {
@@ -1991,7 +2155,6 @@ proc globalSectionsBLH(module M, int lin_reg, int max_length, intvec gen_degs)
   matrix mm;
   list relation_blocks;
   list merged_blocks;
-  module full_relations = MT_orig; // This will be extended to the full global section module
   // Now we need to assemble the additional relations for the S-module on this side.
   for(j=2; j<=size(ranks); j++){ // going through the direct summands
     if(PL > 1) { dbprint(1, "j: "+string(j)); }

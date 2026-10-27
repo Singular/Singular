@@ -8173,6 +8173,11 @@ computes from list of spectrum numbers the multiple of it.
 @cindex system, std_syz
 compute a partial groebner base of a module, stop after the given column
 @c ..........................
+@item @code{system("pruneGraded",} module @code{)}
+@cindex system, pruneGraded
+internal for @code{pruneGraded} in @code{sheafcoh.lib}; minimally embeds a
+homogeneous module while preserving its @code{isHomog} component weights
+@c ..........................
 @item @code{system("tensorModuleMult",} int, module @code{)}
 @cindex system, tensorModuleMult
 internal for sheafcoh.lib (see id_TensorModuleMult)
