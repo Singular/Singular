@@ -9,9 +9,9 @@ AUTHORS: Shamsa Kanwal           lotus_zone16@yahoo.com
 
 OVERVIEW: Computing Janet bases and border bases for any ordering
           using the idea of r-standard bases (defined by V. Gerdt).
-          Rational Weyl border bases are supported when Singular is configured
-          with --with-ratGB, including bases for an explicitly supplied order
-          ideal without choosing it through a monomial ordering.
+          Rational Weyl border bases for an explicitly supplied order ideal are
+          supported in standard builds.  Groebner-derived rational Weyl border
+          bases additionally require configuration with --with-ratGB.
 
 REFERENCES:
    [1] A. Kehrein, M. Kreuzer, L. Robbiano: An algebrists view on border bases, in:

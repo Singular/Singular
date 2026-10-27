@@ -9,7 +9,7 @@
 
 #include "kernel/GBEngine/ratborderbasis_orderideal.h"
 
-#ifdef HAVE_RATGRING
+#ifdef HAVE_RWBORDER
 
 #include <algorithm>
 #include <climits>
@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "kernel/GBEngine/borderbasis_staircase.h"
-#include "kernel/GBEngine/ratgring.h"
+#include "kernel/GBEngine/ratweyl_common.h"
 #include "kernel/ideals.h"
 #include "kernel/polys.h"
 #include "polys/clapsing.h"
@@ -360,6 +360,7 @@ static void makePrimitive(poly &p, const int firstOperator,
   {
     poly coefficient = coefficientAt(p, *it, firstOperator, r);
     poly quotient = singclap_pdivide(coefficient, content, r);
+    p_Delete(&coefficient, r);
     poly monomial = borderbasis_kernel::makeMonomial(*it, firstOperator, r);
     primitive = p_Add_q(primitive, p_Mult_q(quotient, monomial, r), r);
   }

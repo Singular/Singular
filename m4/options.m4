@@ -35,17 +35,38 @@ AM_CONDITIONAL([ENABLE_PLURAL],[test x$ENABLE_PLURAL != xno])
 
 AC_MSG_RESULT($ENABLE_PLURAL)
 
+AC_ARG_ENABLE(rwborder,
+  AS_HELP_STRING([--disable-rwborder],
+                 [Disable rational Weyl order-ideal border bases]))
+
+AC_MSG_CHECKING(whether to have rational Weyl order-ideal border bases)
+if test "x$ENABLE_PLURAL" = xno || test "x$enable_rwborder" = xno; then
+  ENABLE_RWBORDER=no
+  AC_MSG_RESULT(no)
+else
+  ENABLE_RWBORDER=yes
+  AC_DEFINE(HAVE_RWBORDER, 1,
+            [Enable rational Weyl order-ideal border bases])
+  AC_MSG_RESULT(yes)
+fi
+
 
 AC_ARG_WITH(RatGB, AS_HELP_STRING([--with-ratGB], [do compile with ratGB support (experimental)]))
 
 AC_MSG_CHECKING(whether to have ratGB)
 if test "x$with_ratGB" != xyes && test "x$enable_ratGB" != xyes; then
+  ENABLE_RATGB=no
   AC_MSG_RESULT(no)
 else
+  ENABLE_RATGB=yes
   AC_DEFINE(HAVE_RATGRING, 1, [Enable RatGB support])
   AC_MSG_RESULT(yes)
 fi
 
+if test "x$ENABLE_RWBORDER" = xyes || test "x$ENABLE_RATGB" = xyes; then
+  AC_DEFINE(HAVE_RATWEYL_COMMON, 1,
+            [Enable shared rational Weyl kernel support])
+fi
 
 ])
 

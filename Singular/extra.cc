@@ -70,6 +70,8 @@
 #include "kernel/GBEngine/borderbasis.h"
 #ifdef HAVE_RATGRING
 #include "kernel/GBEngine/ratborderbasis.h"
+#endif
+#ifdef HAVE_RWBORDER
 #include "kernel/GBEngine/ratborderbasis_orderideal.h"
 #endif
 #include "kernel/GBEngine/syz.h"
@@ -568,6 +570,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #endif
         #ifdef HAVE_RATGRING
           TEST_FOR("ratGB")
+        #endif
+        #ifdef HAVE_RWBORDER
+          TEST_FOR("rwborder")
         #endif
         #ifdef OM_NDEBUG
           TEST_FOR("om_ndebug")
@@ -3052,6 +3057,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
+  #endif
+  #ifdef HAVE_RWBORDER
       if (strcmp(sys_cmd, "rationalWeylBorderBasisForOrderIdeal") == 0)
       {
         if ((h == NULL) || (h->Typ() != IDEAL_CMD) || (h->next == NULL) ||
@@ -3088,6 +3095,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
+  #endif
+  #ifdef HAVE_RATGRING
       if (strcmp(sys_cmd, "intratNF") == 0)
       {
         poly p;

@@ -3,7 +3,7 @@
 
 #include "kernel/structs.h"
 
-#ifdef HAVE_RATGRING
+#ifdef HAVE_RWBORDER
 // Compute a rational-Weyl border basis for a caller-supplied differential
 // order ideal.  Unlike nc_RationalWeylBorderBasis, this routine does not
 // compute a Groebner basis or derive the order ideal from leading terms.

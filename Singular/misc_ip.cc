@@ -916,6 +916,9 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_RATGRING
               StringAppendS("ratGB,");
 #endif
+#ifdef HAVE_RWBORDER
+              StringAppendS("rwborder,");
+#endif
               StringAppend("random=%d\n",siRandomStart);
 
 #define SI_SHOW_BUILTIN_MODULE(name) StringAppend(" %s", #name);

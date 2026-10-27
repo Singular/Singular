@@ -155,32 +155,6 @@ ideal ncGCD2(poly p, poly q, const ring r)
   return(h);
 }
 
-/* returns ideal (u,v) s.t. up + vq = 0 */
-
-ideal ncGCD(poly p, poly q, const ring r)
-{
-  // destroys p and q
-  // assume: p,q are in the comm. ring
-  // to be used in the coeff business
-#ifdef PDEBUG
-  PrintS(" GCD_start:");
-#endif
-  poly g = singclap_gcd_r(p_Copy(p,r),p_Copy(q,r), r);
-#ifdef PDEBUG
-  p_wrp(g,r);
-  PrintS(" GCD_end;\n");
-#endif
-  poly u = singclap_pdivide(q, g, r); //q/g
-  poly v = singclap_pdivide(p, g, r); //p/g
-  v = p_Neg(v,r);
-  p_Delete(&p,r);
-  p_Delete(&q,r);
-  ideal h = idInit(2,1);
-  h->m[0] = u; // p_Copy(u,r);
-  h->m[1] = v; // p_Copy(v,r);
-  return(h);
-}
-
 /* PINLINE1 void p_ExpVectorDiff
    remains as is -> BUT we can do memory shift on smaller number of exp's */
 
