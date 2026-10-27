@@ -212,6 +212,14 @@ category: Math
 requires: $requires
 EOF
 
+cat > "$package_dir/$package_base-src.hint" <<EOF
+sdesc: "Singular upstream computer algebra system sources"
+ldesc: "Source code for the Singular upstream computer algebra system"
+category: Math
+homepage: https://www.singular.uni-kl.de/
+license: (GPL-2.0-only OR GPL-3.0-only) AND BSD-3-Clause
+EOF
+
 (
   cd "$repository"
   mksetupini \
