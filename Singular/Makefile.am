@@ -20,7 +20,7 @@ BUILTIN_FLAGS = ${BUILTIN_LIBS}
 libSingular_LTLIBRARIES = libSingular.la
 libSingulardir = $(libdir)
 
-libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR ${PTHREAD_CFLAGS}
+libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR ${PTHREAD_CFLAGS} ${SODIUM_CFLAGS} ${OPENSSL_FIPS_CFLAGS}
 
 SOURCES = \
    links/asciiLink.cc\
@@ -63,6 +63,7 @@ SOURCES = \
    links/sing_dbm.cc\
    links/slInit_Static.cc\
    links/ssiLink.cc\
+   links/ssi2Link.cc\
    links/semaphore.c\
    subexpr.cc\
    pyobject_setup.cc\
@@ -77,6 +78,8 @@ SOURCES = \
 #   links/slInit_Dynamic.cc
 
 libSingular_la_SOURCES   = $(SOURCES)
+
+noinst_HEADERS = links/ssi2Link.h
 
 SingularHEADERS = \
    attrib.h \
@@ -136,7 +139,7 @@ SingularHEADERS = \
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc
 
 libSingular_la_LDFLAGS    =$(SINGULAR_LDFLAGS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} $(CCLUSTER_LIBS) ${PTHREAD_LDFLAGS}
-libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${BUILTIN_FLAGS} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
+libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${BUILTIN_FLAGS} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS} ${SODIUM_LIBS} ${OPENSSL_FIPS_LIBS}
 
 libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
@@ -244,4 +247,3 @@ MOD:
 
 echoLIBS:
 	@echo ${SLIB0} ${SLIB1} ${SLIB2} ${PLIBS}
-
