@@ -24,7 +24,7 @@ import sys
 import tempfile
 
 HERE = Path(__file__).resolve().parent
-VERSION = "singular-native-v6"
+VERSION = "singular-native-v10"
 CACHE_FORMAT = "cache-v1"
 ABI_SNAPSHOT_FORMAT = "abi-snapshot-v3"
 ARTIFACT_RECEIPT_FORMAT = "artifact-receipt-v2"
@@ -584,15 +584,54 @@ class LibraryScanner:
         return dict(procedures=self.procedures, imports=self.imports)
 
 
+def _literal_mod_init_newstructs(procedures):
+    """Return unconditional literal newstruct declarations run at LIB load."""
+    procedure = procedures.get("mod_init")
+    if procedure is None:
+        return []
+    values = [token for token, _ in procedure["body"]]
+    result, seen, depth = [], set(), 0
+    for index, value in enumerate(values):
+        if value == "{":
+            depth += 1
+            continue
+        if value == "}":
+            depth -= 1
+            continue
+        # A declaration after a straight-line terminator is not installed by
+        # mod_init and therefore cannot safely define a nominal ABI type.
+        if depth == 0 and value in ("return", "ERROR"):
+            break
+        if depth != 0 or value != "newstruct" or index+6 >= len(values):
+            continue
+        call = values[index:index+7]
+        if call[1] != "(" or call[3] != "," or call[5:] != [")", ";"]:
+            continue
+        if not (call[2].startswith('"') and call[4].startswith('"')):
+            continue
+        try:
+            name = json.loads(call[2])
+            json.loads(call[4])
+        except (TypeError, ValueError):
+            continue
+        if not isinstance(name, str) or not IDENT.fullmatch(name) or name in seen:
+            continue
+        seen.add(name)
+        result.append(name)
+    return result
+
+
 def library_index(source):
-    return LibraryScanner(source).scan()
+    result = LibraryScanner(source).scan()
+    result["newstructs"] = _literal_mod_init_newstructs(result["procedures"])
+    return result
 
 
 PRECEDENCE = {"or": 1, "||": 1, "and": 2, "&&": 2,
               "==": 3, "!=": 3, "<>": 3, "<": 4, "<=": 4, ">": 4, ">=": 4,
-              "..": 5, "+": 6, "-": 6, "*": 7, "/": 7, "%": 7,
+              "..": 5, ":": 6, "+": 6, "-": 6, "*": 7, "/": 7, "%": 7,
               "div": 7, "mod": 7, "^": 9, "**": 9}
-KERNELS = {"nvars", "deg", "size", "poly", "var", "lead", "leadmonom", "jet",
+KERNELS = {"nvars", "ncols", "nrows", "deg", "size", "poly", "var", "lead", "leadmonom", "jet",
            "number", "int", "diff", "numerator", "denominator", "subst", "list", "delete",
            "insert", "intvec", "ideal", "string", "leadcoef", "leadexp", "typeof", "ringlist"}
 OWNED = {"poly": "snative::Poly", "number": "snative::Number", "list": "snative::List",
@@ -784,7 +823,7 @@ class Parser(Reader):
             return ["error", message[1:-1]]
         if self.accept("return"):
             self.take("(")
-            result = ["return", self.expression()]
+            result = ["return", self.sequence()]
             self.take(")")
             self.take(";")
             return result
@@ -824,32 +863,39 @@ class Parser(Reader):
         return ["block", result]
 
 
-def signature(proc):
+def signature(proc, newstructs=(), include_nominal=False):
     if [t[0] for t in proc["params"]] == ["list", "#"]:
         # The interpreter presents variadic arguments as the procedure-local
         # list '#'. Materialize the complete heterogeneous list at the entry.
         # The internal name is deliberately unavailable to source declarations.
-        return [["varargs", "__snative_varargs"]]
+        result = [["varargs", "__snative_varargs"]]
+        return (result, {}) if include_nominal else result
     r = Reader(proc["params"])
     params = []
+    nominal = {}
+    newstructs = set(newstructs)
     while r.peek() != "<eof>":
         kind, name = r.take(), r.take()
-        if kind not in ("int", "intvec", "poly", "number", "string", "ideal", "list", "def") or not identifier(name):
+        if (kind not in ("int", "intvec", "poly", "number", "string", "ideal", "list", "def")
+                and kind not in newstructs) or not identifier(name):
             raise CompileError("supported parameters are int/intvec/poly/number/string/ideal/list and checked def")
         if name in [n for _, n in params] or name == "basering":
             raise CompileError(f"duplicate/reserved parameter {name}")
+        if kind in newstructs:
+            nominal[name] = kind
+            kind = "value"
         params.append(["value" if kind=="def" else kind, name])
         if not r.accept(","):
             break
     if r.peek() != "<eof>":
         raise CompileError("unsupported parameter list")
-    return params
+    return (params, nominal) if include_nominal else params
 
 
 class Closure:
     def __init__(self, cache, search):
         self.cache, self.search = cache, search
-        self.libraries, self.nodes = {}, {}
+        self.libraries, self.nodes, self.newstruct_types = {}, {}, {}
         self.stack = []
         self.stats = empty_stats()
 
@@ -884,6 +930,30 @@ class Closure:
                 return str(candidate.resolve())
         raise CompileError(f"cannot resolve imported library {name}")
 
+    def available_newstructs(self, path):
+        path = str(Path(path).resolve())
+        if path in self.newstruct_types:
+            return self.newstruct_types[path]
+        found, seen, pending = set(), set(), [path]
+        while pending:
+            current = pending.pop()
+            if current in seen:
+                continue
+            seen.add(current)
+            library = self.library(current)
+            found.update(library.get("newstructs", ()))
+            for name in library["imports"]:
+                if not name.endswith(".lib"):
+                    continue
+                try:
+                    pending.append(self.import_path(current, name))
+                except CompileError:
+                    # Type discovery must not make an otherwise irrelevant,
+                    # unavailable optional import part of this closure.
+                    continue
+        self.newstruct_types[path] = frozenset(found)
+        return self.newstruct_types[path]
+
     def resolve(self, path, name):
         if name in self.library(path)["procedures"]:
             return path, name
@@ -914,14 +984,16 @@ class Closure:
                 raise CompileError(f"procedure {name} not found")
             if not identifier(name) or name=="compilerCalls":
                 raise CompileError(f"unsupported/reserved procedure name {name}")
-            params = signature(proc)
+            params, nominal_params = signature(
+                proc, self.available_newstructs(path), include_nominal=True)
             if any(t[0]=="#" for t in proc["body"]) and not (len(params)==1 and params[0][0]=="varargs"):
                 raise CompileError("# is supported only in a list # procedure")
             ast = self.cached("ast", digest([VERSION, [t[0] for t in proc["body"]]]),
                               lambda: Parser(proc["body"]).parse(), "procedures_parsed")
-            node = dict(path=path, name=name, params=params, ast=ast, dependencies=set(), calls={},
+            node = dict(path=path, name=name, params=params, nominal_params=nominal_params,
+                        ast=ast, dependencies=set(), calls={},
                         returns=set(), chain=list(self.stack), private=proc["private"],
-                        symbol="sn_" + name + "_" + digest([path, name, params])[:12])
+                        symbol="sn_" + name + "_" + digest([path, name, params, nominal_params])[:12])
             parameter_names = {name for kind, name in params if kind!="varargs"}
             node["mutated"] = {tree[1][1] if tree[1][0]=="var" else tree[1][1][1]
                                for tree in trees(ast)
@@ -984,7 +1056,7 @@ class Closure:
             if op == "binary":
                 if tree[2][0]=="sequence" or tree[3][0]=="sequence":
                     return set()
-                if tree[1] == "..":
+                if tree[1] in ("..", ":"):
                     return {"intvec"}
                 if tree[1] not in ("+", "-", "*", "/", "%", "div", "mod", "^", "**"):
                     return {"int"}
@@ -993,7 +1065,7 @@ class Closure:
                     return left
                 return {"string" if a==b=="string" else "list" if "list" in (a,b)
                         else "ideal" if "ideal" in (a,b) else "poly" if "poly" in (a,b) else "number" if "number" in (a,b)
-                        else "intvec" if "intvec" in (a,b) else "int"
+                        else "intvec" if "intvec" in (a,b) else "value" if "value" in (a,b) else "int"
                         for a in left for b in right}
             if op == "call":
                 if tree[1] in KERNELS:
@@ -1028,20 +1100,17 @@ class Closure:
                         node["returns"].update(infer(tree[1], types, node))
                 changed |= before != node["returns"]
         for node in sorted(self.nodes.values(), key=lambda n: len(n["chain"]), reverse=True):
-            # A dynamic list/# element can be checked at runtime when every
-            # other return path fixes one native ABI type (template.lib's msum
-            # is the canonical zero/int-or-#[1] example).
-            concrete = node["returns"]-{"value"}
-            if "value" in node["returns"] and len(concrete)==1:
-                node["returns"] = concrete
             if len(node["returns"])!=1 or not node["returns"] <= {"int", "intvec", "poly", "number", "string", "ideal", "list"}:
                 raise CompileError("cannot infer one int/intvec/poly/number/string/ideal/list return type (mixed types or ungrounded recursion)\n"
                                    + "call chain: " + " -> ".join(node["chain"]))
             node["result"] = next(iter(node["returns"]))
+            node["contextual_sequence_result"] = any(
+                tree[0] == "return" and tree[1][0] == "sequence"
+                for tree in trees(node["ast"]))
             node["needs_ring"] = (node["result"] in ("poly", "number", "ideal") or any(t in ("poly", "number", "ideal") for t,_ in node["params"]) or
                                   any((t[0]=="var" and t[1]=="basering") or
                                       (t[0]=="declare" and t[1] in ("poly", "number", "ideal")) or
-                                      (t[0]=="call" and t[1] in KERNELS-{"size", "list", "delete", "insert", "int", "intvec", "string", "typeof"})
+                                      (t[0]=="call" and t[1] in KERNELS-{"size", "nrows", "list", "delete", "insert", "int", "intvec", "string", "typeof"})
                                       for t in trees(node["ast"])))
         changed = True
         while changed:
@@ -1069,6 +1138,9 @@ class Emitter:
         self.locals, self.lines = [], []
         self.poly_locals, self.owned = set(), {}
         self.bound_params = {}
+        for name, nominal in node.get("nominal_params", {}).items():
+            self.locals.append(
+                f"v_{name}=snative::newstruct_argument(v_{name}, {json.dumps(nominal)});")
         for name, kind in self.types.items():
             if kind == "poly":
                 self.locals.append(f"snative::PolyBinding b_{name}(v_{name}, ctx.r);")
@@ -1085,12 +1157,21 @@ class Emitter:
             source = self.bound_params.get(name, f"v_{name}")
             self.locals.append(f"snative::{owner} c_{name}({source}{suffix});")
         self.declared = set(self.types)
+        self.guarded_declarations = set()
         self.parameter_locals = set()
         self.poly_scans = {}
         self.serial, self.indent, self.loop = 0, 1, 0
 
     def out(self, text):
         self.lines.append("  "*self.indent + text)
+
+    def lexical_state(self):
+        """Return the name/type state which may not escape a C++ block."""
+        return (dict(self.types), set(self.declared), set(self.poly_locals),
+                set(self.parameter_locals))
+
+    def restore_lexical_state(self, state):
+        self.types, self.declared, self.poly_locals, self.parameter_locals = state
 
     def temp(self, code, kind="int"):
         self.serial += 1
@@ -1222,7 +1303,7 @@ class Emitter:
         raise CompileError(f"expected ideal, poly, number, or int, got {kind}")
 
     def integer(self, expression):
-        kind, value = self.expr(expression)
+        kind, value = self.expr(expression, expected="int")
         if kind == "value":
             return self.temp(f"snative::int_argument({value})")[1]
         if kind != "int":
@@ -1267,6 +1348,12 @@ class Emitter:
         self.out(f"snative::IntvecArgument {name}({value});")
         return name+".get()"
 
+    def converted_poly_argument(self, value):
+        self.serial += 1
+        name = "t"+str(self.serial)
+        self.out(f"snative::PolyArgument {name}({value}, ctx.r);")
+        return name+".get()"
+
     def convert(self, kind, expression, consume=None):
         if kind=="list" and expression[0]=="sequence":
             return self.list_literal([self.expr(value) for value in expression[1]])[1]
@@ -1280,7 +1367,11 @@ class Emitter:
             if indexed[0] == "number":
                 return indexed[1]
             return self.number(*indexed)
-        args = self.expr(expression, consume)
+        # A private comma-returning procedure may be lowered to one intvec
+        # only when this expression is the complete RHS of an explicitly
+        # typed intvec destination.  Pass that proof down to the call emitter;
+        # an untyped use (notably list(f(...))) must retain exprlist semantics.
+        args = self.expr(expression, consume, expected="intvec" if kind=="intvec" else None)
         return (self.list_value if kind=="list" else self.polynomial if kind=="poly" else
                 self.intvec_value if kind=="intvec" else self.string_value if kind=="string" else
                 self.ideal_value if kind=="ideal" else self.number)(*args)
@@ -1416,7 +1507,7 @@ class Emitter:
             raise CompileError("only intvec/poly/string/ideal indexing is supported")
         return self.temp(f"snative::get({vector}, {index})")
 
-    def expr(self, tree, consume=None):
+    def expr(self, tree, consume=None, expected=None):
         op = tree[0]
         if op == "int":
             return "int", str(tree[1])+"L"
@@ -1441,6 +1532,8 @@ class Emitter:
             values = [self.expr(value) for value in tree[1]]
             return self.intvec_literal(values)
         if op == "index":
+            if tree[1][0]=="var" and tree[1][1] in self.node.get("nominal_params", {}):
+                raise CompileError("direct newstruct indexing requires interpreted operator dispatch")
             return self.index_expression(tree)
         if op == "index2":
             # Keep matrix/intmat multidimensional indexing on the interpreted
@@ -1455,6 +1548,10 @@ class Emitter:
             if tree[2][0]=="sequence":
                 raise CompileError("arithmetic on a comma expression requires interpreted exprlist semantics")
             kind, value = self.expr(tree[2])
+            if kind=="value" and tree[1]=="-":
+                kind, value = self.owned_value(f"snative::unary_value({value}, '-', ctx.r)")
+                return (self.temp(f"snative::int_argument({value})")
+                        if expected=="int" else (kind, value))
             if kind == "intvec" and tree[1] == "-":
                 return self.temp(f"snative::intvec_neg({value})", "intvec")
             if kind == "poly" and tree[1] == "-":
@@ -1496,12 +1593,27 @@ class Emitter:
                 kind, value = self.expr(typeof[2][0])
                 comparison = f"snative::type_is({self.box(kind, value)}, {json.dumps(literal)})"
                 return self.temp(("!" if operator!="==" else "")+comparison)
+            integer_context = (expected=="int" and operator in
+                               ("+", "-", "*", "%", "div", "mod", "^", "**"))
+            # Expected type constrains this operation's result, not either
+            # operand.  An overloaded child may legitimately return a custom
+            # value consumed by the enclosing overloaded operation.
             lt, lhs = self.expr(tree[2])
             rt, rhs = self.expr(tree[3])
+            if operator in ("^", "**") and rt=="value" and lt in ("poly", "number", "ideal"):
+                if lt=="poly":
+                    return self.temp(f"snative::poly_power_value({lhs}, {rhs}, ctx.r)", "poly")
+                if lt=="number":
+                    return self.temp(f"snative::number_power_value({lhs}, {rhs}, ctx.r)", "number")
+                return self.temp(f"snative::ideal_power_value({lhs}, {rhs}, ctx.r)", "ideal")
             if operator == "..":
                 if lt!=rt or lt!="int":
                     raise CompileError("range requires two int operands")
                 return self.temp(f"snative::intvec_range({lhs}, {rhs})", "intvec")
+            if operator == ":":
+                if lt!=rt or lt!="int":
+                    raise CompileError("repetition requires two int operands")
+                return self.temp(f"snative::intvec_repeat({lhs}, {rhs})", "intvec")
             if lt==rt=="string" and operator == "+":
                 return self.temp(f"snative::string_add({lhs}, {rhs})", "string")
             if lt==rt=="string" and operator in ("==", "!=", "<>", "<", "<=", ">", ">="):
@@ -1512,12 +1624,32 @@ class Emitter:
                 lhs, rhs = self.list_value(lt,lhs), self.list_value(rt,rhs)
                 owner, values = self.left_owner([lhs, rhs], "list", consume)
                 return self.temp(f"snative::list_add({owner}, {values[1]}, ctx.r)", "list")
-            # A def/list element used with an integer operand has a checked
-            # integer specialization. Do not silently dispatch other overloads.
-            if lt=="value" and rt=="int":
-                lt, lhs = self.temp(f"snative::int_argument({lhs})")
-            if rt=="value" and lt=="int":
-                rt, rhs = self.temp(f"snative::int_argument({rhs})")
+            if operator in ("==", "!=", "<>", "<", "<=", ">", ">="):
+                comparison = {"<":"'<'", ">":"'>'", "<=":"LE", ">=":"GE",
+                              "==":"EQUAL_EQUAL", "!=":"NOTEQUAL",
+                              "<>":"NOTEQUAL"}[operator]
+                if lt==rt=="value":
+                    return self.temp(
+                        f"snative::compare_values({lhs}, {rhs}, {comparison}, ctx.r)")
+                if lt=="value" and rt=="int":
+                    return self.temp(
+                        f"snative::compare_value_int({lhs}, {rhs}, {comparison}, true, ctx.r)")
+                if lt=="int" and rt=="value":
+                    return self.temp(
+                        f"snative::compare_value_int({rhs}, {lhs}, {comparison}, false, ctx.r)")
+            if operator in ("+", "-", "*", "%", "mod", "div", "^", "**"):
+                operation = {"mod":"%", "div":"INTDIV_CMD", "**":"^"}.get(operator, operator)
+                operation = operation if operation=="INTDIV_CMD" else repr(operation)
+                if lt=="value" and rt=="int":
+                    kind, value = self.owned_value(
+                        f"snative::binary_value_int({lhs}, {rhs}, {operation}, true, ctx.r)")
+                    return (self.temp(f"snative::int_argument({value})")
+                            if integer_context else (kind, value))
+                if lt=="int" and rt=="value":
+                    kind, value = self.owned_value(
+                        f"snative::binary_value_int({rhs}, {lhs}, {operation}, false, ctx.r)")
+                    return (self.temp(f"snative::int_argument({value})")
+                            if integer_context else (kind, value))
             # The procedure's eventual return type says nothing about the
             # runtime types of two values selected from lists/newstructs.  In
             # particular, `return(a[i]==b[i]);` is not evidence that the
@@ -1545,6 +1677,8 @@ class Emitter:
                     return self.temp(f"snative::intvec_scalar({rhs}, {lhs}, '{operator}')", "intvec")
                 raise CompileError(f"unsupported intvec operator {operator}({lt}, {rt})")
             if operator in ("^", "**"):
+                if lt==rt=="int":
+                    return self.temp(f"snative::integer_power({lhs}, {rhs})")
                 if lt=="ideal" and rt=="int":
                     return self.temp(f"snative::ideal_power({lhs}, {rhs}, ctx.r)", "ideal")
                 if lt=="number" and rt=="int":
@@ -1620,7 +1754,17 @@ class Emitter:
             name = tree[1]
             if name in KERNELS and any(argument[0]=="sequence" for argument in tree[2]):
                 raise CompileError("comma expression in a fixed-arity kernel requires interpreted exprlist semantics")
-            args = [self.expr(a) for a in tree[2]]
+            callee = None if name in KERNELS else self.closure.nodes[self.node["calls"][name]]
+            if (callee is not None and callee.get("contextual_sequence_result") and
+                    expected != "intvec" and
+                    not (expected == "recursive_sequence_component" and callee is self.node)):
+                raise CompileError(
+                    "contextual comma-return procedure requires an explicit intvec destination")
+            expected_args = ([None]*len(tree[2]) if callee is None or
+                             (len(callee["params"])==1 and callee["params"][0][0]=="varargs") else
+                             ["int" if kind=="int" else None for kind, _ in callee["params"]])
+            args = [self.expr(argument, expected=expected_args[i] if i<len(expected_args) else None)
+                    for i, argument in enumerate(tree[2])]
             types, values = [t for t, _ in args], [v for _, v in args]
             # Exact overload mappings. No iiExprArith/iiPStart/interpreter call.
             if name == "typeof" and len(args)==1:
@@ -1635,6 +1779,9 @@ class Emitter:
                 return self.string_literal(args)
             if name == "delete" and types == ["list", "int"]:
                 return self.temp(f"snative::list_delete({values[0]}, {values[1]}, ctx.r)", "list")
+            if name == "delete" and types == ["list", "value"]:
+                position = self.temp(f"snative::int_argument({values[1]})")[1]
+                return self.temp(f"snative::list_delete({values[0]}, {position}, ctx.r)", "list")
             if name == "delete" and types == ["intvec", "int"]:
                 return self.temp(f"snative::intvec_delete({values[0]}, {values[1]})", "intvec")
             if name == "insert" and len(args) in (2, 3) and types[0]=="list" and (len(args)==2 or types[2]=="int"):
@@ -1675,8 +1822,14 @@ class Emitter:
                 return self.temp(f"snative::jet({owner}, {values[1]})", "poly")
             if name == "nvars" and types == ["ring"]:
                 return self.temp(f"{values[0]}->N")
+            if name == "ncols" and types == ["ideal"]:
+                return self.temp(f"snative::ideal_columns({values[0]})")
+            if name == "nrows" and types == ["intvec"]:
+                return self.temp(f"{values[0]}->rows()")
             if name == "deg" and types in (["poly"], ["poly", "intvec"]):
                 return self.temp("snative::degree("+", ".join(values+["ctx.r"])+")")
+            if name == "size" and types == ["int"]:
+                return self.temp(f"snative::integer_size({values[0]})")
             if name == "size" and types == ["poly"]:
                 return self.temp(f"pLength({values[0]})")
             if name == "size" and types == ["intvec"]:
@@ -1687,9 +1840,10 @@ class Emitter:
                 return self.temp(f"strlen({values[0]})")
             if name == "size" and types == ["ideal"]:
                 return self.temp(f"snative::ideal_size({values[0]})")
+            if name == "size" and types == ["value"]:
+                return self.temp(f"snative::size_value({values[0]}, ctx.r)")
             if name in KERNELS:
                 raise CompileError(f"unsupported kernel overload {name}({', '.join(types)})")
-            callee = self.closure.nodes[self.node["calls"][name]]
             if len(callee["params"])==1 and callee["params"][0][0]=="varargs":
                 _, arguments = self.list_literal(args, variadic_arguments=True)
                 values = [arguments]
@@ -1711,6 +1865,8 @@ class Emitter:
                                      if kind=="value" else self.string_value(kind,value))
                     elif expected=="ideal":
                         values[i] = self.ideal_value(kind,value)
+                    elif expected=="poly" and kind=="value":
+                        values[i] = self.converted_poly_argument(value)
                     elif expected=="int" and kind=="value":
                         values[i] = self.temp(f"snative::int_argument({value})")[1]
                     elif expected=="value":
@@ -1762,11 +1918,19 @@ class Emitter:
         if self.parameter_locals and op in ("if", "for", "while", "break", "continue", "return", "error"):
             raise CompileError("lowered execute declarations require straight-line use before kill")
         if op == "block":
+            if guarded:
+                self.out("{")
+                self.indent += 1
+            before_scope = self.lexical_state() if guarded else None
             before_parameters = set(self.parameter_locals)
             for child in tree[1]:
                 self.statement(child, guarded)
             if self.parameter_locals != before_parameters:
                 raise CompileError("lowered execute declarations must be killed in the same block")
+            if before_scope is not None:
+                self.restore_lexical_state(before_scope)
+                self.indent -= 1
+                self.out("}")
         elif op == "parameter_declare":
             name = tree[1]
             if name in self.declared:
@@ -1789,14 +1953,14 @@ class Emitter:
             self.types.pop(name)
             # Keep the C++ declaration reserved within this lexical block.
         elif op == "declare":
-            if guarded:
-                raise CompileError("conditional/repeated declarations need lifetime analysis")
             for name, value in tree[2]:
+                declared_as_def = tree[1] == "def"
                 kind = tree[1]
                 typed_ideal = kind == "ideal"
                 if name in self.declared or not identifier(name):
                     raise CompileError(f"duplicate/reserved local {name}")
                 # Initializer is resolved before this identifier is introduced.
+                initializer_start = len(self.lines)
                 initial = None
                 if kind == "def":
                     if value is None:
@@ -1804,8 +1968,6 @@ class Emitter:
                     if value[0] == "sequence":
                         raise CompileError("def comma initializer requires interpreted exprlist assignment")
                     kind, initial = self.expr(value)
-                    if kind=="value" and self.node["result"]=="int":
-                        kind, initial = self.temp(f"snative::int_argument({initial})")
                     if kind not in ("int", "intvec", "poly", "number", "string", "ideal", "list"):
                         raise CompileError("def initializer has an unsupported static type")
                     if kind in OWNED:
@@ -1821,6 +1983,16 @@ class Emitter:
                             initial = f"snative::ideal_assign({initial}, ctx.r)"
                     else:
                         initial = self.integer(value)
+                if guarded:
+                    initializer_lines = self.lines[initializer_start:]
+                    del self.lines[initializer_start:]
+                    if name not in self.guarded_declarations:
+                        self.locals.append(f"int sn_declared_{name}=0;")
+                        self.guarded_declarations.add(name)
+                    token = "LIST_CMD" if kind=="paramnames" else kind.upper()+"_CMD"
+                    self.out(f"snative::declare_local(sn_declared_{name}, {token}, "
+                             f"{str(declared_as_def).lower()}, {json.dumps(name)});")
+                    self.lines.extend(initializer_lines)
                 self.types[name] = kind
                 self.declared.add(name)
                 if kind in OWNED:
@@ -1923,8 +2095,18 @@ class Emitter:
             self.out(f"v_{lhs[1]} = snative::increment(v_{lhs[1]}, {tree[2]});")
         elif op == "return":
             if tree[1][0] == "sequence":
-                raise CompileError("comma expression return requires interpreted exprlist semantics")
-            kind, value = self.expr(tree[1])
+                # A comma expression is normally an interpreter exprlist.  It
+                # is an intvec collection only when the procedure is already
+                # known to return intvec *and* one component is itself an
+                # intvec.  The latter keeps an all-int `return((1,2))` dynamic.
+                values = [self.expr(child, expected="recursive_sequence_component")
+                          for child in tree[1][1]]
+                if (not self.node["private"] or self.node["result"]!="intvec" or
+                        not any(item[0]=="intvec" for item in values)):
+                    raise CompileError("comma expression return requires interpreted exprlist semantics")
+                kind, value = self.intvec_literal(values)
+            else:
+                kind, value = self.expr(tree[1], expected="int" if self.node["result"]=="int" else None)
             if kind=="value" and self.node["result"] in ("int", "number", "string", "ideal", "list", "intvec"):
                 expected = self.node["result"]
                 if expected=="int":
@@ -1951,19 +2133,19 @@ class Emitter:
             value = self.integer(tree[1])
             self.out(f"if (snative::truth({value})) {{")
             self.indent += 1
-            before = dict(self.types)
-            before_declared, before_owned = set(self.declared), set(self.poly_locals)
-            # A branch that exits the procedure cannot redeclare on a later
-            # iteration. Its locals cannot escape to subsequent statements.
-            self.statement(tree[2], not terminates(tree[2]))
-            self.types = dict(before)
-            self.declared, self.poly_locals = set(before_declared), set(before_owned)
+            before = self.lexical_state()
+            # Even a terminating branch can be reached after another branch
+            # declared the same source name on an earlier loop iteration.
+            # Keep the runtime declaration check on both sides; lexical state
+            # is still restored below so neither branch's locals escape.
+            self.statement(tree[2], True)
+            self.restore_lexical_state((dict(before[0]), set(before[1]),
+                                        set(before[2]), set(before[3])))
             self.indent -= 1
             self.out("} else {")
             self.indent += 1
-            self.statement(tree[3], not terminates(tree[3]))
-            self.types = before
-            self.declared, self.poly_locals = before_declared, before_owned
+            self.statement(tree[3], True)
+            self.restore_lexical_state(before)
             self.indent -= 1
             self.out("}")
         elif op in ("for", "while"):
@@ -1987,12 +2169,20 @@ class Emitter:
                 key = (source, index)
                 previous = self.poly_scans.get(key)
                 self.poly_scans[key] = cursor
+                before_body = self.lexical_state()
                 self.statement(body, True)
+                self.restore_lexical_state(before_body)
                 if previous is None:
                     self.poly_scans.pop(key)
                 else:
                     self.poly_scans[key] = previous
+                self.out("{")
+                self.indent += 1
+                before_step = self.lexical_state()
                 self.statement(tree[3], True)
+                self.restore_lexical_state(before_step)
+                self.indent -= 1
+                self.out("}")
                 self.out(f"{cursor} = pNext({cursor});")
                 self.loop -= 1
                 self.indent -= 1
@@ -2004,10 +2194,18 @@ class Emitter:
             self.out("ctx.tick();")
             value = self.integer(condition)
             self.out(f"if (!snative::truth({value})) break;")
+            before_body = self.lexical_state()
             self.statement(body, True)
+            self.restore_lexical_state(before_body)
             if op == "for":
                 # Singular continue skips the step, unlike a C++ for-loop.
+                self.out("{")
+                self.indent += 1
+                before_step = self.lexical_state()
                 self.statement(tree[3], True)
+                self.restore_lexical_state(before_step)
+                self.indent -= 1
+                self.out("}")
             self.loop -= 1
             self.indent -= 1
             self.out("}")
@@ -4192,23 +4390,30 @@ def module_source(roots, export_prefix, aliases):
                 lines += [f"    snative::IdealArgument a{j}(arg,currRing);", "    arg=arg->next;"]
                 values.append(f"a{j}.get()")
                 continue
-            token = {"int":"INT_CMD", "poly":"POLY_CMD"}[kind]
+            if kind == "poly":
+                lines += [f"    sleftv a{j}_materialized;",
+                          f"    char a{j}_string_value[2];",
+                          f"    leftv a{j}_input=snative::scalar_index_argument(arg,a{j}_materialized,a{j}_string_value);",
+                          f"    a{j}_input=snative::value_argument(a{j}_input);"]
+                if node["result"]=="poly":
+                    lines += [f'    if (snative::unsupported_poly_result_metadata(a{j}_input)) throw std::runtime_error("attributed poly arguments for polynomial returns are unsupported");']
+                lines += [f"    snative::PolyArgument a{j}(a{j}_input,currRing);",
+                          "    arg=arg->next;"]
+                values.append(f"a{j}.get()")
+                continue
+            token = {"int":"INT_CMD"}[kind]
             argument = "arg"
-            if kind in ("int", "poly"):
+            if kind == "int":
                 argument = f"a{j}_input"
                 lines += [f"    sleftv a{j}_materialized;",
                           f"    char a{j}_string_value[2];",
                           f"    leftv {argument}=snative::scalar_index_argument(arg,a{j}_materialized,a{j}_string_value);",
                           f"    {argument}=snative::value_argument({argument});"]
-            mismatch = (f"({argument}->Typ()!=POLY_CMD && {argument}->Typ()!=BUCKET_CMD)"
-                        if kind=="poly" else f"{argument}->Typ()!={token}")
+            mismatch = f"{argument}->Typ()!={token}"
             lines += [f"    if ({argument}==NULL || {mismatch} || {argument}->e!=NULL || {argument}->rtyp==ALIAS_CMD)",
                       f'      throw std::runtime_error("native argument {j+1} requires {kind}; got token " + std::to_string({argument}==NULL ? -1 : {argument}->Typ()) + ({argument}!=NULL && {argument}->e!=NULL ? " (indexed value)" : ""));',
                       *([f'    if (snative::metadata({argument})) throw std::runtime_error("attributed int arguments are unsupported");'] if kind=="int" else []),
-                      *([f'    if (snative::unsupported_poly_result_metadata({argument})) throw std::runtime_error("attributed poly arguments for polynomial returns are unsupported");']
-                        if kind=="poly" and node["result"]=="poly" else []),
-                      f"    {CPP_TYPES[kind]} a{j}=" +
-                      (f"snative::borrow_poly({argument});" if kind=="poly" else f"({CPP_TYPES[kind]}){argument}->Data();"),
+                      f"    {CPP_TYPES[kind]} a{j}=({CPP_TYPES[kind]}){argument}->Data();",
                       "    if (errorreported) return TRUE;",
                       "    arg=arg->next;"]
             values.append(f"a{j}")
@@ -4221,9 +4426,10 @@ def module_source(roots, export_prefix, aliases):
                   ("    result->rtyp=INT_CMD; result->data=(void*)value;" if node["result"]=="int" else
                    ("    result->rtyp=IDEAL_CMD; result->flag=value.flags(); result->data=(void*)value.release();"
                     if node["result"]=="ideal" else
-                    f"    result->rtyp={node['result'].upper()}_CMD; result->data=(void*)value.release();")),
+                  f"    result->rtyp={node['result'].upper()}_CMD; result->data=(void*)value.release();")),
                   "    return FALSE;",
-                  "  } catch (const std::exception &e) { WerrorS(e.what()); return TRUE; }", "}"]
+                  "  } catch (const snative::ReportedInterpreterError &) { return TRUE; }",
+                  "  catch (const std::exception &e) { WerrorS(e.what()); return TRUE; }", "}"]
     lines += ['extern "C" __attribute__((visibility("default"))) int mod_init(SModulFunctions *api) {']
     lines += ["  try {"]
     native_names = [export_prefix+"compilerCalls"]+[export_prefix+n["name"] for n in roots]
@@ -4263,6 +4469,7 @@ def module_source(roots, export_prefix, aliases):
 
 def _node_identity(node):
     return {"path": node["path"], "name": node["name"], "params": node["params"],
+            "nominal_params": node.get("nominal_params", {}),
             "dependencies": sorted(node["dependencies"]), "calls": node["calls"],
             "private": node["private"], "symbol": node["symbol"],
             "result": node["result"], "needs_ring": node["needs_ring"], "code": node["code"]}
@@ -4339,7 +4546,8 @@ def build(args):
         objects.append(obj)
         manifest_nodes.append(dict(library=node["path"], procedure=node["name"],
                                    symbol=node["symbol"], result=node["result"], private=node["private"],
-                                   parameters=node["params"], source=str(source), object=str(obj),
+                                   parameters=node["params"], nominal_parameters=node.get("nominal_params", {}),
+                                   source=str(source), object=str(obj),
                                    key=object_id, dependencies=[dep["symbol"] for dep in dependencies]))
     wrapper = module_source(roots, args.export_prefix, skipped)
     wrapper_id = digest([CACHE_FORMAT, identities["compile"], wrapper])

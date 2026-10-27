@@ -57,11 +57,11 @@ def main():
             check(result.returncode==0, result.stderr)
             return json.loads(result.stdout)
 
-        def singular(source, expected=None, extra_env=None):
+        def singular(source, expected=None, extra_env=None, timeout=90):
             result = subprocess.run([str(binary), "-q", "--no-rc", "-r12345678"], input=source+"\nquit;\n",
                                     env=dict(os.environ, **(extra_env or {})),
                                     cwd=directory,
-                                    capture_output=True, text=True, timeout=90)
+                                    capture_output=True, text=True, timeout=timeout)
             check(result.returncode==0 and not result.stderr, repr(result))
             if expected is not None:
                 check(result.stdout==expected, result.stdout)
@@ -101,6 +101,47 @@ poly selected=polyBox.values[1,1];
 print(native_polyFresh(selected)==Field_boundary::polyFresh(selected));
 print(selected==x2+y);
 ''', "9\n4\n1\n3\n4\n1\n1\n1\n")
+
+        nominal_fixture = directory/"nominal_newstruct.lib"
+        nominal_fixture.write_text('''info="native nominal newstruct fixture";
+static proc mod_init()
+{
+  newstruct("NativeCompilerPoint","int x, string label");
+  newstruct("NativeCompilerOther","int x, string label");
+}
+static proc pointX(NativeCompilerPoint point)
+{
+  int result=point.x;
+  return(result);
+}
+proc pointScore(NativeCompilerPoint point)
+{
+  string label=point.label;
+  return(pointX(point)+size(label));
+}
+proc forwardPoint(def point)
+{
+  return(pointX(point));
+}
+''')
+        nominal_module = compile_lib(
+            nominal_fixture, ["pointScore", "forwardPoint"],
+            ["--strict", "--export-prefix", "ns_"])
+        nominal_manifest = json.loads(Path(nominal_module["manifest"]).read_text())
+        nominal_sources = "\n".join(
+            Path(node["source"]).read_text() for node in nominal_manifest["procedures"])
+        check(nominal_sources.count('newstruct_argument(v_point, "NativeCompilerPoint")')==2,
+              nominal_sources)
+        nominal_output = singular(f'''LIB "{nominal_fixture}"; LIB "{nominal_module["module"]}";
+NativeCompilerPoint point; point.x=7; point.label="abcd";
+print(ns_pointScore(point)==pointScore(point));
+print(ns_forwardPoint(point)==forwardPoint(point));
+NativeCompilerOther other; other.x=7; other.label="abcd";
+ns_pointScore(other);
+print("NOMINAL_RECOVERY"); print(ns_pointScore(point));''')
+        check(nominal_output.startswith("1\n1\n") and
+              "native argument requires newstruct NativeCompilerPoint" in nominal_output and
+              nominal_output.endswith("NOMINAL_RECOVERY\n11\n"), nominal_output)
 
         # Native entries retain the exact interpreted source procinfo used by
         # help/example even after both package and top-level bindings are
@@ -162,6 +203,19 @@ print("COUNTER_EXAMPLE_END");
               "NATIVE_SOURCE_EXAMPLE_MARKER" in source_example, source_example)
         check([line.strip() for line in counter_example.splitlines() if line.strip()]==
               ["// proc unrelated_compilerCalls from lib compiled.so"], counter_example)
+
+        # Loading an eager source library from a generated module's mod_init
+        # may itself import a dynamic module.  The loader must keep other
+        # threads excluded while permitting that same-thread nested load.
+        nested_loader = directory/"nested_loader.lib"
+        nested_loader.write_text('''LIB "customstd.so";
+proc nestedLoader(int value){return(value+1);}
+''')
+        nested_module = compile_lib(
+            nested_loader, ["nestedLoader"],
+            ["--strict", "--export-prefix", "nested_"])
+        singular(f'''LIB "{nested_module["module"]}";
+print(nested_nestedLoader(4));''', "5\n", timeout=20)
 
         library = ROOT/"Singular/LIB/absfact.lib"
         first = compile_lib(library, ["variableWithSmallestPositiveDegree"])
@@ -568,6 +622,81 @@ print(string(native_permute(list(1,2,3)))==string(permute(list(1,2,3))));
         check("signal" not in errors and "expected non-negative degree" in errors and
               "wrong input type" in errors and errors.endswith("RECOVERED_LISTS\n1\n1\n"), errors)
         print(f"ellipticcovers.lib: native permute + both propagator overloads, {list_count} comparisons")
+
+        # Real loop-heavy roots unlocked by lexical block locals, checked
+        # dynamic list-element -> poly arguments, and native integer power.
+        piecewise = compile_lib(ROOT/"Singular/LIB/arnold.lib", ["piecewisedegree"], ["--strict"])
+        check("native_piecewisedegree" in piecewise["native_exports"] and not piecewise["aliases"], piecewise)
+        signature = compile_lib(ROOT/"Singular/LIB/surfacesignature.lib",
+                                ["signatureBrieskorn"], ["--strict"])
+        check(signature["native_exports"]==["native_signatureBrieskorn"] and not signature["aliases"], signature)
+        profitable_source = f'''LIB "arnold.lib"; LIB "{piecewise["module"]}";
+ring profitableRing=0,(x,y),dp;
+list weights=intvec(1,2),intvec(2,1),intvec(3,5),intvec(7,4);
+poly p0=0; poly p1=1; poly p2=x; poly p3=y; poly p4=x7+y5+x3*y2; poly p5=(x+y)^20;
+list polynomials=p0,p1,p2,p3,p4,p5;
+for(int i=1;i<=size(polynomials);i++)
+{{print(native_piecewisedegree(polynomials[i],weights)==piecewisedegree(polynomials[i],weights));}}
+LIB "surfacesignature.lib"; LIB "{signature["module"]}";
+for(int a=2;a<=8;a++)
+{{print(native_signatureBrieskorn(a,a+1,a+2)==signatureBrieskorn(a,a+1,a+2));}}
+'''
+        singular(profitable_source, "1\n"*13)
+        number_count += 13
+        print("arnold.lib + surfacesignature.lib: 13 native/interpreted comparisons")
+
+        # Dynamic values in these static ncfactor helpers now retain exact
+        # Singular comparison, size, indexing, and delete semantics.  They are
+        # transitive hot spots in factorization and homogeneous-part searches.
+        ncfactor = compile_lib(
+            ROOT/"Singular/LIB/ncfactor.lib",
+            ["nextSmallerEntry", "binarySearch", "permpp"],
+            ["--strict", "--export-prefix", "ncf_"])
+        check(set(ncfactor["native_exports"])==
+              {"ncf_nextSmallerEntry", "ncf_binarySearch", "ncf_permpp"} and
+              not ncfactor["aliases"], ncfactor)
+        ncfactor_manifest = json.loads(Path(ncfactor["manifest"]).read_text())
+        ncfactor_sources = {node["procedure"]: Path(node["source"]).read_text()
+                            for node in ncfactor_manifest["procedures"]}
+        check(set(ncfactor_sources)=={"nextSmallerEntry", "binarySearch", "permpp"} and
+              "snative::compare_values" in ncfactor_sources["binarySearch"] and
+              "snative::indexed_value" in ncfactor_sources["binarySearch"] and
+              "snative::list_delete" in ncfactor_sources["permpp"] and
+              "snative::append(" in ncfactor_sources["nextSmallerEntry"],
+              "\n".join(ncfactor_sources.values()))
+        ncfactor_source = f'''LIB "ncfactor.lib"; LIB "{ncfactor["module"]}";
+print(ncf_nextSmallerEntry(intvec(3),intvec(2),intvec(5,5))==intvec(2));
+print(ncf_nextSmallerEntry(intvec(1,2),intvec(1,1),intvec(5,5,5,5))==intvec(1,1));
+print(ncf_nextSmallerEntry(intvec(2,-5),intvec(1,1),intvec(5,5,5,5))==intvec(1,5));
+print(ncf_nextSmallerEntry(intvec(2,-5,-5),intvec(1,1,1),intvec(5,5,5,5,5,5))==intvec(1,5,5));
+print(ncf_binarySearch(list(),5)==0);
+print(ncf_binarySearch(list(1,2,6,9,15,22),9)==4);
+print(ncf_binarySearch(list(1,2,6,9,15,22),5)==0);
+intvec searchVector=1,2,6,9,15,22;print(ncf_binarySearch(searchVector,9)==4);
+list searchVectors=list(intvec(0,0),intvec(0,1),intvec(1,0),intvec(2,0));
+print(ncf_binarySearch(searchVectors,intvec(1,0))==3);
+print(ncf_binarySearch(searchVectors,intvec(1,1))==0);
+print(size(ncf_permpp(list()))==0);
+print(size(ncf_permpp(list(1,2,3,4)))==24);
+print(size(ncf_permpp(list(1,2,2,3)))==12);
+list permutationInput=list(1,2,2,3);string savedPermutationInput=string(permutationInput);
+def ignoredPermutations=ncf_permpp(permutationInput);print(string(permutationInput)==savedPermutationInput);
+ring ncfRing=0,(x,y),dp;
+ideal searchIdeal=1,x,x2;print(ncf_binarySearch(searchIdeal,x)==2);
+print(ncf_binarySearch(searchIdeal,y)==0);
+vector searchModule=[1,x,x2];print(ncf_binarySearch(searchModule,x)==2);
+print(ncf_binarySearch(searchModule,y)==0);
+vector va=gen(1);vector vb=gen(2);print(size(ncf_permpp(list(va,vb,va)))==3);
+print(ncf_compilerCalls()>0);
+'''
+        singular(ncfactor_source, "1\n"*20)
+        number_count += 20
+        print("ncfactor.lib: native nextSmallerEntry + binarySearch + permpp, 20 checks")
+
+        complete = compile_lib(ROOT/"Singular/LIB/chern.lib", ["CompleteHomog"])
+        check(not complete["native_exports"] and
+              [entry["procedure"] for entry in complete["aliases"]]==["CompleteHomog"], complete)
+
         list_fixture = directory/"list_kernels.lib"
         list_fixture.write_text('''proc copyList(list input){return(input);}
 proc replaceList(list input){list L=input;L[1]=L[2];return(L);}
@@ -583,6 +712,7 @@ proc appendLiteral(list input){list L=input;L=L+list(8,9);return(L);}
 proc doubleList(list input){list L=input;L=L+L;return(L);}
 proc nestedConcat(list input){return(list(1,2)+list(3,4)+input);}
 proc growSequential(int n){list L;for(int i=1;i<=n;i++){L[i]=i;}return(L);}
+proc growCopied(list input,int n){list L=input;for(int i=1;i<=n;i++){L=L+list(poly(0));}return(L);}
 proc listFailure(list input,int fail){list L=input;L[size(L)+1]=L;
 if(fail){ERROR("list cleanup test");}return(L);}
 ''')
@@ -615,7 +745,7 @@ if(fail){ERROR("list cleanup test");}return(L);}
               double_code.index("snative::list_add(std::move(v_L)") and
               nested_concat_code.count("snative::list_add(std::move(")>=1,
               append_code+double_code+nested_concat_code)
-        source = f'LIB "{list_fixture}"; LIB "{list_module["module"]}"; ring lr=(0,a),(x,y),dp;\n'
+        source = f'LIB "general.lib"; LIB "{list_fixture}"; LIB "{list_module["module"]}"; ring lr=(0,a),(x,y),dp;\n'
         source += 'list input=list(list(x,a),"text",4); string original=string(input);\n'
         kernel_count = 0
         for call in ['copyList(input)', 'replaceList(input)', 'selfAppend(input)', 'selfAppend(list())',
@@ -632,8 +762,14 @@ list markedRef=appendLiteral(marked); list markedNative=lk_appendLiteral(marked)
 print(typeof(attrib(markedRef[1],"tag"))==typeof(attrib(markedNative[1],"tag")));
 print(attrib(marked[1],"tag")==7);
 markedNative=lk_ownedLiteral(marked,x+y,a); print(attrib(markedNative[4][1],"tag")==7);
+list boundaryInput;for(int boundaryIndex=1;boundaryIndex<=52;boundaryIndex++){boundaryInput[boundaryIndex]=boundaryIndex;}
+string savedBoundaryInput=string(boundaryInput);
+list boundaryRef=growCopied(boundaryInput,205);list boundaryNative=lk_growCopied(boundaryInput,205);
+print(string(boundaryNative)==string(boundaryRef));
+print(string(boundaryInput)==savedBoundaryInput);
+print(typeof(boundaryNative[size(boundaryNative)])=="poly");
 '''
-        kernel_count += 3
+        kernel_count += 6
         for a, b in [(8,3),(-8,3),(8,-3),(-8,-3),(2147483647,7),(2147483647*4,7)]:
             # Large values are built by int arithmetic, not out-of-range literals.
             lhs = str(a) if abs(a)<=2147483647 else "2147483647*4"
@@ -659,6 +795,9 @@ killattrib(input,"tag"); print(string(lk_copyList(input))==saved);
         # heterogeneous list #, and lazy copies for mutated typed parameters.
         typed_fixture = directory/"typed_milestone2.lib"
         typed_fixture.write_text('''proc ivSequence(intvec input,int k){intvec v=1,2,input,4..2;v[2]=k;return(v);}
+proc ivRepeat(int value,int count){return(value:count);}
+proc ivRepeatPrecedence(){return(1:2+3);}
+proc ivRepeatWideCount(){int count=2147483647+2147483647+2;return(7:count);}
 proc ivConstruct(intvec input){return(intvec(1,input,3..1));}
 proc ivSlice(intvec input,int first,int last){intvec selected=input[first..last];return(selected);}
 proc ivEmptySlice(intvec input){intvec empty=delete(1..1,1);intvec selected=input[empty];return(selected);}
@@ -676,7 +815,34 @@ proc kernelData(poly p,number n,list L,def value,int position){
   return(list(leadcoef(p),leadexp(p),int(n),insert(L,value,position)));}
 proc numberOrder(number a,number b){return((a<b)+2*(a<=b)+4*(a>b)+8*(a>=b)+16*(a==b)+32*(a!=b));}
 proc integerOps(int a,int b){return(100*(a div b)+(a mod b));}
-proc dynamicNumberReturn(int branch,list values){if(branch){return(number(1));}return(values[1]);}
+proc integerPower(int a,int b){return(a^b);}
+proc integerPowerAlt(int a,int b){return(a**b);}
+proc scopedConditional(int n){int result=0;if(n>0){int local=n+1;result=local;}return(result);}
+proc scopedPolynomial(poly p,int n){poly result=0;for(int i=1;i<=n;i++){poly term=p+i;int extra=i+i;result=result+term+extra;}return(result);}
+proc scopedControl(poly p,int n){poly result=0;int i=0;while(i<n){i++;if(i==2){poly skipped=p;continue;}poly term=p+i;result=result+term;if(i==4){poly stopped=term;break;}}return(result);}
+proc scopedStepDuplicate(int n){int total=0;int i=0;for(i=0;i<n;int q=i){int q=i;total=total+q;i++;}return(total);}
+proc scopedTypeConflict(poly p){for(int i=1;i<=2;i++){if(i==1){int clash=i;}else{poly clash=p;}}return(1);}
+proc scopedTerminalTypeConflict(poly p){for(int i=1;i<=2;i++){if(i==1){int terminalClash=i;}else{poly terminalClash=p;return(1);}}return(0);}
+proc scopedDefChange(poly p){for(int i=1;i<=3;i++){if(i==1){def changing=i;}else{def changing=p;}}return(1);}
+proc dynamicIntContext(list values){int result=values[1]+1;return(result);}
+proc dynamicNegate(def value){int result=-value;return(result);}
+proc dynamicNestedInt(def value){int result=(-value)+1;return(result);}
+proc dynamicCompareLeft(def value,int scalar){return(list(value<scalar,value<=scalar,value>scalar,value>=scalar,value==scalar,value!=scalar));}
+proc dynamicCompareRight(int scalar,def value){return(list(scalar<value,scalar<=value,scalar>value,scalar>=value,scalar==value,scalar!=value));}
+proc dynamicRemainder(def value,int divisor){return((value%divisor)==0);}
+static proc vectorSequenceReturn(intvec prefix,int tail){if(tail<0){return(prefix);}return(prefix,tail);}
+proc vectorSequenceReturnReference(intvec prefix,int tail){intvec result=vectorSequenceReturn(prefix,tail);return(result);}
+proc dynamicCompareValues(def left,def right){return(list(left<right,left<=right,left>right,left>=right,left==right,left!=right));}
+proc dynamicSize(def value){return(size(value));}
+proc dynamicDelete(list values,list positions){return(delete(values,positions[1]));}
+proc intSize(int value){return(size(value));}
+proc idealColumns(ideal value){return(ncols(value));}
+proc intvecRows(intvec value){return(nrows(value));}
+static proc typedWeightedDegree(poly p,intvec weights){return(deg(p,weights));}
+proc dynamicPolyArgument(list values,intvec weights){return(typedWeightedDegree(values[1],weights));}
+proc dynamicPolyPower(poly base,list exponent){return(base^exponent[1]);}
+proc dynamicNumberPower(number base,list exponent){return(base^exponent[1]);}
+proc dynamicIdealPower(ideal base,list exponent){return(base^exponent[1]);}
 proc pack(list #){return(#);}
 proc packWithLocal(list #){int args=7;return(list(args,#));}
 proc packFromNative(){return(pack(1,"text",list(2,3),3..1));}
@@ -685,9 +851,14 @@ proc dynamicSelector(intvec input,list selectors){intvec out=input[selectors[1]]
 proc dynamicExpressionSelector(intvec input,list selectors){intvec out=(input+1)[selectors[1]];return(out);}
 proc packNested(list carrier){return(list(carrier[1][1]));}
 ''')
-        typed_entries = ["ivSequence", "ivConstruct", "ivSlice", "ivEmptySlice", "ivDelete", "ivCompare", "intvecIdentity", "dynamicToIntvec",
+        typed_entries = ["ivSequence", "ivRepeat", "ivRepeatPrecedence", "ivRepeatWideCount", "ivConstruct", "ivSlice", "ivEmptySlice", "ivDelete", "ivCompare", "intvecIdentity", "dynamicToIntvec",
                          "cowIntvec", "cowPoly", "cowNumber", "cowList", "cowListAppend", "listSequence",
-                         "kernelData", "numberOrder", "integerOps", "dynamicNumberReturn",
+                         "kernelData", "numberOrder", "integerOps",
+                         "integerPower", "integerPowerAlt", "scopedConditional", "scopedPolynomial", "scopedControl",
+                         "scopedStepDuplicate", "scopedTypeConflict", "scopedTerminalTypeConflict", "scopedDefChange", "dynamicIntContext", "dynamicNegate", "dynamicNestedInt",
+                         "dynamicCompareLeft", "dynamicCompareRight", "dynamicRemainder", "vectorSequenceReturn",
+                         "dynamicCompareValues", "dynamicSize", "dynamicDelete", "intSize", "idealColumns", "intvecRows", "dynamicPolyArgument",
+                         "dynamicPolyPower", "dynamicNumberPower", "dynamicIdealPower",
                          "pack", "packWithLocal", "packFromNative",
                          "forwardPack", "dynamicSelector", "dynamicExpressionSelector", "packNested"]
         typed = compile_lib(typed_fixture, typed_entries, ["--strict", "--export-prefix", "m2_"])
@@ -695,10 +866,13 @@ proc packNested(list carrier){return(list(carrier[1][1]));}
         typed_code = "\n".join(Path(n["source"]).read_text() for n in typed_manifest["procedures"])
         typed_entry_code = Path(typed_manifest["entry_source"]).read_text()
         for expected in ["snative::CowIntvec", "snative::CowPoly", "snative::CowNumber",
-                         "snative::CowList", "snative::intvec_range", "snative::intvec_select",
+                         "snative::CowList", "snative::intvec_range", "snative::intvec_repeat", "snative::intvec_select",
                          "snative::intvec_delete", "snative::leadcoef",
                          "snative::leadexp", "snative::number_to_int", "n_Greater(",
-                         "snative::list_insert", "snative::quotient", "snative::remainder"]:
+                         "snative::list_insert", "snative::quotient", "snative::remainder",
+                         "snative::integer_power", "snative::compare_value_int", "snative::compare_values",
+                         "snative::binary_value_int", "snative::unary_value", "snative::size_value", "snative::integer_size", "snative::ideal_columns",
+                         "snative::PolyArgument"]:
             check(expected in typed_code, typed_code)
         check("snative::arguments_list" in typed_entry_code and "snative::IntvecArgument" in typed_entry_code and
               "snative::scalar_index_argument" in typed_entry_code and
@@ -713,9 +887,6 @@ proc packNested(list carrier){return(list(carrier[1][1]));}
               typed_sources["cowPoly"]+typed_sources["cowNumber"]+typed_sources["cowListAppend"])
         check("snative::list_set_argument" in typed_sources["forwardPack"],
               typed_sources["forwardPack"])
-        check("snative::exact_number_argument" in typed_sources["dynamicNumberReturn"],
-              typed_sources["dynamicNumberReturn"])
-
         dynamic_variadic = directory/"dynamic_variadic.lib"
         dynamic_variadic.write_text('''proc dynamicFirst(list #){return(#[1]);}
 proc dynamicInt(def value){return(int(value));}
@@ -726,19 +897,22 @@ proc defSequence(){def value=(1,2);return(1);}
 proc listSlotSequence(list L){L[1]=(1,2);return(L);}
 proc mixedSequenceReturn(int b){if(b){return(intvec(3));}return((1,2));}
 proc sequenceIndexSource(intvec v,intvec w){intvec out=(v,w)[1];return(out);}
+proc dynamicNumberReturn(int branch,list values){if(branch){return(number(1));}return(values[1]);}
 ''')
         dynamic_result = compile_lib(dynamic_variadic,
                                      ["dynamicFirst", "dynamicInt", "namedArgs", "nestedInsert", "nestedSelector",
-                                      "defSequence", "listSlotSequence", "mixedSequenceReturn", "sequenceIndexSource"],
+                                      "defSequence", "listSlotSequence", "mixedSequenceReturn", "sequenceIndexSource",
+                                      "dynamicNumberReturn"],
                                      ["--export-prefix", "m2_"])
         check(dynamic_result["native_exports"]==[] and
               {entry["procedure"] for entry in dynamic_result["aliases"]}==
               {"dynamicFirst", "dynamicInt", "namedArgs", "nestedInsert", "nestedSelector", "defSequence",
-               "listSlotSequence", "mixedSequenceReturn", "sequenceIndexSource"},
+               "listSlotSequence", "mixedSequenceReturn", "sequenceIndexSource", "dynamicNumberReturn"},
               dynamic_result)
 
         milestone_count = 0
         source = f'LIB "{typed_fixture}"; LIB "{typed["module"]}";\n'
+        source += 'option(noredefine);\n'
         # Heterogeneous # and intvec-only entries do not require a basering.
         for call in ['pack()', 'pack(1,"alpha",list(2,3),3..1)',
                      'packWithLocal(1,"alpha")', 'packFromNative()']:
@@ -776,8 +950,19 @@ list dynamicScalarSelector=list(2);
 print(m2_dynamicExpressionSelector(dynamicSelectInput,dynamicScalarSelector)==dynamicExpressionSelector(dynamicSelectInput,dynamicScalarSelector));
 '''
         milestone_count += 10
+        for call in ["integerPower(0,0)", "integerPower(0,7)", "integerPower(1,123)",
+                     "integerPower(-1,124)", "integerPower(-1,125)", "integerPower(-2,7)",
+                     "integerPowerAlt(3,11)", "scopedConditional(-2)", "scopedConditional(5)",
+                     "scopedStepDuplicate(0)", "scopedStepDuplicate(6)"]:
+            source += f'print(m2_{call}=={call});\n'
+            milestone_count += 1
         source += '''intvec outside=1,2,3;intvec outsideSaved=outside;
 print(m2_ivSequence(outside,4)==ivSequence(outside,4));
+print(m2_ivRepeat(3,0)==ivRepeat(3,0));
+print(m2_ivRepeat(-2,3)==ivRepeat(-2,3));
+print(m2_ivRepeat(2147483647+1,2)==ivRepeat(2147483647+1,2));
+print(m2_ivRepeatPrecedence()==ivRepeatPrecedence());
+print(m2_ivRepeatWideCount()==ivRepeatWideCount());
 print(m2_ivSequence(outside,scalarVectorArgument[1])==ivSequence(outside,scalarVectorArgument[1]));
 print(m2_ivSequence(outside,outside[1])==ivSequence(outside,outside[1]));
 print(m2_ivConstruct(outside)==ivConstruct(outside));
@@ -791,16 +976,42 @@ print(m2_ivDelete(outside,2)==ivDelete(outside,2));
 print(m2_ivCompare(outside,2)==ivCompare(outside,2));
 intvec equalValues=2,2,2;print(m2_ivCompare(equalValues,2)==ivCompare(equalValues,2));
 print(m2_ivCompare(outside,2147483647+1)==ivCompare(outside,2147483647+1));
+print(m2_intvecRows(outside)==intvecRows(outside));
 print(m2_cowIntvec(outside)==cowIntvec(outside));
 intvec discardedCowIntvec=m2_cowIntvec(outside);print(outside==outsideSaved);
+list dynamicInts=list(41);print(m2_dynamicIntContext(dynamicInts)==dynamicIntContext(dynamicInts));
+print(string(m2_dynamicCompareLeft(1,2))==string(dynamicCompareLeft(1,2)));
+print(string(m2_dynamicCompareRight(2,1))==string(dynamicCompareRight(2,1)));
+intvec dynamicComparedVector=1,2;
+print(string(m2_dynamicCompareLeft(dynamicComparedVector,2))==string(dynamicCompareLeft(dynamicComparedVector,2)));
+print(string(m2_dynamicCompareRight(2,dynamicComparedVector))==string(dynamicCompareRight(2,dynamicComparedVector)));
+print(m2_dynamicRemainder(42,5)==dynamicRemainder(42,5));
+print(m2_dynamicRemainder(bigint(42),5)==dynamicRemainder(bigint(42),5));
+print(m2_dynamicRemainder(dynamicComparedVector,2)==dynamicRemainder(dynamicComparedVector,2));
+print(m2_vectorSequenceReturn(dynamicComparedVector,3)==vectorSequenceReturnReference(dynamicComparedVector,3));
+print(m2_vectorSequenceReturn(dynamicComparedVector,-1)==vectorSequenceReturnReference(dynamicComparedVector,-1));
+print(string(m2_dynamicCompareValues(1,2))==string(dynamicCompareValues(1,2)));
+print(string(m2_dynamicCompareValues(intvec(1,2),intvec(1,3)))==string(dynamicCompareValues(intvec(1,2),intvec(1,3))));
+print(m2_dynamicSize(dynamicComparedVector)==dynamicSize(dynamicComparedVector));
+print(m2_dynamicSize("native")==dynamicSize("native"));
+list dynamicDeleteInput=list("first","second","third");list dynamicDeletePositions=list(2);
+string dynamicDeleteSaved=string(dynamicDeleteInput);
+print(string(m2_dynamicDelete(dynamicDeleteInput,dynamicDeletePositions))==string(dynamicDelete(dynamicDeleteInput,dynamicDeletePositions)));
+print(string(dynamicDeleteInput)==dynamicDeleteSaved);
+print(m2_intSize(0)==intSize(0));
+print(m2_intSize(-1)==intSize(-1));
+print(m2_intSize(2147483647+1)==intSize(2147483647+1));
+print(m2_intSize((2147483647+1)*2)==intSize((2147483647+1)*2));
 '''
-        milestone_count += 16
+        milestone_count += 42
+        source += 'option(noredefine);\n'
         for index, characteristic in enumerate(["0", "7", "(0,a,b)"]):
             source += f'ring m2r{index}={characteristic},(x,y,z),dp;\n'
             source += 'poly p=x2+2*x*y+3;poly savedP=p;number n;number savedN;list L=list(x,"old",3);string savedL=string(L);\n'
             source += '''print(m2_cowNumber(outside[1])==cowNumber(outside[1]));
 print(m2_cowNumber(nestedVectorArgument[1][1])==cowNumber(nestedVectorArgument[1][1]));
 ideal indexedIdeal=x,y; string savedIndexedIdeal=string(indexedIdeal);
+print(m2_idealColumns(indexedIdeal)==idealColumns(indexedIdeal));
 print(string(m2_pack(indexedIdeal[1]))==string(pack(indexedIdeal[1])));
 list indexedIdealCarrier=list(indexedIdeal);
 print(string(m2_pack(indexedIdealCarrier[1][1]))==string(pack(indexedIdealCarrier[1][1])));
@@ -813,12 +1024,44 @@ print(string(m2_packNested(indexedMapCarrier))==string(packNested(indexedMapCarr
 print(m2_cowPoly(indexedIdeal[1])==cowPoly(indexedIdeal[1]));
 print(m2_cowPoly(indexedIdealCarrier[1][1])==cowPoly(indexedIdealCarrier[1][1]));
 print(m2_cowPoly(indexedMap[1])==cowPoly(indexedMap[1]));
+print(m2_cowPoly(3)==cowPoly(3));
+number convertedNumber=3/2;print(m2_cowPoly(convertedNumber)==cowPoly(convertedNumber));
+bigint convertedBigint=bigint(12345678901234567890);print(m2_cowPoly(convertedBigint)==cowPoly(convertedBigint));
+print(string(m2_dynamicCompareLeft(convertedBigint,2))==string(dynamicCompareLeft(convertedBigint,2)));
+print(string(m2_dynamicCompareRight(2,convertedBigint))==string(dynamicCompareRight(2,convertedBigint)));
+print(string(m2_dynamicCompareLeft(convertedNumber,2))==string(dynamicCompareLeft(convertedNumber,2)));
+print(string(m2_dynamicCompareRight(2,convertedNumber))==string(dynamicCompareRight(2,convertedNumber)));
+print(string(m2_dynamicCompareLeft(p,2))==string(dynamicCompareLeft(p,2)));
+print(string(m2_dynamicCompareRight(2,p))==string(dynamicCompareRight(2,p)));
+print(m2_dynamicRemainder(number(6),2)==dynamicRemainder(number(6),2));
+print(m2_dynamicRemainder(poly(x2+1),2)==dynamicRemainder(poly(x2+1),2));
+print(string(m2_dynamicCompareValues(number(1),number(2)))==string(dynamicCompareValues(number(1),number(2))));
+print(string(m2_dynamicCompareValues(poly(x),poly(y)))==string(dynamicCompareValues(poly(x),poly(y))));
+print(m2_dynamicSize(p)==dynamicSize(p));
+ideal dynamicSizedIdeal=x,y;print(m2_dynamicSize(dynamicSizedIdeal)==dynamicSize(dynamicSizedIdeal));
+list dynamicPolys=list(p,p+x,poly(0),1,number(2),convertedBigint);intvec dynamicWeights=1,2,3;
+print(m2_dynamicPolyArgument(dynamicPolys,dynamicWeights)==dynamicPolyArgument(dynamicPolys,dynamicWeights));
+for(int dynamicIndex=4;dynamicIndex<=6;dynamicIndex++)
+{print(m2_dynamicPolyArgument(list(dynamicPolys[dynamicIndex]),dynamicWeights)==dynamicPolyArgument(list(dynamicPolys[dynamicIndex]),dynamicWeights));}
+for(int dynamicExponent=0;dynamicExponent<=3;dynamicExponent=dynamicExponent+3)
+{
+  list dynamicExponentValue=list(dynamicExponent);
+  print(m2_dynamicPolyPower(p,dynamicExponentValue)==dynamicPolyPower(p,dynamicExponentValue));
+  print(m2_dynamicNumberPower(convertedNumber,dynamicExponentValue)==dynamicNumberPower(convertedNumber,dynamicExponentValue));
+  print(string(m2_dynamicIdealPower(indexedIdeal,dynamicExponentValue))==string(dynamicIdealPower(indexedIdeal,dynamicExponentValue)));
+}
+list attributedExponent=list(2);attrib(attributedExponent[1],"native_marker",1);
+print(m2_dynamicPolyPower(p,attributedExponent)==dynamicPolyPower(p,attributedExponent));
+print(m2_dynamicNumberPower(convertedNumber,attributedExponent)==dynamicNumberPower(convertedNumber,attributedExponent));
+print(string(m2_dynamicIdealPower(indexedIdeal,attributedExponent))==string(dynamicIdealPower(indexedIdeal,attributedExponent)));
+print(m2_scopedPolynomial(p,5)==scopedPolynomial(p,5));
+print(m2_scopedControl(p,7)==scopedControl(p,7));
 print(string(indexedIdeal)==savedIndexedIdeal);
 list indexedPolyCarrier=list(x); string savedIndexedPolyCarrier=string(indexedPolyCarrier);
 print(m2_cowPoly(indexedPolyCarrier[1])==cowPoly(indexedPolyCarrier[1]));
 print(string(indexedPolyCarrier)==savedIndexedPolyCarrier);
 '''
-            milestone_count += 14
+            milestone_count += 45
             values = (["3/2", "-3/2", "2147483647+1"] if characteristic=="0" else
                       ["6", "3", "0"] if characteristic=="7" else ["a/b", "a+1", "0"])
             for value in values:
@@ -830,11 +1073,6 @@ print(string(indexedPolyCarrier)==savedIndexedPolyCarrier);
                 source += 'print(n==savedN);\n'
                 milestone_count += 1
             source += 'print(m2_cowPoly(p)==cowPoly(p));print(p==savedP);\n'
-            source += '''list dynamicNumberValues=list(n);
-print(typeof(m2_dynamicNumberReturn(0,dynamicNumberValues))==typeof(dynamicNumberReturn(0,dynamicNumberValues)));
-print(m2_dynamicNumberReturn(0,dynamicNumberValues)==dynamicNumberReturn(0,dynamicNumberValues));
-print(m2_dynamicNumberReturn(1,dynamicNumberValues)==dynamicNumberReturn(1,dynamicNumberValues));
-'''
             source += 'print(string(m2_cowList(L))==string(cowList(L)));print(string(L)==savedL);\n'
             source += 'print(string(m2_cowListAppend(L))==string(cowListAppend(L)));print(string(L)==savedL);\n'
             source += 'print(string(m2_listSequence(L))==string(listSequence(L)));print(string(L)==savedL);\n'
@@ -843,19 +1081,82 @@ list referenceInserted=kernelData(p,n,L,insertCarrier[1],1);
 list nativeInserted=m2_kernelData(p,n,L,insertCarrier[1],1);
 print(string(nativeInserted)==string(referenceInserted));print(string(insertCarrier)==savedCarrier);
 '''
-            milestone_count += 13
+            milestone_count += 10
             for left, right in [(0,0),(1,2),(2,1),(-1,1)]:
                 source += f'print(m2_numberOrder(number({left}),number({right}))==numberOrder(number({left}),number({right})));\n'
                 milestone_count += 1
             source += ('kill p,savedP,n,savedN,L,savedL,indexedIdeal,savedIndexedIdeal,'
                        'indexedIdealCarrier,indexedMap,indexedMapCarrier,indexedPolyCarrier,'
-                       'savedIndexedPolyCarrier,dynamicNumberValues,insertCarrier,savedCarrier,'
+                       'savedIndexedPolyCarrier,convertedNumber,convertedBigint,dynamicPolys,dynamicWeights,dynamicSizedIdeal,insertCarrier,savedCarrier,'
                        'referenceInserted,nativeInserted;\n')
         for left, right in [(17,5),(-17,5),(17,-5),(-17,-5)]:
             source += f'print(m2_integerOps({left},{right})==integerOps({left},{right}));\n'
             milestone_count += 1
+        source += 'option(redefine);\n'
         singular(source, "1\n"*milestone_count)
         number_count += milestone_count
+        scoped_warnings = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+option(redefine); ring scopedRing=0,(x),dp;
+m2_scopedPolynomial(x,3); scopedPolynomial(x,3);
+m2_scopedDefChange(x); scopedDefChange(x);
+print("SCOPED_WARNING_RECOVERY"); print(m2_scopedPolynomial(x,1)==scopedPolynomial(x,1));''')
+        check(scoped_warnings.count("redefining term")==4 and
+              scoped_warnings.count("redefining extra")==4 and
+              scoped_warnings.count("redefining changing")==4 and
+              scoped_warnings.endswith("SCOPED_WARNING_RECOVERY\n1\n"), scoped_warnings)
+        scoped_conflict = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+ring scopedConflictRing=0,(x),dp;
+m2_scopedTypeConflict(x); print("NATIVE_CONFLICT_RECOVERY");
+scopedTypeConflict(x); print("INTERPRETED_CONFLICT_RECOVERY");
+m2_scopedTerminalTypeConflict(x); print("NATIVE_TERMINAL_CONFLICT_RECOVERY");
+scopedTerminalTypeConflict(x); print("INTERPRETED_TERMINAL_CONFLICT_RECOVERY");''')
+        check(scoped_conflict.count("identifier `clash` in use")==2 and
+              scoped_conflict.count("identifier `terminalClash` in use")==2 and
+              scoped_conflict.endswith("INTERPRETED_TERMINAL_CONFLICT_RECOVERY\n"), scoped_conflict)
+        custom_integer_dispatch = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+proc NativeCompilerCustomAdd(def left,def right){{return(41);}}
+proc NativeCompilerCustomNeg(def value){{return(-41);}}
+proc NativeCompilerCustomIdentity(def value){{return(value);}}
+proc NativeCompilerCustomPower(def left,def right){{return(left);}}
+newstruct("NativeCompilerIntOps","int value");
+system("install","NativeCompilerIntOps","+",NativeCompilerCustomAdd,2);
+system("install","NativeCompilerIntOps","-",NativeCompilerCustomNeg,1);
+NativeCompilerIntOps customValue;
+list customValues=list(customValue);
+print(m2_dynamicIntContext(customValues)==dynamicIntContext(customValues));
+print(m2_dynamicNegate(customValue)==dynamicNegate(customValue));
+newstruct("NativeCompilerNestedIntOps","int value");
+system("install","NativeCompilerNestedIntOps","+",NativeCompilerCustomAdd,2);
+system("install","NativeCompilerNestedIntOps","-",NativeCompilerCustomIdentity,1);
+NativeCompilerNestedIntOps nestedValue;
+print(m2_dynamicNestedInt(nestedValue)==dynamicNestedInt(nestedValue));
+newstruct("NativeCompilerPowerExponent","int value");
+system("install","NativeCompilerPowerExponent","^",NativeCompilerCustomPower,2);
+NativeCompilerPowerExponent customExponent;
+list customExponentValue=list(customExponent);
+ring customPowerRing=0,(x),dp;
+poly customPoly=x+1; number customNumber=3/2; ideal customIdeal=ideal(x,1);
+print(m2_dynamicPolyPower(customPoly,customExponentValue)==dynamicPolyPower(customPoly,customExponentValue));
+print(m2_dynamicNumberPower(customNumber,customExponentValue)==dynamicNumberPower(customNumber,customExponentValue));
+print(string(m2_dynamicIdealPower(customIdeal,customExponentValue))==string(dynamicIdealPower(customIdeal,customExponentValue)));''')
+        check(custom_integer_dispatch.endswith("1\n1\n1\n1\n1\n1\n"), custom_integer_dispatch)
+        power_errors = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+print("POWER_OVERFLOW_BEGIN");
+print(m2_integerPower(2,63)==integerPower(2,63));
+print("POWER_OVERFLOW_END");
+m2_integerPower(2,-1);
+print("POWER_RECOVERY"); print(m2_integerPower(3,4));''')
+        check(power_errors.count("int overflow(^), result may be wrong")==2 and
+              "POWER_OVERFLOW_BEGIN\n" in power_errors and "\n1\nPOWER_OVERFLOW_END\n" in power_errors and
+              "exponent must be non-negative" in power_errors and
+              power_errors.endswith("POWER_RECOVERY\n81\n"), power_errors)
+        dynamic_poly_error = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+ring r=0,(x),dp; list wrong=list("not a polynomial"); intvec weights=1;
+m2_dynamicPolyArgument(wrong,weights);
+print("POLY_RECOVERY"); list right=list(poly(x+1));
+print(m2_dynamicPolyArgument(right,weights)==dynamicPolyArgument(right,weights));''')
+        check("requires poly, number, bigint, or int" in dynamic_poly_error and
+              dynamic_poly_error.endswith("POLY_RECOVERY\n1\n"), dynamic_poly_error)
         dynamic_output = singular(f'''LIB "{dynamic_variadic}"; LIB "{dynamic_result["module"]}";
 print(string(m2_dynamicFirst("kept dynamic"))==string(dynamicFirst("kept dynamic")));
 list nestedInput=list(9); print(string(m2_nestedInsert(nestedInput))==string(nestedInsert(nestedInput)));
@@ -875,15 +1176,6 @@ print(string(m2_forwardPack(7))==string(forwardPack(7)));''')
         check("undefined" in internal_undefined_variadic and
               internal_undefined_variadic.endswith("INTERNAL_VARIADIC_RECOVERY\n1\n"),
               internal_undefined_variadic)
-        dynamic_number_return_error = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
-ring r=0,(x),dp; list integerValue=list(1);
-m2_dynamicNumberReturn(0,integerValue);
-print("DYNAMIC_NUMBER_RETURN_RECOVERY");
-list numberValue=list(number(1));
-print(m2_dynamicNumberReturn(0,numberValue)==dynamicNumberReturn(0,numberValue));''')
-        check("requires a plain number" in dynamic_number_return_error and
-              dynamic_number_return_error.endswith("DYNAMIC_NUMBER_RETURN_RECOVERY\n1\n"),
-              dynamic_number_return_error)
         dynamic_selector_error = singular(f'''LIB "{typed["module"]}";
 intvec selectorSource=10,20; list vectorSelector=list(intvec(1,2));
 m2_dynamicExpressionSelector(selectorSource,vectorSelector);
@@ -950,7 +1242,9 @@ proc dynamicWideIndex(int branch,list values,int position){if(branch){return(0);
                         "idealFromNumber", "idealNumberThenIdentity", "idealNestedNumberIdentity",
                         "forwardDynamicIdeal", "dynamicIdealReturn", "nestedValues",
                         "ownedValues", "wideIndexReads", "wideIndexWrites", "dynamicWideIndex"]
-        rich = compile_lib(rich_fixture, rich_entries, ["--strict", "--export-prefix", "rich_"])
+        rich = compile_lib(rich_fixture, rich_entries, ["--export-prefix", "rich_"])
+        check({entry["procedure"] for entry in rich["aliases"]}==
+              {"dynamicStringReturn", "dynamicIdealReturn", "dynamicWideIndex"}, rich)
         rich_manifest = json.loads(Path(rich["manifest"]).read_text())
         rich_code = "\n".join(Path(n["source"]).read_text() for n in rich_manifest["procedures"])
         rich_sources = {n["procedure"]: Path(n["source"]).read_text()
@@ -969,8 +1263,6 @@ proc dynamicWideIndex(int branch,list values,int position){if(branch){return(0);
               rich_sources["wideIndexReads"])
         check(rich_sources["wideIndexWrites"].count("(int)(v_position)")==4,
               rich_sources["wideIndexWrites"])
-        check(rich_sources["dynamicWideIndex"].count("(int)(v_position)")==1,
-              rich_sources["dynamicWideIndex"])
 
         unsupported_rich = directory/"string_ideal_fallback.lib"
         unsupported_rich.write_text('''proc idealSubtract(ideal I,ideal J){return(I-J);}
@@ -1158,7 +1450,15 @@ print(string(qraw)==savedQraw);
 print(attrib(qNative,"qringNF")==attrib(qReference,"qringNF") and attrib(qNative,"qringNF")==1);
 '''
         rich_count += 33
-        singular(rich_source, "1\n"*rich_count)
+        rich_output = singular(rich_source)
+        rich_lines = rich_output.splitlines()
+        rich_unexpected = [line for line in rich_lines if line!="1" and not
+                           (line.startswith("// ** redefining rich_dynamic") or
+                            (line.startswith("// ** rich_dynamic") and
+                             line.endswith(" is an interpreted alias, not native C++")))]
+        check(not rich_unexpected and rich_lines.count("1")==rich_count and
+              rich_output.count(" is an interpreted alias, not native C++")==3,
+              rich_output)
         number_count += rich_count
 
         string_write_error = singular(f'''LIB "{rich_fixture}"; LIB "{rich["module"]}";
@@ -1300,16 +1600,22 @@ proc zGood(int n){return(shared(n)+2);}
               serial_manifest["exports"]==parallel_manifest["exports"],
               (serial_manifest, parallel_manifest))
 
-        # Library-at-a-time milestone: all public procedures in template.lib,
-        # including the integer specialization of its variadic msum loop.
-        template = compile_lib(ROOT/"Singular/LIB/template.lib", [], ["--export-prefix", "c_", "--strict"])
-        check(set(template["exports"])=={"c_mdouble","c_mtriple","c_msum"} and not template["skipped"], template)
-        singular(f'''LIB "template.lib"; LIB "{template["module"]}";
+        # Library-at-a-time milestone: statically typed procedures compile;
+        # msum remains an exact interpreted alias because # elements can have
+        # types other than int at runtime.
+        template = compile_lib(ROOT/"Singular/LIB/template.lib", [], ["--export-prefix", "c_"])
+        check(set(template["native_exports"])=={"c_mdouble","c_mtriple"} and
+              {entry["procedure"] for entry in template["aliases"]}=={"msum"}, template)
+        template_output = singular(f'''LIB "template.lib"; LIB "{template["module"]}";
 print(c_mdouble(21)==mdouble(21)); print(c_mtriple(-7)==mtriple(-7));
 print(c_msum()==msum()); print(c_msum(8)==msum(8));
-print(c_msum(1,2,3,4)==msum(1,2,3,4));''', "1\n"*5)
-        rejected = singular(f'LIB "{template["module"]}"; c_msum("text");\nprint(c_msum(2,3));')
-        check("plain int" in rejected and rejected.endswith("5\n"), rejected)
+print(c_msum(1,2,3,4)==msum(1,2,3,4));''')
+        check("c_msum is an interpreted alias, not native C++" in template_output and
+              template_output.endswith("1\n"*5), template_output)
+        template_dynamic = singular(f'''LIB "template.lib"; LIB "{template["module"]}";
+print(c_msum("a","b")==msum("a","b"));''')
+        check("interpreted alias" in template_dynamic and
+              template_dynamic.endswith("1\n"), template_dynamic)
         collision = singular(f'''LIB "template.lib";
 int c_mdouble=77;
 LIB "{template["module"]}";
@@ -1390,8 +1696,8 @@ print("EVOLUTION"); print(c_value(1)); print(value(1)); print(saved(1));''')
         bad = directory/"bad.lib"
         for unsupported in ['return(execute("1"));', 'ideal q=p;q=q-ideal(p);return(1);', 'return(unknown(p));', 'int while=2;return(1);',
                             'if(1){int k=2;}return(k);',
-                            'while(1){if(1){poly q=p;break;return(q);}}return(p);',
-                            'while(1){if(1){if(1){continue;}poly q=p;return(q);}}return(p);',
+                            'list L=list(0);return(L[1]+1);',
+                            'int i=0;for(i=0;i<2;int x=i){i++;}return(x);',
                             'if(1){poly q=p;return(q);}return(q);',
                             'return(diff(1,1));', 'return(diff(p,p));',
                             'execute("number xx = "+"a");kill xx;return(1);',

@@ -228,6 +228,27 @@ LIB "second.lib";
         self.assertEqual(compiler.library_index(source)["imports"],
                          ["first.lib", "second.lib"])
 
+    def test_only_unconditional_literal_mod_init_newstructs_are_indexed(self):
+        source = '''info="new style";
+static proc mod_init()
+{
+  newstruct("Point","int x, string label");
+  if (1) { newstruct("Conditional","int x"); }
+  newstruct(dynamicName,"int x");
+  newstruct("BeforeReturn","int x");
+  return();
+  newstruct("Unreachable","int x");
+}
+proc coordinate(Point point) { return(point.x); }
+'''
+        index = compiler.library_index(source)
+        self.assertEqual(index["newstructs"], ["Point", "BeforeReturn"])
+        params, nominal = compiler.signature(
+            index["procedures"]["coordinate"], index["newstructs"],
+            include_nominal=True)
+        self.assertEqual(params, [["value", "point"]])
+        self.assertEqual(nominal, {"point": "Point"})
+
     def test_unsupported_import_forms_remain_errors(self):
         cases = {
             'LIB "missing-semicolon.lib"\n': "expected ';' after LIB declaration",

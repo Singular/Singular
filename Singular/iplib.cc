@@ -1190,6 +1190,28 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
 
 THREAD_VAR std::map<std::string, void *> *dyn_modules;
 
+// A module's mod_init may load an interpreted source library which in turn
+// imports another dynamic module.  Keep other threads excluded for the whole
+// transaction, but permit that intentional same-thread nesting.
+static pthread_mutex_t load_modules_mutex;
+static pthread_once_t load_modules_mutex_once = PTHREAD_ONCE_INIT;
+static int load_modules_mutex_error = 0;
+
+static void initialize_load_modules_mutex()
+{
+  pthread_mutexattr_t attributes;
+  int error=pthread_mutexattr_init(&attributes);
+  if (error==0)
+  {
+    error=pthread_mutexattr_settype(&attributes,PTHREAD_MUTEX_RECURSIVE);
+    if (error==0)
+      error=pthread_mutex_init(&load_modules_mutex,&attributes);
+    const int destroy_error=pthread_mutexattr_destroy(&attributes);
+    if (error==0) error=destroy_error;
+  }
+  load_modules_mutex_error=error;
+}
+
 bool registered_dyn_module(char *fullname) {
   if (dyn_modules == NULL)
     return false;
@@ -1319,10 +1341,23 @@ BOOLEAN load_modules_aux(const char *newlib, char *fullname, BOOLEAN autoexport)
 
 BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
 {
-  GLOBAL_VAR static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-  pthread_mutex_lock(&mutex);
+  if (pthread_once(&load_modules_mutex_once,initialize_load_modules_mutex)!=0 ||
+      load_modules_mutex_error!=0)
+  {
+    WerrorS("cannot initialize the dynamic-module loader mutex");
+    return TRUE;
+  }
+  if (pthread_mutex_lock(&load_modules_mutex)!=0)
+  {
+    WerrorS("cannot lock the dynamic-module loader mutex");
+    return TRUE;
+  }
   BOOLEAN r = load_modules_aux(newlib, fullname, autoexport);
-  pthread_mutex_unlock(&mutex);
+  if (pthread_mutex_unlock(&load_modules_mutex)!=0)
+  {
+    WerrorS("cannot unlock the dynamic-module loader mutex");
+    return TRUE;
+  }
   return r;
 }
 #endif /* HAVE_DYNAMIC_LOADING */

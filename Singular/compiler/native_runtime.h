@@ -11,6 +11,7 @@
 #include "polys/sbuckets.h"
 #include "polys/ext_fields/transext.h"
 #include <climits>
+#include <cstring>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -535,11 +536,43 @@ inline long mul(long a, long b) {
     WarnS("int overflow(*), result may be wrong");
   return z;
 }
+inline long integer_size(long value) {
+  // COUNT_CMD reaches an int through iiI2BI, which narrows to C int before
+  // constructing the bigint.  A nonzero machine int has one bigint limb.
+  return (int)value==0 ? 0 : 1;
+}
+inline long integer_power(long base, long exponent) {
+  if (exponent<0) throw std::runtime_error("exponent must be non-negative");
+  if (base==0) return exponent==0;
+  if (exponent==0 || base==1) return 1;
+  if (base==-1) return (exponent&1) ? -1 : 1;
+  long result=1;
+  bool overflow=false;
+  while (exponent--!=0) {
+    const long previous=result;
+    result=(long)((unsigned long)result*(unsigned long)base);
+    if (!overflow && result/base!=previous) overflow=true;
+  }
+  if (overflow) WarnS("int overflow(^), result may be wrong");
+  return result;
+}
 inline long neg(long a) { return (long)(0UL-(unsigned long)a); }
 inline long increment(long a, int step) {
   return (int)((unsigned long)a+(unsigned long)step);
 }
 inline bool truth(long a) { return (int)a!=0; }
+inline void declare_local(int &declared_type, int type, bool declared_as_def,
+                          const char *name) {
+  if (declared_type!=0) {
+    if (!declared_as_def && declared_type!=type)
+      throw std::runtime_error(std::string("identifier `")+name+"` in use");
+    if (BVERBOSE(V_REDEFINE)) Warn("redefining %s",name);
+  }
+  // A def declaration adopts its initializer's concrete type.  It may change
+  // an existing identifier's type, but a later explicit declaration must then
+  // agree with that new concrete type.
+  declared_type=type;
+}
 
 inline String string_add(const char *a, const char *b) {
   if (a==nullptr) a="";
@@ -602,6 +635,10 @@ inline Ideal ideal_from_number(number value, ring r) {
 inline long ideal_size(IdealView value) {
   if (value.data()==nullptr) throw std::runtime_error("native ideal value is invalid");
   return idElem(value.data());
+}
+inline long ideal_columns(IdealView value) {
+  if (value.data()==nullptr) throw std::runtime_error("native ideal value is invalid");
+  return MATCOLS((matrix)value.data());
 }
 inline BITSET ideal_assignment_flags(IdealView value, ring r) {
   BITSET flags=value.flags();
@@ -867,6 +904,13 @@ public:
       ? omAlloc0((size_t)grown*sizeof(sleftv))
       : omRealloc0Size(value->m,(size_t)allocated*sizeof(sleftv),
                        (size_t)grown*sizeof(sleftv)));
+    // omRealloc0Size may keep allocator padding between the old requested
+    // size and a rounded block boundary.  That padding becomes live sleftv
+    // storage after a capacity increase, so initialize it explicitly rather
+    // than relying on the allocator to clear every newly exposed slot.
+    if (grown>allocated)
+      std::memset(value->m+allocated,0,
+                  (size_t)(grown-allocated)*sizeof(sleftv));
     allocated=(int)grown;
   }
   lists release() {
@@ -974,10 +1018,25 @@ public:
   Value(Value &&v) noexcept: value(v.value), owner(v.owner) { v.value.Init(); }
   leftv get() { return &value; }
 };
+// Marks an error already diagnosed by an interpreter kernel.  Native entry
+// wrappers return it directly instead of printing a second, less useful
+// exception message on top of the original Singular diagnostic.
+struct ReportedInterpreterError {};
 inline leftv value_argument(leftv argument) {
   argument=list_element_argument(argument);
   if (argument==nullptr || argument->e!=nullptr || argument->rtyp==ALIAS_CMD)
     throw std::runtime_error("native argument requires a plain value or list selection");
+  return argument;
+}
+inline leftv newstruct_argument(leftv argument, const char *expected) {
+  argument=value_argument(argument);
+  const int type=argument->Typ();
+  blackbox *box=getBlackboxStuff(type);
+  const char *actual=type>MAX_TOK ? getBlackboxName(type) : nullptr;
+  if (box==nullptr || box->blackbox_Op2!=newstruct_Op2 || box->data==nullptr ||
+      actual==nullptr || std::strcmp(actual,expected)!=0)
+    throw std::runtime_error(std::string("native argument requires newstruct ")+
+                             expected);
   return argument;
 }
 inline String string_from_value(leftv argument) {
@@ -1076,6 +1135,51 @@ inline leftv scalar_index_argument(leftv argument, sleftv &materialized,
   }
   return argument;
 }
+class PolyArgument {
+  Poly converted;
+  poly value;
+public:
+  PolyArgument(leftv argument, ring r): converted(nullptr,r), value(nullptr) {
+    sleftv materialized;
+    char string_value[2];
+    argument=scalar_index_argument(argument,materialized,string_value);
+    argument=value_argument(argument);
+    const int type=argument->Typ();
+    if (type==POLY_CMD || type==BUCKET_CMD) {
+      value=borrow_poly(argument);
+    } else if (type==INT_CMD) {
+      void *data=argument->Data();
+      if (errorreported) throw ReportedInterpreterError();
+      converted=Poly(p_ISet((int)(long)data,r),r);
+      if (errorreported) throw ReportedInterpreterError();
+      value=converted.get();
+    } else if (type==NUMBER_CMD) {
+      number data=(number)argument->Data();
+      if (errorreported) throw ReportedInterpreterError();
+      Number copied(n_Copy(data,r->cf),r->cf);
+      if (errorreported) throw ReportedInterpreterError();
+      converted=Poly(p_NSet(copied.release(),r),r);
+      if (errorreported) throw ReportedInterpreterError();
+      value=converted.get();
+    } else if (type==BIGINT_CMD) {
+      number data=(number)argument->Data();
+      nMapFunc map=n_SetMap(coeffs_BIGINT,r->cf);
+      if (errorreported) throw ReportedInterpreterError();
+      if (map==nullptr)
+        throw std::runtime_error("native bigint-to-poly argument conversion failed");
+      Number mapped(map(data,coeffs_BIGINT,r->cf),r->cf);
+      if (errorreported) throw ReportedInterpreterError();
+      converted=Poly(p_NSet(mapped.release(),r),r);
+      if (errorreported) throw ReportedInterpreterError();
+      value=converted.get();
+    } else {
+      throw std::runtime_error("native polynomial argument requires poly, number, bigint, or int");
+    }
+  }
+  PolyArgument(const PolyArgument &)=delete;
+  PolyArgument &operator=(const PolyArgument &)=delete;
+  poly get() const { return value; }
+};
 inline long int_argument(leftv argument) {
   sleftv materialized;
   char string_value[2];
@@ -1086,6 +1190,188 @@ inline long int_argument(leftv argument) {
   void *data=argument->Data();
   if (errorreported) throw std::runtime_error("native int argument is invalid");
   return (long)data;
+}
+inline long power_exponent(leftv argument) {
+  argument=value_argument(argument);
+  if (argument->Typ()!=INT_CMD)
+    throw std::runtime_error("native exponent requires int");
+  void *data=argument->Data();
+  if (errorreported) throw ReportedInterpreterError();
+  // jjPOWER_P/N/ID consume only Data(); attributes and flags on the integer
+  // operand do not participate in the operation.
+  return (long)data;
+}
+inline long compare_ints(long left, long right, int operation) {
+  // Singular's INT_CMD kernels compare C ints even though the interpreter
+  // stores them in pointer-sized slots.
+  const int a=(int)left, b=(int)right;
+  switch (operation) {
+    case '<': return a<b;
+    case '>': return a>b;
+    case LE: return a<=b;
+    case GE: return a>=b;
+    case EQUAL_EQUAL: return a==b;
+    case NOTEQUAL: return a!=b;
+  }
+  throw std::runtime_error("unsupported native integer comparison");
+}
+inline long compare_value_int(leftv argument, long integer, int operation,
+                              bool value_on_left, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  argument=scalar_index_argument(argument,materialized,string_value);
+  argument=value_argument(argument);
+
+  // This is the hot path for a def/list value guarded by typeof(...), as in
+  // ellipticcovers.lib::propagator.  Keep it entirely in generated C++.
+  const int argument_type=argument->Typ();
+  if (errorreported) throw ReportedInterpreterError();
+  if (argument_type==INT_CMD) {
+    void *data=argument->Data();
+    if (errorreported) throw ReportedInterpreterError();
+    const long dynamic=(long)data;
+    return value_on_left ? compare_ints(dynamic,integer,operation)
+                         : compare_ints(integer,dynamic,operation);
+  }
+
+  // A runtime value can also select Singular's number, bigint, polynomial,
+  // intvec, string, blackbox, or other comparison overload.  Deep-copy both
+  // operands before asking the ordinary binary dispatcher so its mandatory
+  // cleanup cannot touch interpreter- or list-owned data.  This cold path is
+  // deliberately exact rather than guessing an overload from the result type.
+  Value left(r), right(r), result(r);
+  leftv dynamic=value_on_left ? left.get() : right.get();
+  leftv scalar=value_on_left ? right.get() : left.get();
+  // A direct def formal points into the native entry's argument chain.  The
+  // following arguments are not part of this expression operand.
+  sleftv head=*argument;
+  head.next=nullptr;
+  dynamic->Copy(&head);
+  if (errorreported) throw ReportedInterpreterError();
+  scalar->rtyp=INT_CMD;
+  scalar->data=(void*)integer;
+  struct RestoreOperation {
+    int saved;
+    RestoreOperation(): saved(iiOp) {}
+    ~RestoreOperation() { iiOp=saved; }
+  } restore_operation;
+  const BOOLEAN failed=iiExprArith2(result.get(),left.get(),operation,right.get());
+  if (errorreported) throw ReportedInterpreterError();
+  if (failed || result.get()->Typ()!=INT_CMD)
+    throw std::runtime_error("native dynamic comparison failed");
+  void *data=result.get()->Data();
+  if (errorreported) throw ReportedInterpreterError();
+  return (long)data;
+}
+inline long compare_values(leftv first, leftv second, int operation, ring r) {
+  sleftv first_materialized, second_materialized;
+  char first_string[2], second_string[2];
+  first=scalar_index_argument(first,first_materialized,first_string);
+  second=scalar_index_argument(second,second_materialized,second_string);
+  first=value_argument(first);
+  second=value_argument(second);
+  const int first_type=first->Typ(), second_type=second->Typ();
+  if (errorreported) throw ReportedInterpreterError();
+  if (first_type==INT_CMD && second_type==INT_CMD) {
+    void *a=first->Data(), *b=second->Data();
+    if (errorreported) throw ReportedInterpreterError();
+    return compare_ints((long)a,(long)b,operation);
+  }
+
+  Value left(r), right(r), result(r);
+  sleftv first_head=*first, second_head=*second;
+  first_head.next=nullptr;
+  second_head.next=nullptr;
+  left.get()->Copy(&first_head);
+  if (errorreported) throw ReportedInterpreterError();
+  right.get()->Copy(&second_head);
+  if (errorreported) throw ReportedInterpreterError();
+  struct RestoreOperation {
+    int saved;
+    RestoreOperation(): saved(iiOp) {}
+    ~RestoreOperation() { iiOp=saved; }
+  } restore_operation;
+  const BOOLEAN failed=iiExprArith2(result.get(),left.get(),operation,right.get());
+  if (errorreported) throw ReportedInterpreterError();
+  if (failed || result.get()->Typ()!=INT_CMD)
+    throw std::runtime_error("native dynamic comparison failed");
+  void *data=result.get()->Data();
+  if (errorreported) throw ReportedInterpreterError();
+  return (long)data;
+}
+inline long size_value(leftv argument, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  argument=scalar_index_argument(argument,materialized,string_value);
+  argument=value_argument(argument);
+  const int type=argument->Typ();
+  if (errorreported) throw ReportedInterpreterError();
+  void *data=argument->Data();
+  if (errorreported) throw ReportedInterpreterError();
+  switch (type) {
+    case POLY_CMD:
+    case VECTOR_CMD: return pLength((poly)data);
+    case IDEAL_CMD:
+    case MODUL_CMD: return idElem((ideal)data);
+    case INTVEC_CMD:
+    case INTMAT_CMD: return ((intvec*)data)->length();
+    case LIST_CMD: return lSize((lists)data)+1;
+    case STRING_CMD: return strlen((const char*)data);
+  }
+
+  Value input(r), result(r);
+  sleftv head=*argument;
+  head.next=nullptr;
+  input.get()->Copy(&head);
+  if (errorreported) throw ReportedInterpreterError();
+  struct RestoreOperation {
+    int saved;
+    RestoreOperation(): saved(iiOp) {}
+    ~RestoreOperation() { iiOp=saved; }
+  } restore_operation;
+  const BOOLEAN failed=iiExprArith1(result.get(),input.get(),COUNT_CMD);
+  if (errorreported) throw ReportedInterpreterError();
+  if (failed || result.get()->Typ()!=INT_CMD)
+    throw std::runtime_error("native dynamic size failed");
+  data=result.get()->Data();
+  if (errorreported) throw ReportedInterpreterError();
+  return (long)data;
+}
+inline Value unary_value(leftv argument, int operation, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  argument=scalar_index_argument(argument,materialized,string_value);
+  argument=value_argument(argument);
+  const int type=argument->Typ();
+  if (errorreported) throw ReportedInterpreterError();
+
+  Value result(r);
+  if (type==INT_CMD && operation=='-') {
+    void *data=argument->Data();
+    if (errorreported) throw ReportedInterpreterError();
+    result.get()->rtyp=INT_CMD;
+    result.get()->data=(void*)neg((long)data);
+    return result;
+  }
+
+  // The interpreter dispatches an overloaded unary operator before assigning
+  // its result to a typed destination.  Work on a private copy because the
+  // ordinary dispatcher may consume or normalize its input.
+  Value input(r);
+  sleftv head=*argument;
+  head.next=nullptr;
+  input.get()->Copy(&head);
+  if (errorreported) throw ReportedInterpreterError();
+  struct RestoreOperation {
+    int saved;
+    RestoreOperation(): saved(iiOp) {}
+    ~RestoreOperation() { iiOp=saved; }
+  } restore_operation;
+  const BOOLEAN failed=iiExprArith1(result.get(),input.get(),operation);
+  if (errorreported) throw ReportedInterpreterError();
+  if (failed)
+    throw std::runtime_error("native dynamic unary operation failed");
+  return result;
 }
 inline intvec *intvec_argument(leftv argument) {
   argument=value_argument(argument);
@@ -1195,6 +1481,76 @@ inline Ideal exact_ideal_argument(leftv argument, ring r) {
     throw std::runtime_error("native ideal return is invalid");
   return Ideal::copy(IdealView(value,value_flags(argument)),r);
 }
+inline Number exact_number_argument(leftv argument, ring r);
+inline Poly exact_poly_argument(leftv argument, ring r) {
+  argument=value_argument(argument);
+  if ((argument->Typ()!=POLY_CMD && argument->Typ()!=BUCKET_CMD) ||
+      unsupported_poly_result_metadata(argument))
+    throw std::runtime_error("native polynomial result requires a plain poly");
+  poly value=borrow_poly(argument);
+  if (errorreported) throw ReportedInterpreterError();
+  return Poly(p_Copy(value,r),r);
+}
+inline Value binary_static_value(int type, void *data, BITSET flags,
+                                 leftv argument, int operation, ring r) {
+  Value left(r), right(r), result(r);
+  left.get()->rtyp=type;
+  if (type==POLY_CMD)
+    left.get()->data=(void*)p_Copy((poly)data,r);
+  else if (type==NUMBER_CMD)
+    left.get()->data=(void*)n_Copy((number)data,r->cf);
+  else if (type==IDEAL_CMD) {
+    left.get()->data=(void*)id_Copy((ideal)data,r);
+    left.get()->flag=flags;
+  } else {
+    throw std::runtime_error("unsupported native static/dynamic operation");
+  }
+  sleftv head=*argument;
+  head.next=nullptr;
+  right.get()->Copy(&head);
+  if (errorreported) throw ReportedInterpreterError();
+  struct RestoreOperation {
+    int saved;
+    RestoreOperation(): saved(iiOp) {}
+    ~RestoreOperation() { iiOp=saved; }
+  } restore_operation;
+  const BOOLEAN failed=iiExprArith2(result.get(),left.get(),operation,right.get());
+  if (errorreported) throw ReportedInterpreterError();
+  if (failed)
+    throw std::runtime_error("native static/dynamic operation failed");
+  return result;
+}
+inline Poly poly_power_value(poly base, leftv exponent, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  exponent=scalar_index_argument(exponent,materialized,string_value);
+  exponent=value_argument(exponent);
+  if (exponent->Typ()==INT_CMD)
+    return power(Poly::copy(base,r),power_exponent(exponent));
+  Value result=binary_static_value(POLY_CMD,(void*)base,0,exponent,'^',r);
+  return exact_poly_argument(result.get(),r);
+}
+inline Number number_power_value(number base, leftv exponent, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  exponent=scalar_index_argument(exponent,materialized,string_value);
+  exponent=value_argument(exponent);
+  if (exponent->Typ()==INT_CMD)
+    return number_power(base,power_exponent(exponent),r);
+  Value result=binary_static_value(NUMBER_CMD,(void*)base,0,exponent,'^',r);
+  return exact_number_argument(result.get(),r);
+}
+inline Ideal ideal_power_value(IdealView base, leftv exponent, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  exponent=scalar_index_argument(exponent,materialized,string_value);
+  exponent=value_argument(exponent);
+  if (exponent->Typ()==INT_CMD)
+    return ideal_power(base,power_exponent(exponent),r);
+  Value result=binary_static_value(
+      IDEAL_CMD,(void*)base.data(),base.flags(),exponent,'^',r);
+  return exact_ideal_argument(result.get(),r);
+}
 inline Value indexed_value(leftv argument, int index, ring r) {
   argument=value_argument(argument);
   Value result(r);
@@ -1213,6 +1569,14 @@ inline Value indexed_value(leftv argument, int index, ring r) {
       throw std::runtime_error("native ideal/module index out of range");
     result.get()->rtyp=type==MODUL_CMD ? VECTOR_CMD : POLY_CMD;
     result.get()->data=(void*)p_Copy(value->m[index-1],r);
+  } else if (argument->Typ()==VECTOR_CMD) {
+    poly value=(poly)argument->Data();
+    if (errorreported)
+      throw std::runtime_error("native vector argument is invalid");
+    result.get()->rtyp=POLY_CMD;
+    // Match jjINDEX_V: select and copy one component, stripping its vector
+    // component marker from the returned polynomial.
+    result.get()->data=(void*)p_Vec2Poly(value,index,r);
   } else if (argument->Typ()==STRING_CMD) {
     const char *value=(const char*)argument->Data();
     if (errorreported) throw std::runtime_error("native string argument is invalid");
@@ -1223,7 +1587,7 @@ inline Value indexed_value(leftv argument, int index, ring r) {
     result.get()->rtyp=STRING_CMD;
     result.get()->data=(void*)selected;
   } else {
-    throw std::runtime_error("native indexing requires list/intvec/string/ideal/module/map");
+    throw std::runtime_error("native indexing requires list/intvec/string/ideal/module/map/vector");
   }
   return result;
 }
@@ -1460,6 +1824,57 @@ inline long quotient(long a, long b) {
   const long r=a%b;
   return (a-r)/b;
 }
+inline Value binary_value_int(leftv argument, long integer, int operation,
+                              bool value_on_left, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  argument=scalar_index_argument(argument,materialized,string_value);
+  argument=value_argument(argument);
+  const int argument_type=argument->Typ();
+  if (errorreported) throw ReportedInterpreterError();
+
+  Value result(r);
+  if (argument_type==INT_CMD) {
+    void *data=argument->Data();
+    if (errorreported) throw ReportedInterpreterError();
+    const long dynamic=(long)data;
+    const long a=value_on_left ? dynamic : integer;
+    const long b=value_on_left ? integer : dynamic;
+    long value;
+    switch (operation) {
+      case '+': value=add(a,b); break;
+      case '-': value=sub(a,b); break;
+      case '*': value=mul(a,b); break;
+      case '%': value=remainder(a,b); break;
+      case INTDIV_CMD: value=quotient(a,b); break;
+      case '^': value=integer_power(a,b); break;
+      default: throw std::runtime_error("unsupported native dynamic integer operation");
+    }
+    result.get()->rtyp=INT_CMD;
+    result.get()->data=(void*)value;
+    return result;
+  }
+
+  Value left(r), right(r);
+  leftv dynamic=value_on_left ? left.get() : right.get();
+  leftv scalar=value_on_left ? right.get() : left.get();
+  sleftv head=*argument;
+  head.next=nullptr;
+  dynamic->Copy(&head);
+  if (errorreported) throw ReportedInterpreterError();
+  scalar->rtyp=INT_CMD;
+  scalar->data=(void*)integer;
+  struct RestoreOperation {
+    int saved;
+    RestoreOperation(): saved(iiOp) {}
+    ~RestoreOperation() { iiOp=saved; }
+  } restore_operation;
+  const BOOLEAN failed=iiExprArith2(result.get(),left.get(),operation,right.get());
+  if (errorreported) throw ReportedInterpreterError();
+  if (failed)
+    throw std::runtime_error("native dynamic integer operation failed");
+  return result;
+}
 inline long number_to_int(number value, ring r) {
   number copy=n_Copy(value,r->cf); // n_Int may normalize destructively
   const long wide=n_Int(copy,r->cf);
@@ -1540,6 +1955,14 @@ inline Number indexed_number(leftv argument, int index, ring r) {
 
 inline Intvec intvec_range(long first, long last) {
   return Intvec(new intvec((int)first,(int)last));
+}
+inline Intvec intvec_repeat(long value, long count) {
+  const int narrowed_count=(int)count;
+  if (narrowed_count<0)
+    throw std::runtime_error("native intvec repetition count out of range");
+  Intvec result(narrowed_count);
+  for (int i=0;i<narrowed_count;++i) (*result.get())[i]=(int)value;
+  return result;
 }
 inline Intvec intvec_select(const intvec *source, const intvec *indexes) {
   // jjINDEX_IV leaves the dispatcher's default scalar zero in place when its
