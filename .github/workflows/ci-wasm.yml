@@ -49,8 +49,8 @@ jobs:
       - name: Check out Singular in Browser build support
         uses: actions/checkout@v5
         with:
-          repository: jankoboehm/Singular-in-browser
-          ref: 790eb9b3f637b7bacd5cdb7819f497505aa41a25
+          repository: Singular/Singular-in-browser
+          ref: b149e1baaed077055aa028c1e075457630795a69
           path: browser
           persist-credentials: false
 
