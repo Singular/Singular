@@ -10,6 +10,7 @@ bug_curvepar
 bug_division_2
 bug_dump
 bug_ecart
+bug_factorize_univariate_unit
 bug_heuristic
 bug_heuristic
 bug_hilb

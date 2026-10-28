@@ -6105,6 +6105,13 @@ progress during the following computations:
 @anchor{option(redSB)}
 See below for more details.
 @c ---------
+@item @code{qringPower}
+@cindex qringPower, option
+reduces the base and all intermediate products of polynomial powers modulo
+the current commutative @code{qring}. This option is on by default.
+Use @code{option(noqringPower)} to restore the previous powering behavior,
+which keeps unreduced representatives unless @code{qringNF} applies later.
+@c ---------
 @item @code{qringNF}
 @cindex qringNF, option
 simplifies modulo the current @code{qring} in all assignments.

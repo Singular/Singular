@@ -17,10 +17,11 @@ jobs:
         include:
           - os: macos-15
             configflags: "--with-ntl --with-flint"
-          - os: macos-26
-            configflags: "--with-ntl --with-flint"
           - os: macos-26-intel
             configflags: "--with-ntl --with-flint"
+          - os: ubuntu-latest
+            configflags: "--without-ntl --without-flint"
+            limited_no_ntl_flint: true
 
     steps:
       - uses: actions/checkout@v5
@@ -62,7 +63,7 @@ jobs:
       - run: make install
 
       - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Old/universal.lst
-        if: ${{ always() }}
+        if: ${{ always() && matrix.limited_no_ntl_flint != true }}
       #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Buch/buch.lst
       #  if: ${{ always() }}
       - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Plural/short.lst
@@ -72,7 +73,11 @@ jobs:
       - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Manual/annRat.tst Manual/deRhamCohom.tst Manual/deRhamCohomIdeal.tst
         if: ${{ always() }}
       - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Short/ok_s.lst
-        if: ${{ always() }}
+        if: ${{ always() && matrix.limited_no_ntl_flint != true }}
+
+      - name: Run limited no-NTL/no-FLINT regression tests
+        if: ${{ always() && matrix.limited_no_ntl_flint == true }}
+        run: cd Tst && ./regress.cmd -s $prefix/bin/Singular NoNtlFlint.ci.lst
 
       - name: Run Tst/New/new.tst (if present)
         if: ${{ always() && runner.os == 'Linux' && matrix.configflags == '--with-ntl --with-flint' && hashFiles('Tst/New/new.tst') != '' }}

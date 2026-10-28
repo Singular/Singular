@@ -260,8 +260,18 @@ CFFactory::basic ( int type, long value, bool nonimm )
 InternalCF *
 CFFactory::basic ( const mpz_ptr num )
 {
-  ASSERT (currenttype == IntegerDomain, "Integer domain expected");
-  return new InternalInteger( num );
+  if ( currenttype == IntegerDomain )
+    return new InternalInteger( num );
+#ifndef HAVE_NTL
+  else  if ( currenttype == PrimePowerDomain ) {
+    InternalPrimePower * result = new InternalPrimePower( num );
+    return result->normalize_myself();
+  }
+#endif
+  else {
+    ASSERT( 0, "illegal basic domain!" );
+    return 0;
+  }
 }
 
 InternalCF *

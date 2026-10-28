@@ -95,6 +95,7 @@ Short/bug_diff.tst
 Short/bug_div.tst
 Short/bug_division.tst
 Short/bug_factorize.tst
+Short/bug_factorize_univariate_unit.tst
 Short/bug_hilbstd.tst
 Short/bug_hilbstd_mixed_order.tst
 Short/bug_homog.tst
@@ -241,6 +242,7 @@ Short/primdecint_some_special_cases.tst
 Short/primefactors.tst
 Short/primitiv_s.tst
 Short/qhw_s.tst
+Short/qring_power.tst
 Short/quotient_s.tst
 Short/rInit.tst
 Short/rcyclic_13_32003_lp.tst

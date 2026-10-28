@@ -8,7 +8,7 @@ qring Q = std(ideal(var(1)**2, var(2)**2,
 reduce( maxideal(2) * gen(1), std(0));
 
 // std (compleReduce) was not complete (index bounds to small)
-vector v = var(1)**2 + var(2)**2 + var(1)*var(2); v;
+vector v = var(1)*var(1) + var(2)*var(2) + var(1)*var(2); v;
 option(redTail); option(redSB);
 std(v);
 
