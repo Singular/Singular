@@ -103,5 +103,139 @@ kill r;
    print(M2);
    dimGradedPart(M2,2);
 
-tst_status(1);$
+// --------------------------------------------------
+// Test of globalSectionsBLH and its degree cutoff:
+   kill R;
+   ring Q=0,(x,y,z,u),dp;
+   resolution T=mres(maxideal(1),0);
+   module C=T[3];
+   intvec cv=2,2,2,2,2,2;
+   attrib(C,"isHomog",cv);
+   module G0=globalSectionsBLH(C,2,0,cv);
+   print(betti(mres(G0,0)),"betti");
+   int d;
+   intvec h0;
+   for (d=0;d<=5;d++)
+   {
+     h0[d+1]=dimGradedPart(G0,d);
+   }
+   h0;
+   // Minimize the presentation without shifting its graded generators.
+   module PG0=pruneGraded(G0);
+   print(string(nrows(PG0))+"x"+string(ncols(PG0)));
+   attrib(PG0,"isHomog");
+   print(betti(mres(PG0,0)),"betti");
+   intvec ph0;
+   for (d=0;d<=5;d++)
+   {
+     ph0[d+1]=dimGradedPart(PG0,d);
+   }
+   ph0;
+   // Computing directly at a higher cutoff agrees with truncating G0.
+   module G3=globalSectionsBLH(C,2,3,cv);
+   module TG3=truncate(G0,3);
+   intvec h3direct;
+   intvec h3truncated;
+   for (d=2;d<=5;d++)
+   {
+     h3direct[d-1]=dimGradedPart(G3,d);
+     h3truncated[d-1]=dimGradedPart(TG3,d);
+   }
+   h3direct;
+   h3truncated;
 
+// A finite-length module sheafifies to zero, including at its regularity.
+   kill Q;
+   ring L=0,(x,y),dp;
+   module Finite=x,y;
+   intvec finiteDegrees=0;
+   module HFinite=globalSectionsBLH(Finite,0,0,finiteDegrees);
+   intvec hFinite;
+   int dFinite;
+   for (dFinite=0;dFinite<=2;dFinite++)
+   {
+     hFinite[dFinite+1]=dimGradedPart(HFinite,dFinite);
+   }
+   hFinite;
+
+// Recover nonzero sections below regularity for the sheaf of a point.
+   kill L;
+   ring P=0,(x,y,z),dp;
+   module Point=x,y;
+   intvec pointDegrees=0;
+   module HPoint=globalSectionsBLH(Point,0,-2,pointDegrees);
+   intvec hPoint;
+   int dPoint;
+   for (dPoint=-3;dPoint<=2;dPoint++)
+   {
+     hPoint[dPoint+4]=dimGradedPart(HPoint,dPoint);
+   }
+   hPoint;
+
+// A free summand plus irrelevant torsion checks that the irrelevant part is
+// discarded by the section construction; the associated sheaf is just O.
+   module Mixed=x*gen(2),y*gen(2),z*gen(2);
+   intvec mixedDegrees=0,0;
+   module HMixed=globalSectionsBLH(Mixed,0,-2,mixedDegrees);
+   intvec hMixed;
+   int dMixed;
+   for (dMixed=-3;dMixed<=4;dMixed++)
+   {
+     hMixed[dMixed+4]=dimGradedPart(HMixed,dMixed);
+   }
+   hMixed;
+
+// Repeated unit eliminations used to delete the wrong component weights.
+   kill P;
+   ring W=0,(x,y),dp;
+   matrix WA[3][2]=1,0,
+                    0,1,
+                    0,0;
+   module WM=WA;
+   attrib(WM,"isHomog",intvec(3,3,2));
+   module WP=pruneGraded(WM);
+   WP;
+   attrib(WP,"isHomog");
+   intvec hWM;
+   intvec hWP;
+   int dW;
+   for (dW=1;dW<=4;dW++)
+   {
+     hWM[dW]=dimGradedPart(WM,dW);
+     hWP[dW]=dimGradedPart(WP,dW);
+   }
+   hWM;
+   hWP;
+
+// Preserve weights for zero relations and use the canonical zero weight if
+// every ambient generator is cancelled.
+   matrix WZ[2][1];
+   module WFree=WZ;
+   attrib(WFree,"isHomog",intvec(4,7));
+   module WPFree=pruneGraded(WFree);
+   nrows(WPFree);
+   ncols(WPFree);
+   size(WPFree);
+   attrib(WPFree,"isHomog");
+   module WAll=unitmat(2);
+   attrib(WAll,"isHomog",intvec(3,5));
+   module WPAll=pruneGraded(WAll);
+   nrows(WPAll);
+   size(WPAll);
+   attrib(WPAll,"isHomog");
+   module WTAll=truncate(WPAll,0);
+   nrows(WTAll);
+   size(WTAll);
+
+// Nonconsecutive eliminations and pivot order must select the surviving
+// original component in every fibre of the kernel component map.
+   module WN=gen(2),gen(4),x11*gen(3)+x*gen(5);
+   attrib(WN,"isHomog",intvec(0,5,10,15,20));
+   module WPN=pruneGraded(WN);
+   attrib(WPN,"isHomog");
+   module WNR=gen(4),gen(2),x11*gen(3)+x*gen(5);
+   attrib(WNR,"isHomog",intvec(0,5,10,15,20));
+   module WPNR=pruneGraded(WNR);
+   attrib(WPNR,"isHomog");
+
+tst_status(1);$
