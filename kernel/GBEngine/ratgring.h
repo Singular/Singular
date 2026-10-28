@@ -10,6 +10,7 @@
 
 #ifdef HAVE_RATGRING
 #include "kernel/structs.h"
+#include "kernel/GBEngine/ratweyl_common.h"
 #include "polys/nc/nc.h"
 #include "polys/monomials/p_polys.h"
 
@@ -26,8 +27,6 @@ poly p_HeadRat(poly p, int ishift, ring r);
 void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r);
 
 ideal ncGCD2(poly p, poly q, ring r); // real nc stuff
-
-ideal ncGCD(poly p, poly q, ring r); // for p,q from a commutative ring
 
 poly nc_rat_CreateSpoly(poly p1, poly p2, int ishift, ring r);
 
