@@ -102,12 +102,475 @@ print(native_polyFresh(selected)==Field_boundary::polyFresh(selected));
 print(selected==x2+y);
 ''', "9\n4\n1\n3\n4\n1\n1\n1\n")
 
+        # Bigints remain a coefficient domain of their own. Exercise exact
+        # arguments/results, explicit conversion, Euclidean div/mod, large
+        # literals, owned list slots, copy-on-write, and schema fields without
+        # routing arithmetic back through the interpreter.
+        bigint_fixture = directory/"bigint_exact.lib"
+        bigint_fixture.write_text('''info="native bigint fixture";
+static proc mod_init(){newstruct("NativeCompilerBigBox","bigint value");}
+proc floorLike(number a){bigint m=bigint(numerator(a));bigint n=bigint(denominator(a));return(number(m div n));}
+proc arithmetic(bigint a,bigint b,int exponent){return(list(a+b,a-b,a*b,a div b,a mod b,a^exponent,-a,a<b,a==b));}
+proc divisionForms(bigint a,bigint b){return(list(a/b,a div b,a%b,a mod b));}
+proc identity(bigint value){return(value);}
+proc incremented(bigint value){value=value+1;return(value);}
+proc implicitBigint(number value){bigint result=value;return(result);}
+proc explicitBigint(number value){return(bigint(value));}
+proc dynamicBigint(list values){bigint value=values[1];return(value);}
+proc boxed(bigint value){return(list(value,value+1));}
+proc literal(){return(123456789012345678901234567890);}
+proc leadingZeroInt(){return(00000001);}
+proc leadingZeroBigintZero(){return(000000000);}
+proc leadingZeroBigintOne(){return(000000001);}
+proc zero(){bigint value;return(value);}
+proc asInt(bigint value){return(int(value));}
+proc asNumber(bigint value){return(number(value));}
+proc asPoly(bigint value){return(poly(value));}
+proc fromPoly(poly value){return(bigint(value));}
+proc makeBox(bigint value){NativeCompilerBigBox box;box.value=value;return(box);}
+proc readBox(NativeCompilerBigBox box){return(box.value);}
+''')
+        bigint_entries = ["floorLike", "arithmetic", "divisionForms", "identity",
+                          "incremented", "implicitBigint", "explicitBigint",
+                          "dynamicBigint", "boxed", "literal", "zero", "asInt",
+                          "leadingZeroInt", "leadingZeroBigintZero",
+                          "leadingZeroBigintOne", "asNumber", "asPoly",
+                          "fromPoly", "makeBox", "readBox"]
+        bigint_module = compile_lib(
+            bigint_fixture, bigint_entries,
+            ["--strict", "--export-prefix", "bi_"])
+        bigint_manifest = json.loads(Path(bigint_module["manifest"]).read_text())
+        bigint_code = "\n".join(
+            Path(node["source"]).read_text()
+            for node in bigint_manifest["procedures"])
+        bigint_entry_code = Path(bigint_manifest["entry_source"]).read_text()
+        for expected in ("snative::Bigint", "snative::BigintArgument",
+                         "snative::CowBigint", "snative::bigint_div",
+                         "snative::bigint_mod", "snative::bigint_power",
+                         "snative::bigint_from_string",
+                         "snative::number_from_bigint",
+                         "snative::struct_set_field"):
+            check(expected in bigint_code+bigint_entry_code,
+                  bigint_code+bigint_entry_code)
+        # Pure bigint code and its C-procedure boundary remain usable before a
+        # basering exists.  Only conversions involving number/poly need one.
+        singular(f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+bigint noRing=123456789012345678901234567890;
+print(bi_identity(noRing)==identity(noRing));
+print(bi_incremented(noRing)==incremented(noRing));
+print(bi_literal()==literal());
+print(bi_leadingZeroInt()==1);
+print(bi_leadingZeroBigintZero()==0);
+print(bi_leadingZeroBigintOne()==1);
+print(bi_asInt(2147483647)==2147483647);
+print(bi_asInt(2147483648)==0);
+''', "1\n"*8)
+        bigint_source = f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+ring bigintRing=0,(x),dp;
+bigint large=123456789012345678901234567890;
+bigint negative=-123456789012345678901234567890;
+print(string(bi_arithmetic(large,-97,5))==string(arithmetic(large,-97,5)));
+print(string(bi_arithmetic(negative,97,3))==string(arithmetic(negative,97,3)));
+print(string(bi_divisionForms(17,5))==string(divisionForms(17,5)));
+print(string(bi_divisionForms(-17,5))==string(divisionForms(-17,5)));
+print(string(bi_divisionForms(17,-5))==string(divisionForms(17,-5)));
+print(string(bi_divisionForms(-17,-5))==string(divisionForms(-17,-5)));
+print(bi_floorLike(17/5)==floorLike(17/5));
+print(bi_floorLike(-17/5)==floorLike(-17/5));
+print(bi_identity(large)==identity(large));
+print(bi_identity(7)==identity(7));
+number integral=7; print(bi_identity(integral)==7);
+print(bi_incremented(large)==incremented(large)); print(large==123456789012345678901234567890);
+print(bi_explicitBigint(17/5)==explicitBigint(17/5));
+print(bi_explicitBigint(-17/5)==explicitBigint(-17/5));
+list dynamicValues=list(large); print(bi_dynamicBigint(dynamicValues)==dynamicBigint(dynamicValues));
+print(string(bi_boxed(large))==string(boxed(large)));
+print(bi_literal()==literal()); print(bi_zero()==zero());
+print(bi_asNumber(0)==0); print(bi_asPoly(0)==0);
+print(bi_asPoly(large)==asPoly(large));
+print(bi_fromPoly(poly(23))==fromPoly(poly(23)));
+NativeCompilerBigBox box=bi_makeBox(large);
+print(bi_readBox(box)==readBox(box)); print(box.value==large);
+ring bigintPrimeRing=7,(y),dp;
+number residue=6;
+// The affected interpreter's typed NUMBER->BIGINT helper can crash, so test
+// the safe compiled boundary directly against its documented raw-residue
+// semantics. Explicit bigint(number) intentionally uses the symmetric lift.
+print(bi_identity(residue)==6);
+print(bi_implicitBigint(residue)==6);
+print(bi_explicitBigint(residue)==-1);
+print(bi_asNumber(0)==0); print(bi_asPoly(0)==0);
+'''
+        singular(bigint_source, "1\n"*30)
+        bigint_assignment_error = singular(f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+ring bigintErrorRing=0,(x),dp; number fraction=3/2;
+bi_identity(fraction);
+print("BIGINT_RECOVERY"); print(bi_identity(9)==9);''')
+        check("cannot assign to bigint" in bigint_assignment_error and
+              bigint_assignment_error.endswith("BIGINT_RECOVERY\n1\n"),
+              bigint_assignment_error)
+        bigint_poly_error = singular(f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+ring bigintPolyRing=0,(x),dp;
+bi_fromPoly(x+1);
+print("BIGINT_POLY_RECOVERY"); print(bi_fromPoly(poly(11))==11);''')
+        check("poly must be constant" in bigint_poly_error and
+              bigint_poly_error.endswith("BIGINT_POLY_RECOVERY\n1\n"),
+              bigint_poly_error)
+
+        matrix_fixture = directory/"matrix_owned.lib"
+        matrix_fixture.write_text('''info="native matrix/intmat fixture";
+static proc mod_init(){newstruct("NativeCompilerMatrixBox","matrix values, intmat indexes");}
+proc matrixIdentity(matrix value){return(value);}
+proc matrixAt(matrix value,int row,int column){return(value[row,column]);}
+proc matrixMutate(matrix value,int row,int column,poly replacement)
+{value[row,column]=replacement;return(value);}
+proc matrixSelfAssign(matrix value){value=value;return(value);}
+proc matrixSelect(matrix value,intvec rows,intvec columns)
+{matrix result[size(rows)][size(columns)]=value[rows,columns];return(result);}
+proc intmatIdentity(intmat value){return(value);}
+proc intmatAt(intmat value,int row,int column){return(value[row,column]);}
+proc intmatMutate(intmat value,int row,int column,int replacement)
+{value[row,column]=replacement;return(value);}
+proc intmatSelfAssign(intmat value){value=value;return(value);}
+proc matrixBox(matrix values,intmat indexes)
+{NativeCompilerMatrixBox box;box.values=values;box.indexes=indexes;return(box);}
+proc matrixBoxValues(NativeCompilerMatrixBox box){return(box.values);}
+proc matrixBoxIndexes(NativeCompilerMatrixBox box){return(box.indexes);}
+proc matrixList(matrix values,intmat indexes){return(list(values,indexes));}
+proc matrixAssignIdeal(matrix target,ideal source){target=source;return(target);}
+proc matrixAssignPoly(matrix target,poly source){target=source;return(target);}
+proc matrixAssignNumber(matrix target,number source){target=source;return(target);}
+proc matrixAssignBigint(matrix target,bigint source){target=source;return(target);}
+proc matrixAssignInt(matrix target,int source){target=source;return(target);}
+proc matrixAssignExact(matrix target,matrix source){target=source;return(target);}
+proc matrixAssignIntmat(matrix target,intmat source){target=source;return(target);}
+proc matrixDeclareIdeal(ideal source)
+{matrix target[2][3]=source;return(target);}
+proc matrixCastIdeal(ideal source){return(matrix(source));}
+proc matrixCastExact(matrix source){return(matrix(source));}
+proc matrixCastIntmat(intmat source){return(matrix(source));}
+proc matrixDynamicAssign(matrix target,list source)
+{target=source[1];return(target);}
+proc matrixDynamicCast(list source){return(matrix(source[1]));}
+proc matrixFormalBox(matrix value){return(list(value));}
+proc matrixDynamicCastBox(list source){return(list(matrix(source[1])));}
+proc intmatAssignExact(intmat target,intmat source){target=source;return(target);}
+proc intmatAssignInt(intmat target,int source){target=source;return(target);}
+proc intmatDeclareInt(int source)
+{intmat target[2][3]=source;return(target);}
+proc intmatAssignIntvec(intmat target,intvec source){target=source;return(target);}
+proc intmatCastExact(intmat source){return(intmat(source));}
+proc intmatCastIntvec(intvec source){return(intmat(source));}
+proc intmatDynamicAssign(intmat target,list source)
+{target=source[1];return(target);}
+proc intmatDynamicCast(list source){return(intmat(source[1]));}
+''')
+        matrix_entries = ["matrixIdentity", "matrixAt", "matrixMutate", "matrixSelfAssign",
+                          "matrixSelect", "intmatIdentity", "intmatMutate",
+                          "intmatAt", "intmatSelfAssign", "matrixBox", "matrixBoxValues",
+                          "matrixBoxIndexes", "matrixList", "matrixAssignIdeal",
+                          "matrixAssignPoly", "matrixAssignNumber",
+                          "matrixAssignBigint", "matrixAssignInt", "matrixAssignExact",
+                          "matrixAssignIntmat", "matrixDeclareIdeal", "matrixCastIdeal",
+                          "matrixCastExact", "matrixCastIntmat", "matrixDynamicAssign",
+                          "matrixDynamicCast", "matrixFormalBox", "matrixDynamicCastBox",
+                          "intmatAssignExact",
+                          "intmatAssignInt", "intmatDeclareInt", "intmatAssignIntvec",
+                          "intmatCastExact", "intmatCastIntvec", "intmatDynamicAssign",
+                          "intmatDynamicCast"]
+        matrix_module = compile_lib(
+            matrix_fixture, matrix_entries,
+            ["--strict", "--export-prefix", "mx_"])
+        matrix_manifest = json.loads(Path(matrix_module["manifest"]).read_text())
+        matrix_code = "\n".join(
+            Path(node["source"]).read_text()
+            for node in matrix_manifest["procedures"])
+        matrix_entry_code = Path(matrix_manifest["entry_source"]).read_text()
+        for expected in ("snative::Matrix", "snative::Intmat",
+                         "snative::MatrixArgument", "snative::IntmatArgument",
+                         "snative::CowMatrix", "snative::CowIntmat",
+                         "snative::matrix_get", "snative::matrix_set",
+                         "snative::intmat_set", "snative::matrix_select",
+                         "snative::struct_set_field"):
+            check(expected in matrix_code+matrix_entry_code,
+                  matrix_code+matrix_entry_code)
+        singular(f'''LIB "{matrix_fixture}"; LIB "{matrix_module["module"]}";
+ring matrixRing=0,(x,y),dp;
+matrix source[3][3]=1,x,y,x2,xy,y2,x3,x2y,xy2;
+intmat indexes[2][3]=1,2,3,4,5,6;
+intvec rows=1,3; intvec columns=2,3;
+print(string(mx_matrixIdentity(source))==string(matrixIdentity(source)));
+print(mx_matrixAt(source,2,3)==matrixAt(source,2,3));
+print(string(mx_matrixSelect(source,rows,columns))==string(matrixSelect(source,rows,columns)));
+print(string(mx_matrixMutate(source,2,3,x+y))==string(matrixMutate(source,2,3,x+y)));
+print(source[2,3]==y2);
+print(string(mx_intmatIdentity(indexes))==string(intmatIdentity(indexes)));
+print(mx_intmatAt(indexes,2,3)==intmatAt(indexes,2,3));
+print(string(mx_intmatMutate(indexes,2,1,17))==string(intmatMutate(indexes,2,1,17)));
+print(indexes[2,1]==4);
+NativeCompilerMatrixBox nativeBox=mx_matrixBox(source,indexes);
+print(string(mx_matrixBoxValues(nativeBox))==string(matrixBoxValues(nativeBox)));
+print(string(mx_matrixBoxIndexes(nativeBox))==string(matrixBoxIndexes(nativeBox)));
+print(string(mx_matrixList(source,indexes))==string(matrixList(source,indexes)));
+attrib(source,"native_marker",intvec(6,7));
+attrib(indexes,"native_marker",intvec(8,9));
+matrix nativeMatrixIdentity=mx_matrixIdentity(source);
+intmat nativeIntmatIdentity=mx_intmatIdentity(indexes);
+print(attrib(nativeMatrixIdentity,"native_marker")==intvec(6,7));
+print(attrib(nativeIntmatIdentity,"native_marker")==intvec(8,9));
+matrix nativeMatrixMutation=mx_matrixMutate(source,1,1,x);
+intmat nativeIntmatMutation=mx_intmatMutate(indexes,1,1,11);
+print(typeof(attrib(nativeMatrixMutation,"native_marker"))=="string");
+print(typeof(attrib(nativeIntmatMutation,"native_marker"))=="string");
+print(typeof(attrib(mx_matrixSelfAssign(source),"native_marker"))==
+      typeof(attrib(matrixSelfAssign(source),"native_marker")));
+print(typeof(attrib(mx_intmatSelfAssign(indexes),"native_marker"))==
+      typeof(attrib(intmatSelfAssign(indexes),"native_marker")));
+ideal generators=1,x,y;
+attrib(generators,"native_marker",intvec(1,2)); attrib(generators,"isSB",1);
+matrix target[2][3]=9,8,7,6,5,4;
+attrib(target,"old_marker",intvec(3,4)); attrib(target,"isSB",1);
+matrix nativeFormal=mx_matrixIdentity(generators);
+matrix singularFormal=matrixIdentity(generators);
+print(string(nativeFormal)==string(singularFormal) and nrows(nativeFormal)==1 and
+      ncols(nativeFormal)==1 and typeof(attrib(nativeFormal,"native_marker"))=="string" and
+      attrib(nativeFormal,"isSB")==0);
+module moduleSource=[x,y],[x2,y2];
+attrib(moduleSource,"native_marker",intvec(11,12));
+matrix nativeModuleFormal=mx_matrixIdentity(moduleSource);
+matrix singularModuleFormal=matrixIdentity(moduleSource);
+print(string(nativeModuleFormal)==string(singularModuleFormal) and
+      nrows(nativeModuleFormal)==2 and ncols(nativeModuleFormal)==2 and
+      typeof(attrib(nativeModuleFormal,"native_marker"))=="string");
+matrix nativeIdeal=mx_matrixAssignIdeal(target,generators);
+matrix singularIdeal=matrixAssignIdeal(target,generators);
+print(string(nativeIdeal)==string(singularIdeal) and nrows(nativeIdeal)==2 and
+      ncols(nativeIdeal)==3 and typeof(attrib(nativeIdeal,"native_marker"))=="string" and
+      attrib(nativeIdeal,"isSB")==0);
+matrix nativeDeclared=mx_matrixDeclareIdeal(generators);
+matrix singularDeclared=matrixDeclareIdeal(generators);
+print(string(nativeDeclared)==string(singularDeclared) and nrows(nativeDeclared)==2 and
+      ncols(nativeDeclared)==3 and typeof(attrib(nativeDeclared,"native_marker"))=="string");
+matrix nativePoly=mx_matrixAssignPoly(target,x+y);
+matrix singularPoly=matrixAssignPoly(target,x+y);
+print(string(nativePoly)==string(singularPoly) and nrows(nativePoly)==2 and ncols(nativePoly)==3);
+number scalarNumber=5; bigint scalarBigint=13;
+matrix nativeNumber=mx_matrixAssignNumber(target,scalarNumber);
+matrix singularNumber=matrixAssignNumber(target,scalarNumber);
+print(string(nativeNumber)==string(singularNumber) and nrows(nativeNumber)==2 and ncols(nativeNumber)==3);
+matrix nativeBigint=mx_matrixAssignBigint(target,scalarBigint);
+matrix singularBigint=matrixAssignBigint(target,scalarBigint);
+print(string(nativeBigint)==string(singularBigint) and nrows(nativeBigint)==2 and ncols(nativeBigint)==3);
+matrix nativeInt=mx_matrixAssignInt(target,17);
+matrix singularInt=matrixAssignInt(target,17);
+print(string(nativeInt)==string(singularInt) and nrows(nativeInt)==2 and ncols(nativeInt)==3);
+matrix exactSource[1][2]=x,y;
+attrib(exactSource,"native_marker",intvec(5,6)); attrib(exactSource,"isSB",1);
+matrix nativeExact=mx_matrixAssignExact(target,exactSource);
+matrix singularExact=matrixAssignExact(target,exactSource);
+print(string(nativeExact)==string(singularExact) and nrows(nativeExact)==1 and
+      ncols(nativeExact)==2 and attrib(nativeExact,"native_marker")==intvec(5,6) and
+      attrib(nativeExact,"isSB")==1);
+attrib(indexes,"isSB",1);
+matrix nativeFromIntmat=mx_matrixAssignIntmat(target,indexes);
+matrix singularFromIntmat=matrixAssignIntmat(target,indexes);
+print(string(nativeFromIntmat)==string(singularFromIntmat) and
+      nrows(nativeFromIntmat)==2 and ncols(nativeFromIntmat)==3 and
+      typeof(attrib(nativeFromIntmat,"native_marker"))=="string" and
+      attrib(nativeFromIntmat,"isSB")==0);
+matrix nativeIdealCast=mx_matrixCastIdeal(generators);
+matrix singularIdealCast=matrixCastIdeal(generators);
+print(string(nativeIdealCast)==string(singularIdealCast) and
+      nrows(nativeIdealCast)==1 and ncols(nativeIdealCast)==3 and
+      typeof(attrib(nativeIdealCast,"native_marker"))=="string" and
+      attrib(nativeIdealCast,"isSB")==0);
+matrix nativeExactCast=mx_matrixCastExact(exactSource);
+matrix singularExactCast=matrixCastExact(exactSource);
+print(string(nativeExactCast)==string(singularExactCast) and
+      attrib(nativeExactCast,"native_marker")==intvec(5,6) and
+      attrib(nativeExactCast,"isSB")==1);
+matrix nativeIntmatCast=mx_matrixCastIntmat(indexes);
+matrix singularIntmatCast=matrixCastIntmat(indexes);
+print(string(nativeIntmatCast)==string(singularIntmatCast) and
+      typeof(attrib(nativeIntmatCast,"native_marker"))=="string" and
+      attrib(nativeIntmatCast,"isSB")==0);
+vector vectorValue=[x,y]; list vectorCarrier=list(vectorValue);
+matrix nativeVectorAssign=mx_matrixDynamicAssign(target,vectorCarrier);
+matrix singularVectorAssign=matrixDynamicAssign(target,vectorCarrier);
+matrix nativeVectorCast=mx_matrixDynamicCast(vectorCarrier);
+matrix singularVectorCast=matrixDynamicCast(vectorCarrier);
+print(string(nativeVectorAssign)==string(singularVectorAssign) and
+      nrows(nativeVectorAssign)==2 and ncols(nativeVectorAssign)==3);
+print(string(nativeVectorCast)==string(singularVectorCast) and
+      nrows(nativeVectorCast)==2 and ncols(nativeVectorCast)==1);
+matrix denseSparse[2][2]=x,y,x2,y2; smatrix sparseValue=smatrix(denseSparse);
+list sparseCarrier=list(sparseValue);
+matrix nativeSparseAssign=mx_matrixDynamicAssign(target,sparseCarrier);
+matrix singularSparseAssign=matrixDynamicAssign(target,sparseCarrier);
+matrix nativeSparseCast=mx_matrixDynamicCast(sparseCarrier);
+matrix singularSparseCast=matrixDynamicCast(sparseCarrier);
+print(string(nativeSparseAssign)==string(singularSparseAssign) and
+      nrows(nativeSparseAssign)==2 and ncols(nativeSparseAssign)==3);
+print(string(nativeSparseCast)==string(singularSparseCast) and
+      nrows(nativeSparseCast)==2 and ncols(nativeSparseCast)==2);
+print(string(mx_matrixIdentity(vectorValue[1]))==string(matrixIdentity(vectorValue[1])));
+print(string(mx_matrixIdentity(source[1]))==string(matrixIdentity(source[1])));
+print(string(mx_matrixIdentity(sparseValue[1]))==string(matrixIdentity(sparseValue[1])));
+print(string(mx_matrixIdentity(sparseValue[1,2]))==string(matrixIdentity(sparseValue[1,2])));
+intmat intTarget[2][3]=9,8,7,6,5,4;
+attrib(intTarget,"old_marker",intvec(3,4)); attrib(intTarget,"isSB",1);
+intmat intSource[1][2]=12,14;
+attrib(intSource,"native_marker",intvec(7,8)); attrib(intSource,"isSB",1);
+intmat nativeIntExact=mx_intmatAssignExact(intTarget,intSource);
+intmat singularIntExact=intmatAssignExact(intTarget,intSource);
+print(string(nativeIntExact)==string(singularIntExact) and nrows(nativeIntExact)==1 and
+      ncols(nativeIntExact)==2 and attrib(nativeIntExact,"native_marker")==intvec(7,8) and
+      attrib(nativeIntExact,"isSB")==1);
+intmat nativeIntScalar=mx_intmatAssignInt(intTarget,19);
+intmat singularIntScalar=intmatAssignInt(intTarget,19);
+print(string(nativeIntScalar)==string(singularIntScalar) and nrows(nativeIntScalar)==2 and
+      ncols(nativeIntScalar)==3 and typeof(attrib(nativeIntScalar,"old_marker"))=="string" and
+      attrib(nativeIntScalar,"isSB")==0);
+intmat nativeIntDeclared=mx_intmatDeclareInt(19);
+intmat singularIntDeclared=intmatDeclareInt(19);
+print(string(nativeIntDeclared)==string(singularIntDeclared) and
+      nrows(nativeIntDeclared)==2 and ncols(nativeIntDeclared)==3);
+intvec vectorSource=21,22,23;
+intmat nativeIntvec=mx_intmatAssignIntvec(intTarget,vectorSource);
+intmat singularIntvec=intmatAssignIntvec(intTarget,vectorSource);
+print(string(nativeIntvec)==string(singularIntvec) and nrows(nativeIntvec)==3 and
+      ncols(nativeIntvec)==1 and typeof(attrib(nativeIntvec,"native_marker"))=="string");
+intmat nativeIntExactCast=mx_intmatCastExact(intSource);
+intmat singularIntExactCast=intmatCastExact(intSource);
+print(string(nativeIntExactCast)==string(singularIntExactCast) and
+      attrib(nativeIntExactCast,"native_marker")==intvec(7,8) and
+      attrib(nativeIntExactCast,"isSB")==1);
+intmat nativeIntvecCast=mx_intmatCastIntvec(vectorSource);
+intmat singularIntvecCast=intmatCastIntvec(vectorSource);
+print(string(nativeIntvecCast)==string(singularIntvecCast) and
+      typeof(attrib(nativeIntvecCast,"native_marker"))=="string");
+intvec attributedVector=31,32,33; attrib(attributedVector,"native_marker",intvec(9,10));
+list attributedCarrier=list(attributedVector);
+intmat nativeDynamicIntvec=mx_intmatDynamicAssign(intTarget,attributedCarrier);
+intmat singularDynamicIntvec=intmatDynamicAssign(intTarget,attributedCarrier);
+print(string(nativeDynamicIntvec)==string(singularDynamicIntvec) and
+      typeof(attrib(nativeDynamicIntvec,"native_marker"))=="string");
+intmat nativeDynamicIntvecCast=mx_intmatDynamicCast(attributedCarrier);
+intmat singularDynamicIntvecCast=intmatDynamicCast(attributedCarrier);
+print(string(nativeDynamicIntvecCast)==string(singularDynamicIntvecCast) and
+      typeof(attrib(nativeDynamicIntvecCast,"native_marker"))=="string");
+print(string(mx_intmatIdentity(indexes[2,1]))==string(intmatIdentity(indexes[2,1])));
+''', "1\n"*48)
+
+        # Cross conversions to a matrix formal/cast do not manufacture the
+        # qringNF flag. Box the result immediately so a later typed matrix
+        # assignment cannot change the boundary being inspected.
+        singular(f'''LIB "{matrix_fixture}"; LIB "{matrix_module["module"]}";
+ring matrixQBase=0,(x,y),dp; ideal Q=x2+1; qring matrixQ=std(Q);
+option(qringNF);
+vector qVector=[x,y]; module qModule=[x,y],[y,x];
+matrix qDense[2][2]=x,y,y,1; smatrix qSparse=smatrix(qDense);
+list nv=mx_matrixFormalBox(qVector); list iv=matrixFormalBox(qVector);
+list nm=mx_matrixFormalBox(qModule); list im=matrixFormalBox(qModule);
+list ns=mx_matrixFormalBox(qSparse); list ivs=matrixFormalBox(qSparse);
+list ncv=mx_matrixDynamicCastBox(list(qVector)); list icv=matrixDynamicCastBox(list(qVector));
+list ncm=mx_matrixDynamicCastBox(list(qModule)); list icm=matrixDynamicCastBox(list(qModule));
+list ncs=mx_matrixDynamicCastBox(list(qSparse)); list ics=matrixDynamicCastBox(list(qSparse));
+print(string(nv)==string(iv) and attrib(nv[1],"qringNF")==0 and attrib(iv[1],"qringNF")==0);
+print(string(nm)==string(im) and attrib(nm[1],"qringNF")==0 and attrib(im[1],"qringNF")==0);
+print(string(ns)==string(ivs) and attrib(ns[1],"qringNF")==0 and attrib(ivs[1],"qringNF")==0);
+print(string(ncv)==string(icv) and attrib(ncv[1],"qringNF")==0 and attrib(icv[1],"qringNF")==0);
+print(string(ncm)==string(icm) and attrib(ncm[1],"qringNF")==0 and attrib(icm[1],"qringNF")==0);
+print(string(ncs)==string(ics) and attrib(ncs[1],"qringNF")==0 and attrib(ics[1],"qringNF")==0);
+''', "1\n"*6)
+
+        attributed_intvec_error = singular(f'''LIB "{matrix_fixture}"; LIB "{matrix_module["module"]}";
+ring attributedIntvecRing=0,(x),dp;
+intmat target[2][2]=1,2,3,4;
+intvec attributed=5,6; attrib(attributed,"native_marker",intvec(7));
+mx_intmatAssignIntvec(target,attributed);
+print("INTVEC_RECOVERY");
+intvec plain=5,6;
+print(string(mx_intmatAssignIntvec(target,plain))==string(intmatAssignIntvec(target,plain)));''')
+        check("plain intvec or int" in attributed_intvec_error and
+              attributed_intvec_error.endswith("INTVEC_RECOVERY\n1\n"),
+              attributed_intvec_error)
+
+        # Small typed kernels lower directly to public C++ APIs.  The dynamic
+        # general.lib routines are specialized only at statically proven call
+        # sites and only while their complete audited source fingerprint is
+        # unchanged.
+        typed_fixture = directory/"typed_kernels.lib"
+        typed_fixture.write_text('''info="native typed-kernel fixture";
+LIB "general.lib";
+proc kernelSummary(poly p,number n,ideal I,string text,string needle,int start)
+{
+  return(list(univariate(p),pardeg(n),find(text,needle),find(text,"ana",start),
+              ord(p),npars(basering),par(1),prime(start),charstr(basering),
+              simplify(p,65),simplify(I,127)));
+}
+proc sumVector(intvec values){return(sum(values));}
+proc sumSelected(intvec values,intvec selected){return(sum(values,selected));}
+proc productVector(intvec values){return(product(values));}
+proc productSelected(intvec values,int selected){return(product(values,selected));}
+proc productSelectedVector(intvec values,intvec selected){return(product(values,selected));}
+proc sortVector(intvec values){return(sort(values));}
+proc sortLiteral(int a,int b,int c,int d){return(sort(list(a,b,c,d)));}
+proc sortWide(int a,int b){return(sort(list(a,b)));}
+proc sortEmpty(){return(sort(list()));}
+''')
+        typed_entries = ["kernelSummary", "sumVector", "sumSelected",
+                         "productVector", "productSelected",
+                         "productSelectedVector", "sortVector", "sortLiteral", "sortWide",
+                         "sortEmpty"]
+        typed_module = compile_lib(
+            typed_fixture, typed_entries,
+            ["--strict", "--export-prefix", "typed_"])
+        typed_manifest = json.loads(Path(typed_module["manifest"]).read_text())
+        check({node["procedure"] for node in typed_manifest["procedures"]} ==
+              set(typed_entries), typed_manifest)
+        typed_code = "\n".join(
+            Path(node["source"]).read_text() for node in typed_manifest["procedures"])
+        for helper in ("snative::univariate", "snative::parameter_degree",
+                       "snative::find_string", "snative::order",
+                       "snative::parameter_count", "snative::parameter(",
+                       "snative::previous_prime", "snative::characteristic_string",
+                       "snative::simplify_poly", "snative::simplify_ideal",
+                       "snative::sum_intvec", "snative::product_intvec",
+                       "snative::sort_intvec", "snative::sort_int_list"):
+            check(helper in typed_code, typed_code)
+        singular(f'''LIB "{typed_fixture}"; LIB "{typed_module["module"]}";
+ring typedRing=(0,a),(x,y),dp;
+poly p=x3+x*y2+1; number n=a3+a; ideal generators=x,0,x,y,x;
+intvec values=5,-2,5,0,9; intvec selected=2,5,2; intvec invalid=0,2;
+intvec empty=intvec();
+int wide=2147483647; wide=wide+1;
+print(string(typed_kernelSummary(p,n,generators,"banana","ana",3))==
+      string(kernelSummary(p,n,generators,"banana","ana",3)));
+print(typed_sumVector(values)==sumVector(values));
+print(typed_sumSelected(values,selected)==sumSelected(values,selected));
+print(typed_sumSelected(values,invalid)==sumSelected(values,invalid));
+print(typed_sumSelected(values,empty)==sumSelected(values,empty));
+print(typed_productVector(values)==productVector(values));
+print(typed_productSelected(values,2)==productSelected(values,2));
+print(typed_productSelected(values,99)==productSelected(values,99));
+print(typed_productSelectedVector(values,empty)==productSelectedVector(values,empty));
+print(string(typed_sortVector(values))==string(sortVector(values)));
+print(string(typed_sortVector(empty))==string(sortVector(empty)));
+print(string(typed_sortLiteral(5,-2,5,0))==string(sortLiteral(5,-2,5,0)));
+print(string(typed_sortWide(wide,0))==string(sortWide(wide,0)));
+print(string(typed_sortEmpty())==string(sortEmpty()));
+''', "1\n"*14)
+
         nominal_fixture = directory/"nominal_newstruct.lib"
         nominal_fixture.write_text('''info="native nominal newstruct fixture";
 static proc mod_init()
 {
   newstruct("NativeCompilerPoint","int x, string label");
   newstruct("NativeCompilerOther","int x, string label");
+  newstruct("NativeCompilerOuter","NativeCompilerPoint point");
+  newstruct("NativeCompilerPayload","intvec values, list items, number coefficient, poly polynomial, ideal generators");
+  newstruct("NativeCompilerDynamic","def value");
 }
 static proc pointX(NativeCompilerPoint point)
 {
@@ -123,25 +586,148 @@ proc forwardPoint(def point)
 {
   return(pointX(point));
 }
+proc makePoint(int x, string label)
+{
+  NativeCompilerPoint point;
+  point.x=x;
+  point.label=label;
+  return(point);
+}
+proc rewritePoint(NativeCompilerPoint point, int x)
+{
+  point.x=x;
+  return(point);
+}
+proc replacePoint(NativeCompilerPoint point, NativeCompilerPoint replacement)
+{
+  point=replacement;
+  return(point);
+}
+proc makeOuter(NativeCompilerPoint point)
+{
+  NativeCompilerOuter outer;
+  outer.point=point;
+  return(outer);
+}
+proc outerX(NativeCompilerOuter outer)
+{
+  return(outer.point.x);
+}
+proc makePayload(intvec values, list items, number coefficient, poly polynomial, ideal generators)
+{
+  NativeCompilerPayload payload;
+  payload.values=values;
+  payload.items=items;
+  payload.coefficient=coefficient;
+  payload.polynomial=polynomial;
+  payload.generators=generators;
+  return(payload);
+}
+proc payloadValue(NativeCompilerPayload payload) { return(payload.values[2]); }
+proc payloadItems(NativeCompilerPayload payload) { return(payload.items); }
+proc payloadWeight(NativeCompilerPayload payload) { return(payload.coefficient); }
+proc payloadPolynomial(NativeCompilerPayload payload) { return(payload.polynomial); }
+proc payloadGenerators(NativeCompilerPayload payload) { return(payload.generators); }
+proc payloadGeneratorsTyped(NativeCompilerPayload payload)
+{
+  ideal result=payload.generators;
+  return(result);
+}
+proc numberIdentity(number input) { return(input); }
+proc idealIdentity(ideal input) { return(input); }
+proc dynamicValueInt(NativeCompilerDynamic payload)
+{
+  int result=payload.value;
+  return(result);
+}
 ''')
+        nominal_entries = [
+            "pointScore", "forwardPoint", "makePoint", "rewritePoint", "replacePoint",
+            "makeOuter", "outerX", "makePayload", "payloadValue", "payloadItems",
+            "payloadWeight", "payloadPolynomial", "payloadGenerators",
+            "payloadGeneratorsTyped", "numberIdentity", "idealIdentity",
+            "dynamicValueInt"]
         nominal_module = compile_lib(
-            nominal_fixture, ["pointScore", "forwardPoint"],
+            nominal_fixture, nominal_entries,
             ["--strict", "--export-prefix", "ns_"])
         nominal_manifest = json.loads(Path(nominal_module["manifest"]).read_text())
         nominal_sources = "\n".join(
             Path(node["source"]).read_text() for node in nominal_manifest["procedures"])
-        check(nominal_sources.count('newstruct_argument(v_point, "NativeCompilerPoint")')==2,
+        check(nominal_sources.count('newstruct_argument(v_point, "NativeCompilerPoint")')>=2 and
+              "default_newstruct" in nominal_sources and
+              "struct_set_field" in nominal_sources,
               nominal_sources)
         nominal_output = singular(f'''LIB "{nominal_fixture}"; LIB "{nominal_module["module"]}";
 NativeCompilerPoint point; point.x=7; point.label="abcd";
 print(ns_pointScore(point)==pointScore(point));
 print(ns_forwardPoint(point)==forwardPoint(point));
+NativeCompilerPoint made=ns_makePoint(5,"xy");
+print(made.x==5 and made.label=="xy");
+NativeCompilerPoint rewritten=ns_rewritePoint(point,19);
+print(rewritten.x==19 and rewritten.label=="abcd");
+print(point.x==7 and point.label=="abcd");
+NativeCompilerPoint replaced=ns_replacePoint(point,made);
+print(replaced.x==5 and replaced.label=="xy");
+print(point.x==7 and point.label=="abcd");
+NativeCompilerOuter outer=ns_makeOuter(made);
+print(ns_outerX(outer)==5 and outer.point.label=="xy");
+ring nominalRing=0,(x,y),dp;
+intvec values=3,8;
+list items=list("tag",4);
+ideal generators=x,y2;
+NativeCompilerPayload payload=ns_makePayload(values,items,3/2,x2+y,generators);
+print(ns_payloadValue(payload)==8);
+list returnedItems=ns_payloadItems(payload);
+print(size(returnedItems)==2 and returnedItems[1]=="tag" and returnedItems[2]==4);
+print(ns_payloadWeight(payload)==3/2);
+number payloadWeightValue=payload.coefficient;
+print(ns_numberIdentity(payload.coefficient)==payloadWeightValue);
+print(ns_payloadPolynomial(payload)==x2+y);
+ideal returnedGenerators=ns_payloadGenerators(payload);
+print(size(returnedGenerators)==2 and returnedGenerators[1]==x and returnedGenerators[2]==y2);
+print(string(ns_idealIdentity(payload.generators))==string(payload.generators));
+homog(payload.generators);
+attrib(payload.generators,"native_marker",intvec(6,7));
+ideal cachedGenerators=ns_payloadGenerators(payload);
+ideal cachedIdentity=ns_idealIdentity(payload.generators);
+ideal cachedTyped=ns_payloadGeneratorsTyped(payload);
+print(attrib(cachedGenerators,"isHomog")==attrib(payload.generators,"isHomog") and
+      attrib(cachedGenerators,"native_marker")==intvec(6,7));
+print(attrib(cachedIdentity,"isHomog")==attrib(payload.generators,"isHomog") and
+      attrib(cachedIdentity,"native_marker")==intvec(6,7));
+print(attrib(cachedTyped,"isHomog")==attrib(payload.generators,"isHomog") and
+      attrib(cachedTyped,"native_marker")==intvec(6,7));
+payload.generators=std(generators);
+print(attrib(ns_payloadGenerators(payload),"isSB")==0 and
+      attrib(ns_payloadGeneratorsTyped(payload),"isSB")==1 and
+      attrib(ns_idealIdentity(payload.generators),"isSB")==1);
+NativeCompilerDynamic dynamic; dynamic.value=37;
+print(ns_dynamicValueInt(dynamic)==dynamicValueInt(dynamic));
 NativeCompilerOther other; other.x=7; other.label="abcd";
 ns_pointScore(other);
 print("NOMINAL_RECOVERY"); print(ns_pointScore(point));''')
-        check(nominal_output.startswith("1\n1\n") and
+        check(nominal_output.startswith("1\n"*20) and
               "native argument requires newstruct NativeCompilerPoint" in nominal_output and
               nominal_output.endswith("NOMINAL_RECOVERY\n11\n"), nominal_output)
+
+        unsafe_nominal = directory/"unsafe_nominal.lib"
+        unsafe_nominal.write_text('''info="native unsafe nominal fixture";
+static proc mod_init()
+{
+  newstruct("NativeCompilerUnsafe","ideal value");
+}
+proc unsafe(ideal value)
+{
+  NativeCompilerUnsafe result=value;
+  return(result);
+}
+''')
+        unsafe_result = subprocess.run(
+            command(unsafe_nominal, ["unsafe"], ["--strict"]),
+            capture_output=True, text=True, timeout=120)
+        check(unsafe_result.returncode!=0 and
+              "expected newstruct NativeCompilerUnsafe, got ideal" in unsafe_result.stderr,
+              unsafe_result.stdout+unsafe_result.stderr)
 
         # Native entries retain the exact interpreted source procinfo used by
         # help/example even after both package and top-level bindings are
@@ -529,7 +1115,8 @@ native_numList(a,list(1)[2]);
 native_numError(a,0);
 print("RECOVERED"); print(a==2); print(native_numList(a,list(3,4))==9);
 ''')
-        for message in ["div. by 0", "differentiation not defined", "number or int", "number error test"]:
+        for message in ["div. by 0", "differentiation not defined",
+                        "number, bigint, or int", "number error test"]:
             check(message in number_errors, number_errors)
         check(number_errors.endswith("RECOVERED\n1\n1\n"), number_errors)
 
@@ -846,6 +1433,10 @@ proc dynamicIdealPower(ideal base,list exponent){return(base^exponent[1]);}
 proc pack(list #){return(#);}
 proc packWithLocal(list #){int args=7;return(list(args,#));}
 proc packFromNative(){return(pack(1,"text",list(2,3),3..1));}
+proc fixedPack(int prefix,list #){return(list(prefix,#));}
+proc fixedPackFromNative(){return(fixedPack(8,"native",intvec(2,1)));}
+proc fixedPackListFromNative(list values){return(fixedPack(8,values));}
+proc fixedPackForward(int prefix,list #){return(fixedPack(prefix,#));}
 proc forwardPack(def value){return(pack(value));}
 proc dynamicSelector(intvec input,list selectors){intvec out=input[selectors[1]];return(out);}
 proc dynamicExpressionSelector(intvec input,list selectors){intvec out=(input+1)[selectors[1]];return(out);}
@@ -859,7 +1450,7 @@ proc packNested(list carrier){return(list(carrier[1][1]));}
                          "dynamicCompareLeft", "dynamicCompareRight", "dynamicRemainder", "vectorSequenceReturn",
                          "dynamicCompareValues", "dynamicSize", "dynamicDelete", "intSize", "idealColumns", "intvecRows", "dynamicPolyArgument",
                          "dynamicPolyPower", "dynamicNumberPower", "dynamicIdealPower",
-                         "pack", "packWithLocal", "packFromNative",
+                         "pack", "packWithLocal", "packFromNative", "fixedPack", "fixedPackFromNative", "fixedPackListFromNative", "fixedPackForward",
                          "forwardPack", "dynamicSelector", "dynamicExpressionSelector", "packNested"]
         typed = compile_lib(typed_fixture, typed_entries, ["--strict", "--export-prefix", "m2_"])
         typed_manifest = json.loads(Path(typed["manifest"]).read_text())
@@ -885,7 +1476,7 @@ proc packNested(list carrier){return(list(carrier[1][1]));}
               "std::move(c_L)" not in typed_sources["cowListAppend"] and
               "snative::List::copy(c_L.get(), ctx.r)" in typed_sources["cowListAppend"],
               typed_sources["cowPoly"]+typed_sources["cowNumber"]+typed_sources["cowListAppend"])
-        check("snative::list_set_argument" in typed_sources["forwardPack"],
+        check("snative::single_variadic_argument" in typed_sources["forwardPack"],
               typed_sources["forwardPack"])
         dynamic_variadic = directory/"dynamic_variadic.lib"
         dynamic_variadic.write_text('''proc dynamicFirst(list #){return(#[1]);}
@@ -915,13 +1506,25 @@ proc dynamicNumberReturn(int branch,list values){if(branch){return(number(1));}r
         source += 'option(noredefine);\n'
         # Heterogeneous # and intvec-only entries do not require a basering.
         for call in ['pack()', 'pack(1,"alpha",list(2,3),3..1)',
-                     'packWithLocal(1,"alpha")', 'packFromNative()']:
+                     'packWithLocal(1,"alpha")', 'packFromNative()',
+                     'fixedPack(5)', 'fixedPack(5,"alpha",list(2,3),3..1)',
+                     'fixedPackFromNative()', 'fixedPackListFromNative(list(2,3))',
+                     'fixedPackForward(5)', 'fixedPackForward(5,7)',
+                     'fixedPackForward(5,list(2,3))',
+                     'fixedPackForward(5,7,list(2,3))']:
             source += f'print(string(m2_{call})==string({call}));\n'
             milestone_count += 1
         source += '''list packed=m2_pack(1,"alpha",list(2,3),3..1);
 print(size(packed)==4 and typeof(packed[3])=="list" and typeof(packed[4])=="intvec");
 packed=m2_packFromNative();
 print(size(packed)==4 and typeof(packed[3])=="list" and typeof(packed[4])=="intvec");
+list soleList=list(2,3);string savedSoleList=string(soleList);
+print(size(m2_pack(soleList))==2 and string(m2_pack(soleList))==string(pack(soleList)));
+list emptyOptionalList=list();
+print(size(m2_pack(emptyOptionalList))==0 and string(m2_pack(emptyOptionalList))==string(pack(emptyOptionalList)));
+print(string(m2_forwardPack(soleList))==string(forwardPack(soleList)));
+print(string(m2_fixedPack(5,soleList))==string(fixedPack(5,soleList)));
+print(string(soleList)==savedSoleList);
 string indexedString="abcd"; string savedIndexedString=indexedString;
 print(string(m2_pack(indexedString[2]))==string(pack(indexedString[2])));
 print(string(m2_forwardPack(indexedString[2]))==string(forwardPack(indexedString[2])));
@@ -934,7 +1537,7 @@ print(string(m2_pack(indexedString[0]))==string(pack(indexedString[0])));
 print(indexedString==savedIndexedString);
 print(string(indexedStringCarrier)==savedIndexedStringCarrier);
 '''
-        milestone_count += 10
+        milestone_count += 15
         source += '''print(m2_ivConstruct(5)==ivConstruct(5));
 list scalarVectorArgument=list(6);print(m2_ivConstruct(scalarVectorArgument[1])==ivConstruct(scalarVectorArgument[1]));
 print(m2_dynamicToIntvec(5)==dynamicToIntvec(5));
@@ -1062,6 +1665,13 @@ print(m2_cowPoly(indexedPolyCarrier[1])==cowPoly(indexedPolyCarrier[1]));
 print(string(indexedPolyCarrier)==savedIndexedPolyCarrier);
 '''
             milestone_count += 45
+            if index==0:
+                source += '''resolution soleResolution=mres(indexedIdeal,0);
+print(string(m2_pack(soleResolution))==string(pack(soleResolution)));
+print(string(m2_forwardPack(soleResolution))==string(forwardPack(soleResolution)));
+kill soleResolution;
+'''
+                milestone_count += 2
             values = (["3/2", "-3/2", "2147483647+1"] if characteristic=="0" else
                       ["6", "3", "0"] if characteristic=="7" else ["a/b", "a+1", "0"])
             for value in values:
@@ -1176,6 +1786,13 @@ print(string(m2_forwardPack(7))==string(forwardPack(7)));''')
         check("undefined" in internal_undefined_variadic and
               internal_undefined_variadic.endswith("INTERNAL_VARIADIC_RECOVERY\n1\n"),
               internal_undefined_variadic)
+        missing_fixed_variadic = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+m2_fixedPack();
+print("FIXED_VARIADIC_RECOVERY");
+print(string(m2_fixedPack(7))==string(fixedPack(7)));''')
+        check("native argument" in missing_fixed_variadic and
+              missing_fixed_variadic.endswith("FIXED_VARIADIC_RECOVERY\n1\n"),
+              missing_fixed_variadic)
         dynamic_selector_error = singular(f'''LIB "{typed["module"]}";
 intvec selectorSource=10,20; list vectorSelector=list(intvec(1,2));
 m2_dynamicExpressionSelector(selectorSource,vectorSelector);
@@ -1217,6 +1834,8 @@ proc emptyIdeal(){return(ideal());}
 proc idealSelfAdd(ideal input){input=input+input;return(input);}
 proc idealSelfMultiply(ideal input){input=input*input;return(input);}
 proc idealSelfAssign(ideal input){input=input;return(input);}
+proc idealAttributedDeclaration(ideal input){ideal result=input;return(result);}
+proc idealAttributedAssign(ideal input){ideal result;result=input;return(result);}
 proc idealConstructorAssign(ideal input){input=ideal(input);return(input);}
 proc idealDefaultConstructorAssign(){ideal input;input=ideal(input);return(input);}
 proc idealExactCopyBox(ideal input){ideal copy=input;return(list(input,copy));}
@@ -1237,7 +1856,8 @@ proc dynamicWideIndex(int branch,list values,int position){if(branch){return(0);
                         "idealIdentity", "idealConstructorIdentity", "idealConstruct", "idealDeclaration", "idealMutate", "idealAdd",
                         "idealAddPoly", "polyAddIdeal", "idealMultiply", "idealRightMultiply",
                         "idealLeftMultiply", "idealPower", "idealIndex", "idealSize", "defaultIdeal", "mutateDefaultIdeal", "emptyIdeal",
-                        "idealSelfAdd", "idealSelfMultiply", "idealSelfAssign", "idealConstructorAssign",
+                        "idealSelfAdd", "idealSelfMultiply", "idealSelfAssign", "idealAttributedDeclaration",
+                        "idealAttributedAssign", "idealConstructorAssign",
                         "idealDefaultConstructorAssign", "idealExactCopyBox", "idealFromPoly",
                         "idealFromNumber", "idealNumberThenIdentity", "idealNestedNumberIdentity",
                         "forwardDynamicIdeal", "dynamicIdealReturn", "nestedValues",
@@ -1277,8 +1897,9 @@ proc stringSlice(string s){return(s[1,2]);}
                              "idealAttribute", "stringVectorIndex", "stringSlice"]
         unsupported_result = compile_lib(unsupported_rich, unsupported_names,
                                          ["--export-prefix", "rich_"])
-        check(unsupported_result["native_exports"]==[] and
-              {entry["procedure"] for entry in unsupported_result["aliases"]}==set(unsupported_names),
+        check(unsupported_result["native_exports"]==["rich_idealPlusNumber"] and
+              {entry["procedure"] for entry in unsupported_result["aliases"]}==
+              set(unsupported_names)-{"idealPlusNumber"},
               unsupported_result)
 
         rich_count = 0
@@ -1387,6 +2008,10 @@ print(attrib(rich_idealSelfAdd(flagBasis),"isSB")==attrib(idealSelfAdd(flagBasis
 print(attrib(rich_idealSelfAssign(flagBasis),"isSB")==attrib(idealSelfAssign(flagBasis),"isSB") and attrib(rich_idealSelfAssign(flagBasis),"isSB")==0);
 print(attrib(rich_idealConstructorAssign(flagBasis),"isSB")==attrib(idealConstructorAssign(flagBasis),"isSB") and attrib(rich_idealConstructorAssign(flagBasis),"isSB")==1);
 print(attrib(rich_idealDefaultConstructorAssign(),"isSB")==attrib(idealDefaultConstructorAssign(),"isSB") and attrib(rich_idealDefaultConstructorAssign(),"isSB")==1);
+attrib(I,"native_marker",intvec(6,7));
+print(attrib(rich_idealAttributedDeclaration(I),"native_marker")==intvec(6,7));
+print(attrib(rich_idealAttributedAssign(I),"native_marker")==intvec(6,7));
+print(attrib(rich_idealSelfAssign(I),"native_marker")==attrib(idealSelfAssign(I),"native_marker"));
 list nativeFlagBox=rich_nestedValues("flag",flagBasis);list referenceFlagBox=nestedValues("flag",flagBasis);
 print(attrib(nativeFlagBox[2],"isSB")==attrib(referenceFlagBox[2],"isSB") and attrib(nativeFlagBox[2],"isSB")==1);
 list dynamicFlagBox=list(flagBasis);
@@ -1398,7 +2023,7 @@ kill p,n,I,J,savedI,savedJ,made,ignoredIdeal,Z,dynamicIdeals,listInput,listText,
   wideNative,oneNative,writeValues,writeVector,writeText,writeIdeal,savedWriteValues,
   flagBasis,nativeFlagBox,referenceFlagBox,dynamicFlagBox,nativeOwnedFlag,referenceOwnedFlag;
 '''
-            rich_count += 64
+            rich_count += 67
         rich_source += '''ring richnc=0,(x,y),dp;
 matrix richD[2][2]; richD[1,2]=1;
 def richNC=nc_algebra(1,richD); setring richNC;
@@ -1486,7 +2111,7 @@ print("IDEAL_INDEX_RECOVERY");print(ncols(I)==2 and I[2]==0);''')
         check(actual==reference and int(count.strip())>0, actual)
         print(f"Manual/ellipticcovers.tst: exact interpreter parity; {count.strip()} native entries")
         elliptic_all = compile_lib(ROOT/"Singular/LIB/ellipticcovers.lib", [])
-        check(len(elliptic_all["native_exports"])==4 and len(elliptic_all["aliases"])==7, elliptic_all)
+        check(len(elliptic_all["native_exports"])==5 and len(elliptic_all["aliases"])==6, elliptic_all)
         descriptors = singular(f'''LIB "ellipticcovers.lib";
 print("FD_BEFORE"); system("sh","ls /proc/"+string(system("pid"))+"/fd | wc -l");
 LIB "{elliptic_all["module"]}";
@@ -1714,7 +2339,7 @@ print("EVOLUTION"); print(c_value(1)); print(value(1)); print(saved(1));''')
             bad.write_text("proc bad(poly p){return(helper(p));}\nproc helper(poly p){"+unsupported+"}\n")
             result = subprocess.run(command(bad, ["bad"], ["--strict"]), capture_output=True, text=True, timeout=30)
             check(result.returncode!=0 and "bad.lib::bad -> bad.lib::helper" in result.stderr, result)
-    print(f"Native compiler correctness: {checks} checks plus {274+poly_count+number_count} native/interpreted comparisons, 0 failures")
+    print(f"Native compiler correctness: {checks} checks plus {287+poly_count+number_count} native/interpreted comparisons, 0 failures")
     return 0
 
 

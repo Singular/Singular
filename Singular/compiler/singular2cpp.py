@@ -2,7 +2,7 @@
 """Translate a strict, typed Singular library call closure to native C++.
 
 No evaluation, interpreter dispatch, or source execution is used by the compiler.
-The typed subset returns int/intvec/poly/number/string/ideal/list and borrows native call arguments.
+The typed subset returns int/bigint/intvec/intmat/matrix/poly/number/string/ideal/list and borrows native call arguments.
 Unsupported reachable code is an error, with its complete dependency chain.
 """
 
@@ -24,7 +24,7 @@ import sys
 import tempfile
 
 HERE = Path(__file__).resolve().parent
-VERSION = "singular-native-v10"
+VERSION = "singular-native-v19"
 CACHE_FORMAT = "cache-v1"
 ABI_SNAPSHOT_FORMAT = "abi-snapshot-v3"
 ARTIFACT_RECEIPT_FORMAT = "artifact-receipt-v2"
@@ -584,46 +584,102 @@ class LibraryScanner:
         return dict(procedures=self.procedures, imports=self.imports)
 
 
+def _newstruct_schema(value):
+    """Parse the literal member grammar accepted by newstructFromString.
+
+    Keep the source type names here.  Whether a member type is part of the
+    native subset is decided later, after imported newstruct declarations have
+    been merged.
+    """
+    if not isinstance(value, str) or not value.strip():
+        return None
+    result, seen = [], set()
+    for member in value.split(","):
+        match = re.fullmatch(
+            r"\s*([A-Za-z][A-Za-z0-9]*)\s+([A-Za-z][A-Za-z0-9]*)\s*",
+            member)
+        if (match is None or match[2] in seen or
+                match[2].startswith("r_")):
+            return None
+        seen.add(match[2])
+        result.append([match[1], match[2]])
+    return result
+
+
 def _literal_mod_init_newstructs(procedures):
     """Return unconditional literal newstruct declarations run at LIB load."""
     procedure = procedures.get("mod_init")
     if procedure is None:
-        return []
+        return [], {}
     values = [token for token, _ in procedure["body"]]
-    result, seen, depth = [], set(), 0
+    result, schemas, conflicts, depth, parentheses = [], {}, set(), 0, 0
+    guarded_statement = guarded_terminator = False
     for index, value in enumerate(values):
+        if value == "(":
+            parentheses += 1
+            continue
+        if value == ")":
+            parentheses -= 1
+            continue
         if value == "{":
             depth += 1
             continue
         if value == "}":
             depth -= 1
+            if depth == 0 and guarded_statement:
+                if guarded_terminator:
+                    break
+                guarded_statement = False
+            continue
+        if (not guarded_statement and depth == 0 and parentheses == 0 and
+                value in ("if", "else", "for", "while", "do", "switch")):
+            guarded_statement = True
+            guarded_terminator = False
+            continue
+        if value == "newstruct" and index+6 < len(values):
+            call = values[index:index+7]
+            if (call[1] == "(" and call[3] == "," and call[5:] == [")", ";"] and
+                    call[2].startswith('"') and call[4].startswith('"')):
+                try:
+                    name = json.loads(call[2])
+                    schema = _newstruct_schema(json.loads(call[4]))
+                except (TypeError, ValueError):
+                    name, schema = None, None
+                valid_name = (isinstance(name, str) and len(name) >= 2 and
+                              identifier(name))
+                if valid_name:
+                    # A conditional/nested installation, or an unsupported
+                    # earlier layout, makes the process-global name unstable
+                    # even if another straight-line declaration looks valid.
+                    if guarded_statement or depth != 0 or parentheses != 0 or schema is None:
+                        conflicts.add(name)
+                        schemas.pop(name, None)
+                    elif name not in schemas and name not in conflicts:
+                        result.append(name)
+                        schemas[name] = schema
+                    else:
+                        conflicts.add(name)
+                        schemas.pop(name, None)
+                continue
+        if guarded_statement:
+            if value in ("return", "ERROR"):
+                guarded_terminator = True
+            if depth == 0 and parentheses == 0 and value == ";":
+                if guarded_terminator:
+                    break
+                guarded_statement = False
             continue
         # A declaration after a straight-line terminator is not installed by
         # mod_init and therefore cannot safely define a nominal ABI type.
-        if depth == 0 and value in ("return", "ERROR"):
+        if depth == 0 and parentheses == 0 and value in ("return", "ERROR"):
             break
-        if depth != 0 or value != "newstruct" or index+6 >= len(values):
-            continue
-        call = values[index:index+7]
-        if call[1] != "(" or call[3] != "," or call[5:] != [")", ";"]:
-            continue
-        if not (call[2].startswith('"') and call[4].startswith('"')):
-            continue
-        try:
-            name = json.loads(call[2])
-            json.loads(call[4])
-        except (TypeError, ValueError):
-            continue
-        if not isinstance(name, str) or not IDENT.fullmatch(name) or name in seen:
-            continue
-        seen.add(name)
-        result.append(name)
-    return result
+    return [name for name in result if name in schemas], schemas
 
 
 def library_index(source):
     result = LibraryScanner(source).scan()
-    result["newstructs"] = _literal_mod_init_newstructs(result["procedures"])
+    result["newstructs"], result["newstruct_schemas"] = \
+        _literal_mod_init_newstructs(result["procedures"])
     return result
 
 
@@ -631,16 +687,141 @@ PRECEDENCE = {"or": 1, "||": 1, "and": 2, "&&": 2,
               "==": 3, "!=": 3, "<>": 3, "<": 4, "<=": 4, ">": 4, ">=": 4,
               "..": 5, ":": 6, "+": 6, "-": 6, "*": 7, "/": 7, "%": 7,
               "div": 7, "mod": 7, "^": 9, "**": 9}
-KERNELS = {"nvars", "ncols", "nrows", "deg", "size", "poly", "var", "lead", "leadmonom", "jet",
-           "number", "int", "diff", "numerator", "denominator", "subst", "list", "delete",
-           "insert", "intvec", "ideal", "string", "leadcoef", "leadexp", "typeof", "ringlist"}
-OWNED = {"poly": "snative::Poly", "number": "snative::Number", "list": "snative::List",
+KERNELS = {"nvars", "npars", "ncols", "nrows", "deg", "size", "poly", "var", "lead", "leadmonom", "jet",
+           "number", "bigint", "int", "diff", "numerator", "denominator", "subst", "list", "delete",
+           "insert", "intvec", "intmat", "matrix", "ideal", "string", "leadcoef", "leadexp", "typeof", "ringlist",
+           "univariate", "pardeg", "find", "ord", "par", "prime", "charstr", "simplify"}
+
+# These are token-stream fingerprints of the three generic procedures shipped
+# in general.lib.  Specializing a call is safe only while both its signature
+# and complete body are exactly the audited implementation.  A user procedure
+# with the same name, or a future general.lib implementation, takes the normal
+# transitive-closure/fallback path instead of silently acquiring these rules.
+CANONICAL_GENERIC_FINGERPRINTS = {
+    "sum": "4e48feef7d622dda673f460e7c259a9014e24243a061efd557e0c9ccac9fe208",
+    "product": "be3bffd8dd50cbf2fbdc8751da8f55bc46ad609e8a310bb34e3c9ad60239c22b",
+    "sort": "4444528720a0db8afdd582baf6843e8cc409b17cff9434eb2edc9596c905664f",
+}
+
+# Fingerprint source-level helpers whose behavior is inlined by a generic
+# specialization as well. In particular, general.lib::sum delegates large
+# inputs to its private lsum procedure; guarding sum alone would be unsafe if
+# that helper changed while the public procedure remained identical.
+CANONICAL_GENERIC_DEPENDENCIES = {
+    "sum": {
+        "lsum": "122fc2436534783dfa8418d2c8f2d1e8bea6a235f3d513465ace8d881ce5100c",
+    },
+}
+
+
+def canonical_generic(proc):
+    """Return an audited generic name only for its exact source definition."""
+    name = proc.get("name")
+    expected = CANONICAL_GENERIC_FINGERPRINTS.get(name)
+    if expected is None:
+        return None
+    identity = [proc.get("private", False),
+                [token for token, _ in proc.get("params", ())],
+                [token for token, _ in proc.get("body", ())]]
+    return name if digest(identity) == expected else None
+
+
+def canonical_generic_dependencies(name, procedures):
+    """Whether every source helper inlined by *name* has its audited body."""
+    for helper, expected in CANONICAL_GENERIC_DEPENDENCIES.get(name, {}).items():
+        proc = procedures.get(helper)
+        if proc is None:
+            return False
+        identity = [proc.get("private", False),
+                    [token for token, _ in proc.get("params", ())],
+                    [token for token, _ in proc.get("body", ())]]
+        if digest(identity) != expected:
+            return False
+    return True
+
+
+OWNED = {"poly": "snative::Poly", "number": "snative::Number", "bigint": "snative::Bigint",
+         "list": "snative::List",
          "paramnames": "snative::List", "intvec": "snative::Intvec",
+         "intmat": "snative::Intmat", "matrix": "snative::Matrix",
          "string": "snative::String", "ideal": "snative::Ideal"}
-CPP_TYPES = {"int": "long", "poly": "poly", "number": "number", "list": "lists",
+CPP_TYPES = {"int": "long", "poly": "poly", "number": "number", "bigint": "number",
+             "list": "lists",
              "value": "leftv", "paramname": "leftv", "string": "const char *",
              "ideal": "snative::IdealView",
+             "matrix": "snative::MatrixView", "intmat": "snative::IntmatView",
              "intvec": "intvec *", "varargs": "lists"}
+NOMINAL_PREFIX = "newstruct:"
+STATIC_TYPES = frozenset(("int", "bigint", "intvec", "intmat", "matrix", "poly", "number", "string", "ideal",
+                          "list", "value"))
+
+
+def nominal_kind(name):
+    return NOMINAL_PREFIX + name
+
+
+def is_nominal(kind):
+    return isinstance(kind, str) and kind.startswith(NOMINAL_PREFIX)
+
+
+def nominal_name(kind):
+    return kind[len(NOMINAL_PREFIX):]
+
+
+def cpp_type(kind):
+    return "leftv" if is_nominal(kind) else CPP_TYPES[kind]
+
+
+def owned_type(kind):
+    return "snative::Value" if is_nominal(kind) else OWNED.get(kind)
+
+
+def is_owned_type(kind):
+    return kind in OWNED or is_nominal(kind)
+
+
+def command_token(kind):
+    if is_nominal(kind):
+        return f"snative::newstruct_type({json.dumps(nominal_name(kind))})"
+    return {"int": "INT_CMD", "intvec": "INTVEC_CMD", "intmat": "INTMAT_CMD",
+            "matrix": "MATRIX_CMD", "poly": "POLY_CMD",
+            "number": "NUMBER_CMD", "bigint": "BIGINT_CMD", "string": "STRING_CMD", "ideal": "IDEAL_CMD",
+            "list": "LIST_CMD"}.get(kind)
+
+
+def schema_member(schemas, kind, member):
+    if not is_nominal(kind):
+        return None
+    schema = schemas.get(nominal_name(kind))
+    if schema is None:
+        return None
+    for member_type, member_name in schema:
+        if member_name == member:
+            if member_type == "def":
+                return "value"
+            if member_type in STATIC_TYPES:
+                return member_type
+            return nominal_kind(member_type) if member_type in schemas else None
+    return None
+
+
+def nominal_needs_ring(kind, schemas, seen=None):
+    if not is_nominal(kind):
+        # Unsupported schema members are conservatively ring-dependent.  In
+        # particular map/matrix initialization dereferences currRingHdl.
+        return kind not in ("int", "bigint", "intvec", "intmat", "string", "list", "def", "value")
+    name = nominal_name(kind)
+    if name not in schemas:
+        return True
+    seen = set() if seen is None else seen
+    if name in seen:
+        return False
+    seen.add(name)
+    for member_type, _ in schemas.get(name, ()):
+        child = nominal_kind(member_type) if member_type in schemas else member_type
+        if nominal_needs_ring(child, schemas, seen):
+            return True
+    return False
 
 
 def exits(tree):
@@ -671,7 +852,10 @@ def trees(tree):
     """Walk AST nodes, not declaration pairs or argument/statement lists."""
     yield tree
     if tree[0] == "declare":
-        children = [value for _, value in tree[2] if value is not None]
+        children = [child for declaration in tree[2]
+                    for child in ([declaration[1]] if declaration[1] is not None else []) +
+                                 ([] if len(declaration)<3 or declaration[2] is None
+                                  else list(declaration[2]))]
     elif tree[0] == "block":
         children = tree[1]
     elif tree[0] == "call":
@@ -685,6 +869,12 @@ def trees(tree):
 
 
 class Parser(Reader):
+    def __init__(self, tokens, newstructs=()):
+        super().__init__(tokens)
+        self.declaration_types = {
+            "int", "bigint", "intvec", "intmat", "matrix", "poly", "number", "string", "ideal", "list", "def",
+            *newstructs}
+
     def sequence(self):
         """Parse Singular's lowest-precedence comma expression.
 
@@ -709,9 +899,14 @@ class Parser(Reader):
         else:
             value = self.take()
             if value.isdigit():
-                if int(value) > 2147483647 or (len(value)>1 and value[0]=="0"):
-                    raise CompileError("integer literal outside the supported int syntax")
-                left = ["int", int(value)]
+                integer = int(value)
+                # grammar.y performs its atoi/text mismatch check only when
+                # strlen(token)+2 reaches MAX_INT_LEN (11).  Short leading-zero
+                # tokens therefore remain INT_CMD; nine-digit ones become
+                # BIGINT_CMD even when their mathematical value is small.
+                left = (["bigint", value] if len(value)>=9 and
+                        (integer > 2147483647 or value != str(integer))
+                        else ["int", integer])
             elif value.startswith('"') and "\\" not in value:
                 left = ["string", value[1:-1]]
             elif value == "#":
@@ -731,7 +926,7 @@ class Parser(Reader):
                     # insert(L,(1,2)) consumes the head of the parenthesized
                     # expression as one value; keep that shape so the emitter
                     # can conservatively reject it instead of moving position.
-                    if value not in KERNELS or value in ("list", "intvec", "ideal", "string"):
+                    if value not in KERNELS or value in ("list", "intvec", "intmat", "matrix", "ideal", "string"):
                         args = [child for argument in args
                                 for child in (argument[1] if argument[0]=="sequence" else [argument])]
                     self.take(")")
@@ -757,21 +952,30 @@ class Parser(Reader):
         return left
 
     def simple(self):
-        if self.peek() in ("int", "intvec", "poly", "number", "string", "ideal", "list", "def"):
+        if self.peek() in self.declaration_types:
             kind = self.take()
             declarations = []
             while True:
                 name = self.take()
                 if not identifier(name):
                     raise CompileError(f"unsupported identifier {name!r}")
-                value = (self.sequence() if kind in ("intvec", "ideal", "list") else self.expression()) if self.accept("=") else None
-                declarations.append([name, value])
+                dimensions = None
+                if kind in ("matrix", "intmat") and self.accept("["):
+                    rows = self.expression()
+                    self.take("]")
+                    self.take("[")
+                    columns = self.expression()
+                    self.take("]")
+                    dimensions = [rows, columns]
+                value = (self.sequence() if kind in ("intvec", "intmat", "matrix", "ideal", "list") else self.expression()) if self.accept("=") else None
+                declarations.append([name, value, dimensions])
                 if not self.accept(","):
                     break
             # Singular declares every name first and then distributes one
             # common comma RHS.  Until that pairwise assignment is modeled,
             # do not accept the superficially similar C declaration shape.
-            if len(declarations)>1 and any(value is not None for _, value in declarations):
+            if len(declarations)>1 and any(declaration[1] is not None
+                                           for declaration in declarations):
                 raise CompileError("initialized multi-name declarations require contextual comma assignment")
             return ["declare", kind, declarations]
         lhs = self.expression()
@@ -864,26 +1068,27 @@ class Parser(Reader):
 
 
 def signature(proc, newstructs=(), include_nominal=False):
-    if [t[0] for t in proc["params"]] == ["list", "#"]:
-        # The interpreter presents variadic arguments as the procedure-local
-        # list '#'. Materialize the complete heterogeneous list at the entry.
-        # The internal name is deliberately unavailable to source declarations.
-        result = [["varargs", "__snative_varargs"]]
-        return (result, {}) if include_nominal else result
     r = Reader(proc["params"])
     params = []
     nominal = {}
     newstructs = set(newstructs)
     while r.peek() != "<eof>":
-        kind, name = r.take(), r.take()
-        if (kind not in ("int", "intvec", "poly", "number", "string", "ideal", "list", "def")
+        kind = r.take()
+        if kind == "list" and r.accept("#"):
+            # Singular exposes all arguments after the fixed prefix through
+            # the procedure-local list '#'.  Keep that list as one internal
+            # ABI parameter; its name cannot collide with source identifiers.
+            params.append(["varargs", "__snative_varargs"])
+            break
+        name = r.take()
+        if (kind not in ("int", "bigint", "intvec", "intmat", "matrix", "poly", "number", "string", "ideal", "list", "def")
                 and kind not in newstructs) or not identifier(name):
-            raise CompileError("supported parameters are int/intvec/poly/number/string/ideal/list and checked def")
+            raise CompileError("supported parameters are int/bigint/intvec/intmat/matrix/poly/number/string/ideal/list and checked def")
         if name in [n for _, n in params] or name == "basering":
             raise CompileError(f"duplicate/reserved parameter {name}")
         if kind in newstructs:
             nominal[name] = kind
-            kind = "value"
+            kind = nominal_kind(kind)
         params.append(["value" if kind=="def" else kind, name])
         if not r.accept(","):
             break
@@ -893,11 +1098,20 @@ def signature(proc, newstructs=(), include_nominal=False):
 
 
 class Closure:
-    def __init__(self, cache, search):
+    def __init__(self, cache, search, canonical_generic_paths=()):
         self.cache, self.search = cache, search
-        self.libraries, self.nodes, self.newstruct_types = {}, {}, {}
+        self.libraries, self.nodes = {}, {}
+        self.newstruct_types, self.newstruct_schemas = {}, {}
         self.stack = []
         self.stats = empty_stats()
+        # Source-tree runs trust the general.lib next to this translator;
+        # installed runs additionally pass their prefix's system library.
+        # An exact user copy is deliberately not sufficient to acquire a
+        # specialization: its normal transitive closure remains authoritative.
+        bundled_general = Path(__file__).resolve().parent.parent/"LIB/general.lib"
+        self.canonical_generic_paths = frozenset(
+            str(Path(candidate).resolve())
+            for candidate in (bundled_general, *canonical_generic_paths))
 
     def cached(self, category, key, producer, counter):
         path = self.cache / category / (digest([file_digest(__file__), key]) + ".json")
@@ -931,17 +1145,29 @@ class Closure:
         raise CompileError(f"cannot resolve imported library {name}")
 
     def available_newstructs(self, path):
+        return frozenset(self.available_newstruct_schemas(path))
+
+    def available_newstruct_schemas(self, path):
         path = str(Path(path).resolve())
-        if path in self.newstruct_types:
-            return self.newstruct_types[path]
-        found, seen, pending = set(), set(), [path]
+        if path in self.newstruct_schemas:
+            return self.newstruct_schemas[path]
+        found, origins, conflicts, seen, pending = {}, {}, set(), set(), [path]
         while pending:
             current = pending.pop()
             if current in seen:
                 continue
             seen.add(current)
             library = self.library(current)
-            found.update(library.get("newstructs", ()))
+            for name, schema in library.get("newstruct_schemas", {}).items():
+                if name in conflicts:
+                    continue
+                if name in found and origins[name] != current:
+                    found.pop(name, None)
+                    origins.pop(name, None)
+                    conflicts.add(name)
+                else:
+                    found[name] = schema
+                    origins[name] = current
             for name in library["imports"]:
                 if not name.endswith(".lib"):
                     continue
@@ -951,8 +1177,25 @@ class Closure:
                     # Type discovery must not make an otherwise irrelevant,
                     # unavailable optional import part of this closure.
                     continue
+        # Step 2 only admits layouts whose complete transitive field schema is
+        # understood.  Matrix/intmat and other opaque owners enter in their
+        # dedicated later steps; a parent of an unsupported/conflicting type
+        # is unsupported as well.
+        primitive_members = {
+            "int", "bigint", "intvec", "intmat", "matrix", "poly", "number", "string", "ideal", "list", "def"}
+        retained = set(found)
+        while True:
+            invalid = {
+                name for name in retained
+                if any(member_type not in primitive_members and member_type not in retained
+                       for member_type, _ in found[name])}
+            if not invalid:
+                break
+            retained.difference_update(invalid)
+        found = {name: schema for name, schema in found.items() if name in retained}
+        self.newstruct_schemas[path] = found
         self.newstruct_types[path] = frozenset(found)
-        return self.newstruct_types[path]
+        return self.newstruct_schemas[path]
 
     def resolve(self, path, name):
         if name in self.library(path)["procedures"]:
@@ -984,27 +1227,46 @@ class Closure:
                 raise CompileError(f"procedure {name} not found")
             if not identifier(name) or name=="compilerCalls":
                 raise CompileError(f"unsupported/reserved procedure name {name}")
-            params, nominal_params = signature(
-                proc, self.available_newstructs(path), include_nominal=True)
-            if any(t[0]=="#" for t in proc["body"]) and not (len(params)==1 and params[0][0]=="varargs"):
+            schemas = self.available_newstruct_schemas(path)
+            params, nominal_params = signature(proc, schemas, include_nominal=True)
+            if any(t[0]=="#" for t in proc["body"]) and not any(
+                    kind=="varargs" for kind, _ in params):
                 raise CompileError("# is supported only in a list # procedure")
-            ast = self.cached("ast", digest([VERSION, [t[0] for t in proc["body"]]]),
-                              lambda: Parser(proc["body"]).parse(), "procedures_parsed")
+            ast = self.cached(
+                "ast", digest([VERSION, sorted(schemas), [t[0] for t in proc["body"]]]),
+                lambda: Parser(proc["body"], schemas).parse(), "procedures_parsed")
             node = dict(path=path, name=name, params=params, nominal_params=nominal_params,
-                        ast=ast, dependencies=set(), calls={},
+                        schemas=schemas, ast=ast, dependencies=set(), calls={},
+                        special_calls={},
                         returns=set(), chain=list(self.stack), private=proc["private"],
-                        symbol="sn_" + name + "_" + digest([path, name, params, nominal_params])[:12])
+                        symbol="sn_" + name + "_" +
+                        digest([path, name, params, nominal_params, schemas])[:12])
             parameter_names = {name for kind, name in params if kind!="varargs"}
-            node["mutated"] = {tree[1][1] if tree[1][0]=="var" else tree[1][1][1]
-                               for tree in trees(ast)
-                               if tree[0] in ("assign", "increment") and
-                               tree[1][0] in ("var", "index") and
-                               (tree[1][0]=="var" or tree[1][1][0]=="var") and
-                               (tree[1][1] if tree[1][0]=="var" else tree[1][1][1]) in parameter_names}
+            def assigned_root(tree):
+                while tree[0] in ("index", "index2", "field"):
+                    tree = tree[1]
+                return tree[1] if tree[0] == "var" else None
+            node["mutated"] = {
+                root for tree in trees(ast)
+                if tree[0] in ("assign", "increment")
+                for root in [assigned_root(tree[1])]
+                if root in parameter_names}
             self.nodes[key] = node  # forward declarations permit recursive closures
             for tree in trees(ast):
                 if tree[0] == "call" and tree[1] not in KERNELS:
                     target = self.resolve(path, tree[1])
+                    target_procedures = self.library(target[0])["procedures"]
+                    specialization = (canonical_generic(
+                        target_procedures[target[1]])
+                        if str(Path(target[0]).resolve()) in
+                        self.canonical_generic_paths else None)
+                    if (specialization is not None and not
+                            canonical_generic_dependencies(
+                                specialization, target_procedures)):
+                        specialization = None
+                    if specialization is not None:
+                        node["special_calls"][tree[1]] = specialization
+                        continue
                     self.visit(*target)
                     node["dependencies"].add(target)
                     node["calls"][tree[1]] = target
@@ -1023,10 +1285,15 @@ class Closure:
             op = tree[0]
             if op == "int":
                 return {"int"}
+            if op == "bigint":
+                return {"bigint"}
             if op == "string":
                 return {"string"}
             if op == "field":
-                return {"value"}
+                bases = infer(tree[1], types, node)
+                return {field for base in bases
+                        for field in [schema_member(node["schemas"], base, tree[2])]
+                        if field is not None}
             if op == "var":
                 if tree[1] not in types:
                     return set()
@@ -1044,7 +1311,15 @@ class Closure:
                         else "value" if kind in ("list", "value") else "int"
                         for kind in infer(tree[1], types, node)}
             if op == "index2":
-                return set()
+                sources = infer(tree[1], types, node)
+                first = infer(tree[2], types, node)
+                second = infer(tree[3], types, node)
+                # Vector selectors are expression-list valued and become one
+                # matrix only under an explicit matrix/intmat destination.
+                if "intvec" in first or "intvec" in second:
+                    return set()
+                return {"poly" if kind=="matrix" else "int" if kind=="intmat" else None
+                        for kind in sources} - {None}
             if op == "sequence":
                 # A bare comma expression remains an interpreter exprlist.
                 # Only an explicit intvec destination may collect its values.
@@ -1065,16 +1340,39 @@ class Closure:
                     return left
                 return {"string" if a==b=="string" else "list" if "list" in (a,b)
                         else "ideal" if "ideal" in (a,b) else "poly" if "poly" in (a,b) else "number" if "number" in (a,b)
+                        else "bigint" if "bigint" in (a,b)
                         else "intvec" if "intvec" in (a,b) else "value" if "value" in (a,b) else "int"
                         for a in left for b in right}
             if op == "call":
+                specialization = node.get("special_calls", {}).get(tree[1])
+                if specialization in ("sum", "product"):
+                    arguments = [infer(argument, types, node) for argument in tree[2]]
+                    if (len(arguments) in (1, 2) and arguments[0] == {"intvec"} and
+                            (len(arguments) == 1 or
+                             arguments[1] in ({"int"}, {"intvec"}))):
+                        return {"int"}
+                    return set()
+                if specialization == "sort":
+                    if not tree[2]:
+                        return set()
+                    first = infer(tree[2][0], types, node)
+                    literal_int_list = (
+                        tree[2][0][0:2] == ["call", "list"] and
+                        all(infer(argument, types, node) == {"int"}
+                            for argument in tree[2][0][2]))
+                    return {"list"} if first == {"intvec"} or literal_int_list else set()
                 if tree[1] in KERNELS:
                     if tree[1]=="delete" and tree[2]:
                         return infer(tree[2][0], types, node) & {"list", "intvec"}
-                    return {"list" if tree[1] in ("list", "delete", "insert", "ringlist") else "string" if tree[1] in ("typeof", "string")
+                    if tree[1]=="simplify" and tree[2]:
+                        return infer(tree[2][0], types, node) & {"poly", "ideal"}
+                    return {"list" if tree[1] in ("list", "delete", "insert", "ringlist") else "string" if tree[1] in ("typeof", "string", "charstr")
                             else "ideal" if tree[1]=="ideal"
+                            else "matrix" if tree[1]=="matrix"
+                            else "intmat" if tree[1]=="intmat"
                             else "poly" if tree[1] in ("poly", "var", "lead", "leadmonom", "jet", "subst")
-                            else "number" if tree[1] in ("number", "diff", "numerator", "denominator", "leadcoef")
+                            else "number" if tree[1] in ("number", "diff", "numerator", "denominator", "leadcoef", "par")
+                            else "bigint" if tree[1]=="bigint"
                             else "intvec" if tree[1] in ("intvec", "leadexp") else "int"}
                 return self.nodes[node["calls"][tree[1]]]["returns"]
             return set()
@@ -1087,9 +1385,11 @@ class Closure:
                     if tree[0] == "parameter_declare":
                         types[tree[1]] = "number"
                     if tree[0] == "declare":
-                        for n, value in tree[2]:
+                        for declaration in tree[2]:
+                            n, value = declaration[:2]
                             if tree[1] != "def":
-                                types[n] = tree[1]
+                                types[n] = (nominal_kind(tree[1])
+                                            if tree[1] in node["schemas"] else tree[1])
                             elif value is not None:
                                 candidates = infer(value, types, node)
                                 if len(candidates)==1:
@@ -1100,17 +1400,22 @@ class Closure:
                         node["returns"].update(infer(tree[1], types, node))
                 changed |= before != node["returns"]
         for node in sorted(self.nodes.values(), key=lambda n: len(n["chain"]), reverse=True):
-            if len(node["returns"])!=1 or not node["returns"] <= {"int", "intvec", "poly", "number", "string", "ideal", "list"}:
-                raise CompileError("cannot infer one int/intvec/poly/number/string/ideal/list return type (mixed types or ungrounded recursion)\n"
+            supported_results = {"int", "bigint", "intvec", "intmat", "matrix", "poly", "number", "string", "ideal", "list"}
+            if (len(node["returns"]) != 1 or
+                    not all(kind in supported_results or
+                            (is_nominal(kind) and nominal_name(kind) in node["schemas"])
+                            for kind in node["returns"])):
+                raise CompileError("cannot infer one supported static return type (mixed types or ungrounded recursion)\n"
                                    + "call chain: " + " -> ".join(node["chain"]))
             node["result"] = next(iter(node["returns"]))
             node["contextual_sequence_result"] = any(
                 tree[0] == "return" and tree[1][0] == "sequence"
                 for tree in trees(node["ast"]))
-            node["needs_ring"] = (node["result"] in ("poly", "number", "ideal") or any(t in ("poly", "number", "ideal") for t,_ in node["params"]) or
+            node["needs_ring"] = (nominal_needs_ring(node["result"], node["schemas"]) or
+                                  any(nominal_needs_ring(t, node["schemas"]) for t,_ in node["params"] if t!="varargs") or
                                   any((t[0]=="var" and t[1]=="basering") or
-                                      (t[0]=="declare" and t[1] in ("poly", "number", "ideal")) or
-                                      (t[0]=="call" and t[1] in KERNELS-{"size", "nrows", "list", "delete", "insert", "int", "intvec", "string", "typeof"})
+                                      (t[0]=="declare" and t[1] in ("poly", "number", "ideal", "matrix")) or
+                                      (t[0]=="call" and t[1] in KERNELS-{"size", "nrows", "ncols", "list", "delete", "insert", "int", "bigint", "intvec", "intmat", "string", "typeof", "find", "prime"})
                                       for t in trees(node["ast"])))
         changed = True
         while changed:
@@ -1126,8 +1431,9 @@ class Closure:
 
 
 def declaration(node):
-    params = [f"{CPP_TYPES[t]} v_{n}" for t, n in node["params"]]
-    return OWNED.get(node["result"], "long") + " " + node["symbol"] + "(" + ", ".join(["snative::Context &ctx"]+params) + ")"
+    params = [f"{cpp_type(t)} v_{n}" for t, n in node["params"]]
+    return (owned_type(node["result"]) or "long") + " " + node["symbol"] + \
+        "(" + ", ".join(["snative::Context &ctx"]+params) + ")"
 
 
 class Emitter:
@@ -1149,17 +1455,24 @@ class Emitter:
                 self.locals.append(f"snative::IdealBinding b_{name}(v_{name}, ctx.r);")
                 self.bound_params[name] = f"b_{name}.get()"
         self.cow_params = {name: kind for name, kind in self.types.items()
-                           if name in node["mutated"] and kind in ("poly", "number", "string", "ideal", "list", "intvec")}
+                           if name in node["mutated"] and
+                           (kind in ("poly", "number", "bigint", "string", "ideal", "matrix", "intmat", "list", "intvec") or
+                            is_nominal(kind))}
         for name, kind in self.cow_params.items():
-            owner = {"poly":"CowPoly", "number":"CowNumber", "string":"CowString", "ideal":"CowIdeal",
-                     "list":"CowList", "intvec":"CowIntvec"}[kind]
-            suffix = ", ctx.r" if kind in ("poly", "number", "ideal", "list") else ""
+            owner = ("CowNewstruct" if is_nominal(kind) else
+                      {"poly":"CowPoly", "number":"CowNumber", "bigint":"CowBigint",
+                      "string":"CowString", "ideal":"CowIdeal",
+                      "matrix":"CowMatrix", "intmat":"CowIntmat",
+                      "list":"CowList", "intvec":"CowIntvec"}[kind])
+            suffix = (f", {json.dumps(nominal_name(kind))}, ctx.r" if is_nominal(kind) else
+                      ", ctx.r" if kind in ("poly", "number", "ideal", "matrix", "intmat", "list") else "")
             source = self.bound_params.get(name, f"v_{name}")
             self.locals.append(f"snative::{owner} c_{name}({source}{suffix});")
         self.declared = set(self.types)
         self.guarded_declarations = set()
         self.parameter_locals = set()
         self.poly_scans = {}
+        self.list_element_types = {}
         self.serial, self.indent, self.loop = 0, 1, 0
 
     def out(self, text):
@@ -1176,8 +1489,8 @@ class Emitter:
     def temp(self, code, kind="int"):
         self.serial += 1
         name = "t" + str(self.serial)
-        if kind in OWNED:
-            self.out(f"{OWNED[kind]} {name} = {code};")
+        if is_owned_type(kind):
+            self.out(f"{owned_type(kind)} {name} = {code};")
             self.out('if (errorreported) throw std::runtime_error("native algebra kernel failed");')
             self.owned[name+".get()"] = name
             return kind, name+".get()"
@@ -1190,7 +1503,10 @@ class Emitter:
         # procedure arguments and all other named values remain borrowed.
         if value in self.owned:
             return "std::move("+self.owned[value]+")"
-        return f"{OWNED[kind]}::copy({value}{', ctx.r' if kind in ('poly', 'number', 'ideal', 'list', 'paramnames') else ''})"
+        if is_nominal(kind):
+            return (f"snative::copy_newstruct({value}, "
+                    f"{json.dumps(nominal_name(kind))}, ctx.r)")
+        return f"{OWNED[kind]}::copy({value}{', ctx.r' if kind in ('poly', 'number', 'ideal', 'matrix', 'intmat', 'list', 'paramnames') else ''})"
 
     def owned_arguments(self, values, kind, consume=None):
         """Give destructive kernels owners, optionally reusing an accumulator.
@@ -1260,18 +1576,38 @@ class Emitter:
             return self.temp(f"snative::Poly(p_ISet((int)({value}), ctx.r), ctx.r)", "poly")[1]
         if kind == "number":
             return self.temp(f"snative::polynomial({value}, ctx.r)", "poly")[1]
+        if kind == "bigint":
+            return self.temp(f"snative::polynomial_bigint({value}, ctx.r)", "poly")[1]
         if kind != "poly":
-            raise CompileError(f"expected poly or int, got {kind}")
+            raise CompileError(f"expected poly, number, bigint, or int, got {kind}")
         return value
 
     def number(self, kind, value, explicit=False):
         if kind == "number":
             return value
+        if kind == "bigint":
+            return self.temp(f"snative::number_from_bigint({value}, ctx.r)", "number")[1]
         if kind == "int" or (kind == "poly" and explicit):
             return self.temp(f"snative::number_from_{kind}({value}, ctx.r)", "number")[1]
         if kind == "value":
             return self.temp(f"snative::number_argument({value}, ctx.r)", "number")[1]
         raise CompileError(f"expected number or int, got {kind}")
+
+    def bigint(self, kind, value, explicit=False):
+        if kind == "bigint":
+            return value
+        if kind == "int":
+            return self.temp(f"snative::bigint_from_int({value})", "bigint")[1]
+        if explicit and kind in ("number", "poly"):
+            return self.temp(
+                f"snative::bigint_from_{kind}({value}, ctx.r)", "bigint")[1]
+        if kind == "number":
+            return self.temp(
+                f"snative::bigint_assignment_number({value}, ctx.r)", "bigint")[1]
+        if kind == "value":
+            helper = "bigint_argument" if explicit else "bigint_assignment_argument"
+            return self.temp(f"snative::{helper}({value}, ctx.r)", "bigint")[1]
+        raise CompileError(f"expected bigint, number, poly, or int, got {kind}")
 
     def string_value(self, kind, value):
         if kind == "string":
@@ -1295,12 +1631,71 @@ class Emitter:
             return self.temp(f"snative::ideal_from_int({value}, ctx.r)", "ideal")[1]
         if kind == "number":
             return self.temp(f"snative::ideal_from_number({value}, ctx.r)", "ideal")[1]
+        if kind == "bigint":
+            polynomial = self.temp(
+                f"snative::polynomial_bigint({value}, ctx.r)", "poly")[1]
+            return self.temp(f"snative::ideal_from_poly({polynomial}, ctx.r)", "ideal")[1]
         if kind == "value":
             self.serial += 1
             name = "t"+str(self.serial)
             self.out(f"snative::IdealArgument {name}({value}, ctx.r);")
             return name+".get()"
-        raise CompileError(f"expected ideal, poly, number, or int, got {kind}")
+        raise CompileError(f"expected ideal, poly, number, bigint, or int, got {kind}")
+
+    def matrix_value(self, kind, value, explicit=False, shape=None):
+        if kind == "matrix":
+            return value
+        rows, columns = shape or ("1L", "1L")
+        if kind == "ideal":
+            helper = "matrix_from_ideal" if explicit else "matrix_from_ideal_shaped"
+            dimensions = "" if explicit else f", {rows}, {columns}"
+            return self.temp(
+                f"snative::{helper}({value}{dimensions}, ctx.r)", "matrix")[1]
+        if kind == "intmat":
+            return self.temp(
+                f"snative::matrix_from_intvec({value}.data(), ctx.r)", "matrix")[1]
+        if kind == "intvec":
+            return self.temp(
+                f"snative::matrix_from_intvec({value}, ctx.r)", "matrix")[1]
+        if kind in ("poly", "number", "bigint", "int"):
+            helper = f"matrix_from_{kind}" + ("" if explicit else "_shaped")
+            dimensions = "" if explicit else f", {rows}, {columns}"
+            return self.temp(
+                f"snative::{helper}({value}{dimensions}, ctx.r)", "matrix")[1]
+        if kind == "value":
+            self.serial += 1
+            name = "t"+str(self.serial)
+            self.out(
+                f"snative::MatrixArgument {name}({value}, ctx.r, {rows}, {columns}, "
+                f"{str(explicit).lower()});")
+            return name+".get()"
+        raise CompileError(
+            f"expected matrix, ideal, intmat, intvec, poly, number, bigint, or int, got {kind}")
+
+    def intmat_value(self, kind, value, explicit=False, shape=None,
+                     assignment_target=None):
+        if kind == "intmat":
+            return value
+        rows, columns = shape or ("1L", "1L")
+        if kind == "intvec":
+            return self.temp(
+                f"snative::Intmat(new intvec({value}), ctx.r)", "intmat")[1]
+        if kind == "int":
+            if explicit:
+                raise CompileError("explicit intmat(int) conversion remains interpreted")
+            conversion = (f"snative::intmat_assign_int({assignment_target}, {value}, ctx.r)"
+                          if assignment_target is not None else
+                          f"snative::intmat_from_int_shaped({value}, {rows}, {columns}, ctx.r)")
+            return self.temp(conversion, "intmat")[1]
+        if kind == "value":
+            self.serial += 1
+            name = "t"+str(self.serial)
+            self.out(
+                f"snative::IntmatArgument {name}({value}, ctx.r, {rows}, {columns}, "
+                f"{str(explicit).lower()}"
+                f"{', '+assignment_target if assignment_target is not None else ''});")
+            return name+".get()"
+        raise CompileError(f"expected intmat, intvec, or int, got {kind}")
 
     def integer(self, expression):
         kind, value = self.expr(expression, expected="int")
@@ -1354,7 +1749,18 @@ class Emitter:
         self.out(f"snative::PolyArgument {name}({value}, ctx.r);")
         return name+".get()"
 
-    def convert(self, kind, expression, consume=None):
+    def convert(self, kind, expression, consume=None, shape=None,
+                assignment_target=None):
+        if is_nominal(kind):
+            actual, value = self.expr(expression)
+            if actual == kind:
+                return value
+            if actual == "value":
+                return self.temp(
+                    f"snative::newstruct_argument({value}, "
+                    f"{json.dumps(nominal_name(kind))})", "leftv")[1]
+            raise CompileError(
+                f"expected newstruct {nominal_name(kind)}, got {actual}")
         if kind=="list" and expression[0]=="sequence":
             return self.list_literal([self.expr(value) for value in expression[1]])[1]
         if kind=="ideal" and expression[0]=="sequence":
@@ -1362,6 +1768,11 @@ class Emitter:
         if kind=="intvec" and expression[0]=="index":
             indexed = self.index_expression(expression, intvec_context=True)
             return self.intvec_value(*indexed)
+        if kind in ("matrix", "intmat") and expression[0]=="index2":
+            indexed = self.index2_expression(expression, context=kind)
+            return (self.matrix_value(*indexed, shape=shape) if kind=="matrix" else
+                    self.intmat_value(*indexed, shape=shape,
+                                      assignment_target=assignment_target))
         if kind == "number" and expression[0] == "index":
             indexed = self.index_expression(expression, number=True)
             if indexed[0] == "number":
@@ -1371,38 +1782,86 @@ class Emitter:
         # only when this expression is the complete RHS of an explicitly
         # typed intvec destination.  Pass that proof down to the call emitter;
         # an untyped use (notably list(f(...))) must retain exprlist semantics.
-        args = self.expr(expression, consume, expected="intvec" if kind=="intvec" else None)
+        args = self.expr(expression, consume, expected=kind)
+        if kind=="matrix":
+            return self.matrix_value(*args, shape=shape)
+        if kind=="intmat":
+            return self.intmat_value(
+                *args, shape=shape, assignment_target=assignment_target)
         return (self.list_value if kind=="list" else self.polynomial if kind=="poly" else
+                self.bigint if kind=="bigint" else
                 self.intvec_value if kind=="intvec" else self.string_value if kind=="string" else
                 self.ideal_value if kind=="ideal" else self.number)(*args)
 
     def box(self, kind, value):
-        if kind == "value":
+        if kind == "value" or is_nominal(kind):
             return value
-        if kind not in ("int", "number", "poly", "string", "ideal", "list", "intvec", "ring"):
+        if kind not in ("int", "number", "bigint", "poly", "string", "ideal", "matrix", "intmat", "list", "intvec", "ring"):
             raise CompileError(f"cannot box native {kind}")
         self.serial += 1
         name = "t"+str(self.serial)
-        if kind == "ideal":
+        if kind in ("ideal", "matrix", "intmat"):
             self.out(f"snative::View {name}({value});")
         else:
             self.out(f"snative::View {name}({kind.upper()}_CMD, (void*)({value}));")
         return name+".get()"
 
-    def owned_value(self, code):
+    def owned_value(self, code, kind="value"):
         self.serial += 1
         name = "t"+str(self.serial)
         self.out(f"snative::Value {name} = {code};")
-        return "value", name+".get()"
+        self.owned[name+".get()"] = name
+        return kind, name+".get()"
+
+    def exact_value(self, kind, value):
+        """Read one already-materialized leftv as an exact static field type."""
+        if kind == "value":
+            return kind, value
+        if is_nominal(kind):
+            return kind, self.temp(
+                f"snative::newstruct_argument({value}, {json.dumps(nominal_name(kind))})",
+                "leftv")[1]
+        if kind == "int":
+            return self.temp(f"snative::int_argument({value})")
+        if kind == "number":
+            return self.temp(f"snative::exact_number_argument({value}, ctx.r)", "number")
+        if kind == "bigint":
+            return self.temp(f"snative::exact_bigint_argument({value})", "bigint")
+        if kind == "string":
+            return self.temp(f"snative::exact_string_argument({value})", "string")
+        if kind == "ideal":
+            return self.temp(f"snative::exact_ideal_argument({value}, ctx.r)", "ideal")
+        if kind == "matrix":
+            return self.temp(f"snative::exact_matrix_argument({value}, ctx.r)", "matrix")
+        if kind == "intmat":
+            return self.temp(f"snative::exact_intmat_argument({value}, ctx.r)", "intmat")
+        if kind == "list":
+            return "list", self.temp(
+                f"snative::plain_list_argument({value})", "lists")[1]
+        if kind == "intvec":
+            return "intvec", self.borrowed_intvec(value)
+        if kind == "poly":
+            return self.temp(f"snative::exact_poly_argument({value}, ctx.r)", "poly")
+        raise CompileError(f"unsupported newstruct member type {kind}")
 
     def list_literal(self, args, variadic_arguments=False):
         """Build a list after evaluating every element, moving owned values."""
+        if variadic_arguments and len(args)==1:
+            kind, value = args[0]
+            if kind=="list":
+                # Singular assigns one list optional argument directly to #.
+                # Copy even an owned local: the callee may write through # and
+                # procedure parameters have value semantics.
+                return self.temp(f"snative::List::copy({value}, ctx.r)", "list")
+            if kind=="value":
+                return self.temp(
+                    f"snative::single_variadic_argument({value}, ctx.r)", "list")
         self.serial += 1
         name = "t"+str(self.serial)
         self.out(f"snative::List {name}(ctx.r);")
         self.out(f"{name}.reserve({len(args)}L);")
         for index, (kind, value) in enumerate(args, 1):
-            if kind in ("poly", "number", "string", "ideal", "list", "intvec") and value in self.owned:
+            if kind in ("poly", "number", "bigint", "string", "ideal", "matrix", "intmat", "list", "intvec") and value in self.owned:
                 owner = self.owned.pop(value)
                 self.out(f"snative::list_set_owned({name}, {index}L, std::move({owner}), ctx.r);")
             else:
@@ -1426,7 +1885,7 @@ class Emitter:
     def ideal_literal(self, args, flatten_ideals=False):
         if not flatten_ideals and len(args)==1 and args[0][0]=="ideal":
             return args[0]
-        allowed = ("int", "number", "poly") + (("ideal",) if flatten_ideals else ())
+        allowed = ("int", "number", "bigint", "poly") + (("ideal",) if flatten_ideals else ())
         if any(kind not in allowed for kind, _ in args):
             raise CompileError("ideal construction requires int/number/poly elements")
         self.serial += 1
@@ -1507,10 +1966,45 @@ class Emitter:
             raise CompileError("only intvec/poly/string/ideal indexing is supported")
         return self.temp(f"snative::get({vector}, {index})")
 
+    def index2_expression(self, tree, context=None, result_dimensions=None):
+        kind, source = self.expr(tree[1])
+        if kind not in ("matrix", "intmat"):
+            raise CompileError("two-dimensional indexing requires matrix or intmat")
+        row_kind, rows = self.expr(tree[2])
+        column_kind, columns = self.expr(tree[3])
+        if row_kind==column_kind=="int":
+            row = self.narrow_index(rows)
+            column = self.narrow_index(columns)
+            helper = "matrix_get" if kind=="matrix" else "intmat_get"
+            result = "poly" if kind=="matrix" else "int"
+            suffix = ", ctx.r" if kind=="matrix" else ""
+            return self.temp(
+                f"snative::{helper}({source}, {row}, {column}{suffix})", result)
+        if context != kind:
+            raise CompileError(
+                "vector-valued two-dimensional indexing requires an explicit matrix/intmat destination")
+        if tree[1][0] != "var":
+            raise CompileError("vector-valued matrix indexing requires a named source")
+        if row_kind not in ("int", "intvec") or column_kind not in ("int", "intvec"):
+            raise CompileError("matrix selectors require int or intvec")
+        if row_kind=="int":
+            rows = self.intvec_value(row_kind, rows)
+        if column_kind=="int":
+            columns = self.intvec_value(column_kind, columns)
+        helper = "matrix_select" if kind=="matrix" else "intmat_select"
+        dimensions = ""
+        if result_dimensions is not None:
+            dimensions = f", {result_dimensions[0]}, {result_dimensions[1]}"
+        return self.temp(
+            f"snative::{helper}({source}, {rows}, {columns}{dimensions}, ctx.r)", kind)
+
     def expr(self, tree, consume=None, expected=None):
         op = tree[0]
         if op == "int":
             return "int", str(tree[1])+"L"
+        if op == "bigint":
+            return self.temp(
+                f"snative::bigint_from_string({json.dumps(tree[1])})", "bigint")
         if op == "string":
             return "string", json.dumps(tree[1])
         if op == "var":
@@ -1532,18 +2026,36 @@ class Emitter:
             values = [self.expr(value) for value in tree[1]]
             return self.intvec_literal(values)
         if op == "index":
-            if tree[1][0]=="var" and tree[1][1] in self.node.get("nominal_params", {}):
+            source_kind = self.types.get(tree[1][1]) if tree[1][0] == "var" else None
+            if is_nominal(source_kind):
                 raise CompileError("direct newstruct indexing requires interpreted operator dispatch")
             return self.index_expression(tree)
         if op == "index2":
-            # Keep matrix/intmat multidimensional indexing on the interpreted
-            # fallback until those static types have native owners.
-            raise CompileError("two-dimensional indexing requires matrix/intmat support")
+            return self.index2_expression(tree)
         if op == "field":
             kind, value = self.expr(tree[1])
-            if kind != "value" or not IDENT.fullmatch(tree[2]):
+            if not IDENT.fullmatch(tree[2]):
                 raise CompileError("field access requires a dynamic newstruct value")
-            return self.owned_value(f"snative::struct_field({value}, {json.dumps(tree[2])}, ctx.r)")
+            if is_nominal(kind):
+                field = schema_member(self.node["schemas"], kind, tree[2])
+                if field is None:
+                    raise CompileError(
+                        f"unknown or unsupported {nominal_name(kind)} member {tree[2]}")
+                if field == "value":
+                    return self.owned_value(
+                        f"snative::struct_field_dynamic({value}, "
+                        f"{json.dumps(nominal_name(kind))}, "
+                        f"{json.dumps(tree[2])}, ctx.r)")
+                _, selected = self.owned_value(
+                    f"snative::struct_field_exact({value}, "
+                    f"{json.dumps(nominal_name(kind))}, {json.dumps(tree[2])}, "
+                    f"{command_token(field)}, ctx.r, "
+                    f"{str(field in ('ideal', 'matrix', 'intmat') and expected==field).lower()})")
+                return self.exact_value(field, selected)
+            if kind != "value":
+                raise CompileError("field access requires a newstruct value")
+            return self.owned_value(
+                f"snative::struct_field({value}, {json.dumps(tree[2])}, ctx.r)")
         if op == "unary":
             if tree[2][0]=="sequence":
                 raise CompileError("arithmetic on a comma expression requires interpreted exprlist semantics")
@@ -1565,6 +2077,14 @@ class Emitter:
                              else f"std::move({self.owned[value]})")
                     return self.temp(f"snative::number_neg({owner}, ctx.r)", "number")
                 return self.temp(f"snative::number_neg({value}, ctx.r)", "number")
+            if kind == "bigint" and tree[1] == "-":
+                if ((consume is not None and consume[0] == "bigint" and value == consume[1]) or
+                        value in self.owned):
+                    owner = (f"std::move({consume[2]})" if consume is not None and
+                             consume[0] == "bigint" and value == consume[1]
+                             else f"std::move({self.owned[value]})")
+                    return self.temp(f"snative::bigint_neg({owner})", "bigint")
+                return self.temp(f"snative::bigint_neg({value})", "bigint")
             if kind != "int":
                 raise CompileError(f"unsupported unary {tree[1]}({kind})")
             code = f"snative::neg({value})" if tree[1]=="-" else f"!snative::truth({value})"
@@ -1679,6 +2199,8 @@ class Emitter:
             if operator in ("^", "**"):
                 if lt==rt=="int":
                     return self.temp(f"snative::integer_power({lhs}, {rhs})")
+                if lt=="bigint" and rt=="int":
+                    return self.temp(f"snative::bigint_power({lhs}, {rhs})", "bigint")
                 if lt=="ideal" and rt=="int":
                     return self.temp(f"snative::ideal_power({lhs}, {rhs}, ctx.r)", "ideal")
                 if lt=="number" and rt=="int":
@@ -1688,15 +2210,15 @@ class Emitter:
                 owner = self.owned_arguments([lhs], "poly", consume)[0]
                 return self.temp(f"snative::power({owner}, {rhs})", "poly")
             if "ideal" in (lt, rt):
-                if operator=="+" and lt in ("ideal", "poly", "int") and rt in ("ideal", "poly", "int"):
+                if operator=="+" and lt in ("ideal", "poly", "number", "bigint", "int") and rt in ("ideal", "poly", "number", "bigint", "int"):
                     lhs, rhs = self.ideal_value(lt,lhs), self.ideal_value(rt,rhs)
                     return self.temp(f"snative::ideal_add({lhs}, {rhs}, ctx.r)", "ideal")
                 if operator=="*" and lt==rt=="ideal":
                     return self.temp(f"snative::ideal_mul({lhs}, {rhs}, ctx.r)", "ideal")
-                if operator=="*" and lt=="ideal" and rt in ("poly", "number", "int"):
+                if operator=="*" and lt=="ideal" and rt in ("poly", "number", "bigint", "int"):
                     rhs = self.polynomial(rt,rhs)
                     return self.temp(f"snative::ideal_mul_poly({lhs}, {rhs}, ctx.r)", "ideal")
-                if operator=="*" and rt=="ideal" and lt in ("poly", "number", "int"):
+                if operator=="*" and rt=="ideal" and lt in ("poly", "number", "bigint", "int"):
                     lhs = self.polynomial(lt,lhs)
                     return self.temp(f"snative::poly_mul_ideal({lhs}, {rhs}, ctx.r)", "ideal")
                 raise CompileError(f"unsupported ideal operator {operator}({lt}, {rt})")
@@ -1732,6 +2254,23 @@ class Emitter:
                         greater = f"({greater} || n_Equal({lhs}, {rhs}, ctx.r->cf))"
                     return self.temp(greater)
                 raise CompileError(f"unsupported number operator {operator}")
+            if "bigint" in (lt, rt):
+                lhs, rhs = self.bigint(lt, lhs), self.bigint(rt, rhs)
+                if operator in ("+", "-", "*"):
+                    method = {"+":"add", "-":"sub", "*":"mul"}[operator]
+                    return self.temp(
+                        f"snative::bigint_{method}({lhs}, {rhs})", "bigint")
+                if operator in ("/", "div"):
+                    return self.temp(f"snative::bigint_div({lhs}, {rhs})", "bigint")
+                if operator in ("%", "mod"):
+                    return self.temp(f"snative::bigint_mod({lhs}, {rhs})", "bigint")
+                if operator in ("==", "!=", "<>", "<", "<=", ">", ">="):
+                    comparison = {"<":"'<'", ">":"'>'", "<=":"LE", ">=":"GE",
+                                  "==":"EQUAL_EQUAL", "!=":"NOTEQUAL",
+                                  "<>":"NOTEQUAL"}[operator]
+                    return self.temp(
+                        f"snative::bigint_compare({lhs}, {rhs}, {comparison})")
+                raise CompileError(f"unsupported bigint operator {operator}")
             if lt!="int" or rt!="int":
                 raise CompileError(f"unsupported operator {operator}({lt}, {rt})")
             if operator == "/":
@@ -1754,25 +2293,67 @@ class Emitter:
             name = tree[1]
             if name in KERNELS and any(argument[0]=="sequence" for argument in tree[2]):
                 raise CompileError("comma expression in a fixed-arity kernel requires interpreted exprlist semantics")
-            callee = None if name in KERNELS else self.closure.nodes[self.node["calls"][name]]
+            specialization = self.node.get("special_calls", {}).get(name)
+            callee = (None if name in KERNELS or specialization is not None else
+                      self.closure.nodes[self.node["calls"][name]])
+            if callee is not None:
+                nominal_abi = [kind for kind, _ in callee["params"]
+                               if is_nominal(kind)]
+                if is_nominal(callee["result"]):
+                    nominal_abi.append(callee["result"])
+                for kind in nominal_abi:
+                    nominal = nominal_name(kind)
+                    if (self.node["schemas"].get(nominal) !=
+                            callee["schemas"].get(nominal)):
+                        raise CompileError(
+                            f"newstruct schema for {nominal} is not stable across call {name}")
             if (callee is not None and callee.get("contextual_sequence_result") and
                     expected != "intvec" and
                     not (expected == "recursive_sequence_component" and callee is self.node)):
                 raise CompileError(
                     "contextual comma-return procedure requires an explicit intvec destination")
-            expected_args = ([None]*len(tree[2]) if callee is None or
-                             (len(callee["params"])==1 and callee["params"][0][0]=="varargs") else
-                             ["int" if kind=="int" else None for kind, _ in callee["params"]])
+            callee_params = [] if callee is None else callee["params"]
+            variadic = bool(callee_params and callee_params[-1][0]=="varargs")
+            fixed_params = callee_params[:-1] if variadic else callee_params
+            expected_args = ([None]*len(tree[2]) if callee is None else
+                             ["int" if kind=="int" else None for kind, _ in fixed_params] +
+                             ([None]*max(0, len(tree[2])-len(fixed_params)) if variadic else []))
             args = [self.expr(argument, expected=expected_args[i] if i<len(expected_args) else None)
                     for i, argument in enumerate(tree[2])]
             types, values = [t for t, _ in args], [v for _, v in args]
             # Exact overload mappings. No iiExprArith/iiPStart/interpreter call.
+            if specialization in ("sum", "product"):
+                if (len(args) not in (1, 2) or types[0] != "intvec" or
+                        (len(args) == 2 and types[1] not in ("int", "intvec"))):
+                    raise CompileError(
+                        f"audited {specialization} specialization requires intvec and optional int/intvec selector")
+                helper = specialization+"_intvec"
+                return self.temp(
+                    f"snative::{helper}("+", ".join(values+["ctx"])+")")
+            if specialization == "sort":
+                if not args:
+                    raise CompileError("audited sort specialization requires an argument")
+                if types[0] == "intvec":
+                    return self.temp(
+                        f"snative::sort_intvec({values[0]}, ctx)", "list")
+                element_types = self.list_element_types.get(id(tree[2][0]))
+                if types[0] == "list" and element_types is not None and all(
+                        kind == "int" for kind in element_types):
+                    return self.temp(
+                        f"snative::sort_int_list({values[0]}, ctx)", "list")
+                raise CompileError(
+                    "audited sort specialization requires intvec or a statically typed list<int> literal")
             if name == "typeof" and len(args)==1:
                 return self.temp(f"snative::type_name({self.box(*args[0])})", "string")
             if name == "list":
+                self.list_element_types[id(tree)] = tuple(types)
                 return self.list_literal(args)
             if name == "intvec":
                 return self.intvec_literal(args)
+            if name == "matrix" and len(args)==1:
+                return "matrix", self.matrix_value(*args[0], explicit=True)
+            if name == "intmat" and len(args)==1:
+                return "intmat", self.intmat_value(*args[0], explicit=True)
             if name == "ideal":
                 return self.ideal_literal(args)
             if name == "string":
@@ -1788,14 +2369,18 @@ class Emitter:
                 inserted = self.box(*args[1])
                 position = values[2] if len(args)==3 else "0L"
                 return self.temp(f"snative::list_insert({values[0]}, {inserted}, {position}, ctx.r)", "list")
-            if name == "poly" and len(args)==1 and types[0] in ("int", "poly", "number"):
+            if name == "poly" and len(args)==1 and types[0] in ("int", "poly", "number", "bigint"):
                 return "poly", self.polynomial(*args[0])
-            if name == "number" and len(args)==1 and types[0] in ("int", "poly", "number", "value"):
+            if name == "number" and len(args)==1 and types[0] in ("int", "poly", "number", "bigint", "value"):
                 return "number", self.number(*args[0], explicit=True)
+            if name == "bigint" and len(args)==1 and types[0] in ("int", "poly", "number", "bigint", "value"):
+                return "bigint", self.bigint(*args[0], explicit=True)
             if name == "int" and types == ["int"]:
                 return args[0]
             if name == "int" and types == ["number"]:
                 return self.temp(f"snative::number_to_int({values[0]}, ctx.r)")
+            if name == "int" and types == ["bigint"]:
+                return self.temp(f"snative::bigint_to_int({values[0]})")
             if name == "int" and types == ["string"]:
                 return self.temp(f"snative::string_to_int({values[0]})")
             if name in ("numerator", "denominator") and len(args)==1 and types[0] in ("int", "number"):
@@ -1817,6 +2402,37 @@ class Emitter:
                 return self.temp(f"snative::leadcoef({values[0]}, ctx.r)", "number")
             if name == "leadexp" and types == ["poly"]:
                 return self.temp(f"snative::leadexp({values[0]}, ctx.r)", "intvec")
+            if name == "univariate" and types == ["poly"]:
+                return self.temp(f"snative::univariate({values[0]}, ctx.r)")
+            if name == "pardeg" and types == ["number"]:
+                return self.temp(f"snative::parameter_degree({values[0]}, ctx.r)")
+            if name == "find" and types == ["string", "string"]:
+                return self.temp(f"snative::find_string({values[0]}, {values[1]})")
+            if name == "find" and types == ["string", "string", "int"]:
+                # jjFIND3 reads one byte past an empty needle.  Only a literal,
+                # proven nonempty needle has a defined source operation which
+                # can safely be reproduced in generated C++.
+                if tree[2][1][0] != "string" or tree[2][1][1] == "":
+                    raise CompileError(
+                        "three-argument find requires a nonempty literal needle")
+                return self.temp(
+                    f"snative::find_string({values[0]}, {values[1]}, {values[2]})")
+            if name == "ord" and types == ["poly"]:
+                return self.temp(f"snative::order({values[0]}, ctx.r)")
+            if name == "npars" and types == ["ring"]:
+                return self.temp(f"snative::parameter_count({values[0]})")
+            if name == "par" and types == ["int"]:
+                return self.temp(f"snative::parameter({values[0]}, ctx.r)", "number")
+            if name == "prime" and types == ["int"]:
+                return self.temp(f"snative::previous_prime({values[0]})")
+            if name == "charstr" and types == ["ring"]:
+                return self.temp(f"snative::characteristic_string({values[0]})", "string")
+            if name == "simplify" and types == ["poly", "int"]:
+                return self.temp(
+                    f"snative::simplify_poly({values[0]}, {values[1]}, ctx.r)", "poly")
+            if name == "simplify" and types == ["ideal", "int"]:
+                return self.temp(
+                    f"snative::simplify_ideal({values[0]}, {values[1]}, ctx.r)", "ideal")
             if name == "jet" and types == ["poly", "int"]:
                 owner = self.owned_arguments([values[0]], "poly", consume)[0]
                 return self.temp(f"snative::jet({owner}, {values[1]})", "poly")
@@ -1824,12 +2440,22 @@ class Emitter:
                 return self.temp(f"{values[0]}->N")
             if name == "ncols" and types == ["ideal"]:
                 return self.temp(f"snative::ideal_columns({values[0]})")
+            if name == "ncols" and types == ["matrix"]:
+                return self.temp(f"snative::matrix_columns({values[0]})")
+            if name == "ncols" and types == ["intmat"]:
+                return self.temp(f"snative::intmat_columns({values[0]})")
             if name == "nrows" and types == ["intvec"]:
                 return self.temp(f"{values[0]}->rows()")
+            if name == "nrows" and types == ["matrix"]:
+                return self.temp(f"snative::matrix_rows({values[0]})")
+            if name == "nrows" and types == ["intmat"]:
+                return self.temp(f"snative::intmat_rows({values[0]})")
             if name == "deg" and types in (["poly"], ["poly", "intvec"]):
                 return self.temp("snative::degree("+", ".join(values+["ctx.r"])+")")
             if name == "size" and types == ["int"]:
                 return self.temp(f"snative::integer_size({values[0]})")
+            if name == "size" and types == ["bigint"]:
+                return self.temp(f"n_Size({values[0]}, coeffs_BIGINT)")
             if name == "size" and types == ["poly"]:
                 return self.temp(f"pLength({values[0]})")
             if name == "size" and types == ["intvec"]:
@@ -1840,39 +2466,56 @@ class Emitter:
                 return self.temp(f"strlen({values[0]})")
             if name == "size" and types == ["ideal"]:
                 return self.temp(f"snative::ideal_size({values[0]})")
+            if name == "size" and types == ["matrix"]:
+                return self.temp(f"snative::matrix_size({values[0]})")
+            if name == "size" and types == ["intmat"]:
+                return self.temp(f"snative::intmat_size({values[0]})")
             if name == "size" and types == ["value"]:
                 return self.temp(f"snative::size_value({values[0]}, ctx.r)")
             if name in KERNELS:
                 raise CompileError(f"unsupported kernel overload {name}({', '.join(types)})")
-            if len(callee["params"])==1 and callee["params"][0][0]=="varargs":
-                _, arguments = self.list_literal(args, variadic_arguments=True)
-                values = [arguments]
-            else:
-                if len(args)!=len(callee["params"]):
-                    raise CompileError(f"argument count does not match {name}")
-                for i, ((kind, value), (expected, _)) in enumerate(zip(args, callee["params"])):
-                    if expected=="number":
-                        values[i] = self.number(kind, value)
-                    elif expected=="list":
-                        values[i] = self.list_value(kind, value)
-                    elif expected=="intvec":
-                        if kind=="value":
-                            values[i] = self.converted_intvec_argument(value)
-                        else:
-                            values[i] = self.intvec_value(kind, value)
-                    elif expected=="string":
-                        values[i] = (self.converted_string_argument(value)
-                                     if kind=="value" else self.string_value(kind,value))
-                    elif expected=="ideal":
-                        values[i] = self.ideal_value(kind,value)
-                    elif expected=="poly" and kind=="value":
-                        values[i] = self.converted_poly_argument(value)
-                    elif expected=="int" and kind=="value":
-                        values[i] = self.temp(f"snative::int_argument({value})")[1]
-                    elif expected=="value":
-                        values[i] = self.box(kind, value)
-                    elif kind!=expected:
+            if len(args)<len(fixed_params) or (not variadic and len(args)!=len(fixed_params)):
+                raise CompileError(f"argument count does not match {name}")
+            for i, ((kind, value), (expected, _)) in enumerate(zip(args, fixed_params)):
+                if expected=="number":
+                    values[i] = self.number(kind, value)
+                elif expected=="bigint":
+                    values[i] = self.bigint(kind, value)
+                elif expected=="list":
+                    values[i] = self.list_value(kind, value)
+                elif expected=="intvec":
+                    if kind=="value":
+                        values[i] = self.converted_intvec_argument(value)
+                    else:
+                        values[i] = self.intvec_value(kind, value)
+                elif expected=="string":
+                    values[i] = (self.converted_string_argument(value)
+                                 if kind=="value" else self.string_value(kind,value))
+                elif expected=="ideal":
+                    values[i] = self.ideal_value(kind,value)
+                elif expected=="matrix":
+                    values[i] = self.matrix_value(kind,value)
+                elif expected=="intmat":
+                    values[i] = self.intmat_value(kind,value)
+                elif expected=="poly" and kind=="value":
+                    values[i] = self.converted_poly_argument(value)
+                elif expected=="int" and kind=="value":
+                    values[i] = self.temp(f"snative::int_argument({value})")[1]
+                elif is_nominal(expected):
+                    if kind == "value":
+                        values[i] = self.temp(
+                            f"snative::newstruct_argument({value}, "
+                            f"{json.dumps(nominal_name(expected))})", "leftv")[1]
+                    elif kind != expected:
                         raise CompileError(f"argument types do not match {name}")
+                elif expected=="value":
+                    values[i] = self.box(kind, value)
+                elif kind!=expected:
+                    raise CompileError(f"argument types do not match {name}")
+            if variadic:
+                _, arguments = self.list_literal(
+                    args[len(fixed_params):], variadic_arguments=True)
+                values = values[:len(fixed_params)] + [arguments]
             return self.temp(callee["symbol"]+"("+", ".join(["ctx"]+values)+")", callee["result"])
         raise CompileError(f"unsupported expression {op}")
 
@@ -1953,31 +2596,53 @@ class Emitter:
             self.types.pop(name)
             # Keep the C++ declaration reserved within this lexical block.
         elif op == "declare":
-            for name, value in tree[2]:
+            for declaration in tree[2]:
+                name, value = declaration[:2]
+                dimensions = declaration[2] if len(declaration)>2 else None
                 declared_as_def = tree[1] == "def"
-                kind = tree[1]
+                kind = (nominal_kind(tree[1])
+                        if tree[1] in self.node["schemas"] else tree[1])
                 typed_ideal = kind == "ideal"
                 if name in self.declared or not identifier(name):
                     raise CompileError(f"duplicate/reserved local {name}")
                 # Initializer is resolved before this identifier is introduced.
                 initializer_start = len(self.lines)
                 initial = None
+                dimension_values = None
+                if dimensions is not None:
+                    dimension_values = (self.integer(dimensions[0]),
+                                        self.integer(dimensions[1]))
                 if kind == "def":
                     if value is None:
                         raise CompileError("def requires a statically typed initializer")
                     if value[0] == "sequence":
                         raise CompileError("def comma initializer requires interpreted exprlist assignment")
                     kind, initial = self.expr(value)
-                    if kind not in ("int", "intvec", "poly", "number", "string", "ideal", "list"):
+                    if (kind not in ("int", "bigint", "intvec", "intmat", "matrix", "poly", "number", "string", "ideal", "list") and
+                            not is_nominal(kind)):
                         raise CompileError("def initializer has an unsupported static type")
-                    if kind in OWNED:
+                    if is_owned_type(kind):
                         initial = self.own(initial, kind)
                 elif value is not None:
                     if kind=="list" and value == ["index", ["index", ["call", "ringlist", [["var", "basering"]]], ["int", 1]], ["int", 2]]:
                         kind, initial = self.expr(value)
                         initial = self.own(initial, kind)
-                    elif kind in OWNED:
-                        converted = self.convert(kind, value)
+                    elif kind in ("matrix", "intmat") and value[0]=="index2":
+                        result_dimensions = dimension_values
+                        converted = self.index2_expression(
+                            value, context=kind,
+                            result_dimensions=result_dimensions)
+                        if converted[0] != kind:
+                            raise CompileError(
+                                "scalar matrix/intmat initializer remains interpreted")
+                        initial = self.own(converted[1], kind)
+                    elif kind in ("matrix", "intmat") and value[0]=="sequence":
+                        raise CompileError(
+                            "matrix/intmat comma initializers remain interpreted")
+                    elif is_owned_type(kind):
+                        shape = ((dimension_values or ("1L", "1L"))
+                                 if kind in ("matrix", "intmat") else None)
+                        converted = self.convert(kind, value, shape=shape)
                         initial = self.own(converted, kind)
                         if typed_ideal:
                             initial = f"snative::ideal_assign({initial}, ctx.r)"
@@ -1989,30 +2654,106 @@ class Emitter:
                     if name not in self.guarded_declarations:
                         self.locals.append(f"int sn_declared_{name}=0;")
                         self.guarded_declarations.add(name)
-                    token = "LIST_CMD" if kind=="paramnames" else kind.upper()+"_CMD"
+                    token = (f"snative::newstruct_type({json.dumps(nominal_name(kind))})"
+                             if is_nominal(kind) else
+                             "LIST_CMD" if kind=="paramnames" else kind.upper()+"_CMD")
                     self.out(f"snative::declare_local(sn_declared_{name}, {token}, "
                              f"{str(declared_as_def).lower()}, {json.dumps(name)});")
                     self.lines.extend(initializer_lines)
                 self.types[name] = kind
                 self.declared.add(name)
-                if kind in OWNED:
+                if is_owned_type(kind):
                     self.poly_locals.add(name)
                     if initial is not None:
-                        self.out(f"{OWNED[kind]} v_{name} = {initial};")
+                        self.out(f"{owned_type(kind)} v_{name} = {initial};")
                     else:
+                        if is_nominal(kind):
+                            self.out(
+                                f"snative::Value v_{name}=snative::default_newstruct("
+                                f"{json.dumps(nominal_name(kind))}, ctx.r);")
+                            continue
+                        if kind=="matrix":
+                            rows, columns = dimension_values or ("1L", "1L")
+                            self.out(
+                                f"snative::Matrix v_{name}=snative::matrix_new({rows}, {columns}, ctx.r);")
+                            continue
+                        if kind=="intmat":
+                            rows, columns = dimension_values or ("1L", "1L")
+                            self.out(
+                                f"snative::Intmat v_{name}=snative::intmat_new({rows}, {columns}, ctx.r);")
+                            continue
                         default = ("nullptr, ctx.r" if kind=="poly" else "ctx.r" if kind in ("list", "paramnames")
                                    else "1" if kind=="intvec" else "omStrDup(\"\")" if kind=="string"
                                    else "idInit(1,1), ctx.r, Sy_bit(FLAG_STD)" if kind=="ideal"
+                                   else "n_Init(0, coeffs_BIGINT)" if kind=="bigint"
                                    else "n_Init(0, ctx.r->cf), ctx.r->cf")
-                        self.out(f"{OWNED[kind]} v_{name}("+default+");")
+                        self.out(f"{owned_type(kind)} v_{name}("+default+");")
                 else:
                     self.out(f"long v_{name} = 0;")
-                if initial is not None and kind not in OWNED:
+                if initial is not None and not is_owned_type(kind):
                     self.out(f"v_{name} = {initial};")
         elif op == "assign":
             # Native parser evaluates the indexing expression before the RHS.
             lhs = tree[1]
-            if lhs[0] == "index":
+            if lhs[0] == "field":
+                if lhs[1][0] != "var":
+                    raise CompileError(
+                        "nested newstruct field assignment requires explicit copy/writeback")
+                target_name = lhs[1][1]
+                target_kind = self.types.get(target_name)
+                if not is_nominal(target_kind):
+                    raise CompileError("field assignment requires a statically typed newstruct")
+                field_kind = schema_member(self.node["schemas"], target_kind, lhs[2])
+                if field_kind is None:
+                    raise CompileError(
+                        f"unknown or unsupported {nominal_name(target_kind)} member {lhs[2]}")
+                if field_kind == "value":
+                    raise CompileError("assignment to a def newstruct member remains interpreted")
+                if field_kind == "int":
+                    value = self.integer(tree[2])
+                else:
+                    value = self.convert(field_kind, tree[2])
+                boxed = self.box(field_kind, value)
+                if target_name in self.poly_locals:
+                    owner = f"v_{target_name}"
+                elif target_name in self.cow_params:
+                    owner = f"c_{target_name}.write()"
+                else:
+                    raise CompileError(
+                        "newstruct field assignment requires an owned local or parameter")
+                expected = command_token(field_kind)
+                if expected is None:
+                    raise CompileError(f"unsupported newstruct member type {field_kind}")
+                self.out(
+                    f"snative::struct_set_field({owner}, "
+                    f"{json.dumps(nominal_name(target_kind))}, {json.dumps(lhs[2])}, "
+                    f"{expected}, {boxed}, ctx.r);")
+            elif lhs[0] == "index2":
+                kind, target = self.expr(lhs[1])
+                if kind not in ("matrix", "intmat") or lhs[1][0] != "var":
+                    raise CompileError(
+                        "two-dimensional assignment requires a typed matrix/intmat variable")
+                target_name = lhs[1][1]
+                row = self.narrow_index(self.integer(lhs[2]))
+                column = self.narrow_index(self.integer(lhs[3]))
+                if target_name in self.poly_locals:
+                    owner = f"v_{target_name}"
+                elif target_name in self.cow_params:
+                    owner = f"c_{target_name}.write()"
+                else:
+                    raise CompileError(
+                        "matrix/intmat element assignment requires an owned local or parameter")
+                if kind=="matrix":
+                    value_kind, value = self.expr(tree[2])
+                    polynomial = self.polynomial(value_kind,value)
+                    self.out(
+                        f"snative::matrix_set({owner}, {row}, {column}, "
+                        f"{self.own(polynomial, 'poly')});")
+                else:
+                    value = self.integer(tree[2])
+                    self.out(
+                        f"snative::intmat_set({owner}, {row}, {column}, {value});")
+            elif lhs[0] == "index":
                 kind, target = self.expr(lhs[1])
                 index = self.integer(lhs[2])
                 index = self.narrow_index(index)
@@ -2022,7 +2763,7 @@ class Emitter:
                         raise CompileError("comma expression list-slot assignment requires interpreted exprlist semantics")
                     value_kind, value = self.expr(tree[2])
                     owner = f"v_{target_name}" if target_name in self.poly_locals else f"c_{target_name}.write()"
-                    if value_kind in ("poly", "number", "string", "ideal", "list", "intvec") and value in self.owned:
+                    if value_kind in ("poly", "number", "bigint", "string", "ideal", "matrix", "intmat", "list", "intvec") and value in self.owned:
                         owned = self.owned.pop(value)
                         self.out(f"snative::list_set_owned({owner}, {index}, std::move({owned}), ctx.r);")
                     else:
@@ -2056,12 +2797,20 @@ class Emitter:
             elif lhs[0] == "var" and lhs[1] in self.cow_params:
                 kind = self.types[lhs[1]]
                 owner = f"c_{lhs[1]}"
-                if kind == "ideal" and tree[2] == ["var", lhs[1]]:
-                    # iiAssign clears IDFLAG before its raw-data self-alias
-                    # fast path.  No assignment conversion is then applied.
-                    self.out(f"{owner}.write().clear_flags();")
+                if kind in ("matrix", "intmat") and tree[2][0]=="index2":
+                    raise CompileError(
+                        "matrix/intmat vector-selection reassignment remains interpreted")
+                if kind in ("ideal", "matrix", "intmat") and tree[2] == ["var", lhs[1]]:
+                    # iiAssign clears attributes and IDFLAG before its raw-data
+                    # self-alias fast path. No conversion is then applied.
+                    self.out(f"{owner}.write().clear_metadata();")
                     return
-                value = self.convert(kind, tree[2])
+                shape = ((f"snative::{kind}_rows({owner}.get())",
+                          f"snative::{kind}_columns({owner}.get())")
+                         if kind in ("matrix", "intmat") else None)
+                value = self.convert(
+                    kind, tree[2], shape=shape,
+                    assignment_target=owner+".get()" if kind=="intmat" else None)
                 if value != owner+".get()" or kind == "ideal":
                     assigned = self.own(value, kind)
                     if kind == "ideal":
@@ -2069,15 +2818,23 @@ class Emitter:
                     self.out(f"{owner}.assign({assigned});")
             elif lhs[0] == "var" and lhs[1] in self.poly_locals:
                 kind = self.types.get(lhs[1])
-                if kind not in OWNED:
+                if not is_owned_type(kind):
                     raise CompileError(f"local {lhs[1]} is not available on this path")
                 if kind=="paramnames":
                     raise CompileError("ring parameter-name lists must remain read-only")
                 owner = f"v_{lhs[1]}"
-                if kind == "ideal" and tree[2] == ["var", lhs[1]]:
-                    self.out(f"{owner}.clear_flags();")
+                if kind in ("matrix", "intmat") and tree[2][0]=="index2":
+                    raise CompileError(
+                        "matrix/intmat vector-selection reassignment remains interpreted")
+                if kind in ("ideal", "matrix", "intmat") and tree[2] == ["var", lhs[1]]:
+                    self.out(f"{owner}.clear_metadata();")
                     return
-                value = self.convert(kind, tree[2], (kind, owner+".get()", owner))
+                shape = ((f"snative::{kind}_rows({owner}.get())",
+                          f"snative::{kind}_columns({owner}.get())")
+                         if kind in ("matrix", "intmat") else None)
+                value = self.convert(
+                    kind, tree[2], (kind, owner+".get()", owner), shape=shape,
+                    assignment_target=owner+".get()" if kind=="intmat" else None)
                 # Other native value types can elide pointer-identical
                 # assignment. Ideal identity conversions cannot: their flag
                 # assignment boundary remains observable.
@@ -2107,23 +2864,34 @@ class Emitter:
                 kind, value = self.intvec_literal(values)
             else:
                 kind, value = self.expr(tree[1], expected="int" if self.node["result"]=="int" else None)
-            if kind=="value" and self.node["result"] in ("int", "number", "string", "ideal", "list", "intvec"):
+            if kind=="value" and self.node["result"] in ("int", "number", "bigint", "string", "ideal", "matrix", "intmat", "list", "intvec"):
                 expected = self.node["result"]
                 if expected=="int":
                     kind, value = self.temp(f"snative::int_argument({value})")
                 elif expected=="number":
                     kind, value = self.temp(f"snative::exact_number_argument({value}, ctx.r)", "number")
+                elif expected=="bigint":
+                    kind, value = self.temp(f"snative::exact_bigint_argument({value})", "bigint")
                 elif expected=="list":
                     kind, value = "list", self.list_value(kind, value)
                 elif expected=="string":
                     kind, value = "string", self.temp(f"snative::exact_string_argument({value})", "string")[1]
                 elif expected=="ideal":
                     kind, value = "ideal", self.temp(f"snative::exact_ideal_argument({value}, ctx.r)", "ideal")[1]
+                elif expected=="matrix":
+                    kind, value = "matrix", self.temp(f"snative::exact_matrix_argument({value}, ctx.r)", "matrix")[1]
+                elif expected=="intmat":
+                    kind, value = "intmat", self.temp(f"snative::exact_intmat_argument({value}, ctx.r)", "intmat")[1]
                 else:
                     kind, value = "intvec", self.borrowed_intvec(value)
+            elif kind == "value" and is_nominal(self.node["result"]):
+                kind = self.node["result"]
+                value = self.temp(
+                    f"snative::newstruct_argument({value}, "
+                    f"{json.dumps(nominal_name(kind))})", "leftv")[1]
             if kind != self.node["result"]:
                 raise CompileError("return type does not match inferred procedure type")
-            if kind in OWNED:
+            if is_owned_type(kind):
                 if tree[1][0]=="var" and tree[1][1] in self.poly_locals:
                     value = "std::move(v_"+tree[1][1]+")"
                 else:
@@ -2220,7 +2988,7 @@ class Emitter:
 
     def generate(self):
         if not terminates(self.node["ast"]):
-            raise CompileError("every path must return an int/intvec/poly/number/string/ideal/list or raise ERROR")
+            raise CompileError("every path must return an int/bigint/intvec/intmat/matrix/poly/number/string/ideal/list or raise ERROR")
         self.statement(self.node["ast"])
         return (declaration(self.node) + " {\n  snative::Call call(ctx);\n" +
                 "".join("  "+line+"\n" for line in self.locals) +
@@ -4361,6 +5129,11 @@ def module_source(roots, export_prefix, aliases):
                           f"    lists a{j}=a{j}_owner.get();", "    arg=nullptr;"]
                 values.append(f"a{j}")
                 continue
+            if kind == "bigint":
+                lines += [f"    snative::BigintArgument a{j}(arg,currRing);",
+                          "    if (errorreported) return TRUE;", "    arg=arg->next;"]
+                values.append(f"a{j}.get()")
+                continue
             if kind == "number":
                 lines += [f"    snative::NumberArgument a{j}(arg,currRing);",
                           "    if (errorreported) return TRUE;", "    arg=arg->next;"]
@@ -4369,6 +5142,13 @@ def module_source(roots, export_prefix, aliases):
             if kind == "list":
                 helper = "plain_list_argument" if node["result"]=="list" else "list_argument"
                 lines += [f"    lists a{j}=snative::{helper}(arg);", "    arg=arg->next;"]
+                values.append(f"a{j}")
+                continue
+            if is_nominal(kind):
+                lines += [
+                    f"    leftv a{j}=snative::newstruct_argument("
+                    f"arg, {json.dumps(nominal_name(kind))});",
+                    "    arg=arg->next;"]
                 values.append(f"a{j}")
                 continue
             if kind == "value":
@@ -4380,6 +5160,14 @@ def module_source(roots, export_prefix, aliases):
                 continue
             if kind == "intvec":
                 lines += [f"    snative::IntvecArgument a{j}(arg);", "    arg=arg->next;"]
+                values.append(f"a{j}.get()")
+                continue
+            if kind == "matrix":
+                lines += [f"    snative::MatrixArgument a{j}(arg,currRing);", "    arg=arg->next;"]
+                values.append(f"a{j}.get()")
+                continue
+            if kind == "intmat":
+                lines += [f"    snative::IntmatArgument a{j}(arg,currRing);", "    arg=arg->next;"]
                 values.append(f"a{j}.get()")
                 continue
             if kind == "string":
@@ -4413,19 +5201,20 @@ def module_source(roots, export_prefix, aliases):
             lines += [f"    if ({argument}==NULL || {mismatch} || {argument}->e!=NULL || {argument}->rtyp==ALIAS_CMD)",
                       f'      throw std::runtime_error("native argument {j+1} requires {kind}; got token " + std::to_string({argument}==NULL ? -1 : {argument}->Typ()) + ({argument}!=NULL && {argument}->e!=NULL ? " (indexed value)" : ""));',
                       *([f'    if (snative::metadata({argument})) throw std::runtime_error("attributed int arguments are unsupported");'] if kind=="int" else []),
-                      f"    {CPP_TYPES[kind]} a{j}=({CPP_TYPES[kind]}){argument}->Data();",
+                      f"    {cpp_type(kind)} a{j}=({cpp_type(kind)}){argument}->Data();",
                       "    if (errorreported) return TRUE;",
                       "    arg=arg->next;"]
             values.append(f"a{j}")
         lines += ['    if (arg!=NULL) throw std::runtime_error("native entry argument count mismatch");',
                   "    snative::Context ctx(currRing);",
                   "    ++compiled_entries;",
-                  "    "+OWNED.get(node["result"], "const long")+" value="+node["symbol"]+"("+", ".join(["ctx"]+values)+");",
+                  "    "+(owned_type(node["result"]) or "const long")+" value="+node["symbol"]+"("+", ".join(["ctx"]+values)+");",
                   "    if (errorreported) return TRUE;",
                   "    if (sLastPrinted.rtyp!=0) sLastPrinted.CleanUp();",
                   ("    result->rtyp=INT_CMD; result->data=(void*)value;" if node["result"]=="int" else
-                   ("    result->rtyp=IDEAL_CMD; result->flag=value.flags(); result->data=(void*)value.release();"
-                    if node["result"]=="ideal" else
+                   "    value.release_to(result);" if is_nominal(node["result"]) else
+                   (f"    result->rtyp={node['result'].upper()}_CMD; result->flag=value.flags(); result->attribute=value.release_attributes(); result->data=(void*)value.release();"
+                    if node["result"] in ("ideal", "matrix", "intmat") else
                   f"    result->rtyp={node['result'].upper()}_CMD; result->data=(void*)value.release();")),
                   "    return FALSE;",
                   "  } catch (const snative::ReportedInterpreterError &) { return TRUE; }",
@@ -4470,7 +5259,9 @@ def module_source(roots, export_prefix, aliases):
 def _node_identity(node):
     return {"path": node["path"], "name": node["name"], "params": node["params"],
             "nominal_params": node.get("nominal_params", {}),
+            "schemas": node.get("schemas", {}),
             "dependencies": sorted(node["dependencies"]), "calls": node["calls"],
+            "special_calls": node.get("special_calls", {}),
             "private": node["private"], "symbol": node["symbol"],
             "result": node["result"], "needs_ring": node["needs_ring"], "code": node["code"]}
 
@@ -4486,13 +5277,15 @@ def build(args):
     cache = cache_namespace(args.cache_dir.resolve())
     search = [p.resolve() for p in args.library_path]
     search += [Path(p).resolve() for p in args.library_search.split(os.pathsep) if p]
-    search += [args.singular_prefix.resolve()/"share/singular/LIB"]
+    system_library = args.singular_prefix.resolve()/"share/singular/LIB"
+    search += [system_library]
+    canonical_generic_paths = [system_library/"general.lib"]
     candidates = [args.library]+[p/args.library for p in search]
     library = next((p for p in candidates if p.is_file()), None)
     if library is None:
         raise CompileError(f"library not found: {args.library}")
     stats = empty_stats()
-    discovery = Closure(cache, search)
+    discovery = Closure(cache, search, canonical_generic_paths)
     path = str(library.resolve())
     library_index_value = discovery.library(path)
     add_stats(stats, discovery.stats)
@@ -4500,7 +5293,7 @@ def build(args):
                                           if not proc["private"]]))
     root_keys, skipped, nodes = [], [], {}
     for name in requested:
-        closure = Closure(cache, search)
+        closure = Closure(cache, search, canonical_generic_paths)
         closure.libraries = discovery.libraries
         try:
             node = analyze_root(closure, path, name)

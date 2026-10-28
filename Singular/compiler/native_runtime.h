@@ -10,6 +10,7 @@
 #include "polys/weight.h"
 #include "polys/sbuckets.h"
 #include "polys/ext_fields/transext.h"
+#include "misc/prime.h"
 #include <climits>
 #include <cstring>
 #include <stdexcept>
@@ -270,6 +271,35 @@ public:
   number release() { number n=value; value=nullptr; return n; }
 };
 
+// Singular bigints use their own process-global integer coefficient domain.
+// Keep them nominally distinct from basering coefficients even though both
+// are represented by `number`: mixing the two domains would select the wrong
+// destructor and, more subtly, the wrong division and conversion semantics.
+class Bigint {
+  number value;
+public:
+  explicit Bigint(number n): value(n) {}
+  ~Bigint() { if (value!=nullptr) n_Delete(&value,coeffs_BIGINT); }
+  Bigint(const Bigint &) = delete;
+  Bigint &operator=(const Bigint &) = delete;
+  Bigint(Bigint &&n) noexcept: value(n.release()) {}
+  Bigint &operator=(Bigint &&n) noexcept {
+    if (this!=&n) {
+      if (value!=nullptr) n_Delete(&value,coeffs_BIGINT);
+      value=n.release();
+    }
+    return *this;
+  }
+  // Some coefficient domains use NULL as their canonical zero.  It is a
+  // valid BIGINT_CMD payload after a coefficient map, but nlCopy treats NULL
+  // as deleted storage rather than an integer handle.
+  static Bigint copy(number n) {
+    return Bigint(n==nullptr ? nullptr : n_Copy(n,coeffs_BIGINT));
+  }
+  number get() const { return value; }
+  number release() { number n=value; value=nullptr; return n; }
+};
+
 // Interpreter strings are omalloc-owned NUL-terminated byte strings.  Keep
 // that representation at the native ABI: std::string storage must never be
 // handed to sleftv::CleanUp or returned through a STRING_CMD result.
@@ -300,14 +330,17 @@ public:
 class IdealView {
   ideal value;
   BITSET flag;
+  attr attributes;
   // NUMBER_CMD reaches an ideal formal through NUMBER->MATRIX->IDEAL.  The
   // matrix assignment has already happened in ideal_from_number, so exactly
   // the next typed boundary must not re-run jiA_IDEAL's one-column STD rule.
   bool skip_next_binding;
 public:
-  IdealView(ideal i, BITSET f, bool skip=false): value(i), flag(f), skip_next_binding(skip) {}
+  IdealView(ideal i, BITSET f, bool skip=false, attr a=nullptr)
+    : value(i), flag(f), attributes(a), skip_next_binding(skip) {}
   ideal data() const { return value; }
   BITSET flags() const { return flag; }
+  attr attribute_list() const { return attributes; }
   bool skips_binding() const { return skip_next_binding; }
 };
 
@@ -315,30 +348,172 @@ class Ideal {
   ideal value;
   ring owner;
   BITSET flag;
+  attr attributes;
   bool skip_next_binding;
+  void clear_attributes() {
+    if (attributes!=nullptr) attributes->killAll(owner);
+    attributes=nullptr;
+  }
 public:
-  Ideal(ideal i, ring r, BITSET f=0, bool skip=false): value(i), owner(r), flag(f), skip_next_binding(skip) {}
-  ~Ideal() { if (value!=nullptr) id_Delete(&value,owner); }
+  Ideal(ideal i, ring r, BITSET f=0, bool skip=false, attr a=nullptr)
+    : value(i), owner(r), flag(f), attributes(a), skip_next_binding(skip) {}
+  ~Ideal() {
+    if (value!=nullptr) id_Delete(&value,owner);
+    clear_attributes();
+  }
   Ideal(const Ideal &) = delete;
   Ideal &operator=(const Ideal &) = delete;
-  Ideal(Ideal &&i) noexcept: value(i.release()), owner(i.owner), flag(i.flag), skip_next_binding(i.skip_next_binding) {}
+  Ideal(Ideal &&i) noexcept
+    : value(i.release()), owner(i.owner), flag(i.flag),
+      attributes(i.release_attributes()), skip_next_binding(i.skip_next_binding) {}
   Ideal &operator=(Ideal &&i) noexcept {
     if (this!=&i) {
       if (value!=nullptr) id_Delete(&value,owner);
-      owner=i.owner; flag=i.flag; skip_next_binding=i.skip_next_binding; value=i.release();
+      clear_attributes();
+      owner=i.owner; flag=i.flag; skip_next_binding=i.skip_next_binding;
+      value=i.release(); attributes=i.release_attributes();
     }
     return *this;
   }
-  static Ideal copy(IdealView i, ring r) { return Ideal(id_Copy(i.data(),r),r,i.flags(),i.skips_binding()); }
-  IdealView get() const { return IdealView(value,flag,skip_next_binding); }
+  static Ideal copy(IdealView i, ring r) {
+    attr copied=i.attribute_list()==nullptr ? nullptr : i.attribute_list()->Copy();
+    return Ideal(id_Copy(i.data(),r),r,i.flags(),i.skips_binding(),copied);
+  }
+  IdealView get() const { return IdealView(value,flag,skip_next_binding,attributes); }
   ideal data() const { return value; }
   BITSET flags() const { return flag; }
   void flags(BITSET f) { flag=f; }
   bool skips_binding() const { return skip_next_binding; }
   void consume_binding_marker() { skip_next_binding=false; }
   void clear_flags() { flag=0; skip_next_binding=false; }
+  void clear_metadata() { clear_flags(); clear_attributes(); }
   ring base() const { return owner; }
   ideal release() { ideal i=value; value=nullptr; return i; }
+  attr release_attributes() { attr a=attributes; attributes=nullptr; return a; }
+};
+
+// Matrices share the kernel's ip_smatrix storage with ideals, but their
+// dimensions and assignment/indexing rules are different.  Keep them a
+// distinct nominal owner so generated code cannot accidentally flatten a
+// matrix through an ideal helper.  Flags and attributes belong to the
+// Singular value, not the raw matrix allocation, and therefore travel with
+// the native view/owner as well.
+class MatrixView {
+  matrix value;
+  BITSET flag;
+  attr attributes;
+public:
+  MatrixView(matrix m, BITSET f=0, attr a=nullptr)
+    : value(m), flag(f), attributes(a) {}
+  matrix data() const { return value; }
+  BITSET flags() const { return flag; }
+  attr attribute_list() const { return attributes; }
+};
+
+class Matrix {
+  matrix value;
+  ring owner;
+  BITSET flag;
+  attr attributes;
+  void clear_attributes() {
+    if (attributes!=nullptr) attributes->killAll(owner);
+    attributes=nullptr;
+  }
+public:
+  Matrix(matrix m, ring r, BITSET f=0, attr a=nullptr)
+    : value(m), owner(r), flag(f), attributes(a) {}
+  ~Matrix() {
+    if (value!=nullptr) mp_Delete(&value,owner);
+    clear_attributes();
+  }
+  Matrix(const Matrix &)=delete;
+  Matrix &operator=(const Matrix &)=delete;
+  Matrix(Matrix &&m) noexcept
+    : value(m.release()), owner(m.owner), flag(m.flag),
+      attributes(m.release_attributes()) {}
+  Matrix &operator=(Matrix &&m) noexcept {
+    if (this!=&m) {
+      if (value!=nullptr) mp_Delete(&value,owner);
+      clear_attributes();
+      owner=m.owner; flag=m.flag;
+      value=m.release(); attributes=m.release_attributes();
+    }
+    return *this;
+  }
+  static Matrix copy(MatrixView m, ring r) {
+    if (m.data()==nullptr)
+      throw std::runtime_error("native matrix value is invalid");
+    attr copied=m.attribute_list()==nullptr ? nullptr : m.attribute_list()->Copy();
+    return Matrix(mp_Copy(m.data(),r,r),r,m.flags(),copied);
+  }
+  MatrixView get() const { return MatrixView(value,flag,attributes); }
+  matrix data() const { return value; }
+  BITSET flags() const { return flag; }
+  attr attribute_list() const { return attributes; }
+  ring base() const { return owner; }
+  void clear_metadata() { flag=0; clear_attributes(); }
+  matrix release() { matrix m=value; value=nullptr; return m; }
+  attr release_attributes() { attr a=attributes; attributes=nullptr; return a; }
+};
+
+// intmat and intvec use the same intvec allocation, but intmat is a genuine
+// two-dimensional value in the language.  In particular it must not silently
+// enter intvec's one-dimensional grow-on-write paths.
+class IntmatView {
+  intvec *value;
+  BITSET flag;
+  attr attributes;
+public:
+  IntmatView(intvec *m, BITSET f=0, attr a=nullptr)
+    : value(m), flag(f), attributes(a) {}
+  intvec *data() const { return value; }
+  BITSET flags() const { return flag; }
+  attr attribute_list() const { return attributes; }
+};
+
+class Intmat {
+  intvec *value;
+  ring owner;
+  BITSET flag;
+  attr attributes;
+  void clear_attributes() {
+    if (attributes!=nullptr) attributes->killAll(owner);
+    attributes=nullptr;
+  }
+public:
+  Intmat(intvec *m, ring r, BITSET f=0, attr a=nullptr)
+    : value(m), owner(r), flag(f), attributes(a) {}
+  Intmat(int rows, int columns, ring r)
+    : value(new intvec(rows,columns,0)), owner(r), flag(0), attributes(nullptr) {}
+  ~Intmat() { delete value; clear_attributes(); }
+  Intmat(const Intmat &)=delete;
+  Intmat &operator=(const Intmat &)=delete;
+  Intmat(Intmat &&m) noexcept
+    : value(m.release()), owner(m.owner), flag(m.flag),
+      attributes(m.release_attributes()) {}
+  Intmat &operator=(Intmat &&m) noexcept {
+    if (this!=&m) {
+      delete value;
+      clear_attributes();
+      owner=m.owner; flag=m.flag;
+      value=m.release(); attributes=m.release_attributes();
+    }
+    return *this;
+  }
+  static Intmat copy(IntmatView m, ring r) {
+    if (m.data()==nullptr)
+      throw std::runtime_error("native intmat value is invalid");
+    attr copied=m.attribute_list()==nullptr ? nullptr : m.attribute_list()->Copy();
+    return Intmat(new intvec(m.data()),r,m.flags(),copied);
+  }
+  IntmatView get() const { return IntmatView(value,flag,attributes); }
+  intvec *data() const { return value; }
+  BITSET flags() const { return flag; }
+  attr attribute_list() const { return attributes; }
+  ring base() const { return owner; }
+  void clear_metadata() { flag=0; clear_attributes(); }
+  intvec *release() { intvec *m=value; value=nullptr; return m; }
+  attr release_attributes() { attr a=attributes; attributes=nullptr; return a; }
 };
 
 // intvec's implicit copy operations alias its raw allocation. Keep every
@@ -363,6 +538,112 @@ public:
 inline Number number_from_int(long n, ring r) {
   // iiI2N narrows Singular's machine int to C int.
   return Number(n_Init((int)n,r->cf),r->cf);
+}
+inline Bigint bigint_from_int(long n) {
+  // iiI2BI narrows an INT_CMD value to the C int accepted by n_Init.
+  return Bigint(n_Init((int)n,coeffs_BIGINT));
+}
+inline Bigint bigint_from_string(const char *text) {
+  number value=nullptr;
+  const char *rest=n_Read(text,&value,coeffs_BIGINT);
+  if (rest==nullptr || *rest!='\0') {
+    if (value!=nullptr) n_Delete(&value,coeffs_BIGINT);
+    throw std::runtime_error("native bigint literal is invalid");
+  }
+  return Bigint(value);
+}
+inline Bigint bigint_from_number(number value, ring r) {
+  if (r==nullptr)
+    throw std::runtime_error("native number-to-bigint conversion requires a basering");
+  nMapFunc map=n_SetMap(r->cf,coeffs_BIGINT);
+  if (map==nullptr)
+    throw std::runtime_error("cannot convert to bigint");
+  number converted=map(value,r->cf,coeffs_BIGINT);
+  if (errorreported)
+    throw std::runtime_error("cannot convert to bigint");
+  return Bigint(converted);
+}
+inline Bigint bigint_from_poly(poly value, ring r) {
+  if (r==nullptr)
+    throw std::runtime_error("native polynomial-to-bigint conversion requires a basering");
+  if (value==nullptr) return Bigint(n_Init(0,coeffs_BIGINT));
+  if (pNext(value)!=nullptr || !p_IsConstant(value,r))
+    throw std::runtime_error("poly must be constant");
+  return bigint_from_number(p_GetCoeff(value,r),r);
+}
+inline Number number_from_bigint(number value, ring r) {
+  if (r==nullptr)
+    throw std::runtime_error("native bigint-to-number conversion requires a basering");
+  nMapFunc map=n_SetMap(coeffs_BIGINT,r->cf);
+  if (map==nullptr)
+    throw std::runtime_error("cannot convert bigint to coefficient ring");
+  number converted=map(value,coeffs_BIGINT,r->cf);
+  // NULL is the canonical zero in several coefficient domains.
+  if (errorreported)
+    throw std::runtime_error("cannot convert bigint to coefficient ring");
+  return Number(converted,r->cf);
+}
+inline Poly polynomial_bigint(number value, ring r) {
+  Number converted=number_from_bigint(value,r);
+  return Poly(p_NSet(converted.release(),r),r);
+}
+inline Bigint bigint_neg(number value) {
+  if (value==nullptr) return Bigint(nullptr);
+  return Bigint(n_InpNeg(n_Copy(value,coeffs_BIGINT),coeffs_BIGINT));
+}
+inline Bigint bigint_neg(Bigint value) {
+  if (value.get()==nullptr) return Bigint(nullptr);
+  return Bigint(n_InpNeg(value.release(),coeffs_BIGINT));
+}
+inline Bigint bigint_add(number a, number b) {
+  return Bigint(n_Add(a,b,coeffs_BIGINT));
+}
+inline Bigint bigint_sub(number a, number b) {
+  return Bigint(n_Sub(a,b,coeffs_BIGINT));
+}
+inline Bigint bigint_mul(number a, number b) {
+  number result=n_Mult(a,b,coeffs_BIGINT);
+  n_Normalize(result,coeffs_BIGINT);
+  return Bigint(result);
+}
+inline Bigint bigint_div(number a, number b) {
+  if (n_IsZero(b,coeffs_BIGINT)) throw std::runtime_error("div. by 0");
+  number result=n_Div(a,b,coeffs_BIGINT);
+  n_Normalize(result,coeffs_BIGINT);
+  return Bigint(result);
+}
+inline Bigint bigint_mod(number a, number b) {
+  if (n_IsZero(b,coeffs_BIGINT)) throw std::runtime_error("div. by 0");
+  return Bigint(n_IntMod(a,b,coeffs_BIGINT));
+}
+inline Bigint bigint_power(number value, long exponent) {
+  const int narrowed=(int)exponent;
+  if (narrowed<0)
+    throw std::runtime_error("exponent must be non-negative");
+  number result=nullptr;
+  n_Power(value,narrowed,&result,coeffs_BIGINT);
+  if (errorreported)
+    throw std::runtime_error("native bigint power failed");
+  return Bigint(result);
+}
+inline long bigint_compare(number a, number b, int operation) {
+  const bool equal=n_Equal(a,b,coeffs_BIGINT);
+  const bool greater=n_Greater(a,b,coeffs_BIGINT);
+  switch (operation) {
+    case '<': return !equal && !greater;
+    case '>': return greater;
+    case LE: return !greater;
+    case GE: return equal || greater;
+    case EQUAL_EQUAL: return equal;
+    case NOTEQUAL: return !equal;
+  }
+  throw std::runtime_error("unsupported native bigint comparison");
+}
+inline long bigint_to_int(number value) {
+  if (value==nullptr) return 0;
+  const long wide=n_Int(value,coeffs_BIGINT);
+  const int narrowed=(int)wide;
+  return (long)narrowed==wide ? wide : 0;
 }
 inline Number number_from_poly(poly p, ring r) {
   // Explicit number(poly), jjP2N: a nonconstant polynomial converts to zero.
@@ -516,6 +797,72 @@ inline Poly jet(Poly p, long degree) {
   return Poly(p_Jet(p.release(),(int)degree,r),r);
 }
 
+// Direct, statically typed counterparts of small interpreter kernels.  Keep
+// their narrowing, one-based indexing, copying, and error boundaries visible
+// here rather than routing generated code through iiExprArith.
+inline long univariate(poly value, ring r) {
+  return p_IsUnivariate(value,r);
+}
+inline long parameter_degree(number value, ring r) {
+  return n_ParDeg(value,r->cf);
+}
+inline long find_string(const char *where, const char *what) {
+  if (where==nullptr) where="";
+  if (what==nullptr) what="";
+  const char *found=strstr(where,what);
+  return found==nullptr ? 0L : (long)(found-where)+1L;
+}
+inline long find_string(const char *where, const char *what, long start) {
+  if (where==nullptr) where="";
+  if (what==nullptr) what="";
+  if (*what=='\0')
+    throw std::runtime_error("native three-argument find requires a nonempty needle");
+  const int position=(int)start;
+  const int length=(int)strlen(where);
+  if (position<1 || position>length)
+    throw std::runtime_error("native find start position out of range");
+  // jjFIND3's strchr/strncmp loop is equivalent to strstr for a nonempty
+  // needle.
+  const char *found=strstr(where+position-1,what);
+  return found==nullptr ? 0L : (long)(found-where)+1L;
+}
+inline long order(poly value, ring r) {
+  return value==nullptr ? -1L : r->pFDeg(value,r);
+}
+inline long parameter_count(ring r) { return rPar(r); }
+inline Number parameter(long index, ring r) {
+  const int narrowed=(int)index;
+  const int count=rPar(r);
+  if (narrowed<=0 || narrowed>count)
+    throw std::runtime_error("native par number out of range");
+  return Number(n_Param(narrowed,r),r->cf);
+}
+inline long previous_prime(long value) {
+  const int candidate=IsPrime((int)value);
+  return candidate>1 ? candidate : 2;
+}
+inline String characteristic_string(ring r) { return String(rCharStr(r)); }
+inline Poly simplify_poly(poly value, long options, ring r) {
+  Poly result(p_Copy(value,r),r);
+  const int flags=(int)options;
+  if (flags & 1) p_Norm(result.get(),r);
+  if (flags & 64) p_Normalize(result.get(),r);
+  return result;
+}
+inline Ideal simplify_ideal(IdealView value, long options, ring r) {
+  Ideal result(id_Copy(value.data(),r),r);
+  ideal data=result.data();
+  const int flags=(int)options;
+  if (flags & 32) id_DelDiv(data,r);
+  if (flags & 16) id_DelLmEquals(data,r);
+  if (flags & 8) id_DelMultiples(data,r);
+  else if (flags & 4) id_DelEquals(data,r);
+  if (flags & 2) idSkipZeroes(data);
+  if (flags & 1) id_Norm(data,r);
+  if (flags & 64) id_Normalize(data,r);
+  return result;
+}
+
 inline long add(long a, long b) {
   const unsigned long x=a, y=b, z=x+y;
   const unsigned long sign=1UL << (sizeof(long)*CHAR_BIT-1);
@@ -652,13 +999,14 @@ inline Ideal ideal_assign(Ideal value, ring r) {
     value.consume_binding_marker();
     return std::move(value);
   }
+  if (value.data()==nullptr) throw std::runtime_error("native ideal value is invalid");
+  attr attributes=value.release_attributes();
   ideal data=value.release();
   BITSET flags=value.flags();
-  if (data==nullptr) throw std::runtime_error("native ideal value is invalid");
   id_Normalize(data,r);
   IdealView normalized(data,flags);
   flags=ideal_assignment_flags(normalized,r);
-  return Ideal(data,r,flags);
+  return Ideal(data,r,flags,false,attributes);
 }
 class IdealBinding {
   IdealView value;
@@ -667,9 +1015,10 @@ public:
     if (input.data()==nullptr)
       throw std::runtime_error("native ideal value is invalid");
     if (input.skips_binding()) {
-      value=IdealView(input.data(),input.flags());
+      value=IdealView(input.data(),input.flags(),false,input.attribute_list());
     } else {
-      value=IdealView(input.data(),ideal_assignment_flags(input,r));
+      value=IdealView(input.data(),ideal_assignment_flags(input,r),false,
+                      input.attribute_list());
     }
   }
   IdealBinding(const IdealBinding &)=delete;
@@ -709,7 +1058,7 @@ inline Poly ideal_get(IdealView value, int index, ring r) {
 }
 inline void ideal_set(Ideal &target, int index, Poly value) {
   // iiAssign clears IDFLAG before dispatching every indexed assignment.
-  target.clear_flags();
+  target.clear_metadata();
   if (index<=0)
     throw std::runtime_error("native ideal index out of range");
   ideal result=target.data();
@@ -724,6 +1073,131 @@ inline void ideal_set(Ideal &target, int index, Poly value) {
     replacement=jj_NormalizeQRingP(replacement,target.base());
   p_Delete(&result->m[index-1],target.base());
   result->m[index-1]=replacement;
+}
+inline int checked_matrix_dimension(long value) {
+  const int narrowed=(int)value;
+  if (value<0 || (long)narrowed!=value)
+    throw std::runtime_error("native matrix dimension out of range");
+  return narrowed;
+}
+inline Matrix matrix_new(long rows, long columns, ring r) {
+  return Matrix(mpNew(checked_matrix_dimension(rows),
+                      checked_matrix_dimension(columns)),r);
+}
+inline Intmat intmat_new(long rows, long columns, ring r) {
+  return Intmat(checked_matrix_dimension(rows),
+                checked_matrix_dimension(columns),r);
+}
+inline long matrix_rows(MatrixView value) {
+  if (value.data()==nullptr) throw std::runtime_error("native matrix value is invalid");
+  return MATROWS(value.data());
+}
+inline long matrix_columns(MatrixView value) {
+  if (value.data()==nullptr) throw std::runtime_error("native matrix value is invalid");
+  return MATCOLS(value.data());
+}
+inline long matrix_size(MatrixView value) {
+  return matrix_rows(value)*matrix_columns(value);
+}
+inline long intmat_rows(IntmatView value) {
+  if (value.data()==nullptr) throw std::runtime_error("native intmat value is invalid");
+  return value.data()->rows();
+}
+inline long intmat_columns(IntmatView value) {
+  if (value.data()==nullptr) throw std::runtime_error("native intmat value is invalid");
+  return value.data()->cols();
+}
+inline long intmat_size(IntmatView value) {
+  return intmat_rows(value)*intmat_columns(value);
+}
+inline Poly matrix_get(MatrixView value, int row, int column, ring r) {
+  matrix m=value.data();
+  if (m==nullptr || row<1 || row>MATROWS(m) || column<1 || column>MATCOLS(m))
+    throw std::runtime_error("native matrix index out of range");
+  return Poly(p_Copy(MATELEM(m,row,column),r),r);
+}
+inline long intmat_get(IntmatView value, int row, int column) {
+  intvec *m=value.data();
+  if (m==nullptr || row<1 || row>m->rows() || column<1 || column>m->cols())
+    throw std::runtime_error("native intmat index out of range");
+  return (long)IMATELEM((*m),row,column);
+}
+inline void matrix_set(Matrix &target, int row, int column, Poly replacement) {
+  matrix m=target.data();
+  if (m==nullptr || row<1 || row>MATROWS(m) || column<1 || column>MATCOLS(m))
+    throw std::runtime_error("native matrix index out of range");
+  // iiAssign clears value metadata before an indexed write.
+  target.clear_metadata();
+  poly value=replacement.release();
+  if (value!=nullptr) p_Normalize(value,target.base());
+  if (value!=nullptr && TEST_V_QRING && target.base()->qideal!=nullptr)
+    value=jj_NormalizeQRingP(value,target.base());
+  p_Delete(&MATELEM(m,row,column),target.base());
+  MATELEM(m,row,column)=value;
+}
+inline void intmat_set(Intmat &target, int row, int column, long replacement) {
+  intvec *m=target.data();
+  if (m==nullptr || row<1 || row>m->rows() || column<1 || column>m->cols())
+    throw std::runtime_error("native intmat index out of range");
+  target.clear_metadata();
+  IMATELEM((*m),row,column)=(int)replacement;
+}
+inline void validate_matrix_selection(MatrixView source, const intvec *rows,
+                                      const intvec *columns) {
+  if (source.data()==nullptr || rows==nullptr || columns==nullptr)
+    throw std::runtime_error("native matrix selection is invalid");
+  for (int i=0;i<rows->length();++i)
+    if ((*rows)[i]<1 || (*rows)[i]>MATROWS(source.data()))
+      throw std::runtime_error("native matrix row index out of range");
+  for (int i=0;i<columns->length();++i)
+    if ((*columns)[i]<1 || (*columns)[i]>MATCOLS(source.data()))
+      throw std::runtime_error("native matrix column index out of range");
+}
+inline Matrix matrix_select(MatrixView source, const intvec *rows,
+                            const intvec *columns, long result_rows,
+                            long result_columns, ring r) {
+  validate_matrix_selection(source,rows,columns);
+  Matrix result=matrix_new(result_rows,result_columns,r);
+  matrix output=result.data();
+  const long capacity=(long)MATROWS(output)*(long)MATCOLS(output);
+  long position=0;
+  for (int i=0;i<rows->length() && position<capacity;++i)
+    for (int j=0;j<columns->length() && position<capacity;++j,++position)
+      output->m[position]=p_Copy(
+          MATELEM(source.data(),(*rows)[i],(*columns)[j]),r);
+  return result;
+}
+inline Matrix matrix_select(MatrixView source, const intvec *rows,
+                            const intvec *columns, ring r) {
+  return matrix_select(source,rows,columns,rows->length(),columns->length(),r);
+}
+inline void validate_intmat_selection(IntmatView source, const intvec *rows,
+                                      const intvec *columns) {
+  if (source.data()==nullptr || rows==nullptr || columns==nullptr)
+    throw std::runtime_error("native intmat selection is invalid");
+  for (int i=0;i<rows->length();++i)
+    if ((*rows)[i]<1 || (*rows)[i]>source.data()->rows())
+      throw std::runtime_error("native intmat row index out of range");
+  for (int i=0;i<columns->length();++i)
+    if ((*columns)[i]<1 || (*columns)[i]>source.data()->cols())
+      throw std::runtime_error("native intmat column index out of range");
+}
+inline Intmat intmat_select(IntmatView source, const intvec *rows,
+                            const intvec *columns, long result_rows,
+                            long result_columns, ring r) {
+  validate_intmat_selection(source,rows,columns);
+  Intmat result= intmat_new(result_rows,result_columns,r);
+  const long capacity=(long)result.data()->rows()*(long)result.data()->cols();
+  long position=0;
+  for (int i=0;i<rows->length() && position<capacity;++i)
+    for (int j=0;j<columns->length() && position<capacity;++j,++position)
+      (*result.data())[(int)position]=
+          IMATELEM((*source.data()),(*rows)[i],(*columns)[j]);
+  return result;
+}
+inline Intmat intmat_select(IntmatView source, const intvec *rows,
+                            const intvec *columns, ring r) {
+  return intmat_select(source,rows,columns,rows->length(),columns->length(),r);
 }
 inline Ideal ideal_add(IdealView a, IdealView b, ring r) {
   return Ideal(id_Add(a.data(),b.data(),r),r);
@@ -766,6 +1240,22 @@ inline BITSET value_flags(leftv argument) {
   }
   return argument->flag;
 }
+inline attr value_attributes(leftv argument) {
+  if (argument==nullptr) return nullptr;
+  if (argument->rtyp==IDHDL) {
+    idhdl id=(idhdl)argument->data;
+    return id==nullptr ? nullptr : IDATTR(id);
+  }
+  return argument->attribute;
+}
+inline BITSET value_flags_without_ring_marker(leftv argument) {
+  if (argument==nullptr) return 0;
+  return (argument->flag | value_flags(argument)) & ~Sy_bit(FLAG_RING);
+}
+inline bool other_ring_value(leftv argument) {
+  return argument==nullptr ||
+         Sy_inset(FLAG_OTHER_RING,argument->flag | value_flags(argument));
+}
 inline bool unsupported_poly_result_metadata(leftv argument) {
   // FLAG_RING is an internal marker carried by values read from a
   // ring-dependent newstruct field.  It does not describe the polynomial and
@@ -773,10 +1263,7 @@ inline bool unsupported_poly_result_metadata(leftv argument) {
   // user attributes and every semantic flag (including FLAG_QRING) on the
   // conservative path; FLAG_OTHER_RING is deliberately not ignored either.
   if (argument==nullptr) return true;
-  const BITSET semantic=~Sy_bit(FLAG_RING);
-  return attributed(argument) ||
-         (argument->flag & semantic)!=0 ||
-         (value_flags(argument) & semantic)!=0;
+  return attributed(argument) || value_flags_without_ring_marker(argument)!=0;
 }
 inline leftv get(lists list, int index) {
   if (index<=0 || index>list->nr+1)
@@ -945,6 +1432,15 @@ public:
   number get() const { return is_owned ? owned.get() : borrowed; }
   void assign(Number value) { owned=std::move(value); is_owned=true; }
 };
+class CowBigint {
+  number borrowed;
+  Bigint owned;
+  bool is_owned;
+public:
+  explicit CowBigint(number n): borrowed(n), owned(nullptr), is_owned(false) {}
+  number get() const { return is_owned ? owned.get() : borrowed; }
+  void assign(Bigint value) { owned=std::move(value); is_owned=true; }
+};
 class CowString {
   const char *borrowed;
   String owned;
@@ -971,6 +1467,36 @@ public:
     return owned;
   }
   void assign(Ideal value) { owned=std::move(value); is_owned=true; }
+};
+class CowMatrix {
+  MatrixView borrowed;
+  Matrix owned;
+  ring base;
+  bool is_owned;
+public:
+  CowMatrix(MatrixView m, ring r)
+    : borrowed(m), owned((matrix)nullptr,r), base(r), is_owned(false) {}
+  MatrixView get() const { return is_owned ? owned.get() : borrowed; }
+  Matrix &write() {
+    if (!is_owned) { owned=Matrix::copy(borrowed,base); is_owned=true; }
+    return owned;
+  }
+  void assign(Matrix value) { owned=std::move(value); is_owned=true; }
+};
+class CowIntmat {
+  IntmatView borrowed;
+  Intmat owned;
+  ring base;
+  bool is_owned;
+public:
+  CowIntmat(IntmatView m, ring r)
+    : borrowed(m), owned((intvec*)nullptr,r), base(r), is_owned(false) {}
+  IntmatView get() const { return is_owned ? owned.get() : borrowed; }
+  Intmat &write() {
+    if (!is_owned) { owned=Intmat::copy(borrowed,base); is_owned=true; }
+    return owned;
+  }
+  void assign(Intmat value) { owned=std::move(value); is_owned=true; }
 };
 class CowList {
   lists borrowed;
@@ -1003,7 +1529,16 @@ struct View {
   sleftv value;
   View(int type, void *data) { value.Init(); value.rtyp=type; value.data=data; }
   explicit View(IdealView ideal) {
-    value.Init(); value.rtyp=IDEAL_CMD; value.data=ideal.data(); value.flag=ideal.flags();
+    value.Init(); value.rtyp=IDEAL_CMD; value.data=ideal.data();
+    value.flag=ideal.flags(); value.attribute=ideal.attribute_list();
+  }
+  explicit View(MatrixView matrix_value) {
+    value.Init(); value.rtyp=MATRIX_CMD; value.data=matrix_value.data();
+    value.flag=matrix_value.flags(); value.attribute=matrix_value.attribute_list();
+  }
+  explicit View(IntmatView matrix_value) {
+    value.Init(); value.rtyp=INTMAT_CMD; value.data=matrix_value.data();
+    value.flag=matrix_value.flags(); value.attribute=matrix_value.attribute_list();
   }
   leftv get() { return &value; }
 };
@@ -1016,7 +1551,36 @@ public:
   Value(const Value &) = delete;
   Value &operator=(const Value &) = delete;
   Value(Value &&v) noexcept: value(v.value), owner(v.owner) { v.value.Init(); }
+  Value &operator=(Value &&v) noexcept {
+    if (this!=&v) {
+      value.CleanUp(owner);
+      value=v.value;
+      owner=v.owner;
+      v.value.Init();
+    }
+    return *this;
+  }
+  static Value copy(leftv source, ring r) {
+    if (source==nullptr)
+      throw std::runtime_error("cannot copy an undefined native value");
+    Value result(r);
+    sleftv view=*source;
+    view.next=nullptr;
+    result.get()->Copy(&view);
+    if (errorreported)
+      throw std::runtime_error("native value copy failed");
+    return result;
+  }
   leftv get() { return &value; }
+  void release_to(leftv target) {
+    if (target==nullptr)
+      throw std::runtime_error("native result target is unavailable");
+    if (value.e!=nullptr || value.next!=nullptr || value.rtyp==IDHDL ||
+        value.rtyp==ALIAS_CMD)
+      throw std::runtime_error("native result is not a plain owned value");
+    memcpy(target,&value,sizeof(sleftv));
+    value.Init();
+  }
 };
 // Marks an error already diagnosed by an interpreter kernel.  Native entry
 // wrappers return it directly instead of printing a second, less useful
@@ -1030,6 +1594,9 @@ inline leftv value_argument(leftv argument) {
 }
 inline leftv newstruct_argument(leftv argument, const char *expected) {
   argument=value_argument(argument);
+  if (metadata(argument))
+    throw std::runtime_error(std::string("native argument requires a plain newstruct ")+
+                             expected);
   const int type=argument->Typ();
   blackbox *box=getBlackboxStuff(type);
   const char *actual=type>MAX_TOK ? getBlackboxName(type) : nullptr;
@@ -1039,6 +1606,59 @@ inline leftv newstruct_argument(leftv argument, const char *expected) {
                              expected);
   return argument;
 }
+inline int newstruct_type(const char *expected) {
+  int type=0;
+  if (expected==nullptr || blackboxIsCmd(expected,type)!=ROOT_DECL || type<=MAX_TOK)
+    throw std::runtime_error(std::string("native newstruct type is unavailable: ")+
+                             (expected==nullptr ? "<null>" : expected));
+  blackbox *box=getBlackboxStuff(type);
+  const char *actual=getBlackboxName(type);
+  if (box==nullptr || box->blackbox_Op2!=newstruct_Op2 || box->data==nullptr ||
+      box->blackbox_Init==nullptr || box->blackbox_Copy==nullptr ||
+      actual==nullptr || std::strcmp(actual,expected)!=0)
+    throw std::runtime_error(std::string("native newstruct type is unavailable: ")+
+                             expected);
+  return type;
+}
+inline Value default_newstruct(const char *expected, ring r) {
+  const int type=newstruct_type(expected);
+  blackbox *box=getBlackboxStuff(type);
+  Value result(r);
+  result.get()->rtyp=type;
+  result.get()->data=box->blackbox_Init(box);
+  if (result.get()->data==nullptr || errorreported)
+    throw std::runtime_error(std::string("native newstruct initialization failed: ")+
+                             expected);
+  return result;
+}
+inline Value copy_newstruct(leftv source, const char *expected, ring r) {
+  source=newstruct_argument(source,expected);
+  return Value::copy(source,r);
+}
+class CowNewstruct {
+  leftv borrowed;
+  Value owned;
+  const char *expected;
+  ring owner;
+  bool is_owned;
+public:
+  CowNewstruct(leftv value, const char *expected, ring r)
+    : borrowed(newstruct_argument(value,expected)), owned(r), expected(expected), owner(r),
+      is_owned(false) {}
+  leftv get() { return is_owned ? owned.get() : borrowed; }
+  Value &write() {
+    if (!is_owned) {
+      owned=copy_newstruct(borrowed,expected,owner);
+      is_owned=true;
+    }
+    return owned;
+  }
+  void assign(Value value) {
+    newstruct_argument(value.get(),expected);
+    owned=std::move(value);
+    is_owned=true;
+  }
+};
 inline String string_from_value(leftv argument) {
   argument=value_argument(argument);
   char *raw=argument->String();
@@ -1047,8 +1667,17 @@ inline String string_from_value(leftv argument) {
     throw std::runtime_error("native string conversion failed");
   return result;
 }
+inline Poly selected_vector_component(poly source, int component, ring r) {
+  if (source==nullptr || component<=0) return Poly(nullptr,r);
+  poly remaining=p_Copy(source,r);
+  poly selected=p_TakeOutComp(&remaining,component,r);
+  p_Delete(&remaining,r);
+  return Poly(selected,r);
+}
 inline leftv scalar_index_argument(leftv argument, sleftv &materialized,
-                                   char string_value[2]) {
+                                   char string_value[2],
+                                   Poly *selected_owner=nullptr,
+                                   ring selected_ring=nullptr) {
   // A scalar selection is represented by a value plus a Subexpr chain. Walk
   // only a list prefix, then materialize one supported final scalar index.
   // This covers v[i], I[i], and carrier[...][i] without invoking general
@@ -1085,6 +1714,45 @@ inline leftv scalar_index_argument(leftv argument, sleftv &materialized,
       materialized.data=(void*)(long)IMATELEM((*source),row,column);
       return &materialized;
     }
+    if (type==MATRIX_CMD && index->next!=nullptr &&
+        index->next->next==nullptr) {
+      matrix source=(matrix)data;
+      const int row=index->start;
+      const int column=index->next->start;
+      if (source==nullptr || row<1 || row>MATROWS(source) ||
+          column<1 || column>MATCOLS(source))
+        throw std::runtime_error("native matrix index out of range");
+      materialized.Init();
+      materialized.rtyp=POLY_CMD;
+      materialized.data=(void*)MATELEM(source,row,column);
+      // Do not reinterpret a selected polynomial in the current ring merely
+      // because materializing the deferred index removed its IDHDL wrapper.
+      materialized.flag=value_flags(current) & Sy_bit(FLAG_OTHER_RING);
+      return &materialized;
+    }
+    if (type==SMATRIX_CMD && index->next!=nullptr &&
+        index->next->next==nullptr && selected_owner!=nullptr &&
+        selected_ring!=nullptr) {
+      // Selecting a sparse-matrix component requires traversing and copying
+      // its polynomial payload.  Reject a deferred selection from another
+      // ring before selected_vector_component sees that foreign storage.
+      if (other_ring_value(current))
+        throw std::runtime_error(
+            "native matrix argument belongs to another ring");
+      ideal source=(ideal)data;
+      const int row=index->start;
+      const int column=index->next->start;
+      if (source==nullptr || row<1 || row>source->rank ||
+          column<1 || column>IDELEMS(source))
+        throw std::runtime_error("native sparse matrix index out of range");
+      *selected_owner=selected_vector_component(
+          source->m[column-1],row,selected_ring);
+      materialized.Init();
+      materialized.rtyp=POLY_CMD;
+      materialized.data=(void*)selected_owner->get();
+      materialized.flag=value_flags(current) & Sy_bit(FLAG_OTHER_RING);
+      return &materialized;
+    }
     if (index->next==nullptr) break;
     lists prefix=list_like_data(current);
     if (prefix==nullptr) return argument;
@@ -1108,6 +1776,32 @@ inline leftv scalar_index_argument(leftv argument, sleftv &materialized,
     materialized.data=(void*)(long)(*source)[position-1];
     return &materialized;
   }
+  if (type==MATRIX_CMD && selected_owner!=nullptr) {
+    matrix source=(matrix)data;
+    // Singular's one-index matrix selection denotes a column, so only column
+    // numbers are valid.  MatrixArgument needs just the first component when
+    // adapting that deferred column to its statically known 1x1 boundary.
+    if (source==nullptr || position<1 || position>MATCOLS(source))
+      throw std::runtime_error("native matrix index out of range");
+    materialized.rtyp=POLY_CMD;
+    materialized.data=(void*)source->m[position-1];
+    materialized.flag=value_flags(current) & Sy_bit(FLAG_OTHER_RING);
+    return &materialized;
+  }
+  if (type==VECTOR_CMD && selected_owner!=nullptr &&
+      selected_ring!=nullptr) {
+    // p_Copy/p_TakeOutComp must never inspect a vector owned by a different
+    // ring using the current ring's polynomial representation.
+    if (other_ring_value(current))
+      throw std::runtime_error(
+          "native matrix argument belongs to another ring");
+    *selected_owner=selected_vector_component(
+        (poly)data,position,selected_ring);
+    materialized.rtyp=POLY_CMD;
+    materialized.data=(void*)selected_owner->get();
+    materialized.flag=value_flags(current) & Sy_bit(FLAG_OTHER_RING);
+    return &materialized;
+  }
   // Singular keeps a scalar string selection deferred in the argument leftv.
   // Give callers a non-owning view backed by their stack storage; callers
   // either copy it immediately (for list values) or keep that storage alive
@@ -1125,12 +1819,15 @@ inline leftv scalar_index_argument(leftv argument, sleftv &materialized,
   // Ideal/module scalar indexing is another deferred LANG_C boundary value.
   // Borrow the selected polynomial only long enough for the caller to copy or
   // consume it; unlike Data(), this neither rewrites the leftv nor allocates.
-  if (type==IDEAL_CMD || type==MODUL_CMD || type==MAP_CMD) {
+  if (type==IDEAL_CMD || type==MODUL_CMD || type==SMATRIX_CMD ||
+      type==MAP_CMD) {
     ideal source=(ideal)data;
     if (source==nullptr || position<1 || position>IDELEMS(source))
       throw std::runtime_error("native ideal/module index out of range");
-    materialized.rtyp=type==MODUL_CMD ? VECTOR_CMD : POLY_CMD;
+    materialized.rtyp=(type==MODUL_CMD || type==SMATRIX_CMD)
+                      ? VECTOR_CMD : POLY_CMD;
     materialized.data=(void*)source->m[position-1];
+    materialized.flag=value_flags(current) & Sy_bit(FLAG_OTHER_RING);
     return &materialized;
   }
   return argument;
@@ -1145,6 +1842,9 @@ public:
     argument=scalar_index_argument(argument,materialized,string_value);
     argument=value_argument(argument);
     const int type=argument->Typ();
+    if ((type==POLY_CMD || type==BUCKET_CMD || type==NUMBER_CMD) &&
+        other_ring_value(argument))
+      throw std::runtime_error("native polynomial argument belongs to another ring");
     if (type==POLY_CMD || type==BUCKET_CMD) {
       value=borrow_poly(argument);
     } else if (type==INT_CMD) {
@@ -1443,43 +2143,368 @@ public:
     char string_value[2];
     argument=scalar_index_argument(argument,materialized,string_value);
     argument=value_argument(argument);
-    if (attributed(argument))
-      throw std::runtime_error("native ideal argument must be a plain ideal, poly, number, or int");
     const int type=argument->Typ();
     if (type==IDEAL_CMD) {
+      if (other_ring_value(argument))
+        throw std::runtime_error("native ideal argument belongs to another ring");
       ideal data=(ideal)argument->Data();
       if (errorreported || data==nullptr)
         throw std::runtime_error("native ideal argument is invalid");
-      value=IdealView(data,value_flags(argument));
+      value=IdealView(data,value_flags_without_ring_marker(argument),false,
+                      value_attributes(argument));
     } else if (type==POLY_CMD || type==BUCKET_CMD) {
+      if (other_ring_value(argument))
+        throw std::runtime_error("native ideal argument belongs to another ring");
+      if (attributed(argument))
+        throw std::runtime_error("native ideal argument cannot convert an attributed polynomial");
       converted=ideal_from_poly(borrow_poly(argument),r);
       value=converted.get();
     } else if (type==INT_CMD) {
+      if (metadata(argument))
+        throw std::runtime_error("native ideal argument cannot convert an attributed integer");
       void *data=argument->Data();
       if (errorreported) throw std::runtime_error("native int argument is invalid");
       converted=ideal_from_int((long)data,r);
       value=converted.get();
     } else if (type==NUMBER_CMD) {
+      if (other_ring_value(argument))
+        throw std::runtime_error("native ideal argument belongs to another ring");
+      if (unsupported_poly_result_metadata(argument))
+        throw std::runtime_error("native ideal argument cannot convert an attributed number");
       number data=(number)argument->Data();
       if (errorreported) throw std::runtime_error("native number argument is invalid");
       converted=ideal_from_number(data,r);
       value=converted.get();
+    } else if (type==BIGINT_CMD) {
+      if (metadata(argument))
+        throw std::runtime_error("native ideal argument cannot convert an attributed bigint");
+      number data=(number)argument->Data();
+      if (errorreported) throw std::runtime_error("native bigint argument is invalid");
+      Poly polynomial=polynomial_bigint(data,r);
+      converted=ideal_from_poly(polynomial.get(),r);
+      value=converted.get();
     } else {
-      throw std::runtime_error("native ideal argument requires ideal, poly, number, or int");
+      throw std::runtime_error("native ideal argument requires ideal, poly, number, bigint, or int");
     }
   }
   IdealArgument(const IdealArgument &) = delete;
   IdealArgument &operator=(const IdealArgument &) = delete;
   IdealView get() const { return value; }
 };
+inline attr copy_value_attributes(leftv value) {
+  attr attributes=value_attributes(value);
+  return attributes==nullptr ? nullptr : attributes->Copy();
+}
+inline Matrix matrix_from_poly(poly value, ring r, BITSET flags=0,
+                               attr attributes=nullptr) {
+  matrix result=mpNew(1,1);
+  MATELEM(result,1,1)=p_Copy(value,r);
+  return Matrix(result,r,flags,attributes);
+}
+inline Matrix matrix_from_number(number value, ring r, BITSET flags=0,
+                                 attr attributes=nullptr) {
+  Number copied(n_Copy(value,r->cf),r->cf);
+  matrix result=mpNew(1,1);
+  MATELEM(result,1,1)=p_NSet(copied.release(),r);
+  return Matrix(result,r,flags,attributes);
+}
+inline Matrix matrix_from_int(long value, ring r, BITSET flags=0,
+                              attr attributes=nullptr) {
+  matrix result=mpNew(1,1);
+  MATELEM(result,1,1)=p_ISet((int)value,r);
+  return Matrix(result,r,flags,attributes);
+}
+inline Matrix matrix_from_bigint(number value, ring r, BITSET flags=0,
+                                 attr attributes=nullptr) {
+  Poly polynomial=polynomial_bigint(value,r);
+  matrix result=mpNew(1,1);
+  MATELEM(result,1,1)=polynomial.release();
+  return Matrix(result,r,flags,attributes);
+}
+inline Matrix matrix_from_intvec(const intvec *value, ring r, BITSET flags=0,
+                                 attr attributes=nullptr) {
+  if (value==nullptr) throw std::runtime_error("native int matrix conversion is invalid");
+  matrix result=mpNew(value->rows(),value->cols());
+  for (int i=1;i<=value->rows();++i)
+    for (int j=1;j<=value->cols();++j)
+      MATELEM(result,i,j)=p_ISet(IMATELEM((*value),i,j),r);
+  return Matrix(result,r,flags,attributes);
+}
+inline Matrix matrix_from_ideal(IdealView value, ring r) {
+  if (value.data()==nullptr) throw std::runtime_error("native ideal value is invalid");
+  // Every ideal -> matrix conversion is a cross-type conversion.  Singular
+  // keeps the ideal's natural 1 x n shape for an explicit cast, but does not
+  // transfer value flags or attributes.
+  return Matrix(mp_Copy((matrix)value.data(),r,r),r);
+}
+inline Matrix matrix_from_ideal_shaped(IdealView value, long rows,
+                                       long columns, ring r) {
+  if (value.data()==nullptr) throw std::runtime_error("native ideal value is invalid");
+  Matrix result=matrix_new(rows,columns,r);
+  const long capacity=(long)MATROWS(result.data())*(long)MATCOLS(result.data());
+  const long count=si_min(capacity,(long)IDELEMS(value.data()));
+  for (long i=0;i<count;++i)
+    result.data()->m[i]=p_Copy(value.data()->m[i],r);
+  return result;
+}
+inline Matrix matrix_from_module(ideal value, ring r) {
+  if (value==nullptr)
+    throw std::runtime_error("native module value is invalid");
+  // iiMo2Ma receives CopyD(MODUL_CMD) and id_Module2Matrix consumes that
+  // copy. This is the automatic conversion used for a module passed to a
+  // matrix formal; unlike ideal/scalar assignment it determines its own
+  // matrix dimensions from the module rank and generators.
+  matrix result=id_Module2Matrix(id_Copy(value,r),r);
+  if (result==nullptr)
+    throw std::runtime_error("native module-to-matrix conversion failed");
+  return Matrix(result,r);
+}
+inline Matrix matrix_from_vector(poly value, ring r) {
+  Poly copied=Poly::copy(value,r);
+  matrix result=(matrix)id_Vec2Ideal(copied.get(),r);
+  if (result==nullptr)
+    throw std::runtime_error("native vector-to-matrix conversion failed");
+  const int columns=MATCOLS(result);
+  MATCOLS(result)=MATROWS(result);
+  MATROWS(result)=columns;
+  result->rank=columns;
+  return Matrix(result,r);
+}
+inline Matrix matrix_from_matrix_shaped(MatrixView value, long rows,
+                                        long columns, ring r) {
+  if (value.data()==nullptr)
+    throw std::runtime_error("native matrix conversion source is invalid");
+  matrix result=mpNew(checked_matrix_dimension(rows),
+                      checked_matrix_dimension(columns));
+  const long capacity=(long)MATROWS(result)*(long)MATCOLS(result);
+  const long source_size=(long)MATROWS(value.data())*(long)MATCOLS(value.data());
+  const long count=si_min(capacity,source_size);
+  for (long i=0;i<count;++i) result->m[i]=p_Copy(value.data()->m[i],r);
+  id_Normalize((ideal)result,r);
+  return Matrix(result,r);
+}
+inline Matrix matrix_from_poly_shaped(poly value, long rows, long columns,
+                                      ring r) {
+  Matrix result=matrix_new(rows,columns,r);
+  if (matrix_size(result.get())>0) result.data()->m[0]=p_Copy(value,r);
+  return result;
+}
+inline Matrix matrix_from_number_shaped(number value, long rows, long columns,
+                                        ring r) {
+  Matrix result=matrix_new(rows,columns,r);
+  if (matrix_size(result.get())>0) {
+    Number copied(n_Copy(value,r->cf),r->cf);
+    result.data()->m[0]=p_NSet(copied.release(),r);
+  }
+  return result;
+}
+inline Matrix matrix_from_bigint_shaped(number value, long rows, long columns,
+                                        ring r) {
+  Matrix result=matrix_new(rows,columns,r);
+  if (matrix_size(result.get())>0) {
+    Poly polynomial=polynomial_bigint(value,r);
+    result.data()->m[0]=polynomial.release();
+  }
+  return result;
+}
+inline Matrix matrix_from_int_shaped(long value, long rows, long columns,
+                                     ring r) {
+  Matrix result=matrix_new(rows,columns,r);
+  if (matrix_size(result.get())>0) result.data()->m[0]=p_ISet((int)value,r);
+  return result;
+}
+inline Intmat intmat_from_int_shaped(long value, long rows, long columns,
+                                     ring r) {
+  Intmat result=intmat_new(rows,columns,r);
+  if (intmat_size(result.get())>0) (*result.data())[0]=(int)value;
+  return result;
+}
+inline Intmat intmat_assign_int(IntmatView target, long value, ring r) {
+  if (target.data()==nullptr)
+    throw std::runtime_error("native intmat assignment target is invalid");
+  // jiA_IV_I writes the first scalar slot of an existing intmat rather than
+  // rebuilding a zero-filled matrix.  Value metadata is nevertheless cleared
+  // by the typed assignment boundary.
+  Intmat result(new intvec(target.data()),r);
+  if (intmat_size(result.get())>0) (*result.data())[0]=(int)value;
+  return result;
+}
+class MatrixArgument {
+  Poly selected;
+  Matrix converted;
+  MatrixView value;
+public:
+  MatrixArgument(leftv argument, ring r, long target_rows=1,
+                 long target_columns=1, bool explicit_cast=false)
+    : selected(nullptr,r), converted((matrix)nullptr,r), value(nullptr) {
+    sleftv materialized;
+    char string_value[2];
+    argument=scalar_index_argument(argument,materialized,string_value,
+                                   &selected,r);
+    argument=value_argument(argument);
+    const int type=argument->Typ();
+    if (type==MATRIX_CMD) {
+      if (other_ring_value(argument))
+        throw std::runtime_error("native matrix argument belongs to another ring");
+      matrix data=(matrix)argument->Data();
+      if (errorreported || data==nullptr)
+        throw std::runtime_error("native matrix argument is invalid");
+      value=MatrixView(data,value_flags_without_ring_marker(argument),
+                       value_attributes(argument));
+      return;
+    }
+    if ((type==IDEAL_CMD || type==MODUL_CMD || type==SMATRIX_CMD ||
+         type==VECTOR_CMD || type==POLY_CMD || type==BUCKET_CMD ||
+         type==NUMBER_CMD) && other_ring_value(argument))
+      throw std::runtime_error("native matrix argument belongs to another ring");
+    if (type==IDEAL_CMD) {
+        ideal data=(ideal)argument->Data();
+        if (errorreported || data==nullptr)
+          throw std::runtime_error("native ideal argument is invalid");
+        IdealView source(data,value_flags_without_ring_marker(argument),false,
+                         value_attributes(argument));
+        converted=(explicit_cast
+                   ? matrix_from_ideal(source,r)
+                   : matrix_from_ideal_shaped(source,target_rows,target_columns,r));
+    } else if (type==MODUL_CMD) {
+        ideal data=(ideal)argument->Data();
+        if (errorreported || data==nullptr)
+          throw std::runtime_error("native module argument is invalid");
+        converted=matrix_from_module(data,r);
+        if (!explicit_cast) id_Normalize((ideal)converted.data(),r);
+    } else if (type==VECTOR_CMD) {
+        poly data=(poly)argument->Data();
+        if (errorreported)
+          throw std::runtime_error("native vector argument is invalid");
+        Matrix natural=matrix_from_vector(data,r);
+        converted=(explicit_cast
+                   ? std::move(natural)
+                   : matrix_from_matrix_shaped(natural.get(),target_rows,
+                                               target_columns,r));
+    } else if (type==SMATRIX_CMD) {
+        ideal data=(ideal)argument->Data();
+        if (errorreported || data==nullptr)
+          throw std::runtime_error("native sparse matrix argument is invalid");
+        Matrix natural=matrix_from_module(data,r);
+        converted=(explicit_cast
+                   ? std::move(natural)
+                   : matrix_from_matrix_shaped(natural.get(),target_rows,
+                                               target_columns,r));
+    } else if (type==INTMAT_CMD || type==INTVEC_CMD) {
+        intvec *data=(intvec*)argument->Data();
+        if (errorreported || data==nullptr)
+          throw std::runtime_error("native int matrix argument is invalid");
+        converted=matrix_from_intvec(data,r);
+    } else if (type==POLY_CMD || type==BUCKET_CMD) {
+        converted=(explicit_cast
+                   ? matrix_from_poly(borrow_poly(argument),r)
+                   : matrix_from_poly_shaped(borrow_poly(argument),target_rows,
+                                             target_columns,r));
+    } else if (type==NUMBER_CMD) {
+        number data=(number)argument->Data();
+        if (errorreported) throw ReportedInterpreterError();
+        converted=(explicit_cast
+                   ? matrix_from_number(data,r)
+                   : matrix_from_number_shaped(data,target_rows,target_columns,r));
+    } else if (type==BIGINT_CMD) {
+        number data=(number)argument->Data();
+        if (errorreported) throw ReportedInterpreterError();
+        converted=(explicit_cast
+                   ? matrix_from_bigint(data,r)
+                   : matrix_from_bigint_shaped(data,target_rows,target_columns,r));
+    } else if (type==INT_CMD) {
+        void *data=argument->Data();
+        if (errorreported) throw ReportedInterpreterError();
+        converted=(explicit_cast
+                   ? matrix_from_int((long)data,r)
+                   : matrix_from_int_shaped((long)data,target_rows,
+                                            target_columns,r));
+    } else {
+        throw std::runtime_error(
+            "native matrix argument requires matrix, module, sparse matrix, vector, ideal, intmat, intvec, poly, number, bigint, or int");
+    }
+    value=converted.get();
+  }
+  MatrixArgument(const MatrixArgument &)=delete;
+  MatrixArgument &operator=(const MatrixArgument &)=delete;
+  MatrixView get() const { return value; }
+};
+inline Matrix exact_matrix_argument(leftv argument, ring r) {
+  argument=value_argument(argument);
+  if (argument->Typ()!=MATRIX_CMD)
+    throw std::runtime_error("native matrix return requires a matrix");
+  if (other_ring_value(argument))
+    throw std::runtime_error("native matrix return belongs to another ring");
+  matrix value=(matrix)argument->Data();
+  if (errorreported || value==nullptr)
+    throw std::runtime_error("native matrix return is invalid");
+  return Matrix(mp_Copy(value,r,r),r,value_flags_without_ring_marker(argument),
+                copy_value_attributes(argument));
+}
+class IntmatArgument {
+  Intmat converted;
+  IntmatView value;
+public:
+  IntmatArgument(leftv argument, ring r, long target_rows=1,
+                 long target_columns=1, bool explicit_cast=false,
+                 IntmatView assignment_target=IntmatView(nullptr))
+    : converted((intvec*)nullptr,r), value(nullptr) {
+    sleftv materialized;
+    char string_value[2];
+    argument=scalar_index_argument(argument,materialized,string_value);
+    argument=value_argument(argument);
+    const int type=argument->Typ();
+    if (type==INTMAT_CMD) {
+      intvec *data=(intvec*)argument->Data();
+      if (errorreported || data==nullptr)
+        throw std::runtime_error("native intmat argument is invalid");
+      value=IntmatView(data,value_flags_without_ring_marker(argument),
+                       value_attributes(argument));
+      return;
+    }
+    if (type==INTVEC_CMD) {
+        intvec *data=(intvec*)argument->Data();
+        if (errorreported || data==nullptr)
+          throw std::runtime_error("native intvec argument is invalid");
+        converted=Intmat(new intvec(data),r);
+    } else if (type==INT_CMD) {
+        if (explicit_cast)
+          throw std::runtime_error("explicit intmat(int) conversion is unsupported");
+        void *data=argument->Data();
+        if (errorreported) throw ReportedInterpreterError();
+        converted=(assignment_target.data()==nullptr
+                   ? intmat_from_int_shaped((long)data,target_rows,target_columns,r)
+                   : intmat_assign_int(assignment_target,(long)data,r));
+    } else {
+        throw std::runtime_error("native intmat argument requires intmat, intvec, or int");
+    }
+    value=converted.get();
+  }
+  IntmatArgument(const IntmatArgument &)=delete;
+  IntmatArgument &operator=(const IntmatArgument &)=delete;
+  IntmatView get() const { return value; }
+};
+inline Intmat exact_intmat_argument(leftv argument, ring r) {
+  argument=value_argument(argument);
+  if (argument->Typ()!=INTMAT_CMD)
+    throw std::runtime_error("native intmat return requires an intmat");
+  intvec *value=(intvec*)argument->Data();
+  if (errorreported || value==nullptr)
+    throw std::runtime_error("native intmat return is invalid");
+  return Intmat(new intvec(value),r,value_flags_without_ring_marker(argument),
+                copy_value_attributes(argument));
+}
 inline Ideal exact_ideal_argument(leftv argument, ring r) {
   argument=value_argument(argument);
-  if (argument->Typ()!=IDEAL_CMD || attributed(argument))
-    throw std::runtime_error("native ideal return requires a plain ideal");
+  if (argument->Typ()!=IDEAL_CMD)
+    throw std::runtime_error("native ideal return requires an ideal");
+  if (other_ring_value(argument))
+    throw std::runtime_error("native ideal return belongs to another ring");
   ideal value=(ideal)argument->Data();
   if (errorreported || value==nullptr)
     throw std::runtime_error("native ideal return is invalid");
-  return Ideal::copy(IdealView(value,value_flags(argument)),r);
+  return Ideal::copy(IdealView(value,value_flags_without_ring_marker(argument),
+                               false,value_attributes(argument)),r);
 }
 inline Number exact_number_argument(leftv argument, ring r);
 inline Poly exact_poly_argument(leftv argument, ring r) {
@@ -1734,6 +2759,11 @@ inline void list_set_owned(List &target, int index, Number &&value, ring r) {
   slot->rtyp=NUMBER_CMD;
   slot->data=value.release();
 }
+inline void list_set_owned(List &target, int index, Bigint &&value, ring r) {
+  leftv slot=list_assignment_slot(target,index,r);
+  slot->rtyp=BIGINT_CMD;
+  slot->data=value.release();
+}
 inline void list_set_owned(List &target, int index, String &&value, ring r) {
   leftv slot=list_assignment_slot(target,index,r);
   slot->rtyp=STRING_CMD;
@@ -1743,6 +2773,21 @@ inline void list_set_owned(List &target, int index, Ideal &&value, ring r) {
   leftv slot=list_assignment_slot(target,index,r);
   slot->rtyp=IDEAL_CMD;
   slot->flag=value.flags();
+  slot->attribute=value.release_attributes();
+  slot->data=value.release();
+}
+inline void list_set_owned(List &target, int index, Matrix &&value, ring r) {
+  leftv slot=list_assignment_slot(target,index,r);
+  slot->rtyp=MATRIX_CMD;
+  slot->flag=value.flags();
+  slot->attribute=value.release_attributes();
+  slot->data=value.release();
+}
+inline void list_set_owned(List &target, int index, Intmat &&value, ring r) {
+  leftv slot=list_assignment_slot(target,index,r);
+  slot->rtyp=INTMAT_CMD;
+  slot->flag=value.flags();
+  slot->attribute=value.release_attributes();
   slot->data=value.release();
 }
 inline void list_set_owned(List &target, int index, Intvec &&value, ring r) {
@@ -1750,7 +2795,52 @@ inline void list_set_owned(List &target, int index, Intvec &&value, ring r) {
   slot->rtyp=INTVEC_CMD;
   slot->data=value.release();
 }
+inline leftv single_variadic_value(leftv argument, sleftv &head) {
+  if (argument==nullptr) return nullptr;
+  leftv current=argument;
+  if (argument->e!=nullptr) {
+    // Resolve only an exact list/list-like selection. Other indexed scalar
+    // values remain ordinary single optional arguments and are materialized
+    // later by list_set_argument().
+    head=*argument;
+    head.e=nullptr;
+    current=&head;
+    for (Subexpr index=argument->e; index!=nullptr; index=index->next) {
+      lists container=list_like_data(current);
+      if (container==nullptr) return nullptr;
+      current=get(container,index->start);
+    }
+  }
+  return current->e==nullptr ? current : nullptr;
+}
+inline List single_variadic_argument(leftv argument, ring r) {
+  sleftv head;
+  leftv selected=single_variadic_value(argument,head);
+  if (selected!=nullptr && selected->Typ()==LIST_CMD) {
+    lists flattened=(lists)selected->Data();
+    if (errorreported || flattened==nullptr)
+      throw std::runtime_error("native variadic list argument is invalid");
+    return List::copy(flattened,r);
+  }
+  if (selected!=nullptr && selected->Typ()==RESOLUTION_CMD) {
+    int row_shift=0;
+    intvec *weights=(intvec*)atGet(selected,"isHomog",INTVEC_CMD);
+    if (weights!=nullptr) row_shift=weights->min_in();
+    syStrategy resolution=(syStrategy)selected->CopyD(RESOLUTION_CMD);
+    if (errorreported || resolution==nullptr)
+      throw std::runtime_error("native variadic resolution argument is invalid");
+    return List(syConvRes(resolution,TRUE,row_shift),r);
+  }
+  List result(r);
+  list_set_argument(result,1,argument,r);
+  return result;
+}
 inline List arguments_list(leftv arguments, ring r) {
+  // Singular's list-# binding has one deliberate exception to ordinary
+  // exprlist collection: one list argument becomes # itself, not a nested
+  // one-element list. Always copy it so writes to # retain value semantics.
+  if (arguments!=nullptr && arguments->next==nullptr)
+    return single_variadic_argument(arguments,r);
   List result(r);
   int index=1;
   for (leftv argument=arguments; argument!=nullptr; argument=argument->next) {
@@ -1777,7 +2867,8 @@ inline List list_insert(lists input, leftv value, long position, ring r) {
   }
   return List(result,r);
 }
-inline Value struct_field(leftv argument, const char *name, ring r) {
+inline Value struct_field(leftv argument, const char *name, ring r,
+                          bool preserve_member_flags=false) {
   argument=value_argument(argument);
   blackbox *box=getBlackboxStuff(argument->Typ());
   if (box==nullptr || box->blackbox_Op2!=newstruct_Op2 || box->data==nullptr)
@@ -1790,9 +2881,79 @@ inline Value struct_field(leftv argument, const char *name, ring r) {
   member.get()->name=omStrDup(name);
   if (newstruct_Op2('.',selected.get(),input.get(),member.get()))
     throw std::runtime_error("native newstruct member lookup failed");
+  leftv slot=list_element_argument(selected.get());
+  if (slot==nullptr || other_ring_value(slot))
+    throw std::runtime_error("native newstruct member belongs to another ring");
+  const BITSET flags=value_flags_without_ring_marker(slot);
   result.get()->Copy(selected.get());
   if (errorreported) throw std::runtime_error("native newstruct member copy failed");
+  // Copy() follows the deferred selection for data and attributes, but copies
+  // the enclosing leftv's flags. A direct expression/return has exactly those
+  // semantics. A typed assignment/call boundary instead copies the member's
+  // semantic flags through jiAssignAttr; request that behavior explicitly.
+  if (preserve_member_flags) result.get()->flag=flags;
   return result;
+}
+inline Value struct_field_exact(leftv argument, const char *owner_name,
+                                const char *name, int expected_type, ring r,
+                                bool preserve_member_flags=false) {
+  newstruct_argument(argument,owner_name);
+  Value result=struct_field(argument,name,r,preserve_member_flags);
+  if (result.get()->Typ()!=expected_type)
+    throw std::runtime_error("native newstruct schema does not match loaded type");
+  return result;
+}
+inline Value struct_field_dynamic(leftv argument, const char *owner_name,
+                                  const char *name, ring r) {
+  newstruct_argument(argument,owner_name);
+  return struct_field(argument,name,r);
+}
+inline void clear_value_selection(leftv value) {
+  while (value!=nullptr && value->e!=nullptr) {
+    Subexpr current=value->e;
+    value->e=current->next;
+    omFreeBin((ADDRESS)current,sSubexpr_bin);
+  }
+}
+inline void restore_struct_target(Value &target, Value &selected) {
+  clear_value_selection(selected.get());
+  target=std::move(selected);
+}
+inline void struct_set_field(Value &target, const char *owner_name,
+                             const char *name, int expected_type,
+                             leftv rhs, ring r) {
+  leftv base=target.get();
+  if (name==nullptr || base==nullptr)
+    throw std::runtime_error("native newstruct member assignment is invalid");
+  newstruct_argument(base,owner_name);
+  blackbox *box=getBlackboxStuff(base->Typ());
+  if (box==nullptr || box->blackbox_Op2!=newstruct_Op2 || box->data==nullptr)
+    throw std::runtime_error("native field assignment requires a newstruct value");
+
+  // iiAssign consumes its right operand, and the RHS may alias the object being
+  // updated.  Make the private RHS copy before '.' moves the whole target into
+  // the indexed selection.
+  rhs=value_argument(rhs);
+  if (rhs->Typ()!=expected_type)
+    throw std::runtime_error("native newstruct member assignment type mismatch");
+  Value right=Value::copy(rhs,r);
+  Value member(r), selected(r);
+  member.get()->name=omStrDup(name);
+  if (newstruct_Op2('.',selected.get(),target.get(),member.get()))
+    throw std::runtime_error("native newstruct member lookup failed");
+
+  bool failed=false;
+  try {
+    leftv slot=list_element_argument(selected.get());
+    if (slot==nullptr || slot->Typ()!=expected_type)
+      throw std::runtime_error("native newstruct schema does not match loaded type");
+    failed=iiAssign(selected.get(),right.get(),FALSE);
+  } catch (...) {
+    restore_struct_target(target,selected);
+    throw;
+  }
+  restore_struct_target(target,selected);
+  if (failed || errorreported) throw ReportedInterpreterError();
 }
 inline List parameter_names(ring r) {
   List description(rDecompose(r),r);
@@ -1889,18 +3050,21 @@ inline void *checked_number_argument(leftv &argument, sleftv &materialized) {
   argument=scalar_index_argument(argument,materialized,string_value);
   argument=list_element_argument(argument);
   if (argument==nullptr || argument->e!=nullptr ||
-      (argument->rtyp!=NUMBER_CMD && argument->rtyp!=INT_CMD && argument->rtyp!=IDHDL) || metadata(argument))
-    throw std::runtime_error("native number argument must be a plain number or int");
+      (argument->rtyp!=NUMBER_CMD && argument->rtyp!=BIGINT_CMD &&
+       argument->rtyp!=INT_CMD && argument->rtyp!=IDHDL) ||
+      unsupported_poly_result_metadata(argument))
+    throw std::runtime_error("native number argument must be a plain number, bigint, or int");
   const int type=argument->Typ();
   void *data=argument->Data();
   if (errorreported) throw std::runtime_error("native number argument is invalid");
-  if (type==NUMBER_CMD || type==INT_CMD) return data;
-  throw std::runtime_error("native number argument requires number or int");
+  if (type==NUMBER_CMD || type==BIGINT_CMD || type==INT_CMD) return data;
+  throw std::runtime_error("native number argument requires number, bigint, or int");
 }
 inline Number number_argument(leftv argument, ring r) {
   sleftv materialized;
   void *data=checked_number_argument(argument,materialized);
   if (argument->Typ()==NUMBER_CMD) return Number::copy((number)data,r);
+  if (argument->Typ()==BIGINT_CMD) return number_from_bigint((number)data,r);
   return number_from_int((long)data,r);
 }
 inline Number exact_number_argument(leftv argument, ring r) {
@@ -1910,7 +3074,7 @@ inline Number exact_number_argument(leftv argument, ring r) {
   char string_value[2];
   argument=scalar_index_argument(argument,materialized,string_value);
   argument=value_argument(argument);
-  if (argument->Typ()!=NUMBER_CMD || metadata(argument))
+  if (argument->Typ()!=NUMBER_CMD || unsupported_poly_result_metadata(argument))
     throw std::runtime_error("native number return requires a plain number");
   number value=(number)argument->Data();
   if (errorreported) throw std::runtime_error("native number return is invalid");
@@ -1926,6 +3090,9 @@ public:
     if (argument->Typ()==NUMBER_CMD) {
       // Entry arguments outlive the native call, so exact numbers are views.
       value=(number)data;
+    } else if (argument->Typ()==BIGINT_CMD) {
+      converted=number_from_bigint((number)data,r);
+      value=converted.get();
     } else {
       // Singular's implicit int-to-number conversion does need owned storage.
       converted=number_from_int((long)data,r);
@@ -1936,6 +3103,106 @@ public:
   NumberArgument &operator=(const NumberArgument &) = delete;
   number get() const { return value; }
 };
+inline Bigint bigint_assignment_number(number value, ring r) {
+  // jiA_BIGINT_N accepts only the coefficient representations for which a
+  // scalar can denote an integer.  The explicit bigint(number) kernel is
+  // deliberately different: over QQ it takes the Euclidean integer part.
+  // Use only the public coefficient representation contract here.  Calling
+  // jiA_BIGINT_N is unsafe in affected interpreters and n_SetMap alone would
+  // change a prime-field residue to its symmetric representative.
+  if (r==nullptr) throw std::runtime_error("cannot assign to bigint");
+  if (r->cf->rep==n_rep_int)
+    return Bigint(n_Init((long)value,coeffs_BIGINT));
+  if (r->cf->rep==n_rep_gmp) {
+    if (n_IsZero(value,r->cf)) return Bigint(n_Init(0,coeffs_BIGINT));
+    return Bigint(n_InitMPZ((mpz_ptr)value,coeffs_BIGINT));
+  }
+  if (r->cf->rep==n_rep_gap_rat) {
+    nMapFunc to_bigint=n_SetMap(r->cf,coeffs_BIGINT);
+    nMapFunc from_bigint=n_SetMap(coeffs_BIGINT,r->cf);
+    if (to_bigint==nullptr || from_bigint==nullptr)
+      throw std::runtime_error("cannot assign to bigint");
+    number converted=to_bigint(value,r->cf,coeffs_BIGINT);
+    if (errorreported) {
+      if (converted!=nullptr) n_Delete(&converted,coeffs_BIGINT);
+      throw ReportedInterpreterError();
+    }
+    number roundtrip=from_bigint(converted,coeffs_BIGINT,r->cf);
+    if (errorreported) {
+      if (roundtrip!=nullptr) n_Delete(&roundtrip,r->cf);
+      if (converted!=nullptr) n_Delete(&converted,coeffs_BIGINT);
+      throw ReportedInterpreterError();
+    }
+    const bool integral=n_Equal(value,roundtrip,r->cf);
+    if (roundtrip!=nullptr) n_Delete(&roundtrip,r->cf);
+    if (!integral) {
+      if (converted!=nullptr) n_Delete(&converted,coeffs_BIGINT);
+      throw std::runtime_error("cannot assign to bigint");
+    }
+    return Bigint(converted);
+  }
+  throw std::runtime_error("cannot assign to bigint");
+}
+class BigintArgument {
+  Bigint converted;
+  number value;
+public:
+  BigintArgument(leftv argument, ring r): converted(nullptr), value(nullptr) {
+    sleftv materialized;
+    char string_value[2];
+    argument=scalar_index_argument(argument,materialized,string_value);
+    argument=value_argument(argument);
+    if (metadata(argument))
+      throw std::runtime_error("native bigint argument requires a plain value");
+    const int type=argument->Typ();
+    void *data=argument->Data();
+    if (errorreported) throw std::runtime_error("native bigint argument is invalid");
+    if (type==BIGINT_CMD) {
+      value=(number)data;
+    } else if (type==INT_CMD) {
+      converted=bigint_from_int((long)data);
+      value=converted.get();
+    } else if (type==NUMBER_CMD) {
+      converted=bigint_assignment_number((number)data,r);
+      value=converted.get();
+    } else {
+      throw std::runtime_error("native bigint argument requires bigint, number, or int");
+    }
+  }
+  BigintArgument(const BigintArgument &) = delete;
+  BigintArgument &operator=(const BigintArgument &) = delete;
+  number get() const { return value; }
+};
+inline Bigint bigint_assignment_argument(leftv argument, ring r) {
+  BigintArgument converted(argument,r);
+  return Bigint::copy(converted.get());
+}
+inline Bigint bigint_argument(leftv argument, ring r) {
+  sleftv materialized;
+  char string_value[2];
+  argument=scalar_index_argument(argument,materialized,string_value);
+  argument=value_argument(argument);
+  if (unsupported_poly_result_metadata(argument))
+    throw std::runtime_error("native bigint conversion requires a plain value");
+  const int type=argument->Typ();
+  void *data=argument->Data();
+  if (errorreported) throw std::runtime_error("native bigint conversion is invalid");
+  if (type==BIGINT_CMD) return Bigint::copy((number)data);
+  if (type==INT_CMD) return bigint_from_int((long)data);
+  if (type==NUMBER_CMD) return bigint_from_number((number)data,r);
+  if (type==POLY_CMD || type==BUCKET_CMD)
+    return bigint_from_poly(borrow_poly(argument),r);
+  throw std::runtime_error("native bigint conversion requires bigint, number, poly, or int");
+}
+inline Bigint exact_bigint_argument(leftv argument) {
+  argument=value_argument(argument);
+  if (argument->Typ()!=BIGINT_CMD || metadata(argument))
+    throw std::runtime_error("native bigint return requires a plain bigint");
+  number value=(number)argument->Data();
+  if (errorreported)
+    throw std::runtime_error("native bigint return is invalid");
+  return Bigint::copy(value);
+}
 inline Number indexed_number(leftv argument, int index, ring r) {
   // Contextual number lowering can copy/convert the selected scalar exactly
   // once instead of first materializing a generic owning Value.
@@ -2062,6 +3329,164 @@ inline long get(const intvec *v, int index) {
   if (v==nullptr || index<=0 || index>v->length())
     throw std::runtime_error("native intvec index out of range");
   return (*v)[index-1];
+}
+
+inline bool selected_intvec_values(const intvec *source, const intvec *selector,
+                                   std::vector<long> &values) {
+  if (source==nullptr || selector==nullptr)
+    throw std::runtime_error("native general.lib specialization requires intvec values");
+  if (source->length()==0)
+    throw std::runtime_error("native general.lib sum/product cannot convert an empty intvec");
+  values.reserve(selector->length());
+  for (int i=0;i<selector->length();++i) {
+    const int index=(*selector)[i];
+    if (index<=0 || index>source->length()) return false;
+    values.push_back((*source)[index-1]);
+  }
+  return true;
+}
+inline bool selected_intvec_values(const intvec *source, long selector,
+                                   std::vector<long> &values) {
+  if (source==nullptr)
+    throw std::runtime_error("native general.lib specialization requires intvec values");
+  if (source->length()==0)
+    throw std::runtime_error("native general.lib sum/product cannot convert an empty intvec");
+  const int index=(int)selector; // int -> intvec assignment narrows here.
+  if (index<=0 || index>source->length()) return false;
+  values.push_back((*source)[index-1]);
+  return true;
+}
+inline std::vector<long> all_intvec_values(const intvec *source) {
+  if (source==nullptr)
+    throw std::runtime_error("native general.lib specialization requires intvec values");
+  std::vector<long> values;
+  values.reserve(source->length());
+  for (int i=0;i<source->length();++i) values.push_back((*source)[i]);
+  return values;
+}
+inline long grouped_int_sum(const std::vector<long> &values, size_t begin,
+                            size_t count, bool top, Context &ctx) {
+  if (count==0) return 0;
+  if (count>10) {
+    const size_t left=count/2;
+    const long first=grouped_int_sum(values,begin,left,false,ctx);
+    const long second=grouped_int_sum(values,begin+left,count-left,false,ctx);
+    return add(first,second);
+  }
+  long result=top ? 0L : values[begin];
+  size_t at=begin+(top ? 0 : 1);
+  for (const size_t end=begin+count; at<end; ++at) {
+    ctx.tick();
+    result=add(result,values[at]);
+  }
+  return result;
+}
+inline long sum_intvec(const intvec *source, Context &ctx) {
+  std::vector<long> values=all_intvec_values(source);
+  if (values.empty())
+    throw std::runtime_error("native general.lib sum cannot convert an empty intvec");
+  return grouped_int_sum(values,0,values.size(),true,ctx);
+}
+inline long sum_intvec(const intvec *source, const intvec *selector,
+                       Context &ctx) {
+  std::vector<long> values;
+  if (!selected_intvec_values(source,selector,values)) return 0;
+  return grouped_int_sum(values,0,values.size(),true,ctx);
+}
+inline long sum_intvec(const intvec *source, long selector, Context &ctx) {
+  std::vector<long> values;
+  if (!selected_intvec_values(source,selector,values)) return 0;
+  return grouped_int_sum(values,0,values.size(),true,ctx);
+}
+inline long intvec_product_values(const std::vector<long> &values, Context &ctx) {
+  if (values.empty())
+    throw std::runtime_error("native product of an empty intvec is undefined");
+  long result=values[0];
+  for (size_t i=1;i<values.size();++i) {
+    ctx.tick();
+    result=mul(result,values[i]);
+  }
+  return result;
+}
+inline long product_intvec(const intvec *source, Context &ctx) {
+  return intvec_product_values(all_intvec_values(source),ctx);
+}
+inline long product_intvec(const intvec *source, const intvec *selector,
+                           Context &ctx) {
+  std::vector<long> values;
+  if (!selected_intvec_values(source,selector,values)) return 1;
+  if (values.empty()) return 0;
+  return intvec_product_values(values,ctx);
+}
+inline long product_intvec(const intvec *source, long selector, Context &ctx) {
+  std::vector<long> values;
+  if (!selected_intvec_values(source,selector,values)) return 1;
+  if (values.empty()) return 0;
+  return intvec_product_values(values,ctx);
+}
+inline void stable_sort_ints(std::vector<long> &values, std::vector<int> &permutation,
+                             Context &ctx) {
+  const size_t count=values.size();
+  permutation.resize(count);
+  for (size_t i=0;i<count;++i) permutation[i]=(int)i+1;
+  for (size_t pass=1;pass<count;++pass) {
+    bool sorted=true;
+    for (size_t i=0;i<count-pass;++i) {
+      ctx.tick();
+      // INT_CMD comparisons in jjGT_I narrow both stored longs to C int.
+      // Preserve that historical behavior for list<int>, including values
+      // outside the int range; intvec elements are already ints.
+      if ((int)values[i]>(int)values[i+1]) {
+        std::swap(values[i],values[i+1]);
+        std::swap(permutation[i],permutation[i+1]);
+        sorted=false;
+      }
+    }
+    if (sorted) break;
+  }
+}
+inline Intvec permutation_vector(const std::vector<int> &permutation) {
+  // An unassigned `intvec pivot;` is the one-entry zero vector.  That case is
+  // observable for sort(list()) and is retained here.
+  Intvec result(permutation.empty() ? 1 : (int)permutation.size());
+  for (size_t i=0;i<permutation.size();++i) (*result.get())[(int)i]=permutation[i];
+  return result;
+}
+inline List sort_intvec(const intvec *source, Context &ctx) {
+  ring r=ctx.r;
+  std::vector<long> values=all_intvec_values(source);
+  std::vector<int> permutation;
+  stable_sort_ints(values,permutation,ctx);
+  Intvec sorted=Intvec::copy(source);
+  for (size_t i=0;i<values.size();++i) (*sorted.get())[(int)i]=(int)values[i];
+  Intvec order=permutation_vector(permutation);
+  List result(r);
+  list_set_owned(result,1,std::move(sorted),r);
+  list_set_owned(result,2,std::move(order),r);
+  return result;
+}
+inline void list_set_int(List &target, int index, long value, ring r) {
+  View element(INT_CMD,(void*)value);
+  list_set(target,index,element.get(),r);
+}
+inline List sort_int_list(lists source, Context &ctx) {
+  ring r=ctx.r;
+  if (source==nullptr)
+    throw std::runtime_error("native general.lib specialization requires a list");
+  std::vector<long> values;
+  const int count=source->nr+1;
+  values.reserve(count);
+  for (int i=1;i<=count;++i) values.push_back(int_argument(get(source,i)));
+  std::vector<int> permutation;
+  stable_sort_ints(values,permutation,ctx);
+  List sorted(r);
+  for (size_t i=0;i<values.size();++i)
+    list_set_int(sorted,(int)i+1,values[i],r);
+  Intvec order=permutation_vector(permutation);
+  List result(r);
+  list_set_owned(result,1,std::move(sorted),r);
+  list_set_owned(result,2,std::move(order),r);
+  return result;
 }
 
 // Match jjDEG and jjDEG_IV, including zero-polynomial and ring-order rules.

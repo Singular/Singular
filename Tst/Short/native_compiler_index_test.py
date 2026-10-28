@@ -3,6 +3,7 @@
 
 import importlib.util
 from pathlib import Path
+import tempfile
 import unittest
 
 
@@ -14,6 +15,31 @@ spec.loader.exec_module(compiler)
 
 
 class LibraryIndexTest(unittest.TestCase):
+    def test_matrix_declarations_retain_runtime_dimensions_and_two_indexes(self):
+        parsed = compiler.Parser(compiler.tokens('''matrix values[rows][columns];
+intmat indexes[2][3];
+values[1,2]=7;
+return(values[1,2]);
+''')).parse()
+        matrix_declaration, intmat_declaration, assignment, returned = parsed[1]
+        self.assertEqual(matrix_declaration[1], "matrix")
+        self.assertEqual(matrix_declaration[2][0][2],
+                         [["var", "rows"], ["var", "columns"]])
+        self.assertEqual(intmat_declaration[2][0][2],
+                         [["int", 2], ["int", 3]])
+        self.assertEqual(assignment[1][0], "index2")
+        self.assertEqual(returned[1][0], "index2")
+
+    def test_integer_literal_classification_matches_singular_length_threshold(self):
+        parsed = compiler.Parser(compiler.tokens('''int shortValue=00000001;
+bigint longValue=000000001;
+return(2147483648);
+''')).parse()
+        short_declaration, long_declaration, returned = parsed[1]
+        self.assertEqual(short_declaration[2][0][1], ["int", 1])
+        self.assertEqual(long_declaration[2][0][1], ["bigint", "000000001"])
+        self.assertEqual(returned[1], ["bigint", "2147483648"])
+
     def test_legacy_preamble_keywords_quotes_and_braces_are_not_declarations(self):
         source = '''Legacy prose mentions proc fake() { return(0); } and LIB "fake.lib".
 More prose contains "proc quoted() { LIB \\"quoted.lib\\"; }" and {literal braces}.
@@ -179,6 +205,25 @@ proc empty()
                          [["list", 6], ["#", 6]])
         self.assertEqual(procedures["empty"]["params"], [])
 
+    def test_fixed_prefix_may_end_in_variadic_arguments(self):
+        source = '''proc optional(int count, string label, list #)
+{
+  return(size(#)+count+size(label));
+}
+proc misplaced(int count, list #, string label)
+{
+  return(count);
+}
+'''
+        procedures = compiler.library_index(source)["procedures"]
+        self.assertEqual(
+            compiler.signature(procedures["optional"]),
+            [["int", "count"], ["string", "label"],
+             ["varargs", "__snative_varargs"]])
+        with self.assertRaisesRegex(compiler.CompileError,
+                                    "unsupported parameter list"):
+            compiler.signature(procedures["misplaced"])
+
     def test_newline_before_parentheses_remains_implicit_variadic(self):
         source = '''proc newline
 (int value)
@@ -232,8 +277,15 @@ LIB "second.lib";
         source = '''info="new style";
 static proc mod_init()
 {
+  newstruct("x","int invalid");
+  newstruct("int","int invalid");
+  newstruct("ReservedField","int r_value");
+  newstruct("Duplicate","int first");
+  newstruct("Duplicate","int second");
   newstruct("Point","int x, string label");
   if (1) { newstruct("Conditional","int x"); }
+  if (0) newstruct("UnbracedConditional","int x");
+  for (int i=0; i<1; i++) newstruct("LoopConditional","int x");
   newstruct(dynamicName,"int x");
   newstruct("BeforeReturn","int x");
   return();
@@ -243,11 +295,71 @@ proc coordinate(Point point) { return(point.x); }
 '''
         index = compiler.library_index(source)
         self.assertEqual(index["newstructs"], ["Point", "BeforeReturn"])
+        self.assertEqual(index["newstruct_schemas"], {
+            "Point": [["int", "x"], ["string", "label"]],
+            "BeforeReturn": [["int", "x"]]})
         params, nominal = compiler.signature(
             index["procedures"]["coordinate"], index["newstructs"],
             include_nominal=True)
-        self.assertEqual(params, [["value", "point"]])
+        self.assertEqual(params, [["newstruct:Point", "point"]])
         self.assertEqual(nominal, {"point": "Point"})
+
+    def test_transitive_schema_requires_supported_member_owners(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            library = root/"types.lib"
+            library.write_text('''info="schema closure";
+static proc mod_init()
+{
+  newstruct("Plain","int x, string label");
+  newstruct("Opaque","map value");
+  newstruct("Parent","Opaque value");
+}
+proc entry(Plain value) { return(value.x); }
+''')
+            cache = root/"cache"
+            cache.mkdir()
+            closure = compiler.Closure(cache, [root])
+            schemas = closure.available_newstruct_schemas(str(library))
+            self.assertEqual(schemas, {
+                "Plain": [["int", "x"], ["string", "label"]]})
+            self.assertFalse(compiler.nominal_needs_ring(
+                compiler.nominal_kind("Plain"), schemas))
+            self.assertTrue(compiler.nominal_needs_ring("map", schemas))
+
+    def test_guarded_terminator_invalidates_later_schema_declarations(self):
+        for guarded in ('if (condition) return();',
+                        'if (condition) { ERROR("stop"); }'):
+            with self.subTest(guarded=guarded):
+                source = f'''info="conditional terminator";
+static proc mod_init()
+{{
+  newstruct("Before","int x");
+  {guarded}
+  newstruct("MaybeInstalled","int x");
+}}
+'''
+                index = compiler.library_index(source)
+                self.assertEqual(index["newstructs"], ["Before"])
+                self.assertEqual(set(index["newstruct_schemas"]), {"Before"})
+
+    def test_guarded_duplicate_poisons_global_schema_in_both_orders(self):
+        bodies = (
+            'if (condition) newstruct("Point","string x");\n'
+            '  newstruct("Point","int x");',
+            'newstruct("Point","int x");\n'
+            '  if (condition) newstruct("Point","string x");')
+        for body in bodies:
+            with self.subTest(body=body):
+                source = f'''info="conditional duplicate";
+static proc mod_init()
+{{
+  {body}
+}}
+'''
+                index = compiler.library_index(source)
+                self.assertEqual(index["newstructs"], [])
+                self.assertEqual(index["newstruct_schemas"], {})
 
     def test_unsupported_import_forms_remain_errors(self):
         cases = {
@@ -267,6 +379,42 @@ static proc overloaded(int value) { return(value); }
         with self.assertRaisesRegex(compiler.CompileError,
                                     "duplicate procedure overloaded"):
             compiler.library_index(source)
+
+    def test_general_specializations_require_complete_source_fingerprints(self):
+        general = compiler.library_index(
+            (ROOT/"Singular/LIB/general.lib").read_text())
+        for name in ("sum", "product", "sort"):
+            with self.subTest(name=name):
+                procedure = general["procedures"][name]
+                self.assertEqual(compiler.canonical_generic(procedure), name)
+
+                # Physical line changes are immaterial; the complete token
+                # stream, signature, and visibility are the identity.
+                relined = dict(procedure)
+                relined["body"] = [[token, line+1000]
+                                   for token, line in procedure["body"]]
+                self.assertEqual(compiler.canonical_generic(relined), name)
+
+                changed = dict(procedure)
+                changed["body"] = [list(token) for token in procedure["body"]]
+                changed["body"][-1][0] = ";" if changed["body"][-1][0] != ";" else "0"
+                self.assertIsNone(compiler.canonical_generic(changed))
+
+                private = dict(procedure, private=True)
+                self.assertIsNone(compiler.canonical_generic(private))
+
+        self.assertTrue(compiler.canonical_generic_dependencies(
+            "sum", general["procedures"]))
+        changed_procedures = dict(general["procedures"])
+        changed_lsum = dict(changed_procedures["lsum"])
+        changed_lsum["body"] = [list(token) for token in changed_lsum["body"]]
+        changed_lsum["body"][-1][0] = (";" if changed_lsum["body"][-1][0] != ";"
+                                         else "0")
+        changed_procedures["lsum"] = changed_lsum
+        self.assertFalse(compiler.canonical_generic_dependencies(
+            "sum", changed_procedures))
+        self.assertTrue(compiler.canonical_generic_dependencies(
+            "product", changed_procedures))
 
     def test_library_corpus_sentinels(self):
         library_dir = ROOT/"Singular/LIB"
