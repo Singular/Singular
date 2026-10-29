@@ -1,0 +1,63 @@
+name: Linux i386 target
+
+on:
+  push:
+    branches:
+      - spielwiese
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-i386:
+    name: Linux i386 tests
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-linux-i386
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Build and test in a 32-bit userspace
+        run: |
+          docker run --rm --pull=always --platform linux/386 \
+            --volume "$GITHUB_WORKSPACE:/source" \
+            --workdir /source \
+            debian:bookworm-slim \
+            bash -euxo pipefail -c '
+              test "$(dpkg --print-architecture)" = i386
+              test "$(getconf LONG_BIT)" = 32
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                autoconf automake autoconf-archive bison build-essential \
+                ca-certificates cmake file flex git libtool m4 make perl \
+                pkg-config python3 sharutils texinfo \
+                libcdd-dev libflint-dev libgmp-dev libmpfr-dev \
+                libntl-dev libopenblas-dev libreadline-dev
+              ./autogen.sh
+              mkdir _build-i386
+              cd _build-i386
+              ../configure --enable-gfanlib --with-ntl --with-flint
+              grep -qx "#define SIZEOF_LONG 4" _config.h
+              make -j2
+              file Singular/.libs/Singular | grep -q "ELF 32-bit.*Intel 80386"
+              make check
+            '
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-i386-test-logs
+          path: |
+            _build-i386/**/test-suite.log
+            _build-i386/**/*.log
+          if-no-files-found: ignore
