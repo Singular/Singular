@@ -28,6 +28,64 @@
 
 #define MAX_MAP_DEG 128
 
+#ifdef HAVE_OMALLOC
+struct maLongPreimageBin
+{
+  omBin bin;
+  maLongPreimageBin *next;
+};
+
+static maLongPreimageBin *maLongPreimageBins=NULL;
+
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((cold,noinline))
+#endif
+static char *maDupLongPreimage(const char *s, const size_t length)
+{
+  omBin bin=omGetSpecBin(length);
+  maLongPreimageBin *entry=maLongPreimageBins;
+  while ((entry!=NULL) && (entry->bin!=bin)) entry=entry->next;
+  if (entry==NULL)
+  {
+    entry=(maLongPreimageBin *)omAlloc(sizeof(maLongPreimageBin));
+    entry->bin=bin;
+    entry->next=maLongPreimageBins;
+    maLongPreimageBins=entry;
+  }
+  else
+  {
+    omUnGetSpecBin(&bin);
+    bin=entry->bin;
+  }
+  char *copy=(char *)omAllocBin(bin);
+  memcpy(copy,s,length);
+  return copy;
+}
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((noinline))
+#endif
+static void maCopyPreimageBytes(char *destination, const char *source,
+                                const size_t length)
+{
+  memcpy(destination,source,length);
+}
+
+static inline char *maDupPreimage(const char *s)
+{
+  size_t length=0;
+  while (s[length]!='\0') length++;
+  length++;
+#ifdef HAVE_OMALLOC
+  if (UNLIKELY(length>OM_MAX_BLOCK_SIZE))
+    return maDupLongPreimage(s,length);
+#endif
+  char *copy=(char *)omAlloc(length);
+  maCopyPreimageBytes(copy,s,length);
+  return copy;
+}
+
 /*2
 * copy a map
 */
@@ -37,7 +95,7 @@ map maCopy(map theMap, const ring r)
   map m=(map)idInit(IDELEMS(theMap),0);
   for (i=IDELEMS(theMap)-1; i>=0; i--)
       m->m[i] = p_Copy(theMap->m[i],r);
-  m->preimage=omStrDup(theMap->preimage);
+  m->preimage=maDupPreimage(theMap->preimage);
   return m;
 }
 

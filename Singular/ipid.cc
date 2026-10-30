@@ -59,6 +59,61 @@ VAR idhdl currRingHdl = NULL;
 
 void paCleanUp(package pack);
 
+#ifdef HAVE_OMALLOC
+struct iiLongIdentifierBin
+{
+  omBin bin;
+  iiLongIdentifierBin *next;
+};
+
+static iiLongIdentifierBin *iiLongIdentifierBins=NULL;
+#endif
+
+char *iiDupLongIdentifier(const char *s, size_t length)
+{
+#ifndef HAVE_OMALLOC
+  return omStrDup(s);
+#else
+  omBin bin=omGetSpecBin(length);
+  iiLongIdentifierBin *entry=iiLongIdentifierBins;
+  while ((entry!=NULL) && (entry->bin!=bin)) entry=entry->next;
+  if (entry==NULL)
+  {
+    entry=(iiLongIdentifierBin *)omAlloc(sizeof(iiLongIdentifierBin));
+    entry->bin=bin;
+    entry->next=iiLongIdentifierBins;
+    iiLongIdentifierBins=entry;
+  }
+  else
+  {
+    omUnGetSpecBin(&bin);
+    bin=entry->bin;
+  }
+  char *copy=(char *)omAllocBin(bin);
+  memcpy(copy,s,length);
+  return copy;
+#endif
+}
+
+void iiCopyIdentifier(char *destination, const char *source,
+                      const size_t length)
+{
+  memcpy(destination,source,length);
+}
+
+char *iiNormalizeIdentifier(char *s)
+{
+#ifndef HAVE_OMALLOC
+  return s;
+#else
+  if (LIKELY(omIsBinPageAddr(s))) return s;
+  const size_t length=strlen(s)+1;
+  char *copy=iiDupLongIdentifier(s,length);
+  omFree((ADDRESS)s);
+  return copy;
+#endif
+}
+
 /*0 implementation*/
 
 static inline long iiS2I(const char *s)
@@ -178,7 +233,7 @@ void *idrecDataInit(int t)
     case MAP_CMD:
     {
       map m = (map)idInit(1,1);
-      m->preimage = omStrDup(IDID(currRingHdl));
+      m->preimage = iiDupIdentifier(IDID(currRingHdl));
       return (void *)m;
     }
     case STRING_CMD:
@@ -279,12 +334,18 @@ char * idrec::String(BOOLEAN typed)
   return tmp.String(NULL, typed);
 }
 
-idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN search)
+static idhdl enterid_impl(const char *s, int lev, int t, idhdl* root,
+                          BOOLEAN init, BOOLEAN search,
+                          const BOOLEAN take_ownership)
 {
   if (s==NULL) return NULL;
-  if (root==NULL) return NULL;
+  if (root==NULL)
+  {
+    if (take_ownership) omFreeBinAddr((ADDRESS)s);
+    return NULL;
+  }
   idhdl h;
-  s=omStrDup(s);
+  if (!take_ownership) s=iiDupIdentifier(s);
   // idhdl *save_root=root;
   if (t==PACKAGE_CMD)
   {
@@ -387,6 +448,18 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
     omFreeBinAddr((ADDRESS)s);
     return NULL;
 }
+idhdl enterid(const char *s, int lev, int t, idhdl* root,
+              BOOLEAN init, BOOLEAN search)
+{
+  return enterid_impl(s,lev,t,root,init,search,FALSE);
+}
+
+idhdl enteridOwned(char *s, int lev, int t, idhdl* root,
+                   BOOLEAN init, BOOLEAN search)
+{
+  return enterid_impl(s,lev,t,root,init,search,TRUE);
+}
+
 void killid(const char * id, idhdl * ih)
 {
   if (id!=NULL)
@@ -766,6 +839,7 @@ BOOLEAN piKill(procinfov pi)
       }
       if (pi->data.s.body != NULL) // OB: ????
         omFree((ADDRESS)pi->data.s.body);
+      // iiInitSingularProcinfo keeps these names in omalloc bins.
       if (pi->libname != NULL) // OB: ????
         omFreeBinAddr((ADDRESS)pi->libname);
       if (pi->procname != NULL) // OB: ????
@@ -774,6 +848,9 @@ BOOLEAN piKill(procinfov pi)
     }
     if( pi->language == LANG_C)
     {
+      procinfov source=pi->data.o.singular_source;
+      pi->data.o.singular_source=NULL;
+      if ((source!=NULL)&&(source!=pi)) piKill(source);
     }
     memset((void *) pi, 0, sizeof(procinfo));
     //pi->language=LANG_NONE;
@@ -931,4 +1008,3 @@ BOOLEAN iiAlias(leftv p)
   omFreeBin((ADDRESS)h, sleftv_bin);
   return FALSE;
 }
-

@@ -74,6 +74,14 @@ jobs:
       - run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Short/ok_s.lst
         if: ${{ always() }}
 
+      - name: Check interpreter input paths and exact diagnostics
+        if: ${{ always() }}
+        run: python3 Tst/Short/interpreter_correctness.py --singular "$prefix/bin/Singular"
+
+      - name: Check native C++ library compiler and persistent cache
+        if: ${{ always() && runner.os == 'Linux' && matrix.configflags == '--with-ntl --with-flint' }}
+        run: python3 Tst/Short/native_compiler_correctness.py --prefix "$prefix"
+
       - name: Run Tst/New/new.tst (if present)
         if: ${{ always() && runner.os == 'Linux' && matrix.configflags == '--with-ntl --with-flint' && hashFiles('Tst/New/new.tst') != '' }}
         run: cd Tst && ./regress.cmd -s $prefix/bin/Singular New/new.tst

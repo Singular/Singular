@@ -169,6 +169,18 @@ jobs:
             echo "::endgroup::"
           done
 
+          if [[ "$SUITE" = "all" || "$SUITE" = "Short.lst" || "$SUITE" = "Short/ok_s.lst" ]]; then
+            if ! python3 Short/interpreter_correctness.py --singular "$prefix/bin/Singular"; then
+              failed=1
+              failed_suites+=(Short/interpreter_correctness.py)
+            fi
+
+            if ! python3 Short/native_compiler_correctness.py --prefix "$prefix"; then
+              failed=1
+              failed_suites+=(Short/native_compiler_correctness.py)
+            fi
+          fi
+
           if [ "$failed" -ne 0 ]; then
             printf 'Failed suites:\n' >&2
             printf '  %s\n' "${failed_suites[@]}" >&2

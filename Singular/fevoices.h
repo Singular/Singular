@@ -29,7 +29,8 @@ enum   feBufferInputs
 {
   BI_stdin = 1,
   BI_buffer,
-  BI_file
+  BI_file,
+  BI_replay
 };
 enum noeof_t
 {
@@ -82,6 +83,7 @@ class Voice
             *       ==1: if (0) processed, execute else
             *       ==2: if (1) processed, else allowed but not executed
             */
+    unsigned char lambda_arrow_state; // scanner cache: unknown/no/maybe
     feBufferTypes   typ;  // buffer type: see BT_..
 
   Voice() { memset(this,0,sizeof(*this));}
@@ -92,6 +94,11 @@ class Voice
 EXTERN_VAR Voice  *currentVoice;
 
 Voice * feInitStdin(Voice *pp);
+#if defined(__GNUC__) || defined(__clang__)
+void feReportPrematureEof() __attribute__((visibility("hidden")));
+#else
+void feReportPrematureEof();
+#endif
 
 const  char * VoiceName();
 int VoiceLine();
@@ -107,4 +114,3 @@ void    myyoldbuffer(void * oldb);
 
 #endif
 #endif
-

@@ -443,22 +443,36 @@ void singular_example(char *str)
   idhdl h=IDROOT->get_level(s,0);
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
-    char *lib=iiGetLibName(IDPROC(h));
+    procinfov pi=IDPROC(h);
+    BOOLEAN release_pi=FALSE;
+    if ((pi->language==LANG_C)
+    && (pi->data.o.singular_source!=NULL)
+    && (pi->data.o.singular_source->language==LANG_SINGULAR))
+    {
+      pi=piCopy(pi->data.o.singular_source);
+      release_pi=TRUE;
+    }
+    char *lib=iiGetLibName(pi);
     if((lib!=NULL)&&(*lib!='\0'))
     {
       Print("// proc %s from lib %s\n",s,lib);
-      s=iiGetLibProcBuffer(IDPROC(h), 2);
-      if (s!=NULL)
+      if (pi->language==LANG_SINGULAR)
       {
-        if (strlen(s)>5)
+        char *example=iiGetLibProcBuffer(pi, 2);
+        if (example!=NULL)
         {
-          iiEStart(s,IDPROC(h));
-          omFree((ADDRESS)s);
-          return;
+          if (strlen(example)>5)
+          {
+            iiEStart(example,pi);
+            omFree((ADDRESS)example);
+            if (release_pi) piKill(pi);
+            return;
+          }
+          else omFree((ADDRESS)example);
         }
-        else omFree((ADDRESS)s);
       }
     }
+    if (release_pi) piKill(pi);
   }
   else
   {

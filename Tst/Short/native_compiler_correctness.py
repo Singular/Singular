@@ -1,0 +1,2347 @@
+#!/usr/bin/env python3
+"""Build real C++ library closures; test native parity and persistent reuse.
+
+Linux: python3 Tst/Short/native_compiler_correctness.py --prefix /path/to/install
+Normal interpreter calls remain independent of the native module compiler.
+"""
+import argparse
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[2]
+TRANSLATOR = ROOT/"Singular/compiler/singular2cpp.py"
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--prefix", type=Path, required=True)
+    args = parser.parse_args()
+    binary = args.prefix/"bin/Singular"
+    checks = 0
+
+    def check(condition, message):
+        nonlocal checks
+        checks += 1
+        if not condition:
+            raise AssertionError(message)
+
+    python_unit = subprocess.run(
+        [sys.executable, "-m", "unittest",
+         "Tst.Short.native_compiler_benchmark_test",
+         "Tst.Short.native_compiler_procedure_benchmark_test",
+         "Tst.Short.native_compiler_index_test",
+         "Tst.Short.native_compiler_compatibility_test",
+         "Tst.Short.native_compiler_cache_test"],
+        cwd=ROOT, capture_output=True, text=True, timeout=90)
+    check(python_unit.returncode==0, python_unit.stdout+python_unit.stderr)
+
+    with tempfile.TemporaryDirectory(prefix="singular-native-tests-") as temp:
+        directory = Path(temp)
+        cache = directory/"cache"
+
+        def command(library, entries, extra=()):
+            return [sys.executable, str(TRANSLATOR), str(library),
+                    "--singular-prefix", str(args.prefix), "--cache-dir", str(cache), "--export-prefix", "native_"] + \
+                   [arg for entry in entries for arg in ("--entry", entry)] + list(extra)
+
+        def compile_lib(library, entries, extra=()):
+            result = subprocess.run(command(library, entries, extra), capture_output=True, text=True, timeout=120)
+            check(result.returncode==0, result.stderr)
+            return json.loads(result.stdout)
+
+        def singular(source, expected=None, extra_env=None, timeout=90):
+            result = subprocess.run([str(binary), "-q", "--no-rc", "-r12345678"], input=source+"\nquit;\n",
+                                    env=dict(os.environ, **(extra_env or {})),
+                                    cwd=directory,
+                                    capture_output=True, text=True, timeout=timeout)
+            check(result.returncode==0 and not result.stderr, repr(result))
+            if expected is not None:
+                check(result.stdout==expected, result.stdout)
+            return result.stdout
+
+        # A field selection is represented as a Subexpr on a list-like
+        # newstruct value at the C-procedure boundary. Materialize that field
+        # without mutating the interpreter-owned object or invoking a generic
+        # arithmetic dispatcher.
+        field_fixture = directory/"field_boundary.lib"
+        field_fixture.write_text('''proc fieldAt(intvec values,int position){return(values[position]);}
+proc scalarAt(int value){return(value);}
+proc matrixAt(intmat values){return(native_scalarAt(values[2,1]));}
+proc nestedMatrixAt(list carrier){return(native_scalarAt(carrier[1][2,2]));}
+proc polyFresh(poly value){return(jet(value,1));}
+''')
+        field_module = compile_lib(field_fixture, ["fieldAt", "scalarAt", "polyFresh"], ["--strict"])
+        singular(f'''LIB "{field_module["module"]}";
+newstruct("NativeCompilerFieldBox","intvec values");
+NativeCompilerFieldBox fieldBox;
+fieldBox.values=intvec(4,9);
+print(native_fieldAt(fieldBox.values,2));
+print(native_scalarAt(fieldBox.values[1]));
+print(fieldBox.values==intvec(4,9));
+intmat integerMatrix[2][2]=1,2,3,4;
+print(Field_boundary::matrixAt(integerMatrix));
+list matrixCarrier=list(integerMatrix);
+print(Field_boundary::nestedMatrixAt(matrixCarrier));
+print(integerMatrix[1,1]==1 and integerMatrix[1,2]==2 and
+      integerMatrix[2,1]==3 and integerMatrix[2,2]==4);
+ring fieldRing=0,(x,y),dp;
+newstruct("NativeCompilerPolyBox","matrix values");
+NativeCompilerPolyBox polyBox;
+matrix polyMatrix[1][1]=x2+y;
+polyBox.values=polyMatrix;
+poly selected=polyBox.values[1,1];
+print(native_polyFresh(selected)==Field_boundary::polyFresh(selected));
+print(selected==x2+y);
+''', "9\n4\n1\n3\n4\n1\n1\n1\n")
+
+        # Bigints remain a coefficient domain of their own. Exercise exact
+        # arguments/results, explicit conversion, Euclidean div/mod, large
+        # literals, owned list slots, copy-on-write, and schema fields without
+        # routing arithmetic back through the interpreter.
+        bigint_fixture = directory/"bigint_exact.lib"
+        bigint_fixture.write_text('''info="native bigint fixture";
+static proc mod_init(){newstruct("NativeCompilerBigBox","bigint value");}
+proc floorLike(number a){bigint m=bigint(numerator(a));bigint n=bigint(denominator(a));return(number(m div n));}
+proc arithmetic(bigint a,bigint b,int exponent){return(list(a+b,a-b,a*b,a div b,a mod b,a^exponent,-a,a<b,a==b));}
+proc divisionForms(bigint a,bigint b){return(list(a/b,a div b,a%b,a mod b));}
+proc identity(bigint value){return(value);}
+proc incremented(bigint value){value=value+1;return(value);}
+proc implicitBigint(number value){bigint result=value;return(result);}
+proc explicitBigint(number value){return(bigint(value));}
+proc dynamicBigint(list values){bigint value=values[1];return(value);}
+proc boxed(bigint value){return(list(value,value+1));}
+proc literal(){return(123456789012345678901234567890);}
+proc leadingZeroInt(){return(00000001);}
+proc leadingZeroBigintZero(){return(000000000);}
+proc leadingZeroBigintOne(){return(000000001);}
+proc zero(){bigint value;return(value);}
+proc asInt(bigint value){return(int(value));}
+proc asNumber(bigint value){return(number(value));}
+proc asPoly(bigint value){return(poly(value));}
+proc fromPoly(poly value){return(bigint(value));}
+proc makeBox(bigint value){NativeCompilerBigBox box;box.value=value;return(box);}
+proc readBox(NativeCompilerBigBox box){return(box.value);}
+''')
+        bigint_entries = ["floorLike", "arithmetic", "divisionForms", "identity",
+                          "incremented", "implicitBigint", "explicitBigint",
+                          "dynamicBigint", "boxed", "literal", "zero", "asInt",
+                          "leadingZeroInt", "leadingZeroBigintZero",
+                          "leadingZeroBigintOne", "asNumber", "asPoly",
+                          "fromPoly", "makeBox", "readBox"]
+        bigint_module = compile_lib(
+            bigint_fixture, bigint_entries,
+            ["--strict", "--export-prefix", "bi_"])
+        bigint_manifest = json.loads(Path(bigint_module["manifest"]).read_text())
+        bigint_code = "\n".join(
+            Path(node["source"]).read_text()
+            for node in bigint_manifest["procedures"])
+        bigint_entry_code = Path(bigint_manifest["entry_source"]).read_text()
+        for expected in ("snative::Bigint", "snative::BigintArgument",
+                         "snative::CowBigint", "snative::bigint_div",
+                         "snative::bigint_mod", "snative::bigint_power",
+                         "snative::bigint_from_string",
+                         "snative::number_from_bigint",
+                         "snative::struct_set_field"):
+            check(expected in bigint_code+bigint_entry_code,
+                  bigint_code+bigint_entry_code)
+        # Pure bigint code and its C-procedure boundary remain usable before a
+        # basering exists.  Only conversions involving number/poly need one.
+        singular(f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+bigint noRing=123456789012345678901234567890;
+print(bi_identity(noRing)==identity(noRing));
+print(bi_incremented(noRing)==incremented(noRing));
+print(bi_literal()==literal());
+print(bi_leadingZeroInt()==1);
+print(bi_leadingZeroBigintZero()==0);
+print(bi_leadingZeroBigintOne()==1);
+print(bi_asInt(2147483647)==2147483647);
+print(bi_asInt(2147483648)==0);
+''', "1\n"*8)
+        bigint_source = f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+ring bigintRing=0,(x),dp;
+bigint large=123456789012345678901234567890;
+bigint negative=-123456789012345678901234567890;
+print(string(bi_arithmetic(large,-97,5))==string(arithmetic(large,-97,5)));
+print(string(bi_arithmetic(negative,97,3))==string(arithmetic(negative,97,3)));
+print(string(bi_divisionForms(17,5))==string(divisionForms(17,5)));
+print(string(bi_divisionForms(-17,5))==string(divisionForms(-17,5)));
+print(string(bi_divisionForms(17,-5))==string(divisionForms(17,-5)));
+print(string(bi_divisionForms(-17,-5))==string(divisionForms(-17,-5)));
+print(bi_floorLike(17/5)==floorLike(17/5));
+print(bi_floorLike(-17/5)==floorLike(-17/5));
+print(bi_identity(large)==identity(large));
+print(bi_identity(7)==identity(7));
+number integral=7; print(bi_identity(integral)==7);
+print(bi_incremented(large)==incremented(large)); print(large==123456789012345678901234567890);
+print(bi_explicitBigint(17/5)==explicitBigint(17/5));
+print(bi_explicitBigint(-17/5)==explicitBigint(-17/5));
+list dynamicValues=list(large); print(bi_dynamicBigint(dynamicValues)==dynamicBigint(dynamicValues));
+print(string(bi_boxed(large))==string(boxed(large)));
+print(bi_literal()==literal()); print(bi_zero()==zero());
+print(bi_asNumber(0)==0); print(bi_asPoly(0)==0);
+print(bi_asPoly(large)==asPoly(large));
+print(bi_fromPoly(poly(23))==fromPoly(poly(23)));
+NativeCompilerBigBox box=bi_makeBox(large);
+print(bi_readBox(box)==readBox(box)); print(box.value==large);
+ring bigintPrimeRing=7,(y),dp;
+number residue=6;
+// The affected interpreter's typed NUMBER->BIGINT helper can crash, so test
+// the safe compiled boundary directly against its documented raw-residue
+// semantics. Explicit bigint(number) intentionally uses the symmetric lift.
+print(bi_identity(residue)==6);
+print(bi_implicitBigint(residue)==6);
+print(bi_explicitBigint(residue)==-1);
+print(bi_asNumber(0)==0); print(bi_asPoly(0)==0);
+'''
+        singular(bigint_source, "1\n"*30)
+        bigint_assignment_error = singular(f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+ring bigintErrorRing=0,(x),dp; number fraction=3/2;
+bi_identity(fraction);
+print("BIGINT_RECOVERY"); print(bi_identity(9)==9);''')
+        check("cannot assign to bigint" in bigint_assignment_error and
+              bigint_assignment_error.endswith("BIGINT_RECOVERY\n1\n"),
+              bigint_assignment_error)
+        bigint_poly_error = singular(f'''LIB "{bigint_fixture}"; LIB "{bigint_module["module"]}";
+ring bigintPolyRing=0,(x),dp;
+bi_fromPoly(x+1);
+print("BIGINT_POLY_RECOVERY"); print(bi_fromPoly(poly(11))==11);''')
+        check("poly must be constant" in bigint_poly_error and
+              bigint_poly_error.endswith("BIGINT_POLY_RECOVERY\n1\n"),
+              bigint_poly_error)
+
+        matrix_fixture = directory/"matrix_owned.lib"
+        matrix_fixture.write_text('''info="native matrix/intmat fixture";
+static proc mod_init(){newstruct("NativeCompilerMatrixBox","matrix values, intmat indexes");}
+proc matrixIdentity(matrix value){return(value);}
+proc matrixAt(matrix value,int row,int column){return(value[row,column]);}
+proc matrixMutate(matrix value,int row,int column,poly replacement)
+{value[row,column]=replacement;return(value);}
+proc matrixSelfAssign(matrix value){value=value;return(value);}
+proc matrixSelect(matrix value,intvec rows,intvec columns)
+{matrix result[size(rows)][size(columns)]=value[rows,columns];return(result);}
+proc intmatIdentity(intmat value){return(value);}
+proc intmatAt(intmat value,int row,int column){return(value[row,column]);}
+proc intmatMutate(intmat value,int row,int column,int replacement)
+{value[row,column]=replacement;return(value);}
+proc intmatSelfAssign(intmat value){value=value;return(value);}
+proc matrixBox(matrix values,intmat indexes)
+{NativeCompilerMatrixBox box;box.values=values;box.indexes=indexes;return(box);}
+proc matrixBoxValues(NativeCompilerMatrixBox box){return(box.values);}
+proc matrixBoxIndexes(NativeCompilerMatrixBox box){return(box.indexes);}
+proc matrixList(matrix values,intmat indexes){return(list(values,indexes));}
+proc matrixAssignIdeal(matrix target,ideal source){target=source;return(target);}
+proc matrixAssignPoly(matrix target,poly source){target=source;return(target);}
+proc matrixAssignNumber(matrix target,number source){target=source;return(target);}
+proc matrixAssignBigint(matrix target,bigint source){target=source;return(target);}
+proc matrixAssignInt(matrix target,int source){target=source;return(target);}
+proc matrixAssignExact(matrix target,matrix source){target=source;return(target);}
+proc matrixAssignIntmat(matrix target,intmat source){target=source;return(target);}
+proc matrixDeclareIdeal(ideal source)
+{matrix target[2][3]=source;return(target);}
+proc matrixCastIdeal(ideal source){return(matrix(source));}
+proc matrixCastExact(matrix source){return(matrix(source));}
+proc matrixCastIntmat(intmat source){return(matrix(source));}
+proc matrixDynamicAssign(matrix target,list source)
+{target=source[1];return(target);}
+proc matrixDynamicCast(list source){return(matrix(source[1]));}
+proc matrixFormalBox(matrix value){return(list(value));}
+proc matrixDynamicCastBox(list source){return(list(matrix(source[1])));}
+proc intmatAssignExact(intmat target,intmat source){target=source;return(target);}
+proc intmatAssignInt(intmat target,int source){target=source;return(target);}
+proc intmatDeclareInt(int source)
+{intmat target[2][3]=source;return(target);}
+proc intmatAssignIntvec(intmat target,intvec source){target=source;return(target);}
+proc intmatCastExact(intmat source){return(intmat(source));}
+proc intmatCastIntvec(intvec source){return(intmat(source));}
+proc intmatDynamicAssign(intmat target,list source)
+{target=source[1];return(target);}
+proc intmatDynamicCast(list source){return(intmat(source[1]));}
+''')
+        matrix_entries = ["matrixIdentity", "matrixAt", "matrixMutate", "matrixSelfAssign",
+                          "matrixSelect", "intmatIdentity", "intmatMutate",
+                          "intmatAt", "intmatSelfAssign", "matrixBox", "matrixBoxValues",
+                          "matrixBoxIndexes", "matrixList", "matrixAssignIdeal",
+                          "matrixAssignPoly", "matrixAssignNumber",
+                          "matrixAssignBigint", "matrixAssignInt", "matrixAssignExact",
+                          "matrixAssignIntmat", "matrixDeclareIdeal", "matrixCastIdeal",
+                          "matrixCastExact", "matrixCastIntmat", "matrixDynamicAssign",
+                          "matrixDynamicCast", "matrixFormalBox", "matrixDynamicCastBox",
+                          "intmatAssignExact",
+                          "intmatAssignInt", "intmatDeclareInt", "intmatAssignIntvec",
+                          "intmatCastExact", "intmatCastIntvec", "intmatDynamicAssign",
+                          "intmatDynamicCast"]
+        matrix_module = compile_lib(
+            matrix_fixture, matrix_entries,
+            ["--strict", "--export-prefix", "mx_"])
+        matrix_manifest = json.loads(Path(matrix_module["manifest"]).read_text())
+        matrix_code = "\n".join(
+            Path(node["source"]).read_text()
+            for node in matrix_manifest["procedures"])
+        matrix_entry_code = Path(matrix_manifest["entry_source"]).read_text()
+        for expected in ("snative::Matrix", "snative::Intmat",
+                         "snative::MatrixArgument", "snative::IntmatArgument",
+                         "snative::CowMatrix", "snative::CowIntmat",
+                         "snative::matrix_get", "snative::matrix_set",
+                         "snative::intmat_set", "snative::matrix_select",
+                         "snative::struct_set_field"):
+            check(expected in matrix_code+matrix_entry_code,
+                  matrix_code+matrix_entry_code)
+        singular(f'''LIB "{matrix_fixture}"; LIB "{matrix_module["module"]}";
+ring matrixRing=0,(x,y),dp;
+matrix source[3][3]=1,x,y,x2,xy,y2,x3,x2y,xy2;
+intmat indexes[2][3]=1,2,3,4,5,6;
+intvec rows=1,3; intvec columns=2,3;
+print(string(mx_matrixIdentity(source))==string(matrixIdentity(source)));
+print(mx_matrixAt(source,2,3)==matrixAt(source,2,3));
+print(string(mx_matrixSelect(source,rows,columns))==string(matrixSelect(source,rows,columns)));
+print(string(mx_matrixMutate(source,2,3,x+y))==string(matrixMutate(source,2,3,x+y)));
+print(source[2,3]==y2);
+print(string(mx_intmatIdentity(indexes))==string(intmatIdentity(indexes)));
+print(mx_intmatAt(indexes,2,3)==intmatAt(indexes,2,3));
+print(string(mx_intmatMutate(indexes,2,1,17))==string(intmatMutate(indexes,2,1,17)));
+print(indexes[2,1]==4);
+NativeCompilerMatrixBox nativeBox=mx_matrixBox(source,indexes);
+print(string(mx_matrixBoxValues(nativeBox))==string(matrixBoxValues(nativeBox)));
+print(string(mx_matrixBoxIndexes(nativeBox))==string(matrixBoxIndexes(nativeBox)));
+print(string(mx_matrixList(source,indexes))==string(matrixList(source,indexes)));
+attrib(source,"native_marker",intvec(6,7));
+attrib(indexes,"native_marker",intvec(8,9));
+matrix nativeMatrixIdentity=mx_matrixIdentity(source);
+intmat nativeIntmatIdentity=mx_intmatIdentity(indexes);
+print(attrib(nativeMatrixIdentity,"native_marker")==intvec(6,7));
+print(attrib(nativeIntmatIdentity,"native_marker")==intvec(8,9));
+matrix nativeMatrixMutation=mx_matrixMutate(source,1,1,x);
+intmat nativeIntmatMutation=mx_intmatMutate(indexes,1,1,11);
+print(typeof(attrib(nativeMatrixMutation,"native_marker"))=="string");
+print(typeof(attrib(nativeIntmatMutation,"native_marker"))=="string");
+print(typeof(attrib(mx_matrixSelfAssign(source),"native_marker"))==
+      typeof(attrib(matrixSelfAssign(source),"native_marker")));
+print(typeof(attrib(mx_intmatSelfAssign(indexes),"native_marker"))==
+      typeof(attrib(intmatSelfAssign(indexes),"native_marker")));
+ideal generators=1,x,y;
+attrib(generators,"native_marker",intvec(1,2)); attrib(generators,"isSB",1);
+matrix target[2][3]=9,8,7,6,5,4;
+attrib(target,"old_marker",intvec(3,4)); attrib(target,"isSB",1);
+matrix nativeFormal=mx_matrixIdentity(generators);
+matrix singularFormal=matrixIdentity(generators);
+print(string(nativeFormal)==string(singularFormal) and nrows(nativeFormal)==1 and
+      ncols(nativeFormal)==1 and typeof(attrib(nativeFormal,"native_marker"))=="string" and
+      attrib(nativeFormal,"isSB")==0);
+module moduleSource=[x,y],[x2,y2];
+attrib(moduleSource,"native_marker",intvec(11,12));
+matrix nativeModuleFormal=mx_matrixIdentity(moduleSource);
+matrix singularModuleFormal=matrixIdentity(moduleSource);
+print(string(nativeModuleFormal)==string(singularModuleFormal) and
+      nrows(nativeModuleFormal)==2 and ncols(nativeModuleFormal)==2 and
+      typeof(attrib(nativeModuleFormal,"native_marker"))=="string");
+matrix nativeIdeal=mx_matrixAssignIdeal(target,generators);
+matrix singularIdeal=matrixAssignIdeal(target,generators);
+print(string(nativeIdeal)==string(singularIdeal) and nrows(nativeIdeal)==2 and
+      ncols(nativeIdeal)==3 and typeof(attrib(nativeIdeal,"native_marker"))=="string" and
+      attrib(nativeIdeal,"isSB")==0);
+matrix nativeDeclared=mx_matrixDeclareIdeal(generators);
+matrix singularDeclared=matrixDeclareIdeal(generators);
+print(string(nativeDeclared)==string(singularDeclared) and nrows(nativeDeclared)==2 and
+      ncols(nativeDeclared)==3 and typeof(attrib(nativeDeclared,"native_marker"))=="string");
+matrix nativePoly=mx_matrixAssignPoly(target,x+y);
+matrix singularPoly=matrixAssignPoly(target,x+y);
+print(string(nativePoly)==string(singularPoly) and nrows(nativePoly)==2 and ncols(nativePoly)==3);
+number scalarNumber=5; bigint scalarBigint=13;
+matrix nativeNumber=mx_matrixAssignNumber(target,scalarNumber);
+matrix singularNumber=matrixAssignNumber(target,scalarNumber);
+print(string(nativeNumber)==string(singularNumber) and nrows(nativeNumber)==2 and ncols(nativeNumber)==3);
+matrix nativeBigint=mx_matrixAssignBigint(target,scalarBigint);
+matrix singularBigint=matrixAssignBigint(target,scalarBigint);
+print(string(nativeBigint)==string(singularBigint) and nrows(nativeBigint)==2 and ncols(nativeBigint)==3);
+matrix nativeInt=mx_matrixAssignInt(target,17);
+matrix singularInt=matrixAssignInt(target,17);
+print(string(nativeInt)==string(singularInt) and nrows(nativeInt)==2 and ncols(nativeInt)==3);
+matrix exactSource[1][2]=x,y;
+attrib(exactSource,"native_marker",intvec(5,6)); attrib(exactSource,"isSB",1);
+matrix nativeExact=mx_matrixAssignExact(target,exactSource);
+matrix singularExact=matrixAssignExact(target,exactSource);
+print(string(nativeExact)==string(singularExact) and nrows(nativeExact)==1 and
+      ncols(nativeExact)==2 and attrib(nativeExact,"native_marker")==intvec(5,6) and
+      attrib(nativeExact,"isSB")==1);
+attrib(indexes,"isSB",1);
+matrix nativeFromIntmat=mx_matrixAssignIntmat(target,indexes);
+matrix singularFromIntmat=matrixAssignIntmat(target,indexes);
+print(string(nativeFromIntmat)==string(singularFromIntmat) and
+      nrows(nativeFromIntmat)==2 and ncols(nativeFromIntmat)==3 and
+      typeof(attrib(nativeFromIntmat,"native_marker"))=="string" and
+      attrib(nativeFromIntmat,"isSB")==0);
+matrix nativeIdealCast=mx_matrixCastIdeal(generators);
+matrix singularIdealCast=matrixCastIdeal(generators);
+print(string(nativeIdealCast)==string(singularIdealCast) and
+      nrows(nativeIdealCast)==1 and ncols(nativeIdealCast)==3 and
+      typeof(attrib(nativeIdealCast,"native_marker"))=="string" and
+      attrib(nativeIdealCast,"isSB")==0);
+matrix nativeExactCast=mx_matrixCastExact(exactSource);
+matrix singularExactCast=matrixCastExact(exactSource);
+print(string(nativeExactCast)==string(singularExactCast) and
+      attrib(nativeExactCast,"native_marker")==intvec(5,6) and
+      attrib(nativeExactCast,"isSB")==1);
+matrix nativeIntmatCast=mx_matrixCastIntmat(indexes);
+matrix singularIntmatCast=matrixCastIntmat(indexes);
+print(string(nativeIntmatCast)==string(singularIntmatCast) and
+      typeof(attrib(nativeIntmatCast,"native_marker"))=="string" and
+      attrib(nativeIntmatCast,"isSB")==0);
+vector vectorValue=[x,y]; list vectorCarrier=list(vectorValue);
+matrix nativeVectorAssign=mx_matrixDynamicAssign(target,vectorCarrier);
+matrix singularVectorAssign=matrixDynamicAssign(target,vectorCarrier);
+matrix nativeVectorCast=mx_matrixDynamicCast(vectorCarrier);
+matrix singularVectorCast=matrixDynamicCast(vectorCarrier);
+print(string(nativeVectorAssign)==string(singularVectorAssign) and
+      nrows(nativeVectorAssign)==2 and ncols(nativeVectorAssign)==3);
+print(string(nativeVectorCast)==string(singularVectorCast) and
+      nrows(nativeVectorCast)==2 and ncols(nativeVectorCast)==1);
+matrix denseSparse[2][2]=x,y,x2,y2; smatrix sparseValue=smatrix(denseSparse);
+list sparseCarrier=list(sparseValue);
+matrix nativeSparseAssign=mx_matrixDynamicAssign(target,sparseCarrier);
+matrix singularSparseAssign=matrixDynamicAssign(target,sparseCarrier);
+matrix nativeSparseCast=mx_matrixDynamicCast(sparseCarrier);
+matrix singularSparseCast=matrixDynamicCast(sparseCarrier);
+print(string(nativeSparseAssign)==string(singularSparseAssign) and
+      nrows(nativeSparseAssign)==2 and ncols(nativeSparseAssign)==3);
+print(string(nativeSparseCast)==string(singularSparseCast) and
+      nrows(nativeSparseCast)==2 and ncols(nativeSparseCast)==2);
+print(string(mx_matrixIdentity(vectorValue[1]))==string(matrixIdentity(vectorValue[1])));
+print(string(mx_matrixIdentity(source[1]))==string(matrixIdentity(source[1])));
+print(string(mx_matrixIdentity(sparseValue[1]))==string(matrixIdentity(sparseValue[1])));
+print(string(mx_matrixIdentity(sparseValue[1,2]))==string(matrixIdentity(sparseValue[1,2])));
+intmat intTarget[2][3]=9,8,7,6,5,4;
+attrib(intTarget,"old_marker",intvec(3,4)); attrib(intTarget,"isSB",1);
+intmat intSource[1][2]=12,14;
+attrib(intSource,"native_marker",intvec(7,8)); attrib(intSource,"isSB",1);
+intmat nativeIntExact=mx_intmatAssignExact(intTarget,intSource);
+intmat singularIntExact=intmatAssignExact(intTarget,intSource);
+print(string(nativeIntExact)==string(singularIntExact) and nrows(nativeIntExact)==1 and
+      ncols(nativeIntExact)==2 and attrib(nativeIntExact,"native_marker")==intvec(7,8) and
+      attrib(nativeIntExact,"isSB")==1);
+intmat nativeIntScalar=mx_intmatAssignInt(intTarget,19);
+intmat singularIntScalar=intmatAssignInt(intTarget,19);
+print(string(nativeIntScalar)==string(singularIntScalar) and nrows(nativeIntScalar)==2 and
+      ncols(nativeIntScalar)==3 and typeof(attrib(nativeIntScalar,"old_marker"))=="string" and
+      attrib(nativeIntScalar,"isSB")==0);
+intmat nativeIntDeclared=mx_intmatDeclareInt(19);
+intmat singularIntDeclared=intmatDeclareInt(19);
+print(string(nativeIntDeclared)==string(singularIntDeclared) and
+      nrows(nativeIntDeclared)==2 and ncols(nativeIntDeclared)==3);
+intvec vectorSource=21,22,23;
+intmat nativeIntvec=mx_intmatAssignIntvec(intTarget,vectorSource);
+intmat singularIntvec=intmatAssignIntvec(intTarget,vectorSource);
+print(string(nativeIntvec)==string(singularIntvec) and nrows(nativeIntvec)==3 and
+      ncols(nativeIntvec)==1 and typeof(attrib(nativeIntvec,"native_marker"))=="string");
+intmat nativeIntExactCast=mx_intmatCastExact(intSource);
+intmat singularIntExactCast=intmatCastExact(intSource);
+print(string(nativeIntExactCast)==string(singularIntExactCast) and
+      attrib(nativeIntExactCast,"native_marker")==intvec(7,8) and
+      attrib(nativeIntExactCast,"isSB")==1);
+intmat nativeIntvecCast=mx_intmatCastIntvec(vectorSource);
+intmat singularIntvecCast=intmatCastIntvec(vectorSource);
+print(string(nativeIntvecCast)==string(singularIntvecCast) and
+      typeof(attrib(nativeIntvecCast,"native_marker"))=="string");
+intvec attributedVector=31,32,33; attrib(attributedVector,"native_marker",intvec(9,10));
+list attributedCarrier=list(attributedVector);
+intmat nativeDynamicIntvec=mx_intmatDynamicAssign(intTarget,attributedCarrier);
+intmat singularDynamicIntvec=intmatDynamicAssign(intTarget,attributedCarrier);
+print(string(nativeDynamicIntvec)==string(singularDynamicIntvec) and
+      typeof(attrib(nativeDynamicIntvec,"native_marker"))=="string");
+intmat nativeDynamicIntvecCast=mx_intmatDynamicCast(attributedCarrier);
+intmat singularDynamicIntvecCast=intmatDynamicCast(attributedCarrier);
+print(string(nativeDynamicIntvecCast)==string(singularDynamicIntvecCast) and
+      typeof(attrib(nativeDynamicIntvecCast,"native_marker"))=="string");
+print(string(mx_intmatIdentity(indexes[2,1]))==string(intmatIdentity(indexes[2,1])));
+''', "1\n"*48)
+
+        # Cross conversions to a matrix formal/cast do not manufacture the
+        # qringNF flag. Box the result immediately so a later typed matrix
+        # assignment cannot change the boundary being inspected.
+        singular(f'''LIB "{matrix_fixture}"; LIB "{matrix_module["module"]}";
+ring matrixQBase=0,(x,y),dp; ideal Q=x2+1; qring matrixQ=std(Q);
+option(qringNF);
+vector qVector=[x,y]; module qModule=[x,y],[y,x];
+matrix qDense[2][2]=x,y,y,1; smatrix qSparse=smatrix(qDense);
+list nv=mx_matrixFormalBox(qVector); list iv=matrixFormalBox(qVector);
+list nm=mx_matrixFormalBox(qModule); list im=matrixFormalBox(qModule);
+list ns=mx_matrixFormalBox(qSparse); list ivs=matrixFormalBox(qSparse);
+list ncv=mx_matrixDynamicCastBox(list(qVector)); list icv=matrixDynamicCastBox(list(qVector));
+list ncm=mx_matrixDynamicCastBox(list(qModule)); list icm=matrixDynamicCastBox(list(qModule));
+list ncs=mx_matrixDynamicCastBox(list(qSparse)); list ics=matrixDynamicCastBox(list(qSparse));
+print(string(nv)==string(iv) and attrib(nv[1],"qringNF")==0 and attrib(iv[1],"qringNF")==0);
+print(string(nm)==string(im) and attrib(nm[1],"qringNF")==0 and attrib(im[1],"qringNF")==0);
+print(string(ns)==string(ivs) and attrib(ns[1],"qringNF")==0 and attrib(ivs[1],"qringNF")==0);
+print(string(ncv)==string(icv) and attrib(ncv[1],"qringNF")==0 and attrib(icv[1],"qringNF")==0);
+print(string(ncm)==string(icm) and attrib(ncm[1],"qringNF")==0 and attrib(icm[1],"qringNF")==0);
+print(string(ncs)==string(ics) and attrib(ncs[1],"qringNF")==0 and attrib(ics[1],"qringNF")==0);
+''', "1\n"*6)
+
+        attributed_intvec_error = singular(f'''LIB "{matrix_fixture}"; LIB "{matrix_module["module"]}";
+ring attributedIntvecRing=0,(x),dp;
+intmat target[2][2]=1,2,3,4;
+intvec attributed=5,6; attrib(attributed,"native_marker",intvec(7));
+mx_intmatAssignIntvec(target,attributed);
+print("INTVEC_RECOVERY");
+intvec plain=5,6;
+print(string(mx_intmatAssignIntvec(target,plain))==string(intmatAssignIntvec(target,plain)));''')
+        check("plain intvec or int" in attributed_intvec_error and
+              attributed_intvec_error.endswith("INTVEC_RECOVERY\n1\n"),
+              attributed_intvec_error)
+
+        # Small typed kernels lower directly to public C++ APIs.  The dynamic
+        # general.lib routines are specialized only at statically proven call
+        # sites and only while their complete audited source fingerprint is
+        # unchanged.
+        typed_fixture = directory/"typed_kernels.lib"
+        typed_fixture.write_text('''info="native typed-kernel fixture";
+LIB "general.lib";
+proc kernelSummary(poly p,number n,ideal I,string text,string needle,int start)
+{
+  return(list(univariate(p),pardeg(n),find(text,needle),find(text,"ana",start),
+              ord(p),npars(basering),par(1),prime(start),charstr(basering),
+              simplify(p,65),simplify(I,127)));
+}
+proc sumVector(intvec values){return(sum(values));}
+proc sumSelected(intvec values,intvec selected){return(sum(values,selected));}
+proc productVector(intvec values){return(product(values));}
+proc productSelected(intvec values,int selected){return(product(values,selected));}
+proc productSelectedVector(intvec values,intvec selected){return(product(values,selected));}
+proc sortVector(intvec values){return(sort(values));}
+proc sortLiteral(int a,int b,int c,int d){return(sort(list(a,b,c,d)));}
+proc sortWide(int a,int b){return(sort(list(a,b)));}
+proc sortEmpty(){return(sort(list()));}
+''')
+        typed_entries = ["kernelSummary", "sumVector", "sumSelected",
+                         "productVector", "productSelected",
+                         "productSelectedVector", "sortVector", "sortLiteral", "sortWide",
+                         "sortEmpty"]
+        typed_module = compile_lib(
+            typed_fixture, typed_entries,
+            ["--strict", "--export-prefix", "typed_"])
+        typed_manifest = json.loads(Path(typed_module["manifest"]).read_text())
+        check({node["procedure"] for node in typed_manifest["procedures"]} ==
+              set(typed_entries), typed_manifest)
+        typed_code = "\n".join(
+            Path(node["source"]).read_text() for node in typed_manifest["procedures"])
+        for helper in ("snative::univariate", "snative::parameter_degree",
+                       "snative::find_string", "snative::order",
+                       "snative::parameter_count", "snative::parameter(",
+                       "snative::previous_prime", "snative::characteristic_string",
+                       "snative::simplify_poly", "snative::simplify_ideal",
+                       "snative::sum_intvec", "snative::product_intvec",
+                       "snative::sort_intvec", "snative::sort_int_list"):
+            check(helper in typed_code, typed_code)
+        singular(f'''LIB "{typed_fixture}"; LIB "{typed_module["module"]}";
+ring typedRing=(0,a),(x,y),dp;
+poly p=x3+x*y2+1; number n=a3+a; ideal generators=x,0,x,y,x;
+intvec values=5,-2,5,0,9; intvec selected=2,5,2; intvec invalid=0,2;
+intvec empty=intvec();
+int wide=2147483647; wide=wide+1;
+print(string(typed_kernelSummary(p,n,generators,"banana","ana",3))==
+      string(kernelSummary(p,n,generators,"banana","ana",3)));
+print(typed_sumVector(values)==sumVector(values));
+print(typed_sumSelected(values,selected)==sumSelected(values,selected));
+print(typed_sumSelected(values,invalid)==sumSelected(values,invalid));
+print(typed_sumSelected(values,empty)==sumSelected(values,empty));
+print(typed_productVector(values)==productVector(values));
+print(typed_productSelected(values,2)==productSelected(values,2));
+print(typed_productSelected(values,99)==productSelected(values,99));
+print(typed_productSelectedVector(values,empty)==productSelectedVector(values,empty));
+print(string(typed_sortVector(values))==string(sortVector(values)));
+print(string(typed_sortVector(empty))==string(sortVector(empty)));
+print(string(typed_sortLiteral(5,-2,5,0))==string(sortLiteral(5,-2,5,0)));
+print(string(typed_sortWide(wide,0))==string(sortWide(wide,0)));
+print(string(typed_sortEmpty())==string(sortEmpty()));
+''', "1\n"*14)
+
+        nominal_fixture = directory/"nominal_newstruct.lib"
+        nominal_fixture.write_text('''info="native nominal newstruct fixture";
+static proc mod_init()
+{
+  newstruct("NativeCompilerPoint","int x, string label");
+  newstruct("NativeCompilerOther","int x, string label");
+  newstruct("NativeCompilerOuter","NativeCompilerPoint point");
+  newstruct("NativeCompilerPayload","intvec values, list items, number coefficient, poly polynomial, ideal generators");
+  newstruct("NativeCompilerDynamic","def value");
+}
+static proc pointX(NativeCompilerPoint point)
+{
+  int result=point.x;
+  return(result);
+}
+proc pointScore(NativeCompilerPoint point)
+{
+  string label=point.label;
+  return(pointX(point)+size(label));
+}
+proc forwardPoint(def point)
+{
+  return(pointX(point));
+}
+proc makePoint(int x, string label)
+{
+  NativeCompilerPoint point;
+  point.x=x;
+  point.label=label;
+  return(point);
+}
+proc rewritePoint(NativeCompilerPoint point, int x)
+{
+  point.x=x;
+  return(point);
+}
+proc replacePoint(NativeCompilerPoint point, NativeCompilerPoint replacement)
+{
+  point=replacement;
+  return(point);
+}
+proc makeOuter(NativeCompilerPoint point)
+{
+  NativeCompilerOuter outer;
+  outer.point=point;
+  return(outer);
+}
+proc outerX(NativeCompilerOuter outer)
+{
+  return(outer.point.x);
+}
+proc makePayload(intvec values, list items, number coefficient, poly polynomial, ideal generators)
+{
+  NativeCompilerPayload payload;
+  payload.values=values;
+  payload.items=items;
+  payload.coefficient=coefficient;
+  payload.polynomial=polynomial;
+  payload.generators=generators;
+  return(payload);
+}
+proc payloadValue(NativeCompilerPayload payload) { return(payload.values[2]); }
+proc payloadItems(NativeCompilerPayload payload) { return(payload.items); }
+proc payloadWeight(NativeCompilerPayload payload) { return(payload.coefficient); }
+proc payloadPolynomial(NativeCompilerPayload payload) { return(payload.polynomial); }
+proc payloadGenerators(NativeCompilerPayload payload) { return(payload.generators); }
+proc payloadGeneratorsTyped(NativeCompilerPayload payload)
+{
+  ideal result=payload.generators;
+  return(result);
+}
+proc numberIdentity(number input) { return(input); }
+proc idealIdentity(ideal input) { return(input); }
+proc dynamicValueInt(NativeCompilerDynamic payload)
+{
+  int result=payload.value;
+  return(result);
+}
+''')
+        nominal_entries = [
+            "pointScore", "forwardPoint", "makePoint", "rewritePoint", "replacePoint",
+            "makeOuter", "outerX", "makePayload", "payloadValue", "payloadItems",
+            "payloadWeight", "payloadPolynomial", "payloadGenerators",
+            "payloadGeneratorsTyped", "numberIdentity", "idealIdentity",
+            "dynamicValueInt"]
+        nominal_module = compile_lib(
+            nominal_fixture, nominal_entries,
+            ["--strict", "--export-prefix", "ns_"])
+        nominal_manifest = json.loads(Path(nominal_module["manifest"]).read_text())
+        nominal_sources = "\n".join(
+            Path(node["source"]).read_text() for node in nominal_manifest["procedures"])
+        check(nominal_sources.count('newstruct_argument(v_point, "NativeCompilerPoint")')>=2 and
+              "default_newstruct" in nominal_sources and
+              "struct_set_field" in nominal_sources,
+              nominal_sources)
+        nominal_output = singular(f'''LIB "{nominal_fixture}"; LIB "{nominal_module["module"]}";
+NativeCompilerPoint point; point.x=7; point.label="abcd";
+print(ns_pointScore(point)==pointScore(point));
+print(ns_forwardPoint(point)==forwardPoint(point));
+NativeCompilerPoint made=ns_makePoint(5,"xy");
+print(made.x==5 and made.label=="xy");
+NativeCompilerPoint rewritten=ns_rewritePoint(point,19);
+print(rewritten.x==19 and rewritten.label=="abcd");
+print(point.x==7 and point.label=="abcd");
+NativeCompilerPoint replaced=ns_replacePoint(point,made);
+print(replaced.x==5 and replaced.label=="xy");
+print(point.x==7 and point.label=="abcd");
+NativeCompilerOuter outer=ns_makeOuter(made);
+print(ns_outerX(outer)==5 and outer.point.label=="xy");
+ring nominalRing=0,(x,y),dp;
+intvec values=3,8;
+list items=list("tag",4);
+ideal generators=x,y2;
+NativeCompilerPayload payload=ns_makePayload(values,items,3/2,x2+y,generators);
+print(ns_payloadValue(payload)==8);
+list returnedItems=ns_payloadItems(payload);
+print(size(returnedItems)==2 and returnedItems[1]=="tag" and returnedItems[2]==4);
+print(ns_payloadWeight(payload)==3/2);
+number payloadWeightValue=payload.coefficient;
+print(ns_numberIdentity(payload.coefficient)==payloadWeightValue);
+print(ns_payloadPolynomial(payload)==x2+y);
+ideal returnedGenerators=ns_payloadGenerators(payload);
+print(size(returnedGenerators)==2 and returnedGenerators[1]==x and returnedGenerators[2]==y2);
+print(string(ns_idealIdentity(payload.generators))==string(payload.generators));
+homog(payload.generators);
+attrib(payload.generators,"native_marker",intvec(6,7));
+ideal cachedGenerators=ns_payloadGenerators(payload);
+ideal cachedIdentity=ns_idealIdentity(payload.generators);
+ideal cachedTyped=ns_payloadGeneratorsTyped(payload);
+print(attrib(cachedGenerators,"isHomog")==attrib(payload.generators,"isHomog") and
+      attrib(cachedGenerators,"native_marker")==intvec(6,7));
+print(attrib(cachedIdentity,"isHomog")==attrib(payload.generators,"isHomog") and
+      attrib(cachedIdentity,"native_marker")==intvec(6,7));
+print(attrib(cachedTyped,"isHomog")==attrib(payload.generators,"isHomog") and
+      attrib(cachedTyped,"native_marker")==intvec(6,7));
+payload.generators=std(generators);
+print(attrib(ns_payloadGenerators(payload),"isSB")==0 and
+      attrib(ns_payloadGeneratorsTyped(payload),"isSB")==1 and
+      attrib(ns_idealIdentity(payload.generators),"isSB")==1);
+NativeCompilerDynamic dynamic; dynamic.value=37;
+print(ns_dynamicValueInt(dynamic)==dynamicValueInt(dynamic));
+NativeCompilerOther other; other.x=7; other.label="abcd";
+ns_pointScore(other);
+print("NOMINAL_RECOVERY"); print(ns_pointScore(point));''')
+        check(nominal_output.startswith("1\n"*20) and
+              "native argument requires newstruct NativeCompilerPoint" in nominal_output and
+              nominal_output.endswith("NOMINAL_RECOVERY\n11\n"), nominal_output)
+
+        unsafe_nominal = directory/"unsafe_nominal.lib"
+        unsafe_nominal.write_text('''info="native unsafe nominal fixture";
+static proc mod_init()
+{
+  newstruct("NativeCompilerUnsafe","ideal value");
+}
+proc unsafe(ideal value)
+{
+  NativeCompilerUnsafe result=value;
+  return(result);
+}
+''')
+        unsafe_result = subprocess.run(
+            command(unsafe_nominal, ["unsafe"], ["--strict"]),
+            capture_output=True, text=True, timeout=120)
+        check(unsafe_result.returncode!=0 and
+              "expected newstruct NativeCompilerUnsafe, got ideal" in unsafe_result.stderr,
+              unsafe_result.stdout+unsafe_result.stderr)
+
+        # Native entries retain the exact interpreted source procinfo used by
+        # help/example even after both package and top-level bindings are
+        # rebound.  A same-basename cwd decoy catches accidental basename-only
+        # loading, and the unrelated prefix catches name-derived lookup.
+        source_directory = directory/"elsewhere"
+        source_directory.mkdir()
+        source_fixture = source_directory/"sourceownership.lib"
+        source_fixture.write_text('''proc sourceName()
+"native source ownership fixture"
+{
+  return(17);
+}
+example
+{
+  print("NATIVE_SOURCE_EXAMPLE_MARKER");
+}
+''')
+        (directory/source_fixture.name).write_text('''proc sourceName()
+"wrong cwd source fixture"
+{
+  return(99);
+}
+example
+{
+  print("WRONG_CWD_SOURCE_MARKER");
+}
+''')
+        source_module = compile_lib(
+            source_fixture, ["sourceName"],
+            ["--strict", "--export-prefix", "unrelated_"])
+        source_output = singular(f'''LIB "{source_module["module"]}";
+proc sourceName=Sourceownership::sourceName;
+Sourceownership::sourceName=unrelated_sourceName;
+sourceName=unrelated_sourceName;
+int sourceCallsBefore=unrelated_compilerCalls();
+print("REBIND_CALLS");
+print(Sourceownership::sourceName()==17);
+print(sourceName()==17);
+print(unrelated_compilerCalls()-sourceCallsBefore==2);
+print("SOURCE_EXAMPLE_BEGIN");
+example sourceName;
+print("SOURCE_EXAMPLE_END");
+print("COUNTER_EXAMPLE_BEGIN");
+example unrelated_compilerCalls;
+print("COUNTER_EXAMPLE_END");
+''')
+        check("REBIND_CALLS\n1\n1\n1\n" in source_output, source_output)
+        check("WRONG_CWD_SOURCE_MARKER" not in source_output, source_output)
+        check("SOURCE_EXAMPLE_BEGIN\n" in source_output and
+              "SOURCE_EXAMPLE_END\n" in source_output and
+              "COUNTER_EXAMPLE_BEGIN\n" in source_output and
+              "COUNTER_EXAMPLE_END\n" in source_output, source_output)
+        source_example = source_output.split("SOURCE_EXAMPLE_BEGIN\n", 1)[1].split(
+            "SOURCE_EXAMPLE_END\n", 1)[0]
+        counter_example = source_output.split("COUNTER_EXAMPLE_BEGIN\n", 1)[1].split(
+            "COUNTER_EXAMPLE_END\n", 1)[0]
+        check("// proc sourceName from lib "+str(source_fixture.resolve()) in source_example and
+              "NATIVE_SOURCE_EXAMPLE_MARKER" in source_example, source_example)
+        check([line.strip() for line in counter_example.splitlines() if line.strip()]==
+              ["// proc unrelated_compilerCalls from lib compiled.so"], counter_example)
+
+        # Loading an eager source library from a generated module's mod_init
+        # may itself import a dynamic module.  The loader must keep other
+        # threads excluded while permitting that same-thread nested load.
+        nested_loader = directory/"nested_loader.lib"
+        nested_loader.write_text('''LIB "customstd.so";
+proc nestedLoader(int value){return(value+1);}
+''')
+        nested_module = compile_lib(
+            nested_loader, ["nestedLoader"],
+            ["--strict", "--export-prefix", "nested_"])
+        singular(f'''LIB "{nested_module["module"]}";
+print(nested_nestedLoader(4));''', "5\n", timeout=20)
+
+        library = ROOT/"Singular/LIB/absfact.lib"
+        first = compile_lib(library, ["variableWithSmallestPositiveDegree"])
+        check(first["stats"]["objects_compiled"]==3, first)
+        manifest = json.loads(Path(first["manifest"]).read_text())
+        check({n["procedure"] for n in manifest["procedures"]} ==
+              {"partialDegree", "variableWithSmallestPositiveDegree"}, manifest)
+        code = "\n".join(Path(n["source"]).read_text() for n in manifest["procedures"])
+        check("while (true)" in code and "sn_partialDegree_" in code and
+              "snative::degree" in code and "iiExprArith" not in code and "iiPStart" not in code, code)
+        mtimes = {n["object"]: Path(n["object"]).stat().st_mtime_ns for n in manifest["procedures"]}
+        warm = compile_lib(library, ["variableWithSmallestPositiveDegree"])
+        check(warm["module"]==first["module"] and warm["stats"]["objects_compiled"]==0 and
+              warm["stats"]["procedures_parsed"]==0 and warm["stats"]["libraries_indexed"]==0 and
+              warm["stats"]["modules_linked"]==0, warm)
+        check(all(Path(p).stat().st_mtime_ns==mtime for p, mtime in mtimes.items()), "warm build changed objects")
+        helper = compile_lib(library, ["partialDegree"])
+        check(helper["stats"]["objects_compiled"]==1 and helper["stats"]["objects_reused"]==1, helper)
+
+        source = f'LIB "{library}";\nLIB "{first["module"]}";\nLIB "{helper["module"]}";\n'
+        source += '''proc reference(poly p){return(AbsFact::variableWithSmallestPositiveDegree(p));}
+proc referencePartial(poly p,int i){return(AbsFact::partialDegree(p,i));}
+'''.replace("AbsFact::", "Absfact::")
+        count = 0
+        for index, (characteristic, order) in enumerate([(0,"dp"),(32003,"dp"),(0,"lp"),(0,"ds"),(0,"wp(1,2,3)")]):
+            source += f"ring r{index}={characteristic},(x,y,z),{order};\npoly p;\n"
+            for poly in ["0", "1", "x", "x2+y3", "x8+y5+z2", "x*y*z", "x2*y3+x*y+z7", "x5+y5+z5"]:
+                source += f"p={poly};\nattrib(p,\"native_test\",23);\n"
+                source += "print(reference(p)==native_variableWithSmallestPositiveDegree(p));\n"
+                count += 1
+                for i in range(1, 4):
+                    source += f"print(referencePartial(p,{i})==native_partialDegree(p,{i}));\n"
+                    count += 1
+                source += f"print(p==({poly}));\nprint(attrib(p,\"native_test\")==23);\n"
+                count += 2
+        singular(source, "1\n"*count)
+        check(count==240, count)
+
+        # Run the real Short-suite case, substituting only our compiled roots.
+        both = compile_lib(library, ["variableWithSmallestPositiveDegree", "partialDegree"])
+        case = (ROOT/"Tst/Short/absfact.tst").read_text().rstrip()
+        check(case.endswith("$"), "expected Short-suite termination marker")
+        case = case[:-1]
+        prelude = 'int tst_no_status=1; LIB "absfact.lib";\n'
+        native_prelude = prelude + f'LIB "{both["module"]}";\n'
+        native_prelude += 'Absfact::variableWithSmallestPositiveDegree=native_variableWithSmallestPositiveDegree;\n'
+        native_prelude += 'Absfact::partialDegree=native_partialDegree;\n'
+        baseline_prelude = prelude + '\n'*3  # keep diagnostic source lines identical
+        reference = singular(baseline_prelude+case+'\nprint("NATIVE_COUNTER"); print(0);')
+        actual = singular(native_prelude+case+'\nprint("NATIVE_COUNTER"); print(native_compilerCalls());')
+        before, calls = actual.rsplit("NATIVE_COUNTER\n", 1)
+        check(before==reference.rsplit("NATIVE_COUNTER\n", 1)[0], before)
+        check(int(calls.strip())>0, "Short/absfact.tst did not execute native code")
+        print(f"Short/absfact.tst: exact interpreter parity; {calls.strip()} native entry calls")
+
+        deps = directory/"deps.lib"
+        deps.write_text('proc leaf(poly p,int k){return(deg(p)+k+1);}\n')
+        fixture = directory/"closure.lib"
+        fixture.write_text('''LIB "deps.lib";
+proc root(poly p,int n) {
+  int total=0;
+  for(int i=0;i<n;i++) { total=total+leaf(p,i); }
+  return(total);
+}
+proc sibling(poly p){return(leaf(p,2));}
+proc recursive(int n){if(n<=0){return(0);}else{return(mutual(n-1)+1);}}
+proc mutual(int n){if(n<=0){return(0);}else{return(recursive(n-1)+1);}}
+proc skipping(int n){int i=0;int total=0;for(i=0;i<n;i++){
+  if(i==2){i=i+1;continue;}total=total+i;if(i==5){break;}}
+  while(i<8){i++;total=total+1;}return(total);}
+proc logic(int a,int b){return((!a)+(a and b)+(a or b)+(a<b)+(a==b));}
+''')
+        root = compile_lib(fixture, ["root"])
+        sibling = compile_lib(fixture, ["sibling"])
+        check(sibling["stats"]["objects_compiled"]==2 and sibling["stats"]["objects_reused"]==1, sibling)
+        original_manifest = json.loads(Path(root["manifest"]).read_text())
+        root_object = next(n["object"] for n in original_manifest["procedures"] if n["procedure"]=="root")
+        deps.write_text(deps.read_text().replace("+k+1", "+k+2"))
+        changed = compile_lib(fixture, ["root"])
+        check(changed["module"]!=root["module"] and changed["stats"]["objects_compiled"]==1 and
+              changed["stats"]["objects_reused"]==2 and changed["stats"]["modules_linked"]==1, changed)
+        changed_manifest = json.loads(Path(changed["manifest"]).read_text())
+        check(root_object==next(n["object"] for n in changed_manifest["procedures"] if n["procedure"]=="root"), changed_manifest)
+        singular(f'LIB "{changed["module"]}";\nring r=0,(x,y),dp;\nprint(native_root(x2+y3,4));', "26\n")
+        # Both images must bind their own helper, even when loaded together.
+        isolated = compile_lib(fixture, ["root"], ["--export-prefix", "updated_"])
+        singular(f'''LIB "{root["module"]}";
+LIB "{isolated["module"]}";
+ring r=0,(x,y),dp;
+print(native_root(x2+y3,4));
+print(updated_root(x2+y3,4));''', "22\n26\n")
+        routines = compile_lib(fixture, ["recursive", "skipping", "logic"])
+        source = f'LIB "{fixture}";\nLIB "{routines["module"]}";\nring r=0,(x,y),dp;\n'
+        for n in range(12):
+            source += f"print(recursive({n})==native_recursive({n}));\nprint(skipping({n})==native_skipping({n}));\n"
+        for value in ["0", "-1", "2147483647", "2147483647+1", "(2147483647+1)*2"]:
+            source += f"print(logic({value},1)==native_logic({value},1));\n"
+        singular(source, "1\n"*29)
+
+        # Polynomial ownership, typed closure inference, recursive returns and
+        # direct kernel mappings. Library sources themselves are not rewritten.
+        poly_deps = directory/"polydeps.lib"
+        poly_deps.write_text('proc polyLeaf(poly p,int n){return(p^n+1);}\n')
+        poly_fixture = directory/"polyclosure.lib"
+        poly_fixture.write_text('''LIB "polydeps.lib";
+proc polyRoot(poly p,int n){poly q=0;for(int i=0;i<n;i++){q=q+polyLeaf(p,i);}return(q);}
+proc polyRec(poly p,int n){if(n<=0){return(poly(1));}else{return(p*polyMutual(p,n-1));}}
+proc polyMutual(poly p,int n){return(polyRec(p,n));}
+proc polyAlias(poly p){poly q=p;poly saved=q;q=q;q=q+q;q=q-q;return(saved);}
+proc polyIdentity(poly p){return(p);}
+proc polyTerms(poly p){poly q=0;for(int i=1;i<=size(p);i++){q=q+p[i];}return(q);}
+proc polyTail(poly p){return(p-lead(p));}
+proc polyScanIndex(poly p,int stop){int i;poly q=0;for(i=1;i<=size(p);i++){
+  q=q+p[i];if(i==stop){break;}}return(i);}
+proc polyScanReturn(poly p,int stop){for(int i=1;i<=size(p);i++){
+  if(i==stop){return(p[i]);}}return(poly(0));}
+proc polyScanUnsafe(poly p){poly q=p;poly out=0;for(int i=1;i<=size(q);i++){
+  out=out+q[i];q=q;}return(out);}
+proc polyHeads(poly p,int n){poly q=jet(p,n);return(q-lead(q)+leadmonom(q));}
+proc polySigns(poly p){return(-p+2*p-3+poly(3));}
+proc polyCompare(poly p){return((p==0)+(p!=1)+(0<>p));}
+proc polyPowerSyntax(poly p){return(-p^2+p**2+(p^2)^3-p^2^3);}
+proc polyIndex(poly p,int n){return(p[n]);}
+proc polyFailure(poly p,int n){poly q=p+p;return(q^n);}
+proc polyForwardTerm(poly p){return(polyIdentity(p)[1]);}
+proc polyNames(poly p){poly call=p;poly declare=call;poly block=declare;return(block);}
+proc polyAccumulate(poly p){poly q=p;q=q-lead(q);q=lead(q)+q;q=q+q;
+  q=-q;q=q^2;q=jet(q,size(q));return(q);}
+proc polyNestedUse(poly p){poly q=p;q=(q+1)+lead(q);return(q);}
+''')
+        entries = ["polyRoot", "polyRec", "polyAlias", "polyIdentity", "polyTerms", "polyTail",
+                   "polyScanIndex", "polyScanReturn", "polyScanUnsafe", "polyHeads",
+                   "polySigns", "polyCompare", "polyPowerSyntax", "polyIndex", "polyFailure", "polyForwardTerm", "polyNames",
+                   "polyAccumulate", "polyNestedUse"]
+        polys = compile_lib(poly_fixture, entries)
+        poly_manifest = json.loads(Path(polys["manifest"]).read_text())
+        check(len(poly_manifest["procedures"])==len(entries)+2, poly_manifest)
+        poly_code = "\n".join(Path(n["source"]).read_text() for n in poly_manifest["procedures"])
+        poly_sources = {n["procedure"]: Path(n["source"]).read_text()
+                        for n in poly_manifest["procedures"]}
+        accumulator_code = poly_sources["polyAccumulate"]
+        nested_code = poly_sources["polyNestedUse"]
+        terms_code = poly_sources["polyTerms"]
+        return_scan_code = poly_sources["polyScanReturn"]
+        unsafe_scan_code = poly_sources["polyScanUnsafe"]
+        tail_code = poly_sources["polyTail"]
+        check("snative::Poly sn_polyRoot" in poly_code and "sn_polyLeaf_" in poly_code and
+              "poly v_p" in poly_code and "snative::Poly v_q = " in poly_code and
+              "iiExprArith" not in poly_code, poly_code)
+        check("snative::drop_lead(std::move(v_q))" in accumulator_code and
+              "snative::add(std::move(v_q)," in accumulator_code and
+              ", std::move(v_q))" in accumulator_code and
+              "snative::neg(std::move(v_q))" in accumulator_code and
+              "snative::power(std::move(v_q)," in accumulator_code and
+              "snative::jet(std::move(v_q)," in accumulator_code and
+              accumulator_code.index("pLength(v_q.get())") <
+              accumulator_code.index("snative::jet(std::move(v_q)") and
+              accumulator_code.count("snative::Poly::copy(v_q.get(), ctx.r)")==1,
+              accumulator_code)
+        check("snative::drop_lead(snative::Poly::copy(b_p.get(), ctx.r))" in tail_code and
+              "pNext(" in terms_code and "pLength(v_p)" not in terms_code and
+              "snative::term(v_p" not in terms_code and
+              "pNext(" in return_scan_code and "snative::term(v_p" not in return_scan_code and
+              "pLength(v_q.get())" in unsafe_scan_code and
+              "snative::term(v_q.get()" in unsafe_scan_code,
+              tail_code+terms_code+return_scan_code+unsafe_scan_code)
+        # Nested consumption would invalidate the later lead(q); only the
+        # outermost RHS operation may take ownership of the assignment target.
+        check("snative::Poly::copy(v_q.get(), ctx.r)" in nested_code and
+              "snative::add(std::move(v_q)" not in nested_code and
+              "snative::sub(std::move(v_q)" not in nested_code, nested_code)
+        poly_warm = compile_lib(poly_fixture, entries)
+        check(poly_warm["stats"]["objects_compiled"]==0 and poly_warm["stats"]["modules_linked"]==0, poly_warm)
+
+        real_polys = [("swalk", "initialForm"), ("goettsche", "geomS"), ("VecField", "productOfRingVars")]
+        source = f'LIB "{poly_fixture}";\nLIB "{polys["module"]}";\n'
+        # Call interpreted static helpers through public wrappers, comparing
+        # actual unmodified library code. VecField is also a custom type name.
+        for lib, entry in real_polys:
+            compiled = compile_lib(ROOT/f"Singular/LIB/{lib}.lib", [entry])
+            source += f'LIB "{lib}.lib";\nLIB "{compiled["module"]}";\n'
+        source += '''proc refInitial(poly p){return(Swalk::initialForm(p));}
+proc refGeom(poly p,int n){return(Goettsche::geomS(p,n));}
+proc refProduct(){return(`"VecField"`::productOfRingVars());}
+'''
+        poly_count = 0
+        for index, (characteristic, order) in enumerate([(0,"dp"),(32003,"dp"),(2,"dp"),(0,"lp"),(0,"ds"),(0,"wp(1,2,3)")]):
+            source += f"ring pr{index}={characteristic},(x,y,z),{order};\npoly p; poly saved;\n"
+            for value in ["0", "1", "x", "x2+y3", "x*y*z+2*x+y+1", "x3+y3+z2+1", "2*x2-3*y+5"]:
+                source += f"p={value}; saved=p;\n"
+                calls = ["polyRoot(p,5)", "polyRec(p,4)", "polyAlias(p)", "polyIdentity(p)",
+                         "polyTerms(p)", "polyTail(p)", "polyScanIndex(p,2)", "polyScanIndex(p,999)",
+                         "polyScanReturn(p,1)", "polyScanReturn(p,2)", "polyScanReturn(p,999)",
+                         "polyScanUnsafe(p)", "polyHeads(p,2)", "polySigns(p)", "polyCompare(p)",
+                         "polyPowerSyntax(p)", "polyIndex(p,-1)", "polyIndex(p,0)",
+                         "polyIndex(p,1)", "polyIndex(p,999)", "polyForwardTerm(p)", "polyNames(p)",
+                         "polyAccumulate(p)", "polyNestedUse(p)"]
+                for call in calls:
+                    source += f"print({call}==native_{call});\n"
+                    poly_count += 1
+                source += "print(refInitial(p)==native_initialForm(p));\n"
+                source += "print(refGeom(p,5)==native_geomS(p,5));\n"
+                source += "print(refProduct()==native_productOfRingVars());\nprint(p==saved);\n"
+                poly_count += 4
+            # Returned values must own their storage after inputs and other
+            # result aliases are reassigned or destroyed.
+            source += "p=x+y; saved=native_polyIdentity(p); p=0; print(saved==x+y);\n"
+            source += "p=native_polyAlias(saved); saved=0; print(p==x+y);\n"
+            poly_count += 2
+        singular(source, "1\n"*poly_count)
+        # Error cleanup: an owned local and power operand exist when this throws.
+        failure_source = f'LIB "{polys["module"]}";\nring r=0,(x,y),dp; poly p=x+y;\n'
+        failure_source += 'native_polyFailure(p,-1);\nprint(p==x+y);\nprint(native_polyFailure(p,2)==4*(x+y)^2);'
+        failure = singular(failure_source)
+        check("exponent must be non-negative" in failure and failure.endswith("1\n1\n"), failure)
+        attributed = singular(f'''LIB "{polys["module"]}";
+ring r=0,(x,y),dp; poly p=x+y; attrib(p,"test",23);
+native_polyIdentity(p);
+print(p==x+y); print(attrib(p,"test")==23);''')
+        check("attributed poly arguments" in attributed and attributed.endswith("1\n1\n"), attributed)
+
+        numbers_fixture = directory/"numbers.lib"
+        numbers_fixture.write_text('''proc numIdentity(number a){return(a);}
+proc numOps(number a,int n){number b=a;return((a+2)*(b-1)/(a+3)+a^n);}
+proc numParts(number a){return(numerator(a)/denominator(a));}
+proc numNeg(number a){number b=-a;return(-b);}
+proc numCompare(number a,number b){return((a==b)+(a!=b)+(a<>b));}
+proc numPoly(number a){poly p=a;return(p);}
+proc polyNum(poly p){return(number(p));}
+proc numDiff(number a,number b){return(diff(a,b));}
+proc numDivide(number a,number b){number c=a+b;return(c/b);}
+proc numList(number p,list xs){number total=p;for(int i=1;i<=size(xs);i++){
+  total=total+numIdentity(xs[i]);}return(total);}
+proc numBranch(number a,int n){if(n){number b=a+1;return(b);}else{number c=a-1;return(c);}}
+proc numError(number a,int n){number b=a;if(n){return(b);}ERROR("number error test");}
+proc numSelf(number a){number b=a;b=b;return(b);}
+proc numAccumulate(number a,number b){number q=a;q=q+b;q=b+q;q=q*b;q=b*q;
+  q=-q;q=q+q;q=q*q;return(q);}
+proc numNested(number a){number q=a;q=(q+1)+numIdentity(q);return(q);}
+proc polySub(poly p,poly x,poly q){return(subst(p,x,q));}
+proc polyDiv(poly p,poly q){return(p/q);}
+''')
+        number_entries = ["numIdentity", "numOps", "numParts", "numNeg", "numCompare", "numPoly",
+                          "polyNum", "numDiff", "numDivide", "numList", "numBranch", "numError", "numSelf",
+                          "numAccumulate", "numNested",
+                          "polySub", "polyDiv"]
+        numbers = compile_lib(numbers_fixture, number_entries, ["--strict"])
+        number_manifest = json.loads(Path(numbers["manifest"]).read_text())
+        number_code = "\n".join(Path(n["source"]).read_text() for n in number_manifest["procedures"])
+        number_entries_code = Path(number_manifest["entry_source"]).read_text()
+        check("snative::Number v_b = snative::Number::copy" in number_code and
+              "snative::NumberArgument" in number_entries_code and
+              "snative::Number a0=snative::number_argument" not in number_entries_code,
+              number_code+number_entries_code)
+        num_self_code = next(Path(n["source"]).read_text() for n in number_manifest["procedures"]
+                             if n["procedure"]=="numSelf")
+        check(num_self_code.count("v_b =")==1, num_self_code)
+        num_accumulator_code = next(Path(n["source"]).read_text() for n in number_manifest["procedures"]
+                                    if n["procedure"]=="numAccumulate")
+        num_nested_code = next(Path(n["source"]).read_text() for n in number_manifest["procedures"]
+                               if n["procedure"]=="numNested")
+        check("snative::number_add(std::move(v_q)," in num_accumulator_code and
+              "snative::number_add(v_b, std::move(v_q)" in num_accumulator_code and
+              "snative::number_mul(std::move(v_q)," in num_accumulator_code and
+              "snative::number_mul(v_b, std::move(v_q)" in num_accumulator_code and
+              "snative::number_neg(std::move(v_q), ctx.r)" in num_accumulator_code and
+              num_accumulator_code.count("snative::Number::copy(v_q.get(), ctx.r)")==2,
+              num_accumulator_code)
+        check(num_nested_code.index("sn_numIdentity_") <
+              num_nested_code.rindex("snative::number_add(std::move(") and
+              "snative::number_add(std::move(v_q)" not in num_nested_code,
+              num_nested_code)
+        number_count = 0
+        source = f'LIB "{numbers_fixture}";\nLIB "{numbers["module"]}";\n'
+        for index, characteristic in enumerate(["0", "32003", "(0,a,b)", "(32003,a,b)"]):
+            source += f"ring nr{index}={characteristic},(x,y),dp; number a0; number saved; list xs; poly q;\n"
+            for value in (["1", "2/3", "-2"] if "a,b" not in characteristic else
+                          ["1", "(a+b)/(a-b)", "a^2/(1+b)", "1/(a^3*(1-a))"]):
+                source += f"a0={value}; saved=a0; xs=list(a0,2,a0+1);\n"
+                calls = ["numIdentity(a0)", "numParts(a0)", "numNeg(a0)", "numPoly(a0)",
+                         "numCompare(a0,saved)", "numCompare(a0,a0+1)", "numList(a0,xs)",
+                         "numBranch(a0,0)", "numBranch(a0,1)", "numError(a0,1)", "numSelf(a0)",
+                         "numAccumulate(a0,saved)", "numNested(a0)"]
+                calls += [f"numOps(a0,{n})" for n in [0,1,3,-2]]
+                for call in calls:
+                    source += f"print({call}==native_{call});\n"
+                    number_count += 1
+                source += 'print(a0==saved); print(xs[1]==saved);\n'
+                source += 'saved=native_numIdentity(a0); a0=0; print(saved==xs[1]);\n'
+                number_count += 3
+            for value in ["0", "1", "x+y", "x2+2*x*y+y2"]:
+                source += f"q={value};\n"
+                for call in ["polyNum(q)", "polySub(q,x,y+1)", "polySub(q,x,poly(0))", "polyDiv(q,x+y)"]:
+                    source += f"print({call}==native_{call});\n"
+                    number_count += 1
+            source += 'print(native_numIdentity(7)==number(7)); print(native_numList(7,list())==number(7));\n'
+            number_count += 2
+            source += 'list nested=list(list(number(2),3));\n'
+            source += 'print(native_numList(1,nested[1])==numList(1,nested[1]));\n'
+            source += 'print(native_numIdentity(nested[1][1])==numIdentity(nested[1][1]));\n'
+            source += 'print(native_numIdentity(nested[1][2])==numIdentity(nested[1][2]));\n'
+            number_count += 3
+        singular(source, "1\n"*number_count)
+        number_errors = singular(f'''LIB "{numbers["module"]}";
+ring r=0,(x,y),dp; number a=2;
+native_numDivide(a,0);
+native_numDiff(a,a);
+native_numList(a,list(1,"bad"));
+native_numIdentity(x);
+native_numList(a,list(1)[2]);
+native_numError(a,0);
+print("RECOVERED"); print(a==2); print(native_numList(a,list(3,4))==9);
+''')
+        for message in ["div. by 0", "differentiation not defined",
+                        "number, bigint, or int", "number error test"]:
+            check(message in number_errors, number_errors)
+        check(number_errors.endswith("RECOVERED\n1\n1\n"), number_errors)
+
+        # Unmodified real-library closure: rational-function differentiation,
+        # parameter substitution, polynomial division, and borrowed list input.
+        elliptic = compile_lib(ROOT/"Singular/LIB/ellipticcovers.lib", ["evaluateIntegral"], ["--strict"])
+        check(set(elliptic["native_exports"])=={"native_computeConstant", "native_evaluateIntegral"}, elliptic)
+        elliptic_manifest = json.loads(Path(elliptic["manifest"]).read_text())
+        elliptic_code = "\n".join(Path(n["source"]).read_text() for n in elliptic_manifest["procedures"])
+        check("sn_computeConstant_" in elliptic_code and "snative::number_diff" in elliptic_code and
+              not any(s in elliptic_code for s in ["iiExprArith", "iiMake_proc", "iiPStart", "execute("]), elliptic_code)
+        elliptic_warm = compile_lib(ROOT/"Singular/LIB/ellipticcovers.lib", ["evaluateIntegral"], ["--strict"])
+        check(elliptic_warm["stats"]["objects_compiled"]==0 and elliptic_warm["stats"]["modules_linked"]==0, elliptic_warm)
+        source = f'LIB "ellipticcovers.lib";\nLIB "{elliptic["module"]}";\n'
+        for index, characteristic in enumerate(["0", "32003"]):
+            source += f"ring er{index}=({characteristic},a,b),(x,y),dp; number f; number saved; list xs=a,b;\n"
+            for value in ["0", "1", "a", "1/a", "1/(1-a)", "1/(a^6*(1-a))",
+                          "(1+a+a2)/(a3*(1-a))", "b/(a*(b-a))", "(a+b)/(a2*b3*(1-a)*(1-b))"]:
+                source += f"f={value}; saved=f;\n"
+                for call in ["computeConstant(f,a)", "computeConstant(f,b)", "evaluateIntegral(f,xs)"]:
+                    source += f"print({call}==native_{call});\n"
+                    number_count += 1
+                source += 'print(f==saved); print(xs[1]==a and xs[2]==b);\n'
+                number_count += 2
+        singular(source, "1\n"*90)
+        print("ellipticcovers.lib: native computeConstant + evaluateIntegral closure, 90 comparisons")
+        elliptic = compile_lib(ROOT/"Singular/LIB/ellipticcovers.lib",
+                               ["evaluateIntegral", "permute", "propagator"], ["--strict"])
+        check(set(elliptic["native_exports"])=={"native_computeConstant", "native_evaluateIntegral",
+                                               "native_permute", "native_propagator"} and not elliptic["aliases"], elliptic)
+        native_manifest = json.loads(Path(elliptic["manifest"]).read_text())
+        native_code = "\n".join(Path(n["source"]).read_text() for n in native_manifest["procedures"])
+        check("sn_permute_" in native_code and "sn_propagator_" in native_code and
+              "snative::parameter_number" in native_code and "snative::indexed_number" in native_code and
+              "snative::type_is" in native_code and "snative::type_name" not in native_code and
+              "snative::list_set_owned" in native_code and
+              not any(s in native_code for s in ["iiExprArith", "iiMake_proc", "iiPStart", "execute("]), native_code)
+        warmed = compile_lib(ROOT/"Singular/LIB/ellipticcovers.lib",
+                             ["evaluateIntegral", "permute", "propagator"], ["--strict"])
+        check(warmed["stats"]["objects_compiled"]==warmed["stats"]["modules_linked"]==0, warmed)
+        list_count = 0
+        source = f'LIB "ellipticcovers.lib"; LIB "{elliptic["module"]}";\n'
+        # List-only entry also works before any ring exists. Check exact order,
+        # nesting, arbitrary element types, duplicates and input preservation.
+        source += 'list N; string savedList;\n'
+        for value in ["list()", "list(5)", "list(1,2)", "list(1,2,3,4,5)",
+                      'list("alpha","beta",17)', 'list(list(1,2),list(3),"end")', "list(1,1,2)"]:
+            source += f'N={value}; savedList=string(N);\n'
+            source += 'print(string(native_permute(N))==string(permute(N))); print(string(N)==savedList);\n'
+            list_count += 2
+        for index, characteristic in enumerate(["0", "32003"]):
+            source += f'ring pr{index}=({characteristic},a,b,c),(x,y),dp;\n'
+            source += 'list points=a,b; graph G=makeGraph(list(1,2,3),list(list(1,2),list(2,3),list(1,3)));\n'
+            source += 'string savedEdges=string(G.edges);\n'
+            for degree in range(13):
+                source += f'print(native_propagator(points,{degree})==propagator(points,{degree}));\n'
+                list_count += 1
+            for degree in ["list(0,0,0)", "list(0,1,2)", "list(1,2,3)", "list(3,1,0)"]:
+                source += f'print(native_propagator(G,{degree})==propagator(G,{degree}));\n'
+                list_count += 1
+            source += 'intvec branchType=0,1,2;\n'
+            source += 'print(native_propagator(G,branchType)==propagator(G,branchType));\n'
+            source += 'list branches=partitions(3,2);\n'
+            source += 'for(int branch=1;branch<=size(branches);branch++){print(native_propagator(G,branches[branch])==propagator(G,branches[branch]));}\n'
+            source += 'kill branchType; kill branches; kill branch;\n'
+            list_count += 7
+            for value in ['list(x+y,x2,number(a/b))', 'list(a,b,c)', 'list(G,list(x,a),"tail")']:
+                source += f'list values={value}; string before=string(values);\n'
+                source += 'print(string(native_permute(values))==string(permute(values))); print(string(values)==before);\n'
+                source += 'kill values; kill before;\n'
+                list_count += 2
+            source += 'print(string(G.edges)==savedEdges); print(points[1]==a and points[2]==b);\n'
+            source += 'kill G; kill savedEdges;\n'
+            list_count += 2
+        singular(source, "1\n"*list_count)
+        number_count += list_count
+        errors = singular(f'''LIB "ellipticcovers.lib"; LIB "{elliptic["module"]}";
+ring r=(0,a,b),(x,y),dp;
+native_propagator(list(a,b),-1);
+native_propagator(list(a),1);
+native_propagator(list(a,b),list(1));
+native_propagator("bad","bad");
+graph G=makeGraph(list(1,2),list(list(1,2)));
+native_propagator(G,list());
+native_propagator(G,1);
+print("RECOVERED_LISTS");
+print(native_propagator(G,list(1))==propagator(G,list(1)));
+print(string(native_permute(list(1,2,3)))==string(permute(list(1,2,3))));
+''')
+        check("signal" not in errors and "expected non-negative degree" in errors and
+              "wrong input type" in errors and errors.endswith("RECOVERED_LISTS\n1\n1\n"), errors)
+        print(f"ellipticcovers.lib: native permute + both propagator overloads, {list_count} comparisons")
+
+        # Real loop-heavy roots unlocked by lexical block locals, checked
+        # dynamic list-element -> poly arguments, and native integer power.
+        piecewise = compile_lib(ROOT/"Singular/LIB/arnold.lib", ["piecewisedegree"], ["--strict"])
+        check("native_piecewisedegree" in piecewise["native_exports"] and not piecewise["aliases"], piecewise)
+        signature = compile_lib(ROOT/"Singular/LIB/surfacesignature.lib",
+                                ["signatureBrieskorn"], ["--strict"])
+        check(signature["native_exports"]==["native_signatureBrieskorn"] and not signature["aliases"], signature)
+        profitable_source = f'''LIB "arnold.lib"; LIB "{piecewise["module"]}";
+ring profitableRing=0,(x,y),dp;
+list weights=intvec(1,2),intvec(2,1),intvec(3,5),intvec(7,4);
+poly p0=0; poly p1=1; poly p2=x; poly p3=y; poly p4=x7+y5+x3*y2; poly p5=(x+y)^20;
+list polynomials=p0,p1,p2,p3,p4,p5;
+for(int i=1;i<=size(polynomials);i++)
+{{print(native_piecewisedegree(polynomials[i],weights)==piecewisedegree(polynomials[i],weights));}}
+LIB "surfacesignature.lib"; LIB "{signature["module"]}";
+for(int a=2;a<=8;a++)
+{{print(native_signatureBrieskorn(a,a+1,a+2)==signatureBrieskorn(a,a+1,a+2));}}
+'''
+        singular(profitable_source, "1\n"*13)
+        number_count += 13
+        print("arnold.lib + surfacesignature.lib: 13 native/interpreted comparisons")
+
+        # Dynamic values in these static ncfactor helpers now retain exact
+        # Singular comparison, size, indexing, and delete semantics.  They are
+        # transitive hot spots in factorization and homogeneous-part searches.
+        ncfactor = compile_lib(
+            ROOT/"Singular/LIB/ncfactor.lib",
+            ["nextSmallerEntry", "binarySearch", "permpp"],
+            ["--strict", "--export-prefix", "ncf_"])
+        check(set(ncfactor["native_exports"])==
+              {"ncf_nextSmallerEntry", "ncf_binarySearch", "ncf_permpp"} and
+              not ncfactor["aliases"], ncfactor)
+        ncfactor_manifest = json.loads(Path(ncfactor["manifest"]).read_text())
+        ncfactor_sources = {node["procedure"]: Path(node["source"]).read_text()
+                            for node in ncfactor_manifest["procedures"]}
+        check(set(ncfactor_sources)=={"nextSmallerEntry", "binarySearch", "permpp"} and
+              "snative::compare_values" in ncfactor_sources["binarySearch"] and
+              "snative::indexed_value" in ncfactor_sources["binarySearch"] and
+              "snative::list_delete" in ncfactor_sources["permpp"] and
+              "snative::append(" in ncfactor_sources["nextSmallerEntry"],
+              "\n".join(ncfactor_sources.values()))
+        ncfactor_source = f'''LIB "ncfactor.lib"; LIB "{ncfactor["module"]}";
+print(ncf_nextSmallerEntry(intvec(3),intvec(2),intvec(5,5))==intvec(2));
+print(ncf_nextSmallerEntry(intvec(1,2),intvec(1,1),intvec(5,5,5,5))==intvec(1,1));
+print(ncf_nextSmallerEntry(intvec(2,-5),intvec(1,1),intvec(5,5,5,5))==intvec(1,5));
+print(ncf_nextSmallerEntry(intvec(2,-5,-5),intvec(1,1,1),intvec(5,5,5,5,5,5))==intvec(1,5,5));
+print(ncf_binarySearch(list(),5)==0);
+print(ncf_binarySearch(list(1,2,6,9,15,22),9)==4);
+print(ncf_binarySearch(list(1,2,6,9,15,22),5)==0);
+intvec searchVector=1,2,6,9,15,22;print(ncf_binarySearch(searchVector,9)==4);
+list searchVectors=list(intvec(0,0),intvec(0,1),intvec(1,0),intvec(2,0));
+print(ncf_binarySearch(searchVectors,intvec(1,0))==3);
+print(ncf_binarySearch(searchVectors,intvec(1,1))==0);
+print(size(ncf_permpp(list()))==0);
+print(size(ncf_permpp(list(1,2,3,4)))==24);
+print(size(ncf_permpp(list(1,2,2,3)))==12);
+list permutationInput=list(1,2,2,3);string savedPermutationInput=string(permutationInput);
+def ignoredPermutations=ncf_permpp(permutationInput);print(string(permutationInput)==savedPermutationInput);
+ring ncfRing=0,(x,y),dp;
+ideal searchIdeal=1,x,x2;print(ncf_binarySearch(searchIdeal,x)==2);
+print(ncf_binarySearch(searchIdeal,y)==0);
+vector searchModule=[1,x,x2];print(ncf_binarySearch(searchModule,x)==2);
+print(ncf_binarySearch(searchModule,y)==0);
+vector va=gen(1);vector vb=gen(2);print(size(ncf_permpp(list(va,vb,va)))==3);
+print(ncf_compilerCalls()>0);
+'''
+        singular(ncfactor_source, "1\n"*20)
+        number_count += 20
+        print("ncfactor.lib: native nextSmallerEntry + binarySearch + permpp, 20 checks")
+
+        complete = compile_lib(ROOT/"Singular/LIB/chern.lib", ["CompleteHomog"])
+        check(not complete["native_exports"] and
+              [entry["procedure"] for entry in complete["aliases"]]==["CompleteHomog"], complete)
+
+        list_fixture = directory/"list_kernels.lib"
+        list_fixture.write_text('''proc copyList(list input){return(input);}
+proc replaceList(list input){list L=input;L[1]=L[2];return(L);}
+proc selfAppend(list input){list L=input;L[size(L)+1]=L;return(L);}
+proc growList(list input){list L=input;L[size(L)+3]=list(8,9);return(L);}
+proc joinLists(list first,list second){return(first+second);}
+proc deleteItem(list input,int index){return(delete(input,index));}
+proc remainderOf(int first,int second){return(first%second);}
+proc selfList(list input){list L=input;L=L;return(L);}
+proc setOwnedScalars(list input,poly p,number n){list L=input;L[1]=p+p;L[2]=n+n;return(L);}
+proc ownedLiteral(list input,poly p,number n){return(list(p+p,n+n,list(8,9),input));}
+proc appendLiteral(list input){list L=input;L=L+list(8,9);return(L);}
+proc doubleList(list input){list L=input;L=L+L;return(L);}
+proc nestedConcat(list input){return(list(1,2)+list(3,4)+input);}
+proc growSequential(int n){list L;for(int i=1;i<=n;i++){L[i]=i;}return(L);}
+proc growCopied(list input,int n){list L=input;for(int i=1;i<=n;i++){L=L+list(poly(0));}return(L);}
+proc listFailure(list input,int fail){list L=input;L[size(L)+1]=L;
+if(fail){ERROR("list cleanup test");}return(L);}
+''')
+        list_module = compile_lib(list_fixture, [], ["--strict", "--export-prefix", "lk_"])
+        list_manifest = json.loads(Path(list_module["manifest"]).read_text())
+        list_code = "\n".join(Path(n["source"]).read_text() for n in list_manifest["procedures"])
+        check("snative::List v_L = snative::List::copy" in list_code and
+              "snative::list_set_owned" in list_code and "snative::list_set(" in list_code, list_code)
+        self_list_code = next(Path(n["source"]).read_text() for n in list_manifest["procedures"]
+                              if n["procedure"]=="selfList")
+        check(self_list_code.count("v_L =")==1, self_list_code)
+        scalar_list_code = next(Path(n["source"]).read_text() for n in list_manifest["procedures"]
+                                if n["procedure"]=="setOwnedScalars")
+        check(scalar_list_code.count("snative::list_set_owned")==2, scalar_list_code)
+        literal_code = next(Path(n["source"]).read_text() for n in list_manifest["procedures"]
+                            if n["procedure"]=="ownedLiteral")
+        append_code = next(Path(n["source"]).read_text() for n in list_manifest["procedures"]
+                           if n["procedure"]=="appendLiteral")
+        double_code = next(Path(n["source"]).read_text() for n in list_manifest["procedures"]
+                           if n["procedure"]=="doubleList")
+        nested_concat_code = next(Path(n["source"]).read_text() for n in list_manifest["procedures"]
+                                  if n["procedure"]=="nestedConcat")
+        check(literal_code.count("snative::list_set_owned")==3 and
+              "reserve(4L)" in literal_code and "snative::list_set(" in literal_code and
+              "snative::list_of" not in literal_code,
+              literal_code)
+        check("snative::list_add(std::move(v_L)," in append_code and
+              "snative::list_add(std::move(v_L)," in double_code and
+              double_code.index("snative::List::copy(v_L.get(), ctx.r)") <
+              double_code.index("snative::list_add(std::move(v_L)") and
+              nested_concat_code.count("snative::list_add(std::move(")>=1,
+              append_code+double_code+nested_concat_code)
+        source = f'LIB "general.lib"; LIB "{list_fixture}"; LIB "{list_module["module"]}"; ring lr=(0,a),(x,y),dp;\n'
+        source += 'list input=list(list(x,a),"text",4); string original=string(input);\n'
+        kernel_count = 0
+        for call in ['copyList(input)', 'replaceList(input)', 'selfAppend(input)', 'selfAppend(list())',
+                     'growList(input)', 'growList(list())', 'joinLists(input,input)',
+                     'joinLists(list(),input)', 'deleteItem(input,1)', 'deleteItem(input,3)',
+                     'listFailure(input,0)', 'copyList(list(input)[1])', 'selfList(input)',
+                     'setOwnedScalars(input,x+y,a)', 'ownedLiteral(input,x+y,a)',
+                     'appendLiteral(input)', 'doubleList(input)', 'nestedConcat(input)',
+                     'growSequential(257)']:
+            source += f'print(string(lk_{call})==string({call})); print(string(input)==original);\n'
+            kernel_count += 2
+        source += '''list marked=list(x,y); attrib(marked[1],"tag",7);
+list markedRef=appendLiteral(marked); list markedNative=lk_appendLiteral(marked);
+print(typeof(attrib(markedRef[1],"tag"))==typeof(attrib(markedNative[1],"tag")));
+print(attrib(marked[1],"tag")==7);
+markedNative=lk_ownedLiteral(marked,x+y,a); print(attrib(markedNative[4][1],"tag")==7);
+list boundaryInput;for(int boundaryIndex=1;boundaryIndex<=52;boundaryIndex++){boundaryInput[boundaryIndex]=boundaryIndex;}
+string savedBoundaryInput=string(boundaryInput);
+list boundaryRef=growCopied(boundaryInput,205);list boundaryNative=lk_growCopied(boundaryInput,205);
+print(string(boundaryNative)==string(boundaryRef));
+print(string(boundaryInput)==savedBoundaryInput);
+print(typeof(boundaryNative[size(boundaryNative)])=="poly");
+'''
+        kernel_count += 6
+        for a, b in [(8,3),(-8,3),(8,-3),(-8,-3),(2147483647,7),(2147483647*4,7)]:
+            # Large values are built by int arithmetic, not out-of-range literals.
+            lhs = str(a) if abs(a)<=2147483647 else "2147483647*4"
+            source += f'print(lk_remainderOf({lhs},{b})==remainderOf({lhs},{b}));\n'
+            kernel_count += 1
+        singular(source, "1\n"*kernel_count)
+        number_count += kernel_count
+        rejected = singular(f'''LIB "{list_module["module"]}";
+ring r=0,(x,y),dp; list input=list(x,y); string saved=string(input);
+lk_listFailure(input,1);
+lk_deleteItem(input,0);
+lk_deleteItem(input,3);
+lk_remainderOf(1,0);
+attrib(input,"tag",7);
+lk_copyList(input);
+print("LIST_RECOVERY"); print(attrib(input,"tag")==7); print(string(input)==saved);
+killattrib(input,"tag"); print(string(lk_copyList(input))==saved);
+''')
+        check("list cleanup test" in rejected and "attributed list values" in rejected and
+              rejected.endswith("LIST_RECOVERY\n1\n1\n1\n") and "signal" not in rejected, rejected)
+
+        # Milestone 2: owned intvec values, exact scalar/kernel mappings,
+        # heterogeneous list #, and lazy copies for mutated typed parameters.
+        typed_fixture = directory/"typed_milestone2.lib"
+        typed_fixture.write_text('''proc ivSequence(intvec input,int k){intvec v=1,2,input,4..2;v[2]=k;return(v);}
+proc ivRepeat(int value,int count){return(value:count);}
+proc ivRepeatPrecedence(){return(1:2+3);}
+proc ivRepeatWideCount(){int count=2147483647+2147483647+2;return(7:count);}
+proc ivConstruct(intvec input){return(intvec(1,input,3..1));}
+proc ivSlice(intvec input,int first,int last){intvec selected=input[first..last];return(selected);}
+proc ivEmptySlice(intvec input){intvec empty=delete(1..1,1);intvec selected=input[empty];return(selected);}
+proc ivDelete(intvec input,int position){return(delete(input,position));}
+proc ivCompare(intvec input,int scalar){return((input<scalar)+2*(input<=scalar)+4*(input>scalar)+8*(input>=scalar)+16*(input==scalar));}
+proc intvecIdentity(intvec input){return(input);}
+proc dynamicToIntvec(def value){return(intvecIdentity(value));}
+proc cowIntvec(intvec v){v[1]=v[1]+10;v=v+1;return(v);}
+proc cowPoly(poly p){p=p+1;return(p);}
+proc cowNumber(number n){n=n+1;return(n);}
+proc cowList(list L){L[1]="changed";return(L);}
+proc cowListAppend(list L){L=L+list("tail");return(L);}
+proc listSequence(list L){L=1,"two",L,3..1;return(L);}
+proc kernelData(poly p,number n,list L,def value,int position){
+  return(list(leadcoef(p),leadexp(p),int(n),insert(L,value,position)));}
+proc numberOrder(number a,number b){return((a<b)+2*(a<=b)+4*(a>b)+8*(a>=b)+16*(a==b)+32*(a!=b));}
+proc integerOps(int a,int b){return(100*(a div b)+(a mod b));}
+proc integerPower(int a,int b){return(a^b);}
+proc integerPowerAlt(int a,int b){return(a**b);}
+proc scopedConditional(int n){int result=0;if(n>0){int local=n+1;result=local;}return(result);}
+proc scopedPolynomial(poly p,int n){poly result=0;for(int i=1;i<=n;i++){poly term=p+i;int extra=i+i;result=result+term+extra;}return(result);}
+proc scopedControl(poly p,int n){poly result=0;int i=0;while(i<n){i++;if(i==2){poly skipped=p;continue;}poly term=p+i;result=result+term;if(i==4){poly stopped=term;break;}}return(result);}
+proc scopedStepDuplicate(int n){int total=0;int i=0;for(i=0;i<n;int q=i){int q=i;total=total+q;i++;}return(total);}
+proc scopedTypeConflict(poly p){for(int i=1;i<=2;i++){if(i==1){int clash=i;}else{poly clash=p;}}return(1);}
+proc scopedTerminalTypeConflict(poly p){for(int i=1;i<=2;i++){if(i==1){int terminalClash=i;}else{poly terminalClash=p;return(1);}}return(0);}
+proc scopedDefChange(poly p){for(int i=1;i<=3;i++){if(i==1){def changing=i;}else{def changing=p;}}return(1);}
+proc dynamicIntContext(list values){int result=values[1]+1;return(result);}
+proc dynamicNegate(def value){int result=-value;return(result);}
+proc dynamicNestedInt(def value){int result=(-value)+1;return(result);}
+proc dynamicCompareLeft(def value,int scalar){return(list(value<scalar,value<=scalar,value>scalar,value>=scalar,value==scalar,value!=scalar));}
+proc dynamicCompareRight(int scalar,def value){return(list(scalar<value,scalar<=value,scalar>value,scalar>=value,scalar==value,scalar!=value));}
+proc dynamicRemainder(def value,int divisor){return((value%divisor)==0);}
+static proc vectorSequenceReturn(intvec prefix,int tail){if(tail<0){return(prefix);}return(prefix,tail);}
+proc vectorSequenceReturnReference(intvec prefix,int tail){intvec result=vectorSequenceReturn(prefix,tail);return(result);}
+proc dynamicCompareValues(def left,def right){return(list(left<right,left<=right,left>right,left>=right,left==right,left!=right));}
+proc dynamicSize(def value){return(size(value));}
+proc dynamicDelete(list values,list positions){return(delete(values,positions[1]));}
+proc intSize(int value){return(size(value));}
+proc idealColumns(ideal value){return(ncols(value));}
+proc intvecRows(intvec value){return(nrows(value));}
+static proc typedWeightedDegree(poly p,intvec weights){return(deg(p,weights));}
+proc dynamicPolyArgument(list values,intvec weights){return(typedWeightedDegree(values[1],weights));}
+proc dynamicPolyPower(poly base,list exponent){return(base^exponent[1]);}
+proc dynamicNumberPower(number base,list exponent){return(base^exponent[1]);}
+proc dynamicIdealPower(ideal base,list exponent){return(base^exponent[1]);}
+proc pack(list #){return(#);}
+proc packWithLocal(list #){int args=7;return(list(args,#));}
+proc packFromNative(){return(pack(1,"text",list(2,3),3..1));}
+proc fixedPack(int prefix,list #){return(list(prefix,#));}
+proc fixedPackFromNative(){return(fixedPack(8,"native",intvec(2,1)));}
+proc fixedPackListFromNative(list values){return(fixedPack(8,values));}
+proc fixedPackForward(int prefix,list #){return(fixedPack(prefix,#));}
+proc forwardPack(def value){return(pack(value));}
+proc dynamicSelector(intvec input,list selectors){intvec out=input[selectors[1]];return(out);}
+proc dynamicExpressionSelector(intvec input,list selectors){intvec out=(input+1)[selectors[1]];return(out);}
+proc packNested(list carrier){return(list(carrier[1][1]));}
+''')
+        typed_entries = ["ivSequence", "ivRepeat", "ivRepeatPrecedence", "ivRepeatWideCount", "ivConstruct", "ivSlice", "ivEmptySlice", "ivDelete", "ivCompare", "intvecIdentity", "dynamicToIntvec",
+                         "cowIntvec", "cowPoly", "cowNumber", "cowList", "cowListAppend", "listSequence",
+                         "kernelData", "numberOrder", "integerOps",
+                         "integerPower", "integerPowerAlt", "scopedConditional", "scopedPolynomial", "scopedControl",
+                         "scopedStepDuplicate", "scopedTypeConflict", "scopedTerminalTypeConflict", "scopedDefChange", "dynamicIntContext", "dynamicNegate", "dynamicNestedInt",
+                         "dynamicCompareLeft", "dynamicCompareRight", "dynamicRemainder", "vectorSequenceReturn",
+                         "dynamicCompareValues", "dynamicSize", "dynamicDelete", "intSize", "idealColumns", "intvecRows", "dynamicPolyArgument",
+                         "dynamicPolyPower", "dynamicNumberPower", "dynamicIdealPower",
+                         "pack", "packWithLocal", "packFromNative", "fixedPack", "fixedPackFromNative", "fixedPackListFromNative", "fixedPackForward",
+                         "forwardPack", "dynamicSelector", "dynamicExpressionSelector", "packNested"]
+        typed = compile_lib(typed_fixture, typed_entries, ["--strict", "--export-prefix", "m2_"])
+        typed_manifest = json.loads(Path(typed["manifest"]).read_text())
+        typed_code = "\n".join(Path(n["source"]).read_text() for n in typed_manifest["procedures"])
+        typed_entry_code = Path(typed_manifest["entry_source"]).read_text()
+        for expected in ["snative::CowIntvec", "snative::CowPoly", "snative::CowNumber",
+                         "snative::CowList", "snative::intvec_range", "snative::intvec_repeat", "snative::intvec_select",
+                         "snative::intvec_delete", "snative::leadcoef",
+                         "snative::leadexp", "snative::number_to_int", "n_Greater(",
+                         "snative::list_insert", "snative::quotient", "snative::remainder",
+                         "snative::integer_power", "snative::compare_value_int", "snative::compare_values",
+                         "snative::binary_value_int", "snative::unary_value", "snative::size_value", "snative::integer_size", "snative::ideal_columns",
+                         "snative::PolyArgument"]:
+            check(expected in typed_code, typed_code)
+        check("snative::arguments_list" in typed_entry_code and "snative::IntvecArgument" in typed_entry_code and
+              "snative::scalar_index_argument" in typed_entry_code and
+              not any(name in typed_code for name in ["iiExprArith", "iiPStart"]),
+              typed_code+typed_entry_code)
+        typed_sources = {node["procedure"]: Path(node["source"]).read_text()
+                         for node in typed_manifest["procedures"]}
+        check("std::move(c_p)" not in typed_sources["cowPoly"] and
+              "std::move(c_n)" not in typed_sources["cowNumber"] and
+              "std::move(c_L)" not in typed_sources["cowListAppend"] and
+              "snative::List::copy(c_L.get(), ctx.r)" in typed_sources["cowListAppend"],
+              typed_sources["cowPoly"]+typed_sources["cowNumber"]+typed_sources["cowListAppend"])
+        check("snative::single_variadic_argument" in typed_sources["forwardPack"],
+              typed_sources["forwardPack"])
+        dynamic_variadic = directory/"dynamic_variadic.lib"
+        dynamic_variadic.write_text('''proc dynamicFirst(list #){return(#[1]);}
+proc dynamicInt(def value){return(int(value));}
+proc namedArgs(list #){return(args);}
+proc nestedInsert(list L){return(insert(L,(1,2)));}
+proc nestedSelector(intvec v){intvec out=v[(1,2)];return(out);}
+proc defSequence(){def value=(1,2);return(1);}
+proc listSlotSequence(list L){L[1]=(1,2);return(L);}
+proc mixedSequenceReturn(int b){if(b){return(intvec(3));}return((1,2));}
+proc sequenceIndexSource(intvec v,intvec w){intvec out=(v,w)[1];return(out);}
+proc dynamicNumberReturn(int branch,list values){if(branch){return(number(1));}return(values[1]);}
+''')
+        dynamic_result = compile_lib(dynamic_variadic,
+                                     ["dynamicFirst", "dynamicInt", "namedArgs", "nestedInsert", "nestedSelector",
+                                      "defSequence", "listSlotSequence", "mixedSequenceReturn", "sequenceIndexSource",
+                                      "dynamicNumberReturn"],
+                                     ["--export-prefix", "m2_"])
+        check(dynamic_result["native_exports"]==[] and
+              {entry["procedure"] for entry in dynamic_result["aliases"]}==
+              {"dynamicFirst", "dynamicInt", "namedArgs", "nestedInsert", "nestedSelector", "defSequence",
+               "listSlotSequence", "mixedSequenceReturn", "sequenceIndexSource", "dynamicNumberReturn"},
+              dynamic_result)
+
+        milestone_count = 0
+        source = f'LIB "{typed_fixture}"; LIB "{typed["module"]}";\n'
+        source += 'option(noredefine);\n'
+        # Heterogeneous # and intvec-only entries do not require a basering.
+        for call in ['pack()', 'pack(1,"alpha",list(2,3),3..1)',
+                     'packWithLocal(1,"alpha")', 'packFromNative()',
+                     'fixedPack(5)', 'fixedPack(5,"alpha",list(2,3),3..1)',
+                     'fixedPackFromNative()', 'fixedPackListFromNative(list(2,3))',
+                     'fixedPackForward(5)', 'fixedPackForward(5,7)',
+                     'fixedPackForward(5,list(2,3))',
+                     'fixedPackForward(5,7,list(2,3))']:
+            source += f'print(string(m2_{call})==string({call}));\n'
+            milestone_count += 1
+        source += '''list packed=m2_pack(1,"alpha",list(2,3),3..1);
+print(size(packed)==4 and typeof(packed[3])=="list" and typeof(packed[4])=="intvec");
+packed=m2_packFromNative();
+print(size(packed)==4 and typeof(packed[3])=="list" and typeof(packed[4])=="intvec");
+list soleList=list(2,3);string savedSoleList=string(soleList);
+print(size(m2_pack(soleList))==2 and string(m2_pack(soleList))==string(pack(soleList)));
+list emptyOptionalList=list();
+print(size(m2_pack(emptyOptionalList))==0 and string(m2_pack(emptyOptionalList))==string(pack(emptyOptionalList)));
+print(string(m2_forwardPack(soleList))==string(forwardPack(soleList)));
+print(string(m2_fixedPack(5,soleList))==string(fixedPack(5,soleList)));
+print(string(soleList)==savedSoleList);
+string indexedString="abcd"; string savedIndexedString=indexedString;
+print(string(m2_pack(indexedString[2]))==string(pack(indexedString[2])));
+print(string(m2_forwardPack(indexedString[2]))==string(forwardPack(indexedString[2])));
+intvec stringIndexes=1,5,3;
+print(string(m2_pack(indexedString[stringIndexes]))==string(pack(indexedString[stringIndexes])));
+list indexedStringCarrier=list(indexedString); string savedIndexedStringCarrier=string(indexedStringCarrier);
+print(string(m2_pack(indexedStringCarrier[1][3]))==string(pack(indexedStringCarrier[1][3])));
+print(string(m2_packNested(indexedStringCarrier))==string(packNested(indexedStringCarrier)));
+print(string(m2_pack(indexedString[0]))==string(pack(indexedString[0])));
+print(indexedString==savedIndexedString);
+print(string(indexedStringCarrier)==savedIndexedStringCarrier);
+'''
+        milestone_count += 15
+        source += '''print(m2_ivConstruct(5)==ivConstruct(5));
+list scalarVectorArgument=list(6);print(m2_ivConstruct(scalarVectorArgument[1])==ivConstruct(scalarVectorArgument[1]));
+print(m2_dynamicToIntvec(5)==dynamicToIntvec(5));
+intvec dynamicVectorValue=8,9;print(m2_dynamicToIntvec(dynamicVectorValue)==dynamicToIntvec(dynamicVectorValue));
+print(m2_dynamicToIntvec(scalarVectorArgument[1])==dynamicToIntvec(scalarVectorArgument[1]));
+list nestedVectorArgument=list(intvec(6,7));
+print(m2_ivConstruct(nestedVectorArgument[1][1])==ivConstruct(nestedVectorArgument[1][1]));
+print(m2_dynamicToIntvec(nestedVectorArgument[1][1])==dynamicToIntvec(nestedVectorArgument[1][1]));
+print(string(m2_pack(nestedVectorArgument[1][1]))==string(pack(nestedVectorArgument[1][1])));
+intvec dynamicSelectInput=10,20;list dynamicSelectors=list(intvec(2,1));
+print(m2_dynamicSelector(dynamicSelectInput,dynamicSelectors)==dynamicSelector(dynamicSelectInput,dynamicSelectors));
+list dynamicScalarSelector=list(2);
+print(m2_dynamicExpressionSelector(dynamicSelectInput,dynamicScalarSelector)==dynamicExpressionSelector(dynamicSelectInput,dynamicScalarSelector));
+'''
+        milestone_count += 10
+        for call in ["integerPower(0,0)", "integerPower(0,7)", "integerPower(1,123)",
+                     "integerPower(-1,124)", "integerPower(-1,125)", "integerPower(-2,7)",
+                     "integerPowerAlt(3,11)", "scopedConditional(-2)", "scopedConditional(5)",
+                     "scopedStepDuplicate(0)", "scopedStepDuplicate(6)"]:
+            source += f'print(m2_{call}=={call});\n'
+            milestone_count += 1
+        source += '''intvec outside=1,2,3;intvec outsideSaved=outside;
+print(m2_ivSequence(outside,4)==ivSequence(outside,4));
+print(m2_ivRepeat(3,0)==ivRepeat(3,0));
+print(m2_ivRepeat(-2,3)==ivRepeat(-2,3));
+print(m2_ivRepeat(2147483647+1,2)==ivRepeat(2147483647+1,2));
+print(m2_ivRepeatPrecedence()==ivRepeatPrecedence());
+print(m2_ivRepeatWideCount()==ivRepeatWideCount());
+print(m2_ivSequence(outside,scalarVectorArgument[1])==ivSequence(outside,scalarVectorArgument[1]));
+print(m2_ivSequence(outside,outside[1])==ivSequence(outside,outside[1]));
+print(m2_ivConstruct(outside)==ivConstruct(outside));
+print(m2_ivConstruct(outside[1])==ivConstruct(outside[1]));
+print(string(m2_pack(outside[1]))==string(pack(outside[1])));
+print(m2_dynamicToIntvec(outside[1])==dynamicToIntvec(outside[1]));
+print(m2_ivSlice(outside,1,3)==ivSlice(outside,1,3));
+print(m2_ivSlice(outside,3,1)==ivSlice(outside,3,1));
+print(m2_ivEmptySlice(outside)==ivEmptySlice(outside));
+print(m2_ivDelete(outside,2)==ivDelete(outside,2));
+print(m2_ivCompare(outside,2)==ivCompare(outside,2));
+intvec equalValues=2,2,2;print(m2_ivCompare(equalValues,2)==ivCompare(equalValues,2));
+print(m2_ivCompare(outside,2147483647+1)==ivCompare(outside,2147483647+1));
+print(m2_intvecRows(outside)==intvecRows(outside));
+print(m2_cowIntvec(outside)==cowIntvec(outside));
+intvec discardedCowIntvec=m2_cowIntvec(outside);print(outside==outsideSaved);
+list dynamicInts=list(41);print(m2_dynamicIntContext(dynamicInts)==dynamicIntContext(dynamicInts));
+print(string(m2_dynamicCompareLeft(1,2))==string(dynamicCompareLeft(1,2)));
+print(string(m2_dynamicCompareRight(2,1))==string(dynamicCompareRight(2,1)));
+intvec dynamicComparedVector=1,2;
+print(string(m2_dynamicCompareLeft(dynamicComparedVector,2))==string(dynamicCompareLeft(dynamicComparedVector,2)));
+print(string(m2_dynamicCompareRight(2,dynamicComparedVector))==string(dynamicCompareRight(2,dynamicComparedVector)));
+print(m2_dynamicRemainder(42,5)==dynamicRemainder(42,5));
+print(m2_dynamicRemainder(bigint(42),5)==dynamicRemainder(bigint(42),5));
+print(m2_dynamicRemainder(dynamicComparedVector,2)==dynamicRemainder(dynamicComparedVector,2));
+print(m2_vectorSequenceReturn(dynamicComparedVector,3)==vectorSequenceReturnReference(dynamicComparedVector,3));
+print(m2_vectorSequenceReturn(dynamicComparedVector,-1)==vectorSequenceReturnReference(dynamicComparedVector,-1));
+print(string(m2_dynamicCompareValues(1,2))==string(dynamicCompareValues(1,2)));
+print(string(m2_dynamicCompareValues(intvec(1,2),intvec(1,3)))==string(dynamicCompareValues(intvec(1,2),intvec(1,3))));
+print(m2_dynamicSize(dynamicComparedVector)==dynamicSize(dynamicComparedVector));
+print(m2_dynamicSize("native")==dynamicSize("native"));
+list dynamicDeleteInput=list("first","second","third");list dynamicDeletePositions=list(2);
+string dynamicDeleteSaved=string(dynamicDeleteInput);
+print(string(m2_dynamicDelete(dynamicDeleteInput,dynamicDeletePositions))==string(dynamicDelete(dynamicDeleteInput,dynamicDeletePositions)));
+print(string(dynamicDeleteInput)==dynamicDeleteSaved);
+print(m2_intSize(0)==intSize(0));
+print(m2_intSize(-1)==intSize(-1));
+print(m2_intSize(2147483647+1)==intSize(2147483647+1));
+print(m2_intSize((2147483647+1)*2)==intSize((2147483647+1)*2));
+'''
+        milestone_count += 42
+        source += 'option(noredefine);\n'
+        for index, characteristic in enumerate(["0", "7", "(0,a,b)"]):
+            source += f'ring m2r{index}={characteristic},(x,y,z),dp;\n'
+            source += 'poly p=x2+2*x*y+3;poly savedP=p;number n;number savedN;list L=list(x,"old",3);string savedL=string(L);\n'
+            source += '''print(m2_cowNumber(outside[1])==cowNumber(outside[1]));
+print(m2_cowNumber(nestedVectorArgument[1][1])==cowNumber(nestedVectorArgument[1][1]));
+ideal indexedIdeal=x,y; string savedIndexedIdeal=string(indexedIdeal);
+print(m2_idealColumns(indexedIdeal)==idealColumns(indexedIdeal));
+print(string(m2_pack(indexedIdeal[1]))==string(pack(indexedIdeal[1])));
+list indexedIdealCarrier=list(indexedIdeal);
+print(string(m2_pack(indexedIdealCarrier[1][1]))==string(pack(indexedIdealCarrier[1][1])));
+print(string(m2_packNested(indexedIdealCarrier))==string(packNested(indexedIdealCarrier)));
+map indexedMap=basering,x,y,z;
+print(string(m2_pack(indexedMap[1]))==string(pack(indexedMap[1])));
+list indexedMapCarrier=list(indexedMap);
+print(string(m2_pack(indexedMapCarrier[1][1]))==string(pack(indexedMapCarrier[1][1])));
+print(string(m2_packNested(indexedMapCarrier))==string(packNested(indexedMapCarrier)));
+print(m2_cowPoly(indexedIdeal[1])==cowPoly(indexedIdeal[1]));
+print(m2_cowPoly(indexedIdealCarrier[1][1])==cowPoly(indexedIdealCarrier[1][1]));
+print(m2_cowPoly(indexedMap[1])==cowPoly(indexedMap[1]));
+print(m2_cowPoly(3)==cowPoly(3));
+number convertedNumber=3/2;print(m2_cowPoly(convertedNumber)==cowPoly(convertedNumber));
+bigint convertedBigint=bigint(12345678901234567890);print(m2_cowPoly(convertedBigint)==cowPoly(convertedBigint));
+print(string(m2_dynamicCompareLeft(convertedBigint,2))==string(dynamicCompareLeft(convertedBigint,2)));
+print(string(m2_dynamicCompareRight(2,convertedBigint))==string(dynamicCompareRight(2,convertedBigint)));
+print(string(m2_dynamicCompareLeft(convertedNumber,2))==string(dynamicCompareLeft(convertedNumber,2)));
+print(string(m2_dynamicCompareRight(2,convertedNumber))==string(dynamicCompareRight(2,convertedNumber)));
+print(string(m2_dynamicCompareLeft(p,2))==string(dynamicCompareLeft(p,2)));
+print(string(m2_dynamicCompareRight(2,p))==string(dynamicCompareRight(2,p)));
+print(m2_dynamicRemainder(number(6),2)==dynamicRemainder(number(6),2));
+print(m2_dynamicRemainder(poly(x2+1),2)==dynamicRemainder(poly(x2+1),2));
+print(string(m2_dynamicCompareValues(number(1),number(2)))==string(dynamicCompareValues(number(1),number(2))));
+print(string(m2_dynamicCompareValues(poly(x),poly(y)))==string(dynamicCompareValues(poly(x),poly(y))));
+print(m2_dynamicSize(p)==dynamicSize(p));
+ideal dynamicSizedIdeal=x,y;print(m2_dynamicSize(dynamicSizedIdeal)==dynamicSize(dynamicSizedIdeal));
+list dynamicPolys=list(p,p+x,poly(0),1,number(2),convertedBigint);intvec dynamicWeights=1,2,3;
+print(m2_dynamicPolyArgument(dynamicPolys,dynamicWeights)==dynamicPolyArgument(dynamicPolys,dynamicWeights));
+for(int dynamicIndex=4;dynamicIndex<=6;dynamicIndex++)
+{print(m2_dynamicPolyArgument(list(dynamicPolys[dynamicIndex]),dynamicWeights)==dynamicPolyArgument(list(dynamicPolys[dynamicIndex]),dynamicWeights));}
+for(int dynamicExponent=0;dynamicExponent<=3;dynamicExponent=dynamicExponent+3)
+{
+  list dynamicExponentValue=list(dynamicExponent);
+  print(m2_dynamicPolyPower(p,dynamicExponentValue)==dynamicPolyPower(p,dynamicExponentValue));
+  print(m2_dynamicNumberPower(convertedNumber,dynamicExponentValue)==dynamicNumberPower(convertedNumber,dynamicExponentValue));
+  print(string(m2_dynamicIdealPower(indexedIdeal,dynamicExponentValue))==string(dynamicIdealPower(indexedIdeal,dynamicExponentValue)));
+}
+list attributedExponent=list(2);attrib(attributedExponent[1],"native_marker",1);
+print(m2_dynamicPolyPower(p,attributedExponent)==dynamicPolyPower(p,attributedExponent));
+print(m2_dynamicNumberPower(convertedNumber,attributedExponent)==dynamicNumberPower(convertedNumber,attributedExponent));
+print(string(m2_dynamicIdealPower(indexedIdeal,attributedExponent))==string(dynamicIdealPower(indexedIdeal,attributedExponent)));
+print(m2_scopedPolynomial(p,5)==scopedPolynomial(p,5));
+print(m2_scopedControl(p,7)==scopedControl(p,7));
+print(string(indexedIdeal)==savedIndexedIdeal);
+list indexedPolyCarrier=list(x); string savedIndexedPolyCarrier=string(indexedPolyCarrier);
+print(m2_cowPoly(indexedPolyCarrier[1])==cowPoly(indexedPolyCarrier[1]));
+print(string(indexedPolyCarrier)==savedIndexedPolyCarrier);
+'''
+            milestone_count += 45
+            if index==0:
+                source += '''resolution soleResolution=mres(indexedIdeal,0);
+print(string(m2_pack(soleResolution))==string(pack(soleResolution)));
+print(string(m2_forwardPack(soleResolution))==string(forwardPack(soleResolution)));
+kill soleResolution;
+'''
+                milestone_count += 2
+            values = (["3/2", "-3/2", "2147483647+1"] if characteristic=="0" else
+                      ["6", "3", "0"] if characteristic=="7" else ["a/b", "a+1", "0"])
+            for value in values:
+                source += f'n={value};savedN=n;\n'
+                for call in ["cowNumber(n)", "kernelData(p,n,L,\"new\",5)",
+                             "kernelData(poly(0),n,list(),x,0)"]:
+                    source += f'print(string(m2_{call})==string({call}));\n'
+                    milestone_count += 1
+                source += 'print(n==savedN);\n'
+                milestone_count += 1
+            source += 'print(m2_cowPoly(p)==cowPoly(p));print(p==savedP);\n'
+            source += 'print(string(m2_cowList(L))==string(cowList(L)));print(string(L)==savedL);\n'
+            source += 'print(string(m2_cowListAppend(L))==string(cowListAppend(L)));print(string(L)==savedL);\n'
+            source += 'print(string(m2_listSequence(L))==string(listSequence(L)));print(string(L)==savedL);\n'
+            source += '''list insertCarrier=list(x+y);string savedCarrier=string(insertCarrier);
+list referenceInserted=kernelData(p,n,L,insertCarrier[1],1);
+list nativeInserted=m2_kernelData(p,n,L,insertCarrier[1],1);
+print(string(nativeInserted)==string(referenceInserted));print(string(insertCarrier)==savedCarrier);
+'''
+            milestone_count += 10
+            for left, right in [(0,0),(1,2),(2,1),(-1,1)]:
+                source += f'print(m2_numberOrder(number({left}),number({right}))==numberOrder(number({left}),number({right})));\n'
+                milestone_count += 1
+            source += ('kill p,savedP,n,savedN,L,savedL,indexedIdeal,savedIndexedIdeal,'
+                       'indexedIdealCarrier,indexedMap,indexedMapCarrier,indexedPolyCarrier,'
+                       'savedIndexedPolyCarrier,convertedNumber,convertedBigint,dynamicPolys,dynamicWeights,dynamicSizedIdeal,insertCarrier,savedCarrier,'
+                       'referenceInserted,nativeInserted;\n')
+        for left, right in [(17,5),(-17,5),(17,-5),(-17,-5)]:
+            source += f'print(m2_integerOps({left},{right})==integerOps({left},{right}));\n'
+            milestone_count += 1
+        source += 'option(redefine);\n'
+        singular(source, "1\n"*milestone_count)
+        number_count += milestone_count
+        scoped_warnings = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+option(redefine); ring scopedRing=0,(x),dp;
+m2_scopedPolynomial(x,3); scopedPolynomial(x,3);
+m2_scopedDefChange(x); scopedDefChange(x);
+print("SCOPED_WARNING_RECOVERY"); print(m2_scopedPolynomial(x,1)==scopedPolynomial(x,1));''')
+        check(scoped_warnings.count("redefining term")==4 and
+              scoped_warnings.count("redefining extra")==4 and
+              scoped_warnings.count("redefining changing")==4 and
+              scoped_warnings.endswith("SCOPED_WARNING_RECOVERY\n1\n"), scoped_warnings)
+        scoped_conflict = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+ring scopedConflictRing=0,(x),dp;
+m2_scopedTypeConflict(x); print("NATIVE_CONFLICT_RECOVERY");
+scopedTypeConflict(x); print("INTERPRETED_CONFLICT_RECOVERY");
+m2_scopedTerminalTypeConflict(x); print("NATIVE_TERMINAL_CONFLICT_RECOVERY");
+scopedTerminalTypeConflict(x); print("INTERPRETED_TERMINAL_CONFLICT_RECOVERY");''')
+        check(scoped_conflict.count("identifier `clash` in use")==2 and
+              scoped_conflict.count("identifier `terminalClash` in use")==2 and
+              scoped_conflict.endswith("INTERPRETED_TERMINAL_CONFLICT_RECOVERY\n"), scoped_conflict)
+        custom_integer_dispatch = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+proc NativeCompilerCustomAdd(def left,def right){{return(41);}}
+proc NativeCompilerCustomNeg(def value){{return(-41);}}
+proc NativeCompilerCustomIdentity(def value){{return(value);}}
+proc NativeCompilerCustomPower(def left,def right){{return(left);}}
+newstruct("NativeCompilerIntOps","int value");
+system("install","NativeCompilerIntOps","+",NativeCompilerCustomAdd,2);
+system("install","NativeCompilerIntOps","-",NativeCompilerCustomNeg,1);
+NativeCompilerIntOps customValue;
+list customValues=list(customValue);
+print(m2_dynamicIntContext(customValues)==dynamicIntContext(customValues));
+print(m2_dynamicNegate(customValue)==dynamicNegate(customValue));
+newstruct("NativeCompilerNestedIntOps","int value");
+system("install","NativeCompilerNestedIntOps","+",NativeCompilerCustomAdd,2);
+system("install","NativeCompilerNestedIntOps","-",NativeCompilerCustomIdentity,1);
+NativeCompilerNestedIntOps nestedValue;
+print(m2_dynamicNestedInt(nestedValue)==dynamicNestedInt(nestedValue));
+newstruct("NativeCompilerPowerExponent","int value");
+system("install","NativeCompilerPowerExponent","^",NativeCompilerCustomPower,2);
+NativeCompilerPowerExponent customExponent;
+list customExponentValue=list(customExponent);
+ring customPowerRing=0,(x),dp;
+poly customPoly=x+1; number customNumber=3/2; ideal customIdeal=ideal(x,1);
+print(m2_dynamicPolyPower(customPoly,customExponentValue)==dynamicPolyPower(customPoly,customExponentValue));
+print(m2_dynamicNumberPower(customNumber,customExponentValue)==dynamicNumberPower(customNumber,customExponentValue));
+print(string(m2_dynamicIdealPower(customIdeal,customExponentValue))==string(dynamicIdealPower(customIdeal,customExponentValue)));''')
+        check(custom_integer_dispatch.endswith("1\n1\n1\n1\n1\n1\n"), custom_integer_dispatch)
+        power_errors = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+print("POWER_OVERFLOW_BEGIN");
+print(m2_integerPower(2,63)==integerPower(2,63));
+print("POWER_OVERFLOW_END");
+m2_integerPower(2,-1);
+print("POWER_RECOVERY"); print(m2_integerPower(3,4));''')
+        check(power_errors.count("int overflow(^), result may be wrong")==2 and
+              "POWER_OVERFLOW_BEGIN\n" in power_errors and "\n1\nPOWER_OVERFLOW_END\n" in power_errors and
+              "exponent must be non-negative" in power_errors and
+              power_errors.endswith("POWER_RECOVERY\n81\n"), power_errors)
+        dynamic_poly_error = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+ring r=0,(x),dp; list wrong=list("not a polynomial"); intvec weights=1;
+m2_dynamicPolyArgument(wrong,weights);
+print("POLY_RECOVERY"); list right=list(poly(x+1));
+print(m2_dynamicPolyArgument(right,weights)==dynamicPolyArgument(right,weights));''')
+        check("requires poly, number, bigint, or int" in dynamic_poly_error and
+              dynamic_poly_error.endswith("POLY_RECOVERY\n1\n"), dynamic_poly_error)
+        dynamic_output = singular(f'''LIB "{dynamic_variadic}"; LIB "{dynamic_result["module"]}";
+print(string(m2_dynamicFirst("kept dynamic"))==string(dynamicFirst("kept dynamic")));
+list nestedInput=list(9); print(string(m2_nestedInsert(nestedInput))==string(nestedInsert(nestedInput)));
+intvec nestedVector=10,20; print(m2_nestedSelector(nestedVector)==nestedSelector(nestedVector));
+ring dynamicRing=0,(x),dp; number dynamicNumber=3/2;
+print(m2_dynamicInt(dynamicNumber)==dynamicInt(dynamicNumber));''')
+        check("interpreted alias" in dynamic_output and dynamic_output.endswith("1\n1\n1\n1\n"), dynamic_output)
+        undefined_variadic = singular(f'''LIB "{typed["module"]}";
+def undefinedValue; m2_pack(undefinedValue);
+print("VARIADIC_RECOVERY"); print(size(m2_pack(1))==1);''')
+        check("undefined" in undefined_variadic and undefined_variadic.endswith("VARIADIC_RECOVERY\n1\n"),
+              undefined_variadic)
+        internal_undefined_variadic = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+def undefinedValue; m2_forwardPack(undefinedValue);
+print("INTERNAL_VARIADIC_RECOVERY");
+print(string(m2_forwardPack(7))==string(forwardPack(7)));''')
+        check("undefined" in internal_undefined_variadic and
+              internal_undefined_variadic.endswith("INTERNAL_VARIADIC_RECOVERY\n1\n"),
+              internal_undefined_variadic)
+        missing_fixed_variadic = singular(f'''LIB "{typed_fixture}"; LIB "{typed["module"]}";
+m2_fixedPack();
+print("FIXED_VARIADIC_RECOVERY");
+print(string(m2_fixedPack(7))==string(fixedPack(7)));''')
+        check("native argument" in missing_fixed_variadic and
+              missing_fixed_variadic.endswith("FIXED_VARIADIC_RECOVERY\n1\n"),
+              missing_fixed_variadic)
+        dynamic_selector_error = singular(f'''LIB "{typed["module"]}";
+intvec selectorSource=10,20; list vectorSelector=list(intvec(1,2));
+m2_dynamicExpressionSelector(selectorSource,vectorSelector);
+print("DYNAMIC_SELECTOR_RECOVERY");
+print(m2_dynamicExpressionSelector(selectorSource,list(1))==intvec(11));''')
+        check("named source" in dynamic_selector_error and
+              dynamic_selector_error.endswith("DYNAMIC_SELECTOR_RECOVERY\n1\n"), dynamic_selector_error)
+
+        # First-class strings and ideals retain Singular ownership, slot, and
+        # typed-call semantics without routing arithmetic through the evaluator.
+        rich_fixture = directory/"string_ideal_milestone2.lib"
+        rich_fixture.write_text('''proc stringIdentity(string input){return(input);}
+proc stringConcat(string input){input=input+input;return(input);}
+proc stringMutate(string input,string replacement,int position){input[position]=replacement;return(input);}
+proc stringIndex(string input,int position){return(input[position]);}
+proc stringCompare(string left,string right){return((left<right)+2*(left<=right)+4*(left>right)+8*(left>=right)+16*(left==right)+32*(left!=right));}
+proc stringToInt(string input){return(int(input));}
+proc stringConvert(int value,poly p,number n){return(string("i=",value,";p=",p,";n=",n));}
+proc defaultString(){string value;return(value);}
+proc forwardDynamicString(list values){return(stringIdentity(values[1]));}
+proc dynamicStringReturn(int branch,list values){if(branch){return("fixed");}return(values[1]);}
+proc idealIdentity(ideal input){return(input);}
+proc idealConstructorIdentity(ideal input){return(ideal(input));}
+proc idealConstruct(poly p,number n){return(ideal(p,0,n,0));}
+proc idealDeclaration(ideal input,poly p){ideal result=input,p;return(result);}
+proc idealMutate(ideal input,poly p,int position){input[position]=p;return(input);}
+proc idealAdd(ideal left,ideal right){return(left+right);}
+proc idealAddPoly(ideal left,poly right){return(left+right);}
+proc polyAddIdeal(poly left,ideal right){return(left+right);}
+proc idealMultiply(ideal left,ideal right){return(left*right);}
+proc idealRightMultiply(ideal left,poly right){return(left*right);}
+proc idealLeftMultiply(poly left,ideal right){return(left*right);}
+proc idealPower(ideal input,int exponent){return(input^exponent);}
+proc idealIndex(ideal input,int position){return(input[position]);}
+proc idealSize(ideal input){return(size(input));}
+proc defaultIdeal(){ideal input;return(input);}
+proc mutateDefaultIdeal(poly p){ideal input;input[1]=p;return(input);}
+proc emptyIdeal(){return(ideal());}
+proc idealSelfAdd(ideal input){input=input+input;return(input);}
+proc idealSelfMultiply(ideal input){input=input*input;return(input);}
+proc idealSelfAssign(ideal input){input=input;return(input);}
+proc idealAttributedDeclaration(ideal input){ideal result=input;return(result);}
+proc idealAttributedAssign(ideal input){ideal result;result=input;return(result);}
+proc idealConstructorAssign(ideal input){input=ideal(input);return(input);}
+proc idealDefaultConstructorAssign(){ideal input;input=ideal(input);return(input);}
+proc idealExactCopyBox(ideal input){ideal copy=input;return(list(input,copy));}
+proc idealFromPoly(poly input){return(idealIdentity(input));}
+proc idealFromNumber(number input){return(idealIdentity(input));}
+proc idealNumberThenIdentity(number input){ideal I=input;return(idealIdentity(I));}
+proc idealNestedNumberIdentity(number input){return(idealIdentity(idealIdentity(input)));}
+proc forwardDynamicIdeal(list values){return(idealIdentity(values[1]));}
+proc dynamicIdealReturn(int branch,list values){if(branch){return(ideal(0));}return(values[1]);}
+proc nestedValues(string text,ideal input){return(list(text,input,list(text+"!",input[1])));}
+proc ownedValues(poly p){return(list(string("owned"),ideal(p,0)));}
+proc wideIndexReads(poly p,list values,intvec ivalue,string text,ideal I,int position){return(list(p[position],values[position],ivalue[position],text[position],I[position]));}
+proc wideIndexWrites(list values,intvec ivalue,string text,ideal I,poly p,int position){values[position]=p;ivalue[position]=77;text[position]="Z";I[position]=p;return(list(values,ivalue,text,I));}
+proc dynamicWideIndex(int branch,list values,int position){if(branch){return(0);}return(values[1][position]);}
+''')
+        rich_entries = ["stringIdentity", "stringConcat", "stringMutate", "stringIndex", "stringCompare",
+                        "stringToInt", "stringConvert", "defaultString", "forwardDynamicString", "dynamicStringReturn",
+                        "idealIdentity", "idealConstructorIdentity", "idealConstruct", "idealDeclaration", "idealMutate", "idealAdd",
+                        "idealAddPoly", "polyAddIdeal", "idealMultiply", "idealRightMultiply",
+                        "idealLeftMultiply", "idealPower", "idealIndex", "idealSize", "defaultIdeal", "mutateDefaultIdeal", "emptyIdeal",
+                        "idealSelfAdd", "idealSelfMultiply", "idealSelfAssign", "idealAttributedDeclaration",
+                        "idealAttributedAssign", "idealConstructorAssign",
+                        "idealDefaultConstructorAssign", "idealExactCopyBox", "idealFromPoly",
+                        "idealFromNumber", "idealNumberThenIdentity", "idealNestedNumberIdentity",
+                        "forwardDynamicIdeal", "dynamicIdealReturn", "nestedValues",
+                        "ownedValues", "wideIndexReads", "wideIndexWrites", "dynamicWideIndex"]
+        rich = compile_lib(rich_fixture, rich_entries, ["--export-prefix", "rich_"])
+        check({entry["procedure"] for entry in rich["aliases"]}==
+              {"dynamicStringReturn", "dynamicIdealReturn", "dynamicWideIndex"}, rich)
+        rich_manifest = json.loads(Path(rich["manifest"]).read_text())
+        rich_code = "\n".join(Path(n["source"]).read_text() for n in rich_manifest["procedures"])
+        rich_sources = {n["procedure"]: Path(n["source"]).read_text()
+                        for n in rich_manifest["procedures"]}
+        rich_entry_code = Path(rich_manifest["entry_source"]).read_text()
+        for expected in ["snative::String", "snative::Ideal", "snative::IdealView", "snative::IdealBinding",
+                         "snative::PolyBinding", "snative::CowString", "snative::CowIdeal",
+                         "snative::string_add", "snative::string_compare", "snative::string_index",
+                         "snative::ideal_add", "snative::ideal_mul", "snative::ideal_mul_poly",
+                         "snative::poly_mul_ideal", "snative::ideal_power", "snative::ideal_get",
+                         "snative::IdealArgument", "snative::StringArgument", "result->flag=value.flags()"]:
+            check(expected in rich_code+rich_entry_code, expected)
+        check("std::string" not in rich_code+rich_entry_code, rich_code+rich_entry_code)
+        check("list_set_owned" in rich_code and "std::move" in rich_code, rich_code)
+        check(rich_sources["wideIndexReads"].count("(int)(v_position)")==4,
+              rich_sources["wideIndexReads"])
+        check(rich_sources["wideIndexWrites"].count("(int)(v_position)")==4,
+              rich_sources["wideIndexWrites"])
+
+        unsupported_rich = directory/"string_ideal_fallback.lib"
+        unsupported_rich.write_text('''proc idealSubtract(ideal I,ideal J){return(I-J);}
+proc idealCompare(ideal I,ideal J){return(I==J);}
+proc idealPlusNumber(ideal I,number n){return(I+n);}
+proc idealNestedConstructor(ideal I,poly p){return(ideal(I,p));}
+proc idealAttribute(ideal I){return(attrib(I,"isSB"));}
+proc stringVectorIndex(string s,intvec positions){return(s[positions]);}
+proc stringSlice(string s){return(s[1,2]);}
+''')
+        unsupported_names = ["idealSubtract", "idealCompare", "idealPlusNumber", "idealNestedConstructor",
+                             "idealAttribute", "stringVectorIndex", "stringSlice"]
+        unsupported_result = compile_lib(unsupported_rich, unsupported_names,
+                                         ["--export-prefix", "rich_"])
+        check(unsupported_result["native_exports"]==["rich_idealPlusNumber"] and
+              {entry["procedure"] for entry in unsupported_result["aliases"]}==
+              set(unsupported_names)-{"idealPlusNumber"},
+              unsupported_result)
+
+        rich_count = 0
+        rich_source = f'LIB "{rich_fixture}"; LIB "{rich["module"]}";\n'
+        rich_source += '''string original="abcd";string savedOriginal=original;
+print(rich_stringIdentity(original)==stringIdentity(original));
+print(rich_stringIdentity(original[2])==stringIdentity(original[2]));
+print(rich_stringConcat(original)==stringConcat(original));
+string ignoredString=rich_stringConcat(original);print(original==savedOriginal);
+print(rich_stringMutate(original,"YZ",2)==stringMutate(original,"YZ",2));
+print(rich_stringMutate(original,"",2)==stringMutate(original,"",2));
+ignoredString=rich_stringMutate(original,"Z",1);print(original==savedOriginal);
+print(rich_stringIndex(original,-1)==stringIndex(original,-1));
+print(rich_stringIndex(original,0)==stringIndex(original,0));
+print(rich_stringIndex(original,5)==stringIndex(original,5));
+print(rich_stringCompare("a","b")==stringCompare("a","b"));
+print(rich_stringCompare("same","same")==stringCompare("same","same"));
+print(rich_stringCompare("z","b")==stringCompare("z","b"));
+print(rich_stringToInt("  -17rest")==stringToInt("  -17rest"));
+print(rich_defaultString()==defaultString());
+list dynamicStrings=list("dynamic");
+print(rich_forwardDynamicString(dynamicStrings)==forwardDynamicString(dynamicStrings));
+print(rich_dynamicStringReturn(0,dynamicStrings)==dynamicStringReturn(0,dynamicStrings));
+print(rich_dynamicStringReturn(1,dynamicStrings)==dynamicStringReturn(1,dynamicStrings));
+list dynamicListCarrier=list(list(31,32));list dynamicVectorCarrier=list(intvec(41,42));
+print(rich_dynamicWideIndex(0,dynamicListCarrier,65536*65536+1)==dynamicWideIndex(0,dynamicListCarrier,65536*65536+1));
+print(rich_dynamicWideIndex(0,dynamicListCarrier,65536*65536+1)==rich_dynamicWideIndex(0,dynamicListCarrier,1));
+print(rich_dynamicWideIndex(0,dynamicVectorCarrier,65536*65536+1)==dynamicWideIndex(0,dynamicVectorCarrier,65536*65536+1));
+print(rich_dynamicWideIndex(0,dynamicVectorCarrier,65536*65536+1)==rich_dynamicWideIndex(0,dynamicVectorCarrier,1));
+'''
+        rich_count += 22
+        for index, characteristic in enumerate(["0", "7", "(0,a,b)"]):
+            rich_source += f'ring richr{index}={characteristic},(x,y),dp;\n'
+            coefficient = "3/2" if characteristic=="0" else "3" if characteristic=="7" else "a/b"
+            rich_source += f'''poly p=x2+y+1; number n={coefficient};
+ideal I=p,0,y,0; ideal J=x,0; string savedI=string(I); string savedJ=string(J);
+print(rich_stringConvert(-12,p,n)==stringConvert(-12,p,n));
+print(string(rich_idealIdentity(I))==string(idealIdentity(I)));
+print(string(rich_idealIdentity(p))==string(idealIdentity(p)));
+print(string(rich_idealIdentity(n))==string(idealIdentity(n)));
+print(string(rich_idealIdentity(2))==string(idealIdentity(2)));
+print(string(rich_idealConstruct(p,n))==string(idealConstruct(p,n)));
+ideal made=rich_idealConstruct(p,n);print(size(made)==2 and ncols(made)==4 and made[2]==0 and made[4]==0);
+print(string(rich_idealDeclaration(I,x))==string(idealDeclaration(I,x)));
+made=rich_idealDeclaration(I,x);print(ncols(made)==5 and made[2]==0 and made[4]==0);
+print(string(rich_idealMutate(I,x+y,6))==string(idealMutate(I,x+y,6)));
+made=rich_idealMutate(I,x+y,6);print(ncols(made)==6 and made[5]==0);
+ideal ignoredIdeal=rich_idealMutate(I,x,1);print(string(I)==savedI);
+print(string(rich_idealAdd(I,J))==string(idealAdd(I,J)));
+print(string(rich_idealAddPoly(I,x))==string(idealAddPoly(I,x)));
+print(string(rich_polyAddIdeal(x,I))==string(polyAddIdeal(x,I)));
+print(string(rich_idealMultiply(I,J))==string(idealMultiply(I,J)));
+print(string(rich_idealRightMultiply(I,x+y))==string(idealRightMultiply(I,x+y)));
+print(string(rich_idealLeftMultiply(x+y,I))==string(idealLeftMultiply(x+y,I)));
+print(string(rich_idealPower(I,0))==string(idealPower(I,0)));
+print(string(rich_idealPower(I,2))==string(idealPower(I,2)));
+print(string(rich_idealPower(I,-1))==string(idealPower(I,-1)));
+ideal Z=0;print(string(rich_idealPower(Z,0))==string(idealPower(Z,0)));
+print(rich_idealIndex(I,2)==idealIndex(I,2));
+print(rich_idealIndex(I,4)==idealIndex(I,4));
+print(rich_idealSize(I)==idealSize(I));
+made=rich_defaultIdeal();print(size(made)==0 and ncols(made)==1);
+made=rich_emptyIdeal();print(size(made)==0 and ncols(made)==0);
+print(string(rich_idealSelfAdd(I))==string(idealSelfAdd(I)));
+print(string(rich_idealSelfMultiply(I))==string(idealSelfMultiply(I)));
+print(string(rich_idealFromPoly(p))==string(idealFromPoly(p)));
+print(string(rich_idealFromNumber(n))==string(idealFromNumber(n)));
+list dynamicIdeals=list(I);
+print(string(rich_forwardDynamicIdeal(dynamicIdeals))==string(forwardDynamicIdeal(dynamicIdeals)));
+print(string(rich_dynamicIdealReturn(0,dynamicIdeals))==string(dynamicIdealReturn(0,dynamicIdeals)));
+print(string(rich_dynamicIdealReturn(1,dynamicIdeals))==string(dynamicIdealReturn(1,dynamicIdeals)));
+print(string(rich_nestedValues("text",I))==string(nestedValues("text",I)));
+print(string(rich_ownedValues(p))==string(ownedValues(p)));
+ideal listInput=I; string listText="text"; string savedListInput=string(listInput);
+list boxed=rich_nestedValues(listText,listInput);
+listText[1]="X";listInput[1]=x;
+print(boxed[1]=="text" and string(boxed[2])==savedListInput);
+string boxedText=boxed[1];ideal boxedIdeal=boxed[2];
+boxedText[1]="Z";boxedIdeal[1]=x;print(boxed[1]=="text" and string(boxed[2])==savedI);
+print(string(I)==savedI and string(J)==savedJ);
+list readValues=list(11,12);intvec readVector=21,22;string readText="ab";
+print(string(rich_wideIndexReads(p,readValues,readVector,readText,I,65536*65536+1))==string(wideIndexReads(p,readValues,readVector,readText,I,65536*65536+1)));
+list wideNative=rich_wideIndexReads(p,readValues,readVector,readText,I,65536*65536+1);
+list oneNative=rich_wideIndexReads(p,readValues,readVector,readText,I,1);
+print(wideNative[1]==0 and wideNative[2]==oneNative[2] and wideNative[3]==oneNative[3] and wideNative[4]==oneNative[4] and wideNative[5]==oneNative[5]);
+list writeValues=list(11,12);intvec writeVector=21,22;string writeText="ab";ideal writeIdeal=x,y;
+string savedWriteValues=string(list(writeValues,writeVector,writeText,writeIdeal));
+print(string(rich_wideIndexWrites(writeValues,writeVector,writeText,writeIdeal,p,65536*65536+1))==string(wideIndexWrites(writeValues,writeVector,writeText,writeIdeal,p,65536*65536+1)));
+print(string(rich_wideIndexWrites(writeValues,writeVector,writeText,writeIdeal,p,65536*65536+1))==string(rich_wideIndexWrites(writeValues,writeVector,writeText,writeIdeal,p,1)));
+print(string(list(writeValues,writeVector,writeText,writeIdeal))==savedWriteValues);
+ideal flagBasis=std(ideal(x,y));
+print(attrib(rich_defaultIdeal(),"isSB")==attrib(defaultIdeal(),"isSB") and attrib(rich_defaultIdeal(),"isSB")==1);
+print(attrib(rich_mutateDefaultIdeal(p),"isSB")==attrib(mutateDefaultIdeal(p),"isSB") and attrib(rich_mutateDefaultIdeal(p),"isSB")==0);
+print(attrib(rich_idealIdentity(flagBasis),"isSB")==attrib(idealIdentity(flagBasis),"isSB") and attrib(rich_idealIdentity(flagBasis),"isSB")==1);
+print(attrib(rich_idealConstructorIdentity(flagBasis),"isSB")==attrib(idealConstructorIdentity(flagBasis),"isSB") and attrib(rich_idealConstructorIdentity(flagBasis),"isSB")==1);
+print(attrib(rich_idealFromPoly(p),"isSB")==attrib(idealFromPoly(p),"isSB") and attrib(rich_idealFromPoly(p),"isSB")==1);
+print(attrib(rich_idealFromNumber(n),"isSB")==attrib(idealFromNumber(n),"isSB") and attrib(rich_idealFromNumber(n),"isSB")==0);
+print(attrib(rich_idealNumberThenIdentity(n),"isSB")==attrib(idealNumberThenIdentity(n),"isSB") and attrib(rich_idealNumberThenIdentity(n),"isSB")==1);
+print(attrib(rich_idealNestedNumberIdentity(n),"isSB")==attrib(idealNestedNumberIdentity(n),"isSB") and attrib(rich_idealNestedNumberIdentity(n),"isSB")==1);
+print(attrib(rich_idealMutate(flagBasis,x,1),"isSB")==attrib(idealMutate(flagBasis,x,1),"isSB") and attrib(rich_idealMutate(flagBasis,x,1),"isSB")==0);
+print(attrib(rich_idealAdd(flagBasis,flagBasis),"isSB")==attrib(idealAdd(flagBasis,flagBasis),"isSB") and attrib(rich_idealAdd(flagBasis,flagBasis),"isSB")==0);
+print(attrib(rich_idealMultiply(flagBasis,flagBasis),"isSB")==attrib(idealMultiply(flagBasis,flagBasis),"isSB") and attrib(rich_idealMultiply(flagBasis,flagBasis),"isSB")==0);
+print(attrib(rich_idealPower(flagBasis,2),"isSB")==attrib(idealPower(flagBasis,2),"isSB") and attrib(rich_idealPower(flagBasis,2),"isSB")==0);
+print(attrib(rich_idealConstruct(p,n),"isSB")==attrib(idealConstruct(p,n),"isSB") and attrib(rich_idealConstruct(p,n),"isSB")==0);
+print(attrib(rich_idealSelfAdd(flagBasis),"isSB")==attrib(idealSelfAdd(flagBasis),"isSB") and attrib(rich_idealSelfAdd(flagBasis),"isSB")==0);
+print(attrib(rich_idealSelfAssign(flagBasis),"isSB")==attrib(idealSelfAssign(flagBasis),"isSB") and attrib(rich_idealSelfAssign(flagBasis),"isSB")==0);
+print(attrib(rich_idealConstructorAssign(flagBasis),"isSB")==attrib(idealConstructorAssign(flagBasis),"isSB") and attrib(rich_idealConstructorAssign(flagBasis),"isSB")==1);
+print(attrib(rich_idealDefaultConstructorAssign(),"isSB")==attrib(idealDefaultConstructorAssign(),"isSB") and attrib(rich_idealDefaultConstructorAssign(),"isSB")==1);
+attrib(I,"native_marker",intvec(6,7));
+print(attrib(rich_idealAttributedDeclaration(I),"native_marker")==intvec(6,7));
+print(attrib(rich_idealAttributedAssign(I),"native_marker")==intvec(6,7));
+print(attrib(rich_idealSelfAssign(I),"native_marker")==attrib(idealSelfAssign(I),"native_marker"));
+list nativeFlagBox=rich_nestedValues("flag",flagBasis);list referenceFlagBox=nestedValues("flag",flagBasis);
+print(attrib(nativeFlagBox[2],"isSB")==attrib(referenceFlagBox[2],"isSB") and attrib(nativeFlagBox[2],"isSB")==1);
+list dynamicFlagBox=list(flagBasis);
+print(attrib(rich_forwardDynamicIdeal(dynamicFlagBox),"isSB")==attrib(forwardDynamicIdeal(dynamicFlagBox),"isSB") and attrib(rich_forwardDynamicIdeal(dynamicFlagBox),"isSB")==1);
+list nativeOwnedFlag=rich_ownedValues(p);list referenceOwnedFlag=ownedValues(p);
+print(attrib(nativeOwnedFlag[2],"isSB")==attrib(referenceOwnedFlag[2],"isSB") and attrib(nativeOwnedFlag[2],"isSB")==0);
+kill p,n,I,J,savedI,savedJ,made,ignoredIdeal,Z,dynamicIdeals,listInput,listText,
+  savedListInput,boxed,boxedText,boxedIdeal,readValues,readVector,readText,
+  wideNative,oneNative,writeValues,writeVector,writeText,writeIdeal,savedWriteValues,
+  flagBasis,nativeFlagBox,referenceFlagBox,dynamicFlagBox,nativeOwnedFlag,referenceOwnedFlag;
+'''
+            rich_count += 67
+        rich_source += '''ring richnc=0,(x,y),dp;
+matrix richD[2][2]; richD[1,2]=1;
+def richNC=nc_algebra(1,richD); setring richNC;
+ideal ncI=x+y,0; string savedNcI=string(ncI);
+print(string(rich_idealRightMultiply(ncI,y))==string(idealRightMultiply(ncI,y)));
+print(string(rich_idealLeftMultiply(y,ncI))==string(idealLeftMultiply(y,ncI)));
+print(string(idealRightMultiply(ncI,y))!=string(idealLeftMultiply(y,ncI)));
+print(string(ncI)==savedNcI);
+ring richqbase=0,(x,y),dp; ideal richQ=x2+1; qring richq=std(richQ);option(qringNF);
+ideal qI;qI=ideal(y,0); poly qp=x3+y;number qn=2;string savedQI=string(qI);
+print(string(rich_idealMutate(qI,qp,2))==string(idealMutate(qI,qp,2)));
+print(string(qI)==savedQI);
+print(attrib(rich_defaultIdeal(),"isSB")==attrib(defaultIdeal(),"isSB") and attrib(rich_defaultIdeal(),"isSB")==1);
+print(attrib(rich_defaultIdeal(),"qringNF")==attrib(defaultIdeal(),"qringNF") and attrib(rich_defaultIdeal(),"qringNF")==0);
+print(attrib(rich_mutateDefaultIdeal(qp),"isSB")==attrib(mutateDefaultIdeal(qp),"isSB") and attrib(rich_mutateDefaultIdeal(qp),"isSB")==0 and attrib(rich_mutateDefaultIdeal(qp),"qringNF")==0);
+print(attrib(rich_idealIdentity(qI),"qringNF")==attrib(idealIdentity(qI),"qringNF") and attrib(rich_idealIdentity(qI),"qringNF")==1);
+print(attrib(rich_idealConstructorIdentity(qI),"qringNF")==attrib(idealConstructorIdentity(qI),"qringNF") and attrib(rich_idealConstructorIdentity(qI),"qringNF")==1);
+print(attrib(rich_idealFromPoly(qp),"qringNF")==attrib(idealFromPoly(qp),"qringNF") and attrib(rich_idealFromPoly(qp),"qringNF")==0);
+print(attrib(rich_idealFromNumber(qn),"qringNF")==attrib(idealFromNumber(qn),"qringNF") and attrib(rich_idealFromNumber(qn),"qringNF")==0);
+print(attrib(rich_idealNumberThenIdentity(qn),"qringNF")==attrib(idealNumberThenIdentity(qn),"qringNF") and attrib(rich_idealNumberThenIdentity(qn),"qringNF")==0);
+print(attrib(rich_idealNestedNumberIdentity(qn),"qringNF")==attrib(idealNestedNumberIdentity(qn),"qringNF") and attrib(rich_idealNestedNumberIdentity(qn),"qringNF")==0);
+print(attrib(rich_idealMutate(qI,qp,1),"qringNF")==attrib(idealMutate(qI,qp,1),"qringNF") and attrib(rich_idealMutate(qI,qp,1),"qringNF")==0);
+print(attrib(rich_idealAdd(qI,qI),"qringNF")==attrib(idealAdd(qI,qI),"qringNF") and attrib(rich_idealAdd(qI,qI),"qringNF")==0);
+print(attrib(rich_idealMultiply(qI,qI),"qringNF")==attrib(idealMultiply(qI,qI),"qringNF") and attrib(rich_idealMultiply(qI,qI),"qringNF")==0);
+print(attrib(rich_idealPower(qI,2),"qringNF")==attrib(idealPower(qI,2),"qringNF") and attrib(rich_idealPower(qI,2),"qringNF")==0);
+print(attrib(rich_idealConstruct(qp,qn),"qringNF")==attrib(idealConstruct(qp,qn),"qringNF") and attrib(rich_idealConstruct(qp,qn),"qringNF")==0);
+print(attrib(rich_idealSelfAdd(qI),"qringNF")==attrib(idealSelfAdd(qI),"qringNF") and attrib(rich_idealSelfAdd(qI),"qringNF")==0);
+print(attrib(rich_idealSelfAssign(qI),"qringNF")==attrib(idealSelfAssign(qI),"qringNF") and attrib(rich_idealSelfAssign(qI),"qringNF")==0);
+print(attrib(rich_idealConstructorAssign(qI),"qringNF")==attrib(idealConstructorAssign(qI),"qringNF") and attrib(rich_idealConstructorAssign(qI),"qringNF")==1);
+print(attrib(rich_idealDefaultConstructorAssign(),"qringNF")==attrib(idealDefaultConstructorAssign(),"qringNF") and attrib(rich_idealDefaultConstructorAssign(),"qringNF")==0);
+list nativeQBox=rich_nestedValues("q",qI);list referenceQBox=nestedValues("q",qI);
+print(attrib(nativeQBox[2],"qringNF")==attrib(referenceQBox[2],"qringNF") and attrib(nativeQBox[2],"qringNF")==1);
+list dynamicQBox=list(qI);
+print(attrib(rich_forwardDynamicIdeal(dynamicQBox),"qringNF")==attrib(forwardDynamicIdeal(dynamicQBox),"qringNF") and attrib(rich_forwardDynamicIdeal(dynamicQBox),"qringNF")==1);
+list nativeOwnedQ=rich_ownedValues(qp);list referenceOwnedQ=ownedValues(qp);
+print(attrib(nativeOwnedQ[2],"qringNF")==attrib(referenceOwnedQ[2],"qringNF") and attrib(nativeOwnedQ[2],"qringNF")==0);
+option(noqringNF);ideal qRawIdeal;qRawIdeal=ideal(x2,0);poly qRawPoly=x2;
+string qRawIdealText=string(qRawIdeal);string qRawPolyText=string(qRawPoly);option(qringNF);
+list nativeRawCopies=rich_idealExactCopyBox(qRawIdeal);list referenceRawCopies=idealExactCopyBox(qRawIdeal);
+list nativeRawPoly=list(rich_idealIdentity(qRawPoly));list referenceRawPoly=list(idealIdentity(qRawPoly));
+print(attrib(nativeRawCopies[1],"qringNF")==0 and attrib(nativeRawCopies[2],"qringNF")==0 and attrib(nativeRawPoly[1],"qringNF")==0);
+option(noqringNF);
+print(string(nativeRawCopies)==string(referenceRawCopies) and string(nativeRawCopies[1])==qRawIdealText and string(nativeRawCopies[2])==qRawIdealText);
+print(string(nativeRawPoly)==string(referenceRawPoly) and string(nativeRawPoly[1])==qRawPolyText);option(qringNF);
+option(noqringNF);poly qraw=x3+x2*y+y;string savedQraw=string(qraw);option(qringNF);
+ideal qNative=rich_idealFromPoly(qraw);ideal qReference=idealFromPoly(qraw);
+print(string(qNative)==string(qReference) and size(qNative)==size(qReference));
+print(string(qraw)==savedQraw);
+print(attrib(qNative,"qringNF")==attrib(qReference,"qringNF") and attrib(qNative,"qringNF")==1);
+'''
+        rich_count += 33
+        rich_output = singular(rich_source)
+        rich_lines = rich_output.splitlines()
+        rich_unexpected = [line for line in rich_lines if line!="1" and not
+                           (line.startswith("// ** redefining rich_dynamic") or
+                            (line.startswith("// ** rich_dynamic") and
+                             line.endswith(" is an interpreted alias, not native C++")))]
+        check(not rich_unexpected and rich_lines.count("1")==rich_count and
+              rich_output.count(" is an interpreted alias, not native C++")==3,
+              rich_output)
+        number_count += rich_count
+
+        string_write_error = singular(f'''LIB "{rich_fixture}"; LIB "{rich["module"]}";
+string value="abc"; rich_stringMutate(value,"x",0);
+print("STRING_WRITE_RECOVERY");print(value=="abc");''')
+        check("string index out of range" in string_write_error and
+              string_write_error.endswith("STRING_WRITE_RECOVERY\n1\n"), string_write_error)
+        ideal_index_error = singular(f'''LIB "{rich_fixture}"; LIB "{rich["module"]}";
+ring r=0,(x),dp; ideal I=x,0; rich_idealIndex(I,3);
+print("IDEAL_INDEX_RECOVERY");print(ncols(I)==2 and I[2]==0);''')
+        check("ideal index out of range" in ideal_index_error and
+              ideal_index_error.endswith("IDEAL_INDEX_RECOVERY\n1\n"), ideal_index_error)
+
+        manual = (ROOT/"Tst/Manual/ellipticcovers.tst").read_text().rstrip()
+        check(manual.endswith("$"), "expected ellipticcovers termination marker")
+        prelude = 'int tst_no_status=1; LIB "ellipticcovers.lib";\n'
+        native_prelude = prelude+f'LIB "{elliptic["module"]}";\n'
+        native_prelude += 'Ellipticcovers::computeConstant=native_computeConstant; computeConstant=native_computeConstant;\n'
+        native_prelude += 'Ellipticcovers::evaluateIntegral=native_evaluateIntegral; evaluateIntegral=native_evaluateIntegral;\n'
+        native_prelude += 'Ellipticcovers::permute=native_permute; permute=native_permute;\n'
+        native_prelude += 'Ellipticcovers::propagator=native_propagator; propagator=native_propagator;\n'
+        reference = singular(prelude+'\n'*5+manual[:-1])
+        actual = singular(native_prelude+manual[:-1]+'\nprint("NATIVE_COUNTER"); print(native_compilerCalls());')
+        actual, count = actual.rsplit("NATIVE_COUNTER\n", 1)
+        check(actual==reference and int(count.strip())>0, actual)
+        print(f"Manual/ellipticcovers.tst: exact interpreter parity; {count.strip()} native entries")
+        elliptic_all = compile_lib(ROOT/"Singular/LIB/ellipticcovers.lib", [])
+        check(len(elliptic_all["native_exports"])==5 and len(elliptic_all["aliases"])==6, elliptic_all)
+        descriptors = singular(f'''LIB "ellipticcovers.lib";
+print("FD_BEFORE"); system("sh","ls /proc/"+string(system("pid"))+"/fd | wc -l");
+LIB "{elliptic_all["module"]}";
+print("FD_AFTER"); system("sh","ls /proc/"+string(system("pid"))+"/fd | wc -l");
+''')
+        fd_before = re.search(r"FD_BEFORE\n\s*(\d+)", descriptors)
+        fd_after = re.search(r"FD_AFTER\n\s*(\d+)", descriptors)
+        check(fd_before and fd_after and fd_before[1]==fd_after[1], descriptors)
+        print(f"ellipticcovers.lib alias loading: {fd_before[1]} -> {fd_after[1]} open descriptors")
+        mixed = compile_lib(ROOT/"Singular/LIB/customstd.lib", [])
+        mixed_output = singular(f'''LIB "customstd.lib";
+LIB "{mixed["module"]}";
+ring r=0,(x,y),dp; ideal I=x;
+print("MIXED_PACKAGE");
+print(string(native_monomialabortstd(I))==string(monomialabortstd(I)));
+''')
+        check("package is unavailable" not in mixed_output and mixed_output.endswith("MIXED_PACKAGE\n1\n"), mixed_output)
+
+        # A changed return ABI invalidates callers and entry wrappers, unlike a
+        # body-only edit. A direct forwarding caller infers the new poly result.
+        abi = directory/"abi.lib"
+        abi.write_text('proc forward(poly p){return(valueOf(p));}\nproc valueOf(poly p){return(deg(p));}\n')
+        before_abi = compile_lib(abi, ["forward"])
+        abi.write_text(abi.read_text().replace("return(deg(p))", "return(p)"))
+        after_abi = compile_lib(abi, ["forward"])
+        check(after_abi["stats"]["objects_compiled"]==3 and after_abi["module"]!=before_abi["module"], after_abi)
+        singular(f'LIB "{after_abi["module"]}"; ring r=0,(x,y),dp; print(native_forward(x+y)==x+y);', "1\n")
+
+        real_cxx = shutil.which("c++")
+        check(real_cxx is not None, "C++ compiler not found")
+        compiler_log = directory/"compiler-commands.log"
+        compiler_wrapper = directory/"record-cxx"
+        compiler_wrapper.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> '+
+                                    shlex.quote(str(compiler_log))+'\nexec '+
+                                    shlex.quote(real_cxx)+' "$@"\n')
+        compiler_wrapper.chmod(0o755)
+        flags = compile_lib(fixture, ["root"], ["--cxx", str(compiler_wrapper), "--cxxflag=-O0"])
+        check(flags["module"]!=changed["module"] and flags["stats"]["objects_compiled"]==3, flags)
+        compiler_commands = compiler_log.read_text().splitlines()
+        check(any("-shared" in line and "-O0" in line for line in compiler_commands), compiler_commands)
+        flags_warm = compile_lib(fixture, ["root"], ["--cxx", str(compiler_wrapper), "--cxxflag=-O0"])
+        check(flags_warm["stats"]["abi_snapshots_reused"]==1 and
+              flags_warm["stats"]["objects_compiled"]==flags_warm["stats"]["modules_linked"]==0,
+              flags_warm)
+        check(compiler_log.read_text().splitlines()==compiler_commands,
+              "warm ABI snapshot invoked the compiler")
+        # Damaged cached objects are rebuilt instead of trusted on existence alone.
+        helper_object = next(Path(n["object"]) for n in changed_manifest["procedures"] if n["procedure"]=="leaf")
+        helper_object.write_bytes(b"not an object file")
+        repaired = compile_lib(fixture, ["root"])
+        check(repaired["stats"]["objects_compiled"]==1, repaired)
+        # Concurrent builds serialize and share one set of compiled artifacts.
+        concurrent_cache = directory/"concurrent"
+        concurrent_command = command(fixture, ["root"], ["--cache-dir", str(concurrent_cache)])
+        jobs = [subprocess.Popen(concurrent_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) for _ in range(2)]
+        outputs = [job.communicate(timeout=120) for job in jobs]
+        check(all(job.returncode==0 for job in jobs), outputs)
+        concurrent_results = [json.loads(out) for out, _ in outputs]
+        check(len({result["module"] for result in concurrent_results})==1, concurrent_results)
+        check(sum(result["stats"]["objects_compiled"] for result in concurrent_results)==3 and
+              sum(result["stats"]["objects_reused"] for result in concurrent_results)==3 and
+              sum(result["stats"]["modules_linked"] for result in concurrent_results)==1 and
+              sum(result["stats"]["modules_reused"] for result in concurrent_results)==1,
+              concurrent_results)
+
+        # Failed public roots are analyzed in private closures: their partial
+        # inference/emission cannot poison good roots which share helpers.
+        root_isolation = directory/"root-isolation.lib"
+        root_isolation.write_text('''proc shared(int n){return(n+1);}
+proc aGood(int n){return(shared(n));}
+static proc poison(string s){return(s[1,1]);}
+proc mBad(int n){return(shared(n)+size(poison("ab")));}
+proc zGood(int n){return(shared(n)+2);}
+''')
+        isolated_roots = compile_lib(root_isolation, [])
+        isolated_manifest = json.loads(Path(isolated_roots["manifest"]).read_text())
+        check({node["procedure"] for node in isolated_manifest["procedures"]}==
+              {"shared", "aGood", "zGood"}, isolated_manifest)
+        check({entry["procedure"] for entry in isolated_roots["aliases"]}=={"mBad"}, isolated_roots)
+        isolated_output = singular(
+            f'LIB "{isolated_roots["module"]}"; print(native_aGood(4)); print(native_zGood(4));')
+        check("native_mBad is an interpreted alias, not native C++" in isolated_output and
+              isolated_output.endswith("5\n7\n"), isolated_output)
+
+        # Cache namespaces make all pre-v1 entries and the legacy global lock inert.
+        legacy_cache = directory/"legacy-cache"
+        for category in ("objects", "modules", "index", "ast"):
+            (legacy_cache/category).mkdir(parents=True, exist_ok=True)
+            (legacy_cache/category/"sentinel").write_text(category)
+        legacy_lock = (legacy_cache/"lock").open("a")
+        fcntl.flock(legacy_lock, fcntl.LOCK_EX)
+        try:
+            legacy = compile_lib(fixture, ["root"], ["--cache-dir", str(legacy_cache), "--jobs", "2"])
+        finally:
+            fcntl.flock(legacy_lock, fcntl.LOCK_UN)
+            legacy_lock.close()
+        check(all((legacy_cache/category/"sentinel").read_text()==category
+                  for category in ("objects", "modules", "index", "ast")), legacy)
+        check(str(Path(legacy["module"])).startswith(str(legacy_cache/"cache-v1")), legacy)
+
+        # Scheduling width is not part of any content identity.
+        serial = compile_lib(fixture, ["root"],
+                             ["--cache-dir", str(directory/"serial-cache"), "--jobs", "1"])
+        parallel = compile_lib(fixture, ["root"],
+                               ["--cache-dir", str(directory/"parallel-cache"), "--jobs", "4"])
+        check(Path(serial["module"]).name==Path(parallel["module"]).name, (serial, parallel))
+        serial_manifest = json.loads(Path(serial["manifest"]).read_text())
+        parallel_manifest = json.loads(Path(parallel["manifest"]).read_text())
+        check([node["key"] for node in serial_manifest["procedures"]]==
+              [node["key"] for node in parallel_manifest["procedures"]] and
+              serial_manifest["exports"]==parallel_manifest["exports"],
+              (serial_manifest, parallel_manifest))
+
+        # Library-at-a-time milestone: statically typed procedures compile;
+        # msum remains an exact interpreted alias because # elements can have
+        # types other than int at runtime.
+        template = compile_lib(ROOT/"Singular/LIB/template.lib", [], ["--export-prefix", "c_"])
+        check(set(template["native_exports"])=={"c_mdouble","c_mtriple"} and
+              {entry["procedure"] for entry in template["aliases"]}=={"msum"}, template)
+        template_output = singular(f'''LIB "template.lib"; LIB "{template["module"]}";
+print(c_mdouble(21)==mdouble(21)); print(c_mtriple(-7)==mtriple(-7));
+print(c_msum()==msum()); print(c_msum(8)==msum(8));
+print(c_msum(1,2,3,4)==msum(1,2,3,4));''')
+        check("c_msum is an interpreted alias, not native C++" in template_output and
+              template_output.endswith("1\n"*5), template_output)
+        template_dynamic = singular(f'''LIB "template.lib"; LIB "{template["module"]}";
+print(c_msum("a","b")==msum("a","b"));''')
+        check("interpreted alias" in template_dynamic and
+              template_dynamic.endswith("1\n"), template_dynamic)
+        collision = singular(f'''LIB "template.lib";
+int c_mdouble=77;
+LIB "{template["module"]}";
+print("COLLISION"); print(c_mdouble); print(mdouble(5)); print(defined(c_mtriple));''')
+        check("conflicts with a non-procedure" in collision and collision.endswith("COLLISION\n77\n10\n0\n"), collision)
+
+        partial = directory/"partial.lib"
+        partial.write_text('''info="native compiler partial-library fixture";
+static proc hidden(int n){return(n+1);}
+proc publicHelper(int n){return(hidden(n));}
+proc entry(int n){return(publicHelper(n));}
+// Keep one deliberately unsupported string overload in the alias/UI tests;
+// ordinary string concatenation is native now.
+static proc decorate(string s){return(s[1,size(s)]+"!");}
+proc unsupported(string s){return(decorate(s));}
+''')
+        public = compile_lib(partial, ["entry"], ["--export-prefix", "c_"])
+        check(set(public["exports"])=={"c_entry","c_publicHelper"}, public)
+        all_public = compile_lib(partial, [], ["--export-prefix", "c_"])
+        check(set(all_public["exports"])==set(public["exports"])|{"c_unsupported"} and
+              [p["procedure"] for p in all_public["skipped"]]==["unsupported"], all_public)
+        check(all_public["stats"]["objects_compiled"]==1, all_public) # new alias wrapper only
+        strict = subprocess.run(command(partial, [], ["--strict"]), capture_output=True, text=True, timeout=30)
+        check(strict.returncode!=0 and "unsupported" in strict.stderr, strict)
+        singular(f'LIB "{public["module"]}"; print(c_entry(9)); print(c_publicHelper(4)); print(defined(c_hidden));', "10\n5\n0\n")
+
+        # Source-checkout UI, including shell metacharacters in paths. Build-only
+        # must not load or rewrite anything, and failures must not load a stale
+        # receipt from an earlier successful build. Unsupported public roots
+        # instead load genuine interpreted aliases, with a warning.
+        ui_cache = directory/"cache space ' ; literal"
+        ui = f'''LIB "{ROOT}/Singular/LIB/compiler.lib";
+LIB "template.lib";
+proc mdouble(int i){{return(i+1000);}}
+compilerSetup("{TRANSLATOR}","{ui_cache}");
+string artifact=compileLib("template.lib");
+print("BUILD_ONLY"); print(defined(c_mdouble)); print(mdouble(21));
+loadCompiled(artifact);
+print("LOADED"); print(c_mdouble(21)); print(c_msum(1,2,3)); print(mdouble(21));
+print(mdouble(21));
+string procModule=compileProc("{partial}","entry",1);
+print("PROCEDURE"); print(c_entry(3)); print(c_publicHelper(5)); print(defined(c_hidden));
+compileProc("{partial}","unsupported",1);
+print("ALIASED"); print(c_unsupported("works"));
+compileProc("{partial}","missing",1);
+print("AFTER_FAILURE"); print(c_entry(3)); print(mdouble(21));
+'''
+        ui_output = singular(ui)
+        for expected in ["BUILD_ONLY\n0\n1021\n", "LOADED\n42\n6\n1021\n1021\n",
+                         "PROCEDURE\n4\n6\n0\n", "ALIASED\nworks!\n", "AFTER_FAILURE\n4\n1021\n"]:
+            check(expected in ui_output, ui_output)
+        check("no module was loaded" in ui_output, ui_output)
+        check("c_unsupported is an interpreted alias, not native C++" in ui_output, ui_output)
+
+        installed_ui = singular('''LIB "compiler.lib";
+string artifact=compileLib("template.lib",1);
+print("INSTALLED_UI"); print(c_mdouble(21)); print(c_msum(1,2,3,4));''',
+                                extra_env={"SINGULAR_NATIVE_DRIVER":"", "SINGULAR_NATIVE_CACHE":str(directory/"installed-cache")})
+        check(installed_ui.endswith("INSTALLED_UI\n42\n10\n"), installed_ui)
+
+        # Replacing c_value must not mutate a shared interpreted procinfo.
+        # Keep the original library at version one while loading native v2.
+        evolving = directory/"evolving.lib"
+        version_one = 'proc value(int n){print("interpreted");return(n+1);}\n'
+        evolving.write_text(version_one)
+        alias_image = compile_lib(evolving, [], ["--export-prefix", "c_"])
+        check(alias_image["native_exports"]==[] and len(alias_image["aliases"])==1, alias_image)
+        evolving.write_text('proc value(int n){return(n+10);}\n')
+        native_image = compile_lib(evolving, [], ["--export-prefix", "c_"])
+        evolving.write_text(version_one)
+        evolution = singular(f'''LIB "{evolving}";
+LIB "{alias_image["module"]}";
+proc saved=c_value;
+LIB "{native_image["module"]}";
+print("EVOLUTION"); print(c_value(1)); print(value(1)); print(saved(1));''')
+        check("interpreted alias" in evolution and evolution.endswith("EVOLUTION\n11\ninterpreted\n2\ninterpreted\n2\n"), evolution)
+
+        bad = directory/"bad.lib"
+        for unsupported in ['return(execute("1"));', 'ideal q=p;q=q-ideal(p);return(1);', 'return(unknown(p));', 'int while=2;return(1);',
+                            'if(1){int k=2;}return(k);',
+                            'list L=list(0);return(L[1]+1);',
+                            'int i=0;for(i=0;i<2;int x=i){i++;}return(x);',
+                            'if(1){poly q=p;return(q);}return(q);',
+                            'return(diff(1,1));', 'return(diff(p,p));',
+                            'execute("number xx = "+"a");kill xx;return(1);',
+                            'execute("number xx = "+list("a")[1]);kill xx;return(1);',
+                            'list names=ringlist(basering)[1][2];execute("number xx = "+names[1]);return(1);',
+                            'list names=ringlist(basering)[1][2];names[1]=1;execute("number xx = "+names[1]);kill xx;return(1);',
+                            'if(size(p)==0){return(0);}return(p);', 'return(helper(p));',
+                            'return(p<poly(1));', 'return(p[1,1]);',
+                            'intvec v=1,2;return(v[1..2]);',
+                            'intvec v=1,2;intvec out=(v+1)[1..2];return(out);',
+                            'return((1,2));',
+                            'list A,B=1,2;return(B);',
+                            'intvec v=1,2;return(v!=1);', 'return(p^-1+unknown(p));']:
+            bad.write_text("proc bad(poly p){return(helper(p));}\nproc helper(poly p){"+unsupported+"}\n")
+            result = subprocess.run(command(bad, ["bad"], ["--strict"]), capture_output=True, text=True, timeout=30)
+            check(result.returncode!=0 and "bad.lib::bad -> bad.lib::helper" in result.stderr, result)
+    print(f"Native compiler correctness: {checks} checks plus {287+poly_count+number_count} native/interpreted comparisons, 0 failures")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
