@@ -29,13 +29,13 @@ proc tst_system(string s, list #)
 RETURN:   string which is stdout and stderr of system(\"sh\", s)
 EXAMPLE:  example tst_system; shows examples"
 {
-  string tmpfile = "/tmp/tst_" + string(system("pid"));
+  string tmpfile = system("tmpdir") + "/tst_" + string(system("pid"));
   int errno;
 
-  s = s + " 1>" + tmpfile + " 2>&1";
+  s = s + " 1>\"" + tmpfile + "\" 2>&1";
   errno = system("sh", s);
   s = read(tmpfile);
-  errno = system("sh", "rm -f " + tmpfile);
+  errno = system("sh", "rm -f \"" + tmpfile + "\"");
   if (size(#) > 0 && size(s) > 1)
   {
     s = s[1, size(s) -1];

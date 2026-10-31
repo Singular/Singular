@@ -1,0 +1,102 @@
+proc compatCheck(int ok, string label)
+{
+  if (!ok)
+  {
+    ERROR(label);
+  }
+}
+
+string tmpProbe=system("tmpdir")+"/singular_tmp_"+string(system("pid"));
+write(":w "+tmpProbe,"TMP_OK");
+string tmpText=read(tmpProbe);
+compatCheck(find(tmpText,"TMP_OK")==1,"tmpdir");
+compatCheck(system("sh","rm -f \""+tmpProbe+"\"")==0,"tmpdir cleanup");
+
+def memory0=memory(0);
+def memory1=memory(1);
+def memory2=memory(2);
+compatCheck(typeof(memory0)=="bigint" && memory0==0,"memory(0)");
+compatCheck(typeof(memory1)=="bigint" && memory1==0,"memory(1)");
+compatCheck(typeof(memory2)=="bigint" && memory2==0,"memory(2)");
+
+LIB(compatLib);
+
+ring R=0,(x,y,z),dp;
+int ii=42;
+string ss="portable";
+bigint bi=123456789012345678901234567890;
+number nn=3/7;
+poly pp=x2+2/3*y*z-5;
+vector vv=[x+y,z2,1];
+ideal id=pp,x*y-z;
+module mo=[x,y,z],[z2,1,x+y];
+matrix ma[2][2]=x,y,z,x+y+1;
+smatrix sma=ma;
+intvec iv=1,-2,3,5;
+intmat im[2][3]=1,2,3,4,5,6;
+bigintmat bm[2][2]=1,224553233465,-3,4;
+bigintvec bv=2,5,224553233465;
+list li=ii,ss,pp,id,iv;
+
+string ii_s=string(ii);
+string ss_s=ss;
+string bi_s=string(bi);
+string nn_s=string(nn);
+string ring_s=string(R);
+string pp_s=string(pp);
+string vv_s=string(vv);
+string id_s=string(id);
+string mo_s=string(mo);
+string ma_s=string(ma);
+string sma_s=string(matrix(sma));
+string iv_s=string(iv);
+string im_s=string(im);
+string bm_s=string(bm);
+string bv_s=string(bv);
+string li_s=string(li);
+
+link out="ssi:w "+compatSsi;
+write(out,ii,ss,bi,nn);
+write(out,R,pp,vv,id,mo,ma,sma);
+write(out,iv,im,bm,bv,windowsLineEndingProc,li);
+close(out);
+kill out;
+
+link input="ssi:r "+compatSsi;
+def rii=read(input);
+compatCheck(typeof(rii)=="int" && string(rii)==ii_s,"int");
+def rss=read(input);
+compatCheck(typeof(rss)=="string" && rss==ss_s,"string");
+def rbi=read(input);
+compatCheck(typeof(rbi)=="bigint" && string(rbi)==bi_s,"bigint");
+def rnn=read(input);
+compatCheck(typeof(rnn)=="number" && string(rnn)==nn_s,"number");
+def rring=read(input);
+compatCheck(typeof(rring)=="ring" && string(rring)==ring_s,"ring");
+def rpp=read(input);
+compatCheck(typeof(rpp)=="poly" && string(rpp)==pp_s,"poly");
+def rvv=read(input);
+compatCheck(typeof(rvv)=="vector" && string(rvv)==vv_s,"vector");
+def rid=read(input);
+compatCheck(typeof(rid)=="ideal" && string(rid)==id_s,"ideal");
+def rmo=read(input);
+compatCheck(typeof(rmo)=="module" && string(rmo)==mo_s,"module");
+def rma=read(input);
+compatCheck(typeof(rma)=="matrix" && string(rma)==ma_s,"matrix");
+def rsma=read(input);
+compatCheck(typeof(rsma)=="smatrix" && string(matrix(rsma))==sma_s,"smatrix");
+def riv=read(input);
+compatCheck(typeof(riv)=="intvec" && string(riv)==iv_s,"intvec");
+def rim=read(input);
+compatCheck(typeof(rim)=="intmat" && string(rim)==im_s,"intmat");
+def rbm=read(input);
+compatCheck(typeof(rbm)=="bigintmat" && string(rbm)==bm_s,"bigintmat");
+def rbv=read(input);
+compatCheck(typeof(rbv)=="bigintvec" && string(rbv)==bv_s,"bigintvec");
+def rproc=read(input);
+compatCheck(typeof(rproc)=="proc" && rproc(41)==42,"proc");
+def rli=read(input);
+compatCheck(typeof(rli)=="list" && string(rli)==li_s,"list");
+close(input);
+
+print("SSI_TYPES_OK");
