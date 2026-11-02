@@ -151,6 +151,7 @@ and @code{LIB} no brackets are allowed.
 * modulo::
 * monitor::
 * monomial::
+* monomialResolution::
 * mpresmat::
 * mres::
 * mres_map::
@@ -5296,7 +5297,7 @@ See
 @ref{link expressions}.
 @c ref
 @c ---------------------------------------
-@node monomial, mpresmat, monitor, Functions
+@node monomial, monomialResolution, monitor, Functions
 @subsection monomial
 @cindex monomial
 @table @code
@@ -5324,7 +5325,77 @@ See
 @ref{intvec}.
 @c ref
 @c ---------------------------------------
-@node mpresmat, mres, monomial, Functions
+@node monomialResolution, mpresmat, monomial, Functions
+@subsection monomialResolution
+@cindex monomialResolution
+@cindex squarefreeResolution
+@cindex monomialResolutionBox
+@cindex squarefreeResolutionBox
+@cindex monres
+@cindex monresExplicit
+@cindex monresRanks
+@cindex monresDegrees
+@cindex monresMatrix
+@cindex monresApply
+
+@table @code
+@item @strong{Syntax:}
+@code{monomialResolution (} ideal_expression [@code{,} int_expression] @code{)}
+@*@code{squarefreeResolution (} ideal_expression [@code{,} int_expression] @code{)}
+@*@code{monomialResolutionBox (} ideal_expression [@code{,} int_expression] @code{)}
+@*@code{squarefreeResolutionBox (} ideal_expression [@code{,} int_expression] @code{)}
+@*@code{monresExplicit (} monres_expression @code{)}
+@*@code{monresRanks (} monres_expression @code{)}
+@*@code{monresDegrees (} monres_expression @code{,} int_expression @code{)}
+@*@code{monresMatrix (} monres_expression @code{,} int_expression @code{)}
+@*@code{monresApply (} monres_expression @code{,} int_expression
+@code{,} vector_expression @code{)}
+@item @strong{Type:}
+resolution for the first two commands, @code{monres} for the @code{Box}
+commands, and resolution, intvec, intmat, matrix, or vector for the accessors
+@item @strong{Purpose:}
+@code{monomialResolution} computes a minimal free resolution of
+@code{basering/I} for a proper monomial ideal @code{I}.
+@code{squarefreeResolution} likewise computes a minimal free resolution,
+using the Herzog--Takayama formula, Lyubeznik cancellation, or support-lattice
+homology as appropriate for the input. Its Lyubeznik constructor represents
+faces and variable sets by 64-bit blocks and builds one homological degree at
+a time; it also supports rings with more than 64 variables.
+@*
+The @code{Box} variants return a compact object of type @code{monres}.
+@code{monresExplicit} converts it to a resolution.
+@code{monresRanks} and @code{monresDegrees} return its ranks and multidegrees.
+@code{monresMatrix} returns one differential, while @code{monresApply}
+applies that differential without constructing its matrix.
+@*
+The optional positive integer bounds the construction size and defaults to
+@code{200000}.
+@item @strong{Note:}
+The basering must be a commutative polynomial ring over an exact field with
+a global ordering. The squarefree commands require squarefree generators.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=32003,(x,y,z),dp;
+  ideal I=xy,xz,yz;
+  monres B=squarefreeResolutionBox(I);
+  monresRanks(B);
+  matrix D=monresMatrix(B,2);
+  resolution R=monresExplicit(B);
+  betti(R);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{mres};
+@ref{fres};
+@ref{minres};
+@ref{betti}.
+@c ref
+@c ---------------------------------------
+
+@node mpresmat, mres, monomialResolution, Functions
 @subsection mpresmat
 @cindex mpresmat
 @cindex resultant
