@@ -2274,7 +2274,7 @@ NOTE:    genus always treats projective curves and takes projective closure if i
          singularity. @*
          genus(I,"nor") uses the normalization to compute delta. Usually genus(I,"nor")
          is slower than genus(I) but sometimes not. @*
-         genus(I,"pri") starts with a primary decompsition.
+         genus(I,"pri") starts with a primary decomposition.
 EXAMPLE: example genus; shows an example
 "
 {
@@ -5500,7 +5500,7 @@ EXAMPLE: example changeDenominator; shows an example
 {
   ASSUME(0, not isQuotientRing(basering) );
 // Let A = R / I. Given an A-module in the form 1/c1 * U1 (U1 ideal of A), it
-// computes a new ideal U2 such that the the A-module is 1/c2 * U2.
+// computes a new ideal U2 such that the A-module is 1/c2 * U2.
 // The base ring is R, but the computations are to be done in R / I.
   int a;      // counter
   def R = basering;

@@ -358,7 +358,7 @@ static proc Classify_Z_Y_FindWeights( poly fPoly, int k )
  poly firstlead = lead(fPoly);
  if( leadmonom(firstlead) != var(1)^4 ){ ERROR("Something went wrong");}
 
-//* Compute the the minimal weights
+//* Compute the minimal weights
  fPoly = fPoly - firstlead;
  intvec weights2;
  while( fPoly != 0 ){
@@ -506,7 +506,7 @@ static proc Classify_Y_FindWeights( poly f, int k, intvec weights1 )
  if( leadmonom(firstlead) != var(1)^2*var(2)^(2*k) )
  { ERROR("Something went wrong");}
 
-//* Compute the the minimal weights
+//* Compute the minimal weights
  f = f - firstlead;
  intvec weights2;
  while( f != 0 ){

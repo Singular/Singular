@@ -709,7 +709,7 @@ static proc equallistsA(list A, list B)
 }
 
 // Input:
-//  A,B:  lists lists of of P-rep, i.e. of the form [[p_1,[p_{11},..,p_{1j_1}]] .. [p_i,[p_{i1},..,p_{ij_i}]]
+//  A,B:  lists lists of P-rep, i.e. of the form [[p_1,[p_{11},..,p_{1j_1}]] .. [p_i,[p_{i1},..,p_{ij_i}]]
 // Output:
 //   1 if both lists of lists of P-rep are equal, or 0 if not
 static proc equallistsAall(list A,list B)
@@ -1430,8 +1430,8 @@ static proc incquotient(ideal N, poly f)
 }
 
 // Auxiliary routine to define an order for ideals
-// Returns 1 if the ideal a is shoud precede ideal b by sorting them in idbefid order
-//             2 if the the contrary happen
+// Returns 1 if the ideal a should precede ideal b by sorting them in idbefid order
+//             2 if the contrary happens
 //             0 if the order is not relevant
 static proc idbefid(ideal a, ideal b)
 {
@@ -2468,7 +2468,7 @@ static proc precombine(list L)
 //    poly Pi is the polynomial in Q[a][x] on V(pi) \ V(Mi)
 //    (p1,..,pr) are the prime decomposition of the lpp-segment
 //    list crep =(ideal ida,ideal idb): the Crep of the segment.
-//    list Pci of the intersecctions of all pj except the ith one
+//    list Pci of the intersections of all pj except the ith one
 // output:
 //    poly P on an open and dense set of V(p_1 int ... p_r)
 static proc combine(list L, ideal F)
@@ -3628,7 +3628,7 @@ static proc radicalmember(poly f,ideal ida)
 // output:
 //    list caout
 //            the minimum set of elements of CC needed such that at least one
-//            of the q's is non-null on S, as well as the C-rep of of the
+//            of the q's is non-null on S, as well as the C-rep of the
 //            points where the q's are null on S.
 //            The elements of caout are of the form (p,q,prep);
 static proc selectextendcoef(matrix CC, ideal ida, ideal idb)
@@ -4484,7 +4484,7 @@ static proc ConstoPrep(list L)
 //    Assumed to be called in the ring Q[a]
 proc ConsLevels(list A0)
 "USAGE: ConsLevels(list L);
-       L=[[P1,Q1],...,[Ps,Qs]] is a list of lists of of pairs of
+       L=[[P1,Q1],...,[Ps,Qs]] is a list of lists of pairs of
        ideals represening the constructible set
        S=V(P1) \ V(Q1) u ... u V(Ps) \ V(Qs).
        To be called in a ring Q[a][x] or a ring Q[a]. But the
@@ -5116,7 +5116,7 @@ static proc dimP0(ideal N)
 
 //     DimComp
 //     Auxilliary routine of locus2 determining the dimension of a parametric ideal
-//     it is identical to DimPar but adds infromation about the character of the component
+//     it is identical to DimPar but adds information about the character of the component
  static proc DimComp(ideal PA, int nax,int nx)
  {
 //     def RR=basering;

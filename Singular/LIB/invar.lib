@@ -30,7 +30,7 @@ RETURNS: SL(n) sets the current group to SL_n. The following global variables
             groupideal   of type <ideal>
             SLrep        of type <matrix>
             reynolds     of type <proc>
-          The quotient of of `group` and `groupideal` is the coordinate
+          The quotient of `group` and `groupideal` is the coordinate
           ring of SL_n. The matrix `SLrep` will be set to the standard
           representation of SL_n. The basering will be set to 'group'.
 EXAMPLE: example SL; shows an example"
@@ -286,7 +286,7 @@ RETURNS: torus(n) sets the current group to an n-dimensional torus. The
            group        of type <ring>
            groupideal   of type <ideal>
            reynolds     of type <proc>
-         The quotient of of `group` and `groupideal` is the coordinate
+         The quotient of `group` and `groupideal` is the coordinate
          ring of an n-dimensional torus. The basering will be set to
          'group'.
 EXAMPLE: example torus; shows an example"

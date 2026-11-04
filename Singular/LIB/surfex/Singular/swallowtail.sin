@@ -22,7 +22,7 @@ if(1) {
     ring r = 0,(x,y,z),dp;
     poly swallowtail = -4*y^2*z^3-16*x*z^4+27*y^4+144*x*y^2*z+128*x^2*z^2-256*x^3;
 
-    "only show the real 2-dimesional part:";
+    "only show the real 2-dimensional part:";
 //    plotRotated(swallowtail, list(x,y,z),0);
 
     "also show the real 1-dimensional parts:";

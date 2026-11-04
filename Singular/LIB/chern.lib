@@ -2762,7 +2762,7 @@ example
 proc rHRR(int N, list ch, list td)
 "USAGE:   rHRR( N, ch, td);  N integer, ch, td  lists of polynomials
 RETURN:   polynomial
-PURPOSE:  computes the the main ingredient of the right-hand side
+PURPOSE:  computes the main ingredient of the right-hand side
           of the Hirzebruch-Riemann-Roch formula
 EXAMPLE:  example rHRR; shows an example
 NOTE:     in order to get the right-hand side of the HRR formula
@@ -3217,7 +3217,7 @@ NOTE:
   resPoly= NF( 1-cl*mlt, u@^(n+1));
   matrix cf=coeffs(resPoly, u@); // coefficients of the Segre class
   rez=list(); // empty the list
-  for(i=0;i<=n;i++) // fill the list with the the Segre classes in positive degrees
+  for(i=0;i<=n;i++) // fill the list with the Segre classes in positive degrees
   {
     if( i < nrows(cf) ) // if i is not bigger than the maximal degree of non-zero Segre classes
     {
@@ -3317,7 +3317,7 @@ NOTE:
   resPoly= NF( (1+u@)^(n+1)*(1-cl*mlt), u@^(n+1) );
   matrix cf=coeffs(resPoly, u@); // coefficients of the Fulton class
   rez=list(); // empty the list
-  for(i=0;i<=n;i++) // fill the list with the the Fulton classes in positive degrees
+  for(i=0;i<=n;i++) // fill the list with the Fulton classes in positive degrees
   {
     if( i < nrows(cf) ) // if i is not bigger than the maximal degree of non-zero Fulton classes
     {

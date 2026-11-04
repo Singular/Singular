@@ -982,7 +982,7 @@ static proc normToInt(poly f, ideal normalGen, poly D, int needGroeb)
 // Computes the integral basis of R[y]/f, with R = k[x] localized at
 // the x coordinates of the points in P.
 // It uses the algorithm by Boehm, Decker, Laplagne, Pfister.
-// If locBasis = 1, it does not take into account the the unit from f
+// If locBasis = 1, it does not take into account the unit from f
 // after localization
 
 static proc ibLocal(poly f, ideal P, int locBasis, int useRotation, int optimize){
@@ -1649,7 +1649,7 @@ proc optiTwoSets(list ib1, number slope1, list ib2, number slope2)
 
 // Computes the integral basis of R[y]/f, with R = k[x] localized at x=0.
 // It uses the algorithm by Boehm, Decker, Laplagne, Pfister.
-// If locBasis = 1, it does not take into account the the unit from f
+// If locBasis = 1, it does not take into account the unit from f
 // after localization
 static proc ibAt0(poly f, int locBasis, int optimize)
 {
@@ -5422,7 +5422,7 @@ static proc xCondu(poly px, list norOut, ideal I)
   return(XCX[1]);
 }
 
-// Compose the tower of minimimal polynomials.
+// Compose the tower of minimal polynomials.
 // We assume that the polynomials are given in the second variable.
 // The first polynomial in the list is not used.
 static proc composePolys(list minPolys)
@@ -5522,7 +5522,7 @@ static proc isZeroIdeal(ideal I)
 
 // Case: singularity with non-rational Y coordinate, and X = 0.
 // py is a polynomial in Y, whose roots are the Y-coordinate of the
-// singuarities.
+// singularities.
 static proc ibNonRatY(poly f, poly py, int locBasis){
   // We have singularities at <x, roots of(py)>.
   int i;

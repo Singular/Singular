@@ -193,8 +193,8 @@ example
 static proc diffExpo(poly f)
 "USAGE:  diffExpo(f); f polynomial
 RETURN:  a list of integers vectors which are the difference of exponent
-         vector of leading monomial of f with the exponent vector of of other
-         monmials in f.
+         vector of leading monomial of f with the exponent vector of other
+         monomials in f.
 EXAMPLE: example diffExpo; shows an example
 "
 {

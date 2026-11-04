@@ -53,7 +53,7 @@ PROCEDURES:
   rootIsolationNoPreprocessing(I,L,e);
                           computes boxes containing unique roots of I lying in L
   rootIsolation(I,B,e);   slims down input box B and calls rootIsolationNoPreprocessing
-  rootIsolationPrimdec(I,B,e);   runs a primary decomposition primdecGTZ before root isoation
+  rootIsolationPrimdec(I,B,e);   runs a primary decomposition primdecGTZ before root isolation
 
 
 KEYWORDS:   real root isolation; interval arithmetic; Newton step

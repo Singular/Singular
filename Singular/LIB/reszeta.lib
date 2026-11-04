@@ -4560,7 +4560,7 @@ static proc findTrans(ideal Z, ideal E, list notE, list #)
 "
 {
 //---Auxilliary procedure for fetchInTree!
-//---Assume E prime ideal, Z+E eqidimensional,
+//---Assume E prime ideal, Z+E equidimensional,
 //---ht(E)+r=ht(Z+E). Compute  P=<p[1],...,p[r]> in Z+E, and polynomial f,
 //---such that radical(Z+E)=radical((E+P):f)
    int i,j,d,e;
