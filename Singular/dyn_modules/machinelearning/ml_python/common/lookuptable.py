@@ -6,11 +6,11 @@ these up in a lookup table.
 
 # System imports
 import os
+from urllib import request
 
 # Third party imports
 import tarfile
 import numpy as np
-from six.moves import urllib
 
 # local imports
 from common.keyword_vector import get_vectors, read_dictionary
@@ -27,8 +27,8 @@ def fetch_tbz2_data(tbz2_url=HELP_FILE_URL, data_path=HELP_FILE_PATH,
     if not os.path.isdir(data_path):
         os.makedirs(data_path)
     tbz2_path = os.path.join(data_path, file_name)
-    urllib.request.urlcleanup()
-    urllib.request.urlretrieve(tbz2_url, tbz2_path)
+    request.urlcleanup()
+    request.urlretrieve(tbz2_url, tbz2_path)
 
     tbz2_file = tarfile.open(tbz2_path)
     tbz2_file.extractall(path=data_path)
