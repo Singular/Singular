@@ -731,7 +731,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         }
         if(v->rtyp == IDHDL)
         {
-          v->name = omStrDup(v->name);
+          v->name = iiDupIdentifier(v->name);
         }
         else if (v->rtyp!=0)
         {
@@ -1563,7 +1563,7 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
   long slen = strlen(u->name) + 14;
   char *nn = (char*) omAlloc(slen);
   snprintf(nn,slen,"%s(%d)",u->name,(int)(long)v->Data());
-  char *n=omStrDup(nn);
+  char *n=iiDupIdentifier(nn);
   omFreeSize((ADDRESS)nn,slen);
   syMake(res,n);
   if (u->next!=NULL) return jjKLAMMER_rest(res,u->next,v);
@@ -1590,7 +1590,7 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
       p=p->next;
     }
     snprintf(n,slen,"%s(%d)",u->name,(*iv)[i]);
-    syMake(p,omStrDup(n));
+    syMake(p,iiDupIdentifier(n));
   }
   omFreeSize(n, slen);
   if (u->next!=NULL) return jjKLAMMER_rest(res,u->next,v);
@@ -5205,7 +5205,7 @@ static BOOLEAN jjP2I(leftv res, leftv v)
 static BOOLEAN jjPREIMAGE_R(leftv res, leftv v)
 {
   map mapping=(map)v->Data();
-  syMake(res,omStrDup(mapping->preimage));
+  syMake(res,iiDupIdentifier(mapping->preimage));
   return FALSE;
 }
 static BOOLEAN jjPRIME(leftv res, leftv v)
@@ -8382,7 +8382,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
     } while (v->next!=NULL);
     while (*s!='\0') s++;
     nn=strcat(nn,")");
-    char *n=omStrDup(nn);
+    char *n=iiDupIdentifier(nn);
     omFree((ADDRESS)nn);
     syMake(res,n);
     b=FALSE;

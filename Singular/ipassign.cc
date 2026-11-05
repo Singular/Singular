@@ -2314,7 +2314,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       if ((rt == RING_CMD)&&(r->e==NULL))
       {
         omFreeBinAddr((ADDRESS)IDMAP((idhdl)l->data)->preimage);
-        IDMAP((idhdl)l->data)->preimage = omStrDup (r->Fullname());
+        IDMAP((idhdl)l->data)->preimage = iiDupIdentifier(r->Fullname());
         /* advance the expressionlist to get the next element after the ring */
         hh = r->next;
       }

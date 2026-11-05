@@ -213,7 +213,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       if(w->rtyp==MAP_CMD)
       {
         ((map)data)->preimage=tmpR;
-        ((map)m)->preimage=omStrDup(tmpR);
+        ((map)m)->preimage=iiDupIdentifier(tmpR);
       }
       else
       {

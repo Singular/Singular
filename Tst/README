@@ -42,6 +42,31 @@ To test(s) correctness of Singular:
     alternatively be specified using the -s <Singular> option.
 
 
+To check interpreter input paths and exact diagnostics:
+------------------------------------------------------
+Run from this directory:
+  python3 Short/interpreter_correctness.py --singular /path/to/Singular
+
+This supplements the lambda and interpreter_io tests in Short/ok_s.lst.
+It checks small procedure/lambda call and lifecycle cases through files,
+piped input, execute(), and library loading, including buffer boundaries,
+CRLF, EOF without a final newline, and unfiltered diagnostic locations.
+Expected results are fixed; no timing or memory-performance thresholds are
+used. The per-process timeout is only a hang guard. Python 3.7 or newer is
+required, with no third-party packages.
+
+For an additional differential check of standard syntax and old lambdas:
+  python3 Short/interpreter_correctness.py --singular /path/to/candidate \
+    --reference /path/to/spielwiese
+
+New syntax and oversized legacy bodies that exceed the old allocator's
+limit are excluded from the reference comparison, but still checked against
+explicit expected results on the candidate. These are correctness tests,
+not the repeated performance cases in VeryLong/pr1404_performance_cases.py.
+Automatic CI runs this script alongside Short/ok_s.lst; the manual all/Short
+workflows do so as well.
+
+
 To test memory/timing performance of Singular:
 ----------------------------------------------
 1.) Put the Singular binary in this directory
@@ -150,5 +175,4 @@ To add a new test for a library/commando to the test-suite:
 
 * The command for generating xx.res.gz.uu and xx.stat is:
   cd <directopry where xx.tst resides>; perl ../regress.cmd -g xx.tst
-
 

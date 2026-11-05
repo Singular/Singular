@@ -47,6 +47,15 @@ EXTERN_VAR int blocknest; /* scaner.l internal */
 VAR int    yy_noeof=0;     // the scanner "state"
 VAR int    yy_blocklineno; // to get the lineno of the block start from scanner
 VAR Voice  *currentVoice = NULL;
+#if defined(__GNUC__) || defined(__clang__)
+extern void yyLambdaReplayLine(long offset)
+  __attribute__((visibility("hidden")));
+extern void yyLambdaReplayFinishInput()
+  __attribute__((visibility("hidden")));
+#else
+extern void yyLambdaReplayLine(long offset);
+extern void yyLambdaReplayFinishInput();
+#endif
 // FILE   *feFilePending; /*temp. storage for grammar.y */
 
 //static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
@@ -170,13 +179,14 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   //  t,BT_name[t],pname,currentVoice);
   if (pi!=NULL)
   {
-    long l=strlen(pi->procname);
-    if (pi->libname!=NULL) l+=strlen(pi->libname);
-    currentVoice->filename = (char *)omAlloc(l+3);
-    *currentVoice->filename='\0';
-    if (pi->libname!=NULL) strcat(currentVoice->filename,pi->libname);
-    strcat(currentVoice->filename,"::");
-    strcat(currentVoice->filename,pi->procname);
+    const size_t proc_len=strlen(pi->procname);
+    const size_t lib_len=(pi->libname!=NULL) ? strlen(pi->libname) : 0;
+    char *filename=(char *)omAlloc(lib_len+proc_len+3);
+    if (lib_len!=0) memcpy(filename,pi->libname,lib_len);
+    filename[lib_len]=':';
+    filename[lib_len+1]=':';
+    memcpy(filename+lib_len+2,pi->procname,proc_len+1);
+    currentVoice->filename = filename;
     currentVoice->pi       = pi;
   }
   else
@@ -415,23 +425,14 @@ static void feShowPrompt(void)
 /*2
 * print echo (si_echo or TRACE), set my_yylinebuf
 */
-static int fePrintEcho(char *anf, char */*b*/)
+static int fePrintEcho(const char *anf, const int len_s)
 {
-  char *ss=strrchr(anf,'\n');
-  int len_s;
-  if (ss==NULL)
-  {
-    len_s=strlen(anf);
-  }
-  else
-  {
-    len_s=ss-anf+1;
-  }
   // my_yylinebuf:
-  int mrc=si_min(len_s,79)-1;
-  strcpy(my_yylinebuf,anf+(len_s-1)-mrc);
-  if (my_yylinebuf[mrc] == '\n') my_yylinebuf[mrc] = '\0';
-  mrc--;
+  const int count=si_min(len_s,79);
+  memcpy(my_yylinebuf,anf+len_s-count,count);
+  my_yylinebuf[count]='\0';
+  if ((count>0) && (my_yylinebuf[count-1]=='\n'))
+    my_yylinebuf[count-1]='\0';
   // handle echo:
   if (((si_echo>myynest)
     && ((currentVoice->typ==BT_proc)
@@ -497,6 +498,78 @@ static int fePrintEcho(char *anf, char */*b*/)
   return len_s;
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+#if defined(__APPLE__) && defined(__MACH__)
+#define FE_COLD_OUTLINE __attribute__((section("__TEXT,__lambda_text"),noinline))
+#else
+#define FE_COLD_OUTLINE __attribute__((section(".lambda_text"),noinline))
+#endif
+#else
+#define FE_COLD_OUTLINE
+#endif
+
+void FE_COLD_OUTLINE feReportPrematureEof()
+{
+  const char *err;
+  switch(yy_noeof)
+  {
+    case noeof_brace:
+    case noeof_block:
+      err="{...}";
+      break;
+    case noeof_asstring:
+      err="till `.`";
+      break;
+    case noeof_string:
+      err="string";
+      break;
+    case noeof_bracket:
+      err="(...)";
+      break;
+    case noeof_procname:
+      err="proc";
+      break;
+    case noeof_comment:
+      err="/*...*/";
+      break;
+    default:
+      return;
+  }
+  Werror("premature end of file while reading %s",err);
+}
+
+#undef FE_COLD_OUTLINE
+
+#if defined(__GNUC__) || defined(__clang__)
+#if defined(__APPLE__) && defined(__MACH__)
+#define FE_REPLAY_COLD \
+  __attribute__((section("__TEXT,__lambda_text"),noinline,cold))
+#else
+#define FE_REPLAY_COLD \
+  __attribute__((section(".lambda_text"),noinline,cold))
+#endif
+#else
+#define FE_REPLAY_COLD
+#endif
+
+int feReadLine(char *b, int l);
+
+static int FE_REPLAY_COLD
+feReplayChunk(const long startfptr, const int count)
+{
+  yyLambdaReplayLine(startfptr);
+  currentVoice->fptr++;
+  return count;
+}
+
+static int FE_REPLAY_COLD feReplayEnd(char *b, const int l)
+{
+  yyLambdaReplayFinishInput();
+  return feReadLine(b,l);
+}
+
+#undef FE_REPLAY_COLD
+
 int feReadLine(char* b, int l)
 {
   char *s=NULL;
@@ -561,12 +634,14 @@ int feReadLine(char* b, int l)
         }
         if (show_echo)
         {
-          char *s=(char *)omAlloc(len+2);
-          strncpy(s,anf,len+2);
-          s[len+1]='\0';
-          fePrintEcho(s,b);
-          omFree((ADDRESS)s);
+          // Echo and the debugger consume a length-delimited line.  Keep
+          // diagnostics identical without allocating a temporary string.
+          fePrintEcho(anf,len+(anf[len]=='\n'));
         }
+      }
+      else if (UNLIKELY(currentVoice->sw==BI_replay))
+      {
+        return feReplayChunk(startfptr,i);
       }
       currentVoice->fptr++;
       return i;
@@ -574,6 +649,10 @@ int feReadLine(char* b, int l)
     // no buffer there or e-o-buffer or eoln:
     if (currentVoice->sw!=BI_buffer)
     {
+      if (UNLIKELY(currentVoice->sw==BI_replay))
+      {
+        return feReplayEnd(b,l);
+      }
       currentVoice->fptr=0;
       if (currentVoice->buffer==NULL)
       {
@@ -623,7 +702,9 @@ int feReadLine(char* b, int l)
       File_Log_written=TRUE;
       fputs(s,File_Log);
     }
-    int rc=fePrintEcho(s,b)+1;
+    const char *last_newline=strrchr(s,'\n');
+    const int line_length=(last_newline==NULL) ? strlen(s) : last_newline-s+1;
+    int rc=fePrintEcho(s,line_length)+1;
     //s[strlen(s)+1]='\0'; add an second \0 at the end of the string
     s[rc]='\0';
     // handel \\ :
@@ -698,4 +779,3 @@ Voice * feInitStdin(Voice *pp)
   return p;
 }
 #endif
-
