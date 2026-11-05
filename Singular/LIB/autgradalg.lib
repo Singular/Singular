@@ -550,7 +550,7 @@ static proc wmonomialsRec(bigintmat v, bigint bnd, intmat Q, intvec BNDs, list s
     intvec ivQv0tmp = Q*v0tmp;
     bigintmat Qv0tmp[1][size(ivQv0tmp)] = ivQv0tmp[1..size(ivQv0tmp)];
 
-    // this monmial will be too big to have degree w0:
+    // this monomial will be too big to have degree w0:
     if((Qv0tmp * v)[1,1] > bnd){
       return(list(sol0tmp));
     }
@@ -1305,7 +1305,7 @@ static proc createAutMatrix(list BL)
     }
   }
 
-  // the lower rows of of A
+  // the lower rows of A
   // are determined by the first ones:
   // e.g. A*(T_1^2) = (A*T_1)^2:
   for(i = n0 + 1; i <= size(MONS); i++){

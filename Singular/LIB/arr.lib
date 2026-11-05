@@ -272,7 +272,7 @@ static proc arrAddMatrix(arr A, matrix M){
 // access to hyperplanes, overloads [] operator
 static proc arrGet(arr A, intvec v)
 "USAGE:     A[v]; v int/intvec
-RETURN:     [poly] if v is [int] The defining poly of the the v-th hyperplane+
+RETURN:     [poly] if v is [int] The defining poly of the v-th hyperplane+
             [arr] if v is [intvec] The corresponding subarrangement
 SEE ALSO:   arrGet, arrSet
 KEYWORDS:   arrangement; get; operator

@@ -395,7 +395,7 @@ static proc setIntersectionOfLists(list L1,list L2)
 
 proc intersectionSet(Set N, Set M)
 "USAGE: intersectionSet(N,M) or N*M; N,M sets
-RETURN: Set, the interseection of the sets N and M
+RETURN: Set, the intersection of the sets N and M
 EXAMPLE: example intersection, shows an example
 KEYWORDS: intersection
 "

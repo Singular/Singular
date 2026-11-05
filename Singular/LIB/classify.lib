@@ -3115,7 +3115,7 @@ EXAMPLE: no example"
   Isomorphie_s17 (poly f, poly fk, int k, int ct)
   printresult (string f,string typ,int Mu,int m,int corank,int K)
   ";
-  "   Internal functions for the classifcation by invariants:
+  "   Internal functions for the classification by invariants:
   Cubic (poly f)
   parity (int e)             //return the parity of e
   HKclass (intvec i)

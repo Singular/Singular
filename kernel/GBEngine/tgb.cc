@@ -4085,7 +4085,7 @@ static inline BOOLEAN pHasNotCFExtended (poly p1, poly p2, poly m)
   }
 }
 
-//for impl reasons may return false if the the normal product criterion matches
+//for impl reasons may return false if the normal product criterion matches
 static inline BOOLEAN
 extended_product_criterion (poly p1, poly gcd1, poly p2, poly gcd2,
                             slimgb_alg * c)

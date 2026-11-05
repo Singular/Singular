@@ -353,7 +353,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
   map altphi=ALTERRING,maxideal(1);
   ideal i=altphi(i);
   int j,k,l,jj,kk;  // index variables
-  // work through the optionional parameters
+  // work through the optional parameters
   int isprime,iszerodim,isintrop,gfanold,findall,noabs,nogfan,noresubst,puiseux;
   for (j=1;j<=size(#);j++)
   {
@@ -630,7 +630,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
         //       there occurred some unexpected cancellation;
         //       we only know that for SOME
         //       solution of the zero-dimensional reduction NO
-        //       canellation will occur,
+        //       cancellation will occur,
         //       but for others this may very well happen;
         //       this in particular means that
         //       we possibly MUST compute all zero-dimensional
@@ -1002,7 +1002,7 @@ ASSUME:  f is a non-constant polynomial in two variables which is not
 RETURN:  list, where each entry of the list l describes the Newton-Puiseux
 @*             parametrisations of one branch of the plane curve singularity
 @*             at the origin defined by f; only the terms up to order n of each
-@*             parametetrisation are computed
+@*             parametrisation are computed
 @*             l[i][1] = is a ring
 @*             l[i][2] = int
 @*             l[i][3] = string
@@ -4192,7 +4192,7 @@ NOTE:        needs the libraries random.lib and primdec.lib;
   setring BASERING;
   A[1,1..size(wminust)]=wminust;
   A[2,1..size(wminust)]=1..size(wminust);
-  // sort this matrix in otder to get the d smallest entries
+  // sort this matrix in order to get the d smallest entries
   // (without counting the t-entry)
   A=sortintmat(A);
   randomp=0;
@@ -6569,7 +6569,7 @@ RETURN:      list, each entry corresponds to a vertex in the tropical plane
                    curve defined by tp
                    l[i][1] = x-coordinate of the ith vertex
                    l[i][2] = y-coordinate of the ith vertex
-                   l[i][3] = a polynomial whose monimials mark the vertices in
+                   l[i][3] = a polynomial whose monomials mark the vertices in
                              the Newton polygon corresponding to the entries in
                              tp which take the common minimum at the ith vertex
 NOTE:      - the information in l[i][3] represents the subdivision of the Newton
@@ -6704,7 +6704,7 @@ NOTE:      - the tropical curve defined by tp will consist of a bunch of
              list, each entry corresponds to a vertex in the tropical plane
                    curve defined by tp
                    l[i][1] = the equation of the ith line in the tropical curve
-                   l[i][2] = a polynomial whose monimials mark the vertices in
+                   l[i][2] = a polynomial whose monomials mark the vertices in
                              the Newton polygon corresponding to the entries in
                              tp which take the common minimum at the ith vertex
            - the information in l[i][2] represents the subdivision of the Newton

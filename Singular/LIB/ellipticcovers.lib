@@ -15,7 +15,7 @@ It has been obtained by proving mirror symmetry
 for arbitrary genus by tropical methods in [BBM]. A Feynman graph of genus
 g is a trivalent, connected graph of genus g (with 2g-2 vertices
 and 3g-3 edges). The branch type b=(b_1,...,b_(3g-3)) of a stable map is the
-multiplicity of the the edge i over a fixed base point.
+multiplicity of the edge i over a fixed base point.
 
 Given a Feynman graph G and a branch type b, we obtain the number
 N_(G,b) of stable maps of branch type b from a genus g curve of topological type G

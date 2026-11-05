@@ -7378,7 +7378,7 @@ THEORY:  A Groebner basis of the ideal of algebraic relations of the invariant
          and the polynomials that are left define the relative orbit variety
          with respect to I.
 NOTE:    This procedure is now replaced by rel_orbit_variety
-         (see @ref{rel_orbit_variety}), which uses a different elemination
+         (see @ref{rel_orbit_variety}), which uses a different elimination
          order that should usually allow faster computations.
 SEE ALSO: rel_orbit_variety
 EXAMPLE: example relative_orbit_variety; shows an example

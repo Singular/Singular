@@ -600,7 +600,7 @@ NOTE:     this procedure is NOT Grobner free and should be used only if the
 }
 /////////////////////////////////////////////////////////////////////////////
 //
-// Comparing irreducible decompsitions
+// Comparing irreducible decompositions
 // WARNING: this is not a test, when the answer is 1 and the decompositions
 //          may not coincide but it is fast and easy and when the answer is
 //          0 the decomposition do not coincide.
@@ -1384,7 +1384,7 @@ example
 proc isartinianMon (ideal I)
 "USAGE:    isartinianMon(I); I ideal.
 RETURN:   1, if ideal is artinian; 0, otherwise.
-          (return -1 if ideal I is not a monmomial ideal).
+          (return -1 if ideal I is not a monomial ideal).
 ASSUME:   I is a monomial ideal of the basering.
 EXAMPLE:  example isartinianMon; shows some examples
 "

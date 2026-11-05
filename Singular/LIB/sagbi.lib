@@ -1106,8 +1106,8 @@ EXAMPLE: example sagbiReduction; shows an example"
     return(p);
   }
   //======================2end variant of algorithm=========================
-  //It uses two different commands for elimaination.
-  //if(choose==1):"elimainate"command.
+  //It uses two different commands for elimination.
+  //if(choose==1):"eliminate"command.
   //if (choose==2):"nselect" command.
   else
   {

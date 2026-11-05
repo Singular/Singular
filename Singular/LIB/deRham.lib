@@ -929,7 +929,7 @@ RETURN  AlList of the form (K,g), where K is an ideal and g a univariant polynom
   /* We use Algorithm 3.1.12 in[R] to compute the s-parametric
      annihilator. Then we use the s-parametric annihilator to compute the b-function
      via Algorithm 4.7 in [W1].*/
-  /* We assume that the basering the the nth Weyl algebra D_n. We create the ring
+  /* We assume that the basering is the nth Weyl algebra D_n. We create the ring
      D_n[s,t], where t*s=s*t-t*/
   def save = basering;
   int N = nvars(basering)-1;
@@ -5523,7 +5523,7 @@ static proc nDeg (matrix M,intvec m)
 ////////////////////////////////////////////////////////////////////////////////////
 
 static proc minIntRootD(list L,list #)
-"USAGE:minIntRootD(L [,M]); L list, M optinonal list
+"USAGE:minIntRootD(L [,M]); L list, M optional list
 ASSUME:L a list of univariate polynomials with rational coefficients @*
        the variable of the polynomial is s if size(#)==0 (needed for proc
        MVComplex) and t else (needed for globalBFun)
