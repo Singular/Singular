@@ -1,0 +1,50 @@
+class SingularSispasm < Formula
+  desc "Computer algebra system with the SpaSM-backed sispasm module"
+  homepage "https://www.singular.uni-kl.de/"
+  url "@SOURCE_URL@"
+  version "@VERSION@"
+  sha256 "@SOURCE_SHA256@"
+  license "GPL-2.0-or-later"
+
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "bison" => :build
+  depends_on "libtool" => :build
+
+  depends_on "cddlib"
+  depends_on "flint"
+  depends_on "gmp"
+  depends_on "mpfr"
+  depends_on "ntl"
+  depends_on "readline"
+  depends_on "spasm"
+
+  conflicts_with "singular", because: "both install the Singular executable"
+
+  def install
+    system "./autogen.sh"
+    system "./configure", "--enable-gfanlib",
+                          "--enable-sispasm-module",
+                          "--with-ntl=yes",
+                          "--with-flint=yes",
+                          "--without-python",
+                          "--disable-python",
+                          *std_configure_args
+    system "make", "install"
+  end
+
+  test do
+    input = <<~EOS
+      LIB "sispasm.so";
+      ring r = 32003,(x,y),dp;
+      matrix m[2][2] = 1,2,3,4;
+      spasm s = m;
+      nrows(s);
+      ncols(s);
+      matrix n = to_matrix(s);
+      print("HOMEBREW_SISPASM_TEST_OK");
+      quit;
+    EOS
+    assert_match "HOMEBREW_SISPASM_TEST_OK", pipe_output("#{bin}/Singular -q", input, 0)
+  end
+end

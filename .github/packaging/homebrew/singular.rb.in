@@ -1,0 +1,41 @@
+class Singular < Formula
+  desc "Computer algebra system for polynomial computations"
+  homepage "https://www.singular.uni-kl.de/"
+  url "@SOURCE_URL@"
+  version "@VERSION@"
+  sha256 "@SOURCE_SHA256@"
+  license "GPL-2.0-or-later"
+
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "bison" => :build
+  depends_on "libtool" => :build
+
+  depends_on "cddlib"
+  depends_on "flint"
+  depends_on "gmp"
+  depends_on "mpfr"
+  depends_on "ntl"
+  depends_on "readline"
+
+  def install
+    system "./autogen.sh"
+    system "./configure", "--enable-gfanlib",
+                          "--with-ntl=yes",
+                          "--with-flint=yes",
+                          "--without-python",
+                          "--disable-python",
+                          *std_configure_args
+    system "make", "install"
+  end
+
+  test do
+    input = <<~EOS
+      ring r = 0,(x,y,z),dp;
+      poly p = x*y*z;
+      if (string(p) == "xyz") { print("HOMEBREW_TEST_OK"); }
+      quit;
+    EOS
+    assert_match "HOMEBREW_TEST_OK", pipe_output("#{bin}/Singular -q", input, 0)
+  end
+end
