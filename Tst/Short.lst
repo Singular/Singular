@@ -190,6 +190,7 @@ Short/gcdp_s.tst
 Short/gerhard_1_32003_lp.tst
 Short/graphics.tst
 Short/groebner_s.tst
+Short/grobcov_internal_options.tst
 Short/htable.tst
 Short/highcorner_s.tst
 Short/hilb_weights.tst
@@ -202,6 +203,7 @@ Short/intersect_s.tst
 Short/intersect_q.tst
 Short/invar.tst
 Short/invarlib.tst
+Short/issue_1417.tst
 Short/janet.tst
 Short/jmbtest.tst
 Short/kernel_weighted_homog.tst
