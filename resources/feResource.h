@@ -55,6 +55,10 @@ void feReInitResources();
 
 EXTERN_VAR char* feArgv0;
 
-const char fePathSep = ':' ;
+#ifdef _WIN32
+const char fePathSep = ';';
+#else
+const char fePathSep = ':';
+#endif
 
 #endif

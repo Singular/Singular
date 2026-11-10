@@ -39,7 +39,12 @@ s_buff s_open(int fd)
 
 s_buff s_open_by_name(const char *n)
 {
+#ifdef _WIN32
+  // Native Windows: SSI files use the Unix byte format.
+  int fd=si_open(n,O_RDONLY | O_BINARY);
+#else
   int fd=si_open(n,O_RDONLY);
+#endif
   return s_open(fd);
 }
 

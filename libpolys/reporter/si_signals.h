@@ -9,18 +9,19 @@
 #include <signal.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/select.h>
-
 #include <unistd.h>
-#include <sys/uio.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/socket.h>
 #include <time.h>
 #include <stdio.h>
 #include <semaphore.h>
 #include <stdarg.h>
+#ifndef _WIN32
+# include <sys/wait.h>
+# include <sys/select.h>
+# include <sys/uio.h>
+# include <sys/socket.h>
+#endif
 #ifdef HAVE_POLL_H
 #include <poll.h>
 #endif
@@ -45,6 +46,7 @@ static inline return_type newfunc decl   \
 #define SI_EINTR_SAVE_SCANF(return_type, func, decl, args) \
   SI_EINTR_SAVE_FUNC_TEMPLATE(return_type, si_##func, func, decl, args, == EOF)
 
+#ifndef _WIN32
 SI_EINTR_SAVE_FUNC(int, select,
                    (int nfds, fd_set *readfds, fd_set *writefds,
                     fd_set *exceptfds, struct timeval *timeout),
@@ -61,6 +63,7 @@ SI_EINTR_SAVE_FUNC(int, poll,
 SI_EINTR_SAVE_FUNC(pid_t, wait, (int *status), (status))
 SI_EINTR_SAVE_FUNC(pid_t, waitpid, (pid_t pid, int *status, int options),
                    (pid, status, options))
+#endif
 
 //SI_EINTR_SAVE_FUNC(int, waitid,
 //                   (idtype_t idtype, id_t id, siginfo_t *infop, int options),
@@ -96,6 +99,7 @@ SI_EINTR_SAVE_FUNC_TEMPLATE(int, si_open2, open,
 
 SI_EINTR_SAVE_FUNC(int, close, (int fd), (fd))
 
+#ifndef _WIN32
 SI_EINTR_SAVE_FUNC(int, accept,
                    (int sockfd, struct sockaddr *addr, socklen_t *addrlen),
                    (sockfd, addr, addrlen))
@@ -103,6 +107,7 @@ SI_EINTR_SAVE_FUNC(int, accept,
 SI_EINTR_SAVE_FUNC(int, connect,
                    (int sockfd, const struct sockaddr *addr, socklen_t addrlen),
                    (sockfd, addr, addrlen))
+#endif
 
 #if 0
 /* @note: We respect that the user may explicitly deactivate the
@@ -183,14 +188,16 @@ SI_EINTR_SAVE_FUNC(int, stat, (const char *path, struct stat *buf),
                    (path, buf))
 SI_EINTR_SAVE_FUNC(int, fstat, (int fd, struct stat *buf),
                    (fd, buf))
+#ifndef _WIN32
 SI_EINTR_SAVE_FUNC(int, lstat, (const char *path, struct stat *buf),
                    (path, buf))
-
-
 SI_EINTR_SAVE_FUNC(int, sigaction,
                    (int signum, const struct sigaction *act,
                     struct sigaction *oldact),
                    (signum, act, oldact))
+#else
+# define si_lstat(path, buf) si_stat((path), (buf))
+#endif
 
 
 #ifdef HAVE_SIGINTERRUPT

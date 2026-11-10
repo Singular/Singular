@@ -56,6 +56,11 @@ BOOLEAN slInit(si_link l, char *istr)
     // find the first colon char in istr
     i = 0;
     while (istr[i] != ':' && istr[i] != '\0') i++;
+#ifdef _WIN32
+    // Native Windows: drive paths are file names, not link types.
+    if ((i==1)&&(istr[i]==':')&&((istr[i+1]=='/')||(istr[i+1]=='\\')))
+      while (istr[i]!='\0') i++;
+#endif
     if (istr[i] == ':')
     {
       // if found, set type

@@ -23,9 +23,40 @@
 
 #include <ctype.h>
 
+#ifdef _WIN32
+// Native Windows: read physical library bytes before LF normalization.
+#define iiLibFread fread
+
+static long iiNormalizeLibText(char *text, long length)
+{
+  char *cr = (char *)memchr(text, '\r', length);
+  if (cr == NULL)
+  {
+    text[length] = '\0';
+    return length;
+  }
+
+  long in = cr - text;
+  long out = in;
+
+  while (in < length)
+  {
+    if ((text[in] == '\r') && (in + 1 < length) && (text[in + 1] == '\n'))
+      in++;
+    else if (text[in] == '\r')
+      text[in] = '\n';
+    text[out++] = text[in++];
+  }
+  text[out] = '\0';
+  return out;
+}
+#else
+#define iiLibFread myfread
+#endif
+
 #if SIZEOF_LONG == 8
 #define SI_MAX_NEST 500
-#elif defined(__CYGWIN__)
+#elif defined(_WIN32)
 #define SI_MAX_NEST 480
 #else
 #define SI_MAX_NEST 1000
@@ -33,7 +64,7 @@
 
 #if defined(ix86Mac_darwin) || defined(x86_64Mac_darwin) || defined(ppcMac_darwin)
 #  define MODULE_SUFFIX bundle
-#elif defined(__CYGWIN__)
+#elif defined(_WIN32)
 #  define MODULE_SUFFIX dll
 #else
 #  define MODULE_SUFFIX so
@@ -220,12 +251,12 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
     s = (char *)omAlloc(procbuflen+head+3);
-    res=myfread(s, head, 1, fp);
+    res=iiLibFread(s, head, 1, fp);
     if (res<=0) /* error*/ { omFree(s); return NULL; }
     s[head] = '\n';
     int res=fseek(fp, pi->data.s.help_start, SEEK_SET);
     if (res==-1) /*error*/ { omFree(s); return NULL; }
-    res=myfread(s+head+1, procbuflen, 1, fp);
+    res=iiLibFread(s+head+1, procbuflen, 1, fp);
     if (res<=0) /* error*/ { omFree(s); return NULL; }
     fclose(fp);
     s[procbuflen+head+1] = '\n';
@@ -241,6 +272,10 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
       }
       if(offset>0) s[i-offset] = s[i];
     }
+#ifdef _WIN32
+    // Native Windows: expose canonical LF text.
+    iiNormalizeLibText(s, strlen(s));
+#endif
     return(s);
   }
   else if(part==1)
@@ -248,7 +283,11 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     procbuflen = pi->data.s.def_end - pi->data.s.proc_start;
     char *ss=(char *)omAlloc(procbuflen+2);
     //fgets(buf, sizeof(buf), fp);
-    myfread( ss, procbuflen, 1, fp);
+    iiLibFread( ss, procbuflen, 1, fp);
+#ifdef _WIN32
+    // Native Windows: expose canonical LF text.
+    iiNormalizeLibText(ss, procbuflen);
+#endif
     char ct;
     char *e;
     s=iiProcName(ss,ct,e);
@@ -266,9 +305,18 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     assume(pi->data.s.body != NULL);
     fseek(fp, pi->data.s.body_start, SEEK_SET);
     strcpy(pi->data.s.body,argstr);
+#ifdef _WIN32
+    // Native Windows: expose canonical LF text.
+    long arglen = strlen(argstr);
+    iiLibFread( pi->data.s.body+arglen, procbuflen, 1, fp);
+    fclose( fp );
+    procbuflen+=arglen;
+    procbuflen=iiNormalizeLibText(pi->data.s.body, procbuflen);
+#else
     myfread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
     fclose( fp );
     procbuflen+=strlen(argstr);
+#endif
     omFree(argstr);
     omFree(ss);
     pi->data.s.body[procbuflen] = '\0';
@@ -293,11 +341,15 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);
     s = (char *)omAlloc(procbuflen+14);
-    myfread(s, procbuflen, 1, fp);
+    iiLibFread(s, procbuflen, 1, fp);
     s[procbuflen] = '\0';
     strcat(s+procbuflen-3, "\n;return();\n\n" );
     p=(char *)strchr(s,'{');
     if (p!=NULL) *p=' ';
+#ifdef _WIN32
+    // Native Windows: expose canonical LF text.
+    iiNormalizeLibText(s, strlen(s));
+#endif
     return(s);
   }
   return NULL;
@@ -897,7 +949,12 @@ BOOLEAN iiLibCmd( const char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOO
   char libnamebuf[1024];
   idhdl pl;
   char *plib = iiConvName(newlib);
+#ifdef _WIN32
+  // Native Windows: keep lazy procedure offsets physical.
+  FILE * fp = feFopen( newlib, "rb", libnamebuf, tellerror );
+#else
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
+#endif
   // int lines = 1;
   BOOLEAN LoadResult = TRUE;
 
