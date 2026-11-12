@@ -14,7 +14,8 @@ PROCEDURES:
  truncateFast(phi,d);    truncation of coker(phi) at d (fast+ experimental)
  CM_regularity(M);       Castelnuovo-Mumford regularity of coker(M)
  sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
- globalSectionsBLH(M,r,d0,w); global sections in all degrees >= d0
+ globalSectionsBLH(M,r,d0); global sections in all degrees >= d0
+ globalSectionsBLH_w(M,r,d0,w); global sections in all degrees >= d0 with weights
  sheafCohBGGregul(M,l,h,r); cohomology of sheaf associated to coker(M)
                           with given regularity
  sheafCohBGGregul_w(M,l,h,r,w); cohomology with given module weights
@@ -1783,7 +1784,7 @@ Examples:
 //     obtained independently as `truncate(M,d)`.
 // Debug output follows the convention used throughout this library:
 // `printlevel >= 2` shows progress and `printlevel >= 3` intermediate data.
-proc globalSectionsBLH(module M, int reg_bound, int d0, intvec gen_degs)
+proc globalSectionsBLH_w(module M, int reg_bound, int d0, intvec gen_degs)
 "USAGE:   globalSectionsBLH(M,r,d0,w); M module, r,d0 int, w intvec
 ASSUME:   M is a homogeneous presentation matrix over a standard graded
          polynomial ring, w contains the degrees of the generators of its
@@ -2208,3 +2209,14 @@ SEE ALSO: truncate, dimGradedPart, CM_regularity, sheafCohBGG
   attrib(full_relations, "isHomog", new_degs);
   return(full_relations);
 }
+
+proc globalSectionsBLH(module M, int reg_bound, int d0)
+{
+  intvec w = attrib(M, "isHomog");
+  if(typeof(w) != "intvec")
+  {
+    error("module is not graded");
+  }
+  return(globalSectionsBLH_w(M, reg_bound, d0, w));
+}
+
