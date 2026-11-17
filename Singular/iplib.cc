@@ -709,6 +709,15 @@ int ii_CallProcId2Int(const char *lib,const char *proc, ideal arg, const ring R)
 /// arg_types: 0 terminated array of corresponding types
 leftv ii_CallLibProcM(const char*n, void **args, int* arg_types, const ring R, BOOLEAN &err)
 {
+  return ii_CallLibProcMFlags(n,args,arg_types,NULL,R,err);
+}
+
+/// like ii_CallLibProcM, but if arg_flags is not NULL, then it is an array
+/// of the same length as arg_types, and the i-th argument is marked as a
+/// standard basis (FLAG_STD, the attribute "isSB") if arg_flags[i] is nonzero,
+/// so that library procedures do not compute a standard basis again
+leftv ii_CallLibProcMFlags(const char*n, void **args, int* arg_types, const int* arg_flags, const ring R, BOOLEAN &err)
+{
   idhdl h=ggetid(n);
   if ((h==NULL)
   || (IDTYP(h)!=PROC_CMD))
@@ -730,12 +739,14 @@ leftv ii_CallLibProcM(const char*n, void **args, int* arg_types, const ring R, B
     tmp.Init();
     tmp.data=args[0];
     tmp.rtyp=arg_types[0];
+    if ((arg_flags!=NULL) && (arg_flags[0]!=0)) setFlag(&tmp,FLAG_STD);
     while(arg_types[i]!=0)
     {
       tt->next=(leftv)omAlloc0Bin(sleftv_bin);
       tt=tt->next;
       tt->rtyp=arg_types[i];
       tt->data=args[i];
+      if ((arg_flags!=NULL) && (arg_flags[i]!=0)) setFlag(tt,FLAG_STD);
       i++;
     }
     // call proc
