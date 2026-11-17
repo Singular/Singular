@@ -1,5 +1,5 @@
 /*
- * provides (after defintion of a ring with coeffs in Z/p)
+ * provides (after definition of a ring with coeffs in Z/p)
  * - type spasm
  * - assignment smatrix,module ->spasm, matrix ->spasm
  * - printing/string(spasm)

@@ -276,11 +276,10 @@ RETURN:    j: the intersection of their realradicals
 EXAMPLE:   example radzero; shows no example"
 {
  def r=basering;
- int n,ll;
  //for the mapping in general position
- map phi,psi;
+ map phi,psi,psi1;
  ideal j;
- ideal jmap=randomLast(20);
+ ideal jmap,jmap2;
  string ri;
  bigintvec @hilb;
  ideal trans,transprep;// the transformation ideals
@@ -306,6 +305,8 @@ EXAMPLE:   example radzero; shows no example"
  int m=size(buffer);
  for (l=1;l<=m;l++)
  {
+   jmap=randomLast(20);
+   jmap2=maxideal(1);
    //searching first non univariate polynomial with an even degree
    //for odd degree we could use the fundamental theorem of algebra and
    //get real zeros
@@ -314,14 +315,17 @@ EXAMPLE:   example radzero; shows no example"
    //denote that this random chance doesn't work always
    //the ideas for the transformation into general position are
    //used from the primdec.lib
+   //prepare_max may return a basis computed in a permuted variable order
+   buffer[l]=groebner(buffer[l]);
    transprep=buffer[l];
    if (voice>=10)
    {
      jmap[size(jmap)]=randp;
    }
 
-
-   for (k=2;k<=n;k++)
+   //turn generators with linear leading monomials into coordinate variables
+   //before the random change, and remember the inverse substitution
+   for (k=1;k<=size(buffer[l]);k++)
    {
      if (ord(buffer[l][k])==1)
      {
@@ -329,18 +333,20 @@ EXAMPLE:   example radzero; shows no example"
        {
          if (lead(buffer[l][k])/var(zz)!=0)
          {
+           jmap2[zz]=buffer[l][k];
            transprep[k]=var(zz);
          }
        }
-       jmap[nva]=subst(jmap[nva],lead(buffer[l][k]),0);
      }
    }
+   //do not remove these variables from jmap: randomLast must stay invertible
    phi =r,jmap;
    for (k=1;k<=nva;k++)
    {
      jmap[k]=-(jmap[k]-2*var(k));
    }
    psi =r,jmap;
+   psi1=r,jmap2;
 
    //coordinate chance
    trans=phi(transprep);
@@ -376,7 +382,8 @@ EXAMPLE:   example radzero; shows no example"
      trans=realzero(trans);
 
      //going back
-     buffer[l]=psi(trans);
+     trans=psi(trans);
+     buffer[l]=psi1(trans);
      //buffer[l]=timeStd(buffer[l],301);//timelimit for std computation
      buffer[l]=interred(buffer[l]);//timeStd does not work yet
    }

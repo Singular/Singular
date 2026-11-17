@@ -2445,7 +2445,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
 
 // construct a new weight vector and check whether vec[j] is overflow, i.e. vec[j] > 2^31.
 // If vec[j] doesn't overflow, define a weight vector. Otherwise, report that overflow
-// appears. In the second case, test whether the the correctness of the new vector plays
+// appears. In the second case, test whether the correctness of the new vector plays
 // an important role
 
   for (j=0; j<nRing; j++)
@@ -7102,7 +7102,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       }
 #endif
 
-    // check whether the the computed vector is in the correct cone.
+    // check whether the computed vector is in the correct cone.
     // If no, compute the reduced Groebner basis of an omega-homogeneous
     // ideal with Buchberger's algorithm and stop this recursion step
     if(Overflow_Error == TRUE || test_w_in_ConeCC(G, next_vect) != 1)  //e.g. Example s7, cyc6
@@ -7663,7 +7663,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       }
 #endif
 
-/*     check whether the the computed vector is in the correct cone
+/*     check whether the computed vector is in the correct cone
        If no, the reduced GB of an omega-homogeneous ideal will be
        computed by Buchberger algorithm and stop this recursion step
 */

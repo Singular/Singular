@@ -113,6 +113,10 @@ to describe:
 -cfClearContent
 -cfClearDenominators
 -cfPower only small exponents (machine int) supported right now.
+-cfFactorize: optional hook for polynomial factorization over a polynomial ring
+ with these coefficients.  The input polynomial is borrowed/read-only; the
+ returned ideal and exponent vector must follow the singclap_factorize
+ with_exps convention.  Return NULL to use Singular's built-in fallback.
 
 ----------------------------------------------------------------------------
 Howto define a new coeff type:
@@ -121,4 +125,3 @@ Howto define a new coeff type:
 // create the new coeff type:
  coeffs cf=nInitChar(type,<your parameter for the InitChar procedure>);
 // cf may now be used for (polynomial) ring definitions etc.
-

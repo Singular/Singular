@@ -5,8 +5,12 @@
 
 #include "test_iparith.hpp"
 #include <kernel/mod2.h>
+#include <kernel/polys.h>
+#include <polys/monomials/ring.h>
 #include <Singular/grammar.h>
 #include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <Singular/htable.h>
 
 using namespace Singular::tests;
 
@@ -93,6 +97,101 @@ void IpArithTest::test_iiArithFindCmd()
   CPPUNIT_ASSERT(pos==-1);
 
   return;
+}
+
+
+void IpArithTest::test_HTableCommandRegistration()
+{
+  int pos = iiArithFindCmd("htable");
+  CPPUNIT_ASSERT(pos >= 0);
+  CPPUNIT_ASSERT(std::string("htable") == std::string(iiArithGetCmd(pos)));
+  CPPUNIT_ASSERT(std::string("htable") == std::string(Tok2Cmdname(HTABLE_CMD)));
+
+  pos = iiArithFindCmd("getValue");
+  CPPUNIT_ASSERT(pos >= 0);
+  CPPUNIT_ASSERT(std::string("getValue") == std::string(iiArithGetCmd(pos)));
+  CPPUNIT_ASSERT(std::string("getValue") == std::string(Tok2Cmdname(GETVALUE_CMD)));
+
+  pos = iiArithFindCmd("parentOfValue");
+  CPPUNIT_ASSERT(pos >= 0);
+  CPPUNIT_ASSERT(std::string("parentOfValue") == std::string(iiArithGetCmd(pos)));
+  CPPUNIT_ASSERT(std::string("parentOfValue") == std::string(Tok2Cmdname(PARENTOFVALUE_CMD)));
+
+  pos = iiArithFindCmd("typeOfValue");
+  CPPUNIT_ASSERT(pos >= 0);
+  CPPUNIT_ASSERT(std::string("typeOfValue") == std::string(iiArithGetCmd(pos)));
+  CPPUNIT_ASSERT(std::string("typeOfValue") == std::string(Tok2Cmdname(TYPEOFVALUE_CMD)));
+}
+
+void IpArithTest::test_HTableCore()
+{
+  stablerec *t = t_createTable(3);
+
+  sleftv v;
+  v.Init();
+  v.rtyp = INT_CMD;
+  v.data = (void*)42;
+
+  CPPUNIT_ASSERT(!t_addTable(t, omStrDup("alpha"), &v));
+  CPPUNIT_ASSERT_EQUAL(1, t_countTable(t));
+
+  sleftv out;
+  out.Init();
+  CPPUNIT_ASSERT(!t_copyTableVal(&out, t, "alpha"));
+  CPPUNIT_ASSERT_EQUAL(INT_CMD, out.Typ());
+  CPPUNIT_ASSERT_EQUAL(42, (int)(long)out.Data());
+  out.CleanUp();
+
+  CPPUNIT_ASSERT(!t_addTable(t, omStrDup("alpha"), &v));
+  CPPUNIT_ASSERT_EQUAL(1, t_countTable(t));
+
+  stablerec *copy = t_cloneTable(t);
+  CPPUNIT_ASSERT(copy != NULL);
+  CPPUNIT_ASSERT_EQUAL(1, t_countTable(copy));
+  t_destroyTable(copy);
+
+  t_destroyTable(t);
+  v.CleanUp();
+
+  char **r1_vars = (char**)omAlloc(sizeof(char*));
+  r1_vars[0] = omStrDup("x");
+  ring r1 = rDefault(32003, 1, r1_vars);
+
+  char **r2_vars = (char**)omAlloc(sizeof(char*));
+  r2_vars[0] = omStrDup("y");
+  ring r2 = rDefault(32003, 1, r2_vars);
+
+  ring save = currRing;
+  rChangeCurrRing(r1);
+
+  stablerec *rt = t_createTable(3);
+  sleftv pv;
+  pv.Init();
+  pv.rtyp = POLY_CMD;
+  pv.data = (void*)p_ISet(1, r1);
+  pSetExp((poly)pv.data, 1, 1);
+  pSetm((poly)pv.data);
+
+  CPPUNIT_ASSERT(!t_addTable(rt, omStrDup("x"), &pv));
+
+  rChangeCurrRing(r2);
+  out.Init();
+  CPPUNIT_ASSERT(t_copyTableVal(&out, rt, "x"));
+  CPPUNIT_ASSERT(errorreported);
+  errorreported = 0;
+  out.CleanUp(r2);
+
+  rChangeCurrRing(r1);
+  out.Init();
+  CPPUNIT_ASSERT(!t_copyTableVal(&out, rt, "x"));
+  CPPUNIT_ASSERT_EQUAL(POLY_CMD, out.Typ());
+  out.CleanUp(r1);
+
+  pv.CleanUp(r1);
+  t_destroyTable(rt);
+  rChangeCurrRing(save);
+  rKill(r1);
+  rKill(r2);
 }
 
 void IpArithTest::test_Timing1()

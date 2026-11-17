@@ -714,16 +714,31 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sat (def id, ideal j)
-"USAGE:   sat(id,j);  id=ideal/module, j=ideal
+proc sat (def id, ideal j, list #)
+"USAGE:   sat(id,j[,algorithm]);  id=ideal/module, j=ideal,
+                                  algorithm=string
 RETURN:  ideal/module
          saturation of id with respect to j (= union_(k=1...) of id:j^k)
-NOTE:    result is a standard basis in the basering
+NOTE:    result is a standard basis in the basering.
+@*       If algorithm is \"principal\", id and j must be ideals and j must
+         have exactly one generator. This is experimental.
 KEYWORDS: saturation
 SEE ALSO: modSat; sat_with_exp
 EXAMPLE: example sat; shows an example
 "{
-   return(system("sat",id,j));
+   if (size(#)==0)
+   {
+      return(system("sat",id,j));
+   }
+   if (size(#)==1 and typeof(#[1])=="string" and #[1]=="principal")
+   {
+      if (typeof(id)!="ideal" or ncols(j)!=1)
+      {
+         ERROR("algorithm \"principal\" requires two ideals and a principal second ideal");
+      }
+      return(satPrincipalInternal(id,j));
+   }
+   ERROR("unknown saturation algorithm");
 }
 example
 { "EXAMPLE:"; echo = 2;

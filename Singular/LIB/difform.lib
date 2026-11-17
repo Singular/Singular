@@ -451,7 +451,7 @@ SEE ALSO:   difformListSort, difformIsBigger, difformIsSmaller"
             kill gen_weight;
         }
     }
-    // If the ordering for the ring variables is a weighted monmial ordering, a weight-vector is needed
+    // If the ordering for the ring variables is a weighted monomial ordering, a weight-vector is needed
     if(ringvar_ord == "wp" || ringvar_ord == "Wp" || ringvar_ord == "ws" || ringvar_ord == "Ws")
     {
         if(!defined(ringvar_weight))
@@ -1204,7 +1204,7 @@ dx*dy*dz / dz;
 (dx*x2 - yx2) / x2;
 
 //////////////////////////////
-// Divisions with reaminder //
+// Divisions with remainder //
 //////////////////////////////
 
 (dx + dx*dy + 1) / dx;

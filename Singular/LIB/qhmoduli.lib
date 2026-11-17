@@ -1247,7 +1247,7 @@ GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
 
 static proc AllCombinations(list partition, list indices)
 "USAGE:   AllCombinations(partition,indices); list partition, indices)
-PURPOSE: all combinations for a given partititon
+PURPOSE: all combinations for a given partition
 RETURN:  list
 GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
 "
@@ -1329,7 +1329,7 @@ RETURN:  list
 
 static proc AllCombinationsAux(list parts, list index)
 "USAGE:  AllCombinationsAux(parts ,index); list parts, index
-PURPOSE: all compbinations for nonlinear substituiton
+PURPOSE: all combinations for nonlinear substitution
 RETURN:  list
 "
 {

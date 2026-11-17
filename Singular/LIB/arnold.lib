@@ -3911,7 +3911,7 @@ static proc modalityNB(Poly F) //wrapper
    }
    l=newtonpoly(f);
    k=2;
-   if (l[k][1]==2)
+   if ((size(l)>2) && (l[k][1]==2))
    {
      v=l[k][2]-l[k+1][2], l[k+1][1]-l[k][1];
    }
@@ -4550,4 +4550,3 @@ static proc classifyNB(RightEquivalenceChainWithPrecision Tr, int flag, int flag
 
 
 }
-

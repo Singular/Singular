@@ -146,10 +146,10 @@ example
 
 proc writeToString(def d)
 "USAGE: writeToString(d); d: any type
-RETURN: none
+RETURN: string
 EXAMPLE: example writeToString, shows an example"
 {
-  return(system("ssi",d));
+  return(ssiWriteToStringInternal(d));
 }
 example
 {
@@ -158,10 +158,10 @@ example
 }
 proc readFromString(string s)
 "USAGE: readFromString(s); : string
-RETURN: expression_list
+RETURN: expression
 EXAMPLE: example readFromString, shows an example"
 {
-  return(system("ssi-r",s));
+  return(ssiReadFromStringInternal(s));
 }
 example
 {

@@ -439,6 +439,36 @@ proc findnewvar(string Z)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+static proc findvarindex(string Z)
+"USAGE: Finds the index of the variable named Z"
+{
+  for(int i=1; i<=nvars(basering); i++)
+  {
+    if(string(var(i)) == Z)
+    {
+      return(i);
+    }
+  }
+  return(0);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+static proc findparindex(string Z)
+"USAGE: Finds the index of the parameter named Z"
+{
+  for(int i=1; i<=npars(basering); i++)
+  {
+    if(string(par(i)) == Z || string(par(i)) == "(" + Z + ")")
+    {
+      return(i);
+    }
+  }
+  return(0);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
 static proc mylcm(ideal id,list asl)
 "USAGE: computes the lcm of these numbers"
 {
@@ -764,13 +794,23 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   def den = mylcm(denz,asl);
   z = z * den;
   int newAptest = 0;
+  string invdenpar;
   if(den != 1)
   {
     newAptest = 1;
     string aa = "a";
     list newpar;
-    newpar[1] = string(findnewvar(aa));
-    as = as + "," + findnewvar(aa);
+    invdenpar = string(findnewvar(aa));
+    newpar[1] = invdenpar;
+    asl[size(asl)+1] = invdenpar;
+    if(size(as) == 0)
+    {
+      as = invdenpar;
+    }
+    else
+    {
+      as = as + "," + invdenpar;
+    }
     nra = nra + 1;
     def newApbase = ring(crl(list(),asl+xsl,"dp"));
     setring newApbase;
@@ -1006,7 +1046,12 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     if(newAptest == 1)
     {
-      "s =",reduce(ss, std(var(nvars(basering)-nrx)*imap(Apreal, den)-1));
+      int invdenvaridx = findvarindex(invdenpar);
+      if(invdenvaridx == 0)
+      {
+        ERROR("Could not find the denominator inverse variable");
+      }
+      "s =",reduce(ss, std(var(invdenvaridx)*imap(Apreal, den)-1));
       //"s =",subst(ss, imap(Apreal, z),1/imap(Apreal, den));
     }
     else
@@ -1055,6 +1100,15 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   }
   def E = ring(crl(newas+xsl,yz+ts,"dp"));
   setring E;
+  int invdenparidx = 0;
+  if(newAptest == 1)
+  {
+    invdenparidx = findparindex(invdenpar);
+    if(invdenparidx == 0)
+    {
+      ERROR("Could not find the denominator inverse parameter");
+    }
+  }
   def d = imap(D,d);
   number ss = leadcoef(imap(D,ss));
   def G = imap(seeG,G);
@@ -1082,7 +1136,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     if(newAptest == 1)
     {
-      "h = ";mysubst(h, npars(basering)-nrx,1/imap(Apreal, den),"par");
+      "h = ";mysubst(h, invdenparidx,1/imap(Apreal, den),"par");
     }
     else
     {
@@ -1157,7 +1211,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     if(newAptest == 1)
     {
-      "s^m =";mysubst(ssm, npars(basering)-nrx,1/imap(Apreal, den),"par");
+      "s^m =";mysubst(ssm, invdenparidx,1/imap(Apreal, den),"par");
     }
     else
     {
@@ -1184,7 +1238,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     if(newAptest == 1)
     {
-      "QT =";mysubst(QT, npars(basering)-nrx,1/imap(Apreal, den),"par");
+      "QT =";mysubst(QT, invdenparidx,1/imap(Apreal, den),"par");
     }
     else
     {
@@ -1203,8 +1257,8 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
       "g = ";
       if(newAptest == 1)
       {
-        mysubst(g, npars(basering)-nrx,1/imap(Apreal, den),"par");
-        //reduce(mysubst(g, npars(basering)-nrx,1/imap(Apreal, den),"par"),std(x2^6,x1^4));
+        mysubst(g, invdenparidx,1/imap(Apreal, den),"par");
+        //reduce(mysubst(g, invdenparidx,1/imap(Apreal, den),"par"),std(x2^6,x1^4));
       }
       else
       {
@@ -1221,7 +1275,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     ideal p1,p2;
     string myvar = "x1,x2";
     string mypar = "a1,a2,T1,T2,T3,T4,T5,Y1,Y2,Y3,Y4,Y5";
-    //QT = mysubst(QT, npars(basering)-nrx,1/imap(Apreal, den),"par");
+    //QT = mysubst(QT, invdenparidx,1/imap(Apreal, den),"par");
     for(int kk = 1; kk<=3;kk++)
     {
       "Next one!";

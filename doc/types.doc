@@ -38,6 +38,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * bigintmat::
 * bigintvec::
 * def::
+* htable::
 * ideal::
 * int::
 * intmat::
@@ -624,7 +625,7 @@ is a bigintvec entry.
 
 
 @c ---------------------------------------
-@node def, ideal, bigintvec, Data types
+@node def, htable, bigintvec, Data types
 @section def
 @cindex def
 @cindex untyped definitions
@@ -705,7 +706,153 @@ See
 @c ref
 
 @c ---------------------------------------
-@node ideal, int, def, Data types
+@node htable, ideal, def, Data types
+@section htable
+@cindex htable
+@cindex hash table
+
+Hash tables store values under string keys.  They are useful for named
+collections whose entries have different types, and for caches where lookup
+by name is preferable to positional access.
+
+The lookup is implemented by hashing the key and searching only the
+corresponding bucket.  Hence lookup is expected to take constant time, apart
+from collisions.
+
+Values are stored together with their type.  If a value depends on the
+current basering, the hash table entry also stores that ring.  Plain lookup
+only returns such a value if this ring is the current basering.  The function
+@code{getValue} switches to the stored ring before returning the value.
+
+@menu
+* htable declarations::
+* htable expressions::
+* htable operations::
+* htable related functions::
+@end menu
+
+@c ---------------------------------------
+@node htable declarations, htable expressions, htable, htable
+@subsection htable declarations
+@cindex htable declarations
+
+@table @strong
+@item Syntax:
+@code{htable} name @code{=} htable_expression @code{;}
+
+@item Purpose:
+defines a hash table.
+
+@item Default:
+empty table
+
+@item Example:
+@smallexample
+@c example
+  htable H = htable("a" -> 1, "b" -> "text");
+  H;
+  size(H);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node htable expressions, htable operations, htable declarations, htable
+@subsection htable expressions
+@cindex htable expressions
+@cindex ->
+
+An htable expression is:
+@enumerate
+@item
+an identifier of type htable
+@item
+the empty hash table @code{htable()}
+@item
+a type cast @code{htable(} htable_expression @code{)}
+@item
+@code{htable(} entry_list @code{)}, where each entry has the form
+@code{key -> value}
+@item
+a list whose entries have the form @code{key -> value}, converted by
+@code{htable}
+@item
+htable expressions and entries combined by @code{+}
+@end enumerate
+
+Keys are either string expressions or undefined identifiers.  An undefined
+identifier used as a key is stored as its name.  For example,
+@code{htable(key -> 7)} stores the value under the string key @code{"key"}.
+Lookup always uses a string key.  Duplicate keys are not allowed.
+
+Values may have different types.  Undefined values are not allowed.
+
+@*@strong{Example:}
+@smallexample
+@c example
+  htable H = htable("a" -> 1, key -> intvec(1,2,3));
+  H["a"];
+  H["key"];
+  htable I = H + ("b" -> "new");
+  size(I);
+@c example
+@end smallexample
+
+@c ---------------------------------------
+@node htable operations, htable related functions, htable expressions, htable
+@subsection htable operations
+@cindex htable operations
+@cindex lookup
+
+@table @asis
+@item htable_expression @code{[} string_expression @code{]}
+lookup of a value by key
+@item htable_expression @code{(} string_expression @code{)}
+lookup of a value by key
+@item @code{+}
+merge htables and entries of the form @code{key -> value}
+@end table
+
+If the key is not present, lookup reports an error.  If the stored value
+belongs to a ring different from the current basering, plain lookup reports
+an error; use @code{getValue} to switch to the stored ring and return the
+value.
+
+@*@strong{Example:}
+@smallexample
+@c example
+  ring r = 0,(x,y),dp;
+  poly p = x+y;
+  htable H = htable("p" -> p, "n" -> 3);
+  H["p"];
+  ring s = 0,a,dp;
+  setring s;
+  // H["p"];        // error: value belongs to another ring
+  getValue(H, "p"); // switches to the parent ring of H["p"]
+  varstr(basering);
+@c example
+@end smallexample
+
+@c ---------------------------------------
+@node htable related functions,  , htable operations, htable
+@subsection htable related functions
+@cindex htable related functions
+
+@table @code
+@item getValue
+returns the value stored at a key and switches to its stored parent ring if
+necessary (see @ref{getValue})
+@item parentOfValue
+returns the stored parent ring of a value, or @code{0} if the value has no
+parent ring (see @ref{parentOfValue})
+@item size
+number of entries (see @ref{size})
+@item typeOfValue
+type of the value stored at a key (see @ref{typeOfValue})
+@end table
+
+@c ---------------------------------------
+@node ideal, int, htable, Data types
 @section ideal
 @cindex ideal
 

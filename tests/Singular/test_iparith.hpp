@@ -10,6 +10,8 @@ namespace Singular {
 
       CPPUNIT_TEST_SUITE(Singular::tests::IpArithTest);
       CPPUNIT_TEST( test_iiArithFindCmd );
+      CPPUNIT_TEST( test_HTableCommandRegistration );
+      CPPUNIT_TEST( test_HTableCore );
       CPPUNIT_TEST( test_Timing1 );
       CPPUNIT_TEST_SUITE_END();
 
@@ -22,6 +24,8 @@ namespace Singular {
 
     protected:
       void test_iiArithFindCmd();
+      void test_HTableCommandRegistration();
+      void test_HTableCore();
       void test_Timing1();
     };
   }

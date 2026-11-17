@@ -532,9 +532,9 @@ static proc completeSubduction(ideal Q){
 //  -----------------------------------------------
 
 static proc Tete_A_TeteHilbControlled(ideal P, int crit_degree, int is_normal)
-// Computes the terte-a-ztete of a system of polynomials (termonology of
+// Computes the tete-a-tete of a system of polynomials (terminology of
 // Robbiano-Sweedler). Control by Hilbert series: only the crit degree is
-// evaluated and normalioty is exploited. Genereal version below.
+// evaluated and normality is exploited. General version below.
 {
     dbprint(our_printlevel,"Start Tete-a-tete ");
     string output;

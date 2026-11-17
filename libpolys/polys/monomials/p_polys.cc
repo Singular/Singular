@@ -1728,13 +1728,13 @@ poly p_GetCoeffRat(poly p, int ishift, ring r)
   poly q   = pNext(p);
   poly res; // = p_Head(p,r);
   res = p_GetExp_k_n(p, ishift+1, r->N, r); // does pSetm internally
-  p_SetCoeff(res,n_Copy(p_GetCoeff(p,r),r),r);
+  p_SetCoeff(res,n_Copy(p_GetCoeff(p,r),r->cf),r);
   poly s;
   long cmp = p_GetComp(p, r);
   while ( (q!= NULL) && (p_Comp_k_n(p, q, ishift+1, r)) && (p_GetComp(q, r) == cmp) )
   {
     s   = p_GetExp_k_n(q, ishift+1, r->N, r);
-    p_SetCoeff(s,n_Copy(p_GetCoeff(q,r),r),r);
+    p_SetCoeff(s,n_Copy(p_GetCoeff(q,r),r->cf),r);
     res = p_Add_q(res,s,r);
     q   = pNext(q);
   }
@@ -1816,7 +1816,7 @@ void p_ContentRat(poly &ph, const ring r)
   // adjoin pContentRat here?
   for(i=0; i<=k; i++)
   {
-    d=singclap_gcd(d,p_Copy(C[i], r), r);
+    d=singclap_gcd_r(d,p_Copy(C[i], r), r);
     if (p_Totaldegree(d, r)==0)
     {
       // cleanup, pContent, return

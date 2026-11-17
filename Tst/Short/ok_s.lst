@@ -121,7 +121,10 @@ bug_tr874
 bug_genus_etc
 conv_bi
 ; divrem2
+enumnf
 facstd
+factorize_largeprime_s
+factorize_transext_alg_s
 fermat_gcd_1var
 fermat_gcd_2var
 fermat_gcd_3var
@@ -143,9 +146,12 @@ gmssin_s
 hodge_lib_bugfix1
 homalg
 invar_lib
+invar_lib_default
+issue1272
 issue1277
 issue1284
 issue1285
+issue1287
 issue1293
 kernel_weighted_homog
 liftstd_m

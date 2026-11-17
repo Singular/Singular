@@ -390,7 +390,7 @@ So you might want to try out surfex without convert.
 ";
 
 failmsg=">>> Try to run INSTALL_WINDOWS once again. This sometimes solves the problem.
-If not then, please, read the the information above.
+If not, then please read the information above.
 ";
 
 	    echo $failmsg

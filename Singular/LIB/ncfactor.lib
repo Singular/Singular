@@ -6091,7 +6091,7 @@ SEE ALSO: facSubWeyl, testNCfac, facFirstShift, facFirstWeyl
   if (!checkIfProperNthWeyl())
   {//The given ring was not a proper nth Weyl algebra
     dbprint(p,dbprintWhitespace +" positions of the variables have to be switched");
-    dbprint(p,dbprintWhitespace + "Constructing the the proper ring.");
+    dbprint(p,dbprintWhitespace + "Constructing the proper ring.");
     def r = basering;
     list tempRingList = ringlist(r);
     tempRingList = delete(tempRingList,6);

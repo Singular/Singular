@@ -8,8 +8,8 @@ name: Release Tarball
 ## by SageMath.
 ##
 ## Trigger: publishing a GitHub Release whose tag looks like
-##   v4.4.1p5   – patch release  → tarball singular-4.4.1p5.tar.gz
-##   v4.4.1     – major release  → tarball singular-4.4.1.tar.gz
+##   Release-4-4-1p5 or v4.4.1p5   – patch release
+##   Release-4-5-0   or v4.5.0     – major release
 
 on:
   release:
@@ -32,6 +32,11 @@ on:
           Override tarball version string (e.g. 4.4.1p6).
           Leave empty to derive from the release tag.
         required: false
+      distribution_build:
+        description: Build a manual non-dev distribution test tarball
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -58,11 +63,14 @@ jobs:
         env:
           INPUT_MODE: ${{ inputs.mode }}
           INPUT_TARBALL_VERSION: ${{ inputs.tarball_version }}
+          INPUT_DISTRIBUTION_BUILD: ${{ inputs.distribution_build }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
 
           MODE="${INPUT_MODE:-tarball}"
+          DISTRIBUTION_BUILD="${INPUT_DISTRIBUTION_BUILD:-false}"
           if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
             MODE="tarball"
           fi
@@ -75,14 +83,69 @@ jobs:
               ;;
           esac
 
+          case "$DISTRIBUTION_BUILD" in
+            true|false) ;;
+            *)
+              echo "::error::distribution_build must be true or false"
+              exit 1
+              ;;
+          esac
+
           # Prefer the manual input, then the release tag, then configure.ac
+          SOURCE_VERSION="$(sed -n "s/^AC_INIT(\[singular\], \[\(.*\)\],.*/\1/p" configure.ac)"
+          if [[ -z "$SOURCE_VERSION" ]]; then
+            echo "::error::Could not read Singular version from configure.ac"
+            exit 1
+          fi
+
+          release_version_key() {
+            local release_version="$1"
+            if [[ "$release_version" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(p([0-9]+))?$ ]]; then
+              local patchlevel=0
+              if [[ -n "${BASH_REMATCH[5]:-}" ]]; then
+                patchlevel="${BASH_REMATCH[5]}"
+              fi
+              printf "%05d.%05d.%05d.%05d\n" \
+                "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+                "${BASH_REMATCH[3]}" "$patchlevel"
+            else
+              return 1
+            fi
+          }
+
+          release_tag_version() {
+            local release_tag="$1"
+            if [[ "$release_tag" =~ ^Release-([0-9]+)-([0-9]+)-([0-9]+)(p[0-9]+)?$ ]]; then
+              printf "%s.%s.%s%s\n" \
+                "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+                "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
+            elif [[ "$release_tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)(p[0-9]+)?$ ]]; then
+              printf "%s.%s.%s%s\n" \
+                "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+                "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}"
+            else
+              return 1
+            fi
+          }
+
+          MANUAL_DISTRIBUTION_TEST=false
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$DISTRIBUTION_BUILD" == "true" ]]; then
+            MANUAL_DISTRIBUTION_TEST=true
+            if [[ -z "$INPUT_TARBALL_VERSION" ]]; then
+              echo "::error::Manual distribution test builds require tarball_version"
+              exit 1
+            fi
+          fi
+
           if [[ -n "$INPUT_TARBALL_VERSION" ]]; then
             TARVERSION="$INPUT_TARBALL_VERSION"
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            # strip leading 'v' from tag  (v4.4.1p5 → 4.4.1p5)
-            TARVERSION="${GITHUB_REF_NAME#v}"
+            if ! TARVERSION="$(release_tag_version "$GITHUB_REF_NAME")"; then
+              echo "::error::Release tag must look like X.Y.Z, X.Y.ZpN, vX.Y.Z, vX.Y.ZpN, Release-X-Y-Z, or Release-X-Y-ZpN: $GITHUB_REF_NAME"
+              exit 1
+            fi
           else
-            TARVERSION="$(sed -n "s/^AC_INIT(\[singular\], \[\(.*\)\],.*/\1/p" configure.ac)-dev"
+            TARVERSION="${SOURCE_VERSION}-dev"
           fi
 
           # Base VERSION is everything up to the first 'p' suffix
@@ -91,6 +154,56 @@ jobs:
           BUILD_DOCS=false
           BUILD_TARBALL=false
           INCLUDE_DOCS=false
+          MAKE_DISTRIBUTION=false
+
+          if [[ "$GITHUB_EVENT_NAME" == "release" || "$MANUAL_DISTRIBUTION_TEST" == "true" ]]; then
+            if [[ "$VERSION" != "$SOURCE_VERSION" ]]; then
+              echo "::error::Release version $VERSION does not match configure.ac version $SOURCE_VERSION"
+              exit 1
+            fi
+
+            if ! current_release_key="$(release_version_key "$TARVERSION")"; then
+              echo "::error::Release tag version must be X.Y.Z or X.Y.ZpN: $TARVERSION"
+              exit 1
+            fi
+
+            previous_release_version=""
+            previous_release_key=""
+            while IFS= read -r release_tag; do
+              if [[ "$release_tag" == "$GITHUB_REF_NAME" ]]; then
+                continue
+              fi
+              if ! release_tag_name_version="$(release_tag_version "$release_tag")"; then
+                continue
+              fi
+              if ! release_tag_key="$(release_version_key "$release_tag_name_version")"; then
+                continue
+              fi
+              if [[ -z "$previous_release_key" || "$release_tag_key" > "$previous_release_key" ]]; then
+                previous_release_version="$release_tag_name_version"
+                previous_release_key="$release_tag_key"
+              fi
+            done < <(gh api --paginate "/repos/${GITHUB_REPOSITORY}/releases" --jq '.[] | select(.draft == false) | .tag_name')
+
+            if [[ -z "$previous_release_key" ]]; then
+              echo "::error::Could not find a previous release tag to verify that $TARVERSION is bumped"
+              exit 1
+            fi
+
+            if [[ ! "$current_release_key" > "$previous_release_key" ]]; then
+              echo "::error::Release version $TARVERSION is not newer than previous release $previous_release_version"
+              exit 1
+            fi
+
+            MAKE_DISTRIBUTION=true
+          fi
+
+          TARBALL_BASENAME="singular-${TARVERSION}"
+          ARTIFACT_NAME="singular-tarball"
+          if [[ "$MANUAL_DISTRIBUTION_TEST" == "true" ]]; then
+            TARBALL_BASENAME="singular-${TARVERSION}-distribution-test"
+            ARTIFACT_NAME="singular-distribution-test-tarball"
+          fi
 
           if [[ "$MODE" == "old-docu" || "$MODE" == "tarball-with-old-docu" ]]; then
             BUILD_DOCS=true
@@ -115,6 +228,25 @@ jobs:
           echo "BUILD_DOCS=$BUILD_DOCS" >> "$GITHUB_OUTPUT"
           echo "BUILD_TARBALL=$BUILD_TARBALL" >> "$GITHUB_OUTPUT"
           echo "INCLUDE_DOCS=$INCLUDE_DOCS" >> "$GITHUB_OUTPUT"
+          echo "MAKE_DISTRIBUTION=$MAKE_DISTRIBUTION" >> "$GITHUB_OUTPUT"
+          echo "TARBALL_BASENAME=$TARBALL_BASENAME" >> "$GITHUB_OUTPUT"
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
+
+      # ── 2b. Select dev/release banner mode ───────────────────────
+      # Keep normal checkout builds unchanged.  Only this workflow edits the
+      # marker for a published GitHub Release.
+      - name: Set distribution marker
+        env:
+          MAKE_DISTRIBUTION: ${{ steps.settings.outputs.MAKE_DISTRIBUTION }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$MAKE_DISTRIBUTION" == "true" ]]; then
+            printf '#define MAKE_DISTRIBUTION\n' > libpolys/misc/distrib.h
+          else
+            printf '#undef MAKE_DISTRIBUTION\n' > libpolys/misc/distrib.h
+          fi
 
       # ── 3. Install build prerequisites ────────────────────────────
       - name: Install build dependencies
@@ -197,6 +329,8 @@ jobs:
           INCLUDE_DOCS: ${{ steps.settings.outputs.INCLUDE_DOCS }}
           TARVERSION: ${{ steps.settings.outputs.TARVERSION }}
           VERSION: ${{ steps.settings.outputs.VERSION }}
+          MAKE_DISTRIBUTION: ${{ steps.settings.outputs.MAKE_DISTRIBUTION }}
+          TARBALL_BASENAME: ${{ steps.settings.outputs.TARBALL_BASENAME }}
         shell: bash
         run: |
           set -eo pipefail
@@ -217,6 +351,12 @@ jobs:
           # --- export a clean tree from git ---
           rm -rf "singular-${VERSION}"
           git archive --prefix="singular-${VERSION}/" HEAD | tar xf -
+
+          if [[ "$MAKE_DISTRIBUTION" == "true" ]]; then
+            printf '#define MAKE_DISTRIBUTION\n' > "singular-${VERSION}/libpolys/misc/distrib.h"
+          else
+            printf '#undef MAKE_DISTRIBUTION\n' > "singular-${VERSION}/libpolys/misc/distrib.h"
+          fi
 
           # --- remove files that should not ship ---
           # .gdbinit files
@@ -278,9 +418,9 @@ jobs:
           done
 
           # --- create the compressed tarball ---
-          tar cf "singular-${TARVERSION}.tar" "singular-${VERSION}"
-          gzip -9 -f "singular-${TARVERSION}.tar"
-          ls -lh "singular-${TARVERSION}.tar.gz"
+          tar cf "${TARBALL_BASENAME}.tar" "singular-${VERSION}"
+          gzip -9 -f "${TARBALL_BASENAME}.tar"
+          ls -lh "${TARBALL_BASENAME}.tar.gz"
 
           # clean up
           rm -rf "singular-${VERSION}"
@@ -290,12 +430,12 @@ jobs:
         if: steps.settings.outputs.BUILD_TARBALL == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: singular-tarball
-          path: singular-${{ steps.settings.outputs.TARVERSION }}.tar.gz
+          name: ${{ steps.settings.outputs.ARTIFACT_NAME }}
+          path: ${{ steps.settings.outputs.TARBALL_BASENAME }}.tar.gz
 
       # ── 12. Attach tarball to GitHub Release ─────────────────────
       - name: Attach tarball to release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: singular-${{ steps.settings.outputs.TARVERSION }}.tar.gz
+          files: ${{ steps.settings.outputs.TARBALL_BASENAME }}.tar.gz

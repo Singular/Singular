@@ -84,7 +84,7 @@ static proc zerodim_ICIS(ideal I)
 "USAGE: zerodim_ICIS(l);  I is an ideal
 ASSUME: I is given by two generators
 PURPOSE: Check whether the ideal defines a complete intersection singularity of dimension zero or not
-RETURN: String  type in the classification of Giusti,M, of the 0-dimensional complete inetersection
+RETURN: String  type in the classification of Giusti,M, of the 0-dimensional complete intersection
 @*       or The given singularity is not simple
 EXAMPLE: example zerodim_ICIS; shows an example
 "
@@ -431,7 +431,7 @@ static proc onedim_ICIS(ideal I)
 "USAGE:  onedim_ICIS(l);  I is an ideal
 ASSUME: I is given by two generators
 PURPOSE: Check whether the ideal defines a complete intersection singularity of dimension 1 or not
-RETURN: String  type in the classification of Giusti,M, of 1-dimesnional complete inetersection singualrity
+RETURN: String  type in the classification of Giusti,M, of 1-dimensional complete intersection singularity
 @*       or The given singularity is not simple
 EXAMPLE: example onedim_ICIS; shows an example
 "

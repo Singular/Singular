@@ -252,7 +252,7 @@ static BOOLEAN slDumpAscii(si_link l)
   return status;
 }
 
-// we do that recursively, to dump ids in the the order in which they
+// we do that recursively, to dump ids in the order in which they
 // were actually defined
 static BOOLEAN DumpAscii(FILE *fd, idhdl h, char ***list_of_libs)
 {
@@ -349,7 +349,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h, char ***list_of_libs)
   // put type and name
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF)
     return TRUE;
-  // for matricies, append the dimension
+  // for matrices, append the dimension
   if (type_id == MATRIX_CMD)
   {
     ideal id = IDIDEAL(h);

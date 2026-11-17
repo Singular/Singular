@@ -652,7 +652,7 @@ static proc SPILPRO(poly p,int B)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc surCeq2(poly f)
-//====Classification of Surface Singularaties in case when p=2
+//====Classification of Surface Singularities in case when p=2
 {
         //===input a funation defined in the ring whose Characteristic is 2.
         //===output is a Normal Form to which Given function is contact equivalent or function is not simple.
@@ -987,7 +987,7 @@ E^0[8]:z2+x3+y5.");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc surDsing(poly f)
-//====Classification of Dk singularaties========================
+//====Classification of Dk singularities========================
 
 {
       //===input: A function which is an isolated singularity.
@@ -1085,7 +1085,7 @@ D^"+string(findRSUR(f))+" ["+string(((tjurina(f)+2*findRSUR(f)) div 2)+1)+"]:z2+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc formf(poly f)
 //=====Transform jet(f,2) in to the polynomial var(3)^2.
-//=====This is the case when We are in Dk and Ek surface singularaties.
+//=====This is the case when We are in Dk and Ek surface singularities.
 {
 
         poly j=jet(f,2);
@@ -1509,7 +1509,7 @@ static proc whichtru(poly f)
 static proc findR(poly f)
 //====Find the number of blowups required by polynomial such that
 //====difference between two consecutive blowups become 4
-//====this procedure find the value of r in case of Ak singularaties as in [1].
+//====this procedure find the value of r in case of Ak singularities as in [1].
 {
     int a, r,b;
     while(1)
@@ -1534,7 +1534,7 @@ static proc findR(poly f)
 static proc findRD(poly p)
 //=====Find the number of blowups required by polynomial such
 //=====that difference between two consecutive blowups become 4
-//=====this procedure find the value of r in case of Dk singularaties as in [1].
+//=====this procedure find the value of r in case of Dk singularities as in [1].
 {
 
    int k=tjurina(p);

@@ -1,0 +1,82 @@
+name: WebAssembly target
+
+on:
+  push:
+    branches:
+      - spielwiese
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wasm32:
+    if: >-
+      github.event_name != 'pull_request' ||
+      (
+        contains(github.event.pull_request.labels.*.name, 'run-wasm-ci') &&
+        (github.event.action != 'labeled' || github.event.label.name == 'run-wasm-ci')
+      )
+    name: WebAssembly build and coefficient tests
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    container:
+      image: emscripten/emsdk:3.1.23
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            autoconf automake autoconf-archive bison ca-certificates curl file \
+            flex g++ gcc git libtool m4 make nodejs patch pkg-config python3 \
+            rsync xz-utils
+
+      - name: Check out Singular
+        uses: actions/checkout@v5
+        with:
+          path: Singular
+          persist-credentials: false
+
+      - name: Check out Singular in Browser build support
+        uses: actions/checkout@v5
+        with:
+          repository: Singular/Singular-in-browser
+          ref: b149e1baaed077055aa028c1e075457630795a69
+          path: browser
+          persist-credentials: false
+
+      - name: Overlay browser build support
+        run: |
+          mkdir -p Singular/emscripten
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='LICENSE' \
+            --exclude='Singular/' \
+            browser/ Singular/emscripten/
+
+      - name: Build and test Singular for wasm32
+        working-directory: Singular
+        env:
+          JOBS: 4
+        run: bash emscripten/web-workbench/scripts/build-and-test-singular-wasm.sh
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm32-build-logs
+          path: |
+            Singular/config.log
+            Singular/**/test-suite.log
+            Singular/**/*.log
+          if-no-files-found: ignore

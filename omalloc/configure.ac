@@ -196,10 +196,10 @@ AC_MSG_CHECKING(size of system page)
 AC_CACHE_VAL(ac_cv_pagesize,
 ac_cv_pagesize=`getconf PAGESIZE`)
 AC_MSG_RESULT($ac_cv_pagesize)
-if test "$ac_cv_pagesize" = 4096 || test "$ac_cv_pagesize" = 8192 || test "$ac_cv_pagesize" = 16384; then
+if test "$ac_cv_pagesize" = 4096 || test "$ac_cv_pagesize" = 8192 || test "$ac_cv_pagesize" = 16384 || test "$ac_cv_pagesize" = 65536; then
   AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize, "Page-size of the build-system")
 else
-AC_MSG_ERROR([need system page to be of size 4096, 8192, or 16384, but is $ac_cv_pagesize])
+AC_MSG_ERROR([need system page to be of size 4096, 8192, 16384, or 65536, but is $ac_cv_pagesize])
 fi
 
 AC_DEFINE_UNQUOTED(SIZEOF_OM_PAGE,SIZEOF_SYSTEM_PAGE,Page-size of the build-system)

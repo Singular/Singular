@@ -15,7 +15,7 @@
  * implementation of the class groebnerCone
  *
  * groebnerCone is a class that encapsulates relevant (possibly redundant) information about a groebnerCone.
- * Moreover, it contains implrementation of several highly non-trivial algorithms, such as computing its neighbours
+ * Moreover, it contains implementations of several highly non-trivial algorithms, such as computing its neighbours
  * in the Groebner fan or computing its neighbours in the tropical variety.
  */
 

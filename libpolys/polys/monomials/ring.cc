@@ -90,6 +90,15 @@ static unsigned long rGetDivMask(int bits);
 static void rRightAdjustVarOffset(ring r);
 static void rOptimizeLDeg(ring r);
 
+static BOOLEAN rDefaultHasInvalidVarCount(const int N)
+{
+  if ((N >= 0) && (N <= SHRT_MAX)) return FALSE;
+
+  Werror("number of variables %d is outside the supported range 0..%d",
+         N, SHRT_MAX);
+  return TRUE;
+}
+
 /*0 implementation*/
 //BOOLEAN rField_is_R(ring r)
 //{
@@ -103,8 +112,9 @@ static void rOptimizeLDeg(ring r);
 ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1, int** wvhdl, unsigned long bitmask)
 {
   assume( cf != NULL);
+  if (rDefaultHasInvalidVarCount(N)) return NULL;
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
-  r->N     = N;
+  r->N     = (short)N;
   r->cf = cf;
   /*rPar(r)  = 0; Alloc0 */
   /*names*/
@@ -130,6 +140,7 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, rRingOrder_t *ord, 
 }
 ring rDefault(int ch, int N, char **n,int ord_size, rRingOrder_t *ord, int *block0, int *block1,int ** wvhdl)
 {
+  if (rDefaultHasInvalidVarCount(N)) return NULL;
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
   else       cf=nInitChar(n_Zp,(void*)(long)ch);
@@ -139,6 +150,8 @@ ring rDefault(int ch, int N, char **n,int ord_size, rRingOrder_t *ord, int *bloc
 ring rDefault(const coeffs cf, int N, char **n,  const rRingOrder_t o)
 {
   assume( cf != NULL);
+  if (rDefaultHasInvalidVarCount(N)) return NULL;
+
   /*order: o=lp,0*/
   rRingOrder_t *order = (rRingOrder_t *) omAlloc(2* sizeof(rRingOrder_t));
   int *block0 = (int *)omAlloc0(2 * sizeof(int));
@@ -155,6 +168,8 @@ ring rDefault(const coeffs cf, int N, char **n,  const rRingOrder_t o)
 
 ring rDefault(int ch, int N, char **n)
 {
+  if (rDefaultHasInvalidVarCount(N)) return NULL;
+
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
   else       cf=nInitChar(n_Zp,(void*)(long)ch);

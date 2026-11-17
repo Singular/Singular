@@ -1078,6 +1078,10 @@ EXAMPLE: example syModStd; shows an example
       int n2 = 10;
       int n3 = 10;
    }
+   if(find(option(), "probabilistic") > 0)
+   {
+      exactness = 0;
+   }
 
    if(printlevel >= 10)
    {

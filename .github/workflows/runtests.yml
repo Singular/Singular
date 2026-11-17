@@ -19,6 +19,8 @@ jobs:
             configflags: "--with-ntl --with-flint"
           - os: macos-26
             configflags: "--with-ntl --with-flint"
+          - os: macos-26-intel
+            configflags: "--with-ntl --with-flint"
 
     steps:
       - uses: actions/checkout@v5
@@ -30,6 +32,10 @@ jobs:
           if command -v getconf >/dev/null 2>&1; then
             echo "getconf PAGESIZE=$(getconf PAGESIZE)"
           fi
+
+      - name: Verify Intel macOS page size
+        if: matrix.os == 'macos-26-intel'
+        run: test "$(getconf PAGESIZE)" = 4096
 
       - name: Install dependencies
         run: |
@@ -82,6 +88,66 @@ jobs:
 
       #- run: cd Tst && ./regress.cmd -s $prefix/bin/Singular Long/ok_l.lst
       #  if: ${{ always() }}
+
+  cygwin:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      CHERE_INVOKING: 1
+      CYGWIN_NOWINPATH: 1
+
+    steps:
+      - name: Preserve Unix line endings
+        run: git config --global core.autocrlf input
+
+      - uses: actions/checkout@v5
+
+      - name: Install Cygwin and build dependencies
+        uses: cygwin/cygwin-install-action@v6
+        with:
+          packages: >-
+            autoconf2.7 automake1.18 binutils cddlib-devel cygwin-devel gcc-core
+            gcc-g++ git libflint-devel libgmp-devel libmpfr-devel
+            libntl-devel libreadline-devel libtool m4 make perl pkg-config
+            texinfo
+
+      - name: Verify Cygwin system page size
+        run: >-
+          bash --login -eo pipefail -c
+          'uname -a; page_size=$(getconf PAGESIZE);
+          echo "getconf PAGESIZE=$page_size"; test "$page_size" = 65536'
+
+      - name: Generate build system
+        run: >-
+          bash --login -eo pipefail -c
+          'mkdir -p /usr/local/bin;
+          ln -sf /usr/bin/autoconf-2.73 /usr/local/bin/autoconf;
+          ln -sf /usr/bin/autoheader-2.73 /usr/local/bin/autoheader;
+          ln -sf /usr/bin/autom4te-2.73 /usr/local/bin/autom4te;
+          ln -sf /usr/bin/autoreconf-2.73 /usr/local/bin/autoreconf;
+          ln -sf /usr/bin/aclocal-1.18 /usr/local/bin/aclocal;
+          ln -sf /usr/bin/automake-1.18 /usr/local/bin/automake;
+          ./autogen.sh'
+
+      - name: Configure
+        run: >-
+          bash --login -eo pipefail -c
+          './configure --prefix=/tmp/prefix --disable-shared --enable-gfanlib
+          --disable-p-procs-dynamic --enable-p-procs-static
+          --with-builtinmodules=gfanlib,gitfan,interval,loctriv,partialgb,syzextra,customstd,cohomo,subsets,freealgebra,systhreads
+          --without-python --without-pythonmodule --disable-cf-inline'
+
+      - name: Build
+        run: bash --login -eo pipefail -c 'make -j2'
+
+      - name: Test omalloc
+        run: bash --login -eo pipefail -c 'make -C omalloc check'
+
+      - name: Install
+        run: bash --login -eo pipefail -c 'make install'
+
+      - name: Smoke-test Singular
+        run: bash --login -eo pipefail -c '/tmp/prefix/bin/Singular --version'
 
   extra:
 

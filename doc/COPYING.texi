@@ -22,7 +22,7 @@
 @center @sc{Singular} version @value{VERSION}
 @center @uref{https://rptu.de/,,University of Kaiserslautern-Landau}
 @center @uref{https://mathrptu.de/,,Department of Mathematics} and  @uref{https://www.singular.uni-kl.de/zca/,,Centre for Computer Algebra}
-@center Authors: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann
+@center Authors: J. Boehm, W. Decker, G.-M. Greuel, G. Pfister, and H. Schoenemann
 
 @center Copyright @copyright{} 1986-@value{VERSION_DATE}
 @sp 2
@@ -143,10 +143,12 @@ Some external programs are optional:
 @heading Acknowledgements
 
 The development of @sc{Singular} is directed and coordinated by
-Wolfram Decker, Gert-Martin Greuel, Gerhard Pfister, and Hans Sch@"onemann.
+Janko Boehm, Wolfram Decker, Gert-Martin Greuel, Gerhard Pfister,
+and Hans Sch@"onemann.
 
 @cindex Contributors
 @cindex Authors
+@cindex Boehm, Janko
 @cindex Decker, Wolfram
 @cindex Greuel, Gert-Martin
 @cindex Pfister, Gerhard
@@ -170,6 +172,7 @@ and
 University of Valladolid.
 
 Current @sc{Singular} developers:
+J. Boehm,
 Wolfram Decker,
 Gert-Martin Greuel,
 Gerhard Pfister,
@@ -239,7 +242,6 @@ Muhammad Ahsan Banyamin,
 Thomas Bauer,
 Thomas Bayer,
 Markus Becker,
-J. Boehm,
 Gergo Gyula Borus,
 Winfried Bruns,
 Fernando Hernando Carrillo,
@@ -316,4 +318,3 @@ It is currently funded by
 and
     the Europeans Unions Horizon 2020
     research and innovation programme under grant agreement 676541.
-

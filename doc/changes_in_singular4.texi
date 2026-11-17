@@ -41,7 +41,7 @@ To get the complete version number, use
 @subsubheading Coefficient rings
 @cindex Coefficient rings
 
-To allow for easy integration of new coefficient rings into Singular, the the way
+To allow for easy integration of new coefficient rings into Singular, the way
 coefficient rings are being handled has been redesigned.
 
 In general, the user syntax has not changed, however there are some changes in the behaviour of Singular:

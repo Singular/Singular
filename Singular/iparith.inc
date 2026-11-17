@@ -1668,5 +1668,9 @@ void iiInitCmdName()
   iiArithAddCmd("while",               0,  -1, 0, 244);
 /* end of list marker */
   sArithBase.nLastIdentifier = 237;
+  iiArithAddCmd("getValue",            0, GETVALUE_CMD, CMD_2, -1);
+  iiArithAddCmd("htable",              0, HTABLE_CMD, ROOT_DECL_LIST, -1);
+  iiArithAddCmd("parentOfValue",       0, PARENTOFVALUE_CMD, CMD_2, -1);
+  iiArithAddCmd("typeOfValue",         0, TYPEOFVALUE_CMD, CMD_2, -1);
 }
 #define LAST_IDENTIFIER 237

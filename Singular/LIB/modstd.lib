@@ -42,6 +42,8 @@ NOTE:     The procedure computes a standard basis of I (over the rational
           If in addition the generators of I are homogeneous
 	  or the ordering is local, the result is a standard basis of I.
           Otherwise, the result is a standard basis of I with high probability.
+       @* If @code{option(probabilistic)} is set, the final exact verification
+          is omitted independently of @code{exactness}.
 SEE ALSO: modular
 EXAMPLE:  example modStd; shows an example"
 {
@@ -135,6 +137,8 @@ NOTE:     The procedure computes a standard basis of I (over the rational
           If exactness = 1(default), the procedure computes a standard basis
           of I for sure; if exactness = 0, it computes a standard basis of I
           with high probability.
+       @* If @code{option(probabilistic)} is set, the final exact verification
+          is omitted independently of @code{exactness}.
 SEE ALSO: modular
 EXAMPLE:  example modGB; shows an example"
 {
@@ -907,6 +911,8 @@ NOTE:     The procedure computes a standard basis of I (over the rational
           If exactness = 1(default), the procedure computes a standard basis
           of I for sure; if exactness = 0, it computes a standard basis of I
           with high probability.
+       @* The global @code{option(probabilistic)} is propagated to the external
+          Singular and omits its final exact verification.
 SEE ALSO: modular, modStd
 EXAMPLE:  example modStdL; shows an example"
 {
@@ -915,6 +921,11 @@ EXAMPLE:  example modStdL; shows an example"
   read(l); //dummy: return value of option
   write(l,quote(load("modstd.lib","with"))); // load library
   read(l); //dummy: return value of load
+  if (find(option(), "probabilistic") > 0)
+  {
+    write(l,quote(option(probabilistic)));
+    read(l); //dummy: return value of option
+  }
   if (size(#)==0)
   {
     write(l,quote(modStd(eval(I))));
@@ -1023,4 +1034,3 @@ poly f = x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)
          +x^(alpha-3)*y^(beta-4)*z^2+x^(alpha-4)*y^(beta-4)*(y^2+t*x)^2;
 ideal i = jacob(f);
 */
-

@@ -34,6 +34,7 @@
 #include "Singular/ipid.h"
 #include "Singular/blackbox.h"
 #include "Singular/number2.h"
+#include "Singular/htable.h"
 
 #ifdef SINGULAR_4_2
 #include "Singular/number2.h"
@@ -188,6 +189,8 @@ void *idrecDataInit(int t)
       l->Init();
       return (void*)l;
     }
+    case HTABLE_CMD:
+      return (void*)t_createTable(17);
     //the types with the standard init: set the struct to zero
     case LINK_CMD:
       return (void*) omAlloc0Bin(sip_link_bin);

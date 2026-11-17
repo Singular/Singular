@@ -34,6 +34,7 @@
 #include "Singular/subexpr.h"
 #include "Singular/blackbox.h"
 #include "Singular/number2.h"
+#include "Singular/htable.h"
 
 #include <ctype.h>
 
@@ -299,6 +300,10 @@ void sleftv::Print(leftv store, int spaces)
           }
           break;
         }
+        case HTABLE_CMD:
+          PrintNSpaces(spaces);
+          htable_Print((stablerec*)d);
+          break;
 
         default:
           if (t>MAX_TOK)
@@ -425,6 +430,8 @@ BOOLEAN sleftv::RingDependend()
     return TRUE;
   if (rt==LIST_CMD)
     return lRingDependend((lists)Data());
+  if (rt==HTABLE_CMD)
+    return t_RingDependend((stablerec*)Data());
   if (this->next!=NULL)
     return this->next->RingDependend();
   return FALSE;
@@ -480,6 +487,8 @@ static inline void * s_internalCopy(const int t,  void *d)
       return  (void *)maCopy((map)d, currRing);
     case LIST_CMD:
       return  (void *)lCopy((lists)d);
+    case HTABLE_CMD:
+      return  (void *)copyTable((stablerec*)d);
     case LINK_CMD:
       return (void *)slCopy((si_link) d);
     case RING_CMD:
@@ -614,6 +623,11 @@ void s_internalDelete(const int t,  void *d, const ring r)
     {
       lists l=(lists)d;
       l->Clean(r);
+      break;
+    }
+    case HTABLE_CMD:
+    {
+      t_destroyTable((stablerec*)d);
       break;
     }
     case LINK_CMD:
@@ -1032,6 +1046,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
 
         case LIST_CMD:
           return lString((lists) d, typed, dim);
+
+        case HTABLE_CMD:
+          return stringTable((stablerec*)d);
 
         default:
           if(t> MAX_TOK)

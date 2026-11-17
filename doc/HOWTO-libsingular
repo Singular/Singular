@@ -6,7 +6,7 @@ The following is valid for Singular 4-x-x:
 make install
 
 ---------------------------------------
-how to compile and run the the example:
+how to compile and run the example:
 libsingular-config --libs: gives the correct arguments for linking
 libsingular-config --cflags: gives the correct arguments for compiling
 g++ ...... -o tt tt.cc ....

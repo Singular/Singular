@@ -153,17 +153,76 @@ int main(          /* main entry to Singular */
 
   if (TEST_V_QUIET)
   {
-    (printf)(
-"                     SINGULAR                                 /"
+    const char *singular_url = "www.singular.uni-kl.de";
+    const char *singular_description =
+      "A Computer Algebra System for Polynomial Computations";
+    const char *singular_authors =
+      "by: J.Boehm, W.Decker, G.-M.Greuel, G.Pfister, H.Schoenemann";
+    const char *singular_affiliation =
+      "FB Mathematik, RPTU Kaiserslautern-Landau, D-67653 Kaiserslautern";
+    const int version_column = 69;
+    const int title_mark_column = 67;
+    const int url_mark_column = 66;
+    const int middle_mark_column = 64;
+    const int author_mark_column = 66;
+    const int affiliation_mark_column = 67;
+    const int url_area_width = url_mark_column - 1;
+    const int title_padding = 21;
+    const int title_width = 8;
+    int title_gap = version_column - title_mark_column - 1;
+    if (title_gap < 1) title_gap = 1;
+    int url_padding = title_padding
+                      + (title_width - (int)strlen(singular_url))/2;
+    if (url_padding < 0) url_padding = 0;
+    int url_trailing = url_area_width
+                       - url_padding
+                       - (int)strlen(singular_url);
+    if (url_trailing < 1) url_trailing = 1;
+    int url_gap = version_column - url_mark_column - 1;
+    if (url_gap < 1) url_gap = 1;
+    int middle_padding = middle_mark_column
+                         - (int)strlen(singular_description) - 1;
+    if (middle_padding < 1) middle_padding = 1;
+    int middle_gap = version_column - middle_mark_column - 2;
+    if (middle_gap < 1) middle_gap = 1;
+    int author_padding = author_mark_column
+                         - (int)strlen(singular_authors) - 1;
+    if (author_padding < 1) author_padding = 1;
+    int author_gap = version_column - author_mark_column - 1;
+    if (author_gap < 1) author_gap = 1;
+    int affiliation_padding = affiliation_mark_column
+                              - (int)strlen(singular_affiliation) - 1;
+    if (affiliation_padding < 1) affiliation_padding = 1;
+
+    (printf)("%s%*s%s\n",
+             "                     SINGULAR                                     /",
+             title_gap, "",
+             "Version");
+    (printf)("%*s%s%*s/%*s%s\n",
+             url_padding, "",
+             singular_url,
+             url_trailing, "",
+             url_gap, "",
+             VERSION);
+    (printf)("%s%*s0<%*s%s\n",
+             singular_description,
+             middle_padding, "",
+             middle_gap, "",
+             VERSION_DATE);
 #ifndef MAKE_DISTRIBUTION
-"  Development"
+    (printf)("%s%*s\\%*s%s\n",
+             singular_authors,
+             author_padding, "",
+             author_gap, "",
+             "Dev.");
+#else
+    (printf)("%s%*s\\\n",
+             singular_authors,
+             author_padding, "");
 #endif
-"\n"
-" A Computer Algebra System for Polynomial Computations       /   version %s\n"
-"                                                           0<\n"
-" by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   %s\n"
-"FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\\n"
-, VERSION, VERSION_DATE);
+    (printf)("%s%*s\\\n",
+             singular_affiliation,
+             affiliation_padding, "");
     if (feOptValue(FE_OPT_NO_SHELL))
     {
       WarnS("running in restricted mode:"
@@ -272,4 +331,3 @@ int main(          /* main entry to Singular */
   m2_end(0);
   return 0;
 }
-

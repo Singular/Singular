@@ -1270,7 +1270,21 @@ YY_RULE_SETUP
 case 54:
 YY_RULE_SETUP
 #line 288 "scanner.l"
-{ return ARROW; }
+{
+                           int c;
+                           char buf[1024];
+                           int n = 0;
+                           do
+                           {
+                             c = yyinput();
+                             if (c == EOF) break;
+                             if (n < (int)sizeof(buf)) buf[n++] = (char)c;
+                           }
+                           while ((c == ' ') || (c == '\t') || (c == '\r') || (c == '\n'));
+                           while (n > 0) unput(buf[--n]);
+                           if (c == '{') return ARROW;
+                           return ':';
+                         }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP

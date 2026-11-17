@@ -41,7 +41,7 @@ SLIB1 = arr.lib arnold.lib arnoldclassify.lib \
 	classify2.lib classifyMapGerms.lib classifyceq.lib classifyci.lib classify_aeq.lib\
 	chern.lib cimonom.lib combinat.lib customstd.lib curveInv.lib \
 	deRham.lib difform.lib dmodloc.lib divisors.lib \
-	ellipticcovers.lib \
+	ellipticcovers.lib enumnf.lib \
         ffsolve.lib ffmodstd.lib decomp.lib template.lib \
         findifs.lib finitediff.lib \
         gfan.lib gitfan.lib gradedModules.lib GND.lib graal.lib goettsche.lib \
@@ -72,7 +72,7 @@ PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
 	ncall.lib ncalg.lib ncdecomp.lib ncfactor.lib nchomolog.lib \
         ncModslimgb.lib ncpreim.lib nctools.lib \
 	perron.lib purityfiltration.lib  qmatrix.lib \
-        ratgb.lib
+        ratgb.lib rwborder.lib
 
 # contributed libs, status not yet decided
 SLIB2 = arc.lib KVequiv.lib deflation.lib enumpoints.lib invar.lib lejeune.lib\

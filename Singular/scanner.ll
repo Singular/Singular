@@ -268,7 +268,21 @@ proc[ \t]+{name}[ \t]*\( {
 "!="                     { return NOTEQUAL; }
 "<>"                     { return NOTEQUAL; }
 "**"                     { return '^'; }
-"->"                     { return ARROW; }
+"->"                     {
+                           int c;
+                           char buf[1024];
+                           int n = 0;
+                           do
+                           {
+                             c = yyinput();
+                             if (c == EOF) break;
+                             if (n < (int)sizeof(buf)) buf[n++] = (char)c;
+                           }
+                           while ((c == ' ') || (c == '\t') || (c == '\r') || (c == '\n'));
+                           while (n > 0) unput(buf[--n]);
+                           if (c == '{') return ARROW;
+                           return ':';
+                         }
 \\                       { return '\\'; }
 newline                  {
                            lvalp->name = omStrDup("\n");

@@ -23,7 +23,7 @@ for step by step instructions.
 
 * `--with-readline=static` (embed readline)
 * `--disable-shared --enable-static --without-pic` (totally disable dynamic linkage)
-* `--enable-p-procs-static --disable-p-procs-dynamic` (builds-in the the generated p_Procs functions)
+* `--enable-p-procs-static --disable-p-procs-dynamic` (builds-in the generated p_Procs functions)
 
 Moreover modules may be built-in as follows:
 * `--with-builtinmodules=A,M,...` means that the listed modules are to be built-in. Possible internal built-ins are:

@@ -57,7 +57,7 @@ static proc lis (int n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// creates a list of all combinations without repititions of m objects out of n
+// creates a list of all combinations without repetitions of m objects out of n
 static proc combinations (int m, int n)
 {
  list result;

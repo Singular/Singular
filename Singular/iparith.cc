@@ -2111,22 +2111,31 @@ static BOOLEAN jjFAC_P2(leftv res, leftv u,leftv dummy)
 }
 static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
 {
-  ideal_list p,h;
-  h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL,(ideal)w->Data());
-  p=h;
-  int l=0;
-  while (p!=NULL) { p=p->next;l++; }
   lists L=(lists)omAllocBin(slists_bin);
-  L->Init(l);
-  l=0;
-  while(h!=NULL)
+  if (singclap_factorize_is_supported(currRing))
   {
-    L->m[l].data=(char *)h->d;
-    L->m[l].rtyp=IDEAL_CMD;
-    p=h->next;
-    omFreeSize(h,sizeof(*h));
-    h=p;
-    l++;
+    ideal_list p,h;
+    h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL,(ideal)w->Data());
+    p=h;
+    int l=0;
+    while (p!=NULL) { p=p->next;l++; }
+    L->Init(l);
+    l=0;
+    while(h!=NULL)
+    {
+      L->m[l].data=(char *)h->d;
+      L->m[l].rtyp=IDEAL_CMD;
+      p=h->next;
+      omFreeSize(h,sizeof(*h));
+      h=p;
+      l++;
+    }
+  }
+  else
+  {
+    WerrorS("facstd: factorization is not implemented for this coefficient domain");
+    omFreeBin((ADDRESS)L, slists_bin);
+    return TRUE;
   }
   res->data=(void *)L;
   return FALSE;
@@ -3632,15 +3641,329 @@ static BOOLEAN jjSYZ_2(leftv res, leftv u, leftv v)
   if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
-#ifdef HTABLE
-static BOOLEAN jjTABLE_GET(leftv res, leftv u, leftv v)
+static const char *HTABLE_PAIR_ATTR        = "isHTablePair";
+static const char *HTABLE_ORIGIN_TYP_ATTR  = "htableOriginTyp";
+static const char *HTABLE_ORIGIN_DATA_ATTR = "htableOriginData";
+
+static void jjSetCurrRingHdlFromRing(ring r)
 {
-  stablerec* t=(stablerec*)u->Data();
-  leftv r=t_findTabelVal(t,(char*)v->Data());
-  if (r!=NULL) res->Copy(r);
-  return (r==NULL);
+  idhdl h = rFindHdl(r, NULL);
+  if (h == NULL)
+  {
+    char name_buffer[100];
+    STATIC_VAR int ending = 1000000;
+    ending++;
+    snprintf(name_buffer, 100, "PYTHON_RING_VAR%d", ending);
+    h = enterid(name_buffer, 0, RING_CMD, &IDROOT);
+    IDRING(h) = rIncRefCnt(r);
+  }
+  rSetHdl(h);
 }
-#endif
+
+static char *jjTYPEOF_Name(int t)
+{
+  switch (t)
+  {
+    case CRING_CMD:
+    case INT_CMD:
+    case POLY_CMD:
+    case VECTOR_CMD:
+    case STRING_CMD:
+    case INTVEC_CMD:
+    case IDEAL_CMD:
+    case MATRIX_CMD:
+    case MODUL_CMD:
+    case MAP_CMD:
+    case PROC_CMD:
+    case RING_CMD:
+    case SMATRIX_CMD:
+    //case QRING_CMD:
+    case INTMAT_CMD:
+    case BIGINTMAT_CMD:
+    case BIGINTVEC_CMD:
+    case NUMBER_CMD:
+    #ifdef SINGULAR_4_2
+    case CNUMBER_CMD:
+    #endif
+    case BIGINT_CMD:
+    case BUCKET_CMD:
+    case LIST_CMD:
+    case PACKAGE_CMD:
+    case LINK_CMD:
+    case RESOLUTION_CMD:
+    case HTABLE_CMD:
+      return omStrDup(Tok2Cmdname(t));
+    case DEF_CMD:
+    case NONE:
+      return omStrDup("none");
+    default:
+      if (t > MAX_TOK) return omStrDup(getBlackboxName(t));
+      return omStrDup("?unknown type?");
+  }
+}
+
+static BOOLEAN jjHTABLE_IsPair(leftv v, BOOLEAN marked_only)
+{
+  if ((v == NULL) || (v->Typ() != LIST_CMD)) return FALSE;
+  if (marked_only && (atGet(v, HTABLE_PAIR_ATTR, INT_CMD) == NULL)) return FALSE;
+  lists L = (lists)v->Data();
+  if ((L == NULL) || (L->nr != 1)) return FALSE;
+  if (L->m[0].Typ() != STRING_CMD) return FALSE;
+  if ((L->m[1].rtyp == 0) || (L->m[1].rtyp == DEF_CMD)) return FALSE;
+  return TRUE;
+}
+
+static int jjHTABLE_PairOriginTyp(leftv pair, leftv val)
+{
+  void *ot = atGet(pair, HTABLE_ORIGIN_TYP_ATTR, INT_CMD);
+  if (ot != NULL) return (int)(long)ot;
+  return val->Typ();
+}
+
+static void *jjHTABLE_PairOriginData(leftv pair, leftv val)
+{
+  void *ot = atGet(pair, HTABLE_ORIGIN_TYP_ATTR, INT_CMD);
+  if (ot != NULL) return atGet(pair, HTABLE_ORIGIN_DATA_ATTR, INT_CMD);
+  return val->Data();
+}
+
+static BOOLEAN jjHTABLE_MAKE_PAIR(leftv res, leftv keyv, leftv valv)
+{
+  const char *key = NULL;
+  int kt = keyv->Typ();
+  if (kt == STRING_CMD)
+  {
+    key = (const char*)keyv->Data();
+  }
+  else if (kt == UNKNOWN)
+  {
+    key = keyv->Fullname();
+  }
+  else
+  {
+    Werror("htable key must be a string or an undefined identifier, not `%s'", Tok2Cmdname(kt));
+    return TRUE;
+  }
+  if ((key == NULL) || (key == sNoName_fe) || errorreported)
+  {
+    WerrorS("invalid htable key");
+    return TRUE;
+  }
+
+  int vt = valv->Typ();
+  if (vt == UNKNOWN)
+  {
+    Werror("undefined value `%s' in htable entry `%s'", valv->Fullname(), key);
+    return TRUE;
+  }
+  void *origin_data = valv->Data();
+  if (errorreported) return TRUE;
+
+  lists L = (lists)omAlloc0Bin(slists_bin);
+  L->Init(2);
+  L->m[0].rtyp = STRING_CMD;
+  L->m[0].data = omStrDup(key);
+  L->m[1].rtyp = vt;
+  L->m[1].data = valv->CopyD(vt);
+  L->m[1].flag = valv->flag;
+  if (errorreported)
+  {
+    L->Clean();
+    return TRUE;
+  }
+  attr *aa = valv->Attribute();
+  if ((aa != NULL) && (*aa != NULL)) L->m[1].attribute = (*aa)->Copy();
+
+  res->rtyp = LIST_CMD;
+  res->data = (void*)L;
+  atSet(res, omStrDup(HTABLE_PAIR_ATTR), (void*)1, INT_CMD);
+  atSet(res, omStrDup(HTABLE_ORIGIN_TYP_ATTR), (void*)(long)vt, INT_CMD);
+  atSet(res, omStrDup(HTABLE_ORIGIN_DATA_ATTR), origin_data, INT_CMD);
+  return FALSE;
+}
+
+static BOOLEAN jjHTABLE_AddPair(stablerec *t, leftv pair, BOOLEAN marked_only)
+{
+  if (!jjHTABLE_IsPair(pair, marked_only))
+  {
+    WerrorS("htable entry must be of the form key -> value");
+    return TRUE;
+  }
+  lists L = (lists)pair->Data();
+  char *key = (char*)L->m[0].Data();
+  if (errorreported) return TRUE;
+  leftv val = &(L->m[1]);
+  int origin_typ = jjHTABLE_PairOriginTyp(pair, val);
+  void *origin_data = jjHTABLE_PairOriginData(pair, val);
+  if (errorreported) return TRUE;
+  return t_addTableOrigin(t, omStrDup(key), val, origin_typ, origin_data);
+}
+
+static BOOLEAN jjHTABLE_AddOperand(stablerec *t, leftv v, BOOLEAN marked_pair_only)
+{
+  int vt = v->Typ();
+  if (vt == HTABLE_CMD)
+  {
+    return t_mergeTable(t, (stablerec*)v->Data());
+  }
+  if (vt == LIST_CMD)
+  {
+    return jjHTABLE_AddPair(t, v, marked_pair_only);
+  }
+  Werror("expected htable or key -> value entry, got `%s'", Tok2Cmdname(vt));
+  return TRUE;
+}
+
+static BOOLEAN jjHTABLE_PlusApplies(int at, int bt, leftv a, leftv b)
+{
+  BOOLEAN has_htable = ((at == HTABLE_CMD) || (bt == HTABLE_CMD));
+  if (has_htable)
+  {
+    if ((at != HTABLE_CMD) && !jjHTABLE_IsPair(a, FALSE)) return FALSE;
+    if ((bt != HTABLE_CMD) && !jjHTABLE_IsPair(b, FALSE)) return FALSE;
+    return TRUE;
+  }
+  return ((at == LIST_CMD) && (bt == LIST_CMD)
+       && jjHTABLE_IsPair(a, TRUE) && jjHTABLE_IsPair(b, TRUE));
+}
+
+static BOOLEAN jjHTABLE_PLUS(leftv res, leftv a, leftv b)
+{
+  stablerec *t = t_createTable(17);
+  BOOLEAN a_marked_only = (a->Typ() != HTABLE_CMD) && (b->Typ() != HTABLE_CMD);
+  BOOLEAN b_marked_only = a_marked_only;
+  if (jjHTABLE_AddOperand(t, a, a_marked_only)
+  ||  jjHTABLE_AddOperand(t, b, b_marked_only))
+  {
+    t_destroyTable(t);
+    return TRUE;
+  }
+  res->rtyp = HTABLE_CMD;
+  res->data = (void*)t;
+  return FALSE;
+}
+
+static BOOLEAN jjHTABLE_GET(leftv res, leftv u, leftv v)
+{
+  stablerec* t = (stablerec*)u->Data();
+  char *key = (char*)v->Data();
+  if (errorreported) return TRUE;
+  return t_copyTableVal(res, t, key);
+}
+
+static telem jjHTABLE_FindEntry(leftv u, leftv v)
+{
+  stablerec* t = (stablerec*)u->Data();
+  char *key = (char*)v->Data();
+  if (errorreported) return NULL;
+  telem p = t_findTable(t, key);
+  if (p == NULL) Werror("no such key `%s' in htable", key == NULL ? "" : key);
+  return p;
+}
+
+static BOOLEAN jjHTABLE_TYPEOF(leftv res, leftv u, leftv v)
+{
+  telem p = jjHTABLE_FindEntry(u, v);
+  if (p == NULL) return TRUE;
+  res->rtyp = STRING_CMD;
+  res->data = jjTYPEOF_Name(p->val.Typ());
+  return errorreported;
+}
+
+static BOOLEAN jjHTABLE_PARENTOFVALUE(leftv res, leftv u, leftv v)
+{
+  telem p = jjHTABLE_FindEntry(u, v);
+  if (p == NULL) return TRUE;
+  if (p->val_ring == NULL)
+  {
+    res->rtyp = INT_CMD;
+    res->data = (void*)0;
+  }
+  else
+  {
+    res->rtyp = RING_CMD;
+    res->data = (void*)rIncRefCnt(p->val_ring);
+  }
+  return FALSE;
+}
+
+static BOOLEAN jjHTABLE_GETVALUE(leftv res, leftv u, leftv v)
+{
+  telem p = jjHTABLE_FindEntry(u, v);
+  if (p == NULL) return TRUE;
+  if ((p->val_ring != NULL) && (currRing != p->val_ring))
+  {
+    jjSetCurrRingHdlFromRing(p->val_ring);
+    if (errorreported) return TRUE;
+  }
+  return t_copyTableVal(res, (stablerec*)u->Data(), (char*)v->Data());
+}
+
+static BOOLEAN jjHTABLE_COUNT(leftv res, leftv u)
+{
+  res->rtyp = INT_CMD;
+  res->data = (void*)(long)t_countTable((stablerec*)u->Data());
+  return errorreported;
+}
+
+static BOOLEAN jjHTABLE_M(leftv res, leftv a)
+{
+  stablerec *t = t_createTable(17);
+
+  if (a == NULL)
+  {
+    res->rtyp = HTABLE_CMD;
+    res->data = (void*)t;
+    return FALSE;
+  }
+
+  if ((a->next == NULL) && (a->Typ() == HTABLE_CMD))
+  {
+    t_destroyTable(t);
+    t = t_cloneTable((stablerec*)a->Data());
+    if (t == NULL) return TRUE;
+    res->rtyp = HTABLE_CMD;
+    res->data = (void*)t;
+    return FALSE;
+  }
+
+  if ((a->next == NULL) && (a->Typ() == LIST_CMD) && !jjHTABLE_IsPair(a, TRUE))
+  {
+    lists L = (lists)a->Data();
+    if (errorreported)
+    {
+      t_destroyTable(t);
+      return TRUE;
+    }
+    for (int i = 0; i <= L->nr; i++)
+    {
+      if ((L->m[i].rtyp != DEF_CMD) && (L->m[i].rtyp != 0))
+      {
+        if (jjHTABLE_AddPair(t, &(L->m[i]), FALSE))
+        {
+          t_destroyTable(t);
+          return TRUE;
+        }
+      }
+    }
+    res->rtyp = HTABLE_CMD;
+    res->data = (void*)t;
+    return FALSE;
+  }
+
+  for (leftv v = a; v != NULL; v = v->next)
+  {
+    if (jjHTABLE_AddOperand(t, v, FALSE))
+    {
+      t_destroyTable(t);
+      return TRUE;
+    }
+  }
+  res->rtyp = HTABLE_CMD;
+  res->data = (void*)t;
+  return FALSE;
+}
+
 static BOOLEAN jjTENSOR(leftv res, leftv u, leftv v)
 {
   ideal A=(ideal)u->Data();
@@ -3858,17 +4181,7 @@ static BOOLEAN jjSetRing(leftv, leftv u)
   else
   {
     ring r=(ring)u->Data();
-    idhdl h=rFindHdl(r,NULL);
-    if (h==NULL)
-    {
-      char name_buffer[100];
-      STATIC_VAR int ending=1000000;
-      ending++;
-      snprintf(name_buffer,100, "PYTHON_RING_VAR%d",ending);
-      h=enterid(name_buffer,0,RING_CMD,&IDROOT);
-      IDRING(h)=rIncRefCnt(r);
-    }
-    rSetHdl(h);
+    jjSetCurrRingHdlFromRing(r);
   }
   return FALSE;
 }
@@ -4221,7 +4534,7 @@ static BOOLEAN jjEXECUTE(leftv, leftv v)
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   lists L=(lists)omAllocBin(slists_bin);
-  if (currRing->cf->convSingNFactoryN!=ndConvSingNFactoryN) /* conversion to factory*/
+  if (singclap_factorize_is_supported(currRing))
   {
     ideal_list p,h;
     h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
@@ -4251,9 +4564,9 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
   }
   else
   {
-    WarnS("no factorization implemented");
-    L->Init(1);
-    iiExprArith1(&(L->m[0]),v,STD_CMD);
+    WerrorS("facstd: factorization is not implemented for this coefficient domain");
+    omFreeBin((ADDRESS)L, slists_bin);
+    return TRUE;
   }
   res->data=(void *)L;
   return FALSE;
@@ -5428,50 +5741,7 @@ static BOOLEAN jjRIGHTSTD(leftv res, leftv v)
 static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
   int t=(int)(long)v->data;
-  switch (t)
-  {
-    case CRING_CMD:
-    case INT_CMD:
-    case POLY_CMD:
-    case VECTOR_CMD:
-    case STRING_CMD:
-    case INTVEC_CMD:
-    case IDEAL_CMD:
-    case MATRIX_CMD:
-    case MODUL_CMD:
-    case MAP_CMD:
-    case PROC_CMD:
-    case RING_CMD:
-    case SMATRIX_CMD:
-    //case QRING_CMD:
-    case INTMAT_CMD:
-    case BIGINTMAT_CMD:
-    case BIGINTVEC_CMD:
-    case NUMBER_CMD:
-    #ifdef SINGULAR_4_2
-    case CNUMBER_CMD:
-    #endif
-    case BIGINT_CMD:
-    case BUCKET_CMD:
-    case LIST_CMD:
-    case PACKAGE_CMD:
-    case LINK_CMD:
-    case RESOLUTION_CMD:
-    #ifdef HTABLE
-    case HTABLE_CMD:
-    #endif
-         res->data=omStrDup(Tok2Cmdname(t)); break;
-    case DEF_CMD:
-    case NONE:           res->data=omStrDup("none"); break;
-    default:
-    {
-      if (t>MAX_TOK)
-        res->data=omStrDup(getBlackboxName(t));
-      else
-        res->data=omStrDup("?unknown type?");
-      break;
-    }
-  }
+  res->data = jjTYPEOF_Name(t);
   return FALSE;
 }
 static BOOLEAN jjUNIVARIATE(leftv res, leftv v)
@@ -6751,15 +7021,6 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
   if (kernel_cmd) idDelete(&image);
   return (res->data==NULL/* is of type ideal, should not be NULL*/);
 }
-#ifdef HTABLE
-static BOOLEAN jjTABLE_ADD(leftv res, leftv u, leftv v, leftv w)
-{
-  stablerec* lt=(stablerec*)u->Data();
-  char *key=(char*)v->CopyD();
-  t_addTable(lt,key,w);
-  return FALSE;
-}
-#endif
 static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 {
   int di, k;
@@ -9199,6 +9460,69 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 #endif
     int at=a->Typ();
     int bt=b->Typ();
+    if ((op == ':') && ((at == STRING_CMD) || (at == UNKNOWN)))
+    {
+      BOOLEAN bo = jjHTABLE_MAKE_PAIR(res, a, b);
+      a->CleanUp();
+      b->CleanUp();
+      return bo;
+    }
+    if ((op == '+') && jjHTABLE_PlusApplies(at, bt, a, b))
+    {
+      BOOLEAN bo = jjHTABLE_PLUS(res, a, b);
+      a->CleanUp();
+      b->CleanUp();
+      return bo;
+    }
+    if (((op == '[') || (op == '(')) && (at == HTABLE_CMD) && (bt == STRING_CMD))
+    {
+      BOOLEAN bo = jjHTABLE_GET(res, a, b);
+      a->CleanUp();
+      b->CleanUp();
+      return bo;
+    }
+    if ((op == TYPEOFVALUE_CMD) && (at == HTABLE_CMD) && (bt == STRING_CMD))
+    {
+      BOOLEAN bo = jjHTABLE_TYPEOF(res, a, b);
+      a->CleanUp();
+      b->CleanUp();
+      return bo;
+    }
+    if (op == TYPEOFVALUE_CMD)
+    {
+      WerrorS("expected typeOfValue(`htable`, `string`)");
+      a->CleanUp();
+      b->CleanUp();
+      return TRUE;
+    }
+    if ((op == GETVALUE_CMD) && (at == HTABLE_CMD) && (bt == STRING_CMD))
+    {
+      BOOLEAN bo = jjHTABLE_GETVALUE(res, a, b);
+      a->CleanUp();
+      b->CleanUp();
+      return bo;
+    }
+    if (op == GETVALUE_CMD)
+    {
+      WerrorS("expected getValue(`htable`, `string`)");
+      a->CleanUp();
+      b->CleanUp();
+      return TRUE;
+    }
+    if ((op == PARENTOFVALUE_CMD) && (at == HTABLE_CMD) && (bt == STRING_CMD))
+    {
+      BOOLEAN bo = jjHTABLE_PARENTOFVALUE(res, a, b);
+      a->CleanUp();
+      b->CleanUp();
+      return bo;
+    }
+    if (op == PARENTOFVALUE_CMD)
+    {
+      WerrorS("expected parentOfValue(`htable`, `string`)");
+      a->CleanUp();
+      b->CleanUp();
+      return TRUE;
+    }
     // handling bb-objects ----------------------------------------------------
     if (at>MAX_TOK)
     {
@@ -9384,6 +9708,12 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     }
 #endif
     int at=a->Typ();
+    if ((op == COUNT_CMD) && (at == HTABLE_CMD))
+    {
+      BOOLEAN bo = jjHTABLE_COUNT(res, a);
+      a->CleanUp();
+      return bo;
+    }
     // handling bb-objects ----------------------------------------------------
     if(op>MAX_TOK) // explicit type conversion to bb
     {
@@ -9710,6 +10040,12 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       return FALSE;
     }
 #endif
+    if (op == HTABLE_CMD)
+    {
+      BOOLEAN bo = jjHTABLE_M(res, a);
+      if (a != NULL) a->CleanUp();
+      return bo;
+    }
     if ((a!=NULL) && (a->Typ()>MAX_TOK))
     {
       blackbox *bb=getBlackboxStuff(a->Typ());

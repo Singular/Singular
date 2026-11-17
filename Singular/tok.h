@@ -216,6 +216,10 @@ enum {
   VSHORTOUT,
   VPRINTLEVEL,
   /* end system var section: VPRINTLEVEL */
+  GETVALUE_CMD,
+  HTABLE_CMD,
+  PARENTOFVALUE_CMD,
+  TYPEOFVALUE_CMD,
 
   MAX_TOK /* must be the last, biggest token number */
 };

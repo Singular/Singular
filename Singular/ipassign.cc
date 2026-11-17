@@ -48,6 +48,7 @@
 #include "ipshell.h"
 #include "blackbox.h"
 #include "Singular/number2.h"
+#include "htable.h"
 
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv, leftv a)
@@ -1424,6 +1425,21 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, int rt, BOOLEAN toplevel, BOOLEAN is
   &&(rt==RING_CMD))
   {
     Warn("qring .. = <ring>; is misleading in >>%s<<",my_yylinebuf);
+  }
+  if ((lt==HTABLE_CMD) && (rt==HTABLE_CMD))
+  {
+    if (traceit&TRACE_ASSIGN) Print("assign %s=%s\n",Tok2Cmdname(lt),Tok2Cmdname(rt));
+    void *nd = r->CopyD(HTABLE_CMD);
+    if (errorreported) return TRUE;
+    if (ld->data != NULL) t_destroyTable((stablerec*)ld->data);
+    ld->data = nd;
+    jiAssignAttr(ld,r);
+    if (l!=ld)
+    {
+      l->flag=ld->flag;
+      l->attribute=ld->attribute;
+    }
+    return FALSE;
   }
   int start=0;
   while ((dAssign[start].res!=lt)

@@ -31,6 +31,7 @@ ideal ssiReadIdeal(ssiInfo *d);
 void ssiWriteIdeal(const ssiInfo *d, int typ,const ideal I);
 int ssiReadInt(const ssiInfo *d);
 void ssiWriteInt(const ssiInfo *d,const int i);
+char* ssiReadString(const ssiInfo *d);
 
 // ssi via string
 char* ssiWritePoly_S(poly p, const ring r);

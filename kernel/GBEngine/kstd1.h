@@ -60,7 +60,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** mw, bigintmat *hilb=NULL,
 
 ideal kTryHilbstd(ideal F, ideal Q);
 ideal kTryHilbstd_par(ideal F, ideal Q, tHomog h, intvec ** mw);
-poly kTryHC(ideal F, ideal Q);
+poly kTryHC(ideal F, ideal Q, long* colength);
 
 ideal rightgb(ideal F,const ideal Q);
 
@@ -124,4 +124,3 @@ verbose:31 stop at certain weights
 */
 
 #endif
-

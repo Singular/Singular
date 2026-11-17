@@ -1,0 +1,2045 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version enumnf.lib 0.1.0 May_2026 ";
+category="Singularity Theory";
+info="
+LIBRARY: enumnf.lib  Enumeration of normal-form series with non-degenerate Newton boundary
+AUTHORS:               Janko Boehm,      Department of Mathematics, RPTU Kaiserslautern-Landau, email: boehm@mathematik.uni-kl.de
+                       Mathias Koehler,  Department of Mathematics, RPTU Kaiserslautern-Landau, email: koehlerm@rptu.de
+                       Magdaleen Marais, Analytics and Computing, Fraunhofer ITWM, Department of Mathematics and Applied Mathematics, University of Stellenbosch, email: magdaleen.suzanne.boehm-marais@itwm.fraunhofer.de
+                       Gerhard Pfister,  Department of Mathematics, RPTU Kaiserslautern-Landau, email: pfister@mathematik.uni-kl.de
+                       Danial Shirazi,   Department of Mathematics, RPTU Kaiserslautern-Landau, email: danial.sh1378@gmail.com
+
+OVERVIEW:
+This library implements a tree-traversal algorithm to enumerate normal-form
+representatives of corank <=2 singularities with non-degenerate Newton boundary
+up to a Milnor-number bound and/or up to a modality bound. Enumeration up to
+modality is the canonical question. The algorithm turns this into a finite
+problem by arranging representatives into series, similar to those in Arnold's
+lists up to modality 2.
+The data structures are ring independent, except that evaluating
+a representative as an actual polynomial uses var(1), var(2) of the current basering.
+The current basering should have characteristic zero and at least two variables.
+
+Main user-facing procedures:
+NNBenumerate(m[,p]);     enumerate series of normal-form representatives up to the
+                          modality bound m.  If p<>0, print the representative
+                          series grouped by modality.  Returns a list grouped
+                          by modalities 0..m, with NNBNormalFormSeries entries,
+                          not Arnold NormalForm objects.
+
+NNBenumerateBounded(mu0,m0[,p]); enumerate individual actual normal forms with a
+                          Milnor-number bound and optional modality bound.
+                          Use mu0>=0,m0=-1 for Milnor-only, or mu0>=0,m0>=0
+                          for both bounds.  Returns a list grouped by
+                          modality, with Arnold NormalForm entries whose
+                          parameters store the regular basis on/above the
+                          Newton boundary.
+
+NNBevaluateNormalFormSeries(s[,k,l]);
+                          substitute the exponent parameters k,l in the
+                          normal-form series s and evaluate the resulting
+                          representative polynomial.
+
+NNBevaluateNormalFormSeriesToNormalForm(s[,k,l]);
+                          substitute the exponent parameters k,l in the
+                          normal-form series s and convert the result to an
+                          Arnold NormalForm, with regular-basis parameters
+                          filled.  Use NNBenumerateBounded when actual Arnold
+                          NormalForm objects are required directly.
+
+NNBnormalFormSeriesParameters(s);
+                          return the series parameters.
+
+User-facing procedures:
+NNBenumerateRaw(mu0,m0[,p]); enumerate normal-form representatives.  Use
+                          mu0>=0,m0=-1 for bounded Milnor number, or
+                          mu0=-1,m0>=0 for the modality-series mode.  If p<>0,
+                          print the series of normal-form representatives grouped by modality;
+                          Returns raw enumeration data list(V,S), not Arnold
+                          NormalForm objects.  Here V is the enumeration tree
+                          of NNBVertex objects, while S is the storage list of
+                          buckets [flag vector, signature, representatives].
+
+NNBnormalFormsRaw(E,m[,p]);  group the raw enumeration result, a list
+                          E=list(V,S) returned by NNBenumerateRaw, into normal-form
+                          series of normal-form representatives by modality.
+                          Returns NNBNormalFormSeries entries, not Arnold
+                          NormalForm objects.
+
+NNBnormalFormSeriesString(s);
+                          turn a series of normal-form representatives into a string.
+NNBprintNormalFormSeries(s);
+                          print a given series of normal-form representatives.
+
+For commands with exponent parameters k,l, the values required by the series
+must be given.  The arguments are positional as k,l; hence a series depending
+only on l must be called with a placeholder for k, for example (s,0,l).
+If the series has no exponent parameter, no exponent values are accepted.
+
+NNBregularBasis(s[,k,l]); substitute the exponent parameters k,l in the
+                          normal-form series s and return exponent vectors of
+                          the regular basis on/above the Newton boundary.
+NNBtermsAsExponents(s[,k,l]);
+                          substitute the exponent parameters k,l in the
+                          normal-form series s and return the term exponents.
+NNBhashFunction(s[,k,l]); substitute the exponent parameters k,l in the
+                          normal-form series s and return the tuple (area-like hash,
+                          number of terms, sum of coordinates).
+
+Data types:
+NNBRatExpr      symbolic rational expression in parameters k,l, used for bounds.
+NNBExpr         affine expression ck*k+cl*l+c, with an optional parameter bound.
+NNBMonomial     a monomial x^a y^b with optional parameter constraint.
+NNBVertex       an enumeration-tree vertex.
+NNBNormalForm   internal Newton-boundary representation used by the enumerator.
+NNBNormalFormSeries
+                a symbolic normal-form series; its members are internal
+                NNBNormalForm representatives with parameter bounds.
+NormalForm      Arnold-library normal-form object returned by
+                NNBenumerateBounded and NNBevaluateNormalFormSeriesToNormalForm.  Its
+                normalForm field contains the polynomial normal form and its
+                parameters field stores the regular-basis monomials on/above
+                the Newton boundary.
+
+EXAMPLE:
+  ring R=0,(x,y),ds;
+  list S=NNBenumerate(1,1);
+  list M=NNBenumerateBounded(6,1,0);
+";
+
+LIB "arnold.lib";
+
+static proc mod_init()
+{
+  newstruct("NNBRatExpr","int op, number value, list args");
+  newstruct("NNBExpr","number ck, number cl, number c, list bound");
+  newstruct("NNBMonomial","NNBExpr monx, NNBExpr mony, list constraint");
+  newstruct("NNBVertex","int name, NNBMonomial monom, int ancestor, intvec rho, NNBExpr area, int modality, intvec F");
+  newstruct("NNBNormalForm","list terms, NNBMonomial rhomon, NNBExpr area, list regularBasis");
+  newstruct("NNBNormalFormSeries","list normalForms, int modality");
+  system("install","NNBNormalForm","print",NNBprintNormalForm,1);
+  system("install","NNBNormalFormSeries","print",NNBprintNormalFormSeries,1);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// basic exact arithmetic helpers
+//////////////////////////////////////////////////////////////////////////////
+
+static proc NNBfloor(number a)
+{
+  bigint m = bigint(numerator(a));
+  bigint n = bigint(denominator(a));
+  return(number(m div n));
+}
+
+static proc NNBceil(number a)
+{
+  return(-NNBfloor(-a));
+}
+
+static proc NNBmin(number a, number b)
+{
+  if (a<=b) { return(a); }
+  return(b);
+}
+
+static proc NNBmax(number a, number b)
+{
+  if (a>=b) { return(a); }
+  return(b);
+}
+
+static proc NNBabs(number a)
+{
+  if (a<0) { return(-a); }
+  return(a);
+}
+
+static proc NNBiv2(int a, int b)
+{
+  intvec v=a,b;
+  return(v);
+}
+
+static proc NNBiv4(int a, int b, int c, int d)
+{
+  intvec v=a,b,c,d;
+  return(v);
+}
+
+static proc NNBivecAt(intvec v, int i)
+{
+  if (size(v)<i) { return(0); }
+  return(v[i]);
+}
+
+static proc NNBreverseF(intvec F)
+{
+  return(NNBiv4(NNBivecAt(F,4),NNBivecAt(F,3),NNBivecAt(F,2),NNBivecAt(F,1)));
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// symbolic rational expressions for bounds: op 0 const, 1 k, 2 l,
+// 3 add, 4 sub, 5 mul, 6 div, 7 neg.
+//////////////////////////////////////////////////////////////////////////////
+
+static proc NNBrConst(number a)
+{
+  NNBRatExpr e;
+  e.op=0; e.value=a; list A; e.args=A;
+  return(e);
+}
+
+static proc NNBrK()
+{
+  NNBRatExpr e;
+  e.op=1; e.value=0; list A; e.args=A;
+  return(e);
+}
+
+static proc NNBrL()
+{
+  NNBRatExpr e;
+  e.op=2; e.value=0; list A; e.args=A;
+  return(e);
+}
+
+static proc NNBrNode(int op, NNBRatExpr a, list #)
+{
+  NNBRatExpr e;
+  e.op=op; e.value=0;
+  list A; A[1]=a;
+  if (size(#)>0) { A[2]=#[1]; }
+  e.args=A;
+  return(e);
+}
+
+static proc NNBrIsConstant(NNBRatExpr e)
+{
+  if (e.op==0) { return(1); }
+  if (e.op==1 || e.op==2) { return(0); }
+  if (e.op==7) { return(NNBrIsConstant(e.args[1])); }
+  return(NNBrIsConstant(e.args[1]) && NNBrIsConstant(e.args[2]));
+}
+
+static proc NNBrEval(NNBRatExpr e, number kval, number lval)
+{
+  if (e.op==0) { return(e.value); }
+  if (e.op==1) { return(kval); }
+  if (e.op==2) { return(lval); }
+  if (e.op==3) { return(NNBrEval(e.args[1],kval,lval)+NNBrEval(e.args[2],kval,lval)); }
+  if (e.op==4) { return(NNBrEval(e.args[1],kval,lval)-NNBrEval(e.args[2],kval,lval)); }
+  if (e.op==5) { return(NNBrEval(e.args[1],kval,lval)*NNBrEval(e.args[2],kval,lval)); }
+  if (e.op==6) { return(NNBrEval(e.args[1],kval,lval)/NNBrEval(e.args[2],kval,lval)); }
+  if (e.op==7) { return(-NNBrEval(e.args[1],kval,lval)); }
+  ERROR("unknown NNBRatExpr opcode");
+}
+
+static proc NNBrConstValue(NNBRatExpr e)
+{
+  return(NNBrEval(e,0,0));
+}
+
+static proc NNBrIsConst(NNBRatExpr e, number c)
+{
+  if (!NNBrIsConstant(e)) { return(0); }
+  return(NNBrConstValue(e)==c);
+}
+
+static proc NNBrAdd(NNBRatExpr a, NNBRatExpr b)
+{
+  if (NNBrIsConst(a,0)) { return(b); }
+  if (NNBrIsConst(b,0)) { return(a); }
+  if (NNBrIsConstant(a) && NNBrIsConstant(b)) { return(NNBrConst(NNBrConstValue(a)+NNBrConstValue(b))); }
+  return(NNBrNode(3,a,b));
+}
+
+static proc NNBrSub(NNBRatExpr a, NNBRatExpr b)
+{
+  if (NNBrIsConst(b,0)) { return(a); }
+  if (NNBrIsConstant(a) && NNBrIsConstant(b)) { return(NNBrConst(NNBrConstValue(a)-NNBrConstValue(b))); }
+  return(NNBrNode(4,a,b));
+}
+
+static proc NNBrMul(NNBRatExpr a, NNBRatExpr b)
+{
+  if (NNBrIsConst(a,0) || NNBrIsConst(b,0)) { return(NNBrConst(0)); }
+  if (NNBrIsConst(a,1)) { return(b); }
+  if (NNBrIsConst(b,1)) { return(a); }
+  if (NNBrIsConstant(a) && NNBrIsConstant(b)) { return(NNBrConst(NNBrConstValue(a)*NNBrConstValue(b))); }
+  return(NNBrNode(5,a,b));
+}
+
+static proc NNBrDiv(NNBRatExpr a, NNBRatExpr b)
+{
+  if (NNBrIsConst(b,1)) { return(a); }
+  if (NNBrIsConstant(a) && NNBrIsConstant(b)) { return(NNBrConst(NNBrConstValue(a)/NNBrConstValue(b))); }
+  return(NNBrNode(6,a,b));
+}
+
+static proc NNBrNeg(NNBRatExpr a)
+{
+  if (NNBrIsConstant(a)) { return(NNBrConst(-NNBrConstValue(a))); }
+  return(NNBrNode(7,a));
+}
+
+static proc NNBrSwitch(NNBRatExpr e)
+{
+  if (e.op==0) { return(NNBrConst(e.value)); }
+  if (e.op==1) { return(NNBrL()); }
+  if (e.op==2) { return(NNBrK()); }
+  if (e.op==3) { return(NNBrAdd(NNBrSwitch(e.args[1]),NNBrSwitch(e.args[2]))); }
+  if (e.op==4) { return(NNBrSub(NNBrSwitch(e.args[1]),NNBrSwitch(e.args[2]))); }
+  if (e.op==5) { return(NNBrMul(NNBrSwitch(e.args[1]),NNBrSwitch(e.args[2]))); }
+  if (e.op==6) { return(NNBrDiv(NNBrSwitch(e.args[1]),NNBrSwitch(e.args[2]))); }
+  if (e.op==7) { return(NNBrNeg(NNBrSwitch(e.args[1]))); }
+}
+
+static proc NNBrString(NNBRatExpr e)
+{
+  if (e.op==0) { return(string(e.value)); }
+  if (e.op==1) { return("k"); }
+  if (e.op==2) { return("l"); }
+  if (e.op==3) { return("("+NNBrString(e.args[1])+"+"+NNBrString(e.args[2])+")"); }
+  if (e.op==4) { return("("+NNBrString(e.args[1])+"-"+NNBrString(e.args[2])+")"); }
+  if (e.op==5) { return("("+NNBrString(e.args[1])+"*"+NNBrString(e.args[2])+")"); }
+  if (e.op==6) { return("("+NNBrString(e.args[1])+"/"+NNBrString(e.args[2])+")"); }
+  if (e.op==7) { return("(-"+NNBrString(e.args[1])+")"); }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// affine exponent expressions and monomials
+//////////////////////////////////////////////////////////////////////////////
+
+static proc NNBboundConst(number kb, number lb)
+{
+  return(list(NNBrConst(kb),NNBrConst(lb)));
+}
+
+static proc NNBboundR(NNBRatExpr kb, NNBRatExpr lb)
+{
+  return(list(kb,lb));
+}
+
+static proc NNBnoBound()
+{
+  list B;
+  return(B);
+}
+
+static proc NNBexpr(number ck, number cl, number c, list #)
+{
+  NNBExpr e;
+  e.ck=ck; e.cl=cl; e.c=c;
+  if (size(#)>0) { e.bound=#; }
+  else { list B; e.bound=B; }
+  return(e);
+}
+
+static proc NNBexprConst(number c)
+{
+  return(NNBexpr(0,0,c));
+}
+
+static proc NNBexprK(list #)
+{
+  if (size(#)>0) { return(NNBexpr(1,0,0,#)); }
+  return(NNBexpr(1,0,0));
+}
+
+static proc NNBexprL(list #)
+{
+  if (size(#)>0) { return(NNBexpr(0,1,0,#)); }
+  return(NNBexpr(0,1,0));
+}
+
+static proc NNBexprAddAffine(NNBExpr e, number dk, number dl, number dc)
+{
+  return(NNBexpr(e.ck+dk,e.cl+dl,e.c+dc,e.bound));
+}
+
+static proc NNBexprEval(NNBExpr e, number kval, number lval)
+{
+  return(e.ck*kval+e.cl*lval+e.c);
+}
+
+static proc NNBexprIsConstant(NNBExpr e)
+{
+  return(e.ck==0 && e.cl==0);
+}
+
+static proc NNBexprConstValue(NNBExpr e)
+{
+  if (!NNBexprIsConstant(e)) { ERROR("expected a constant affine expression"); }
+  return(e.c);
+}
+
+static proc NNBrFromExpr(NNBExpr e)
+{
+  NNBRatExpr r=NNBrConst(e.c);
+  if (e.ck<>0) { r=NNBrAdd(r,NNBrMul(NNBrConst(e.ck),NNBrK())); }
+  if (e.cl<>0) { r=NNBrAdd(r,NNBrMul(NNBrConst(e.cl),NNBrL())); }
+  return(r);
+}
+
+static proc NNBexprSwitch(NNBExpr e)
+{
+  list B;
+  if (size(e.bound)>0) { B=NNBboundR(NNBrSwitch(e.bound[2]),NNBrSwitch(e.bound[1])); }
+  return(NNBexpr(e.cl,e.ck,e.c,B));
+}
+
+static proc NNBexprEqual(NNBExpr a, NNBExpr b)
+{
+  return(a.ck==b.ck && a.cl==b.cl && a.c==b.c);
+}
+
+static proc NNBexprString(NNBExpr e)
+{
+  string s="";
+  int printed=0;
+  if (e.ck<>0)
+  {
+    if (e.ck==1) { s="k"; }
+    else
+    {
+      if (e.ck==-1) { s="-k"; }
+      else { s=string(e.ck)+"*k"; }
+    }
+    printed=1;
+  }
+  if (e.cl<>0)
+  {
+    string t;
+    if (e.cl==1) { t="l"; }
+    else
+    {
+      if (e.cl==-1) { t="-l"; }
+      else { t=string(e.cl)+"*l"; }
+    }
+    if (printed && e.cl>0) { s=s+"+"+t; }
+    else
+    {
+      if (printed) { s=s+t; }
+      else { s=t; }
+    }
+    printed=1;
+  }
+  if (e.c<>0 || !printed)
+  {
+    if (printed && e.c>0) { s=s+"+"+string(e.c); }
+    else { s=s+string(e.c); }
+  }
+  return(s);
+}
+
+static proc NNBboundString(list B)
+{
+  if (size(B)==0) { return(""); }
+  string s=""; int printed=0;
+  if (!NNBrIsConst(B[1],-1)) { s=s+" k > "+NNBrString(B[1]); printed=1; }
+  if (!NNBrIsConst(B[2],-1))
+  {
+    if (printed) { s=s+" and"; }
+    s=s+" l > "+NNBrString(B[2]);
+  }
+  return(s);
+}
+
+static proc NNBmon(NNBExpr mx, NNBExpr my, list #)
+{
+  NNBMonomial m;
+  m.monx=mx; m.mony=my;
+  if (size(#)>0) { m.constraint=#; }
+  else { list C; m.constraint=C; }
+  return(m);
+}
+
+static proc NNBmonConst(number x, number y, list #)
+{
+  if (size(#)>0) { return(NNBmon(NNBexprConst(x),NNBexprConst(y),#)); }
+  return(NNBmon(NNBexprConst(x),NNBexprConst(y)));
+}
+
+static proc NNBmonSwitch(NNBMonomial m)
+{
+  list C;
+  if (size(m.constraint)>0) { C=NNBboundR(NNBrSwitch(m.constraint[2]),NNBrSwitch(m.constraint[1])); }
+  return(NNBmon(NNBexprSwitch(m.mony),NNBexprSwitch(m.monx),C));
+}
+
+static proc NNBmonEqual(NNBMonomial a, NNBMonomial b)
+{
+  return(NNBexprEqual(a.monx,b.monx) && NNBexprEqual(a.mony,b.mony));
+}
+
+static proc NNBmonString(NNBMonomial m)
+{
+  string s="x^("+NNBexprString(m.monx)+") * y^("+NNBexprString(m.mony)+")";
+  string bs=NNBboundString(m.constraint);
+  if (size(bs)>0) { s=s+" with"+bs; }
+  return(s);
+}
+
+static proc NNBmakeVertex(int name, NNBMonomial m, int ancestor, intvec rho, NNBExpr area, int modality, intvec F)
+{
+  NNBVertex v;
+  v.name=name; v.monom=m; v.ancestor=ancestor; v.rho=rho; v.area=area; v.modality=modality; v.F=F;
+  return(v);
+}
+
+static proc NNBmakeNF(list terms, NNBMonomial rhoMon, NNBExpr area)
+{
+  NNBNormalForm f;
+  list B;
+  f.terms=terms; f.rhomon=rhoMon; f.area=area; f.regularBasis=B;
+  return(f);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 2D rational half-space lattice enumeration.  A half-space is list(a,b,c)
+// and means a*x+b*y <= c.
+//////////////////////////////////////////////////////////////////////////////
+
+static proc NNBsatisfies(number x, number y, list H)
+{
+  for (int i=1;i<=size(H);i++)
+  {
+    if (H[i][1]*x+H[i][2]*y > H[i][3]) { return(0); }
+  }
+  return(1);
+}
+
+static proc NNBlatticePoints(list H)
+{
+  list V;
+  int i;
+  int j;
+  number detv;
+  number x;
+  number y;
+  for (i=1;i<=size(H);i++)
+  {
+    for (j=i+1;j<=size(H);j++)
+    {
+      detv=H[i][1]*H[j][2]-H[j][1]*H[i][2];
+      if (detv<>0)
+      {
+        x=(H[i][3]*H[j][2]-H[j][3]*H[i][2])/detv;
+        y=(H[i][1]*H[j][3]-H[j][1]*H[i][3])/detv;
+        if (NNBsatisfies(x,y,H)) { V[size(V)+1]=list(x,y); }
+      }
+    }
+  }
+  list P;
+  if (size(V)==0) { return(P); }
+  number minx=V[1][1]; number maxx=V[1][1]; number miny=V[1][2]; number maxy=V[1][2];
+  for (i=2;i<=size(V);i++)
+  {
+    if (V[i][1]<minx) { minx=V[i][1]; }
+    if (V[i][1]>maxx) { maxx=V[i][1]; }
+    if (V[i][2]<miny) { miny=V[i][2]; }
+    if (V[i][2]>maxy) { maxy=V[i][2]; }
+  }
+  int xi, yi;
+  for (xi=int(NNBceil(minx)); xi<=int(NNBfloor(maxx)); xi++)
+  {
+    for (yi=int(NNBceil(miny)); yi<=int(NNBfloor(maxy)); yi++)
+    {
+      if (NNBsatisfies(xi,yi,H)) { P[size(P)+1]=NNBiv2(xi,yi); }
+    }
+  }
+  return(P);
+}
+
+static proc NNBpointInList(list P, intvec q)
+{
+  for (int i=1;i<=size(P);i++)
+  {
+    if (P[i][1]==q[1] && P[i][2]==q[2]) { return(1); }
+  }
+  return(0);
+}
+
+static proc NNBuniquePoints(list P)
+{
+  list Q;
+  for (int i=1;i<=size(P);i++)
+  {
+    if (!NNBpointInList(Q,P[i])) { Q[size(Q)+1]=P[i]; }
+  }
+  return(Q);
+}
+
+static proc NNBremoveLine(list P, number a, number b, number c)
+{
+  list Q;
+  for (int i=1;i<=size(P);i++)
+  {
+    if (a*P[i][1]+b*P[i][2] <> c) { Q[size(Q)+1]=P[i]; }
+  }
+  return(Q);
+}
+
+static proc NNBfilterIneq(list P, number a, number b, number c)
+{
+  list Q;
+  for (int i=1;i<=size(P);i++)
+  {
+    if (a*P[i][1]+b*P[i][2] <= c) { Q[size(Q)+1]=P[i]; }
+  }
+  return(Q);
+}
+
+static proc NNBaddIntegralPoint(list P, number x, number y)
+{
+  if (x==NNBfloor(x) && y==NNBfloor(y))
+  {
+    intvec q=int(x),int(y);
+    if (!NNBpointInList(P,q)) { P[size(P)+1]=q; }
+  }
+  return(P);
+}
+
+static proc NNBgradientPoints(number x1, number y1, number x2, number y2)
+{
+  return((y2-y1)/(x2-x1));
+}
+
+static proc NNBgradientMon(NNBMonomial m1, NNBMonomial m2)
+{
+  return(NNBgradientPoints(NNBexprConstValue(m1.monx),NNBexprConstValue(m1.mony),NNBexprConstValue(m2.monx),NNBexprConstValue(m2.mony)));
+}
+
+static proc NNBgradientVertex(NNBVertex v1, NNBVertex v2)
+{
+  return(NNBgradientMon(v1.monom,v2.monom));
+}
+
+static proc NNBgradientR(NNBMonomial m1, NNBMonomial m2)
+{
+  return(NNBrDiv(NNBrSub(NNBrFromExpr(m2.mony),NNBrFromExpr(m1.mony)),NNBrSub(NNBrFromExpr(m2.monx),NNBrFromExpr(m1.monx))));
+}
+
+static proc NNBcountWcapPM(number ux, number uy, number wx, number wy)
+{
+  number g=NNBgradientPoints(ux,uy,wx,wy);
+  list H;
+  H[1]=list(-1,0,-ux-1);
+  H[2]=list(1,0,wx);
+  H[3]=list(0,-1,-2);
+  H[4]=list(-g,1,uy-g*ux);
+  H[5]=list(-1,0,-2);
+  H[6]=list(0,-1,-2);
+  return(size(NNBlatticePoints(H)));
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// normal forms
+//////////////////////////////////////////////////////////////////////////////
+
+static proc NNBsampleValue(NNBExpr e, int useMax)
+{
+  if (size(e.bound)==0) { return(NNBexprConstValue(e)); }
+  number k0=NNBfloor(NNBrEval(e.bound[1],0,0)+1);
+  number l0=NNBfloor(NNBrEval(e.bound[2],k0,0)+1);
+  if (useMax && l0<k0) { l0=k0; }
+  return(NNBexprEval(e,k0,l0));
+}
+
+static proc NNBsortNF(NNBNormalForm f)
+{
+  list T=f.terms;
+  int i;
+  int j;
+  def tmp;
+  for (i=1;i<=size(T);i++)
+  {
+    for (j=i+1;j<=size(T);j++)
+    {
+      if (NNBsampleValue(T[j].monx,0) < NNBsampleValue(T[i].monx,0))
+      {
+        tmp=T[i]; T[i]=T[j]; T[j]=tmp;
+      }
+    }
+  }
+  return(NNBmakeNF(T,f.rhomon,f.area));
+}
+
+static proc NNBnormalFormSwitch(NNBNormalForm f)
+{
+  list T;
+  int n=size(f.terms);
+  for (int i=1;i<=n;i++) { T[i]=NNBmonSwitch(f.terms[n-i+1]); }
+  return(NNBmakeNF(T,f.rhomon,NNBexprSwitch(f.area)));
+}
+
+static proc NNBnfEqual(NNBNormalForm f, NNBNormalForm g)
+{
+  if (size(f.terms)<>size(g.terms)) { return(0); }
+  for (int i=1;i<=size(f.terms);i++)
+  {
+    if (!NNBmonEqual(f.terms[i],g.terms[i])) { return(0); }
+  }
+  return(1);
+}
+
+static proc NNBNF(NNBVertex v, list V)
+{
+  NNBVertex cur=v;
+  list T;
+  while (cur.ancestor<>0)
+  {
+    T[size(T)+1]=cur.monom;
+    cur=V[cur.ancestor];
+  }
+  NNBVertex rv=V[NNBivecAt(v.rho,1)];
+  NNBNormalForm f=NNBsortNF(NNBmakeNF(T,rv.monom,v.area));
+  if (size(f.terms)==0) { return(list(f,0)); }
+  NNBExpr ex1=f.terms[size(f.terms)].monx;
+  NNBExpr ex2=f.terms[1].mony;
+  number a=NNBsampleValue(ex1,1);
+  number b=NNBsampleValue(ex2,1);
+  if (a>b && (size(ex1.bound)>0 || size(ex2.bound)==0)) { return(list(NNBnormalFormSwitch(f),1)); }
+  if (a==b && NNBexprEqual(f.rhomon.monx,NNBexprConst(1)) && NNBexprEqual(f.rhomon.mony,NNBexprConst(2)) && !NNBnfEqual(NNBnormalFormSwitch(f),f))
+  {
+    return(list(NNBnormalFormSwitch(f),1));
+  }
+  return(list(f,0));
+}
+
+static proc NNBconvenient(NNBNormalForm f)
+{
+  int n=0;
+  int i;
+  int x0;
+  int y0;
+  for (i=1;i<=size(f.terms);i++)
+  {
+    x0=NNBexprEqual(f.terms[i].monx,NNBexprConst(0));
+    y0=NNBexprEqual(f.terms[i].mony,NNBexprConst(0));
+    if ((x0 && !y0) || (y0 && !x0)) { n++; }
+  }
+  return(n==2);
+}
+
+static proc NNBf_s_t(NNBNormalForm f, int u, int s, int t, int w)
+{
+  list T;
+  number bx=NNBmax(2*s,u);
+  number by=NNBmax(2*t,w);
+  int i;
+  NNBMonomial m;
+  for (i=1;i<=size(f.terms);i++)
+  {
+    m=f.terms[i];
+    if (size(m.monx.bound)==0 && size(m.mony.bound)==0 && NNBexprIsConstant(m.monx) && NNBexprIsConstant(m.mony))
+    {
+      if (m.monx.c>=bx && m.mony.c>=by) { T[size(T)+1]=m; }
+    }
+  }
+  return(NNBmakeNF(T,f.rhomon,f.area));
+}
+
+static proc NNBsignature(NNBNormalForm f)
+{
+  string s="";
+  for (int i=1;i<=size(f.terms);i++)
+  {
+    s=s+"("+NNBexprString(f.terms[i].monx)+","+NNBexprString(f.terms[i].mony)+")";
+  }
+  return(s);
+}
+
+static proc NNBfindBucket(list S, intvec F, string sig)
+{
+  string fs=string(F);
+  for (int i=1;i<=size(S);i++)
+  {
+    if (string(S[i][1])==fs && S[i][2]==sig) { return(i); }
+  }
+  return(0);
+}
+
+static proc NNBbucketContains(list vals, NNBNormalForm f)
+{
+  for (int i=1;i<=size(vals);i++)
+  {
+    if (NNBnfEqual(vals[i][2],f)) { return(1); }
+  }
+  return(0);
+}
+
+static proc NNBaddNormalForm(NNBVertex v, list V, list S)
+{
+  list nfinfo;
+  NNBNormalForm f;
+  NNBNormalForm sf;
+  intvec F;
+  intvec Frev;
+  intvec Fsw;
+  int u;
+  int s;
+  int t;
+  int w;
+  int pos;
+  int possw;
+  string fst;
+  string fstsw;
+  list vals;
+  nfinfo=NNBNF(v,V);
+  f=nfinfo[1];
+  F=v.F;
+  if (nfinfo[2])
+  {
+    Frev=NNBiv4(NNBivecAt(F,4),NNBivecAt(F,3),NNBivecAt(F,2),NNBivecAt(F,1));
+    F=Frev;
+  }
+  u=NNBivecAt(F,1); s=NNBivecAt(F,2); t=NNBivecAt(F,3); w=NNBivecAt(F,4);
+  fst=NNBsignature(NNBf_s_t(f,u,s,t,w));
+  pos=NNBfindBucket(S,F,fst);
+  if (pos>0)
+  {
+    if (NNBbucketContains(S[pos][3],f)) { return(S); }
+  }
+
+  Fsw=NNBiv4(NNBivecAt(F,4),NNBivecAt(F,3),NNBivecAt(F,2),NNBivecAt(F,1));
+  sf=NNBnormalFormSwitch(f);
+  fstsw=NNBsignature(NNBnormalFormSwitch(NNBf_s_t(f,u,s,t,w)));
+  possw=NNBfindBucket(S,Fsw,fstsw);
+  if (possw>0)
+  {
+    if (NNBbucketContains(S[possw][3],sf)) { return(S); }
+  }
+
+  if (s==1 || t==1)
+  {
+    if (pos>0)
+    {
+      vals=S[pos][3]; vals[size(vals)+1]=list(v,f); S[pos][3]=vals; return(S);
+    }
+    if (possw>0)
+    {
+      vals=S[possw][3]; vals[size(vals)+1]=list(v,sf); S[possw][3]=vals; return(S);
+    }
+  }
+  S[size(S)+1]=list(F,fst,list(list(v,f)));
+  return(S);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// extension step and main enumeration
+//////////////////////////////////////////////////////////////////////////////
+
+static proc NNBextensions(NNBVertex v, list V, int vertexName, list leaves, int mu0, int m0)
+{
+  int firstIteration=0;
+  if (NNBivecAt(v.rho,1)==v.name && NNBivecAt(v.F,2)==1) { firstIteration=1; }
+  number ux=NNBexprConstValue(v.monom.monx);
+  number uy=NNBexprConstValue(v.monom.mony);
+
+  if (uy==1)
+  {
+    vertexName++;
+    NNBExpr Aw=v.area;
+    NNBVertex w=NNBmakeVertex(vertexName,NNBmon(NNBexprAddAffine(Aw,0,0,2),NNBexprConst(0)),v.name,v.rho,Aw,v.modality,v.F);
+    V[w.name]=w; leaves[size(leaves)+1]=w.name;
+    return(list(V,vertexName,leaves));
+  }
+
+  if (mu0==-1 && uy==2)
+  {
+    number g=0;
+    if (v.ancestor<>1) { g=NNBabs(NNBgradientVertex(v,V[v.ancestor])); }
+    number i=ux; number j=0;
+    if (int(i) mod 2 == 0) { j=1; }
+    number kb=NNBmax((i+j)/2+g,1);
+    list B=NNBboundConst(kb,-1);
+    vertexName++;
+    NNBExpr Aw=NNBexpr(v.area.ck+2,v.area.cl,v.area.c-j-i,B);
+    intvec rho=v.rho; if (firstIteration) { rho=NNBiv2(v.name,vertexName); }
+    NNBVertex w=NNBmakeVertex(vertexName,NNBmon(NNBexpr(2,0,-j,B),NNBexprConst(0),B),v.name,rho,Aw,v.modality,NNBiv4(NNBivecAt(v.F,1),NNBivecAt(v.F,2),NNBivecAt(v.F,3),0));
+    V[w.name]=w; leaves[size(leaves)+1]=w.name;
+
+    kb=NNBmax(i+g,1);
+    B=NNBboundConst(kb,-1);
+    vertexName++;
+    rho=v.rho; if (firstIteration) { rho=NNBiv2(v.name,vertexName); }
+    NNBVertex w1=NNBmakeVertex(vertexName,NNBmon(NNBexprK(B),NNBexprConst(1),B),v.name,rho,NNBexprConst(0),v.modality,v.F);
+    V[w1.name]=w1;
+
+    vertexName++;
+    NNBExpr Aw2=NNBexpr(v.area.ck+2,v.area.cl,v.area.c-2*i,B);
+    NNBVertex w2=NNBmakeVertex(vertexName,NNBmon(NNBexprAddAffine(Aw2,0,0,2),NNBexprConst(0),B),w1.name,w1.rho,Aw2,v.modality,NNBiv4(NNBivecAt(v.F,1),NNBivecAt(v.F,2),NNBivecAt(v.F,3),1));
+    V[w2.name]=w2; leaves[size(leaves)+1]=w2.name;
+    return(list(V,vertexName,leaves));
+  }
+
+  int hasC1=0; int hasC2=0; number c1; number c2;
+  if (mu0<>-1)
+  {
+    number area=NNBexprConstValue(v.area);
+    c1=(mu0-area+ux*uy-ux)/(uy-1);
+    hasC1=1;
+  }
+
+  if (m0<>-1 && uy<>2)
+  {
+    number d; number g=0;
+    if (v.ancestor==1) { d=ux+1; }
+    else { g=NNBgradientVertex(v,V[v.ancestor]); d=NNBfloor(-(uy/g)+ux+1); }
+    int M=0;
+    list U=list(list(0,0),list(0,0),list(d,0));
+    list H;
+    list H2;
+    list uEnd;
+    list uEnd2;
+    number h1;
+    number h;
+    number dy;
+    number dy2;
+    int dx;
+    while (M<=m0)
+    {
+      h1=NNBgradientPoints(ux,uy,U[3][1],U[3][2]);
+      H=list();
+      H[1]=list(-1,0,-ux-1); H[2]=list(0,-1,-2); H[3]=list(-h1,1,-h1*d); H[4]=list(-1,0,-2); H[5]=list(0,-1,-2);
+      M=v.modality+size(NNBlatticePoints(H));
+      U[1]=U[2]; U[2]=U[3]; d=d+1; U[3]=list(d,0);
+    }
+    uEnd=U[1]; d=U[1][1];
+    if (d==0)
+    {
+      d=NNBfloor(-(uy/g)+ux); uEnd=list(d,0);
+    }
+    uEnd2=U[2];
+    for (dx=int(d); dx>=int(ux)+1; dx--)
+    {
+      dy=NNBfloor(uEnd[2]+1);
+      dy2=uEnd2[2]-NNBgradientPoints(ux,uy,uEnd2[1],uEnd2[2]);
+      if (dy<dy2)
+      {
+        M=0; U=list(list(0,0),list(0,0),list(dx,dy));
+        while (M<=m0)
+        {
+          h1=NNBgradientPoints(ux,uy,U[3][1],U[3][2]);
+          H2=list();
+          H2[1]=list(-1,0,-ux-1); H2[2]=list(0,-1,-2); H2[3]=list(-h1,1,dy-h1*dx); H2[4]=list(-1,0,-2); H2[5]=list(0,-1,-2);
+          M=v.modality+size(NNBlatticePoints(H2));
+          U[1]=U[2]; U[2]=U[3]; dy=dy+1; U[3]=list(dx,dy);
+          if (dy>=dy2 && M<=m0) { U[1]=U[2]; break; }
+        }
+        if (!(U[1][1]==0 && U[1][2]==0)) { uEnd=U[1]; }
+      }
+      uEnd2=list(dx,NNBmin(uEnd[2]+1,dy2));
+      if (dx<>int(ux)+1)
+      {
+        h=NNBgradientPoints(ux,uy,uEnd[1],uEnd[2]);
+        uEnd=list(dx-1,uEnd[2]-h);
+      }
+    }
+    h=NNBgradientPoints(ux,uy,uEnd[1],uEnd[2]);
+    if (v.ancestor<>1)
+    {
+      if (h<=g) { return(list(V,vertexName,leaves)); }
+    }
+    c2=ux-uy/h; hasC2=1;
+  }
+
+  if (!hasC1 && !hasC2) { return(list(V,vertexName,leaves)); }
+  number cmin; int minIsC1=0;
+  if (hasC1 && hasC2)
+  {
+    cmin=NNBmin(c1,c2); if (c1<=c2) { minIsC1=1; }
+  }
+  else
+  {
+    if (hasC1) { cmin=c1; minIsC1=1; }
+    else { cmin=c2; }
+  }
+
+  number g2=NNBgradientPoints(ux,uy,cmin,0);
+  list P; number g1=0;
+  if (v.ancestor==1)
+  {
+    P[1]=list(0,-1,0); P[2]=list(-1,0,-ux); P[3]=list(-g2,1,uy-g2*ux);
+  }
+  else
+  {
+    g1=NNBgradientVertex(v,V[v.ancestor]);
+    P[1]=list(0,-1,0); P[2]=list(g1,-1,-uy+g1*ux); P[3]=list(-g2,1,uy-g2*ux);
+  }
+  list LP=NNBlatticePoints(P);
+  if (v.ancestor==1) { LP=NNBremoveLine(LP,-1,0,-ux); }
+  else { LP=NNBremoveLine(LP,-g1,1,uy-g1*ux); }
+  if (minIsC1) { LP=NNBremoveLine(LP,-g2,1,uy-g2*ux); }
+  LP=NNBaddIntegralPoint(LP,cmin,0);
+  if (g2<>0) { LP=NNBaddIntegralPoint(LP,cmin+1/g2,1); }
+  LP=NNBuniquePoints(LP);
+
+  NNBVertex rv=V[NNBivecAt(v.rho,1)];
+  number rhoX=NNBexprConstValue(rv.monom.monx);
+  number rhoY=NNBexprConstValue(rv.monom.mony);
+  if (rhoX==0)
+  {
+    LP=NNBremoveLine(LP,0,1,1); LP=NNBremoveLine(LP,1,0,1);
+    if (mu0==-1) { LP=NNBremoveLine(LP,0,1,2); LP=NNBremoveLine(LP,1,0,2); }
+    LP=NNBfilterIneq(LP,1,1,rhoY);
+  }
+  if (rhoX==1)
+  {
+    list Q;
+    int q;
+    for (q=1;q<=size(LP);q++) { if (!(LP[q][2]==1 && LP[q][1]>=rhoY+1)) { Q[size(Q)+1]=LP[q]; } }
+    LP=Q;
+    if (mu0==-1) { LP=NNBremoveLine(LP,0,1,2); LP=NNBremoveLine(LP,1,0,2); }
+  }
+  if (rhoX==2)
+  {
+    list Q2;
+    int q;
+    for (q=1;q<=size(LP);q++) { if (!(LP[q][2]==2 && LP[q][1]>=rhoY+1)) { Q2[size(Q2)+1]=LP[q]; } }
+    LP=Q2;
+  }
+
+  int p;
+  number wx;
+  number wy;
+  int keep;
+  number ii;
+  number m1y;
+  number m2x;
+  number jj;
+  number m1yy;
+  number m2xx;
+  number dc;
+  NNBExpr areaExpr;
+  intvec Fw;
+  int count;
+  intvec rhoNew;
+  NNBVertex nv;
+  for (p=1;p<=size(LP);p++)
+  {
+    wx=LP[p][1]; wy=LP[p][2]; keep=1;
+    if (wy==0)
+    {
+      ii=NNBmin(ux,wx); m1y=uy; m2x=wx-ii;
+      if (m1y<>0)
+      {
+        if (int(m2x) mod int(m1y) == 0) { keep=0; }
+      }
+    }
+    if (ux==0)
+    {
+      jj=NNBmin(uy,wy); m1yy=uy-jj; m2xx=wx;
+      if (m2xx<>0)
+      {
+        if (int(m1yy) mod int(m2xx) == 0) { keep=0; }
+      }
+    }
+    if (keep)
+    {
+      vertexName++;
+      dc=2*wy*(wx-ux)+(wx-ux)*(uy-wy)-(wx-ux);
+      areaExpr=NNBexprAddAffine(v.area,0,0,dc);
+      Fw=v.F;
+      if (wx==2)
+      {
+        if (wy==2) { Fw=NNBiv4(NNBivecAt(v.F,1),1,1,NNBivecAt(v.F,4)); }
+        else
+        {
+          if (wy==1) { Fw=NNBiv4(NNBivecAt(v.F,1),1,0,1); }
+          else { Fw=NNBiv4(NNBivecAt(v.F,1),1,0,NNBivecAt(v.F,4)); }
+        }
+      }
+      else
+      {
+        if (wy==2) { Fw=NNBiv4(NNBivecAt(v.F,1),NNBivecAt(v.F,2),1,NNBivecAt(v.F,4)); }
+        else
+        {
+          if (wy==1) { Fw=NNBiv4(NNBivecAt(v.F,1),NNBivecAt(v.F,2),NNBivecAt(v.F,3),1); }
+        }
+      }
+      count=NNBcountWcapPM(ux,uy,wx,wy);
+      rhoNew=v.rho; if (firstIteration) { rhoNew=NNBiv2(v.name,vertexName); }
+      nv=NNBmakeVertex(vertexName,NNBmonConst(wx,wy),v.name,rhoNew,areaExpr,v.modality+count,Fw);
+      V[nv.name]=nv; leaves[size(leaves)+1]=nv.name;
+    }
+  }
+  return(list(V,vertexName,leaves));
+}
+
+proc NNBenumerateRaw(int mu0, int m0, list #)
+"USAGE: NNBenumerateRaw(mu0,m0[,p]); int mu0, int m0, optional int p
+RETURN: raw enumeration data E=list(V,S), not Arnold NormalForm objects.
+        V is the enumeration tree of NNBVertex objects.  S is the storage list
+        of buckets [flag vector, signature, representatives], where the
+        representatives are stored as terminal vertex/internal NNBNormalForm
+        pairs.  Use NNBnormalFormsRaw(E,m[,p]) to obtain series of normal-form representatives
+        grouped by modality.
+        Use mu0>=0,m0=-1 for a Milnor-number bound; use mu0=-1,m0>=0 for
+        the modality-series mode.  If p is non-zero, print the grouped
+        series of normal-form representatives.
+EXAMPLE: example NNBenumerateRaw; shows a small enumeration"
+{
+  int printFlag=0; if (size(#)>0) { printFlag=#[1]; }
+  list S; list leaves; list V;
+  int vertexName=1;
+  NNBVertex root=NNBmakeVertex(1,NNBmonConst(0,0),0,NNBiv2(0,0),NNBexprConst(0),0,NNBiv4(0,0,0,0));
+  V[1]=root;
+  int i;
+  intvec Fv;
+  NNBVertex v;
+
+  if (mu0<>-1)
+  {
+    for (i=2;i<=mu0+1;i++)
+    {
+      vertexName++;
+      Fv=NNBiv4(0,0,0,0); if (i==2) { Fv=NNBiv4(0,0,1,0); }
+      v=NNBmakeVertex(vertexName,NNBmonConst(0,i),1,NNBiv2(vertexName,0),NNBexprConst(-i+1),0,Fv);
+      V[v.name]=v; leaves[size(leaves)+1]=v.name;
+    }
+    for (i=1;i<=((mu0+1) div 2);i++)
+    {
+      vertexName++;
+      Fv=NNBiv4(1,0,0,0); if (i==1) { Fv=NNBiv4(1,0,0,1); } else { if (i==2) { Fv=NNBiv4(1,0,1,0); } }
+      v=NNBmakeVertex(vertexName,NNBmonConst(1,i),1,NNBiv2(vertexName,0),NNBexprConst(i),0,Fv);
+      V[v.name]=v; leaves[size(leaves)+1]=v.name;
+    }
+  }
+  else
+  {
+    for (i=2;i<=3*m0+5;i++)
+    {
+      vertexName++;
+      Fv=NNBiv4(0,0,0,0); if (i==2) { Fv=NNBiv4(0,0,1,0); }
+      v=NNBmakeVertex(vertexName,NNBmonConst(0,i),1,NNBiv2(vertexName,0),NNBexprConst(-i+1),0,Fv);
+      V[v.name]=v; leaves[size(leaves)+1]=v.name;
+    }
+    for (i=1;i<=2*m0+3;i++)
+    {
+      vertexName++;
+      Fv=NNBiv4(1,0,0,0); if (i==1) { Fv=NNBiv4(1,0,0,1); } else { if (i==2) { Fv=NNBiv4(1,0,1,0); } }
+      v=NNBmakeVertex(vertexName,NNBmonConst(1,i),1,NNBiv2(vertexName,0),NNBexprConst(i),0,Fv);
+      V[v.name]=v; leaves[size(leaves)+1]=v.name;
+    }
+    for (i=2;i<=m0+1;i++)
+    {
+      vertexName++;
+      Fv=NNBiv4(0,1,0,0); if (i==2) { Fv=NNBiv4(0,1,1,0); }
+      v=NNBmakeVertex(vertexName,NNBmonConst(2,i),1,NNBiv2(vertexName,0),NNBexprConst(3*i-1),i-1,Fv);
+      V[v.name]=v; leaves[size(leaves)+1]=v.name;
+    }
+  }
+
+  int n=size(V); int n0=0;
+  list extres;
+  list updated;
+  int li;
+  list nfres;
+  NNBVertex rv;
+  number rx;
+  NNBExpr Av;
+  list B;
+  NNBVertex u;
+  number ii;
+  NNBRatExpr gR;
+  NNBVertex child;
+  number gr;
+  NNBRatExpr kbR;
+  number jj;
+  list B1;
+  NNBExpr Au;
+  NNBVertex newv;
+  list B2;
+  NNBVertex uu;
+  NNBExpr Aw;
+  NNBVertex w;
+  while (n>n0)
+  {
+    n0=size(V);
+    updated=list();
+    for (li=1;li<=size(leaves);li++)
+    {
+      v=V[leaves[li]];
+      if (NNBexprConstValue(v.monom.mony)>=1)
+      {
+        extres=NNBextensions(v,V,vertexName,updated,mu0,m0);
+        V=extres[1]; vertexName=extres[2]; updated=extres[3]; n=size(V);
+      }
+      else
+      {
+        nfres=NNBNF(v,V);
+        if (NNBconvenient(nfres[1])) { S=NNBaddNormalForm(v,V,S); }
+        rv=V[NNBivecAt(v.rho,1)];
+        rx=NNBexprConstValue(rv.monom.monx);
+        if (rx==1)
+        {
+          vertexName++;
+          Av=v.area; B=list();
+          if (size(Av.bound)>0) { B=NNBboundR(Av.bound[1],NNBrConst(-1)); }
+          u=NNBmakeVertex(vertexName,NNBmon(NNBexprConst(0),NNBexprAddAffine(Av,0,0,2),B),v.name,v.rho,Av,v.modality,v.F);
+          V[u.name]=u; S=NNBaddNormalForm(u,V,S);
+        }
+        if (rx==2)
+        {
+          ii=NNBexprConstValue(rv.monom.mony);
+          if (ii==2)
+          {
+            child=V[NNBivecAt(v.rho,2)];
+            gR=NNBrDiv(NNBrSub(NNBrConst(2),NNBrFromExpr(child.monom.mony)),NNBrSub(NNBrFromExpr(child.monom.monx),NNBrConst(2)));
+          }
+          else
+          {
+            gr=NNBabs(NNBgradientVertex(V[NNBivecAt(v.rho,1)],V[NNBivecAt(v.rho,2)]));
+            gR=NNBrConst(gr);
+          }
+          kbR=NNBrConst(-1); if (size(v.area.bound)>0) { kbR=v.area.bound[1]; }
+          jj=0; if (int(ii) mod 2 == 0) { jj=1; }
+          B1=NNBboundR(kbR,NNBrAdd(NNBrConst((ii+jj)/2),gR));
+          vertexName++;
+          Au=NNBexpr(v.area.ck,v.area.cl+2,v.area.c-jj-ii,B1);
+          u=NNBmakeVertex(vertexName,NNBmon(NNBexprConst(0),NNBexpr(0,2,-jj,B1),B1),v.name,NNBiv2(v.name,NNBivecAt(v.rho,2)),Au,v.modality,v.F);
+          V[u.name]=u;
+          newv=V[v.name];
+          if (NNBivecAt(v.F,4)==1) { newv.monom=NNBmon(NNBexprAddAffine(Au,0,0,2),NNBexprConst(0),B1); }
+          newv.area=Au; V[v.name]=newv;
+          S=NNBaddNormalForm(u,V,S);
+
+          B2=NNBboundR(kbR,NNBrAdd(NNBrConst(ii),gR));
+          vertexName++;
+          uu=NNBmakeVertex(vertexName,NNBmon(NNBexprConst(1),NNBexprL(B2),B2),v.name,v.rho,NNBexprConst(0),0,NNBiv4(1,0,0,0));
+          V[uu.name]=uu;
+          vertexName++;
+          Aw=NNBexpr(v.area.ck,v.area.cl+2,v.area.c-2*ii,B2);
+          w=NNBmakeVertex(vertexName,NNBmon(NNBexprConst(0),NNBexprAddAffine(Aw,0,0,2),B2),uu.name,NNBiv2(v.name,NNBivecAt(v.rho,2)),Aw,v.modality,NNBiv4(1,NNBivecAt(v.F,2),NNBivecAt(v.F,3),NNBivecAt(v.F,4)));
+          V[w.name]=w;
+          newv=V[v.name];
+          if (NNBivecAt(v.F,4)==1) { newv.monom=NNBmon(NNBexprAddAffine(Aw,0,0,2),NNBexprConst(0),B2); }
+          newv.area=Aw; V[v.name]=newv;
+          S=NNBaddNormalForm(w,V,S);
+        }
+      }
+    }
+    leaves=updated;
+  }
+  list E=list(V,S);
+  if (printFlag)
+  {
+    int mm=m0; if (mm<0) { mm=mu0; }
+    list printedGroups=NNBnormalFormsRaw(E, mm, 1);
+  }
+  return(E);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list E=NNBenumerateRaw(4,-1,1);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// user-facing printing, grouping and evaluation
+//////////////////////////////////////////////////////////////////////////////
+
+static proc NNBbasisMonomialString(intvec e)
+{
+  int x=NNBivecAt(e,1);
+  int y=NNBivecAt(e,2);
+  string s="";
+  if (x==0 && y==0) { return("1"); }
+  if (x<>0) { s="x^("+string(x)+")"; }
+  if (y<>0)
+  {
+    if (size(s)>0) { s=s+" * "; }
+    s=s+"y^("+string(y)+")";
+  }
+  return(s);
+}
+
+static proc NNBregularBasisString(list B)
+{
+  string s="[";
+  for (int i=1;i<=size(B);i++)
+  {
+    if (i>1) { s=s+", "; }
+    s=s+NNBbasisMonomialString(B[i]);
+  }
+  return(s+"]");
+}
+
+static proc NNBmakeNormalFormSeries(list normalForms, int modality)
+{
+  NNBNormalFormSeries s;
+  s.normalForms=normalForms;
+  s.modality=modality;
+  return(s);
+}
+
+static proc NNBparameterFlagsOr(intvec a, intvec b)
+{
+  int hasK=0;
+  int hasL=0;
+  if ((NNBivecAt(a,1)<>0) || (NNBivecAt(b,1)<>0)) { hasK=1; }
+  if ((NNBivecAt(a,2)<>0) || (NNBivecAt(b,2)<>0)) { hasL=1; }
+  return(NNBiv2(hasK,hasL));
+}
+
+static proc NNBrParameterFlags(NNBRatExpr e)
+{
+  intvec flags=NNBiv2(0,0);
+  if (e.op==1) { flags[1]=1; }
+  if (e.op==2) { flags[2]=1; }
+  for (int i=1;i<=size(e.args);i++)
+  {
+    flags=NNBparameterFlagsOr(flags,NNBrParameterFlags(e.args[i]));
+  }
+  return(flags);
+}
+
+static proc NNBexprParameterFlags(NNBExpr e)
+{
+  intvec flags=NNBiv2(0,0);
+  if (e.ck<>0) { flags[1]=1; }
+  if (e.cl<>0) { flags[2]=1; }
+  for (int i=1;i<=size(e.bound);i++)
+  {
+    flags=NNBparameterFlagsOr(flags,NNBrParameterFlags(e.bound[i]));
+  }
+  return(flags);
+}
+
+static proc NNBmonomialParameterFlags(NNBMonomial m)
+{
+  intvec flags=NNBexprParameterFlags(m.monx);
+  flags=NNBparameterFlagsOr(flags,NNBexprParameterFlags(m.mony));
+  for (int i=1;i<=size(m.constraint);i++)
+  {
+    flags=NNBparameterFlagsOr(flags,NNBrParameterFlags(m.constraint[i]));
+  }
+  return(flags);
+}
+
+static proc NNBnormalFormParameterFlags(NNBNormalForm f)
+{
+  intvec flags=NNBexprParameterFlags(f.area);
+  flags=NNBparameterFlagsOr(flags,NNBmonomialParameterFlags(f.rhomon));
+  for (int i=1;i<=size(f.terms);i++)
+  {
+    flags=NNBparameterFlagsOr(flags,NNBmonomialParameterFlags(f.terms[i]));
+  }
+  return(flags);
+}
+
+proc NNBnormalFormSeriesParameters(NNBNormalFormSeries s)
+"USAGE: NNBnormalFormSeriesParameters(s); s NNBNormalFormSeries
+RETURN: list of strings naming the series exponent parameters occurring in s.
+        The possible names are k and l; an empty list means that the series is
+        represented by concrete normal form exponents.
+EXAMPLE: example NNBnormalFormSeriesParameters; shows the common series workflow"
+{
+  intvec flags=NNBiv2(0,0);
+  for (int i=1;i<=size(s.normalForms);i++)
+  {
+    flags=NNBparameterFlagsOr(flags,NNBnormalFormParameterFlags(s.normalForms[i]));
+  }
+  list params;
+  if (NNBivecAt(flags,1)<>0) { params[size(params)+1]="k"; }
+  if (NNBivecAt(flags,2)<>0) { params[size(params)+1]="l"; }
+  return(params);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(2,0);
+  NNBNormalFormSeries s=G[3][10];
+  NNBnormalFormSeriesParameters(s);
+}
+
+static proc NNBnormalFormSeriesParameterString(NNBNormalFormSeries s)
+{
+  list params=NNBnormalFormSeriesParameters(s);
+  if (size(params)==0) { return("no series parameter"); }
+  string out="series parameters: ";
+  for (int i=1;i<=size(params);i++)
+  {
+    if (i>1) { out=out+", "; }
+    out=out+params[i];
+  }
+  return(out);
+}
+
+proc NNBnormalFormSeriesString(NNBNormalFormSeries s)
+"USAGE: NNBnormalFormSeriesString(s); s NNBNormalFormSeries
+RETURN: string representation of a symbolic normal-form series
+EXAMPLE: example NNBnormalFormSeriesString; shows a modality-series example"
+{
+  string out="normal form series";
+  if (s.modality>=0) { out=out+" of modality "+string(s.modality); }
+  out=out+"; "+NNBnormalFormSeriesParameterString(s)+"; normal forms: ";
+  for (int i=1;i<=size(s.normalForms);i++)
+  {
+    if (i>1) { out=out+"; "; }
+    out=out+NNBnormalFormString(s.normalForms[i]);
+  }
+  return(out);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(1,0);
+  NNBnormalFormSeriesString(G[1][1]);
+}
+
+proc NNBprintNormalFormSeries(NNBNormalFormSeries s)
+"USAGE: NNBprintNormalFormSeries(s); s NNBNormalFormSeries
+RETURN: prints a symbolic normal-form series
+EXAMPLE: example NNBprintNormalFormSeries; shows a modality-series example"
+{
+  NNBnormalFormSeriesString(s);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(1,0);
+  NNBprintNormalFormSeries(G[1][1]);
+}
+
+static proc NNBnormalFormString(NNBNormalForm f)
+{
+  string s="";
+  int i;
+  NNBMonomial m;
+  int x0;
+  int y0;
+  list first;
+  list last;
+  int printed;
+  int lastHasK;
+  int firstHasL;
+  string cond;
+  for (i=1;i<=size(f.terms);i++)
+  {
+    if (i>1) { s=s+" + "; }
+    m=f.terms[i];
+    x0=NNBexprEqual(m.monx,NNBexprConst(0));
+    y0=NNBexprEqual(m.mony,NNBexprConst(0));
+    if (x0 && y0) { s=s+"1"; }
+    else
+    {
+      if (x0) { s=s+"y^("+NNBexprString(m.mony)+")"; }
+      else
+      {
+        if (y0) { s=s+"x^("+NNBexprString(m.monx)+")"; }
+        else { s=s+"x^("+NNBexprString(m.monx)+") * y^("+NNBexprString(m.mony)+")"; }
+      }
+    }
+  }
+  if (size(f.terms)>0)
+  {
+    first=f.terms[1].constraint;
+    last=f.terms[size(f.terms)].constraint;
+    printed=0; lastHasK=0; firstHasL=0; cond="";
+    if (size(last)>0)
+    {
+      if (!NNBrIsConst(last[1],-1)) { cond=cond+" k > "+NNBrString(last[1]); printed=1; lastHasK=1; }
+    }
+    if (size(first)>0)
+    {
+      if (!NNBrIsConst(first[2],-1)) { if (printed) { cond=cond+" and"; } cond=cond+" l > "+NNBrString(first[2]); printed=1; firstHasL=1; }
+    }
+    if (printed) { s=s+" with"+cond; }
+    if (lastHasK && firstHasL)
+    {
+      if (NNBnfEqual(NNBnormalFormSwitch(f),f)) { s=s+" and l >= k"; }
+    }
+  }
+  if (size(f.regularBasis)>0) { s=s+"; regular basis: "+NNBregularBasisString(f.regularBasis); }
+  return(s);
+}
+
+static proc NNBprintNormalForm(NNBNormalForm f)
+{
+  NNBnormalFormString(f);
+}
+
+static proc NNBfamilyContainsSymbolic(list fam)
+{
+  for (int i=1;i<=size(fam);i++)
+  {
+    if (!NNBnormalFormConcrete(fam[i])) { return(1); }
+  }
+  return(0);
+}
+
+proc NNBnormalFormsRaw(list E, int m, list #)
+"USAGE: NNBnormalFormsRaw(E,m[,p]); E a list E=list(V,S) returned by NNBenumerateRaw, m int, p optional int
+RETURN: list grouped by modality 0..m.  If p is non-zero, print the groups.
+EXAMPLE: example NNBnormalFormsRaw; shows a small enumeration"
+{
+  int p=1; if (size(#)>0) { p=#[1]; }
+  list S=E[2]; list modalities;
+  int i;
+  int a;
+  int b;
+  int j;
+  int q;
+  int modalityIndex;
+  list L;
+  list vals;
+  list fam;
+  for (i=0;i<=m;i++) { L=list(); modalities[i+1]=L; }
+  for (a=1;a<=size(S);a++)
+  {
+    vals=S[a][3];
+    if (size(vals)==0) { continue; }
+    modalityIndex=vals[1][1].modality;
+    if (modalityIndex<0 || modalityIndex>m) { continue; }
+    if (size(vals)==1 && NNBivecAt(vals[1][1].F,2)==0 && NNBivecAt(vals[1][1].F,3)==0)
+    {
+      fam=list(vals[1][2]);
+      L=modalities[modalityIndex+1];
+      L[size(L)+1]=NNBmakeNormalFormSeries(fam,modalityIndex);
+      modalities[modalityIndex+1]=L;
+    }
+    else
+    {
+      fam=list();
+      for (b=1;b<=size(vals);b++) { fam[size(fam)+1]=vals[b][2]; }
+      L=modalities[modalityIndex+1];
+      L[size(L)+1]=NNBmakeNormalFormSeries(fam,modalityIndex);
+      modalities[modalityIndex+1]=L;
+    }
+  }
+  if (p)
+  {
+    for (i=0;i<=m;i++)
+    {
+      L=modalities[i+1];
+      if (size(L)>0)
+      {
+        "normalforms with modality "+string(i)+":"; "";
+        for (j=1;j<=size(L);j++)
+        {
+          NNBprintNormalFormSeries(L[j]);
+        }
+        "";
+      }
+    }
+  }
+  return(modalities);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list E=NNBenumerateRaw(4,-1,0);
+  list G=NNBnormalFormsRaw(E,4,1);
+}
+
+proc NNBenumerate(int m, list #)
+"USAGE: NNBenumerate(m[,p]); int m, optional int p
+RETURN: list grouped by modalities 0..m.  Each entry is an
+        NNBNormalFormSeries.  This is the main modality-bound enumerator and
+        returns series of normal-form representatives, not Arnold NormalForm
+        objects.  If p is non-zero, print the grouped series of normal-form representatives.
+EXAMPLE: example NNBenumerate; shows the common series workflow"
+{
+  int p=0; if (size(#)>0) { p=#[1]; }
+  if (m<0) { ERROR("NNBenumerate needs a non-negative modality bound"); }
+  list E=NNBenumerateRaw(-1,m,0);
+  return(NNBnormalFormsRaw(E,m,p));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(2,0);
+  NNBNormalFormSeries s=G[3][10];
+  NNBnormalFormSeriesParameters(s);
+  poly f=NNBevaluateNormalFormSeries(s,0,5);
+  f;
+  NormalForm nf=NNBevaluateNormalFormSeriesToNormalForm(s,0,5);
+  nf;
+}
+
+static proc NNBevaluateNormalForm(NNBNormalForm f, list #)
+{
+  number kval=0; number lval=0;
+  if (size(#)>=1) { kval=#[1]; }
+  if (size(#)>=2) { lval=#[2]; }
+  poly p=0;
+  int i;
+  number xe;
+  number ye;
+  for (i=1;i<=size(f.terms);i++)
+  {
+    xe=NNBexprEval(f.terms[i].monx,kval,lval);
+    ye=NNBexprEval(f.terms[i].mony,kval,lval);
+    if (xe<>NNBfloor(xe) || ye<>NNBfloor(ye)) { ERROR("evaluated exponent is not integral"); }
+    p=p+var(1)^int(xe)*var(2)^int(ye);
+  }
+  return(p);
+}
+
+static proc NNBevaluateNormalFormSeriesEntryWithValues(NNBNormalFormSeries s, int representativeIndex, number kval, number lval)
+{
+  if (representativeIndex<1 || representativeIndex>size(s.normalForms))
+  {
+    ERROR("internal representative index out of range");
+  }
+  return(NNBevaluateNormalForm(s.normalForms[representativeIndex],kval,lval));
+}
+
+proc NNBevaluateNormalFormSeries(NNBNormalFormSeries s, list #)
+"USAGE: NNBevaluateNormalFormSeries(s[,k,l]); s NNBNormalFormSeries,
+        integer/rational exponent parameters k,l if required by s
+RETURN: polynomial in var(1),var(2), obtained by substituting k,l in the
+        normal-form series s.  If s contains exponent parameters, their values
+        must be supplied positionally as k,l; for an l-only series pass a k
+        placeholder first.  For a series with no exponent parameter, no
+        exponent values are accepted.
+EXAMPLE: example NNBevaluateNormalFormSeries; shows the common series workflow"
+{
+  list values=NNBseriesParameterValues(s,#,"NNBevaluateNormalFormSeries");
+  number kval=values[1];
+  number lval=values[2];
+  if (size(s.normalForms)<>1)
+  {
+    ERROR("NNBevaluateNormalFormSeries cannot evaluate this grouped internal series directly");
+  }
+  return(NNBevaluateNormalFormSeriesEntryWithValues(s,1,kval,lval));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(2,0);
+  NNBNormalFormSeries s=G[3][10];
+  NNBnormalFormSeriesParameters(s);
+  poly f=NNBevaluateNormalFormSeries(s,0,5);
+  f;
+}
+
+static proc NNBnormalFormConcrete(NNBNormalForm f)
+{
+  if (!NNBexprIsConstant(f.area)) { return(0); }
+  for (int i=1;i<=size(f.terms);i++)
+  {
+    if (!NNBexprIsConstant(f.terms[i].monx) || !NNBexprIsConstant(f.terms[i].mony)) { return(0); }
+    if (size(f.terms[i].constraint)>0) { return(0); }
+  }
+  return(1);
+}
+
+static proc NNBevaluateMonomial(NNBMonomial m, number kval, number lval)
+{
+  number xe=NNBexprEval(m.monx,kval,lval);
+  number ye=NNBexprEval(m.mony,kval,lval);
+  if (xe<>NNBfloor(xe) || ye<>NNBfloor(ye)) { ERROR("evaluated exponent is not integral"); }
+  return(NNBmonConst(xe,ye));
+}
+
+static proc NNBevaluateInternalNormalForm(NNBNormalForm f, number kval, number lval)
+{
+  list T;
+  for (int i=1;i<=size(f.terms);i++)
+  {
+    T[i]=NNBevaluateMonomial(f.terms[i],kval,lval);
+  }
+  return(NNBmakeNF(T,NNBevaluateMonomial(f.rhomon,kval,lval),NNBexprConst(NNBexprEval(f.area,kval,lval))));
+}
+
+static proc NNBnormalFormSeriesInternalForm(NNBNormalFormSeries s, number kval, number lval, string commandName)
+{
+  if (size(s.normalForms)<>1)
+  {
+    ERROR(commandName+" cannot use this grouped internal series directly");
+  }
+  return(NNBevaluateInternalNormalForm(s.normalForms[1],kval,lval));
+}
+
+static proc NNBseriesParameterValues(NNBNormalFormSeries s, list args, string commandName)
+{
+  if (size(args)>2) { ERROR(commandName+" expects at most the exponent parameters k,l"); }
+  list params=NNBnormalFormSeriesParameters(s);
+  int hasK=0;
+  int hasL=0;
+  int i;
+  for (i=1;i<=size(params);i++)
+  {
+    if (params[i]=="k") { hasK=1; }
+    if (params[i]=="l") { hasL=1; }
+  }
+  if (!hasK && !hasL && size(args)>0)
+  {
+    ERROR(commandName+" expects no exponent parameters for this series");
+  }
+  if (hasK && size(args)<1)
+  {
+    ERROR(commandName+" needs a value for exponent parameter k");
+  }
+  if (hasL && size(args)<2)
+  {
+    ERROR(commandName+" needs a value for exponent parameter l; pass a k value first because arguments are positional");
+  }
+  if (!hasL && size(args)>1)
+  {
+    ERROR(commandName+" got a value for unused exponent parameter l");
+  }
+  number kval=0;
+  number lval=0;
+  if (size(args)>=1) { kval=args[1]; }
+  if (size(args)>=2) { lval=args[2]; }
+  return(list(kval,lval));
+}
+
+static proc NNBregularBasisForPoly(poly p)
+{
+  Poly P=makePoly(p);
+  return(regularBasis(P,1));
+}
+
+static proc NNBregularBasisAboveBoundary(NNBNormalForm f)
+{
+  return(NNBregularBasisForPoly(NNBevaluateNormalForm(f)));
+}
+
+proc NNBregularBasis(def s, list #)
+"USAGE: NNBregularBasis(s[,k,l]); s NNBNormalFormSeries,
+        integer/rational exponent parameters k,l if required by s
+RETURN: list of intvec exponent pairs for the regular basis on or above the
+        Newton boundary, following the convention of arnold.lib regularBasis(F,1).
+        If s contains exponent parameters, their values must be supplied
+        positionally as k,l; for an l-only series pass a k placeholder first.
+        For a series with no exponent parameter, no exponent values are accepted.
+        For an already evaluated polynomial p, NNBregularBasis(p) is also accepted.
+EXAMPLE: example NNBregularBasis; shows the common series workflow"
+{
+  list M;
+  if (typeof(s)=="poly")
+  {
+    if (size(#)>0) { ERROR("NNBregularBasis expects no exponent parameters for polynomial input"); }
+    M=NNBregularBasisForPoly(s);
+  }
+  else
+  {
+    if (typeof(s)=="NNBNormalFormSeries")
+    {
+      list values=NNBseriesParameterValues(s,#,"NNBregularBasis");
+      M=NNBregularBasisAboveBoundary(NNBnormalFormSeriesInternalForm(s,values[1],values[2],"NNBregularBasis"));
+    }
+    else
+    {
+      ERROR("NNBregularBasis expects a normal-form series or an evaluated polynomial");
+    }
+  }
+  list B;
+  intvec e;
+  for (int i=1;i<=size(M);i++)
+  {
+    e=leadexp(M[i]);
+    B[i]=NNBiv2(NNBivecAt(e,1),NNBivecAt(e,2));
+  }
+  return(B);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(2,0);
+  NNBNormalFormSeries s=G[3][10];
+  NNBnormalFormSeriesParameters(s);
+  NNBregularBasis(s,0,5);
+  poly p=NNBevaluateNormalFormSeries(s,0,5);
+  NNBregularBasis(p);
+}
+
+static proc NNBsingularityTypeString(NNBNormalForm f)
+{
+  string s="";
+  for (int i=1;i<=size(f.terms);i++)
+  {
+    if (i>1) { s=s+","; }
+    s=s+"("+string(int(NNBexprConstValue(f.terms[i].monx)))+","+string(int(NNBexprConstValue(f.terms[i].mony)))+")";
+  }
+  return(s);
+}
+
+static proc NNBemptyChain(Poly P)
+{
+  RightEquivalenceChainWithPrecision T;
+  list trans;
+  T.sourcegerm=P;
+  T.targetgerm=P;
+  T.transformations=trans;
+  T.precision=0;
+  T.HC=0;
+  return(T);
+}
+
+static proc NNBtoArnoldNormalForm(NNBNormalForm f)
+{
+  def baseRing=basering;
+  poly boundary=NNBevaluateNormalForm(f);
+  list rb=NNBregularBasisAboveBoundary(f);
+  Poly boundaryPoly=makePoly(boundary);
+  Poly zeroPoly=makePoly(0);
+  Poly exceptionalPoly=makePoly(-1);
+  RightEquivalenceChainWithPrecision chain=NNBemptyChain(boundaryPoly);
+  int mu=int(NNBexprConstValue(f.area));
+  string singularityType=NNBsingularityTypeString(f);
+  int numberOfParameters=size(rb);
+  Poly normalFormPoly;
+  list parameters;
+  if (numberOfParameters>0)
+  {
+    ring parameterRing=(0,a(1..numberOfParameters)),(var(1),var(2)),ds;
+    poly normalForm=fetch(baseRing,boundary);
+    list rbParameterRing=fetch(baseRing,rb);
+    for (int i=1;i<=size(rbParameterRing);i++)
+    {
+      normalForm=normalForm+a(i)*rbParameterRing[i];
+      parameters[i]=makePoly(rbParameterRing[i]);
+    }
+    normalFormPoly=makePoly(normalForm);
+    setring baseRing;
+  }
+  else
+  {
+    normalFormPoly=boundaryPoly;
+  }
+
+  NormalForm N;
+  N.numbervars=2;
+  N.inputRing=baseRing;
+  N.nondegeneratePart=boundaryPoly;
+  N.nonNormalizedNNBGerm=boundaryPoly;
+  N.semiNormalizedNNBGerm=boundaryPoly;
+  N.singularityType=singularityType;
+  N.milnorNumber=mu;
+  N.normalForm=normalFormPoly;
+  N.phi=chain;
+  N.phiBeforeMorseSplit=chain;
+  N.normalFormEquation=zeroPoly;
+  N.normalFormEquationUpToRescaling=zeroPoly;
+  N.modality=size(parameters);
+  N.parameters=parameters;
+  N.corank=2;
+  N.determinacy=0;
+  N.delta=0;
+  N.numberOfBranches=0;
+  N.extension1=zeroPoly;
+  N.extension2=zeroPoly;
+  N.exceptionalHypersurface=exceptionalPoly;
+  N.ArnoldType="";
+  return(N);
+}
+
+proc NNBevaluateNormalFormSeriesToNormalForm(NNBNormalFormSeries s, list #)
+"USAGE: NNBevaluateNormalFormSeriesToNormalForm(s[,k,l]); s NNBNormalFormSeries,
+        integer/rational exponent parameters k,l if required by s
+RETURN: Arnold NormalForm obtained by substituting k,l in the normal-form
+        series s, with regular-basis parameters filled.  If s contains exponent
+        parameters, their values must be supplied positionally as k,l; for an
+        l-only series pass a k placeholder first.  For a series with no
+        exponent parameter, no exponent values are accepted.
+EXAMPLE: example NNBevaluateNormalFormSeriesToNormalForm; shows the common series workflow"
+{
+  list values=NNBseriesParameterValues(s,#,"NNBevaluateNormalFormSeriesToNormalForm");
+  if (size(s.normalForms)<>1)
+  {
+    ERROR("NNBevaluateNormalFormSeriesToNormalForm cannot convert this grouped internal series directly");
+  }
+  return(NNBtoArnoldNormalForm(NNBevaluateInternalNormalForm(s.normalForms[1],values[1],values[2])));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(2,0);
+  NNBNormalFormSeries s=G[3][10];
+  NNBnormalFormSeriesParameters(s);
+  NormalForm nf=NNBevaluateNormalFormSeriesToNormalForm(s,0,5);
+  nf;
+}
+
+static proc NNBappendWithRegularBasis(list L, NNBNormalForm f)
+{
+  if (!NNBnormalFormConcrete(f))
+  {
+    ERROR("NNBenumerateBounded expected an individual normal form, but found a parameter family");
+  }
+  L[size(L)+1]=NNBtoArnoldNormalForm(f);
+  return(L);
+}
+
+static proc NNBflattenBoundedEntry(list L, def entry)
+{
+  if (typeof(entry)=="NNBNormalForm") { return(NNBappendWithRegularBasis(L,entry)); }
+  if (typeof(entry)=="NNBNormalFormSeries")
+  {
+    int seriesIndex;
+    for (seriesIndex=1;seriesIndex<=size(entry.normalForms);seriesIndex++)
+    {
+      L=NNBappendWithRegularBasis(L,entry.normalForms[seriesIndex]);
+    }
+    return(L);
+  }
+  if (typeof(entry)=="list")
+  {
+    int entryIndex;
+    for (entryIndex=1;entryIndex<=size(entry);entryIndex++) { L=NNBflattenBoundedEntry(L,entry[entryIndex]); }
+    return(L);
+  }
+  ERROR("unexpected entry in normal-form list");
+}
+
+static proc NNBprintBoundedNormalForms(list G)
+{
+  list L;
+  int groupIndex;
+  int formIndex;
+  for (groupIndex=1;groupIndex<=size(G);groupIndex++)
+  {
+    L=G[groupIndex];
+    if (size(L)>0)
+    {
+      "normalforms with modality "+string(groupIndex-1)+":"; "";
+      for (formIndex=1;formIndex<=size(L);formIndex++) { L[formIndex]; }
+      "";
+    }
+  }
+}
+
+proc NNBenumerateBounded(int mu0, int m0, list #)
+"USAGE: NNBenumerateBounded(mu0,m0[,p]); int mu0, int m0, optional int p
+RETURN: list grouped by modality.  Every entry is an individual
+        NormalForm with parameters filled by the regular basis on/above the
+        Newton boundary, enumerated with mu<=mu0 and modality<=m0.
+        Use m0=-1 for only the Milnor-number bound; then the
+        result is grouped by modalities 0..mu0.  Pure modality-series mode
+        mu0=-1 is intentionally rejected.  If p is non-zero, print the groups.
+EXAMPLE: example NNBenumerateBounded; shows direct bounded NormalForm enumeration"
+{
+  int p=0; if (size(#)>0) { p=#[1]; }
+  if (mu0<0) { ERROR("NNBenumerateBounded needs a non-negative Milnor-number bound"); }
+  if (m0<-1) { ERROR("NNBenumerateBounded expects m0=-1 or a non-negative modality bound"); }
+  int groupBound=m0;
+  if (groupBound<0) { groupBound=mu0; }
+  list E=NNBenumerateRaw(mu0,m0,0);
+  list G=NNBnormalFormsRaw(E,groupBound,0);
+  list R;
+  list L;
+  int modalityPos;
+  int groupedPos;
+  for (modalityPos=1;modalityPos<=size(G);modalityPos++)
+  {
+    L=list();
+    for (groupedPos=1;groupedPos<=size(G[modalityPos]);groupedPos++) { L=NNBflattenBoundedEntry(L,G[modalityPos][groupedPos]); }
+    R[modalityPos]=L;
+  }
+  if (p) { NNBprintBoundedNormalForms(R); }
+  return(R);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list B=NNBenumerateBounded(15,2,0);
+  B[3][1];
+}
+
+static proc NNBtermsAsExponentsForNormalForm(NNBNormalForm f)
+{
+  list L;
+  for (int i=1;i<=size(f.terms);i++) { L[i]=list(NNBexprString(f.terms[i].monx),NNBexprString(f.terms[i].mony)); }
+  return(L);
+}
+
+proc NNBtermsAsExponents(NNBNormalFormSeries s, list #)
+"USAGE: NNBtermsAsExponents(s[,k,l]); s NNBNormalFormSeries,
+        integer/rational exponent parameters k,l if required by s
+RETURN: list of exponent pairs of the terms obtained by substituting k,l in
+        the normal-form series s.  If s contains exponent parameters, their
+        values must be supplied positionally as k,l; for an l-only series pass
+        a k placeholder first.  For a series with no exponent parameter, no
+        exponent values are accepted.
+EXAMPLE: example NNBtermsAsExponents; shows the common series workflow"
+{
+  list values=NNBseriesParameterValues(s,#,"NNBtermsAsExponents");
+  return(NNBtermsAsExponentsForNormalForm(NNBnormalFormSeriesInternalForm(s,values[1],values[2],"NNBtermsAsExponents")));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(2,0);
+  NNBNormalFormSeries s=G[3][10];
+  NNBnormalFormSeriesParameters(s);
+  NNBtermsAsExponents(s,0,5);
+}
+
+static proc NNBhashFunctionForNormalForm(NNBNormalForm f)
+{
+  if (size(f.terms)==0) { return(list(0,0,0)); }
+  list P; int imin; int jmin; int S=0;
+  int i;
+  int j;
+  int x;
+  int y;
+  def tmp;
+  for (i=1;i<=size(f.terms);i++)
+  {
+    x=int(NNBexprConstValue(f.terms[i].monx)); y=int(NNBexprConstValue(f.terms[i].mony));
+    if (i==1) { imin=x; }
+    else { if (x<imin) { imin=x; } }
+    if (i==1) { jmin=y; }
+    else { if (y<jmin) { jmin=y; } }
+    P[i]=NNBiv2(x,y); S=S+x+y;
+  }
+  P[size(P)+1]=NNBiv2(imin,jmin);
+  // Compute a simple shoelace hash after sorting by x; sufficient as a stable key.
+  list Q=P;
+  for (i=1;i<=size(Q);i++)
+  {
+    for (j=i+1;j<=size(Q);j++)
+    {
+      if (Q[j][1]<Q[i][1] || (Q[j][1]==Q[i][1] && Q[j][2]<Q[i][2])) { tmp=Q[i]; Q[i]=Q[j]; Q[j]=tmp; }
+    }
+  }
+  int area2=0;
+  for (i=1;i<size(Q);i++) { area2=area2+Q[i][1]*Q[i+1][2]-Q[i+1][1]*Q[i][2]; }
+  area2=area2+Q[size(Q)][1]*Q[1][2]-Q[1][1]*Q[size(Q)][2];
+  if (area2<0) { area2=-area2; }
+  return(list(area2,size(f.terms),S));
+}
+
+proc NNBhashFunction(NNBNormalFormSeries s, list #)
+"USAGE: NNBhashFunction(s[,k,l]); s NNBNormalFormSeries,
+        integer/rational exponent parameters k,l if required by s
+RETURN: list(area2,N,S).  The values are computed from the term exponents
+        obtained by substituting k,l in the normal-form series s.  Here area2
+        is twice the Euclidean area of the convex hull of the term exponents
+        and the lower-left closing point.  If s contains exponent parameters,
+        their values must be supplied positionally as k,l; for an l-only series
+        pass a k placeholder first.  For a series with no exponent parameter,
+        no exponent values are accepted.
+EXAMPLE: example NNBhashFunction; shows the common series workflow"
+{
+  list values=NNBseriesParameterValues(s,#,"NNBhashFunction");
+  return(NNBhashFunctionForNormalForm(NNBnormalFormSeriesInternalForm(s,values[1],values[2],"NNBhashFunction")));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list G=NNBenumerate(2,0);
+  NNBNormalFormSeries s=G[3][10];
+  NNBnormalFormSeriesParameters(s);
+  NNBhashFunction(s,0,5);
+}

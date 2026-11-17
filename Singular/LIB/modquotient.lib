@@ -226,7 +226,7 @@ proc modSat(ideal I, ideal J, list #)
 "USAGE:   modSat(I, J, #); I, J ideals, # an optional list which is either empty (not entered) or consists of precisely one integer which is 0 or 1.
 ASSUME: The common basering of I and J is defined over the rationals.
 RETURN: A list consisting of an ideal [1] and an integer [2]:@*
-        [1] = saturation of of I by J
+        [1] = saturation of I by J
         [2] = saturation exponent (= min( k | I:J^k = I:J^(k+1)))
 NOTE: [1] is given by a standard basis in the basering.@*
       - The function proceeds by successively computing ideal quotients.

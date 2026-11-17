@@ -19,26 +19,139 @@
 @end macro
 @end ifset
 
-@heading News for version @value{VERSION}
+@macro commit{hash}
+@uref{https://github.com/Singular/Singular/commit/\hash\,\hash\}
+@end macro
+
+@heading News for version 4-5-0
+
+New libraries:
+@itemize
+@item @code{enumnf.lib}: enumeration of normal-form series with
+non-degenerate Newton boundary [@commit{f8e2789a1}]
+@item @code{conway.lib}: computation of Conway polynomials over finite fields
+[@commit{31b8169ef}]
+@item @code{arc.lib}: construction of generalized arc spaces
+[@commit{d87861767}]
+@item @code{sresext.lib}: Schreyer resolutions over the exterior algebra
+[@commit{e35fab845}]
+@end itemize
+
+New type:
+@itemize
+@item @code{htable}: hash tables with string keys and values of mixed types
+and SSI serialization support (@nref{htable})
+[@commit{00cf393bf}, @commit{7cb24c691}]
+@end itemize
 
 Changed libraries:
 @itemize
-@item @code{homolog.lib}: handling of module weights (@nref{Ext_R})
-@item @code{normaliz.lib}: new version (@nref{normaliz_lib})
+@item @code{integralbasis.lib}: fix Puiseux class handling in integral basis
+computations (@nref{integralbasis_lib}) [@commit{6cc919fbe}]
+@item @code{realrad.lib}: fix general-position normalization
+(@nref{realrad_lib}) [@commit{1b221306e}]
+@item @code{dmod.lib}, @code{dmodapp.lib}: removed obsolete
+@code{annfspecialOld}; @code{annRat} and @code{deRhamCohom} now use
+@code{annfspecial} (@nref{annfspecial}, @nref{annRat}, @nref{deRhamCohom})
+[@commit{41c1d6bfa}]
+@item @code{primdecint.lib}: fixes for integer overflow and bigint handling
+in primary decomposition over the integers (@nref{primdecint_lib})
+[@commit{4b94dd619}]
+@item @code{sheafcoh.lib}: new weighted routines @code{dimH_w} and
+@code{dimGradedPart_w}; fixes for weighted sheaf cohomology
+(@nref{sheafcoh_lib}) [@commit{30799bcc0}]
+@item @code{hodge.lib}: fixes in the computation of Hodge ideals
+(@nref{hodge_lib}) [@commit{81b1217cc}]
 @item @code{polymake.lib}: new version for topcom 1.1 (@nref{polymake_lib})
-@item @code{sagbiNormaliz.lib}: new version for normaliz 3.10.5 (@nref{sagbiNormaliz_lib})
-@item @code{sagbiNormaliz0.lib}: version for normaliz <=3.10.1 (@nref{sagbiNormaliz0_lib})
+[@commit{7df8b077a}]
+@item @code{primdec.lib}, @code{modprimdec.lib}: fixes and improvements for
+primary decomposition defaults and edge cases
+(@nref{primdec_lib}, @nref{modprimdec_lib}) [@commit{c1dd834e4}]
+@item @code{sagbiNormaliz.lib}: new version for normaliz 3.10.5
+(@nref{sagbiNormaliz_lib}) [@commit{2e0ef719a}]
+@item @code{sagbiNormaliz0.lib}: version for normaliz <=3.10.1
+(@nref{sagbiNormaliz0_lib}) [@commit{03476c2f0}]
+@item @code{normaliz.lib}: new version (@nref{normaliz_lib})
+[@commit{bfe491d07}]
+@item @code{homolog.lib}: handling of module weights (@nref{Ext_R})
+[@commit{dade9c380}]
+@item @code{ehv.lib}: fix a wrong variable name in
+@code{annihilatorBM} [@commit{9a32d6e4e}]
+@item @code{triang.lib}: improve @code{triangL} output
+(@nref{triang_lib}) [@commit{4ead8b67a}]
 @end itemize
 
 Changes in the kernel/build system:
 @itemize
-@item changes for gcc 15
-@item changes for FLINT 3.3
-@item changes for normaliz 3.10.5
-@item fix @code{quotient} for qring case (@nref{quotient})
+@item fix silent overflow in the number of ring variables
+[@commit{11befc1bb}]
+@item new algorithmic @code{option(stdhilb)} for @code{std}; it is also
+activated by @code{option(probabilistic)}. This shortcut is unchecked and an
+unlucky prime may lead to an incorrect result over @code{QQ}
+[@commit{b1c797710}]
+@item new global @code{option(probabilistic)}. It enables probabilistic
+Groebner-basis shortcuts and omits final exact verification, but not
+stabilization, in modular algorithms [@commit{b1c797710}]
+@item the modular Hilbert-driven block-ordering shortcut for @code{std} is now
+disabled by default and enabled by @code{option(probabilistic)}
+[@commit{b1c797710}]
+@item verify the colength used by the modular highest-corner shortcut for local
+standard bases and fall back to an untruncated computation if it differs
+[@commit{b1c797710}]
+@item fix normalization in factorization, @code{resultant}, @code{pdivide},
+and related computations over transcendental extensions [@commit{fea562cea}]
+@item improve @code{preimage} and elimination for weighted homogeneous input
+[@commit{af1d0f474}]
+@item add and extend GitHub Actions workflows for release tarballs,
+Singular.jl downstream testing, Oscar downstream testing, Sage testing, and
+full regression testing [@commit{74ba9e1bf}, @commit{ae06fdaaf},
+@commit{d27c6a409}, @commit{723704d80}]
+@item fix interruption handling in @code{std}/@code{groebner} computations
+[@commit{84b7b1f76}]
+@item improve Hilbert-driven standard-basis computations for weighted and
+mixed orderings [@commit{b91bc1953}, @commit{614931fcb}]
+@item regression tests now support compressed @code{.res.gz} reference files
+[@commit{a66f22c13}]
 @item @code{nres},@code{mres},@code{prune_map}: allow ring elements as coefficients
-(@nref{nres},@nref{mres},@nref{prune_map})
-@item @code{read},@code{write} support a link (@code{"ssi:string"}) to read/write data encoded as strings (@nref{read},@nref{write})
+(@nref{nres},@nref{mres},@nref{prune_map}) [@commit{3f7bc6f89}]
+@item build and CI updates for newer macOS runners [@commit{bdb25263f}]
+@item fix buffer-size handling in expression parsing [@commit{7a2ec83c4}]
+@item fix and tune standard-basis, high-corner, FGLM, and monomial-ordering
+computations [@commit{743bfd6ff}, @commit{709497400},
+@commit{17d9e982c}]
+@item update coefficient maps from GAP GMP integer representations
+[@commit{0f28b8731}]
+@item fix short-real precision selection by using the configured
+@code{SIZEOF_DOUBLE} value [@commit{759846af9}]
+@item @code{simplex}: support real coefficient fields in addition to long real
+coefficient fields [@commit{7a234259f}]
+@item fix @code{gcd(0,0)} over fields @code{ZZ/n} to return @code{0}
+[@commit{91dd89953}, @commit{abc73b691}]
+@item require FLINT 3.0 or newer when FLINT support is enabled; configure now
+fails if FLINT was explicitly requested but could not be found
+[@commit{557b265c2}]
+@item support @code{tropicalVariety} over coefficient fields other than
+@code{QQ} [@commit{c791b8806}]
+@item improve runtime error handling, resource lookup, link handling, and
+build-time robustness [@commit{4c5e9e075}]
+@item changes for gcc 15 [@commit{b9ee893d1}]
+@item documentation, test-reference, dependency, and release-maintenance
+updates [@commit{7df8b077a}]
+@item @code{read},@code{write} support a link (@code{"ssi:string"}) to
+read/write data encoded as strings (@nref{read},@nref{write})
+[@commit{0e082ef0b}]
+@item fix @code{quotient} for qring case (@nref{quotient})
+[@commit{e3bf4a15e}]
+@item fix parser and procedure-expression handling [@commit{186a1fd7c}]
+@item improve syzygy and resolution computations, including
+@code{sres}/@code{fres}/@code{mres}/@code{nres} edge cases
+[@commit{bc70778de}]
+@item changes for FLINT 3.3 [@commit{22ffc1b6f}, @commit{05f5116e1}]
+@item changes for normaliz 3.10.5 [@commit{bfe491d07}]
+@item fix polynomial, ideal, map, and coefficient arithmetic edge cases
+[@commit{0a4bc0e28}]
+@item improve CPU/fork handling for modular, parallel, and link-based
+computations [@commit{1103844a9}]
 @end itemize
 
 @heading News for version 4-4-1
@@ -579,4 +692,3 @@ Availability
 
 @sc{Singular} is available as source code and for Linux, Mac OS X, Windows, FreeBSD and
 SunOS-5.
-
