@@ -110,7 +110,22 @@ jobs:
           ./autogen.sh
       - name: "Override bundled Singular"
         run: |
-          julia --proj=override $SINGULARJL_PATH/etc/setup_override_dir.jl /tmp/SINGULARROOT /tmp/singular_jll_override
+          install -m 0644 "$SINGULARJL_PATH/etc/setup_override_dir.jl" /tmp/setup_override_dir.jl
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("/tmp/setup_override_dir.jl")
+          text = path.read_text()
+          old = "artifact_paths = collect_artifact_paths(deps)"
+          replacement = r'''
+          include(joinpath(singular_prefix, ".github", "setup_override_artifacts.jl"))
+          artifact_paths = singular_ci_collect_artifact_paths(deps)
+          '''
+          if old not in text:
+              raise SystemExit("setup_override_dir.jl changed: expected collect_artifact_paths(deps) call not found")
+          path.write_text(text.replace(old, replacement, 1))
+          PY
+          julia --proj=override /tmp/setup_override_dir.jl /tmp/SINGULARROOT /tmp/singular_jll_override
       - name: "Verify omalloc page size"
         if: matrix.omalloc-config != 'default'
         run: |
