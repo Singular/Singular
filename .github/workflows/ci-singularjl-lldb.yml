@@ -82,8 +82,11 @@ jobs:
         run: |
           # Match the 4 KiB omalloc ABI used by the published macOS ARM64 JLLs.
           export ac_cv_pagesize=4096
+          install -m 0644 "$SINGULARJL_PATH/etc/setup_override_dir.jl" /tmp/setup_override_dir.jl
+          test "$(grep -Fc 'artifact_paths = collect_artifact_paths(deps)' /tmp/setup_override_dir.jl)" -eq 1
+          sed -i.bak 's|artifact_paths = collect_artifact_paths(deps)|include(joinpath(ENV["GITHUB_WORKSPACE"], "DEBUGTOOLS", ".github", "setup_override_artifacts.jl")); artifact_paths = singular_ci_collect_artifact_paths(deps)|' /tmp/setup_override_dir.jl
           julia --project=override \
-            "$SINGULARJL_PATH/etc/setup_override_dir.jl" \
+            /tmp/setup_override_dir.jl \
             /tmp/SINGULARROOT \
             /tmp/singular_jll_override
 
