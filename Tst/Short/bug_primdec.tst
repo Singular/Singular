@@ -27,6 +27,20 @@ ring rng2 = (0),(x,y,z,u,w),dp;
 ideal I2 = -28*1*x*z*w*1-15*y*z*u*w,-28*1^2*x*u+14*1*x^2*y*w*1+17,12*1*u*w^2*1+18*x*y^2*w;
 list result2 = primdecGTZ (I2);
 
+////////////////////////////////////////////////////////////////
+// avoid the two-parameter performance regression from Oscar issue 6421
+ring issue6421_r = (0,a,b),(x,y,z),dp;
+poly h = (x+2)*(z+2);
+ideal issue6421_i =
+  x*(z+2)*((1-x-b)*(x+2)-(a+1)*y),
+  y*(-a*h+2*(a+1)*x),
+  z*((a+1)*x*y-h);
+option(noredSB);
+intvec issue6421_options = option(get);
+list issue6421_primes = minAssGTZ(issue6421_i);
+size(issue6421_primes)==7;
+option(get)==issue6421_options;
+
 
 LIB "tst.lib"; tst_status(1);
 $

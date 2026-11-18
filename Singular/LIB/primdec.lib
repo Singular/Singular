@@ -2074,6 +2074,10 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
   setring P;
   ideal i=imap(P0,i);
 
+  // simplifyIdeal turns multiple parameters into variables. Reduced bases
+  // avoid a severe performance regression in the resulting computations.
+  if(npars(P) > 1)  { option(redSB); }
+
   // Set input parameters
   algorithm = "SL";         // Default: SL algorithm
   facstdOption = "Facstd";    // Default: facstd is not used
