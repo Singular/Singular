@@ -242,6 +242,7 @@ Short/primdec_s.tst
 Short/primdecint_some_special_cases.tst
 Short/primefactors.tst
 Short/primitiv_s.tst
+Short/proc_options_error.tst
 Short/qhw_s.tst
 Short/quotient_s.tst
 Short/rInit.tst
