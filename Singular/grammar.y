@@ -873,7 +873,7 @@ extendedid:
             {
               MYYERROR("string expression expected");
             }
-            $$ = (char *)$2.CopyD(STRING_CMD);
+            $$ = iiNormalizeIdentifier((char *)$2.CopyD(STRING_CMD));
             $2.CleanUp();
           }
         ;

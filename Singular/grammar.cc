@@ -3300,7 +3300,7 @@ yyreduce:
             {
               MYYERROR("string expression expected");
             }
-            (yyval.name) = (char *)(yyvsp[(2) - (3)].lv).CopyD(STRING_CMD);
+            (yyval.name) = iiNormalizeIdentifier((char *)(yyvsp[(2) - (3)].lv).CopyD(STRING_CMD));
             (yyvsp[(2) - (3)].lv).CleanUp();
           ;}
     break;
@@ -4456,6 +4456,3 @@ yyreturn:
   /* Make sure YYID is used.  */
   return YYID (yyresult);
 }
-
-
-

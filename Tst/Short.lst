@@ -199,6 +199,7 @@ Short/homolog_s.tst
 Short/hres_s.tst
 Short/imap.tst
 Short/intdet_s.tst
+Short/interpreter_io.tst
 Short/intersect_s.tst
 Short/intersect_q.tst
 Short/invar.tst
@@ -207,6 +208,9 @@ Short/issue_1417.tst
 Short/janet.tst
 Short/jmbtest.tst
 Short/kernel_weighted_homog.tst
+Short/lambda.tst
+Short/lambda_compat.tst
+Short/lambda_continuation.tst
 Short/latex.tst
 Short/lift_s.tst
 Short/liftstd_s.tst
