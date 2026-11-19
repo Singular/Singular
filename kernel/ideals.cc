@@ -346,7 +346,11 @@ ideal idSect (ideal h1,ideal h2, GbVariant alg)
     && (currRing->OrdSgn==1)
     && (!rIsPluralRing(currRing))
     && ((TEST_V_INTERSECT_ELIM) || (!TEST_V_INTERSECT_SYZ)))
-      return idSectWithElim(first,second,alg);
+    {
+      result=idSectWithElim(first,second,alg);
+      SI_RESTORE_OPT1(save_opt);
+      return result;
+    }
     else length = 1;
   }
   if (TEST_OPT_PROT) PrintS("intersect by syzygy methods\n");
