@@ -8,6 +8,6 @@ Comment[es]=
 Comment[fr]=lire le manuel d'utilisation de Singular @PACKAGE_VERSION@
 Comment[ru]=
 Type=Link
-URL=file://@DOC_DIR@/html/index.htm
+URL=file://@HTML_DIR@/index.htm
 Icon=@DATA_DIR@/icons/Singular.png
 
