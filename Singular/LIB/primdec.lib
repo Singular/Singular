@@ -2010,6 +2010,11 @@ static proc minAssPrimesE(ideal I, list #)
       1, "noFacstd" ->  does not use facstd (default)
       "SL" ->     the new algorithm is used (default)
       "GTZ" ->     the old algorithm is used
+      "redSB" ->   forces reduced standard bases
+      "noredSB" -> forces non-reduced standard bases
+      The options "redSB" and "noredSB" control whether reduced standard bases are used during the computation.
+      By default, redSB is used when the coefficient field has no parameters or at least two parameters.
+      When it has exactly one parameter, the setting of the input ring is used.
 RETURN:  list = the minimal associated prime ideals of I
 EXAMPLE: example minAssPrimesE; shows an example
 "
@@ -2034,6 +2039,11 @@ static proc minAssPrimes(ideal I, list #)
       1, "noFacstd" ->  does not use facstd (default)
       "SL" ->     the new algorithm is used (default)
       "GTZ" ->     the old algorithm is used
+      "redSB" ->   forces reduced standard bases
+      "noredSB" -> forces non-reduced standard bases
+      The options "redSB" and "noredSB" control whether reduced standard bases are used during the computation.
+      By default, redSB is used when the coefficient field has no parameters or at least two parameters.
+      When it has exactly one parameter, the setting of the input ring is used.
 RETURN:  list = the minimal associated prime ideals of I. If I is the unit ideal returns list(ideal(1)) ;
 EXAMPLE: example minAssPrimes; shows an example
 "
@@ -2074,13 +2084,10 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
   setring P;
   ideal i=imap(P0,i);
 
-  // simplifyIdeal turns multiple parameters into variables. Reduced bases
-  // avoid a severe performance regression in the resulting computations.
-  if(npars(P) > 1)  { option(redSB); }
-
   // Set input parameters
   algorithm = "SL";         // Default: SL algorithm
   facstdOption = "Facstd";    // Default: facstd is not used
+  string redSBOption = "";
   int subsystem=0;
   if(size(#) > 0)
   {
@@ -2105,6 +2112,11 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
           facstdOption = #[j];
           valid = 1;
         }
+        if(#[j] == "redSB" || #[j] == "noredSB")
+        {
+          redSBOption = #[j];
+          valid = 1;
+        }
         if(#[j] == "noSubsystem" || #[j] == "subsystem")
         {
           subsystem = (#[j]=="subsystem");
@@ -2117,6 +2129,12 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
       }
     }
   }
+
+  if(redSBOption == "redSB")   { option(redSB); }
+  if(redSBOption == "noredSB") { option(noredSB); }
+  // simplifyIdeal turns multiple parameters into variables. Reduced bases
+  // avoid a severe performance regression in the resulting computations.
+  if(redSBOption == "" && npars(P) > 1) { option(redSB); }
 
   i=simplify(i,2);
   intvec op = option(get);
@@ -2131,7 +2149,11 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
 
     list result;
 
-    if(npars(P) == 0)  { option(redSB); }
+    if(npars(P) == 0)
+    {
+      if(redSBOption == "noredSB") { option(noredSB); }
+      else                          { option(redSB); }
+    }
 
     if (!attrib(i,"isSB"))
     {
@@ -6156,6 +6178,11 @@ proc minAssGTZE(ideal I,list #)
    @* 1, \"noFacstd\" -> does not use facstd
    @* \"GTZ\" -> the original algorithm by Gianni, Trager and Zacharias is used (default)
    @* \"SL\" -> GTZ algorithm with modificiations by Laplagne is used
+   @* \"redSB\" -> forces reduced standard bases
+   @* \"noredSB\" -> forces non-reduced standard bases
+   @* The options \"redSB\" and \"noredSB\" control whether reduced standard bases are used during the computation.
+   @* By default, redSB is used when the coefficient field has no parameters or at least two parameters.
+   @* When it has exactly one parameter, the setting of the input ring is used.
 
 RETURN:  a list, the minimal associated prime ideals of I.
 NOTE:    - Designed for characteristic 0, works also in char k > 0 based
@@ -6193,6 +6220,11 @@ proc minAssGTZ(ideal I, list #)
    @* 1, \"noFacstd\" -> does not use facstd
    @* \"GTZ\" -> the original algorithm by Gianni, Trager and Zacharias is used
    @* \"SL\" -> GTZ algorithm with modificiations by Laplagne is used (default)
+   @* \"redSB\" -> forces reduced standard bases
+   @* \"noredSB\" -> forces non-reduced standard bases
+   @* The options \"redSB\" and \"noredSB\" control whether reduced standard bases are used during the computation.
+   @* By default, redSB is used when the coefficient field has no parameters or at least two parameters.
+   @* When it has exactly one parameter, the setting of the input ring is used.
 
 RETURN:  a list, the minimal associated prime ideals of proper ideal I, otherwise ideal(1)
 NOTE:    - Designed for characteristic 0, works also in char k > 0 based
@@ -6242,7 +6274,7 @@ static proc minAssGTZ_i(int patchPrimaryDecomposition, ideal i,list #)
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
-      list li=minAssGTZ_i(patchPrimaryDecomposition,i);
+      list li=minAssGTZ_i(patchPrimaryDecomposition,i,#);
       int sizeli = size(li);
       setring r;
       if (sizeli==0) { return(list()); }
@@ -6265,12 +6297,14 @@ static proc minAssGTZ_i(int patchPrimaryDecomposition, ideal i,list #)
   int j;
   string algorithm;
   string facstdOption;
+  string redSBOption;
   string subsystem="noSubsystem";
   int useFac;
 
   // Set input parameters
   algorithm = "SL";         // Default: GTZ algorithm
   facstdOption = "facstd";
+  redSBOption = "";
   if(size(#) > 0)
   {
     int valid;
@@ -6294,6 +6328,11 @@ static proc minAssGTZ_i(int patchPrimaryDecomposition, ideal i,list #)
           facstdOption = #[j];
           valid = 1;
         }
+        if((#[j] == "redSB") || (#[j] == "noredSB"))
+        {
+          redSBOption = #[j];
+          valid = 1;
+        }
         if((#[j] == "noSubsystem") || (#[j] == "subsystem"))
         {
           subsystem = #[j];
@@ -6312,7 +6351,15 @@ static proc minAssGTZ_i(int patchPrimaryDecomposition, ideal i,list #)
     return(algeDeco_i(patchPrimaryDecomposition,i,2));
   }
 
-  list result = minAssPrimes_i(patchPrimaryDecomposition,i, facstdOption, algorithm, subsystem);
+  list result;
+  if(redSBOption == "")
+  {
+    result = minAssPrimes_i(patchPrimaryDecomposition,i, facstdOption, algorithm, subsystem);
+  }
+  else
+  {
+    result = minAssPrimes_i(patchPrimaryDecomposition,i, facstdOption, algorithm, subsystem, redSBOption);
+  }
   return(result);
 }
 
