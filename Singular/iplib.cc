@@ -317,6 +317,8 @@ BOOLEAN iiAllStart(procinfov pi, const char *p, feBufferTypes t, int l)
   // see below:
   BITSET save1=si_opt_1;
   BITSET save2=si_opt_2;
+  ring save_ring=currRing;
+  BITSET save_ring_options=(save_ring==NULL) ? 0 : save_ring->options;
   newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
                pi, l );
   BOOLEAN err=yyparse();
@@ -367,6 +369,11 @@ BOOLEAN iiAllStart(procinfov pi, const char *p, feBufferTypes t, int l)
       }
     }
     PrintLn();
+  }
+  if (err)
+  {
+    SI_RESTORE_OPT(save1,save2);
+    if (save_ring!=NULL) save_ring->options=save_ring_options;
   }
   return err;
 }
