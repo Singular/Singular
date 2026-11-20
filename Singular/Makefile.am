@@ -32,6 +32,7 @@ SOURCES = \
    denom_list.cc\
    eigenval_ip.cc\
    extra.cc\
+   monres.cc\
    feOpt.cc\
    fehelp.cc\
    fevoices.cc\
@@ -245,3 +246,5 @@ MOD:
 echoLIBS:
 	@echo ${SLIB0} ${SLIB1} ${SLIB2} ${PLIBS}
 
+# monres catches resource-limit exceptions at its interpreter boundary.
+libSingular_la-monres.%: CXXFLAGS += -fexceptions

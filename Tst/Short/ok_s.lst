@@ -156,6 +156,7 @@ issue1293
 kernel_weighted_homog
 liftstd_m
 modules
+monres
 nets
 ncfactor_facNthShift1_s
 ncfactor_landau_ex_s
