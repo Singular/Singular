@@ -36,48 +36,74 @@ size_t VMem::filesize() {
   return stat.st_size;
 }
 
-Status VMem::init(int fd) {
+Status VMem::init_fd(int fd, int process_count) {
+  if (process_count < 1 || process_count > MAX_PROCESS)
+    return Status(ErrGeneral);
   this->fd = fd;
+  metapage = NULL;
+  file_handle = NULL;
+  current_process = -1;
+  freelist = NULL;
+  channel_count = 0;
   for (int i = 0; i < MAX_SEGMENTS; i++)
     segments[i] = VSeg(NULL);
-  for (int i = 0; i < MAX_PROCESS; i++) {
+  for (int i = 0; i < process_count; i++) {
     int channel[2];
     if (pipe(channel) < 0) {
-      for (int j = 0; j < i; j++) {
+      for (int j = 0; j < channel_count; j++) {
         close(channels[j].fd_read);
         close(channels[j].fd_write);
       }
+      channel_count = 0;
       return Status(ErrOS);
     }
     channels[i].fd_read = channel[0];
     channels[i].fd_write = channel[1];
+    channel_count++;
   }
   lock_metapage();
   init_metapage(filesize() == 0);
   unlock_metapage();
+  if (metapage == NULL) {
+    for (int i = 0; i < channel_count; i++) {
+      close(channels[i].fd_read);
+      close(channels[i].fd_write);
+    }
+    channel_count = 0;
+    return Status(ErrMMap);
+  }
   freelist = metapage->freelist;
   return Status(ErrNone);
 }
 
-Status VMem::init() {
+Status VMem::init(int process_count) {
   FILE *fp = tmpfile();
-  Status result = init(fileno(fp));
-  if (!result.ok())
+  if (fp == NULL)
+    return Status(ErrFile);
+  Status result = init_fd(fileno(fp), process_count);
+  if (!result.ok()) {
+    fclose(fp);
+    fd = -1;
     return result;
+  }
   current_process = 0;
   file_handle = fp;
   metapage->process_info[0].pid = getpid();
   return Status(ErrNone);
 }
 
-Status VMem::init(const char *path) {
+Status VMem::init(const char *path, int process_count) {
   int fd = open(path, O_RDWR | O_CREAT, 0600);
   if (fd < 0)
     return Status(ErrFile);
-  init(fd);
-  lock_metapage();
-  // TODO: enter process in meta table
-  unlock_metapage();
+  Status result = init_fd(fd, process_count);
+  if (!result.ok()) {
+    close(fd);
+    this->fd = -1;
+    return result;
+  }
+  current_process = 0;
+  metapage->process_info[0].pid = getpid();
   return Status(ErrNone);
 }
 
@@ -96,10 +122,11 @@ void VMem::deinit() {
     if (segments[i].base) munmap(segments[i].base, SEGMENT_SIZE);
     segments[i] = NULL;
   }
-  for (int i = 0; i < MAX_PROCESS; i++) {
+  for (int i = 0; i < channel_count; i++) {
     close(channels[i].fd_read);
     close(channels[i].fd_write);
   }
+  channel_count = 0;
 }
 
 void *VMem::mmap_segment(int seg) {
@@ -332,6 +359,7 @@ void unlock_metapage() {
 }
 
 void init_metapage(bool create) {
+  vmem.metapage = NULL;
   if (create) {
     if (ftruncate(vmem.fd, METABLOCK_SIZE) != 0) {
       char err_msg[256];
@@ -340,8 +368,16 @@ void init_metapage(bool create) {
       return;
     }
   }
-  vmem.metapage = (MetaPage *) mmap(
+  void *map = mmap(
       NULL, METABLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, vmem.fd, 0);
+  if (map == MAP_FAILED) {
+    char err_msg[256];
+    snprintf(err_msg, sizeof(err_msg),
+        "cannot map vspace metadata: %s", strerror(errno));
+    WerrorS(err_msg);
+    return;
+  }
+  vmem.metapage = (MetaPage *) map;
   if (create) {
     memcpy(vmem.metapage->config_header, config, sizeof(config));
     for (int i = 0; i <= LOG2_SEGMENT_SIZE; i++) {
@@ -350,7 +386,10 @@ void init_metapage(bool create) {
     vmem.metapage->segment_count = 0;
     vmem.metapage->allocator_lock = FastLock(metapageaddr(allocator_lock));
   } else {
-    assert(memcmp(vmem.metapage->config_header, config, sizeof(config)) != 0);
+    if (memcmp(vmem.metapage->config_header, config, sizeof(config)) != 0) {
+      munmap(vmem.metapage, METABLOCK_SIZE);
+      vmem.metapage = NULL;
+    }
   }
 }
 
@@ -487,11 +526,11 @@ ipc_signal_t wait_signal(bool lock) {
 pid_t fork_process() {
   using namespace internals;
   lock_metapage();
-  for (int p = 0; p < MAX_PROCESS; p++) {
+  for (int p = 0; p < vmem.channel_count; p++) {
     if (vmem.metapage->process_info[p].pid == 0) {
       pid_t pid = fork();
       if (pid < 0) {
-        // error
+        unlock_metapage();
         return -1;
       } else if (pid == 0) {
         // child process
@@ -647,48 +686,74 @@ size_t VMem::filesize() {
   return stat.st_size;
 }
 
-Status VMem::init(int fd) {
+Status VMem::init_fd(int fd, int process_count) {
+  if (process_count < 1 || process_count > MAX_PROCESS)
+    return Status(ErrGeneral);
   this->fd = fd;
+  metapage = NULL;
+  file_handle = NULL;
+  current_process = -1;
+  freelist = NULL;
+  channel_count = 0;
   for (int i = 0; i < MAX_SEGMENTS; i++)
     segments[i] = VSeg(NULL);
-  for (int i = 0; i < MAX_PROCESS; i++) {
+  for (int i = 0; i < process_count; i++) {
     int channel[2];
     if (pipe(channel) < 0) {
-      for (int j = 0; j < i; j++) {
+      for (int j = 0; j < channel_count; j++) {
         close(channels[j].fd_read);
         close(channels[j].fd_write);
       }
+      channel_count = 0;
       return Status(ErrOS);
     }
     channels[i].fd_read = channel[0];
     channels[i].fd_write = channel[1];
+    channel_count++;
   }
   lock_metapage();
   init_metapage(filesize() == 0);
   unlock_metapage();
+  if (metapage == NULL) {
+    for (int i = 0; i < channel_count; i++) {
+      close(channels[i].fd_read);
+      close(channels[i].fd_write);
+    }
+    channel_count = 0;
+    return Status(ErrMMap);
+  }
   freelist = metapage->freelist;
   return Status(ErrNone);
 }
 
-Status VMem::init() {
-  FILE *fp = tmpfile();
-  Status result = init(fileno(fp));
-  if (!result.ok())
+Status VMem::init(int process_count) {
+  std::FILE *fp = std::tmpfile();
+  if (fp == NULL)
+    return Status(ErrFile);
+  Status result = init_fd(fileno(fp), process_count);
+  if (!result.ok()) {
+    std::fclose(fp);
+    fd = -1;
     return result;
+  }
   current_process = 0;
   file_handle = fp;
   metapage->process_info[0].pid = getpid();
   return Status(ErrNone);
 }
 
-Status VMem::init(const char *path) {
+Status VMem::init(const char *path, int process_count) {
   int fd = open(path, O_RDWR | O_CREAT, 0600);
   if (fd < 0)
     return Status(ErrFile);
-  init(fd);
-  lock_metapage();
-  // TODO: enter process in meta table
-  unlock_metapage();
+  Status result = init_fd(fd, process_count);
+  if (!result.ok()) {
+    close(fd);
+    this->fd = -1;
+    return result;
+  }
+  current_process = 0;
+  metapage->process_info[0].pid = getpid();
   return Status(ErrNone);
 }
 
@@ -708,10 +773,11 @@ void VMem::deinit() {
       munmap(segments[i].base, SEGMENT_SIZE);
     segments[i] = VSeg(NULL);
   }
-  for (int i = 0; i < MAX_PROCESS; i++) {
+  for (int i = 0; i < channel_count; i++) {
     close(channels[i].fd_read);
     close(channels[i].fd_write);
   }
+  channel_count = 0;
 }
 
 void *VMem::mmap_segment(int seg) {
@@ -952,6 +1018,7 @@ void unlock_metapage() {
 }
 
 void init_metapage(bool create) {
+  vmem.metapage = NULL;
   if (create) {
     if (ftruncate(vmem.fd, METABLOCK_SIZE) != 0) {
       char err_msg[256];
@@ -960,8 +1027,16 @@ void init_metapage(bool create) {
       return;
     }
   }
-  vmem.metapage = (MetaPage *) mmap(
+  void *map = mmap(
       NULL, METABLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, vmem.fd, 0);
+  if (map == MAP_FAILED) {
+    char err_msg[256];
+    snprintf(err_msg, sizeof(err_msg),
+        "cannot map vspace metadata: %s", strerror(errno));
+    WerrorS(err_msg);
+    return;
+  }
+  vmem.metapage = (MetaPage *) map;
   if (create) {
     std::memcpy(vmem.metapage->config_header, config, sizeof(config));
     for (int i = 0; i <= LOG2_SEGMENT_SIZE; i++) {
@@ -970,8 +1045,11 @@ void init_metapage(bool create) {
     vmem.metapage->segment_count = 0;
     vmem.metapage->allocator_lock = FastLock(metapageaddr(allocator_lock));
   } else {
-    assert(std::memcmp(vmem.metapage->config_header, config,
-        sizeof(config)) != 0);
+    if (std::memcmp(vmem.metapage->config_header, config,
+        sizeof(config)) != 0) {
+      munmap(vmem.metapage, METABLOCK_SIZE);
+      vmem.metapage = NULL;
+    }
   }
 }
 
@@ -1108,11 +1186,11 @@ ipc_signal_t wait_signal(bool lock) {
 pid_t fork_process() {
   using namespace internals;
   lock_metapage();
-  for (int p = 0; p < MAX_PROCESS; p++) {
+  for (int p = 0; p < vmem.channel_count; p++) {
     if (vmem.metapage->process_info[p].pid == 0) {
       pid_t pid = fork();
       if (pid < 0) {
-        // error
+        unlock_metapage();
         return -1;
       } else if (pid == 0) {
         // child process

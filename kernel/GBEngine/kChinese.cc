@@ -225,12 +225,13 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   if (cpus<=1)
     /* at least 5 polys for each process, or switch to seriell version */
     return id_ChineseRemainder(xx,q,rl,r);
+  int parent_pid=getpid();
+  using namespace vspace;
+  if (!vmem_init(cpus + 1).ok())
+    return id_ChineseRemainder(xx,q,rl,r);
   ideal result=idInit(cnt,xx[0]->rank);
   result->nrows=rw; // for lifting matrices
   result->ncols=cl; // for lifting matrices
-  int parent_pid=getpid();
-  using namespace vspace;
-  vmem_init();
   // Create a queue of int
   VRef<Queue<int> > queue = vnew<Queue<int> >();
   for(int i=cnt-1;i>=0; i--)
@@ -243,12 +244,15 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   }
   // Create a queue of polys
   VRef<Queue<VRef<VString> > > rqueue = vnew<Queue<VRef<VString> > >();
-  int *pids=(int*)omAlloc0(cpus*sizeof(int));
+  int pids_size=cpus;
+  int *pids=(int*)omAlloc0(pids_size*sizeof(int));
+  int started=0;
   for (int i=0;i<cpus;i++)
   {
     int pid = fork_process();
     if (pid==0) break; //child
-    pids[i]=pid;
+    if (pid<0) break;
+    pids[started++]=pid;
   }
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
@@ -287,6 +291,16 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
   }
   else // parent ---------------------------------------------------
   {
+    cpus=started;
+    if (cpus==0)
+    {
+      omFreeSize(pids,pids_size*sizeof(int));
+      queue.free();
+      rqueue.free();
+      vmem_deinit();
+      idDelete(&result);
+      return id_ChineseRemainder(xx,q,rl,r);
+    }
     if (TEST_OPT_PROT) printf("%d children created\n",cpus);
     VRef<VString> msg;
     while(cnt>0)
@@ -318,7 +332,7 @@ ideal id_ChineseRemainder_0(ideal *xx, number *q, int rl, const ring r)
       if (i==0) i=cpus;
       i--;
     }
-    omFreeSize(pids,cpus*sizeof(int));
+    omFreeSize(pids,pids_size*sizeof(int));
     // removes queues
     queue.free();
     rqueue.free();
@@ -338,13 +352,13 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   if (cpus<=1) /* at least 5 polys for each process,
                      or switch to seriell version */
     return id_Farey(x,N,r);
+  int parent_pid=getpid();
+  using namespace vspace;
+  if (!vmem_init(cpus + 1).ok())
+    return id_Farey(x,N,r);
   ideal result=idInit(cnt,x->rank);
   result->nrows=x->nrows; // for lifting matrices
   result->ncols=x->ncols; // for lifting matrices
-
-  int parent_pid=getpid();
-  using namespace vspace;
-  vmem_init();
   // Create a queue of int
   VRef<Queue<int> > queue = vnew<Queue<int> >();
   for(int i=cnt-1;i>=0; i--)
@@ -357,12 +371,15 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   }
   // Create a queue of polys
   VRef<Queue<VRef<VString> > > rqueue = vnew<Queue<VRef<VString> > >();
-  int *pids=(int*)omAlloc0(cpus*sizeof(int));
+  int pids_size=cpus;
+  int *pids=(int*)omAlloc0(pids_size*sizeof(int));
+  int started=0;
   for (int i=0;i<cpus;i++)
   {
     int pid = fork_process();
     if (pid==0) break; //child
-    pids[i]=pid;
+    if (pid<0) break;
+    pids[started++]=pid;
   }
   if (parent_pid!=getpid()) // child ------------------------------------------
   {
@@ -388,6 +405,16 @@ ideal id_Farey_0(ideal x, number N, const ring r)
   }
   else // parent ---------------------------------------------------
   {
+    cpus=started;
+    if (cpus==0)
+    {
+      omFreeSize(pids,pids_size*sizeof(int));
+      queue.free();
+      rqueue.free();
+      vmem_deinit();
+      idDelete(&result);
+      return id_Farey(x,N,r);
+    }
     if (TEST_OPT_PROT) printf("%d children created\n",cpus);
     VRef<VString> msg;
     while(cnt>0)
@@ -419,7 +446,7 @@ ideal id_Farey_0(ideal x, number N, const ring r)
       if (i==0) i=cpus;
       i--;
     }
-    omFreeSize(pids,cpus*sizeof(int));
+    omFreeSize(pids,pids_size*sizeof(int));
     // removes queues
     queue.free();
     rqueue.free();
